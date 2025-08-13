@@ -1,0 +1,15 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+generator client {
+  provider = "prisma-client-js"
+}
+model AbandonedCart {
+  id         Int      @id @default(autoincrement())
+  checkoutId String   @unique
+  email      String
+  lineItems  Json
+  totalPrice Float
+  createdAt  DateTime @default(now())
+}
