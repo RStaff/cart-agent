@@ -166,3 +166,5 @@ if (!app.get('added-health')) {
   app.get('/health', (_req, res) => res.send('ok'));
   app.set('added-health', true);
 }
+
+app.get("/health", (_req,res)=>res.send("ok"));
