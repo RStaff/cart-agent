@@ -3,10 +3,9 @@ services:
     name: cart-agent-backend
     runtime: node
     rootDir: web
-    buildCommand: |
-      npm ci
-      npx prisma generate || true
+    buildCommand: npm ci && npx prisma generate || true
     startCommand: node index.js
+    healthCheckPath: /health
     autoDeploy: true
     envVars:
       - key: NODE_ENV
