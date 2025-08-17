@@ -162,3 +162,7 @@ app.get("/api/carts/recent", async (_req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
+if (!app.get('added-health')) {
+  app.get('/health', (_req, res) => res.send('ok'));
+  app.set('added-health', true);
+}
