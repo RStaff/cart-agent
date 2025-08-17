@@ -1,10 +1,12 @@
 services:
   - type: web
     name: cart-agent-backend
+    plan: free
     runtime: node
     rootDir: web
-    buildCommand: npm ci && npx prisma generate || true
+    buildCommand: npm ci && npx prisma generate
     startCommand: node index.js
+    postDeployCommand: npx prisma migrate deploy
     healthCheckPath: /health
     autoDeploy: true
     envVars:
