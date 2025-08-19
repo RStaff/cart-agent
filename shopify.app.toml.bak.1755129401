@@ -3,7 +3,7 @@
 client_id = "83114672506075ba4866194fe0160cde"
 name = "cart-agent"
 handle = "cart-agent-1"
-application_url = "https://cart-agent-backend.onrender.com"
+application_url = "https://producers-marco-spell-bin.trycloudflare.com"
 embedded = true
 
 [build]
@@ -18,7 +18,11 @@ api_version = "2025-07"
 scopes = "write_products"
 
 [auth]
-redirect_urls = ["https://cart-agent-backend.onrender.com/auth/callback","https://cart-agent-backend.onrender.com/auth/shopify/callback","https://cart-agent-backend.onrender.com/api/auth/callback"]
 
+redirect_urls = [
+  "https://producers-marco-spell-bin.trycloudflare.com/auth/callback",
+  "https://producers-marco-spell-bin.trycloudflare.com/auth/shopify/callback",
+  "https://producers-marco-spell-bin.trycloudflare.com/api/auth/callback"
+]
 [pos]
 embedded = false
