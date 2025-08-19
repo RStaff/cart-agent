@@ -9,10 +9,11 @@ services:
     healthCheckPath: /health
     autoDeploy: true
     envVars:
+    envVars:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        sync: false
+        value: postgresql://postgresql://cart_agent_db_user:bXglioESAPxCyThmMX76xrppynDmWKuQ@dpg-d2ie2c9r0fns73dbkm90-a/cart_agent_db
       - key: EMAIL_PROVIDER
         sync: false
       - key: RESEND_API_KEY
