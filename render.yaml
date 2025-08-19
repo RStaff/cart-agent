@@ -5,8 +5,7 @@ services:
     runtime: node
     rootDir: web
     buildCommand: npm ci && npx prisma generate --schema=web/prisma/schema.prisma
-    startCommand: node index.js
-    postDeployCommand: npx prisma migrate deploy --schema=web/prisma/schema.prisma
+    startCommand: npx prisma migrate deploy --schema=web/prisma/schema.prisma && node index.js
     healthCheckPath: /health
     autoDeploy: true
     envVars:
