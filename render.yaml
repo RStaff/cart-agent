@@ -4,9 +4,9 @@ services:
     plan: free
     runtime: node
     rootDir: web
-    buildCommand: npm ci && npx prisma generate
+    buildCommand: npm ci && npx prisma generate --schema=web/prisma/schema.prisma
     startCommand: node index.js
-    postDeployCommand: npx prisma migrate deploy
+    postDeployCommand: npx prisma migrate deploy --schema=web/prisma/schema.prisma
     healthCheckPath: /health
     autoDeploy: true
     envVars:
