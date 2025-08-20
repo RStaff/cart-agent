@@ -12,17 +12,13 @@ services:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        sync: false
+        value: postgresql://cart_agent_db_user:bXglioESAPxCyThmMX76xrppynDmWKuQ@dpg-d2ie2c9r0fns73dbkm90-a.virginia-postgres.render.com/cart_agent_db?sslmode=require
       - key: EMAIL_PROVIDER
-        sync: false
+        value: resend
       - key: RESEND_API_KEY
         sync: false
       - key: RESEND_FROM
-        sync: false
-      - key: SENDGRID_API_KEY
-        sync: false
-      - key: SENDGRID_FROM
-        sync: false
+        value: Cart Agent <notify@yourdomain.com>
       - key: SHOPIFY_API_KEY
         sync: false
       - key: SHOPIFY_API_SECRET
@@ -30,4 +26,4 @@ services:
       - key: SHOPIFY_SCOPES
         value: write_products
       - key: WEBHOOK_SECRET
-        sync: false
+        value: ecec1ab3ba7331c096f3175e4e7c377a4bebdabbdb762dcbc5f6fff3b3018060
