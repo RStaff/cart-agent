@@ -12,7 +12,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        value: postgresql://cart_agent_db_user:bXglioESAPxCyThmMX76xrppynDmWKuQ@dpg-d2ie2c9r0fns73dbkm90-a.virginia-postgres.render.com/cart_agent_db?sslmode=require
+        sync: false
       - key: EMAIL_PROVIDER
         value: resend
       - key: RESEND_API_KEY
@@ -26,4 +26,4 @@ services:
       - key: SHOPIFY_SCOPES
         value: write_products
       - key: WEBHOOK_SECRET
-        value: ecec1ab3ba7331c096f3175e4e7c377a4bebdabbdb762dcbc5f6fff3b3018060
+        sync: false
