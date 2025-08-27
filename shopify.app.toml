@@ -3,7 +3,7 @@
 client_id = "83114672506075ba4866194fe0160cde"
 name = "cart-agent"
 handle = "cart-agent-1"
-application_url = "https://kills-satin-prepaid-itunes.trycloudflare.com"
+application_url = "https://held-fig-microwave-jesus.trycloudflare.com"
 embedded = true
 
 [build]
@@ -18,7 +18,7 @@ api_version = "2025-07"
 scopes = "write_products"
 
 [auth]
-redirect_urls = ["https://kills-satin-prepaid-itunes.trycloudflare.com/auth/callback", "https://kills-satin-prepaid-itunes.trycloudflare.com/auth/shopify/callback", "https://kills-satin-prepaid-itunes.trycloudflare.com/api/auth/callback"]
+redirect_urls = ["https://held-fig-microwave-jesus.trycloudflare.com/auth/callback", "https://held-fig-microwave-jesus.trycloudflare.com/auth/shopify/callback", "https://held-fig-microwave-jesus.trycloudflare.com/api/auth/callback"]
 
 [pos]
 embedded = false
