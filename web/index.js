@@ -37,6 +37,16 @@ app.get('/api/metrics', (_req, res) =>
   res.json({ ok: true, ts: new Date().toISOString() })
 );
 
+app.post('/api/abandoned-cart', async (req, res) => {
+  try {
+    const { checkoutId, email, lineItems = [], totalPrice = 0 } = req.body || {};
+    console.log('[abandoned-cart]', { checkoutId, email, totalPrice, count: lineItems.length });
+    return res.status(201).json({ ok: true, received: { checkoutId, email, totalPrice, items: lineItems.length } });
+  } catch (e) {
+    return res.status(500).json({ error: String(e) });
+  }
+});
+
 // --- catch-all 404 MUST BE LAST ---
 app.use((req, res) => {
   res.status(404).json({ error: 'not_found', path: req.path, method: req.method });
