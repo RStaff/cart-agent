@@ -30,27 +30,30 @@ app.post('/api/generate-copy', async (req, res) => {
   try {
     const { items = [], tone = 'Friendly', brand = 'Default', goal = 'recover', total = 0 } = req.body || {};
 
-    const formatted = Array.isArray(items)
-      ? items.map(it => {
-          if (typeof it === 'string') return it;
-          const title = (it && it.title) ? String(it.title) : 'Item';
-          const qty = Number(it?.quantity ?? 1) || 1;
-          const price = Number(it?.unitPrice ?? 0) || 0;
-          return price > 0
-            ? `${title} x${qty} @$${price.toFixed(2)}`
-            : `${title} x${qty}`;
-        })
-      : [String(items || '')];
+    // Accept either array of strings/objects or newline string
+    const list = Array.isArray(items)
+      ? items
+      : (typeof items === 'string'
+          ? items.split(/\n+/).map(t => t.trim()).filter(Boolean)
+          : []);
 
-    const computed = Array.isArray(items)
-      ? items.reduce((sum, it) => {
-          const qty = Number(it?.quantity ?? 1) || 1;
-          const price = Number(it?.unitPrice ?? 0) || 0;
-          return sum + (qty * price);
-        }, 0)
-      : 0;
+    // Normalize: {title, quantity, unitPrice}
+    const normalized = list.map((it, i) => {
+      if (typeof it === 'string') return { title: it, quantity: 1, unitPrice: 0 };
+      const title = (it && it.title) ? String(it.title) : `Item ${i + 1}`;
+      const quantity = Number(it?.quantity ?? 1) || 1;
+      const unitPrice = Number(it?.unitPrice ?? 0) || 0;
+      return { title, quantity, unitPrice };
+    });
 
-    const finalTotal = computed > 0 ? computed : (Number(total) || 0);
+    // Pretty line items for the email body
+    const formatted = normalized.map(({ title, quantity, unitPrice }) =>
+      unitPrice > 0 ? `${title} x${quantity} @$${unitPrice.toFixed(2)}` : `${title} x${quantity}`
+    );
+
+    // Compute total from normalized items (fallback to provided total)
+    const totalComputed = normalized.reduce((sum, { quantity, unitPrice }) => sum + quantity * unitPrice, 0);
+    const finalTotal = totalComputed > 0 ? totalComputed : (Number(total) || 0);
 
     const subject = goal === 'upsell'
       ? 'A little something extra for your cart'
@@ -67,11 +70,13 @@ Finish checkout here: {{checkout_url}}
 
 Thanks!`;
 
-    res.json({ subject, body, provider: 'local' });
-  } catch (e) {
-    res.status(500).json({ error: String(e) });
-  }
-});
+    res.json({
+      subject,
+      body,
+      provider: 'local',
+      itemsNormalized: normalized,
+      totalComputed: Number(finalTotal.toFixed(2)),
+    });
   } catch (e) {
     res.status(500).json({ error: String(e) });
   }
