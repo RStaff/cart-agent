@@ -29,26 +29,50 @@ app.get('/health', (_req, res) => res.status(200).send('ok'));
 app.post('/api/generate-copy', async (req, res) => {
   try {
     const { items = [], tone = 'Friendly', brand = 'Default', goal = 'recover', total = 0 } = req.body || {};
-    const computed = computeTotalFromLineItems(items);
-    const finalTotal = computed ?? Number(total||0);
+
+    const formatted = Array.isArray(items)
+      ? items.map(it => {
+          if (typeof it === 'string') return it;
+          const title = (it && it.title) ? String(it.title) : 'Item';
+          const qty = Number(it?.quantity ?? 1) || 1;
+          const price = Number(it?.unitPrice ?? 0) || 0;
+          return price > 0
+            ? `${title} x${qty} @$${price.toFixed(2)}`
+            : `${title} x${qty}`;
+        })
+      : [String(items || '')];
+
+    const computed = Array.isArray(items)
+      ? items.reduce((sum, it) => {
+          const qty = Number(it?.quantity ?? 1) || 1;
+          const price = Number(it?.unitPrice ?? 0) || 0;
+          return sum + (qty * price);
+        }, 0)
+      : 0;
+
+    const finalTotal = computed > 0 ? computed : (Number(total) || 0);
+
     const subject = goal === 'upsell'
       ? 'A little something extra for your cart'
       : 'You left something behind 🛒';
-    const lines = Array.isArray(items)
-      ? items.map(it=> it.title + (it.quantity?` x${it.quantity}`:'')).join(', ')
-      : String(items||'');
+
     const body = `Hi there,
 
 We saved your cart${finalTotal ? ` (total $${finalTotal.toFixed(2)})` : ''}.
-Items: ${lines || 'n/a'}.
+Items: ${formatted.join(', ') || 'n/a'}.
 
 Tone: ${tone} | Brand: ${brand} | Goal: ${goal}
 
 Finish checkout here: {{checkout_url}}
 
 Thanks!`;
+
     res.json({ subject, body, provider: 'local' });
-  } catch (e) { (e) {
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
+});
+  } catch (e) {
     res.status(500).json({ error: String(e) });
   }
 });
