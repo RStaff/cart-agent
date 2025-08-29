@@ -18,6 +18,15 @@ const app = express();
 app.use(express.json());
 app.use(cors({ origin: '*', methods: ['GET','POST'], allowedHeaders: ['Content-Type'] }));
 
+// log every request with timing
+app.use((req,res,next)=>{
+  const t = Date.now();
+  res.on('finish', ()=>{
+    console.log(`[req] ${req.method} ${req.originalUrl} -> ${res.statusCode} in ${Date.now()-t}ms`);
+  });
+  next();
+});
+
 
 // log every request
 app.use((req,_res,next)=>{console.log(`[req]  `);next();});
