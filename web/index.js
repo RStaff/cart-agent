@@ -18,6 +18,10 @@ const app = express();
 app.use(express.json());
 app.use(cors({ origin: '*', methods: ['GET','POST'], allowedHeaders: ['Content-Type'] }));
 
+
+// log every request
+app.use((req,_res,next)=>{console.log(`[req]  `);next();});
+
 // health first (Render checks this)
 app.get('/health', (_req, res) => res.status(200).send('ok'));
 
