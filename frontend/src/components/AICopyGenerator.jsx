@@ -97,15 +97,32 @@ export default function AICopyGenerator({ backendBase="", onFlag }){
         <textarea className="textarea" value={itemsText} onChange={e=>setItemsText(e.target.value)} />
       </div>
 
-      {result && (
-        <div className="card" style={{padding:14}}>
-          {result.subject && <div className="label" style={{marginBottom:6}}>Subject</div>}
-          {result.subject && <div style={{fontWeight:700, marginBottom:10}}>{result.subject}</div>}
-          <pre className="copy" style={{margin:0}}>{result.body}</pre>
-          <div className="divider" />
-          <div className="small">Provider: {result.provider}</div>
-        </div>
-      )}
+	{result && (
+  <div className="border rounded-lg p-4 grid gap-2">
+    {result.subject && (
+      <div className="font-semibold">Subject: {result.subject}</div>
+    )}
+
+    <pre className="whitespace-pre-wrap text-sm leading-6">{result.body}</pre>
+
+    <div className="text-sm">
+      <div>
+        <span className="font-medium">Computed Total:</span>{" "}
+        ${Number(result.totalComputed ?? 0).toFixed(2)}
+      </div>
+
+      <div className="font-medium mt-2">Line Items</div>
+      <ul className="list-disc ml-5">
+        {(result.itemsNormalized || []).map((it, i) => (
+          <li key={i}>
+            {it.title} x{it.quantity}
+            {it.unitPrice > 0
+              ? ` @$${Number(it.unitPrice).toFixed(2)}`
+              : ""}
+          </li>
+        ))}
+      </ul>
     </div>
-  );
-}
+  </div>
+)}
+
