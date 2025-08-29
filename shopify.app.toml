@@ -2,9 +2,9 @@
 
 client_id = "83114672506075ba4866194fe0160cde"
 name = "cart-agent"
-handle = "cart-agent-1"
-application_url = "https://html-everywhere-paid-athletics.trycloudflare.com"
+application_url = "https://sentence-katie-burton-simulation.trycloudflare.com"
 embedded = true
+handle = "cart-agent-1"
 
 [build]
 automatically_update_urls_on_dev = true
@@ -18,7 +18,7 @@ api_version = "2025-07"
 scopes = "write_products"
 
 [auth]
-redirect_urls = ["https://html-everywhere-paid-athletics.trycloudflare.com/auth/callback", "https://html-everywhere-paid-athletics.trycloudflare.com/auth/shopify/callback", "https://html-everywhere-paid-athletics.trycloudflare.com/api/auth/callback"]
+redirect_urls = ["https://sentence-katie-burton-simulation.trycloudflare.com/auth/callback", "https://sentence-katie-burton-simulation.trycloudflare.com/auth/shopify/callback", "https://sentence-katie-burton-simulation.trycloudflare.com/api/auth/callback"]
 
 [pos]
 embedded = false
