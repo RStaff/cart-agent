@@ -3,7 +3,7 @@
 client_id = "83114672506075ba4866194fe0160cde"
 name = "cart-agent"
 handle = "cart-agent-1"
-application_url = "https://held-fig-microwave-jesus.trycloudflare.com"
+application_url = "https://html-everywhere-paid-athletics.trycloudflare.com"
 embedded = true
 
 [build]
@@ -18,7 +18,7 @@ api_version = "2025-07"
 scopes = "write_products"
 
 [auth]
-redirect_urls = ["https://held-fig-microwave-jesus.trycloudflare.com/auth/callback", "https://held-fig-microwave-jesus.trycloudflare.com/auth/shopify/callback", "https://held-fig-microwave-jesus.trycloudflare.com/api/auth/callback"]
+redirect_urls = ["https://html-everywhere-paid-athletics.trycloudflare.com/auth/callback", "https://html-everywhere-paid-athletics.trycloudflare.com/auth/shopify/callback", "https://html-everywhere-paid-athletics.trycloudflare.com/api/auth/callback"]
 
 [pos]
 embedded = false

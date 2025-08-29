@@ -1,85 +1,111 @@
-import React, {useState} from 'react'
+import React, { useMemo, useState } from "react";
 
-export default function AICopyGenerator({ backendBase = "" }) {
-  const [itemsText, setItemsText] = useState("T-Shirt x1\nJeans x1")
-  const [tone, setTone] = useState("Friendly")
-  const [brand, setBrand] = useState("Default")
-  const [goal, setGoal] = useState("recover")
-  const [total, setTotal] = useState("0")
-  const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState(null)
-  const [error, setError] = useState("")
+export default function AICopyGenerator({ backendBase="", onFlag }){
+  const [tone,setTone]=useState("Friendly");
+  const [brand,setBrand]=useState("Default");
+  const [goal,setGoal]=useState("recover");
+  const [total,setTotal]=useState("49.99");
+  const [email,setEmail]=useState("you@example.com");
+  const [itemsText,setItemsText]=useState("T-Shirt x2");
+  const [loading,setLoading]=useState(false);
+  const [result,setResult]=useState(null);
+  const items = useMemo(()=>itemsText.split("\n").map(s=>s.trim()).filter(Boolean),[itemsText]);
 
-  const handleGenerate = async () => {
-    setLoading(true); setError(""); setResult(null)
-    try {
-      const items = itemsText.split("\n").map(s => s.trim()).filter(Boolean)
-      const res = await fetch(`${backendBase || ""}/api/generate-copy`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items, tone, brand, goal, total: Number(total||0) })
-      })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const data = await res.json()
-      setResult(data)
-    } catch (e) {
-      setError(String(e))
-    } finally {
-      setLoading(false)
-    }
+  async function generateCopy(){
+    setLoading(true);
+    try{
+      const r = await fetch(`${backendBase}/api/generate-copy`,{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ items, tone, brand, goal, total })
+      });
+      const json = await r.json();
+      setResult({ ...json, provider: json.provider || "backend" });
+    }catch(e){
+      setResult({ subject:"Error", body:String(e), provider:"local" });
+    }finally{ setLoading(false); }
+  }
+
+  async function flagAbandoned(){
+    setLoading(true);
+    try{
+      const r = await fetch(`${backendBase}/api/abandoned-cart`,{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({
+          checkoutId: crypto.randomUUID(),
+          email,
+          lineItems: items.map((t,i)=>({ id:i+1, title:t, quantity:1 })),
+          totalPrice: Number(total||0)
+        })
+      });
+      const json = await r.json();
+      setResult({ subject:"Abandoned Cart Flagged", body: JSON.stringify(json,null,2), provider:"backend" });
+      onFlag?.(json);
+    }catch(e){
+      setResult({ subject:"Error", body:String(e), provider:"local" });
+    }finally{ setLoading(false); }
   }
 
   return (
-    <div style={{display:'grid', gap:16}}>
-      <div style={{display:'grid', gap:8, gridTemplateColumns:'repeat(3, minmax(0,1fr))'}}>
+    <div className="grid" style={{gap:18}}>
+      {/* controls */}
+      <div className="controls">
         <div>
-          <label style={{fontSize:12, fontWeight:600}}>Tone</label>
-          <select value={tone} onChange={e=>setTone(e.target.value)} style={{width:'100%', padding:'8px'}}>
-            <option>Friendly</option>
-            <option>Urgent</option>
-            <option>Luxury</option>
-            <option>Casual</option>
-            <option>Minimal</option>
+          <div className="label">Tone</div>
+          <select className="select" value={tone} onChange={e=>setTone(e.target.value)}>
+            {["Friendly","Urgent","Luxury","Casual","Minimal"].map(t=><option key={t}>{t}</option>)}
           </select>
         </div>
         <div>
-          <label style={{fontSize:12, fontWeight:600}}>Brand</label>
-          <input value={brand} onChange={e=>setBrand(e.target.value)} style={{width:'100%', padding:'8px'}} />
+          <div className="label">Brand</div>
+          <input className="input" value={brand} onChange={e=>setBrand(e.target.value)} />
         </div>
         <div>
-          <label style={{fontSize:12, fontWeight:600}}>Goal</label>
-          <select value={goal} onChange={e=>setGoal(e.target.value)} style={{width:'100%', padding:'8px'}}>
+          <div className="label">Goal</div>
+          <select className="select" value={goal} onChange={e=>setGoal(e.target.value)}>
             <option value="recover">Recover Cart</option>
             <option value="upsell">Upsell</option>
           </select>
         </div>
-      </div>
-
-      <div style={{display:'grid', gap:8, gridTemplateColumns:'1fr 150px 150px'}}>
         <div>
-          <label style={{fontSize:12, fontWeight:600}}>Items (one per line)</label>
-          <textarea value={itemsText} onChange={e=>setItemsText(e.target.value)} style={{width:'100%', minHeight:100, padding:'8px'}} />
-        </div>
-        <div>
-          <label style={{fontSize:12, fontWeight:600}}>Total ($)</label>
-          <input inputMode="decimal" value={total} onChange={e=>setTotal(e.target.value)} style={{width:'100%', padding:'8px'}} />
-        </div>
-        <div style={{display:'flex', alignItems:'end'}}>
-          <button onClick={handleGenerate} disabled={loading} style={{width:'100%', padding:'10px 12px', background:'black', color:'white', borderRadius:8, opacity: loading?0.6:1}}>
-            {loading ? 'Generating…' : 'Generate Copy'}
-          </button>
+          <div className="label">Total ($)</div>
+          <input className="input" inputMode="decimal" value={total} onChange={e=>setTotal(e.target.value)} />
         </div>
       </div>
 
-      {error && <div style={{color:'#b91c1c', fontSize:12}}>{error}</div>}
+      <div className="controls" style={{gridTemplateColumns:"1fr 1fr"}}>
+        <div>
+          <div className="label">Customer Email</div>
+          <input className="input" value={email} onChange={e=>setEmail(e.target.value)} />
+        </div>
+        <div>
+          <div className="label">Actions</div>
+          <div className="actions">
+            <button className="btn primary" disabled={loading} onClick={generateCopy}>
+              {loading ? "Generating…" : "Generate Copy"}
+            </button>
+            <button className="btn" disabled={loading} onClick={flagAbandoned}>
+              Flag Abandoned
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div className="label">Items (one per line, e.g. “T-Shirt x2”)</div>
+        <textarea className="textarea" value={itemsText} onChange={e=>setItemsText(e.target.value)} />
+      </div>
 
       {result && (
-        <div style={{border:'1px solid #e5e7eb', borderRadius:12, padding:16, display:'grid', gap:8}}>
-          {result.subject && <div style={{fontWeight:600}}>Subject: {result.subject}</div>}
-          <pre style={{whiteSpace:'pre-wrap', fontSize:14, lineHeight:1.6, margin:0}}>{result.body}</pre>
-          <div style={{fontSize:12, color:'#6b7280'}}>Provider: {result.provider}</div>
+        <div className="card" style={{padding:14}}>
+          {result.subject && <div className="label" style={{marginBottom:6}}>Subject</div>}
+          {result.subject && <div style={{fontWeight:700, marginBottom:10}}>{result.subject}</div>}
+          <pre className="copy" style={{margin:0}}>{result.body}</pre>
+          <div className="divider" />
+          <div className="small">Provider: {result.provider}</div>
         </div>
       )}
     </div>
-  )
+  );
 }
