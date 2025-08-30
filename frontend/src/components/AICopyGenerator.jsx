@@ -113,16 +113,17 @@ export default function AICopyGenerator({ backendBase="", onFlag }){
 
       <div className="font-medium mt-2">Line Items</div>
       <ul className="list-disc ml-5">
-        {(result.itemsNormalized || []).map((it, i) => (
-          <li key={i}>
-            {it.title} x{it.quantity}
-            {it.unitPrice > 0
-              ? ` @$${Number(it.unitPrice).toFixed(2)}`
-              : ""}
-          </li>
-        ))}
-      </ul>
-    </div>
+{result?.itemsNormalized && (
+  <div className="border rounded-md p-3 text-sm">
+    <div className="font-medium mb-2">Parsed Items</div>
+    <ul className="list-disc pl-5">
+      {result.itemsNormalized.map((it, i) => (
+        <li key={i}>
+          {it.title} — qty {it.quantity}{it.unitPrice > 0 ? ` @ $${it.unitPrice.toFixed(2)}` : ""}
+        </li>
+      ))}
+    </ul>
+    <div className="mt-2">Computed total: <b>${Number(result.totalComputed ?? 0).toFixed(2)}</b></div>
   </div>
 )}
 

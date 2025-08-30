@@ -1,6 +1,10 @@
 import express from 'express';
+import { PrismaClient } from '/client';
+
 import cors from 'cors';
 
+
+import { prisma, normalizeItems, saveAbandonedCart, logGeneratedCopy } from './db.js';
 function computeTotalFromLineItems(items){
   try{
     if(!Array.isArray(items)) return null;
@@ -14,6 +18,9 @@ function computeTotalFromLineItems(items){
     return anyUnit? Number(total.toFixed(2)) : null;
   }catch{return null}
 }
+const prisma = globalThis.prisma ?? new PrismaClient();
+if (process.env.NODE_ENV !== "production") globalThis.prisma = prisma;
+
 const app = express();
 app.use(express.json());
 app.use(cors({ origin: '*', methods: ['GET','POST'], allowedHeaders: ['Content-Type'] }));
@@ -37,7 +44,7 @@ app.get('/health', (_req, res) => res.status(200).send('ok'));
 // --- your new route(s) GO HERE ---
 app.post('/api/generate-copy', async (req, res) => {
   try {
-    const { items = [], tone = 'Friendly', brand = 'Default', goal = 'recover', total = 0 } = req.body || {};
+    const { items = [], tone = 'Friendly', brand = 'Default', goal = 'recover', total = 0, checkoutId } = req.body || {};
 
     // Accept either array of strings/objects or newline string
     const list = Array.isArray(items)
@@ -79,13 +86,8 @@ Finish checkout here: {{checkout_url}}
 
 Thanks!`;
 
-    res.json({
-      subject,
-      body,
-      provider: 'local',
-      itemsNormalized: normalized,
-      totalComputed: Number(finalTotal.toFixed(2)),
-    });
+    try { await logGeneratedCopy({ checkoutId, subject, body, goal, tone, brand, total: finalTotal }); } catch (_) {}
+    res.json({ subject, body, provider: 'local', itemsNormalized: normalized, totalComputed: Number(finalTotal.toFixed(2)) });
   } catch (e) {
     res.status(500).json({ error: String(e) });
   }
@@ -97,12 +99,16 @@ app.get('/api/metrics', (_req, res) =>
 );
 
 // --- Abandoned cart endpoint ---
-app.post('/api/abandoned-cart', async (req, res) => {
-  try {
-    const { checkoutId, email, lineItems = [], totalPrice = 0 } = req.body || {};
 
-    if (!checkoutId || !email) {
-      return res.status(400).json({ error: 'missing_fields', need: ['checkoutId','email'] });
+app.post('/api/abandoned-cart', async (req,res)=>{
+  try{
+    const { checkoutId, email, lineItems = [], totalPrice } = req.body || {};
+    const { cart, normalized, finalTotal } = await saveAbandonedCart({ checkoutId, email, lineItems, totalPrice });
+    res.status(201).json({ ok:true, received:{ checkoutId: cart.checkoutId, email: cart.email, items: normalized.length, totalPrice: finalTotal }});
+  }catch(e){
+    res.status(500).json({ ok:false, error:String(e) });
+  }
+});
     }
 
     // Try to persist (optional). If DB/env is missing, we still succeed.
@@ -139,3 +145,18 @@ app.listen(PORT, () => console.log(`[boot] listening on ${PORT}`));
 
 export default app;
 
+
+function normalizeItems(items) {
+  const list = Array.isArray(items)
+    ? items
+    : (typeof items === 'string'
+        ? items.split(/\n+/).map(t=>t.trim()).filter(Boolean)
+        : []);
+  return list.map((it,i) => {
+    if (typeof it === 'string') return { title: it, quantity: 1, unitPrice: 0 };
+    const title = it?.title ? String(it.title) : `Item ${i+1}`;
+    const quantity = Number(it?.quantity ?? 1) || 1;
+    const unitPrice = Number(it?.unitPrice ?? 0) || 0;
+    return { title, quantity, unitPrice };
+  });
+}

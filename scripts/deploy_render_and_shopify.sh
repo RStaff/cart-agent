@@ -1,97 +1,71 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ========= SETTINGS =========
 BASE="${BASE:-https://cart-agent-backend.onrender.com}"
-STORE="${STORE:-cart-agent-dev.myshopify.com}"
-INSERT_REDIRECTS="${INSERT_REDIRECTS:-true}"   # set to "false" to skip auto-insert
-APP_TOML="${APP_TOML:-shopify.app.toml}"
-# ============================
 
-echo "== Stage backend + config =="
-git add web/index.js web/package.json web/prisma render.yaml "$APP_TOML" 2>/dev/null || true
-git commit -m "deploy: backend/config update" || true
+echo "== Ensure we’re in a git repo and on a branch =="
+git rev-parse --is-inside-work-tree >/dev/null
 
-echo "== Stash other local edits (if any) =="
-STASHED="false"
-if ! git diff --quiet || ! git diff --cached --quiet; then
-  git stash -u
-  STASHED="true"
-fi
+echo "== Auto-stage backend bits if present =="
+git add web/index.js web/package.json 2>/dev/null || true
 
-restore_stash() {
-  if [ "$STASHED" = "true" ]; then
-    echo "== Restoring stashed edits =="
-    git stash pop || true
+echo "== Commit staged (if any) =="
+git commit -m "chore: backend update" || true
+
+echo "== Stash ANY uncommitted edits =="
+git stash -u || true
+
+echo "== Rebase & push =="
+git pull --rebase origin main || true
+git push || true
+
+echo "== Restore stashed edits (if any) =="
+git stash pop || true
+
+if [ "${PATCH_REDIRECTS:-0}" = "1" ]; then
+  echo "== Patch [auth].redirect_urls in shopify.app.toml (if missing) =="
+  if [ -f shopify.app.toml ] && grep -q '^\[auth\]' shopify.app.toml; then
+    if ! grep -q '^[[:space:]]*redirect_urls' shopify.app.toml; then
+      awk '{
+        print $0
+        if ($0 ~ /^\[auth\]/ && !p) {
+          print "redirect_urls = [\"https://cart-agent-backend.onrender.com/auth/callback\"]"
+          p=1
+        }
+      }' shopify.app.toml > shopify.app.toml.tmp && mv shopify.app.toml.tmp shopify.app.toml
+      git add shopify.app.toml
+      git commit -m "chore: add auth.redirect_urls" || true
+      git push || true
+    else
+      echo "redirect_urls already present"
+    fi
+  else
+    echo "shopify.app.toml missing or [auth] block not found; skipping"
   fi
-}
-trap restore_stash EXIT
-
-echo "== Rebase with origin/main and push =="
-git pull --rebase origin main
-git push
-
-if [ "$INSERT_REDIRECTS" = "true" ]; then
-  echo "== Ensuring [auth].redirect_urls in $APP_TOML =="
-  python3 - <<PY
-from pathlib import Path
-import re, sys, os
-
-toml_path = Path("${APP_TOML}")
-if not toml_path.exists():
-    print("WARNING: shopify.app.toml not found; skipping redirect_urls insert")
-    sys.exit(0)
-
-s = toml_path.read_text(encoding="utf-8")
-
-auth_match = re.search(r'(?ms)^\[auth\]\s*.*?(?=^\[|\Z)', s)
-if not auth_match:
-    # No [auth] section at all; create one at end
-    block = f"\n[auth]\nredirect_urls = [\n  \"{os.getenv('BASE','${BASE}')}/auth/callback\",\n  \"{os.getenv('BASE','${BASE}')}/api/auth/callback\"\n]\n"
-    s = s.rstrip() + block
-    toml_path.write_text(s, encoding="utf-8")
-    print("Added [auth] with redirect_urls at end of file")
-    sys.exit(0)
-
-auth_block = auth_match.group(0)
-if re.search(r'^\s*redirect_urls\s*=\s*\[', auth_block, flags=re.M):
-    print("redirect_urls already present; no changes")
-    sys.exit(0)
-
-insert = f"redirect_urls = [\n  \"{os.getenv('BASE','${BASE}')}/auth/callback\",\n  \"{os.getenv('BASE','${BASE}')}/api/auth/callback\"\n]\n"
-# Insert after [auth] line
-s = s[:auth_match.start()] + re.sub(r'^\[auth\]\s*', f"[auth]\n{insert}", auth_block, count=1, flags=re.M) + s[auth_match.end():]
-toml_path.write_text(s, encoding="utf-8")
-print("Inserted redirect_urls under [auth]")
-PY
-
-  # Include the change in this deploy
-  git add "$APP_TOML" || true
-  git commit -m "config: add [auth].redirect_urls" || true
-  git push
 fi
 
-echo "== Poll Render /health until 200 =="
-for i in $(seq 1 40); do
-  code="$(curl -sS -o /dev/null -w '%{http_code}' "$BASE/health" || true)"
+echo "== Poll Render /health =="
+# Poll /health with a clear timeout
+max=60  # 60 tries * 2s = ~2 minutes
+for i in $(seq 1 $max); do
+  code=$(curl -s -o /dev/null -w "%{http_code}" "$BASE/health" || true)
   if [ "$code" = "200" ]; then
     echo "health OK"
     break
   fi
-  echo "waiting $i (code=$code)"
-  sleep 3
-  if [ "$i" -eq 40 ]; then
-    echo "ERROR: /health never returned 200"; exit 1
+  echo "waiting $i/$max (code=$code)"
+  sleep 2
+  if [ "$i" -eq "$max" ]; then
+    echo "ERROR: Health never reached 200. Check Render logs."
+    exit 1
   fi
 done
 
-echo "== Shopify: deploy updated app config =="
-shopify app deploy
 
-echo "== Shopify: reset local CLI config (refresh URLs, etc.) =="
-shopify app dev --reset --store="$STORE"
-
-echo "== Smoke test: /api/generate-copy =="
-payload='{"items":["T-Shirt x2"],"tone":"Friendly","brand":"Default","goal":"recover","total":49.99}'
-curl -sS -X POST "$BASE/api/generate-copy" -H "Content-Type: application/json" -d "$payload"
-echo
+if git status --porcelain -- shopify.app.toml | grep -q .; then
+  echo ""
+  echo "⚠️  shopify.app.toml changed locally."
+  echo "Run these to refresh config:"
+  echo "   shopify app deploy"
+  echo "   shopify app dev --reset --store=cart-agent-dev.myshopify.com"
+fi
