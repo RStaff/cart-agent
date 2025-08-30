@@ -2,7 +2,7 @@
 
 client_id = "83114672506075ba4866194fe0160cde"
 name = "cart-agent"
-application_url = "https://sentence-katie-burton-simulation.trycloudflare.com"
+application_url = "https://waterproof-propose-wit-gage.trycloudflare.com"
 embedded = true
 handle = "cart-agent-1"
 
@@ -18,7 +18,7 @@ api_version = "2025-07"
 scopes = "write_products"
 
 [auth]
-redirect_urls = ["https://sentence-katie-burton-simulation.trycloudflare.com/auth/callback", "https://sentence-katie-burton-simulation.trycloudflare.com/auth/shopify/callback", "https://sentence-katie-burton-simulation.trycloudflare.com/api/auth/callback"]
+redirect_urls = ["https://waterproof-propose-wit-gage.trycloudflare.com/auth/callback", "https://waterproof-propose-wit-gage.trycloudflare.com/auth/shopify/callback", "https://waterproof-propose-wit-gage.trycloudflare.com/api/auth/callback"]
 
 [pos]
 embedded = false
