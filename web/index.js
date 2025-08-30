@@ -29,7 +29,10 @@ app.use(cors({ origin: '*', methods: ['GET','POST'], allowedHeaders: ['Content-T
 app.use((req,res,next)=>{
   const t = Date.now();
   res.on('finish', ()=>{
-    console.log(`[req] ${req.method} ${req.originalUrl} -> ${res.statusCode} in ${Date.now()-t}ms`);
+    const pth = req.path || req.originalUrl || '';
+    if (!['/','/health','/healthz'].includes(pth)) {
+      console.log(`[req] ${req.method} ${req.originalUrl} -> ${res.statusCode} in ${Date.now()-t}ms`);
+    }
   });
   next();
 });
@@ -133,6 +136,14 @@ app.post('/api/abandoned-cart', async (req,res)=>{
     return res.status(500).json({ error: String(e) });
   }
 });
+
+app.get("/",(_req,res)=>res.status(200).type("text/plain").send("ok"));
+app.head("/health",(_req,res)=>res.status(200).end());
+app.get("/healthz",(_req,res)=>res.status(200).send("ok"));
+
+app.get("/",(_req,res)=>res.status(200).type("text/plain").send("ok"));
+app.head("/health",(_req,res)=>res.status(200).end());
+app.get("/healthz",(_req,res)=>res.status(200).send("ok"));
 
 // --- catch-all 404 MUST BE LAST ---
 app.use((req, res) => {
