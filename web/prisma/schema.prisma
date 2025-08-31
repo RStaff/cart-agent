@@ -8,41 +8,10 @@ datasource db {
 }
 
 model AbandonedCart {
-  id         String          @id @default(cuid())
-  checkoutId String          @unique
-  email      String?
-  total      Decimal?        @db.Decimal(10, 2)
-  items      CartItem[]
-  copies     GeneratedCopy[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model CartItem {
-  id        String  @id @default(cuid())
-  title     String
-  quantity  Int
-  unitPrice Decimal @db.Decimal(10, 2)
-
-  cart   AbandonedCart @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  cartId String
-
-  createdAt DateTime @default(now())
-}
-
-model GeneratedCopy {
-  id       String   @id @default(cuid())
-  provider String
-  subject  String
-  body     String
-  goal     String
-  tone     String?
-  brand    String?
-  total    Decimal? @db.Decimal(10, 2)
-
-  cart   AbandonedCart? @relation(fields: [cartId], references: [id], onDelete: SetNull)
-  cartId String?
-
-  createdAt DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  checkoutId String   @unique
+  email      String
+  lineItems  Json
+  totalPrice Float
+  createdAt  DateTime @default(now())
 }

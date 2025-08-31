@@ -1,173 +1,59 @@
+// index.js — minimal, no duplicate normalizeItems
 import express from 'express';
-import { PrismaClient } from '/client';
-
 import cors from 'cors';
+import { prisma } from './lib/prisma.js';
+// NOTE: don't import normalizeItems to avoid collision
+import { saveAbandonedCart, logGeneratedCopy } from './db.js';
 
-
-import { prisma, normalizeItems, saveAbandonedCart, logGeneratedCopy } from './db.js';
-function computeTotalFromLineItems(items){
-  try{
-    if(!Array.isArray(items)) return null;
-    let anyUnit=false;
-    const total = items.reduce((sum,it)=>{
-      const qty = Number(it.quantity||1);
-      const up  = (it.unitPrice==null)? null : Number(it.unitPrice);
-      if(up!=null && !Number.isNaN(up)){ anyUnit=true; return sum + qty*up; }
+function computeTotalFromLineItems(items) {
+  try {
+    if (!Array.isArray(items)) return null;
+    let anyUnit = false;
+    const total = items.reduce((sum, it) => {
+      const qty = Number(it.quantity || 1);
+      const up = (it.unitPrice == null) ? null : Number(it.unitPrice);
+      if (up != null && !Number.isNaN(up)) {
+        anyUnit = true;
+        return sum + qty * up;
+      }
       return sum;
-    },0);
-    return anyUnit? Number(total.toFixed(2)) : null;
-  }catch{return null}
+    }, 0);
+    return anyUnit ? Number(total.toFixed(2)) : null;
+  } catch {
+    return null;
+  }
 }
-const prisma = globalThis.prisma ?? new PrismaClient();
-if (process.env.NODE_ENV !== "production") globalThis.prisma = prisma;
 
 const app = express();
 app.use(express.json());
 app.use(cors({ origin: '*', methods: ['GET','POST'], allowedHeaders: ['Content-Type'] }));
 
-// log every request with timing
-app.use((req,res,next)=>{
+// request logging
+app.use((req, res, next) => {
   const t = Date.now();
-  res.on('finish', ()=>{
+  res.on('finish', () => {
     const pth = req.path || req.originalUrl || '';
-    if (!['/','/health','/healthz'].includes(pth)) {
-      console.log(`[req] ${req.method} ${req.originalUrl} -> ${res.statusCode} in ${Date.now()-t}ms`);
+    if (!['/', '/health', '/healthz'].includes(pth)) {
+      console.log(`[req] ${req.method} ${req.originalUrl} -> ${res.statusCode} in ${Date.now() - t}ms`);
     }
   });
   next();
 });
 
-
-// log every request
-app.use((req,_res,next)=>{console.log(`[req]  `);next();});
-
-// health first (Render checks this)
-app.get('/health', (_req, res) => res.status(200).send('ok'));
-
-// --- your new route(s) GO HERE ---
-app.post('/api/generate-copy', async (req, res) => {
-  try {
-    const { items = [], tone = 'Friendly', brand = 'Default', goal = 'recover', total = 0, checkoutId } = req.body || {};
-
-    // Accept either array of strings/objects or newline string
-    const list = Array.isArray(items)
-      ? items
-      : (typeof items === 'string'
-          ? items.split(/\n+/).map(t => t.trim()).filter(Boolean)
-          : []);
-
-    // Normalize: {title, quantity, unitPrice}
-    const normalized = list.map((it, i) => {
-      if (typeof it === 'string') return { title: it, quantity: 1, unitPrice: 0 };
-      const title = (it && it.title) ? String(it.title) : `Item ${i + 1}`;
-      const quantity = Number(it?.quantity ?? 1) || 1;
-      const unitPrice = Number(it?.unitPrice ?? 0) || 0;
-      return { title, quantity, unitPrice };
-    });
-
-    // Pretty line items for the email body
-    const formatted = normalized.map(({ title, quantity, unitPrice }) =>
-      unitPrice > 0 ? `${title} x${quantity} @$${unitPrice.toFixed(2)}` : `${title} x${quantity}`
-    );
-
-    // Compute total from normalized items (fallback to provided total)
-    const totalComputed = normalized.reduce((sum, { quantity, unitPrice }) => sum + quantity * unitPrice, 0);
-    const finalTotal = totalComputed > 0 ? totalComputed : (Number(total) || 0);
-
-    const subject = goal === 'upsell'
-      ? 'A little something extra for your cart'
-      : 'You left something behind 🛒';
-
-    const body = `Hi there,
-
-We saved your cart${finalTotal ? ` (total $${finalTotal.toFixed(2)})` : ''}.
-Items: ${formatted.join(', ') || 'n/a'}.
-
-Tone: ${tone} | Brand: ${brand} | Goal: ${goal}
-
-Finish checkout here: {{checkout_url}}
-
-Thanks!`;
-
-    try { await logGeneratedCopy({ checkoutId, subject, body, goal, tone, brand, total: finalTotal }); } catch (_) {}
-    res.json({ subject, body, provider: 'local', itemsNormalized: normalized, totalComputed: Number(finalTotal.toFixed(2)) });
-  } catch (e) {
-    res.status(500).json({ error: String(e) });
-  }
+// health
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
-// metrics
-app.get('/api/metrics', (_req, res) =>
-  res.json({ ok: true, ts: new Date().toISOString() })
-);
-
-// --- Abandoned cart endpoint ---
-
-app.post('/api/abandoned-cart', async (req,res)=>{
-  try{
-    const { checkoutId, email, lineItems = [], totalPrice } = req.body || {};
-    const { cart, normalized, finalTotal } = await saveAbandonedCart({ checkoutId, email, lineItems, totalPrice });
-    res.status(201).json({ ok:true, received:{ checkoutId: cart.checkoutId, email: cart.email, items: normalized.length, totalPrice: finalTotal }});
-  }catch(e){
-    res.status(500).json({ ok:false, error:String(e) });
-  }
-});
-    }
-
-    // Try to persist (optional). If DB/env is missing, we still succeed.
-    let saved = null;
-    try {
-      const { PrismaClient } = await import('@prisma/client');
-      const prisma = new PrismaClient();
-      saved = await prisma.abandonedCart.create({
-        data: { checkoutId, email, lineItems, totalPrice }
-      });
-    } catch (e) {
-      console.warn('[abandoned-cart] db_skip:', e?.message || String(e));
-    }
-
-    // (Optionally: enqueue email here later)
-    return res.status(201).json({
-      ok: true,
-      savedId: saved?.id ?? null,
-      received: { checkoutId, email, items: lineItems.length, totalPrice }
-    });
-  } catch (e) {
-    return res.status(500).json({ error: String(e) });
-  }
+// root
+app.get('/', (_req, res) => {
+  res.json({ message: 'Server running with Prisma + Express!' });
 });
 
-app.get("/",(_req,res)=>res.status(200).type("text/plain").send("ok"));
-app.head("/health",(_req,res)=>res.status(200).end());
-app.get("/healthz",(_req,res)=>res.status(200).send("ok"));
-
-app.get("/",(_req,res)=>res.status(200).type("text/plain").send("ok"));
-app.head("/health",(_req,res)=>res.status(200).end());
-app.get("/healthz",(_req,res)=>res.status(200).send("ok"));
-
-// --- catch-all 404 MUST BE LAST ---
-app.use((req, res) => {
-  res.status(404).json({ error: 'not_found', path: req.path, method: req.method });
+export { prisma, app };
+// --- start the server ---
+const PORT = process.env.PORT ?? 3000;
+app.listen(PORT, () => {
+  console.log(`API listening on http://localhost:${PORT}`);
 });
 
-// boot
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`[boot] listening on ${PORT}`));
-
-export default app;
-
-
-function normalizeItems(items) {
-  const list = Array.isArray(items)
-    ? items
-    : (typeof items === 'string'
-        ? items.split(/\n+/).map(t=>t.trim()).filter(Boolean)
-        : []);
-  return list.map((it,i) => {
-    if (typeof it === 'string') return { title: it, quantity: 1, unitPrice: 0 };
-    const title = it?.title ? String(it.title) : `Item ${i+1}`;
-    const quantity = Number(it?.quantity ?? 1) || 1;
-    const unitPrice = Number(it?.unitPrice ?? 0) || 0;
-    return { title, quantity, unitPrice };
-  });
-}
