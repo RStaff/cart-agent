@@ -1,40 +1,32 @@
-import { Router } from "express";
-import { PrismaClient } from "@prisma/client";
-import pino from "pino";
+import express from "express";
+import { prisma } from "../db.js";
 
-const log = pino();
-const prisma = new PrismaClient();
-export const opsRouter = Router();
+const router = express.Router();
 
-// Protect with ADMIN_API_KEY (for cron)
-opsRouter.post("/scan", async (req, res) => {
+/** Liveness */
+router.get("/healthz", (req, res) => {
+  res.json({ ok: true, env: process.env.NODE_ENV || "development", time: new Date().toISOString() });
+});
+
+/** Env peek (safe) */
+router.get("/_env", (req, res) => {
+  res.json({
+    env: process.env.NODE_ENV || "development",
+    node: process.version,
+    pid: process.pid,
+    databaseUrlSet: Boolean(process.env.DATABASE_URL),
+  });
+});
+
+/** Readiness: verify DB */
+router.get("/ops/ready", async (req, res) => {
   try {
-    const adminKey = req.header("x-admin-key") || "";
-    if (!process.env.ADMIN_API_KEY || adminKey !== process.env.ADMIN_API_KEY) {
-      return res.status(401).json({ error: "unauthorized" });
-    }
-
-    const cutoff = new Date(Date.now() - 30 * 60 * 1000); // 30 minutes ago
-    const toNotify = await prisma.cart.findMany({
-      where: {
-        status: "abandoned",
-        createdAt: { lt: cutoff },
-      },
-      take: 50,
-      orderBy: { createdAt: "asc" },
-      include: { shop: true },
-    });
-
-    for (const cart of toNotify) {
-      // TODO: replace with real mailer (Resend/SendGrid)
-      log.info({ cartId: cart.cartId, to: cart.userEmail, shop: cart.shop.name }, "[ops] would send recovery email");
-      // Optionally mark as 'queued' or leave as-is to retry later
-      // await prisma.cart.update({ where: { id: cart.id }, data: { status: "queued" } })
-    }
-
-    res.json({ scanned: toNotify.length });
+    // cheap query—works on Postgres
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({ ok: true });
   } catch (err) {
-    log.error({ err }, "[ops] scan failed");
-    res.status(500).json({ error: "internal" });
+    res.status(503).json({ ok: false, error: "db_unavailable", details: String(err?.message || err) });
   }
 });
+
+export default router;
