@@ -7,11 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model AbandonedCart {
-  id         Int      @id @default(autoincrement())
-  checkoutId String   @unique
-  email      String
-  lineItems  Json
-  totalPrice Float
-  createdAt  DateTime @default(now())
+model Cart {
+  id        String   @id @default(cuid())
+  cartId    String   @unique
+  userEmail String
+  items     Json
+  status    String   @default("abandoned") // abandoned | recovered | converted
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
