@@ -1,117 +1,138 @@
-import express, { Router } from "express";
-import { PrismaClient } from "@prisma/client";
-import pino from "pino";
+import express from "express";
+import { prisma } from "../db.js";
+import { queueAbandonEmail } from "../lib/queue-email.js";
 
-const log = pino();
-const prisma = new PrismaClient();
-
-export const abandonRouter = Router();
-
-// Ensure JSON body parsing even if the parent app forgot to add it
-abandonRouter.use(express.json({ limit: "1mb" }));
+const router = express.Router();
 
 /**
- * Resolve optional shop context:
- * - req.shop.key (Shopify middleware)
- * - header: X-Shop-Key
- * - body:   shopKey
+ * POST /api/carts/ingest
+ * - Accepts { cartId, userEmail, items[], shopKey? } in body
+ * - Or provides shopKey via 'x-shop-key' header
+ * - Upserts Shop (if shopKey present) and Cart
+ * - Queues an email (best-effort) for the cart
  */
-async function resolveShopContext(req) {
-  const fromReq = req?.shop?.key;
-  const fromHeader = req.get("x-shop-key");
-  const fromBody = req.body?.shopKey;
-  const shopKey = (fromReq || fromHeader || fromBody || "").trim();
+router.post("/api/carts/ingest", async (req, res) => {
+  const hdrShopKey = req.get("x-shop-key")?.trim();
+  const bodyShopKey = req.body?.shopKey?.trim();
+  const shopKey = hdrShopKey || bodyShopKey || null;
 
-  if (!shopKey) return { shopId: null, shopKey: null };
+  const cartId = req.body?.cartId;
+  const userEmail = req.body?.userEmail;
+  const items = req.body?.items ?? [];
 
-  const shop = await prisma.shop.upsert({
-    where: { key: shopKey },
-    create: { key: shopKey },
-    update: {},
-  });
-  return { shopId: shop.id, shopKey: shop.key };
-}
+  if (!cartId || !userEmail) {
+    return res.status(400).json({ ok: false, error: "invalid_request", details: "cartId and userEmail are required" });
+  }
 
-function normalizeItems(items) {
-  if (!Array.isArray(items)) return [];
-  return items.map((it) => {
-    const sku = typeof it?.sku === "string" ? it.sku : String(it?.sku ?? "");
-    const q = Number(it?.qty ?? 0);
-    const qty = Number.isFinite(q) && q > 0 ? q : 1;
-    const rest = { ...it };
-    delete rest.sku;
-    delete rest.qty;
-    return { sku, qty, ...rest };
-  });
-}
-
-/** POST /api/carts/ingest  */
-abandonRouter.post("/ingest", async (req, res) => {
   try {
-    const { cartId, userEmail, items } = req.body || {};
-    if (!cartId || !userEmail) {
-      return res.status(400).json({ error: "cartId and userEmail required" });
+    // If we have a shopKey, ensure a Shop exists (idempotent upsert by key)
+    let shop = null;
+    if (shopKey) {
+      const provider = shopKey.includes(".myshopify.com") ? "shopify" : "generic";
+      shop = await prisma.shop.upsert({
+        where: { key: shopKey },
+        create: {
+          key: shopKey,
+          name: provider === "shopify" ? "Demo Shopify Store" : "Demo Store",
+          provider,
+          apiKey: "seeded-api-key",
+          emailFrom: "sales@example.com",
+        },
+        update: {},
+      });
     }
 
-    const { shopId, shopKey } = await resolveShopContext(req);
-    const normalizedItems = normalizeItems(items);
-
-    const saved = await prisma.cart.upsert({
+    // Upsert the cart
+    const cart = await prisma.cart.upsert({
       where: { cartId },
-      update: { userEmail, items: normalizedItems, ...(shopId ? { shopId } : {}) },
       create: {
         cartId,
         userEmail,
-        items: normalizedItems,
+        items,
         status: "abandoned",
-        ...(shopId ? { shopId } : {}),
+        shopId: shop?.id ?? null,
+      },
+      update: {
+        userEmail,
+        items,
+        status: "abandoned",
+        shopId: shop?.id ?? null,
       },
     });
 
-    log.info({ cartId, shopKey, shopId }, "[cart] saved");
-    return res.json({ ok: true, cart: saved });
+    // Best-effort: queue an email. Never fail the API if queueing fails.
+    try {
+      await queueAbandonEmail({ cart, shop });
+    } catch (e) {
+      console.error("[email-queue] failed", e);
+    }
+
+    return res.json({ ok: true, cart });
   } catch (err) {
-    log.error({ err }, "failed to ingest cart");
-    const details = process.env.NODE_ENV !== "production" ? String(err?.message || err) : undefined;
-    return res.status(500).json({ error: "internal", details });
+    console.error(err);
+    return res.status(500).json({ ok: false, error: "internal", details: String(err?.message || err) });
   }
 });
 
-/** GET /api/carts  (?shopKey=... | ?shopId=...) */
-abandonRouter.get("/", async (req, res) => {
+/**
+ * GET /api/carts
+ * Optional: ?shopKey=...
+ */
+router.get("/api/carts", async (req, res) => {
+  const shopKey = req.query.shopKey?.toString().trim();
   try {
-    const { shopKey, shopId: qShopId } = req.query || {};
-    let shopId = qShopId || null;
-
-    if (!shopId && typeof shopKey === "string" && shopKey.trim()) {
-      const shop = await prisma.shop.findUnique({ where: { key: shopKey.trim() } });
-      if (shop) shopId = shop.id;
+    if (shopKey) {
+      const shop = await prisma.shop.findUnique({ where: { key: shopKey } });
+      if (!shop) return res.json([]);
+      const carts = await prisma.cart.findMany({
+        where: { shopId: shop.id },
+        orderBy: { createdAt: "desc" },
+        take: 100,
+      });
+      return res.json(carts);
     }
-
     const carts = await prisma.cart.findMany({
-      where: shopId ? { shopId } : undefined,
       orderBy: { createdAt: "desc" },
       take: 100,
     });
-
     return res.json(carts);
   } catch (err) {
-    log.error({ err }, "failed to list carts");
-    const details = process.env.NODE_ENV !== "production" ? String(err?.message || err) : undefined;
-    return res.status(500).json({ error: "internal", details });
+    console.error(err);
+    return res.status(500).json({ ok: false, error: "internal", details: String(err?.message || err) });
   }
 });
 
 /** GET /api/carts/:cartId */
-abandonRouter.get("/:cartId", async (req, res) => {
+router.get("/api/carts/:cartId", async (req, res) => {
+  const cartId = req.params.cartId;
   try {
-    const { cartId } = req.params;
     const cart = await prisma.cart.findUnique({ where: { cartId } });
-    if (!cart) return res.status(404).json({ error: "not found" });
+    if (!cart) return res.status(404).json({ ok: false, error: "not_found" });
     return res.json(cart);
   } catch (err) {
-    log.error({ err }, "failed to fetch cart");
-    const details = process.env.NODE_ENV !== "production" ? String(err?.message || err) : undefined;
-    return res.status(500).json({ error: "internal", details });
+    console.error(err);
+    return res.status(500).json({ ok: false, error: "internal", details: String(err?.message || err) });
   }
 });
+
+/**
+ * (Handy inspector) GET /api/emails?status=queued&limit=10
+ * Lets you confirm email queue rows are being created.
+ */
+router.get("/api/emails", async (req, res) => {
+  const status = (req.query.status?.toString() || "queued");
+  const limit = Math.min(parseInt(req.query.limit?.toString() || "10", 10) || 10, 100);
+  try {
+    const emails = await prisma.emailQueue.findMany({
+      where: { status },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+    });
+    res.json(emails);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ ok: false, error: "internal", details: String(err?.message || err) });
+  }
+});
+
+export default router;
