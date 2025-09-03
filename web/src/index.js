@@ -11,11 +11,11 @@ app.use(express.json());
 app.use(ops);
 app.use("/api/carts", abandonRouter);
 
-// Health check (already exists in /ops, but duplicate is fine)
+// Extra liveness (okay to duplicate /healthz)
 app.get("/healthz", (req, res) => {
   res.json({ ok: true, env: process.env.NODE_ENV || "development", time: new Date().toISOString() });
 });
 
 app.listen(PORT, () => {
-  console.log(`[web] server listening on port ${PORT}`);
+  console.log(JSON.stringify({ level: 30, msg: "[web] server listening", port: Number(PORT), env: process.env.NODE_ENV || "development" }));
 });
