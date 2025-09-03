@@ -13,7 +13,8 @@
     "smoke": "./scripts/dev_and_smoke.sh",
     "smoke:local": "./scripts/dev_and_smoke.sh local",
     "all": "./scripts/mvp_all_in_one.sh",
-    "all:deploy": "DEPLOY=yes ./scripts/mvp_all_in_one.sh"
+    "all:deploy": "DEPLOY=yes ./scripts/mvp_all_in_one.sh",
+    "smoke:carts": "npm --prefix web run smoke:carts"
   },
   "author": "rossstafford",
   "private": true,
