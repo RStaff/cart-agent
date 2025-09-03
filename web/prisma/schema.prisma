@@ -7,12 +7,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Shop {
+  id        String   @id @default(cuid())
+  key       String   @unique            // shop domain or any external id
+  carts     Cart[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Cart {
   id        String   @id @default(cuid())
   cartId    String   @unique
   userEmail String
   items     Json
   status    String   @default("abandoned") // abandoned | recovered | converted
+
+  // optional relation to Shop (keeps it platform-agnostic)
+  shopId    String?
+  shop      Shop?    @relation(fields: [shopId], references: [id])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([shopId])
 }
