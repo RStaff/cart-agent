@@ -18,7 +18,8 @@
     "migrate:dev:create": "npm run guard:shadow && prisma migrate dev --name init_postgres_fix --create-only --schema=./prisma/schema.prisma",
     "migrate:heal": "npm run migrate:resolve:rb && npm run migrate:diff:fix && npm run migrate:deploy",
     "dev:alt": "PORT=3001 npm run dev",
-    "smoke:carts": "scripts/smoke-carts.sh"
+    "smoke:carts": "scripts/smoke-carts.sh",
+    "seed:shop": "node scripts/seed-shop.js"
   },
   "dependencies": {
     "@prisma/client": "^6.15.0",

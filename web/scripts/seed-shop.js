@@ -1,23 +1,36 @@
-import { PrismaClient } from "@prisma/client";
-import crypto from "crypto";
-
-const prisma = new PrismaClient();
-
-function newKey() {
-  return crypto.randomBytes(24).toString("base64url"); // short, URL-safe
-}
+import { prisma } from "../src/db.js";
 
 async function main() {
-  const name = process.env.SEED_SHOP_NAME || "Demo Store";
-  const emailFrom = process.env.SEED_EMAIL_FROM || "sales@example.com";
-  const apiKey = newKey();
+  const shopKey = process.argv[2] || process.env.SEED_SHOP_KEY;
+  if (!shopKey) {
+    console.error("SEED_SHOP_KEY (env) or arg <shopKey> is required");
+    process.exit(1);
+  }
 
-  const shop = await prisma.shop.create({
-    data: { name, provider: "generic", apiKey, emailFrom },
+  // decide provider by key
+  const provider = shopKey.includes(".myshopify.com") ? "shopify" : "generic";
+
+  const defaults = {
+    name: provider === "shopify" ? "Demo Shopify Store" : "Demo Store",
+    provider,                       // e.g., 'shopify' | 'generic'
+    apiKey: process.env.SEED_API_KEY || "dev-seed-api-key",
+    emailFrom: process.env.SEED_EMAIL_FROM || "sales@example.com",
+  };
+
+  const shop = await prisma.shop.upsert({
+    where: { key: shopKey },
+    create: { key: shopKey, ...defaults },
+    update: { provider }, // keep it minimal; you can expand safely
   });
 
-  console.log("✔ Created shop:");
-  console.log(JSON.stringify({ id: shop.id, name: shop.name, apiKey: shop.apiKey, emailFrom: shop.emailFrom }, null, 2));
+  console.log(JSON.stringify({ ok: true, shop }, null, 2));
 }
 
-main().finally(() => prisma.$disconnect());
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
