@@ -1,0 +1,24 @@
+{
+  "cartId": "CART-001",
+  "shopDomain": "example.com",
+  "customerEmail": "jane@example.com",
+  "items": [
+    {
+      "title": "Black T-Shirt",
+      "quantity": 2,
+      "unitPrice": 19.99
+    },
+    {
+      "title": "Hat",
+      "quantity": 1,
+      "unitPrice": 12.50
+    }
+  ],
+  "channel": "email",
+  "consents": {
+    "email": true,
+    "sms": false,
+    "whatsapp": true
+  }
+}
+

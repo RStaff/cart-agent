@@ -79,6 +79,7 @@ app.post('/ingest/cart', apiKeyAuth, async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 startWithFallback();
+});
 
 
 /* --- Copy generation route --- */

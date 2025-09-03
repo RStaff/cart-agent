@@ -78,7 +78,9 @@ app.post('/ingest/cart', apiKeyAuth, async (req, res) => {
 // (keep any Shopify routes you already have… they can coexist)
 
 const PORT = process.env.PORT || 3000;
-startWithFallback();
+app.listen(PORT, () => {
+  console.log(`API listening on http://localhost:${PORT}`);
+});
 
 
 /* --- Copy generation route --- */
@@ -153,28 +155,3 @@ app.get('/copy', async (req, res) => {
   }
 });
 
-
-
-/* -------- Port fallback helper --------
-   Tries PORT (default 3000), then 3001..PORT_MAX (default 3010) on EADDRINUSE.
-*/
-function startWithFallback(
-  startPort = Number(process.env.PORT) || 3000,
-  maxPort   = Number(process.env.PORT_MAX) || 3010
-) {
-  const tryPort = (p) => {
-    const server = app.listen(p, () => {
-      console.log(`API listening on http://localhost:${p}`);
-    });
-    server.on('error', (err) => {
-      if (err && err.code === 'EADDRINUSE' && p < maxPort) {
-        console.warn(`Port ${p} in use, retrying on ${p + 1}...`);
-        tryPort(p + 1);
-      } else {
-        console.error('Server listen error:', err);
-        process.exit(1);
-      }
-    });
-  };
-  tryPort(startPort);
-}
