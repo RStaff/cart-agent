@@ -1,23 +1,36 @@
 #!/usr/bin/env bash
-set -euo pipefail
+# Cart Agent — Render start (minimal, hardened)
+set -Eeuo pipefail
 
-# App directory = the "web" folder (this file lives in web/scripts)
-APP_DIR="$(cd "$(dirname "$0")/.."; pwd)"
-cd "$APP_DIR"
+log() { printf '[%(%FT%TZ)T] %s\n' -1 "$*"; }
+die() { log "FATAL: $*"; exit 1; }
 
-echo "[render-start] node: $(node -v)"
-export PORT="${PORT:-3000}"
-echo "[render-start] cwd: $(pwd)  |  using PORT=${PORT}"
+# Go to /web
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+WEB_DIR="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
+cd "${WEB_DIR}" || die "Cannot cd to ${WEB_DIR}"
 
-# 1) Resolve any failed/incomplete Prisma migrations (safe no-op if none)
-if [ -x "$APP_DIR/scripts/resolve-failed-migrations.sh" ]; then
-  echo "[render-start] resolving any failed/incomplete migrations (SQL)…"
-  "$APP_DIR/scripts/resolve-failed-migrations.sh" || echo "[migrate-safe] continuing (non-fatal)…"
-else
-  echo "[render-start] (skip) resolve-failed-migrations.sh not found/executable"
+: "${DATABASE_URL:?DATABASE_URL is required (Render → Environment)}"
+: "${PORT:=10000}"
+
+SCHEMA="prisma/schema.prisma"
+
+log "node: $(node -v)"
+log "cwd: ${PWD}  |  using PORT=${PORT}"
+
+# Apply migrations (idempotent)
+log "prisma migrate deploy…"
+npx prisma migrate deploy --schema="${SCHEMA}"
+
+# Ensure client is generated
+log "prisma generate…"
+npx prisma generate --schema="${SCHEMA}" >/dev/null
+
+# (Optional) seed a default shop if SEED_SHOP_KEY is set
+if [[ -n "${SEED_SHOP_KEY:-}" ]]; then
+  log "seeding shop '${SEED_SHOP_KEY}' (non-fatal)…"
+  node scripts/seed-shop.js "${SEED_SHOP_KEY}" || log "seed skipped/failed"
 fi
 
-# 2) Ensure Prisma Client exists (safe retry)
-echo "[render-start] checking Prisma Client presence…"
-if ! node -e "require.resolve(@prisma/client)" >/dev/null 2>&1; then
-  echo "[render-start] @prisma/client missing — running npx
+log "starting web on PORT=${PORT}…"
+exec node src/index.js
