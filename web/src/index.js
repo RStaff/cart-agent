@@ -1,6 +1,6 @@
 import express from "express";
 import ops from "./routes/ops.js";
-import abandonRouter from "./routes/abandon.js";
+import { abandonRouter } from "./routes/abandon.js"; // <- named import
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,5 +17,10 @@ app.get("/healthz", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(JSON.stringify({ level: 30, msg: "[web] server listening", port: Number(PORT), env: process.env.NODE_ENV || "development" }));
+  console.log(JSON.stringify({
+    level: 30,
+    msg: "[web] server listening",
+    port: Number(PORT),
+    env: process.env.NODE_ENV || "development"
+  }));
 });
