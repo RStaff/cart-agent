@@ -1,0 +1,31 @@
+{
+  "name": "shopify-app-template-node",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=16.13.0"
+  },
+"scripts": {
+  "dev": "cross-env NODE_ENV=development nodemon --config nodemon.json index.js",
+  "dev:kill": "bash scripts/dev-kill.sh",
+  "dev:reset": "bash scripts/dev-reset.sh",
+  "seed:merchant": "SEED_SHOP=example.com SEED_KEY=dev_api_key_123 node --env-file=.env seed-merchant.js",
+  "seed:cart": "curl -s -X POST http://localhost:3000/ingest/cart -H 'Content-Type: application/json' -H 'X-Api-Key: dev_api_key_123' -H 'X-Shop-Domain: example.com' --data @scripts/cart.json",
+  "seed:all": "npm run -s seed:merchant && npm run -s seed:cart",
+  "copy:generate": "API_KEY=dev_api_key_123 SHOP=example.com CART_ID=CART-001 VARIANT=subject_a node -e \"fetch('http://localhost:3000/copy/generate',{method:'POST',headers:{'Content-Type':'application/json','X-Api-Key':process.env.API_KEY,'X-Shop-Domain':process.env.SHOP},body:JSON.stringify({cartId:process.env.CART_ID,variant:process.env.VARIANT})}).then(r=>r.text()).then(t=>console.log(t)).catch(console.error)\"",
+  "migrate:heal": "npx prisma migrate resolve --schema=./prisma/schema.prisma --rolled-back 1756517907_init_carts_and_copy && npx prisma migrate resolve --schema=./prisma/schema.prisma --rolled-back 20250820020426_init_postgres",
+  "migrate:deploy": "npx prisma migrate deploy --schema=./prisma/schema.prisma",
+  "migrate:fix": "npm run -s migrate:heal && npm run -s migrate:deploy"
+}
+  "dependencies": {
+    "@prisma/client": "^6.15.0",
+    "cross-env": "^7.0.3",
+    "express": "^4.18.2",
+    "nodemon": "^2.0.22",
+    "pino": "^8.11.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.15.0"
+  }
+}

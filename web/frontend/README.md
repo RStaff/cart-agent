@@ -1,16 +1,12 @@
-# Shopify React Frontend App
+# React + Vite
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.md)
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-This repository is the frontend for Shopify’s app starter templates. **You probably don’t want to use this repository directly**, but rather through one of the templates and the [Shopify CLI](https://github.com/Shopify/shopify-cli).
+Currently, two official plugins are available:
 
-## Developer resources
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-- [Introduction to Shopify apps](https://shopify.dev/apps/getting-started)
-  - [App authentication](https://shopify.dev/apps/auth)
-- [Shopify CLI command reference](https://shopify.dev/apps/tools/cli/app)
-- [Shopify API Library documentation](https://github.com/Shopify/shopify-node-api/tree/main/docs)
+## Expanding the ESLint configuration
 
-## License
-
-This repository is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.

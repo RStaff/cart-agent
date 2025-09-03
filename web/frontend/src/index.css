@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optional: tiny helper classes */
+.env-pill {
+  @apply fixed top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold shadow;
+}
+
