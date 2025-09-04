@@ -2,7 +2,7 @@ import express from "express";
 import { prisma } from "../db.js";
 import { queueAbandonEmail } from "../lib/queue-email.js";
 
-const router = express.Router();
+const abandonRouter = express.Router();
 
 /**
  * POST /api/carts/ingest
@@ -11,7 +11,7 @@ const router = express.Router();
  * - Upserts Shop (if shopKey present) and Cart
  * - Queues an email (best-effort) for the cart
  */
-router.post("/api/carts/ingest", async (req, res) => {
+abandonRouter.post("/carts/ingest", async (req, res) => {
   const hdrShopKey = req.get("x-shop-key")?.trim();
   const bodyShopKey = req.body?.shopKey?.trim();
   const shopKey = hdrShopKey || bodyShopKey || null;
@@ -78,7 +78,7 @@ router.post("/api/carts/ingest", async (req, res) => {
  * GET /api/carts
  * Optional: ?shopKey=...
  */
-router.get("/api/carts", async (req, res) => {
+abandonRouter.get("/carts", async (req, res) => {
   const shopKey = req.query.shopKey?.toString().trim();
   try {
     if (shopKey) {
@@ -103,7 +103,7 @@ router.get("/api/carts", async (req, res) => {
 });
 
 /** GET /api/carts/:cartId */
-router.get("/api/carts/:cartId", async (req, res) => {
+abandonRouter.get("/carts/:cartId", async (req, res) => {
   const cartId = req.params.cartId;
   try {
     const cart = await prisma.cart.findUnique({ where: { cartId } });
@@ -119,7 +119,7 @@ router.get("/api/carts/:cartId", async (req, res) => {
  * (Handy inspector) GET /api/emails?status=queued&limit=10
  * Lets you confirm email queue rows are being created.
  */
-router.get("/api/emails", async (req, res) => {
+abandonRouter.get("/emails", async (req, res) => {
   const status = (req.query.status?.toString() || "queued");
   const limit = Math.min(parseInt(req.query.limit?.toString() || "10", 10) || 10, 100);
   try {
@@ -135,4 +135,19 @@ router.get("/api/emails", async (req, res) => {
   }
 });
 
-export default router;
+export { abandonRouter }; export default abandonRouter;
+
+// POST /api/emails/:id/requeue   -> set status=queued, runAt=now, attempts unchanged
+abandonRouter.post("/emails/:id/requeue", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const updated = await prisma.emailQueue.update({
+      where: { id },
+      data: { status: "queued", runAt: new Date() },
+    });
+    res.json({ ok: true, email: updated });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ ok: false, error: "internal", details: String(err?.message || err) });
+  }
+});
