@@ -10,6 +10,8 @@ import { prisma } from "./db.js";
 
 import previewRoutes from "./routes/preview.js";
 
+import previewPage from "./routes/previewPage.js";
+
 const app = express();
 app.use(express.static(new URL("../public", import.meta.url).pathname));
 
@@ -45,6 +47,7 @@ app.get("/ops/ready", async (req, res) => {
   }
 });
 
+app.use("/", previewPage);
 app.use("/api", previewRoutes);
 app.listen(PORT, () => {
   console.log(JSON.stringify({
