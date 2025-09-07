@@ -8,6 +8,8 @@ import ops from "./routes/ops.js";
 import { abandonRouter } from "./routes/abandon.js";
 import { prisma } from "./db.js";
 
+import previewRoutes from "./routes/preview.js";
+
 const app = express();
 app.use(express.static(new URL("../public", import.meta.url).pathname));
 
@@ -52,6 +54,3 @@ app.listen(PORT, () => {
     env: process.env.NODE_ENV || "development"
   }));
 });
-
-import { registerPreviewRoutes } from "./routes/preview.js";
-registerPreviewRoutes(app);
