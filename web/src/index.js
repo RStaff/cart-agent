@@ -3,17 +3,24 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import cors from "cors";
 import express from "express";
+const PORT = process.env.PORT || 3000;
 import ops from "./routes/ops.js";
 import { abandonRouter } from "./routes/abandon.js";
 import { prisma } from "./db.js";
 
 const app = express();
+app.use(express.static(new URL("../public", import.meta.url).pathname));
+
 app.use(cors({
-  origin: [/^https?:\/\/localhost(:[0-9]+)?$/, /^https?:\/\/.*\.abando\.ai$/],
-  methods: ["POST"],
-  allowedHeaders: ["Content-Type"],
+  origin: [
+    /^https?:\/\/localhost(:\d+)?$/,
+    /^https?:\/\/.*\.abando\.ai$/
+  ],
+  methods: ["GET","POST","OPTIONS"],
+  allowedHeaders: ["Content-Type","Authorization"],
+  credentials: false,
 }));
-const PORT = process.env.PORT || 3000;
+
 
 app.use(express.json());
 
