@@ -1,29 +1,31 @@
 <!doctype html>
 <meta charset="utf-8" />
-<title>Abando Preview</title>
-<div id="abando-preview">Loading…</div>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Abando — Live Preview</title>
+<div id="abando-preview" style="font:14px/1.4 system-ui,Segoe UI,Arial;max-width:720px;margin:40px auto;padding:24px;border:1px solid #e5e7eb;border-radius:12px">
+  <div style="font-size:20px;font-weight:700;margin-bottom:8px">Abandoned Email Preview</div>
+  <div id="subj" style="margin:10px 0;color:#111827;font-weight:600"></div>
+  <div id="body"></div>
+</div>
 <script>
 (async function () {
-  const payload = {
-    brand: "Abando",
-    tone: "friendly",
-    resumeUrl: "https://example-shop.test/cart?cart_id=demo123",
-    items: [{ sku: "Waxed Canvas Tote", qty: 1, image: "https://resend.com/static/sample/logo.png" }]
-  };
-  // LOCAL while developing. After you deploy the API, swap to https://app.abando.ai
-  const res = await fetch("http://localhost:3000/api/preview/abandon", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
-  const data = await res.json();
-  const el = document.getElementById("abando-preview");
-  el.innerHTML = `
-    <div style="border:1px solid #e5e7eb;border-radius:12px;padding:16px;max-width:560px">
-      <div style="font-size:14px;color:#6b7280;margin-bottom:8px">Subject preview</div>
-      <div style="font-weight:600;margin-bottom:12px">\${data.subject || "(no subject)"}</div>
-      <div style="font-size:14px;color:#6b7280;margin:12px 0">Email body</div>
-      \${data.html || "<em>no html</em>"}
-    </div>`;
+  try {
+    const payload = {
+      brand: "Abando",
+      tone: "friendly",
+      resumeUrl: "https://example-shop.test/cart?cart_id=demo123",
+      items: [{ sku: "Waxed Canvas Tote", qty: 1, image: "https://resend.com/static/sample/logo.png" }]
+    };
+    const res = await fetch("/api/preview/abandon", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    document.getElementById("subj").textContent = data.subject || "(no subject)";
+    document.getElementById("body").innerHTML = data.html || "<em>no html</em>";
+  } catch (e) {
+    document.getElementById("abando-preview").innerHTML = "<b>Preview error:</b> " + (e?.message || e);
+  }
 })();
 </script>
