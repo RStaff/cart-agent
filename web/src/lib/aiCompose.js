@@ -10,38 +10,33 @@ export function composeAbandonEmail({ items = [], tone = "friendly", brand = "Yo
   const itemLabel = first?.sku ? ` ${first.sku}` : "";
 
   // Subject heuristics by tone
-  const subjects = {
-    friendly: [
-      "Forgot something?",
-      `We saved your cart${itemLabel} for you`,
-      "Want to finish checking out?"
-    ],
-    persuasive: [
-      `${name} — unlock your saved items`,
-      `Still available: your cart${itemLabel}`,
-      "Claim your cart before it’s gone"
-    ],
-    playful: [
-      `👀 Still eyeing${itemLabel}?`,
-      "Psst… your cart misses you",
-      "We kept your picks warm"
-    ],
-    urgent: [
-      "Last chance to grab it",
-      "Your cart will expire soon",
-      "Don’t lose your picks"
-    ],,
-    kevin_hart: [
-      "Look, don’t play—finish the checkout",
-      "Quit stalling. Your cart is calling 😂",
-      "You were THIS close. Tap to wrap it up"
-    ]
-    kevin_hart: [
-      "Look, don’t play—finish the checkout",
-      "Quit stalling. Your cart is calling 😂",
-      "You were THIS close. Tap to wrap it up"
-    ]
-  };
+const subjects = {
+  friendly: [
+    "Forgot something?",
+    `We saved your cart${itemLabel} for you`,
+    "Want to finish checking out?"
+  ],
+  persuasive: [
+    `${name} — unlock your saved items`,
+    `Still available: your cart${itemLabel}`,
+    "Claim your cart before it’s gone"
+  ],
+  playful: [
+    `👀 Still eyeing${itemLabel}?`,
+    "Psst… your cart misses you",
+    "We kept your picks warm"
+  ],
+  urgent: [
+    "Last chance to grab it",
+    "Your cart will expire soon",
+    "Don’t lose your picks"
+  ],
+  kevin_hart: [
+    "Look, don’t play—finish the checkout",
+    "Quit stalling. Your cart is calling 😂",
+    "You were THIS close. Tap to wrap it up"
+  ]
+};
 
   const pool = subjects[tone] || subjects.friendly;
   const subject = pool[Math.floor(Math.random() * pool.length)];
