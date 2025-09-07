@@ -43,6 +43,7 @@ app.get("/ops/ready", async (req, res) => {
   }
 });
 
+app.use("/api", previewRoutes);
 app.listen(PORT, () => {
   console.log(JSON.stringify({
     level: 30,
