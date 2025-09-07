@@ -30,7 +30,12 @@ export function composeAbandonEmail({ items = [], tone = "friendly", brand = "Yo
       "Last chance to grab it",
       "Your cart will expire soon",
       "Don’t lose your picks"
-    ],
+    ],,
+    kevin_hart: [
+      "Look, don’t play—finish the checkout",
+      "Quit stalling. Your cart is calling 😂",
+      "You were THIS close. Tap to wrap it up"
+    ]
     kevin_hart: [
       "Look, don’t play—finish the checkout",
       "Quit stalling. Your cart is calling 😂",
