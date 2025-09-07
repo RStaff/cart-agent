@@ -19,15 +19,23 @@
     "migrate:heal": "npm run migrate:resolve:rb && npm run migrate:diff:fix && npm run migrate:deploy",
     "dev:alt": "PORT=3001 npm run dev",
     "smoke:carts": "scripts/smoke-carts.sh",
-    "seed:shop": "node scripts/seed-shop.js"
+    "seed:shop": "node scripts/seed-shop.js",
+    "worker:once": "node ./src/lib/send-worker.js",
+    "worker:loop": "node -e \"const run=async()=>{await import(\\x27./src/lib/send-worker.js\\x27).catch(e=>console.error(\\x27[worker]\\x27,e)); setTimeout(run,10000)}; run();\"",
+    "dev:both": "concurrently -c auto -n api,worker \"npm:dev\" \"npm:worker:start\"",
+    "worker:start": "node ./src/lib/worker-entry.js"
   },
   "dependencies": {
     "@prisma/client": "^6.15.0",
+    "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "express": "^4.21.1",
-    "pino": "^9.2.0"
+    "nodemailer": "^7.0.6",
+    "pino": "^9.2.0",
+    "resend": "^6.0.2"
   },
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "nodemon": "^3.1.0",
     "prisma": "^6.15.0"
   }
