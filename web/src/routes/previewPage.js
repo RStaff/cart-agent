@@ -2,6 +2,9 @@ import { Router } from "express";
 
 const router = Router();
 
+// Redirect legacy URL -> live preview
+router.get("/preview.html", (_req,res) => res.redirect(302, "/preview"));
+
 router.get("/preview", (_req, res) => {
   res.type("html").send(`<!doctype html>
 <html lang="en">
@@ -10,30 +13,54 @@ router.get("/preview", (_req, res) => {
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>abando.ai • Preview</title>
 <style>
-  :root { --bg:#0b0c10; --panel:#101218; --muted:#9aa3af; --text:#e5e7eb; --accent:#3b82f6; --accent-2:#22c55e; --red:#ef4444; }
-  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:14px/1.4 ui-sans-serif,system-ui,Segoe UI,Roboto,Inter,Arial}
-  a{color:var(--accent)} .container{max-width:1100px;margin:24px auto;padding:0 16px}
-  .header{display:flex;gap:12px;align-items:center;margin-bottom:16px}
-  .logo{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--accent),var(--accent-2))}
-  .card{background:var(--panel);border:1px solid #222534;border-radius:12px;padding:16px}
-  .grid{display:grid;grid-template-columns:1.1fr 1fr;gap:16px}
+  :root {
+    --bg:#0a0c12;
+    --panel:#0f1420;
+    --muted:#a4afc0;
+    --text:#eef2f8;
+    --border:#253049;
+    --accent:#7c5cff;      /* primary */
+    --accent-2:#32d583;    /* success */
+    --accent-3:#00b3ff;    /* info */
+    --danger:#ff5c80;
+    --shadow: 0 10px 30px rgba(12,16,24,.35);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Arial}
+  a{color:var(--accent-3)}
+  .container{max-width:1100px;margin:28px auto;padding:0 18px}
+  .header{display:flex;gap:12px;align-items:center;margin-bottom:18px}
+  .logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--shadow)}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:#121a2a;border:1px solid var(--border);font-size:12px;color:var(--muted)}
+  .ok{color:var(--accent-2)} .err{color:var(--danger)}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+  .grid{display:grid;grid-template-columns:1.05fr 1fr;gap:18px}
   .row{display:flex;gap:12px;flex-wrap:wrap}
   label{display:block;margin:6px 0 6px 2px;color:var(--muted);font-size:12px}
-  input,select,textarea{width:100%;background:#0f1117;border:1px solid #2a2f3a;border-radius:10px;color:var(--text);padding:10px 12px}
-  textarea{min-height:96px;resize:vertical}
-  button{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:10px 14px;cursor:pointer}
-  button.secondary{background:#1f2430}
-  button.ghost{background:transparent;border:1px solid #2a2f3a}
-  .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:#151927;border:1px solid #242b38;font-size:12px;color:var(--muted)}
-  .preview-card{background:#0f1117;border:1px dashed #303646;border-radius:12px;padding:16px;min-height:200px}
-  .subject{font-weight:600;font-size:15px;margin-bottom:8px}
+  input,select,textarea{
+    width:100%;background:#0b101a;border:1px solid var(--border);border-radius:12px;
+    color:var(--text);padding:11px 12px;outline:none
+  }
+  input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,92,255,.25)}
+  textarea{min-height:110px;resize:vertical}
+  button{
+    background:var(--accent);color:#fff;border:0;border-radius:12px;padding:11px 16px;
+    cursor:pointer;font-weight:600;transition:filter .15s ease, transform .02s ease
+  }
+  button:hover{filter:brightness(1.08)}
+  button:active{transform:translateY(1px)}
+  button.secondary{background:#182032;color:var(--text)}
+  button.ghost{background:transparent;border:1px solid var(--border)}
+  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .preview-card{background:#0b101a;border:1px dashed var(--border);border-radius:12px;padding:16px;min-height:220px}
+  .subject{font-weight:700;font-size:16px;margin-bottom:10px}
   .muted{color:var(--muted)}
-  .split{display:flex;gap:16px;flex-wrap:wrap}
-  iframe{width:100%;height:360px;border:1px solid #2a2f3a;border-radius:10px;background:white}
+  iframe{width:100%;height:420px;border:1px solid var(--border);border-radius:12px;background:#fff}
   .footer{margin-top:18px;font-size:12px;color:var(--muted)}
-  .hint{font-size:12px;color:var(--muted)}
-  .ok{color:var(--accent-2)} .err{color:var(--red)}
+  .skel{position:relative;overflow:hidden;background:#10182820;border-radius:8px}
+  .skel::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);
+    transform:translateX(-100%);animation:sh 1.2s infinite}
+  @keyframes sh{to{transform:translateX(100%)}}
 </style>
 </head>
 <body>
@@ -49,15 +76,15 @@ router.get("/preview", (_req, res) => {
 
     <div class="card" style="margin-bottom:16px">
       <div class="row">
-        <div style="min-width:240px;flex:1">
+        <div style="min-width:220px;flex:1">
           <label>Tone</label>
           <select id="tone"></select>
         </div>
-        <div style="min-width:240px;flex:1">
+        <div style="min-width:220px;flex:1">
           <label>Template</label>
           <select id="templateId"></select>
         </div>
-        <div style="min-width:240px;flex:1">
+        <div style="min-width:220px;flex:1">
           <label>Customer name</label>
           <input id="name" placeholder="e.g., Ross" />
         </div>
@@ -68,11 +95,11 @@ router.get("/preview", (_req, res) => {
       </div>
 
       <div class="row">
-        <div style="min-width:260px;flex:1">
+        <div style="min-width:220px;flex:1">
           <label>Discount code (optional)</label>
           <input id="discountCode" placeholder="HELLO10" />
         </div>
-        <div style="min-width:200px;max-width:240px">
+        <div style="min-width:160px;max-width:220px">
           <label>Discount %</label>
           <input id="discountPct" type="number" min="1" max="100" placeholder="10" />
         </div>
@@ -91,7 +118,7 @@ Track Pants'></textarea>
       <div class="toolbar" style="margin-top:10px">
         <button id="genSubjects">Generate Subjects</button>
         <button class="secondary" id="genEmail">Compose Email</button>
-        <span class="hint">Subjects pick 3 by default; Email uses first tone’s subject unless you override.</span>
+        <span class="muted">Subjects pick 3 by default; Email uses first tone’s subject unless you override.</span>
       </div>
     </div>
 
@@ -116,25 +143,18 @@ Track Pants'></textarea>
             <button class="ghost" id="copyHtml">Copy HTML</button>
           </div>
         </div>
-        <div class="split">
-          <iframe id="htmlFrame"></iframe>
-        </div>
+        <iframe id="htmlFrame" title="Email Preview"></iframe>
       </div>
     </div>
 
     <div class="footer">
-      Tip: Your API returns <code>{{checkout_url}}</code> placeholders—this page swaps them with the Checkout URL you enter above (client-side only for preview).
+      Tip: The page swaps <code>{{checkout_url}}</code> with the Checkout URL above (client-side only for preview).
     </div>
   </div>
-
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <script>
     (async function () {
       const $ = (sel) => document.querySelector(sel);
-      const healthBadge = $("#healthBadge");
       const toneSel = $("#tone");
       const templateSel = $("#templateId");
       const nameInp = $("#name");
@@ -146,28 +166,28 @@ Track Pants'></textarea>
       const subjectList = $("#subjectList");
       const frame = $("#htmlFrame");
       let lastSubjects = [];
-      let lastHtml = "";
+      window.lastEmailHtml = "";
 
+      // Health badge
       try {
         const ok = await fetch("/api/preview/health").then(r => r.ok);
-        healthBadge.textContent = ok ? "API: healthy" : "API: error";
-        healthBadge.className = "badge " + (ok ? "ok" : "err");
+        const hb = $("#healthBadge");
+        hb.textContent = ok ? "API: healthy" : "API: error";
+        hb.className = "badge " + (ok ? "ok" : "err");
       } catch {
-        healthBadge.textContent = "API: error";
-        healthBadge.className = "badge err";
+        const hb = $("#healthBadge");
+        hb.textContent = "API: error";
+        hb.className = "badge err";
       }
 
+      // Load tones/templates
       try {
         const meta = await fetch("/api/preview/templates").then(r => r.json());
         for (const t of meta.tones) {
-          const o = document.createElement("option");
-          o.value = o.textContent = t;
-          toneSel.appendChild(o);
+          const o = document.createElement("option"); o.value = o.textContent = t; toneSel.appendChild(o);
         }
         for (const tpl of meta.templates) {
-          const o = document.createElement("option");
-          o.value = tpl.id; o.textContent = tpl.name;
-          templateSel.appendChild(o);
+          const o = document.createElement("option"); o.value = tpl.id; o.textContent = tpl.name; templateSel.appendChild(o);
         }
         toneSel.value = "friendly";
         templateSel.value = "short-n-sweet";
@@ -176,43 +196,83 @@ Track Pants'></textarea>
       }
 
       function parseItems(raw) {
-        const val = raw.trim();
+        const val = (raw||"").trim();
         if (!val) return [];
-        try {
-          const j = JSON.parse(val);
-          if (Array.isArray(j)) return j;
-        } catch {}
+        try { const j = JSON.parse(val); if (Array.isArray(j)) return j; } catch {}
         return val.split(/\\r?\\n/).map(s => s.trim()).filter(Boolean);
       }
 
-      function injectHtml(html) {
-        const checkout = checkoutUrl.value.trim() || "https://shop.example/checkout/demo";
-        const rendered = html.replaceAll("{{checkout_url}}", checkout);
-        lastHtml = rendered;
-        const doc = frame.contentDocument || frame.contentWindow.document;
-        doc.open();
-        doc.write(\`<!doctype html><html><head><meta charset="utf-8"><meta name="color-scheme" content="light only"></head><body>\${rendered}</body></html>\`);
-        doc.close();
+      function showPreviewSkeleton() {
+        frame.setAttribute("srcdoc",
+          \`<!doctype html><html><head><meta charset="utf-8">
+           <style>body{margin:0;background:#fff;font:16px/1.5 system-ui}
+           .sk{height:18px;margin:18px;border-radius:6px;background:#eee;overflow:hidden;position:relative}
+           .sk::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(0,0,0,.06),transparent);
+                      animation:sh 1.2s infinite;transform:translateX(-100%)}@keyframes sh{to{transform:translateX(100%)}}
+           </style></head><body>
+           <div class="sk" style="width:70%"></div>
+           <div class="sk" style="width:94%"></div>
+           <div class="sk" style="width:88%"></div>
+           <div class="sk" style="width:76%"></div>
+           </body></html>\`
+        );
       }
+
+      function injectHtml(html) {
+        const checkout = (checkoutUrl.value || "").trim() || "https://shop.example/checkout/demo";
+        const rendered = (html || "<p>(empty)</p>").replaceAll("{{checkout_url}}", checkout);
+        const docHtml =
+          \`<!doctype html><html><head>
+             <meta charset="utf-8">
+             <meta name="color-scheme" content="light only">
+             <style>
+               body{font:16px/1.5 -apple-system,Segoe UI,Roboto,Arial; color:#111827; margin:0; padding:18px;}
+               a{color:#2563eb} p{margin:0 0 12px} ul{margin:0 0 12px 18px}
+             </style>
+           </head><body>\${rendered}</body></html>\`;
+        try { frame.setAttribute("srcdoc", docHtml); } catch (e) {
+          const doc = frame.contentDocument || frame.contentWindow.document;
+          doc.open(); doc.write(docHtml); doc.close();
+        }
+        window.lastEmailHtml = rendered;
+      }
+
+      // Actions
+      $("#copySubject").addEventListener("click", async () => {
+        const s = subjectText.textContent.trim(); if (!s) return;
+        await navigator.clipboard.writeText(s);
+        const old = subjectText.textContent; subjectText.textContent = "Copied ✓";
+        setTimeout(() => subjectText.textContent = old, 700);
+      });
+
+      $("#copyHtml").addEventListener("click", async () => {
+        if (!window.lastEmailHtml) return;
+        await navigator.clipboard.writeText(window.lastEmailHtml);
+        const btn = $("#copyHtml"); const old = btn.textContent; btn.textContent = "Copied ✓";
+        setTimeout(() => btn.textContent = old, 700);
+      });
 
       $("#genSubjects").addEventListener("click", async () => {
         const tone = toneSel.value;
         const name = nameInp.value.trim();
         const items = parseItems(itemsTa.value);
-        const res = await fetch("/api/preview/subject", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ tone, name, items, count: 3 })
-        });
-        const data = await res.json();
-        lastSubjects = data.subjects || [];
-        subjectText.textContent = lastSubjects[0] || "—";
-        subjectList.innerHTML = "";
-        lastSubjects.forEach(s => {
-          const li = document.createElement("li");
-          li.textContent = s;
-          subjectList.appendChild(li);
-        });
+        try {
+          const data = await fetch("/api/preview/subject", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ tone, name, items, count: 3 })
+          }).then(r => r.json());
+          lastSubjects = data.subjects || [];
+          subjectText.textContent = lastSubjects[0] || "—";
+          subjectList.innerHTML = "";
+          lastSubjects.forEach((s,i) => {
+            const li = document.createElement("li"); li.textContent = \`\${i+1}. \${s}\`; subjectList.appendChild(li);
+          });
+          // auto-compose after subjects so preview isn't blank
+          $("#genEmail").click();
+        } catch (e) {
+          subjectText.textContent = "(error generating subjects)";
+          console.error(e);
+        }
       });
 
       $("#genEmail").addEventListener("click", async () => {
@@ -223,35 +283,24 @@ Track Pants'></textarea>
         const discount = (discountCode.value.trim() && discountPct.value)
           ? { code: discountCode.value.trim(), pct: Number(discountPct.value) || 10 }
           : undefined;
-
-        const res = await fetch("/api/preview/email", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ templateId, tone, name, items, discount })
-        });
-        const data = await res.json();
-        subjectText.textContent = data.subject || "—";
-        subjectList.innerHTML = "";
-        injectHtml(data.html || "<p>(empty)</p>");
+        try {
+          showPreviewSkeleton();
+          const data = await fetch("/api/preview/email", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ templateId, tone, name, items, discount })
+          }).then(r => r.json());
+          subjectText.textContent = data.subject || "—";
+          subjectList.innerHTML = "";
+          injectHtml(data.html || "<p>(empty)</p>");
+        } catch (e) {
+          subjectText.textContent = "(error composing email)";
+          injectHtml("<p style='color:#b91c1c'>Failed to compose email.</p>");
+          console.error(e);
+        }
       });
 
-      $("#copySubject").addEventListener("click", async () => {
-        const s = subjectText.textContent.trim();
-        if (!s) return;
-        await navigator.clipboard.writeText(s);
-        const old = subjectText.textContent;
-        subjectText.textContent = "Copied ✓";
-        setTimeout(() => subjectText.textContent = old, 700);
-      });
-
-      $("#copyHtml").addEventListener("click", async () => {
-        if (!lastHtml) return;
-        await navigator.clipboard.writeText(lastHtml);
-        const btn = $("#copyHtml");
-        const old = btn.textContent;
-        btn.textContent = "Copied ✓";
-        setTimeout(() => btn.textContent = old, 700);
-      });
+      // Render immediately on load
+      window.addEventListener("load", () => { $("#genSubjects").click(); });
     })();
   </script>
 </body>
