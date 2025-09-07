@@ -1,16 +1,25 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import cors from "cors";
 import express from "express";
 import ops from "./routes/ops.js";
 import { abandonRouter } from "./routes/abandon.js";
 import { prisma } from "./db.js";
 
 const app = express();
+app.use(cors({
+  origin: [/^https?:\/\/localhost(:[0-9]+)?$/, /^https?:\/\/.*\.abando\.ai$/],
+  methods: ["POST"],
+  allowedHeaders: ["Content-Type"],
+}));
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
 // Mount ops + carts routes
 app.use(ops);
-app.use("/api/carts", abandonRouter);
+app.use("/api", abandonRouter);
 
 // Extra liveness (dup of ops)
 app.get("/healthz", (req, res) => {
@@ -35,3 +44,6 @@ app.listen(PORT, () => {
     env: process.env.NODE_ENV || "development"
   }));
 });
+
+import { registerPreviewRoutes } from "./routes/preview.js";
+registerPreviewRoutes(app);
