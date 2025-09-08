@@ -1,37 +1,30 @@
-import { prisma } from "../db.js";
-import { renderAbandonEmail } from "./renderAbandonedEmail.js";
+import { prisma } from "./db.js";
+import { sendEmail } from "./mailer.js";
+import { renderAbandonedEmail } from "./renderAbandonedEmail.js";
 
-const DELAY_MS = parseInt(process.env.EMAIL_DELAY_MS || String(30 * 60 * 1000), 10); // default 30m
+/**
+ * Queue an abandoned cart email.
+ * Expects cart: { id, shopId, userEmail, items: [...], resumeUrl? }
+ * Stores a row in the email queue; your worker will send it.
+ */
+export async function queueAbandonedEmail(cart) {
+  const html = renderAbandonedEmail({
+    items: Array.isArray(cart?.items) ? cart.items : [],
+    resumeUrl: cart?.resumeUrl || "#",
+  });
 
-export async function queueAbandonEmail({ cart, shop }) {
-  const { subject, html } = renderAbandonEmail({ cart, shop });
-  const runAt = new Date(Date.now() + DELAY_MS);
+  // simple, safe default subject
+  const subject = "You left something in your cart 🛒";
 
-  const cartRowId = cart?.id ?? null;
-
-  return prisma.$transaction(async (tx) => {
-    const existing = await tx.emailQueue.findFirst({
-      where: { cartId: cartRowId, status: "queued" },
-      select: { id: true },
-    });
-
-    if (existing) {
-      return tx.emailQueue.update({
-        where: { id: existing.id },
-        data: { to: cart.userEmail, subject, html, runAt },
-      });
-    }
-
-    return tx.emailQueue.create({
-      data: {
-        shopId: shop?.id ?? null,
-        cartId: cartRowId,
-        to: cart.userEmail,
-        subject,
-        html,
-        status: "queued",
-        runAt,
-      },
-    });
+  return prisma.email.create({
+    data: {
+      shopId: cart.shopId,
+      cartId: cart.id,
+      to: cart.userEmail,
+      subject,
+      html,
+      status: "queued",
+      runAt: new Date(),
+    },
   });
 }
