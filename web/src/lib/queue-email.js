@@ -1,5 +1,5 @@
 import { prisma } from "../db.js";
-import { renderAbandonEmail } from "./email-template.js";
+import { renderAbandonEmail } from "./renderAbandonedEmail.js";
 
 const DELAY_MS = parseInt(process.env.EMAIL_DELAY_MS || String(30 * 60 * 1000), 10); // default 30m
 
