@@ -1,3 +1,4 @@
+import { renderAbandonedEmail } from "../lib/renderAbandonedEmail.js";
 import express from "express";
 import { prisma } from "../db.js";
 import { queueAbandonEmail } from "../lib/queue-email.js";
@@ -151,3 +152,8 @@ abandonRouter.post("/emails/:id/requeue", async (req, res) => {
     res.status(500).json({ ok: false, error: "internal", details: String(err?.message || err) });
   }
 });
+/**
+ * Builds the abandoned-cart email HTML.
+ * - Inlines a CID image if the first item has an image (worker will attach it).
+ * - Uses resumeUrl for the CTA link; falls back to '#'.
+ */

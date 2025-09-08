@@ -43,3 +43,6 @@ dev.db
 dev.log
 *.tmp
 .vercel
+web/prisma/schema.prisma.bak.*
+web/src/**/*.bak.*
+*.bak.*
