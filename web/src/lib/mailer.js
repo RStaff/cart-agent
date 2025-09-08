@@ -3,11 +3,10 @@ const resendApiKey = process.env.RESEND_API_KEY || "";
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 /**
- * sendEmail({ to, subject, html, from? })
- * - If RESEND_API_KEY is present, actually send via Resend.
- * - Else, "fake send" (console.log) for local/dev.
+ * sendEmail({ to, subject, html, from?, attachments? })
+ * attachments: [{ path, filename?, contentId?, content_type? }]
  */
-export async function sendEmail({ to, subject, html, from }) {
+export async function sendEmail({ to, subject, html, from, attachments = [] }) {
   const fromAddr = from || process.env.DEFAULT_FROM || "sales@example.com";
 
   if (!resend) {
@@ -16,6 +15,9 @@ export async function sendEmail({ to, subject, html, from }) {
     console.log("To:", to);
     console.log("Subject:", subject);
     console.log("HTML:", html);
+    if (attachments?.length) {
+      console.log("Attachments:", attachments);
+    }
     console.log("=================\n");
     return { id: "fake-" + Date.now() };
   }
@@ -25,6 +27,13 @@ export async function sendEmail({ to, subject, html, from }) {
     to: [to],
     subject,
     html,
+    // Resend supports remote paths; use camelCase contentId
+    attachments: attachments.map(a => ({
+      path: a.path,
+      filename: a.filename,
+      contentId: a.contentId,
+      content_type: a.content_type
+    })),
   });
   if (error) throw new Error(String(error?.message || error));
   return data;
