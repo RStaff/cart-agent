@@ -1,61 +1,25 @@
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-import cors from "cors";
 import express from "express";
-const PORT = process.env.PORT || 3000;
-import ops from "./routes/ops.js";
-import { abandonRouter } from "./routes/abandon.js";
-import { prisma } from "./db.js";
+import cors from "cors";
+import dotenv from "dotenv";
 
-import previewRoutes from "./routes/preview.js";
-
-import previewPage from "./routes/previewPage.js";
+dotenv.config();
 
 const app = express();
-app.use(express.static(new URL("../public", import.meta.url).pathname));
 
-app.use(cors({
-  origin: [
-    /^https?:\/\/localhost(:\d+)?$/,
-    /^https?:\/\/.*\.abando\.ai$/
-  ],
-  methods: ["GET","POST","OPTIONS"],
-  allowedHeaders: ["Content-Type","Authorization"],
-  credentials: false,
-}));
-
-
+// Middleware
+app.use(cors());
 app.use(express.json());
 
-// Mount ops + carts routes
-app.use(ops);
-app.use("/api", abandonRouter);
-
-// Extra liveness (dup of ops)
-app.get("/healthz", (req, res) => {
-  res.json({ ok: true, env: process.env.NODE_ENV || "development", time: new Date().toISOString() });
+// Health check
+app.get("/", (req, res) => {
+  res.json({ status: "ok", message: "Cart Agent backend running 🚀" });
 });
 
-// Inline readiness — guaranteed present
-app.get("/ops/ready", async (req, res) => {
-  try {
-    await prisma.$queryRaw`SELECT 1`;
-    res.json({ ok: true });
-  } catch (err) {
-    res.status(503).json({ ok: false, error: "db_unavailable", details: String(err?.message || err) });
-  }
+// Example API route
+app.get("/hello", (req, res) => {
+  res.json({ msg: "Hello from Cart Agent!" });
 });
 
-app.use("/", previewPage);
-app.use("/api", previewRoutes);
-app.listen(PORT, () => {
-  console.log(JSON.stringify({
-    level: 30,
-    msg: "[web] server listening",
-    port: Number(PORT),
-    env: process.env.NODE_ENV || "development"
-  }));
-});
-
+// IMPORTANT: don't call app.listen()
+// Bootstrapper will attach this app.
 export default app;
