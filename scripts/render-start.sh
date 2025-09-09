@@ -8,4 +8,4 @@ echo "[start] cwd: $(pwd)  |  PORT=${PORT:-<unset>}"
 npx prisma migrate deploy --schema prisma/schema.prisma
 
 # Start only the web (workers should be separate services)
-node start.js
+exec node start.js
