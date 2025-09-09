@@ -1,4 +1,4 @@
-import { prisma } from "./db.js";
+import { prisma } from "../db.js";
 import { sendEmail } from "./mailer.js";
 import { renderAbandonedEmail } from "./renderAbandonedEmail.js";
 
