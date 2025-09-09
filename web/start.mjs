@@ -1,43 +1,44 @@
-import http from 'node:http';
-import { setTimeout as delay } from 'node:timers/promises';
+import http from "http";
+import { fileURLToPath, pathToFileURL } from "url";
+import path from "path";
+import fs from "fs";
 
-const HOST = '0.0.0.0';
-const PORT = Number(process.env.PORT || 3000);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const PORT = process.env.PORT || 10000;
+const APP_ENTRY = process.env.APP_ENTRY || "./src/index.js";
 
-// Bind immediately so Render detects the port
-const server = http.createServer((req, res) => res.end('OK'));
-server.listen(PORT, HOST, () => console.log(`[start] listening on http://${HOST}:${PORT}`));
+let handler = (req, res) => {
+  res.writeHead(200, { "Content-Type": "text/plain" });
+  res.end("OK");
+};
 
-const candidates = ['./src/index.js', './index.js'];
+// start listening immediately so Render sees the port
+const server = http.createServer((req, res) => handler(req, res));
+server.listen(PORT, "0.0.0.0", () =>
+  console.log(`[start] listening on http://0.0.0.0:${PORT}`)
+);
 
-function pick(mod) {
-  const c = mod?.default ?? mod?.app ?? mod?.router ?? mod;
-  if (!c) return null;
-  if (typeof c === 'function') return c;
-  if (typeof c?.handle === 'function') return c;
-  if (typeof c?.use === 'function') return c;
-  return null;
-}
-
-for (let attempt = 1; attempt <= 30; attempt++) {
-  for (const rel of candidates) {
-    try {
-      const mod = await import(rel);
-      const app = pick(mod);
-      if (app) {
-        const handler = app.handle?.bind(app) ?? app;
-        server.removeAllListeners('request');
-        server.on('request', handler);
-        console.log(`[start] attached app from ${rel}`);
-        process.env.BOOTSTRAPPED = '1';
-
-      } else {
-        console.log(`[start] ${rel} loaded, no attachable app`);
-      }
-    } catch (e) {
-      console.log(`[start] import failed for ${rel} (attempt ${attempt}): ${e?.message || e}`);
-    }
+// try to attach the real app
+(async () => {
+  const fullPath = path.join(__dirname, APP_ENTRY);
+  if (!fs.existsSync(fullPath)) {
+    console.error(`[start] APP_ENTRY ${APP_ENTRY} not found`);
+    return;
   }
-  await delay(2000);
-}
-console.log('[start] fallback only; no app attached');
+  try {
+    const mod = await import(pathToFileURL(fullPath).href);
+    const app =
+      mod.default ||
+      mod.app ||
+      (typeof mod === "function" ? mod : null);
+
+    if (app && typeof app.handle === "function") {
+      handler = (req, res) => app.handle(req, res);
+      console.log(`[start] attached app from ${APP_ENTRY}`);
+    } else {
+      console.error("[start] app found but not attachable, serving fallback");
+    }
+  } catch (err) {
+    console.error("[start] failed to import app:", err);
+  }
+})();
