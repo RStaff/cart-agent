@@ -1,52 +1,43 @@
-import http from "http";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath, pathToFileURL } from "url";
+import http from 'node:http';
+import { setTimeout as delay } from 'node:timers/promises';
 
-const HOST = "0.0.0.0";
+const HOST = '0.0.0.0';
 const PORT = Number(process.env.PORT || 3000);
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
-let attached = false;
+// Bind immediately so Render detects the port
+const server = http.createServer((req, res) => res.end('OK'));
+server.listen(PORT, HOST, () => console.log(`[start] listening on http://${HOST}:${PORT}`));
 
-const server = http.createServer((req, res) => res.end("OK"));
-server.listen(PORT, HOST, () => {
-  console.log(`[start] listening on http://${HOST}:${PORT}`);
-  attachLoop();
-});
+const candidates = ['./src/index.js', './index.js'];
 
-async function attachLoop() {
-  const candidates = [process.env.APP_ENTRY || "./src/index.js"];
-  for (let attempt = 1; attempt <= 60 && !attached; attempt++) {
-    for (const rel of candidates) {
-      const abs = path.resolve(__dirname, rel);
-      const exists = fs.existsSync(abs);
-      if (!exists) continue;
-      try {
-        const mod = await import(pathToFileURL(abs).href + `?t=${Date.now()}`);
-        const app = pickApp(mod);
-        if (!app) continue;
-        const handler = app.handle?.bind(app) ?? app;
-        server.removeAllListeners("request");
-        server.on("request", handler);
-        attached = true;
-        console.log(`[start] attached app from ${rel} (attempt ${attempt})`);
-        return;
-      } catch (e) {
-        console.log(`[start] import failed for ${rel} (attempt ${attempt}): ${e?.message || e}`);
-      }
-    }
-    if (!attached) await new Promise(r => setTimeout(r, 2000));
-  }
-  if (!attached) console.log("[start] fallback only; no app attached");
-}
-
-function pickApp(mod) {
+function pick(mod) {
   const c = mod?.default ?? mod?.app ?? mod?.router ?? mod;
   if (!c) return null;
-  if (typeof c === "function") return c;
-  if (typeof c?.handle === "function") return c;
-  if (typeof c?.use === "function") return c;
+  if (typeof c === 'function') return c;
+  if (typeof c?.handle === 'function') return c;
+  if (typeof c?.use === 'function') return c;
   return null;
 }
+
+for (let attempt = 1; attempt <= 30; attempt++) {
+  for (const rel of candidates) {
+    try {
+      const mod = await import(rel);
+      const app = pick(mod);
+      if (app) {
+        const handler = app.handle?.bind(app) ?? app;
+        server.removeAllListeners('request');
+        server.on('request', handler);
+        console.log(`[start] attached app from ${rel}`);
+        process.env.BOOTSTRAPPED = '1';
+        return;
+      } else {
+        console.log(`[start] ${rel} loaded, no attachable app`);
+      }
+    } catch (e) {
+      console.log(`[start] import failed for ${rel} (attempt ${attempt}): ${e?.message || e}`);
+    }
+  }
+  await delay(2000);
+}
+console.log('[start] fallback only; no app attached');
