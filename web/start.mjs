@@ -1,5 +1,4 @@
 import http from 'http';
-import { pathToFileURL } from 'url';
 
 const HOST = '0.0.0.0';
 const PORT = Number(process.env.PORT || 3000);
@@ -11,28 +10,39 @@ server.listen(PORT, HOST, () => {
 });
 
 async function attachApp() {
-  const candidates = ['./index.js', './src/index.js', './server.js', './src/server.js'];
-  for (const c of candidates) {
+  const candidates = [
+    './src/index.js', './src/index.mjs',
+    './index.js', './index.mjs',
+    './src/server.js', './src/server.mjs',
+    './src/app.js', './src/app.mjs'
+  ];
+
+  for (const p of candidates) {
     try {
-      const url = new URL(c, import.meta.url);
-      const mod = await import(url.href);
-      const app = resolveApp(mod);
+      const mod = await import(new URL(p, import.meta.url));
+      const app = pickApp(mod);
       if (app) {
-        const handler = app.handle ? app.handle.bind(app) : app;
+        const handler = app.handle?.bind(app) ?? app;
         server.removeAllListeners('request');
         server.on('request', handler);
-        console.log(`[start] attached app from ${c}`);
+        console.log(`[start] attached app from ${p}`);
         return;
+      } else {
+        console.log(`[start] ${p} loaded; keys=${Object.keys(mod)} (no attachable app)`);
       }
-    } catch {}
+    } catch (e) {
+      // Uncomment to debug: console.log('[start] import failed', p, e?.message);
+    }
   }
   console.log('[start] no app found; serving fallback OK handler');
 }
 
-function resolveApp(m) {
-  if (!m) return null;
-  const cand = m.default ?? m;
-  if (typeof cand === 'function') return cand;
-  if (cand && typeof cand.handle === 'function') return cand;
+function pickApp(mod) {
+  const c = mod?.default ?? mod?.app ?? mod?.router ?? mod;
+  if (!c) return null;
+  // Express app or router are function-like; app has .use/.handle, router has .handle
+  if (typeof c === 'function') return c;
+  if (typeof c?.handle === 'function') return c;
+  if (typeof c?.use === 'function' && typeof c?.listen !== 'function') return c;
   return null;
 }
