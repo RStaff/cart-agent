@@ -30,7 +30,7 @@ for (let attempt = 1; attempt <= 30; attempt++) {
         server.on('request', handler);
         console.log(`[start] attached app from ${rel}`);
         process.env.BOOTSTRAPPED = '1';
-        return;
+
       } else {
         console.log(`[start] ${rel} loaded, no attachable app`);
       }
