@@ -4,12 +4,12 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=18.18.0"
+    "node": "20.x"
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon --watch src --ext js,ts --exec node ./src/index.js",
-    "start": "node ./src/index.js",
-    "start:render": "scripts/render-start.sh",
+    "start": "node web/index.js",
+    "start:render": "bash scripts/render-start.sh",
     "migrate:status": "prisma migrate status --schema=./prisma/schema.prisma",
     "migrate:deploy": "prisma migrate deploy --schema=./prisma/schema.prisma",
     "migrate:resolve:rb": "prisma migrate resolve --rolled-back 20250820020426_init_postgres",
