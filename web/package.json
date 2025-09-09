@@ -7,34 +7,19 @@
     "node": "20.x"
   },
   "scripts": {
-    "dev": "cross-env NODE_ENV=development nodemon --watch src --ext js,ts --exec node ./src/index.js",
-    "start": "node web/index.js",
-    "start:render": "bash scripts/render-start.sh",
-    "migrate:status": "prisma migrate status --schema=./prisma/schema.prisma",
-    "migrate:deploy": "prisma migrate deploy --schema=./prisma/schema.prisma",
-    "migrate:resolve:rb": "prisma migrate resolve --rolled-back 20250820020426_init_postgres",
-    "migrate:diff:fix": "node -e \"const fs=require('fs'); const p=`prisma/migrations/${new Date().toISOString().replace(/[-:.TZ]/g,'').slice(0,14)}_init_postgres_fix`; fs.mkdirSync(p,{recursive:true}); process.stdout.write(p);\" | xargs -I {} sh -lc 'npx prisma migrate diff --from-url=\"$DATABASE_URL\" --to-schema-datamodel=./prisma/schema.prisma --script > {}/migration.sql && echo \"Wrote {}/migration.sql\"'",
-    "guard:shadow": "node -e \"const u=process.env.SHADOW_DATABASE_URL||''; const du=process.env.DATABASE_URL||''; if(!u){console.error('❌ SHADOW_DATABASE_URL is not set'); process.exit(1);} try{const URL=require('url').URL; const su=new URL(u); const host=su.hostname||su.host; if(!/^(localhost|127\\.0\\.0\\.1)$/i.test(host)){console.error('❌ SHADOW_DATABASE_URL must point to localhost/127.0.0.1. Got: '+host); process.exit(1);} if(/render\\.com/i.test(u)){console.error('❌ SHADOW_DATABASE_URL must NOT be a Render DB'); process.exit(1);} if(u===du){console.error('❌ SHADOW_DATABASE_URL must differ from DATABASE_URL'); process.exit(1);} console.log('✅ Shadow DB OK:', host);}catch(e){console.error('❌ Invalid SHADOW_DATABASE_URL:', e.message); process.exit(1);} \"",
-    "migrate:dev:create": "npm run guard:shadow && prisma migrate dev --name init_postgres_fix --create-only --schema=./prisma/schema.prisma",
-    "migrate:heal": "npm run migrate:resolve:rb && npm run migrate:diff:fix && npm run migrate:deploy",
-    "dev:alt": "PORT=3001 npm run dev",
-    "smoke:carts": "scripts/smoke-carts.sh",
-    "seed:shop": "node scripts/seed-shop.js",
-    "worker:once": "node ./src/lib/send-worker.js",
-    "worker:loop": "node -e \"const run=async()=>{await import(\\x27./src/lib/send-worker.js\\x27).catch(e=>console.error(\\x27[worker]\\x27,e)); setTimeout(run,10000)}; run();\"",
-    "dev:both": "concurrently -c auto -n api,worker \"npm:dev\" \"npm:worker:start\"",
-    "worker:start": "node ./src/lib/worker-entry.js"
+    "start:render": "bash scripts/render-start.sh"
   },
   "dependencies": {
     "@prisma/client": "^6.15.0",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
-    "express": "^4.21.1",
+    "express": "^4.18.3",
     "helmet": "^8.1.0",
     "morgan": "^1.10.1",
     "nodemailer": "^7.0.6",
     "pino": "^9.2.0",
-    "resend": "^6.0.2"
+    "resend": "^6.0.2",
+    "dotenv": "^16.4.5"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
