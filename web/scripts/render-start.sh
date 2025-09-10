@@ -2,5 +2,5 @@
 set -euo pipefail
 echo "[start] node: $(node -v)"
 echo "[start] cwd: $(pwd)  |  PORT=${PORT:-<unset>}"
-# Strict: do NOT install at runtime; rely on CI & lockfile
+# No runtime npm install; must be satisfied at build time
 exec node start.mjs
