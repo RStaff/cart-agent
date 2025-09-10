@@ -10,7 +10,7 @@
     "start:render": "bash scripts/render-start.sh"
   },
   "dependencies": {
-    "@prisma/client": "^6.15.0",
+    "@prisma/client": "^6.16.0",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "dotenv": "^16.6.1",
