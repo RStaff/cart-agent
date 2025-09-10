@@ -1,25 +1,23 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-dotenv.config();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import express from "express";
+import cors from "cors";
+import { meRouter } from "./routes/me.js";
+import { billingRouter, stripeWebhook } from "./routes/billing.js";
+import { attachUser } from "./middleware/attachUser.js";
+import { usageGate } from "./middleware/usageGate.js";
 
 const app = express();
+app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 app.use(cors());
 app.use(express.json());
+app.use(attachUser);
 
-// health/smoke
-app.get('/healthz', (req, res) => res.type('text/plain').send('ok'));
-app.get('/hello', (req, res) => res.json({ msg: 'Hello from Cart Agent!' }));
+app.get("/healthz", (_req, res) => res.type("text/plain").send("ok"));
+app.get("/hello", (_req, res) => res.json({ msg: "Hello from Cart Agent!" }));
 
-// static splash at /
-app.use(express.static(path.join(__dirname, '..', 'public')));
+app.use("/api/me", meRouter);
+app.use("/api/billing", billingRouter);
 
-// DO NOT app.listen(); bootstrap will attach this app
+app.post("/api/abando/run", usageGate({ kind: "abandoned_cart_run", cost: 1 }), async (_req, res) => {
+  res.json({ ok: true, message: "Ran the agent ✨" });
+});
 export default app;
-import 'totally-fake-package';
