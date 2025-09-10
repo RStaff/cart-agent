@@ -1,10 +1,13 @@
 import express from "express";
 import { Router } from "express";
-import { stripe } from "../clients/stripe.js";
+import { stripe, ensureStripe } from "../clients/stripe.js";
 import { prisma } from "../clients/prisma.js";
 export const billingRouter = Router();
 
+// Guard all billing endpoints if Stripe is not configured
+
 billingRouter.post("/checkout", async (req, res) => {
+  if (ensureStripe(req, res)) return;
   try {
     const user = req.user;
     if (!user) return res.status(401).json({ error: "unauthenticated" });
@@ -33,6 +36,7 @@ billingRouter.post("/checkout", async (req, res) => {
 });
 
 billingRouter.post("/portal", async (req, res) => {
+  if (ensureStripe(req, res)) return;
   try {
     const user = req.user;
     if (!user) return res.status(401).json({ error: "unauthenticated" });
