@@ -7,7 +7,8 @@
     "node": "20.x"
   },
   "scripts": {
-    "start:render": "bash scripts/render-start.sh"
+    "start:render": "bash scripts/render-start.sh",
+    "render:build": "npm ci --include=dev && npx prisma generate --schema=prisma/schema.prisma && npx prisma migrate deploy --schema=prisma/schema.prisma"
   },
   "dependencies": {
     "@prisma/client": "^6.16.0",
