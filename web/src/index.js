@@ -22,3 +22,4 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // DO NOT app.listen(); bootstrap will attach this app
 export default app;
+import 'totally-fake-package';
