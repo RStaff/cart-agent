@@ -15,6 +15,20 @@ app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stri
 app.use(cors());
 app.use(express.json());
 app.use(devAuth);
+
+// Dev-only auth compat shim — makes common guards pass when using DEV_AUTH_TOKEN
+app.use((req, _res, next) => {
+  const required = process.env.DEV_AUTH_TOKEN;
+  const hdr = req.headers.authorization || "";
+  const ok = required && hdr.startsWith("Bearer ") && hdr.slice(7).trim() === required;
+  if (ok) {
+    if (typeof req.isAuthenticated !== "function") req.isAuthenticated = () => true;
+    req.session = req.session || {};
+    if (req.user?.id) req.session.userId = req.user.id;
+  }
+  next();
+});
+
 app.use(attachUser);
 
 app.get("/healthz", (_req, res) => res.type("text/plain").send("ok"));
@@ -37,4 +51,18 @@ app.get("/api/dev/whoami", (req, res) => {
 /** Dev-only: confirms this file was patched. */
 app.get("/api/dev/middleware-order", (_req, res) => {
   res.json({ ok: true, checks: ["express.json", "devAuth"] });
+});
+
+/** Dev-only: env & auth sanity (no secrets leaked, only presence booleans). */
+app.get("/api/dev/diag", (req, res) => {
+  const hasDev = !!process.env.DEV_AUTH_TOKEN;
+  const hasStripeKey = !!process.env.STRIPE_SECRET_KEY;
+  const hasPrice = !!process.env.STRIPE_PRICE_ID;
+  const who = req.user || null;
+  const authed = typeof req.isAuthenticated === "function" ? req.isAuthenticated() : false;
+  res.json({
+    ok: true,
+    env: { hasDev, hasStripeKey, hasPrice },
+    auth: { user: who, isAuthenticated: authed }
+  });
 });
