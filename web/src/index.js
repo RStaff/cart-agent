@@ -33,3 +33,8 @@ app.get("/api/dev/whoami", (req, res) => {
   if (!process.env.DEV_AUTH_TOKEN) return res.status(404).end();
   res.json({ user: req.user || null });
 });
+
+/** Dev-only: confirms this file was patched. */
+app.get("/api/dev/middleware-order", (_req, res) => {
+  res.json({ ok: true, checks: ["express.json", "devAuth"] });
+});
