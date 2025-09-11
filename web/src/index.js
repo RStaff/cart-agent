@@ -6,6 +6,10 @@ import { attachUser } from "./middleware/attachUser.js";
 import { usageGate } from "./middleware/usageGate.js";
 
 const app = express();
+
+// Root route: plain text hinting available endpoints
+app.get('/', (req,res)=>{ res.type('text/plain').send('Cart Agent API. Try /hello and /healthz'); });
+
 app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 app.use(cors());
 app.use(express.json());
