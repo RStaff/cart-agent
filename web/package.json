@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start:render": "bash scripts/render-start.sh",
-    "render:build": "npm ci --include=dev && npx prisma generate --schema=prisma/schema.prisma && npx prisma migrate deploy --schema=prisma/schema.prisma"
+    "render:build": "bash -lc \"if [ -f package-lock.json ]; then npm ci --include=dev; else echo \\\"[build] package-lock.json missing — using npm install\\\"; npm install --include=dev; fi && npx prisma generate --schema=prisma/schema.prisma && npx prisma migrate deploy --schema=prisma/schema.prisma\" "
   },
   "dependencies": {
     "@prisma/client": "6.16.0",
