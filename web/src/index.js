@@ -5,6 +5,7 @@ import { billingRouter, stripeWebhook } from "./routes/billing.js";
 import { attachUser } from "./middleware/attachUser.js";
 import { usageGate } from "./middleware/usageGate.js";
 import { devAuth } from "./middleware/devAuth.js";
+import { router as devCheckoutBypass } from "./dev/checkoutBypass.dev.js";
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stri
 app.use(cors());
 app.use(express.json());
 app.use(devAuth);
+app.use(devCheckoutBypass);
 
 // Dev-only auth compat shim — makes common guards pass when using DEV_AUTH_TOKEN
 app.use((req, _res, next) => {
