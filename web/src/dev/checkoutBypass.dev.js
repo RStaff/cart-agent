@@ -18,21 +18,28 @@ router.post("/api/billing/checkout", async (req, res, next) => {
       auth.slice(7).trim() === process.env.DEV_AUTH_TOKEN;
     if (!ok) return next();
 
-    if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_PRICE_ID) {
-      return res.status(500).json({ error: "stripe_env_missing" });
-    }
-
     const email =
       (req.body && req.body.email) ||
       req.query?.email ||
       "dev@example.com";
+
+    // Allow dynamic price; fallback to env.
+    const bodyPrice = req.body?.priceId || req.query?.price_id;
+    const envPrice = process.env.STRIPE_PRICE_ID;
+    const priceId = (typeof bodyPrice === "string" && bodyPrice.startsWith("price_"))
+      ? bodyPrice
+      : envPrice;
+
+    if (!process.env.STRIPE_SECRET_KEY || !priceId) {
+      return res.status(500).json({ error: "stripe_env_missing_or_bad_price" });
+    }
 
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     const appUrl = process.env.APP_URL || "https://example.com";
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
-      line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
+      line_items: [{ price: priceId, quantity: 1 }],
       success_url: appUrl + "/success?session_id={CHECKOUT_SESSION_ID}",
       cancel_url: appUrl + "/billing/cancel",
       customer_email: email,
@@ -40,7 +47,7 @@ router.post("/api/billing/checkout", async (req, res, next) => {
       billing_address_collection: "auto",
     });
 
-    return res.json({ url: session.url, devBypass: true });
+    return res.json({ url: session.url, devBypass: true, priceId });
   } catch (e) {
     console.error("[dev checkout bypass]", e);
     return res.status(500).json({ error: "dev_checkout_failed" });
