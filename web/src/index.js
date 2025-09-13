@@ -1,3 +1,4 @@
+const checkoutPublic = require("./dev/checkoutPublic.cjs");
 import express from "express";
 import cors from "cors";
 import { meRouter } from "./routes/me.js";
@@ -8,6 +9,7 @@ import { devAuth } from "./middleware/devAuth.js";
 import { router as devCheckoutBypass } from "./dev/checkoutBypass.dev.js";
 
 const app = express();
+app.use("/api/billing/checkout", checkoutPublic);
 
 // Root route: plain text hinting available endpoints
 app.get('/', (req,res)=>{ res.type('text/plain').send('Cart Agent API. Try /hello and /healthz'); });
