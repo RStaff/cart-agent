@@ -1,3 +1,4 @@
+import checkoutPublic from "./dev/checkoutPublic.esm.js";
 const checkoutPublic = require("./dev/checkoutPublic.cjs");
 import express from "express";
 import cors from "cors";
