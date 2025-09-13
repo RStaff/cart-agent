@@ -9,7 +9,7 @@ export const router = Router();
  *  2) PUBLIC CHECKOUT: if ALLOW_PUBLIC_CHECKOUT === "true"
  * If neither applies, fallthrough to the real (auth) handler.
  */
-router.post("/api/billing/checkout", async (req, res, next) => {
+router.post("/api/dev/billing/checkout", async (req, res, next) => {
   const stripeKey = process.env.STRIPE_SECRET_KEY;
   const priceFromBody = req.body?.priceId;
   const priceFromEnv = process.env.STRIPE_PRICE_ID;
