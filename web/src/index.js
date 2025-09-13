@@ -10,6 +10,7 @@ import { devAuth } from "./middleware/devAuth.js";
 import { router as devCheckoutBypass } from "./dev/checkoutBypass.dev.js";
 
 const app = express();
+app.use("/api/billing/public-checkout", checkoutPublic);
 app.use("/api/billing/checkout", checkoutPublic);
 
 // Root route: plain text hinting available endpoints
