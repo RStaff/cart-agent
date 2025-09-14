@@ -12,9 +12,8 @@ import { router as devCheckoutBypass } from "./dev/checkoutBypass.dev.js";
 const app = express();
 app.use("/api/billing/checkout", checkoutPublic);
 app.use("/__public-checkout", checkoutPublic);
-app.get("/__public-checkout/_status", (req,res) => res.json({ ok: true, public: String(process.env.ALLOW_PUBLIC_CHECKOUT||""), price: process.env.STRIPE_PRICE_ID ? "set" : "missing" }));
 
- (req,res)=>res.json({ok:true, public:String(process.env.ALLOW_PUBLIC_CHECKOUT||""), price: process.env.STRIPE_PRICE_ID ? "set":"missing"}));
+app.get("/__public-checkout/_status", (req,res)=>res.json({ok:true, public:String(process.env.ALLOW_PUBLIC_CHECKOUT||""), price: process.env.STRIPE_PRICE_ID ? "set":"missing"}));
 
 // Root route: plain text hinting available endpoints
 app.get('/', (req,res)=>{ res.type('text/plain').send('Cart Agent API. Try /hello and /healthz'); });
