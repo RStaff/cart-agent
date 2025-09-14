@@ -14,33 +14,7 @@ import { devAuth } from "./middleware/devAuth.js";
 const app = express();
 
 // --- Map plan -> Stripe Price ID (starter|pro|scale); fallback to explicit priceId or STRIPE_PRICE_ID ---
-function planToPrice(req, _res, next) {
-  try {
-    const body = req.body || {};
-    // if caller already gave priceId, do nothing
-    if (body && typeof body.priceId === 'string' && body.priceId.trim()) return next();
 
-    const plan = String(body.plan || '').toLowerCase();
-    const byPlan = {
-      starter: process.env.STRIPE_PRICE_STARTER || '',
-      pro:     process.env.STRIPE_PRICE_PRO     || '',
-      scale:   process.env.STRIPE_PRICE_SCALE   || '',
-    };
-
-    let chosen = (plan && byPlan[plan]) ? byPlan[plan] : '';
-
-    // fallback chain: default single price, then any defined plan in pref order
-    if (!chosen) {
-      chosen = process.env.STRIPE_PRICE_ID
-            || byPlan.pro || byPlan.starter || byPlan.scale || '';
-    }
-
-    if (chosen) {
-      req.body = { ...(req.body||{}), priceId: chosen };
-    }
-  } catch (_) {}
-  return next();
-}
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
