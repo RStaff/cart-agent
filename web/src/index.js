@@ -46,7 +46,6 @@ app.use("/api/billing", billingRouter);
 app.post("/api/abando/run", usageGate({ kind: "abandoned_cart_run", cost: 1 }), async (_req, res) => {
   res.json({ ok: true, message: "Ran the agent ✨" });
 });
-export default app;
 
 // Dev probe: whoami (works only when DEV_AUTH_TOKEN is provided)
 app.get("/api/dev/whoami", (req, res) => {
@@ -72,3 +71,5 @@ app.get("/api/dev/diag", (req, res) => {
     auth: { user: who, isAuthenticated: authed }
   });
 });
+
+export default app;
