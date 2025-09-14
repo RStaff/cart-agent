@@ -11,6 +11,8 @@ import { usageGate } from "./middleware/usageGate.js";
 import { devAuth } from "./middleware/devAuth.js";
 
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use("/api/billing/ops", billingOps);
 
 app.use("/api/billing/checkout", checkoutPublic);
@@ -23,7 +25,6 @@ app.get('/', (req,res)=>{ res.type('text/plain').send('Cart Agent API. Try /hell
 
 app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 app.use(cors());
-app.use(express.json());
 app.use(devAuth);
 
 // Dev-only auth compat shim — makes common guards pass when using DEV_AUTH_TOKEN
@@ -77,3 +78,9 @@ app.get("/api/dev/diag", (req, res) => {
 });
 
 export default app;
+
+
+/** Dev-only: echo request body to debug parsers */
+app.post("/api/dev/echo-body", (req,res)=>{
+  res.json({ headers: req.headers, body: req.body || null });
+});
