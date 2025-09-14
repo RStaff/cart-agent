@@ -11,6 +11,7 @@ import { usageGate } from "./middleware/usageGate.js";
 import { devAuth } from "./middleware/devAuth.js";
 
 const app = express();
+app.use("/api/billing/checkout", checkoutPublic);
 app.use("/api/billing/checkout", planToPrice, checkoutPublic);
 app.use("/__public-checkout", planToPrice, checkoutPublic);
 
