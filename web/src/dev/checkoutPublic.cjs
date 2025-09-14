@@ -1,40 +1,51 @@
 const express = require("express");
-const router = express.Router();
 const Stripe = require("stripe");
+const router = express.Router();
 
-/**
- * Public checkout when ALLOW_PUBLIC_CHECKOUT === "true"
- * Uses STRIPE_SECRET_KEY and STRIPE_PRICE_ID (or body.priceId if provided).
- */
+const API_VERSION = "2023-10-16";
+const ok = (v) => typeof v === "string" && v.trim().length > 0;
+
+router.get("/_status", (req, res) => {
+  res.json({
+    ok: true,
+    public: String(process.env.ALLOW_PUBLIC_CHECKOUT || ""),
+    price: process.env.STRIPE_PRICE_ID ? "set" : "missing",
+  });
+});
+
 router.post("/", async (req, res) => {
   try {
     const allow = String(process.env.ALLOW_PUBLIC_CHECKOUT || "").toLowerCase() === "true";
     if (!allow) return res.status(403).json({ error: "public_checkout_disabled" });
 
     const key = process.env.STRIPE_SECRET_KEY;
-    if (!key) return res.status(500).json({ error: "stripe_key_missing" });
+    if (!ok(key)) return res.status(500).json({ error: "stripe_key_missing" });
 
-    const stripe = Stripe(key);
+    const stripe = new Stripe(key, { apiVersion: API_VERSION });
 
-    // robust email extraction even if body parser is missing
-    let email = (req.body && req.body.email) || (req.query && req.query.email);
+    let email = req?.body?.email || req?.query?.email;
     if (!email) {
       try {
         let raw = "";
-        await new Promise((resolve) => { req.on("data", c => raw += c); req.on("end", resolve); });
+        await new Promise((r) => { req.on("data", (c) => raw += c); req.on("end", r); });
         if (raw) email = JSON.parse(raw).email;
-      } catch (_) {}
+      } catch {}
     }
     email = email || "customer@example.com";
 
-    const bodyPrice = req.body && req.body.priceId;
-    const priceId = (typeof bodyPrice === "string" && bodyPrice.startsWith("price_"))
-      ? bodyPrice
+    const givenPrice = req?.body?.priceId;
+    const priceId = (typeof givenPrice === "string" && /^price_[A-Za-z0-9]+$/.test(givenPrice))
+      ? givenPrice
       : process.env.STRIPE_PRICE_ID;
 
-    if (!priceId) return res.status(400).json({ error: "price_id_missing" });
+    if (!ok(priceId)) return res.status(400).json({ error: "price_id_missing" });
 
     const appUrl = process.env.APP_URL || "https://abando.ai";
+    const origin = req.get("Origin");
+    if (origin && appUrl && !origin.includes(new URL(appUrl).hostname)) {
+      // Not blocking for now; flip to 403 to enforce.
+      // return res.status(403).json({ error: "bad_origin" });
+    }
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
