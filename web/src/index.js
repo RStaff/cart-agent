@@ -47,19 +47,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/billing/ops", billingOps);
 
-app.get("/__public-checkout/_status", (req,res)=>res.json({
+app.get("/__public-checkout/_status", (req, res) => {
+  res.json({
     ok: true,
     public: String(process.env.ALLOW_PUBLIC_CHECKOUT || ""),
-    priceDefault: !!process.env.STRIPE_PRICE_ID,
     prices: {
-      starter: !!process.env.STRIPE_PRICE_STARTER,
-      pro:     !!process.env.STRIPE_PRICE_PRO,
-      scale:   !!process.env.STRIPE_PRICE_SCALE
+      starter: Boolean((process.env.STRIPE_PRICE_STARTER || "").trim()),
+      pro:     Boolean((process.env.STRIPE_PRICE_PRO || "").trim()),
+      scale:   Boolean((process.env.STRIPE_PRICE_SCALE || "").trim())
     }
-  }));
-
-// Root route: plain text hinting available endpoints
-app.get('/', (req,res)=>{ res.type('text/plain').send('Cart Agent API. Try /hello and /healthz'); });
+  });
+});
 
 app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 app.use(cors());
