@@ -1,4 +1,5 @@
 import billingOps from "./routes/billing-ops.esm.js";
+
 import checkoutPublic from "./dev/checkoutPublic.esm.js";
 
 import express from "express";
@@ -10,19 +11,58 @@ import { usageGate } from "./middleware/usageGate.js";
 import { devAuth } from "./middleware/devAuth.js";
 
 const app = express();
+app.use("/api/billing/checkout", planToPrice, checkoutPublic);
+app.use("/__public-checkout", planToPrice, checkoutPublic);
+
+// --- Map plan -> Stripe Price ID (starter|pro|scale); fallback to explicit priceId or STRIPE_PRICE_ID ---
+function planToPrice(req, _res, next) {
+  try {
+    const body = req.body || {};
+    // if caller already gave priceId, do nothing
+    if (body && typeof body.priceId === 'string' && body.priceId.trim()) return next();
+
+    const plan = String(body.plan || '').toLowerCase();
+    const byPlan = {
+      starter: process.env.STRIPE_PRICE_STARTER || '',
+      pro:     process.env.STRIPE_PRICE_PRO     || '',
+      scale:   process.env.STRIPE_PRICE_SCALE   || '',
+    };
+
+    let chosen = (plan && byPlan[plan]) ? byPlan[plan] : '';
+
+    // fallback chain: default single price, then any defined plan in pref order
+    if (!chosen) {
+      chosen = process.env.STRIPE_PRICE_ID
+            || byPlan.pro || byPlan.starter || byPlan.scale || '';
+    }
+
+    if (chosen) {
+      req.body = { ...(req.body||{}), priceId: chosen };
+    }
+  } catch (_) {}
+  return next();
+}
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use("/api/billing/ops", billingOps);
 
-app.use("/api/billing/checkout", checkoutPublic);
-app.use("/__public-checkout", checkoutPublic);
-
-app.get("/__public-checkout/_status", (req,res)=>res.json({ok:true, public:String(process.env.ALLOW_PUBLIC_CHECKOUT||""), price: process.env.STRIPE_PRICE_ID ? "set":"missing"}));
+app.get("/__public-checkout/_status", (req,res)=>res.json({
+    ok: true,
+    public: String(process.env.ALLOW_PUBLIC_CHECKOUT || ""),
+    priceDefault: !!process.env.STRIPE_PRICE_ID,
+    prices: {
+      starter: !!process.env.STRIPE_PRICE_STARTER,
+      pro:     !!process.env.STRIPE_PRICE_PRO,
+      scale:   !!process.env.STRIPE_PRICE_SCALE
+    }
+  }));
 
 // Root route: plain text hinting available endpoints
 app.get('/', (req,res)=>{ res.type('text/plain').send('Cart Agent API. Try /hello and /healthz'); });
 
 app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 app.use(cors());
-app.use(express.json());
 app.use(devAuth);
 
 // Dev-only auth compat shim — makes common guards pass when using DEV_AUTH_TOKEN
@@ -76,3 +116,8 @@ app.get("/api/dev/diag", (req, res) => {
 });
 
 export default app;
+
+/** Dev-only: echo request body to debug parsers */
+app.post("/api/dev/echo-body", (req,res)=>{
+  res.json({ headers: req.headers, body: req.body || null });
+});
