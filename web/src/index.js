@@ -1,3 +1,4 @@
+import billingOps from "./routes/billing-ops.esm.js";
 import checkoutPublic from "./dev/checkoutPublic.esm.js";
 
 import express from "express";
@@ -9,6 +10,8 @@ import { usageGate } from "./middleware/usageGate.js";
 import { devAuth } from "./middleware/devAuth.js";
 
 const app = express();
+app.use("/api/billing/ops", billingOps);
+
 app.use("/api/billing/checkout", checkoutPublic);
 app.use("/__public-checkout", checkoutPublic);
 
