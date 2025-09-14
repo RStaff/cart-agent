@@ -1,18 +1,60 @@
 import express from "express";
 import Stripe from "stripe";
 
+/** tiny in-memory rate limit per IP (burst 10/min) */
+const __rl = new Map();
+function allowIp(req){
+  const ip = (req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "unknown") + "";
+  const now = Date.now();
+  const slot = Math.floor(now / 60000); // per-minute bucket
+  const state = __rl.get(ip) || {slot, count:0};
+  if (state.slot !== slot) { state.slot = slot; state.count = 0; }
+  state.count++;
+  __rl.set(ip, state);
+  return state.count <= 10;
+}
+
+
+function getAdminHeader(req) {
+  // Node makes headers lower-case already, but normalize defensively
+  const raw = (req.headers["x-admin-key"] ?? req.headers["X-Admin-Key"] ?? req.headers["authorization"] ?? req.headers["Authorization"] ?? "");
+  const s = (typeof raw === "string" ? raw : String(raw)).replace(/^Bearer\s+/i, "").trim();
+  return s;
+}
+function jsonError(res, code, error, extra){
+  res.status(code).json(Object.assign({ error }, extra || {}));
+}
+
 const router = express.Router();
+
+router.post("/admin/ping", (req, res) => {
+  if (!allowIp(req)) return jsonError(res, 429, "rate_limited");
+  const adminKey = (process.env.ADMIN_API_KEY || "").trim();
+  const hdr = getAdminHeader(req);
+  res.json({
+    ok: true,
+    adminKeyPresent: adminKey.length > 0,
+    headerPresent: hdr.length > 0,
+    lengths: { env: adminKey.length, header: hdr.length },
+    match: adminKey.length > 0 && hdr === adminKey
+  });
+});
+router.all("/admin/ping", (_req, res) => res.status(405).json({ error: "method_not_allowed" }));
+
 
 router.post("/portal", async (req, res) => {
   try {
-    const key = process.env.STRIPE_SECRET_KEY;
-    if (!key) return res.status(500).json({ error: "stripe_key_missing" });
+    if (!allowIp(req)) return jsonError(res, 429, "rate_limited");
+    const key = (process.env.STRIPE_SECRET_KEY || "").trim();
+    if (!key) return jsonError(res, 500, "stripe_key_missing");
     const stripe = new Stripe(key);
 
-    // Identify customer: prefer explicit customerId; else look up by email.
-    const { customerId, email, return_url } = req.body || {};
-    let customer = customerId;
+    const body = (req.body && typeof req.body === "object") ? req.body : {};
+    const customerId = typeof body.customerId === "string" ? body.customerId.trim() : "";
+    const email = typeof body.email === "string" ? body.email.trim() : "";
+    const return_url = typeof body.return_url === "string" ? body.return_url.trim() : "";
 
+    let customer = customerId;
     if (!customer && email) {
       const found = await stripe.customers.list({ email, limit: 1 });
       customer = found?.data?.[0]?.id || null;
@@ -21,53 +63,42 @@ router.post("/portal", async (req, res) => {
         customer = created.id;
       }
     }
+    if (!customer) return jsonError(res, 400, "missing_customer_or_email");
 
-    if (!customer) return res.status(400).json({ error: "missing_customer_or_email" });
-
-    const appUrl = process.env.APP_URL || "https://abando.ai";
+    const appUrl = (process.env.APP_URL || "https://abando.ai").trim();
     const session = await stripe.billingPortal.sessions.create({
       customer,
       return_url: return_url || appUrl + "/dashboard"
     });
     res.json({ url: session.url });
   } catch (e) {
-    console.error("[portal]", e);
-    res.status(500).json({ error: "portal_failed" });
+    console.error("[ops/portal]", e);
+    jsonError(res, 500, "portal_failed");
   }
 });
+router.all("/portal", (_req, res) => res.status(405).json({ error: "method_not_allowed" }));
+
 
 router.post("/admin/provision", async (req, res) => {
   try {
-    const adminKey = process.env.ADMIN_API_KEY || "";
-    const hdr = (req.headers["x-admin-key"] || req.headers["authorization"] || "").toString().replace(/^Bearers+/i,"").trim();
-    if (!adminKey || hdr !== adminKey) return res.status(403).json({ error: "forbidden" });
+    if (!allowIp(req)) return jsonError(res, 429, "rate_limited");
+    const adminKey = (process.env.ADMIN_API_KEY || "").trim();
+    const hdr = getAdminHeader(req);
+    if (!adminKey || hdr !== adminKey) return jsonError(res, 403, "forbidden");
 
-    const { email, plan="pro", tokens=1000 } = req.body || {};
-    if (!email) return res.status(400).json({ error: "missing_email" });
+    const body = (req.body && typeof req.body === "object") ? req.body : {};
+    const email = (typeof body.email === "string" && body.email.trim()) || "";
+    const plan = (typeof body.plan === "string" && body.plan.trim()) || "pro";
+    const tokens = Number.isFinite(body.tokens) ? body.tokens : 1000;
 
-    // Minimal stub: keep it database-agnostic for now; return a shape your UI expects.
-    // If you already have Prisma models, you can replace this with a real upsert.
-    res.json({ ok:true, email, plan, tokensProvisioned: tokens });
+    if (!email) return jsonError(res, 400, "missing_email");
+    // Stubbed provisioning payload (drop-in spot for your DB upsert)
+    res.json({ ok: true, email, plan, tokensProvisioned: tokens });
   } catch (e) {
-    console.error("[admin/provision]", e);
-    res.status(500).json({ error: "provision_failed" });
+    console.error("[ops/admin/provision]", e);
+    jsonError(res, 500, "provision_failed");
   }
 });
-
-router.get("/usage/me", async (req, res) => {
-  try {
-    // Read-only safe defaults (until full usage tables are wired)
-    const email = (req.headers["x-user-email"] || req.query.email || "").toString();
-    res.json({
-      ok: true,
-      email: email || null,
-      plan: "trial",
-      tokensRemaining: 100
-    });
-  } catch (e) {
-    console.error("[usage/me]", e);
-    res.status(500).json({ error: "usage_failed" });
-  }
-});
+router.all("/admin/provision", (_req, res) => res.status(405).json({ error: "method_not_allowed" }));
 
 export default router;
