@@ -62,3 +62,27 @@ enum EmailStatus {
   sent
   failed
 }
+/* --- abando billing + usage models --- */
+model User {
+  id               String   @id @default(cuid())
+  email            String   @unique
+  stripeCustomerId String?  @unique
+  stripeSubStatus  String?
+  freeCredits      Int      @default(20)
+  creditsResetAt   DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  usages           Usage[]
+}
+
+model Usage {
+  id        String   @id @default(cuid())
+  userId    String
+  kind      String
+  cost      Int
+  meta      Json?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+}

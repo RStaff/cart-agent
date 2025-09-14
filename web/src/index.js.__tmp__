@@ -1,4 +1,3 @@
-import billingOps from "./routes/billing-ops.esm.js";
 import checkoutPublic from "./dev/checkoutPublic.esm.js";
 
 import express from "express";
@@ -8,13 +7,11 @@ import { billingRouter, stripeWebhook } from "./routes/billing.js";
 import { attachUser } from "./middleware/attachUser.js";
 import { usageGate } from "./middleware/usageGate.js";
 import { devAuth } from "./middleware/devAuth.js";
+import { router as devCheckoutBypass } from "./dev/checkoutBypass.dev.js";
 
 const app = express();
-app.use("/api/billing/ops", billingOps);
-
 app.use("/api/billing/checkout", checkoutPublic);
 app.use("/__public-checkout", checkoutPublic);
-
 app.get("/__public-checkout/_status", (req,res)=>res.json({ok:true, public:String(process.env.ALLOW_PUBLIC_CHECKOUT||""), price: process.env.STRIPE_PRICE_ID ? "set":"missing"}));
 
 // Root route: plain text hinting available endpoints
@@ -23,7 +20,10 @@ app.get('/', (req,res)=>{ res.type('text/plain').send('Cart Agent API. Try /hell
 app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 app.use(cors());
 app.use(express.json());
+app.use("/api/billing/checkout", checkoutPublic);
+app.use("/__public-checkout", checkoutPublic);
 app.use(devAuth);
+app.use(devCheckoutBypass);
 
 // Dev-only auth compat shim — makes common guards pass when using DEV_AUTH_TOKEN
 app.use((req, _res, next) => {
@@ -49,6 +49,7 @@ app.use("/api/billing", billingRouter);
 app.post("/api/abando/run", usageGate({ kind: "abandoned_cart_run", cost: 1 }), async (_req, res) => {
   res.json({ ok: true, message: "Ran the agent ✨" });
 });
+export default app;
 
 // Dev probe: whoami (works only when DEV_AUTH_TOKEN is provided)
 app.get("/api/dev/whoami", (req, res) => {
@@ -74,5 +75,3 @@ app.get("/api/dev/diag", (req, res) => {
     auth: { user: who, isAuthenticated: authed }
   });
 });
-
-export default app;
