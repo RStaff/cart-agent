@@ -1,3 +1,4 @@
+import app from "./src/index.js";
 import http from "http";
 import { fileURLToPath, pathToFileURL } from "url";
 import path from "path";
@@ -42,3 +43,8 @@ server.listen(PORT, "0.0.0.0", () =>
     console.error("[start] failed to import app:", err);
   }
 })();
+
+app.set?.('trust proxy', 1);
+app.listen(PORT, () => {
+  console.log("[start] listening on http://0.0.0.0:" + PORT);
+});
