@@ -1,5 +1,6 @@
 import billingOps from "./routes/billing-ops.esm.js";
 
+import planToPrice from "./middleware/planToPrice.esm.js";
 import checkoutPublic from "./dev/checkoutPublic.esm.js";
 
 import express from "express";
@@ -11,9 +12,6 @@ import { usageGate } from "./middleware/usageGate.js";
 import { devAuth } from "./middleware/devAuth.js";
 
 const app = express();
-app.use("/api/billing/checkout", checkoutPublic);
-app.use("/api/billing/checkout", planToPrice, checkoutPublic);
-app.use("/__public-checkout", planToPrice, checkoutPublic);
 
 // --- Map plan -> Stripe Price ID (starter|pro|scale); fallback to explicit priceId or STRIPE_PRICE_ID ---
 function planToPrice(req, _res, next) {
@@ -46,6 +44,11 @@ function planToPrice(req, _res, next) {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Public + API checkout with plan→price enforcement
+app.use("/__public-checkout", planToPrice, checkoutPublic);
+app.use("/api/billing/checkout", planToPrice, checkoutPublic);
+
 app.use("/api/billing/ops", billingOps);
 
 app.get("/__public-checkout/_status", (req, res) => {
