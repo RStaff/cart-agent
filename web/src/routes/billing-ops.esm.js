@@ -25,6 +25,21 @@ function jsonError(res, code, error, extra){
   res.status(code).json(Object.assign({ error }, extra || {}));
 }
 
+async function getBody(req) {
+  // If express.json() already parsed, prefer it
+  if (req && req.body && Object.keys(req.body||{}).length) return req.body;
+  // Otherwise, collect raw and try JSON
+  const buf = await new Promise((resolve,reject)=>{
+    const chunks=[]; req.on('data',d=>chunks.push(d));
+    req.on('end',()=>resolve(Buffer.concat(chunks)));
+    req.on('error',reject);
+  });
+  if (!buf || !buf.length) return {};
+  try { return JSON.parse(buf.toString('utf8')); } catch { return {}; }
+}
+
+
+
 const router = express.Router();
 
 router.post("/admin/ping", (req, res) => {
