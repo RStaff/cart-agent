@@ -19,9 +19,12 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Public + API checkout with plan→price enforcement (POST only)
+app.post("/__public-checkout", planToPrice, checkoutPublic);
+app.post("/api/billing/checkout", planToPrice, checkoutPublic);
+
+
 // Public + API checkout with plan→price enforcement
-app.use("/__public-checkout", planToPrice, checkoutPublic);
-app.use("/api/billing/checkout", planToPrice, checkoutPublic);
 
 app.use("/api/billing/ops", billingOps);
 
