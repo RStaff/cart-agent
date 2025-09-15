@@ -15,8 +15,6 @@ import { devAuth } from "./middleware/devAuth.js";
 
 const app = express();
 
-
-
 // --- plan→price guard that never skips the route ---
 function mapPlanSafe(req,res,next){
   try {
@@ -113,27 +111,30 @@ if (app.get("checkoutMounted")) {
   }
 // === CHECKOUT INLINE BEGIN ===
 function handleCheckout(req,res,next){
-  if (process.env.CHECKOUT_DRY_RUN === '1') {
-    console.log('[checkout] DRY_RUN on, skipping Stripe for', req.body?.plan);
-    return res.json({ ok:true, url:'https://example.com/fake-checkout', priceId: (res.locals && res.locals.priceId) || (req.body && req.body.priceId) || null, dryRun:true });
-  }
-  console.log('[checkout] entering handleCheckout', { plan:req.body?.plan, email:req.body?.email });
+  // Delegates to your real handler; it already returns a promise and .catch(next) internally.
   Promise.resolve().then(()=>checkoutPublic(req,res,next)).catch(next);
 }
 const _paths = ["/__public-checkout","/api/billing/checkout"];
 for (const p of _paths) {
+  // mount once; skip if already present
   const already = (app._router?.stack||[]).some(l=>l.route?.path===p);
   if (already) continue;
 
-  app.all(p, express.json(), (req,res,next)=>{ console.log('[checkout]', req.method, p); next(); }, planToPrice, (req,res,next)=>{
+  app.all(p, express.json(), mapPlanSafe, (req,res,next)=>{
+    // Mark that we matched this route (helps 404 debug if we ever fall through)
+    req._matchedIn = 'checkout_inline';
+
     if (req.method !== "POST") {
       res.set("Allow","POST");
       return res.status(405).json({ ok:false, code:"method_not_allowed", route:p });
     }
 
-    /* DRY_RUN short-circuit */
+    // DRY RUN: return stable JSON without calling Stripe
     if (String(process.env.CHECKOUT_DRY_RUN || '') !== '') {
-      const priceId = (res.locals && res.locals.priceId) || (req.body && req.body.priceId) || null;
+      const priceId =
+        (res.locals && res.locals.priceId) ||
+        (req.body && req.body.priceId) ||
+        null;
       return res.status(200).json({
         ok: true,
         dryRun: true,
@@ -142,10 +143,8 @@ for (const p of _paths) {
       });
     }
 
-    return handleCheckout(req,res,next); catch (e) {
-      console.error('[checkout] sync error', e);
-      return next(e);
-    }
+    // Live path
+    return handleCheckout(req,res,next);
   });
 }
 console.log("[startup] mounted inline checkout handlers for", _paths.join(", "));
