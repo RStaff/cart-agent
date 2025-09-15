@@ -49,8 +49,6 @@ app.use(jsonUnlessStripe);
 app.use(urlUnlessStripe);
 
 // Public + API checkout with plan→price enforcement
-app.use("/__public-checkout", planToPrice, checkoutPublic);
-app.use("/api/billing/checkout", planToPrice, checkoutPublic);
 
 // 405s for wrong methods so responses stay JSON
 app.all("/__public-checkout", (req,res,next) => {
@@ -120,4 +118,12 @@ export default app;
 /** Dev-only: echo request body to debug parsers */
 app.post("/api/dev/echo-body", (req,res)=>{
   res.json({ headers: req.headers, body: req.body || null });
+});
+
+
+// /* json error handler */
+app.use((err, req, res, _next) => {
+  const code = err?.status || 500;
+  const msg  = err?.message || "internal_error";
+  res.status(code).json({ ok:false, code, message: msg });
 });
