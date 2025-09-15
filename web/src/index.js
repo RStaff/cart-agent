@@ -73,31 +73,25 @@ if (!app.locals.__forceFirstPublic) {
 // [auto] ESM inline public checkout (order-proof)
 (async () => {
   try {
-    const mod = await import("./checkout-inline.mjs");
     const getHelpers = () => ({ mapPlanSafe, checkoutDryRun, checkoutPublic, ensureResponse, checkoutError });
     mod.default(app, express, getHelpers);
   } catch (err) {
     console.error("[checkout] ESM inline mount failed:", err && err.message);
   }
 })();
-// [auto] inline public checkout (order-proof)
 try {
-  const mountInline = require("./checkout-inline");
   const getHelpers = () => ({ mapPlanSafe, checkoutDryRun, checkoutPublic, ensureResponse, checkoutError });
   mountInline(app, express, getHelpers);
 } catch (err) {
   console.error("[checkout] failed to mount inline public route:", err && err.message);
 }
-// [auto] deferred public checkout mount
 try {
-  const deferred = require("./checkout-deferred");
   // Supply a getter so we don't require helpers before they exist
   const getHelpers = () => ({ mapPlanSafe, checkoutDryRun, checkoutPublic, ensureResponse, checkoutError });
   deferred(app, express, getHelpers);
 } catch (err) {
   console.error("[checkout] failed to schedule deferred public mount:", err && err.message);
 }
-// [auto] mount public checkout
 try {
   const mountPublicCheckout = require("./checkout-public");
   const helpers = { mapPlanSafe, checkoutDryRun, checkoutPublic, ensureResponse, checkoutError };
@@ -105,7 +99,6 @@ try {
 } catch (err) {
   console.error("[checkout] failed to mount public route:", err && err.message);
 }
-// [auto] mount public checkout (do not remove)
 try {
   const mountPublicCheckout = require("./checkout-public");
   // Pull helpers from existing scope
