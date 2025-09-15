@@ -21,7 +21,6 @@ router.post("/", async (req, res) => {
 
     const stripe = new Stripe(secret, { apiVersion: "2024-06-20" });
 
-    // allow client to supply one, otherwise make a stable-ish hash
     const idem = req.headers["idempotency-key"]
       || body.idempotencyKey
       || crypto.createHash("sha256")

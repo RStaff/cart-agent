@@ -15,17 +15,20 @@ import { devAuth } from "./middleware/devAuth.js";
 
 const app = express();
 
+app.set('trust proxy', 1);
 // --- Map plan -> Stripe Price ID (starter|pro|scale); fallback to explicit priceId or STRIPE_PRICE_ID ---
 
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Public + API checkout with plan→price enforcement
+app.use("/__public-checkout", planToPrice, checkoutPublic);
+app.use("/api/billing/checkout", planToPrice, checkoutPublic);
+
+
 // Public checkout: rate limited + JSON-only handler
 const checkoutLimiter = rateLimit({ windowMs: 60_000, max: 20, standardHeaders: true, legacyHeaders: false });
-app.post("/__public-checkout", checkoutLimiter, planToPrice, checkoutPublic);
-app.post("/api/billing/checkout", checkoutLimiter, planToPrice, checkoutPublic);
-
 
 // Public + API checkout with plan→price enforcement (POST only)
 
