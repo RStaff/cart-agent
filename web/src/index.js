@@ -93,14 +93,12 @@ try {
   console.error("[checkout] failed to schedule deferred public mount:", err && err.message);
 }
 try {
-  const mountPublicCheckout = require("./checkout-public");
   const helpers = { mapPlanSafe, checkoutDryRun, checkoutPublic, ensureResponse, checkoutError };
   mountPublicCheckout(app, express, helpers);
 } catch (err) {
   console.error("[checkout] failed to mount public route:", err && err.message);
 }
 try {
-  const mountPublicCheckout = require("./checkout-public");
   // Pull helpers from existing scope
   const helpers = { mapPlanSafe, checkoutDryRun, checkoutPublic, ensureResponse, checkoutError };
   mountPublicCheckout(app, express, helpers);
