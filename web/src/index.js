@@ -30,7 +30,6 @@ if (!app.locals.__forceFirstPublic) {
     }
 
     // Debug helpers
-    if (req.method === "GET" && p === "/__public-checkout/_probe") {
       const stack = (req.app._router?.stack||[])
         .map(l => (l.route?.path) ? { path:l.route.path, methods:l.route.methods } : null)
         .filter(Boolean);
@@ -38,7 +37,6 @@ if (!app.locals.__forceFirstPublic) {
       const hasMain = !!stack.find(r => r.path === "/__public-checkout");
       return res.json({ ok:true, force:true, hasMain, idx404, sample: stack.slice(0,20) });
     }
-    if (req.method === "POST" && p === "/__public-checkout/_ping") {
       return res.json({ ok:true, pong:true });
     }
 
@@ -75,37 +73,31 @@ if (!app.locals.__forceFirstPublic) {
   try {
     const getHelpers = () => ({ mapPlanSafe, checkoutDryRun, checkoutPublic, ensureResponse, checkoutError });
     mod.default(app, express, getHelpers);
-  } catch (err) {
-    console.error("[checkout] ESM inline mount failed:", err && err.message);
-  }
+    } catch (err) { console.error("[checkout] skipped legacy CJS mount:", err && err.message); }
+}
 })();
 try {
   const getHelpers = () => ({ mapPlanSafe, checkoutDryRun, checkoutPublic, ensureResponse, checkoutError });
   mountInline(app, express, getHelpers);
-} catch (err) {
-  console.error("[checkout] failed to mount inline public route:", err && err.message);
+  } catch (err) { console.error("[checkout] skipped legacy CJS mount:", err && err.message); }
 }
 try {
   // Supply a getter so we don't require helpers before they exist
   const getHelpers = () => ({ mapPlanSafe, checkoutDryRun, checkoutPublic, ensureResponse, checkoutError });
   deferred(app, express, getHelpers);
-} catch (err) {
-  console.error("[checkout] failed to schedule deferred public mount:", err && err.message);
+  } catch (err) { console.error("[checkout] skipped legacy CJS mount:", err && err.message); }
 }
 try {
   const helpers = { mapPlanSafe, checkoutDryRun, checkoutPublic, ensureResponse, checkoutError };
   mountPublicCheckout(app, express, helpers);
-} catch (err) {
-  console.error("[checkout] failed to mount public route:", err && err.message);
+  } catch (err) { console.error("[checkout] skipped legacy CJS mount:", err && err.message); }
 }
 try {
   // Pull helpers from existing scope
   const helpers = { mapPlanSafe, checkoutDryRun, checkoutPublic, ensureResponse, checkoutError };
   mountPublicCheckout(app, express, helpers);
-} catch (err) {
-  console.error("[checkout] failed to mount public route:", err && err.message);
+  } catch (err) { console.error("[checkout] skipped legacy CJS mount:", err && err.message); }
 }
-
 // --- plan→price guard that never skips the route ---
 function mapPlanSafe(req,res,next){
   try {
@@ -423,9 +415,8 @@ app.use((req,res) => {
 
     app.set("cartAgentCheckoutV42Mounted", true);
     console.log("[checkout] V4.2 mounted for", paths.join(", "));
-  } catch (e) {
-    console.error("[checkout] V4.2 failed:", e);
-  }
+    } catch (err) { console.error("[checkout] skipped legacy CJS mount:", err && err.message); }
+}
 })();
 // === CART-AGENT CHECKOUT V4.2 END ===
 
