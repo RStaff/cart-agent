@@ -111,42 +111,45 @@ if (app.get("checkoutMounted")) {
   }
 
 // === CHECKOUT ROUTER BEGIN ===
-(function initCheckoutRouter(){
-  if (app.get("checkoutMounted")) {
-    console.warn("[startup] checkout router already mounted; skipping");
+(function ensureCheckoutRoutesMounted(){
+  function isMounted(p){
+    try {
+      return !!(app && app._router && app._router.stack && app._router.stack.some(
+        l => l && l.route && l.route.path === p
+      ));
+    } catch { return false; }
+  }
+  const paths = ["/__public-checkout","/api/billing/checkout"];
+  const allPresent = paths.every(isMounted);
+  if (allPresent) {
+    console.warn("[startup] checkout handlers already present (introspection); not remounting");
     return;
   }
-  app.set("checkoutMounted", true);
 
   const checkout = express.Router();
-  checkout.use(express.json()); // route-local body parser
+  checkout.use(express.json());
 
-  // 405 JSON guard for wrong methods (keeps clients out of HTML)
-  checkout.all("/", (req,res,next) => {
+  // Method guard (JSON 405)
+  checkout.all("/", (req,res,next)=>{
     if (req.method !== "POST") {
       res.set("Allow","POST");
-      return res.status(405).json({ ok:false, code:"method_not_allowed", route: req.baseUrl || "/__public-checkout" });
+      return res.status(405).json({ ok:false, code:"method_not_allowed", route: req.baseUrl || "/" });
     }
-    return next();
+    next();
   });
 
-  checkout.post("/", mapPlanSafe, async (req, res, next) => {
+  checkout.post("/", mapPlanSafe, async (req,res,next)=>{
     try {
-      req._matchedIn = 'checkoutRouter';
-      await Promise.resolve().then(() => checkoutPublic(req, res, next));
-      if (!res.headersSent) {
-        return res.status(500).json({ ok:false, code:"checkout_no_response" });
-      }
-    } catch (err) {
-      return next(err);
-    }
+      await Promise.resolve().then(()=>checkoutPublic(req,res,next));
+      if (!res.headersSent) return res.status(500).json({ ok:false, code:"checkout_no_response" });
+    } catch (err) { return next(err); }
   });
 
-  // Mount at both entry points
+  // Mount once at both entry points
   app.use("/__public-checkout", checkout);
   app.use("/api/billing/checkout", checkout);
 
-  console.log("[startup] mounted checkout router at /__public-checkout and /api/billing/checkout");
+  console.log("[startup] mounted checkout handlers at /__public-checkout and /api/billing/checkout");
 })();
 // === CHECKOUT ROUTER END ===
 
