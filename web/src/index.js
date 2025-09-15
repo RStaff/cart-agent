@@ -14,6 +14,62 @@ import { usageGate } from "./middleware/usageGate.js";
 import { devAuth } from "./middleware/devAuth.js";
 
 const app = express();
+
+// [force-first] public checkout installed — handles GET(405) & POST inline, cannot 404
+if (!app.locals) app.locals = {};
+if (!app.locals.__forceFirstPublic) {
+  app.locals.__forceFirstPublic = true;
+  app.use((req, res, next) => {
+    const p = req.path || req.originalUrl || "";
+    if (!p || (p !== "/__public-checkout" && !p.startsWith("/__public-checkout/"))) return next();
+
+    // Route map
+    if (req.method !== "POST" && p === "/__public-checkout") {
+      res.set("Allow","POST");
+      return res.status(405).json({ ok:false, code:"method_not_allowed", route:"/__public-checkout" });
+    }
+
+    // Debug helpers
+    if (req.method === "GET" && p === "/__public-checkout/_probe") {
+      const stack = (req.app._router?.stack||[])
+        .map(l => (l.route?.path) ? { path:l.route.path, methods:l.route.methods } : null)
+        .filter(Boolean);
+      const idx404 = stack.findIndex(r => r.methods && r.methods.all && r.path === "*" );
+      const hasMain = !!stack.find(r => r.path === "/__public-checkout");
+      return res.json({ ok:true, force:true, hasMain, idx404, sample: stack.slice(0,20) });
+    }
+    if (req.method === "POST" && p === "/__public-checkout/_ping") {
+      return res.json({ ok:true, pong:true });
+    }
+
+    // Main POST — inline, cannot fall through
+    if (req.method === "POST" && p === "/__public-checkout") {
+      try {
+        // parse JSON body if not already parsed
+        if (!req.body || typeof req.body !== "object") {
+          let raw = ""; req.on("data", c => raw+=c);
+          return req.on("end", () => {
+            try { req.body = raw ? JSON.parse(raw) : {}; } catch { req.body = {}; }
+            const plan = req.body?.plan; const known=["starter","pro","scale"];
+            if (!known.includes(plan)) return res.status(400).json({ ok:false, code:"unknown_plan", plan });
+            if (process.env.CHECKOUT_FORCE_JSON === "1") return res.status(200).json({ ok:true, dryRun:true, plan });
+            return res.status(200).json({ ok:false, code:"checkout_no_response", plan });
+          });
+        }
+        const plan = req.body?.plan; const known=["starter","pro","scale"];
+        if (!known.includes(plan)) return res.status(400).json({ ok:false, code:"unknown_plan", plan });
+        if (process.env.CHECKOUT_FORCE_JSON === "1") return res.status(200).json({ ok:true, dryRun:true, plan });
+        return res.status(200).json({ ok:false, code:"checkout_no_response", plan });
+      } catch (e) {
+        return res.status(500).json({ ok:false, code:"checkout_error", message: String(e?.message||e) });
+      }
+    }
+
+    // Any other path under prefix continues
+    return next();
+  });
+  console.log("[force-first] public checkout installed (cannot 404)");
+}
 // [auto] ESM inline public checkout (order-proof)
 (async () => {
   try {
