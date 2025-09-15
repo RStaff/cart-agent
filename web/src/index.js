@@ -57,6 +57,25 @@ app.get("/__public-checkout/_status", (req, res) => {
 });
 
 app.use(cors());
+
+
+// === Public + API checkout (POST only) ===============================
+app.post("/__public-checkout", planToPrice, (req,res,next) => {
+  try { return checkoutPublic(req,res,next); } catch(e) { return next(e); }
+});
+app.post("/api/billing/checkout", planToPrice, (req,res,next) => {
+  try { return checkoutPublic(req,res,next); } catch(e) { return next(e); }
+});
+
+// 405 JSON guard for wrong methods (no HTML errors)
+for (const route of ["/__public-checkout", "/api/billing/checkout"]) {
+  app.all(route, (req,res,next) => {
+    if (req.method === "POST") return next();
+    res.set("Allow","POST");
+    return res.status(405).json({ ok:false, code:"method_not_allowed", route });
+  });
+}
+
 const jsonUnlessStripe = (req,res,next) =>
   req.originalUrl === "/api/billing/webhook" ? next() : express.json()(req,res,next);
 const urlUnlessStripe  = (req,res,next) =>
@@ -67,12 +86,10 @@ app.use(urlUnlessStripe);
 // Public + API checkout with plan→price enforcement
 
 // 405s for wrong methods so responses stay JSON
-app.all("/__public-checkout", (req,res,next) => {
-  if (req.method === "POST") return next();
+
   return res.status(405).json({ ok:false, code:"method_not_allowed" });
 });
-app.all("/api/billing/checkout", (req,res,next) => {
-  if (req.method === "POST") return next();
+
   return res.status(405).json({ ok:false, code:"method_not_allowed" });
 });
 app.use(helmet({ crossOriginEmbedderPolicy: false }));
@@ -153,4 +170,21 @@ app.get("/__diag/ip", (req, res) => {
     xForwardedFor: req.headers["x-forwarded-for"] || null,
     trustProxy: app.get("trust proxy"),
   });
+});
+
+app.get("/__diag/routes", (_req,res) => {
+  const out = [];
+  const src = app._router && app._router.stack ? app._router.stack : [];
+  for (const l of src) {
+    if (l.route && l.route.path) {
+      out.push({ path: l.route.path, methods: Object.keys(l.route.methods||{}).filter(Boolean) });
+    } else if (l.name === 'router' && l.handle && l.handle.stack) {
+      for (const r of l.handle.stack) {
+        if (r.route && r.route.path) {
+          out.push({ path: r.route.path, methods: Object.keys(r.route.methods||{}).filter(Boolean) });
+        }
+      }
+    }
+  }
+  res.json({ ok:true, routes: out });
 });
