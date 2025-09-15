@@ -16,6 +16,33 @@ import { devAuth } from "./middleware/devAuth.js";
 const app = express();
 
 
+
+// --- plan→price guard that never skips the route ---
+function mapPlanSafe(req,res,next){
+  try {
+    const plan = String((req.body && req.body.plan) || '').toLowerCase();
+    const prices = {
+      starter: process.env.STRIPE_PRICE_STARTER,
+      pro:     process.env.STRIPE_PRICE_PRO,
+      scale:   process.env.STRIPE_PRICE_SCALE,
+    };
+    if (!['starter','pro','scale'].includes(plan)) {
+      return res.status(400).json({ ok:false, code:'invalid_plan', plan });
+    }
+    const priceId = prices[plan];
+    if (!priceId) {
+      return res.status(400).json({ ok:false, code:'price_not_configured', plan });
+    }
+    res.locals.plan = plan;
+    res.locals.priceId = priceId;
+    // also mirror into body for downstream handlers that read from body
+    try { req.body = req.body || {}; req.body.priceId = priceId; } catch (_){}
+    return next();
+  } catch (e) {
+    console.error('[mapPlanSafe] error', e);
+    return res.status(500).json({ ok:false, code:'internal_error' });
+  }
+}
 process.on('unhandledRejection', e => { console.error('[unhandledRejection]', e); });
 process.on('uncaughtException',  e => { console.error('[uncaughtException]',  e); });
 app.set('trust proxy', true);
@@ -88,7 +115,7 @@ if (app.get("checkoutMounted")) {
 function handleCheckout(req,res,next){
   if (process.env.CHECKOUT_DRY_RUN === '1') {
     console.log('[checkout] DRY_RUN on, skipping Stripe for', req.body?.plan);
-    return res.json({ ok:true, url:'https://example.com/fake-checkout', priceId:req.body?.plan || null, dryRun:true });
+    return res.json({ ok:true, url:'https://example.com/fake-checkout', priceId: (res.locals && res.locals.priceId) || (req.body && req.body.priceId) || null, dryRun:true });
   }
   console.log('[checkout] entering handleCheckout', { plan:req.body?.plan, email:req.body?.email });
   Promise.resolve().then(()=>checkoutPublic(req,res,next)).catch(next);
