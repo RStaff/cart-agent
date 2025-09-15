@@ -207,7 +207,138 @@ app.get("/__diag/routes", (_req,res) => {
 
 // __JSON_NOT_FOUND__
 app.use((req,res) => {
-  res.status(404).json({ ok:false, code:"route_not_found", method:req.method, url:req.originalUrl, matched: req._matchedIn || null });
+  
+
+// === CART-AGENT CHECKOUT V4.2 BEGIN ===
+(function cartAgentCheckout(){
+  try {
+    if (app.get("cartAgentCheckoutV42Mounted")) {
+      console.log("[checkout] V4.2 already mounted; skipping");
+      return;
+    }
+
+    const expressJson = (typeof express !== "undefined" && express && typeof express.json === "function")
+      ? express.json()
+      : null;
+
+    const paths = ["/__public-checkout","/api/billing/checkout"];
+
+    function mapPlanSafe(req,res,next){
+      try {
+        const plan = (req.body && typeof req.body.plan === "string")
+          ? req.body.trim ? req.body.trim().toLowerCase() : String(req.body).toLowerCase()
+          : (typeof req.body?.plan === "string" ? req.body.plan.trim().toLowerCase() : "");
+        const envMap = {
+          starter: process.env.STRIPE_PRICE_STARTER || "",
+          pro:     process.env.STRIPE_PRICE_PRO     || "",
+          scale:   process.env.STRIPE_PRICE_SCALE   || ""
+        };
+        const pid = envMap[plan] || "";
+        if (!pid) {
+          if (!res.headersSent) {
+            return res.status(400).json({
+              ok:false, code:"price_not_configured",
+              message:`No Stripe price configured for '${plan || "unknown"}'`,
+              plan
+            });
+          }
+          return;
+        }
+        req.priceId = pid;
+        next();
+      } catch (e) {
+        console.error("[checkout][mapPlanSafe]", e);
+        if (!res.headersSent) res.status(500).json({ ok:false, code:"internal_error" });
+      }
+    }
+
+    function methodGate(routePath){
+      return (req,res,next)=>{
+        if (req.method !== "POST") {
+          res.set("Allow","POST");
+          if (!res.headersSent) {
+            return res.status(405).json({ ok:false, code:"method_not_allowed", route:routePath });
+          }
+          return;
+        }
+        next();
+      };
+    }
+
+    async function invokeCheckout(req,res,next){
+      try {
+        await checkoutPublic(req,res,next);
+      } catch (err) {
+        return next(err);
+      }
+      if (!res.headersSent) return next(); // fall through to ensureResponse only if nothing was sent
+    }
+
+    function ensureResponse(req,res,_next){
+      if (res.headersSent) return; // no-op if already handled
+      if (process.env.CHECKOUT_FORCE_JSON === "1") {
+        return res.status(200).json({
+          ok:true, dryRun:true,
+          plan: req.body?.plan ?? null,
+          priceId: req.priceId,
+          via: "fallback"
+        });
+      }
+      return res.status(500).json({ ok:false, code:"checkout_no_response" });
+    }
+
+    function checkoutDryRun(req,res){
+      res.set('X-Checkout-Mode','dry-run');
+      if (!res.headersSent) {
+        return res.status(200).json({
+          ok:true, dryRun:true,
+          plan: req.body?.plan ?? null,
+          priceId: req.priceId,
+          via: "shortcircuit"
+        });
+      }
+    }
+
+    // Mount our routes (placed BEFORE any 404 tail by source insertion)
+    for (const p of paths) {
+      if (process.env.CHECKOUT_FORCE_JSON === "1") {
+        if (expressJson) app.post(p, expressJson, mapPlanSafe, checkoutDryRun);
+        else             app.post(p,            mapPlanSafe, checkoutDryRun);
+      }
+      if (expressJson) app.all(p, expressJson, mapPlanSafe, methodGate(p), invokeCheckout, ensureResponse);
+      else             app.all(p,              mapPlanSafe, methodGate(p), invokeCheckout, ensureResponse);
+    }
+
+    // Error handler LOCAL to these routes (respond only if we haven't already)
+    app.use((err,req,res,next)=>{
+      const u = req?.path || "";
+      const ours = (u === "/__public-checkout" || u === "/api/billing/checkout");
+      if (!ours || res.headersSent) return next(err);
+      return res.status(500).json({ ok:false, code:"checkout_error", message: err?.message ?? "error" });
+    });
+
+    // Status probe
+    app.get("/__public-checkout/_status", (_req,res)=>{
+      res.json({
+        ok: true,
+        public: "true",
+        prices: {
+          starter: !!process.env.STRIPE_PRICE_STARTER,
+          pro:     !!process.env.STRIPE_PRICE_PRO,
+          scale:   !!process.env.STRIPE_PRICE_SCALE
+        }
+      });
+    });
+
+    app.set("cartAgentCheckoutV42Mounted", true);
+    console.log("[checkout] V4.2 mounted for", paths.join(", "));
+  } catch (e) {
+    console.error("[checkout] V4.2 failed:", e);
+  }
+})();
+// === CART-AGENT CHECKOUT V4.2 END ===
+
+res.status(404).json({ ok:false, code:"route_not_found", method:req.method, url:req.originalUrl, matched: req._matchedIn || null });
 });
 
 // __JSON_ERROR_HANDLER__
