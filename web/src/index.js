@@ -33,7 +33,6 @@ const limiter = rateLimit({
 app.use(limiter);
 /* end: global rate limit */
 // --- Map plan -> Stripe Price ID (starter|pro|scale); fallback to explicit priceId or STRIPE_PRICE_ID ---
-// Public + API checkout with plan→price enforcement
 
 // Public checkout: rate limited + JSON-only handler
 const checkoutLimiter = rateLimit({ windowMs: 60_000, max: 20, standardHeaders: true, legacyHeaders: false });
@@ -58,7 +57,6 @@ app.get("/__public-checkout/_status", (req, res) => {
 
 app.use(cors());
 
-
 // === Public + API checkout (POST only) ===============================
 
 // 405 JSON guard for wrong methods (no HTML errors)
@@ -77,12 +75,6 @@ const urlUnlessStripe  = (req,res,next) =>
 app.use(jsonUnlessStripe);
 app.use(urlUnlessStripe);
 
-
-
-
-
-
-
 // === BEGIN CHECKOUT BLOCK ===
 app.post("/__public-checkout", planToPrice, (req, res, next) => {
   Promise.resolve().then(() => checkoutPublic(req, res, next)).catch(next);
@@ -91,19 +83,18 @@ app.post("/api/billing/checkout", planToPrice, (req, res, next) => {
   Promise.resolve().then(() => checkoutPublic(req, res, next)).catch(next);
 });
 
-// 405 for wrong methods (JSON only)
+// 405 JSON for wrong methods (keep clients out of HTML)
 for (const route of ["/__public-checkout", "/api/billing/checkout"]) {
   app.all(route, (req, res, next) => {
     if (req.method === "POST") return next();
     res.set("Allow", "POST");
-    res.status(405).json({ ok:false, code:"method_not_allowed" });
+    return res.status(405).json({ ok:false, code:"method_not_allowed" });
   });
 }
 // === END CHECKOUT BLOCK ===
 
 // Public + API checkout with plan→price enforcement
 
-// 405s for wrong methods so responses stay JSON
 });
 });
 app.use(helmet({ crossOriginEmbedderPolicy: false }));
@@ -167,14 +158,12 @@ app.post("/api/dev/echo-body", (req,res)=>{
   res.json({ headers: req.headers, body: req.body || null });
 });
 
-
 // /* json error handler */
 app.use((err, req, res, _next) => {
   const code = err?.status || 500;
   const msg  = err?.message || "internal_error";
   res.status(code).json({ ok:false, code, message: msg });
 });
-
 
 app.get("/__diag/ip", (req, res) => {
   res.json({
