@@ -109,49 +109,69 @@ if (app.get("checkoutMounted")) {
   app.set("checkoutMounted", true);
 
   }
+// === CART-AGENT CHECKOUT BEGIN ===
+(function installCheckoutHandlers(){
+  try {
+    // Avoid duplicate mounts via introspection.
+    const has = (app?._router?.stack || []).some(l => l?.route?.path === "/__public-checkout" || l?.route?.path === "/api/billing/checkout");
+    if (has) { console.log("[startup] checkout handlers already present; not remounting"); return; }
 
-// === CHECKOUT ROUTER BEGIN ===
-(function ensureCheckoutRoutesMounted(){
-  function isMounted(p){
-    try {
-      return !!(app && app._router && app._router.stack && app._router.stack.some(
-        l => l && l.route && l.route.path === p
-      ));
-    } catch { return false; }
-  }
-  const paths = ["/__public-checkout","/api/billing/checkout"];
-  const allPresent = paths.every(isMounted);
-  if (allPresent) {
-    console.warn("[startup] checkout handlers already present (introspection); not remounting");
-    return;
-  }
-
-  const checkout = express.Router();
-  checkout.use(express.json());
-
-  // Method guard (JSON 405)
-  checkout.all("/", (req,res,next)=>{
-    if (req.method !== "POST") {
-      res.set("Allow","POST");
-      return res.status(405).json({ ok:false, code:"method_not_allowed", route: req.baseUrl || "/" });
+    // Map plan -> Stripe price (400 if not configured)
+    function mapPlanSafe(req,res,next){
+      try {
+        const plan = (req.body && typeof req.body.plan === "string") ? req.body.plan.trim().toLowerCase() : "";
+        const envMap = {
+          starter: process.env.STRIPE_PRICE_STARTER || "",
+          pro:     process.env.STRIPE_PRICE_PRO     || "",
+          scale:   process.env.STRIPE_PRICE_SCALE   || "",
+        };
+        const pid = envMap[plan] || "";
+        if (!pid) {
+          return res.status(400).json({ ok:false, code:"price_not_configured", message:`No Stripe price configured for '${plan || "unknown"}'`, plan });
+        }
+        req.priceId = pid;
+        return next();
+      } catch (e) {
+        console.error("[mapPlanSafe] error", e);
+        return res.status(500).json({ ok:false, code:"internal_error" });
+      }
     }
-    next();
-  });
 
-  checkout.post("/", mapPlanSafe, async (req,res,next)=>{
-    try {
-      await Promise.resolve().then(()=>checkoutPublic(req,res,next));
-      if (!res.headersSent) return res.status(500).json({ ok:false, code:"checkout_no_response" });
-    } catch (err) { return next(err); }
-  });
+    // Uniform async wrapper to avoid unhandled rejections
+    function handleCheckout(req,res,next){
+      Promise.resolve().then(() => checkoutPublic(req,res,next)).catch(next);
+    }
 
-  // Mount once at both entry points
-  app.use("/__public-checkout", checkout);
-  app.use("/api/billing/checkout", checkout);
+    const paths = ["/__public-checkout","/api/billing/checkout"];
+    for (const p of paths) {
+      app.all(p, express.json(), mapPlanSafe, (req,res,next) => {
+        if (req.method !== "POST") {
+          res.set("Allow","POST");
+          return res.status(405).json({ ok:false, code:"method_not_allowed", route:p });
+        }
+        return handleCheckout(req,res,next);
+      });
+    }
 
-  console.log("[startup] mounted checkout handlers at /__public-checkout and /api/billing/checkout");
+    // Lightweight status endpoint (no secrets)
+    app.get("/__public-checkout/_status", (_req,res) => {
+      res.json({
+        ok: true,
+        public: "true",
+        prices: {
+          starter: !!process.env.STRIPE_PRICE_STARTER,
+          pro:     !!process.env.STRIPE_PRICE_PRO,
+          scale:   !!process.env.STRIPE_PRICE_SCALE
+        }
+      });
+    });
+
+    console.log("[startup] mounted inline checkout handlers for", paths.join(", "));
+  } catch (e) {
+    console.error("[startup] failed to install checkout handlers", e);
+  }
 })();
-// === CHECKOUT ROUTER END ===
+ // === CART-AGENT CHECKOUT END ===
 
 app.use(helmet({ crossOriginEmbedderPolicy: false }));
 app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook);
