@@ -110,19 +110,18 @@ if (app.get("checkoutMounted")) {
 
   }
 
-// === CART-AGENT CHECKOUT V2 BEGIN ===
-(function installCartAgentCheckout(){
+// === CART-AGENT CHECKOUT V3 BEGIN ===
+(function installCartAgentCheckoutV3(){
   try {
+    if (app.get("cartAgentCheckoutV3Mounted")) {
+      console.log("[startup] checkout V3 already mounted; skipping");
+      return;
+    }
+    app.set("cartAgentCheckoutV3Mounted", true);
+
     const paths = ["/__public-checkout","/api/billing/checkout"];
 
-    // Introspection: do we already have a POST-capable route for each path?
-    const stack = (app && app._router && app._router.stack) ? app._router.stack : [];
-    const already = paths.every(p =>
-      stack.some(l => l && l.route && l.route.path === p && (l.route.methods.post || l.route.methods.all))
-    );
-    if (already) { console.log("[startup] checkout handlers already present; not remounting"); return; }
-
-    // Map plan -> Stripe price; 400 JSON if missing
+    // map plan -> Stripe price; 400 if missing
     function mapPlanSafe(req,res,next){
       try{
         const plan = (req.body && typeof req.body.plan === "string")
@@ -143,38 +142,54 @@ if (app.get("checkoutMounted")) {
         }
         req.priceId = pid;
         next();
-      } catch(err) {
+      } catch(err){
         console.error("[mapPlanSafe]", err);
         res.status(500).json({ ok:false, code:"internal_error" });
       }
     }
 
-    // Gate non-POST requests to 405 JSON
-    function methodGate(p){
-      return function(req,res,next){
+    // 405 for non-POST
+    function methodGate(routePath){
+      return (req,res,next)=>{
         if (req.method !== "POST") {
           res.set("Allow","POST");
-          return res.status(405).json({ ok:false, code:"method_not_allowed", route:p });
+          return res.status(405).json({ ok:false, code:"method_not_allowed", route:routePath });
         }
         next();
       };
     }
 
-    // Wrap original handler to surface errors to Express
+    // call your real handler; bubble errors
     async function invokeCheckout(req,res,next){
       try {
         await checkoutPublic(req,res,next);
-      } catch(err) {
+        next(); // continue to ensureResponse in case the handler called next() without sending
+      } catch(err){
         next(err);
       }
     }
 
-    // Optional dry-run short-circuit
+    // make sure we never fall through to route_not_found
+    function ensureResponse(req,res,next){
+      if (res.headersSent) return next();
+      if (process.env.CHECKOUT_FORCE_JSON === "1") {
+        // friendly success when in dry-run mode
+        return res.status(200).json({
+          ok:true, dryRun:true,
+          plan: req.body?.plan ?? null,
+          priceId: req.priceId,
+          via: "fallback"
+        });
+      }
+      // otherwise flag the issue clearly
+      return res.status(500).json({ ok:false, code:"checkout_no_response" });
+    }
+
+    // optional explicit dry-run that preempts the all() handler
     function checkoutDryRun(req,res){
       res.set('X-Checkout-Mode','dry-run');
       res.status(200).json({
-        ok:true,
-        dryRun:true,
+        ok:true, dryRun:true,
         plan: req.body?.plan ?? null,
         priceId: req.priceId,
         via: "shortcircuit"
@@ -182,26 +197,13 @@ if (app.get("checkoutMounted")) {
     }
 
     for (const p of paths) {
-      // Dry-run POST first so it intercepts before the all()-gate
       if (process.env.CHECKOUT_FORCE_JSON === "1") {
         app.post(p, express.json(), mapPlanSafe, checkoutDryRun);
       }
-      // Canonical gate -> real handler
-      app.all(p, express.json(), mapPlanSafe, methodGate(p), invokeCheckout);
+      app.all(p, express.json(), mapPlanSafe, methodGate(p), invokeCheckout, ensureResponse);
     }
 
-    // Optional fallthrough guard if the real handler forgets to reply
-    if (process.env.CHECKOUT_STRICT === "1") {
-      app.use((req,res,next)=>{
-        const u = req.originalUrl.split("?")[0];
-        if ((u === "/__public-checkout" || u === "/api/billing/checkout") && !res.headersSent) {
-          return res.status(500).json({ ok:false, code:"checkout_no_response" });
-        }
-        next();
-      });
-    }
-
-    // Lightweight status probe (no secrets)
+    // status probe
     app.get("/__public-checkout/_status", (_req,res)=>{
       res.json({
         ok: true,
@@ -214,123 +216,12 @@ if (app.get("checkoutMounted")) {
       });
     });
 
-    console.log("[startup] mounted checkout handlers for", paths.join(", "));
-  } catch(e) {
-    console.error("[startup] failed to install checkout handlers", e);
+    console.log("[startup] mounted checkout V3 handlers for", paths.join(", "));
+  } catch(e){
+    console.error("[startup] failed to install checkout V3", e);
   }
 })();
-// === CART-AGENT CHECKOUT V2 END ===
-
-// === CART-AGENT CHECKOUT V2 BEGIN ===
-(function installCartAgentCheckout(){
-  try {
-    const paths = ["/__public-checkout","/api/billing/checkout"];
-
-    // Introspection: do we already have a POST-capable route for each path?
-    const stack = (app && app._router && app._router.stack) ? app._router.stack : [];
-    const already = paths.every(p =>
-      stack.some(l => l && l.route && l.route.path === p && (l.route.methods.post || l.route.methods.all))
-    );
-    if (already) { console.log("[startup] checkout handlers already present; not remounting"); return; }
-
-    // Map plan -> Stripe price; 400 JSON if missing
-    function mapPlanSafe(req,res,next){
-      try{
-        const plan = (req.body && typeof req.body.plan === "string")
-          ? req.body.plan.trim().toLowerCase()
-          : "";
-        const envMap = {
-          starter: process.env.STRIPE_PRICE_STARTER || "",
-          pro:     process.env.STRIPE_PRICE_PRO     || "",
-          scale:   process.env.STRIPE_PRICE_SCALE   || ""
-        };
-        const pid = envMap[plan] || "";
-        if (!pid) {
-          return res.status(400).json({
-            ok:false, code:"price_not_configured",
-            message:`No Stripe price configured for '${plan || "unknown"}'`,
-            plan
-          });
-        }
-        req.priceId = pid;
-        next();
-      } catch(err) {
-        console.error("[mapPlanSafe]", err);
-        res.status(500).json({ ok:false, code:"internal_error" });
-      }
-    }
-
-    // Gate non-POST requests to 405 JSON
-    function methodGate(p){
-      return function(req,res,next){
-        if (req.method !== "POST") {
-          res.set("Allow","POST");
-          return res.status(405).json({ ok:false, code:"method_not_allowed", route:p });
-        }
-        next();
-      };
-    }
-
-    // Wrap original handler to surface errors to Express
-    async function invokeCheckout(req,res,next){
-      try {
-        await checkoutPublic(req,res,next);
-      } catch(err) {
-        next(err);
-      }
-    }
-
-    // Optional dry-run short-circuit
-    function checkoutDryRun(req,res){
-      res.set('X-Checkout-Mode','dry-run');
-      res.status(200).json({
-        ok:true,
-        dryRun:true,
-        plan: req.body?.plan ?? null,
-        priceId: req.priceId,
-        via: "shortcircuit"
-      });
-    }
-
-    for (const p of paths) {
-      // Dry-run POST first so it intercepts before the all()-gate
-      if (process.env.CHECKOUT_FORCE_JSON === "1") {
-        app.post(p, express.json(), mapPlanSafe, checkoutDryRun);
-      }
-      // Canonical gate -> real handler
-      app.all(p, express.json(), mapPlanSafe, methodGate(p), invokeCheckout);
-    }
-
-    // Optional fallthrough guard if the real handler forgets to reply
-    if (process.env.CHECKOUT_STRICT === "1") {
-      app.use((req,res,next)=>{
-        const u = req.originalUrl.split("?")[0];
-        if ((u === "/__public-checkout" || u === "/api/billing/checkout") && !res.headersSent) {
-          return res.status(500).json({ ok:false, code:"checkout_no_response" });
-        }
-        next();
-      });
-    }
-
-    // Lightweight status probe (no secrets)
-    app.get("/__public-checkout/_status", (_req,res)=>{
-      res.json({
-        ok: true,
-        public: "true",
-        prices: {
-          starter: !!process.env.STRIPE_PRICE_STARTER,
-          pro:     !!process.env.STRIPE_PRICE_PRO,
-          scale:   !!process.env.STRIPE_PRICE_SCALE
-        }
-      });
-    });
-
-    console.log("[startup] mounted checkout handlers for", paths.join(", "));
-  } catch(e) {
-    console.error("[startup] failed to install checkout handlers", e);
-  }
-})();
-// === CART-AGENT CHECKOUT V2 END ===
+// === CART-AGENT CHECKOUT V3 END ===
 
 app.use(helmet({ crossOriginEmbedderPolicy: false }));
 app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook);
