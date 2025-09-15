@@ -46,3 +46,24 @@ export default function mountPublicInline(app, express, getHelpers) {
 
   console.log('[checkout] ESM inline handler active for /__public-checkout');
 }
+
+/** --- DEBUG PROBE: safe to leave temporarily --- */
+export function installPublicDebugProbe(app) {
+  // Show whether our inline route is mounted and list known paths.
+  app.get('/__public-checkout/_probe', (req, res) => {
+    try {
+      const stack = (app._router && app._router.stack || [])
+        .map(l => (l.route && l.route.path) ? { path: l.route.path, methods: l.route.methods } : null)
+        .filter(Boolean);
+      const hasMain = !!stack.find(r => r.path === '/__public-checkout');
+      res.json({ ok: true, hasMain, stack });
+    } catch (e) {
+      res.status(500).json({ ok:false, code:'probe_error', message: String(e && e.message || e) });
+    }
+  });
+
+  // Simple POST sanity check under same prefix.
+  app.post('/__public-checkout/_ping', (req, res) => {
+    res.json({ ok: true, pong: true });
+  });
+}
