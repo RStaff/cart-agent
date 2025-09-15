@@ -173,6 +173,55 @@ if (app.get("checkoutMounted")) {
 })();
  // === CART-AGENT CHECKOUT END ===
 
+// === CART-AGENT DRYRUN BEGIN ===
+(function installCheckoutDryRun(){
+  try {
+    if (process.env.CHECKOUT_FORCE_JSON !== '1') return; // off unless explicitly on
+
+    const paths = ["/__public-checkout","/api/billing/checkout"];
+    const hasDryRun = (app?._router?.stack || []).some(l => {
+      try { return l?.route && paths.includes(l.route.path) && !!l.route.methods.post && l.name === 'checkoutDryRun'; }
+      catch { return false; }
+    });
+    if (hasDryRun) { console.log("[startup] dry-run checkout already installed"); return; }
+
+    function mapPlanSafe(req,res,next){
+      try {
+        const plan = (req.body && typeof req.body.plan === "string") ? req.body.plan.trim().toLowerCase() : "";
+        const envMap = {
+          starter: process.env.STRIPE_PRICE_STARTER || "",
+          pro:     process.env.STRIPE_PRICE_PRO     || "",
+          scale:   process.env.STRIPE_PRICE_SCALE   || "",
+        };
+        const pid = envMap[plan] || "";
+        if (!pid) return res.status(400).json({ ok:false, code:"price_not_configured", message:`No Stripe price configured for '${plan || "unknown"}'`, plan });
+        req.priceId = pid;
+        next();
+      } catch (e) { console.error("[mapPlanSafe]", e); res.status(500).json({ ok:false, code:"internal_error" }); }
+    }
+
+    function checkoutDryRun(req,res){
+      // Explicit JSON success; proves mapping & body parsing work
+      res.set('X-Checkout-Mode','dry-run');
+      res.status(200).json({
+        ok: true,
+        dryRun: true,
+        plan: (req.body?.plan || null),
+        priceId: req.priceId,
+        via: "shortcircuit"
+      });
+    }
+
+    for (const p of paths) {
+      app.post(p, express.json(), mapPlanSafe, checkoutDryRun);
+    }
+    console.log("[startup] installed dry-run JSON checkout handlers on", paths.join(", "));
+  } catch (e) {
+    console.error("[startup] failed to install dry-run checkout", e);
+  }
+})();
+// === CART-AGENT DRYRUN END ===
+
 app.use(helmet({ crossOriginEmbedderPolicy: false }));
 app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 app.use(devAuth);
