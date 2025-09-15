@@ -127,3 +127,14 @@ app.use((err, req, res, _next) => {
   const msg  = err?.message || "internal_error";
   res.status(code).json({ ok:false, code, message: msg });
 });
+
+
+app.get("/__diag/ip", (req, res) => {
+  res.json({
+    ip: req.ip,
+    ips: req.ips || [],
+    cfConnectingIp: req.headers["cf-connecting-ip"] || null,
+    xForwardedFor: req.headers["x-forwarded-for"] || null,
+    trustProxy: app.get("trust proxy"),
+  });
+});
