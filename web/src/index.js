@@ -14,6 +14,14 @@ import { usageGate } from "./middleware/usageGate.js";
 import { devAuth } from "./middleware/devAuth.js";
 
 const app = express();
+// [auto] inline public checkout (order-proof)
+try {
+  const mountInline = require("./checkout-inline");
+  const getHelpers = () => ({ mapPlanSafe, checkoutDryRun, checkoutPublic, ensureResponse, checkoutError });
+  mountInline(app, express, getHelpers);
+} catch (err) {
+  console.error("[checkout] failed to mount inline public route:", err && err.message);
+}
 // [auto] deferred public checkout mount
 try {
   const deferred = require("./checkout-deferred");
