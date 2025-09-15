@@ -130,9 +130,19 @@ for (const p of _paths) {
       res.set("Allow","POST");
       return res.status(405).json({ ok:false, code:"method_not_allowed", route:p });
     }
-    try {
-      return handleCheckout(req,res,next);
-    } catch (e) {
+
+    /* DRY_RUN short-circuit */
+    if (String(process.env.CHECKOUT_DRY_RUN || '') !== '') {
+      const priceId = (res.locals && res.locals.priceId) || (req.body && req.body.priceId) || null;
+      return res.status(200).json({
+        ok: true,
+        dryRun: true,
+        priceId,
+        url: 'https://example.com/fake-checkout'
+      });
+    }
+
+    return handleCheckout(req,res,next); catch (e) {
       console.error('[checkout] sync error', e);
       return next(e);
     }
