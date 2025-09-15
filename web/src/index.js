@@ -60,12 +60,6 @@ app.use(cors());
 
 
 // === Public + API checkout (POST only) ===============================
-app.post("/__public-checkout", planToPrice, (req,res,next) => {
-  try { return checkoutPublic(req,res,next); } catch(e) { return next(e); }
-});
-app.post("/api/billing/checkout", planToPrice, (req,res,next) => {
-  try { return checkoutPublic(req,res,next); } catch(e) { return next(e); }
-});
 
 // 405 JSON guard for wrong methods (no HTML errors)
 for (const route of ["/__public-checkout", "/api/billing/checkout"]) {
@@ -82,6 +76,26 @@ const urlUnlessStripe  = (req,res,next) =>
   req.originalUrl === "/api/billing/webhook" ? next() : express.urlencoded({ extended: true })(req,res,next);
 app.use(jsonUnlessStripe);
 app.use(urlUnlessStripe);
+
+
+
+// === BEGIN CHECKOUT BLOCK ===
+app.post("/__public-checkout", planToPrice, (req, res, next) => {
+  try { return checkoutPublic(req, res, next); } catch (e) { return next(e); }
+});
+app.post("/api/billing/checkout", planToPrice, (req, res, next) => {
+  try { return checkoutPublic(req, res, next); } catch (e) { return next(e); }
+});
+
+// 405 for wrong methods (JSON)
+for (const route of ["/__public-checkout", "/api/billing/checkout"]) {
+  app.all(route, (req, res, next) => {
+    if (req.method === "POST") return next();
+    res.set("Allow", "POST");
+    res.status(405).json({ ok:false, code:"method_not_allowed" });
+  });
+}
+// === END CHECKOUT BLOCK ===
 
 // Public + API checkout with plan→price enforcement
 
