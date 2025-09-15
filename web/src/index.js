@@ -24,9 +24,10 @@ const limiter = rateLimit({
   windowMs: 60_000,
   limit: 60,
   standardHeaders: true,   // adds RateLimit-* headers
-  legacyHeaders: false,
+  legacyHeaders: true,
   keyGenerator: realIp,
   skip: (req) => req.originalUrl === "/api/billing/webhook", // don't rate-limit Stripe webhooks
+
 });
 
 app.use(limiter);
