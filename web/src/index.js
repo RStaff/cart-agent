@@ -14,6 +14,15 @@ import { usageGate } from "./middleware/usageGate.js";
 import { devAuth } from "./middleware/devAuth.js";
 
 const app = express();
+// [auto] deferred public checkout mount
+try {
+  const deferred = require("./checkout-deferred");
+  // Supply a getter so we don't require helpers before they exist
+  const getHelpers = () => ({ mapPlanSafe, checkoutDryRun, checkoutPublic, ensureResponse, checkoutError });
+  deferred(app, express, getHelpers);
+} catch (err) {
+  console.error("[checkout] failed to schedule deferred public mount:", err && err.message);
+}
 // [auto] mount public checkout
 try {
   const mountPublicCheckout = require("./checkout-public");
