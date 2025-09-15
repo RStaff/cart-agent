@@ -1,4 +1,6 @@
 import billingOps from "./routes/billing-ops.esm.js";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 
 import planToPrice from "./middleware/planToPrice.esm.js";
 import checkoutPublic from "./dev/checkoutPublic.esm.js";
@@ -19,10 +21,13 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Public + API checkout with plan→price enforcement (POST only)
-app.post("/__public-checkout", planToPrice, checkoutPublic);
-app.post("/api/billing/checkout", planToPrice, checkoutPublic);
+// Public checkout: rate limited + JSON-only handler
+const checkoutLimiter = rateLimit({ windowMs: 60_000, max: 20, standardHeaders: true, legacyHeaders: false });
+app.post("/__public-checkout", checkoutLimiter, planToPrice, checkoutPublic);
+app.post("/api/billing/checkout", checkoutLimiter, planToPrice, checkoutPublic);
 
+
+// Public + API checkout with plan→price enforcement (POST only)
 
 // Public + API checkout with plan→price enforcement
 
@@ -40,8 +45,9 @@ app.get("/__public-checkout/_status", (req, res) => {
   });
 });
 
-app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 app.use(cors());
+app.use(helmet({ crossOriginEmbedderPolicy: false }));
+app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 app.use(devAuth);
 
 // Dev-only auth compat shim — makes common guards pass when using DEV_AUTH_TOKEN
