@@ -15,7 +15,22 @@ import { devAuth } from "./middleware/devAuth.js";
 
 const app = express();
 
-app.set('trust proxy', 1);
+app.set('trust proxy', true);
+
+/* begin: global rate limit */
+const realIp = (req) => req.headers["cf-connecting-ip"] || req.ip;
+
+const limiter = rateLimit({
+  windowMs: 60_000,
+  limit: 60,
+  standardHeaders: true,   // adds RateLimit-* headers
+  legacyHeaders: false,
+  keyGenerator: realIp,
+  skip: (req) => req.originalUrl === "/api/billing/webhook", // don't rate-limit Stripe webhooks
+});
+
+app.use(limiter);
+/* end: global rate limit */
 // --- Map plan -> Stripe Price ID (starter|pro|scale); fallback to explicit priceId or STRIPE_PRICE_ID ---
 // Public + API checkout with plan→price enforcement
 
