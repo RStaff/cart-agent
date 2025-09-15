@@ -14,6 +14,15 @@ import { usageGate } from "./middleware/usageGate.js";
 import { devAuth } from "./middleware/devAuth.js";
 
 const app = express();
+// [auto] mount public checkout (do not remove)
+try {
+  const mountPublicCheckout = require("./checkout-public");
+  // Pull helpers from existing scope
+  const helpers = { mapPlanSafe, checkoutDryRun, checkoutPublic, ensureResponse, checkoutError };
+  mountPublicCheckout(app, express, helpers);
+} catch (err) {
+  console.error("[checkout] failed to mount public route:", err && err.message);
+}
 
 // --- plan→price guard that never skips the route ---
 function mapPlanSafe(req,res,next){
