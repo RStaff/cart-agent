@@ -15,6 +15,9 @@ import { devAuth } from "./middleware/devAuth.js";
 
 const app = express();
 
+
+process.on('unhandledRejection', e => { console.error('[unhandledRejection]', e); });
+process.on('uncaughtException',  e => { console.error('[uncaughtException]',  e); });
 app.set('trust proxy', true);
 
 /* begin: global rate limit */
@@ -83,20 +86,29 @@ if (app.get("checkoutMounted")) {
   }
 // === CHECKOUT INLINE BEGIN ===
 function handleCheckout(req,res,next){
+  if (process.env.CHECKOUT_DRY_RUN === '1') {
+    console.log('[checkout] DRY_RUN on, skipping Stripe for', req.body?.plan);
+    return res.json({ ok:true, url:'https://example.com/fake-checkout', priceId:req.body?.plan || null, dryRun:true });
+  }
+  console.log('[checkout] entering handleCheckout', { plan:req.body?.plan, email:req.body?.email });
   Promise.resolve().then(()=>checkoutPublic(req,res,next)).catch(next);
 }
 const _paths = ["/__public-checkout","/api/billing/checkout"];
 for (const p of _paths) {
-  // mount once; skip if already present
   const already = (app._router?.stack||[]).some(l=>l.route?.path===p);
   if (already) continue;
 
-  app.all(p, express.json(), planToPrice, (req,res,next)=>{
+  app.all(p, express.json(), (req,res,next)=>{ console.log('[checkout]', req.method, p); next(); }, planToPrice, (req,res,next)=>{
     if (req.method !== "POST") {
       res.set("Allow","POST");
       return res.status(405).json({ ok:false, code:"method_not_allowed", route:p });
     }
-    return handleCheckout(req,res,next);
+    try {
+      return handleCheckout(req,res,next);
+    } catch (e) {
+      console.error('[checkout] sync error', e);
+      return next(e);
+    }
   });
 }
 console.log("[startup] mounted inline checkout handlers for", _paths.join(", "));
