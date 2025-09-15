@@ -75,7 +75,12 @@ const urlUnlessStripe  = (req,res,next) =>
 app.use(jsonUnlessStripe);
 app.use(urlUnlessStripe);
 
-// === BEGIN CHECKOUT BLOCK ===
+if (app.get("checkoutMounted")) {
+  console.warn("[startup] checkout routes already mounted; skipping duplicate");
+} else {
+  app.set("checkoutMounted", true);
+
+  // === BEGIN CHECKOUT BLOCK ===
 app.post("/__public-checkout", planToPrice, (req, res, next) => {
   Promise.resolve().then(() => checkoutPublic(req, res, next)).catch(next);
 });
@@ -92,6 +97,7 @@ for (const route of ["/__public-checkout", "/api/billing/checkout"]) {
   });
 }
 // === END CHECKOUT BLOCK ===
+}
 
 app.use(helmet({ crossOriginEmbedderPolicy: false }));
 app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook);
