@@ -79,15 +79,19 @@ app.use(urlUnlessStripe);
 
 
 
+
+
+
+
 // === BEGIN CHECKOUT BLOCK ===
 app.post("/__public-checkout", planToPrice, (req, res, next) => {
-  try { return checkoutPublic(req, res, next); } catch (e) { return next(e); }
+  Promise.resolve().then(() => checkoutPublic(req, res, next)).catch(next);
 });
 app.post("/api/billing/checkout", planToPrice, (req, res, next) => {
-  try { return checkoutPublic(req, res, next); } catch (e) { return next(e); }
+  Promise.resolve().then(() => checkoutPublic(req, res, next)).catch(next);
 });
 
-// 405 for wrong methods (JSON)
+// 405 for wrong methods (JSON only)
 for (const route of ["/__public-checkout", "/api/billing/checkout"]) {
   app.all(route, (req, res, next) => {
     if (req.method === "POST") return next();
@@ -100,11 +104,9 @@ for (const route of ["/__public-checkout", "/api/billing/checkout"]) {
 // Public + API checkout with plan→price enforcement
 
 // 405s for wrong methods so responses stay JSON
-
-  return res.status(405).json({ ok:false, code:"method_not_allowed" });
+res.status(405).json({ ok:false, code:"method_not_allowed" });
 });
-
-  return res.status(405).json({ ok:false, code:"method_not_allowed" });
+res.status(405).json({ ok:false, code:"method_not_allowed" });
 });
 app.use(helmet({ crossOriginEmbedderPolicy: false }));
 app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook);
