@@ -93,10 +93,6 @@ for (const route of ["/__public-checkout", "/api/billing/checkout"]) {
 }
 // === END CHECKOUT BLOCK ===
 
-// Public + API checkout with plan→price enforcement
-
-});
-});
 app.use(helmet({ crossOriginEmbedderPolicy: false }));
 app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 app.use(devAuth);
