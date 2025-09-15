@@ -109,52 +109,100 @@ if (app.get("checkoutMounted")) {
   app.set("checkoutMounted", true);
 
   }
-// === CART-AGENT CHECKOUT BEGIN ===
-(function installCheckoutHandlers(){
-  try {
-    // Avoid duplicate mounts via introspection.
-    const has = (app?._router?.stack || []).some(l => l?.route?.path === "/__public-checkout" || l?.route?.path === "/api/billing/checkout");
-    if (has) { console.log("[startup] checkout handlers already present; not remounting"); return; }
 
-    // Map plan -> Stripe price (400 if not configured)
+// === CART-AGENT CHECKOUT V2 BEGIN ===
+(function installCartAgentCheckout(){
+  try {
+    const paths = ["/__public-checkout","/api/billing/checkout"];
+
+    // Introspection: do we already have a POST-capable route for each path?
+    const stack = (app && app._router && app._router.stack) ? app._router.stack : [];
+    const already = paths.every(p =>
+      stack.some(l => l && l.route && l.route.path === p && (l.route.methods.post || l.route.methods.all))
+    );
+    if (already) { console.log("[startup] checkout handlers already present; not remounting"); return; }
+
+    // Map plan -> Stripe price; 400 JSON if missing
     function mapPlanSafe(req,res,next){
-      try {
-        const plan = (req.body && typeof req.body.plan === "string") ? req.body.plan.trim().toLowerCase() : "";
+      try{
+        const plan = (req.body && typeof req.body.plan === "string")
+          ? req.body.plan.trim().toLowerCase()
+          : "";
         const envMap = {
           starter: process.env.STRIPE_PRICE_STARTER || "",
           pro:     process.env.STRIPE_PRICE_PRO     || "",
-          scale:   process.env.STRIPE_PRICE_SCALE   || "",
+          scale:   process.env.STRIPE_PRICE_SCALE   || ""
         };
         const pid = envMap[plan] || "";
         if (!pid) {
-          return res.status(400).json({ ok:false, code:"price_not_configured", message:`No Stripe price configured for '${plan || "unknown"}'`, plan });
+          return res.status(400).json({
+            ok:false, code:"price_not_configured",
+            message:`No Stripe price configured for '${plan || "unknown"}'`,
+            plan
+          });
         }
         req.priceId = pid;
-        return next();
-      } catch (e) {
-        console.error("[mapPlanSafe] error", e);
-        return res.status(500).json({ ok:false, code:"internal_error" });
+        next();
+      } catch(err) {
+        console.error("[mapPlanSafe]", err);
+        res.status(500).json({ ok:false, code:"internal_error" });
       }
     }
 
-    // Uniform async wrapper to avoid unhandled rejections
-    function handleCheckout(req,res,next){
-      Promise.resolve().then(() => checkoutPublic(req,res,next)).catch(next);
-    }
-
-    const paths = ["/__public-checkout","/api/billing/checkout"];
-    for (const p of paths) {
-      app.all(p, express.json(), mapPlanSafe, (req,res,next) => {
+    // Gate non-POST requests to 405 JSON
+    function methodGate(p){
+      return function(req,res,next){
         if (req.method !== "POST") {
           res.set("Allow","POST");
           return res.status(405).json({ ok:false, code:"method_not_allowed", route:p });
         }
-        return handleCheckout(req,res,next);
+        next();
+      };
+    }
+
+    // Wrap original handler to surface errors to Express
+    async function invokeCheckout(req,res,next){
+      try {
+        await checkoutPublic(req,res,next);
+      } catch(err) {
+        next(err);
+      }
+    }
+
+    // Optional dry-run short-circuit
+    function checkoutDryRun(req,res){
+      res.set('X-Checkout-Mode','dry-run');
+      res.status(200).json({
+        ok:true,
+        dryRun:true,
+        plan: req.body?.plan ?? null,
+        priceId: req.priceId,
+        via: "shortcircuit"
       });
     }
 
-    // Lightweight status endpoint (no secrets)
-    app.get("/__public-checkout/_status", (_req,res) => {
+    for (const p of paths) {
+      // Dry-run POST first so it intercepts before the all()-gate
+      if (process.env.CHECKOUT_FORCE_JSON === "1") {
+        app.post(p, express.json(), mapPlanSafe, checkoutDryRun);
+      }
+      // Canonical gate -> real handler
+      app.all(p, express.json(), mapPlanSafe, methodGate(p), invokeCheckout);
+    }
+
+    // Optional fallthrough guard if the real handler forgets to reply
+    if (process.env.CHECKOUT_STRICT === "1") {
+      app.use((req,res,next)=>{
+        const u = req.originalUrl.split("?")[0];
+        if ((u === "/__public-checkout" || u === "/api/billing/checkout") && !res.headersSent) {
+          return res.status(500).json({ ok:false, code:"checkout_no_response" });
+        }
+        next();
+      });
+    }
+
+    // Lightweight status probe (no secrets)
+    app.get("/__public-checkout/_status", (_req,res)=>{
       res.json({
         ok: true,
         public: "true",
@@ -166,61 +214,12 @@ if (app.get("checkoutMounted")) {
       });
     });
 
-    console.log("[startup] mounted inline checkout handlers for", paths.join(", "));
-  } catch (e) {
+    console.log("[startup] mounted checkout handlers for", paths.join(", "));
+  } catch(e) {
     console.error("[startup] failed to install checkout handlers", e);
   }
 })();
- // === CART-AGENT CHECKOUT END ===
-
-// === CART-AGENT DRYRUN BEGIN ===
-(function installCheckoutDryRun(){
-  try {
-    if (process.env.CHECKOUT_FORCE_JSON !== '1') return; // off unless explicitly on
-
-    const paths = ["/__public-checkout","/api/billing/checkout"];
-    const hasDryRun = (app?._router?.stack || []).some(l => {
-      try { return l?.route && paths.includes(l.route.path) && !!l.route.methods.post && l.name === 'checkoutDryRun'; }
-      catch { return false; }
-    });
-    if (hasDryRun) { console.log("[startup] dry-run checkout already installed"); return; }
-
-    function mapPlanSafe(req,res,next){
-      try {
-        const plan = (req.body && typeof req.body.plan === "string") ? req.body.plan.trim().toLowerCase() : "";
-        const envMap = {
-          starter: process.env.STRIPE_PRICE_STARTER || "",
-          pro:     process.env.STRIPE_PRICE_PRO     || "",
-          scale:   process.env.STRIPE_PRICE_SCALE   || "",
-        };
-        const pid = envMap[plan] || "";
-        if (!pid) return res.status(400).json({ ok:false, code:"price_not_configured", message:`No Stripe price configured for '${plan || "unknown"}'`, plan });
-        req.priceId = pid;
-        next();
-      } catch (e) { console.error("[mapPlanSafe]", e); res.status(500).json({ ok:false, code:"internal_error" }); }
-    }
-
-    function checkoutDryRun(req,res){
-      // Explicit JSON success; proves mapping & body parsing work
-      res.set('X-Checkout-Mode','dry-run');
-      res.status(200).json({
-        ok: true,
-        dryRun: true,
-        plan: (req.body?.plan || null),
-        priceId: req.priceId,
-        via: "shortcircuit"
-      });
-    }
-
-    for (const p of paths) {
-      app.post(p, express.json(), mapPlanSafe, checkoutDryRun);
-    }
-    console.log("[startup] installed dry-run JSON checkout handlers on", paths.join(", "));
-  } catch (e) {
-    console.error("[startup] failed to install dry-run checkout", e);
-  }
-})();
-// === CART-AGENT DRYRUN END ===
+// === CART-AGENT CHECKOUT V2 END ===
 
 app.use(helmet({ crossOriginEmbedderPolicy: false }));
 app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook);
