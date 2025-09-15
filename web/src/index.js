@@ -17,15 +17,7 @@ const app = express();
 
 app.set('trust proxy', 1);
 // --- Map plan -> Stripe Price ID (starter|pro|scale); fallback to explicit priceId or STRIPE_PRICE_ID ---
-
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
 // Public + API checkout with plan→price enforcement
-app.use("/__public-checkout", planToPrice, checkoutPublic);
-app.use("/api/billing/checkout", planToPrice, checkoutPublic);
-
 
 // Public checkout: rate limited + JSON-only handler
 const checkoutLimiter = rateLimit({ windowMs: 60_000, max: 20, standardHeaders: true, legacyHeaders: false });
@@ -49,6 +41,26 @@ app.get("/__public-checkout/_status", (req, res) => {
 });
 
 app.use(cors());
+const jsonUnlessStripe = (req,res,next) =>
+  req.originalUrl === "/api/billing/webhook" ? next() : express.json()(req,res,next);
+const urlUnlessStripe  = (req,res,next) =>
+  req.originalUrl === "/api/billing/webhook" ? next() : express.urlencoded({ extended: true })(req,res,next);
+app.use(jsonUnlessStripe);
+app.use(urlUnlessStripe);
+
+// Public + API checkout with plan→price enforcement
+app.use("/__public-checkout", planToPrice, checkoutPublic);
+app.use("/api/billing/checkout", planToPrice, checkoutPublic);
+
+// 405s for wrong methods so responses stay JSON
+app.all("/__public-checkout", (req,res,next) => {
+  if (req.method === "POST") return next();
+  return res.status(405).json({ ok:false, code:"method_not_allowed" });
+});
+app.all("/api/billing/checkout", (req,res,next) => {
+  if (req.method === "POST") return next();
+  return res.status(405).json({ ok:false, code:"method_not_allowed" });
+});
 app.use(helmet({ crossOriginEmbedderPolicy: false }));
 app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 app.use(devAuth);
