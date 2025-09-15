@@ -104,9 +104,7 @@ for (const route of ["/__public-checkout", "/api/billing/checkout"]) {
 // Public + API checkout with plan→price enforcement
 
 // 405s for wrong methods so responses stay JSON
-res.status(405).json({ ok:false, code:"method_not_allowed" });
 });
-res.status(405).json({ ok:false, code:"method_not_allowed" });
 });
 app.use(helmet({ crossOriginEmbedderPolicy: false }));
 app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook);
