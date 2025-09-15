@@ -14,6 +14,16 @@ import { usageGate } from "./middleware/usageGate.js";
 import { devAuth } from "./middleware/devAuth.js";
 
 const app = express();
+// [auto] ESM inline public checkout (order-proof)
+(async () => {
+  try {
+    const mod = await import("./checkout-inline.mjs");
+    const getHelpers = () => ({ mapPlanSafe, checkoutDryRun, checkoutPublic, ensureResponse, checkoutError });
+    mod.default(app, express, getHelpers);
+  } catch (err) {
+    console.error("[checkout] ESM inline mount failed:", err && err.message);
+  }
+})();
 // [auto] inline public checkout (order-proof)
 try {
   const mountInline = require("./checkout-inline");
