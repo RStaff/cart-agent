@@ -81,34 +81,26 @@ if (app.get("checkoutMounted")) {
   app.set("checkoutMounted", true);
 
   }
-// === CHECKOUT ROUTER BEGIN ===
-if (!app.get("checkoutMounted")) {
-  app.set("checkoutMounted", true);
-  const checkout = express.Router();
-
-  // Route-local JSON parsing (bulletproof even if globals change)
-  checkout.use(express.json());
-
-  // Public checkout POST (two entry points share the same handler)
-  checkout.post("/__public-checkout",    planToPrice, (req,res,next)=>Promise.resolve().then(()=>checkoutPublic(req,res,next)).catch(next));
-  checkout.post("/api/billing/checkout", planToPrice, (req,res,next)=>Promise.resolve().then(()=>checkoutPublic(req,res,next)).catch(next));
-
-  // 405 JSON (no HTML) for wrong methods
-  for (const route of ["/__public-checkout", "/api/billing/checkout"]) {
-    checkout.all(route, (req,res,next) => {
-      if (req.method === "POST") return next();
-      res.set("Allow", "POST");
-      return res.status(405).json({ ok:false, code:"method_not_allowed", route });
-    });
-  }
-
-  // trace marker: lets us see if this router handled the request
-  checkout.use((req,_res,next)=>{ req._matchedIn='checkoutRouter'; next(); });
-
-  app.use(checkout);
-  console.log("[startup] mounted checkout routes via dedicated router");
+// === CHECKOUT INLINE BEGIN ===
+function handleCheckout(req,res,next){
+  Promise.resolve().then(()=>checkoutPublic(req,res,next)).catch(next);
 }
-// === CHECKOUT ROUTER END ===
+const _paths = ["/__public-checkout","/api/billing/checkout"];
+for (const p of _paths) {
+  // mount once; skip if already present
+  const already = (app._router?.stack||[]).some(l=>l.route?.path===p);
+  if (already) continue;
+
+  app.all(p, express.json(), planToPrice, (req,res,next)=>{
+    if (req.method !== "POST") {
+      res.set("Allow","POST");
+      return res.status(405).json({ ok:false, code:"method_not_allowed", route:p });
+    }
+    return handleCheckout(req,res,next);
+  });
+}
+console.log("[startup] mounted inline checkout handlers for", _paths.join(", "));
+// === CHECKOUT INLINE END ===
 
 app.use(helmet({ crossOriginEmbedderPolicy: false }));
 app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook);
