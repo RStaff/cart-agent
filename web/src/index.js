@@ -68,7 +68,7 @@ if (!app.locals.__forceFirstPublic) {
 
 
 // Root route: plain text hinting available endpoints
-app.get('/', (req,res)=>{ res.type('text/plain').send('Cart Agent API. Try /hello and /healthz'); });
+app.get('/api', (req,res)=>{ res.type('text/plain').send('Cart Agent API. Try /hello and /healthz'); });
 
 app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 app.use(cors());
