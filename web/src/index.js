@@ -122,3 +122,8 @@ import("./routes/success.esm.js")
 import("./routes/snippet.esm.js")
   .then(m => (m && typeof m.installSnippet === "function") ? m.installSnippet(app) : null)
   .catch(e => console.error("[snippet] skipped:", (e && e.message) || e));
+
+// [shopify-install] one-click ScriptTag injector for Shopify
+import("./routes/installShopify.esm.js")
+  .then(m => (m && typeof m.installShopify === "function") ? m.installShopify(app) : null)
+  .catch(e => console.error("[shopify-install] skipped:", (e && e.message) || e));
