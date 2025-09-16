@@ -76,3 +76,8 @@ app.get("/api/dev/whoami", (req, res) => {
   if (!process.env.DEV_AUTH_TOKEN) return res.status(404).end();
   res.json({ user: req.user || null });
 });
+
+// [public-pages] attach lightweight buy/success pages without breaking anything
+import("./routes/publicPages.esm.js")
+  .then(m => (m && typeof m.installPublicPages === "function") ? m.installPublicPages(app) : null)
+  .catch(e => console.error("[public-pages] skipped:", (e && e.message) || e));
