@@ -97,3 +97,8 @@ import("./routes/publicPages.esm.js")
 import("./routes/stripeWebhook.esm.js")
   .then(m => (m && typeof m.installStripeWebhook === "function") ? m.installStripeWebhook(app) : null)
   .catch(e => console.error("[stripe-webhook] skipped:", (e && e.message) || e));
+
+// [landing] attach high-converting landing page at "/"
+import("./routes/landing.esm.js")
+  .then(m => (m && typeof m.installLanding === "function") ? m.installLanding(app) : null)
+  .catch(e => console.error("[landing] skipped:", (e && e.message) || e));
