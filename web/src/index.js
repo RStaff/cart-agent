@@ -117,3 +117,8 @@ import("./routes/demoWidget.esm.js")
 import("./routes/success.esm.js")
   .then(m => (m && typeof m.installSuccess === "function") ? m.installSuccess(app) : null)
   .catch(e => console.error("[success-pages] skipped:", (e && e.message) || e));
+
+// [snippet] public embeddable script + install page
+import("./routes/snippet.esm.js")
+  .then(m => (m && typeof m.installSnippet === "function") ? m.installSnippet(app) : null)
+  .catch(e => console.error("[snippet] skipped:", (e && e.message) || e));
