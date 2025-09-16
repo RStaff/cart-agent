@@ -102,3 +102,8 @@ import("./routes/stripeWebhook.esm.js")
 import("./routes/landing.esm.js")
   .then(m => (m && typeof m.installLanding === "function") ? m.installLanding(app) : null)
   .catch(e => console.error("[landing] skipped:", (e && e.message) || e));
+
+// [demo-widget] floating demo embed for homepage
+import("./routes/demoWidget.esm.js")
+  .then(m => (m && typeof m.installDemo === "function") ? m.installDemo(app) : null)
+  .catch(e => console.error("[demo-widget] skipped:", (e && e.message) || e));

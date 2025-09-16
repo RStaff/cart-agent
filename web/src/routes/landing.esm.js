@@ -43,6 +43,7 @@ export function installLanding(app) {
     summary { cursor:pointer; font-weight:700 }
     footer { opacity:.65; font-size:14px; padding: 28px 0 60px }
   </style>
+<script src="/demo/embed.js" defer></script>
 </head>
 <body>
   <header>
