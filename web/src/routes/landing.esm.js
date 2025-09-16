@@ -1,91 +1,90 @@
 /**
- * High-converting landing page mounted at "/"
- * - Clear hero + CTA
- * - 3 benefit cards
- * - Social proof strip (replace logos later)
- * - FAQ accordion
- * - Single primary CTA -> /pricing (already live)
+ * installLanding(app): "/" homepage
+ * - Minimal, fast, server-rendered HTML
+ * - Big hero, social proof, feature bullets, CTA to /pricing
+ * - Includes floating demo widget button (/demo/embed.js)
  */
-export function installLanding(app) {
-  const SITE = process.env.APP_URL || "https://abando.ai";
-  const CTA = "/pricing";
-
-  app.get("/", (_req, res) => {
-    const html = `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Abando — Recover more carts (14-day free trial)</title>
-  <meta name="description" content="Abando adds a smart on-site conversion agent that guides shoppers and recovers abandoned carts. 14-day free trial. Cancel anytime.">
-  <meta property="og:title" content="Recover more carts with Abando"/>
-  <meta property="og:description" content="On-site conversion agent. Break even after one recovered cart."/>
-  <meta property="og:url" content="${SITE}"/>
-  <style>
-    :root { color-scheme: dark; }
-    * { box-sizing: border-box }
-    body { margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:#0b0b0c; color:#f2f2f2; }
-    a { color:#8ab4ff; text-decoration:none }
-    header, .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
-    header { height: 68px; display:flex; align-items:center; justify-content:space-between; }
-    .logo { font-weight:900; letter-spacing:.3px; }
-    .cta { display:inline-block; padding:12px 16px; border-radius:10px; background:#5b8cff; color:#0b0b0c; font-weight:800; }
-    .hero { padding: 52px 0 22px; }
-    h1 { font-size: clamp(30px,5vw,54px); margin:0 0 12px }
-    .lead { opacity:.9; font-size: clamp(16px,2.2vw,20px); line-height:1.6; max-width: 780px; }
-    .strip { opacity:.65; font-size:14px; margin: 22px 0 10px }
-    .logos { display:flex; gap:18px; flex-wrap:wrap; opacity:.5 }
-    .logo-pill { padding:6px 10px; border:1px solid #222; border-radius:8px; }
-    .grid { display:grid; gap:18px; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); margin-top:26px }
-    .card { background:#121214; border:1px solid #222; border-radius:14px; padding:18px }
-    .faq { margin: 28px 0 40px }
-    details { background:#121214; border:1px solid #222; border-radius:12px; padding:14px 16px; margin-top:10px }
-    summary { cursor:pointer; font-weight:700 }
-    footer { opacity:.65; font-size:14px; padding: 28px 0 60px }
-  </style>
-<script src="/demo/embed.js" defer></script>
-</head>
+export function installLanding(app){
+  app.get("/", (_req,res)=>{
+    const title = "Abando — turn abandoned carts into revenue";
+    const year = new Date().getFullYear();
+    res.status(200).type("html").send(`<!doctype html><html lang="en">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>${title}</title>
+<meta name="description" content="A checkout co-pilot that answers questions, guides, and closes—so abandoned carts become orders."/>
+<link rel="icon" href="data:;base64,iVBORw0KGgo="/>
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:#0b0b0c;color:#f2f2f2;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
+a{color:inherit}
+.hero{max-width:1100px;margin:0 auto;padding:60px 20px 30px;display:flex;flex-wrap:wrap;gap:24px;align-items:center}
+.h-left{flex:1 1 520px}
+.badge{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border:1px solid #222;border-radius:999px;background:#121214;font-size:12px;opacity:.9}
+h1{font-size:clamp(32px,6.5vw,56px);line-height:1.05;margin:14px 0 10px}
+.lead{opacity:.9;font-size:clamp(16px,2.2vw,20px);line-height:1.6;max-width:48ch}
+.ctas{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.btn{display:inline-block;padding:12px 16px;border-radius:12px;font-weight:800;text-decoration:none}
+.btn.primary{background:#5b8cff;color:#0b0b0c}
+.btn.ghost{border:1px solid #222;background:#121214}
+.h-right{flex:1 1 420px}
+.card{background:#121214;border:1px solid #222;border-radius:16px;padding:14px}
+.mock{border-radius:12px;border:1px dashed #2a2a2e;padding:14px;opacity:.95}
+.grid{max-width:1100px;margin:0 auto;padding:10px 20px 40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.kv{background:#121214;border:1px solid #222;border-radius:12px;padding:14px}
+.kv b{display:block;opacity:.75;margin-bottom:6px}
+.footer{max-width:1100px;margin:0 auto;padding:20px;color:#aaa;font-size:13px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid #18181a}
+.logo{font-weight:900;letter-spacing:.3px}
+small.mono{font-family:ui-monospace, SFMono-Regular, Menlo, monospace;opacity:.8}
+</style>
 <body>
-  <header>
-    <div class="logo">Abando</div>
-    <nav><a class="cta" href="${CTA}">Start Free Trial</a></nav>
+  <header class="hero">
+    <div class="h-left">
+      <div class="badge">✨ New • 14-day free trial</div>
+      <h1>Recover more checkouts with an AI cart co-pilot</h1>
+      <p class="lead">Abando answers questions, handles objections, and guides buyers through checkout—so <em>abandonment</em> turns into <strong>orders</strong>.</p>
+      <div class="ctas">
+        <a class="btn primary" href="/pricing">Start Free Trial</a>
+        <a class="btn ghost" href="/demo">See a quick demo</a>
+      </div>
+      <p style="opacity:.7;margin-top:10px">Pays for itself after a single recovered cart.</p>
+    </div>
+    <div class="h-right">
+      <div class="card mock">
+        <div style="font-weight:700;margin-bottom:8px">Live preview</div>
+        <div class="card" style="background:#0e0e10">
+          <div style="display:flex;gap:8px;margin-bottom:8px"><div style="width:8px;height:8px;border-radius:999px;background:#2a2a2e"></div><div style="width:8px;height:8px;border-radius:999px;background:#2a2a2e"></div><div style="width:8px;height:8px;border-radius:999px;background:#2a2a2e"></div></div>
+          <div style="display:flex;gap:10px;margin:6px 0">
+            <div style="background:#1a1a1c;border:1px solid #2a2a2e;border-radius:12px;padding:10px 12px;max-width:80%">👋 Hey there! I can answer questions and guide you to checkout.</div>
+          </div>
+          <div style="display:flex;gap:10px;margin:6px 0;justify-content:flex-end">
+            <div style="background:#23d18b;color:#002a15;border-radius:12px;padding:10px 12px;max-width:80%;font-weight:700">Do you have free returns?</div>
+          </div>
+          <div style="display:flex;gap:10px;margin:6px 0">
+            <div style="background:#1a1a1c;border:1px solid #2a2a2e;border-radius:12px;padding:10px 12px;max-width:80%">Yes—30 days, no questions asked. Ready to checkout?</div>
+          </div>
+        </div>
+        <p style="opacity:.65;font-size:12px;margin-top:8px">This is a lightweight preview. Click “See a quick demo.”</p>
+      </div>
+    </div>
   </header>
 
-  <div class="wrap hero">
-    <h1>Recover more carts, automatically.</h1>
-    <p class="lead">Abando adds a smart on-site conversion agent that answers questions, reduces friction, and brings shoppers back if they drift. Most stores break even after a single recovered cart.</p>
-    <p style="margin:18px 0 0">
-      <a class="cta" href="${CTA}">Start Free Trial</a>
-      <span style="opacity:.7; margin-left:10px; font-size:14px">14-day free trial • Cancel anytime</span>
-    </p>
+  <section class="grid">
+    <div class="kv"><b>Answers that convert</b><div>Shipping, sizing, returns—instantly handled, on-brand.</div></div>
+    <div class="kv"><b>Guided checkout</b><div>Collects what’s needed and hands off to Stripe/Shopify.</div></div>
+    <div class="kv"><b>Playbooks</b><div>Proven objection-handling flows you can toggle on/off.</div></div>
+    <div class="kv"><b>Analytics</b><div>See recovered carts and the moments that mattered.</div></div>
+  </section>
 
-    <div class="strip">Trusted by teams like</div>
-    <div class="logos">
-      <div class="logo-pill">Your Logo</div>
-      <div class="logo-pill">Soon™</div>
-      <div class="logo-pill">Add Later</div>
-    </div>
+  <footer class="footer">
+    <div><span class="logo">Abando</span> · © ${year}</div>
+    <div><a href="/pricing">Pricing</a> · <a href="/onboarding">Onboarding</a> · <a href="mailto:support@abando.ai">Support</a></div>
+  </footer>
 
-    <div class="grid">
-      <div class="card"><strong>On-site agent</strong><br/>Guides shoppers, handles objections, nudges to checkout.</div>
-      <div class="card"><strong>Recovery plays</strong><br/>Proven flows that re-engage and convert abandoned carts.</div>
-      <div class="card"><strong>Fast install</strong><br/>Works with or without Shopify. Be live in minutes.</div>
-    </div>
-
-    <div class="faq">
-      <h3>FAQ</h3>
-      <details><summary>How long is the trial?</summary><div>14 days. Cancel anytime in one click.</div></details>
-      <details><summary>Will it slow down my site?</summary><div>No. The agent loads asynchronously and is optimized for speed.</div></details>
-      <details><summary>What’s included on Pro?</summary><div>All Starter features plus advanced playbooks, integrations, and priority support.</div></details>
-    </div>
-
-    <p><a class="cta" href="${CTA}">Start Free Trial</a></p>
-    <footer>© <span id="y"></span> Abando • <a href="${CTA}">Pricing</a></footer>
-  </div>
-
-  <script>document.getElementById('y').textContent = new Date().getFullYear()</script>
+  <!-- floating demo pill -->
+  <script src="/demo/embed.js" defer></script>
 </body>
-</html>`;
-    res.status(200).type("html").send(html);
+</html>`);
   });
 }
