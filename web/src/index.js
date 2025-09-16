@@ -81,3 +81,8 @@ app.get("/api/dev/whoami", (req, res) => {
 import("./routes/publicPages.esm.js")
   .then(m => (m && typeof m.installPublicPages === "function") ? m.installPublicPages(app) : null)
   .catch(e => console.error("[public-pages] skipped:", (e && e.message) || e));
+
+// [stripe-webhook] attach minimal Stripe webhook endpoint
+import("./routes/stripeWebhook.esm.js")
+  .then(m => (m && typeof m.installStripeWebhook === "function") ? m.installStripeWebhook(app) : null)
+  .catch(e => console.error("[stripe-webhook] skipped:", (e && e.message) || e));
