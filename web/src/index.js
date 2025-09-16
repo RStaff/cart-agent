@@ -112,3 +112,8 @@ import("./routes/landing.esm.js")
 import("./routes/demoWidget.esm.js")
   .then(m => (m && typeof m.installDemo === "function") ? m.installDemo(app) : null)
   .catch(e => console.error("[demo-widget] skipped:", (e && e.message) || e));
+
+// [success-pages] Stripe success/cancel/onboarding routes
+import("./routes/success.esm.js")
+  .then(m => (m && typeof m.installSuccess === "function") ? m.installSuccess(app) : null)
+  .catch(e => console.error("[success-pages] skipped:", (e && e.message) || e));
