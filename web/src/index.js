@@ -8,6 +8,11 @@ import { devAuth } from "./middleware/devAuth.js";
 
 const app = express();
 
+// [public-checkout] public Stripe checkout endpoints
+import("./checkout-public.js")
+  .then(m => (m && m.default ? m.default(app) : null))
+  .catch(e => console.error("[public-checkout] skipped:", (e && e.message) || e));
+
 // [pricing-page] mounted
 import("./pricing-page.js")
   .then(m => {
