@@ -8,6 +8,17 @@ import { devAuth } from "./middleware/devAuth.js";
 
 const app = express();
 
+// [pricing-page] mounted
+import("./pricing-page.js")
+  .then(m => {
+    const handler = (m && (m.default || m.pricingPage));
+    if (typeof handler === "function") {
+      app.get("/pricing", handler);
+      console.log("[pricing] /pricing page mounted");
+    }
+  })
+  .catch(e => console.error("[pricing] skip:", e && e.message || e));
+
 
 // [force-first] public checkout installed — GET=405 guard; POST delegates; cannot 404
 if (!app.locals) app.locals = {};
