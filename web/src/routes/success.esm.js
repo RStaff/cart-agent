@@ -88,7 +88,7 @@ footer{opacity:.6;font-size:13px;margin-top:20px}
         </div>
 
         <p style="margin-top:14px">
-          <a class="cta" href="/onboarding">Set up Abando</a>
+          <a class="cta" href="/install">Set up Abando</a>
           <a class="ghost" style="margin-left:8px" href="/">Back to site</a>
         </p>
 
