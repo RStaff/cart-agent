@@ -1,54 +1,60 @@
 <!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Abando – Playground</title><link rel="stylesheet" href="/assets/style.css">
-</head>
-<body>
-
+<title>Abando – Playground</title><link rel="stylesheet" href="/assets/style.css"></head><body>
 <nav><div class="container">
   <a href="/" class="logo">Abando</a>
-  <div class="nav-links">
-    <a href="/demo">Demo</a>
+  <div class="links">
+    <a href="/demo/image">Demo (Image)</a>
+    <a href="/demo/playground" style='border-bottom:2px solid var(--primary)'>Playground</a>
     <a href="/pricing">Pricing</a>
     <a href="/onboarding">Onboarding</a>
   </div>
 </div></nav>
+<section class="hero"><div class="container">
+  <h1>Interactive Playground</h1>
+  <p class="sub">Try different tones, channels and offers, then copy the message.</p>
+</div></section>
+<section class="section"><div class="container grid-2">
+  <div class="card">
+    <label style="display:block;margin:.5rem 0">Tone
+      <select id="tone" style="width:100%;padding:.6rem;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text)">
+        <option value="friendly">Friendly</option>
+        <option value="professional">Professional</option>
+        <option value="casual">Casual</option>
+      </select>
+    </label>
+    <label style="display:block;margin:.5rem 0">Channel
+      <select id="channel" style="width:100%;padding:.6rem;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text)">
+        <option value="email">Email</option>
+        <option value="sms">SMS</option>
+        <option value="on-site">On-Site</option>
+      </select>
+    </label>
+    <label style="display:block;margin:.5rem 0">Offer (optional)
+      <input id="offer" placeholder="e.g., 10% off shipping" style="width:100%;padding:.6rem;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text)">
+    </label>
+    <label style="display:block;margin:.5rem 0">Call to action
+      <input id="cta" placeholder="Complete your order" style="width:100%;padding:.6rem;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text)">
+    </label>
+    <button class="btn btn-primary" id="generate" style="margin-top:.5rem">Generate message</button>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">Preview</h3>
+    <p id="preview-message" style="white-space:pre-wrap;min-height:120px;margin:0 0 1rem">Your message will appear here.</p>
+    <button class="btn btn-outline" id="copy">Copy message</button>
+    <div class="card" style="margin-top:1rem">
+      <h3 style="margin:.25rem 0">Glossary</h3>
+      <ul style="margin:0;padding-left:1rem;color:var(--muted);line-height:1.6">
+        <li><strong>CTA</strong>: Call to Action</li>
+        <li><strong>AOV</strong>: Average Order Value</li>
+        <li><strong>LTV</strong>: Lifetime Value</li>
+        <li><strong>CTR</strong>: Click-through Rate</li>
+        <li><strong>ROI</strong>: Return on Investment</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
 
-<header class="hero"><div class="container">
-  <div style="max-width:620px">
-    <h1>Customize your recovery message</h1>
-    <p class="sub">Pick tone, channel, and offers. Copy the output.</p>
-  </div>
-</div></header>
-<section class="container" style="display:grid;gap:16px;grid-template-columns:1fr 1fr">
-  <div class="card">
-    <label>Tone<br><select id="tone"><option value="friendly">Friendly</option><option value="professional">Professional</option><option value="casual">Casual</option></select></label><br><br>
-    <label>Channel<br><select id="channel"><option value="email">Email</option><option value="sms">SMS</option><option value="on-site">On-site</option></select></label><br><br>
-    <label>Offer (optional)<br><input id="offer" placeholder="10% off shipping"></label><br><br>
-    <label>Call to action text<br><input id="cta" placeholder="Complete your order"></label><br><br>
-    <button id="generate" class="btn btn-primary">Generate message</button>
-  </div>
-  <div class="card">
-    <h3>Preview</h3>
-    <pre id="preview" style="white-space:pre-wrap;min-height:120px"></pre>
-    <button id="copy" class="btn btn-secondary">Copy message</button>
-  </div>
-</section>
-<section class="container">
-  <div class="card">
-    <h3>Glossary</h3>
-    <ul>
-      <li><strong>CTA</strong>: Call to Action.</li>
-      <li><strong>ROI</strong>: Return on Investment.</li>
-      <li><strong>AOV</strong>: Average Order Value.</li>
-      <li><strong>LTV</strong>: Lifetime Value.</li>
-      <li><strong>CTR</strong>: Click-through Rate.</li>
-      <li><strong>FAQ</strong>: Frequently Asked Questions.</li>
-    </ul>
-  </div>
-</section>
-<section class="container" style="text-align:center;margin:24px 0">
-  <a class="btn btn-primary" href="/pricing">View pricing and plans</a>
-</section>
-<footer class="footer"><small>&copy; 2025 Abando</small></footer>
-<script src="/assets/main.js"></script>
+<footer class="footer"><div class="container"><small>© 2025 Abando™</small></div></footer>
 </body></html>
+<script src="/assets/main.js"></script>

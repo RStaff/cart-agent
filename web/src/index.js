@@ -77,6 +77,15 @@ app.get("/demo", (_req,res)=>res.sendFile(join(__dirname,"public","demo","index.
 
 
 
+
+app.get("/demo", (_req, res) => res.sendFile(join(__dirname, "public", "demo", "index.html")));
+app.get("/demo/", (_req, res) => res.sendFile(join(__dirname, "public", "demo", "index.html")));
+app.get("/demo/image", (_req, res) => res.sendFile(join(__dirname, "public", "demo", "image", "index.html")));
+app.get("/demo/image/", (_req, res) => res.sendFile(join(__dirname, "public", "demo", "image", "index.html")));
+app.get("/demo/playground", (_req, res) => res.sendFile(join(__dirname, "public", "demo", "playground", "index.html")));
+app.get("/demo/playground/", (_req, res) => res.sendFile(join(__dirname, "public", "demo", "playground", "index.html")));
+app.get("/demo/light", (_req, res) => res.redirect(301, "/demo/image"));
+app.get("/demo/light/", (_req, res) => res.redirect(301, "/demo/image"));
 // [playground mount v2] semicolon-safe, ES5-friendly
 ;(function(){
   import("./routes/playground.esm.js")
