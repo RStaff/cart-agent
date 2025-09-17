@@ -1,306 +1,274 @@
 /**
- * Demo Playground (no external APIs)
- *  - GET /demo                -> 302 to /demo/playground
- *  - GET /demo/playground     -> interactive UI
+ * Playground routes:
+ *   GET /demo            -> simple landing explaining the demo
+ *   GET /demo/playground -> HTML shell (includes <script src="/demo/playground.js">)
+ *   GET /demo/playground.js -> client JS (assembled without backticks)
  */
 export function installPlayground(app) {
-  app.get("/demo", (_req, res) => res.redirect(302, "/demo/playground"));
-
-  app.get("/demo/playground", (_req, res) => {
-    const html = `<!doctype html><html lang="en">
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Abando Playground – Try it live</title>
-<style>
-:root{color-scheme:dark}
-*{box-sizing:border-box}
-body{margin:0;background:#0b0b0c;color:#f2f2f2;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-.wrap{max-width:1100px;margin:0 auto;padding:32px 18px}
-h1{font-size:clamp(26px,4.8vw,40px);margin:0 0 10px}
-.lead{opacity:.9;line-height:1.6;margin:0 0 18px}
-.grid{display:grid;grid-template-columns: 360px 1fr;gap:16px}
-@media (max-width:960px){.grid{grid-template-columns: 1fr}}
-.card{background:#121214;border:1px solid #222;border-radius:16px;padding:16px}
-.row{display:flex;gap:8px;flex-wrap:wrap}
-label{display:block;font-size:12px;opacity:.75;margin:8px 0 4px}
-input,select,button,textarea{font:inherit}
-input[type=text],input[type=number],select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #333;background:#0e0e10;color:#f2f2f2}
-textarea{min-height:80px;resize:vertical}
-small{opacity:.65}
-.kv{display:grid;grid-template-columns:120px 1fr;gap:6px;margin:8px 0}
-.preview{background:#0f0f11;border:1px solid #222;border-radius:12px;padding:14px;min-height:220px;white-space:pre-wrap;line-height:1.55}
-.badge{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:#0f0f11;border:1px solid #333;margin-right:6px}
-.cta{display:inline-block;padding:10px 14px;border-radius:10px;background:#5b8cff;color:#0b0b0c;font-weight:800;text-decoration:none;border:0;cursor:pointer}
-.ghost{display:inline-block;padding:10px 14px;border-radius:10px;background:#0f0f11;border:1px solid #333;color:#f2f2f2;text-decoration:none;cursor:pointer}
-hr{border:0;border-top:1px solid #222;margin:14px 0}
-footer{opacity:.6;font-size:13px;margin-top:20px}
-.code{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;background:#0e0e10;border:1px solid #222;border-radius:8px;padding:8px}
-</style>
-<body><div class="wrap">
-  <h1>Abando Playground</h1>
-  <p class="lead">Shape the recovery message you'll send when a shopper leaves. Switch tone, channel, offer, timing, and see A/B variants instantly.</p>
-
-  <div class="grid">
-    <div class="card" id="controls">
-      <div class="row">
-        <span class="badge">1</span><b>Audience & Context</b>
-      </div>
-      <label>First name (optional)</label>
-      <input id="firstName" type="text" placeholder="Alex">
-
-      <label>Product name (optional)</label>
-      <input id="productName" type="text" placeholder="Soft Touch Hoodie">
-
-      <label>Checkout URL (optional)</label>
-      <input id="checkoutUrl" type="text" placeholder="https://yourstore.com/checkout?token=...">
-
-      <hr>
-      <div class="row">
-        <span class="badge">2</span><b>Message Style</b>
-      </div>
-      <label>Tone</label>
-      <select id="tone">
-        <option>Friendly</option>
-        <option>Direct</option>
-        <option>Playful</option>
-        <option>Luxury</option>
-        <option>Urgent</option>
-        <option>Minimal</option>
-      </select>
-
-      <label>Channel</label>
-      <select id="channel">
-        <option>Email</option>
-        <option>SMS</option>
-        <option>On-site nudge</option>
-      </select>
-
-      <label>Length</label>
-      <select id="length">
-        <option>Short</option>
-        <option selected>Standard</option>
-        <option>Long</option>
-      </select>
-
-      <label>CTA label</label>
-      <input id="ctaLabel" type="text" value="Resume checkout">
-
-      <div class="row" style="margin-top:8px">
-        <label><input type="checkbox" id="tokName" checked> Include {{first_name}}</label>
-        <label><input type="checkbox" id="tokProd" checked> Include {{product_name}}</label>
-        <label><input type="checkbox" id="tokUrl" checked> Include {{checkout_url}}</label>
-        <label><input type="checkbox" id="tokDisc"> Include {{discount_code}}</label>
-      </div>
-
-      <hr>
-      <div class="row">
-        <span class="badge">3</span><b>Offer & Cadence</b>
-      </div>
-      <label>Offer</label>
-      <select id="offer">
-        <option>None</option>
-        <option>Free shipping</option>
-        <option>10% off</option>
-        <option>$10 off</option>
-      </select>
-
-      <label>Send timing</label>
-      <select id="timing">
-        <option>15 minutes</option>
-        <option>4 hours</option>
-        <option>24 hours</option>
-      </select>
-
-      <label>Language</label>
-      <select id="lang">
-        <option value="en" selected>English</option>
-        <option value="es">Español (beta)</option>
-        <option value="fr">Français (beta)</option>
-      </select>
-
-      <hr>
-      <div class="row">
-        <span class="badge">4</span><b>ROI quick calc</b>
-      </div>
-      <div class="kv"><small>Avg order value</small> <input id="aov" type="number" min="1" value="80"></div>
-      <div class="kv"><small>Monthly sessions</small> <input id="sessions" type="number" min="100" value="25000"></div>
-      <div class="kv"><small>Abandon rate (%)</small> <input id="aband" type="number" min="10" max="99" value="70"></div>
-      <div class="kv"><small>Recovery rate (est.)</small> <input id="recovery" type="number" min="0.1" max="20" step="0.1" value="3.0"></div>
-      <div class="row" style="margin-top:8px">
-        <button class="ghost" id="calcBtn" type="button">Estimate revenue</button>
-        <div id="calcOut" class="small" style="margin-left:8px;opacity:.8"></div>
-      </div>
-
-      <hr>
-      <div class="row" style="justify-content:space-between">
-        <button class="cta" id="genBtn" type="button">Update preview</button>
-        <button class="ghost" id="abBtn" type="button">Create A/B Variant</button>
-        <button class="ghost" id="shareBtn" type="button">Share preview link</button>
-      </div>
-    </div>
-
-    <div class="card" id="previewPane">
-      <div class="row" style="justify-content:space-between;align-items:center">
-        <b>Preview</b>
-        <div><span class="badge" id="badgeTone">Friendly</span><span class="badge" id="badgeChannel">Email</span><span class="badge" id="badgeOffer">No offer</span></div>
-      </div>
-      <div id="preview" class="preview"></div>
-      <hr>
-      <b>Variant B</b>
-      <div id="previewB" class="preview" style="opacity:.9"></div>
-      <hr>
-      <div class="small">Webhook sample (cart recovered):</div>
-      <pre class="code" id="hook">{ "event":"cart.recovered", "order_value": 128.00, "currency":"USD", "email":"alex@example.com" }</pre>
-    </div>
-  </div>
-
-  <footer>© <span id="y"></span> Abando™</footer>
-</div>
-
-<script>
-// --- tiny "copywriter" engine (deterministic) ---
-function toneWrap(text, tone){
-  const tweaks={
-    Friendly:[["Hi","Hey"],["We noticed","We saw"],["complete","wrap up"]],
-    Direct:[["Hi",""],["We noticed","You left"],["please",""]],
-    Playful:[["Hi","Psst"],["We noticed","We peeked at your cart—"],["complete","finish up"]],
-    Luxury:[["Hi","Greetings"],["deal","offer"],["save","benefit"]],
-    Urgent:[["Hi","Heads up"],["We noticed","Time-sensitive:"],["soon","today"]],
-    Minimal:[["Hi",""],["We noticed","Reminder:"],["Please",""]]
-  }[tone]||[];
-  let out=text;
-  for(const [a,b] of tweaks){ out=out.replaceAll(a,b); }
-  return out;
-}
-function byChannel(base, ch, cta){
-  if(ch==="SMS"){
-    const s = base.replace(/\n+/g," ").slice(0,240);
-    return s + (cta?(" Reply STOP to opt out. \n"+cta):"");
+  function page({ title, body, head="" }) {
+    return [
+      '<!doctype html><html lang="en"><head>',
+      '<meta charset="utf-8"/>',
+      '<meta name="viewport" content="width=device-width,initial-scale=1"/>',
+      '<title>' + title + '</title>',
+      '<style>',
+      ':root{color-scheme:dark}',
+      '*{box-sizing:border-box}',
+      'body{margin:0;background:#0b0b0c;color:#f2f2f2;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}',
+      '.wrap{max-width:980px;margin:0 auto;padding:40px 20px}',
+      '.card{background:#121214;border:1px solid #222;border-radius:16px;padding:22px}',
+      'h1{font-size:clamp(28px,5vw,42px);margin:.2rem 0 1rem}',
+      '.lead{opacity:.9;font-size:clamp(16px,2.2vw,19px);line-height:1.7}',
+      '.row{display:flex;flex-wrap:wrap;gap:12px;margin:14px 0}',
+      '.kv{flex:1 1 240px;background:#0f0f11;border:1px solid #222;border-radius:12px;padding:12px}',
+      '.kv b{display:block;opacity:.75;font-weight:600;margin-bottom:4px}',
+      '.cta{display:inline-block;padding:12px 16px;border-radius:12px;background:#5b8cff;color:#0b0b0c;font-weight:800;text-decoration:none}',
+      '.ghost{display:inline-block;padding:12px 16px;border-radius:12px;background:#0f0f11;border:1px solid #222;color:#f2f2f2;text-decoration:none}',
+      '.small{opacity:.65;font-size:12px;margin-top:10px}',
+      'input,select,button,textarea{font:inherit}',
+      'input[type=text],input[type=number],select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #333;background:#0e0e10;color:#f2f2f2}',
+      'textarea{min-height:120px;white-space:pre-wrap}',
+      '</style>',
+      head,
+      '</head><body><div class="wrap">',
+      body,
+      '</div></body></html>'
+    ].join('');
   }
-  if(ch==="On-site nudge"){
-    return base.split("\n").slice(0,2).join(" ") + (cta?("\\n[ "+cta+" ]"):"");
-  }
-  return base + (cta?("\n\n→ "+cta):"");
-}
-function offerLine(offer){
-  if(offer==="None") return "";
-  if(offer==="Free shipping") return "We’ll cover shipping—no code needed.";
-  if(offer==="10% off") return "Use code SAVE10 at checkout.";
-  if(offer==="$10 off") return "Use code TAKE10 at checkout.";
-  return "";
-}
-function timingLine(timing){ return `We’ll hold your cart for ${timing}.`; }
-function tokens(s, cfg){
-  s = s.replaceAll("{{first_name}}", cfg.firstName || "there");
-  s = s.replaceAll("{{product_name}}", cfg.productName || "your items");
-  s = s.replaceAll("{{checkout_url}}", cfg.checkoutUrl || "your checkout");
-  s = s.replaceAll("{{discount_code}}", (cfg.offer==="10% off")?"SAVE10":(cfg.offer==="$10 off")?"TAKE10":"");
-  return s;
-}
-function baseCopy(cfg){
-  const greet = cfg.includeName ? "Hi {{first_name}}," : "Hi,";
-  const prod = cfg.includeProd ? " your {{product_name}}" : " your cart";
-  const body = `${greet}
-We noticed you left${prod}. ${offerLine(cfg.offer)}
-${timingLine(cfg.timing)}
-${cfg.includeUrl ? "Pick up where you left off: {{checkout_url}}" : ""}`;
-  return tokens(toneWrap(body, cfg.tone), cfg);
-}
-function altVariant(text){
-  return text
-    .replaceAll("We noticed","Just a nudge:")
-    .replaceAll("Pick up where you left off","Jump back in")
-    .replaceAll("We’ll hold your cart","We’re saving your picks");
-}
-function localize(s, lang){
-  if(lang==="es"){
-    return s
-      .replaceAll("Hi","Hola")
-      .replaceAll("We noticed","Vimos")
-      .replaceAll("Pick up where you left off","Continúa tu compra")
-      .replaceAll("We’ll hold your cart","Guardaremos tu carrito");
-  }
-  if(lang==="fr"){
-    return s
-      .replaceAll("Hi","Salut")
-      .replaceAll("We noticed","Nous avons remarqué")
-      .replaceAll("Pick up where you left off","Reprenez votre commande")
-      .replaceAll("We’ll hold your cart","Nous gardons votre panier");
-  }
-  return s;
-}
-function update(){
-  const cfg={
-    firstName:document.getElementById("firstName").value.trim(),
-    productName:document.getElementById("productName").value.trim(),
-    checkoutUrl:document.getElementById("checkoutUrl").value.trim(),
-    tone:document.getElementById("tone").value,
-    channel:document.getElementById("channel").value,
-    length:document.getElementById("length").value,
-    offer:document.getElementById("offer").value,
-    timing:document.getElementById("timing").value,
-    lang:document.getElementById("lang").value,
-    cta:document.getElementById("ctaLabel").value.trim()||"Resume checkout",
-    includeName:document.getElementById("tokName").checked,
-    includeProd:document.getElementById("tokProd").checked,
-    includeUrl:document.getElementById("tokUrl").checked,
-    includeDisc:document.getElementById("tokDisc").checked
-  };
-  let text = baseCopy(cfg);
-  if(cfg.length==="Short"){ text = text.split("\n").slice(0,2).join(" "); }
-  if(cfg.length==="Long"){ text = text + "\nP.S. Your picks are popular—don’t miss your size."; }
-  text = localize(text, cfg.lang);
-  const chText = byChannel(text, cfg.channel, cfg.cta);
 
-  const b = altVariant(text);
-  const bCh = byChannel(localize(b, cfg.lang), cfg.channel, cfg.cta);
+  app.get('/demo', (_req, res) => {
+    const body = [
+      '<div class="card">',
+      '<h1>Abando Demo</h1>',
+      '<p class="lead">Try the recovery copilot before you buy. Tweak the tone, channel, CTA, and see projected lift with your numbers.</p>',
+      '<p><a class="cta" href="/demo/playground">Open the Playground</a>',
+      ' <a class="ghost" href="/pricing" style="margin-left:8px">View pricing</a></p>',
+      '</div>',
+      '<footer class="small" style="opacity:.6;margin-top:18px">© <span id="y"></span> Abando™</footer>',
+      '<script>document.getElementById("y").textContent=(new Date()).getFullYear()</script>'
+    ].join('');
+    res.status(200).type('html').send(page({ title: 'Abando – Demo', body }));
+  });
 
-  document.getElementById("badgeTone").textContent = cfg.tone;
-  document.getElementById("badgeChannel").textContent = cfg.channel;
-  document.getElementById("badgeOffer").textContent = (cfg.offer==="None"?"No offer":cfg.offer);
-  document.getElementById("preview").textContent = chText;
-  document.getElementById("previewB").textContent = bCh;
+  app.get('/demo/playground', (_req, res) => {
+    const body = [
+      '<div class="card">',
+      '<h1>Interactive Playground</h1>',
+      '<p class="lead">Configure the message you\'d send to recover carts. Then copy the result or share a link to this setup.</p>',
+      '<div id="pg"></div>',
+      '<p style="margin-top:12px">',
+      '<a class="ghost" href="/pricing">Back to pricing</a>',
+      '</p>',
+      '</div>',
+      '<footer class="small" style="opacity:.6;margin-top:18px">© <span id="y"></span> Abando™</footer>',
+      '<script>document.getElementById("y").textContent=(new Date()).getFullYear()</script>',
+      '<script src="/demo/playground.js" defer></script>'
+    ].join('');
+    res.status(200).type('html').send(page({ title: 'Abando – Playground', body }));
+  });
 
-  const params = new URLSearchParams(cfg).toString();
-  history.replaceState(null,"", "?"+params);
-}
-function calc(){
-  const aov=+document.getElementById("aov").value||0;
-  const sessions=+document.getElementById("sessions").value||0;
-  const aband=+document.getElementById("aband").value||0;
-  let rec=+document.getElementById("recovery").value||0;
-  const offer=document.getElementById("offer").value;
-  // simple uplift for demo
-  if(offer==="10% off" || offer==="$10 off") rec+=1.0;
-  if(offer==="Free shipping") rec+=0.5;
-  const carts = sessions * (aband/100);
-  const recovered = carts * (rec/100);
-  const revenue = recovered * aov;
-  document.getElementById("calcOut").textContent = "≈ " + recovered.toFixed(0) + " carts / $" + revenue.toFixed(0) + " month";
-}
-function share(){
-  navigator.clipboard.writeText(location.href).then(()=>alert("Share link copied!"));
-}
-// hydrate from query
-(function(){
-  const q=new URLSearchParams(location.search);
-  for(const [k,v] of q.entries()){
-    const el=document.getElementById(k);
-    if(!el) continue;
-    if(el.type==="checkbox"){ el.checked = (v==="true"||v==="1"); }
-    else el.value = v;
-  }
-  document.getElementById("y").textContent = new Date().getFullYear();
-  update();
-})();
-document.getElementById("genBtn").onclick=update;
-document.getElementById("abBtn").onclick=update;
-document.getElementById("shareBtn").onclick=share;
-document.getElementById("calcBtn").onclick=calc;
-for(const id of ["tone","channel","length","offer","timing","lang","ctaLabel","firstName","productName","checkoutUrl","tokName","tokProd","tokUrl","tokDisc"]){
-  const el=document.getElementById(id); el && el.addEventListener("change",update);
-}
-</script>
-</body></html>`;
-    res.status(200).type("html").send(html);
+  // Serve the client JS assembled from strings (no backticks anywhere)
+  app.get('/demo/playground.js', (_req, res) => {
+    const lines = [];
+
+    // Minimal DOM builder & UI
+    lines.push(
+      '(function(){',
+      '  var el = document.getElementById("pg");',
+      '  if(!el){ return; }',
+      '  function h(tag, attrs, html){',
+      '    var s = "<" + tag; attrs = attrs||{};',
+      '    for(var k in attrs){ if(attrs.hasOwnProperty(k) && attrs[k]!==null){ s += " " + k + "=\\"" + String(attrs[k]).replace(/"/g, "&quot;") + "\\""; } }',
+      '    s += ">"; if(html){ s += html; } s += "</" + tag + ">"; return s;',
+      '  }',
+      '  var controls = [',
+      '    h("div",{class:"row"},',
+      '      h("div",{class:"kv",style:"flex:2 1 320px"},',
+      '        h("b",null,"Audience & Offer") +',
+      '        h("div",null,',
+      '          "<label>First name</label>"+h("input",{type:"text",id:"firstName",placeholder:"Alex"}) +',
+      '          "<label style=\\"display:block;margin-top:8px\\">Product name</label>"+h("input",{type:"text",id:"productName",placeholder:"Canvas Tote"}) +',
+      '          "<label style=\\"display:block;margin-top:8px\\">Checkout URL</label>"+h("input",{type:"text",id:"checkoutUrl",placeholder:"https://yourstore.com/checkout"}) +',
+      '          "<label style=\\"display:block;margin-top:8px\\">Offer</label>"+',
+      '          h("select",{id:"offer"},',
+      '            "<option>None</option><option>Free shipping</option><option>10% off</option><option>$10 off</option>"',
+      '          ) +',
+      '          "<label style=\\"display:block;margin-top:8px\\">Timing</label>"+',
+      '          h("select",{id:"timing"},',
+      '            "<option>24 hours</option><option>3 days</option><option>7 days</option>"',
+      '          )',
+      '        )',
+      '      ) +',
+      '      h("div",{class:"kv",style:"flex:1 1 240px"},',
+      '        h("b",null,"Style & Channel") +',
+      '        h("div",null,',
+      '          "<label>Tone</label>"+h("select",{id:"tone"}, "<option>Friendly</option><option>Direct</option><option>Playful</option><option>Urgent</option><option>Minimal</option>") +',
+      '          "<label style=\\"display:block;margin-top:8px\\">Channel</label>"+h("select",{id:"channel"}, "<option>Email</option><option>SMS</option><option>On-site nudge</option>") +',
+      '          "<label style=\\"display:block;margin-top:8px\\">Length</label>"+h("select",{id:"length"}, "<option>Short</option><option>Medium</option><option>Long</option>") +',
+      '          "<label style=\\"display:block;margin-top:8px\\">CTA label</label>"+h("input",{type:"text",id:"ctaLabel",placeholder:"Resume checkout"})',
+      '        )',
+      '      )',
+      '    ),',
+      '    h("div",{class:"row"},',
+      '      h("div",{class:"kv",style:"flex:2 1 420px"},',
+      '        h("b",null,"Tokens") +',
+      '        h("label",null, h("input",{type:"checkbox",id:"tokName",checked:"checked"}) + " Include first name") +',
+      '        "<br/>"+ h("label",null, h("input",{type:"checkbox",id:"tokProd",checked:"checked"}) + " Include product") +',
+      '        "<br/>"+ h("label",null, h("input",{type:"checkbox",id:"tokUrl",checked:"checked"}) + " Include checkout URL") +',
+      '        "<br/>"+ h("label",null, h("input",{type:"checkbox",id:"tokDisc"}) + " Include discount code token")',
+      '      ) +',
+      '      h("div",{class:"kv",style:"flex:1 1 240px"},',
+      '        h("b",null,"Revenue Estimator") +',
+      '        "<label>AOV ($)</label>"+h("input",{type:"number",id:"aov",value:"80",min:"0"}) +',
+      '        "<label style=\\"display:block;margin-top:8px\\">Monthly sessions</label>"+h("input",{type:"number",id:"sessions",value:"10000",min:"0"}) +',
+      '        "<label style=\\"display:block;margin-top:8px\\">Abandon rate %</label>"+h("input",{type:"number",id:"aband",value:"70",min:"0",max:"100"}) +',
+      '        "<label style=\\"display:block;margin-top:8px\\">Recovery rate %</label>"+h("input",{type:"number",id:"recovery",value:"2",min:"0",max:"100"}) +',
+      '        "<button id=\\"calcBtn\\" class=\\"ghost\\" style=\\"margin-top:8px\\">Recalculate</button>"+',
+      '        "<div id=\\"calcOut\\" class=\\"small\\" style=\\"margin-top:6px\\"></div>"',
+      '      )',
+      '    ),',
+      '    h("div",{class:"row"},',
+      '      h("div",{class:"kv",style:"flex:1 1 100%"},',
+      '        h("b",null,"Preview A") + h("textarea",{id:"preview"})',
+      '      ) +',
+      '      h("div",{class:"kv",style:"flex:1 1 100%"},',
+      '        h("b",null,"Preview B") + h("textarea",{id:"previewB"})',
+      '      )',
+      '    ),',
+      '    "<div style=\\"margin-top:8px\\">"+',
+      '      h("button",{id:"genBtn",class:"cta"},"Generate copy") +',
+      '      " "+ h("button",{id:"shareBtn",class:"ghost"},"Share settings") +',
+      '    "</div>"',
+      '  ].join("");',
+      '  el.innerHTML = controls;',
+      '',
+      '  function toneWrap(text, tone){',
+      '    var tweaks = {',
+      '      "Friendly":[["We noticed","Hey! We noticed"],["Please","Mind taking a look?"],["Reminder:","Quick reminder:"]],',
+      '      "Direct":[["We noticed","You left"],["Please",""],["Reminder:",""]],',
+      '      "Playful":[["Hi","Hey"],["We noticed","Psst—"],["Reminder:","Heads up:"]],',
+      '      "Urgent":[["We noticed","Last chance:"],["We’ll hold your cart","Your cart expires soon!"]],',
+      '      "Minimal":[["Hi",""],["We noticed","Reminder:"],["Please",""]]',
+      '    }[tone]||[];',
+      '    var out=text; for(var i=0;i<tweaks.length;i++){ out = out.split(tweaks[i][0]).join(tweaks[i][1]); }',
+      '    return out;',
+      '  }',
+      '  function byChannel(base, ch, cta){',
+      '    if(ch==="SMS"){',
+      '      var s = base.replace(/\\n+/g," ").slice(0,240);',
+      '      return s + (cta ? " Reply STOP to opt out. \\n" + cta : "");',
+      '    }',
+      '    if(ch==="On-site nudge"){',
+      '      var one = base.split("\\n").slice(0,2).join(" ");',
+      '      return one + (cta ? "\\n[ " + cta + " ]" : "");',
+      '    }',
+      '    return base + (cta ? "\\n\\n→ " + cta : "");',
+      '  }',
+      '  function offerLine(offer){',
+      '    if(offer==="None") return "";',
+      '    if(offer==="Free shipping") return "We\\u2019ll cover shipping\\u2014no code needed.";',
+      '    if(offer==="10% off") return "Use code SAVE10 at checkout.";',
+      '    if(offer==="$10 off") return "Use code TAKE10 at checkout.";',
+      '    return "";',
+      '  }',
+      '  function timingLine(timing){ return "We\\u2019ll hold your cart for " + timing + "."; }',
+      '  function tokens(s, cfg){',
+      '    function rep(a,b){ return s.split(a).join(b); }',
+      '    s = rep("{{first_name}}", cfg.firstName || "there");',
+      '    s = rep("{{product_name}}", cfg.productName || "your items");',
+      '    s = rep("{{checkout_url}}", cfg.checkoutUrl || "your checkout");',
+      '    s = rep("{{discount_code}}", (cfg.offer==="10% off")?"SAVE10":(cfg.offer==="$10 off")?"TAKE10":"");',
+      '    return s;',
+      '  }',
+      '  function baseCopy(cfg){',
+      '    var greet = cfg.includeName ? "Hi {{first_name}}," : "Hi,";',
+      '    var prod = cfg.includeProd ? " your {{product_name}}" : " your cart";',
+      '    var body = greet + "\\n" +',
+      '      "We noticed you left" + prod + ". " + offerLine(cfg.offer) + "\\n" +',
+      '      timingLine(cfg.timing) + "\\n" +',
+      '      (cfg.includeUrl ? "Pick up where you left off: {{checkout_url}}" : "");',
+      '    return tokens(toneWrap(body, cfg.tone), cfg);',
+      '  }',
+      '  function altVariant(text){',
+      '    return text.replace(/We noticed/g,"Just a nudge:")',
+      '               .replace(/Pick up where you left off/g,"Jump back in")',
+      '               .replace(/We\\u2019ll hold your cart/g,"We\\u2019re saving your picks");',
+      '  }',
+      '  function localize(s, lang){',
+      '    if(lang==="es"){',
+      '      return s.replace(/Hi/g,"Hola")',
+      '              .replace(/We noticed/g,"Vimos")',
+      '              .replace(/Pick up where you left off/g,"Contin\\u00FAa tu compra")',
+      '              .replace(/We\\u2019ll hold your cart/g,"Guardaremos tu carrito");',
+      '    }',
+      '    if(lang==="fr"){',
+      '      return s.replace(/Hi/g,"Salut")',
+      '              .replace(/We noticed/g,"Nous avons remarqu\\u00E9")',
+      '              .replace(/Pick up where you left off/g,"Reprenez votre commande")',
+      '              .replace(/We\\u2019ll hold your cart/g,"Nous gardons votre panier");',
+      '    }',
+      '    return s;',
+      '  }',
+      '  function readCfg(){',
+      '    function gv(id){ var e=document.getElementById(id); return e?e.value:""; }',
+      '    function gc(id){ var e=document.getElementById(id); return !!(e && e.checked); }',
+      '    return {',
+      '      firstName: gv("firstName"),',
+      '      productName: gv("productName"),',
+      '      checkoutUrl: gv("checkoutUrl"),',
+      '      tone: gv("tone"), channel: gv("channel"), length: gv("length"),',
+      '      offer: gv("offer"), timing: gv("timing"), lang: (document.getElementById("lang")?gv("lang"):"en"),',
+      '      cta: gv("ctaLabel") || "Resume checkout",',
+      '      includeName: gc("tokName"), includeProd: gc("tokProd"), includeUrl: gc("tokUrl"), includeDisc: gc("tokDisc")',
+      '    };',
+      '  }',
+      '  function update(){',
+      '    var cfg = readCfg();',
+      '    var text = baseCopy(cfg);',
+      '    if(cfg.length==="Short"){ text = text.split("\\n").slice(0,2).join(" "); }',
+      '    if(cfg.length==="Long"){ text = text + "\\nP.S. Your picks are popular\\u2014don\\u2019t miss your size."; }',
+      '    text = localize(text, cfg.lang);',
+      '    var chText = byChannel(text, cfg.channel, cfg.cta);',
+      '    var b = altVariant(text);',
+      '    var bCh = byChannel(localize(b, cfg.lang), cfg.channel, cfg.cta);',
+      '    var p=document.getElementById("preview"); if(p) p.value = chText;',
+      '    var pb=document.getElementById("previewB"); if(pb) pb.value = bCh;',
+      '    var q = new URLSearchParams(cfg).toString(); history.replaceState(null,"","?"+q);',
+      '  }',
+      '  function calc(){',
+      '    var aov=+document.getElementById("aov").value||0;',
+      '    var sessions=+document.getElementById("sessions").value||0;',
+      '    var aband=+document.getElementById("aband").value||0;',
+      '    var rec=+document.getElementById("recovery").value||0;',
+      '    var offer=document.getElementById("offer").value;',
+      '    if(offer==="10% off"||offer==="$10 off") rec+=1.0;',
+      '    if(offer==="Free shipping") rec+=0.5;',
+      '    var carts = sessions * (aband/100);',
+      '    var recovered = carts * (rec/100);',
+      '    var revenue = recovered * aov;',
+      '    document.getElementById("calcOut").textContent = "\\u2248 " + recovered.toFixed(0) + " carts / $" + revenue.toFixed(0) + " month";',
+      '  }',
+      '  function share(){',
+      '    if(navigator.clipboard && navigator.clipboard.writeText){',
+      '      navigator.clipboard.writeText(location.href).then(function(){ alert("Share link copied!"); });',
+      '    }',
+      '  }',
+      '  function wire(){',
+      '    var ids=["genBtn","abBtn","shareBtn","calcBtn"];',
+      '    if(document.getElementById("genBtn")) document.getElementById("genBtn").onclick = update;',
+      '    if(document.getElementById("shareBtn")) document.getElementById("shareBtn").onclick = share;',
+      '    if(document.getElementById("calcBtn")) document.getElementById("calcBtn").onclick = calc;',
+      '    var ch=["tone","channel","length","offer","timing","ctaLabel","firstName","productName","checkoutUrl","tokName","tokProd","tokUrl","tokDisc"];',
+      '    for(var i=0;i<ch.length;i++){ var e=document.getElementById(ch[i]); if(e){ e.addEventListener("change",update); } }',
+      '    // hydrate from query',
+      '    var q=new URLSearchParams(location.search);',
+      '    q.forEach(function(v,k){ var e=document.getElementById(k); if(!e) return; if(e.type==="checkbox"){ e.checked = (v==="true"||v==="1"); } else { e.value = v; } });',
+      '    calc(); update();',
+      '  }',
+      '  wire();',
+      '})();'
+    ).join('\n');
+
+    res.set('Content-Type','application/javascript; charset=utf-8').send(lines);
   });
 }
