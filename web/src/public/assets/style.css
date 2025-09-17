@@ -54,7 +54,7 @@ nav .nav-links a.active { border-bottom: 2px solid var(--primary-color); }
 .chat-preview.light { background: var(--light-chat-bg); border: 1px solid #e0e6f0; color: var(--light-text-color); }
 .chat-preview .msg { border-radius: 8px; padding: 0.75rem 1rem; display: inline-block; max-width: 80%; }
 .chat-preview.dark .msg.bot { background: var(--chat-bot-bg); color: var(--text-color); }
-chat-preview.dark .msg.user { background: var(--chat-user-bg); color: #ffffff; align-self: flex-end; }
+.chat-preview.dark .msg.user { background: var(--chat-user-bg); color: #ffffff; align-self: flex-end; }
 .chat-preview.light .msg.bot { background: var(--light-chat-bot-bg); color: var(--light-text-color); }
 .chat-preview.light .msg.user { background: var(--light-chat-user-bg); color: var(--light-text-color); align-self: flex-end; }
 .preview-info { font-size: 0.8rem; color: var(--subtext-color); margin-top: 0.5rem; }
@@ -77,6 +77,11 @@ chat-preview.dark .msg.user { background: var(--chat-user-bg); color: #ffffff; a
 .preview h3 { margin-top: 0; color: var(--primary-color); }
 .message-box { white-space: pre-wrap; background: var(--dark-bg); padding: 1rem; border-radius: 4px; min-height: 80px; border: 1px solid var(--border-color); color: var(--text-color); }
 .secondary-cta .btn { margin-top: 1rem; }
+.glossary { margin-top: 2rem; }
+.glossary h2 { margin-bottom: 1rem; color: var(--primary-color); }
+.glossary ul { list-style: none; padding: 0; margin: 0; color: var(--subtext-color); }
+.glossary ul li { margin-bottom: 0.5rem; }
+.glossary ul li strong { color: var(--primary-color); margin-right: 0.5rem; }
 @media (max-width: 600px) {
   .hero { flex-direction: column; align-items: flex-start; }
   .feature-card, .plan-card { flex: 1 1 100%; }
