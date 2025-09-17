@@ -8,73 +8,12 @@ import { devAuth } from "./middleware/devAuth.js";
 
 const app = express();
 
-// [public-checkout] public Stripe checkout endpoints
-import("./checkout-public.js")
-  .then(m => (m && m.default ? m.default(app) : null))
-  .catch(e => console.error("[public-checkout] skipped:", (e && e.message) || e));
-
-// [pricing-page] mounted
-import("./pricing-page.js")
-  .then(m => {
-    const handler = (m && (m.default || m.pricingPage));
-    if (typeof handler === "function") {
-      app.get("/pricing", handler);
-      console.log("[pricing] /pricing page mounted");
-    }
-  })
-  .catch(e => console.error("[pricing] skip:", e && e.message || e));
-
-
-// [force-first] public checkout installed — GET=405 guard; POST delegates; cannot 404
-if (!app.locals) app.locals = {};
-if (!app.locals.__forceFirstPublic) {
-  app.locals.__forceFirstPublic = true;
-  app.use(async (req, res, next) => {
-    const p = req.path || req.originalUrl || "";
-    if (!p || (p !== "/__public-checkout" && !p.startsWith("/__public-checkout/"))) return next();
-
-    if (req.method !== "POST" && p === "/__public-checkout") {
-      res.set("Allow","POST");
-      return res.status(405).json({ ok:false, code:"method_not_allowed", route:"/__public-checkout" });
-    }
-
-    if (req.method === "POST" && p === "/__public-checkout") {
-      try {
-        if (!req.body || typeof req.body !== "object") {
-          let raw = ""; req.on("data", c => raw += c);
-          return req.on("end", () => {
-            try { req.body = raw ? JSON.parse(raw) : {}; } catch { req.body = {}; }
-            import("./real-checkout.mjs")
-              .then(m => (typeof m.handlePublicCheckout === "function")
-                ? m.handlePublicCheckout(req, res)
-                : res.status(500).json({ ok:false, code:"checkout_handler_missing" }))
-              .catch(e => res.status(500).json({ ok:false, code:"checkout_import_error", message:String(e && e.message || e) }));
-          });
-        }
-        import("./real-checkout.mjs")
-          .then(m => (typeof m.handlePublicCheckout === "function")
-            ? m.handlePublicCheckout(req, res)
-            : res.status(500).json({ ok:false, code:"checkout_handler_missing" }))
-          .catch(e => res.status(500).json({ ok:false, code:"checkout_import_error", message:String(e && e.message || e) }));
-      } catch (e) {
-        return res.status(500).json({ ok:false, code:"checkout_error", message:String(e && e.message || e) });
-      }
-    }
-
-    return next();
-  });
-  console.log("[force-first] public checkout installed (cannot 404)");
-}
-
-
 // Root route: plain text hinting available endpoints
-app.get('/api', (req,res)=>{ res.type('text/plain').send('Cart Agent API. Try /hello and /healthz'); });
+app.get('/', (req,res)=>{ res.type('text/plain').send('Cart Agent API. Try /hello and /healthz'); });
 
 app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 app.use(cors());
 app.use(express.json());
-
-app.use(express.urlencoded({ extended: true }));
 app.use(devAuth);
 app.use(attachUser);
 
@@ -95,105 +34,21 @@ app.get("/api/dev/whoami", (req, res) => {
   res.json({ user: req.user || null });
 });
 
-// [public-pages] attach lightweight buy/success pages without breaking anything
-import("./routes/publicPages.esm.js")
-  .then(m => (m && typeof m.installPublicPages === "function") ? m.installPublicPages(app) : null)
-  .catch(e => console.error("[public-pages] skipped:", (e && e.message) || e));
 
-// [stripe-webhook] attach minimal Stripe webhook endpoint
-import("./routes/stripeWebhook.esm.js")
-  .then(m => (m && typeof m.installStripeWebhook === "function") ? m.installStripeWebhook(app) : null)
-  .catch(e => console.error("[stripe-webhook] skipped:", (e && e.message) || e));
-
-// [landing] attach high-converting landing page at "/"
-import("./routes/landing.esm.js")
-  .then(m => (m && typeof m.installLanding === "function") ? m.installLanding(app) : null)
-  .catch(e => console.error("[landing] skipped:", (e && e.message) || e));
-
-// [demo-widget] floating demo embed for homepage
-import("./routes/demoWidget.esm.js")
-  .then(m => (m && typeof m.installDemo === "function") ? m.installDemo(app) : null)
-  .catch(e => console.error("[demo-widget] skipped:", (e && e.message) || e));
-
-// [success-pages] Stripe success/cancel/onboarding routes
-import("./routes/success.esm.js")
-  .then(m => (m && typeof m.installSuccess === "function") ? m.installSuccess(app) : null)
-  .catch(e => console.error("[success-pages] skipped:", (e && e.message) || e));
-
-// [snippet] public embeddable script + install page
-import("./routes/snippet.esm.js")
-  .then(m => (m && typeof m.installSnippet === "function") ? m.installSnippet(app) : null)
-  .catch(e => console.error("[snippet] skipped:", (e && e.message) || e));
-
-// [shopify-install] one-click ScriptTag injector for Shopify
-import("./routes/installShopify.esm.js")
-  .then(m => (m && typeof m.installShopify === "function") ? m.installShopify(app) : null)
-  .catch(e => console.error("[shopify-install] skipped:", (e && e.message) || e));
-
-// [debug] list registered routes (GET /__routes)
-try {
-  const seen = new Set();
-  app.get("/__routes", (_req, res) => {
-    const out = [];
-    if (app && app._router && app._router.stack) {
-      app._router.stack.forEach((l) => {
-        if (l.route && l.route.path) {
-          const m = Object.keys(l.route.methods||{}).filter(Boolean).join(',').toUpperCase() || 'GET';
-          const k = m + " " + l.route.path;
-          if(!seen.has(k)){ seen.add(k); out.push(k); }
+// [playground mount v2] semicolon-safe, ES5-friendly
+;(function(){
+  import("./routes/playground.esm.js")
+    .then(function(m){
+      if (m && typeof m.installPlayground === "function") {
+        if (!globalThis.__ABANDO_PLAYGROUND_INSTALLED__) {
+          globalThis.__ABANDO_PLAYGROUND_INSTALLED__ = true;
+          m.installPlayground(app);
         }
-      });
-    }
-    res.json({routes: out.sort()});
-  });
-} catch {}
-
-
-
-
-// [playground] interactive demo (mounted safely)
-  .catch(e => console.error("[playground] failed to import:", (e && e.message) || e));
-
-
-// [playground] interactive demo (mounted safely)
-  .catch(e => console.error("[playground] failed to import:", (e && e.message) || e));
-
-
-// [playground] interactive demo (mounted safely)
-
-// [playground] interactive demo (mounted safely)
-
-// [playground] interactive demo (mounted safely)
-{
-      m.installPlayground(app);
-    } else {
-      console.error("[playground] no installer");
-    }
-  })
-  .catch(e => console.error("[playground] failed to import:", (e && e.message) || e));
-
-    if (m && typeof m.installPlayground === "function") {
-      m.installPlayground(app);
-    } else {
-      console.error("[playground] no installer");
-    }
-  })
-  .catch(e => console.error("[playground] failed to import:", (e && e.message) || e));
-
-    if (m && typeof m.installPlayground === "function") {
-      m.installPlayground(app);
-    } else {
-      console.error("[playground] no installer");
-    }
-  })
-  .catch(e => console.error("[playground] failed to import:", (e && e.message) || e));
-
-// [playground] interactive demo (mounted safely)
-;
-    if (m && typeof m.installPlayground === "function") {
-      m.installPlayground(app);
-    } else {
-      console.error("[playground] no installer");
-    }
-  })
-  .catch(e => console.error("[playground] failed to import:", (e && e.message) || e));
+      } else {
+        console.error("[playground] no installer");
+      }
+    })
+    .catch(function(e){
+      console.error("[playground] failed to import:", (e && e.message) || e);
+    });
+})();
