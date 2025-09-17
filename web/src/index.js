@@ -158,8 +158,46 @@ try {
 
 
 // [playground] interactive demo (mounted safely)
-;import("./routes/playground.esm.js")
-  .then(m => (m && typeof m.installPlayground === "function")
     ? m.installPlayground(app)
     : console.error("[playground] no installer"))
+  .catch(e => console.error("[playground] failed to import:", (e && e.message) || e));
+
+
+// [playground] interactive demo (mounted safely)
+
+// [playground] interactive demo (mounted safely)
+
+// [playground] interactive demo (mounted safely)
+{
+      m.installPlayground(app);
+    } else {
+      console.error("[playground] no installer");
+    }
+  })
+  .catch(e => console.error("[playground] failed to import:", (e && e.message) || e));
+
+    if (m && typeof m.installPlayground === "function") {
+      m.installPlayground(app);
+    } else {
+      console.error("[playground] no installer");
+    }
+  })
+  .catch(e => console.error("[playground] failed to import:", (e && e.message) || e));
+
+    if (m && typeof m.installPlayground === "function") {
+      m.installPlayground(app);
+    } else {
+      console.error("[playground] no installer");
+    }
+  })
+  .catch(e => console.error("[playground] failed to import:", (e && e.message) || e));
+
+// [playground] interactive demo (mounted safely)
+;
+    if (m && typeof m.installPlayground === "function") {
+      m.installPlayground(app);
+    } else {
+      console.error("[playground] no installer");
+    }
+  })
   .catch(e => console.error("[playground] failed to import:", (e && e.message) || e));

@@ -150,7 +150,7 @@ export function installPlayground(app) {
       lines.push('      "<li><b>CTA</b>: Call-To-Action — the button or link (e.g., \\"Resume checkout\\").</li>"+');
       lines.push('      "<li><b>Abandon rate</b>: % of shoppers who add to cart but don’t buy.</li>"+');
       lines.push('      "<li><b>Recovery rate</b>: % of abandoned carts won back with nudges.</li>"+');
-      lines.push('    "</ul>"'));
+      lines.push('    "</ul>"');
       lines.push('),');
 
       // Bottom buttons
