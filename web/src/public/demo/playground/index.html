@@ -1,62 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Abando – Interactive Playground</title>
-  <link rel="stylesheet" href="/assets/style.css">
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Abando – Playground</title><link rel="stylesheet" href="/assets/style.css">
 </head>
 <body>
-<nav>
-  <div class="container">
-    <a href="/" class="logo">Abando</a>
-    <div class="nav-links"><a href="/demo">Demo</a><a href="/pricing">Pricing</a><a href="/onboarding">Onboarding</a></div>
+
+<nav><div class="container">
+  <a href="/" class="logo">Abando</a>
+  <div class="nav-links">
+    <a href="/demo">Demo</a>
+    <a href="/pricing">Pricing</a>
+    <a href="/onboarding">Onboarding</a>
   </div>
-</nav>
-<header class="hero">
-  <div class="container">
+</div></nav>
+
+<header class="hero"><div class="container">
+  <div style="max-width:620px">
     <h1>Customize your recovery message</h1>
-    <p class="subheadline">Try different tones, channels and CTAs, then copy or share the setup.</p>
+    <p class="sub">Pick tone, channel, and offers. Copy the output.</p>
   </div>
-</header>
-<section class="container">
-  <div class="playground-form">
-    <label>Tone:
-      <select id="tone"><option value="friendly">Friendly</option><option value="professional">Professional</option><option value="casual">Casual</option></select>
-    </label>
-    <label>Channel:
-      <select id="channel"><option value="email">Email</option><option value="sms">SMS</option><option value="on-site">On‑Site</option></select>
-    </label>
-    <label>Offer (optional):
-      <input type="text" id="offer" placeholder="e.g. 10% off shipping">
-    </label>
-    <label>Call to action text:
-      <input type="text" id="cta" placeholder="Complete your order">
-    </label>
-    <button class="btn btn-primary" id="generate">Generate message</button>
+</div></header>
+<section class="container" style="display:grid;gap:16px;grid-template-columns:1fr 1fr">
+  <div class="card">
+    <label>Tone<br><select id="tone"><option value="friendly">Friendly</option><option value="professional">Professional</option><option value="casual">Casual</option></select></label><br><br>
+    <label>Channel<br><select id="channel"><option value="email">Email</option><option value="sms">SMS</option><option value="on-site">On-site</option></select></label><br><br>
+    <label>Offer (optional)<br><input id="offer" placeholder="10% off shipping"></label><br><br>
+    <label>Call to action text<br><input id="cta" placeholder="Complete your order"></label><br><br>
+    <button id="generate" class="btn btn-primary">Generate message</button>
   </div>
-  <div class="preview">
+  <div class="card">
     <h3>Preview</h3>
-    <p id="preview-message" class="message-box">Your message will appear here.</p>
-    <button class="btn btn-secondary" id="copy">Copy message</button>
+    <pre id="preview" style="white-space:pre-wrap;min-height:120px"></pre>
+    <button id="copy" class="btn btn-secondary">Copy message</button>
   </div>
-  <section class="glossary">
-    <h2>Glossary</h2>
+</section>
+<section class="container">
+  <div class="card">
+    <h3>Glossary</h3>
     <ul>
-      <li><strong>CTA:</strong> Call to Action – a prompt encouraging the shopper to complete a specific action.</li>
-      <li><strong>ROI:</strong> Return on Investment – the gain or loss from an investment relative to its cost.</li>
-      <li><strong>AOV:</strong> Average Order Value – the average dollar amount spent each time a customer places an order.</li>
-      <li><strong>LTV:</strong> Lifetime Value – the total revenue expected from a customer throughout their relationship with your business.</li>
-      <li><strong>CTR:</strong> Click‑through Rate – the percentage of people who click a link out of the total who see it.</li>
-      <li><strong>FAQ:</strong> Frequently Asked Questions – a list of common questions and their answers.</li>
+      <li><strong>CTA</strong>: Call to Action.</li>
+      <li><strong>ROI</strong>: Return on Investment.</li>
+      <li><strong>AOV</strong>: Average Order Value.</li>
+      <li><strong>LTV</strong>: Lifetime Value.</li>
+      <li><strong>CTR</strong>: Click-through Rate.</li>
+      <li><strong>FAQ</strong>: Frequently Asked Questions.</li>
     </ul>
-  </section>
+  </div>
 </section>
-<section class="secondary-cta">
-  <h2>Ready to recover real revenue?</h2>
-  <a href="/pricing" class="btn btn-primary">View pricing & plans</a>
+<section class="container" style="text-align:center;margin:24px 0">
+  <a class="btn btn-primary" href="/pricing">View pricing and plans</a>
 </section>
-<footer class="footer"><small>&copy; 2025 Abando™</small></footer>
+<footer class="footer"><small>&copy; 2025 Abando</small></footer>
 <script src="/assets/main.js"></script>
-</body>
-</html>
+</body></html>

@@ -1,61 +1,39 @@
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('[data-plan]').forEach(btn => {
-    btn.addEventListener('click', async () => {
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('[data-plan]').forEach(btn=>{
+    btn.addEventListener('click',async()=>{
       const plan = btn.getAttribute('data-plan');
-      try {
-        const res = await fetch('/api/billing/checkout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ plan }),
+      try{
+        const r = await fetch('/api/billing/checkout',{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({plan})
         });
-        const data = await res.json();
-        if (data.url) {
-          window.location.href = data.url;
-        } else {
-          alert('Checkout failed: ' + (data.error || 'Unknown error'));
-        }
-      } catch (err) {
-        console.error(err);
-        alert('Unable to start checkout.');
-      }
+        const d = await r.json();
+        if(d.url) window.location.href=d.url;
+        else alert('Unable to start checkout');
+      }catch(e){ alert('Error. Please try again.'); }
     });
   });
+  const tone=document.getElementById('tone');
+  const channel=document.getElementById('channel');
+  const offer=document.getElementById('offer');
+  const cta=document.getElementById('cta');
+  const out=document.getElementById('preview');
+  const gen=document.getElementById('generate');
+  const copy=document.getElementById('copy');
+  if(gen && out){
+    const build=()=>{
+      let m=(tone?.value==='professional'?'Hello,':'Hey there,')+' ';
+      m+='we noticed you left items in your cart. ';
+      if(offer?.value.trim()) m+='Here is an offer: '+offer.value.trim()+'. ';
+      m+='We can answer questions on '+(channel?.value||'email')+'. ';
+      m+='
 
-  const toneEl = document.getElementById('tone');
-  const channelEl = document.getElementById('channel');
-  const offerEl = document.getElementById('offer');
-  const ctaEl = document.getElementById('cta');
-  const previewEl = document.getElementById('preview-message');
-  const genBtn = document.getElementById('generate');
-  const copyBtn = document.getElementById('copy');
-
-  if (genBtn && previewEl) {
-    const update = () => {
-      let msg = '';
-      switch(toneEl.value) {
-        case 'friendly': msg += 'Hey there!\n'; break;
-        case 'professional': msg += 'Hello,\n'; break;
-        default: msg += 'Hi,\n'; break;
-      }
-      msg += 'We noticed you left some items in your cart. ';
-      if (offerEl.value.trim()) {
-        msg += 'Here’s a special offer: ' + offerEl.value.trim() + '. ';
-      }
-      msg += 'We’re here to answer any questions and help you complete your purchase.\n\n';
-      msg += (ctaEl.value.trim() || 'Finish your order') + ' →';
-      previewEl.textContent = msg;
+'+(cta?.value.trim()||'Finish your order')+' ->';
+      out.textContent=m;
     };
-    genBtn.addEventListener('click', update);
-    [toneEl, channelEl, offerEl, ctaEl].forEach(el => {
-      el && el.addEventListener('input', update);
-    });
-    copyBtn.addEventListener('click', () => {
-      navigator.clipboard.writeText(previewEl.textContent).then(() => {
-        alert('Message copied');
-      }).catch(() => {
-        alert('Copy failed');
-      });
-    });
+    gen.addEventListener('click',build);
+    [tone,channel,offer,cta].forEach(el=>el&&el.addEventListener('input',build));
+    copy?.addEventListener('click',()=>navigator.clipboard.writeText(out.textContent||''));
   }
 });
