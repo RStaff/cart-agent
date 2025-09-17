@@ -5,13 +5,17 @@ import { billingRouter, stripeWebhook } from "./routes/billing.js";
 import { attachUser } from "./middleware/attachUser.js";
 import { usageGate } from "./middleware/usageGate.js";
 import { devAuth } from "./middleware/devAuth.js";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
+app.use(express.static(join(__dirname, "public")));
 
 // Root route: plain text hinting available endpoints
-app.get('/', (req,res)=>{ res.type('text/plain').send('Cart Agent API. Try /hello and /healthz'); });
+app.get("/", (_req, res) => res.sendFile(join(__dirname, "public", "index.html")));
 
-app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 app.use(cors());
 app.use(express.json());
 app.use(devAuth);
