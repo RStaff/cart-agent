@@ -1,4 +1,5 @@
 import express from "express";
+import { billingPublicRouter } from "./routes/billing_public.js";
 import cors from "cors";
 import { meRouter } from "./routes/me.js";
 import { billingRouter, stripeWebhook } from "./routes/billing.js";
@@ -11,7 +12,8 @@ import { dirname, join } from "node:path";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
-app.use(express.static(join(__dirname, "public")));
+app.use("/api/billing", express.json(), billingPublicRouter);
+app.use(express.static(join(__dirname,"public"), { redirect: false }));
 app.get("/pricing",    (_req,res)=>res.sendFile(join(__dirname,"public","pricing","index.html")));
 app.get("/onboarding", (_req,res)=>res.sendFile(join(__dirname,"public","onboarding","index.html")));
 app.get("/demo",       (_req,res)=>res.sendFile(join(__dirname,"public","demo","index.html"))); 
