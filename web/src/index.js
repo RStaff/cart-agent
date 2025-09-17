@@ -149,7 +149,9 @@ try {
 } catch {}
 
 
-// [playground] interactive demo at /demo and /demo/playground (forced mount)
+
+
+// [playground] interactive demo (mounted safely)
 ;import("./routes/playground.esm.js")
   .then(m => (m && typeof m.installPlayground === "function")
     ? m.installPlayground(app)
