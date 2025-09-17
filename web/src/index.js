@@ -12,14 +12,40 @@ import { dirname, join } from "node:path";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
-app.use("/api/billing", express.json(), billingPublicRouter);
+app.use(cors());
+app.use(express.json());
+
+/** PUBLIC checkout (no auth) */
+app.post("/api/billing/checkout", async (req, res) => {
+  try {
+    const Stripe = (await import("stripe")).default;
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    const priceStarter = process.env.STRIPE_PRICE_STARTER;
+    const pricePro = process.env.STRIPE_PRICE_PRO;
+    if (!stripeKey) return res.status(500).json({ error: "stripe_not_configured" });
+    const plan = (req.body && req.body.plan) || "starter";
+    const price = plan === "pro" ? (pricePro || "") : (priceStarter || "");
+    if (!price) return res.status(500).json({ error: "price_not_configured" });
+    const stripe = new Stripe(stripeKey);
+    const session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      line_items: [{ price, quantity: 1 }],
+      success_url: "https://abando.ai/onboarding/",
+      cancel_url: "https://abando.ai/pricing/",
+    });
+    return res.json({ url: session.url });
+  } catch (e) {
+    console.error("[public checkout] error:", e);
+    return res.status(500).json({ error: "checkout_failed" });
+  }
+});
 app.use(express.static(join(__dirname,"public"), { redirect: false }));
-app.get("/pricing",    (_req,res)=>res.sendFile(join(__dirname,"public","pricing","index.html")));
-app.get("/onboarding", (_req,res)=>res.sendFile(join(__dirname,"public","onboarding","index.html")));
-app.get("/demo",       (_req,res)=>res.sendFile(join(__dirname,"public","demo","index.html"))); 
+
+
+ 
 
 // Root route: plain text hinting available endpoints
-app.get("/", (_req, res) => res.sendFile(join(__dirname, "public", "index.html")));
+
 
 app.use(cors());
 app.use(express.json());
@@ -43,6 +69,13 @@ app.get("/api/dev/whoami", (req, res) => {
   res.json({ user: req.user || null });
 });
 
+app.get("/", (_req,res)=>res.sendFile(join(__dirname,"public","index.html")));
+app.get("/pricing", (_req,res)=>res.sendFile(join(__dirname,"public","pricing","index.html")));
+app.get("/onboarding", (_req,res)=>res.sendFile(join(__dirname,"public","onboarding","index.html")));
+app.get("/demo", (_req,res)=>res.sendFile(join(__dirname,"public","demo","index.html")));
+
+
+
 
 // [playground mount v2] semicolon-safe, ES5-friendly
 ;(function(){
@@ -62,8 +95,8 @@ app.get("/api/dev/whoami", (req, res) => {
     });
 })();
 
-app.get("/", (_req,res)=>res.sendFile(join(__dirname,"public","index.html")));
 
-app.get("/pricing", (_req,res)=>res.sendFile(join(__dirname,"public","pricing","index.html")));
 
-app.get("/demo", (_req,res)=>res.sendFile(join(__dirname,"public","demo","index.html")));
+
+
+
