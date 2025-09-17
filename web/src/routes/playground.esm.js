@@ -73,8 +73,7 @@ export function installPlayground(app){
     const lines = [];
 
     // Minimal DOM builder & UI
-    lines.push(
-      '(function(){',
+    lines.push('(function(){',
       '  var el = document.getElementById("pg");',
       '  if(!el){ return; }',
       '  function h(tag, attrs, html){',
@@ -268,8 +267,9 @@ export function installPlayground(app){
       '  }',
       '  wire();',
       '})();'
-    ).join('\n');
+    );
 
-    res.set('Content-Type','application/javascript; charset=utf-8').send(lines);
+    const __src = lines.join('\n');
+    res.set('Content-Type','application/javascript; charset=utf-8').send(__src);
   });
 }
