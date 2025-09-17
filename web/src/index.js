@@ -130,7 +130,28 @@ import("./routes/installShopify.esm.js")
   .then(m => (m && typeof m.installShopify === "function") ? m.installShopify(app) : null)
   .catch(e => console.error("[shopify-install] skipped:", (e && e.message) || e));
 
-// [playground] interactive demo at /demo/playground
-import("./routes/playground.esm.js")
-  .then(m => (m && typeof m.installPlayground === "function") ? m.installPlayground(app) : null)
-  .catch(e => console.error("[playground] skipped:", (e && e.message) || e));
+// [debug] list registered routes (GET /__routes)
+try {
+  const seen = new Set();
+  app.get("/__routes", (_req, res) => {
+    const out = [];
+    if (app && app._router && app._router.stack) {
+      app._router.stack.forEach((l) => {
+        if (l.route && l.route.path) {
+          const m = Object.keys(l.route.methods||{}).filter(Boolean).join(',').toUpperCase() || 'GET';
+          const k = m + " " + l.route.path;
+          if(!seen.has(k)){ seen.add(k); out.push(k); }
+        }
+      });
+    }
+    res.json({routes: out.sort()});
+  });
+} catch {}
+
+
+// [playground] interactive demo at /demo and /demo/playground (forced mount)
+;import("./routes/playground.esm.js")
+  .then(m => (m && typeof m.installPlayground === "function")
+    ? m.installPlayground(app)
+    : console.error("[playground] no installer"))
+  .catch(e => console.error("[playground] failed to import:", (e && e.message) || e));

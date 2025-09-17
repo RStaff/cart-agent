@@ -4,7 +4,8 @@
  *   GET /demo/playground -> HTML shell (includes <script src="/demo/playground.js">)
  *   GET /demo/playground.js -> client JS (assembled without backticks)
  */
-export function installPlayground(app) {
+export function installPlayground(app){
+  console.log(["playground"], "mounting /demo, /demo/playground, /demo/playground.js");
   function page({ title, body, head="" }) {
     return [
       '<!doctype html><html lang="en"><head>',
