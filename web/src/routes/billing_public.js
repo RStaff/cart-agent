@@ -6,12 +6,14 @@ billingPublicRouter.post("/checkout", async (req, res) => {
   try {
     const stripeKey = process.env.STRIPE_SECRET_KEY;
     const priceStarter = process.env.STRIPE_PRICE_STARTER;
-    const plan = (req.body && req.body.plan) || "starter";
+    const pricePro = process.env.STRIPE_PRICE_PRO;
     if (!stripeKey) return res.status(500).json({ error: "stripe_not_configured" });
-    if (!priceStarter && plan==="starter") return res.status(500).json({ error: "price_not_configured" });
+
+    const plan = (req.body && req.body.plan) || "starter";
+    const price = plan === "pro" ? pricePro : priceStarter;
+    if (!price) return res.status(500).json({ error: "price_not_configured" });
 
     const stripe = new Stripe(stripeKey);
-    const price = plan==="starter" ? priceStarter : process.env.STRIPE_PRICE_PRO;
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price, quantity: 1 }],
