@@ -12,6 +12,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 app.use(express.static(join(__dirname, "public")));
+app.get("/pricing",    (_req,res)=>res.sendFile(join(__dirname,"public","pricing","index.html")));
+app.get("/onboarding", (_req,res)=>res.sendFile(join(__dirname,"public","onboarding","index.html")));
+app.get("/demo",       (_req,res)=>res.sendFile(join(__dirname,"public","demo","index.html"))); 
 
 // Root route: plain text hinting available endpoints
 app.get("/", (_req, res) => res.sendFile(join(__dirname, "public", "index.html")));
