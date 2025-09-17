@@ -61,3 +61,9 @@ app.get("/api/dev/whoami", (req, res) => {
       console.error("[playground] failed to import:", (e && e.message) || e);
     });
 })();
+
+app.get("/", (_req,res)=>res.sendFile(join(__dirname,"public","index.html")));
+
+app.get("/pricing", (_req,res)=>res.sendFile(join(__dirname,"public","pricing","index.html")));
+
+app.get("/demo", (_req,res)=>res.sendFile(join(__dirname,"public","demo","index.html")));
