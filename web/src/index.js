@@ -73,6 +73,8 @@ app.get('/api', (req,res)=>{ res.type('text/plain').send('Cart Agent API. Try /h
 app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 app.use(cors());
 app.use(express.json());
+
+app.use(express.urlencoded({ extended: true }));
 app.use(devAuth);
 app.use(attachUser);
 
