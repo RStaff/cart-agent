@@ -129,3 +129,8 @@ import("./routes/snippet.esm.js")
 import("./routes/installShopify.esm.js")
   .then(m => (m && typeof m.installShopify === "function") ? m.installShopify(app) : null)
   .catch(e => console.error("[shopify-install] skipped:", (e && e.message) || e));
+
+// [playground] interactive demo at /demo/playground
+import("./routes/playground.esm.js")
+  .then(m => (m && typeof m.installPlayground === "function") ? m.installPlayground(app) : null)
+  .catch(e => console.error("[playground] skipped:", (e && e.message) || e));
