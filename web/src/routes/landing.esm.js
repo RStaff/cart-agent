@@ -46,6 +46,7 @@ small.mono{font-family:ui-monospace, SFMono-Regular, Menlo, monospace;opacity:.8
       <p class="lead">Abando answers questions, handles objections, and guides buyers through checkout—so <em>abandonment</em> turns into <strong>orders</strong>.</p>
       <div class="ctas">
         <a class="btn primary" href="/pricing">Start Free Trial</a>
+          <a class="ghost" href="/install/shopify" style="margin-left:8px">Install on Shopify</a>
         <a class="btn ghost" href="/demo">See a quick demo</a>
       </div>
       <p style="opacity:.7;margin-top:10px">Pays for itself after a single recovered cart.</p>
