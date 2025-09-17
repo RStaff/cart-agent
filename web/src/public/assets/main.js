@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-plan]').forEach(btn => {
     btn.addEventListener('click', async () => {
@@ -5,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         const res = await fetch('/api/billing/checkout', {
           method: 'POST',
-          headers: { 'Content-Type':'application/json' },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ plan }),
         });
         const data = await res.json();
@@ -35,18 +36,26 @@ document.addEventListener('DOMContentLoaded', () => {
       switch(toneEl.value) {
         case 'friendly': msg += 'Hey there!\n'; break;
         case 'professional': msg += 'Hello,\n'; break;
-        default: msg += 'Hi,\n';
+        default: msg += 'Hi,\n'; break;
       }
       msg += 'We noticed you left some items in your cart. ';
-      if (offerEl.value.trim()) msg += 'Here’s a special offer: ' + offerEl.value.trim() + '. ';
+      if (offerEl.value.trim()) {
+        msg += 'Here’s a special offer: ' + offerEl.value.trim() + '. ';
+      }
       msg += 'We’re here to answer any questions and help you complete your purchase.\n\n';
       msg += (ctaEl.value.trim() || 'Finish your order') + ' →';
       previewEl.textContent = msg;
     };
     genBtn.addEventListener('click', update);
-    [toneEl, channelEl, offerEl, ctaEl].forEach(el => el && el.addEventListener('input', update));
+    [toneEl, channelEl, offerEl, ctaEl].forEach(el => {
+      el && el.addEventListener('input', update);
+    });
     copyBtn.addEventListener('click', () => {
-      navigator.clipboard.writeText(previewEl.textContent).then(() => alert('Message copied'), () => alert('Copy failed'));
+      navigator.clipboard.writeText(previewEl.textContent).then(() => {
+        alert('Message copied');
+      }).catch(() => {
+        alert('Copy failed');
+      });
     });
   }
 });
