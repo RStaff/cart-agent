@@ -1,60 +1,101 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Abando – Playground</title><link rel="stylesheet" href="/assets/style.css"></head><body>
-<nav><div class="container">
-  <a href="/" class="logo">Abando</a>
-  <div class="links">
-    <a href="/demo/image">Demo (Image)</a>
-    <a href="/demo/playground" style='border-bottom:2px solid var(--primary)'>Playground</a>
-    <a href="/pricing">Pricing</a>
-    <a href="/onboarding">Onboarding</a>
-  </div>
-</div></nav>
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Abando – Demo (Playground)</title><link rel="stylesheet" href="/assets/style.css"></head>
+<body>
+<nav><div class="container"><a href="/" class="logo">Abando</a>
+<div class="nav-links"><a href="/demo/image">Demo (Image)</a><a href="/demo/playground" class="active">Demo (Playground)</a><a href="/pricing">Pricing</a><a href="/onboarding">Onboarding</a></div></div></nav>
+
 <section class="hero"><div class="container">
-  <h1>Interactive Playground</h1>
-  <p class="sub">Try different tones, channels and offers, then copy the message.</p>
+  <span class="badge-hint">Interactive</span>
+  <h1 style="margin:.4rem 0 0">Shopping Copilot Playground</h1>
+  <p class="subheadline">Customize tone, channel and offers. Enter AOV, CTR, recovery & plan cost to see your projected impact.</p>
 </div></section>
+
 <section class="section"><div class="container grid-2">
   <div class="card">
-    <label style="display:block;margin:.5rem 0">Tone
-      <select id="tone" style="width:100%;padding:.6rem;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text)">
-        <option value="friendly">Friendly</option>
-        <option value="professional">Professional</option>
-        <option value="casual">Casual</option>
+    <h2 style="margin:0 0 .6rem">Message Setup</h2>
+    <label>Template
+      <select id="template" class="input">
+        <option value="custom">Custom flow</option>
+        <option value="discount">Discount Nudge</option>
+        <option value="urgency">Urgency Play</option>
+        <option value="faq">FAQ Reassurance</option>
       </select>
     </label>
-    <label style="display:block;margin:.5rem 0">Channel
-      <select id="channel" style="width:100%;padding:.6rem;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text)">
-        <option value="email">Email</option>
-        <option value="sms">SMS</option>
-        <option value="on-site">On-Site</option>
-      </select>
-    </label>
-    <label style="display:block;margin:.5rem 0">Offer (optional)
-      <input id="offer" placeholder="e.g., 10% off shipping" style="width:100%;padding:.6rem;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text)">
-    </label>
-    <label style="display:block;margin:.5rem 0">Call to action
-      <input id="cta" placeholder="Complete your order" style="width:100%;padding:.6rem;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text)">
-    </label>
-    <button class="btn btn-primary" id="generate" style="margin-top:.5rem">Generate message</button>
-  </div>
-  <div class="card">
-    <h3 style="margin-top:0">Preview</h3>
-    <p id="preview-message" style="white-space:pre-wrap;min-height:120px;margin:0 0 1rem">Your message will appear here.</p>
-    <button class="btn btn-outline" id="copy">Copy message</button>
-    <div class="card" style="margin-top:1rem">
-      <h3 style="margin:.25rem 0">Glossary</h3>
-      <ul style="margin:0;padding-left:1rem;color:var(--muted);line-height:1.6">
-        <li><strong>CTA</strong>: Call to Action</li>
-        <li><strong>AOV</strong>: Average Order Value</li>
-        <li><strong>LTV</strong>: Lifetime Value</li>
-        <li><strong>CTR</strong>: Click-through Rate</li>
-        <li><strong>ROI</strong>: Return on Investment</li>
-      </ul>
+    <div class="input-row" style="margin-top:.75rem">
+      <label style="flex:1">Tone
+        <select id="tone" class="input">
+          <option value="friendly">Friendly</option>
+          <option value="professional">Professional</option>
+          <option value="casual">Casual</option>
+        </select>
+      </label>
+      <label style="flex:1">Channel
+        <select id="channel" class="input">
+          <option value="email">Email</option>
+          <option value="sms">SMS</option>
+          <option value="on-site">On-site</option>
+        </select>
+      </label>
     </div>
+    <label style="display:block;margin-top:.75rem">Offer (optional)
+      <input id="offer" class="input" placeholder="e.g., 10% off shipping">
+    </label>
+    <label style="display:block;margin-top:.75rem">CTA
+      <span class="hint" data-tip="CTA: Call to Action — the text that prompts the shopper to complete a specific action.">?</span>
+      <input id="cta" class="input" placeholder="Complete your order">
+    </label>
+    <button id="generate" class="btn btn-primary" style="margin-top:1rem">Run Shopping Copilot</button>
+  </div>
+
+  <div class="card">
+    <h2 style="margin:0 0 .6rem">Preview</h2>
+    <p id="preview-message" style="white-space:pre-wrap;min-height:120px;margin:0 0 1rem">Your message will appear here.</p>
+    <button id="copy" class="btn btn-outline">Copy message</button>
+
+    <div class="card" style="margin-top:1rem">
+      <h3 style="margin:0 0 .5rem">Impact Calculator</h3>
+      <div class="slider-row">
+        <label>Abandoned sessions
+          <input type="range" id="sessionSlider" min="100" max="20000" step="100" value="1000">
+        </label>
+        <div id="sessionDisplay" style="text-align:right;margin-top:.3rem;color:var(--muted)">1000</div>
+        <input type="number" id="sessions" value="1000" style="display:none">
+      </div>
+      <div class="input-row" style="margin-top:.8rem">
+        <label style="flex:1">AOV <span class="hint" data-tip="AOV: Average Order Value — average spend per order.">?</span>
+          <input id="aov" class="input" type="number" min="0" step="0.01" placeholder="e.g., 75">
+        </label>
+        <label style="flex:1">LTV <span class="hint" data-tip="LTV: Lifetime Value — total expected revenue per customer. If unknown, leave blank.">?</span>
+          <input id="ltv" class="input" type="number" min="0" step="0.01" placeholder="optional">
+        </label>
+      </div>
+      <div class="input-row" style="margin-top:.75rem">
+        <label style="flex:1">CTR % <span class="hint" data-tip="CTR: Click-through Rate — % who click your message.">?</span>
+          <input id="ctr" class="input" type="number" min="0" max="100" step="0.1" placeholder="e.g., 8">
+        </label>
+        <label style="flex:1">Recovery rate % <span class="hint" data-tip="Recovery rate: % of clickers who complete checkout.">?</span>
+          <input id="recovery" class="input" type="number" min="0" max="100" step="0.1" placeholder="e.g., 25">
+        </label>
+      </div>
+      <div class="input-row" style="margin-top:.75rem">
+        <label style="flex:1">Plan cost / month
+          <input id="plan" class="input" type="number" min="0" step="0.01" placeholder="e.g., 59.99">
+        </label>
+      </div>
+      <div class="kpi-grid">
+        <div class="card"><h4>Recovered orders</h4><p id="kpi-orders">—</p><span class="small">CTR × Recovery × Sessions</span></div>
+        <div class="card"><h4>Recovered revenue</h4><p id="kpi-revenue">—</p><span class="small">Orders × AOV/LTV</span></div>
+        <div class="card"><h4>ROI</h4><p id="kpi-roi">—</p><span class="small">Revenue ÷ Plan cost</span></div>
+      </div>
+      <div class="trusts"><span>GDPR Compliant</span><span>Stripe Verified Partner</span><span>30-Day Free Returns</span></div>
+      <div class="nudge-card"><strong>Nudge:</strong> <span id="nudge-message"></span></div>
+    </div>
+
+    <a href="/onboarding" class="btn btn-primary btn-block" style="margin-top:1rem">Launch Copilot Now</a>
   </div>
 </div></section>
 
-<footer class="footer"><div class="container"><small>© 2025 Abando™</small></div></footer>
-</body></html>
+<footer class="footer"><small>&copy; 2025 Abando™</small></footer>
 <script src="/assets/main.js"></script>
+</body></html>
