@@ -89,3 +89,8 @@ nav .nav-links a.active{border-bottom:2px solid var(--primary)}
 
 /* persona banner */
 .persona-banner{margin:.5rem 0;padding:.5rem .75rem;border:1px dashed var(--border);background:#0b142a;border-radius:8px;color:#cbd5e1;font-size:.9rem}
+
+/* tiny badge */
+.badge{display:inline-block;margin-left:.5rem;font-size:.75rem;padding:.15rem .4rem;border-radius:6px;border:1px solid var(--border);color:#cbd5e1}
+.badge.ok{border-color:#16a34a}
+.badge.warn{border-color:#f59e0b}

@@ -159,3 +159,31 @@ app.post("/api/ai/rewrite", express.json(), async (req,res) => {
   }
 });
 
+
+
+/* === best-effort DB warmup with retry === */
+async function waitForDB(max=12, delayMs=2500){
+  try{
+    const { PrismaClient } = require("@prisma/client");
+    const prisma = new PrismaClient();
+    for (let i=1;i<=max;i++){
+      try { await prisma.$queryRaw`SELECT 1`; console.log("[db] ready on attempt", i); break; }
+      catch(e){ console.warn("[db] not ready (attempt", i, "of", max+"):", String(e)); if (i===max) { console.warn("[db] continuing without DB"); } await new Promise(r=>setTimeout(r,delayMs)); }
+    }
+    await prisma.$disconnect().catch(()=>{});
+  } catch { console.log("[db] prisma not present; skipping warmup"); }
+}
+waitForDB().catch(()=>{});
+
+
+/* === demo stats endpoint === */
+app.get("/api/stats/demo", (req,res)=>{
+  const seedStr = (req.query.seed || "abando") + ":" + new Date().toISOString().slice(0,10);
+  let h=2166136261>>>0;
+  for (let i=0;i<seedStr.length;i++){ h ^= seedStr.charCodeAt(i); h = Math.imul(h, 16777619); }
+  function rand(){ h += 0x6D2B79F5; let t=Math.imul(h^h>>>15,1|h); t^=t+Math.imul(t^t>>>7,61|t); return ((t^t>>>14)>>>0)/4294967296; }
+  const days=7, rev=[], ord=[], ctr=[];
+  for(let i=0;i<days;i++){ rev.push(Math.round(900 + rand()*900)); ord.push(Math.max(1, Math.round(8 + rand()*10))); ctr.push(+ (3 + rand()*2).toFixed(1)); }
+  const totals={ revenue: rev.reduce((a,b)=>a+b,0), orders: ord.reduce((a,b)=>a+b,0), ctr: ctr[ctr.length-1] };
+  res.json({ days, rev, ord, ctr, totals, demo:true });
+});
