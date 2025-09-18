@@ -109,3 +109,14 @@ app.get("/demo/light/", (_req, res) => res.redirect(301, "/demo/image"));
 
 
 
+
+
+app.get("/demo", (_req, res) => res.redirect(301, "/demo/playground"));
+app.get("/demo/", (_req, res) => res.redirect(301, "/demo/playground"));
+app.get("/demo/playground", (_req, res) => res.sendFile(join(__dirname, "public", "demo", "playground", "index.html")));
+app.get("/dashboard", (_req, res) => res.sendFile(join(__dirname, "public", "dashboard", "index.html")));
+app.get("/support", (_req, res) => res.sendFile(join(__dirname, "public", "support", "index.html")));
+app.get("/legal/terms", (_req, res) => res.sendFile(join(__dirname, "public", "legal", "terms", "index.html")));
+app.get("/legal/privacy", (_req, res) => res.sendFile(join(__dirname, "public", "legal", "privacy", "index.html")));
+app.get("/legal/dpa", (_req, res) => res.sendFile(join(__dirname, "public", "legal", "dpa", "index.html")));
+
