@@ -80,8 +80,8 @@ app.get("/demo", (_req,res)=>res.sendFile(join(__dirname,"public","demo","index.
 
 app.get("/demo", (_req, res) => res.sendFile(join(__dirname, "public", "demo", "index.html")));
 app.get("/demo/", (_req, res) => res.sendFile(join(__dirname, "public", "demo", "index.html")));
-app.get("/demo/image", (_req, res) => res.sendFile(join(__dirname, "public", "demo", "image", "index.html")));
-app.get("/demo/image/", (_req, res) => res.sendFile(join(__dirname, "public", "demo", "image", "index.html")));
+app.get("/demo/image", (_req, res) => res.sendFile(join(__dirname, "public", "demo", "playground", "index.html")));
+app.get("/demo/image/", (_req, res) => res.sendFile(join(__dirname, "public", "demo", "playground", "index.html")));
 app.get("/demo/playground", (_req, res) => res.sendFile(join(__dirname, "public", "demo", "playground", "index.html")));
 app.get("/demo/playground/", (_req, res) => res.sendFile(join(__dirname, "public", "demo", "playground", "index.html")));
 app.get("/demo/light", (_req, res) => res.redirect(301, "/demo/image"));
@@ -119,4 +119,12 @@ app.get("/support", (_req, res) => res.sendFile(join(__dirname, "public", "suppo
 app.get("/legal/terms", (_req, res) => res.sendFile(join(__dirname, "public", "legal", "terms", "index.html")));
 app.get("/legal/privacy", (_req, res) => res.sendFile(join(__dirname, "public", "legal", "privacy", "index.html")));
 app.get("/legal/dpa", (_req, res) => res.sendFile(join(__dirname, "public", "legal", "dpa", "index.html")));
+
+
+
+app.get("/demo", (_req, res) => res.sendFile(join(__dirname, "public", "demo", "playground", "index.html")));
+app.get("/demo/playground", (_req, res) => res.sendFile(join(__dirname, "public", "demo", "playground", "index.html")));
+app.get("/demo/playground/", (_req, res) => res.sendFile(join(__dirname, "public", "demo", "playground", "index.html")));
+app.get("/demo/image", (_req, res) => res.redirect(301, "/demo/playground"));
+app.get("/demo/image/*", (_req, res) => res.redirect(301, "/demo/playground"));
 
