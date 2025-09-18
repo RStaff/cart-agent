@@ -1,23 +1,56 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Abando – Pricing</title><link rel="stylesheet" href="/assets/style.css"></head><body>
-<nav><div class="container">
-  <a href="/" class="logo">Abando</a>
-  <div class="links">
-    <a href="/demo/image">Demo (Image)</a>
-    <a href="/demo/playground">Playground</a>
-    <a href="/pricing" style='border-bottom:2px solid var(--primary)'>Pricing</a>
-    <a href="/onboarding">Onboarding</a>
-  </div>
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Abando – Pricing</title>
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<nav><div class="container"><a href="/" class="logo">Abando</a>
+  <div class="nav-links"><a href="/demo/image">Demo</a><a href="/demo/playground">Playground</a><a href="/pricing" class="active">Pricing</a><a href="/onboarding">Onboarding</a></div>
 </div></nav>
-<section class="section"><div class="container">
-  <h1>Choose your plan</h1>
-  <p class="sub">14-day free trial. Cancel anytime.</p>
-  <div class="grid-2" style="margin-top:1rem">
-    <div class="card"><h3>Starter</h3><p class="sub">Core conversion agent</p><p style="font-size:2rem;color:var(--primary);margin:.5rem 0">$59.99/mo</p><a class="btn btn-primary" href="/onboarding">Start Free Trial</a></div>
-    <div class="card"><h3>Pro</h3><p class="sub">Advanced playbooks & integrations</p><p style="font-size:2rem;color:var(--primary);margin:.5rem 0">$149.99/mo</p><a class="btn btn-primary" href="/onboarding">Start Free Trial</a></div>
-  </div>
-</div></section>
 
-<footer class="footer"><div class="container"><small>© 2025 Abando™</small></div></footer>
+<section class="pricing container">
+  <h1>Choose your plan</h1>
+  <p class="subheadline">Abando pays for itself after a single recovered cart. 14-day free trial. Cancel anytime.</p>
+
+  <div class="pricing-cards">
+
+    <div class="pricing-card">
+      <h3>Basic</h3>
+      <p class="price">$29.99<span style="font-size:1rem;">/mo</span></p>
+      <ul>
+        <li>Core conversion agent</li>
+        <li>Email support</li>
+      </ul>
+      <button class="btn btn-primary" data-plan="basic">Start Free Trial</button>
+    </div>
+
+    <div class="pricing-card">
+      <h3>Growth</h3>
+      <p class="price">$59.99<span style="font-size:1rem;">/mo</span></p>
+      <ul>
+        <li>All Basic features</li>
+        <li>Advanced playbooks & integrations</li>
+        <li>Priority email support</li>
+      </ul>
+      <button class="btn btn-primary" data-plan="growth">Start Free Trial</button>
+    </div>
+
+    <div class="pricing-card">
+      <h3>Pro</h3>
+      <p class="price">$149.99<span style="font-size:1rem;">/mo</span></p>
+      <ul>
+        <li>All Growth features</li>
+        <li>Dedicated success manager</li>
+        <li>24/7 priority support</li>
+      </ul>
+      <button class="btn btn-primary" data-plan="pro">Start Free Trial</button>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer"><small>&copy; 2025 Abando™</small></footer>
+<script src="/assets/main.js"></script>
 </body></html>
