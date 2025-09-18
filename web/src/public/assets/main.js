@@ -68,3 +68,94 @@ document.addEventListener('DOMContentLoaded', () => {
 
   buildMessage(); calc();
 });
+
+/* __TRIAL_HELPERS__ (do not remove) */
+(function(){
+  const TRIAL_KEY = 'abando_trial_start';
+  const TRIAL_LEN_DAYS = 14;
+  const DAY_MS = 86400000;
+
+  function getTrialStart(){
+    try { const v = localStorage.getItem(TRIAL_KEY); return v ? Number(v) : null; } catch { return null; }
+  }
+  function setTrialStart(ts){
+    try { localStorage.setItem(TRIAL_KEY, String(ts)); } catch {}
+  }
+  function clearTrial(){ try{ localStorage.removeItem(TRIAL_KEY); }catch{} }
+
+  function daysLeftFrom(start){
+    if (!start) return 0;
+    const diff = Date.now() - start;
+    const used = Math.floor(diff / DAY_MS);
+    return Math.max(0, TRIAL_LEN_DAYS - used);
+  }
+  function isTrialActive(){
+    const start = getTrialStart();
+    return start && daysLeftFrom(start) > 0;
+  }
+
+  function maybeStartTrialFromURL(){
+    try {
+      const p = new URLSearchParams(window.location.search);
+      if (p.get('trial') === '1' || p.get('trial') === 'true') {
+        if (!getTrialStart()) setTrialStart(Date.now());
+        // If there is an inline trial banner container, show it
+        const banner = document.getElementById('trial-banner');
+        if (banner) banner.style.display = 'block';
+      }
+    } catch {}
+  }
+
+  function injectNavTrialBadge(){
+    // Only inject if active
+    if (!isTrialActive()) return;
+    const nav = document.querySelector('nav .container, nav');
+    if (!nav) return;
+
+    // Try to locate the right side links container
+    let links = nav.querySelector('.nav-links');
+    if (!links) {
+      // If markup differs, attach to nav container’s end
+      links = nav;
+    }
+    let badge = document.getElementById('nav-trial-badge');
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.id = 'nav-trial-badge';
+      badge.style.cssText = 'margin-left:8px;padding:4px 8px;border-radius:999px;border:1px solid var(--border,#2d3748);background:#0b142a;color:#cbd5e1;font-size:12px;font-weight:700;white-space:nowrap;';
+      links.appendChild(badge);
+    }
+    const start = getTrialStart();
+    const daysLeft = daysLeftFrom(start);
+    badge.textContent = daysLeft > 0 ? ('Trial: ' + daysLeft + ' days left') : 'Trial ended';
+  }
+
+  function updateDashboardTrialUI(){
+    // If the page provides these IDs, wire them up
+    const daysEl = document.getElementById('trial-days-left');
+    const bar    = document.getElementById('trial-progress');
+    const label  = document.getElementById('trial-progress-label');
+    if (!daysEl && !bar) return;
+
+    const start = getTrialStart();
+    const left  = daysLeftFrom(start);
+    const used  = start ? (TRIAL_LEN_DAYS - left) : 0;
+    if (daysEl) daysEl.textContent = String(left);
+
+    const pct = Math.max(0, Math.min(100, Math.round((used / TRIAL_LEN_DAYS) * 100)));
+    if (bar)  bar.style.width = pct + '%';
+    if (label) label.textContent = pct + '% used';
+
+    // Suggest upgrade button (if present)
+    const upgrade = document.querySelector('[data-upgrade]');
+    if (upgrade && left <= 3 && left > 0) {
+      upgrade.textContent = 'Upgrade now (trial ends in ' + left + ' days)';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    maybeStartTrialFromURL();
+    if (isTrialActive()) injectNavTrialBadge();
+    updateDashboardTrialUI();
+  });
+})();

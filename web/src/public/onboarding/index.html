@@ -3,9 +3,15 @@
 <title>Abando – Onboarding</title><link rel="stylesheet" href="/assets/style.css">
 </head>
 <body>
+<div id="trial-banner" style="display:none;background:#0b142a;border-bottom:1px solid #2d3748;color:#cbd5e1">
+  <div class="container" style="padding:.6rem 0;display:flex;gap:.75rem;align-items:center;justify-content:space-between">
+    <div><strong>14-day Free Trial</strong> — no credit card required until you activate billing.</div>
+    <a href="/pricing" class="btn btn-outline" style="padding:.4rem .75rem">View plans</a>
+  </div>
+</div>
 
 <nav><div class="container">
-  <a href="/" class="logo">Abando™</a>
+  <a href="/" class="logo">Abando<sup>™</sup></a>
   <div class="nav-links">
     <a href="/demo/playground">Demo</a>
     <a href="/pricing">Pricing</a>
@@ -47,4 +53,14 @@
   <small>&copy; 2025 Abando™</small>
 </footer>
 
+<script id="trial-banner-script">
+(function(){
+  try{
+    var p=new URLSearchParams(window.location.search);
+    var b=document.getElementById('trial-banner');
+    if(b && (p.get('trial')==='1' || p.get('trial')==='true')){ b.style.display='block'; }
+  }catch(e){}
+})();
+</script>
+<script src="/assets/main.js"></script>
 </body></html>
