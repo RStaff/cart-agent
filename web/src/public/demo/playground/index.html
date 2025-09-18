@@ -23,6 +23,24 @@
 <section class="section"><div class="container grid-2">
   <div class="card">
     <h2 style="margin:0 0 .6rem">Message Setup</h2>
+    <div class="persona-pills">
+      <button class="persona active" data-persona="brand">Brand voice</button>
+      <button class="persona" data-persona="kevin">Kevin Hart tone</button>
+      <button class="persona" data-persona="beyonce">Beyoncé tone</button>
+      <button class="persona" data-persona="taylor">Taylor Swift tone</button>
+    </div>
+    <div class="row" style="margin-top:.5rem">
+      <label class="col">Product image URL
+        <input id="product-url" class="input" placeholder="https://.../product.jpg">
+        <div class="help">Optional. Leave blank to use a neutral placeholder.</div>
+      </label>
+      <label class="col">Product name
+        <input id="product-name" class="input" placeholder="Essentials Hoodie (Black, M)">
+      </label>
+      <label class="col" style="max-width:160px">Price
+        <input id="product-price" class="input" type="number" min="0" step="0.01" placeholder="68.00">
+      </label>
+    </div>
     <label>Template
       <select id="template" class="input">
         <option value="custom">Custom flow</option>
