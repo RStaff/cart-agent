@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Product card reflect inputs
       const url = (productUrl?.value||'').trim();
-      imgEl.src = url || imgEl.getAttribute('data-fallback');
+      imgEl.src = url || imgEl.getAttribute('data-fallback') || "/assets/hoodie.svg";
       nameEl.textContent = (productName?.value||'Essentials Hoodie (Black, M)');
       priceEl.textContent = productPrice?.value ? ('$'+Number(productPrice.value).toFixed(2)) : '$68.00';
 
