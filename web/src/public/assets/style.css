@@ -80,3 +80,9 @@ nav .nav-links a.active{border-bottom:2px solid var(--primary)}
 /* --- Funnel CTA --- */
 .btn-outline{border:1px solid var(--border);}
 .subheadline{color:#cbd5e1}
+
+
+/* Legal niceties */
+.card h3{margin:.6rem 0 .3rem}
+.card p{margin:.35rem 0}
+.card .note{color:#9ca3af}
