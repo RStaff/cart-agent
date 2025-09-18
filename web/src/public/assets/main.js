@@ -317,3 +317,34 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 })();
 
+
+/* === dashboard demo charts === */
+(function(){
+  function byId(i){return document.getElementById(i)}
+  function spark(elId, data){
+    const el = byId(elId); if (!el) return;
+    const w = el.clientWidth || 220, h = el.clientHeight || 44;
+    const max = Math.max(...data, 1); const min = Math.min(...data, 0);
+    const xs = data.map((_,i)=> i*(w/(data.length-1||1)));
+    const ys = data.map(v => h - ((v-min)/(max-min||1))* (h-6) - 3);
+    const path = xs.map((x,i)=> (i?'L':'M')+x.toFixed(1)+','+ys[i].toFixed(1)).join(' ');
+    el.innerHTML = '<svg width="'+w+'" height="'+h+'"><path d="'+path+'" fill="none" stroke="currentColor" stroke-width="2" opacity="0.9"/></svg>';
+  }
+  function rnd(n=7,base=50,spread=30){ return Array.from({length:n},()=> Math.max(1, Math.round(base + (Math.random()*2-1)*spread)))}
+  function dollars(n){ return '$'+(n||0).toLocaleString() }
+  function pct(n){ return (n||0).toFixed(1)+'%' }
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    // demo numbers
+    const rev = rnd(7, 1200, 400); const ord = rnd(7, 14, 6); const ctr = rnd(7, 4, 1.5);
+    const sum = rev.reduce((a,b)=>a+b,0);
+
+    const kRev = byId('kpi-rev'); if (kRev) kRev.textContent = dollars(sum);
+    const kOrd = byId('kpi-ord'); if (kOrd) kOrd.textContent = ord.reduce((a,b)=>a+b,0);
+    const kCtr = byId('kpi-ctr'); if (kCtr) kCtr.textContent = pct(ctr[ctr.length-1]);
+
+    spark('spark-rev', rev);
+    spark('spark-ord', ord);
+    spark('spark-ctr', ctr);
+  });
+})();
