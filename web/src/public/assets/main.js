@@ -383,3 +383,37 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.addEventListener('DOMContentLoaded', update);
 })();
+
+/* === dashboard stats via API === */
+(function(){
+  function $(id){ return document.getElementById(id); }
+  function dollars(n){ return '$'+(n||0).toLocaleString(); }
+  function pct(n){ return (n||0).toFixed ? (n||0).toFixed(1)+'%' : (n+'%'); }
+  function spark(elId, data){
+    const el = $(elId); if (!el) return;
+    const w = el.clientWidth || 220, h = el.clientHeight || 44;
+    const max = Math.max(...data, 1), min = Math.min(...data, 0);
+    const xs = data.map((_,i)=> i*(w/(data.length-1||1)));
+    const ys = data.map(v => h - ((v-min)/(max-min||1))*(h-6) - 3);
+    const d  = xs.map((x,i)=>(i?'L':'M')+x.toFixed(1)+','+ys[i].toFixed(1)).join(' ');
+    el.innerHTML = '<svg width="'+w+'" height="'+h+'"><path d="'+d+'" fill="none" stroke="currentColor" stroke-width="2" opacity="0.9"/></svg>';
+  }
+  async function load(){
+    const badge = $('stats-badge');
+    try{
+      const r = await fetch('/api/stats/demo');
+      if (!r.ok) throw new Error('bad status '+r.status);
+      const j = await r.json();
+      if ($('kpi-rev')) $('kpi-rev').textContent = dollars(j.totals.revenue);
+      if ($('kpi-ord')) $('kpi-ord').textContent = j.totals.orders;
+      if ($('kpi-ctr')) $('kpi-ctr').textContent = pct(j.totals.ctr);
+      spark('spark-rev', j.rev); spark('spark-ord', j.ord); spark('spark-ctr', j.ctr);
+      if (badge) { badge.textContent = 'Demo data'; badge.classList.add('ok'); }
+    }catch(e){
+      if (badge) { badge.textContent = 'Offline demo'; badge.classList.add('warn'); }
+      // falls back to existing random demo (if present)
+      document.dispatchEvent(new Event('dashboard-demo-fallback'));
+    }
+  }
+  document.addEventListener('DOMContentLoaded', load);
+})();
