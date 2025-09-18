@@ -59,3 +59,15 @@ nav .nav-links a.active{border-bottom:2px solid var(--primary)}
 .preview-bubble{background:#1f2937;color:#fff;border-radius:12px;padding:.8rem}
 .preview-wrap{display:grid;grid-template-columns:120px 1fr;gap:.75rem}
 .preview-avatar{width:48px;height:48px;border-radius:999px;background:#111826;display:flex;align-items:center;justify-content:center;font-weight:800}
+
+
+/* --- Dashboard KPI & spark --- */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.kpi{display:flex;flex-direction:column;gap:.4rem}
+.kpi-title{color:var(--muted);font-size:.9rem}
+.kpi-value{font-weight:800;font-size:1.6rem}
+.spark{height:44px}
+.trial-card{display:grid;gap:.5rem;background:#0b142a;border:1px solid var(--border);border-radius:12px;padding:.9rem}
+.trial-bar{height:8px;background:#1f2937;border-radius:999px;overflow:hidden}
+.trial-bar-fill{height:8px;width:0;background:var(--primary)}
+.trial-meta{display:flex;align-items:center;justify-content:space-between;color:#cbd5e1}
