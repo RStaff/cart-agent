@@ -1,3 +1,4 @@
+import { randomBytes, createHmac } from "node:crypto";
 import express from "express";
 import cookieParser from "cookie-parser";
 import path from "node:path";
@@ -217,14 +218,14 @@ function getShopToken(shop){
 
 function signParams(params){
   const message = Object.keys(params).sort().map(k => `${k}=${params[k]}`).join("&");
-  return crypto.createHmac("sha256", SHOPIFY_API_SECRET).update(message).digest("hex");
+  return createHmac("sha256", SHOPIFY_API_SECRET).update(message).digest("hex");
 }
 
 // Kick off OAuth
 app.get("/shopify/install", (req,res)=>{
   const shop = String(req.query.shop||"").toLowerCase();
   if (!shop.endsWith(".myshopify.com")) return res.status(400).send("Missing/invalid ?shop");
-  const state = crypto.randomBytes(16).toString("hex");
+  const state = randomBytes(16).toString("hex");
   res.cookie("shopify_state", state, {httpOnly:true, sameSite:"lax", secure:true});
   const redirect_uri = encodeURIComponent(`${APP_URL}/shopify/callback`);
   const url = `https://${shop}/admin/oauth/authorize?client_id=${SHOPIFY_API_KEY}&scope=${encodeURIComponent(SHOPIFY_SCOPES)}&redirect_uri=${redirect_uri}&state=${state}&grant_options[]=per-user`;
