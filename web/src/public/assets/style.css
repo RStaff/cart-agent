@@ -86,3 +86,6 @@ nav .nav-links a.active{border-bottom:2px solid var(--primary)}
 .card h3{margin:.6rem 0 .3rem}
 .card p{margin:.35rem 0}
 .card .note{color:#9ca3af}
+
+/* persona banner */
+.persona-banner{margin:.5rem 0;padding:.5rem .75rem;border:1px dashed var(--border);background:#0b142a;border-radius:8px;color:#cbd5e1;font-size:.9rem}
