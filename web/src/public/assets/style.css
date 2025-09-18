@@ -27,3 +27,19 @@ h1,h2,h3{margin:.25rem 0 1rem} .sub{color:var(--muted)}
 .section{padding:2rem 0}
 .footer{border-top:1px solid var(--border);padding:1rem 0;text-align:center;color:var(--muted);font-size:.9rem}
 @media (max-width:900px){.grid-2{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr}}
+
+/* Extra helpers for playground improvements */
+.hint{position:relative;display:inline-block;margin-left:6px;cursor:help;font-weight:800}
+.hint::after{content:attr(data-tip);position:absolute;left:50%;transform:translateX(-50%);bottom:125%;background:rgba(0,0,0,.85);color:#fff;padding:0.5rem 0.6rem;border-radius:6px;white-space:pre-line;opacity:0;pointer-events:none;transition:opacity .15s;min-width:180px;max-width:260px;text-align:left;font-weight:600;font-size:0.8rem}
+.hint:hover::after{opacity:1}
+.nudge-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-top:1rem;color:var(--muted);font-weight:700}
+.trusts{display:flex;flex-wrap:wrap;gap:0.6rem;margin-top:1rem}
+.trusts span{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:0.4rem 0.6rem;font-size:0.8rem;color:var(--muted);white-space:nowrap}
+.input-row{display:flex;gap:0.75rem}
+.slider-row{margin-top:0.75rem}
+.slider-row input[type=range]{width:100%}
+.kpi-grid{display:flex;gap:0.75rem;margin-top:0.75rem}
+.kpi-grid .card h4{margin:0 0 0.3rem;font-size:0.95rem}
+.kpi-grid .card p{margin:0;font-size:1.1rem;font-weight:800}
+.badge-hint{display:inline-flex;align-items:center;gap:0.35rem;padding:0.25rem 0.5rem;border-radius:8px;border:1px solid var(--border);color:var(--muted);font-weight:700;font-size:0.8rem}
+.btn-block{width:100%}
