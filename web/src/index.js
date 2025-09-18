@@ -208,7 +208,7 @@ const API_VERSION = process.env.SHOPIFY_API_VERSION || "2024-07"; // adjust as n
 
 const SHOPS_FILE = path.join(__dirname, "data", "shops.json");
 function loadShops(){ try{ return JSON.parse(fs.readFileSync(SHOPS_FILE,"utf8")); } catch { return {shops:{}}; } }
-function saveShops(obj){ fs.mkdirSync(path.dirname(SHOPS_FILE), {recursive:true}); fs.writeFileSync(SHOPS_FILE, JSON.stringify(obj,null,2)); }
+function saveShops(){ /* no-op on Render */ }
 function setShopToken(shop, token){
   const db = loadShops(); db.shops[shop] = db.shops[shop] || {};
   db.shops[shop].access_token = token; db.shops[shop].updated_at = Date.now(); saveShops(db);
