@@ -71,3 +71,8 @@ nav .nav-links a.active{border-bottom:2px solid var(--primary)}
 .trial-bar{height:8px;background:#1f2937;border-radius:999px;overflow:hidden}
 .trial-bar-fill{height:8px;width:0;background:var(--primary)}
 .trial-meta{display:flex;align-items:center;justify-content:space-between;color:#cbd5e1}
+
+
+/* --- Onboarding CTAs --- */
+.subheadline{color:#cbd5e1}
+.btn-outline{border:1px solid var(--border);}
