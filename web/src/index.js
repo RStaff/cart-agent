@@ -333,3 +333,47 @@ app.get("/shopify/dev-install", (req,res)=>{
   </form></body></html>`);
 });
 // === End Shopify OAuth + Billing ====================================
+
+// === hotfix: robust /shopify/install ===
+if (typeof app !== "undefined" && app && app._router && Array.isArray(app._router.stack)) {
+  app._router.stack = app._router.stack.filter(
+    (l) => !(l.route && l.route.path === "/shopify/install")
+  );
+}
+
+app.get("/shopify/install", (req, res) => {
+  try {
+    // sanitize ?shop to JUST the hostname like cart-agent-dev.myshopify.com
+    const raw = String(req.query.shop || "");
+    const shop = raw.replace(/^https?:\/\//, "").split("/")[0];
+    if (!shop || !shop.endsWith(".myshopify.com")) {
+      return res.status(400).send("Missing/invalid ?shop");
+    }
+
+    const APP_URL   = String(process.env.APP_URL || "").replace(/\/+$/, ""); // e.g. https://abando.ai
+    const CLIENT_ID = process.env.SHOPIFY_API_KEY;
+    const scopes = String(process.env.SHOPIFY_SCOPES ||
+      "read_products,write_products,read_orders,read_checkouts,read_customers");
+
+    // state cookie
+    const state = randomBytes(16).toString("hex");
+    res.cookie("shopify_state", state, { httpOnly: true, sameSite: "lax", secure: true, path: "/" });
+
+    const params = new URLSearchParams({
+      client_id: CLIENT_ID,
+      scope: scopes,
+      redirect_uri: `${APP_URL}/shopify/callback`,
+      state,
+      "grant_options[]": "per-user",
+    });
+
+    // IMPORTANT: redirect to the SHOP domain, not our own
+    const authorizeUrl = `https://${shop}/admin/oauth/authorize?${params.toString()}`;
+    console.log("[shopify] authorize →", authorizeUrl);
+    return res.redirect(authorizeUrl);
+  } catch (e) {
+    console.error("install error", e);
+    res.status(500).send("Install error");
+  }
+});
+// === end hotfix ===
