@@ -417,3 +417,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   document.addEventListener('DOMContentLoaded', load);
 })();
+
+/* === shopify install banner === */
+(function(){
+  const btn = document.querySelector('[data-install-shopify]');
+  if (!btn) return;
+  const params = new URLSearchParams(location.search);
+  const shop = params.get('shop');
+  if (!shop) return; // only show when a shop is specified
+  const card = document.getElementById('shopify-install-banner'); if (card) card.style.display='flex';
+  btn.addEventListener('click', (e)=>{ e.preventDefault(); location.href = '/shopify/install?shop='+encodeURIComponent(shop); });
+})();
