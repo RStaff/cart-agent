@@ -190,12 +190,11 @@ app.get("/api/stats/demo", (req,res)=>{
 
 
 // === Shopify OAuth + Billing (dev scaffold) ==========================
-import express from "express";
-import fetch from "node-fetch";
-import crypto from "node:crypto";
-import fs from "node:fs";
-import path from "node:path";
-
+/* uses existing express import */
+/* uses global fetch on Node 18+ */
+/* uses existing crypto import */
+/* uses existing fs import */
+/* uses existing path import */
 const APP_URL = process.env.APP_URL || "https://abando.ai"; // set in Render
 const SHOPIFY_API_KEY    = process.env.SHOPIFY_API_KEY    || "";
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || "";
