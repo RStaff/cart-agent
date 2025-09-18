@@ -1,4 +1,6 @@
 import express from "express";
+import cookieParser from "cookie-parser";
+import path from "node:path";
 import { billingPublicRouter } from "./routes/billing_public.js";
 import cors from "cors";
 import { meRouter } from "./routes/me.js";
@@ -12,6 +14,7 @@ import { dirname, join } from "node:path";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
+app.use(cookieParser());
 app.use(cors());
 app.use(express.json());
 
