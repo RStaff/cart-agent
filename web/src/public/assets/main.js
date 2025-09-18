@@ -239,3 +239,81 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener('DOMContentLoaded', wirePersonaAndProduct);
 })();
+
+
+/* === AI on Run (rewrite) === */
+(function(){
+  const q = (id)=>document.getElementById(id);
+  const preview = q('preview-message');
+  const runBtn  = q('generate');
+  const useAI   = q('use-ai-on-run') || { checked: true };
+
+  // Inputs used to craft the base text (fallback if AI off or fails)
+  const tone    = q('tone'), channel=q('channel'), offer=q('offer'), cta=q('cta');
+  const nameOut = q('product-name-out');
+  const personaBtnEls = document.querySelectorAll('.persona');
+
+  function currentPersona(){
+    let p = 'brand';
+    personaBtnEls.forEach(b=>{ if (b.classList.contains('active')) p = b.dataset.persona || p; });
+    return p;
+  }
+  function baseTemplate(){
+    const t = (tone?.value || 'friendly');
+    const c = (channel?.value || 'email');
+    const item = (nameOut?.textContent || 'your item');
+    const offerLine = (offer?.value?.trim())
+      ? (t==='professional' ? ` We can extend an offer: ${offer.value.trim()}.` : ` Here’s a perk: ${offer.value.trim()}.`)
+      : '';
+    const ctaText = (cta?.value?.trim())
+      || (t==='professional' ? 'Proceed to checkout'
+         : t==='casual' ? 'Wrap this up' : 'Finish your order');
+    const channelNoun =
+      c === 'sms'     ? (t==='professional' ? 'SMS' : 'text')
+    : c === 'on-site' ? (t==='professional' ? 'on-site chat' : 'chat')
+    :                    (t==='professional' ? 'email' : 'email');
+
+    const heads = t==='professional' ? 'Hello.' : (t==='casual' ? 'Yo!' : 'Hey there!');
+    return `${heads} I’m your AI Shopping Copilot. We noticed **${item}** in your cart.${offerLine} I can answer questions via ${channelNoun} and help you checkout.\n\n${ctaText} →`;
+  }
+
+  async function aiRewrite(base, persona){
+    try{
+      const r = await fetch('/api/ai/rewrite', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          prompt:'Personalize lightly, tighten phrasing, keep one clear CTA. Avoid implying celebrity endorsement.',
+          base, persona
+        })
+      });
+      const j = await r.json();
+      return (j && j.text) ? j.text : base;
+    }catch{
+      return base;
+    }
+  }
+
+  function setBusy(b){
+    if (!runBtn) return;
+    runBtn.disabled = b;
+    runBtn.dataset._orig = runBtn.dataset._orig || runBtn.textContent;
+    runBtn.textContent = b ? 'Generating…' : runBtn.dataset._orig;
+  }
+
+  if (runBtn && preview){
+    runBtn.addEventListener('click', async ()=>{
+      const persona = currentPersona();
+      const base = baseTemplate();
+      if (!useAI.checked){
+        preview.textContent = base;
+        return;
+      }
+      setBusy(true);
+      const text = await aiRewrite(base, persona);
+      preview.textContent = text;
+      setBusy(false);
+    }, { passive:true });
+  }
+})();
+

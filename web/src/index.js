@@ -128,3 +128,34 @@ app.get("/demo/playground/", (_req, res) => res.sendFile(join(__dirname, "public
 app.get("/demo/image", (_req, res) => res.redirect(301, "/demo/playground"));
 app.get("/demo/image/*", (_req, res) => res.redirect(301, "/demo/playground"));
 
+
+
+/* === AI rewrite proxy (OpenAI) === */
+app.post("/api/ai/rewrite", express.json(), async (req,res) => {
+  try {
+    const { prompt, base, persona } = req.body || {};
+    const personaStyle = persona === 'kevin'   ? "concise, high-energy, humorous (Kevin Hart vibe)."
+                      : persona === 'beyonce' ? "empowering, elegant, confident (Beyoncé vibe)."
+                      : persona === 'taylor'  ? "friendly, witty, warm (Taylor Swift vibe)."
+                      : "on-brand, helpful, conversion-focused.";
+    const sys = "You are a cart recovery copywriter. Keep messages brief, plain, and conversion-focused. Avoid over-promising. One clear CTA. Keep it brand-safe and non-infringing.";
+    const user = `Rewrite this cart-recovery message in a ${personaStyle} tone. Do not claim to be the celebrity or imply endorsement.\n\n${base}\n\nExtra guidance: ${prompt || "make it punchy, friendly, and high-converting"}`;
+    const key = process.env.OPENAI_API_KEY;
+    if (!key) return res.status(200).json({ text: base, note: "OPENAI_API_KEY missing: returning base" }); // non-breaking fallback
+    const r = await fetch("https://api.openai.com/v1/chat/completions", {
+      method:"POST",
+      headers:{ "Authorization":"Bearer "+key, "Content-Type":"application/json" },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        temperature: 0.65,
+        messages: [{role:"system", content:sys},{role:"user", content:user}]
+      })
+    });
+    const j = await r.json();
+    const text = j?.choices?.[0]?.message?.content?.trim();
+    res.status(200).json({ text: text || base });
+  } catch (e) {
+    res.status(200).json({ text: (req.body?.base || ''), note: "rewrite error: "+String(e) });
+  }
+});
+
