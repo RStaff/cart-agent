@@ -159,3 +159,83 @@ document.addEventListener('DOMContentLoaded', () => {
     updateDashboardTrialUI();
   });
 })();
+
+
+/* Personas + product preview (addon) */
+(function(){
+  const personaStyles = {
+    brand: (msg)=>msg, // pass-through
+    kevin: (msg)=>"Yo! 😂 " + msg.replace(/\.$/,'!') + " Let’s get you hooked up—real quick.",
+    beyonce: (msg)=>"✨ " + msg + " You deserve a flawless checkout—ready when you are.",
+    taylor: (msg)=>"Hey! 🧣 " + msg + " We’ll make this easy—no bad blood with returns."
+  };
+  function personaWrap(kind, base){
+    const fn = personaStyles[kind] || personaStyles.brand;
+    return fn(base);
+  }
+  function q(id){ return document.getElementById(id); }
+
+  function wirePersonaAndProduct(){
+    // *Inputs*
+    const productUrl = q('product-url');
+    const productName= q('product-name');
+    const productPrice=q('product-price');
+
+    const tone=q('tone'), channel=q('channel'), offer=q('offer'), cta=q('cta');
+    const run=q('generate'), copy=q('copy'), preview=q('preview-message');
+    const personaButtons = document.querySelectorAll('.persona');
+    const imgEl = q('product-img'), nameEl=q('product-name-out'), priceEl=q('product-price-out');
+    const avatar=q('preview-avatar');
+
+    if(!preview) return;
+
+    let persona = 'brand'; // default
+
+    personaButtons.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        personaButtons.forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        persona = btn.getAttribute('data-persona') || 'brand';
+        build(); // re-render
+      });
+    });
+
+    function build(){
+      // Avatar hint (first letter for brand; emoji for personas)
+      avatar.textContent = persona==='brand' ? 'A' : (persona==='kevin'?'😄':persona==='beyonce'?'✨':'🧣');
+
+      // Product card reflect inputs
+      const url = (productUrl?.value||'').trim();
+      imgEl.src = url || imgEl.getAttribute('data-fallback');
+      nameEl.textContent = (productName?.value||'Essentials Hoodie (Black, M)');
+      priceEl.textContent = productPrice?.value ? ('$'+Number(productPrice.value).toFixed(2)) : '$68.00';
+
+      // Base message
+      let msg = (tone?.value==='professional'?'Hello,':'Hey there,') + " I’m your Shopping Copilot. ";
+      msg += "We noticed you left " + (nameEl.textContent||'an item') + " in your cart. ";
+      if (offer?.value?.trim()) msg += "Here’s an offer: " + offer.value.trim() + ". ";
+      msg += "I can answer questions on " + (channel?.value||'email') + " and help you complete your purchase.";
+      msg += "\n\n" + (cta?.value?.trim() || 'Finish your order') + " →";
+
+      // Persona flavor
+      preview.textContent = personaWrap(persona, msg);
+    }
+
+    function copyMsg(){
+      navigator.clipboard.writeText(preview.textContent||'').then(()=> {
+        let t=document.getElementById('toast'); if(!t){ t=document.createElement('div'); t.id='toast'; t.className='toast'; document.body.appendChild(t); }
+        t.textContent='Copied'; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 1200);
+      });
+    }
+
+    // Bindings
+    [productUrl, productName, productPrice, tone, channel, offer, cta].forEach(el=> el && el.addEventListener('input', build));
+    run && run.addEventListener('click', build);
+    copy && copy.addEventListener('click', copyMsg);
+
+    // Initial paint
+    build();
+  }
+
+  document.addEventListener('DOMContentLoaded', wirePersonaAndProduct);
+})();
