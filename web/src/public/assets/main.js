@@ -348,3 +348,38 @@ document.addEventListener('DOMContentLoaded', () => {
     spark('spark-ctr', ctr);
   });
 })();
+
+/* === persona disclaimer banner === */
+(function(){
+  const bannerId='persona-disclaimer';
+  function ensureBanner(){
+    let el=document.getElementById(bannerId);
+    if(!el){
+      el=document.createElement('div');
+      el.id=bannerId;
+      el.className='note persona-banner';
+      el.style.display='none';
+      el.textContent='Style is inspired by a general tone. No affiliation or endorsement is implied.';
+      const container=document.querySelector('.container, main, body')||document.body;
+      container.prepend(el);
+    }
+    return el;
+  }
+  function currentPersona(){
+    let p='brand';
+    document.querySelectorAll('.persona').forEach(b=>{ if(b.classList.contains('active')) p=b.dataset.persona||p; });
+    return p;
+  }
+  function update(){
+    const el=ensureBanner();
+    const p=currentPersona();
+    const show = p==='kevin' || p==='beyonce' || p==='taylor';
+    el.style.display = show ? 'block' : 'none';
+  }
+  document.addEventListener('click', (e)=>{
+    if(e.target && e.target.classList && e.target.classList.contains('persona')) {
+      setTimeout(update, 10);
+    }
+  });
+  document.addEventListener('DOMContentLoaded', update);
+})();
