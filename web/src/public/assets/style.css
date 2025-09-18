@@ -76,3 +76,7 @@ nav .nav-links a.active{border-bottom:2px solid var(--primary)}
 /* --- Onboarding CTAs --- */
 .subheadline{color:#cbd5e1}
 .btn-outline{border:1px solid var(--border);}
+
+/* --- Funnel CTA --- */
+.btn-outline{border:1px solid var(--border);}
+.subheadline{color:#cbd5e1}
