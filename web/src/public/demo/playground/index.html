@@ -1,14 +1,23 @@
-<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Abando – Demo (Playground)</title><link rel="stylesheet" href="/assets/style.css"></head>
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Abando – Demo Playground</title><link rel="stylesheet" href="/assets/style.css">
+</head>
 <body>
-<nav><div class="container"><a href="/" class="logo">Abando</a>
-<div class="nav-links"><a href="/demo/image">Demo (Image)</a><a href="/demo/playground" class="active">Demo (Playground)</a><a href="/pricing">Pricing</a><a href="/onboarding">Onboarding</a></div></div></nav>
+
+<nav><div class="container">
+  <a href="/" class="logo">Abando™</a>
+  <div class="nav-links">
+    <a href="/demo/playground" class="active">Demo</a>
+    <a href="/pricing">Pricing</a>
+    <a href="/onboarding">Onboarding</a>
+    <a href="/support">Support</a>
+  </div>
+</div></nav>
 
 <section class="hero"><div class="container">
-  <span class="badge-hint">Interactive</span>
-  <h1 style="margin:.4rem 0 0">Shopping Copilot Playground</h1>
-  <p class="subheadline">Customize tone, channel and offers. Enter AOV, CTR, recovery & plan cost to see your projected impact.</p>
+  <span class="badge">Interactive</span>
+  <h1 style="margin:.4rem 0 0">AI Shopping Copilot Playground</h1>
+  <p class="subheadline">Customize tone, channel and offers. Enter AOV, CTR, recovery & plan cost to see projected impact.</p>
 </div></section>
 
 <section class="section"><div class="container grid-2">
@@ -84,9 +93,9 @@
         </label>
       </div>
       <div class="kpi-grid">
-        <div class="card"><h4>Recovered orders</h4><p id="kpi-orders">—</p><span class="small">CTR × Recovery × Sessions</span></div>
-        <div class="card"><h4>Recovered revenue</h4><p id="kpi-revenue">—</p><span class="small">Orders × AOV/LTV</span></div>
-        <div class="card"><h4>ROI</h4><p id="kpi-roi">—</p><span class="small">Revenue ÷ Plan cost</span></div>
+        <div class="card"><h4>Recovered orders</h4><p id="kpi-orders">—</p></div>
+        <div class="card"><h4>Recovered revenue</h4><p id="kpi-revenue">—</p></div>
+        <div class="card"><h4>ROI</h4><p id="kpi-roi">—</p></div>
       </div>
       <div class="trusts"><span>GDPR Compliant</span><span>Stripe Verified Partner</span><span>30-Day Free Returns</span></div>
       <div class="nudge-card"><strong>Nudge:</strong> <span id="nudge-message"></span></div>
@@ -96,6 +105,15 @@
   </div>
 </div></section>
 
-<footer class="footer"><small>&copy; 2025 Abando™</small></footer>
+<footer class="footer">
+  <div class="legal-links">
+    <a href="/legal/terms">Terms</a>
+    <a href="/legal/privacy">Privacy</a>
+    <a href="/legal/dpa">DPA</a>
+    <a href="/support">Support</a>
+  </div>
+  <small>&copy; 2025 Abando™</small>
+</footer>
+
 <script src="/assets/main.js"></script>
 </body></html>
