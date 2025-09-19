@@ -155,3 +155,81 @@ app.get("/dashboard", (_req, res) =>
   res.sendFile(join(__dirname, "public", "dashboard", "index.html")));
 app.get("/support", (_req, res) =>
   res.sendFile(join(__dirname, "public", "support", "index.html")));
+
+// ---- AI demo message generation ----
+function buildPrompt(p) {
+  const {
+    productName = "your item",
+    price = "",
+    tone = "Friendly",
+    channel = "Email",
+    offer = "",
+    cta = "Complete your order",
+    template = "Custom flow",
+  } = p || {};
+
+  const priceStr = price ? `$${Number(price).toFixed(2)}` : "";
+  const offerStr = offer ? ` Offer: ${offer}.` : "";
+  return `You are an AI shopping assistant writing a ${channel} message in a ${tone.toLowerCase()} tone.
+Template: ${template}.
+Write a concise, conversion-focused message (80-140 words) that helps the shopper finish checkout.
+
+Product: ${productName} ${priceStr}
+${offerStr}
+CTA: ${cta}
+
+Return ONLY the message body, no greetings like "Hi" unless natural, no markdown.`;
+}
+
+// Fallback message if no model is configured
+function fallbackMessage(p) {
+  const { productName = "your item", cta = "Complete your order", offer = "" } = p || {};
+  const offerLine = offer ? ` We’ve added an exclusive ${offer} just for you.` : "";
+  return `Quick reminder — your ${productName} is still in your cart. I can answer any questions and help you finish up.${offerLine} When you’re ready, tap the link below to pick up where you left off.\n\n${cta} →`;
+}
+
+async function generateWithOpenAI(prompt, params) {
+  const key = process.env.OPENAI_API_KEY || process.env.OPENAI_KEY;
+  if (!key) return { message: fallbackMessage(params), usedAI:false };
+
+  const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${key}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: process.env.OPENAI_MODEL || "gpt-4o-mini",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.7,
+    })
+  });
+
+  if (!resp.ok) {
+    const text = await resp.text().catch(() => "");
+    console.error("[ai] openai error", resp.status, text);
+    return { message: fallbackMessage(params), usedAI:false };
+  }
+  const data = await resp.json();
+  const message = data?.choices?.[0]?.message?.content?.trim() || fallbackMessage(params);
+  return { message, usedAI:true };
+}
+
+async function handleGenerate(req, res) {
+  try {
+    const p = req.body || {};
+    const prompt = buildPrompt(p);
+    const { message, usedAI } = await generateWithOpenAI(prompt, p);
+    const subject = (p.channel || "Email").toLowerCase().includes("email")
+      ? `Your ${p.productName || "item"} is still in your cart`
+      : `Finish your order`;
+    return res.json({ ok: true, subject, message, usedAI });
+  } catch (e) {
+    console.error("[demo] generate error", e);
+    return res.status(500).json({ ok:false, error: "generate_failed" });
+  }
+}
+
+// Accept both paths the UI might call
+app.post("/api/demo/generate", handleGenerate);
+app.post("/api/generate", handleGenerate);
