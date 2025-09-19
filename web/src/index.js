@@ -207,8 +207,29 @@ const SHOPIFY_SCOPES     = process.env.SHOPIFY_SCOPES     || "read_checkouts,rea
 const API_VERSION = process.env.SHOPIFY_API_VERSION || "2024-07"; // adjust as needed
 
 const SHOPS_FILE = path.join(__dirname, "data", "shops.json");
-function loadShops(){ try{ return JSON.parse(fs.readFileSync(SHOPS_FILE,"utf8")); } catch { return {shops:{}}; } }
-function saveShops(){ /* no-op on Render */ }
+function loadShops(){ try{ return JSON.parse(// removed fs write); } catch { return {shops:{}}; } }
+
+async function saveShops(shop, accessToken, scopes) {
+  const { PrismaClient } = await import('@prisma/client');
+  const db = new PrismaClient();
+  const esc = (v) => (v ?? '').toString().replace(/'/g, "''");
+  const now = new Date().toISOString();
+  const sql = `
+    INSERT INTO "Shop" ("id","key","createdAt","updatedAt","name","provider","domain","accessToken","scopes","installedAt")
+    VALUES ('${Math.random().toString(36).slice(2)}', '${esc(shop)}', '${now}', '${now}',
+            '${esc(shop)}', 'shopify', '${esc(shop)}', '${esc(accessToken)}', '${esc(scopes)}', '${now}')
+    ON CONFLICT ("key") DO UPDATE SET
+      "name"        = EXCLUDED."name",
+      "provider"    = EXCLUDED."provider",
+      "domain"      = EXCLUDED."domain",
+      "accessToken" = EXCLUDED."accessToken",
+      "scopes"      = EXCLUDED."scopes",
+      "installedAt" = EXCLUDED."installedAt",
+      "updatedAt"   = NOW();
+  `;
+  try { await db.$executeRawUnsafe(sql); } finally { await db.$disconnect(); }
+}
+
 function setShopToken(shop, token){
   const db = loadShops(); db.shops[shop] = db.shops[shop] || {};
   db.shops[shop].access_token = token; db.shops[shop].updated_at = Date.now(); saveShops(db);
