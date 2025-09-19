@@ -399,3 +399,33 @@ app.get("/shopify/install", (req, res) => {
   }
 });
 // === end hotfix ===
+
+// === DB helper: saveShops (safe UPSERT) ======================
+import { PrismaClient, Prisma } from "@prisma/client";
+
+async function saveShops(shopDomain, accessToken, scopes) {
+  const db = new PrismaClient();
+  try {
+    const now = new Date();
+    const newId = Math.random().toString(36).slice(2);
+
+    await db.$executeRaw(
+      Prisma.sql`
+        INSERT INTO "Shop"
+          ("id","key","createdAt","updatedAt","name","provider","domain","accessToken","scopes","installedAt")
+        VALUES
+          (${newId}, ${shopDomain}, ${now}, ${now}, ${shopDomain}, 'shopify', ${shopDomain}, ${accessToken ?? ''}, ${scopes ?? ''}, ${now})
+        ON CONFLICT (lower("domain")) DO UPDATE SET
+          "name"        = EXCLUDED."name",
+          "provider"    = EXCLUDED."provider",
+          "domain"      = EXCLUDED."domain",
+          "accessToken" = EXCLUDED."accessToken",
+          "scopes"      = EXCLUDED."scopes",
+          "installedAt" = EXCLUDED."installedAt",
+          "updatedAt"   = NOW();
+      `
+    );
+  } finally {
+    await db.$disconnect();
+  }
+}
