@@ -218,7 +218,7 @@ async function saveShops(shop, accessToken, scopes) {
     INSERT INTO "Shop" ("id","key","createdAt","updatedAt","name","provider","domain","accessToken","scopes","installedAt")
     VALUES ('${Math.random().toString(36).slice(2)}', '${esc(shop)}', '${now}', '${now}',
             '${esc(shop)}', 'shopify', '${esc(shop)}', '${esc(accessToken)}', '${esc(scopes)}', '${now}')
-    ON CONFLICT ("key") DO UPDATE SET
+    ON CONFLICT (lower("domain")) DO UPDATE SET
       "name"        = EXCLUDED."name",
       "provider"    = EXCLUDED."provider",
       "domain"      = EXCLUDED."domain",
