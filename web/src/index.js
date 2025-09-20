@@ -233,3 +233,19 @@ async function handleGenerate(req, res) {
 // Accept both paths the UI might call
 app.post("/api/demo/generate", handleGenerate);
 app.post("/api/generate", handleGenerate);
+
+// --- AI healthcheck route ---
+import fetch from "node-fetch"; // ensure node-fetch is installed in your deps
+
+app.get("/api/ai/health", async (req, res) => {
+  try {
+    const resp = await fetch("https://api.openai.com/v1/models", {
+      headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
+    });
+    if (!resp.ok) throw new Error(`OpenAI responded ${resp.status}`);
+    const data = await resp.json();
+    res.json({ ok: true, model: process.env.OPENAI_MODEL || "unset", models: data.data.slice(0,3) });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
