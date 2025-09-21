@@ -1,5 +1,4 @@
 name: Sync Stripe Prices to Render
-
 on:
   workflow_dispatch:
     inputs:
@@ -9,20 +8,18 @@ on:
         options: [apply, dry-run]
         default: dry-run
       domain:
-        description: "Primary domain (e.g., abando.ai). Leave blank if using service_name."
-        required: false
-        default: "abando.ai"
-      service_name:
-        description: "Render service name (used if domain is blank)"
+        description: "Optional: custom domain to match"
         required: false
         default: ""
+      service_name:
+        description: "Render service name (recommended)"
+        required: false
+        default: "cart-agent-backend"
   schedule:
-    # Nightly dry-run to detect drift early without changing prod
-    - cron: "17 6 * * *"
+    - cron: "17 6 * * *"   # nightly dry-run
 
 permissions:
   contents: read
-
 concurrency:
   group: sync-prices-to-render-${{ github.ref }}
   cancel-in-progress: true
@@ -32,19 +29,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      - name: Ensure script is executable
-        run: chmod +x scripts/sync-prices-to-render.sh
-
-      - name: Show planned target & mode
-        run: |
-          echo "mode: ${{ inputs.mode || 'dry-run' }}"
-          echo "domain: ${{ inputs.domain }}"
-          echo "service_name: ${{ inputs.service_name }}"
-
+      - run: sudo apt-get update && sudo apt-get install -y jq
+      - run: chmod +x scripts/sync-prices-to-render.sh
       - name: Run sync (dry-run by default)
         env:
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
@@ -53,12 +39,12 @@ jobs:
           set -euo pipefail
           MODE="${{ inputs.mode || 'dry-run' }}"
           DOMAIN="${{ inputs.domain }}"
-          SVCNAME="${{ inputs.service_name }}"
+          SVCNAME="${{ inputs.service_name || 'cart-agent-backend' }}"
 
-          ARGS=()
-          if [ -n "$DOMAIN" ]; then ARGS+=( --domain "$DOMAIN" ); fi
-          if [ -n "$SVCNAME" ]; then ARGS+=( --service "$SVCNAME" ); fi
-          if [ "$MODE" = "apply" ]; then ARGS+=( --apply ); fi
+          ARGS=( )
+          [ -n "$DOMAIN" ]  && ARGS+=( --domain "$DOMAIN" )
+          [ -n "$SVCNAME" ] && ARGS+=( --service "$SVCNAME" )
+          [ "$MODE" = "apply" ] || ARGS+=( --dry-run )
 
           echo "scripts/sync-prices-to-render.sh ${ARGS[*]}"
           scripts/sync-prices-to-render.sh "${ARGS[@]}"
