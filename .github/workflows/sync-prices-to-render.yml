@@ -1,4 +1,5 @@
 name: Sync Stripe Prices to Render
+
 on:
   workflow_dispatch:
     inputs:
@@ -15,18 +16,36 @@ on:
         description: "Render service name (used if domain is blank)"
         required: false
         default: ""
-  push:
-    branches: [ "main" ]
+  schedule:
+    # Nightly dry-run to detect drift early without changing prod
+    - cron: "17 6 * * *"
+
 permissions:
   contents: read
+
+concurrency:
+  group: sync-prices-to-render-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y jq
-      - run: chmod +x scripts/sync-prices-to-render.sh
-      - name: Run sync
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Ensure script is executable
+        run: chmod +x scripts/sync-prices-to-render.sh
+
+      - name: Show planned target & mode
+        run: |
+          echo "mode: ${{ inputs.mode || 'dry-run' }}"
+          echo "domain: ${{ inputs.domain }}"
+          echo "service_name: ${{ inputs.service_name }}"
+
+      - name: Run sync (dry-run by default)
         env:
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           RENDER_API_KEY:    ${{ secrets.RENDER_API_KEY }}
@@ -35,9 +54,11 @@ jobs:
           MODE="${{ inputs.mode || 'dry-run' }}"
           DOMAIN="${{ inputs.domain }}"
           SVCNAME="${{ inputs.service_name }}"
+
           ARGS=()
           if [ -n "$DOMAIN" ]; then ARGS+=( --domain "$DOMAIN" ); fi
           if [ -n "$SVCNAME" ]; then ARGS+=( --service "$SVCNAME" ); fi
           if [ "$MODE" = "apply" ]; then ARGS+=( --apply ); fi
+
           echo "scripts/sync-prices-to-render.sh ${ARGS[*]}"
           scripts/sync-prices-to-render.sh "${ARGS[@]}"
