@@ -1,30 +1,11 @@
+import Link from "next/link";
 export default function Footer() {
   return (
-    <footer className="border-t">
-      <div className="container grid gap-6 py-10 sm:grid-cols-3">
-        <div>
-          <div className="text-sm font-semibold text-slate-800">Abando</div>
-          <p className="mt-2 text-sm text-slate-500">Recover abandoned carts with AI outreach.</p>
-        </div>
-        <div className="text-sm">
-          <div className="font-medium text-slate-700">Product</div>
-          <ul className="mt-2 space-y-1 text-slate-600">
-            <li><a href="/#how">How it works</a></li>
-            <li><a href="/#pricing">Pricing</a></li>
-            <li><a href="/trial">Demo dashboard</a></li>
-          </ul>
-        </div>
-        <div className="text-sm">
-          <div className="font-medium text-slate-700">Company</div>
-          <ul className="mt-2 space-y-1 text-slate-600">
-            <li><a href="mailto:sales@abando.ai">Contact</a></li>
-            <li><a href="#">Terms</a></li>
-            <li><a href="#">Privacy</a></li>
-          </ul>
-        </div>
-      </div>
-      <div className="border-t">
-        <div className="container py-6 text-sm text-slate-500">© {new Date().getFullYear()} Abando</div>
+    <footer style={{background:"var(--bg)",color:"#9fb0c6",padding:"24px 0",font:"500 13px/1.4 system-ui,-apple-system,sans-serif"}}>
+      <div style={{width:"min(1120px,92vw)",margin:"0 auto",padding:"0 16px"}}>
+        <small>
+          © 2025 Abando<sup>™</sup> · <Link href="/legal/terms">Terms</Link> · <Link href="/legal/privacy">Privacy</Link> · <Link href="/legal/dpa">DPA</Link>
+        </small>
       </div>
     </footer>
   );

@@ -1,21 +1,18 @@
+"use client";
+
 import Link from "next/link";
 
 export default function CTA() {
   return (
-    <section className="border-y bg-gradient-to-r from-brand-50 to-white">
-      <div className="container py-12 sm:py-16 grid gap-6 sm:grid-cols-[1fr_auto] sm:items-center">
+    <section className="container mx-auto px-4 py-10">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <div className="text-sm font-medium text-brand-700">Try the live demo</div>
-          <h3 className="mt-1 text-2xl font-semibold tracking-tight">
-            See Abando’s dashboard with sample data in minutes.
-          </h3>
-          <p className="mt-2 text-slate-600">
-            Use a test checkout to spin up a demo account instantly. No Shopify store required.
-          </p>
+          <h2 className="text-xl font-semibold text-slate-100">Ready to recover more checkouts?</h2>
+          <p className="text-sm text-slate-400">Try the demo dashboard or jump straight into pricing.</p>
         </div>
         <div className="flex gap-3 sm:justify-end">
           <Link href="/trial" className="btn btn-primary">Open demo dashboard</Link>
-          <a href="#pricing" className="btn btn-ghost">See pricing</a>
+          <Link href="#pricing" className="btn btn-ghost">See pricing</Link>
         </div>
       </div>
     </section>
