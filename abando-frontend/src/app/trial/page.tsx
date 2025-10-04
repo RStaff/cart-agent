@@ -1,63 +1,36 @@
 "use client";
-import { useState } from "react";
+import React from "react";
+import Link from "next/link";
+import { toErrorMessage } from "@/lib/errors";
 
-const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL!;
-const DEV_TOKEN = process.env.NEXT_PUBLIC_DEV_AUTH_TOKEN;
+export default function TrialPage() {
+  const [busy, setBusy] = React.useState(false);
+  const [err, setErr] = React.useState<string | null>(null);
 
-export default function Trial() {
-  const [email, setEmail] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
-
-  async function start() {
-    setBusy(true);
-    setErr(null);
+  async function onStart(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setBusy(true); setErr(null);
     try {
-      const res = await fetch(`${BACKEND}/api/billing/checkout`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(DEV_TOKEN ? { Authorization: `Bearer ${DEV_TOKEN}` } : {}),
-          Origin: typeof window !== "undefined" ? window.location.origin : "http://localhost:3000",
-        },
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || "checkout_failed");
-      if (data?.url) window.location.href = data.url;
-      else throw new Error("no_checkout_url");
-    } catch (e: any) {
-      setErr(e.message || "Something went wrong.");
-    } finally {
-      setBusy(false);
-    }
+      const res = await fetch("/api/trial/start", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = (await res.json()) as { checkout_url?: string };
+      if (!data?.checkout_url) throw new Error("no_checkout_url");
+      window.location.href = data.checkout_url;
+    } catch (e: unknown) { setErr(toErrorMessage(e)); }
+    finally { setBusy(false); }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-brand-50">
-      <div className="container py-16">
-        <a href="/" className="text-sm">&larr; Abando</a>
-        <h1 className="mt-4 text-3xl font-semibold tracking-tight">Start your free trial</h1>
-        <p className="mt-2 text-slate-600">No credit card required for Starter.</p>
-
-        <div className="mt-8 max-w-md rounded-xl border bg-white p-4 shadow-sm sm:p-6">
-          <label className="block text-sm font-medium text-slate-700">Your email</label>
-          <div className="mt-2 flex gap-2">
-            <input
-              type="email"
-              placeholder="you@store.com"
-              className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <button onClick={start} disabled={busy || !email} className="btn btn-primary">
-              {busy ? "Continuing..." : "Continue"}
-            </button>
-          </div>
-          <p className="mt-2 text-xs text-slate-500">You’ll be redirected to a Stripe checkout.</p>
-          {err && <p className="mt-3 text-sm text-red-600">{err}</p>}
-        </div>
-      </div>
-    </div>
+    <main style={{ maxWidth: 720, margin: "48px auto", padding: "0 16px" }}>
+      <h1 style={{ margin: 0 }}>Start Free Trial</h1>
+      <p style={{ color: "#9fb0c6" }}>Kick off a trial. You’ll be redirected to checkout if successful.</p>
+      <form onSubmit={onStart} style={{ marginTop: 16 }}>
+        <button type="submit" disabled={busy} style={{ padding:"10px 14px", borderRadius:10, fontWeight:700, border:"none", background: busy ? "#5149ff" : "#635bff", color:"#fff", cursor: busy ? "not-allowed" : "pointer" }}>
+          {busy ? "Processing…" : "Start Trial"}
+        </button>
+      </form>
+      {err && <div role="alert" style={{ marginTop:12, background:"#2a1b1b", color:"#fca5a5", border:"1px solid rgba(255,255,255,.12)", padding:"10px 12px", borderRadius:10 }}>{err}</div>}
+      <div style={{ marginTop: 24 }}><Link href="/" style={{ textDecoration: "underline", color: "#9fb0c6" }}>← Back to home</Link></div>
+    </main>
   );
 }
