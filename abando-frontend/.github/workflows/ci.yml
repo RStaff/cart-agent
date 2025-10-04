@@ -49,3 +49,11 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run ci:build
       - run: npm run ci:e2e
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: |
+            playwright-report/**
+            test-results/**
+          if-no-files-found: ignore
