@@ -1,0 +1,53 @@
+name: Verify deps & lockfile
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  deps-check:
+    runs-on: ubuntu-latest
+    env:
+      # ensure lifecycle hooks (husky, prepare, postinstall) do NOT run in this job
+      HUSKY: "0"
+      NPM_CONFIG_FUND: "false"
+      NPM_CONFIG_AUDIT: "false"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      # Self-contained guard: no external repo script that can 127
+      - name: Dependency guard (self-contained)
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          roots=()
+          [ -f package.json ] && roots+=(".")
+          [ -f web/package.json ] && roots+=("web")
+
+          if [ ${#roots[@]} -eq 0 ]; then
+            echo "ℹ️ No package.json found — nothing to check."; exit 0
+          fi
+
+          for r in "${roots[@]}"; do
+            echo "── Checking deps at: $r"
+
+            if [ -f "$r/package-lock.json" ]; then
+              echo "npm ci --ignore-scripts --dry-run in $r"
+              npm --prefix "$r" ci --ignore-scripts --dry-run
+
+            elif [ -f "$r/yarn.lock" ]; then
+              echo "yarn install --frozen-lockfile --ignore-scripts in $r"
+              (cd "$r" && corepack enable && yarn install --frozen-lockfile --ignore-scripts --non-interactive)
+
+            else
+              echo "⚠️  No lockfile in $r — skipping lockfile check for this root."
+            fi
+          done
