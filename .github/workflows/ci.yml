@@ -10,7 +10,7 @@ jobs:
   deps-check:
     runs-on: ubuntu-latest
     env:
-      # ensure lifecycle hooks (husky, prepare, postinstall) do NOT run in this job
+      # disable lifecycle hooks so husky/prepare/postinstall can't 127
       HUSKY: "0"
       NPM_CONFIG_FUND: "false"
       NPM_CONFIG_AUDIT: "false"
@@ -19,21 +19,23 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'     # align with shopify-app-template-node "20.x"
           cache: 'npm'
 
-      # Self-contained guard: no external repo script that can 127
       - name: Dependency guard (self-contained)
         shell: bash
         run: |
           set -euo pipefail
 
+          # Candidate package roots to check (monorepo-friendly)
           roots=()
           [ -f package.json ] && roots+=(".")
           [ -f web/package.json ] && roots+=("web")
+          [ -f web/frontend/package.json ] && roots+=("web/frontend")
 
           if [ ${#roots[@]} -eq 0 ]; then
-            echo "ℹ️ No package.json found — nothing to check."; exit 0
+            echo "ℹ️ No package.json found — nothing to check."
+            exit 0
           fi
 
           for r in "${roots[@]}"; do
