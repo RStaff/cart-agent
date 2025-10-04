@@ -1,7 +1,16 @@
 #!/usr/bin/env bash
-# Lightweight placeholder that always succeeds.
-# Keeps the CI job structure intact until we implement real policy.
+# Fails on: lockfile drift OR high/critical vulnerabilities in prod deps.
 set -euo pipefail
-cmd="${1:-check}"
-echo "deps-guard: ${cmd} (placeholder) — OK"
-exit 0
+
+echo "→ deps-guard: lockfile integrity (npm ci --dry-run)"
+npm ci --dry-run > /dev/null
+
+echo "→ deps-guard: security (npm audit --omit=dev --audit-level=high)"
+# If audit is unavailable (older npm), fall back to success.
+if npm audit --version >/dev/null 2>&1; then
+  npm audit --omit=dev --audit-level=high
+else
+  echo "↪︎ npm audit not available; skipping."
+fi
+
+echo "✓ deps-guard: OK"
