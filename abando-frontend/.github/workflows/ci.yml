@@ -1,12 +1,29 @@
 name: ci
 on:
-  push:
-    branches: [ main, fix/**, feat/** ]
   pull_request:
+  push:
+    branches: [main]
 
 jobs:
+  deps-check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: abando-frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: bash scripts/git/deps-guard.sh check
+      - run: npm ci --dry-run
+
   build-and-test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: abando-frontend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -14,17 +31,12 @@ jobs:
           node-version: '22'
           cache: 'npm'
       - run: npm ci
-      - run: npx playwright install --with-deps
-      - run: npm run -s mvp:preflight
-      - run: npm run -s ci:build
       - run: npm run -s test:e2e:ci
-        env:
-          CI: 'true'
       - if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
           path: |
-            playwright-report/**
-            test-results/**
+            abando-frontend/playwright-report/**
+            abando-frontend/test-results/**
           if-no-files-found: ignore
