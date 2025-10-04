@@ -1,0 +1,32 @@
+name: Verify deps & lockfile
+on:
+  pull_request:
+  push:
+    branches: ["**"]
+
+jobs:
+  deps-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (PR head or current ref)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
+
+      - name: Show repo root & verify guard script
+        run: |
+          set -euo pipefail
+          pwd; ls -la
+          test -f scripts/git/deps-guard.sh || (echo "MISSING: scripts/git/deps-guard.sh"; exit 1)
+          chmod +x scripts/git/deps-guard.sh
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Dependency guard (static)
+        run: bash scripts/git/deps-guard.sh check
+
+      - name: Lockfile integrity (npm ci dry-run)
+        run: npm ci --dry-run
