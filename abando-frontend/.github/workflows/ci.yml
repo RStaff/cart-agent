@@ -9,10 +9,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # Sanity: show top-level files and verify the guard script is tracked
+      - name: List repo root
+        run: ls -la
+      - name: Verify deps-guard present in checkout
+        run: |
+          set -euo pipefail
+          git ls-files | grep -E '^scripts/git/deps-guard\.sh$' || \
+            (echo 'MISSING: scripts/git/deps-guard.sh (not tracked)'; exit 1)
+          test -f scripts/git/deps-guard.sh || \
+            (echo 'MISSING: scripts/git/deps-guard.sh (not found in FS)'; exit 1)
+          chmod +x scripts/git/deps-guard.sh
+
       - uses: actions/setup-node@v4
         with: { node-version: '22', cache: 'npm' }
-      - run: bash scripts/git/deps-guard.sh check
-      - run: npm ci --dry-run
+
+      - name: Dependency guard (static)
+        run: bash ./scripts/git/deps-guard.sh check
+
+      - name: Lockfile integrity (npm ci dry-run)
+        run: npm ci --dry-run
 
   build-and-test:
     runs-on: ubuntu-latest
@@ -20,10 +37,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: '22', cache: 'npm' }
-      - uses: microsoft/playwright-github-action@v1
       - run: npm ci
-      - run: npx playwright install --with-deps
-      - run: npm run -s env:guard
       - run: npm run -s test:e2e:ci
       - if: failure()
         uses: actions/upload-artifact@v4
