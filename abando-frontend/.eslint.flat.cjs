@@ -1,63 +1,81 @@
-// .eslint.flat.cjs — minimal, flat ESLint v9 config
-const tsParser = require('@typescript-eslint/parser');
-const tsPlugin = require('@typescript-eslint/eslint-plugin');
-let nextPlugin = {};
-try {
-  // ok if not installed yet; if present we can still disable rules cleanly
-  nextPlugin = require('@next/eslint-plugin-next');
-} catch (_) {}
+/* eslint-disable @typescript-eslint/no-require-imports */
+const ts = require("@typescript-eslint/eslint-plugin");
+const tsParser = require("@typescript-eslint/parser");
+const nextPlugin = require("@next/eslint-plugin-next");
 
+/** @type {import("eslint").Linter.FlatConfig[]} */
 module.exports = [
-  // Ignore build artifacts & backups
+  // What NOT to lint
+  { ignores: ["node_modules/**", ".next/**", "backup-*/**", "**/*.bak.*"] },
+
+  // Allow CommonJS + require() in config and cjs utilities
   {
-    ignores: [
-      '.next/**/*',
-      'node_modules/**/*',
-      'dist/**/*',
-      'coverage/**/*',
-      'backup-**',
-      '**/*.bak.*',
-      '**/*.tmp'
-    ],
+    files: [".eslint.flat.cjs", "**/*.cjs"],
+    languageOptions: { sourceType: "commonjs" },
+    rules: { "@typescript-eslint/no-require-imports": "off" },
   },
 
-  // App code (TS/JS/TSX/JSX)
+  // TypeScript / TSX
   {
-    files: ['**/*.{js,jsx,ts,tsx}'],
+    files: ["**/*.{ts,tsx}"],
     languageOptions: {
       parser: tsParser,
-      ecmaVersion: 'latest',
-      sourceType: 'module',
+      parserOptions: {
+        project: false,
+        ecmaVersion: "latest",
+        sourceType: "module",
+      },
     },
     plugins: {
-      '@typescript-eslint': tsPlugin,
-      '@next/next': nextPlugin,
+      "@typescript-eslint": ts,
+      "@next/next": nextPlugin,
     },
     rules: {
-      // Turn off rule that previously blocked you
-      '@next/next/no-img-element': 'off',
-
-      // Prefer TS plugin's rule; allow underscore to mark intentional unused
-      'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' , caughtErrors: 'all', caughtErrorsIgnorePattern: '^_'}
-      ],
+      // reasonable defaults, keep this tight but not painful
+      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+      "@typescript-eslint/no-explicit-any": "off", // you can turn back on later per-file
     },
   },
 
-  // Dev scripts where require()/commonjs is fine
+  // JavaScript helpers / scripts
   {
-    files: ['scripts/**/*.{js,cjs,mjs,ts}', 'web/src/dev/**/*.{js,cjs,mjs}'],
-    languageOptions: {
-      parser: tsParser,
-      ecmaVersion: 'latest',
-      sourceType: 'commonjs',
-    },
-    plugins: { '@typescript-eslint': tsPlugin },
+    files: ["**/*.{js,mjs}"],
+    languageOptions: { ecmaVersion: "latest", sourceType: "module" },
+    plugins: { "@next/next": nextPlugin },
+    rules: {},
+  },
+
+  // Next.js rules only where it makes sense (app + components)
+  {
+    files: ["src/app/**/*.{ts,tsx}", "src/components/**/*.{ts,tsx}"],
+    plugins: { "@next/next": nextPlugin },
     rules: {
-      '@typescript-eslint/no-require-imports': 'off',
-      'no-console': 'off',
+      "@next/next/no-html-link-for-pages": "warn",
+      "@next/next/no-img-element": "warn",
     },
   },
+{
+  /* img-allowlist */
+  files: [
+    "src/components/ImageCard.tsx",
+    "src/components/NavbarV2.tsx",
+    "src/app/dashboard/Client.tsx"
+  ],
+  rules: {
+    "@next/next/no-img-element": "off"
+  }
+  /* /img-allowlist */
+},
+{
+  /* img-allowlist */
+  files: [
+    "src/components/ImageCard.tsx",
+    "src/components/NavbarV2.tsx",
+    "src/app/dashboard/Client.tsx"
+  ],
+  rules: {
+    "@next/next/no-img-element": "off"
+  }
+  /* /img-allowlist */
+},
 ];

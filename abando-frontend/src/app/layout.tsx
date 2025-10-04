@@ -1,5 +1,6 @@
-import "./globals.css"
+import "./globals.css";
 import React from "react";
+import InstallCTA from "@/components/InstallCTA";
 
 export default function RootLayout({
   children,
@@ -8,7 +9,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        {/* Install CTA */}
+        <InstallCTA sticky />
+      </body>
     </html>
   );
 }
