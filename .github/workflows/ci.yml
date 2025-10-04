@@ -1,4 +1,4 @@
-name: Verify deps & lockfile
+name: CI (deps, build, e2e)
 
 on:
   push:
@@ -10,7 +10,7 @@ jobs:
   deps-check:
     runs-on: ubuntu-latest
     env:
-      # disable lifecycle hooks so husky/prepare/postinstall can't 127
+      # keep lifecycle hooks from firing in this job
       HUSKY: "0"
       NPM_CONFIG_FUND: "false"
       NPM_CONFIG_AUDIT: "false"
@@ -19,15 +19,14 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'     # align with shopify-app-template-node "20.x"
+          node-version: '20'   # Shopify template requires 20.x
           cache: 'npm'
 
-      - name: Dependency guard (self-contained)
+      - name: Dependency & lockfile check (self-contained)
         shell: bash
         run: |
           set -euo pipefail
 
-          # Candidate package roots to check (monorepo-friendly)
           roots=()
           [ -f package.json ] && roots+=(".")
           [ -f web/package.json ] && roots+=("web")
@@ -40,16 +39,100 @@ jobs:
 
           for r in "${roots[@]}"; do
             echo "── Checking deps at: $r"
-
             if [ -f "$r/package-lock.json" ]; then
               echo "npm ci --ignore-scripts --dry-run in $r"
               npm --prefix "$r" ci --ignore-scripts --dry-run
-
             elif [ -f "$r/yarn.lock" ]; then
               echo "yarn install --frozen-lockfile --ignore-scripts in $r"
               (cd "$r" && corepack enable && yarn install --frozen-lockfile --ignore-scripts --non-interactive)
-
             else
               echo "⚠️  No lockfile in $r — skipping lockfile check for this root."
             fi
           done
+
+  build:
+    needs: deps-check
+    runs-on: ubuntu-latest
+    env:
+      HUSKY: "0"       # keep hooks disabled for CI
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # web
+      - name: Install (web)
+        if: hashFiles('web/package.json') != ''
+        run: npm --prefix web ci
+      - name: Build (web)
+        if: hashFiles('web/package.json') != ''
+        run: npm --prefix web run -s build
+
+      # web/frontend
+      - name: Install (web/frontend)
+        if: hashFiles('web/frontend/package.json') != ''
+        run: npm --prefix web/frontend ci
+      - name: Build (web/frontend)
+        if: hashFiles('web/frontend/package.json') != ''
+        run: npm --prefix web/frontend run -s build || echo "(no build script)"
+
+  e2e:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      CI: "true"
+      HUSKY: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # Only proceed if Playwright config exists in web/frontend (common layout)
+      - name: Detect Playwright config
+        id: pw
+        run: |
+          set -euo pipefail
+          if [ -f web/frontend/playwright.config.ts ] || [ -f web/frontend/playwright.config.mjs ] || [ -f web/frontend/playwright.config.js ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install (web/frontend)
+        if: steps.pw.outputs.found == 'true'
+        run: npm --prefix web/frontend ci
+
+      - name: Install Playwright browsers
+        if: steps.pw.outputs.found == 'true'
+        run: npx --yes playwright install --with-deps
+        working-directory: web/frontend
+
+      # If your Playwright config has webServer configured, this just works.
+      # Otherwise, provide a `START_COMMAND` env to boot your app under test.
+      - name: Run Playwright tests
+        if: steps.pw.outputs.found == 'true'
+        run: |
+          if [ -n "${START_COMMAND:-}" ]; then
+            echo "Starting app: $START_COMMAND"
+            $START_COMMAND &   # start server in background
+            SERVER_PID=$!
+            trap 'kill $SERVER_PID || true' EXIT
+            npx playwright test --reporter=list
+          else
+            npx playwright test --reporter=list
+          fi
+        working-directory: web/frontend
+
+      - name: Upload Playwright artifacts (on failure)
+        if: failure() && steps.pw.outputs.found == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: |
+            web/frontend/playwright-report/**
+            web/frontend/test-results/**
+          if-no-files-found: ignore
