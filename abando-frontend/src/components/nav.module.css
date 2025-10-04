@@ -1,0 +1,24 @@
+.navWrap{
+  position:sticky; top:0; z-index:50;
+  background:rgba(11,18,32,.95); box-shadow: inset 0 -1px 0 rgba(255,255,255,.08);
+  backdrop-filter:blur(8px);
+}
+.nav{height:var(--nav-h); display:flex; align-items:center; justify-content:space-between;
+  max-width:1120px; margin:0 auto; padding:0 16px;}
+.brand{display:flex; align-items:center; gap:8px; text-decoration:none}
+.brandMark{width:28px;height:28px;display:block}
+.brandWord{color:#E6EAF2; font:700 16px/1 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+.tm{color:#A9B4C5; margin-left:2px; font-size:11px; font-weight:600}
+
+.navLinks{display:none; gap:24px}
+@media (min-width:640px){.navLinks{display:flex}}
+.link{color:#A9B4C5; font:600 14px/1.2 system-ui,-apple-system,sans-serif; text-decoration:none}
+.link:hover{color:#E6EAF2}
+
+.navCtas{display:none; gap:10px}
+@media (min-width:900px){.navCtas{display:flex}}
+.btn{border-radius:10px; padding:10px 14px; font:700 14px/1 system-ui,-apple-system,sans-serif; text-decoration:none}
+.btnPrimary{background:var(--btn-primary); color:#fff}
+.btnPrimary:hover{background:var(--btn-primary-hover)}
+.btnGhost{background:rgba(255,255,255,.08); color:#E6EAF2}
+.btnGhost:hover{background:rgba(255,255,255,.12)}

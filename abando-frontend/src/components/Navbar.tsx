@@ -1,31 +1,30 @@
 "use client";
-import Image from "next/image";
 import Link from "next/link";
+import styles from "./nav.module.css";
+import Image from "next/image";
 
-const links = [
-  { href: "/#how", label: "How it works" },
-  { href: "/#pricing", label: "Pricing" },
-  { href: "/#faq", label: "FAQ" },
-];
-
-export default function Navbar() {
+export default function NavBar() {
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-white/80 backdrop-blur">
-      <nav className="container flex h-14 items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <Image src="/logo.png" alt="Abando" width={26} height={26} priority className="rounded-sm" />
-          <span className="font-semibold text-slate-800">Abando</span>
+    <div className={styles.navWrap}>
+      <nav className={styles.nav}>
+        <Link href="/" className={styles.brand} aria-label="Abando home">
+          <Image src="/abando-logo.png" alt="" width={28} height={28} className={styles.brandMark} priority />
+          <span className={styles.brandWord}>Abando</span>
+          <sup className={styles.tm}>™</sup>
         </Link>
-        <div className="hidden gap-6 sm:flex">
-          {links.map(l => (
-            <a key={l.href} href={l.href} className="text-sm text-slate-600 hover:text-slate-900">{l.label}</a>
-          ))}
+
+        <div className={styles.navLinks}>
+          <Link href="/demo/playground" className={styles.link}>Demo</Link>
+          <Link href="/pricing" className={styles.link}>Pricing</Link>
+          <Link href="/onboarding" className={styles.link}>Onboarding</Link>
+          <Link href="/support" className={styles.link}>Support</Link>
         </div>
-        <div className="flex items-center gap-3">
-          <Link href="/demo" className="btn btn-ghost">Open demo</Link>
-          <Link href="/trial" className="btn btn-primary">Start free trial</Link>
+
+        <div className={styles.navCtas}>
+          <Link href="/demo/playground" className={`${styles.btn} ${styles.btnGhost}`}>Open demo</Link>
+          <Link href="/onboarding?trial=1" className={`${styles.btn} ${styles.btnPrimary}`}>Start free trial</Link>
         </div>
       </nav>
-    </header>
+    </div>
   );
 }
