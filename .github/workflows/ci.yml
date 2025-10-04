@@ -1,10 +1,15 @@
-name: Verify deps & lockfile
+name: Verify deps & lockfile + E2E smoke
 
 on:
   push:
     branches: ["**"]
   pull_request:
     branches: ["**"]
+
+# Avoid overlapping runs on the same branch/PR
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   deps-check:
@@ -23,15 +28,12 @@ jobs:
           set -e
           echo "pwd: $(pwd)"
           echo "HEAD: $(git rev-parse --short HEAD)"
-          echo "Top-level files:"
-          ls -la
-          echo "package.json locations (depth ≤ 3):"
+          echo "package.json locations (≤3 deep):"
           find . -maxdepth 3 -name package.json -print | sort
 
       - uses: actions/setup-node@v4
         with:
-          # Align with your template’s engines (Shopify template expects 20.x)
-          node-version: '20'
+          node-version: '20'      # Shopify template expects 20.x; aligns engines
           cache: 'npm'
 
       - name: Dependency / lockfile check (self-contained)
@@ -59,19 +61,23 @@ jobs:
             echo "── Checking: $r"
             if [ -f "$r/package-lock.json" ]; then
               echo "+ npm ci --ignore-scripts --dry-run (in $r)"
-              if ! npm --prefix "$r" ci --ignore-scripts --dry-run 1>"npm-ci.$(echo "$r" | tr '/.' '__').out" 2>"npm-ci.$(echo "$r" | tr '/.' '__').err"; then
+              if ! npm --prefix "$r" ci --ignore-scripts --dry-run \
+                   1>"npm-ci.$(echo "$r" | tr '/.' '__').out" \
+                   2>"npm-ci.$(echo "$r" | tr '/.' '__').err"; then
                 echo "❌ npm lockfile mismatch in: $r"
                 fail=1
               fi
             elif [ -f "$r/yarn.lock" ]; then
               echo "+ yarn install --frozen-lockfile --ignore-scripts (in $r)"
               (cd "$r" && corepack enable >/dev/null 2>&1)
-              if ! (cd "$r" && yarn install --frozen-lockfile --ignore-scripts --non-interactive) 1>"yarn-ci.$(echo "$r" | tr '/.' '__').out" 2>"yarn-ci.$(echo "$r" | tr '/.' '__').err"; then
+              if ! (cd "$r" && yarn install --frozen-lockfile --ignore-scripts --non-interactive) \
+                   1>"yarn-ci.$(echo "$r" | tr '/.' '__').out" \
+                   2>"yarn-ci.$(echo "$r" | tr '/.' '__').err"; then
                 echo "❌ yarn lockfile mismatch in: $r"
                 fail=1
               fi
             else
-              echo "⚠️ No lockfile in $r — skipping lockfile consistency check."
+              echo "⚠️  No lockfile in $r — skipping lockfile consistency check."
             fi
           done
 
@@ -83,7 +89,7 @@ jobs:
             exit 1
           fi
 
-      - name: Upload install logs (if any failures)
+      - name: Upload deps logs (if failures)
         if: failure()
         uses: actions/upload-artifact@v4
         with:
@@ -93,4 +99,76 @@ jobs:
             npm-ci.*.err
             yarn-ci.*.out
             yarn-ci.*.err
+          if-no-files-found: ignore
+
+  e2e-smoke:
+    needs: deps-check
+    runs-on: ubuntu-latest
+    env:
+      # prevent Husky/prepare hooks during test install
+      HUSKY: "0"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Locate Playwright projects
+        id: locate
+        shell: bash
+        run: |
+          set -euo pipefail
+          # discover playwright roots (root or web/)
+          roots=()
+          for r in . web; do
+            if ls "$r"/playwright.config.* >/dev/null 2>&1; then
+              roots+=("$r")
+            fi
+          done
+          if [ ${#roots[@]} -eq 0 ]; then
+            echo "No Playwright config found; skipping."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            printf '%s\n' "${roots[@]}" > pw_roots.txt
+            echo "Found Playwright roots: ${roots[*]}"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.locate.outputs.skip != 'true'
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps + browsers & run smoke (each Playwright root)
+        if: steps.locate.outputs.skip != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          while IFS= read -r R; do
+            echo
+            echo "==== Playwright root: $R ===="
+
+            echo "+ npm ci in $R"
+            npm --prefix "$R" ci
+
+            echo "+ Install Playwright browsers"
+            (cd "$R" && npx playwright install --with-deps)
+
+            # Prefer your script if present; otherwise run Playwright directly
+            if jq -e '.scripts["test:e2e:ci"]' "$R/package.json" >/dev/null 2>&1; then
+              echo "+ npm run -s test:e2e:ci (in $R)"
+              (cd "$R" && npm run -s test:e2e:ci)
+            else
+              echo "+ npx playwright test --reporter=list (in $R)"
+              (cd "$R" && npx playwright test --reporter=list)
+            fi
+          done < pw_roots.txt
+
+      - name: Upload Playwright artifacts (reports, traces) on failure
+        if: failure() && steps.locate.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: |
+            **/playwright-report/**
+            **/test-results/**
           if-no-files-found: ignore
