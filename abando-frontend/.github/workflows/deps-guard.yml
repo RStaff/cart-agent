@@ -24,6 +24,20 @@ jobs:
           git ls-files scripts/git/deps-guard.sh || echo "NOT TRACKED"
           echo "---- head ----"
           [ -f scripts/git/deps-guard.sh ] && head -n 5 scripts/git/deps-guard.sh || echo "MISSING"
+      - name: Print workspace + ls
+        run: |
+          echo "pwd: $(pwd)"
+          echo "github.workspace: $GITHUB_WORKSPACE"
+          echo "HEAD: $(git rev-parse --short HEAD)"
+          ls -la
+          echo "---- scripts tree (max 3) ----"
+          find . -maxdepth 3 -type f -path "*scripts/*" -print | sort
+          echo "---- ls scripts/git ----"
+          ls -la ./scripts/git || true
+          echo "---- tracked? ----"
+          git ls-files scripts/git/deps-guard.sh || echo "NOT TRACKED"
+          echo "---- head ----"
+          [ -f scripts/git/deps-guard.sh ] && head -n 5 scripts/git/deps-guard.sh || echo "MISSING"
         with:
           ref: ${{ github.event.pull_request.head.sha || github.ref }}
 
