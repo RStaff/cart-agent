@@ -22,6 +22,7 @@ jobs:
         with: { node-version: '22', cache: 'npm' }
       - uses: microsoft/playwright-github-action@v1
       - run: npm ci
+      - run: npm run -s env:guard
       - run: npm run -s test:e2e:ci
       - if: failure()
         uses: actions/upload-artifact@v4

@@ -24,7 +24,7 @@
     "cta:apply": "WRITE=1 node scripts/add-install-cta.mjs",
     "cta:pages:check": "node scripts/ensure-cta-pages.mjs",
     "cta:pages:apply": "WRITE=1 node scripts/ensure-cta-pages.mjs",
-    "mvp:preflight": "bash scripts/mvp-preflight.sh",
+    "mvp:preflight": "npm run -s env:guard && bash scripts/mvp-preflight.sh",
     "mvp:build": "next build",
     "mvp:smoke": "node scripts/mvp-smoke.mjs",
     "mvp:all": "npm run -s mvp:preflight && npm run -s mvp:build && npm run -s mvp:smoke",
@@ -40,7 +40,8 @@
     "mvp:e2e": "npm run -s e2e:install && npm run -s test:e2e",
     "test:all": "npm run -s mvp:preflight && npm run -s ci:build && npm run -s test:e2e",
     "test:e2e:ci": "playwright test --reporter=list",
-    "preview:serve": "PORT=3000 node server.js"
+    "preview:serve": "PORT=3000 node server.js",
+    "env:guard": "node scripts/ci/env-guard.mjs"
   },
   "dependencies": {
     "next": "15.5.3",
