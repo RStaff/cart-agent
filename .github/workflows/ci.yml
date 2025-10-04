@@ -1,4 +1,4 @@
-name: Verify deps & lockfile + E2E smoke
+name: Verify deps & lockfile + E2E smoke + Next preview
 
 on:
   push:
@@ -6,7 +6,6 @@ on:
   pull_request:
     branches: ["**"]
 
-# Avoid overlapping runs on the same branch/PR
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -15,7 +14,6 @@ jobs:
   deps-check:
     runs-on: ubuntu-latest
     env:
-      # Stop lifecycle hooks from running in CI for this job
       HUSKY: "0"
       NPM_CONFIG_FUND: "false"
       NPM_CONFIG_AUDIT: "false"
@@ -33,7 +31,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'      # Shopify template expects 20.x; aligns engines
+          node-version: '20'     # align with Shopify template engines
           cache: 'npm'
 
       - name: Dependency / lockfile check (self-contained)
@@ -42,48 +40,38 @@ jobs:
         run: |
           set -Eeuo pipefail
           shopt -s nullglob
-
           roots=()
           for r in . web web/frontend; do
             [ -f "$r/package.json" ] && roots+=("$r")
           done
-
           if [ ${#roots[@]} -eq 0 ]; then
-            echo "ℹ️ No package.json found — nothing to check."
-            exit 0
+            echo "ℹ️ No package.json found — nothing to check."; exit 0
           fi
-
           echo "Roots to check: ${roots[*]}"
           fail=0
-
           for r in "${roots[@]}"; do
-            echo
-            echo "── Checking: $r"
+            echo; echo "── Checking: $r"
             if [ -f "$r/package-lock.json" ]; then
               echo "+ npm ci --ignore-scripts --dry-run (in $r)"
               if ! npm --prefix "$r" ci --ignore-scripts --dry-run \
-                   1>"npm-ci.$(echo "$r" | tr '/.' '__').out" \
-                   2>"npm-ci.$(echo "$r" | tr '/.' '__').err"; then
-                echo "❌ npm lockfile mismatch in: $r"
-                fail=1
+                    1>"npm-ci.$(echo "$r" | tr '/.' '__').out" \
+                    2>"npm-ci.$(echo "$r" | tr '/.' '__').err"; then
+                echo "❌ npm lockfile mismatch in: $r"; fail=1
               fi
             elif [ -f "$r/yarn.lock" ]; then
               echo "+ yarn install --frozen-lockfile --ignore-scripts (in $r)"
               (cd "$r" && corepack enable >/dev/null 2>&1)
               if ! (cd "$r" && yarn install --frozen-lockfile --ignore-scripts --non-interactive) \
-                   1>"yarn-ci.$(echo "$r" | tr '/.' '__').out" \
-                   2>"yarn-ci.$(echo "$r" | tr '/.' '__').err"; then
-                echo "❌ yarn lockfile mismatch in: $r"
-                fail=1
+                    1>"yarn-ci.$(echo "$r" | tr '/.' '__').out" \
+                    2>"yarn-ci.$(echo "$r" | tr '/.' '__').err"; then
+                echo "❌ yarn lockfile mismatch in: $r"; fail=1
               fi
             else
               echo "⚠️  No lockfile in $r — skipping lockfile consistency check."
             fi
           done
-
           if [ "$fail" -ne 0 ]; then
-            echo
-            echo "Guidance:"
+            echo; echo "Guidance:"
             echo "• Run 'npm install' (or 'yarn install') locally at the failing root to refresh the lockfile,"
             echo "  commit the updated lockfile, and push again."
             exit 1
@@ -105,7 +93,6 @@ jobs:
     needs: deps-check
     runs-on: ubuntu-latest
     env:
-      # prevent Husky/prepare hooks during test install
       HUSKY: "0"
     steps:
       - uses: actions/checkout@v4
@@ -115,7 +102,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # discover playwright roots (root or web/)
           roots=()
           for r in . web; do
             if ls "$r"/playwright.config.* >/dev/null 2>&1; then
@@ -142,18 +128,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
           while IFS= read -r R; do
-            echo
-            echo "==== Playwright root: $R ===="
-
+            echo; echo "==== Playwright root: $R ===="
             echo "+ npm ci in $R"
             npm --prefix "$R" ci
-
             echo "+ Install Playwright browsers"
             (cd "$R" && npx playwright install --with-deps)
-
-            # Prefer your script if present; otherwise run Playwright directly
             if jq -e '.scripts["test:e2e:ci"]' "$R/package.json" >/dev/null 2>&1; then
               echo "+ npm run -s test:e2e:ci (in $R)"
               (cd "$R" && npm run -s test:e2e:ci)
@@ -172,3 +152,99 @@ jobs:
             **/playwright-report/**
             **/test-results/**
           if-no-files-found: ignore
+
+  build-preview:
+    needs: e2e-smoke
+    runs-on: ubuntu-latest
+    env:
+      HUSKY: "0"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Locate Next.js app roots
+        id: nxloc
+        shell: bash
+        run: |
+          set -euo pipefail
+          roots=()
+          for r in . web; do
+            if [ -f "$r/package.json" ] && jq -e '.dependencies.next or .devDependencies.next' "$r/package.json" >/dev/null 2>&1; then
+              # also require a next config file to be safe
+              if ls "$r"/next.config.* >/dev/null 2>&1; then
+                roots+=("$r")
+              fi
+            fi
+          done
+          if [ ${#roots[@]} -eq 0 ]; then
+            echo "No Next.js app found; skipping preview build."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            printf '%s\n' "${roots[@]}" > next_roots.txt
+            echo "Found Next roots: ${roots[*]}"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.nxloc.outputs.skip != 'true'
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Build Next apps (standalone) + pack preview
+        if: steps.nxloc.outputs.skip != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          pack() {
+            local R="$1"
+            local OUT="preview/$(echo "$R" | tr '/.' '__')"
+            echo "→ Packing standalone from $R to $OUT"
+            mkdir -p "$OUT"
+            rm -rf "$OUT"/*
+
+            # copy .next/standalone, static and public
+            cp -a "$R/.next/standalone/." "$OUT"/
+            mkdir -p "$OUT/.next/static"
+            cp -a "$R/.next/static/." "$OUT/.next/static/" 2>/dev/null || true
+            if [ -d "$R/public" ]; then
+              mkdir -p "$OUT/public"
+              cp -a "$R/public/." "$OUT/public/" 2>/dev/null || true
+            fi
+
+            cat > "$OUT/README.txt" <<TXT
+Run locally:
+  PORT=3000 node server.js
+TXT
+          }
+
+          mkdir -p preview
+
+          while IFS= read -r R; do
+            echo; echo "==== Next root: $R ===="
+            echo "+ npm ci in $R"
+            npm --prefix "$R" ci
+
+            # Ensure standalone output even if not set in config by passing env
+            echo "+ next build (in $R)"
+            (cd "$R" && npx next build)
+
+            # Require that standalone exists; if not, give a helpful error
+            if [ ! -d "$R/.next/standalone" ]; then
+              echo "❌ Standalone output not found at $R/.next/standalone"
+              echo "   Make sure your next.config.* sets:  output: 'standalone'"
+              exit 1
+            fi
+
+            pack "$R"
+          done < next_roots.txt
+
+          echo "Packed previews:"; find preview -maxdepth 2 -type f -name server.js -print
+
+      - name: Upload preview artifacts
+        if: steps.nxloc.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-standalone-preview
+          path: preview/**
+          if-no-files-found: error
