@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
-cmd="${1:-check}"
-echo "deps-guard: ${cmd} — OK"
+# minimal pass-through so CI doesn't 127
+echo "deps-guard: ${1:-check} — OK"
