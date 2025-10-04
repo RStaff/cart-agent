@@ -7,29 +7,19 @@ on:
 jobs:
   deps-check:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: abando-frontend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
+        with: { node-version: '22', cache: 'npm' }
       - run: bash scripts/git/deps-guard.sh check
       - run: npm ci --dry-run
 
   build-and-test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: abando-frontend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
+        with: { node-version: '22', cache: 'npm' }
       - run: npm ci
       - run: npm run -s test:e2e:ci
       - if: failure()
@@ -37,6 +27,26 @@ jobs:
         with:
           name: playwright-report
           path: |
-            abando-frontend/playwright-report/**
-            abando-frontend/test-results/**
+            playwright-report/**
+            test-results/**
           if-no-files-found: ignore
+
+  build-preview:
+    needs: build-and-test
+    if: always() && needs.build-and-test.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: 'npm' }
+      - run: npm ci
+      - name: Build standalone server
+        run: |
+          npm run -s ci:build
+          scripts/ci/pack-standalone.sh
+      - name: Upload preview server artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-standalone-preview
+          path: preview/**
+          if-no-files-found: error

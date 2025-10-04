@@ -39,7 +39,8 @@
     "ci:e2e": "playwright test",
     "mvp:e2e": "npm run -s e2e:install && npm run -s test:e2e",
     "test:all": "npm run -s mvp:preflight && npm run -s ci:build && npm run -s test:e2e",
-    "test:e2e:ci": "playwright test --reporter=list"
+    "test:e2e:ci": "playwright test --reporter=list",
+    "preview:serve": "PORT=3000 node server.js"
   },
   "dependencies": {
     "next": "15.5.3",
