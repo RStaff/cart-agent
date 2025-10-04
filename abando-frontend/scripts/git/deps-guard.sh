@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-set -euo pipefail
-# minimal pass-through so CI doesn't 127
-echo "deps-guard: ${1:-check} — OK"
+set -e
+echo "[deps-guard] No-op: skipping static dependency validation"
+exit 0
