@@ -33,7 +33,11 @@
     "ci:preflight": "npm run -s mvp:preflight",
     "ci:build": "next build",
     "ci:smoke": "node scripts/ci/smoke.mjs",
-    "ci:all": "npm run -s ci:deps && npm run -s ci:preflight && npm run -s ci:build && npm run -s ci:smoke"
+    "ci:all": "npm run -s ci:deps && npm run -s ci:preflight && npm run -s ci:build && npm run -s ci:smoke",
+    "e2e:install": "npx playwright install chromium",
+    "test:e2e": "playwright test",
+    "ci:e2e": "playwright test",
+    "mvp:e2e": "npm run -s e2e:install && npm run -s test:e2e"
   },
   "dependencies": {
     "next": "15.5.3",
@@ -43,6 +47,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.55.1",
     "@tailwindcss/postcss": "^4.1.13",
     "@types/node": "^20",
     "@types/react": "^19",
