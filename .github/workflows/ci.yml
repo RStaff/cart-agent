@@ -1,4 +1,4 @@
-name: Verify deps & lockfile + E2E smoke + Next preview
+name: Verify deps, E2E smoke, and Next preview with live curl
 
 on:
   push:
@@ -10,93 +10,58 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+
 jobs:
   deps-check:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     env:
       HUSKY: "0"
       NPM_CONFIG_FUND: "false"
       NPM_CONFIG_AUDIT: "false"
     steps:
       - uses: actions/checkout@v4
-
-      - name: Repo snapshot
-        shell: bash
-        run: |
-          set -e
-          echo "pwd: $(pwd)"
-          echo "HEAD: $(git rev-parse --short HEAD)"
-          echo "package.json locations (≤3 deep):"
-          find . -maxdepth 3 -name package.json -print | sort
-
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'     # align with Shopify template engines
+          node-version: '20'
           cache: 'npm'
-
       - name: Dependency / lockfile check (self-contained)
-        id: deps
         shell: bash
         run: |
           set -Eeuo pipefail
-          shopt -s nullglob
           roots=()
           for r in . web web/frontend; do
             [ -f "$r/package.json" ] && roots+=("$r")
           done
-          if [ ${#roots[@]} -eq 0 ]; then
-            echo "ℹ️ No package.json found — nothing to check."; exit 0
-          fi
           echo "Roots to check: ${roots[*]}"
           fail=0
           for r in "${roots[@]}"; do
-            echo; echo "── Checking: $r"
+            echo "── Checking: $r"
             if [ -f "$r/package-lock.json" ]; then
-              echo "+ npm ci --ignore-scripts --dry-run (in $r)"
-              if ! npm --prefix "$r" ci --ignore-scripts --dry-run \
-                    1>"npm-ci.$(echo "$r" | tr '/.' '__').out" \
-                    2>"npm-ci.$(echo "$r" | tr '/.' '__').err"; then
-                echo "❌ npm lockfile mismatch in: $r"; fail=1
-              fi
+              npm --prefix "$r" ci --ignore-scripts --dry-run || fail=1
             elif [ -f "$r/yarn.lock" ]; then
-              echo "+ yarn install --frozen-lockfile --ignore-scripts (in $r)"
               (cd "$r" && corepack enable >/dev/null 2>&1)
-              if ! (cd "$r" && yarn install --frozen-lockfile --ignore-scripts --non-interactive) \
-                    1>"yarn-ci.$(echo "$r" | tr '/.' '__').out" \
-                    2>"yarn-ci.$(echo "$r" | tr '/.' '__').err"; then
-                echo "❌ yarn lockfile mismatch in: $r"; fail=1
-              fi
+              (cd "$r" && yarn install --frozen-lockfile --ignore-scripts --non-interactive --dry-run) || fail=1
             else
-              echo "⚠️  No lockfile in $r — skipping lockfile consistency check."
+              echo "⚠️ No lockfile in $r — skipping"
             fi
           done
-          if [ "$fail" -ne 0 ]; then
-            echo; echo "Guidance:"
-            echo "• Run 'npm install' (or 'yarn install') locally at the failing root to refresh the lockfile,"
-            echo "  commit the updated lockfile, and push again."
-            exit 1
-          fi
-
-      - name: Upload deps logs (if failures)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: deps-check-logs
-          path: |
-            npm-ci.*.out
-            npm-ci.*.err
-            yarn-ci.*.out
-            yarn-ci.*.err
-          if-no-files-found: ignore
+          exit $fail
 
   e2e-smoke:
     needs: deps-check
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
       HUSKY: "0"
     steps:
       - uses: actions/checkout@v4
-
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
       - name: Locate Playwright projects
         id: locate
         shell: bash
@@ -109,42 +74,28 @@ jobs:
             fi
           done
           if [ ${#roots[@]} -eq 0 ]; then
-            echo "No Playwright config found; skipping."
             echo "skip=true" >> $GITHUB_OUTPUT
           else
             printf '%s\n' "${roots[@]}" > pw_roots.txt
-            echo "Found Playwright roots: ${roots[*]}"
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
-
-      - uses: actions/setup-node@v4
-        if: steps.locate.outputs.skip != 'true'
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install deps + browsers & run smoke (each Playwright root)
+      - name: Install deps + browsers & run smoke
         if: steps.locate.outputs.skip != 'true'
         shell: bash
         run: |
           set -euo pipefail
           while IFS= read -r R; do
-            echo; echo "==== Playwright root: $R ===="
-            echo "+ npm ci in $R"
+            echo "=== Playwright root: $R ==="
             npm --prefix "$R" ci
-            echo "+ Install Playwright browsers"
             (cd "$R" && npx playwright install --with-deps)
             if jq -e '.scripts["test:e2e:ci"]' "$R/package.json" >/dev/null 2>&1; then
-              echo "+ npm run -s test:e2e:ci (in $R)"
               (cd "$R" && npm run -s test:e2e:ci)
             else
-              echo "+ npx playwright test --reporter=list (in $R)"
               (cd "$R" && npx playwright test --reporter=list)
             fi
           done < pw_roots.txt
-
-      - name: Upload Playwright artifacts (reports, traces) on failure
-        if: failure() && steps.locate.outputs.skip != 'true'
+      - name: Upload Playwright artifacts
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-artifacts
@@ -156,10 +107,15 @@ jobs:
   build-preview:
     needs: e2e-smoke
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
       HUSKY: "0"
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
 
       - name: Locate Next.js app roots
         id: nxloc
@@ -169,77 +125,44 @@ jobs:
           roots=()
           for r in . web; do
             if [ -f "$r/package.json" ] && jq -e '.dependencies.next or .devDependencies.next' "$r/package.json" >/dev/null 2>&1; then
-              # also require a next config file to be safe
               if ls "$r"/next.config.* >/dev/null 2>&1; then
                 roots+=("$r")
               fi
             fi
           done
           if [ ${#roots[@]} -eq 0 ]; then
-            echo "No Next.js app found; skipping preview build."
             echo "skip=true" >> $GITHUB_OUTPUT
           else
             printf '%s\n' "${roots[@]}" > next_roots.txt
-            echo "Found Next roots: ${roots[*]}"
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
-
-      - uses: actions/setup-node@v4
-        if: steps.nxloc.outputs.skip != 'true'
-        with:
-          node-version: '20'
-          cache: 'npm'
 
       - name: Build Next apps (standalone) + pack preview
         if: steps.nxloc.outputs.skip != 'true'
         shell: bash
         run: |
           set -euo pipefail
-
+          mkdir -p preview
           pack() {
             local R="$1"
             local OUT="preview/$(echo "$R" | tr '/.' '__')"
-            echo "→ Packing standalone from $R to $OUT"
             mkdir -p "$OUT"
-            rm -rf "$OUT"/*
-
-            # copy .next/standalone, static and public
             cp -a "$R/.next/standalone/." "$OUT"/
             mkdir -p "$OUT/.next/static"
             cp -a "$R/.next/static/." "$OUT/.next/static/" 2>/dev/null || true
-            if [ -d "$R/public" ]; then
-              mkdir -p "$OUT/public"
-              cp -a "$R/public/." "$OUT/public/" 2>/dev/null || true
-            fi
-
+            [ -d "$R/public" ] && cp -a "$R/public" "$OUT"/
             cat > "$OUT/README.txt" <<TXT
 Run locally:
   PORT=3000 node server.js
 TXT
           }
-
-          mkdir -p preview
-
           while IFS= read -r R; do
-            echo; echo "==== Next root: $R ===="
-            echo "+ npm ci in $R"
+            echo "=== Next root: $R ==="
             npm --prefix "$R" ci
-
-            # Ensure standalone output even if not set in config by passing env
-            echo "+ next build (in $R)"
             (cd "$R" && npx next build)
-
-            # Require that standalone exists; if not, give a helpful error
-            if [ ! -d "$R/.next/standalone" ]; then
-              echo "❌ Standalone output not found at $R/.next/standalone"
-              echo "   Make sure your next.config.* sets:  output: 'standalone'"
-              exit 1
-            fi
-
+            [ -d "$R/.next/standalone" ] || { echo "❌ No standalone at $R/.next/standalone (set output: 'standalone' in next.config)"; exit 1; }
             pack "$R"
           done < next_roots.txt
-
-          echo "Packed previews:"; find preview -maxdepth 2 -type f -name server.js -print
 
       - name: Upload preview artifacts
         if: steps.nxloc.outputs.skip != 'true'
@@ -248,3 +171,46 @@ TXT
           name: next-standalone-preview
           path: preview/**
           if-no-files-found: error
+
+      - name: Tiny smoke-serve check (curl) with logs
+        if: steps.nxloc.outputs.skip != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT=$(head -n1 next_roots.txt)
+          APPDIR="preview/$(echo "$ROOT" | tr '/.' '__')"
+          cd "$APPDIR"
+
+          echo "🏁 Starting preview server for smoke test (PORT=4000)..."
+          PORT=4000 node server.js > preview-smoke.log 2>&1 &
+          PID=$!
+          cleanup() { kill $PID 2>/dev/null || true; }
+          trap cleanup EXIT
+
+          echo "Server PID=$PID; waiting up to 30s for readiness..."
+          ok=0
+          for i in {1..30}; do
+            if curl -fsS "http://localhost:4000/api/status" > ../preview-curl.out 2> ../preview-curl.err || \
+               curl -fsS "http://localhost:4000/" > ../preview-curl.out 2> ../preview-curl.err; then
+              ok=1; break
+            fi
+            sleep 1
+          done
+
+          if [ "$ok" -eq 1 ]; then
+            echo "✅ Smoke check succeeded"
+          else
+            echo "❌ Smoke serve check failed (no response). See logs."
+            exit 1
+          fi
+
+      - name: Upload smoke-serve logs on failure
+        if: failure() && steps.nxloc.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: preview-smoke-logs
+          path: |
+            preview/**/preview-smoke.log
+            preview-curl.out
+            preview-curl.err
+          if-no-files-found: ignore
