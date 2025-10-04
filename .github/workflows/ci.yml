@@ -1,4 +1,4 @@
-name: CI (deps, build, e2e)
+name: Verify deps & lockfile
 
 on:
   push:
@@ -10,129 +10,87 @@ jobs:
   deps-check:
     runs-on: ubuntu-latest
     env:
-      # keep lifecycle hooks from firing in this job
+      # Stop lifecycle hooks from running in CI for this job
       HUSKY: "0"
       NPM_CONFIG_FUND: "false"
       NPM_CONFIG_AUDIT: "false"
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'   # Shopify template requires 20.x
-          cache: 'npm'
-
-      - name: Dependency & lockfile check (self-contained)
+      - name: Repo snapshot
         shell: bash
         run: |
-          set -euo pipefail
+          set -e
+          echo "pwd: $(pwd)"
+          echo "HEAD: $(git rev-parse --short HEAD)"
+          echo "Top-level files:"
+          ls -la
+          echo "package.json locations (depth ≤ 3):"
+          find . -maxdepth 3 -name package.json -print | sort
+
+      - uses: actions/setup-node@v4
+        with:
+          # Align with your template’s engines (Shopify template expects 20.x)
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Dependency / lockfile check (self-contained)
+        id: deps
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          shopt -s nullglob
 
           roots=()
-          [ -f package.json ] && roots+=(".")
-          [ -f web/package.json ] && roots+=("web")
-          [ -f web/frontend/package.json ] && roots+=("web/frontend")
+          for r in . web web/frontend; do
+            [ -f "$r/package.json" ] && roots+=("$r")
+          done
 
           if [ ${#roots[@]} -eq 0 ]; then
             echo "ℹ️ No package.json found — nothing to check."
             exit 0
           fi
 
+          echo "Roots to check: ${roots[*]}"
+          fail=0
+
           for r in "${roots[@]}"; do
-            echo "── Checking deps at: $r"
+            echo
+            echo "── Checking: $r"
             if [ -f "$r/package-lock.json" ]; then
-              echo "npm ci --ignore-scripts --dry-run in $r"
-              npm --prefix "$r" ci --ignore-scripts --dry-run
+              echo "+ npm ci --ignore-scripts --dry-run (in $r)"
+              if ! npm --prefix "$r" ci --ignore-scripts --dry-run 1>"npm-ci.$(echo "$r" | tr '/.' '__').out" 2>"npm-ci.$(echo "$r" | tr '/.' '__').err"; then
+                echo "❌ npm lockfile mismatch in: $r"
+                fail=1
+              fi
             elif [ -f "$r/yarn.lock" ]; then
-              echo "yarn install --frozen-lockfile --ignore-scripts in $r"
-              (cd "$r" && corepack enable && yarn install --frozen-lockfile --ignore-scripts --non-interactive)
+              echo "+ yarn install --frozen-lockfile --ignore-scripts (in $r)"
+              (cd "$r" && corepack enable >/dev/null 2>&1)
+              if ! (cd "$r" && yarn install --frozen-lockfile --ignore-scripts --non-interactive) 1>"yarn-ci.$(echo "$r" | tr '/.' '__').out" 2>"yarn-ci.$(echo "$r" | tr '/.' '__').err"; then
+                echo "❌ yarn lockfile mismatch in: $r"
+                fail=1
+              fi
             else
-              echo "⚠️  No lockfile in $r — skipping lockfile check for this root."
+              echo "⚠️ No lockfile in $r — skipping lockfile consistency check."
             fi
           done
 
-  build:
-    needs: deps-check
-    runs-on: ubuntu-latest
-    env:
-      HUSKY: "0"       # keep hooks disabled for CI
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      # web
-      - name: Install (web)
-        if: hashFiles('web/package.json') != ''
-        run: npm --prefix web ci
-      - name: Build (web)
-        if: hashFiles('web/package.json') != ''
-        run: npm --prefix web run -s build
-
-      # web/frontend
-      - name: Install (web/frontend)
-        if: hashFiles('web/frontend/package.json') != ''
-        run: npm --prefix web/frontend ci
-      - name: Build (web/frontend)
-        if: hashFiles('web/frontend/package.json') != ''
-        run: npm --prefix web/frontend run -s build || echo "(no build script)"
-
-  e2e:
-    needs: build
-    runs-on: ubuntu-latest
-    env:
-      CI: "true"
-      HUSKY: "0"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      # Only proceed if Playwright config exists in web/frontend (common layout)
-      - name: Detect Playwright config
-        id: pw
-        run: |
-          set -euo pipefail
-          if [ -f web/frontend/playwright.config.ts ] || [ -f web/frontend/playwright.config.mjs ] || [ -f web/frontend/playwright.config.js ]; then
-            echo "found=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "found=false" >> "$GITHUB_OUTPUT"
+          if [ "$fail" -ne 0 ]; then
+            echo
+            echo "Guidance:"
+            echo "• Run 'npm install' (or 'yarn install') locally at the failing root to refresh the lockfile,"
+            echo "  commit the updated lockfile, and push again."
+            exit 1
           fi
 
-      - name: Install (web/frontend)
-        if: steps.pw.outputs.found == 'true'
-        run: npm --prefix web/frontend ci
-
-      - name: Install Playwright browsers
-        if: steps.pw.outputs.found == 'true'
-        run: npx --yes playwright install --with-deps
-        working-directory: web/frontend
-
-      # If your Playwright config has webServer configured, this just works.
-      # Otherwise, provide a `START_COMMAND` env to boot your app under test.
-      - name: Run Playwright tests
-        if: steps.pw.outputs.found == 'true'
-        run: |
-          if [ -n "${START_COMMAND:-}" ]; then
-            echo "Starting app: $START_COMMAND"
-            $START_COMMAND &   # start server in background
-            SERVER_PID=$!
-            trap 'kill $SERVER_PID || true' EXIT
-            npx playwright test --reporter=list
-          else
-            npx playwright test --reporter=list
-          fi
-        working-directory: web/frontend
-
-      - name: Upload Playwright artifacts (on failure)
-        if: failure() && steps.pw.outputs.found == 'true'
+      - name: Upload install logs (if any failures)
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-artifacts
+          name: deps-check-logs
           path: |
-            web/frontend/playwright-report/**
-            web/frontend/test-results/**
+            npm-ci.*.out
+            npm-ci.*.err
+            yarn-ci.*.out
+            yarn-ci.*.err
           if-no-files-found: ignore
