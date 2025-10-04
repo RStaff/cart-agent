@@ -74,10 +74,10 @@ jobs:
             fi
           done
           if [ ${#roots[@]} -eq 0 ]; then
-            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "skip=true" >> "$GITHUB_OUTPUT"
           else
             printf '%s\n' "${roots[@]}" > pw_roots.txt
-            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
       - name: Install deps + browsers & run smoke
         if: steps.locate.outputs.skip != 'true'
@@ -131,10 +131,10 @@ jobs:
             fi
           done
           if [ ${#roots[@]} -eq 0 ]; then
-            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "skip=true" >> "$GITHUB_OUTPUT"
           else
             printf '%s\n' "${roots[@]}" > next_roots.txt
-            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Build Next apps (standalone) + pack preview
@@ -181,10 +181,10 @@ TXT
           APPDIR="preview/$(echo "$ROOT" | tr '/.' '__')"
           cd "$APPDIR"
 
-          echo "🏁 Starting preview server for smoke test (PORT=4000)..."
+          echo "Starting preview server for smoke test (PORT=4000)..."
           PORT=4000 node server.js > preview-smoke.log 2>&1 &
           PID=$!
-          cleanup() { kill $PID 2>/dev/null || true; }
+          cleanup() { kill "$PID" 2>/dev/null || true; }
           trap cleanup EXIT
 
           echo "Server PID=$PID; waiting up to 30s for readiness..."
@@ -198,9 +198,9 @@ TXT
           done
 
           if [ "$ok" -eq 1 ]; then
-            echo "✅ Smoke check succeeded"
+            echo "Smoke check succeeded"
           else
-            echo "❌ Smoke serve check failed (no response). See logs."
+            echo "Smoke serve check failed (no response). See logs."
             exit 1
           fi
 
