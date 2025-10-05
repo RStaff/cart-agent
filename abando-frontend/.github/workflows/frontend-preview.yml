@@ -1,4 +1,4 @@
-name: Frontend preview (Vite build + curl)
+name: Frontend preview smoke
 
 on:
   push:
@@ -6,19 +6,14 @@ on:
   pull_request:
     branches: ["**"]
 
-concurrency:
-  group: fe-preview-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  vite-preview:
+  preview:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
     env:
       HUSKY: "0"
+      npm_config_ignore_scripts: "true"
       NPM_CONFIG_FUND: "false"
       NPM_CONFIG_AUDIT: "false"
-      NEXT_TELEMETRY_DISABLED: "1"
     steps:
       - uses: actions/checkout@v4
 
@@ -26,17 +21,14 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: |
-            web/frontend/package-lock.json
-            package-lock.json
 
-      - name: Build frontend (web/frontend)
-        working-directory: web/frontend
-        run: |
-          npm ci
-          npm run build
+      - name: Install
+        run: npm --prefix web/frontend ci
 
-      - name: Start preview & curl smoke
+      - name: Build
+        run: npm --prefix web/frontend run build
+
+      - name: Start preview (background) and curl it
         working-directory: web/frontend
         shell: bash
         run: |
@@ -44,8 +36,7 @@ jobs:
           npx vite preview --port 4173 --strictPort > preview.log 2>&1 &
           PID=$!
           trap "kill $PID 2>/dev/null || true" EXIT
-
-          echo "Waiting for preview on :4173 ..."
+          echo "Waiting for :4173 ..."
           for i in {1..30}; do
             if curl -fsS http://localhost:4173/ >/dev/null; then
               echo "✅ Preview responded"
