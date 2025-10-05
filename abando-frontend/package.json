@@ -44,7 +44,10 @@
     "env:guard": "node scripts/ci/env-guard.mjs",
     "dev:frontend": "npm --prefix web/frontend run dev",
     "build:frontend": "npm --prefix web/frontend run build",
-    "preview:frontend": "(npm --prefix web/frontend run build && npx --prefix web/frontend vite preview --port 4173 --strictPort)"
+    "preview:frontend": "(npm --prefix web/frontend run build && npx --prefix web/frontend vite preview --port 4173 --strictPort)",
+    "shopify:dev": "npm --prefix web run dev || (echo 'Install Shopify CLI (brew install shopify-cli) and try again.' && exit 1)",
+    "shopify:build": "npm --prefix web run build || (echo 'Missing Shopify build script in web/; check template.' && exit 1)",
+    "shopify:info": "npm --prefix web run info || (echo 'Shopify CLI not available.' && exit 0)"
   },
   "dependencies": {
     "next": "15.5.3",
