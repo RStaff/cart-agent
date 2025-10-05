@@ -1,0 +1,65 @@
+name: Frontend preview (Vite build + curl)
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+concurrency:
+  group: fe-preview-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  vite-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      HUSKY: "0"
+      NPM_CONFIG_FUND: "false"
+      NPM_CONFIG_AUDIT: "false"
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            web/frontend/package-lock.json
+            package-lock.json
+
+      - name: Build frontend (web/frontend)
+        working-directory: web/frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Start preview & curl smoke
+        working-directory: web/frontend
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx vite preview --port 4173 --strictPort > preview.log 2>&1 &
+          PID=$!
+          trap "kill $PID 2>/dev/null || true" EXIT
+
+          echo "Waiting for preview on :4173 ..."
+          for i in {1..30}; do
+            if curl -fsS http://localhost:4173/ >/dev/null; then
+              echo "✅ Preview responded"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "❌ No response from preview"
+          exit 1
+
+      - name: Upload preview logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vite-preview-logs
+          path: web/frontend/preview.log
+          if-no-files-found: ignore

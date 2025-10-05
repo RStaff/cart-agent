@@ -41,7 +41,10 @@
     "test:all": "npm run -s mvp:preflight && npm run -s ci:build && npm run -s test:e2e",
     "test:e2e:ci": "playwright test --reporter=list",
     "preview:serve": "PORT=3000 node server.js",
-    "env:guard": "node scripts/ci/env-guard.mjs"
+    "env:guard": "node scripts/ci/env-guard.mjs",
+    "dev:frontend": "npm --prefix web/frontend run dev",
+    "build:frontend": "npm --prefix web/frontend run build",
+    "preview:frontend": "(npm --prefix web/frontend run build && npx --prefix web/frontend vite preview --port 4173 --strictPort)"
   },
   "dependencies": {
     "next": "15.5.3",
@@ -52,7 +55,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@playwright/test": "^1.55.1",
-    "@tailwindcss/postcss": "^4.1.13",
+    "@tailwindcss/postcss": "^4.1.14",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
