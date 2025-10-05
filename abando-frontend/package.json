@@ -45,9 +45,9 @@
     "dev:frontend": "npm --prefix web/frontend run dev",
     "build:frontend": "npm --prefix web/frontend run build",
     "preview:frontend": "(npm --prefix web/frontend run build && npx --prefix web/frontend vite preview --port 4173 --strictPort)",
-    "shopify:dev": "bash -lc 'ROOT=/Users/rossstafford/projects/cart-agent/abando-frontend; npm --prefix \"/web\" run dev || (echo \"Install Shopify CLI (brew install shopify-cli) and try again.\" && exit 1)'",
-    "shopify:build": "bash -lc 'ROOT=/Users/rossstafford/projects/cart-agent/abando-frontend; npm --prefix \"/web\" run build || (echo \"Missing Shopify build script in web/; check template.\" && exit 1)'",
-    "shopify:info": "bash -lc 'ROOT=/Users/rossstafford/projects/cart-agent/abando-frontend; npm --prefix \"/web\" run info || (echo \"Shopify CLI not available.\" && exit 0)'"
+    "shopify:dev": "bash -lc 'ROOT=/Users/rossstafford/projects/cart-agent/abando-frontend; if [ -f \"/web/package.json\" ]; then npm --prefix \"/web\" run dev; else echo \"ℹ️ No web/package.json — trying web/frontend dev\"; npm --prefix \"/web/frontend\" run dev; fi'",
+    "shopify:build": "bash -lc 'ROOT=/Users/rossstafford/projects/cart-agent/abando-frontend; if [ -f \"/web/package.json\" ]; then npm --prefix \"/web\" run build; else echo \"ℹ️ No web/package.json — trying web/frontend build\"; npm --prefix \"/web/frontend\" run build; fi'",
+    "shopify:info": "bash -lc 'ROOT=/Users/rossstafford/projects/cart-agent/abando-frontend; if [ -f \"/web/package.json\" ]; then npm --prefix \"/web\" run info || echo \"Shopify CLI not available.\"; else echo \"ℹ️ No web/package.json — nothing to show for Shopify app.\"; fi'"
   },
   "dependencies": {
     "next": "15.5.3",
