@@ -1,0 +1,26 @@
+name: CI settings sanity
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  settings-only:
+    runs-on: ubuntu-latest
+    env:
+      HUSKY: "0"
+      NPM_CONFIG_FUND: "false"
+      NPM_CONFIG_AUDIT: "false"
+      npm_config_ignore_scripts: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Print node + env (sanity)
+        run: |
+          node -v
+          npm -v
+          echo "HUSKY=$HUSKY npm_config_ignore_scripts=$npm_config_ignore_scripts"
