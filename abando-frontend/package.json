@@ -44,10 +44,10 @@
     "env:guard": "node scripts/ci/env-guard.mjs",
     "dev:frontend": "npm --prefix web/frontend run dev",
     "build:frontend": "npm --prefix web/frontend run build",
-    "preview:frontend": "(npm --prefix web/frontend run build && npx --prefix web/frontend vite preview --port 4173 --strictPort)",
-    "shopify:dev": "bash -lc 'ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd); if [ -f \"${ROOT}/web/package.json\" ]; then npm --prefix \"${ROOT}/web\" run dev; elif [ -f \"${ROOT}/web/frontend/package.json\" ]; then npm --prefix \"${ROOT}/web/frontend\" run dev; else echo \"ℹ️ No web or web/frontend app found.\"; exit 0; fi'",
-    "shopify:build": "bash -lc 'ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd); if [ -f \"${ROOT}/web/package.json\" ]; then npm --prefix \"${ROOT}/web\" run build; elif [ -f \"${ROOT}/web/frontend/package.json\" ]; then npm --prefix \"${ROOT}/web/frontend\" run build; else echo \"ℹ️ No web or web/frontend app found.\"; exit 0; fi'",
-    "shopify:info": "bash -lc 'ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd); if [ -f \"${ROOT}/web/package.json\" ]; then npm --prefix \"${ROOT}/web\" run info || echo \"Shopify CLI not available.\"; else echo \"ℹ️ No web/package.json — nothing to show for Shopify app.\"; fi'"
+    "preview:frontend": "(npm --prefix web/frontend run build && npx --prefix web/frontend vite preview --port 4173 --strictPort --host 127.0.0.1)",
+    "shopify:dev": "bash -lc 'ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd);  if [ -f \"${ROOT}/web/frontend/package.json\" ] && node -e \"p=require('\\''${ROOT}/web/frontend/package.json'\\''); if(!(p.scripts&&p.scripts.dev))process.exit(1)\" >/dev/null 2>&1; then    npm --prefix \"${ROOT}/web/frontend\" run dev;  elif [ -f \"${ROOT}/web/package.json\" ] && node -e \"p=require('\\''${ROOT}/web/package.json'\\''); if(!(p.scripts&&p.scripts.dev))process.exit(1)\" >/dev/null 2>&1; then    npm --prefix \"${ROOT}/web\" run dev;  else    echo \"ℹ️ No usable dev script in web/frontend or web.\"; exit 0;  fi'",
+    "shopify:build": "bash -lc 'ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd);  if [ -f \"${ROOT}/web/frontend/package.json\" ] && node -e \"p=require('\\''${ROOT}/web/frontend/package.json'\\''); if(!(p.scripts&&p.scripts.build))process.exit(1)\" >/dev/null 2>&1; then    npm --prefix \"${ROOT}/web/frontend\" run build;  elif [ -f \"${ROOT}/web/package.json\" ] && node -e \"p=require('\\''${ROOT}/web/package.json'\\''); if(!(p.scripts&&p.scripts.build))process.exit(1)\" >/dev/null 2>&1; then    npm --prefix \"${ROOT}/web\" run build;  else    echo \"ℹ️ No usable build script in web/frontend or web.\"; exit 0;  fi'",
+    "shopify:info": "bash -lc 'ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd);  if [ -f \"${ROOT}/web/package.json\" ] && node -e \"p=require('\\''${ROOT}/web/package.json'\\''); if(!(p.scripts&&p.scripts.info))process.exit(1)\" >/dev/null 2>&1; then    npm --prefix \"${ROOT}/web\" run info || echo \"Shopify CLI not available.\";  else    echo \"ℹ️ No Shopify app 'info' script in web/.\"; exit 0;  fi'"
   },
   "dependencies": {
     "next": "15.5.3",
@@ -58,17 +58,17 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@playwright/test": "^1.55.1",
-    "@tailwindcss/postcss": "^4.1.14",
+    "@tailwindcss/postcss": "4.1.14",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@typescript-eslint/eslint-plugin": "^8.45.0",
     "@typescript-eslint/parser": "^8.45.0",
-    "autoprefixer": "^10.4.21",
+    "autoprefixer": "10.4.21",
     "eslint": "^9.36.0",
     "eslint-config-next": "15.5.3",
     "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.18",
+    "tailwindcss": "3.4.18",
     "typescript": "5.9.2"
   },
   "type": "module",

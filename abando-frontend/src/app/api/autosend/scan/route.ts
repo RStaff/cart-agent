@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { requireCronSecret } from "@/lib/autosend-config";
-import { scanAndMaybeSend, DemoRepo, DemoMessenger } from "@/lib/autosend-worker";
+import {
+  scanAndMaybeSend,
+  DemoRepo,
+  DemoMessenger,
+} from "@/lib/autosend-worker";
 
 /**
  * GET /api/autosend/scan
@@ -9,7 +13,10 @@ import { scanAndMaybeSend, DemoRepo, DemoMessenger } from "@/lib/autosend-worker
  */
 export async function GET(req: Request) {
   if (!requireCronSecret(req)) {
-    return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 });
+    return NextResponse.json(
+      { ok: false, error: "forbidden" },
+      { status: 403 },
+    );
   }
 
   // TODO: swap DemoRepo/DemoMessenger for your real implementations

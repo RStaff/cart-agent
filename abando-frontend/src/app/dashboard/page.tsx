@@ -1,5 +1,4 @@
 import DashboardClient from "./Client";
-import { DashboardExplainer } from "@/components/Explainers";
 
 export const dynamic = "force-static";
 

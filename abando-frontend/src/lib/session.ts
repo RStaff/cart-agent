@@ -6,7 +6,7 @@
  * - Use in-memory stores (good for local/dev); swap to Redis later without touching callers.
  */
 
-import { cookies as nextCookies, headers as nextHeaders } from "next/headers";
+import { cookies as nextCookies, headers as _nextHeaders } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 /** ===== Types ===== */
@@ -22,11 +22,18 @@ const COOKIE_NAME = "sid";
 const MAGIC_TTL_MS = 15 * 60 * 1000; // 15 minutes
 
 /** ===== Utils ===== */
-function now() { return Date.now(); }
+function now() {
+  return Date.now();
+}
 
 function randomId(): string {
-  try { return crypto.randomUUID(); }
-  catch { return Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2); }
+  try {
+    return crypto.randomUUID();
+  } catch {
+    return (
+      Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)
+    );
+  }
 }
 
 function isPromiseLike<T = unknown>(x: any): x is Promise<T> {
@@ -95,15 +102,18 @@ export function getSessionEmailOnServer(): string | null {
 export function getSessionEmailFromCookie(req?: NextRequest): string | null {
   try {
     // Prefer request cookies when provided (route handlers)
-    const sid = req?.cookies?.get?.(COOKIE_NAME)?.value
-      ?? ((): string | null => {
-          // Fallback to headers() cookie jar (may be Promise-like)
-          try {
-            const jar: any = (nextCookies as any)();
-            if (isPromiseLike(jar)) return null;
-            return jar?.get?.(COOKIE_NAME)?.value ?? null;
-          } catch { return null; }
-        })();
+    const sid =
+      req?.cookies?.get?.(COOKIE_NAME)?.value ??
+      ((): string | null => {
+        // Fallback to headers() cookie jar (may be Promise-like)
+        try {
+          const jar: any = (nextCookies as any)();
+          if (isPromiseLike(jar)) return null;
+          return jar?.get?.(COOKIE_NAME)?.value ?? null;
+        } catch {
+          return null;
+        }
+      })();
 
     if (!sid) return null;
     return SESSIONS.get(sid)?.email ?? null;
@@ -113,7 +123,10 @@ export function getSessionEmailFromCookie(req?: NextRequest): string | null {
 }
 
 /** Helper to create a session for an email and attach cookie to response. */
-export function createAndAttachSession(email: string, res: NextResponse): Session {
+export function createAndAttachSession(
+  email: string,
+  res: NextResponse,
+): Session {
   const s = createSession(email);
   attachSessionCookie(res, s.id);
   return s;
@@ -127,16 +140,23 @@ export function createMagicToken(email: string): string {
 }
 
 /** Verify (but do not consume) a magic token; returns email or null if invalid/expired. */
-export function verifyMagicToken(token: string | null | undefined): string | null {
+export function verifyMagicToken(
+  token: string | null | undefined,
+): string | null {
   if (!token) return null;
   const rec = MAGIC.get(token);
   if (!rec) return null;
-  if (rec.exp < now()) { MAGIC.delete(token); return null; }
+  if (rec.exp < now()) {
+    MAGIC.delete(token);
+    return null;
+  }
   return rec.email;
 }
 
 /** Consume a magic token (one-time). Returns email or null. */
-export function consumeMagicToken(token: string | null | undefined): string | null {
+export function consumeMagicToken(
+  token: string | null | undefined,
+): string | null {
   if (typeof token !== "string" || !token) return null;
 
   // The map may store either a raw string email (legacy) or a record like { email: string }

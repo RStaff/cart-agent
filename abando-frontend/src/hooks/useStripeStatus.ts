@@ -12,15 +12,15 @@ export function useStripeStatus() {
   React.useEffect(() => {
     let cancelled = false;
     fetch("/api/stripe/status")
-      .then(r => r.json())
-      .then(j => {
+      .then((r) => r.json())
+      .then((j) => {
         if (!cancelled) setEnv(j?.env ?? null);
       })
       .catch(() => {
         if (!cancelled) setEnv(null);
       });
     return () => {
-        cancelled = true;
+      cancelled = true;
     };
   }, []);
 
