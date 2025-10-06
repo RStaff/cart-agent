@@ -1,6 +1,7 @@
 name: Frontend preview smoke
 
 on:
+  workflow_dispatch:
   push:
     branches: ["**"]
   pull_request:
