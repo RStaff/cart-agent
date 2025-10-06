@@ -1,0 +1,61 @@
+name: Frontend preview smoke
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    env:
+      HUSKY: "0"
+      npm_config_ignore_scripts: "true"
+      NPM_CONFIG_FUND: "false"
+      NPM_CONFIG_AUDIT: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install (web/frontend)
+        run: npm --prefix web/frontend ci
+
+      - name: Build (web/frontend)
+        run: npm --prefix web/frontend run build
+
+      - name: Serve preview in background and curl it
+        working-directory: web/frontend
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx vite preview --port 4173 --strictPort --host 127.0.0.1 > preview.log 2>&1 &
+          echo $! > preview.pid
+          echo "Waiting for http://127.0.0.1:4173 …"
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+              echo "OK Preview responded"
+              break
+            fi
+            sleep 1
+          done
+          echo "--- last 40 lines of preview.log ---"
+          tail -n 40 preview.log
+
+      - name: Upload preview logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vite-preview-logs
+          path: web/frontend/preview.log
+          if-no-files-found: ignore
+
+      - name: Upload built site (dist)
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: web/frontend/dist/**
+          if-no-files-found: error

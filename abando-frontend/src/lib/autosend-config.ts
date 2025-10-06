@@ -13,8 +13,6 @@ export function requireCronSecret(req: Request): boolean {
   const want = (process.env.CRON_SECRET || "").trim();
   if (!want) return false;
   const got =
-    req.headers.get("x-cron-secret") ||
-    req.headers.get("X-Cron-Secret") ||
-    "";
+    req.headers.get("x-cron-secret") || req.headers.get("X-Cron-Secret") || "";
   return got === want;
 }

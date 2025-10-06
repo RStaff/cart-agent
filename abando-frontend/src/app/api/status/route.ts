@@ -8,6 +8,6 @@ export async function GET() {
   return NextResponse.json({
     ok: true,
     stripe,
-    autosend: { mode: autosendMode, autosendEnabled }
+    autosend: { mode: autosendMode, autosendEnabled },
   });
 }

@@ -7,9 +7,13 @@ export function wantTour(page: Page): boolean {
     if (url.searchParams.get("tour") === "1") return true;
     const v = localStorage.getItem(KEY[page]);
     return v !== "false"; // default: show once
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
 export function dismissTour(page: Page, _action: "primary" | "skip") {
-  try { localStorage.setItem(KEY[page], "false"); } catch {}
+  try {
+    localStorage.setItem(KEY[page], "false");
+  } catch {}
 }

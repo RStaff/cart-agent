@@ -1,12 +1,30 @@
 /* Global tokens + base (shared by all routes) */
-:root{
-  --bg:#0B1220; --panel:#121A2A; --ink:#E5E7EB; --muted:#9FB0C6;
-  --primary:#8FB3FF; --btn-primary:#635BFF; --btn-primary-hover:#5149FF;
-  --nav-h:64px; --footer-py:28px;
+:root {
+  --bg: #0b1220;
+  --panel: #121a2a;
+  --ink: #e5e7eb;
+  --muted: #9fb0c6;
+  --primary: #8fb3ff;
+  --btn-primary: #635bff;
+  --btn-primary-hover: #5149ff;
+  --nav-h: 64px;
+  --footer-py: 28px;
 }
-html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);}
-*,*::before,*::after{box-sizing:border-box}
-a{color:inherit}
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+a {
+  color: inherit;
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

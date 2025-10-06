@@ -21,6 +21,6 @@ function fromJsonMap(plan: PlanKey): string | undefined {
 export function getPriceId(plan?: string | null): string | undefined {
   if (!plan) return undefined;
   const key = plan.toLowerCase() as PlanKey;
-  if (!["basic","growth","pro"].includes(key)) return undefined;
+  if (!["basic", "growth", "pro"].includes(key)) return undefined;
   return fromEnvVar(key) ?? fromJsonMap(key);
 }

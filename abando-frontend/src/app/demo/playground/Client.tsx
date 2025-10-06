@@ -6,8 +6,21 @@ type Tone = "friendly" | "urgent" | "helpful";
 function Spinner() {
   return (
     <svg viewBox="0 0 24 24" className="h-4 w-4 animate-spin">
-      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" opacity="0.2" />
-      <path d="M22 12a10 10 0 0 1-10 10" stroke="currentColor" strokeWidth="4" fill="none" />
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+        fill="none"
+        opacity="0.2"
+      />
+      <path
+        d="M22 12a10 10 0 0 1-10 10"
+        stroke="currentColor"
+        strokeWidth="4"
+        fill="none"
+      />
     </svg>
   );
 }
@@ -31,8 +44,16 @@ export default function PlaygroundClient() {
   }, []);
 
   // Persist values
-  React.useEffect(() => { try { localStorage.setItem("demo:product", product); } catch {} }, [product]);
-  React.useEffect(() => { try { localStorage.setItem("demo:tone", tone); } catch {} }, [tone]);
+  React.useEffect(() => {
+    try {
+      localStorage.setItem("demo:product", product);
+    } catch {}
+  }, [product]);
+  React.useEffect(() => {
+    try {
+      localStorage.setItem("demo:tone", tone);
+    } catch {}
+  }, [tone]);
 
   const generate = React.useCallback(async () => {
     if (!product.trim()) return;
@@ -85,7 +106,7 @@ export default function PlaygroundClient() {
           <input
             className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100"
             value={product}
-            onChange={e=>setProduct(e.target.value)}
+            onChange={(e) => setProduct(e.target.value)}
             placeholder="e.g., Ceramic pour-over coffee set"
           />
         </label>
@@ -94,7 +115,7 @@ export default function PlaygroundClient() {
           <select
             className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100"
             value={tone}
-            onChange={e=>setTone(e.target.value as Tone)}
+            onChange={(e) => setTone(e.target.value as Tone)}
           >
             <option value="friendly">friendly</option>
             <option value="urgent">urgent</option>
@@ -110,7 +131,13 @@ export default function PlaygroundClient() {
           className="inline-flex items-center gap-2 rounded-md border border-slate-700 px-4 py-2 text-white hover:bg-slate-800 disabled:opacity-50"
           title="⌘/Ctrl + Enter"
         >
-          {loading ? <>Generating <Spinner/></> : "Generate message"}
+          {loading ? (
+            <>
+              Generating <Spinner />
+            </>
+          ) : (
+            "Generate message"
+          )}
         </button>
 
         <button
@@ -123,7 +150,10 @@ export default function PlaygroundClient() {
         {copied && <span className="text-slate-300 text-sm">✓ Copied</span>}
 
         <button
-          onClick={() => { setOut(""); setErr(""); }}
+          onClick={() => {
+            setOut("");
+            setErr("");
+          }}
           disabled={!out && !err}
           className="inline-flex items-center rounded-md border border-slate-700 px-3 py-2 text-white hover:bg-slate-800 disabled:opacity-50"
         >
