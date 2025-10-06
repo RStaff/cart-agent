@@ -37,6 +37,6 @@ export const token: Tokens = {
   successFg: "#34d399",
   errorBg: "rgba(239,68,68,.12)",
   errorFg: "#f87171",
-  warnBg: "rgba(250,204,21,.12)",   // amber-400 @ 12%
-  warnFg: "#facc15",                // amber-400
+  warnBg: "rgba(250,204,21,.12)", // amber-400 @ 12%
+  warnFg: "#facc15", // amber-400
 };

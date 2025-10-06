@@ -13,22 +13,29 @@ async function sendMagicLink(email: string, url: string) {
   }
   await fetch("https://api.resend.com/emails", {
     method: "POST",
-    headers: { "Content-Type":"application/json", Authorization: `Bearer ${apiKey}` },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
     body: JSON.stringify({
       from: "Abando <noreply@abando.ai>",
       to: [email],
       subject: "Your Abando sign-in link",
       html: `<p>Click to sign in:</p><p><a href="${url}">${url}</a></p>`,
     }),
-  }).catch(()=>{ /* ignore email errors in dev */ });
+  }).catch(() => {
+    /* ignore email errors in dev */
+  });
 }
 
 export async function POST(req: NextRequest) {
   try {
     const sig = req.headers.get("stripe-signature");
-    if (!sig) return NextResponse.json({ error: "no_signature" }, { status: 400 });
+    if (!sig)
+      return NextResponse.json({ error: "no_signature" }, { status: 400 });
     const secret = process.env.STRIPE_WEBHOOK_SECRET;
-    if (!secret) return NextResponse.json({ error: "no_webhook_secret" }, { status: 400 });
+    if (!secret)
+      return NextResponse.json({ error: "no_webhook_secret" }, { status: 400 });
 
     const stripe = getStripe();
     const buf = Buffer.from(await req.arrayBuffer());

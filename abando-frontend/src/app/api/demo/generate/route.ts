@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-type Tone = "friendly"|"urgent"|"helpful";
+type Tone = "friendly" | "urgent" | "helpful";
 
 function craft(product: string, tone: Tone): string {
   const p = product.trim() || "your item";
@@ -16,16 +16,21 @@ function craft(product: string, tone: Tone): string {
 
 export async function POST(req: Request) {
   try {
-    const { product = "", tone = "friendly" } = await req.json().catch(() => ({}));
-    const t = (["friendly","urgent","helpful"] as Tone[]).includes(tone) ? (tone as Tone) : "friendly";
+    const { product = "", tone = "friendly" } = await req
+      .json()
+      .catch(() => ({}));
+    const t = (["friendly", "urgent", "helpful"] as Tone[]).includes(tone)
+      ? (tone as Tone)
+      : "friendly";
     const message = craft(String(product || "").slice(0, 120), t);
     return NextResponse.json({ ok: true, message });
-  } catch (e) {
+  } catch {
     // Never return an empty message — provide a safe fallback
     return NextResponse.json({
       ok: true,
-      message: "We saved your item in the cart. When you’re ready, checkout takes under a minute.",
-      note: "fallback"
+      message:
+        "We saved your item in the cart. When you’re ready, checkout takes under a minute.",
+      note: "fallback",
     });
   }
 }

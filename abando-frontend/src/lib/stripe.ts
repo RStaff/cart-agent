@@ -15,10 +15,12 @@ export function getStripe(): Stripe {
 
   const apiVersion = process.env.STRIPE_API_VERSION; // optional
   stripeSingleton = apiVersion
-    // Pass through ONLY if provided, so TS uses the literal type from your installed SDK
-    ? new Stripe(key, { apiVersion: apiVersion as Stripe.StripeConfig["apiVersion"] })
-    // Otherwise rely on SDK default (avoids literal-type mismatch on upgrades)
-    : new Stripe(key);
+    ? // Pass through ONLY if provided, so TS uses the literal type from your installed SDK
+      new Stripe(key, {
+        apiVersion: apiVersion as Stripe.StripeConfig["apiVersion"],
+      })
+    : // Otherwise rely on SDK default (avoids literal-type mismatch on upgrades)
+      new Stripe(key);
 
   return stripeSingleton;
 }

@@ -9,7 +9,9 @@ export default function DemoPlaygroundPage() {
       <main className="max-w-5xl mx-auto px-6 py-10">
         <PlaygroundExplainer />
         <h1 className="text-3xl font-semibold mb-4">Demo playground</h1>
-        <p className="text-slate-400 mb-6">Type a product, pick a tone, and generate a cart-recovery snippet.</p>
+        <p className="text-slate-400 mb-6">
+          Type a product, pick a tone, and generate a cart-recovery snippet.
+        </p>
         <PlaygroundClient />
       </main>
     </DevErrorBoundary>
