@@ -23,7 +23,7 @@ jobs:
           cache: 'npm'
 
       - name: Install (web/frontend)
-        run: npm --prefix web/frontend ci
+        run: npm --prefix web/frontend ci || npm --prefix web/frontend install
 
       - name: Build (web/frontend)
         run: npm --prefix web/frontend run build
