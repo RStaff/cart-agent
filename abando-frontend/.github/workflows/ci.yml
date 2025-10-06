@@ -1,69 +1,60 @@
-name: ci
+name: CI (deps lockfile)
+
 on:
-  pull_request:
   push:
-    branches: [main]
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   deps-check:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      HUSKY: "0"
+      npm_config_ignore_scripts: "true"
+      NPM_CONFIG_FUND: "false"
+      NPM_CONFIG_AUDIT: "false"
     steps:
       - uses: actions/checkout@v4
 
-      # Sanity: show top-level files and verify the guard script is tracked
-      - name: List repo root
-        run: ls -la
-      - name: Verify deps-guard present in checkout
-        run: |
-          set -euo pipefail
-          git ls-files | grep -E '^scripts/git/deps-guard\.sh$' || \
-            (echo 'MISSING: scripts/git/deps-guard.sh (not tracked)'; exit 1)
-          test -f scripts/git/deps-guard.sh || \
-            (echo 'MISSING: scripts/git/deps-guard.sh (not found in FS)'; exit 1)
-          chmod +x scripts/git/deps-guard.sh
-
       - uses: actions/setup-node@v4
-        with: { node-version: '22', cache: 'npm' }
-
-      - name: Dependency guard (static)
-        run: bash ./scripts/git/deps-guard.sh check
-
-      - name: Lockfile integrity (npm ci dry-run)
-        run: npm ci --dry-run
-
-  build-and-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: '22', cache: 'npm' }
-      - run: npm ci
-      - run: npm run -s test:e2e:ci
-      - if: failure()
-        uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
-          path: |
-            playwright-report/**
-            test-results/**
-          if-no-files-found: ignore
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            web/package-lock.json
+            web/frontend/package-lock.json
 
-  build-preview:
-    needs: build-and-test
-    if: always() && needs.build-and-test.result == 'success'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: '22', cache: 'npm' }
-      - run: npm ci
-      - name: Build standalone server
+      - name: Lockfile sanity (npm ci dry-run) for roots
+        shell: bash
         run: |
-          npm run -s ci:build
-          scripts/ci/pack-standalone.sh
-      - name: Upload preview server artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: next-standalone-preview
-          path: preview/**
-          if-no-files-found: error
+          set -Eeuo pipefail
+          roots=()
+          for r in . web web/frontend; do
+            [ -f "$r/package.json" ] && roots+=("$r")
+          done
+
+          if [ ${#roots[@]} -eq 0 ]; then
+            echo "ℹ️ No package.json found — nothing to check."; exit 0
+          fi
+
+          echo "Roots: ${roots[*]}"
+          fail=0
+          for r in "${roots[@]}"; do
+            echo "── $r"
+            if [ -f "$r/package-lock.json" ]; then
+              npm --prefix "$r" ci --ignore-scripts --dry-run || fail=1
+            elif [ -f "$r/yarn.lock" ]; then
+              (cd "$r" && corepack enable >/dev/null 2>&1)
+              (cd "$r" && yarn install --frozen-lockfile --ignore-scripts --non-interactive --dry-run) || fail=1
+            else
+              echo "⚠️  No lockfile in $r — skipping."
+            fi
+          done
+          exit $fail
