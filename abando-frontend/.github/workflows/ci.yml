@@ -7,7 +7,7 @@ on:
     branches: ["**"]
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: deps-ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -31,7 +31,7 @@ jobs:
             web/package-lock.json
             web/frontend/package-lock.json
 
-      - name: Lockfile sanity (npm ci dry-run) for roots
+      - name: Lockfile sanity (npm/yarn dry-run)
         shell: bash
         run: |
           set -Eeuo pipefail
@@ -39,11 +39,9 @@ jobs:
           for r in . web web/frontend; do
             [ -f "$r/package.json" ] && roots+=("$r")
           done
-
           if [ ${#roots[@]} -eq 0 ]; then
             echo "ℹ️ No package.json found — nothing to check."; exit 0
           fi
-
           echo "Roots: ${roots[*]}"
           fail=0
           for r in "${roots[@]}"; do
