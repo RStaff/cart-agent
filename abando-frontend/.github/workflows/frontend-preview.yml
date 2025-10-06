@@ -16,36 +16,34 @@ jobs:
       NPM_CONFIG_AUDIT: "false"
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install
+      - name: Install (web/frontend)
         run: npm --prefix web/frontend ci
 
-      - name: Build
+      - name: Build (web/frontend)
         run: npm --prefix web/frontend run build
 
-      - name: Start preview (background) and curl it
+      - name: Serve preview in background and curl it
         working-directory: web/frontend
         shell: bash
         run: |
           set -euo pipefail
-          npx vite preview --port 4173 --strictPort > preview.log 2>&1 &
-          PID=$!
-          trap "kill $PID 2>/dev/null || true" EXIT
-          echo "Waiting for :4173 ..."
+          npx vite preview --port 4173 --strictPort --host 127.0.0.1 > preview.log 2>&1 &
+          echo $! > preview.pid
+          echo "Waiting for http://127.0.0.1:4173 …"
           for i in {1..30}; do
-            if curl -fsS http://localhost:4173/ >/dev/null; then
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
               echo "✅ Preview responded"
-              exit 0
+              break
             fi
             sleep 1
           done
-          echo "❌ No response from preview"
-          exit 1
+          echo "--- last 40 lines of preview.log ---"
+          tail -n 40 preview.log
 
       - name: Upload preview logs on failure
         if: failure()
@@ -54,3 +52,10 @@ jobs:
           name: vite-preview-logs
           path: web/frontend/preview.log
           if-no-files-found: ignore
+
+      - name: Upload built site (dist)
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: web/frontend/dist/**
+          if-no-files-found: error
