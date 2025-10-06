@@ -1,11 +1,10 @@
 name: Frontend preview smoke
-
 on:
-  workflow_dispatch:
   push:
     branches: ["**"]
   pull_request:
     branches: ["**"]
+  workflow_dispatch: {}
 
 jobs:
   preview:
@@ -17,50 +16,57 @@ jobs:
       NPM_CONFIG_AUDIT: "false"
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+
+      - name: Setup Node (20)
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          # Intentionally no cache to avoid stale node_modules during repair
 
-      - name: Install (web/frontend)
-        run: npm --prefix web/frontend ci || npm --prefix web/frontend install
+      - name: Install deps (web/frontend)
+        run: |
+          if [ -f web/frontend/package-lock.json ]; then
+            npm --prefix web/frontend ci
+          else
+            npm --prefix web/frontend install
+          fi
+
+      - name: Debug: show PostCSS & Tailwind presence
+        run: |
+          echo "PWD=$(pwd)"
+          ls -la web/frontend | sed 's/^/[frontend] /'
+          ls -la web/frontend/src | sed 's/^/[src] /' || true
+          test -f web/frontend/postcss.config.cjs && echo "[ok] postcss.config.cjs present" || echo "[MISS] no postcss.config.cjs"
+          npm --prefix web/frontend ls @tailwindcss/postcss tailwindcss postcss autoprefixer || true
 
       - name: Build (web/frontend)
+        env:
+          VITE_RUN_ID: ${{ github.run_id }}
+          VITE_RUN_NUMBER: ${{ github.run_number }}
         run: npm --prefix web/frontend run build
 
-      - name: Serve preview in background and curl it
+      - name: Serve preview and curl
         working-directory: web/frontend
         shell: bash
         run: |
           set -euo pipefail
           npx vite preview --port 4173 --strictPort --host 127.0.0.1 > preview.log 2>&1 &
           echo $! > preview.pid
-          echo "Waiting for http://127.0.0.1:4173 …"
           for i in {1..30}; do
             if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
-              echo "OK Preview responded"
-              break
+              echo "✅ Preview responded"; break
             fi
             sleep 1
           done
-          echo "--- last 40 lines of preview.log ---"
-          tail -n 40 preview.log
+          echo "--- tail preview.log ---"
+          tail -n 120 preview.log || true
 
-      - name: Upload preview logs on failure
-        if: failure()
+      - name: Upload artifacts (logs + dist)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: vite-preview-logs
-          path: web/frontend/preview.log
-          if-no-files-found: ignore
-
-      - name: Upload built site (dist)
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-dist
-          path: web/frontend/dist/**
-          if-no-files-found: error
-# touch: 2025-10-06T10:19:20-0400
-# touch: 2025-10-06T16:29:10Z
-
-# ci: touch to force Actions re-index 2025-10-06T16:56:00Z
+          name: frontend-preview-artifacts
+          path: |
+            web/frontend/preview.log
+            web/frontend/dist/**
+          if-no-files-found: warn
