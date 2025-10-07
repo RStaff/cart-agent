@@ -1,4 +1,4 @@
-/** Tailwind v4 with the official PostCSS plugin (single source of truth) */
+/** Single source of truth for PostCSS in web/frontend */
 module.exports = {
   plugins: {
     '@tailwindcss/postcss': {},
