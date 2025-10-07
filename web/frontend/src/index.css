@@ -1,12 +1,8 @@
 @import "tailwindcss";
 
-@import "tailwindcss";
 
-@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
 
 /* Optional: tiny helper classes */
 .env-pill {
