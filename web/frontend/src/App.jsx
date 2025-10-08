@@ -1,60 +1,24 @@
-import React from "react";
+import React from 'react';
 
 export default function App() {
   return (
-    <main style={{fontFamily:"ui-sans-serif,system-ui", lineHeight:1.5, padding:"2rem", maxWidth:960, margin:"0 auto"}}>
-      <header style={{textAlign:"center", marginBottom:"2rem"}}>
-        <h1 style={{fontSize:"2rem", fontWeight:700, margin:"0 0 .5rem"}}>Cart Agent</h1>
-        <p style={{opacity:.8}}>AI-powered cart & checkout optimization that installs in minutes.</p>
-      </header>
-
-      <section aria-label="AI Playground" style={{border:"1px solid #e5e7eb", borderRadius:12, padding:"1.25rem", marginBottom:"2rem"}}>
-        <h2 style={{fontSize:"1.25rem", fontWeight:700, margin:"0 0 .5rem"}}>AI Playground / Demo</h2>
-        <p style={{margin:"0 0 1rem"}}>Test prompts and see how agents explain, nudge, and recover carts in real time.</p>
-        <button style={{padding:".6rem 1rem", borderRadius:8, border:"1px solid #111827", background:"#111827", color:"#fff"}}>
-          Try the Playground
-        </button>
-      </section>
-
-      <section aria-label="Pricing Tiers" style={{display:"grid", gap:"1rem", gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))", marginBottom:"2rem"}}>
-        <article style={{border:"1px solid #e5e7eb", borderRadius:12, padding:"1rem"}}>
-          <h3 style={{fontWeight:700, margin:"0 0 .25rem"}}>Free</h3>
-          <p style={{margin:"0 0 .75rem"}}>Basic insights & sample agent. Great for testing.</p>
-          <ul style={{margin:"0 0 .75rem", paddingLeft:"1rem"}}>
-            <li>• 100 agent interactions / mo</li>
-            <li>• Basic dashboard</li>
-          </ul>
-          <button style={{padding:".5rem .9rem", borderRadius:8, border:"1px solid #111827", background:"#fff"}}>Start Free</button>
-        </article>
-
-        <article style={{border:"2px solid #111827", borderRadius:12, padding:"1rem"}}>
-          <h3 style={{fontWeight:700, margin:"0 0 .25rem"}}>Pro</h3>
-          <p style={{margin:"0 0 .75rem"}}>AI conversions + recoveries. Shopify & custom sites.</p>
-          <ul style={{margin:"0 0 .75rem", paddingLeft:"1rem"}}>
-            <li>• 10k interactions / mo</li>
-            <li>• A/B prompts & journeys</li>
-            <li>• Webhooks / API</li>
-          </ul>
-          <button style={{padding:".5rem .9rem", borderRadius:8, border:"1px solid #111827", background:"#111827", color:"#fff"}}>Start Free Trial</button>
-        </article>
-
-        <article style={{border:"1px solid #e5e7eb", borderRadius:12, padding:"1rem"}}>
-          <h3 style={{fontWeight:700, margin:"0 0 .25rem"}}>Scale</h3>
-          <p style={{margin:"0 0 .75rem"}}>Advanced routing, HIPAA/PII controls, and SLAs.</p>
-          <ul style={{margin:"0 0 .75rem", paddingLeft:"1rem"}}>
-            <li>• Unlimited interactions</li>
-            <li>• Multi-store & regions</li>
-            <li>• Dedicated support</li>
-          </ul>
-          <button style={{padding:".5rem .9rem", borderRadius:8, border:"1px solid #111827", background:"#fff"}}>Talk to Sales</button>
-        </article>
-      </section>
-
-      <section aria-label="Billing" style={{display:"flex", alignItems:"center", gap:12, opacity:.85}}>
-        <span style={{display:"inline-block", padding:".35rem .6rem", border:"1px solid #e5e7eb", borderRadius:999}}>
-          Stripe Billing Ready
-        </span>
-        <span>• Free trial • Cancel anytime</span>
+    <main style={{fontFamily:'system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif', lineHeight:1.4}}>
+      <section style={{minHeight:'100vh',display:'grid',placeItems:'center',background:'#0f172a',color:'#e2e8f0',padding:'48px'}}>
+        <div style={{maxWidth:860,textAlign:'center'}}>
+          <h1 style={{margin:'0 0 12px',fontSize:42,fontWeight:800}}>Cart Agent</h1>
+          <p style={{margin:'0 0 24px',fontSize:18,color:'#94a3b8'}}>
+            AI-powered cart recovery & personalized checkout nudges. Works with Shopify and custom stores.
+          </p>
+          <div style={{display:'flex',gap:12,justifyContent:'center',flexWrap:'wrap'}}>
+            <a href="https://buy.stripe.com/test_00w5kEe4sanJaHB15j00001" style={{background:'#3b82f6',color:'#fff',padding:'12px 18px',borderRadius:10,fontWeight:700,textDecoration:'none'}}>
+              Start Free Trial
+            </a>
+            <a href="https://github.com/RStaff/cart-agent" style={{border:'1px solid #334155',color:'#e2e8f0',padding:'12px 18px',borderRadius:10,textDecoration:'none'}}>
+              View Docs
+            </a>
+          </div>
+          <p style={{marginTop:16,fontSize:12,color:'#64748b'}}>Test mode – no real charges.</p>
+        </div>
       </section>
     </main>
   );
