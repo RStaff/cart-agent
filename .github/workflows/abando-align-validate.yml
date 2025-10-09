@@ -1,0 +1,16 @@
+name: abando-align-validate
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ chore/**, feat/** ]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          test -f web/src/smc-align.js
+          grep -q "/api/status" web/src/smc-align.js
+          grep -q "sitemap.xml" web/src/smc-align.js
+          grep -q "robots.txt" web/src/smc-align.js
