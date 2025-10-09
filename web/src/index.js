@@ -1,3 +1,4 @@
+const { installSmcAlign } = require("./smc-align");
 // web/src/index.js — clean ESM server with Shopify OAuth + DB save
 import express from "express";
 import cors from "cors";
@@ -9,6 +10,9 @@ import { PrismaClient, Prisma } from "@prisma/client";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
+
+// Stafford ↔ Abando alignment
+installSmcAlign(app);
 app.use(cookieParser());
 app.use(cors());
 app.use(express.json());
