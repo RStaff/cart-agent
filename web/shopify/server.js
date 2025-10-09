@@ -1,3 +1,4 @@
+const { installSmcAlign } = require("./smc-align");
 import 'dotenv/config';
 import express from 'express';
 import helmet from 'helmet';
@@ -25,6 +26,9 @@ const log = pino({
 
 // ---------- app ----------
 const app = express();
+
+// Stafford ↔ Abando alignment
+installSmcAlign(app);
 app.set('trust proxy', 1);
 
 // security & basics
