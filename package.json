@@ -16,7 +16,7 @@
     "all:deploy": "DEPLOY=yes ./scripts/mvp_all_in_one.sh",
     "smoke:carts": "npm --prefix web run smoke:carts",
     "dev-install": "node scripts/dev-install.mjs",
-    "start": "node --require ./web/smc-preload.cjs web/src/index.js"
+    "start": "bash -lc 'set -a; [ -f .render/env.sh ] && . .render/env.sh; set +a; node --require ./web/smc-preload.cjs web/src/index.js'"
   },
   "author": "rossstafford",
   "private": true,
