@@ -1,3 +1,6 @@
+installStatusSeo(app);
+const { installStatusSeo } = require("./_status_seo");
+const { installHardening } = require("./_hardening");
 const { installSmcAlign } = require("./smc-align");
 // web/src/index.js — clean ESM server with Shopify OAuth + DB save
 import express from "express";
@@ -10,6 +13,7 @@ import { PrismaClient, Prisma } from "@prisma/client";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
+installHardening(app);
 
 // Stafford ↔ Abando alignment
 installSmcAlign(app);
