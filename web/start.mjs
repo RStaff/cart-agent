@@ -1,3 +1,6 @@
+installStatusSeo(app);
+const { installStatusSeo } = require("./_status_seo");
+const { installHardening } = require("./_hardening");
 import http from 'node:http';
 import app from './src/index.js';
 
