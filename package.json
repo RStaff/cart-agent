@@ -267,5 +267,8 @@
   "bugs": {
     "url": "https://github.com/RStaff/cart-agent/issues"
   },
-  "homepage": "https://github.com/RStaff/cart-agent#readme"
+  "homepage": "https://github.com/RStaff/cart-agent#readme",
+  "volta": {
+    "node": "20.19.5"
+  }
 }
