@@ -1,4 +1,6 @@
-const { installSmcAlign } = require("./smc-align");
+import smcAlignMod from "./smc-align.cjs";
+const { installSmcAlign } = smcAlignMod;
+
 // web/src/index.js — clean ESM server with Shopify OAuth + DB save
 import express from "express";
 import cors from "cors";
