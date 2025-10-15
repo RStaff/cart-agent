@@ -16,7 +16,9 @@
     "all:deploy": "DEPLOY=yes ./scripts/mvp_all_in_one.sh",
     "smoke:carts": "npm --prefix web run smoke:carts",
     "dev-install": "node scripts/dev-install.mjs",
-    "start": "bash -lc 'set -a; [ -f .render/env.sh ] && . .render/env.sh; set +a; node --require ./web/smc-preload.cjs web/src/index.js'"
+    "start": "bash -lc 'set -a; [ -f .render/env.sh ] && . .render/env.sh; set +a; node --require ./web/smc-preload.cjs web/src/index.js'",
+    "prisma:generate": "[ -f web/prisma/schema.prisma ] && npx prisma generate --schema web/prisma/schema.prisma || true",
+    "prepare": "npm run prisma:generate"
   },
   "author": "rossstafford",
   "private": true,
@@ -270,5 +272,8 @@
   "homepage": "https://github.com/RStaff/cart-agent#readme",
   "volta": {
     "node": "20.19.5"
+  },
+  "engines": {
+    "node": "20.x"
   }
 }

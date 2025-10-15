@@ -48,3 +48,6 @@ web/src/**/*.bak.*
 *.bak.*
 apps/website/.eslintcache
 .eslintcache
+.smoke.out
+web/prisma-smoke-preload.cjs
+web/_prisma_shim.cjs

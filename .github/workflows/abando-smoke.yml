@@ -1,0 +1,18 @@
+name: abando-smoke
+on:
+  pull_request:
+  push: { branches: [ main ] }
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: npm ci || npm install
+      - run: npm run build
+      - run: npm run prisma:generate
+      - run: PORT=3000 timeout 25s node web/src/index.js & echo $! > server.pid
+      - run: |
+          for i in {1..50}; do curl -fsS http://localhost:3000/api/status && exit 0; sleep 0.4; done; exit 1
+      - run: kill -9 $(cat server.pid) || true

@@ -1,19 +1,19 @@
-installStatusSeo(app);
+
 const { installStatusSeo } = require("../_status_seo.cjs");
 const { installHardening } = require("../_hardening.cjs");
 const { installSmcAlign } = require('./smc-align.cjs');
 // web/src/index.js — clean ESM server with Shopify OAuth + DB save
-import express from "express";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
-import { randomBytes, createHmac } from "node:crypto";
-import { PrismaClient, Prisma } from "@prisma/client";
+const express = require('express');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const { fileURLToPath } = require('node:url');
+const { dirname, join } = require('node:path');
+const { randomBytes, createHmac } = require('node:crypto');
+const { PrismaClient, Prisma } = require('@prisma/client');
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 installHardening(app);
+installStatusSeo(app);
 
 // Stafford ↔ Abando alignment
 installSmcAlign(app);
@@ -129,7 +129,7 @@ app.get("/shopify/billing/return", (_req, res) => res.redirect("/onboarding"));
 // Start
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 app.listen(PORT, () => console.log(`[server] listening on :${PORT}`));
-export default app;
+module.exports = app;
 
 // Public Stripe checkout (no auth)
 app.post("/api/billing/checkout", async (req, res) => {
@@ -243,7 +243,7 @@ app.post("/api/demo/generate", handleGenerate);
 app.post("/api/generate", handleGenerate);
 
 // --- AI healthcheck route ---
-import fetch from "node-fetch"; // ensure node-fetch is installed in your deps
+const fetch = require('node-fetch'); // ensure node-fetch is installed in your deps
 
 app.get("/api/ai/health", async (req, res) => {
   try {
