@@ -1,7 +1,7 @@
 export const metadata = { title: "Terms of Service – Abando" };
 export default function Terms() {
   return (
-    <main className="container prose prose-slate max-w-3xl py-12">
+    <main className="container prose prose-slate max-w-3xl py-12 prose-invert">
       <h1>Terms of Service</h1>
       <p>Last updated: {new Date().toISOString().slice(0,10)}</p>
       <p>Welcome to Abando. By using our site and services, you agree to these terms.</p>

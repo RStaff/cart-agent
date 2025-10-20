@@ -2,7 +2,7 @@ export const metadata = { title: "Data Processing Addendum (DPA) – Abando" };
 
 export default function DPA() {
   return (
-    <main className="container prose prose-slate max-w-3xl py-12">
+    <main className="container prose prose-slate max-w-3xl py-12 prose-invert">
       <h1>Data Processing Addendum (DPA)</h1>
       <p><em>Last updated: {new Date().toISOString().slice(0,10)}</em></p>
       <p>This DPA forms part of the Terms of Service ("Agreement") between the customer ("Controller")

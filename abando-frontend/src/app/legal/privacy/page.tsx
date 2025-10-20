@@ -1,7 +1,7 @@
 export const metadata = { title: "Privacy Policy – Abando" };
 export default function Privacy() {
   return (
-    <main className="container prose prose-slate max-w-3xl py-12">
+    <main className="container prose prose-slate max-w-3xl py-12 prose-invert">
       <h1>Privacy Policy</h1>
       <p>Last updated: {new Date().toISOString().slice(0,10)}</p>
       <p>We collect the minimum data needed to run Abando, provide support, and improve the product.</p>
