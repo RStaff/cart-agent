@@ -46,3 +46,7 @@ dev.log
 web/prisma/schema.prisma.bak.*
 web/src/**/*.bak.*
 *.bak.*
+abando-frontend/.env.local
+abando-frontend/.next.pid*
+cart-agent/
+staffordmedia-site/
