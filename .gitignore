@@ -46,3 +46,5 @@ dev.log
 web/prisma/schema.prisma.bak.*
 web/src/**/*.bak.*
 *.bak.*
+cart-agent/
+staffordmedia-site/
