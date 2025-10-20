@@ -2,7 +2,7 @@ export const metadata = { title: "Data Processing Addendum (DPA) – Abando" };
 
 export default function DPA() {
   return (
-    <main className="container prose prose-invert text-slate-200 max-w-3xl py-12 prose-invert text-slate-200 pt-10 md:pt-12 first:mt-0 prose-headings:mt-0 prose-p:my-3 prose-li:my-1 prose-hr:my-6 prose-hr:border-slate-600">
+    <main className="container prose prose-invert text-slate-200 max-w-3xl py-12 prose-invert text-slate-200 pt-10 md:pt-12 first:mt-0 prose-headings:mt-0 prose-p:my-3 prose-li:my-1 prose-hr:my-6 prose-hr:border-slate-600 prose-invert text-slate-200 pt-10 md:pt-12 first:mt-0 prose-headings:mt-0 prose-p:my-3 prose-li:my-1 prose-hr:my-6 prose-hr:border-slate-600">
       <h1>Data Processing Addendum (DPA)</h1>
       <p><em>Last updated: {new Date().toISOString().slice(0,10)}</em></p>
 
