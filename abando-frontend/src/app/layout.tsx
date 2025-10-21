@@ -1,4 +1,4 @@
-import "./globals.css"
+import IntentTracker from "../lib/intent";import Script from "next/script";import "./globals.css"
 import React from "react";
 
 export default function RootLayout({
@@ -8,7 +8,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body><IntentTracker />{process.env.NEXT_PUBLIC_ANALYTICS==="plausible" ? (<Script defer data-domain={(process.env.NEXT_PUBLIC_ANALYTICS_DOMAIN||"abando.ai")} src="https://plausible.io/js/script.js" />) : null}<IntentTracker />{process.env.NEXT_PUBLIC_ANALYTICS==="plausible"?(<Script defer data-domain={(process.env.NEXT_PUBLIC_ANALYTICS_DOMAIN||"abando.ai")} src="https://plausible.io/js/script.js" />):null}{children}</body>
     </html>
   );
 }
