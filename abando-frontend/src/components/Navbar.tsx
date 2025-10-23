@@ -1,1 +1,1 @@
-export { default } from "./NavbarV2";
+import Link from "next/link";export { default } from "./NavbarV2";
