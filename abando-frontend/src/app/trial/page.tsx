@@ -25,7 +25,7 @@ export default function TrialPage() {
       <h1 style={{ margin: 0 }}>Start Free Trial</h1>
       <p style={{ color: "#9fb0c6" }}>Kick off a trial. You’ll be redirected to checkout if successful.</p>
       <form onSubmit={onStart} style={{ marginTop: 16 }}>
-        <button type="submit" disabled={busy} style={{ padding:"10px 14px", borderRadius:10, fontWeight:700, border:"none", background: busy ? "#5149ff" : "#635bff", color:"#fff", cursor: busy ? "not-allowed" : "pointer" }}>
+        <button type="submit" disabled={busy} style={{ padding:"10px 14px", borderRadius:10, fontWeight:700, border:"none", background: busy ? "#5149ff" : "#635bff", color:"#D4AF37f", cursor: busy ? "not-allowed" : "pointer" }}>
           {busy ? "Processing…" : "Start Trial"}
         </button>
       </form>

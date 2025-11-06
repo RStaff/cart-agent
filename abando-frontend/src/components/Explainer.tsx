@@ -99,7 +99,7 @@ function ExplainerInner({
         </ul>
         <div style={{display:"flex", gap:8}}>
           <button onClick={() => handle("primary")} style={{
-            padding:"10px 14px", borderRadius:10, border:"none", background:"#635bff", color:"#fff", fontWeight:700, cursor:"pointer"
+            padding:"10px 14px", borderRadius:10, border:"none", background:"#635bff", color:"#D4AF37f", fontWeight:700, cursor:"pointer"
           }}>{primary}</button>
           <button onClick={() => handle("skip")} style={{
             padding:"10px 14px", borderRadius:10, border:"1px solid rgba(255,255,255,.18)",

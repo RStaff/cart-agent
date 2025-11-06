@@ -9,7 +9,7 @@
 .heroCtas{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
 
 .btn{border-radius:10px;padding:10px 14px;font:700 14px/1 system-ui,-apple-system,sans-serif;text-decoration:none}
-.btnPrimary{background:#635BFF;color:#fff}
+.btnPrimary{background:#635BFF;color:#D4AF37f}
 .btnPrimary:hover{background:#5149ff}
 .btnGhost{background:rgba(255,255,255,.08);color:#E6EAF2}
 .btnGhost:hover{background:rgba(255,255,255,.12)}
@@ -24,7 +24,7 @@
 .chat{display:grid;gap:10px}
 .msg{border-radius:12px;padding:10px 12px;font:600 14px/1.4 system-ui,-apple-system,sans-serif}
 .bot{background:#0f1524;color:#D5DEF0}
-.user{background:#16A34A;color:#fff;justify-self:start}
+.user{background:#16A34A;color:#D4AF37f;justify-self:start}
 
 .spacer{height:8px}
 .footer{background:var(--bg);color:#9fb0c6;padding:24px 0;font:500 13px/1.4 system-ui,-apple-system,sans-serif}

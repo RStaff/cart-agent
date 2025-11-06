@@ -1,9 +1,5 @@
 /* Global tokens + base (shared by all routes) */
 :root{
-  --performance-gold: #D4AF37;
-  --performance-gold-light: #F2D675;
-  --performance-gold-dark: #957526;
-
   --bg:#0B1220; --panel:#121A2A; --ink:#E5E7EB; --muted:#9FB0C6;
   --primary:#8FB3FF; --btn-primary:#635BFF; --btn-primary-hover:#5149FF;
   --nav-h:64px; --footer-py:28px;
@@ -21,8 +17,8 @@ a{color:inherit}
   --wolf-gray: #1A1A1A;
   --steel-gray: #2E2E2E;
   --mid-gray: #3D3D3D;
-  
-  
+  --gold-primary: #D4AF37;
+  --gold-light: #F2D675;
   --white: #FFFFFF;
   --off-white: #E8E8E8;
 
@@ -73,55 +69,3 @@ body { font-family: var(--font-body); }
 @media (max-width: 1024px) { .wolf-logo { width:180px; } }
 @media (max-width: 640px)  { .wolf-logo { width:140px; } }
 .wolf-fast { transition: all var(--transition-fast) ease; }
-
-/* GOLD-LOCK HELPERS */
-body { background: var(--black); color: var(--off-white); }
-.wolf-surface     { background: var(--wolf-gray); }
-.wolf-steel       { background: var(--steel-gray); }
-.wolf-divider     { border-bottom: 1px solid rgba(255,255,255,0.08); }
-.wolf-heading     { letter-spacing: -0.02em; }
-.wolf-label       { text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.75rem; opacity: .8; }
-
-/* Accent (text/emphasis only — NOT background) */
-.gold-accent      { color: var(--performance-gold); }
-.gold-emphasis    { outline: none; box-shadow: 0 0 0 2px rgba(212,175,55,0.22), inset 0 0 0 1px rgba(212,175,55,0.35); }
-.gold-ring        { box-shadow: 0 0 0 2px rgba(212,175,55,0.22); }
-
-/* Buttons (gold as accent: border/ink/glow; never as solid background) */
-.wolf-btn { display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
-  height: 48px; padding: 0 18px; border-radius: var(--radius-6);
-  transition: all var(--transition-fast) ease; text-decoration: none;
-}
-
-/* Primary: black base, gold border + ink + subtle glow on hover */
-.wolf-btn-primary {
-  background: var(--black);
-  color: var(--performance-gold);
-  border: 1px solid var(--performance-gold);
-  box-shadow: var(--shadow-24);
-}
-.wolf-btn-primary:hover {
-  background: #111213;
-  box-shadow: 0 0 0 2px rgba(212,175,55,0.15), var(--shadow-24);
-}
-
-/* Secondary: steel base, thin gold border on hover only */
-.wolf-btn-secondary {
-  background: var(--steel-gray);
-  color: var(--off-white);
-  border: 1px solid rgba(212,175,55,0.28);
-}
-.wolf-btn-secondary:hover {
-  color: var(--performance-gold);
-  box-shadow: 0 0 0 2px rgba(212,175,55,0.12), inset 0 0 0 1px rgba(212,175,55,0.35);
-}
-
-/* Motion */
-.wolf-fast { transition: all var(--transition-fast) ease; }
-
-/* Enforce: gold NEVER as background (visual lint: background-color using gold vars) */
-.gold-bg-violation { outline: 3px solid red !important;
-/* Font variables (from next/font in layout) */
-:root { --font-heading: "Montserrat", sans-serif; --font-body: "Inter", ui-sans-serif, system-ui; }
-.h1,.h2,.h3,.wolf-heading { font-family: var(--font-heading); }
-body { font-family: var(--font-body); }

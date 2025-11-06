@@ -1,42 +1,23 @@
-import Link from "next/link";
-import { normalizeSearchParams } from "@/lib/searchParams";
-import type { AppPageProps } from "@/types/app";
-import { OnboardingExplainer } from "@/components/Explainers";
-
-export const dynamic = "force-dynamic";
-
-export default async function Onboarding({ searchParams }: AppPageProps) {
-  const sp = await normalizeSearchParams(searchParams);
-  const plan = sp.plan ?? "basic";
-
-  const demoLinks = [
-    { href: "/dashboard", label: "Dashboard" },
-    { href: "/demo/playground", label: "Demo playground" },
-  ];
-
+export default function Onboarding({ searchParams }: { searchParams: { trial?: string; plan?: string }}) {
+  const plan = (searchParams?.plan ?? "basic").toLowerCase();
+  const isTrial = searchParams?.trial === "1";
   return (
-    <div className="max-w-3xl mx-auto px-6 py-10">
-      <OnboardingExplainer />
-      <h1 className="text-3xl font-bold mb-2">Onboarding</h1>
-      <p className="text-slate-500 mb-6">
-        You’re in <b>demo mode.</b> Add Stripe keys in Settings to go live — or explore the dashboard and demo first.
-      </p>
-
-      <div className="rounded-lg border border-slate-800 bg-slate-950 p-5 mb-8">
-        <div className="text-slate-300">Plan:</div>
-        <div className="text-lg font-medium text-white capitalize">{plan}</div>
+    <main className="mx-auto max-w-3xl px-6 py-10 text-slate-100">
+      {isTrial && (
+        <div className="rounded-md bg-slate-800/40 border border-slate-700 px-4 py-3 text-sm mb-6">
+          You’re in <strong>demo mode</strong>. Add Stripe keys in Settings to go live.
+        </div>
+      )}
+      <h1 className="text-2xl font-semibold">Onboarding</h1>
+      <div className="mt-4 rounded-md border border-slate-700 p-4">
+        <div className="text-sm opacity-80">Plan:</div>
+        <div className="mt-1 font-semibold capitalize">{plan}</div>
       </div>
-
-      <div className="flex gap-3">
-        {demoLinks.map(x => (
-          <Link key={x.href} href={x.href} className="px-4 py-2 rounded bg-violet-600 text-white hover:bg-violet-500">
-            {x.label} →
-          </Link>
-        ))}
-        <Link href="/pricing" className="px-4 py-2 rounded border border-slate-700 text-slate-300 hover:text-white">
-          See plans
-        </Link>
+      <div className="mt-6 flex gap-3">
+        <a href="/dashboard" className="rounded-md bg-indigo-500 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-400">Dashboard →</a>
+        <a href="/demo/playground" className="rounded-md bg-slate-700 px-4 py-2 text-sm text-white hover:bg-slate-600">Demo playground →</a>
+        <a href="/pricing" className="rounded-md bg-slate-800 px-4 py-2 text-sm text-white hover:bg-slate-700">See plans</a>
       </div>
-    </div>
+    </main>
   );
 }

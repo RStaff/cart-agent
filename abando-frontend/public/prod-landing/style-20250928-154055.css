@@ -1,6 +1,6 @@
 :root{
   --primary:#3b82f6;--primary-2:#265fd5;--bg:#0e121f;--card:#161d31;--border:#2d3748;
-  --text:#fff;--muted:#a0aec0;--bot:#1f2937;--user:#19a463
+  --text:#D4AF37f;--muted:#a0aec0;--bot:#1f2937;--user:#19a463
 }
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
@@ -15,16 +15,16 @@ nav .nav-links a.active{border-bottom:2px solid var(--primary)}
 .hero h1{margin:0 0 .6rem;font-size:2.4rem;line-height:1.25}
 .subheadline{color:var(--muted);max-width:680px}
 .buttons{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1rem}
-.badge{display:inline-block;padding:.25rem .5rem;background:var(--primary);color:#fff;border-radius:6px;font-size:.75rem;margin-bottom:.6rem}
+.badge{display:inline-block;padding:.25rem .5rem;background:var(--primary);color:#D4AF37f;border-radius:6px;font-size:.75rem;margin-bottom:.6rem}
 .btn{padding:.75rem 1.25rem;border-radius:6px;text-decoration:none;font-weight:800;border:1px solid transparent;display:inline-block}
-.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-2)}
+.btn-primary{background:var(--primary);color:#D4AF37f}.btn-primary:hover{background:var(--primary-2)}
 .btn-outline{background:transparent;color:var(--primary);border-color:var(--primary)}
 .section{padding:2rem 0}.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem}
 .chat-preview{border-radius:10px;border:1px solid var(--border);padding:1rem;max-width:420px;display:flex;flex-direction:column;gap:.5rem}
 .chat-preview .msg{border-radius:10px;padding:.75rem 1rem;max-width:80%}
 .chat-preview .msg.bot{background:var(--bot)}
-.chat-preview .msg.user{background:var(--user);color:#fff;align-self:flex-end}
+.chat-preview .msg.user{background:var(--user);color:#D4AF37f;align-self:flex-end}
 .pricing{padding:3rem 0}
 .pricing-cards{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center}
 .pricing-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem;flex:1 1 280px;max-width:330px;text-align:center}
@@ -32,9 +32,9 @@ nav .nav-links a.active{border-bottom:2px solid var(--primary)}
 .pricing-card .price{font-size:2rem;margin:.5rem 0 1rem;color:var(--primary)}
 .pricing-card ul{list-style:none;padding:0;margin:0 0 1rem;color:var(--muted);text-align:left}
 .footer{border-top:1px solid var(--border);padding:1rem 0;text-align:center;color:var(--muted);font-size:.9rem}
-.input{width:100%;padding:.6rem .75rem;border-radius:8px;border:1px solid var(--border);background:#0b1020;color:#fff}
+.input{width:100%;padding:.6rem .75rem;border-radius:8px;border:1px solid var(--border);background:#0b1020;color:#D4AF37f}
 .hint{position:relative;display:inline-block;margin-left:6px;cursor:help;font-weight:800}
-.hint::after{content:attr(data-tip);position:absolute;left:50%;transform:translateX(-50%);bottom:125%;background:rgba(0,0,0,.85);color:#fff;padding:.5rem .6rem;border-radius:6px;white-space:pre-line;opacity:0;pointer-events:none;transition:opacity .15s;min-width:180px;max-width:260px;text-align:left;font-weight:600;font-size:.8rem}
+.hint::after{content:attr(data-tip);position:absolute;left:50%;transform:translateX(-50%);bottom:125%;background:rgba(0,0,0,.85);color:#D4AF37f;padding:.5rem .6rem;border-radius:6px;white-space:pre-line;opacity:0;pointer-events:none;transition:opacity .15s;min-width:180px;max-width:260px;text-align:left;font-weight:600;font-size:.8rem}
 .hint:hover::after{opacity:1}
 .input-row{display:flex;gap:.75rem}.slider-row{margin-top:.75rem}
 .kpi-grid{display:flex;gap:.75rem;margin-top:.75rem}
@@ -55,8 +55,8 @@ nav .nav-links a.active{border-bottom:2px solid var(--primary)}
 .product-meta .price{color:#a0aec0;font-weight:700}
 .persona-pills{display:flex;flex-wrap:wrap;gap:.4rem;margin:.5rem 0}
 .persona{border:1px dashed var(--border);color:var(--muted);padding:.35rem .55rem;border-radius:999px;cursor:pointer}
-.persona.active,.persona:hover{border-style:solid;color:#fff}
-.preview-bubble{background:#1f2937;color:#fff;border-radius:12px;padding:.8rem}
+.persona.active,.persona:hover{border-style:solid;color:#D4AF37f}
+.preview-bubble{background:#1f2937;color:#D4AF37f;border-radius:12px;padding:.8rem}
 .preview-wrap{display:grid;grid-template-columns:120px 1fr;gap:.75rem}
 .preview-avatar{width:48px;height:48px;border-radius:999px;background:#111826;display:flex;align-items:center;justify-content:center;font-weight:800}
 

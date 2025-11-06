@@ -8,7 +8,7 @@ function ____resolveTone(t?: string): ToneColors {
   const WARN_FG = (token as any).warnFg ?? "#facc15";
 
   if (tnorm === "brand" || tnorm === "primary") {
-    return { bg: token.primary, fg: "#fff", border: token.primaryHover };
+    return { bg: token.primary, fg: "#D4AF37f", border: token.primaryHover };
   }
   if (tnorm === "ghost" || tnorm === "secondary" || tnorm === "neutral") {
     return { bg: token.ghost, fg: token.ink, border: token.border };
@@ -120,9 +120,9 @@ function sizeStyles(size?: Size): { padding: string; radius: number; fontSize: n
 }
 
 function variantStyles(variant: Variant): { bg: string; hover: string; color: string } {
-  if (variant === "danger") return { bg: token.danger, hover: token.dangerHover, color: "#fff" };
+  if (variant === "danger") return { bg: token.danger, hover: token.dangerHover, color: "#D4AF37f" };
   if (variant === "ghost")  return { bg: token.ghost,  hover: token.ghostHover,  color: "#E6EAF2" };
-  return { bg: token.primary, hover: token.primaryHover, color: "#fff" }; // primary
+  return { bg: token.primary, hover: token.primaryHover, color: "#D4AF37f" }; // primary
 }
 
 export type ButtonProps = Merge<

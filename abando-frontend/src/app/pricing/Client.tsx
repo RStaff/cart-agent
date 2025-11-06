@@ -30,7 +30,7 @@ const btn: React.CSSProperties = {
   borderRadius: 10,
   border: "none",
   background: "#635bff",
-  color: "#fff",
+  color: "#D4AF37f",
   fontWeight: 700,
   cursor: "pointer",
   width: "100%",

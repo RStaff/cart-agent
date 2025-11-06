@@ -58,7 +58,7 @@ export default function OnboardingForm() {
         style={{
           padding: "10px 14px", borderRadius: 10, fontWeight: 700,
           border: "none", background: busy ? "#5149ff" : "#635bff",
-          color: "#fff", cursor: busy ? "not-allowed" : "pointer",
+          color: "#D4AF37f", cursor: busy ? "not-allowed" : "pointer",
         }}
       >
         {busy ? "Sending…" : "Email me a login link"}

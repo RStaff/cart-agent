@@ -21,7 +21,7 @@ export default function SettingsPage() {
         Connect Stripe to leave demo mode. Add keys to <code>.env.local</code> and restart.
       </p>
 
-      <div className={`rounded-lg border p-5 mb-6 ${ok ? "border-emerald-700 bg-emerald-950" : "border-amber-700 bg-amber-950"}`}>
+      <div className={`rounded-lg border p-5 mb-6 ${ok ? "border-emerald-700 bg-emerald-950" : "border-amber-700 bg-slate-800"}`}>
         <h3 className="text-white font-semibold mb-2">Stripe status</h3>
         {!status && !err && <div className="text-slate-300">Checking…</div>}
         {err && <div className="text-rose-300">Error: {err}</div>}

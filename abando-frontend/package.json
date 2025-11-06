@@ -20,7 +20,8 @@
     "prebuild": "scripts/guard-next-navigation.sh && scripts/guard-searchparams.sh && sh -c 'npm run guard:autosend && true'",
     "guard:nextnav": "scripts/guard-next-navigation.sh",
     "guard:autosend": "scripts/autosend-guard.sh",
-    "brand:guard": "scripts/brand-guard.sh"
+    "brand:guard": "scripts/brand-guard.sh",
+    "gold:guard": "scripts/brand-gold-guard.sh"
   },
   "dependencies": {
     "next": "15.5.3",

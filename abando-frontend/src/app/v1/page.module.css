@@ -18,7 +18,7 @@
 .chat { padding: 12px; border-radius: var(--radius-sm); border:1px solid var(--panel-border); background: rgba(255,255,255,.02); }
 .msg { padding: 10px 12px; border-radius: 10px; }
 .bot { background: rgba(255,255,255,.06); color: var(--text); }
-.user { background: #16A34A; color: #fff; font-weight: 600; align-self:flex-start; width:max-content; }
+.user { background: #16A34A; color: #D4AF37f; font-weight: 600; align-self:flex-start; width:max-content; }
 .spacer { height: 28px; }
 .footer { border-top: 1px solid rgba(255,255,255,.06); padding: 18px 0; color: var(--muted); }
 .footer a { color: var(--muted); text-decoration:none; }

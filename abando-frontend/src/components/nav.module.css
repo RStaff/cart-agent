@@ -18,7 +18,7 @@
 .navCtas{display:none; gap:10px}
 @media (min-width:900px){.navCtas{display:flex}}
 .btn{border-radius:10px; padding:10px 14px; font:700 14px/1 system-ui,-apple-system,sans-serif; text-decoration:none}
-.btnPrimary{background:var(--btn-primary); color:#fff}
+.btnPrimary{background:var(--btn-primary); color:#D4AF37f}
 .btnPrimary:hover{background:var(--btn-primary-hover)}
 .btnGhost{background:rgba(255,255,255,.08); color:#E6EAF2}
 .btnGhost:hover{background:rgba(255,255,255,.12)}

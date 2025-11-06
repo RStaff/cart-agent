@@ -284,7 +284,7 @@ export default function DemoClient({ initial }: { initial: Initial }) {
                 fontWeight: 700,
                 border: "none",
                 background: busy ? "#5149ff" : "#635bff",
-                color: "#fff",
+                color: "#D4AF37f",
                 cursor: busy ? "not-allowed" : "pointer",
               }}
             >
