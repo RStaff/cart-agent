@@ -112,7 +112,7 @@ export default function AICopyGenerator({ backendBase="", onFlag }){
       </div>
 
       <div className="font-medium mt-2">Line Items</div>
-      <ul className="list-disc ml-5">
+
 {result?.itemsNormalized && (
   <div className="border rounded-md p-3 text-sm">
     <div className="font-medium mb-2">Parsed Items</div>
@@ -127,3 +127,7 @@ export default function AICopyGenerator({ backendBase="", onFlag }){
   </div>
 )}
 
+
+</div>
+</div>
+</div>
