@@ -110,16 +110,36 @@ export default function AICopyGenerator({ backendBase="", onFlag }){
         <span className="font-medium">Computed Total:</span>{" "}
         ${Number(result.totalComputed ?? 0).toFixed(2)}
       </div>
-
-      <div className="font-medium mt-2">Line Items</div>
-
-{result?.itemsNormalized && (
+<div className="font-medium mt-2">Line Items</div>
+{Array.isArray(result?.itemsNormalized) && result.itemsNormalized.length > 0 && (
   <div className="border rounded-md p-3 text-sm">
     <div className="font-medium mb-2">Parsed Items</div>
     <ul className="list-disc pl-5">
       {result.itemsNormalized.map((it, i) => (
         <li key={i}>
+          {it.title} — qty {it.quantity}{it.unitPrice > 0 ? ` @ \$\${it.unitPrice.toFixed(2)}` : ""}
+        </li>
+      ))}
+    </ul>
+    <div className="mt-2">Computed total: <b>\$\${Number(result.totalComputed ?? 0).toFixed(2)}</b></div>
+  </div>
+)}
+
+      <div className="font-medium mt-2">Line Items
+{Array.isArray(result?.itemsNormalized) && result.itemsNormalized.length > 0 && (
+  <div className="border rounded-md p-3 text-sm">
+    <div className="font-medium mb-2">Parsed Items
+    <ul className="list-disc pl-5">
+      {result.itemsNormalized.map((it, i) => (
+        <li key={i}>
           {it.title} — qty {it.quantity}{it.unitPrice > 0 ? ` @ $${it.unitPrice.toFixed(2)}` : ""}
+        
+      ))}
+    
+    <div className="mt-2">Computed total: <b>$${Number(result.totalComputed ?? 0).toFixed(2)}</b>
+  
+)}
+` : ""}
         </li>
       ))}
     </ul>
@@ -127,7 +147,11 @@ export default function AICopyGenerator({ backendBase="", onFlag }){
   </div>
 )}
 
-
 </div>
 </div>
 </div>
+);
+</div>
+</div>
+</div>
+);
