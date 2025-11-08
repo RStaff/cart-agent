@@ -1,63 +1,33 @@
-import React, { useMemo, useState } from "react";
-import AICopyGenerator from "../components/AICopyGenerator.jsx";
+import { Link } from "react-router-dom";
+import { fetchAnalytics } from "../services/api";
+import { useEffect, useState } from "react";
 
-const BASE = import.meta.env.VITE_BACKEND_BASE || "";
+export default function Dashboard() {
+  const [data, setData] = useState({ recoveryRate: 0, sentEmails: 0, recoveredRevenue: 0 });
 
-export default function Dashboard(){
-  const [lastFlag, setLastFlag] = useState(null);
+  useEffect(() => {
+    fetchAnalytics().then(setData).catch(() => {});
+  }, []);
 
   return (
-    <div className="container">
-      <div className="h-stack">
-        <div className="page-title">Dashboard</div>
-        <span className="badge">Connected</span>
-        <span className="small">Backend: {BASE || "local dev"}</span>
-      </div>
-
-      <div className="space" />
-
-      {/* top stats */}
-      <div className="grid grid-3">
-        <div className="stat">
-          <div className="label">Abandoned carts today</div>
-          <div className="value">—</div>
-          <div className="small">Hooking to DB soon</div>
-        </div>
-        <div className="stat">
-          <div className="label">Emails sent</div>
-          <div className="value">—</div>
-          <div className="small">Resend/SendGrid next</div>
-        </div>
-        <div className="stat">
-          <div className="label">Recovery rate</div>
-          <div className="value">—</div>
-          <div className="small">Coming with analytics</div>
-        </div>
-      </div>
-
-      <div className="space" />
-
-      <div className="grid" style={{gridTemplateColumns:"1.2fr .8fr"}}>
-        {/* Copy generator card */}
+    <div className="container main">
+      <div className="h1">Analytics Summary</div>
+      <div style={{display:"grid",gap:"1rem",gridTemplateColumns:"repeat(3,minmax(0,1fr))"}}>
         <div className="card">
-          <div className="row">
-            <h3>AI Copy Generator</h3>
-            <span className="small">Generate + preview cart recovery copy</span>
+          <div className="mono">Recovery Rate</div>
+          <div style={{fontSize:"2rem",fontWeight:700}}>{data.recoveryRate}%</div>
+          <div className="mono">* Mock data displayed if backend is offline</div>
+          <div style={{marginTop:"0.75rem"}}>
+            <Link to="/ai-copy"><button className="btn btn-primary">Go to AI Copy Generator</button></Link>
           </div>
-          <div className="divider" />
-          <AICopyGenerator backendBase={BASE} onFlag={(r)=>setLastFlag(r)} />
         </div>
-
-        {/* Last action card */}
         <div className="card">
-          <h3>Recent Action</h3>
-          {!lastFlag ? (
-            <div className="small">No recent abandoned cart flagged yet.</div>
-          ) : (
-            <pre className="copy" style={{margin:0}}>
-{JSON.stringify(lastFlag, null, 2)}
-            </pre>
-          )}
+          <div className="mono">Emails Sent</div>
+          <div style={{fontSize:"2rem",fontWeight:700}}>{data.sentEmails}</div>
+        </div>
+        <div className="card">
+          <div className="mono">Recovered Revenue</div>
+          <div style={{fontSize:"2rem",fontWeight:700}}>${data.recoveredRevenue.toFixed(2)}</div>
         </div>
       </div>
     </div>
