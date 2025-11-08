@@ -1,45 +1,40 @@
-import express from "express";
-import cors from "cors";
+const express = require('express');
+const cors = require('cors');
 
 const app = express();
-app.use(cors());
+
+// CORS: allow specific origin (Render dashboard: set ALLOWED_ORIGIN to your Vercel URL)
+// Fallback to * during bring-up (OK for now; tighten later)
+const allowed = process.env.ALLOWED_ORIGIN;
+app.use(cors({
+  origin: allowed ? [allowed] : '*',
+  credentials: false,
+}));
 app.use(express.json());
 
-// POST /api/generate-copy
-app.post("/api/generate-copy", (req, res) => {
-  const { cartId, items = [], totalComputed = 0 } = req.body || {};
-  const subject = `Recover your cart ${cartId ? `(${cartId})` : ""}`.trim();
-  const body = `Hey! Looks like you left something in your cart. 
-Come back for 10% off and finish checkout.`;
+// Health endpoints for Render
+app.get('/health', (_req, res) => res.status(200).json({ ok: true }));
+app.get('/healthz', (_req, res) => res.sendStatus(200));
 
-  const itemsNormalized = Array.isArray(items)
-    ? items.map(it => ({
-        title: it?.title ?? "Item",
-        quantity: Number(it?.quantity ?? 1),
-        unitPrice: Number(it?.unitPrice ?? 0)
-      }))
-    : [];
-
-  const total = Number(totalComputed || itemsNormalized.reduce((sum, it) => sum + it.quantity * it.unitPrice, 0));
-
-  return res.json({
-    subject,
-    body,
-    totalComputed: total,
-    itemsNormalized
-  });
+// Demo generate-copy endpoint
+app.post('/api/generate-copy', (req, res) => {
+  try {
+    const { cartId = 'demo', items = [] } = req.body || {};
+    const total = items.reduce((sum, it) => sum + (Number(it.unitPrice || 0) * Number(it.quantity || 0)), 0);
+    const subject = `We saved your cart ${cartId} — ${items[0]?.title || 'your items'} are waiting`;
+    res.json({
+      ok: true,
+      subject,
+      totalComputed: Number(total.toFixed(2)),
+      lines: items.map(i => `${i.quantity} × ${i.title} @ ${i.unitPrice}`),
+    });
+  } catch (e) {
+    res.status(400).json({ ok: false, error: String(e) });
+  }
 });
 
-// GET /api/analytics
-app.get("/api/analytics", (_req, res) => {
-  return res.json({
-    recoveryRate: 8.5,
-    sentEmails: 5,
-    recoveredRevenue: 8.4
-  });
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`API listening on http://localhost:${PORT}`);
+// IMPORTANT: bind to Render's port
+const PORT = process.env.PORT ? Number(process.env.PORT) : 10000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`API listening on http://0.0.0.0:${PORT}`);
 });
