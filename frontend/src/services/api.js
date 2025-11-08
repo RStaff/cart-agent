@@ -58,3 +58,5 @@ export async function fetchAnalytics() {
     return { recoveryRate: 8.5, emailsSent: 5, recoveredRevenue: 8.4 };
   }
 }
+
+export { generateDemoCopy as generateCopy };
