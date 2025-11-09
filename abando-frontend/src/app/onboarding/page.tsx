@@ -1,6 +1,11 @@
-export default function Onboarding({ searchParams }: { searchParams: { trial?: string; plan?: string }}) {
-  const plan = (searchParams?.plan ?? "basic").toLowerCase();
-  const isTrial = searchParams?.trial === "1";
+export default async function Onboarding(props: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+
+
+    const searchParams = await props.searchParams as Record<string, string | string[] | undefined>;
+  const _one = <T,>(v: T | T[] | undefined): T | undefined => Array.isArray(v) ? v[0] : v;
+const plan = String(_one(searchParams?.plan) ?? "basic").toLowerCase();
+  const trialRaw = String(_one(searchParams?.trial) ?? "").toLowerCase();
+  const isTrial = trialRaw === "1" || trialRaw === "true" || trialRaw === "yes";
   return (
     <main className="mx-auto max-w-3xl px-6 py-10 text-slate-100">
       {isTrial && (

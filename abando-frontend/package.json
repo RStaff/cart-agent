@@ -17,13 +17,14 @@
     "smoke": "node scripts/smoke-trial.mjs",
     "build:ci": "next build",
     "guard:stripe": "scripts/stripe-env-check.sh",
-    "prebuild": "scripts/guard-next-navigation.sh && scripts/guard-searchparams.sh && sh -c 'npm run guard:autosend && true'",
+    "prebuild": "scripts/prebuild_ci_safe.sh",
     "guard:nextnav": "scripts/guard-next-navigation.sh",
     "guard:autosend": "scripts/autosend-guard.sh",
     "brand:guard": "scripts/brand-guard.sh",
     "gold:guard": "scripts/brand-gold-guard.sh"
   },
   "dependencies": {
+    "clsx": "2.1.1",
     "next": "15.5.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
