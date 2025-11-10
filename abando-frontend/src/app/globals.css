@@ -476,3 +476,67 @@ a.brandLink sup { text-decoration: none; }
 .partner-logo:hover {
   opacity: 1;
 }
+
+/* ===== BEGIN: anti-bounce / CLS hardening ===== */
+
+/* 1) Keep vertical scrollbar space reserved to prevent width reflow */
+html {
+  /* Modern browsers */
+  scrollbar-gutter: stable both-edges;
+}
+/* Fallback for older ones */
+@supports not (scrollbar-gutter: stable both-edges) {
+  html { overflow-y: scroll; }
+}
+
+/* 2) Lock header/nav height so SSR→hydration doesn't shift */
+:root {
+  --nav-h: 64px;         /* adjust if your Navbar is taller/shorter */
+  --btn-h: 36px;         /* unify button height so hover/active doesn't jiggle */
+}
+header, .site-header {
+  min-height: var(--nav-h);
+}
+
+/* Ensure nav links/buttons don't change height on hover/active */
+header a,
+header .nav-link,
+header .btn,
+header .btnPrimary,
+header .btnGhost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--btn-h);
+  line-height: 1;               /* avoid line-height differences creating jumps */
+  white-space: nowrap;
+  text-decoration: none;
+  vertical-align: middle;
+}
+
+/* 3) Remove subtle border/shadow that can pop in after hydration */
+header, .site-header {
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+/* 4) Footer badge: reserve space + tidy caption so it never pushes content later */
+footer .partner-badge {
+  display: grid;
+  place-items: center;
+  min-height: 84px;             /* space for caption + logo */
+  margin-top: 16px;
+}
+footer .partner-caption {
+  margin: 0 0 6px 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+  text-align: center;
+}
+footer .partner-logo {
+  width: 160px;                 /* explicit width to eliminate reflow */
+  height: auto;
+  display: block;
+}
+
+/* ===== END: anti-bounce / CLS hardening ===== */
