@@ -437,3 +437,22 @@ a.brandLink sup { text-decoration: none; }
   border-color: rgba(255,255,255,0.28);
   background: rgba(255,255,255,0.10);
 }
+
+/* --- Nav tokens (idempotent) --- */
+.navWrap { background:#0f1216; border-bottom:1px solid rgba(255,255,255,0.06); position:sticky; top:0; z-index:50; }
+.container.navRow { max-width:1200px; margin:0 auto; padding:12px 16px; display:flex; align-items:center; gap:16px; }
+.brandLink { display:flex; align-items:center; gap:8px; text-decoration:none !important; }
+.brandLink:hover { text-decoration:none !important; }
+.brandLink .tm { text-decoration:none; border:0; line-height:1; opacity:.9; }
+.brandTxt { font-weight:700; font-size:18px; }
+
+.navLinks { display:flex; gap:28px; margin-left:auto; margin-right:auto; }
+.nav-link { color:#e7ebf0; opacity:.9; text-decoration:none; }
+.nav-link:hover { opacity:1; text-decoration:none; }
+
+.navCtas { display:flex; gap:12px; }
+.btn { display:inline-flex; align-items:center; justify-content:center; padding:10px 16px; border-radius:10px; font-weight:600; text-decoration:none; border:1px solid transparent; }
+.btnPrimary { background:#696CFF; color:#ffffff; }
+.btnPrimary:hover { filter:brightness(1.05); }
+.btnGhost   { background:rgba(255,255,255,0.06); color:#e7ebf0; border-color:rgba(255,255,255,0.12); }
+.btnGhost:hover { background:rgba(255,255,255,0.1); }
