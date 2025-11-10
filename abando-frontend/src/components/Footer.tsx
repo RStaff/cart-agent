@@ -8,6 +8,10 @@ export default function Footer() {
           <a href="/legal/privacy">Privacy</a> · <a href="/legal/dpa">DPA</a>
         </small>
       </div>
-    </footer>
+      <div className="partner-badge">
+    <p className="partner-caption">Proud Shopify Partner</p>
+    <img src="/badges/shopify-logo-darkbg.svg" alt="Shopify Partners" className="partner-logo" width="160" />
+  </div>
+</footer>
   );
 }

@@ -456,3 +456,23 @@ a.brandLink sup { text-decoration: none; }
 .btnPrimary:hover { filter:brightness(1.05); }
 .btnGhost   { background:rgba(255,255,255,0.06); color:#e7ebf0; border-color:rgba(255,255,255,0.12); }
 .btnGhost:hover { background:rgba(255,255,255,0.1); }
+
+/* ===== Partner Badge ===== */
+.partner-badge {
+  margin-top: 1rem;
+  text-align: center;
+}
+.partner-caption {
+  font-size: 0.9rem;
+  color: #aaa;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+.partner-logo {
+  height: 28px;
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+.partner-logo:hover {
+  opacity: 1;
+}
