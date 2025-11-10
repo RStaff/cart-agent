@@ -391,3 +391,49 @@ body { font-family: var(--font-body); }
 .btn-primary{background:#5b67ff;border-color:#5b67ff;color:#fff}
 .site-footer{border-top:1px solid #1f2937;margin-top:48px}
 .footer-inner{max-width:1100px;margin:0 auto;padding:18px 16px;color:#94a3b8}
+
+/* === Abando quick fixes (safe, scoped) === */
+:root {
+  --abando-primary: #6366F1; /* Indigo-ish */
+  --abando-primary-press: #4F46E5;
+  --abando-ghost-border: rgba(255,255,255,0.18);
+  --abando-ghost-bg: rgba(255,255,255,0.06);
+}
+
+/* Never underline the brand mark or its TM */
+a.brandLink, a.brandLink:visited { text-decoration: none; }
+a.brandLink sup { text-decoration: none; }
+
+/* Reusable button tokens (works on <a> or <button>) */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  line-height: 1;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .06s ease, background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+.btn:active { transform: translateY(1px); }
+
+.btnPrimary {
+  background: var(--abando-primary);
+  color: #fff;
+}
+.btnPrimary:hover { background: var(--abando-primary-press); }
+
+.btnGhost {
+  background: var(--abando-ghost-bg);
+  border-color: var(--abando-ghost-border);
+  color: #fff;
+}
+.btnGhost:hover {
+  border-color: rgba(255,255,255,0.28);
+  background: rgba(255,255,255,0.10);
+}
