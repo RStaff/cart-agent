@@ -1,0 +1,34 @@
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
+import AICopyGenerator from "./pages/AICopyGenerator";
+import "./App.css";
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <div className="min-h-screen bg-white text-gray-900 flex flex-col">
+        {/* SINGLE HEADER */}
+        <header className="border-b bg-white shadow-sm p-4 flex justify-between items-center">
+          <div className="font-semibold text-lg">Cart-Agent Command Center</div>
+          <nav className="space-x-4">
+            <Link to="/dashboard" className="text-blue-600 hover:underline">
+              Dashboard
+            </Link>
+            <Link to="/ai-copy" className="text-blue-600 hover:underline">
+              AI Copy Generator
+            </Link>
+          </nav>
+        </header>
+
+        {/* ROUTES */}
+        <main className="flex-1 p-6">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/ai-copy" element={<AICopyGenerator />} />
+          </Routes>
+        </main>
+      </div>
+    </BrowserRouter>
+  );
+}

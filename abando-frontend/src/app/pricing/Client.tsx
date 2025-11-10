@@ -30,7 +30,7 @@ const btn: React.CSSProperties = {
   borderRadius: 10,
   border: "none",
   background: "#635bff",
-  color: "#fff",
+  color: "#D4AF37f",
   fontWeight: 700,
   cursor: "pointer",
   width: "100%",
@@ -46,8 +46,7 @@ export default function PricingClient() {
     <main style={{ maxWidth: 1000, margin: "48px auto", padding: "0 16px" }}>
       <h1 style={{ marginBottom: 12 }}>Pricing</h1>
       <p style={{ color: "#94a3b8", marginBottom: 16 }}>
-        14-day free trial on every plan. In demo mode you’ll be sent to
-        onboarding.
+        14-day free trial on every plan. In demo mode you’ll be sent to onboarding.
       </p>
 
       <div style={grid}>
@@ -58,9 +57,7 @@ export default function PricingClient() {
             <li>Playbooks</li>
             <li>Analytics</li>
           </ul>
-          <button onClick={() => startTrial("basic")} style={btn}>
-            Start Free Trial
-          </button>
+          <button onClick={() => startTrial("basic")} style={btn}>Start Free Trial</button>
         </div>
 
         <div style={card}>
@@ -70,9 +67,7 @@ export default function PricingClient() {
             <li>Voice variants</li>
             <li>A/B helpers</li>
           </ul>
-          <button onClick={() => startTrial("growth")} style={btn}>
-            Start Free Trial
-          </button>
+          <button onClick={() => startTrial("growth")} style={btn}>Start Free Trial</button>
         </div>
 
         <div style={card}>
@@ -82,9 +77,7 @@ export default function PricingClient() {
             <li>Custom voice presets</li>
             <li>Priority support</li>
           </ul>
-          <button onClick={() => startTrial("pro")} style={btn}>
-            Start Free Trial
-          </button>
+          <button onClick={() => startTrial("pro")} style={btn}>Start Free Trial</button>
         </div>
       </div>
     </main>

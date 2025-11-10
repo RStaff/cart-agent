@@ -21,21 +21,19 @@ export type CreateCheckoutParams = {
   [k: string]: unknown;
 };
 
-export type CheckoutResponse =
-  | {
-      ok: true;
-      sessionUrl?: string;
-      sessionId?: string;
-      // allow backend-specific payloads
-      [k: string]: unknown;
-    }
-  | {
-      ok: false;
-      error: string;
-      status?: number;
-      // allow backend-specific payloads
-      [k: string]: unknown;
-    };
+export type CheckoutResponse = {
+  ok: true;
+  sessionUrl?: string;
+  sessionId?: string;
+  // allow backend-specific payloads
+  [k: string]: unknown;
+} | {
+  ok: false;
+  error: string;
+  status?: number;
+  // allow backend-specific payloads
+  [k: string]: unknown;
+};
 
 function baseUrl(): string {
   // Prefer explicit public base URL (works on client & server)
@@ -50,15 +48,13 @@ function buildUrl(path: string): string {
   return root ? `${root}${path}` : path;
 }
 
-export async function createCheckoutSession(
-  params: CreateCheckoutParams,
-): Promise<CheckoutResponse> {
+export async function createCheckoutSession(params: CreateCheckoutParams): Promise<CheckoutResponse> {
   const url = buildUrl("/api/checkout");
 
   // Never include forbidden headers like Origin/Cookie/Host, browsers set those
   const headers: HeadersInit = {
     "Content-Type": "application/json",
-    Accept: "application/json",
+    "Accept": "application/json"
   };
 
   const res = await fetch(url, {
@@ -74,19 +70,11 @@ export async function createCheckoutSession(
   const isJson = contentType.includes("application/json");
 
   if (!res.ok) {
-    const payload = isJson
-      ? await res.json().catch(() => ({}))
-      : await res.text().catch(() => "");
-    const message =
-      isJson && payload && typeof payload.error === "string"
-        ? payload.error
-        : (typeof payload === "string" && payload) || `HTTP ${res.status}`;
-    return {
-      ok: false,
-      error: message,
-      status: res.status,
-      ...(isJson && typeof payload === "object" ? payload : {}),
-    };
+    const payload = isJson ? await res.json().catch(() => ({})) : await res.text().catch(() => "");
+    const message = isJson && payload && typeof payload.error === "string"
+      ? payload.error
+      : (typeof payload === "string" && payload) || `HTTP ${res.status}`;
+    return { ok: false, error: message, status: res.status, ...(isJson && typeof payload === "object" ? payload : {}) };
   }
 
   const json = isJson ? await res.json() : {};
