@@ -1,107 +1,181 @@
-"use client";
-import Link from "next/link";
-import { useState, useEffect } from "react";
-import Image from "next/image";
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function Navbar() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  // lock body scroll when menu open (mobile)
+  // Close mobile menu on route change
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
-  }, [open]);
+    setOpen(false);
+  }, [pathname]);
+
+  const isActive = (href: string) =>
+    pathname === href || (href !== '/' && pathname?.startsWith(href));
 
   return (
-    <header className="nav">
+    <header className="nav" role="banner">
       <div className="nav__inner">
-        {/* Left: brand */}
         <div className="nav__left">
-          <Link href="/" className="nav__brand" aria-label="Abando Home">
-            <Image src="/logo-mark.svg" alt="" width={28} height={28} className="nav__logo" />
-            <span className="nav__brandText">Abando<span className="nav__tm">™</span></span>
+          <Link href="/" className="brand" aria-label="Abando home">
+            {/* If you have a logo, keep img here. Text fallback is accessible. */}
+            <span className="brand__text">Abando</span>
+            <span className="brand__tm" aria-hidden>™</span>
           </Link>
         </div>
 
-        {/* Center: links */}
-        <nav className={`nav__center ${open ? "is-open": ""}`} aria-label="Primary">
-          <Link href="/demo/playground" className="nav__link">Demo</Link>
-          <Link href="/pricing" className="nav__link">Pricing</Link>
-          <Link href="/onboarding" className="nav__link">Onboarding</Link>
-          <Link href="/support" className="nav__link">Support</Link>
-          <Link href="/v1" className="nav__link">Open Interactive Demo</Link>
+        <button
+          className="nav__toggle"
+          aria-label="Toggle menu"
+          aria-expanded={open ? 'true' : 'false'}
+          aria-controls="primary-navigation"
+          onClick={() => setOpen(v => !v)}
+        >
+          <span className="nav__bar" />
+          <span className="nav__bar" />
+          <span className="nav__bar" />
+        </button>
+
+        <nav
+          id="primary-navigation"
+          className={`nav__links ${open ? 'is-open' : ''}`}
+          aria-label="Primary"
+        >
+          <Link href="/demo/playground" className={`nav__link ${isActive('/demo') || isActive('/demo/playground') ? 'is-active' : ''}`}>
+            Open Interactive Demo
+          </Link>
+          <Link href="/pricing" className={`nav__link ${isActive('/pricing') ? 'is-active' : ''}`}>
+            Pricing
+          </Link>
+          <Link href="/onboarding" className={`nav__link ${isActive('/onboarding') ? 'is-active' : ''}`}>
+            Onboarding
+          </Link>
+          <Link href="/support" className={`nav__link ${isActive('/support') ? 'is-active' : ''}`}>
+            Support
+          </Link>
         </nav>
 
-        {/* Right: call-to-actions */}
-        <div className="nav__right">
-          <Link href="/trial" className="wolf-btn-primary nav__cta">Start AI Revenue Trial</Link>
-          <button
-            className="nav__burger"
-            aria-label={open ? "Close menu" : "Open menu"}
-            aria-expanded={open}
-            onClick={() => setOpen(!open)}
-          >
-            <span />
-            <span />
-            <span />
-          </button>
+        <div className="nav__cta">
+          <Link href="/trial" className="cta">Start AI Revenue Trial</Link>
         </div>
       </div>
 
-      {/* mobile drawer */}
-      <div className={`nav__drawer ${open ? "is-open" : ""}`}>
-        <Link onClick={() => setOpen(false)} href="/demo/playground" className="nav__drawerLink">Demo</Link>
-        <Link onClick={() => setOpen(false)} href="/pricing" className="nav__drawerLink">Pricing</Link>
-        <Link onClick={() => setOpen(false)} href="/onboarding" className="nav__drawerLink">Onboarding</Link>
-        <Link onClick={() => setOpen(false)} href="/support" className="nav__drawerLink">Support</Link>
-        <Link onClick={() => setOpen(false)} href="/v1" className="nav__drawerLink">Open Interactive Demo</Link>
-        <Link onClick={() => setOpen(false)} href="/trial" className="wolf-btn-primary nav__drawerCta">Start AI Revenue Trial</Link>
-      </div>
-
       <style jsx>{`
-        .nav { position: sticky; top: 0; z-index: 50; backdrop-filter: saturate(120%) blur(6px); }
+        .nav {
+          position: sticky;
+          top: 0;
+          z-index: 50;
+          background: rgba(10, 12, 16, 0.9);
+          backdrop-filter: saturate(120%) blur(8px);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
         .nav__inner {
+          max-width: 1200px;
+          margin: 0 auto;
           display: grid;
-          grid-template-columns: 1fr auto 1fr;
+          grid-template-columns: auto 1fr auto;
           align-items: center;
-          gap: 16px;
-          padding: 14px min(5vw,24px);
-          border-bottom: 1px solid rgba(212,175,55,0.14);
-          background: rgba(5,8,13,0.85);
+          gap: 12px;
+          padding: 12px 20px;
         }
-        .nav__left { display:flex; align-items:center; }
-        .nav__brand { display:flex; align-items:center; gap:10px; text-decoration:none; }
-        .nav__brandText { font-weight: 700; letter-spacing: .2px; }
-        .nav__tm { font-size: .65em; opacity: .6; margin-left: 2px; }
 
-        .nav__center { display:flex; justify-content:center; gap: 22px; }
-        .nav__link { opacity:.9; text-decoration:none; }
-        .nav__link:hover { opacity:1; text-decoration:underline; }
-
-        .nav__right { display:flex; justify-content:flex-end; align-items:center; gap: 12px; }
-        .nav__cta { display:none; }
-        .nav__burger {
-          display:inline-flex; flex-direction:column; gap:4px;
-          background:transparent; border:0; padding:6px; cursor:pointer;
+        .brand {
+          display: inline-flex;
+          align-items: baseline;
+          gap: 6px;
+          color: #e6ebff;
+          text-decoration: none;
+          font-weight: 700;
+          letter-spacing: 0.2px;
         }
-        .nav__burger span { width:22px; height:2px; background:#cbd5e1; transition:.2s; }
+        .brand__text { font-size: 18px; }
+        .brand__tm { font-size: 10px; opacity: 0.7; transform: translateY(-4px); }
 
-        /* mobile drawer (hidden by default) */
-        .nav__drawer { display:none; }
-        .nav__drawer.is-open {
-          display:flex; flex-direction:column; gap:10px;
-          background: rgba(5,8,13,.98);
-          border-bottom:1px solid rgba(212,175,55,0.14);
-          padding: 12px min(5vw,24px) 16px;
+        .nav__toggle {
+          display: none;
+          background: transparent;
+          border: 0;
+          padding: 8px;
+          margin-left: auto;
+          border-radius: 8px;
         }
-        .nav__drawerLink { padding:8px 0; text-decoration:none; }
-        .nav__drawerCta { margin-top:8px; align-self:flex-start; }
+        .nav__toggle:focus-visible { outline: 2px solid #7aa2ff; outline-offset: 2px; }
+        .nav__bar {
+          display: block;
+          width: 22px;
+          height: 2px;
+          background: #cfd7ff;
+          margin: 4px 0;
+          border-radius: 2px;
+        }
 
-        /* ≥ 980px: show desktop layout fully */
-        @media (min-width: 980px) {
-          .nav__cta { display:inline-flex; }
-          .nav__burger { display:none; }
-          .nav__drawer { display:none !important; }
+        .nav__links {
+          display: flex;
+          align-items: center;
+          gap: 18px;
+          justify-content: center;
+        }
+        .nav__link {
+          color: #cfd7ff;
+          text-decoration: none;
+          font-size: 14px;
+          padding: 8px 6px;
+          line-height: 1;
+          border-radius: 6px;
+          white-space: nowrap;
+        }
+        .nav__link:hover { color: #ffffff; }
+        .nav__link:focus-visible { outline: 2px solid #7aa2ff; outline-offset: 2px; }
+        .nav__link.is-active {
+          color: #ffffff;
+          background: rgba(124, 156, 255, 0.12);
+        }
+
+        .nav__cta { display: flex; justify-content: flex-end; }
+        .cta {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          height: 36px;
+          padding: 0 14px;
+          border-radius: 10px;
+          background: #5b7dff;
+          color: #fff;
+          font-weight: 600;
+          text-decoration: none;
+          box-shadow: 0 8px 20px rgba(91, 125, 255, 0.25);
+        }
+        .cta:hover { filter: brightness(1.07); }
+        .cta:focus-visible { outline: 2px solid #7aa2ff; outline-offset: 2px; }
+
+        /* ---------- Mobile ---------- */
+        @media (max-width: 960px) {
+          .nav__inner {
+            grid-template-columns: auto auto 1fr;
+          }
+          .nav__toggle {
+            display: inline-flex;
+          }
+          .nav__links {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 10px 20px 14px;
+            background: rgba(10, 12, 16, 0.98);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          }
+          .nav__links.is-open { display: flex; }
+          .nav__cta {
+            justify-content: flex-end;
+          }
         }
       `}</style>
     </header>
