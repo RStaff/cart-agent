@@ -1,28 +1,21 @@
+import "./globals.css";
+import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
-
-import './globals.css';
-import type { Metadata } from 'next';
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: 'Abando – AI Shopping Copilot',
-  description: 'Recover more checkouts with Abando.',
-  icons: { icon: '/favicon.ico' }
+  title: "Abando – AI Shopping Copilot",
+  description: "Recover more checkouts with Abando.",
+  icons: { icon: "/favicon.ico" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className="dark">
-      <Navbar />
-        
+        <Navbar />
         <main>{children}</main>
-        <footer className="page_footer__ZP1xQ">
-          <div className="page_container__s52HK">
-            <small>
-              © 2025 Abando<sup>™</sup> · <a href="/legal/terms">Terms</a> · <a href="/legal/privacy">Privacy</a> · <a href="/legal/dpa">DPA</a>
-            </small>
-          </div>
-        </footer>
+        <Footer />
       </body>
     </html>
   );
