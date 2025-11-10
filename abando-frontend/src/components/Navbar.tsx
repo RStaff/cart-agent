@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 export default function Navbar() {
   return (
-    <header className="navWrap">
+    <header className="site-header navWrap">
       <div className="container navRow">
         {/* Brand */}
         <Link href="/" className="brandLink" aria-label="Abando home">
@@ -14,7 +14,7 @@ export default function Navbar() {
         </Link>
 
         {/* Center nav links (text only) */}
-        <nav className="navLinks" aria-label="Primary">
+        <nav className="site-header navLinks" aria-label="Primary">
           <Link href="/demo/playground" className="nav-link">Demo</Link>
           <Link href="/pricing"          className="nav-link">Pricing</Link>
           <Link href="/onboarding"       className="nav-link">Onboarding</Link>
