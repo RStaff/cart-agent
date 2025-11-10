@@ -41,11 +41,7 @@ export default function Page(){
       </section>
 
       <div className={styles.spacer} />
-      <footer className={styles.footer}>
-        <div className={styles.container}>
-          <small>© 2025 Abando<sup>™</sup> · <a href="/legal/terms">Terms</a> · <a href="/legal/privacy">Privacy</a> · <a href="/legal/dpa">DPA</a></small>
-        </div>
-      </footer>
+      {/* footer moved to layout */}
     </div>
   )
 }

@@ -47,13 +47,7 @@ export default function Page() {
         </section>
       </main>
 
-      <footer className={styles.footer}>
-        <div className={styles.container}>
-          <small>
-            © 2025 Abando<sup>™</sup> · <Link href="/legal/terms">Terms</Link> · <Link href="/legal/privacy">Privacy</Link> · <Link href="/legal/dpa">DPA</Link>
-          </small>
-        </div>
-      </footer>
+      
     </div>
   );
 }
