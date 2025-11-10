@@ -1,6 +1,7 @@
+import Navbar from "@/components/Navbar";
+
 import './globals.css';
 import type { Metadata } from 'next';
-import Navbar from '@/components/Navbar';
 
 export const metadata: Metadata = {
   title: 'Abando – AI Shopping Copilot',
@@ -12,7 +13,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="dark">
-        <Navbar />
+      <Navbar />
+        
         <main>{children}</main>
         <footer className="page_footer__ZP1xQ">
           <div className="page_container__s52HK">
