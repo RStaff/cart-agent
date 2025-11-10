@@ -22,7 +22,7 @@ export default function Navbar() {
             src="/brand/abando-mark.svg"
             width={24}
             height={24}
-            alt=""
+            alt="Abando logo"
             aria-hidden
             priority
           />
