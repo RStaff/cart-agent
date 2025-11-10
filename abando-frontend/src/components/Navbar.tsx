@@ -1,30 +1,43 @@
+// NOTE: production-grade navbar — brand left, links center, CTAs right
 'use client';
-import Link from 'next/link';
-import Image from 'next/image';
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <header className="site-header navWrap">
+    <header className={`site-header ${scrolled ? "is-scrolled" : ""}`} role="banner">
       <div className="container navRow">
         {/* Brand */}
         <Link href="/" className="brandLink" aria-label="Abando home">
-          <Image src="/abando-logo.png" alt="Abando" width={30} height={30} priority />
-          <span className="brandTxt">Abando</span>
-          <sup className="tm">™</sup>
+          <span className="brandMark" aria-hidden="true">🛒</span>
+          <span className="brandName">Abando</span>
+          <span className="tm" aria-hidden="true">™</span>
         </Link>
 
-        {/* Center nav links (text only) */}
-        <nav className="site-header navLinks" aria-label="Primary">
-          <Link href="/demo/playground" className="nav-link">Demo</Link>
-          <Link href="/pricing"          className="nav-link">Pricing</Link>
-          <Link href="/onboarding"       className="nav-link">Onboarding</Link>
-          <Link href="/support"          className="nav-link">Support</Link>
+        {/* Center nav */}
+        <nav className="navCenter" aria-label="Primary">
+          <Link className="nav-link" href="/demo">Demo</Link>
+          <Link className="nav-link" href="/pricing">Pricing</Link>
+          <Link className="nav-link" href="/onboarding">Onboarding</Link>
+          <Link className="nav-link" href="/support">Support</Link>
         </nav>
 
+        <div className="spacer" aria-hidden="true" />
+
         {/* Right CTAs */}
-        <div className="navCtas">
-          <Link href="/demo/playground" className="btn btnGhost">Open demo</Link>
-          <Link href="/onboarding"      className="btn btnPrimary">Start free trial</Link>
+        <div className="ctaRow">
+          <Link className="btn btnGhost" href="/demo/playground">Open demo</Link>
+          <Link className="btn btnPrimary" href="/trial">Start free trial</Link>
         </div>
       </div>
     </header>

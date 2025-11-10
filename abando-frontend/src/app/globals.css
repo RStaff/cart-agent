@@ -1149,3 +1149,51 @@ html, body {
 .partner-badge { min-height: 0; }
 .partner-logo  { height: 22px; width: auto; }
   
+
+/* === PROD NAVBAR STYLES === */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: #0b0c10;               /* match your dark header */
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  height: 64px;                       /* height-lock to avoid CLS */
+  will-change: transform;             /* create its own layer */
+  transform: translateZ(0);           /* prevent toolbar-induced jump */
+  -webkit-font-smoothing: antialiased;
+}
+.site-header.is-scrolled {
+  box-shadow: 0 4px 16px rgba(0,0,0,.28); /* subtle enterprise shadow */
+}
+
+.container.navRow {
+  display: flex; align-items: center; gap: 20px; height: 64px;
+}
+
+.brandLink { display:flex; align-items:center; gap:10px; text-decoration:none; }
+.brandName { font-weight: 700; letter-spacing: .2px; }
+.tm { margin-left: 2px; font-size: .7em; opacity:.8; text-decoration: none !important; }
+
+.navCenter {
+  display: flex; gap: 22px;
+}
+.nav-link {
+  text-decoration: none;
+  opacity:.9;
+}
+.nav-link:hover, .nav-link:focus-visible { opacity: 1; text-decoration: none; }
+
+.spacer { flex: 1; }
+
+.ctaRow { display:flex; gap: 12px; }
+.btn { display:inline-flex; align-items:center; justify-content:center; padding:8px 14px; border-radius:10px; font-weight:600; }
+.btnGhost { background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10); }
+.btnGhost:hover, .btnGhost:focus-visible { background: rgba(255,255,255,.10); }
+.btnPrimary { background: #665dff; color: #fff; border: 1px solid rgba(255,255,255,.10); }
+.btnPrimary:hover, .btnPrimary:focus-visible { filter: brightness(1.05); }
+
+/* Shopify partner badge (already present, kept minimal here) */
+.partner-badge { text-align:center; padding: 18px 0 8px; }
+.partner-caption { margin:0 0 6px 0; font-size:.85rem; opacity:.85; }
+.partner-logo { width: 120px; height: 28px; object-fit: contain; opacity:.9; }
+/* === END PROD NAVBAR STYLES === */
