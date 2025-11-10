@@ -179,13 +179,6 @@ export default function DemoClient({ initial }: { initial: Initial }) {
 
   return (
     <main style={{ maxWidth: 1100, margin: "40px auto", padding: "0 16px" }}>
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-        <h1 style={{ margin: 0 }}>Demo Playground</h1>
-        <div style={{ display: "flex", gap: 12 }}>
-          <Link href="/dashboard" style={{ textDecoration: "underline", color: "#9fb0c6" }}>View in dashboard →</Link>
-        </div>
-      </header>
-
       <div style={{ display: "grid", gridTemplateColumns: "1.3fr .7fr", gap: 16 }}>
         {/* Left column */}
         <section style={{ display: "grid", gap: 12 }}>

@@ -1,13 +1,9 @@
-import NavBar from "../../components/Navbar";
 import Link from "next/link";
 import styles from "./page.module.css";
 
 export default function Page() {
   return (
-    <div className={styles.shell}>
-      <NavBar />
-
-      <main className={styles.main}>
+    <div className={styles.shell}><main className={styles.main}>
         <section className={styles.hero}>
           <div className={styles.container}>
             <span className={styles.badge}>New • 14-day free trial</span>
