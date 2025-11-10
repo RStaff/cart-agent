@@ -1,4 +1,4 @@
-export const dynamic = 'error'; // force static
+export const dynamic = 'error'; // keep static
 
 export default function Page() {
   return (
@@ -13,15 +13,9 @@ export default function Page() {
       </ol>
 
       <div className="mt-8 flex gap-3">
-        <a href="/trial" className="btn btn--primary">Start Free Trial</a>
-        <a href="/demo/playground" className="btn btn--ghost">Open demo</a>
+        <a href="/trial" className="wolf-btn-primary" style={{display:'inline-flex',alignItems:'center',justifyContent:'center',height:40,padding:'0 16px',borderRadius:10,fontWeight:600,textDecoration:'none'}}>Start Free Trial</a>
+        <a href="/demo/playground" className="wolf-btn-ghost" style={{display:'inline-flex',alignItems:'center',justifyContent:'center',height:40,padding:'0 16px',borderRadius:10,fontWeight:600,textDecoration:'none',border:'1px solid rgba(198,205,255,.35)'}}>Open demo</a>
       </div>
-
-      <style jsx>{`
-        .btn { display:inline-flex; align-items:center; justify-content:center; height:40px; padding:0 16px; border-radius:10px; font-weight:600; text-decoration:none; }
-        .btn--primary { background:#5b7dff; color:#fff; }
-        .btn--ghost { color:#e6ebff; border:1px solid rgba(198,205,255,.35); }
-      `}</style>
     </main>
   );
 }
