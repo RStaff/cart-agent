@@ -15,10 +15,7 @@ export default function Navbar() {
           <Link className="nav-link btn btnPrimary" href="/onboarding">Onboarding</Link>
           <Link className="nav-link" href="/support">Support</Link>
         </nav>
-        <div className="nav-ctas">
-          <Link className="btn btn-ghost" href="/demo/playground">Try the demo</Link>
-          <Link className="btn btn-primary" href="/onboarding">Start free trial</Link>
-        </div>
+        
       </div>
     </header>
   );
