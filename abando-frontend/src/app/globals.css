@@ -1444,3 +1444,38 @@ main .container, .page .container, .section .container {
   .site-header .navRow > :last-child .btn.secondary { display: none; }
 }
 /* === END ENTERPRISE NAV LCR === */
+/* === ENTERPRISE NAV LCR === */
+.site-header { position: sticky; top: 0; z-index: 60; background: var(--bg, #0b0b0c); width: 100%; will-change: transform; }
+.site-header .navRow {
+  display: flex; align-items: center; gap: 16px;
+  max-width: none !important; margin: 0 !important; padding: 0 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04), 0 10px 30px rgba(0,0,0,0.25);
+}
+.site-header .navRow > * { min-width: 0; }
+
+/* Brand LEFT (first child) */
+.site-header .navRow > :first-child { flex: 0 0 auto; }
+.site-header .navRow a.brandLink { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .1px; }
+.site-header .navRow a.brandLink img, .site-header .navRow a.brandLink svg { height: 22px; width: auto; display: inline-block; }
+
+/* Links CENTER (second child) */
+.site-header .navRow > :nth-child(2) { flex: 1 1 auto; display: flex; justify-content: center; gap: 22px; }
+.site-header .navRow > :nth-child(2) a { opacity: .9; transition: opacity .15s ease; }
+.site-header .navRow > :nth-child(2) a:hover { opacity: 1; }
+
+/* CTAs RIGHT (last child) */
+.site-header .navRow > :last-child { flex: 0 0 auto; margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.site-header .navRow .btn { padding: 10px 14px; border-radius: 12px; font-weight: 600; }
+.site-header .navRow .btn.secondary { background: transparent; border: 1px solid rgba(255,255,255,0.18); }
+.site-header .navRow .btn.primary   { background: #6E56CF; color: #fff; }
+
+/* Wide screen edge-tuck */
+@media (min-width: 1440px) { .site-header .navRow { padding-left: 16px; padding-right: 24px; } }
+
+/* Mobile: keep brand + primary CTA visible */
+@media (max-width: 900px) {
+  .site-header .navRow > :nth-child(2) { display: none; }
+  .site-header .navRow > :last-child .btn.secondary { display: none; }
+}
+/* === END ENTERPRISE NAV LCR === */

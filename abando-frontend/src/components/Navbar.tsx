@@ -32,7 +32,7 @@ export default function Navbar() {
         </Link>
 
         {/* Primary links (CENTER) — no "Demo" link to avoid duplication */}
-        <nav className="primaryNav" aria-label="Primary">
+        <nav className="site-header primaryNav" aria-label="Primary">
           <Link href="/pricing">Pricing</Link>
           <Link href="/onboarding">Onboarding</Link>
           <Link href="/support">Support</Link>
