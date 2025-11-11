@@ -1197,3 +1197,138 @@ html, body {
 .partner-caption { margin:0 0 6px 0; font-size:.85rem; opacity:.85; }
 .partner-logo { width: 120px; height: 28px; object-fit: contain; opacity:.9; }
 /* === END PROD NAVBAR STYLES === */
+
+/* === Enterprise Nav Polish START === */
+:root{
+  --header-h:64px;
+  --header-bg:rgba(11,12,16,0.88);
+  --header-bg-scrolled:rgba(11,12,16,0.95);
+  --link:#cdd3ff;
+  --accent:#6c63ff;
+}
+
+html,body{min-height:100%;}
+body{font-family:var(--font-sans, system-ui, -apple-system, Segoe UI, Roboto, Inter), sans-serif;}
+
+.site-header{
+  position:sticky; top:0; z-index:1000; height:var(--header-h);
+  background:var(--header-bg);
+  -webkit-backdrop-filter:saturate(120%) blur(8px);
+  backdrop-filter:saturate(120%) blur(8px);
+  transform:translateZ(0); will-change:transform;
+  transition:background .25s ease, box-shadow .25s ease;
+}
+.site-header.scrolled{ background:var(--header-bg-scrolled); box-shadow:0 4px 16px rgba(0,0,0,.28); }
+
+.navRow{height:var(--header-h); display:flex; align-items:center; justify-content:space-between; gap:16px;}
+.brandRow{display:flex; align-items:center; gap:10px; white-space:nowrap;}
+.brandName{font-weight:700; letter-spacing:.2px;}
+.brandTM{margin-left:.25rem; opacity:.7; text-decoration:none !important;}
+
+.navCenter{display:flex; align-items:center; gap:22px;}
+.nav-link{position:relative; font-weight:500; opacity:.9; text-decoration:none;}
+.nav-link:hover{opacity:1}
+.nav-link::after{
+  content:""; position:absolute; left:0; right:0; bottom:-10px; height:2px;
+  background:transparent; transform:scaleX(0);
+  transition:transform .25s ease, background .25s ease;
+}
+.nav-link.active::after{ background:var(--accent); transform:scaleX(1); }
+
+.navCTAs{display:flex; align-items:center; gap:12px;}
+.btn{display:inline-flex; align-items:center; justify-content:center; padding:10px 14px; border-radius:10px; font-weight:600; text-decoration:none;}
+.btnGhost{border:1px solid rgba(255,255,255,.16);}
+.btnPrimary{background:var(--accent); color:#fff;}
+
+.hamburger{display:none; width:40px; height:40px; border-radius:10px; border:1px solid rgba(255,255,255,.16); align-items:center; justify-content:center;}
+.hamburger span{width:18px; height:2px; background:#fff; position:relative; display:block;}
+.hamburger span:before,.hamburger span:after{content:""; position:absolute; left:0; width:18px; height:2px; background:#fff;}
+.hamburger span:before{top:-6px} .hamburger span:after{top:6px}
+
+.mobileDrawer{
+  position:fixed; top:var(--header-h); left:0; right:0; background:rgba(11,12,16,.98);
+  border-top:1px solid rgba(255,255,255,.08);
+  transform-origin:top; transform:scaleY(0); opacity:0; transition:transform .2s ease, opacity .2s ease;
+}
+.mobileDrawer.open{transform:scaleY(1); opacity:1;}
+.mobileDrawer .menu{display:flex; flex-direction:column; gap:14px; padding:16px;}
+
+@media (max-width: 768px){
+  .navCenter{display:none;}
+  .navCTAs{display:none;}
+  .hamburger{display:flex;}
+}
+
+/* Shopify badge stability (if used) */
+.partner-wrap{display:flex; flex-direction:column; align-items:center; gap:6px; padding:22px 0;}
+.partner-caption{font-size:13px; color:rgba(255,255,255,.7); margin:0;}
+.partner-logo{width:120px; height:auto; opacity:.9; transition:opacity .2s ease;}
+.partner-logo:hover{opacity:1;}
+/* === Enterprise Nav Polish END === */
+/* === Enterprise Nav Polish START === */
+:root{
+  --header-h:64px;
+  --header-bg:rgba(11,12,16,0.88);
+  --header-bg-scrolled:rgba(11,12,16,0.95);
+  --link:#cdd3ff;
+  --accent:#6c63ff;
+}
+
+html,body{min-height:100%;}
+body{font-family:var(--font-sans, system-ui, -apple-system, Segoe UI, Roboto, Inter), sans-serif;}
+
+.site-header{
+  position:sticky; top:0; z-index:1000; height:var(--header-h);
+  background:var(--header-bg);
+  -webkit-backdrop-filter:saturate(120%) blur(8px);
+  backdrop-filter:saturate(120%) blur(8px);
+  transform:translateZ(0); will-change:transform;
+  transition:background .25s ease, box-shadow .25s ease;
+}
+.site-header.scrolled{ background:var(--header-bg-scrolled); box-shadow:0 4px 16px rgba(0,0,0,.28); }
+
+.navRow{height:var(--header-h); display:flex; align-items:center; justify-content:space-between; gap:16px;}
+.brandRow{display:flex; align-items:center; gap:10px; white-space:nowrap;}
+.brandName{font-weight:700; letter-spacing:.2px;}
+.brandTM{margin-left:.25rem; opacity:.7; text-decoration:none !important;}
+
+.navCenter{display:flex; align-items:center; gap:22px;}
+.nav-link{position:relative; font-weight:500; opacity:.9; text-decoration:none;}
+.nav-link:hover{opacity:1}
+.nav-link::after{
+  content:""; position:absolute; left:0; right:0; bottom:-10px; height:2px;
+  background:transparent; transform:scaleX(0);
+  transition:transform .25s ease, background .25s ease;
+}
+.nav-link.active::after{ background:var(--accent); transform:scaleX(1); }
+
+.navCTAs{display:flex; align-items:center; gap:12px;}
+.btn{display:inline-flex; align-items:center; justify-content:center; padding:10px 14px; border-radius:10px; font-weight:600; text-decoration:none;}
+.btnGhost{border:1px solid rgba(255,255,255,.16);}
+.btnPrimary{background:var(--accent); color:#fff;}
+
+.hamburger{display:none; width:40px; height:40px; border-radius:10px; border:1px solid rgba(255,255,255,.16); align-items:center; justify-content:center;}
+.hamburger span{width:18px; height:2px; background:#fff; position:relative; display:block;}
+.hamburger span:before,.hamburger span:after{content:""; position:absolute; left:0; width:18px; height:2px; background:#fff;}
+.hamburger span:before{top:-6px} .hamburger span:after{top:6px}
+
+.mobileDrawer{
+  position:fixed; top:var(--header-h); left:0; right:0; background:rgba(11,12,16,.98);
+  border-top:1px solid rgba(255,255,255,.08);
+  transform-origin:top; transform:scaleY(0); opacity:0; transition:transform .2s ease, opacity .2s ease;
+}
+.mobileDrawer.open{transform:scaleY(1); opacity:1;}
+.mobileDrawer .menu{display:flex; flex-direction:column; gap:14px; padding:16px;}
+
+@media (max-width: 768px){
+  .navCenter{display:none;}
+  .navCTAs{display:none;}
+  .hamburger{display:flex;}
+}
+
+/* Shopify badge stability (if used) */
+.partner-wrap{display:flex; flex-direction:column; align-items:center; gap:6px; padding:22px 0;}
+.partner-caption{font-size:13px; color:rgba(255,255,255,.7); margin:0;}
+.partner-logo{width:120px; height:auto; opacity:.9; transition:opacity .2s ease;}
+.partner-logo:hover{opacity:1;}
+/* === Enterprise Nav Polish END === */

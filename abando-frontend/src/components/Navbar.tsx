@@ -1,10 +1,20 @@
-// NOTE: production-grade navbar — brand left, links center, CTAs right
-'use client';
+"use client";
 
 import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
+const LINKS = [
+  { href: "/demo/playground", label: "Demo" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/onboarding", label: "Onboarding" },
+  { href: "/support", label: "Support" },
+];
+
 export default function Navbar() {
+  const path = usePathname() || "/";
+  const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -14,30 +24,72 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  return (
-    <header className={`site-header ${scrolled ? "is-scrolled" : ""}`} role="banner">
-      <div className="container navRow">
-        {/* Brand */}
-        <Link href="/" className="brandLink" aria-label="Abando home">
-          <span className="brandMark" aria-hidden="true">🛒</span>
-          <span className="brandName">Abando</span>
-          <span className="tm" aria-hidden="true">™</span>
-        </Link>
+  useEffect(() => { setOpen(false); }, [path]);
 
-        {/* Center nav */}
+  return (
+    <header className={`site-header${scrolled ? " scrolled" : ""}`}>
+      <div className="container navRow">
+        {/* Brand left */}
+        <div className="brandRow">
+          <Link href="/" aria-label="Abando home" className="brandLink">
+            <Image src="/abando-logo.png" alt="Abando" width={28} height={28} priority />
+          </Link>
+          <Link href="/" className="brandName">Abando</Link>
+          <span className="brandTM">™</span>
+        </div>
+
+        {/* Center links (desktop) */}
         <nav className="navCenter" aria-label="Primary">
-          <Link className="nav-link" href="/demo">Demo</Link>
-          <Link className="nav-link" href="/pricing">Pricing</Link>
-          <Link className="nav-link" href="/onboarding">Onboarding</Link>
-          <Link className="nav-link" href="/support">Support</Link>
+          {LINKS.map(({ href, label }) => {
+            const active =
+              path === href || (href !== "/" && path.startsWith(href));
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`nav-link${active ? " active" : ""}`}
+              >
+                {label}
+              </Link>
+            );
+          })}
         </nav>
 
-        <div className="spacer" aria-hidden="true" />
+        {/* Right CTAs (desktop) */}
+        <div className="navCTAs">
+          <Link href="/demo/playground" className="btn btnGhost">Open demo</Link>
+          <Link href="/trial" className="btn btnPrimary">Start free trial</Link>
+        </div>
 
-        {/* Right CTAs */}
-        <div className="ctaRow">
-          <Link className="btn btnGhost" href="/demo/playground">Open demo</Link>
-          <Link className="btn btnPrimary" href="/trial">Start free trial</Link>
+        {/* Mobile hamburger */}
+        <button
+          className="hamburger"
+          aria-label="Open menu"
+          aria-expanded={open ? "true" : "false"}
+          onClick={() => setOpen(!open)}
+        >
+          <span />
+        </button>
+      </div>
+
+      {/* Mobile drawer */}
+      <div className={`mobileDrawer${open ? " open" : ""}`}>
+        <div className="menu">
+          {LINKS.map(({ href, label }) => {
+            const active =
+              path === href || (href !== "/" && path.startsWith(href));
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`nav-link${active ? " active" : ""}`}
+              >
+                {label}
+              </Link>
+            );
+          })}
+          <Link href="/demo/playground" className="btn btnGhost">Open demo</Link>
+          <Link href="/trial" className="btn btnPrimary">Start free trial</Link>
         </div>
       </div>
     </header>
