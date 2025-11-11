@@ -1,7 +1,13 @@
 import "./globals.css";
-import { inter } from "./fonts";
 import { Inter } from "next/font/google";
 
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  adjustFontFallback: true,
+  fallback: ["system-ui","Arial"],
+  variable: "--font-sans",
+});
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -18,14 +24,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en">
       <head>
-        <link
-          rel="preload"
-          as="image"
-          href="/badges/shopify-logo-darkbg.svg"
-          imageSizes="(min-width:1px) 24px"
-        />
         <link
           rel="preload"
           href="/badges/shopify-logo-darkbg.svg"
