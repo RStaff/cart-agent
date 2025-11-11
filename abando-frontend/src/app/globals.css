@@ -1391,3 +1391,20 @@ body{font-family:var(--font-sans, system-ui, -apple-system, Segoe UI, Roboto, In
   .navRow { grid-template-columns: auto 1fr auto; }
 }
  /* === END NAVBAR LAYOUT LOCK === */
+
+/* === FULL BLEED HEADER === */
+.site-header { width: 100%; }
+.site-header .navRow {
+  /* full-bleed: do not center in a fixed max-width box */
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 20px;            /* edge padding */
+}
+@media (min-width: 1440px) {
+  .site-header .navRow { padding: 0 28px; }
+}
+/* keep body content centered; only header is full-bleed */
+main .container, .page .container, .section .container {
+  margin-left: auto; margin-right: auto;
+}
+/* === END FULL BLEED HEADER === */
