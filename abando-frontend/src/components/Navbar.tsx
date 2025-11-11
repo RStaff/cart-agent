@@ -2,112 +2,46 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const LINKS = [
-  { href: "/demo/playground", label: "Demo" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/onboarding", label: "Onboarding" },
-  { href: "/support", label: "Support" },
-];
-
 export default function Navbar() {
-  const path = usePathname() || "/";
-  const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 4);
+    const onScroll = () => setScrolled(window.scrollY > 2);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
-    setOpen(false);
-  }, [path]);
-
   return (
-    <header className={`site-header${scrolled ? " scrolled" : ""}`}>
-      <div className="container navRow">
-        {/* Brand left */}
-        <div className="brandRow">
-          <Link href="/" aria-label="Abando home" className="brandLink">
+    <header className={`site-header${scrolled ? " is-scrolled" : ""}`}>
+      <div className="container navRow" role="navigation" aria-label="Main">
+        {/* Brand (LEFT) */}
+        <Link href="/" className="brandLink" aria-label="Abando home">
+          <span className="brandMark">
             <Image
-              src="/abando-logo.png"
-              alt="Abando"
-              width={28}
-              height={28}
+              src="/logo/cart-wolf.svg"
+              alt=""
+              width={24}
+              height={24}
               priority
             />
-          </Link>
-          <Link href="/" className="brandName">
-            Abando
-          </Link>
-          <span className="brandTM">™</span>
-        </div>
+          </span>
+          <span className="brandText">Abando</span>
+          <span className="tm">™</span>
+        </Link>
 
-        {/* Center links (desktop) */}
-        <nav className="navCenter" aria-label="Primary">
-          {LINKS.map(({ href, label }) => {
-            const active =
-              path === href || (href !== "/" && path.startsWith(href));
-            return (
-              <Link
-                key={href}
-                href={href}
-                className={`nav-link${active ? " active" : ""}`}
-              >
-                {label}
-              </Link>
-            );
-          })}
+        {/* Primary links (CENTER) — no "Demo" link to avoid duplication */}
+        <nav className="primaryNav" aria-label="Primary">
+          <Link href="/pricing">Pricing</Link>
+          <Link href="/onboarding">Onboarding</Link>
+          <Link href="/support">Support</Link>
         </nav>
 
-        {/* Right CTAs (desktop) */}
-        <div className="navCTAs">
-          <Link href="/demo/playground" className="btn btnGhost">
-            Open demo
-          </Link>
-          <Link href="/trial" className="btn btnPrimary">
-            Start free trial
-          </Link>
-        </div>
-
-        {/* Mobile hamburger */}
-        <button
-          className="hamburger"
-          aria-label="Open menu"
-          aria-expanded={open ? "true" : "false"}
-          onClick={() => setOpen(!open)}
-        >
-          <span />
-        </button>
-      </div>
-
-      {/* Mobile drawer */}
-      <div className={`mobileDrawer${open ? " open" : ""}`}>
-        <div className="menu">
-          {LINKS.map(({ href, label }) => {
-            const active =
-              path === href || (href !== "/" && path.startsWith(href));
-            return (
-              <Link
-                key={href}
-                href={href}
-                className={`nav-link${active ? " active" : ""}`}
-              >
-                {label}
-              </Link>
-            );
-          })}
-          <Link href="/demo/playground" className="btn btnGhost">
-            Open demo
-          </Link>
-          <Link href="/trial" className="btn btnPrimary">
-            Start free trial
-          </Link>
+        {/* CTAs (RIGHT) — single Demo CTA + primary Start trial */}
+        <div className="ctaRow" role="group" aria-label="Actions">
+          <Link href="/demo/playground" className="btn ghost">Open demo</Link>
+          <Link href="/trial" className="btn primary">Start free trial</Link>
         </div>
       </div>
     </header>

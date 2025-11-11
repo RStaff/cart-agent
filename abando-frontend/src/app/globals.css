@@ -1341,3 +1341,53 @@ body{font-family:var(--font-sans, system-ui, -apple-system, Segoe UI, Roboto, In
 .partner-logo{height:var(--badgeMaxH);width:auto;opacity:.9;vertical-align:middle;image-rendering:auto}
 .partner-caption{font-size:.84rem;line-height:1;margin:0 .25rem 0 0;opacity:.85;white-space:nowrap}
 .site-header{position:sticky;top:0;z-index:50;backdrop-filter:saturate(140%) blur(8px);transform:translateZ(0)}
+
+/* === NAVBAR LAYOUT LOCK === */
+.site-header {
+  position: sticky; top: 0; z-index: 60;
+  background: rgba(11,11,13,0.86); backdrop-filter: saturate(120%) blur(8px);
+  -webkit-backface-visibility: hidden; backface-visibility: hidden;
+  will-change: transform;
+  transition: box-shadow .18s ease;
+}
+.site-header.is-scrolled { box-shadow: 0 6px 18px rgba(0,0,0,.18); }
+
+.navRow {
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* brand | links | ctas */
+  align-items: center;
+  gap: 20px;
+  min-height: 64px;
+}
+
+.brandLink {
+  display: inline-flex; align-items: center; gap: 8px;
+  text-decoration: none; color: #e7e7ea;
+  margin-right: 8px; /* explicitly pins brand to the left column */
+}
+.brandText { font-weight: 700; letter-spacing: .2px; }
+.tm { font-size: 10px; opacity: .7; margin-left: 2px; line-height: 1; }
+
+.primaryNav {
+  display: flex; justify-content: center; gap: 24px;
+}
+.primaryNav a { color: #cfcfd4; text-decoration: none; font-weight: 500; }
+.primaryNav a:hover { color: #ffffff; }
+
+.ctaRow { display: flex; gap: 12px; justify-content: flex-end; }
+.btn {
+  display:inline-flex; align-items:center; justify-content:center;
+  padding: 8px 14px; border-radius: 10px; font-weight: 600;
+  text-decoration: none; line-height: 1;
+}
+.btn.ghost { border: 1px solid rgba(255,255,255,.14); color:#e7e7ea; }
+.btn.ghost:hover { background: rgba(255,255,255,.06); }
+.btn.primary { background:#7a5cff; color: #0b0b0c; }
+.btn.primary:hover { filter: brightness(1.06); }
+
+/* Mobile: center brand, collapse links, keep CTAs right as icons if desired */
+@media (max-width: 900px) {
+  .primaryNav { display:none; }
+  .navRow { grid-template-columns: auto 1fr auto; }
+}
+ /* === END NAVBAR LAYOUT LOCK === */
