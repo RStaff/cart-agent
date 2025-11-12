@@ -39,5 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+<<<<<<< HEAD
+
+# ignore nested repos
+cart-agent/
+staffordmedia-site/
+=======
 # ignore editor/backup snapshots
 **/*.bak-*
+>>>>>>> origin/main

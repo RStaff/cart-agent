@@ -1,0 +1,48 @@
+:root{
+  --page-gutter: clamp(16px, 4vw, 64px);
+  --nav-height: 64px;
+}
+
+/* Shared container that header & hero both use */
+.abando-container{
+  margin-inline: auto;
+  padding-inline: var(--page-gutter);
+  width: 100%;
+  max-width: 1200px; /* keep content from feeling too wide */
+}
+
+/* Navbar alignments */
+header .abando-container{
+  display:flex; align-items:center; gap:16px; min-height:var(--nav-height);
+}
+
+/* Keep brand pinned to the same left as hero H1 */
+.nav-brand{
+  display:flex; align-items:center; gap:10px;
+  transform: translateX(2px); /* tiny optical nudge */
+}
+
+/* Right side group */
+.nav-actions{
+  margin-left:auto; display:flex; align-items:center; gap:12px;
+}
+
+/* Shopify badge next to CTA */
+.shopify-badge{
+  display:inline-flex; align-items:center; gap:8px;
+  line-height:1; white-space:nowrap;
+  padding:6px 10px; border-radius:10px;
+  background:rgba(159,122,234,0.18); /* subtle purple wash */
+  border:1px solid rgba(159,122,234,0.35);
+  font-size:13px;
+}
+.shopify-badge img{ height:18px; width:auto; }
+
+/* Navbar CTA (use your existing btn styles if present) */
+.nav-cta{ padding:10px 14px; border-radius:12px; font-weight:600; }
+
+/* Hero gap polish */
+.hero-wrap{ margin-top: 8px; } /* tighter than default */
+
+/* Remove footer partner block if it exists */
+.footer-partner, .footer .shopify-partner-block { display:none !important; }
