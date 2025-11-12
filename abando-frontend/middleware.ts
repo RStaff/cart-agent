@@ -8,5 +8,5 @@ export function middleware(_req: NextRequest) {
 }
 
 export const config = {
-  matcher: [], // no protected routes
+  matcher: [] // no protected routes
 };

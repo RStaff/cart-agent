@@ -1,1 +1,47 @@
-export { default } from "./NavbarV2";
+import ShopifyBadge from "./ShopifyBadge";
+import Link from "next/link";
+import Image from "next/image";
+
+export default function Navbar() {
+  return (
+    <header className="site-header">
+      <div className="navRow">
+        {/* Brand — left */}
+        <div className="brand">
+          <a href="/" className="brandLink">
+            <img
+              src="/abando-logo.png"
+              alt="Abando"
+              height={22}
+              loading="eager"
+              decoding="async"
+            />
+            <span className="brandName">Abando</span>
+          </a>
+        </div>
+
+        {/* Links — center */}
+        <nav className="centerLinks">
+          <a href="/pricing">Pricing</a>
+          <a href="/onboarding">Onboarding</a>
+          <a href="/support">Support</a>
+        </nav>
+
+        {/* CTAs — right */}
+        <div className="rightCtas">
+          <a href="/demo/playground" className="btn secondary">
+            Open demo
+          </a>
+          <a href="/trial" className="btn primary">
+            <ShopifyBadge />
+            Start free trial
+          </a>
+        </div>
+      </div>
+    <div className="partnerBadge" aria-label="Shopify partner">
+      <img src="/logos/shopify.svg" alt="" aria-hidden="true" />
+      <span>Proud Shopify Partner</span>
+    </div>
+</header>
+  );
+}

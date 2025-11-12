@@ -17,34 +17,26 @@ export type SavedPayload = {
 
 /** Safe localStorage access on client only */
 export const safeStorage = {
-  get<T = unknown>(key: string, fallback: T): T {
+  get<T=unknown>(key: string, fallback: T): T {
     if (typeof window === "undefined") return fallback;
     try {
       const raw = window.localStorage.getItem(key);
       return raw ? (JSON.parse(raw) as T) : fallback;
-    } catch {
-      return fallback;
-    }
+    } catch { return fallback; }
   },
-  set<T = unknown>(key: string, value: T) {
+  set<T=unknown>(key: string, value: T) {
     if (typeof window === "undefined") return;
-    try {
-      window.localStorage.setItem(key, JSON.stringify(value));
-    } catch {}
+    try { window.localStorage.setItem(key, JSON.stringify(value)); } catch {}
   },
   setString(key: string, value: string) {
     if (typeof window === "undefined") return;
-    try {
-      window.localStorage.setItem(key, value);
-    } catch {}
+    try { window.localStorage.setItem(key, value); } catch {}
   },
   getString(key: string, fallback = ""): string {
     if (typeof window === "undefined") return fallback;
     try {
       const raw = window.localStorage.getItem(key);
       return raw ?? fallback;
-    } catch {
-      return fallback;
-    }
-  },
+    } catch { return fallback; }
+  }
 };

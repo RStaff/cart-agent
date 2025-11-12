@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     if (body.email) qs.set("email", body.email);
     return NextResponse.json(
       { ok: true, redirectUrl: `/onboarding${qs.toString() ? `?${qs}` : ""}` },
-      { status: 200 },
+      { status: 200 }
     );
   }
 
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     if (!resolvedPriceId) {
       return NextResponse.json(
         { ok: false, error: "Missing priceId for selected plan." },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -52,15 +52,12 @@ export async function POST(req: Request) {
       allow_promotion_codes: true,
     });
 
-    return NextResponse.json(
-      { ok: true, redirectUrl: session.url },
-      { status: 200 },
-    );
+    return NextResponse.json({ ok: true, redirectUrl: session.url }, { status: 200 });
   } catch (err: any) {
     console.error("trial/start error:", err);
     return NextResponse.json(
       { ok: false, error: err?.message ?? "Unexpected error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

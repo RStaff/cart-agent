@@ -1,5 +1,5 @@
 export async function normalizeSearchParams(
-  searchParams?: Promise<URLSearchParams | Record<string, string | undefined>>,
+  searchParams?: Promise<URLSearchParams | Record<string, string | undefined>>
 ): Promise<Record<string, string>> {
   const raw: any = await searchParams;
   if (!raw) return {};
@@ -7,8 +7,7 @@ export async function normalizeSearchParams(
     return Object.fromEntries((raw as URLSearchParams).entries());
   }
   return Object.fromEntries(
-    Object.entries(raw as Record<string, string | undefined>).filter(
-      ([, v]) => typeof v === "string",
-    ) as [string, string][],
+    Object.entries(raw as Record<string, string | undefined>)
+      .filter(([, v]) => typeof v === "string") as [string, string][]
   );
 }

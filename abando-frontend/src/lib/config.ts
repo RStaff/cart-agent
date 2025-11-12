@@ -12,8 +12,8 @@ export const cfg = {
       (process.env.STRIPE_MODE || "").toUpperCase() === "MOCK",
   },
   tours: {
-    demoKey: "abando:firstVisit:demo",
-    dashKey: "abando:firstVisit:dash",
-    query: "tour", // ?tour=1 forces the modal open
+    demoKey:  "abando:firstVisit:demo",
+    dashKey:  "abando:firstVisit:dash",
+    query:    "tour", // ?tour=1 forces the modal open
   },
 } as const;

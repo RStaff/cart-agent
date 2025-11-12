@@ -1,39 +1,15 @@
-"use client";
-import styles from "./page.module.css";
-import Brand from "./Brand";
+'use client';
+import styles from './page.module.css';
+import Brand from './Brand';
 
-export default function NavBar() {
+export default function NavBar(){
   return (
     <div className={styles.navWrap}>
       <nav className={styles.nav}>
         <Brand />
         <div className={styles.navLinks}>
-          <Link className={styles.link} href="/demo/playground">
-            Demo
-          </Link>
-          <Link className={styles.link} href="/pricing">
-            Pricing
-          </Link>
-          <Link className={styles.link} href="/onboarding">
-            Onboarding
-          </Link>
-          <Link className={styles.link} href="/support">
-            Support
-          </Link>
-        </div>
-        <div className={styles.navCtas}>
-          <Link
-            className={`${styles.btn} ${styles.btnGhost}`}
-            href="/demo/playground"
-          >
-            Open demo
-          </Link>
-          <Link
-            className={`${styles.btn} ${styles.btnPrimary}`}
-            href="/onboarding?trial=1"
-          >
-            Start free trial
-          </Link>
+          <Link href="/demo/playground" data-cta="open_demo" className="inline-flex items-center rounded-md px-3 py-2 text-sm font-medium bg-slate-700 hover:bg-slate-600 text-white shadow-sm">Open demo</Link>
+          <Link href="/onboarding?trial=1&plan=basic" data-cta="start_free_trial" className="inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold bg-indigo-500 hover:bg-indigo-400 text-white shadow-sm">Start free trial</Link>
         </div>
       </nav>
     </div>

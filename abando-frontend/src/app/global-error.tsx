@@ -1,25 +1,13 @@
 "use client";
-export default function GlobalError({
-  error,
-  reset,
-}: {
-  error: any;
-  reset: () => void;
-}) {
-  console.error("Global error:", error);
+export default function GlobalError({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <html>
-      <body className="p-6">
-        <h1 className="text-2xl font-semibold mb-2">App crashed</h1>
-        <p className="text-slate-500 mb-4">
-          We’re sorry — the app hit an unexpected error.
-        </p>
-        <button
-          onClick={reset}
-          className="px-3 py-2 rounded bg-slate-900 text-white"
-        >
-          Reload
-        </button>
+      <body>
+        <main style={{maxWidth: 720, margin: "6rem auto", padding: "0 1rem", color: "#e5e7eb"}}>
+          <h1 style={{fontSize: "1.5rem", fontWeight: 800, marginBottom: 8}}>App crashed</h1>
+          <p style={{opacity: .8, marginBottom: 24}}>{error?.message ?? "Unexpected error."}</p>
+          <button onClick={reset} style={{borderRadius: 8, padding: "10px 14px", background: "#6E56CF", color: "#fff"}}>Reload</button>
+        </main>
       </body>
     </html>
   );

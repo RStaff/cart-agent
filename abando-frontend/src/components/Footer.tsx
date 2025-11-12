@@ -1,26 +1,21 @@
-import Link from "next/link";
+// src/components/Footer.tsx
 export default function Footer() {
   return (
-    <footer
-      style={{
-        background: "var(--bg)",
-        color: "#9fb0c6",
-        padding: "24px 0",
-        font: "500 13px/1.4 system-ui,-apple-system,sans-serif",
-      }}
-    >
-      <div
-        style={{
-          width: "min(1120px,92vw)",
-          margin: "0 auto",
-          padding: "0 16px",
-        }}
-      >
+    <footer className="page_footer__ZP1xQ">
+      <div className="page_container__s52HK">
         <small>
-          © 2025 Abando<sup>™</sup> · <Link href="/legal/terms">Terms</Link> ·{" "}
-          <Link href="/legal/privacy">Privacy</Link> ·{" "}
-          <Link href="/legal/dpa">DPA</Link>
+          © 2025 Abando<sup>™</sup> · <a href="/legal/terms">Terms</a> ·{" "}
+          <a href="/legal/privacy">Privacy</a> · <a href="/legal/dpa">DPA</a>
         </small>
+      </div>
+      <div className="partner-badge">
+        <p className="partner-caption">Proud Shopify Partner</p>
+        <img
+          src="/badges/shopify-logo-darkbg.svg"
+          alt="Shopify Partners"
+          className="partner-logo"
+          width="160"
+        />
       </div>
     </footer>
   );

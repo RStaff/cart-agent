@@ -1,0 +1,9 @@
+import clsx from "clsx";
+type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary"|"secondary"; as?: "button"|"a"; href?: string; };
+export default function Button({variant="primary", as="button", href, className, children, ...rest}: Props){
+  const base = "wolf-btn text-sm";
+  const kind = variant==="primary" ? "wolf-btn-primary" : "wolf-btn-secondary";
+  const cls = clsx(base, kind, className);
+  if(as==="a" && href){ return <a href={href} className={cls} {...(rest as any)}>{children}</a>; }
+  return <button className={cls} {...rest}>{children}</button>;
+}
