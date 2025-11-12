@@ -1479,3 +1479,33 @@ main .container, .page .container, .section .container {
   .site-header .navRow > :last-child .btn.secondary { display: none; }
 }
 /* === END ENTERPRISE NAV LCR === */
+/* === NAV ROOT CAUSE LCR === */
+.site-header {
+  position: sticky; top: 0; z-index: 60; width: 100%;
+  background: #0b0b0c; -webkit-backdrop-filter: saturate(180%) blur(8px);
+  backdrop-filter: saturate(180%) blur(8px);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04), 0 10px 30px rgba(0,0,0,0.25);
+}
+.site-header .navRow {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center;
+  gap: 16px; padding: 10px 20px; width: 100%;
+}
+/* Left: brand */
+.site-header .brandLink { display:inline-flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.1px; }
+.site-header .brandName { font-size: 15px; }
+.site-header .brandTm { font-size: 12px; opacity: .7; transform: translateY(-4px); display:inline-block; }
+/* Center: links */
+.site-header .midLinks { display:flex; justify-content:center; gap:22px; }
+.site-header .midLinks a { opacity:.9; transition:opacity .15s ease; }
+.site-header .midLinks a:hover { opacity:1; }
+/* Right: CTAs */
+.site-header .ctaGroup { display:flex; justify-content:flex-end; align-items:center; gap:10px; }
+.site-header .btn { padding:10px 14px; border-radius:12px; font-weight:600; line-height:1; }
+.site-header .btn.secondary { background:transparent; border:1px solid rgba(255,255,255,0.18); }
+.site-header .btn.primary { background:#6E56CF; color:#fff; border:1px solid rgba(255,255,255,0.08); }
+/* Mobile: collapse center links; keep primary CTA */
+@media (max-width: 900px) {
+  .site-header .midLinks { display:none; }
+  .site-header .btn.secondary { display:none; }
+}
+/* === END NAV ROOT CAUSE LCR === */
