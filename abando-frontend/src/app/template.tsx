@@ -4,7 +4,7 @@ import Providers from "./Providers";
 
 export default function Template({ children }: { children: ReactNode }) {
   return (
-    <Suspense fallback={<div style={{ display: "contents" }} />}>
+    <Suspense fallback={<div style={{display:"contents"}} />}>
       <Providers>{children}</Providers>
     </Suspense>
   );

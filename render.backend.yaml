@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: cart-agent-api
+    env: node
+    plan: free
+    branch: main
+    repo: https://github.com/RStaff/cart-agent.git
+    rootDir: backend
+    buildCommand: npm ci
+    startCommand: node index.js
+    envVars:
+      - key: NODE_VERSION
+        value: 20.19.5

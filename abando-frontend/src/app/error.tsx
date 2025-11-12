@@ -1,22 +1,10 @@
 "use client";
-export default function Error({
-  error,
-  reset,
-}: {
-  error: any;
-  reset: () => void;
-}) {
-  console.error("Page error:", error);
+export default function Error({ error, reset }: { error: Error; reset: () => void }) {
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <h1 className="text-2xl font-semibold mb-2">Something went wrong</h1>
-      <p className="text-slate-500 mb-4">We hit a snag rendering this page.</p>
-      <button
-        onClick={reset}
-        className="px-3 py-2 rounded bg-slate-900 text-white"
-      >
-        Try again
-      </button>
-    </div>
+    <main className="mx-auto max-w-3xl px-6 py-20 text-slate-200">
+      <h1 className="text-2xl font-bold mb-2">Something went wrong</h1>
+      <p className="mb-6 opacity-80">{error?.message ?? "Unexpected error."}</p>
+      <button onClick={reset} className="rounded-md px-4 py-2 bg-indigo-600 text-white">Try again</button>
+    </main>
   );
 }

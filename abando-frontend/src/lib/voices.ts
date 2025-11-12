@@ -20,92 +20,60 @@ export type VoiceId =
 export type VoiceDef = {
   id: VoiceId;
   name: string;
-  short: string; // short descriptor shown in UI
-  prompt: string; // system style injected to the model
+  short: string;   // short descriptor shown in UI
+  prompt: string;  // system style injected to the model
 };
 
 /** Canonical voice map used across app & API */
 export const VOICES: Map<VoiceId, VoiceDef> = new Map<VoiceId, VoiceDef>([
-  [
-    "brand",
-    {
-      id: "brand",
-      name: "Brand (balanced)",
-      short: "Friendly, clear benefits, gentle urgency.",
-      prompt:
-        "Friendly, helpful, brand-safe tone. Clear benefits, upfront answers, gentle urgency. Keep it concise and skimmable.",
-    },
-  ],
-  [
-    "confident",
-    {
-      id: "confident",
-      name: "Confident",
-      short: "Empowering tone, decisive call-to-action.",
-      prompt:
-        "Confident and empowering. Lead with value, then proof. Decisive CTA. Keep friction low.",
-    },
-  ],
-  [
-    "playful",
-    {
-      id: "playful",
-      name: "Playful",
-      short: "Light humor, upbeat, approachable.",
-      prompt:
-        "Light, upbeat, approachable. Tasteful humor. Keep clarity first, charm second.",
-    },
-  ],
-  [
-    "storyteller",
-    {
-      id: "storyteller",
-      name: "Storyteller",
-      short: "Warm narrative with before→after arc.",
-      prompt:
-        "Warm narrative with a brief before→after arc. Tie benefits to real usage. End with a crisp next step.",
-    },
-  ],
-  [
-    "technical",
-    {
-      id: "technical",
-      name: "Technical",
-      short: "Specs-first, precise, reduces uncertainty.",
-      prompt:
-        "Precise, specs-first, reduces uncertainty. Answer objections directly. No fluff.",
-    },
-  ],
-  [
-    "minimalist",
-    {
-      id: "minimalist",
-      name: "Minimalist",
-      short: "Short, clean, no fluff.",
-      prompt:
-        "Ultra concise. One clear benefit, one reassurance, one CTA. No fluff.",
-    },
-  ],
-  [
-    "luxury",
-    {
-      id: "luxury",
-      name: "Luxury",
-      short: "Premium cues, restrained confidence.",
-      prompt:
-        "Premium cues with restrained confidence. Focus on craft, materials, and experience. Subtle urgency.",
-    },
-  ],
-  [
-    "urgency",
-    {
-      id: "urgency",
-      name: "Urgency",
-      short: "Time-bound nudge, clear next step.",
-      prompt:
-        "Clear, time-bound nudge. Explain what they gain by acting now. Stay respectful; avoid pressure.",
-    },
-  ],
+  ["brand", {
+    id: "brand",
+    name: "Brand (balanced)",
+    short: "Friendly, clear benefits, gentle urgency.",
+    prompt: "Friendly, helpful, brand-safe tone. Clear benefits, upfront answers, gentle urgency. Keep it concise and skimmable."
+  }],
+  ["confident", {
+    id: "confident",
+    name: "Confident",
+    short: "Empowering tone, decisive call-to-action.",
+    prompt: "Confident and empowering. Lead with value, then proof. Decisive CTA. Keep friction low."
+  }],
+  ["playful", {
+    id: "playful",
+    name: "Playful",
+    short: "Light humor, upbeat, approachable.",
+    prompt: "Light, upbeat, approachable. Tasteful humor. Keep clarity first, charm second."
+  }],
+  ["storyteller", {
+    id: "storyteller",
+    name: "Storyteller",
+    short: "Warm narrative with before→after arc.",
+    prompt: "Warm narrative with a brief before→after arc. Tie benefits to real usage. End with a crisp next step."
+  }],
+  ["technical", {
+    id: "technical",
+    name: "Technical",
+    short: "Specs-first, precise, reduces uncertainty.",
+    prompt: "Precise, specs-first, reduces uncertainty. Answer objections directly. No fluff."
+  }],
+  ["minimalist", {
+    id: "minimalist",
+    name: "Minimalist",
+    short: "Short, clean, no fluff.",
+    prompt: "Ultra concise. One clear benefit, one reassurance, one CTA. No fluff."
+  }],
+  ["luxury", {
+    id: "luxury",
+    name: "Luxury",
+    short: "Premium cues, restrained confidence.",
+    prompt: "Premium cues with restrained confidence. Focus on craft, materials, and experience. Subtle urgency."
+  }],
+  ["urgency", {
+    id: "urgency",
+    name: "Urgency",
+    short: "Time-bound nudge, clear next step.",
+    prompt: "Clear, time-bound nudge. Explain what they gain by acting now. Stay respectful; avoid pressure."
+  }],
 ]);
 
 /** Default voice if not specified */
@@ -127,14 +95,13 @@ export function voiceStyle(id: string | VoiceId, custom?: string): string {
 }
 
 /** Human name for a voice id */
-export function voiceName(id: string | VoiceId): string {
-  return VOICES.get(id as VoiceId)?.name || (id as string);
-}
+export function voiceName(id: string | VoiceId): string { return VOICES.get(id as VoiceId)?.name || (id as string); }
 
 // Back-compat alias used by /api/demo/generate
 export function describeVoice(id: string | VoiceId, custom?: string): string {
   return voiceStyle(id, custom);
 }
+
 
 /** Runtime guard for strings coming from URL/localStorage */
 export function isVoiceId(x: string): x is VoiceId {

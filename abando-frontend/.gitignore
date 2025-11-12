@@ -39,3 +39,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+<<<<<<< HEAD
+
+# ignore nested repos
+cart-agent/
+staffordmedia-site/
+=======
+# ignore editor/backup snapshots
+**/*.bak-*
+>>>>>>> origin/main
+
+# keep these out
+cart-agent
+staffordmedia-site
+abando-frontend/abando-frontend
