@@ -1,0 +1,23 @@
+/* === Abando brand/UI overrides (safe, idempotent) === */
+header + main, header + div, header + section {
+  margin-top: clamp(6px, 1.2vw, 12px) !important;
+}
+header nav { padding-left: 14px !important; }
+header nav img, header nav svg { transform: translateX(6px); }
+
+/* Badge styling */
+.ab-badge-nav {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 12px; border-radius: 9999px;
+  background: #6D28D9; color: #fff; font-weight: 600;
+  font-size: 14px; line-height: 1; white-space: nowrap;
+}
+.ab-badge-nav img { width: 18px; height: 18px; }
+
+/* Hide large footer Shopify panel (legacy) */
+footer :is([data-shopify-partner], .shopify-partner, .footer-shopify-block),
+footer img[alt~="Shopify"][alt~="Partner"],
+footer :is(p,div,section):has(img[alt~="Shopify"]) { display: none !important; }
+
+/* Remove tiny duplicates in nav if any */
+nav :is([data-shopify-partner-small], .shopify-partner-small) { display: none !important; }
