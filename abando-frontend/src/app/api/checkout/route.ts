@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Origin: "https://example.com",
+        "Origin": "https://example.com",
         ...(devToken ? { Authorization: `Bearer ${devToken}` } : {}),
       },
       body: JSON.stringify(body),

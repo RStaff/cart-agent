@@ -1,4 +1,3 @@
-const { installSmcAlign } = require("./smc-align");
 import fs from "node:fs";
 import { randomBytes, createHmac } from "node:crypto";
 import express from "express";
@@ -17,9 +16,6 @@ import { dirname, join } from "node:path";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
-
-// Stafford ↔ Abando alignment
-installSmcAlign(app);
 app.use(cookieParser());
 app.use(cors());
 app.use(express.json());
