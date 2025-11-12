@@ -21,8 +21,12 @@
     "guard:nextnav": "scripts/guard-next-navigation.sh",
     "guard:autosend": "scripts/autosend-guard.sh",
     "brand:guard": "scripts/brand-guard.sh",
+<<<<<<< HEAD
     "gold:guard": "scripts/brand-gold-guard.sh",
     "prepare": "sh -c 'if [ -n \"$CI\" ] || [ \"$HUSKY\" = \"0\" ]; then exit 0; fi; npx --no husky install'"
+=======
+    "gold:guard": "scripts/brand-gold-guard.sh"
+>>>>>>> origin/main
   },
   "dependencies": {
     "clsx": "2.1.1",

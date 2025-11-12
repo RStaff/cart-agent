@@ -15,18 +15,13 @@ export async function GET(req: Request) {
     const qs = new URLSearchParams();
     if (plan) qs.set("plan", plan);
     if (email) qs.set("email", email);
-    return NextResponse.redirect(
-      `${APP_URL}/onboarding${qs.size ? `?${qs}` : ""}`,
-      { status: 302 },
-    );
+    return NextResponse.redirect(`${APP_URL}/onboarding${qs.size ? `?${qs}` : ""}`, { status: 302 });
   }
 
   // Prod → create Checkout session
   if (!priceId) {
     // fall back to pricing with a soft error
-    return NextResponse.redirect(`${APP_URL}/pricing?error=missing_price`, {
-      status: 302,
-    });
+    return NextResponse.redirect(`${APP_URL}/pricing?error=missing_price`, { status: 302 });
   }
 
   const Stripe = (await import("stripe")).default;

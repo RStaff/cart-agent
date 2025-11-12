@@ -20,19 +20,13 @@ function wantTour(page: Page): boolean {
 }
 function dismiss(page: Page) {
   const key = page === "demo" ? cfg.tours.demoKey : cfg.tours.dashKey;
-  try {
-    localStorage.setItem(key, "false");
-  } catch {}
+  try { localStorage.setItem(key, "false"); } catch {}
 }
 
-export default function TourProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function TourProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const search = useSearchParams();
-  const router = useRouter();
+  const search   = useSearchParams();
+  const router   = useRouter();
   const [open, setOpen] = React.useState(false);
   const [page, setPage] = React.useState<Page>("none");
 
@@ -50,9 +44,7 @@ export default function TourProvider({
       if (page === "dash") router.push("/demo/playground?tour=1");
       if (page === "demo") {
         setTimeout(() => {
-          const el = document.querySelector(
-            "main input, main select, main textarea",
-          ) as HTMLInputElement | null;
+          const el = document.querySelector("main input, main select, main textarea") as HTMLInputElement | null;
           el?.focus();
         }, 0);
       }
@@ -62,9 +54,7 @@ export default function TourProvider({
   return (
     <>
       {children}
-      {page !== "none" && (
-        <Explainer page={page} open={open} onClose={onClose} />
-      )}
+      {page !== "none" && <Explainer page={page} open={open} onClose={onClose} />}
     </>
   );
 }

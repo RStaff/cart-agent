@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="abando.ai">
-  <defs><style>.b{fill:#1E78FF}.t{fill:#1BAE92}</style></defs>
-  <g transform="translate(18,18)">
-    <path class="b" d="M20 20h84a10 10 0 0 1 0 20H44l12 46h86a12 12 0 1 1 0 24H46a12 12 0 0 1-12-9L20 20z"/>
-    <circle class="b" cx="64" cy="120" r="14"/><circle class="b" cx="106" cy="120" r="14"/>
-    <circle class="t" cx="144" cy="56" r="28"/><circle class="t" cx="144" cy="56" r="13"/>
-    <circle class="t" cx="166" cy="34" r="15"/>
-  </g>
-</svg>
