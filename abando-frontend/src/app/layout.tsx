@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+import InstallCTA from "@/components/InstallCTA";
+=======
 import "./globals.css";
 import { inter } from "./fonts";
 import { Inter } from "next/font/google";
@@ -11,7 +14,9 @@ export const metadata: Metadata = {
   description: "Recover more checkouts with Abando.",
   icons: { icon: "/favicon.ico" },
 };
+>>>>>>> origin/main
 
+import "../styles/brand-overrides.css";
 export default function RootLayout({
   children,
 }: {
