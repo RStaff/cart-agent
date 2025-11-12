@@ -2356,3 +2356,51 @@ main .container,
 /* --- prod polish (safe) --- */
 .site-header .navRow { padding-left: 18px; }
 .site-header nav a[aria-current="page"] { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
+
+/* === CONTAINER & GUTTERS (prod-safe) === */
+:root{
+  --max-content: 1200px;
+  --gutter-x: 24px;
+  --gutter-x-lg: 32px;
+  --brand-offset: 10px;
+}
+@media (min-width:1280px){
+  :root{ --gutter-x: var(--gutter-x-lg); }
+}
+/* Utility container (use anywhere) */
+.container{
+  max-width: var(--max-content);
+  margin: 0 auto;
+  padding-left: var(--gutter-x);
+  padding-right: var(--gutter-x);
+}
+
+/* Header: full-bleed shell, but content constrained + padded */
+.site-header{ position: sticky; top: 0; z-index: 60; width: 100%; background: var(--bg,#0b0b0c); }
+.site-header .navRow{
+  display:flex; align-items:center; gap:16px;
+  max-width: var(--max-content);
+  margin: 0 auto;
+  padding-left: var(--gutter-x);
+  padding-right: var(--gutter-x);
+}
+
+/* Brand spacing off the bezel */
+.site-header a.brandLink{ display:inline-flex; align-items:center; gap:10px; }
+.site-header a.brandLink img,
+.site-header a.brandLink svg{ height:22px; width:auto; transform: translateX(var(--brand-offset)); }
+
+/* Keep center links centered and CTAs right */
+.site-header .navRow > :first-child{ flex:0 0 auto; }
+.site-header .navRow > :nth-child(2){ flex:1 1 auto; display:flex; justify-content:center; gap:22px; }
+.site-header .navRow > :last-child{ flex:0 0 auto; margin-left:auto; display:flex; gap:10px; }
+
+/* Default content centering for common sections */
+main > section,
+.hero, .section, .content-block{
+  max-width: var(--max-content);
+  margin: 0 auto;
+  padding-left: var(--gutter-x);
+  padding-right: var(--gutter-x);
+}
+/* === END CONTAINER & GUTTERS (prod-safe) === */
