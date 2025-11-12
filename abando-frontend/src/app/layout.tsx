@@ -1,3 +1,4 @@
+import '../styles/brand-overrides.css';
 import "./globals.css";
 import { inter } from "./fonts";
 import { Inter } from "next/font/google";
