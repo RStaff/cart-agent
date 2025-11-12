@@ -2450,3 +2450,12 @@ main > section,
 @media (min-width:1024px){ .partnerBadge{ display:inline-flex; } }
 
 /* === END: NAV BADGE + CONTAINER TUNING === */
+
+/* abando:nav-tweaks */
+header.site-header nav { padding-left: 1rem; }
+header.site-header .brand,
+header.site-header img[alt="Abando"],
+header.site-header svg[data-brand] { transform: translateX(6px); }
+
+/* tighten space between navbar and hero */
+header.site-header + main section:first-of-type { margin-top: clamp(4px, 0.8vw, 10px) !important; }
