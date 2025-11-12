@@ -28,7 +28,7 @@
     "mvp:build": "next build",
     "mvp:smoke": "node scripts/mvp-smoke.mjs",
     "mvp:all": "npm run -s mvp:preflight && npm run -s mvp:build && npm run -s mvp:smoke",
-    "prepare": "husky",
+    "prepare": "if [ -n "$CI" ] || [ "$HUSKY" = "0" ]; then exit 0; fi; husky",
     "ci:deps": "bash scripts/git/deps-guard.sh check",
     "ci:preflight": "npm run -s mvp:preflight",
     "ci:build": "next build",
