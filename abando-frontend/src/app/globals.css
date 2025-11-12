@@ -1539,3 +1539,17 @@ main .container, .page .container, .section .container {
   .site-header .btn.secondary { display:none; }
 }
 /* === END NAV ROOT CAUSE LCR === */
+
+/* === NAV FULL BLEED OVERRIDE === */
+.site-header { position: sticky; top: 0; z-index: 60; }
+.site-header .navRow{
+  /* Force full-bleed even when parent uses a centered container */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding-left: 20px; padding-right: 20px;
+}
+@media (min-width:1440px){
+  .site-header .navRow{ padding-left:16px; padding-right:24px; }
+}
+/* === END NAV FULL BLEED OVERRIDE === */
