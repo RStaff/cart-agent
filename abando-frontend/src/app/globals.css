@@ -2404,3 +2404,49 @@ main > section,
   padding-right: var(--gutter-x);
 }
 /* === END CONTAINER & GUTTERS (prod-safe) === */
+
+/* === ABANDO: NAV BADGE + CONTAINER TUNING === */
+:root{
+  --max-content: 1200px;
+  --gutter-x: 20px;
+  --brand-offset: 6px;
+}
+/* Keep content readable; on ultra-wide screens keep gutters slim not huge */
+@media (min-width:1280px){
+  main > section, .hero, .section, .content-block { 
+    max-width: var(--max-content);
+    margin-inline: clamp(8px, calc((100vw - var(--max-content))/2), 80px);
+    padding-inline: var(--gutter-x);
+  }
+}
+
+/* Header shell */
+.site-header{ position: sticky; top:0; z-index:60; width:100%; background:#0b0b0c; }
+.site-header .navRow{
+  display:flex; align-items:center;
+  max-width: var(--max-content);
+  margin-inline: clamp(8px, calc((100vw - var(--max-content))/2), 80px);
+  padding-inline: var(--gutter-x);
+}
+
+/* Brand */
+.site-header a.brandLink{ display:inline-flex; align-items:center; gap:10px; }
+.site-header a.brandLink img,
+.site-header a.brandLink svg{ height:22px; width:auto; transform: translateX(var(--brand-offset)); }
+
+/* L-C-R layout */
+.site-header .navRow > :first-child{ flex:0 0 auto; }
+.site-header .navRow > :nth-child(2){ flex:1 1 auto; display:flex; justify-content:center; gap:22px; }
+.site-header .navRow > :last-child{ flex:0 0 auto; margin-left:auto; display:flex; align-items:center; gap:14px; }
+
+/* Partner badge (hides on small screens) */
+.partnerBadge{
+  display:none;
+  align-items:center; gap:8px;
+  font-size:12px; line-height:1; color:#cbd5e1;
+  opacity:.9; white-space:nowrap;
+}
+.partnerBadge svg, .partnerBadge img{ height:16px; width:auto; display:block; }
+@media (min-width:1024px){ .partnerBadge{ display:inline-flex; } }
+
+/* === END: NAV BADGE + CONTAINER TUNING === */

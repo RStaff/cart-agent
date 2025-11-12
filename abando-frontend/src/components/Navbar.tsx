@@ -36,6 +36,10 @@ export default function Navbar() {
           </a>
         </div>
       </div>
-    </header>
+    <div className="partnerBadge" aria-label="Shopify partner">
+      <img src="/logos/shopify.svg" alt="" aria-hidden="true" />
+      <span>Proud Shopify Partner</span>
+    </div>
+</header>
   );
 }
