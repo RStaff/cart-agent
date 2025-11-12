@@ -1,8 +1,15 @@
-import { NextResponse } from "next/server";
-export const dynamic = "force-dynamic";
+export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
-  return NextResponse.json(
-    { status: "ok", time: new Date().toISOString() },
-    { status: 200, headers: { "cache-control": "no-store" } }
+  return new Response(
+    JSON.stringify({ ok: true, service: 'abando-frontend', ts: new Date().toISOString() }),
+    {
+      status: 200,
+      headers: {
+        'content-type': 'application/json; charset=utf-8',
+        'cache-control': 'no-store',
+      },
+    }
   );
 }
