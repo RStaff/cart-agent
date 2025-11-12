@@ -1,7 +1,6 @@
-import "./globals.css";
-import React from "react";
 import InstallCTA from "@/components/InstallCTA";
 
+import "../styles/brand-overrides.css";
 export default function RootLayout({
   children,
 }: {
