@@ -2352,3 +2352,7 @@ main .container,
   }
 }
 /* === END BRAND OFFSET OVERRIDE === */
+
+/* --- prod polish (safe) --- */
+.site-header .navRow { padding-left: 18px; }
+.site-header nav a[aria-current="page"] { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
