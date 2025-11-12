@@ -48,3 +48,8 @@ staffordmedia-site/
 # ignore editor/backup snapshots
 **/*.bak-*
 >>>>>>> origin/main
+
+# keep these out
+cart-agent
+staffordmedia-site
+abando-frontend/abando-frontend
