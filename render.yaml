@@ -1,5 +1,5 @@
 services:
-  - type: static
+  - type: web
     name: frontend-dev
     env: static
     buildCommand: npm --prefix web/frontend ci && npm --prefix web/frontend run build -- --base="/"
@@ -11,12 +11,12 @@ services:
       - path: /*
         name: Cache-Control
         value: public,max-age=600
-  - type: static
+  - type: web
     name: frontend-stage
     env: static
     buildCommand: npm --prefix web/frontend ci && npm --prefix web/frontend run build -- --base="/"
     staticPublishPath: web/frontend/dist
-  - type: static
+  - type: web
     name: frontend-prod
     env: static
     buildCommand: npm --prefix web/frontend ci && npm --prefix web/frontend run build -- --base="/"
