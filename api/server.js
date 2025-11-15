@@ -38,3 +38,12 @@ const PORT = process.env.PORT ? Number(process.env.PORT) : 10000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`API listening on http://0.0.0.0:${PORT}`);
 });
+
+// Health check for Render (pay.abando.ai) and status scripts.
+// Safe to call unauthenticated and used for uptime/telemetry.
+app.get("/api/health", (_req, res) => {
+  res.status(200).json({
+    service: "abando-backend",
+    connected_to: "staffordmedia.ai",
+  });
+});
