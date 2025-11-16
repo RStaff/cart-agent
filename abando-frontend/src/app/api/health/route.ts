@@ -1,15 +1,9 @@
-export const runtime = 'edge';
-export const dynamic = 'force-dynamic';
+import { NextResponse } from "next/server";
 
 export async function GET() {
-  return new Response(
-    JSON.stringify({ ok: true, service: 'abando-frontend', ts: new Date().toISOString() }),
-    {
-      status: 200,
-      headers: {
-        'content-type': 'application/json; charset=utf-8',
-        'cache-control': 'no-store',
-      },
-    }
-  );
+  return NextResponse.json({
+    service: "abando-frontend",
+    connected_to: "abando-backend",
+    ok: true,
+  });
 }
