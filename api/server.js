@@ -4,6 +4,24 @@ const cors = require('cors');
 
 const app = express();
 
+// AbandoHealthTelemetry middleware
+app.use(async (req, res, next) => {
+  if (req.path === "/api/health") {
+    try {
+      await logEvent({
+        storeId: "abando-system",
+        eventType: "health_check",
+        eventSource: "backend",
+        metadata: { path: req.path, ts: new Date().toISOString() },
+      });
+    } catch (e) {
+      console.error("[health_check logger] error:", e.message);
+    }
+  }
+  next();
+});
+
+
 // CORS: allow specific origin (Render dashboard: set ALLOWED_ORIGIN to your Vercel URL)
 // Fallback to * during bring-up (OK for now; tighten later)
 const allowed = process.env.ALLOWED_ORIGIN;
