@@ -81,3 +81,24 @@ app.post("/api/test-event", async (req, res) => {
     res.status(500).json({ ok: false, error: e.message });
   }
 });
+
+app.post("/api/log-test", async (req, res) => {
+  try {
+    await logEvent({
+      storeId: "debug-store",
+      eventType: "debug_log_test",
+      eventSource: "api/log-test",
+      customerId: null,
+      cartId: null,
+      checkoutId: null,
+      value: null,
+      aiLabel: { reason: "manual-test" },
+      metadata: { ts: new Date().toISOString() },
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error("[log-test] failed:", err);
+    res.status(500).json({ ok: false, error: "log-test-failed" });
+  }
+});

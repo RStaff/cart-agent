@@ -1,12 +1,13 @@
 const { Pool } = require("pg");
 
-const pool = process.env.DATABASE_URL
-  ? new Pool({
-      connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false },
-    })
-  : null;
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+});
 
+/**
+ * Log a unified event into the events table.
+ */
 async function logEvent({
   storeId,
   eventType,
@@ -18,9 +19,7 @@ async function logEvent({
   aiLabel = null,
   metadata = null,
 }) {
-  if (!pool) return;
-
-  const text = \`
+  const text = `
     INSERT INTO events (
       store_id,
       event_type,
@@ -33,7 +32,7 @@ async function logEvent({
       metadata
     )
     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
-  \`;
+  `;
 
   const values = [
     storeId,
@@ -48,9 +47,10 @@ async function logEvent({
   ];
 
   try {
+    console.log("[eventLogger] inserting event", eventType, storeId);
     await pool.query(text, values);
-  } catch (e) {
-    console.error("[eventLogger] Error:", e.message);
+  } catch (err) {
+    console.error("[eventLogger] Failed to insert event:", err);
   }
 }
 
