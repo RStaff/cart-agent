@@ -48,3 +48,18 @@ app.get("/api/health", (_req, res) => {
     connected_to: "staffordmedia.ai",
   });
 });
+
+app.post("/api/test-event", async (req, res) => {
+  try {
+    await logEvent({
+      storeId: "test-store",
+      eventType: "test_event",
+      eventSource: "backend",
+      metadata: { note: "manual test hit" },
+    });
+    res.json({ ok: true });
+  } catch (e) {
+    console.error("[/api/test-event] error:", e.message);
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
