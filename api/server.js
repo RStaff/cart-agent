@@ -1,86 +1,13 @@
 const { logEvent } = require("./lib/eventLogger");
+const { classifyCartEvent } = require("./lib/aiLabeler");
 const express = require("express");
 const cors = require("cors");
 
 const app = express();
 
 // -----------------------------------------------------------------------------
-// AbandoHealthTelemetry middleware
-// Logs when /api/health is hit so you can see backend uptime in Postgres.
-// -----------------------------------------------------------------------------
-app.use(async (req, res, next) => {
-  if (req.path === "/api/health") {
-    try {
-      await logEvent({
-        storeId: "abando-system",
-        eventType: "health_check",
-        eventSource: "backend",
-        metadata: { path: req.path, ts: new Date().toISOString() },
-      });
-    } catch (e) {
-      console.error("[health_check logger] error:", e.message);
-    }
-  }
-  next();
-});
 
-// -----------------------------------------------------------------------------
-// CORS + JSON
-// -----------------------------------------------------------------------------
-const allowed = process.env.ALLOWED_ORIGIN;
-app.use(
-  cors({
-    origin: allowed ? [allowed] : "*",
-    credentials: false,
-  })
-);
-app.use(express.json());
-
-// -----------------------------------------------------------------------------
-// Basic health endpoints for Render
-// -----------------------------------------------------------------------------
-app.get("/health", (_req, res) => res.status(200).json({ ok: true }));
-app.get("/healthz", (_req, res) => res.sendStatus(200));
-
-// -----------------------------------------------------------------------------
-// Demo generate-copy endpoint (kept from earlier template)
-// -----------------------------------------------------------------------------
-app.post("/api/generate-copy", (req, res) => {
-  try {
-    const { cartId = "demo", items = [] } = req.body || {};
-    const total = items.reduce(
-      (sum, it) =>
-        sum + Number(it.unitPrice || 0) * Number(it.quantity || 0),
-      0
-    );
-    const subject = `We saved your cart ${cartId} — ${
-      items[0]?.title || "your items"
-    } are waiting`;
-    res.json({
-      ok: true,
-      subject,
-      totalComputed: Number(total.toFixed(2)),
-      lines: items.map(
-        (i) => `${i.quantity} × ${i.title} @ ${i.unitPrice}`
-      ),
-    });
-  } catch (e) {
-    res.status(400).json({ ok: false, error: String(e) });
-  }
-});
-
-// -----------------------------------------------------------------------------
-// JSON health for pay.abando.ai (used by your scripts)
-// -----------------------------------------------------------------------------
-app.get("/api/health", (_req, res) => {
-  res.status(200).json({
-    service: "abando-backend",
-    connected_to: "staffordmedia.ai",
-  });
-});
-
-// -----------------------------------------------------------------------------
-// ⭐ Unified cart-event ingress for real product events
+// ⭐ Unified cart-event ingress for real product events + AI labeler
 // This is what Shopify / your app will POST to.
 // -----------------------------------------------------------------------------
 app.post("/api/cart-event", async (req, res) => {
@@ -88,18 +15,6 @@ app.post("/api/cart-event", async (req, res) => {
     const body = req.body || {};
 
     const {
-      storeId = "unknown-store",
-      eventType = "cart_event",
-      eventSource = "cart-event-api",
-      customerId = null,
-      cartId = null,
-      checkoutId = null,
-      value = null,
-      aiLabel = null,
-      metadata = {},
-    } = body;
-
-    await logEvent({
       storeId,
       eventType,
       eventSource,
@@ -107,11 +22,120 @@ app.post("/api/cart-event", async (req, res) => {
       cartId,
       checkoutId,
       value,
-      aiLabel,
-      metadata,
+      aiLabel: incomingAiLabel,
+      metadata: rawMetadata,
+    } = body;
+
+    const finalStoreId = storeId || "unknown-store";
+    const finalEventType = eventType || "cart_event";
+    const finalEventSource = eventSource || "cart-event-endpoint";
+
+    // Normalized metadata object
+    const baseMetadata =
+      rawMetadata && typeof rawMetadata === "object" ? rawMetadata : {};
+
+    // --- AI label: use incoming if provided, otherwise classify ---
+    let finalAiLabel = incomingAiLabel || null;
+
+    try {
+      if (!finalAiLabel) {
+        finalAiLabel = await classifyCartEvent({
+          storeId: finalStoreId,
+          eventType: finalEventType,
+          eventSource: finalEventSource,
+          customerId,
+          cartId,
+          checkoutId,
+          value,
+          metadata: baseMetadata,
+        });
+        console.log("[aiLabeler] classified:", finalAiLabel);
+      }
+    } catch (err) {
+      console.error(
+        "[/api/cart-event] classifyCartEvent error:",
+        err && err.message ? err.message : err
+      );
+      // Do NOT fail the request if the AI labeler has issues.
+    }
+
+    // Attach AI label into metadata so it's always queryable via metadata->'aiLabel'
+    const metadataWithAi = {
+      ...baseMetadata,
+      aiLabel: finalAiLabel || null,
+    };
+
+    await logEvent({
+      storeId: finalStoreId,
+      eventType: finalEventType,
+      eventSource: finalEventSource,
+      customerId,
+      cartId,
+      checkoutId,
+      value,
+      metadata: metadataWithAi,
     });
 
-    res.json({ ok: true });
+    res.json({
+      ok: true,
+      storeId: finalStoreId,
+      eventType: finalEventType,
+      eventSource: finalEventSource,
+      aiLabel: finalAiLabel || null,
+    });
+  } catch (err) {
+    console.error("[/api/cart-event] error:", err);
+    res.status(500).json({
+      ok: false,
+      error: String(err && err.message ? err.message : err),
+    });
+  }
+});
+
+}
+    } catch (err) {
+      console.error(
+        "[/api/cart-event] classifyCartEvent error:",
+        err && err.message ? err.message : err
+      );
+      // Do not fail the request if the AI labeler has issues.
+    }
+
+    // Attach AI label into metadata so it's always queryable via metadata->'aiLabel'
+    const metadataWithAi = {
+      ...baseMetadata,
+      aiLabel: finalAiLabel || null,
+    };
+
+    await logEvent({
+      storeId: finalStoreId,
+      eventType: finalEventType,
+      eventSource: finalEventSource,
+      customerId,
+      cartId,
+      checkoutId,
+      value,
+      aiLabel: finalAiLabel || null,
+      metadata: metadataWithAi,
+    });
+
+    res.json({
+      ok: true,
+      storeId: finalStoreId,
+      eventType: finalEventType,
+      eventSource: finalEventSource,
+      aiLabel: finalAiLabel || null,
+    });
+  } catch (err) {
+    console.error("[/api/cart-event] error:", err);
+    res.status(500).json({
+      ok: false,
+      error: String(err && err.message ? err.message : err),
+    });
+  }
+});
+
+res.json({ ok: true });
   } catch (err) {
     console.error("[/api/cart-event] error:", err);
     res
