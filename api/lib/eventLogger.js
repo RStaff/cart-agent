@@ -1,13 +1,12 @@
-const { Pool } = require("pg");
+const { Pool } = require('pg');
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
-/**
- * Log a unified event into the events table.
- */
 async function logEvent({
   storeId,
   eventType,
@@ -47,11 +46,13 @@ async function logEvent({
   ];
 
   try {
-    console.log("[eventLogger] inserting event", eventType, storeId);
     await pool.query(text, values);
+    console.log("[eventLogger] inserted event:", { storeId, eventType, eventSource });
   } catch (err) {
-    console.error("[eventLogger] Failed to insert event:", err);
+    console.error("[eventLogger] Failed to insert event:", err.message);
   }
 }
 
-module.exports = { logEvent };
+module.exports = {
+  logEvent,
+};

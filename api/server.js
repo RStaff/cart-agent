@@ -1,5 +1,6 @@
 const { logEvent } = require("./lib/eventLogger");
 const express = require('express');
+const { logEvent } = require('./lib/eventLogger');
 const cors = require('cors');
 
 const app = express();
