@@ -1,3 +1,4 @@
+🪓 Removing app.listen from line 57
 const { logEvent } = require("./lib/eventLogger");
 const express = require('express');
 const cors = require('cors');
@@ -54,7 +55,6 @@ app.post('/api/generate-copy', (req, res) => {
 
 // IMPORTANT: bind to Render's port
 const PORT = process.env.PORT ? Number(process.env.PORT) : 10000;
-app.listen(PORT, '0.0.0.0', () => {
   console.log(`API listening on http://0.0.0.0:${PORT}`);
 });
 
@@ -101,4 +101,10 @@ app.post("/api/log-test", async (req, res) => {
     console.error("[log-test] failed:", err);
     res.status(500).json({ ok: false, error: "log-test-failed" });
   }
+});
+
+// --- Moved to bottom by fix_server_listen_order.sh ---
+const PORT = process.env.PORT ? Number(process.env.PORT) : 10000;
+app.listen(PORT, 0.0.0.0, () => {
+  console.log(`API listening on http://0.0.0.0:${PORT}`);
 });
