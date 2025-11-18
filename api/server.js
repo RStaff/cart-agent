@@ -1,11 +1,13 @@
-🪓 Removing app.listen from line 57
+"use strict";
+
+const express = require("express");
+const cors = require("cors");
 const { logEvent } = require("./lib/eventLogger");
-const express = require('express');
-const cors = require('cors');
 
 const app = express();
 
-// AbandoHealthTelemetry middleware
+// --- AbandoHealthTelemetry middleware ---
+// Logs whenever /api/health is hit.
 app.use(async (req, res, next) => {
   if (req.path === "/api/health") {
     try {
@@ -22,44 +24,21 @@ app.use(async (req, res, next) => {
   next();
 });
 
-
-// CORS: allow specific origin (Render dashboard: set ALLOWED_ORIGIN to your Vercel URL)
-// Fallback to * during bring-up (OK for now; tighten later)
+// --- CORS + JSON ---
 const allowed = process.env.ALLOWED_ORIGIN;
-app.use(cors({
-  origin: allowed ? [allowed] : '*',
-  credentials: false,
-}));
+app.use(
+  cors({
+    origin: allowed ? [allowed] : "*",
+    credentials: false,
+  })
+);
 app.use(express.json());
 
-// Health endpoints for Render
-app.get('/health', (_req, res) => res.status(200).json({ ok: true }));
-app.get('/healthz', (_req, res) => res.sendStatus(200));
+// --- Render health endpoints ---
+app.get("/health", (_req, res) => res.status(200).json({ ok: true }));
+app.get("/healthz", (_req, res) => res.sendStatus(200));
 
-// Demo generate-copy endpoint
-app.post('/api/generate-copy', (req, res) => {
-  try {
-    const { cartId = 'demo', items = [] } = req.body || {};
-    const total = items.reduce((sum, it) => sum + (Number(it.unitPrice || 0) * Number(it.quantity || 0)), 0);
-    const subject = `We saved your cart ${cartId} — ${items[0]?.title || 'your items'} are waiting`;
-    res.json({
-      ok: true,
-      subject,
-      totalComputed: Number(total.toFixed(2)),
-      lines: items.map(i => `${i.quantity} × ${i.title} @ ${i.unitPrice}`),
-    });
-  } catch (e) {
-    res.status(400).json({ ok: false, error: String(e) });
-  }
-});
-
-// IMPORTANT: bind to Render's port
-const PORT = process.env.PORT ? Number(process.env.PORT) : 10000;
-  console.log(`API listening on http://0.0.0.0:${PORT}`);
-});
-
-// Health check for Render (pay.abando.ai) and status scripts.
-// Safe to call unauthenticated and used for uptime/telemetry.
+// --- Primary API health for app + telemetry ---
 app.get("/api/health", (_req, res) => {
   res.status(200).json({
     service: "abando-backend",
@@ -67,7 +46,34 @@ app.get("/api/health", (_req, res) => {
   });
 });
 
-app.post("/api/test-event", async (req, res) => {
+// --- Demo generate-copy endpoint (used by playground) ---
+app.post("/api/generate-copy", (req, res) => {
+  try {
+    const { cartId = "demo", items = [] } = req.body || {};
+    const total = items.reduce(
+      (sum, it) =>
+        sum +
+        Number(it.unitPrice || 0) * Number(it.quantity || 0),
+      0
+    );
+    const subject = `We saved your cart ${cartId} — ${
+      items[0]?.title || "your items"
+    } are waiting`;
+    res.json({
+      ok: true,
+      subject,
+      totalComputed: Number(total.toFixed(2)),
+      lines: items.map(
+        (i) => `${i.quantity} × ${i.title} @ ${i.unitPrice}`
+      ),
+    });
+  } catch (e) {
+    res.status(400).json({ ok: false, error: String(e) });
+  }
+});
+
+// --- Simple backend test-event endpoint ---
+app.post("/api/test-event", async (_req, res) => {
   try {
     await logEvent({
       storeId: "test-store",
@@ -82,20 +88,18 @@ app.post("/api/test-event", async (req, res) => {
   }
 });
 
-app.post("/api/log-test", async (req, res) => {
+// --- Unified /api/log-test endpoint for your scripts ---
+app.post("/api/log-test", async (_req, res) => {
   try {
     await logEvent({
-      storeId: "debug-store",
-      eventType: "debug_log_test",
+      storeId: "test-store-log",
+      eventType: "log_test",
       eventSource: "api/log-test",
-      customerId: null,
-      cartId: null,
-      checkoutId: null,
-      value: null,
-      aiLabel: { reason: "manual-test" },
-      metadata: { ts: new Date().toISOString() },
+      metadata: {
+        note: "log-test route hit",
+        ts: new Date().toISOString(),
+      },
     });
-
     res.json({ ok: true });
   } catch (err) {
     console.error("[log-test] failed:", err);
@@ -103,8 +107,8 @@ app.post("/api/log-test", async (req, res) => {
   }
 });
 
-// --- Moved to bottom by fix_server_listen_order.sh ---
+// --- IMPORTANT: bind to Render's port (MUST be last) ---
 const PORT = process.env.PORT ? Number(process.env.PORT) : 10000;
-app.listen(PORT, 0.0.0.0, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`API listening on http://0.0.0.0:${PORT}`);
 });
