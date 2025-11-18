@@ -199,6 +199,7 @@
     "path-exists": "^4.0.0",
     "path-key": "^3.1.1",
     "path-to-regexp": "^0.1.12",
+    "pg": "^8.16.3",
     "picocolors": "^1.1.1",
     "postcss-value-parser": "^4.2.0",
     "prelude-ls": "^1.2.1",
