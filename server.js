@@ -1,2 +1,5 @@
-// Thin wrapper so Render's "node server.js" uses the real API in api/server.js
-require('./api/server');
+"use strict";
+
+// Thin wrapper – Render runs `node server.js`,
+// this just boots the real API in ./api/server.js
+require("./api/server");
