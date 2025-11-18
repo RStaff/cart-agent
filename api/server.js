@@ -1,13 +1,13 @@
-"use strict";
-
+const { logEvent } = require("./lib/eventLogger");
 const express = require("express");
 const cors = require("cors");
-const { logEvent } = require("./lib/eventLogger");
 
 const app = express();
 
-// --- AbandoHealthTelemetry middleware ---
-// Logs whenever /api/health is hit.
+// -----------------------------------------------------------------------------
+// AbandoHealthTelemetry middleware
+// Logs when /api/health is hit so you can see backend uptime in Postgres.
+// -----------------------------------------------------------------------------
 app.use(async (req, res, next) => {
   if (req.path === "/api/health") {
     try {
@@ -24,7 +24,9 @@ app.use(async (req, res, next) => {
   next();
 });
 
-// --- CORS + JSON ---
+// -----------------------------------------------------------------------------
+// CORS + JSON
+// -----------------------------------------------------------------------------
 const allowed = process.env.ALLOWED_ORIGIN;
 app.use(
   cors({
@@ -34,26 +36,21 @@ app.use(
 );
 app.use(express.json());
 
-// --- Render health endpoints ---
+// -----------------------------------------------------------------------------
+// Basic health endpoints for Render
+// -----------------------------------------------------------------------------
 app.get("/health", (_req, res) => res.status(200).json({ ok: true }));
 app.get("/healthz", (_req, res) => res.sendStatus(200));
 
-// --- Primary API health for app + telemetry ---
-app.get("/api/health", (_req, res) => {
-  res.status(200).json({
-    service: "abando-backend",
-    connected_to: "staffordmedia.ai",
-  });
-});
-
-// --- Demo generate-copy endpoint (used by playground) ---
+// -----------------------------------------------------------------------------
+// Demo generate-copy endpoint (kept from earlier template)
+// -----------------------------------------------------------------------------
 app.post("/api/generate-copy", (req, res) => {
   try {
     const { cartId = "demo", items = [] } = req.body || {};
     const total = items.reduce(
       (sum, it) =>
-        sum +
-        Number(it.unitPrice || 0) * Number(it.quantity || 0),
+        sum + Number(it.unitPrice || 0) * Number(it.quantity || 0),
       0
     );
     const subject = `We saved your cart ${cartId} — ${
@@ -72,23 +69,60 @@ app.post("/api/generate-copy", (req, res) => {
   }
 });
 
-// --- Simple backend test-event endpoint ---
-app.post("/api/test-event", async (_req, res) => {
+// -----------------------------------------------------------------------------
+// JSON health for pay.abando.ai (used by your scripts)
+// -----------------------------------------------------------------------------
+app.get("/api/health", (_req, res) => {
+  res.status(200).json({
+    service: "abando-backend",
+    connected_to: "staffordmedia.ai",
+  });
+});
+
+// -----------------------------------------------------------------------------
+// ⭐ Unified cart-event ingress for real product events
+// This is what Shopify / your app will POST to.
+// -----------------------------------------------------------------------------
+app.post("/api/cart-event", async (req, res) => {
   try {
+    const body = req.body || {};
+
+    const {
+      storeId = "unknown-store",
+      eventType = "cart_event",
+      eventSource = "cart-event-api",
+      customerId = null,
+      cartId = null,
+      checkoutId = null,
+      value = null,
+      aiLabel = null,
+      metadata = {},
+    } = body;
+
     await logEvent({
-      storeId: "test-store",
-      eventType: "test_event",
-      eventSource: "backend",
-      metadata: { note: "manual test hit" },
+      storeId,
+      eventType,
+      eventSource,
+      customerId,
+      cartId,
+      checkoutId,
+      value,
+      aiLabel,
+      metadata,
     });
+
     res.json({ ok: true });
-  } catch (e) {
-    console.error("[/api/test-event] error:", e.message);
-    res.status(500).json({ ok: false, error: e.message });
+  } catch (err) {
+    console.error("[/api/cart-event] error:", err);
+    res
+      .status(500)
+      .json({ ok: false, error: String(err.message || err) });
   }
 });
 
-// --- Unified /api/log-test endpoint for your scripts ---
+// -----------------------------------------------------------------------------
+// Optional: keep /api/log-test so your existing test_unified_events.sh works
+// -----------------------------------------------------------------------------
 app.post("/api/log-test", async (_req, res) => {
   try {
     await logEvent({
@@ -103,12 +137,35 @@ app.post("/api/log-test", async (_req, res) => {
     res.json({ ok: true });
   } catch (err) {
     console.error("[log-test] failed:", err);
-    res.status(500).json({ ok: false, error: "log-test-failed" });
+    res
+      .status(500)
+      .json({ ok: false, error: "log-test-failed" });
   }
 });
 
-// --- IMPORTANT: bind to Render's port (MUST be last) ---
+// -----------------------------------------------------------------------------
+// (Optional) simple /api/test-event for manual hits
+// -----------------------------------------------------------------------------
+app.post("/api/test-event", async (_req, res) => {
+  try {
+    await logEvent({
+      storeId: "test-store",
+      eventType: "test_event",
+      eventSource: "backend",
+      metadata: { note: "manual test hit" },
+    });
+    res.json({ ok: true });
+  } catch (e) {
+    console.error("[/api/test-event] error:", e.message);
+    res.status(500).json({ ok: false, error: "test-event-failed" });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// IMPORTANT: bind to Render's port (must be last)
+// -----------------------------------------------------------------------------
 const PORT = process.env.PORT ? Number(process.env.PORT) : 10000;
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`API listening on http://0.0.0.0:${PORT}`);
+  console.log("API listening on http://0.0.0.0:" + PORT);
 });
+
