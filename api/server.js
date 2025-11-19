@@ -2,10 +2,10 @@
 
 const express = require("express");
 const cors = require("cors");
+const { Pool } = require("pg");
 
 const { logEvent } = require("./lib/eventLogger");
 const { classifyCartEvent } = require("./lib/aiLabeler");
-const { Pool } = require("pg");
 
 const app = express();
 
@@ -13,10 +13,10 @@ app.use(cors());
 app.use(express.json());
 
 // -----------------------------------------------------------------------------
-– Health check
+// Health check (include version so we can confirm deploy)
 // -----------------------------------------------------------------------------
 app.get("/healthz", (req, res) => {
-  res.json({ ok: true, service: "cart-agent-api" });
+  res.json({ ok: true, service: "cart-agent-api", version: "ai-segments-v1" });
 });
 
 // -----------------------------------------------------------------------------
@@ -149,6 +149,7 @@ const pool = new Pool({
 
 app.get("/api/ai-segments/:storeId", async (req, res) => {
   const storeId = req.params.storeId || "unknown-store";
+  console.log("[/api/ai-segments] hit for storeId =", storeId);
 
   try {
     // Summary stats by segment / urgency / risk
@@ -207,5 +208,5 @@ app.get("/api/ai-segments/:storeId", async (req, res) => {
 // -----------------------------------------------------------------------------
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`API listening on port ${PORT}`);
+  console.log(`API listening on port ${PORT} (version ai-segments-v1)`);
 });
