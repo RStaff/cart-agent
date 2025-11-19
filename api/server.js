@@ -5,6 +5,7 @@ const cors = require("cors");
 
 const { logEvent } = require("./lib/eventLogger");
 const { classifyCartEvent } = require("./lib/aiLabeler");
+const { Pool } = require("pg");
 
 const app = express();
 
@@ -12,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 // -----------------------------------------------------------------------------
-// Health check
+– Health check
 // -----------------------------------------------------------------------------
 app.get("/healthz", (req, res) => {
   res.json({ ok: true, service: "cart-agent-api" });
@@ -132,6 +133,68 @@ app.post("/api/cart-event", async (req, res) => {
       "[/api/cart-event] error:",
       err && err.message ? err.message : err
     );
+    res.status(500).json({
+      ok: false,
+      error: String(err && err.message ? err.message : err),
+    });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// /api/ai-segments/:storeId → JSON summary + recent labeled events
+// -----------------------------------------------------------------------------
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
+app.get("/api/ai-segments/:storeId", async (req, res) => {
+  const storeId = req.params.storeId || "unknown-store";
+
+  try {
+    // Summary stats by segment / urgency / risk
+    const summaryText = `
+      SELECT
+        metadata->'aiLabel'->>'segment'   AS segment,
+        metadata->'aiLabel'->>'urgency'   AS urgency,
+        metadata->'aiLabel'->>'risk'      AS risk,
+        COUNT(*)                          AS event_count,
+        ROUND(SUM(value)::numeric, 2)     AS total_value
+      FROM events
+      WHERE store_id = $1
+        AND metadata->'aiLabel' IS NOT NULL
+      GROUP BY 1,2,3
+      ORDER BY event_count DESC
+    `;
+
+    const summaryResult = await pool.query(summaryText, [storeId]);
+
+    // Recent labeled events
+    const recentText = `
+      SELECT
+        created_at,
+        event_type,
+        value,
+        metadata->'aiLabel'->>'segment'   AS segment,
+        metadata->'aiLabel'->>'urgency'   AS urgency,
+        metadata->'aiLabel'->>'risk'      AS risk,
+        metadata->>'note'                 AS note
+      FROM events
+      WHERE store_id = $1
+        AND metadata->'aiLabel' IS NOT NULL
+      ORDER BY created_at DESC
+      LIMIT 10
+    `;
+
+    const recentResult = await pool.query(recentText, [storeId]);
+
+    res.json({
+      ok: true,
+      storeId,
+      segments: summaryResult.rows,
+      recent: recentResult.rows,
+    });
+  } catch (err) {
+    console.error("[/api/ai-segments] error:", err && err.message ? err.message : err);
     res.status(500).json({
       ok: false,
       error: String(err && err.message ? err.message : err),
