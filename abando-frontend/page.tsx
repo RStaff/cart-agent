@@ -1,7 +1,12 @@
-export default function Home() {
+// app/embedded/page.tsx
+export default function EmbeddedPage() {
   return (
-    <main className="p-8">
-      <h1 className="text-3xl font-bold">Hello, Abando!</h1>
+    <main style={{ padding: '2rem', fontFamily: 'system-ui' }}>
+      <h1>Abando Embedded Shell</h1>
+      <p>
+        If you can see this, <code>/embedded</code> is wired correctly to the app
+        frontend in production.
+      </p>
     </main>
   );
 }
