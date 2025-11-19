@@ -1,48 +1,45 @@
-const { logEvent } = require("./lib/eventLogger");
-const { classifyCartEvent } = require("./lib/aiLabeler");
+"use strict";
+
 const express = require("express");
 const cors = require("cors");
 
+const { logEvent } = require("./lib/eventLogger");
+const { classifyCartEvent } = require("./lib/aiLabeler");
+
 const app = express();
 
+app.use(cors());
+app.use(express.json());
+
 // -----------------------------------------------------------------------------
+// Health check
+// -----------------------------------------------------------------------------
+app.get("/healthz", (req, res) => {
+  res.json({ ok: true, service: "cart-agent-api" });
+});
 
-console.log("[aiLabeler] classified:", finalAiLabel);
-      }
-    } catch (err) {
-      console.error(
-        "[/api/cart-event] classifyCartEvent error:",
-        err && err.message ? err.message : err
-      );
-      // Do NOT fail the request if the AI labeler has issues.
-    }
-
-    // Attach AI label into metadata so it's always queryable via metadata->'aiLabel'
-    const metadataWithAi = {
-      ...baseMetadata,
-      aiLabel: finalAiLabel || null,
-    };
-
+// -----------------------------------------------------------------------------
+// Simple log-test route (used by test_unified_events.sh)
+// -----------------------------------------------------------------------------
+app.post("/api/log-test", async (req, res) => {
+  try {
     await logEvent({
-      storeId: finalStoreId,
-      eventType: finalEventType,
-      eventSource: finalEventSource,
-      customerId,
-      cartId,
-      checkoutId,
-      value,
-      metadata: metadataWithAi,
+      storeId: "test-store-log",
+      eventType: "log_test",
+      eventSource: "log-test-endpoint",
+      customerId: null,
+      cartId: null,
+      checkoutId: null,
+      value: 0,
+      metadata: {
+        note: "log-test ping",
+        at: new Date().toISOString(),
+      },
     });
 
-    res.json({
-      ok: true,
-      storeId: finalStoreId,
-      eventType: finalEventType,
-      eventSource: finalEventSource,
-      aiLabel: finalAiLabel || null,
-    });
+    res.json({ ok: true });
   } catch (err) {
-    console.error("[/api/cart-event] error:", err);
+    console.error("[/api/log-test] error:", err && err.message ? err.message : err);
     res.status(500).json({
       ok: false,
       error: String(err && err.message ? err.message : err),
@@ -50,114 +47,10 @@ console.log("[aiLabeler] classified:", finalAiLabel);
   }
 });
 
-}
-    } catch (err) {
-      console.error(
-        "[/api/cart-event] classifyCartEvent error:",
-        err && err.message ? err.message : err
-      );
-      // Do not fail the request if the AI labeler has issues.
-    }
-
-    // Attach AI label into metadata so it's always queryable via metadata->'aiLabel'
-    const metadataWithAi = {
-      ...baseMetadata,
-      aiLabel: finalAiLabel || null,
-    };
-
-    await logEvent({
-      storeId: finalStoreId,
-      eventType: finalEventType,
-      eventSource: finalEventSource,
-      customerId,
-      cartId,
-      checkoutId,
-      value,
-      aiLabel: finalAiLabel || null,
-      metadata: metadataWithAi,
-    });
-
-    res.json({
-      ok: true,
-      storeId: finalStoreId,
-      eventType: finalEventType,
-      eventSource: finalEventSource,
-      aiLabel: finalAiLabel || null,
-    });
-  } catch (err) {
-    console.error("[/api/cart-event] error:", err);
-    res.status(500).json({
-      ok: false,
-      error: String(err && err.message ? err.message : err),
-    });
-  }
-});
-
-res.json({ ok: true });
-  } catch (err) {
-    console.error("[/api/cart-event] error:", err);
-    res
-      .status(500)
-      .json({ ok: false, error: String(err.message || err) });
-  }
-});
-
-
-// ⭐ Unified cart-event ingress for real product events + AI labeler
+// -----------------------------------------------------------------------------
+// Unified cart-event ingress + AI labeler
 // This is what Shopify / your app will POST to.
 // -----------------------------------------------------------------------------
-}
-    } catch (err) {
-      console.error(
-        "[/api/cart-event] classifyCartEvent error:",
-        err && err.message ? err.message : err
-      );
-      // Do not fail the request if the AI labeler has issues.
-    }
-
-    // Attach AI label into metadata so it's always queryable via metadata->'aiLabel'
-    const metadataWithAi = {
-      ...baseMetadata,
-      aiLabel: finalAiLabel || null,
-    };
-
-    await logEvent({
-      storeId: finalStoreId,
-      eventType: finalEventType,
-      eventSource: finalEventSource,
-      customerId,
-      cartId,
-      checkoutId,
-      value,
-      aiLabel: finalAiLabel || null,
-      metadata: metadataWithAi,
-    });
-
-    res.json({
-      ok: true,
-      storeId: finalStoreId,
-      eventType: finalEventType,
-      eventSource: finalEventSource,
-      aiLabel: finalAiLabel || null,
-    });
-  } catch (err) {
-    console.error("[/api/cart-event] error:", err);
-    res.status(500).json({
-      ok: false,
-      error: String(err && err.message ? err.message : err),
-    });
-  }
-});
-
-
-// -----------------------------------------------------------------------------
-// Optional: keep /api/log-test so your existing test_unified_events.sh works
-// -----------------------------------------------------------------------------
-
-/**
- * Unified cart-event ingress for real events + AI labeler.
- * This is what Shopify / your app will POST to.
- */
 app.post("/api/cart-event", async (req, res) => {
   try {
     const body = req.body || {};
@@ -178,7 +71,7 @@ app.post("/api/cart-event", async (req, res) => {
     const finalEventType = eventType || "cart_event";
     const finalEventSource = eventSource || "cart-event-endpoint";
 
-    // Normalized metadata
+    // Normalized metadata object
     const baseMetadata =
       rawMetadata && typeof rawMetadata === "object" ? rawMetadata : {};
 
@@ -198,12 +91,13 @@ app.post("/api/cart-event", async (req, res) => {
           metadata: baseMetadata,
         });
       }
+      console.log("[/api/cart-event] classified:", finalAiLabel);
     } catch (err) {
       console.error(
         "[/api/cart-event] classifyCartEvent error:",
         err && err.message ? err.message : err
       );
-      // Do not fail the request if the AI labeler has issues.
+      // Do NOT fail the request if the AI labeler has issues.
     }
 
     // Attach AI label into metadata so it's always queryable via metadata->'aiLabel'
@@ -211,6 +105,8 @@ app.post("/api/cart-event", async (req, res) => {
       ...baseMetadata,
       aiLabel: finalAiLabel || null,
     };
+
+    console.log("[/api/cart-event] metadataWithAi about to log:", metadataWithAi);
 
     await logEvent({
       storeId: finalStoreId,
@@ -220,7 +116,6 @@ app.post("/api/cart-event", async (req, res) => {
       cartId,
       checkoutId,
       value,
-      aiLabel: finalAiLabel || null,
       metadata: metadataWithAi,
     });
 
@@ -230,9 +125,13 @@ app.post("/api/cart-event", async (req, res) => {
       eventType: finalEventType,
       eventSource: finalEventSource,
       aiLabel: finalAiLabel || null,
+      metadata: metadataWithAi,
     });
   } catch (err) {
-    console.error("[/api/cart-event] error:", err);
+    console.error(
+      "[/api/cart-event] error:",
+      err && err.message ? err.message : err
+    );
     res.status(500).json({
       ok: false,
       error: String(err && err.message ? err.message : err),
@@ -240,50 +139,10 @@ app.post("/api/cart-event", async (req, res) => {
   }
 });
 
-
-app.post("/api/log-test", async (_req, res) => {
-  try {
-    await logEvent({
-      storeId: "test-store-log",
-      eventType: "log_test",
-      eventSource: "api/log-test",
-      metadata: {
-        note: "log-test route hit",
-        ts: new Date().toISOString(),
-      },
-    });
-    res.json({ ok: true });
-  } catch (err) {
-    console.error("[log-test] failed:", err);
-    res
-      .status(500)
-      .json({ ok: false, error: "log-test-failed" });
-  }
+// -----------------------------------------------------------------------------
+// Start server (Render calls `node server.js`, which requires this file)
+// -----------------------------------------------------------------------------
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`API listening on port ${PORT}`);
 });
-
-// -----------------------------------------------------------------------------
-// (Optional) simple /api/test-event for manual hits
-// -----------------------------------------------------------------------------
-app.post("/api/test-event", async (_req, res) => {
-  try {
-    await logEvent({
-      storeId: "test-store",
-      eventType: "test_event",
-      eventSource: "backend",
-      metadata: { note: "manual test hit" },
-    });
-    res.json({ ok: true });
-  } catch (e) {
-    console.error("[/api/test-event] error:", e.message);
-    res.status(500).json({ ok: false, error: "test-event-failed" });
-  }
-});
-
-// -----------------------------------------------------------------------------
-// IMPORTANT: bind to Render's port (must be last)
-// -----------------------------------------------------------------------------
-const PORT = process.env.PORT ? Number(process.env.PORT) : 10000;
-app.listen(PORT, "0.0.0.0", () => {
-  console.log("API listening on http://0.0.0.0:" + PORT);
-});
-
