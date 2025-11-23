@@ -9,6 +9,12 @@ import { PrismaClient, Prisma } from "@prisma/client";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
+
+// Simple health check for local + Render monitoring
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", service: "abando-backend" });
+});
+
 app.use(cookieParser());
 app.use(cors());
 app.use(express.json());

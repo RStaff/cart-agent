@@ -1,12 +1,25 @@
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
-// Root-cause: dashboard must be public for sales/demo.
-// We keep middleware file present to avoid import errors elsewhere, but do nothing.
-export function middleware(_req: NextRequest) {
-  return NextResponse.next();
+export function middleware(req: NextRequest) {
+  const res = NextResponse.next();
+
+  // Allow embedding (Shopify admin + *.myshopify.com already covered by CSP)
+  res.headers.set('X-Frame-Options', 'ALLOWALL');
+
+  // Ensure frame-ancestors is present (in case Next/Vercel strip or override later)
+  const existingCsp = res.headers.get('Content-Security-Policy') ?? '';
+  const required = "frame-ancestors https://admin.shopify.com https://*.myshopify.com;";
+
+  if (!existingCsp.includes('frame-ancestors')) {
+    const merged = [required, existingCsp].filter(Boolean).join(' ');
+    res.headers.set('Content-Security-Policy', merged);
+  }
+
+  return res;
 }
 
+// Apply only to the embedded app shell
 export const config = {
-  matcher: [] // no protected routes
+  matcher: ['/embedded', '/embedded/:path*'],
 };

@@ -11,8 +11,8 @@ export default function Footer() {
       <div className="partner-badge">
         <p className="partner-caption">Proud Shopify Partner</p>
         <img
-          src="/badges/shopify-logo-darkbg.svg"
-          alt="Shopify Partners"
+          src="/brand/shopify-logo-white.png"
+          alt="Shopify logo"
           className="partner-logo"
           width="160"
         />

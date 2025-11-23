@@ -1,189 +1,200 @@
-"use client";
-
-import { useEffect, useState } from "react";
-
-type ServiceKey = "marketing" | "embedded" | "pay" | "render";
-
-type ServiceStatus = {
-  label: string;
-  url: string;
-  showBody: boolean;
-};
-
-const SERVICES: Record<ServiceKey, ServiceStatus> = {
-  marketing: {
-    label: "Marketing site",
-    url: "https://abando.ai",
-    showBody: false,
+const summaryCards = [
+  {
+    label: "Recovered revenue (30 days)",
+    value: "$9,420",
+    helper: "+27.4% vs baseline",
   },
-  embedded: {
-    label: "Embedded app shell",
-    url: "https://app.abando.ai/embedded",
-    showBody: false,
+  {
+    label: "Carts monitored (24 hours)",
+    value: "384",
+    helper: "AI watching in real time",
   },
-  pay: {
-    label: "Checkout API (pay.abando.ai)",
-    url: "https://pay.abando.ai/api/health",
-    showBody: true,
+  {
+    label: "Recovery rate",
+    value: "32.8%",
+    helper: "Multi-channel flows enabled",
   },
-  render: {
-    label: "Checkout API (Render origin)",
-    url: "https://cart-agent-api.onrender.com/api/health",
-    showBody: true,
-  },
-};
+];
 
-type StatusState = {
-  code: number | null;
-  ok: boolean;
-  body?: string;
-  lastChecked?: string;
-};
+const segments = [
+  {
+    name: "High intent (checkout reached)",
+    carts: "112 carts (24h)",
+    rate: "41% recovery",
+    flow: "Email + SMS",
+  },
+  {
+    name: "Browse abandon (product viewed)",
+    carts: "167 carts (24h)",
+    rate: "19% recovery",
+    flow: "Email + SMS",
+  },
+  {
+    name: "VIP customers",
+    carts: "31 carts (24h)",
+    rate: "58% recovery",
+    flow: "Concierge flow",
+  },
+];
+
+const feed = [
+  {
+    id: "#A-48219",
+    value: "$146.00",
+    channel: "Email + SMS",
+    ago: "12m ago",
+    status: "Recovered",
+  },
+  {
+    id: "#A-48203",
+    value: "$89.00",
+    channel: "Email",
+    ago: "28m ago",
+    status: "Pending",
+  },
+  {
+    id: "#A-48177",
+    value: "$312.00",
+    channel: "VIP concierge",
+    ago: "1h ago",
+    status: "Recovered",
+  },
+  {
+    id: "#A-48112",
+    value: "$57.00",
+    channel: "Email",
+    ago: "2h ago",
+    status: "At risk",
+  },
+];
 
 export default function StatusPanel() {
-  const [statuses, setStatuses] = useState<Record<ServiceKey, StatusState>>({
-    marketing: { code: null, ok: false },
-    embedded: { code: null, ok: false },
-    pay: { code: null, ok: false },
-    render: { code: null, ok: false },
-  });
-
-  const [loading, setLoading] = useState(false);
-
-  async function refresh() {
-    setLoading(true);
-    const now = new Date().toLocaleTimeString();
-
-    const entries = await Promise.all(
-      (Object.keys(SERVICES) as ServiceKey[]).map(async (key) => {
-        const svc = SERVICES[key];
-        try {
-          const res = await fetch(svc.url, { method: "GET" });
-          const text = await res.text();
-          let body = "";
-
-          if (svc.showBody) {
-            // small JSON – keep it as-is for transparency
-            body = text.slice(0, 200);
-          }
-
-          // Treat 200–307 as "ok" for marketing/embedded (redirects are fine)
-          const ok =
-            svc.showBody ? res.ok : res.status >= 200 && res.status < 400;
-
-          return [
-            key,
-            {
-              code: res.status,
-              ok,
-              body,
-              lastChecked: now,
-            } as StatusState,
-          ] as const;
-        } catch (err) {
-          return [
-            key,
-            {
-              code: null,
-              ok: false,
-              body: String(err),
-              lastChecked: now,
-            } as StatusState,
-          ] as const;
-        }
-      })
-    );
-
-    setStatuses((prev) => ({
-      ...prev,
-      ...Object.fromEntries(entries),
-    }));
-
-    setLoading(false);
-  }
-
-  useEffect(() => {
-    refresh();
-    const id = setInterval(refresh, 60_000); // refresh every 60s
-    return () => clearInterval(id);
-  }, []);
-
   return (
-    <section className="mt-8 space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h2 className="text-sm font-semibold text-slate-50">
-            Live stack status
-          </h2>
-          <p className="mt-1 text-xs text-slate-400">
-            pings your live endpoints every 60 seconds so you can see what Abando
-            is doing without opening Render or a terminal.
-          </p>
-        </div>
+    <div className="space-y-8">
+      {/* Top summary row */}
+      <section className="grid gap-4 md:grid-cols-3">
+        {summaryCards.map((card) => (
+          <div
+            key={card.label}
+            className="rounded-xl border border-slate-800 bg-slate-900/60 px-4 py-4 flex flex-col gap-1"
+          >
+            <p className="text-xs font-medium text-slate-400 uppercase tracking-[0.14em]">
+              {card.label}
+            </p>
+            <p className="text-2xl font-semibold text-slate-50">
+              {card.value}
+            </p>
+            <p className="text-xs text-emerald-400/90">{card.helper}</p>
+          </div>
+        ))}
+      </section>
 
-        <button
-          onClick={refresh}
-          disabled={loading}
-          className="inline-flex items-center rounded-full border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs font-semibold text-slate-100 hover:bg-slate-800 disabled:opacity-60"
-        >
-          {loading ? "Checking…" : "Refresh now"}
-        </button>
-      </div>
-
-      <div className="grid gap-3 sm:grid-cols-2">
-        {(Object.keys(SERVICES) as ServiceKey[]).map((key) => {
-          const meta = SERVICES[key];
-          const status = statuses[key];
-          const ok = status.ok;
-          const code =
-            status.code === null ? "—" : String(status.code);
-
-          return (
-            <div
-              key={key}
-              className="flex flex-col justify-between rounded-lg border border-slate-800 bg-slate-950/70 p-3"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <div>
-                  <p className="text-xs font-semibold text-slate-100">
-                    {meta.label}
-                  </p>
-                  <p className="mt-1 line-clamp-1 break-all text-[10px] text-slate-500">
-                    {meta.url}
-                  </p>
-                </div>
-
-                <div className="flex flex-col items-end text-right">
-                  <span
-                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                      ok
-                        ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/40"
-                        : "bg-rose-500/15 text-rose-300 border border-rose-500/40"
-                    }`}
-                  >
-                    <span className="mr-1 h-1.5 w-1.5 rounded-full bg-current" />
-                    {ok ? "Healthy" : "Check"}
-                  </span>
-                  <span className="mt-1 text-[10px] text-slate-500">
-                    HTTP {code}
-                  </span>
-                  {status.lastChecked && (
-                    <span className="mt-0.5 text-[10px] text-slate-500">
-                      as of {status.lastChecked}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {meta.showBody && status.body && (
-                <pre className="mt-2 overflow-x-auto rounded-md bg-slate-900/80 p-2 text-[10px] text-slate-200">
-                  {status.body}
-                </pre>
-              )}
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+        {/* Segments */}
+        <section className="space-y-4">
+          <header className="flex items-center justify-between gap-2">
+            <div>
+              <h2 className="text-sm font-semibold text-slate-100">
+                AI segments
+              </h2>
+              <p className="text-xs text-slate-400">
+                How Abando groups abandoned carts for recovery.
+              </p>
             </div>
-          );
-        })}
+            <span className="inline-flex items-center rounded-full border border-slate-700 px-2 py-0.5 text-[10px] uppercase tracking-[0.16em] text-slate-400">
+              MODEL SNAPSHOT
+            </span>
+          </header>
+
+          <div className="space-y-3">
+            {segments.map((segment) => (
+              <div
+                key={segment.name}
+                className="rounded-xl border border-slate-800 bg-slate-900/60 px-4 py-3"
+              >
+                <p className="text-xs font-semibold text-slate-300">
+                  {segment.name}
+                </p>
+                <div className="mt-1 flex items-center justify-between text-xs text-slate-400">
+                  <span>{segment.carts}</span>
+                  <span>{segment.rate}</span>
+                </div>
+                <p className="mt-1 text-[11px] text-slate-500">
+                  Flow: <span className="text-slate-300">{segment.flow}</span>
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Live feed */}
+        <section className="space-y-4">
+          <header className="flex items-center justify-between gap-2">
+            <div>
+              <h2 className="text-sm font-semibold text-slate-100">
+                Live recovery feed
+              </h2>
+              <p className="text-xs text-slate-400">
+                Recent carts Abando is trying to save.
+              </p>
+            </div>
+            <span className="inline-flex items-center rounded-full border border-emerald-500/60 bg-emerald-500/5 px-2 py-0.5 text-[10px] uppercase tracking-[0.16em] text-emerald-300">
+              LIVE MOCK DATA
+            </span>
+          </header>
+
+          <div className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900/60">
+            <table className="min-w-full text-sm">
+              <thead className="bg-slate-900/80">
+                <tr className="text-xs text-slate-400">
+                  <th className="px-4 py-2 text-left font-medium">Cart</th>
+                  <th className="px-4 py-2 text-left font-medium">Value</th>
+                  <th className="px-4 py-2 text-left font-medium">Channel</th>
+                  <th className="px-4 py-2 text-left font-medium">Seen</th>
+                  <th className="px-4 py-2 text-left font-medium">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/80">
+                {feed.map((row) => (
+                  <tr key={row.id} className="text-slate-200">
+                    <td className="px-4 py-2 text-xs font-mono">
+                      {row.id}
+                    </td>
+                    <td className="px-4 py-2 text-xs">{row.value}</td>
+                    <td className="px-4 py-2 text-xs text-slate-300">
+                      {row.channel}
+                    </td>
+                    <td className="px-4 py-2 text-xs text-slate-400">
+                      {row.ago}
+                    </td>
+                    <td className="px-4 py-2 text-xs">
+                      <span
+                        className={
+                          "inline-flex rounded-full px-2 py-0.5 text-[11px] " +
+                          (row.status === "Recovered"
+                            ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/50"
+                            : row.status === "At risk"
+                            ? "bg-amber-500/10 text-amber-300 border border-amber-500/50"
+                            : "bg-slate-700/40 text-slate-200 border border-slate-600/60")
+                        }
+                      >
+                        {row.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <p className="text-[11px] text-slate-500">
+            This view is currently powered by{" "}
+            <span className="text-slate-300">sample data</span> to keep the
+            demo fast. In production it will stream from your Shopify store via
+            the cart-agent backend.
+          </p>
+        </section>
       </div>
-    </section>
+    </div>
   );
 }

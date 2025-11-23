@@ -1,92 +1,251 @@
-"use client";
+import Image from "next/image";
+import Link from "next/link";
 
-import React from "react";
-
-export default function EmbeddedAppShell() {
+export default function EmbeddedShellPage() {
   return (
-    <main
+    <div
       style={{
         minHeight: "100vh",
-        margin: 0,
-        padding: "2rem",
-        backgroundColor: "#050816",
-        color: "#ffffff",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        backgroundColor: "#050811",
+        color: "#e5e7eb",
         fontFamily:
-          "-apple-system, BlinkMacSystemFont, system-ui, -system-ui, sans-serif",
+          'system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
       }}
     >
-      <div style={{ maxWidth: 720, width: "100%" }}>
-        <p
+      <header
+        style={{
+          borderBottom: "1px solid rgba(255,255,255,0.08)",
+          backgroundColor: "#050811",
+          padding: "16px 24px",
+          position: "sticky",
+          top: 0,
+          zIndex: 10,
+        }}
+      >
+        <div
           style={{
-            textTransform: "uppercase",
-            letterSpacing: "0.16em",
-            fontSize: 12,
-            opacity: 0.7,
-            marginBottom: 8,
+            maxWidth: "1120px",
+            margin: "0 auto",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "24px",
           }}
         >
-          Abando™ for Shopify
+          {/* Left: Abando logo + wordmark (smaller) */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              flex: "0 0 auto",
+            }}
+          >
+            <Image
+              src="/brand/abando-logo-transparent.png"
+              alt="Abando™ logo"
+              width={40}
+              height={40}
+              priority
+            />
+            <span
+              style={{
+                fontSize: "14px",
+                fontWeight: 600,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "#e5e7eb",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Abando™
+            </span>
+          </div>
+
+          {/* Center nav */}
+          <nav
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "24px",
+              fontSize: "14px",
+              flex: "0 0 auto",
+            }}
+          >
+            <Link
+              href="/demo"
+              style={{ textDecoration: "none", color: "#e5e7eb" }}
+            >
+              Demo
+            </Link>
+            <Link
+              href="/pricing"
+              style={{ textDecoration: "none", color: "#e5e7eb" }}
+            >
+              Pricing
+            </Link>
+            <Link
+              href="/onboarding"
+              style={{ textDecoration: "none", color: "#e5e7eb" }}
+            >
+              Onboarding
+            </Link>
+            <Link
+              href="/support"
+              style={{ textDecoration: "none", color: "#e5e7eb" }}
+            >
+              Support
+            </Link>
+          </nav>
+
+          {/* Right: Proud Shopify Partner */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              flex: "0 0 auto",
+            }}
+          >
+            <span
+              style={{
+                fontSize: "11px",
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+                color: "#9ca3af",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Proud Shopify Partner
+            </span>
+            <Image
+              src="/brand/shopify-logo-white.png"
+              alt="Shopify logo"
+              width={72}
+              height={22}
+            />
+          </div>
+        </div>
+      </header>
+
+      <main
+        style={{
+          maxWidth: "720px",
+          margin: "0 auto",
+          padding: "48px 24px 64px",
+        }}
+      >
+        <p
+          style={{
+            fontSize: "11px",
+            letterSpacing: "0.22em",
+            textTransform: "uppercase",
+            color: "#9ca3af",
+            marginBottom: "12px",
+          }}
+        >
+          ABANDO™ FOR SHOPIFY
         </p>
+
         <h1
           style={{
-            fontSize: "2.4rem",
-            margin: 0,
-            marginBottom: "0.75rem",
-            fontWeight: 650,
+            fontSize: "32px",
+            lineHeight: 1.1,
+            fontWeight: 600,
+            marginBottom: "16px",
           }}
         >
           Abando Embedded App Shell
         </h1>
+
         <p
           style={{
-            fontSize: "0.98rem",
-            lineHeight: 1.7,
-            opacity: 0.9,
-            marginBottom: "1.5rem",
+            fontSize: "15px",
+            color: "#d1d5db",
+            lineHeight: 1.6,
+            marginBottom: "24px",
           }}
         >
-          If you are seeing this inside your Shopify admin, Abando&apos;s
-          embedded app frame is wired correctly in production.
+          This subdomain is reserved for Abando&apos;s Shopify embedded app.
+          Merchants normally access it from within their Shopify admin, not
+          directly.
         </p>
 
-        <div
+        <section
           style={{
-            padding: "1rem 1.25rem",
-            borderRadius: 10,
-            background:
-              "linear-gradient(135deg, rgba(93,63,211,0.22), rgba(8,47,133,0.18))",
+            borderRadius: "10px",
             border: "1px solid rgba(148,163,184,0.35)",
-            fontSize: "0.9rem",
+            background:
+              "radial-gradient(circle at top left, rgba(56,189,248,0.12), transparent 60%)",
+            padding: "16px 18px",
+            fontSize: "14px",
+            color: "#e5e7eb",
           }}
         >
-          <p style={{ margin: 0, marginBottom: 6, fontWeight: 600 }}>
+          <p
+            style={{
+              fontWeight: 500,
+              marginBottom: "6px",
+            }}
+          >
             Next step (implementation note)
           </p>
-          <p style={{ margin: 0, opacity: 0.9 }}>
-            This shell is where we&apos;ll render the full merchant dashboard:
-            plan selection, AI cart segments, and configuration. For now it
-            confirms that{" "}
-            <code style={{ fontSize: "0.85em" }}>
+          <p
+            style={{
+              lineHeight: 1.6,
+            }}
+          >
+            Configure your Abando plan and cart segments from the dashboard.
+            For now this shell confirms that{" "}
+            <code
+              style={{
+                backgroundColor: "rgba(15,23,42,0.8)",
+                padding: "2px 4px",
+                borderRadius: "4px",
+                fontSize: "12px",
+              }}
+            >
               https://app.abando.ai/embedded
             </code>{" "}
             is reachable by Shopify.
           </p>
-        </div>
+        </section>
 
-        <p
+        <footer
           style={{
-            fontSize: "0.85rem",
-            opacity: 0.7,
-            marginTop: "1.5rem",
+            marginTop: "32px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "12px",
+            fontSize: "12px",
+            color: "#9ca3af",
+            flexWrap: "wrap",
           }}
         >
-          If you see this in a standalone browser tab, you can safely close it
-          and launch Abando again from your Shopify admin Apps menu.
-        </p>
-      </div>
-    </main>
+          <span>© {new Date().getFullYear()} Abando™</span>
+          <div style={{ display: "flex", gap: "16px" }}>
+            <Link
+              href="/legal/terms"
+              style={{ color: "#9ca3af", textDecoration: "none" }}
+            >
+              Terms
+            </Link>
+            <Link
+              href="/legal/privacy"
+              style={{ color: "#9ca3af", textDecoration: "none" }}
+            >
+              Privacy
+            </Link>
+            <Link
+              href="/legal/dpa"
+              style={{ color: "#9ca3af", textDecoration: "none" }}
+            >
+              DPA
+            </Link>
+          </div>
+        </footer>
+      </main>
+    </div>
   );
 }

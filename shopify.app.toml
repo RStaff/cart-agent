@@ -1,8 +1,8 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "83114672506075ba4866194fe0160cde"
-name = "cart-agent"
-application_url = "https://waterproof-propose-wit-gage.trycloudflare.com"
+name = "cart-agent initial-release"
+application_url = "https://app.abando.ai/embedded"
 embedded = true
 handle = "cart-agent-1"
 
@@ -15,10 +15,15 @@ api_version = "2025-07"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_products"
+scopes = "read_checkouts,read_customers,read_orders,read_products,write_products"
+optional_scopes = [ ]
+use_legacy_install_flow = false
 
 [auth]
-redirect_urls = ["https://waterproof-propose-wit-gage.trycloudflare.com/auth/callback", "https://waterproof-propose-wit-gage.trycloudflare.com/auth/shopify/callback", "https://waterproof-propose-wit-gage.trycloudflare.com/api/auth/callback"]
+redirect_urls = [
+  "https://app.abando.ai/shopify/callback",
+  "https://app.abando.ai/shopify/billing/return"
+]
 
 [pos]
 embedded = false
