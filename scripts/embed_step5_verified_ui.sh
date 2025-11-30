@@ -1,3 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "=============================="
+echo " Abando – Embed Verified UI   "
+echo "=============================="
+
+APP_DIR="abando-frontend/app"
+EMBED_PAGE="${APP_DIR}/embedded/page.tsx"
+
+if [ ! -f "${EMBED_PAGE}" ]; then
+  echo "❌ ${EMBED_PAGE} not found. Are you on main with embed shell merged?"
+  exit 1
+fi
+
+TS=$(date +"%Y%m%d_%H%M%S")
+BACKUP="${APP_DIR}/embedded/_backup_page_${TS}.tsx"
+
+echo "→ Backing up existing embedded/page.tsx to:"
+echo "   ${BACKUP}"
+cp "${EMBED_PAGE}" "${BACKUP}"
+
+cat > "${EMBED_PAGE}" <<'TSX'
 'use client';
 
 import * as React from 'react';
@@ -138,3 +161,9 @@ export default function EmbeddedApp() {
     </main>
   );
 }
+TSX
+
+echo
+echo "✅ embed_step5_verified_ui.sh complete:"
+echo "  - embedded/page.tsx now calls /api/shopify/verify-embedded"
+echo "  - UI shows Verified / Error / Loading states"
