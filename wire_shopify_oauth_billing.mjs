@@ -34,7 +34,7 @@ import path from "node:path";
 const APP_URL = process.env.APP_URL || "https://abando.ai"; // set in Render
 const SHOPIFY_API_KEY    = process.env.SHOPIFY_API_KEY    || "";
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || "";
-const SHOPIFY_SCOPES     = process.env.SHOPIFY_SCOPES     || "read_checkouts,read_orders,write_checkouts,read_script_tags,write_script_tags";
+const SHOPIFY_SCOPES     = process.env.SHOPIFY_SCOPES     || "read_checkouts,read_customers,read_orders,read_products,write_products";
 const API_VERSION = process.env.SHOPIFY_API_VERSION || "2024-07"; // adjust as needed
 
 const SHOPS_FILE = path.join(__dirname, "data", "shops.json");
