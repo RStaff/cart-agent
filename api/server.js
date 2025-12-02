@@ -17,6 +17,32 @@ app.use(express.json());
 // -----------------------------------------------------------------------------
 app.get("/healthz", (req, res) => {
   res.json({ ok: true, service: "cart-agent-api", version: "ai-segments-v1" });
+
+// Shopify app/uninstalled webhook
+app.post("/webhooks/shopify/app-uninstalled", express.json(), (req, res) => {
+  const shopDomain = req.headers["x-shopify-shop-domain"];
+  const topic = req.headers["x-shopify-topic"];
+
+  console.log("[Shopify] app/uninstalled webhook received", {
+    shopDomain,
+    topic,
+    receivedAt: new Date().toISOString(),
+  });
+
+  try {
+    const payload =
+      typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+    console.log("[Shopify] app/uninstalled payload:", payload);
+  } catch (err) {
+    console.warn(
+      "[Shopify] app/uninstalled: could not parse payload as JSON, continuing."
+    );
+  }
+
+  // IMPORTANT: always respond quickly with 200 so Shopify is happy.
+  return res.status(200).send("OK");
+});
+
 });
 
 // -----------------------------------------------------------------------------
