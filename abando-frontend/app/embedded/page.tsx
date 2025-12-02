@@ -1,140 +1,225 @@
-'use client';
+"use client";
 
-import * as React from 'react';
+import { useEffect, useState } from "react";
 
-type VerifyResponse =
-  | { ok: true; shop: string | null; host?: string | null }
-  | { ok: false; error: string };
+type SegmentRow = {
+  segment: string | null;
+  urgency: string | null;
+  risk: string | null;
+  event_count: string;      // comes back as string from Postgres
+  total_value: string;      // string too
+};
 
-export default function EmbeddedApp() {
-  const [state, setState] = React.useState<
-    'idle' | 'verifying' | 'verified' | 'error'
-  >('idle');
-  const [shop, setShop] = React.useState<string | null>(null);
-  const [error, setError] = React.useState<string | null>(null);
+type RecentRow = {
+  created_at: string;
+  event_type: string;
+  value: string;
+  segment: string | null;
+  urgency: string | null;
+  risk: string | null;
+  note: string | null;
+};
 
-  React.useEffect(() => {
-    const run = async () => {
-      setState('verifying');
+type SegmentsResponse = {
+  ok: boolean;
+  storeId: string;
+  segments: SegmentRow[];
+  recent: RecentRow[];
+};
+
+const API_BASE =
+  process.env.NEXT_PUBLIC_ABANDO_API_BASE ?? "https://pay.abando.ai";
+
+export default function EmbeddedDashboardPage() {
+  const [data, setData] = useState<SegmentsResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function load() {
       try {
-        // Pass through the query string from the embedded context
-        const search = window.location.search || '';
-        const url = `/api/shopify/verify-embedded${search}`;
-        const res = await fetch(url, { method: 'GET' });
+        setLoading(true);
+        setError(null);
 
+        const res = await fetch(`${API_BASE}/api/ai-segments/dev-store`);
         if (!res.ok) {
-          setState('error');
-          setError(`HTTP ${res.status}`);
-          return;
+          throw new Error(`API error: ${res.status}`);
         }
 
-        const json = (await res.json()) as VerifyResponse;
-
-        if ('ok' in json && json.ok) {
-          setShop(json.shop ?? null);
-          setState('verified');
-        } else {
-          setState('error');
-          setError(
-            'error' in json && json.error
-              ? json.error
-              : 'Verification failed.'
-          );
-        }
-      } catch (err) {
-        console.error('[Abando] verify-embedded failed', err);
-        setState('error');
-        setError('Network or server error.');
+        const json = (await res.json()) as SegmentsResponse;
+        setData(json);
+      } catch (err: any) {
+        console.error("Failed to load segments:", err);
+        setError(err?.message ?? "Unknown error");
+      } finally {
+        setLoading(false);
       }
-    };
+    }
 
-    void run();
+    load();
   }, []);
 
-  const subtitle =
-    state === 'verified'
-      ? 'This Abando instance is securely connected to your Shopify admin.'
-      : 'This is the placeholder embedded surface for the Shopify admin.';
+  if (loading) {
+    return (
+      <div style={rootStyle}>
+        <h1 style={titleStyle}>Abando – AI Segments</h1>
+        <p style={subtleTextStyle}>Loading live segment data…</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={rootStyle}>
+        <h1 style={titleStyle}>Abando – AI Segments</h1>
+        <p style={{ ...subtleTextStyle, color: "#b91c1c" }}>
+          Error loading data: {error}
+        </p>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div style={rootStyle}>
+        <h1 style={titleStyle}>Abando – AI Segments</h1>
+        <p style={subtleTextStyle}>No data available yet.</p>
+      </div>
+    );
+  }
 
   return (
-    <main
-      style={{
-        padding: '2.5rem 3rem',
-        fontFamily:
-          '-apple-system,BlinkMacSystemFont,system-ui,Segoe UI,Roboto,sans-serif',
-      }}
-    >
-      <h1
-        style={{
-          fontSize: '2.25rem',
-          fontWeight: 700,
-          marginBottom: '0.75rem',
-        }}
-      >
-        Embedded App (Temp Dev Page)
-      </h1>
+    <div style={rootStyle}>
+      <h1 style={titleStyle}>Abando – AI Segments</h1>
+      <p style={subtleTextStyle}>
+        Store: <strong>{data.storeId}</strong>
+      </p>
 
-      <p style={{ fontSize: '1rem', marginBottom: '1.5rem' }}>{subtitle}</p>
-
-      <section
-        style={{
-          padding: '1.25rem 1.5rem',
-          borderRadius: '0.5rem',
-          border: '1px solid #e5e7eb',
-          maxWidth: '32rem',
-          backgroundColor: '#f9fafb',
-        }}
-      >
-        {state === 'verifying' && (
-          <p style={{ margin: 0, fontSize: '0.95rem' }}>
-            🔐 Verifying Shopify embedded session…
-          </p>
-        )}
-
-        {state === 'verified' && (
-          <div>
-            <p style={{ margin: 0, fontSize: '0.95rem' }}>
-              ✅ <strong>Verified Shopify context.</strong>
-            </p>
-            <p style={{ margin: '0.35rem 0 0', fontSize: '0.9rem' }}>
-              Connected shop:{' '}
-              <code style={{ fontSize: '0.85rem' }}>
-                {shop ?? '(shop domain unknown)'}
-              </code>
-            </p>
-          </div>
-        )}
-
-        {state === 'error' && (
-          <div>
-            <p style={{ margin: 0, fontSize: '0.95rem', color: '#b91c1c' }}>
-              ❌ Could not verify embedded Shopify session.
-            </p>
-            {error && (
-              <p style={{ margin: '0.35rem 0 0', fontSize: '0.85rem' }}>
-                Details: <code>{error}</code>
-              </p>
-            )}
-          </div>
-        )}
-
-        {state === 'idle' && (
-          <p style={{ margin: 0, fontSize: '0.95rem' }}>
-            Preparing verification…
-          </p>
+      {/* Segment Summary */}
+      <section style={{ marginTop: "1.5rem" }}>
+        <h2 style={sectionTitleStyle}>Segment Summary</h2>
+        {data.segments.length === 0 ? (
+          <p style={subtleTextStyle}>No events have been logged yet.</p>
+        ) : (
+          <table style={tableStyle}>
+            <thead>
+              <tr>
+                <th style={thStyle}>Segment</th>
+                <th style={thStyle}>Urgency</th>
+                <th style={thStyle}>Risk</th>
+                <th style={thStyle}>Events</th>
+                <th style={thStyle}>Total Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.segments.map((row, idx) => (
+                <tr key={idx}>
+                  <td style={tdStyle}>{row.segment ?? "—"}</td>
+                  <td style={tdStyle}>{row.urgency ?? "—"}</td>
+                  <td style={tdStyle}>{row.risk ?? "—"}</td>
+                  <td style={tdStyle}>{row.event_count}</td>
+                  <td style={tdStyle}>${row.total_value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </section>
 
-      <p
-        style={{
-          marginTop: '1.5rem',
-          fontSize: '0.8rem',
-          color: '#9ca3af',
-        }}
-      >
-        Abando – internal dev shell. Do not expose this page directly to
-        merchants.
-      </p>
-    </main>
+      {/* Recent Events */}
+      <section style={{ marginTop: "2rem" }}>
+        <h2 style={sectionTitleStyle}>Recent Events</h2>
+        {data.recent.length === 0 ? (
+          <p style={subtleTextStyle}>No recent events recorded.</p>
+        ) : (
+          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+            {data.recent.map((row, idx) => (
+              <li key={idx} style={eventCardStyle}>
+                <div style={{ fontSize: "0.8rem", color: "#6b7280" }}>
+                  {new Date(row.created_at).toLocaleString()}
+                </div>
+                <div style={{ marginTop: "0.25rem", fontWeight: 500 }}>
+                  {row.event_type} · ${row.value}
+                </div>
+                <div style={{ marginTop: "0.25rem", fontSize: "0.85rem" }}>
+                  <strong>Segment:</strong> {row.segment ?? "—"} ·{" "}
+                  <strong>Urgency:</strong> {row.urgency ?? "—"} ·{" "}
+                  <strong>Risk:</strong> {row.risk ?? "—"}
+                </div>
+                {row.note && (
+                  <div
+                    style={{
+                      marginTop: "0.25rem",
+                      fontSize: "0.85rem",
+                      color: "#4b5563",
+                    }}
+                  >
+                    {row.note}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </div>
   );
 }
+
+// --- Inline styles (keeps this file dependency-free) ---
+
+const rootStyle: React.CSSProperties = {
+  padding: "1.5rem",
+  fontFamily:
+    '-apple-system, BlinkMacSystemFont, system-ui, -system-ui, "Segoe UI", sans-serif',
+  backgroundColor: "#0b0b0c",
+  color: "#f9fafb",
+  minHeight: "100vh",
+};
+
+const titleStyle: React.CSSProperties = {
+  fontSize: "1.5rem",
+  fontWeight: 600,
+};
+
+const subtleTextStyle: React.CSSProperties = {
+  fontSize: "0.9rem",
+  color: "#9ca3af",
+};
+
+const sectionTitleStyle: React.CSSProperties = {
+  fontSize: "1.1rem",
+  fontWeight: 600,
+  marginBottom: "0.5rem",
+};
+
+const tableStyle: React.CSSProperties = {
+  borderCollapse: "collapse",
+  width: "100%",
+  fontSize: "0.9rem",
+  backgroundColor: "#111827",
+  borderRadius: "0.5rem",
+  overflow: "hidden",
+};
+
+const thStyle: React.CSSProperties = {
+  borderBottom: "1px solid #374151",
+  textAlign: "left",
+  padding: "0.5rem 0.75rem",
+  fontWeight: 500,
+  fontSize: "0.8rem",
+  color: "#9ca3af",
+};
+
+const tdStyle: React.CSSProperties = {
+  borderBottom: "1px solid #1f2937",
+  padding: "0.5rem 0.75rem",
+};
+
+const eventCardStyle: React.CSSProperties = {
+  padding: "0.75rem 0.85rem",
+  borderRadius: "0.5rem",
+  backgroundColor: "#111827",
+  border: "1px solid #1f2937",
+  marginBottom: "0.5rem",
+};
