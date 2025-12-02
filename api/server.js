@@ -17,6 +17,7 @@ app.use(express.json());
 // -----------------------------------------------------------------------------
 app.get("/healthz", (req, res) => {
   res.json({ ok: true, service: "cart-agent-api", version: "ai-segments-v1" });
+});
 
 // Shopify app/uninstalled webhook
 app.post("/webhooks/shopify/app-uninstalled", express.json(), (req, res) => {
@@ -43,8 +44,8 @@ app.post("/webhooks/shopify/app-uninstalled", express.json(), (req, res) => {
   return res.status(200).send("OK");
 });
 
-});
-
+// -----------------------------------------------------------------------------
+// Simple log-test route (used by test_unified_events.sh)
 // -----------------------------------------------------------------------------
 // Simple log-test route (used by test_unified_events.sh)
 // -----------------------------------------------------------------------------
