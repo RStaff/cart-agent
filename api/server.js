@@ -1,3 +1,5 @@
+const { getRecommendation } = require("./recommendationPolicy");
+
 "use strict";
 
 const express = require("express");
