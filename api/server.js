@@ -176,6 +176,48 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
+
+/**
+ * recommendationMiddleware
+ * - Wraps res.json for /api/ai-segments/:storeId
+ * - Injects a `recommendation` object into each recent event before sending
+ */
+app.use("/api/ai-segments/:storeId", (req, res, next) => {
+  const originalJson = res.json.bind(res);
+
+  res.json = (body) => {
+    try {
+      if (body && Array.isArray(body.recent)) {
+        const recentWithRecommendations = body.recent.map((event) => {
+          const recommendation = getRecommendation({
+            segment: event.segment,
+            urgency: event.urgency,
+            risk: event.risk,
+            eventType: event.event_type || event.eventType,
+            value: Number(event.value || 0),
+          });
+
+          return {
+            ...event,
+            recommendation,
+          };
+        });
+
+        body = {
+          ...body,
+          recent: recentWithRecommendations,
+        };
+      }
+    } catch (err) {
+      console.error("[recommendationMiddleware] error:", err && err.message ? err.message : err);
+    }
+
+    return originalJson(body);
+  };
+
+  next();
+});
+
 app.get("/api/ai-segments/:storeId", async (req, res) => {
   const storeId = req.params.storeId || "unknown-store";
   console.log("[/api/ai-segments] hit for storeId =", storeId);
