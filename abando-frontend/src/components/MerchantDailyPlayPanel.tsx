@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
 type Recommendation = {
   recommended_action: string;
@@ -9,225 +9,255 @@ type Recommendation = {
   reason: string;
 };
 
-type EventWithMeta = {
-  created_at?: string;
-  event_type?: string;
-  eventType?: string;
-  value?: string | number;
-  segment?: string;
-  urgency?: string;
-  risk?: string;
-  note?: string | null;
-  recommendation?: Recommendation | null;
-  [key: string]: any;
+type SegmentEvent = {
+  created_at: string;
+  event_type: string;
+  value: string | number | null;
+  segment: string;
+  urgency: string;
+  risk: string;
+  note: string | null;
+  recommendation: Recommendation | null;
 };
 
-type DailyPlayResponse = {
+type ApiResponse = {
   storeId: string;
-  first_recent?: EventWithMeta | null;
-  recent?: EventWithMeta[];
-  [key: string]: any;
+  first_recent: SegmentEvent | null;
 };
 
-interface MerchantDailyPlayPanelProps {
+type MerchantDailyPlayPanelProps = {
   storeId: string;
-  apiBase: string;
+  apiBase?: string;
+};
+
+function normalizeBase(apiBase?: string): string {
+  const base =
+    apiBase && apiBase.trim().length > 0
+      ? apiBase.trim()
+      : "https://pay.abando.ai";
+  return base.replace(/\/$/, "");
 }
 
-export const MerchantDailyPlayPanel: React.FC<MerchantDailyPlayPanelProps> = ({
+export function MerchantDailyPlayPanel({
   storeId,
   apiBase,
-}) => {
+}: MerchantDailyPlayPanelProps) {
+  const [data, setData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [event, setEvent] = useState<EventWithMeta | null>(null);
-  const [recommendation, setRecommendation] = useState<Recommendation | null>(null);
+
+  const effectiveStoreId =
+    storeId && storeId.trim().length > 0
+      ? storeId.trim()
+      : "cart-agent-dev.myshopify.com";
 
   useEffect(() => {
-    let cancelled = false;
+    let isMounted = true;
+    const controller = new AbortController();
 
-    const load = async () => {
+    async function load() {
       setLoading(true);
       setError(null);
+
       try {
-        const url = `${apiBase.replace(/\/$/, '')}/api/ai-segments/${encodeURIComponent(
-          storeId,
-        )}`;
-        const res = await fetch(url, { cache: 'no-store' });
+        const base = normalizeBase(apiBase);
+        const res = await fetch(
+          `${base}/api/ai-segments/${encodeURIComponent(effectiveStoreId)}`,
+          { signal: controller.signal }
+        );
 
         if (!res.ok) {
           throw new Error(`API responded with ${res.status}`);
         }
 
-        const data: DailyPlayResponse = await res.json();
-
-        const first =
-          (data.first_recent as EventWithMeta | null | undefined) ??
-          (Array.isArray(data.recent) && data.recent.length > 0
-            ? data.recent[0]
-            : null);
-
-        if (!first) {
-          if (!cancelled) {
-            setEvent(null);
-            setRecommendation(null);
-          }
-          return;
-        }
-
-        const rec = (first.recommendation as Recommendation | null | undefined) ?? null;
-
-        if (!cancelled) {
-          setEvent(first);
-          setRecommendation(rec);
+        const json = (await res.json()) as ApiResponse;
+        if (isMounted) {
+          setData(json);
         }
       } catch (err: any) {
-        if (!cancelled) {
-          setError(err?.message || 'Unknown error');
-          setEvent(null);
-          setRecommendation(null);
-        }
+        if (!isMounted || err?.name === "AbortError") return;
+        setError(err?.message ?? "Failed to load daily play.");
       } finally {
-        if (!cancelled) {
+        if (isMounted) {
           setLoading(false);
         }
       }
-    };
+    }
 
     void load();
 
     return () => {
-      cancelled = true;
+      isMounted = false;
+      controller.abort();
     };
-  }, [storeId, apiBase]);
+  }, [effectiveStoreId, apiBase]);
 
-  const prettyDate = (iso?: string) => {
-    if (!iso) return '—';
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return iso;
-    return d.toLocaleString();
-  };
-
-  const currency = (value?: string | number) => {
-    const n = Number(value ?? 0);
-    if (Number.isNaN(n)) return '—';
-    return `$${n.toFixed(2)}`;
-  };
+  const event = data?.first_recent ?? null;
+  const rec = event?.recommendation ?? null;
 
   return (
-    <section className="mt-6 rounded-xl border border-slate-800 bg-black/40 p-4 text-slate-100">
-      <header className="mb-3 flex items-center justify-between gap-2">
+    <section className="rounded-xl border border-slate-800 bg-slate-950/70 p-4 shadow-[0_0_0_1px_rgba(15,23,42,0.7)] md:p-6">
+      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-400">
             Merchant Daily Play
+          </p>
+          <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-50 md:text-2xl">
+            Today&apos;s #1 Play
           </h2>
-          <p className="text-xs text-slate-500">
-            Store: <span className="font-mono text-slate-300">{storeId}</span>
+          <p className="mt-1 text-xs text-slate-400">
+            Store:{" "}
+            <span className="font-mono text-[11px] text-slate-200">
+              {data?.storeId ?? effectiveStoreId}
+            </span>
           </p>
         </div>
-        {loading && (
-          <span className="text-xs text-slate-500 animate-pulse">
-            Refreshing…
-          </span>
-        )}
-      </header>
 
-      {error && (
-        <div className="rounded-md border border-red-500/60 bg-red-950/40 p-3 text-xs text-red-100">
-          <div className="font-semibold">API error</div>
-          <div>{error}</div>
-        </div>
-      )}
-
-      {!error && !loading && !event && (
-        <div className="rounded-md border border-slate-700 bg-slate-900/40 p-3 text-xs text-slate-300">
-          <div className="font-semibold text-slate-100">No live AI play yet</div>
-          <p className="mt-1">
-            Once we see enough recovery and churn-risk signals for this store, the #1
-            recommended action for today will appear here automatically.
-          </p>
-        </div>
-      )}
-
-      {!error && event && (
-        <div className="grid gap-3 md:grid-cols-[2fr,3fr]">
-          {/* Left: #1 Play */}
-          <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-3">
-            <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-amber-400">
-              Today&apos;s #1 Play
-            </div>
-
-            {recommendation ? (
-              <>
-                <div className="text-sm font-semibold text-slate-50">
-                  {recommendation.recommended_action}
-                </div>
-                <div className="mt-1 text-xs text-slate-400">
-                  <span className="font-medium text-slate-200">
-                    Channel:
-                  </span>{' '}
-                  {recommendation.channel.toUpperCase()}
-                  {' · '}
-                  <span className="font-medium text-slate-200">Timing:</span>{' '}
-                  {recommendation.timing}
-                </div>
-                <p className="mt-2 text-xs text-slate-300">
-                  {recommendation.reason}
-                </p>
-              </>
-            ) : (
-              <>
-                <div className="text-sm font-semibold text-slate-50">
-                  Tracking live segments…
-                </div>
-                <p className="mt-1 text-xs text-slate-300">
-                  We&apos;ve started labeling visitor behavior for this store. As soon
-                  as a play crosses the action threshold, the exact message, channel,
-                  and timing will appear here.
-                </p>
-              </>
-            )}
+        {event && (
+          <div className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-[11px] text-slate-300">
+            <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+            <span className="uppercase tracking-[0.15em]">
+              {event.segment || "segment"} · {event.urgency || "normal"}
+            </span>
           </div>
+        )}
+      </div>
 
-          {/* Right: Context */}
-          <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-3 text-xs">
-            <div className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-              Context for this play
-            </div>
+      {/* Loading / error / empty states */}
+      {loading && (
+        <div className="mt-6 space-y-3">
+          <div className="h-4 w-3/4 animate-pulse rounded bg-slate-800" />
+          <div className="h-3 w-full animate-pulse rounded bg-slate-900" />
+          <div className="h-3 w-5/6 animate-pulse rounded bg-slate-900" />
+        </div>
+      )}
 
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-1">
-              <dt className="text-slate-500">Event type</dt>
-              <dd className="text-slate-200">
-                {event.event_type || event.eventType || '—'}
-              </dd>
+      {error && !loading && (
+        <div className="mt-6 rounded-lg border border-red-800/60 bg-red-950/40 px-4 py-3 text-xs text-red-200">
+          <p className="font-medium">Couldn&apos;t load today&apos;s play.</p>
+          <p className="mt-1 text-[11px] opacity-90">{error}</p>
+        </div>
+      )}
 
-              <dt className="text-slate-500">Segment</dt>
-              <dd className="text-slate-200">{event.segment || '—'}</dd>
+      {!loading && !error && !event && (
+        <div className="mt-6 text-sm text-slate-400">
+          No recent events found for this store. Try sending a few test visits
+          or carts through the dev store, then refresh this page.
+        </div>
+      )}
 
-              <dt className="text-slate-500">Urgency</dt>
-              <dd className="text-slate-200">{event.urgency || '—'}</dd>
+      {!loading && !error && event && (
+        <>
+          {/* Core recommendation */}
+          <div className="mt-6 rounded-lg border border-emerald-500/40 bg-emerald-950/20 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300">
+              Play summary
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-emerald-50">
+              {rec?.recommended_action ??
+                "We’ve identified a key play for this segment based on recent behaviour."}
+            </p>
 
-              <dt className="text-slate-500">Risk</dt>
-              <dd className="text-slate-200">{event.risk || '—'}</dd>
-
-              <dt className="text-slate-500">Value</dt>
-              <dd className="text-slate-200">{currency(event.value)}</dd>
-
-              <dt className="text-slate-500">Created at</dt>
-              <dd className="text-slate-200">{prettyDate(event.created_at)}</dd>
+            <dl className="mt-4 grid gap-4 text-[11px] text-emerald-100 md:grid-cols-3">
+              <div>
+                <dt className="uppercase tracking-[0.18em] text-emerald-400/80">
+                  Channel
+                </dt>
+                <dd className="mt-1 text-sm text-emerald-50">
+                  {rec?.channel ?? "ONSITE"}
+                </dd>
+              </div>
+              <div>
+                <dt className="uppercase tracking-[0.18em] text-emerald-400/80">
+                  Timing
+                </dt>
+                <dd className="mt-1 text-sm text-emerald-50">
+                  {rec?.timing ?? "next eligible visit"}
+                </dd>
+              </div>
+              <div>
+                <dt className="uppercase tracking-[0.18em] text-emerald-400/80">
+                  Value
+                </dt>
+                <dd className="mt-1 text-sm text-emerald-50">
+                  {event.value != null ? `$${event.value}` : "n/a"}
+                </dd>
+              </div>
             </dl>
 
-            {event.note && (
-              <div className="mt-2 border-t border-slate-800 pt-2">
-                <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                  Note
-                </div>
-                <p className="mt-1 text-[11px] text-slate-300">{event.note}</p>
-              </div>
+            {rec?.reason && (
+              <p className="mt-3 text-[11px] leading-relaxed text-emerald-100/80">
+                <span className="font-semibold">Why this play:</span>{" "}
+                {rec.reason}
+              </p>
             )}
           </div>
-        </div>
+
+          {/* Context section */}
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4 text-xs text-slate-200">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                Event context
+              </p>
+              <dl className="mt-3 space-y-1.5">
+                <div className="flex justify-between gap-4">
+                  <dt className="text-slate-400">Event type</dt>
+                  <dd className="font-mono text-[11px] text-slate-100">
+                    {event.event_type}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-slate-400">Segment</dt>
+                  <dd className="font-mono text-[11px] text-slate-100">
+                    {event.segment}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-slate-400">Urgency</dt>
+                  <dd className="capitalize text-slate-100">
+                    {event.urgency}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-slate-400">Risk</dt>
+                  <dd className="capitalize text-slate-100">{event.risk}</dd>
+                </div>
+              </dl>
+            </div>
+
+            <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4 text-xs text-slate-200">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                Metrics
+              </p>
+              <dl className="mt-3 space-y-1.5">
+                <div className="flex justify-between gap-4">
+                  <dt className="text-slate-400">Value</dt>
+                  <dd className="text-slate-100">
+                    {event.value != null ? `$${event.value}` : "n/a"}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-slate-400">Created at</dt>
+                  <dd className="text-right text-slate-100">
+                    {new Date(event.created_at).toLocaleString()}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+
+            <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4 text-xs text-slate-200">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                Notes
+              </p>
+              <p className="mt-3 text-[11px] leading-relaxed text-slate-200">
+                {event.note ?? "No additional notes on this event."}
+              </p>
+            </div>
+          </div>
+        </>
       )}
     </section>
   );
-};
+}
+
+export default MerchantDailyPlayPanel;
