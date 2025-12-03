@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import React from "react";
 
-export const metadata = {
+import "./globals.css";
+
+export const metadata: Metadata = {
   title: "Abando",
   description: "Abando – AI cart recovery and checkout agent",
 };
@@ -12,7 +15,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="bg-slate-950 text-slate-50 antialiased">
+        {children}
+      </body>
     </html>
   );
 }

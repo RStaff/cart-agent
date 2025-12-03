@@ -3,8 +3,8 @@
 export default {
 darkMode: "class",
   content: [
-    "./src/**/*.{ts,tsx,mdx}",
-    "./abando-frontend/app/demo/**/*.{js,ts,jsx,tsx,mdx}"
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: { extend: {} },
   plugins: [],
