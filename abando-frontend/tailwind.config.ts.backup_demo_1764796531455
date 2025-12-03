@@ -2,10 +2,7 @@
 
 export default {
 darkMode: "class",
-  content: [
-    "./src/**/*.{ts,tsx,mdx}",
-    "./abando-frontend/app/demo/**/*.{js,ts,jsx,tsx,mdx}"
-  ],
+  content: ["./src/**/*.{ts,tsx,mdx}"],
   theme: { extend: {} },
   plugins: [],
 } satisfies Config;
