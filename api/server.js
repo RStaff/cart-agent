@@ -283,6 +283,71 @@ app.use("/api/ai-segments/:storeId", (req, res, next) => {
   next();
 });
 
+
+/**
+ * recommendationMiddleware
+ * - Wraps res.json for /api/ai-segments/:storeId
+ * - Injects a `recommendation` object into:
+ *   - each item in `recent` (if present), OR
+ *   - `first_recent` (if present)
+ */
+app.use("/api/ai-segments/:storeId", (req, res, next) => {
+  const originalJson = res.json.bind(res);
+
+  res.json = (body) => {
+    try {
+      // Case 1: array of recent events
+      if (body && Array.isArray(body.recent)) {
+        const recentWithRecommendations = body.recent.map((event) => {
+          const recommendation = getRecommendation({
+            segment: event.segment,
+            urgency: event.urgency,
+            risk: event.risk,
+            eventType: event.event_type || event.eventType,
+            value: Number(event.value || 0),
+          });
+
+          return {
+            ...event,
+            recommendation,
+          };
+        });
+
+        body = {
+          ...body,
+          recent: recentWithRecommendations,
+        };
+      }
+
+      // Case 2: single first_recent object (defensive)
+      if (body && body.first_recent && typeof body.first_recent === "object") {
+        const e = body.first_recent;
+        const recommendation = getRecommendation({
+          segment: e.segment,
+          urgency: e.urgency,
+          risk: e.risk,
+          eventType: e.event_type || e.eventType,
+          value: Number(e.value || 0),
+        });
+
+        body = {
+          ...body,
+          first_recent: {
+            ...e,
+            recommendation,
+          },
+        };
+      }
+    } catch (err) {
+      console.error("[recommendationMiddleware] error:", err && err.message ? err.message : err);
+    }
+
+    return originalJson(body);
+  };
+
+  next();
+});
+
 app.get("/api/ai-segments/:storeId", async (req, res) => {
   const storeId = req.params.storeId || "unknown-store";
   console.log("[/api/ai-segments] hit for storeId =", storeId);
