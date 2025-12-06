@@ -64,12 +64,6 @@ export default function PlaygroundPage() {
     lineHeight: 1.5,
   } as const;
 
-  const labelStyle = {
-    display: "inline-block",
-    minWidth: "120px",
-    color: "#9ca3af", // gray-400
-  } as const;
-
   const pillRowStyle = {
     display: "flex",
     flexWrap: "wrap",
