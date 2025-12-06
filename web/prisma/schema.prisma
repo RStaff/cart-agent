@@ -86,3 +86,43 @@ model Usage {
 
   user      User     @relation(fields: [userId], references: [id])
 }
+
+$MARKER
+
+/// Daily per-store aggregates for Abando v1 → StaffordOS exports
+
+
+
+$MARKER
+
+// DailyAggregates + related fields for Abando v1
+model DailyAggregate {
+  id                     Int      @id @default(autoincrement())
+  storeId                Int
+  date                   DateTime
+
+  cartsCreated           Int      @default(0)
+  cartsAbandoned         Int      @default(0)
+  cartsRecovered         Int      @default(0)
+
+  recoveryAttemptsSent   Int      @default(0)
+  recoveryClicks         Int      @default(0)
+  recoveriesCount        Int      @default(0)
+
+  potentialRevenue       Decimal  @default(0)
+  revenueRecovered       Decimal  @default(0)
+
+  abandonmentRate        Decimal?
+  recoveryRate           Decimal?
+  clickThroughRate       Decimal?
+  conversionRate         Decimal?
+
+  avgCartValue           Decimal?
+  avgTimeToRecoveryHours Decimal?
+
+  createdAt              DateTime @default(now())
+
+  @@unique([storeId, date])
+  @@index([storeId, date])
+}
+
