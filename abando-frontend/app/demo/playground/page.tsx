@@ -266,6 +266,18 @@ export default function DemoPlaygroundPage() {
             by your real Shopify data and lets you compare patterns like cart
             parkers vs. drop watchers.
           </p>
+<div className="mt-6 rounded-3xl border border-emerald-500/40 bg-emerald-950/10 px-6 py-5 text-sm text-emerald-50 shadow-[0_0_40px_rgba(16,185,129,0.35)]">
+  <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-emerald-300/80">
+    This week at a glance
+  </p>
+  <p className="mt-2 text-sm">
+    Abando quietly rescued <span className="font-semibold">$5,040</span> in revenue that would have vanished.
+  </p>
+  <p className="mt-1 text-xs text-emerald-200/80">
+    That’s roughly <span className="font-semibold">200 extra outfits</span> this month at this pace—without bigger discounts or more ad spend.
+  </p>
+</div>
+
 <p className="mt-3 text-sm text-emerald-300">
   Across the full week, this demo recovers just over
   <span className="font-semibold">$5,000</span> in orders that would have
