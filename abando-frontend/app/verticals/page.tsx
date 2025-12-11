@@ -1,57 +1,46 @@
-import Link from "next/link";
+import { VerticalGrowthEngineSection } from "../components/VerticalGrowthEngineSection";
 
-const VERTICALS = [
-  {
-    slug: "women-boutique",
-    label: "Women’s Boutique Apparel",
-    teaser: "Small curated shops that live or die on repeat customers and merchandising.",
-  },
-  {
-    slug: "supplements",
-    label: "Supplements & Wellness E-commerce",
-    teaser: "DTC brands selling stacks, subscriptions, and high-margin bundles.",
-  },
-];
-
-export default function VerticalsIndexPage() {
+export default function VerticalEnginePage() {
   return (
-    <main className="min-h-screen w-full bg-white">
-      <div className="max-w-5xl mx-auto px-4 py-16">
-        <p className="text-sm uppercase tracking-[0.2em] text-neutral-500 mb-3">
+    <main className="min-h-screen w-full bg-slate-950 text-white">
+      <VerticalGrowthEngineSection variant="boutique" />
+
+      <section className="w-full max-w-4xl mx-auto px-4 pb-16">
+        <h2 className="text-lg font-semibold mb-4">
           Abando Vertical Growth Engine
-        </p>
-        <h1 className="text-3xl sm:text-4xl font-semibold text-neutral-900 mb-4">
-          Choose your growth lane.
-        </h1>
-        <p className="text-base text-neutral-700 mb-10 max-w-2xl">
-          Abando starts with a deep focus on a few specific merchant types.
-          Each vertical gets language, segments, and reports tuned to how money
-          actually moves in that business.
+        </h2>
+        <p className="text-sm text-slate-300 mb-4">
+          Start with one best-fit vertical, then layer in additional segments as
+          you see results. Abando reuses the same AI brain, tuned to your
+          industry.
         </p>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          {VERTICALS.map((v) => (
-            <Link
-              key={v.slug}
-              href={`/verticals/${v.slug}`}
-              className="block rounded-2xl border border-neutral-200 hover:border-neutral-400 hover:shadow-sm transition p-5"
-            >
-              <h2 className="text-lg font-semibold text-neutral-900 mb-2">
-                {v.label}
-              </h2>
-              <p className="text-sm text-neutral-700 mb-3">{v.teaser}</p>
-              <p className="text-xs text-neutral-500">
-                View the Vertical Growth Engine for this segment →
-              </p>
-            </Link>
-          ))}
+        <div className="grid md:grid-cols-2 gap-4 mt-6">
+          <a
+            href="/verticals/women-boutique"
+            className="block bg-slate-900/60 border border-slate-700 rounded-xl p-4 hover:bg-slate-900"
+          >
+            <p className="text-xs text-pink-400 mb-1">VERTICAL · LIVE</p>
+            <h3 className="font-semibold mb-1">Women’s boutique apparel</h3>
+            <p className="text-xs text-slate-300">
+              Recover carts for multi-SKU outfits, seasonal drops, and social
+              traffic.
+            </p>
+          </a>
+
+          <a
+            href="/verticals/supplements"
+            className="block bg-slate-900/60 border border-slate-700 rounded-xl p-4 hover:bg-slate-900"
+          >
+            <p className="text-xs text-emerald-400 mb-1">VERTICAL · BETA</p>
+            <h3 className="font-semibold mb-1">Supplements & wellness</h3>
+            <p className="text-xs text-slate-300">
+              Recover checkouts for subscriptions while staying within your
+              compliance guidelines.
+            </p>
+          </a>
         </div>
-
-        <p className="mt-10 text-xs text-neutral-500">
-          Over time, we can add more verticals here — but we start narrow so you
-          can win one lane at a time.
-        </p>
-      </div>
+      </section>
     </main>
   );
 }

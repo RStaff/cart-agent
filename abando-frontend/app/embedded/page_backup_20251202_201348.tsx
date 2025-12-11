@@ -244,7 +244,7 @@ function Logo() {
   return (
     <div style={logoWrapperStyle}>
       <img
-        src="/abando-logo.inline.png"
+        src="/abando-logo.png"
         alt="Abando.ai logo"
         width={size}
         height={size}
