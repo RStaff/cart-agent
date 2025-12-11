@@ -10,11 +10,15 @@ import { PrismaClient, Prisma } from "@prisma/client";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 app.use(cookieParser());
+app.use("/billing", (await import("./routes/billing_create.js")).default);
 app.use(cors());
+app.use("/billing", (await import("./routes/billing_create.js")).default);
 app.use(express.json());
+app.use("/billing", (await import("./routes/billing_create.js")).default);
 
 // Static + simple pages
 app.use(express.static(join(__dirname, "public")));
+app.use("/billing", (await import("./routes/billing_create.js")).default);
 app.get("/", (_req,res)=>res.sendFile(join(__dirname,"public","index.html")));
 app.get("/pricing", (_req,res)=>res.sendFile(join(__dirname,"public","pricing","index.html")));
 app.get("/onboarding", (_req,res)=>res.sendFile(join(__dirname,"public","onboarding","index.html")));
