@@ -8,7 +8,8 @@
   },
   "scripts": {
     "start:render": "bash scripts/render-start.sh",
-    "render:build": "bash -lc \"set -e;   if [ ! -s package-lock.json ]; then     echo \\\"[build] no or empty lockfile — creating with npm install --package-lock-only\\\";     npm install --package-lock-only --include=dev;   fi;   if ! npm ci --include=dev; then     echo \\\"[build] npm ci failed — falling back to npm install\\\";     npm install --include=dev;   fi;   npx prisma generate --schema=prisma/schema.prisma \" "
+    "render:build": "bash -lc \"set -e;   if [ ! -s package-lock.json ]; then     echo \\\"[build] no or empty lockfile — creating with npm install --package-lock-only\\\";     npm install --package-lock-only --include=dev;   fi;   if ! npm ci --include=dev; then     echo \\\"[build] npm ci failed — falling back to npm install\\\";     npm install --include=dev;   fi;   npx prisma generate --schema=prisma/schema.prisma \" ",
+    "dev": "cross-env NODE_ENV=development nodemon start.mjs"
   },
   "dependencies": {
     "@prisma/client": "6.16.0",

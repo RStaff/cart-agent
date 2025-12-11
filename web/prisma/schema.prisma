@@ -87,13 +87,7 @@ model Usage {
   user      User     @relation(fields: [userId], references: [id])
 }
 
-$MARKER
-
 /// Daily per-store aggregates for Abando v1 → StaffordOS exports
-
-
-
-$MARKER
 
 // DailyAggregates + related fields for Abando v1
 model DailyAggregate {
@@ -126,3 +120,42 @@ model DailyAggregate {
   @@index([storeId, date])
 }
 
+/// Billing plans for the Abando Shopify app
+model ShopifyPlan {
+  id            Int      @id @default(autoincrement())
+  /// E.g. "BASIC", "GROWTH", "PRO"
+  key           String   @unique
+  /// Display name, e.g. "Abando Basic"
+  name          String
+  /// Price in cents per billing interval (e.g. 2999 for $29.99)
+  priceCents    Int
+  /// Currency code, e.g. "USD"
+  currency      String   @default("USD")
+  /// Shopify billing interval, e.g. "EVERY_30_DAYS"
+  interval      String   @default("EVERY_30_DAYS")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  subscriptions ShopifySubscription[]
+}
+
+/// An active (or cancelled) Shopify billing subscription for a shop
+model ShopifySubscription {
+  id              Int      @id @default(autoincrement())
+  /// my-shop.myshopify.com
+  shopDomain      String
+  /// Shopify's recurring_application_charge ID or subscription ID
+  shopifyChargeId String   @unique
+
+  plan    ShopifyPlan @relation(fields: [planId], references: [id])
+  planId  Int
+
+  /// "active", "pending", "cancelled", etc.
+  status         String
+  trialEndsAt    DateTime?
+  activatedAt    DateTime?
+  cancelledAt    DateTime?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
