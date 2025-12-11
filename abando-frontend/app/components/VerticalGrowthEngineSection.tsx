@@ -1,140 +1,81 @@
 "use client";
 
-import Link from "next/link";
+type VerticalVariant = "boutique" | "supplements";
 
-type Variant = "women-boutique" | "supplements";
+interface Props {
+  variant: VerticalVariant;
+}
 
-type VariantCopy = {
+const copyByVariant: Record<VerticalVariant, {
   label: string;
   headline: string;
   subheadline: string;
-  painPoints: string[];
-  promise: string;
-  proofPoints: string[];
-  ctaPrimary: string;
-  ctaSecondary: string;
-};
-
-const VARIANT_COPY: Record<Variant, VariantCopy> = {
-  "women-boutique": {
-    label: "Women’s Boutique Apparel",
-    headline: "Turn 'just browsing' into repeat boutique customers.",
+  bullets: string[];
+}> = {
+  boutique: {
+    label: "WOMEN’S BOUTIQUE APPAREL",
+    headline: "Turn fitting-room interest into checkout revenue.",
     subheadline:
-      "Abando’s Vertical Growth Engine watches every abandoned cart, learns which outfits convert, and nudges shoppers back with on-brand reminders — without you babysitting ads or email flows.",
-    painPoints: [
-      "Shoppers add outfits to cart on their phone and never come back.",
-      "You run discounts, but aren’t sure which offers actually move inventory.",
-      "You don’t have time to babysit Meta Ads, email flows, and popups.",
+      "Abando watches your shoppers’ real behavior and nudges them back with on-brand, boutique-ready flows.",
+    bullets: [
+      "Recover carts from Instagram, TikTok, and email traffic",
+      "Show “complete the look” bundles instead of random upsells",
+      "Use SMS and email that sound like your brand, not a chatbot"
     ],
-    promise:
-      "Abando quietly sits between your checkout and your marketing tools, learning which SKUs, bundles, and offers work best for your boutique — then re-engaging shoppers automatically.",
-    proofPoints: [
-      "Cart-level analytics tuned for small curated catalogs.",
-      "Segment suggestions like 'First-time dress browsers' or 'Loyal basics buyers'.",
-      "Simple weekly report: 'Here’s what drove recovered revenue this week.'",
-    ],
-    ctaPrimary: "See Abando for Boutiques",
-    ctaSecondary: "View sample recovery report",
   },
   supplements: {
-    label: "Supplements & Wellness E-commerce",
-    headline: "Recover abandoned carts while building real customer lifetime value.",
+    label: "DTC SUPPLEMENTS & WELLNESS",
+    headline: "Recover more checkouts without breaking compliance.",
     subheadline:
-      "Abando’s Vertical Growth Engine helps you recover revenue from abandoned stacks and subscriptions — while staying focused on compliance, trust, and long-term retention.",
-    painPoints: [
-      "Cart abandonment on high-margin stacks and bundles hurts every launch.",
-      "You don’t have clear visibility into which SKUs drive true LTV.",
-      "You’re cautious about aggressive discounts or spammy reminders.",
+      "Abando’s AI segments shoppers and nudges them back using language that stays inside your approved claims.",
+    bullets: [
+      "Recover abandoned checkouts from ad traffic and email",
+      "Nudge trial buyers into subscriptions with the right timing",
+      "Guardrails so AI never promises “cures” or unsafe claims"
     ],
-    promise:
-      "Abando learns which offers, bundles, and reminder timings work for your supplement shoppers — then feeds clean segments into your email/SMS tools, not a black-box AI promise.",
-    proofPoints: [
-      "SKU + bundle-level recovery insight (not just 'revenue up').",
-      "Segments like 'First-time stack shoppers' or 'At-risk subscribers'.",
-      "Weekly 'no-BS' report you can share with your ops/finance team.",
-    ],
-    ctaPrimary: "See Abando for Supplements",
-    ctaSecondary: "View sample retention cohorts",
   },
 };
 
-export function VerticalGrowthEngineSection({
-  variant = "women-boutique",
-}: {
-  variant?: Variant;
-}) {
-  const copy = VARIANT_COPY[variant];
+export function VerticalGrowthEngineSection({ variant }: Props) {
+  const copy = copyByVariant[variant];
 
   return (
-    <section className="w-full max-w-5xl mx-auto px-4 py-16">
-      <p className="text-sm uppercase tracking-[0.2em] text-neutral-500 mb-3">
-        Abando Vertical Growth Engine
+    <section className="w-full max-w-4xl mx-auto py-12 px-4">
+      <p className="text-xs font-semibold tracking-[0.2em] text-pink-400 mb-3">
+        {copy.label}
       </p>
-      <h1 className="text-3xl sm:text-4xl font-semibold text-neutral-900 mb-3">
+      <h1 className="text-3xl md:text-4xl font-semibold text-white mb-4">
         {copy.headline}
       </h1>
-      <p className="text-base sm:text-lg text-neutral-700 mb-8 max-w-2xl">
+      <p className="text-slate-300 mb-8 max-w-2xl">
         {copy.subheadline}
       </p>
 
-      <div className="grid gap-8 md:grid-cols-3">
-        <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-neutral-900 uppercase tracking-wide">
-            Who this is for
-          </h2>
-          <p className="text-sm text-neutral-700">{copy.label}</p>
-        </div>
-
-        <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-neutral-900 uppercase tracking-wide">
-            What’s hurting you now
-          </h2>
-          <ul className="space-y-2 text-sm text-neutral-700">
-            {copy.painPoints.map((p) => (
-              <li key={p} className="flex gap-2">
-                <span>•</span>
-                <span>{p}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-neutral-900 uppercase tracking-wide">
-            How Abando helps
-          </h2>
-          <p className="text-sm text-neutral-700">{copy.promise}</p>
-          <ul className="space-y-2 text-sm text-neutral-700">
-            {copy.proofPoints.map((p) => (
-              <li key={p} className="flex gap-2">
-                <span>✓</span>
-                <span>{p}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+      <div className="grid md:grid-cols-3 gap-4 mb-10">
+        {copy.bullets.map((b, i) => (
+          <div
+            key={i}
+            className="bg-slate-900/40 border border-slate-700 rounded-xl p-4 text-sm text-slate-200"
+          >
+            {b}
+          </div>
+        ))}
       </div>
 
-      <div className="mt-10 flex flex-wrap gap-3">
-        <Link
+      <div className="flex flex-wrap gap-3">
+        <a
           href="/demo/playground"
-          className="inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-medium bg-black text-white hover:bg-neutral-800 transition"
+          className="inline-flex items-center px-6 py-3 rounded-lg bg-pink-500 text-black font-semibold hover:bg-pink-400"
         >
-          {copy.ctaPrimary}
-        </Link>
-        <Link
-          href="/demo/playground"
-          className="inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-medium border border-neutral-300 text-neutral-800 hover:bg-neutral-50 transition"
+          View live demo
+        </a>
+        <a
+          href="/verticals"
+          className="inline-flex items-center px-4 py-3 rounded-lg border border-slate-600 text-slate-100 hover:bg-slate-900/60 text-sm"
         >
-          {copy.ctaSecondary}
-        </Link>
+          Explore other verticals
+        </a>
       </div>
-
-      <p className="mt-4 text-xs text-neutral-500">
-        Today, these pages run on sample data. As we finalize your Shopify
-        integration, these same views will be backed by live Abando cart
-        telemetry.
-      </p>
     </section>
   );
 }

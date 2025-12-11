@@ -1,0 +1,21 @@
+"use client";
+
+import Image from "next/image";
+
+export default function ShopifyBadge() {
+  return (
+    <div className="mt-10 flex items-center justify-end gap-3 text-xs text-slate-400">
+      <span className="whitespace-nowrap">
+        Built for merchants on
+      </span>
+      <Image
+        src="/shopify_monotone_white.svg"
+        alt="Shopify"
+        width={80}
+        height={24}
+        className="h-5 w-auto opacity-90"
+        priority
+      />
+    </div>
+  );
+}
