@@ -18,18 +18,10 @@ attachUiProxy(app);
 // === ABANDO_UI_PROXY_END ===
 
 
-
 // Convenience route (people will type /playground)
 app.get("/playground", (_req, res) => res.redirect(307, "/demo/playground"));
 
 ;
-// ✅ ABANDO_UI_PROXY_START
-// Port 3000 = Shopify backend. UI runs on Next.js :3001.
-// Keep same-origin for embedded by proxying UI routes through Express.
-app.get("/", (_req, res) => res.redirect(307, "/demo/playground"));
-app.use("/demo", createProxyMiddleware({ target: "http://localhost:3001", changeOrigin: true, ws: true }));
-app.use("/embedded", createProxyMiddleware({ target: "http://localhost:3001", changeOrigin: true, ws: true }));
-// ✅ ABANDO_UI_PROXY_END
 
 484;
 484
@@ -42,7 +34,6 @@ app.use("/embedded", createProxyMiddleware({ target: "http://localhost:3001", ch
 484;
 484
 
-// ✅ ABANDO_UI_PROXY
 // Serve the Next.js UI (running on :3001) THROUGH the Shopify backend origin (:3000)
 // so embedded iframes + auth stay same-origin in dev.
 app.get("/", (_req, res) => res.redirect(307, "/demo/playground"));
