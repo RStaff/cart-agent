@@ -7,61 +7,8 @@ import { dirname, join } from "node:path";
 import { randomBytes, createHmac } from "node:crypto";
 import { PrismaClient, Prisma } from "@prisma/client";
 
-import { createProxyMiddleware } from "http-proxy-middleware";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
-
-// === ABANDO_UI_PROXY_START ===
-// Proxy Next UI (3001) through Express (3000) for /demo/* and /embedded*
-const { attachUiProxy } = await import("./ui-proxy.mjs");
-attachUiProxy(app);
-// === ABANDO_UI_PROXY_END ===
-
-
-
-// Convenience route (people will type /playground)
-app.get("/playground", (_req, res) => res.redirect(307, "/demo/playground"));
-
-;
-// ✅ ABANDO_UI_PROXY_START
-// Port 3000 = Shopify backend. UI runs on Next.js :3001.
-// Keep same-origin for embedded by proxying UI routes through Express.
-app.get("/", (_req, res) => res.redirect(307, "/demo/playground"));
-app.use("/demo", createProxyMiddleware({ target: "http://localhost:3001", changeOrigin: true, ws: true }));
-app.use("/embedded", createProxyMiddleware({ target: "http://localhost:3001", changeOrigin: true, ws: true }));
-// ✅ ABANDO_UI_PROXY_END
-
-484;
-484
-
-// ---- UI PROXY (MUST COME FIRST) ----
-
-// ---- END UI PROXY ----
-;
-484;
-484;
-484
-
-// ✅ ABANDO_UI_PROXY
-// Serve the Next.js UI (running on :3001) THROUGH the Shopify backend origin (:3000)
-// so embedded iframes + auth stay same-origin in dev.
-app.get("/", (_req, res) => res.redirect(307, "/demo/playground"));
-
-// Proxy UI routes
-app.use("/demo", createProxyMiddleware({
-  target: "http://localhost:3001",
-  changeOrigin: true,
-  ws: true,
-  logLevel: "warn",
-}));
-
-app.use("/embedded", createProxyMiddleware({
-  target: "http://localhost:3001",
-  changeOrigin: true,
-  ws: true,
-  logLevel: "warn",
-}));
-
 app.use(cookieParser());
 app.use("/billing", (await import("./routes/billing_create.js")).default);
 app.use(cors());
@@ -177,7 +124,9 @@ app.get("/shopify/billing/return", (_req, res) => res.redirect("/onboarding"));
 
 // Start
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
-app.listen(PORT, () => console.log(`[server] listening on :${PORT}`));
+
+// (listen moved to start.mjs)
+
 export default app;
 
 // Public Stripe checkout (no auth)

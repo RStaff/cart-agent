@@ -1,78 +1,45 @@
+// ❌ Could not find `const app = express()` to insert proxy block
+// ❌ Could not find app initialization for proxy insertion
 // web/src/index.js — clean ESM server with Shopify OAuth + DB save
-import express from "express";
-import cors from "cors";
+import express from "express";import cors from "cors";
 import cookieParser from "cookie-parser";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { randomBytes, createHmac } from "node:crypto";
 import { PrismaClient, Prisma } from "@prisma/client";
-
 import { createProxyMiddleware } from "http-proxy-middleware";
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 
-// === ABANDO_UI_PROXY_START ===
-// Proxy Next UI (3001) through Express (3000) for /demo/* and /embedded*
-const { attachUiProxy } = await import("./ui-proxy.mjs");
-attachUiProxy(app);
-// === ABANDO_UI_PROXY_END ===
-
-
-
-// Convenience route (people will type /playground)
-app.get("/playground", (_req, res) => res.redirect(307, "/demo/playground"));
-
-;
-// ✅ ABANDO_UI_PROXY_START
-// Port 3000 = Shopify backend. UI runs on Next.js :3001.
-// Keep same-origin for embedded by proxying UI routes through Express.
-app.get("/", (_req, res) => res.redirect(307, "/demo/playground"));
-app.use("/demo", createProxyMiddleware({ target: "http://localhost:3001", changeOrigin: true, ws: true }));
-app.use("/embedded", createProxyMiddleware({ target: "http://localhost:3001", changeOrigin: true, ws: true }));
-// ✅ ABANDO_UI_PROXY_END
-
-484;
-484
-
-// ---- UI PROXY (MUST COME FIRST) ----
-
-// ---- END UI PROXY ----
-;
-484;
-484;
-484
-
-// ✅ ABANDO_UI_PROXY
-// Serve the Next.js UI (running on :3001) THROUGH the Shopify backend origin (:3000)
-// so embedded iframes + auth stay same-origin in dev.
-app.get("/", (_req, res) => res.redirect(307, "/demo/playground"));
-
-// Proxy UI routes
-app.use("/demo", createProxyMiddleware({
-  target: "http://localhost:3001",
-  changeOrigin: true,
-  ws: true,
-  logLevel: "warn",
-}));
-
-app.use("/embedded", createProxyMiddleware({
-  target: "http://localhost:3001",
-  changeOrigin: true,
-  ws: true,
-  logLevel: "warn",
-}));
+// Embedded frontend build output (Vite)
+const FRONTEND_DIST = join(__dirname, "..", "frontend", "dist");
 
 app.use(cookieParser());
 app.use("/billing", (await import("./routes/billing_create.js")).default);
 app.use(cors());
 app.use("/billing", (await import("./routes/billing_create.js")).default);
 app.use(express.json());
+
+// Serve built embedded UI assets
+
+app.get("/demo/playground", (_req, res) => {
+  return res.sendFile(join(FRONTEND_DIST, "index.html"));
+});
+app.get("/demo/playground/", (_req, res) => {
+  return res.sendFile(join(FRONTEND_DIST, "index.html"));
+});
+
+app.use(express.static(FRONTEND_DIST, { index: false }));
+app.use("/cart-agent", express.static(FRONTEND_DIST, { index: false }));
+
+app.get("/", (_req, res) => res.redirect(307, "/demo/playground"));
+
 app.use("/billing", (await import("./routes/billing_create.js")).default);
 
 // Static + simple pages
-app.use(express.static(join(__dirname, "public")));
+app.use(express.static(join(__dirname, "public"), { index: false }));
 app.use("/billing", (await import("./routes/billing_create.js")).default);
-app.get("/", (_req,res)=>res.sendFile(join(__dirname,"public","index.html")));
 app.get("/pricing", (_req,res)=>res.sendFile(join(__dirname,"public","pricing","index.html")));
 app.get("/onboarding", (_req,res)=>res.sendFile(join(__dirname,"public","onboarding","index.html")));
 
@@ -177,7 +144,9 @@ app.get("/shopify/billing/return", (_req, res) => res.redirect("/onboarding"));
 
 // Start
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
-app.listen(PORT, () => console.log(`[server] listening on :${PORT}`));
+
+// (listen moved to start.mjs)
+
 export default app;
 
 // Public Stripe checkout (no auth)
@@ -206,8 +175,6 @@ app.post("/api/billing/checkout", async (req, res) => {
     return res.status(500).json({ error: "checkout_failed" });
   }
 });
-app.get("/demo/playground", (_req, res) =>
-  res.sendFile(join(__dirname, "public", "demo", "playground", "index.html")));
 app.get("/dashboard", (_req, res) =>
   res.sendFile(join(__dirname, "public", "dashboard", "index.html")));
 app.get("/support", (_req, res) =>
@@ -305,4 +272,14 @@ app.get("/api/ai/health", async (req, res) => {
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }
+});
+
+app.get("/__whoami", (_req, res) => {
+  res.json({
+    ok: true,
+    pid: process.pid,
+    cwd: process.cwd(),
+    file: "web/src/index.js",
+    ts: new Date().toISOString()
+  });
 });

@@ -1,3 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROUTE_PATH="web/src/routes/billing_create.js"
+
+echo "📦 Installing billing route with stub + REAL Shopify handler at: $ROUTE_PATH"
+
+cat > "$ROUTE_PATH" << 'FILEEOF'
 import express from "express";
 import shopify from "../../shopify.js";
 
@@ -238,3 +246,6 @@ router.post("/create", async (req, res) => {
 });
 
 export default router;
+FILEEOF
+
+echo "✅ Billing route with REAL Shopify handler installed at: $ROUTE_PATH"

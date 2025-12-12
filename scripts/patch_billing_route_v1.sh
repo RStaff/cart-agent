@@ -1,3 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+TARGET="web/src/routes/billing.js"
+
+echo "🔍 Checking for billing route at: $TARGET"
+if [[ ! -f "$TARGET" ]]; then
+  echo "❌ ERROR: Billing route file not found at $TARGET"
+  exit 1
+fi
+
+echo "📦 Backing up existing billing.js..."
+cp "$TARGET" "${TARGET}.backup_$(date +%s)"
+
+echo "✍️ Writing new billing route..."
+
+cat << 'FILEEOF' > "$TARGET"
 import express from "express";
 import shopify from "../shopify.js";
 import { Shopify } from "@shopify/shopify-api";
@@ -87,3 +104,6 @@ router.post("/create", async (req, res) => {
 });
 
 export default router;
+FILEEOF
+
+echo "✅ Billing route patched successfully."

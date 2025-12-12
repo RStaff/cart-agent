@@ -11,17 +11,10 @@ import { createProxyMiddleware } from "http-proxy-middleware";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 
-// === ABANDO_UI_PROXY_START ===
-// Proxy Next UI (3001) through Express (3000) for /demo/* and /embedded*
+// ---- UI PROXY (MUST COME FIRST) ----
 const { attachUiProxy } = await import("./ui-proxy.mjs");
 attachUiProxy(app);
-// === ABANDO_UI_PROXY_END ===
-
-
-
-// Convenience route (people will type /playground)
-app.get("/playground", (_req, res) => res.redirect(307, "/demo/playground"));
-
+// ---- END UI PROXY ----
 ;
 // ✅ ABANDO_UI_PROXY_START
 // Port 3000 = Shopify backend. UI runs on Next.js :3001.
@@ -31,13 +24,6 @@ app.use("/demo", createProxyMiddleware({ target: "http://localhost:3001", change
 app.use("/embedded", createProxyMiddleware({ target: "http://localhost:3001", changeOrigin: true, ws: true }));
 // ✅ ABANDO_UI_PROXY_END
 
-484;
-484
-
-// ---- UI PROXY (MUST COME FIRST) ----
-
-// ---- END UI PROXY ----
-;
 484;
 484;
 484
