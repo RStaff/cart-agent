@@ -9,6 +9,8 @@ import { PrismaClient, Prisma } from "@prisma/client";
 
 import { createProxyMiddleware } from "http-proxy-middleware";
 const __dirname = dirname(fileURLToPath(import.meta.url));
+import billingRouter from "./routes/billing.js";
+import rescueRouter from "./routes/rescue.js";
 const app = express();
 
 // === ABANDO_UI_PROXY_START ===
@@ -21,18 +23,11 @@ attachUiProxy(app);
 // Convenience route (people will type /playground)
 app.get("/playground", (_req, res) => res.redirect(307, "/demo/playground"));
 
-;
 
-484;
-484
 
 // ---- UI PROXY (MUST COME FIRST) ----
 
 // ---- END UI PROXY ----
-;
-484;
-484;
-484
 
 // Serve the Next.js UI (running on :3001) THROUGH the Shopify backend origin (:3000)
 // so embedded iframes + auth stay same-origin in dev.
@@ -54,15 +49,16 @@ app.use("/embedded", createProxyMiddleware({
 }));
 
 app.use(cookieParser());
+
+
+app.use("/api/rescue", rescueRouter);
+app.use("/api/billing", billingRouter);
 app.use("/billing", (await import("./routes/billing_create.js")).default);
 app.use(cors());
-app.use("/billing", (await import("./routes/billing_create.js")).default);
 app.use(express.json());
-app.use("/billing", (await import("./routes/billing_create.js")).default);
 
 // Static + simple pages
 app.use(express.static(join(__dirname, "public")));
-app.use("/billing", (await import("./routes/billing_create.js")).default);
 app.get("/", (_req,res)=>res.sendFile(join(__dirname,"public","index.html")));
 app.get("/pricing", (_req,res)=>res.sendFile(join(__dirname,"public","pricing","index.html")));
 app.get("/onboarding", (_req,res)=>res.sendFile(join(__dirname,"public","onboarding","index.html")));
