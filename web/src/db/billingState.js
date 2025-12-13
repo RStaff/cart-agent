@@ -1,0 +1,83 @@
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
+
+export async function getBillingState(shopDomain) {
+  const shop = String(shopDomain || "").trim().toLowerCase();
+  if (!shop) return { plan: "free", active: false, source: "stub" };
+
+  const row = await prisma.billingState.findUnique({
+    where: { shopDomain: shop },
+  });
+
+  if (!row) return { plan: "free", active: false, source: "stub" };
+
+  return { plan: row.planKey, active: row.active, source: row.source };
+}
+
+export function entitlementsForPlan(planKey, active) {
+  const plan = String(planKey || "free").toLowerCase();
+  const isActive = !!active;
+
+  // If not active, treat as free no matter what.
+  if (!isActive) {
+    return {
+      plan: "free",
+      active: false,
+      can_auto_rescue: false,
+      can_send_messages: false,
+      needs_subscription: true,
+    };
+  }
+
+  // Active plans
+  if (plan === "starter") {
+    return {
+      plan,
+      active: true,
+      can_auto_rescue: false,
+      can_send_messages: true,
+      needs_subscription: false,
+    };
+  }
+  if (plan === "growth") {
+    return {
+      plan,
+      active: true,
+      can_auto_rescue: true,
+      can_send_messages: true,
+      needs_subscription: false,
+    };
+  }
+  if (plan === "pro") {
+    return {
+      plan,
+      active: true,
+      can_auto_rescue: true,
+      can_send_messages: true,
+      needs_subscription: false,
+    };
+  }
+
+  // default
+  return {
+    plan: "free",
+    active: true,
+    can_auto_rescue: false,
+    can_send_messages: false,
+    needs_subscription: false,
+  };
+}
+
+export async function activateBilling(shopDomain, planKey, source = "stub") {
+  const shop = String(shopDomain || "").trim().toLowerCase();
+  const plan = String(planKey || "starter").trim().toLowerCase();
+  if (!shop) throw new Error("Missing shopDomain");
+
+  await prisma.billingState.upsert({
+    where: { shopDomain: shop },
+    create: { shopDomain: shop, planKey: plan, active: true, source },
+    update: { planKey: plan, active: true, source },
+  });
+
+  return { shop, plan, active: true, source };
+}
