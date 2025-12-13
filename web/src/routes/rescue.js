@@ -55,43 +55,41 @@ return res.json({
 });
 
 router.get("/real", async (req, res) => {
-  const shop = getShopFromReq(req);
-  if (!shop) return res.status(400).json({ error: "Missing shop context" });
+  const shop = String(req.query.shop || "").trim() || "unknown";
 
-  const b = await getBillingState(shop);
-  const billing = entitlementsForPlan(b.plan, b.active);
-const metrics = getRealRescueMetrics(shop);
+  // Shared dev-store lives on globalThis so both index.js simulators and the router can see it.
+  const g = globalThis;
+  if (!g.__abandoDevStore) g.__abandoDevStore = { byShop: new Map() };
+  if (!g.__abandoDevStore.byShop) g.__abandoDevStore.byShop = new Map();
 
-  if (!metrics) {
-    return res.json({
-      kind: "real",
-      shop,
-      ready: false,
-      reason: "No webhook events yet",
-      next_step: "Trigger a test abandoned cart, then a rescue",
-      gating: {
-        plan: billing.plan,
-        can_auto_rescue: billing.can_auto_rescue,
-        can_send_messages: billing.can_send_messages,
-        needs_subscription: !billing.active,
-      },
-    });
-  }
+  const byShop = g.__abandoDevStore.byShop;
+
+  const getShopStore = (s) => {
+    if (!byShop.has(s)) {
+      byShop.set(s, { events: [], recoveredUsd: 0, lastAbandonedAt: null, lastRescueAt: null });
+    }
+    return byShop.get(s);
+  };
+
+  const store = byShop.get(shop) || getShopStore(shop);
+
+  const hasEvents = !!(store?.events?.length);
+  const recoveredUsd = Number(store?.recoveredUsd || 0);
 
   return res.json({
     kind: "real",
     shop,
-    ready: true,
-    window_days: metrics.window_days,
-    currency: metrics.currency,
-    abandoned_carts: metrics.abandoned_carts,
-    rescues: metrics.rescues,
-    recovered_revenue: metrics.recovered_revenue,
+    ready: hasEvents,
+    reason: hasEvents ? "Simulated events present" : "No webhook events yet",
+    recovered_usd_total: recoveredUsd,
+    last_abandoned_at: store?.lastAbandonedAt || null,
+    last_rescue_at: store?.lastRescueAt || null,
+    next_step: hasEvents ? "Wire real webhooks + DB next" : "Trigger a test abandoned cart, then a rescue",
     gating: {
-      plan: billing.plan,
-      can_auto_rescue: billing.can_auto_rescue,
-      can_send_messages: billing.can_send_messages,
-      needs_subscription: !billing.active,
+      plan: "starter",
+      can_auto_rescue: false,
+      can_send_messages: true,
+      needs_subscription: false,
     },
   });
 });

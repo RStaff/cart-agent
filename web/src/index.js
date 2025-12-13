@@ -12,6 +12,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 import billingRouter from "./routes/billing.js";
 import rescueRouter from "./routes/rescue.js";
 const app = express();
+globalThis.__abandoDevStore = globalThis.__abandoDevStore || {
+  byShop: new Map(),
+};
 
 // === ABANDO_UI_PROXY_START ===
 // Proxy Next UI (3001) through Express (3000) for /demo/* and /embedded*
@@ -293,3 +296,47 @@ app.get("/api/ai/health", async (req, res) => {
     res.status(500).json({ ok: false, error: err.message });
   }
 });
+
+
+/**
+ * REAL rescue metrics (stub for now)
+ * Returns a stable 200 so the UI can link it.
+ */
+// ------------------------------
+// DEV SIMULATION ENDPOINTS
+// ------------------------------
+function getShopStore(shop) {
+  const key = String(shop || "unknown").trim() || "unknown";
+  const m = globalThis.__abandoDevStore.byShop;
+  if (!m.has(key)) {
+    m.set(key, {
+      lastAbandonedAt: null,
+      lastRescueAt: null,
+      recoveredUsd: 0,
+      events: [],
+    });
+  }
+  return m.get(key);
+}
+
+app.post("/api/dev/simulate/abandoned", express.json(), (req, res) => {
+  const shop = String(req.query.shop || req.body?.shop || "unknown").trim() || "unknown";
+  const store = getShopStore(shop);
+  store.lastAbandonedAt = new Date().toISOString();
+  store.events.push({ type: "abandoned", at: store.lastAbandonedAt });
+  return res.json({ ok: true, shop, lastAbandonedAt: store.lastAbandonedAt });
+});
+
+app.post("/api/dev/simulate/rescue", express.json(), (req, res) => {
+  const shop = String(req.query.shop || req.body?.shop || "unknown").trim() || "unknown";
+  const store = getShopStore(shop);
+  store.lastRescueAt = new Date().toISOString();
+  const amount = Number(req.body?.recoveredUsd ?? 28.5);
+  store.recoveredUsd = (store.recoveredUsd || 0) + (Number.isFinite(amount) ? amount : 0);
+  store.events.push({ type: "rescue_sent", at: store.lastRescueAt, recoveredUsd: amount });
+  return res.json({ ok: true, shop, lastRescueAt: store.lastRescueAt, recoveredUsdTotal: store.recoveredUsd });
+});
+
+
+
+
