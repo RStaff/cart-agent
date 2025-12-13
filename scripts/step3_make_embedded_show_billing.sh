@@ -1,3 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+ROOT="abando-frontend"
+if [ ! -d "$ROOT" ]; then
+  echo "❌ Missing abando-frontend/ at repo root."
+  exit 1
+fi
+
+# Candidates (App Router first, then Pages Router)
+CANDIDATES=(
+  "$ROOT/app/embedded/page.tsx"
+  "$ROOT/app/embedded/page.jsx"
+  "$ROOT/pages/embedded.tsx"
+  "$ROOT/pages/embedded.jsx"
+)
+
+TARGET=""
+for f in "${CANDIDATES[@]}"; do
+  if [ -f "$f" ]; then TARGET="$f"; break; fi
+done
+
+# If none exist, create App Router file
+if [ -z "$TARGET" ]; then
+  mkdir -p "$ROOT/app/embedded"
+  TARGET="$ROOT/app/embedded/page.tsx"
+  echo "⚠️ No existing embedded page found. Creating: $TARGET"
+else
+  echo "✅ Found embedded page: $TARGET"
+fi
+
+# Backup if present
+if [ -f "$TARGET" ]; then
+  cp "$TARGET" "$TARGET.bak_$(date +%s)" || true
+fi
+
+cat > "$TARGET" <<'PAGE'
 /**
  * Embedded App Home (MVP)
  * - Shows billing status + gating immediately after install/purchase.
@@ -33,8 +71,7 @@ export default async function EmbeddedPage({
 }: {
   searchParams: { shop?: string };
 }) {
-  const sp = await searchParams;
-  const shop = String(sp?.shop || "").trim();
+  const shop = (searchParams?.shop || "").trim();
   const status = shop ? await getStatus(shop) : null;
 
   return (
@@ -101,3 +138,8 @@ export default async function EmbeddedPage({
     </main>
   );
 }
+PAGE
+
+echo "✅ Wrote embedded billing dashboard to: $TARGET"
+echo "NEXT:"
+echo "  We'll run a single command to boot both servers and verify the paid loop + UI."

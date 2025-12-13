@@ -159,3 +159,15 @@ model ShopifySubscription {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
+
+model BillingState {
+  id        String   @id @default(cuid())
+  shopDomain String  @unique
+  planKey   String   @default("free") // free|starter|growth|pro
+  active    Boolean  @default(false)
+  source    String   @default("stub") // stub|shopify
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@index([shopDomain])
+}

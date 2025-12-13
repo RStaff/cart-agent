@@ -42,11 +42,21 @@ function resolvePlan(planKeyRaw) {
 // ---------------- DEV STUB BILLING ----------------
 
 async function handleStubBilling(req, res) {
+  const shop = String(req.query.shop || req.body?.shop || "").trim().toLowerCase();
+  if (!shop || !shop.endsWith(".myshopify.com")) {
+    return res.status(400).json({
+      ok: false,
+      mode: "stub",
+      error: "Missing or invalid ?shop=your-store.myshopify.com",
+    });
+  }
+
   const { planKey } = req.body || {};
   const { key: effectiveKey } = resolvePlan(planKey);
 
+  // same-origin, includes shop + plan
   const confirmationUrl =
-    `https://abando.dev/billing/confirm-stub?plan=${encodeURIComponent(effectiveKey)}`;
+    `/billing/confirm-stub?shop=${encodeURIComponent(shop)}&plan=${encodeURIComponent(effectiveKey)}`;
 
   return res.json({
     ok: true,
@@ -56,6 +66,7 @@ async function handleStubBilling(req, res) {
     confirmationUrl,
     debug: {
       received: planKey ?? null,
+      shop,
     },
   });
 }
@@ -238,8 +249,6 @@ router.post("/create", async (req, res) => {
   }
 });
 
-export default router;
-
 
 /**
  * Stub billing confirmation:
@@ -252,8 +261,12 @@ router.get("/confirm-stub", async (req, res) => {
     if (!shop) return res.status(400).send("Missing shop");
 
     await activateBilling(shop, plan, "stub");
-    return res.redirect(302, "/embedded");
+    return res.redirect(302, `/embedded?shop=${encodeURIComponent(shop)}`);
   } catch (e) {
     return res.status(500).send("Stub confirm failed");
   }
 });
+
+export default router;
+
+

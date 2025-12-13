@@ -1,24 +1,20 @@
-import { fileURLToPath } from "url";
-
 /** @type {import('next').NextConfig} */
+import { fileURLToPath } from "url";
+import path from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const nextConfig = {
-  // ESM-safe "dirname"
-  turbopack: { root: fileURLToPath(new URL(".", import.meta.url)) },
+  turbopack: { root: __dirname },
+  async rewrites() {
+    const apiOrigin =
+      process.env.NEXT_PUBLIC_API_ORIGIN || "http://localhost:3000";
 
-  reactStrictMode: true,
-
-  // Allow Shopify to embed /embedded inside admin.shopify.com + *.myshopify.com
-  async headers() {
     return [
       {
-        source: "/embedded/:path*",
-        headers: [
-          {
-            key: "Content-Security-Policy",
-            value:
-              "frame-ancestors https://admin.shopify.com https://*.myshopify.com;",
-          },
-        ],
+        source: "/api/:path*",
+        destination: `${apiOrigin}/api/:path*`,
       },
     ];
   },
