@@ -59,3 +59,8 @@ app/**/*.before_*.ts
 app/**/*.before_*.tsx
 app/**/*.bak*
 app/**/*.backup_*
+
+# local backups
+*.bak_*
+*.bak-*
+.bak/
