@@ -1,6 +1,7 @@
 import express from "express";
 import shopify from "../../shopify.js";
 
+import { activateBilling } from "../db/billingState.js";
 const router = express.Router();
 
 // BILLING_MODE controls behavior:
@@ -238,3 +239,21 @@ router.post("/create", async (req, res) => {
 });
 
 export default router;
+
+
+/**
+ * Stub billing confirmation:
+ *  /billing/confirm-stub?shop=example.myshopify.com&plan=starter
+ */
+router.get("/confirm-stub", async (req, res) => {
+  try {
+    const shop = String(req.query.shop || "").trim().toLowerCase();
+    const plan = String(req.query.plan || "starter").trim().toLowerCase();
+    if (!shop) return res.status(400).send("Missing shop");
+
+    await activateBilling(shop, plan, "stub");
+    return res.redirect(302, "/embedded");
+  } catch (e) {
+    return res.status(500).send("Stub confirm failed");
+  }
+});
