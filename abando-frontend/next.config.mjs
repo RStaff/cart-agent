@@ -1,26 +1,22 @@
+import { fileURLToPath } from "url";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // ESM-safe "dirname"
+  turbopack: { root: fileURLToPath(new URL(".", import.meta.url)) },
+
   reactStrictMode: true,
 
-  // ✅ Let the app build on Vercel even if ESLint complains
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-
-  // ✅ Allow Shopify to embed /embedded inside admin.shopify.com + *.myshopify.com
+  // Allow Shopify to embed /embedded inside admin.shopify.com + *.myshopify.com
   async headers() {
     return [
       {
-        source: '/embedded/:path*',
+        source: "/embedded/:path*",
         headers: [
           {
-            key: 'Content-Security-Policy',
-            value: "frame-ancestors https://admin.shopify.com https://*.myshopify.com;",
-          },
-          // Optional: override any default X-Frame-Options that might be added
-          {
-            key: 'X-Frame-Options',
-            value: 'ALLOWALL',
+            key: "Content-Security-Policy",
+            value:
+              "frame-ancestors https://admin.shopify.com https://*.myshopify.com;",
           },
         ],
       },
