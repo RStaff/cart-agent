@@ -1,0 +1,19 @@
+These scripts mutate web/src/index.js or routing and should NOT be used anymore.
+Canonical source-of-truth normalizer:
+  - scripts/normalize_web_index_proxy_once.sh
+
+DO NOT RUN (legacy patchers):
+  - scripts/ensure_web_3000_proxies_ui.sh
+  - scripts/ensure_port3000_proxies_ui.sh
+  - scripts/force_ui_proxy_first.sh
+  - scripts/fix_web_index_and_apply_proxy.sh
+  - scripts/patch_web_proxy_only.sh
+  - scripts/patch_web_proxy_and_playground_redirect.sh
+  - scripts/patch_web_ui_proxy_clean.sh
+  - scripts/patch_web_proxy_ui_to_3001.sh
+  - scripts/fix_web_proxy_priority.sh
+  - scripts/fix_root_redirect_vs_static.sh
+  - scripts/route_root_to_demo.sh
+  - scripts/fix_playground_trailing_slash_priority.sh
+  - scripts/mount_frontend_dist_playground.sh
+  - scripts/fix_double_listen_web.sh
