@@ -56,3 +56,4 @@ web/prisma/schema.prisma.bak_*
 web/smc-preload.cjs
 web/src/services/
 
+.env*.local

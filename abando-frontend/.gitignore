@@ -64,3 +64,4 @@ app/**/*.backup_*
 *.bak_*
 *.bak-*
 .bak/
+.env*.local
