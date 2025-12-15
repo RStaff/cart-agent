@@ -12,6 +12,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 import billingRouter from "./routes/billing.js";
 import rescueRouter from "./routes/rescue.js";
 const app = express();
+
+// ABANDO_METRICS_AND_ENTITLEMENT_MOUNTED
+const { entitlementRoutes } = require("./abando/entitlement");
+const { metricsRoutes } = require("./abando/metrics");
+entitlementRoutes(app);
+metricsRoutes(app);
 globalThis.__abandoDevStore = globalThis.__abandoDevStore || {
   byShop: new Map(),
 };
