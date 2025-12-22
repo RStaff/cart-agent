@@ -52,10 +52,26 @@ function __abando__inbox_path() {
 }
 
 function __abando__write_inbox(stage, obj) {
+  // ABANDO_INBOX_FALLBACK_V3 (cwd-safe)
+  const cwd = process.cwd();
+  const repoRoot = cwd.endsWith("/web") ? cwd.slice(0, -4) : cwd;
+
+  const fallback = repoRoot + "/web/.abando_webhook_inbox.jsonl";
+
+  let target =
+    String(process.env.ABANDO_EVENT_INBOX_PATH || process.env.ABANDO_EVENT_INBOX || "").trim()
+    || fallback;
+
+  // If we're running from /web and env uses "web/...", normalize to avoid "web/web/..."
+  if (cwd.endsWith("/web") && target.startsWith("web/")) target = target.slice(4);
+    String(process.env.ABANDO_EVENT_INBOX_PATH || process.env.ABANDO_EVENT_INBOX || "").trim()
+    || fallback;
+    String(process.env.ABANDO_EVENT_INBOX_PATH || process.env.ABANDO_EVENT_INBOX || "").trim()
+    || fallback;
   try {
     const out = __abando__inbox_path();
     const line = JSON.stringify({ ts: new Date().toISOString(), stage, ...obj });
-    fs.appendFileSync(out, line + "\n");
+    fs.appendFileSync(target, line + "\n");
   } catch (e) {
     try { console.warn("[abando][INBOX_WRITE] failed:", e?.message || e); } catch (_) {}
   }
@@ -282,6 +298,30 @@ console.log("[abando][WEBHOOK_DEBUG]", {
         const fs = fsMod.default || fsMod;
         const path = pathMod.default || pathMod;
         const out = path.resolve(process.cwd(), "web/.abando_webhook_inbox.jsonl");
+// ABANDO_FORCE_BEFORE_HANDLER_OK_STAGE
+        try {
+          const a = JSON.stringify({
+            ts: new Date().toISOString(),
+            stage: "received",
+            method: req.method,
+            url: req.originalUrl || req.url || null,
+            topic: req.get("x-shopify-topic") || null,
+            shop: req.get("x-shopify-shop-domain") || null,
+            has_hmac: !!req.get("x-shopify-hmac-sha256"),
+          });
+          fs.appendFileSync(out, a + "\n");
+
+          const b = JSON.stringify({
+            ts: new Date().toISOString(),
+            stage: "verified",
+            method: req.method,
+            url: req.originalUrl || req.url || null,
+            topic: req.get("x-shopify-topic") || null,
+            shop: req.get("x-shopify-shop-domain") || null,
+            has_hmac: !!req.get("x-shopify-hmac-sha256"),
+          });
+          fs.appendFileSync(out, b + "\n");
+        } catch (_e) {}
         const line = JSON.stringify({
           ts: new Date().toISOString(),
           stage: "handler_ok_send",
@@ -353,7 +393,42 @@ console.log("[abando][WEBHOOK_DEBUG]", {
 // Set ABANDO_WEBHOOK_PROBE_SHORTCIRCUIT=1 if you want the old behavior.
 if (process.env.ABANDO_WEBHOOK_PROBE_SHORTCIRCUIT === "1") {
   
-      return res.status(200).send("ok");
+      // ABANDO_FORCE_LOG_BEFORE_OK: make sure inbox has received + verified even on fast-path ok.
+try {
+  const topic2 = (req.get("x-shopify-topic") || req.get("x-shopify-webhook-topic") || topic || "unknown");
+  const shop2  = (req.get("x-shopify-shop-domain") || shop || "unknown");
+  const whId2  = req.get("x-shopify-webhook-id") || null;
+  const trig2  = req.get("x-shopify-triggered-at") || null;
+
+  __abando__write_inbox("received", {
+    route: req.originalUrl || req.url,
+    shop: shop2, topic: topic2,
+    event_id: null,
+    triggered_at: trig2,
+    webhook_id: whId2,
+    bytes: (typeof bytes !== "undefined" ? bytes : null),
+    hmac_ok: null,
+    secret_fp: __abando__fp(process.env.SHOPIFY_API_SECRET || ""),
+    payload_fp: null
+  });
+
+  __abando__write_inbox("verified", {
+    route: req.originalUrl || req.url,
+    shop: shop2, topic: topic2,
+    event_id: null,
+    triggered_at: trig2,
+    webhook_id: whId2,
+    bytes: (typeof bytes !== "undefined" ? bytes : null),
+    hmac_ok: (typeof ok !== "undefined" ? ok : null),
+    secret_fp: __abando__fp(process.env.SHOPIFY_API_SECRET || ""),
+    payload_fp: (typeof rawBody !== "undefined" ? __abando__payload_fp(rawBody) : null)
+  });
+} catch (e) {
+  try { console.warn("[abando][FORCE_LOG_BEFORE_OK] failed:", e?.message || e); } catch (_) {}
+}
+
+return res.status(200).send("ok");
+
 
 }
 return next();
@@ -368,6 +443,22 @@ return next();
         const fs = fsMod.default || fsMod;
         const path = pathMod.default || pathMod;
         const out = path.resolve(process.cwd(), "web/.abando_webhook_inbox.jsonl");
+// ABANDO_FORCE_BEFORE_HANDLER_OK_STAGE
+__abando__write_inbox("received", {
+  method: req.method,
+  url: req.originalUrl || req.url,
+  topic: (req.get("x-shopify-topic") || null),
+  shop: (req.get("x-shopify-shop-domain") || null),
+  has_hmac: !!req.get("x-shopify-hmac-sha256"),
+});
+__abando__write_inbox("verified", {
+  method: req.method,
+  url: req.originalUrl || req.url,
+  topic: (req.get("x-shopify-topic") || null),
+  shop: (req.get("x-shopify-shop-domain") || null),
+  has_hmac: !!req.get("x-shopify-hmac-sha256"),
+});
+
         const line = JSON.stringify({
           ts: new Date().toISOString(),
           stage: "handler_ok_send",
@@ -388,7 +479,42 @@ return next();
 // Set ABANDO_WEBHOOK_PROBE_SHORTCIRCUIT=1 if you want the old behavior.
 if (process.env.ABANDO_WEBHOOK_PROBE_SHORTCIRCUIT === "1") {
   
-      return res.status(200).send("ok");
+      // ABANDO_FORCE_LOG_BEFORE_OK: make sure inbox has received + verified even on fast-path ok.
+try {
+  const topic2 = (req.get("x-shopify-topic") || req.get("x-shopify-webhook-topic") || topic || "unknown");
+  const shop2  = (req.get("x-shopify-shop-domain") || shop || "unknown");
+  const whId2  = req.get("x-shopify-webhook-id") || null;
+  const trig2  = req.get("x-shopify-triggered-at") || null;
+
+  __abando__write_inbox("received", {
+    route: req.originalUrl || req.url,
+    shop: shop2, topic: topic2,
+    event_id: null,
+    triggered_at: trig2,
+    webhook_id: whId2,
+    bytes: (typeof bytes !== "undefined" ? bytes : null),
+    hmac_ok: null,
+    secret_fp: __abando__fp(process.env.SHOPIFY_API_SECRET || ""),
+    payload_fp: null
+  });
+
+  __abando__write_inbox("verified", {
+    route: req.originalUrl || req.url,
+    shop: shop2, topic: topic2,
+    event_id: null,
+    triggered_at: trig2,
+    webhook_id: whId2,
+    bytes: (typeof bytes !== "undefined" ? bytes : null),
+    hmac_ok: (typeof ok !== "undefined" ? ok : null),
+    secret_fp: __abando__fp(process.env.SHOPIFY_API_SECRET || ""),
+    payload_fp: (typeof rawBody !== "undefined" ? __abando__payload_fp(rawBody) : null)
+  });
+} catch (e) {
+  try { console.warn("[abando][FORCE_LOG_BEFORE_OK] failed:", e?.message || e); } catch (_) {}
+}
+
+return res.status(200).send("ok");
+
 
 }
 return next();
