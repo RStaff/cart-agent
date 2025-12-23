@@ -42,3 +42,10 @@ abando-frontend/.env.local
 abando-frontend/.next.pid*
 cart-agent/
 staffordmedia-site/
+
+# --- Abando backups / scratch files (must never ship) ---
+*.before_built_for_swap_*.tsx
+*.before_built_for_swap_*.ts
+*.bak_*.tsx
+*.bak_*.ts
+*.bak_*
