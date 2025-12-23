@@ -1,7 +1,16 @@
 {
   "headers": [
     {
-      "source": "/embedded/:path*",
+      "source": "/embedded/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "frame-ancestors https://admin.shopify.com https://*.myshopify.com;"
+        }
+      ]
+    },
+    {
+      "source": "/embedded",
       "headers": [
         {
           "key": "Content-Security-Policy",
