@@ -49,3 +49,8 @@ staffordmedia-site/
 *.bak_*.tsx
 *.bak_*.ts
 *.bak_*
+
+# editor / safety backups
+*.before_*.tsx
+*.before_*.ts
+*.bak_*
