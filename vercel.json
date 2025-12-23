@@ -1,7 +1,5 @@
 {
-  "framework": "nextjs",
-  "rootDirectory": "abando-frontend",
   "installCommand": "npm ci || npm install",
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next"
+  "buildCommand": "cd abando-frontend && (npm ci || npm install) && npm run build",
+  "outputDirectory": "abando-frontend/.next"
 }
