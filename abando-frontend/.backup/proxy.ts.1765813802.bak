@@ -1,0 +1,25 @@
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+/**
+ * Root Route Policy (Production + Local):
+ * - "/" ALWAYS temporarily redirects (307) to "/demo/playground"
+ * - Reason: merchants should not land on "/" during beta
+ */
+export function proxy(req: NextRequest) {
+  const { pathname, search } = req.nextUrl;
+
+  if (pathname === "/") {
+    const url = req.nextUrl.clone();
+    url.pathname = "/demo/playground";
+    url.search = search;
+    return NextResponse.redirect(url, 307);
+  }
+
+  return NextResponse.next();
+}
+
+// Avoid running on Next internal assets
+export const config = {
+  matcher: ["/((?!_next|favicon.ico|robots.txt|sitemap.xml).*)"],
+};
