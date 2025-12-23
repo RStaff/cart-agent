@@ -40,7 +40,7 @@
       ]
     },
     {
-      "source": "/(.*)",
+      "source": "/(?!embedded(?:/|$)).*",
       "headers": [
         {
           "key": "Cache-Control",
