@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npx next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint --config .eslint.flat.cjs --config-lookup=false --ext .ts,.tsx,.js,.mjs src scripts",
     "lint:fix": "eslint \"src/**/*.{ts,tsx}\" --fix --cache",
