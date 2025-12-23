@@ -3,10 +3,6 @@ const nextConfig = {
   reactStrictMode: true,
 
   // ✅ Let the app build on Vercel even if ESLint complains
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-
   // ✅ Allow Shopify to embed /embedded inside admin.shopify.com + *.myshopify.com
   async headers() {
     return [
