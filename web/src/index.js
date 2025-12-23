@@ -7,9 +7,62 @@ import { dirname, join } from "node:path";
 import { randomBytes, createHmac } from "node:crypto";
 import { PrismaClient, Prisma } from "@prisma/client";
 
+import { createProxyMiddleware } from "http-proxy-middleware";
 const __dirname = dirname(fileURLToPath(import.meta.url));
+import billingRouter from "./routes/billing.js";
+import rescueRouter from "./routes/rescue.js";
 const app = express();
+
+// ABANDO_METRICS_AND_ENTITLEMENT_MOUNTED
+const { entitlementRoutes } = require("./abando/entitlement");
+const { metricsRoutes } = require("./abando/metrics");
+entitlementRoutes(app);
+metricsRoutes(app);
+globalThis.__abandoDevStore = globalThis.__abandoDevStore || {
+  byShop: new Map(),
+};
+
+// === ABANDO_UI_PROXY_START ===
+// Proxy Next UI (3001) through Express (3000) for /demo/* and /embedded*
+const { attachUiProxy } = await import("./ui-proxy.mjs");
+attachUiProxy(app);
+// === ABANDO_UI_PROXY_END ===
+
+
+// Convenience route (people will type /playground)
+app.get("/playground", (_req, res) => res.redirect(307, "/demo/playground"));
+
+
+
+// ---- UI PROXY (MUST COME FIRST) ----
+
+// ---- END UI PROXY ----
+
+// Serve the Next.js UI (running on :3001) THROUGH the Shopify backend origin (:3000)
+// so embedded iframes + auth stay same-origin in dev.
+app.get("/", (_req, res) => res.redirect(307, "/demo/playground"));
+
+// Proxy UI routes
+app.use("/demo", createProxyMiddleware({
+  target: "http://localhost:3001",
+  changeOrigin: true,
+  ws: true,
+  logLevel: "warn",
+}));
+
+app.use("/embedded", createProxyMiddleware({
+  target: "http://localhost:3001",
+  changeOrigin: true,
+  ws: true,
+  logLevel: "warn",
+}));
+
 app.use(cookieParser());
+
+
+app.use("/api/rescue", rescueRouter);
+app.use("/api/billing", billingRouter);
+app.use("/billing", (await import("./routes/billing_create.js")).default);
 app.use(cors());
 app.use(express.json());
 
@@ -249,3 +302,47 @@ app.get("/api/ai/health", async (req, res) => {
     res.status(500).json({ ok: false, error: err.message });
   }
 });
+
+
+/**
+ * REAL rescue metrics (stub for now)
+ * Returns a stable 200 so the UI can link it.
+ */
+// ------------------------------
+// DEV SIMULATION ENDPOINTS
+// ------------------------------
+function getShopStore(shop) {
+  const key = String(shop || "unknown").trim() || "unknown";
+  const m = globalThis.__abandoDevStore.byShop;
+  if (!m.has(key)) {
+    m.set(key, {
+      lastAbandonedAt: null,
+      lastRescueAt: null,
+      recoveredUsd: 0,
+      events: [],
+    });
+  }
+  return m.get(key);
+}
+
+app.post("/api/dev/simulate/abandoned", express.json(), (req, res) => {
+  const shop = String(req.query.shop || req.body?.shop || "unknown").trim() || "unknown";
+  const store = getShopStore(shop);
+  store.lastAbandonedAt = new Date().toISOString();
+  store.events.push({ type: "abandoned", at: store.lastAbandonedAt });
+  return res.json({ ok: true, shop, lastAbandonedAt: store.lastAbandonedAt });
+});
+
+app.post("/api/dev/simulate/rescue", express.json(), (req, res) => {
+  const shop = String(req.query.shop || req.body?.shop || "unknown").trim() || "unknown";
+  const store = getShopStore(shop);
+  store.lastRescueAt = new Date().toISOString();
+  const amount = Number(req.body?.recoveredUsd ?? 28.5);
+  store.recoveredUsd = (store.recoveredUsd || 0) + (Number.isFinite(amount) ? amount : 0);
+  store.events.push({ type: "rescue_sent", at: store.lastRescueAt, recoveredUsd: amount });
+  return res.json({ ok: true, shop, lastRescueAt: store.lastRescueAt, recoveredUsdTotal: store.recoveredUsd });
+});
+
+
+
+

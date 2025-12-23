@@ -1,12 +1,20 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-// Root-cause: dashboard must be public for sales/demo.
-// We keep middleware file present to avoid import errors elsewhere, but do nothing.
-export function middleware(_req: NextRequest) {
+export function middleware(req: NextRequest) {
+  const { pathname, search } = req.nextUrl;
+
+  // only redirect the exact root path
+  if (pathname === "/") {
+    const url = req.nextUrl.clone();
+    url.pathname = "/demo/playground";
+    url.search = search;
+    return NextResponse.redirect(url, 307);
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: [] // no protected routes
+  matcher: ["/((?!_next|favicon.ico|robots.txt|sitemap.xml).*)"],
 };

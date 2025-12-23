@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Shop {
+  id          String       @id @default(cuid())
+  key         String       @unique
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  apiKey      String?
+  emailFrom   String?
+  name        String?
+  provider    String?
+  carts       Cart[]
+  emailQueues EmailQueue[] @relation("Shop_EmailQueue")
+}
+
+model Cart {
+  id          String       @id @default(cuid())
+  cartId      String       @unique
+  userEmail   String
+  items       Json
+  status      String       @default("abandoned")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  shopId      String?
+  shop        Shop?        @relation(fields: [shopId], references: [id])
+  emailQueues EmailQueue[] @relation("Cart_EmailQueue")
+
+  @@index([shopId])
+}
+
+model EmailQueue {
+  id          String      @id @default(cuid())
+  shopId      String?
+  cartId      String?
+  to          String
+  subject     String
+  html        String
+  status      EmailStatus @default(queued)
+  runAt       DateTime    @default(now())
+  attempts    Int         @default(0)
+  error       String?
+  sentAt      DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  attachments Json?
+  cart        Cart?       @relation("Cart_EmailQueue", fields: [cartId], references: [id])
+  shop        Shop?       @relation("Shop_EmailQueue", fields: [shopId], references: [id])
+
+  @@index([status, runAt])
+}
+
+enum EmailStatus {
+  queued
+  sending
+  sent
+  failed
+}
+/* --- abando billing + usage models --- */
+model User {
+  id               String   @id @default(cuid())
+  email            String   @unique
+  stripeCustomerId String?  @unique
+  stripeSubStatus  String?
+  freeCredits      Int      @default(20)
+  creditsResetAt   DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  usages           Usage[]
+}
+
+model Usage {
+  id        String   @id @default(cuid())
+  userId    String
+  kind      String
+  cost      Int
+  meta      Json?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+$MARKER
+
+/// Daily per-store aggregates for Abando v1 → StaffordOS exports
+
+
+
+$MARKER
+
+// DailyAggregates + related fields for Abando v1
+model DailyAggregate {
+  id                     Int      @id @default(autoincrement())
+  storeId                Int
+  date                   DateTime
+
+  cartsCreated           Int      @default(0)
+  cartsAbandoned         Int      @default(0)
+  cartsRecovered         Int      @default(0)
+
+  recoveryAttemptsSent   Int      @default(0)
+  recoveryClicks         Int      @default(0)
+  recoveriesCount        Int      @default(0)
+
+  potentialRevenue       Decimal  @default(0)
+  revenueRecovered       Decimal  @default(0)
+
+  abandonmentRate        Decimal?
+  recoveryRate           Decimal?
+  clickThroughRate       Decimal?
+  conversionRate         Decimal?
+
+  avgCartValue           Decimal?
+  avgTimeToRecoveryHours Decimal?
+
+  createdAt              DateTime @default(now())
+
+  @@unique([storeId, date])
+  @@index([storeId, date])
+}
+

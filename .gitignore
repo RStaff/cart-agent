@@ -42,3 +42,21 @@ abando-frontend/.env.local
 abando-frontend/.next.pid*
 cart-agent/
 staffordmedia-site/
+
+# --- local/dev noise ---
+.dev_*.log
+*.bak_*
+*.bak
+.nvmrc
+
+# generated prisma migration backups (we only commit real migrations dir)
+web/prisma/schema.prisma.bak_*
+
+# local preload + local services dir (if these are generated locally)
+web/smc-preload.cjs
+web/src/services/
+
+.env*.local
+
+# local scratch
+_scratch/

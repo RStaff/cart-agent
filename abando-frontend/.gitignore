@@ -53,3 +53,15 @@ staffordmedia-site/
 cart-agent
 staffordmedia-site
 abando-frontend/abando-frontend
+
+# Never let Next compile editor/script backups inside app/
+app/**/*.before_*.ts
+app/**/*.before_*.tsx
+app/**/*.bak*
+app/**/*.backup_*
+
+# local backups
+*.bak_*
+*.bak-*
+.bak/
+.env*.local

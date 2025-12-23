@@ -1,28 +1,20 @@
 /** @type {import('next').NextConfig} */
+import { fileURLToPath } from "url";
+import path from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const nextConfig = {
-  reactStrictMode: true,
+  turbopack: { root: __dirname },
+  async rewrites() {
+    const apiOrigin =
+      process.env.NEXT_PUBLIC_API_ORIGIN || "http://localhost:3000";
 
-  // ✅ Let the app build on Vercel even if ESLint complains
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-
-  // ✅ Allow Shopify to embed /embedded inside admin.shopify.com + *.myshopify.com
-  async headers() {
     return [
       {
-        source: '/embedded/:path*',
-        headers: [
-          {
-            key: 'Content-Security-Policy',
-            value: "frame-ancestors https://admin.shopify.com https://*.myshopify.com;",
-          },
-          // Optional: override any default X-Frame-Options that might be added
-          {
-            key: 'X-Frame-Options',
-            value: 'ALLOWALL',
-          },
-        ],
+        source: "/api/:path*",
+        destination: `${apiOrigin}/api/:path*`,
       },
     ];
   },
