@@ -57,3 +57,6 @@ web/smc-preload.cjs
 web/src/services/
 
 .env*.local
+
+# local scratch
+_scratch/
