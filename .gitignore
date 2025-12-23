@@ -54,3 +54,22 @@ staffordmedia-site/
 *.before_*.tsx
 *.before_*.ts
 *.bak_*
+
+# local scratch / backups - never deploy
+_scratch/
+.backup/
+**/.backup/
+*.bak
+*.bak_*
+*.backup
+*.log
+*.pid
+node_modules/
+_scratch/
+.backup/
+**/.backup/
+*.bak
+*.bak_*
+*.backup
+*.log
+*.pid
