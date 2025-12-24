@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
     if (!hmac || !shop || !timestamp) {
       return NextResponse.json(
         { ok: false, error: 'Missing required Shopify parameters.' },
-        { status: 400 }
+        { status: 200 }
       );
     }
 
