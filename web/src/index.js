@@ -13,8 +13,8 @@ const app = express();
 
 // --- Embedded entrypoint alias (Shopify Application URL) ---
 app.get("/app", (req,res)=> res.redirect(307, "/embedded"));
-app.get("/app\/", (req,res)=> res.redirect(307, "/demo/playground"));
-app.get("/app\/.*", (req,res)=> res.redirect(307, "/demo/playground"));
+app.get("/app\/", (req,res)=> res.redirect(307, "/embedded"));
+app.get("/app\/.*", (req,res)=> res.redirect(307, "/embedded"));
 
 /* ABANDO_GDPR_ROUTE_ONCE */
 app.head("/api/webhooks/gdpr", (_req, res) => res.status(200).end());
