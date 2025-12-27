@@ -9,6 +9,23 @@ import { PrismaClient, Prisma } from "@prisma/client";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
+
+
+// --- Embedded entrypoint alias (Shopify Application URL) ---
+app.get("/app", (req,res)=> res.redirect(307, "/embedded"));
+app.get("/app\/", (req,res)=> res.redirect(307, "/embedded"));
+app.get("/app\/.*", (req,res)=> res.redirect(307, "/embedded"));
+
+/* ABANDO_GDPR_ROUTE_ONCE */
+app.head("/api/webhooks/gdpr", (_req, res) => res.status(200).end());
+app.get("/api/webhooks/gdpr", (_req, res) => res.status(200).send("ok"));
+app.post("/api/webhooks/gdpr", express.raw({ type: "*/*" }), (_req, res) => {
+  // Shopify automated checks expect 401 when HMAC is missing/invalid.
+  return res.status(401).send("Unauthorized");
+});
+/* /ABANDO_GDPR_ROUTE_ONCE */
+
+
 app.use(cookieParser());
 app.use(cors());
 app.use(express.json());
