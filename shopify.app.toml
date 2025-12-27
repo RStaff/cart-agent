@@ -2,23 +2,32 @@
 
 client_id = "83114672506075ba4866194fe0160cde"
 name = "cart-agent"
-application_url = "https://waterproof-propose-wit-gage.trycloudflare.com"
+application_url = "https://gray-fitting-mats-strictly.trycloudflare.com"
 embedded = true
 handle = "cart-agent-1"
 
 [build]
 automatically_update_urls_on_dev = true
-include_config_on_deploy = true
 
 [webhooks]
 api_version = "2025-07"
+
+  [[webhooks.subscriptions]]
+  uri = "https://auburn-nat-usb-technician.trycloudflare.com/api/webhooks/gdpr"
+  compliance_topics = [ "customers/data_request", "customers/redact", "shop/redact" ]
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
 scopes = "write_products"
 
 [auth]
-redirect_urls = ["https://waterproof-propose-wit-gage.trycloudflare.com/auth/callback", "https://waterproof-propose-wit-gage.trycloudflare.com/auth/shopify/callback", "https://waterproof-propose-wit-gage.trycloudflare.com/api/auth/callback"]
+redirect_urls = [
+  "https://waterproof-propose-wit-gage.trycloudflare.com/auth/callback",
+  "https://waterproof-propose-wit-gage.trycloudflare.com/auth/shopify/callback",
+  "https://waterproof-propose-wit-gage.trycloudflare.com/api/auth/callback"
+]
 
 [pos]
 embedded = false
+
+web_directories = ["web/"]
