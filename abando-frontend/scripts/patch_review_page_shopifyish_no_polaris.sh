@@ -1,5 +1,15 @@
-import Image from "next/image";
+#!/usr/bin/env bash
+set -euo pipefail
 
+ROOT="$(pwd)"
+PAGE="app/embedded/review/page.tsx"
+
+test -d "$ROOT/app" || { echo "❌ Not in abando-frontend root. Expected ./app"; exit 1; }
+test -f "$PAGE" || { echo "❌ Missing $PAGE"; exit 1; }
+
+cp "$PAGE" "$PAGE.bak_$(date +%s)" || true
+
+cat > "$PAGE" << 'PAGEEOF'
 export default function ReviewEmbeddedPage() {
   return (
     <main className="min-h-screen bg-[#050816] text-white">
@@ -7,7 +17,9 @@ export default function ReviewEmbeddedPage() {
       <header className="sticky top-0 z-50 border-b border-white/10 bg-[#050816]/85 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <div><Image src="/abando-logo.inline.png" alt="Abando logo" width={32} height={32} /></div>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10">
+              <span className="text-sm font-semibold">A</span>
+            </div>
             <div>
               <div className="flex items-center gap-2">
                 <div className="text-sm font-semibold">Abando Dashboard</div>
@@ -64,7 +76,7 @@ export default function ReviewEmbeddedPage() {
                 desc="Group sessions into clear behavioral buckets (e.g., sizing uncertainty, timing delay, price friction)."
               />
               <FeatureLine
-                title="Suggested responses by hesitation type"
+                title="Next-best action suggestions"
                 desc="Surface what kind of follow-up fits the hesitation type—without rewriting your whole marketing stack."
               />
               <FeatureLine
@@ -168,3 +180,9 @@ function KpiCard({ title, desc }: { title: string; desc: string }) {
 function Dot() {
   return <span className="mt-1.5 h-2 w-2 rounded-full bg-emerald-300/70 flex-none" />;
 }
+PAGEEOF
+
+echo "✅ Wrote: $PAGE"
+echo "Next:"
+echo "  npm run dev"
+echo "  open http://localhost:3000/embedded/review"
