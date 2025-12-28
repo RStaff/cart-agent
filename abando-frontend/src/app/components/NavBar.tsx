@@ -57,7 +57,7 @@ export function NavBar() {
 
           {/* Primary CTA – internal link only */}
           <Link
-            href="/demo/playground"
+            href="/marketing/demo/playground"
             className="hidden rounded-full bg-amber-400 px-3 py-1.5 text-xs font-semibold text-slate-950 shadow-sm hover:bg-amber-300 md:inline-flex"
           >
             Open demo

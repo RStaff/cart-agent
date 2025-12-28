@@ -53,7 +53,7 @@ export default function SupplementsPlaybookPage() {
           </p>
 
           <a
-            href="/demo/playground"
+            href="/marketing/demo/playground"
             className="inline-block bg-emerald-400 text-black px-6 py-3 rounded-lg font-semibold hover:bg-emerald-300"
           >
             View live demo

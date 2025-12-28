@@ -31,7 +31,7 @@ export default function Dashboard() {
         <div className="rounded-md border border-slate-700 p-4">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold">Latest copy</h3>
-            <a className="text-indigo-400 hover:text-indigo-300 text-sm" href="/demo/playground">Open demo →</a>
+            <a className="text-indigo-400 hover:text-indigo-300 text-sm" href="/marketing/demo/playground">Open demo →</a>
           </div>
           <pre className="mt-3 whitespace-pre-wrap text-slate-200 min-h-[120px]">{demo?.copy || "Run the demo to generate copy."}</pre>
         </div>
@@ -45,7 +45,7 @@ export default function Dashboard() {
       <div className="mt-6">
         <a className="underline text-sm" href="/onboarding?trial=1&plan=basic">Onboard now — under 5 minutes</a>
         {" · "}
-        <a className="underline text-sm" href="/demo/playground">Back to demo</a>
+        <a className="underline text-sm" href="/marketing/demo/playground">Back to demo</a>
       </div>
     </main>
   );

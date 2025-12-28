@@ -50,7 +50,7 @@ export default function WomensBoutiqueLanding() {
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <a
-              href="/demo/playground"
+              href="/marketing/demo/playground"
               className="inline-flex items-center justify-center rounded-full bg-emerald-400 px-5 py-2.5 text-sm font-medium text-slate-950 shadow-lg shadow-emerald-500/40 hover:bg-emerald-300 transition"
             >
               Watch cart recovery demo
@@ -162,7 +162,7 @@ export default function WomensBoutiqueLanding() {
         </div>
         <div className="mt-3 flex flex-wrap gap-3 sm:mt-0">
           <a
-            href="/demo/playground"
+            href="/marketing/demo/playground"
             className="inline-flex items-center justify-center rounded-full bg-emerald-400 px-4 py-2 text-xs font-semibold text-slate-950 hover:bg-emerald-300 transition"
           >
             Watch the cart recovery demo

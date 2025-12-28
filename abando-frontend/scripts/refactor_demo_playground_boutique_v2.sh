@@ -280,7 +280,7 @@ export default function DemoPlaygroundPage() {
                   See full boutique growth plan
                 </Link>
                 <Link
-                  href="/verticals"
+                  href="/marketing/verticals"
                   className="inline-flex w-full items-center justify-center rounded-lg border border-emerald-400/60 px-4 py-2 text-sm font-semibold text-emerald-200 hover:bg-emerald-500/10"
                 >
                   See other verticals

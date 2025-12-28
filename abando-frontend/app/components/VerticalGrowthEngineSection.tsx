@@ -64,13 +64,13 @@ export function VerticalGrowthEngineSection({ variant }: Props) {
 
       <div className="flex flex-wrap gap-3">
         <a
-          href="/demo/playground"
+          href="/marketing/demo/playground"
           className="inline-flex items-center px-6 py-3 rounded-lg bg-pink-500 text-black font-semibold hover:bg-pink-400"
         >
           View live demo
         </a>
         <a
-          href="/verticals"
+          href="/marketing/verticals"
           className="inline-flex items-center px-4 py-3 rounded-lg border border-slate-600 text-slate-100 hover:bg-slate-900/60 text-sm"
         >
           Explore other verticals

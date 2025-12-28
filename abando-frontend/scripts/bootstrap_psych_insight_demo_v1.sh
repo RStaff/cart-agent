@@ -184,7 +184,7 @@ export default function DemoPlaygroundPage() {
             Start with my best-fit vertical
           </Link>
           <Link
-            href="/verticals"
+            href="/marketing/verticals"
             className="inline-flex items-center justify-center rounded-lg border border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-100 hover:bg-slate-900"
           >
             Explore both verticals

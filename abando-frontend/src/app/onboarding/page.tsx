@@ -26,7 +26,7 @@ export default function OnboardingPage() {
 
         <div className="pt-4 flex flex-wrap gap-3">
           <Link
-            href="/demo/playground"
+            href="/marketing/demo/playground"
             className="rounded-md px-4 py-2 text-sm font-medium bg-indigo-500 hover:bg-indigo-400 text-white"
           >
             Jump into the demo

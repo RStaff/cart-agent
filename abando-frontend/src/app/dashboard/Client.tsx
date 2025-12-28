@@ -54,7 +54,7 @@ export default function DashboardClient() {
           <div style={{background:"#0f172a", border:"1px solid rgba(255,255,255,.08)", borderRadius:10, padding:12}}>
             <div style={{display:"flex", justifyContent:"space-between", alignItems:"center"}}>
               <strong>Latest copy</strong>
-              <Link href="/demo/playground" style={{textDecoration:"underline", color:"#9fb0c6"}}>Open demo →</Link>
+              <Link href="/marketing/demo/playground" style={{textDecoration:"underline", color:"#9fb0c6"}}>Open demo →</Link>
             </div>
             <div style={{marginTop:10}}>
               {latest?.message ? (
@@ -84,7 +84,7 @@ export default function DashboardClient() {
           <div style={{display:"flex", gap:8, marginTop:4}}>
             <Link href="/pricing" style={{textDecoration:"underline", color:"#93c5fd"}}>Onboard now — under 5 minutes</Link>
             <span style={{color:"#475569"}}>·</span>
-            <Link href="/demo/playground" style={{textDecoration:"underline", color:"#9fb0c6"}}>Back to demo</Link>
+            <Link href="/marketing/demo/playground" style={{textDecoration:"underline", color:"#9fb0c6"}}>Back to demo</Link>
           </div>
         </section>
 

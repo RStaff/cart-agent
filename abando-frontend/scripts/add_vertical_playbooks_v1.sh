@@ -178,13 +178,13 @@ export default function BoutiquePlaybookPage() {
           </div>
           <div className="flex flex-col gap-3 sm:w-60">
             <Link
-              href="/demo/playground"
+              href="/marketing/demo/playground"
               className="inline-flex items-center justify-center rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-300"
             >
               View live demo
             </Link>
             <Link
-              href="/verticals/women-boutique"
+              href="/marketing/verticals/women-boutique"
               className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-900"
             >
               See the Vertical Growth Engine →
@@ -365,7 +365,7 @@ export default function SupplementsPlaybookPage() {
           </div>
           <div className="flex flex-col gap-3 sm:w-60">
             <Link
-              href="/demo/playground"
+              href="/marketing/demo/playground"
               className="inline-flex items-center justify-center rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-300"
             >
               View live demo
@@ -390,7 +390,7 @@ TSX
 
 if [ -f app/marketing/women-boutique/page.tsx ]; then
   echo "🔁 Updating boutique CTA to point at playbook…"
-  perl -pi -e 's#href="/verticals/women-boutique"#href="/marketing/women-boutique/playbook"#g' app/marketing/women-boutique/page.tsx
+  perl -pi -e 's#href="/marketing/verticals/women-boutique"#href="/marketing/women-boutique/playbook"#g' app/marketing/women-boutique/page.tsx
 fi
 
 if [ -f app/marketing/supplements/page.tsx ]; then

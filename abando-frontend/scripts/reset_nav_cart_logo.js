@@ -52,7 +52,7 @@ export default function Navbar() {
             </Link>
           ))}
 
-          <Link href="/demo/playground" className="nav-link nav-link--secondary">
+          <Link href="/marketing/demo/playground" className="nav-link nav-link--secondary">
             Open Interactive Demo
           </Link>
           <Link href="/trial" className="nav-link nav-link--primary">
