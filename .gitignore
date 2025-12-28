@@ -73,3 +73,5 @@ _scratch/
 *.backup
 *.log
 *.pid
+.env*.local
+abando-frontend/package-lock.json
