@@ -22,7 +22,7 @@ export default function SupplementsMarketingPage() {
             See supplements recovery playbook
           </a>
           <a
-            href="/demo/playground"
+            href="/marketing/demo/playground"
             className="inline-flex items-center px-4 py-3 rounded-lg border border-slate-600 text-slate-100 hover:bg-slate-900/60 text-sm"
           >
             View live demo

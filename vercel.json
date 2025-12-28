@@ -1,3 +1,5 @@
 {
-  "rootDirectory": "abando-frontend"
+  "installCommand": "npm ci || npm install",
+  "buildCommand": "cd abando-frontend && (npm ci || npm install) && npm run build",
+  "outputDirectory": "abando-frontend/.next"
 }

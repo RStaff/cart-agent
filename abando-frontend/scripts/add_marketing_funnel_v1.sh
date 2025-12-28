@@ -80,14 +80,14 @@ export default function WomensBoutiqueMarketingPage() {
 
           <div className="flex flex-wrap gap-3 pt-2">
             <Link
-              href="/demo/playground"
+              href="/marketing/demo/playground"
               className="inline-flex items-center justify-center rounded-full bg-pink-500 px-5 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-pink-500/30 hover:bg-pink-400 transition"
             >
               Try the Abando demo
             </Link>
 
             <Link
-              href="/verticals/women-boutique"
+              href="/marketing/verticals/women-boutique"
               className="inline-flex items-center justify-center rounded-full border border-slate-600 px-5 py-2 text-sm font-medium text-slate-100 hover:border-slate-400 hover:text-white transition"
             >
               View the boutique growth playbook

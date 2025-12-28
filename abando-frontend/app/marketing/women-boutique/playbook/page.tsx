@@ -52,7 +52,7 @@ export default function BoutiquePlaybookPage() {
           </p>
 
           <a
-            href="/demo/playground"
+            href="/marketing/demo/playground"
             className="inline-block bg-pink-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-pink-400"
           >
             View live demo

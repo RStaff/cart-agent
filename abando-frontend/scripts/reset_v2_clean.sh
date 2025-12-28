@@ -78,13 +78,13 @@ export default function NavBar() {
       <nav className={styles.nav}>
         <Brand />
         <div className={styles.navLinks}>
-          <a className={styles.link} href="/demo/playground">Demo</a>
+          <a className={styles.link} href="/marketing/demo/playground">Demo</a>
           <a className={styles.link} href="/pricing">Pricing</a>
           <a className={styles.link} href="/onboarding">Onboarding</a>
           <a className={styles.link} href="/support">Support</a>
         </div>
         <div className={styles.navCtas}>
-          <a className={`${styles.btn} ${styles.btnGhost}`} href="/demo/playground">Open demo</a>
+          <a className={`${styles.btn} ${styles.btnGhost}`} href="/marketing/demo/playground">Open demo</a>
           <a className={`${styles.btn} ${styles.btnPrimary}`} href="/onboarding?trial=1">Start free trial</a>
         </div>
       </nav>
@@ -189,7 +189,7 @@ export default function Page() {
           </p>
           <div className={styles.heroCtas}>
             <a className={`${styles.btn} ${styles.btnPrimary}`} href="/onboarding">Start Free Trial</a>
-            <a className={`${styles.btn} ${styles.btnGhost}`} href="/demo/playground">Try the Demo</a>
+            <a className={`${styles.btn} ${styles.btnGhost}`} href="/marketing/demo/playground">Try the Demo</a>
           </div>
         </div>
       </section>

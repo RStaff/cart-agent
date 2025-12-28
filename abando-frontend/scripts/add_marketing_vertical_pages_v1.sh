@@ -45,13 +45,13 @@ export default function BoutiqueMarketingPage() {
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href="/demo/playground"
+              href="/marketing/demo/playground"
               className="rounded-full bg-pink-500 px-6 py-3 text-sm font-medium text-slate-950 hover:bg-pink-400 transition"
             >
               Try the Abando demo
             </Link>
             <Link
-              href="/verticals/women-boutique"
+              href="/marketing/verticals/women-boutique"
               className="rounded-full border border-slate-600 px-6 py-3 text-sm font-medium text-slate-50 hover:border-slate-300 transition"
             >
               View the boutique growth playbook →
@@ -186,7 +186,7 @@ export default function SupplementsMarketingPage() {
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href="/demo/playground"
+              href="/marketing/demo/playground"
               className="rounded-full bg-emerald-500 px-6 py-3 text-sm font-medium text-slate-950 hover:bg-emerald-400 transition"
             >
               Watch cart recovery demo

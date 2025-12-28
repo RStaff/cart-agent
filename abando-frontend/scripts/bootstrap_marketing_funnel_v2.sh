@@ -90,13 +90,13 @@ export function VerticalGrowthEngineSection({ variant }: Props) {
 
       <div className="flex flex-wrap gap-3">
         <a
-          href="/demo/playground"
+          href="/marketing/demo/playground"
           className="inline-flex items-center px-6 py-3 rounded-lg bg-pink-500 text-black font-semibold hover:bg-pink-400"
         >
           View live demo
         </a>
         <a
-          href="/verticals"
+          href="/marketing/verticals"
           className="inline-flex items-center px-4 py-3 rounded-lg border border-slate-600 text-slate-100 hover:bg-slate-900/60 text-sm"
         >
           Explore other verticals
@@ -130,7 +130,7 @@ export default function VerticalEnginePage() {
 
         <div className="grid md:grid-cols-2 gap-4 mt-6">
           <a
-            href="/verticals/women-boutique"
+            href="/marketing/verticals/women-boutique"
             className="block bg-slate-900/60 border border-slate-700 rounded-xl p-4 hover:bg-slate-900"
           >
             <p className="text-xs text-pink-400 mb-1">VERTICAL · LIVE</p>
@@ -238,7 +238,7 @@ export default function BoutiqueMarketingPage() {
             See boutique recovery playbook
           </a>
           <a
-            href="/demo/playground"
+            href="/marketing/demo/playground"
             className="inline-flex items-center px-4 py-3 rounded-lg border border-slate-600 text-slate-100 hover:bg-slate-900/60 text-sm"
           >
             View live demo
@@ -276,7 +276,7 @@ export default function SupplementsMarketingPage() {
             See supplements recovery playbook
           </a>
           <a
-            href="/demo/playground"
+            href="/marketing/demo/playground"
             className="inline-flex items-center px-4 py-3 rounded-lg border border-slate-600 text-slate-100 hover:bg-slate-900/60 text-sm"
           >
             View live demo
@@ -347,7 +347,7 @@ export default function BoutiquePlaybookPage() {
           </p>
 
           <a
-            href="/demo/playground"
+            href="/marketing/demo/playground"
             className="inline-block bg-pink-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-pink-400"
           >
             View live demo
@@ -416,7 +416,7 @@ export default function SupplementsPlaybookPage() {
           </p>
 
           <a
-            href="/demo/playground"
+            href="/marketing/demo/playground"
             className="inline-block bg-emerald-400 text-black px-6 py-3 rounded-lg font-semibold hover:bg-emerald-300"
           >
             View live demo

@@ -14,7 +14,7 @@ export default function OnboardingClient({ plan }: { plan?: string }) {
       </p>
       <ul>
         <li><a href="/dashboard">Dashboard</a></li>
-        <li><a href="/demo/playground">Demo playground</a></li>
+        <li><a href="/marketing/demo/playground">Demo playground</a></li>
       </ul>
     </main>
   );

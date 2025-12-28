@@ -16,7 +16,7 @@ export default function Page() {
             </p>
             <div className={styles.heroCtas}>
               <Link className={`${styles.btn} ${styles.btnPrimary}`} href="/onboarding">Start Free Trial</Link>
-              <Link className={`${styles.btn} ${styles.btnGhost}`} href="/demo/playground">Try the Demo</Link>
+              <Link className={`${styles.btn} ${styles.btnGhost}`} href="/marketing/demo/playground">Try the Demo</Link>
             </div>
           </div>
         </section>

@@ -132,13 +132,13 @@ export function VerticalGrowthEngineSection({
 
       <div className="mt-10 flex flex-wrap gap-3">
         <Link
-          href="/demo/playground"
+          href="/marketing/demo/playground"
           className="inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-medium bg-black text-white hover:bg-neutral-800 transition"
         >
           {copy.ctaPrimary}
         </Link>
         <Link
-          href="/demo/playground"
+          href="/marketing/demo/playground"
           className="inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-medium border border-neutral-300 text-neutral-800 hover:bg-neutral-50 transition"
         >
           {copy.ctaSecondary}

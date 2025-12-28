@@ -8,7 +8,7 @@ export default function NotFound() {
       <div style={{ marginTop: 16 }}>
         <a href="/" style={{ textDecoration: "underline" }}>Home</a>
         <span style={{ margin: "0 8px" }}>•</span>
-        <a href="/demo/playground" style={{ textDecoration: "underline" }}>Open demo</a>
+        <a href="/marketing/demo/playground" style={{ textDecoration: "underline" }}>Open demo</a>
       </div>
     </main>
   );

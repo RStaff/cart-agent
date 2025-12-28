@@ -40,7 +40,7 @@ export default function Navbar() {
         {/* Right: demo + trial + static Shopify badge */}
         <div className="flex items-center gap-3">
           <Link
-            href="/demo/playground"
+            href="/marketing/demo/playground"
             className="hidden sm:inline-flex rounded-full border border-slate-600 px-3 py-1.5 text-xs font-medium text-slate-100 hover:border-slate-400 hover:text-slate-50"
           >
             Open demo

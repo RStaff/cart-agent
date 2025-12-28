@@ -134,7 +134,7 @@ if (!s.includes('from "@/components/Explainer"')) {
   React.useEffect(() => { if (typeof window!=="undefined" && wantTour("dash")) setShowExplainer(true); }, []);
   function closeExplainer(action: "primary" | "skip") {
     dismissTour("dash", action); setShowExplainer(false);
-    if (action === "primary") { try { window.location.href="/demo/playground"; } catch {} }
+    if (action === "primary") { try { window.location.href="/marketing/demo/playground"; } catch {} }
   }
 
   return (`);
