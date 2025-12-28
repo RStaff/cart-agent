@@ -75,3 +75,8 @@ _scratch/
 *.pid
 .env*.local
 abando-frontend/package-lock.json
+
+# local backups
+**/__bak_*
+**/*.__bak_*
+**/*.bak_*
