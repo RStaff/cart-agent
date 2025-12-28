@@ -80,3 +80,12 @@ abando-frontend/package-lock.json
 **/__bak_*
 **/*.__bak_*
 **/*.bak_*
+
+# local ops scripts (keep repo clean)
+scripts/0*
+scripts/9*
+scripts/10*
+scripts/11*
+scripts/12*
+scripts/13*
+scripts/14*
