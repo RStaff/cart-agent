@@ -1,22 +1,30 @@
-import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-// Root-cause: dashboard must be public for sales/demo.
-// Keep everything public, but make /app an alias to the real embedded entry.
+/**
+ * Canonical policy:
+ * - Marketing pages live under /marketing/*
+ * - "Short" public routes redirect to their /marketing equivalents
+ */
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Redirect /app and anything under it to the embedded entry
-  if (pathname === "/app" || pathname.startsWith("/app/")) {
+  const map: Record<string, string> = {
+    "/demo/playground": "/marketing/demo/playground",
+    "/verticals/women-boutique": "/marketing/verticals/women-boutique",
+    "/verticals": "/marketing/verticals",
+  };
+
+  const target = map[pathname];
+  if (target) {
     const url = req.nextUrl.clone();
-    url.pathname = "/embedded";
-    return NextResponse.redirect(url, 307);
+    url.pathname = target;
+    return NextResponse.redirect(url, 308);
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  // only run middleware for /app so we don't accidentally affect anything else
-  matcher: ["/app", "/app/:path*"],
+  matcher: ["/demo/playground", "/verticals", "/verticals/women-boutique", "/marketing/:path*"],
 };

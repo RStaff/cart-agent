@@ -17,7 +17,7 @@ export default function VerticalEnginePage() {
 
         <div className="grid md:grid-cols-2 gap-4 mt-6">
           <a
-            href="/verticals/women-boutique"
+            href="/marketing/verticals/women-boutique"
             className="block bg-slate-900/60 border border-slate-700 rounded-xl p-4 hover:bg-slate-900"
           >
             <p className="text-xs text-pink-400 mb-1">VERTICAL · LIVE</p>
