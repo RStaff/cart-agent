@@ -17,7 +17,7 @@
     "smoke:carts": "npm --prefix web run smoke:carts",
     "dev-install": "node scripts/dev-install.mjs",
     "start": "bash -lc 'set -a; [ -f .render/env.sh ] && . .render/env.sh; set +a; node --require ./web/smc-preload.cjs web/src/index.js'",
-    "postinstall": "cd abando-frontend && (test -f package-lock.json && npm ci || npm install)"
+    "postinstall": "cd abando-frontend && npm install --package-lock=false"
   },
   "author": "rossstafford",
   "private": true,
