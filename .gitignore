@@ -89,3 +89,11 @@ scripts/11*
 scripts/12*
 scripts/13*
 scripts/14*
+
+# local/uncommitted next routes (WIP)
+abando-frontend/app/onboarding/
+abando-frontend/app/pricing/
+abando-frontend/app/support/
+
+# local helper scripts
+scripts/verify_lockfiles.sh
