@@ -6,6 +6,7 @@ const __dirname = dirname(__filename);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+
   reactStrictMode: true,
 
   // ✅ Let the app build on Vercel even if ESLint complains
@@ -28,6 +29,8 @@ const nextConfig = {
       },
     ];
   },
+
+  turbopack: { root: __dirname },
 };
 
 export default nextConfig;
