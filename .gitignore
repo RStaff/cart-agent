@@ -97,3 +97,7 @@ abando-frontend/app/support/
 
 # local helper scripts
 scripts/verify_lockfiles.sh
+*.DISABLED
+
+# Next build output
+.next/
