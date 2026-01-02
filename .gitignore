@@ -100,3 +100,6 @@ scripts/verify_lockfiles.sh
 
 # Next build output
 .next/
+
+# Local nested folder (not part of this repo)
+cart-agent/
