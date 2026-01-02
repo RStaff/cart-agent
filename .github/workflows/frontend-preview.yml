@@ -33,6 +33,10 @@ jobs:
             npm --prefix web/frontend install
           fi
 
+      - name: Guardrails (PostCSS config)
+        run: |
+          test ! -f web/frontend/postcss.config.js || (echo "❌ legacy postcss.config.js present" && exit 1)
+          test -f web/frontend/postcss.config.cjs || (echo "❌ missing postcss.config.cjs" && exit 1)
       - name: Build (web/frontend)
         env:
           VITE_RUN_ID: ${{ github.run_id }}
