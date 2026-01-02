@@ -6,9 +6,12 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { randomBytes, createHmac } from "node:crypto";
 import { PrismaClient, Prisma } from "@prisma/client";
+import applyAbandoDevProxy from "./abandoDevProxy.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
+applyAbandoDevProxy(app);
+
 
 
 // --- Embedded entrypoint alias (Shopify Application URL) ---
