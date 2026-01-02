@@ -40,7 +40,6 @@ web/src/**/*.bak.*
 *.bak.*
 abando-frontend/.env.local
 abando-frontend/.next.pid*
-cart-agent/
 staffordmedia-site/
 
 # --- Abando backups / scratch files (must never ship) ---
