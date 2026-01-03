@@ -49,11 +49,12 @@
     "shopify:info": "bash -lc 'ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd);  if [ -f \"${ROOT}/web/package.json\" ] && node -e \"p=require('\\''${ROOT}/web/package.json'\\''); if(!(p.scripts&&p.scripts.info))process.exit(1)\" >/dev/null 2>&1; then    npm --prefix \"${ROOT}/web\" run info || echo \"Shopify CLI not available.\";  else    echo \"ℹ️ No Shopify app 'info' script in web/.\"; exit 0;  fi'"
   },
   "dependencies": {
+    "@shopify/app-bridge": "^3.7.11",
+    "@shopify/app-bridge-react": "^4.2.8",
     "clsx": "^2.1.1",
     "next": "^16.0.7",
-    "react": "^19.2.1",
-    "react-dom": "^19.2.1",
-    "react-server-dom-webpack": "^19.2.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "stripe": "^18.5.0"
   },
   "devDependencies": {

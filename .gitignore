@@ -103,3 +103,9 @@ scripts/verify_lockfiles.sh
 
 # Local nested folder (not part of this repo)
 cart-agent/
+
+# GH Actions downloaded artifacts (never commit)
+frontend-dist/
+assets/
+index.html
+vite.svg
