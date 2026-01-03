@@ -13,7 +13,7 @@ automatically_update_urls_on_dev = true
 api_version = "2025-07"
 
   [[webhooks.subscriptions]]
-  uri = "https://auburn-nat-usb-technician.trycloudflare.com/api/webhooks/gdpr"
+  uri = "https://gray-fitting-mats-strictly.trycloudflare.com/api/webhooks/gdpr"
   compliance_topics = [ "customers/data_request", "customers/redact", "shop/redact" ]
 
 [access_scopes]
