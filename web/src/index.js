@@ -7,6 +7,30 @@ import { dirname, join } from "node:path";
 import { randomBytes, createHmac } from "node:crypto";
 import { PrismaClient, Prisma } from "@prisma/client";
 import applyAbandoDevProxy from "./abandoDevProxy.js";
+import crypto from "crypto";
+
+function verifyShopifyWebhookHmac(req) {
+  const hmacHeader = req.get("X-Shopify-Hmac-Sha256") || "";
+  const secret =
+    process.env.SHOPIFY_API_SECRET ||
+    process.env.SHOPIFY_API_SECRET_KEY ||
+    process.env.SHOPIFY_SECRET ||
+    "";
+
+  if (!secret || !hmacHeader) return false;
+
+  const body = req.body;
+  if (!Buffer.isBuffer(body)) return false;
+
+  const digest = crypto.createHmac("sha256", secret).update(body).digest("base64");
+
+  const a = Buffer.from(digest, "utf8");
+  const b = Buffer.from(hmacHeader, "utf8");
+  if (a.length !== b.length) return false;
+
+  return crypto.timingSafeEqual(a, b);
+}
+
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -22,7 +46,12 @@ app.get("/app\/.*", (req,res)=> res.redirect(307, "/embedded"));
 /* ABANDO_GDPR_ROUTE_ONCE */
 app.head("/api/webhooks/gdpr", (_req, res) => res.status(200).end());
 app.get("/api/webhooks/gdpr", (_req, res) => res.status(200).send("ok"));
-app.post("/api/webhooks/gdpr", express.raw({ type: "*/*" }), (_req, res) => {
+app.post("/api/webhooks/gdpr", express.raw({ type: "*/*" }), (req, res) => {
+  if (!verifyShopifyWebhookHmac(req)) {
+    console.error("❌ GDPR webhook HMAC verification failed");
+    return res.status(401).send("Invalid webhook");
+  }
+
   // Shopify automated checks expect 401 when HMAC is missing/invalid.
   return res.status(401).send("Unauthorized");
 });
