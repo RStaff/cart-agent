@@ -109,3 +109,4 @@ frontend-dist/
 assets/
 index.html
 vite.svg
+/tmp/abando_shopify_dev.log
