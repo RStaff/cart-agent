@@ -110,3 +110,10 @@ assets/
 index.html
 vite.svg
 /tmp/abando_shopify_dev.log
+
+# Allow selected Abando dev control scripts (override scripts/11* ignore)
+!scripts/110_dev_up_bg.sh
+!scripts/112_dev_status.sh
+!scripts/114_print_shopify_webhook_urls.sh
+!scripts/115_show_current_ports.sh
+!scripts/93_verify_gdpr_endpoint_is_from_this_backend.sh
