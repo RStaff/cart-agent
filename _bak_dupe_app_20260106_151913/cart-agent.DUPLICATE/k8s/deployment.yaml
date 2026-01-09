@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cart-agent-backend
+  namespace: cart-agent
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: cart-agent-backend }
+  template:
+    metadata:
+      labels: { app: cart-agent-backend }
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/RStaff/cart-agent:${GIT_SHA}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: DATABASE_URL
+              valueFrom: { secretKeyRef: { name: cart-agent-secrets, key: DATABASE_URL } }
+            - name: EMAIL_PROVIDER
+              valueFrom: { secretKeyRef: { name: cart-agent-secrets, key: EMAIL_PROVIDER } }
+            - name: RESEND_API_KEY
+              valueFrom: { secretKeyRef: { name: cart-agent-secrets, key: RESEND_API_KEY } }
+            - name: RESEND_FROM
+              valueFrom: { secretKeyRef: { name: cart-agent-secrets, key: RESEND_FROM } }
+            - name: SENDGRID_API_KEY
+              valueFrom: { secretKeyRef: { name: cart-agent-secrets, key: SENDGRID_API_KEY } }
+            - name: SENDGRID_FROM
+              valueFrom: { secretKeyRef: { name: cart-agent-secrets, key: SENDGRID_FROM } }
+            - name: SHOPIFY_API_KEY
+              valueFrom: { secretKeyRef: { name: cart-agent-secrets, key: SHOPIFY_API_KEY } }
+            - name: SHOPIFY_API_SECRET
+              valueFrom: { secretKeyRef: { name: cart-agent-secrets, key: SHOPIFY_API_SECRET } }
+            - name: SHOPIFY_SCOPES
+              valueFrom: { secretKeyRef: { name: cart-agent-secrets, key: SHOPIFY_SCOPES } }
+            - name: WEBHOOK_SECRET
+              valueFrom: { secretKeyRef: { name: cart-agent-secrets, key: WEBHOOK_SECRET } }
+          readinessProbe:
+            httpGet: { path: /health, port: 3000 }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /health, port: 3000 }
+            initialDelaySeconds: 15
+            periodSeconds: 20

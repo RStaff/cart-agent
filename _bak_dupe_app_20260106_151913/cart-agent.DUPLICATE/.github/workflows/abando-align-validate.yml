@@ -1,0 +1,19 @@
+name: abando-align-validate
+on:
+  pull_request: { branches: [ main ] }
+  push: { branches: [ chore/**, feat/** ] }
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          set -e
+          found=0
+          while IFS= read -r f; do
+            d="$(dirname "$f")"
+            test -f "$d/smc-align.js" || { echo "missing $d/smc-align.js"; exit 1; }
+            grep -q "installSmcAlign(app)" "$f" || { echo "not installed in $f"; exit 1; }
+            found=1
+          done < <(grep -RIl --include="*.js" -E '\bapp\s*=\s*express\s*\(' web | grep -v '/node_modules/' | grep -v '\.backup\.' | grep -v '\.bak$')
+          test "$found" = "1" || { echo "no real entries found"; exit 1; }

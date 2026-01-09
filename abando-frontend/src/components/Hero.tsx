@@ -1,4 +1,6 @@
-import Button from "./Button";"use client";
+"use client";
+
+import Button from "./Button";
 import { BRAND } from "../lib/brand";
 
 export default function Hero() {
@@ -19,7 +21,7 @@ export default function Hero() {
           <Button as="a" href={BRAND.ctas.trial.href} data-cta={BRAND.ctas.trial.data} variant="primary">
             {BRAND.ctas.trial.label}
           </Button>
-          <Button as="a" href={BRAND.ctas.demo.href} data-cta={BRAND.ctas.demo.data} variant="secondary">
+          <Button as="a" href={BRAND.ctas.demo.href} data-cta={BRAND.ctas.demo.data} variant="primary">
             {BRAND.ctas.demo.label}
           </Button>
         </div>

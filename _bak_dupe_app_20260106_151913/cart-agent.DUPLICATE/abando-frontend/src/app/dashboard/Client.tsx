@@ -1,0 +1,231 @@
+"use client";
+
+import * as React from "react";
+import Link from "next/link";
+import {
+  LS_KEYS,
+  safeStorage,
+  type SavedPayload,
+  type Variant,
+} from "@/lib/shared";
+
+export default function DashboardClient() {
+  const [latest, setLatest] = React.useState<SavedPayload | null>(null);
+  const [imageUrl, setImageUrl] = React.useState<string>("");
+
+  React.useEffect(() => {
+    const payload = safeStorage.get<SavedPayload | null>(
+      LS_KEYS.lastMessage,
+      null,
+    );
+    const img = safeStorage.getString(LS_KEYS.lastImage, "");
+    setLatest(payload);
+    setImageUrl(img);
+  }, []);
+
+  const metrics = [
+    {
+      label: "Projected recovered / mo",
+      value: "$420",
+      hint: "Based on store averages",
+    },
+    { label: "Avg. CTR (est.)", value: "12%" },
+    { label: "Avg. Recovery", value: "17%" },
+    { label: "Sends / day (est.)", value: "36" },
+  ];
+
+  const variants: Variant[] = latest?.variants ?? [];
+
+  return (
+    <main style={{ maxWidth: 1100, margin: "48px auto", padding: "0 16px" }}>
+      {/* First-visit explainer */}
+      <h1 style={{ marginBottom: 16 }}>Dashboard</h1>
+
+      <div
+        style={{
+          background: "#1e293b",
+          padding: "16px 20px",
+          borderRadius: 10,
+          marginBottom: 24,
+        }}
+      >
+        <strong>Instant demo mode.</strong> Save real keys in Settings to go
+        live.{" "}
+        <Link
+          href="/pricing"
+          style={{ textDecoration: "underline", color: "#93c5fd" }}
+        >
+          See plans →
+        </Link>
+      </div>
+
+      {/* Metrics */}
+      <div
+        style={{
+          display: "grid",
+          gap: 12,
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          marginBottom: 16,
+        }}
+      >
+        {metrics.map((m) => (
+          <div
+            key={m.label}
+            style={{
+              background: "#0f172a",
+              padding: 20,
+              borderRadius: 10,
+              textAlign: "center",
+            }}
+          >
+            <div style={{ fontSize: 20, fontWeight: 700 }}>{m.value}</div>
+            <div style={{ color: "#94a3b8", marginTop: 6 }}>{m.label}</div>
+            {m.hint ? (
+              <div style={{ color: "#9fb0c6", marginTop: 4, fontSize: 12 }}>
+                {m.hint}
+              </div>
+            ) : null}
+          </div>
+        ))}
+      </div>
+
+      <div
+        style={{ display: "grid", gridTemplateColumns: "1.2fr .8fr", gap: 12 }}
+      >
+        {/* Left: Latest copy */}
+        <section style={{ display: "grid", gap: 12 }}>
+          <div
+            style={{
+              background: "#0f172a",
+              border: "1px solid rgba(255,255,255,.08)",
+              borderRadius: 10,
+              padding: 12,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <strong>Latest copy</strong>
+              <Link
+                href="/demo/playground"
+                style={{ textDecoration: "underline", color: "#9fb0c6" }}
+              >
+                Open demo →
+              </Link>
+            </div>
+            <div style={{ marginTop: 10 }}>
+              {latest?.message ? (
+                <pre
+                  style={{ whiteSpace: "pre-wrap", margin: 0, lineHeight: 1.6 }}
+                >
+                  {latest.message}
+                </pre>
+              ) : (
+                <div style={{ color: "#94a3b8" }}>
+                  Run the demo to generate copy.
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div
+            style={{
+              background: "#0f172a",
+              border: "1px solid rgba(255,255,255,.08)",
+              borderRadius: 10,
+              padding: 12,
+            }}
+          >
+            <strong>Voice variants</strong>
+            {variants.length === 0 ? (
+              <div style={{ color: "#94a3b8", marginTop: 8 }}>
+                Use “Try all voices” in the demo to populate.
+              </div>
+            ) : (
+              <div style={{ marginTop: 8, display: "grid", gap: 8 }}>
+                {variants.map((v) => (
+                  <details
+                    key={v.id}
+                    style={{
+                      background: "#0b1220",
+                      padding: "10px 12px",
+                      borderRadius: 8,
+                      border: "1px solid rgba(255,255,255,.06)",
+                    }}
+                  >
+                    <summary style={{ cursor: "pointer", fontWeight: 700 }}>
+                      {v.id}
+                    </summary>
+                    <div style={{ marginTop: 8, whiteSpace: "pre-wrap" }}>
+                      {v.text}
+                    </div>
+                  </details>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+            <Link
+              href="/pricing"
+              style={{ textDecoration: "underline", color: "#93c5fd" }}
+            >
+              Onboard now — under 5 minutes
+            </Link>
+            <span style={{ color: "#475569" }}>·</span>
+            <Link
+              href="/demo/playground"
+              style={{ textDecoration: "underline", color: "#9fb0c6" }}
+            >
+              Back to demo
+            </Link>
+          </div>
+        </section>
+
+        {/* Right: Image preview */}
+        <aside style={{ position: "sticky", top: 24, alignSelf: "start" }}>
+          <div
+            style={{
+              background: "#0f172a",
+              border: "1px solid rgba(255,255,255,.08)",
+              borderRadius: 10,
+              padding: 12,
+            }}
+          >
+            <strong>Product preview</strong>
+            <div style={{ marginTop: 8 }}>
+              {imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt=""
+                  style={{
+                    maxWidth: "100%",
+                    borderRadius: 10,
+                    display: "block",
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    height: 220,
+                    display: "grid",
+                    placeItems: "center",
+                    color: "#94a3b8",
+                    border: "1px dashed rgba(255,255,255,.12)",
+                    borderRadius: 10,
+                  }}
+                >
+                  Generate from the demo to see the image here
+                </div>
+              )}
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+  );
+}
