@@ -1,9 +1,0 @@
-
-────────────────────────────────────────────────────────────────────────
-SMC ↔ Abando Diagnostics v2.0
-────────────────────────────────────────────────────────────────────────
-Stafford: staffordmedia.ai
-Abando:  abando.ai
-────────────────────────────────────────────────────────────────────────
-→ DNS/TLS/HTTPS for staffordmedia.ai
-✓ DNS resolves for staffordmedia.ai
