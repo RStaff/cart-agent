@@ -117,3 +117,12 @@ vite.svg
 !scripts/114_print_shopify_webhook_urls.sh
 !scripts/115_show_current_ports.sh
 !scripts/93_verify_gdpr_endpoint_is_from_this_backend.sh
+
+# --- ignore backup/dupe trees ---
+_bak*/
+**/_bak*/
+*.bak-*
+*.backup.*
+backup*/
+**/backup*/
+*.dump
