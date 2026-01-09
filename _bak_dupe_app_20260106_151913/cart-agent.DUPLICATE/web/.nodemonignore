@@ -1,7 +1,0 @@
-public
-node_modules
-prisma
-*.log
-.vscode
-.vercel
-.git

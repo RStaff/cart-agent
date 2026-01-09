@@ -1,6 +1,0 @@
-{
-  "watch": ["index.js", "lib", "db.js"],
-  "ext": "js,mjs,json",
-  "ignore": ["frontend/**", "node_modules/**", "prisma/**", ".env", "*.log"]
-}
-
