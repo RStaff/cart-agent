@@ -7,7 +7,7 @@ set -euo pipefail
 ABANDO_MARKETING="https://abando.ai"
 ABANDO_EMBEDDED="https://app.abando.ai/embedded"
 ABANDO_PAY_HEALTH="https://pay.abando.ai/api/health"
-ABANDO_RENDER_HEALTH="https://cart-agent-api.onrender.com/api/health"
+ABANDO_RENDER_HEALTH="https://cart-agent-api.onrender.com/health"
 
 check() {
   local label="$1" url="$2" show_body="${3:-false}"
