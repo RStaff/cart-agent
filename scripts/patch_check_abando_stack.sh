@@ -30,7 +30,7 @@ check() {
 check "Marketing site"                    "https://abando.ai"
 check "Embedded app shell"               "https://app.abando.ai/embedded"
 check "Checkout API (via pay.abando.ai)" "https://pay.abando.ai/api/health"
-check "Checkout API (Render origin)"     "https://cart-agent-api.onrender.com/api/health"
+check "Checkout API (Render origin)"     "https://cart-agent-api.onrender.com/health"
 
 echo "✨ Done."
 INNER

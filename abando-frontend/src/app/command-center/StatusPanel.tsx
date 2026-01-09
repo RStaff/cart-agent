@@ -28,7 +28,7 @@ const SERVICES: Record<ServiceKey, ServiceStatus> = {
   },
   render: {
     label: "Checkout API (Render origin)",
-    url: "https://cart-agent-api.onrender.com/api/health",
+    url: "https://cart-agent-api.onrender.com/health",
     showBody: true,
   },
 };

@@ -5,7 +5,7 @@ ABANDO_MARKETING="https://abando.ai"
 ABANDO_FRONTEND_HEALTH="https://abando.ai/api/health"
 ABANDO_EMBEDDED="https://app.abando.ai/embedded"
 ABANDO_PAY_HEALTH="https://pay.abando.ai/api/health"
-ABANDO_RENDER_HEALTH="https://cart-agent-api.onrender.com/api/health"
+ABANDO_RENDER_HEALTH="https://cart-agent-api.onrender.com/health"
 
 echo "🔎 Checking Abando.ai full stack…"
 echo
