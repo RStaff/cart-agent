@@ -53,3 +53,5 @@ staffordmedia-site/
 cart-agent
 staffordmedia-site
 abando-frontend/abando-frontend
+.env*.local
+!package-lock.json
