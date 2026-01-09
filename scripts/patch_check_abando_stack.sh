@@ -1,39 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
 
-cat > scripts/check_abando_stack.sh << 'INNER'
-#!/usr/bin/env bash
-set -euo pipefail
+file="scripts/check_abando_stack.sh"
+test -f "$file" || { echo "❌ Missing $file"; exit 1; }
 
-echo "🔎 Checking Abando.ai full stack…"
-echo
+# Patch only the pay endpoint if it exists in an older form
+tmp="$(mktemp)"
+cp "$file" "$tmp"
 
-check() {
-  local name="$1"
-  local url="$2"
-  echo "→ $name ($url)"
+# normalize pay endpoint to /health
+perl -0pe 's#https://pay\.abando\.ai/(api/)?health#https://pay.abando.ai/health#g' "$tmp" > "$file"
 
-  # Try curl, but if it fails (TLS error, etc.), capture that as "000"
-  local code
-  code=$(curl -s -o /dev/null -w "%{http_code}" -L --max-time 5 "$url" 2>/dev/null || echo "000")
+rm -f "$tmp"
+chmod +x "$file"
 
-  if [[ "$code" == "200" || "$code" == "204" ]]; then
-    echo "   ✅ OK ($code)"
-  elif [[ "$code" == "000" ]]; then
-    echo "   ❌ FAILED (TLS / connection error)"
-  else
-    echo "   ❌ FAILED ($code)"
-  fi
-  echo
-}
-
-check "Marketing site"                    "https://abando.ai"
-check "Embedded app shell"               "https://app.abando.ai/embedded"
-check "Checkout API (via pay.abando.ai)" "https://pay.abando.ai/api/health"
-check "Checkout API (Render origin)"     "https://cart-agent-api.onrender.com/health"
-
-echo "✨ Done."
-INNER
-
-chmod +x scripts/check_abando_stack.sh
-echo "✅ check_abando_stack.sh patched."
+echo "✅ Patched $file (pay.abando.ai now uses /health)"

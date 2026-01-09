@@ -1,0 +1,12 @@
+# Shopify CLI web configuration
+# Embedded UI is served via backend proxying to Next.js running separately on :3000.
+
+name = "cart-agent"
+roles = ["backend", "frontend"]
+
+# Choose a stable port Shopify CLI can target.
+# Shopify CLI typically provides PORT to the process; this is the intended port for the app server.
+port = 8081
+
+[commands]
+dev = "npm run start"

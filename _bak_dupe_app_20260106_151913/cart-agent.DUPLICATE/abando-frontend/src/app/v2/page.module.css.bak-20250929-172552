@@ -1,0 +1,36 @@
+.page{ background:var(--bg); color:var(--ink) }
+.container{ max-width:1120px; margin:0 auto; padding:0 16px }
+
+/* Hero */
+.hero{ background:var(--bg); color:var(--ink); padding:88px 0 32px }
+.h1{ font:800 clamp(36px,6vw,56px)/1.12 system-ui,-apple-system,sans-serif; letter-spacing:-.02em; margin:10px 0 0 }
+.sub{ max-width:700px; color:#B8C4D4; font:500 18px/1.55 system-ui,-apple-system,sans-serif; margin-top:12px }
+.badge{ display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.06); color:#cbd5e1;
+        border:1px solid rgba(255,255,255,.08); border-radius:999px; padding:6px 10px; font:700 12px/1 system-ui,-apple-system,sans-serif }
+.heroCtas{ display:flex; gap:12px; margin-top:24px; flex-wrap:wrap }
+
+/* Buttons (duplicate minimal styles locally so hero buttons never rely on nav.module.css) */
+.btn{ border-radius:10px; padding:10px 14px; font:700 14px/1 system-ui,-apple-system,sans-serif; text-decoration:none; display:inline-block }
+.btnPrimary{ background:#635BFF; color:#fff }
+.btnPrimary:hover{ background:#5149ff }
+.btnGhost{ background:rgba(255,255,255,.08); color:#E6EAF2 }
+.btnGhost:hover{ background:rgba(255,255,255,.12) }
+
+/* Section + Cards */
+.section{ padding:8px 0 64px }
+.grid{ display:grid; gap:24px; grid-template-columns:1fr }
+@media (min-width:900px){ .grid{ grid-template-columns:1fr 1fr } }
+.card{ background:#12192A; border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:20px }
+.card h3{ margin:0 0 8px; color:#CDD6E6; font:700 16px/1.2 system-ui,-apple-system,sans-serif }
+.card ul{ margin:.25rem 0 0 1rem; color:#9FB0C6 }
+
+/* Chat preview */
+.chat{ display:grid; gap:10px }
+.msg{ border-radius:12px; padding:10px 12px; font:600 14px/1.4 system-ui,-apple-system,sans-serif }
+.bot{ background:#0f1524; color:#D5DEF0 }
+.user{ background:#16A34A; color:#fff; justify-self:start }
+
+/* Footer */
+.footer{ background:var(--bg); color:#9fb0c6; padding:28px 0; font:500 13px/1.4 system-ui,-apple-system,sans-serif }
+.footer a{ color:#9fb0c6; text-decoration:underline }
+.spacer{ height:12px }

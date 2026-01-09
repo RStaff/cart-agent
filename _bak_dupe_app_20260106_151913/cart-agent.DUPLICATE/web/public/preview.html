@@ -1,0 +1,163 @@
+<!doctype html>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Abando — Email Preview</title>
+<style>
+  :root { --bg:#0b0f19; --card:#111827; --muted:#6b7280; --text:#e5e7eb; --line:#1f2937; --accent:#8b5cf6; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:14px/1.4 system-ui, Segoe UI, Arial; }
+  .wrap { max-width:1100px; margin:32px auto; padding:0 16px; }
+  h1 { font-size:22px; font-weight:800; letter-spacing:.2px; display:flex; align-items:center; gap:8px; }
+  .pill { font-size:12px; color:#9ca3af; border:1px solid var(--line); padding:2px 8px; border-radius:999px; }
+  .grid { display:grid; grid-template-columns: 360px 1fr; gap:16px; }
+  @media (max-width: 920px) { .grid { grid-template-columns: 1fr; } }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; }
+  .left { padding:16px; }
+  .right { padding:0; overflow:hidden; }
+  label { display:block; font-size:12px; color:#9ca3af; margin:12px 0 6px; }
+  input, select { width:100%; background:#0f1629; color:var(--text); border:1px solid var(--line); border-radius:10px; padding:10px 12px; outline:none; }
+  small.help { display:block; color:var(--muted); margin-top:6px; font-size:12px; }
+  .actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:16px; }
+  button { background:#181f35; color:var(--text); border:1px solid var(--line); border-radius:10px; padding:10px 12px; cursor:pointer; }
+  button.primary { background:var(--accent); border-color:#6d28d9; }
+  .email { padding:18px; }
+  .email .subtle { color:#9ca3af; font-size:12px; margin-bottom:4px; }
+  .email .subject { font-weight:700; margin-bottom:12px; }
+  .email .canvas { background:#0f1629; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:14px; border-radius:0; }
+  .footer { color:#9ca3af; padding:12px 18px; font-size:12px; }
+  .variantsDrawer { position:fixed; inset:0; display:none; align-items:flex-end; justify-content:center; background:rgba(0,0,0,.5); }
+  .variants { background:var(--card); border:1px solid var(--line); border-radius:14px 14px 0 0; padding:14px; width:min(900px,100%); max-height:70vh; overflow:auto; }
+  .variants h3 { margin:0 0 8px 0; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:10px; }
+  .cardItem { border:1px solid var(--line); background:#0f1629; border-radius:10px; padding:10px; }
+  .topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  .x { background:#1f2937; border:1px solid var(--line); border-radius:8px; padding:8px 10px; cursor:pointer; }
+  a.link { color:#c4b5fd; text-decoration:underline; }
+</style>
+
+<div class="wrap">
+  <h1>Abando Email Preview <span class="pill">live</span></h1>
+  <div class="grid">
+    <div class="card left">
+      <label>Brand
+        <input id="brand" value="Abando" />
+      </label>
+
+      <label>Cart return URL
+        <input id="resumeUrl" value="https://example-shop.test/cart?cart_id=demo123" />
+        <small class="help">Where the button/link should send the shopper to resume checkout.</small>
+      </label>
+
+      <label>Customer email (optional)
+        <input id="customerEmail" placeholder="customer@example.com" />
+        <small class="help">For demo only (not sent from this page).</small>
+      </label>
+
+      <label>Product (SKU/Name)
+        <input id="sku" value="Waxed Canvas Tote" />
+      </label>
+
+      <label>Image URL
+        <input id="image" value="/img/tote.jpg" />
+        <small class="help">Paste a public image URL or a file you placed under <code>/public</code> (e.g. <code>/img/tote.jpg</code>).</small>
+      </label>
+
+      <label>Tone
+        <select id="tone">
+          <option value="friendly" selected>Friendly (default)</option>
+          <option value="persuasive">Persuasive</option>
+          <option value="playful">Playful</option>
+          <option value="urgent">Urgent</option>
+          <option value="kevin_hart">Kevin Hart-ish</option>
+        </select>
+      </label>
+
+      <div class="actions">
+        <button id="refresh" class="primary">Generate Preview</button>
+        <button id="variants">5 Variants</button>
+        <button id="copySubject">Copy Subject</button>
+        <button id="copyHtml">Copy HTML</button>
+        <span id="copied" style="display:none;color:#a7f3d0;margin-top:10px;">Copied ✓</span>
+      </div>
+
+      <small class="help" style="display:block;margin-top:10px;">API: <code>/api/preview/abandon</code></small>
+    </div>
+
+    <div class="card right">
+      <div class="email">
+        <div class="subtle">Subject</div>
+        <div id="subject" class="subject">(subject)</div>
+        <div class="subtle">Email body</div>
+        <div class="canvas" id="html"><em>Loading…</em></div>
+      </div>
+      <div class="footer">Preview only — images and layout show how your email will look to shoppers.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Variants drawer -->
+<div class="variantsDrawer" id="drawer">
+  <div class="variants">
+    <div class="topbar">
+      <h3>Subject variants</h3>
+      <button class="x" id="closeDrawer">Close ✕</button>
+    </div>
+    <div class="cards" id="variantsList"></div>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const API = "/api/preview/abandon";
+
+function payloadFromUI() {
+  return {
+    brand: $("brand").value.trim() || "Abando",
+    tone: $("tone").value,
+    resumeUrl: $("resumeUrl").value.trim(),
+    customerEmail: $("customerEmail").value.trim(),
+    items: [{ sku: $("sku").value.trim() || "Your product", qty: 1, image: $("image").value.trim() }]
+  };
+}
+
+async function callPreview() {
+  const res = await fetch(API, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify(payloadFromUI())
+  });
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.error || "Preview error");
+  $("subject").textContent = data.subject || "(no subject)";
+  $("html").innerHTML = data.html || "<em>no html</em>";
+}
+
+$("refresh").onclick = async () => {
+  $("copied").style.display = "none";
+  try { await callPreview(); } catch(e){ alert(e.message); }
+};
+
+$("variants").onclick = async () => {
+  $("copied").style.display = "none";
+  $("drawer").style.display = "flex";
+  $("variantsList").innerHTML = "";
+  const list = [];
+  for (let i=0;i<5;i++){
+    const res = await fetch(API, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payloadFromUI()) });
+    const data = await res.json();
+    list.push(data.subject || "(no subject)");
+  }
+  $("variantsList").innerHTML = list.map(s=>`<div class="cardItem">${s}</div>`).join("");
+};
+$("closeDrawer").onclick = () => { $("drawer").style.display = "none"; };
+
+$("copySubject").onclick = async () => {
+  try { await navigator.clipboard.writeText($("subject").textContent || ""); $("copied").style.display = "inline"; } catch {}
+};
+$("copyHtml").onclick = async () => {
+  try { await navigator.clipboard.writeText($("html").innerHTML || ""); $("copied").style.display = "inline"; } catch {}
+};
+
+// initial hydrate
+callPreview().catch(()=>{});
+</script>

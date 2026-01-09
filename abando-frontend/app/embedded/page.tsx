@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import ShopifyBadge from "@/components/ShopifyBadge";
-
+import { TitleBar } from "@shopify/app-bridge-react";
 type DayKey = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
 
 type HighlightData = {
@@ -153,7 +152,9 @@ export default function EmbeddedDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50">
+  <>
+      <TitleBar title="Abando" />
+      <div className="min-h-screen bg-slate-950 text-slate-50">
       <main className="mx-auto max-w-6xl px-6 py-8">
         {/* Top header row */}
                             {/* Top header row */}
@@ -194,13 +195,6 @@ export default function EmbeddedDashboard() {
 
         {/* Right: Built for Shopify + CTA */}
         <div className="flex flex-col items-end gap-3">
-          <div className="flex flex-col items-end gap-1">
-            <p className="text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-slate-500">
-              Built for
-            </p>
-            <ShopifyBadge />
-          </div>
-
           <button
             type="button"
             className="inline-flex items-center rounded-full border border-emerald-500/60 px-4 py-1.5 text-xs font-medium tracking-wide text-emerald-100 shadow-[0_0_0_1px_rgba(16,185,129,0.35)] hover:border-emerald-400 hover:text-emerald-50"
@@ -427,5 +421,7 @@ export default function EmbeddedDashboard() {
         </section>
       </main>
     </div>
+  </>
   );
+
 }

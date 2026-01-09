@@ -1,0 +1,58 @@
+name: CI (deps lockfile)
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+concurrency:
+  group: deps-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deps-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      HUSKY: "0"
+      npm_config_ignore_scripts: "true"
+      NPM_CONFIG_FUND: "false"
+      NPM_CONFIG_AUDIT: "false"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            web/package-lock.json
+            web/frontend/package-lock.json
+
+      - name: Lockfile sanity (npm/yarn dry-run)
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          roots=()
+          for r in . web web/frontend; do
+            [ -f "$r/package.json" ] && roots+=("$r")
+          done
+          if [ ${#roots[@]} -eq 0 ]; then
+            echo "ℹ️ No package.json found — nothing to check."; exit 0
+          fi
+          echo "Roots: ${roots[*]}"
+          fail=0
+          for r in "${roots[@]}"; do
+            echo "── $r"
+            if [ -f "$r/package-lock.json" ]; then
+              npm --prefix "$r" ci --ignore-scripts --dry-run || fail=1
+            elif [ -f "$r/yarn.lock" ]; then
+              (cd "$r" && corepack enable >/dev/null 2>&1)
+              (cd "$r" && yarn install --frozen-lockfile --ignore-scripts --non-interactive --dry-run) || fail=1
+            else
+              echo "⚠️  No lockfile in $r — skipping."
+            fi
+          done
+          exit $fail

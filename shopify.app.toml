@@ -1,10 +1,9 @@
-# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
-
 client_id = "83114672506075ba4866194fe0160cde"
 name = "cart-agent"
-application_url = "https://gray-fitting-mats-strictly.trycloudflare.com"
-embedded = true
 handle = "cart-agent-1"
+
+application_url = "https://www.abando.ai"
+embedded = true
 
 [build]
 automatically_update_urls_on_dev = true
@@ -13,21 +12,23 @@ automatically_update_urls_on_dev = true
 api_version = "2025-07"
 
   [[webhooks.subscriptions]]
-  uri = "https://gray-fitting-mats-strictly.trycloudflare.com/api/webhooks/gdpr"
-  compliance_topics = [ "customers/data_request", "customers/redact", "shop/redact" ]
+  uri = "/api/webhooks/gdpr"
+  compliance_topics = [
+    "customers/data_request",
+    "customers/redact",
+    "shop/redact"
+  ]
 
 [access_scopes]
-# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
 scopes = "write_products"
+optional_scopes = []
+use_legacy_install_flow = false
 
 [auth]
 redirect_urls = [
-  "https://waterproof-propose-wit-gage.trycloudflare.com/auth/callback",
-  "https://waterproof-propose-wit-gage.trycloudflare.com/auth/shopify/callback",
-  "https://waterproof-propose-wit-gage.trycloudflare.com/api/auth/callback"
+  "https://www.abando.ai/shopify/callback",
+  "https://www.abando.ai/api/auth/callback"
 ]
 
 [pos]
 embedded = false
-
-web_directories = ["web/"]

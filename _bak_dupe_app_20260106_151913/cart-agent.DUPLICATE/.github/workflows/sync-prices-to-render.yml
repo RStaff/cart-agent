@@ -1,0 +1,50 @@
+name: Sync Stripe Prices to Render
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "apply or dry-run"
+        type: choice
+        options: [apply, dry-run]
+        default: dry-run
+      domain:
+        description: "Optional: custom domain to match"
+        required: false
+        default: ""
+      service_name:
+        description: "Render service name (recommended)"
+        required: false
+        default: "cart-agent-backend"
+  schedule:
+    - cron: "17 6 * * *"   # nightly dry-run
+
+permissions:
+  contents: read
+concurrency:
+  group: sync-prices-to-render-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y jq
+      - run: chmod +x scripts/sync-prices-to-render.sh
+      - name: Run sync (dry-run by default)
+        env:
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          RENDER_API_KEY:    ${{ secrets.RENDER_API_KEY }}
+        run: |
+          set -euo pipefail
+          MODE="${{ inputs.mode || 'dry-run' }}"
+          DOMAIN="${{ inputs.domain }}"
+          SVCNAME="${{ inputs.service_name || 'cart-agent-backend' }}"
+
+          ARGS=( )
+          [ -n "$DOMAIN" ]  && ARGS+=( --domain "$DOMAIN" )
+          [ -n "$SVCNAME" ] && ARGS+=( --service "$SVCNAME" )
+          [ "$MODE" = "apply" ] || ARGS+=( --dry-run )
+
+          echo "scripts/sync-prices-to-render.sh ${ARGS[*]}"
+          scripts/sync-prices-to-render.sh "${ARGS[@]}"
