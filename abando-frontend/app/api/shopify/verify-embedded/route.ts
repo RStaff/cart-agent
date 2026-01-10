@@ -1,10 +1,13 @@
 import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 
-const SHOPIFY_API_SECRET =
+const SHOPIFY_API_SECRET_RAW =
   process.env.SHOPIFY_API_SECRET ||
   process.env.SHOPIFY_API_SECRET_KEY ||
   process.env.SHOPIFY_API_SECRET_VALUE;
+
+// Guard against accidental whitespace/newlines in env var values.
+const SHOPIFY_API_SECRET = SHOPIFY_API_SECRET_RAW?.trim();
 
 if (!SHOPIFY_API_SECRET) {
   console.warn(
