@@ -126,3 +126,27 @@ _bak*/
 backup*/
 **/backup*/
 *.dump
+
+# Local one-off debug scripts (do not commit)
+scripts/201_*.sh
+scripts/202_*.sh
+scripts/203_*.sh
+scripts/204_*.sh
+scripts/207_*.sh
+scripts/208_*.sh
+scripts/209_*.sh
+scripts/210_*.sh
+scripts/212_*.sh
+scripts/214_*.sh
+scripts/215_*.sh
+scripts/216_*.sh
+scripts/218_*.sh
+scripts/219_*.sh
+scripts/220_*.sh
+scripts/222_*.sh
+scripts/223_*.sh
+scripts/224_*.sh
+scripts/225_*.sh
+scripts/226_*.sh
+scripts/227_*.sh
+scripts/228_*.sh
