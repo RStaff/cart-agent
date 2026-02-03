@@ -35,6 +35,32 @@ function verifyShopifyWebhookHmac(req) {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 
+// --- Abando Embedded Checks probe (minimal, intentional) ---
+app.get("/api/embedded-check", (req, res) => {
+  try {
+    res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+    res.set("Pragma", "no-cache");
+    res.set("Expires", "0");
+
+    const auth = req.get("authorization") || "";
+    const hasBearer = /^Bearers+S+/.test(auth);
+
+    console.log("[abando] /api/embedded-check", { hasBearer, ua: req.get("user-agent") });
+
+    res.status(200).json({
+      ok: true,
+      hasBearer,
+      ts: Date.now(),
+    });
+  } catch (e) {
+    console.error("[abando] /api/embedded-check error", e);
+    res.status(500).json({ ok: false });
+  }
+});
+// --- end probe ---
+
+
+
 /* ABANDO_GDPR_WEBHOOK_ROUTE */
 /**
  * Shopify GDPR webhooks:
@@ -88,6 +114,106 @@ app.get("/app\/.*", (req,res)=> res.redirect(307, "/embedded"));
 app.use(cookieParser());
 app.use(cors());
 app.use(express.json());
+
+// --- Abando deploy fingerprint (v1) ---
+app.get("/api/version", (_req, res) => {
+  res.json({
+    ok: true,
+    service: "cart-agent",
+    git: "416588f",
+    built_at_utc: "2026-02-03T20:43:55.754795Z"
+  });
+});
+// --- end fingerprint ---
+
+
+// --- Abando V1 request logging ---
+// Marker: ABANDO_LOG_V1
+// Toggle: ABANDO_LOG_V1=0 disables. Default ON.
+// Optional: ABANDO_LOG_SKIP_REGEX overrides skip filter.
+app.use((req, res, next) => {
+  try {
+    const enabled = process.env.ABANDO_LOG_V1 !== "0";
+    if (!enabled) return next();
+
+    const skipRe = process.env.ABANDO_LOG_SKIP_REGEX
+      ? new RegExp(process.env.ABANDO_LOG_SKIP_REGEX)
+      : /^(?:\/_next\b|\/favicon\.ico$|\/robots\.txt$|\/__nextjs|\/sockjs-node\b|.*\.(?:map|png|jpg|jpeg|gif|svg|ico|css|js)$)/i;
+
+    const url = req.originalUrl || req.url || "";
+    if (skipRe.test(url)) return next();
+
+    const start = process.hrtime.bigint();
+
+    const inboundRid = req.headers["x-request-id"];
+    const rid =
+      (Array.isArray(inboundRid) ? inboundRid[0] : inboundRid) ||
+      `abando-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+    res.setHeader("x-request-id", rid);
+
+    const host = req.headers.host || "";
+    const xfHost = req.headers["x-forwarded-host"] || "";
+    const xfFor = req.headers["x-forwarded-for"] || "";
+    const referer = req.headers.referer || "";
+    const ua = req.headers["user-agent"] || "";
+    const secFetchDest = req.headers["sec-fetch-dest"] || "";
+
+    const isTunnel =
+      String(host).includes("trycloudflare.com") ||
+      String(xfHost).includes("trycloudflare.com");
+
+    const q = req.query || {};
+    const shop = q.shop || "";
+    const embedded = q.embedded || "";
+
+    const auth = req.headers.authorization || "";
+    const hasBearer = typeof auth === "string" && auth.toLowerCase().startsWith("bearer ");
+    const cookieHeader = req.headers.cookie || "";
+    const hasSessionCookie =
+      typeof cookieHeader === "string" && /(session|shopify|_secure)/i.test(cookieHeader);
+
+    res.on("finish", () => {
+      try {
+        const end = process.hrtime.bigint();
+        const ms = Number(end - start) / 1e6;
+
+        const line = {
+          tag: "abando.v1",
+          rid,
+          t: new Date().toISOString(),
+          method: req.method,
+          path: url,
+          status: res.statusCode,
+          ms: Math.round(ms * 10) / 10,
+
+          host,
+          xfHost: Array.isArray(xfHost) ? xfHost[0] : xfHost,
+          xfFor: Array.isArray(xfFor) ? xfFor[0] : xfFor,
+          referer,
+          secFetchDest,
+          isTunnel,
+
+          shop,
+          embedded,
+          hasBearer,
+          hasSessionCookie,
+
+          ua: typeof ua === "string" ? ua.slice(0, 140) : ""
+        };
+
+        console.log(JSON.stringify(line));
+      } catch (e) {
+        console.log("[abando.v1] log error", String(e));
+      }
+    });
+
+    return next();
+  } catch (e) {
+    console.log("[abando.v1] middleware error", String(e));
+    return next();
+  }
+});
+
 
 // Static + simple pages
 app.use(express.static(join(__dirname, "public")));
