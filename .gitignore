@@ -150,3 +150,6 @@ scripts/225_*.sh
 scripts/226_*.sh
 scripts/227_*.sh
 scripts/228_*.sh
+
+# dev runtime pids
+.pids/
