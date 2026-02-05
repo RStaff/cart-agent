@@ -415,4 +415,23 @@ app.listen(PORT, () => {
 // Simple health check for Render + custom domain
 app.get("/health", (req, res) => {
   res.json({ status: "ok", service: "cart-agent-api" });
+
+
+// --- Abando deploy fingerprint (v1) ---
+app.get("/api/version", (_req, res) => {
+  res.json({
+    ok: true,
+    service: "cart-agent-api",
+    git: process.env.RENDER_GIT_COMMIT || process.env.GIT_SHA || null,
+    built_at_utc: new Date().toISOString()
+  });
+});
+
+// --- Abando embedded check (v1) ---
+app.get("/api/embedded-check", (req, res) => {
+  const hasBearer = String(req.get("authorization") || "").includes("Bearer ");
+  res.json({ ok: true, hasBearer, ts: Date.now() });
+});
+// --- end fingerprint + embedded-check ---
+
 });
