@@ -2,6 +2,23 @@ import express from "express";
 import cors from "cors";
 
 const app = express();
+
+// --- Abando deploy fingerprint (v1) ---
+app.get("/api/version", (_req, res) => {
+  res.json({
+    ok: true,
+    service: "cart-agent-api",
+    git: "f93cf92",
+    built_at_utc: "2026-02-05T00:56:13.096Z"
+  });
+});
+
+// --- Abando embedded check (v1) ---
+app.get("/api/embedded-check", (req, res) => {
+  const hasBearer = Boolean(req.get("authorization") || "").includes("Bearer ");
+  res.json({ ok: true, hasBearer, ts: Date.now() });
+});
+// --- end fingerprint + embedded-check ---
 app.use(cors());
 app.use(express.json());
 
