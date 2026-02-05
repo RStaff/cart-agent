@@ -5,9 +5,9 @@ services:
     plan: free
     branch: main
     repo: https://github.com/RStaff/cart-agent.git
-    rootDir: backend
+    rootDir: .
     buildCommand: npm ci
-    startCommand: node index.js
+    startCommand: npm start
     envVars:
       - key: NODE_VERSION
         value: 20.19.5
