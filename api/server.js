@@ -414,7 +414,12 @@ app.listen(PORT, () => {
 
 // Simple health check for Render + custom domain
 app.get("/health", (req, res) => {
-  res.json({ status: "ok", service: "cart-agent-api" });
+  res.json({
+  status: "ok",
+  service: "cart-agent-api",
+  git: process.env.RENDER_GIT_COMMIT || process.env.GIT_SHA || null,
+  built_at_utc: new Date().toISOString()
+});
 
 
 // --- Abando deploy fingerprint (v1) ---
