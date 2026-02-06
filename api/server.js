@@ -417,6 +417,7 @@ app.get("/health", (req, res) => {
   res.json({
   status: "ok",
   service: "cart-agent-api",
+  where: "api/server.js",
   git: process.env.RENDER_GIT_COMMIT || process.env.GIT_SHA || null,
   built_at_utc: new Date().toISOString()
 });
