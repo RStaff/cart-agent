@@ -407,21 +407,6 @@ app.get("/api/ai-segments/:storeId", async (req, res) => {
 // -----------------------------------------------------------------------------
 // Start server (Render calls `node server.js`, which requires this file)
 // -----------------------------------------------------------------------------
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`API listening on port ${PORT} (version ai-segments-v1)`);
-});
-
-// Simple health check for Render + custom domain
-app.get("/health", (req, res) => {
-  res.json({
-  status: "ok",
-  service: "cart-agent-api",
-  where: "api/server.js",
-  git: process.env.RENDER_GIT_COMMIT || process.env.GIT_SHA || null,
-  built_at_utc: new Date().toISOString()
-});
-
 
 // --- Abando deploy fingerprint (v1) ---
 app.get("/api/version", (_req, res) => {
@@ -439,5 +424,21 @@ app.get("/api/embedded-check", (req, res) => {
   res.json({ ok: true, hasBearer, ts: Date.now() });
 });
 // --- end fingerprint + embedded-check ---
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`API listening on port ${PORT} (version ai-segments-v1)`);
+});
+
+// Simple health check for Render + custom domain
+app.get("/health", (req, res) => {
+  res.json({
+  status: "ok",
+  service: "cart-agent-api",
+  where: "api/server.js",
+  git: process.env.RENDER_GIT_COMMIT || process.env.GIT_SHA || null,
+  built_at_utc: new Date().toISOString()
+});
+
+
 
 });
