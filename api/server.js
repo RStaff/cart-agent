@@ -11,6 +11,57 @@ const { classifyCartEvent } = require("./lib/aiLabeler");
 
 const app = express();
 
+
+// === ABANDO_WHOAMI_PROBE ===
+// Prove which code/entrypoint is running in production.
+app.get("/__whoami", (_req, res) => {
+  res.set("X-Abando-Whoami", "api/server.js");
+  res.status(200).type("text/plain").send("api/server.js");
+});
+// === END_ABANDO_WHOAMI_PROBE ===
+
+// === ABANDO_GDPR_WEBHOOK_ROUTE ===
+// Shopify GDPR webhooks: Shopify's automated checks often do GET/HEAD.
+// We return 200 for GET/HEAD and 401 for POST when HMAC is missing/invalid.
+// NOTE: Shopify's real GDPR topics are posted to your configured webhook path.
+function _abandoVerifyShopifyWebhookHmac(req) {
+  // NOTE: Shopify sends base64 HMAC in header.
+  const hmacHeader = (req.get("X-Shopify-Hmac-Sha256") || "").trim();
+  const secret =
+    process.env.SHOPIFY_API_SECRET ||
+    process.env.SHOPIFY_API_SECRET_KEY ||
+    process.env.SHOPIFY_SECRET ||
+    "";
+  if (!secret || !hmacHeader) return false;
+
+  // Raw body: ensure express.raw for this route.
+  const crypto = require("crypto");
+  const body = Buffer.isBuffer(req.body) ? req.body : Buffer.from(String(req.body || ""), "utf8");
+  const digest = crypto.createHmac("sha256", secret).update(body).digest("base64");
+  // timing-safe compare
+  const a = Buffer.from(digest);
+  const b = Buffer.from(hmacHeader);
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
+}
+
+// GET/HEAD: prove route exists (Shopify check friendliness)
+app.all("/api/webhooks/gdpr", (req, res, next) => {
+  res.set("X-Abando-GDPR-Guard", "api/server.js");
+  if (req.method === "GET" || req.method === "HEAD") return res.status(200).send("ok");
+  return next();
+});
+
+// POST: must be raw for HMAC verification
+app.post("/api/webhooks/gdpr", require("express").raw({ type: "*/*" }), (req, res) => {
+  if (!_abandoVerifyShopifyWebhookHmac(req)) {
+    return res.status(401).send("Invalid webhook");
+  }
+  return res.status(200).send("ok");
+});
+// === END_ABANDO_GDPR_WEBHOOK_ROUTE ===
+
+
 app.use(cors());
 app.use(express.json());
 
@@ -425,6 +476,62 @@ app.get("/api/embedded-check", (req, res) => {
 });
 // --- end fingerprint + embedded-check ---
 const PORT = process.env.PORT || 3001;
+// === ABANDO_API_GDPR_WEBHOOKS_V1 ======================================
+// These endpoints are used by Shopify mandatory privacy webhooks and/or
+// automated checks. Must respond quickly.
+const crypto = require("crypto");
+
+function verifyShopifyHmac(req) {
+  const secret =
+    process.env.SHOPIFY_API_SECRET ||
+    process.env.SHOPIFY_API_SECRET_KEY ||
+    process.env.SHOPIFY_SECRET ||
+    "";
+  if (!secret) return false;
+
+  const hmacHeader = (req.get("X-Shopify-Hmac-Sha256") || "").trim();
+  if (!hmacHeader) return false;
+
+  // Express raw body may not be available in this file; fall back to JSON/string.
+  let body = req.body;
+  let raw;
+  try {
+    if (Buffer.isBuffer(body)) raw = body;
+    else if (typeof body === "string") raw = Buffer.from(body, "utf8");
+    else raw = Buffer.from(JSON.stringify(body ?? {}), "utf8");
+  } catch {
+    raw = Buffer.from("", "utf8");
+  }
+
+  const digest = crypto.createHmac("sha256", secret).update(raw).digest("base64");
+  try {
+    return crypto.timingSafeEqual(Buffer.from(digest), Buffer.from(hmacHeader));
+  } catch {
+    return false;
+  }
+}
+
+// Health-style responses for GET/HEAD
+app.head("/api/webhooks/gdpr", (_req, res) => res.status(200).end());
+app.get("/api/webhooks/gdpr", (_req, res) => res.status(200).send("ok"));
+
+// Shopify template-style: GDPR topics often post to /api/webhooks (single endpoint)
+app.head("/api/webhooks", (_req, res) => res.status(200).end());
+app.get("/api/webhooks", (_req, res) => res.status(200).send("ok"));
+
+// Accept POSTs. For automated checks without HMAC, Shopify often expects 401.
+// If your check expects 200, flip the 401 to 200 — but keep it consistent.
+app.post("/api/webhooks/gdpr", express.raw({ type: "*/*" }), (req, res) => {
+  if (!verifyShopifyHmac(req)) return res.status(401).send("Invalid webhook");
+  return res.status(200).send("ok");
+});
+
+app.post("/api/webhooks", express.raw({ type: "*/*" }), (req, res) => {
+  if (!verifyShopifyHmac(req)) return res.status(401).send("Invalid webhook");
+  return res.status(200).send("ok");
+});
+// === END_ABANDO_API_GDPR_WEBHOOKS_V1 ===================================
+
 app.listen(PORT, () => {
   console.log(`API listening on port ${PORT} (version ai-segments-v1)`);
 });
