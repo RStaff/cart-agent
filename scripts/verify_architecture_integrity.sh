@@ -29,6 +29,13 @@ require_file "docs/architecture-canonical.md"
 ROOT_START="$(node -p "(require('./package.json').scripts||{}).start||''")"
 [[ "$ROOT_START" == *"web/src/index.js"* ]] || fail "root scripts.start must boot web/src/index.js (current: $ROOT_START)"
 
+ROOT_BUILD="$(node -p "(require('./package.json').scripts||{}).build||''")"
+[[ "$ROOT_BUILD" == *"web/frontend"* ]] || fail "root scripts.build must target web/frontend (current: $ROOT_BUILD)"
+[[ "$ROOT_BUILD" != *"abando-frontend"* ]] || fail "root scripts.build must not target abando-frontend (current: $ROOT_BUILD)"
+
+ROOT_POSTINSTALL="$(node -p "(require('./package.json').scripts||{}).postinstall||''")"
+[[ "$ROOT_POSTINSTALL" != *"abando-frontend"* ]] || fail "root scripts.postinstall must not target abando-frontend (current: $ROOT_POSTINSTALL)"
+
 WEB_START="$(node -p "(require('./web/package.json').scripts||{}).start||''")"
 [[ "$WEB_START" == "node src/index.js" ]] || fail "web scripts.start must be 'node src/index.js' (current: $WEB_START)"
 
