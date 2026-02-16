@@ -18,7 +18,7 @@
     "smoke:carts": "npm --prefix web run smoke:carts",
     "dev-install": "node scripts/dev-install.mjs",
     "start": "bash -lc 'set -a; [ -f .render/env.sh ] && . .render/env.sh; set +a; node --require ./web/smc-preload.cjs web/src/index.js'",
-    "postinstall": "echo \"[postinstall] workspace install handled by npm\""
+    "postinstall": "npm --prefix web exec prisma generate --schema=prisma/schema.prisma"
   },
   "author": "rossstafford",
   "private": true,
