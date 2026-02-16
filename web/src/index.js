@@ -68,6 +68,7 @@ const PUBLIC_API_PATHS = new Set([
   "/api/webhooks/gdpr",
   "/api/ai/health",
   "/api/embedded-check",
+  "/api/billing/checkout",
 ]);
 
 function verifyEmbeddedSessionToken(req, res, next) {
@@ -291,12 +292,27 @@ app.use((req, res, next) => {
 // Static + simple pages
 app.use(express.static(join(__dirname, "public")));
 app.get("/", (_req,res)=>res.sendFile(join(__dirname,"public","index.html")));
+app.get("/embedded", (_req,res)=>res.sendFile(join(__dirname,"public","embedded","index.html")));
 app.get("/pricing", (_req,res)=>res.sendFile(join(__dirname,"public","pricing","index.html")));
 app.get("/onboarding", (_req,res)=>res.sendFile(join(__dirname,"public","onboarding","index.html")));
 
 // Health/hello
 app.get("/healthz", (_req, res) => res.type("text/plain").send("ok"));
 app.get("/hello", (_req, res) => res.json({ msg: "Hello from Cart Agent!" }));
+app.get("/api/shopify/context", (req, res) => {
+  const session = req.shopifySession || null;
+  return res.json({
+    ok: true,
+    shop: req.shopifyShop || null,
+    session: session ? {
+      iss: session.iss || null,
+      dest: session.dest || null,
+      aud: session.aud || null,
+      exp: session.exp || null,
+      iat: session.iat || null,
+    } : null,
+  });
+});
 
 // Prisma
 const prisma = new PrismaClient();
