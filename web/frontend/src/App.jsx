@@ -1,34 +1,19 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
+    <main style={{ maxWidth: 780, margin: "48px auto", padding: "0 16px", fontFamily: "system-ui, sans-serif" }}>
+      <h1 style={{ fontSize: "2rem", marginBottom: 8 }}>Abando Frontend Build</h1>
+      <p style={{ color: "#444", lineHeight: 1.5 }}>
+        This build artifact is managed for static hosting checks. The canonical Shopify runtime is served by the backend
+        at <code>/app</code> and <code>/embedded</code>.
       </p>
-    </>
+      <div style={{ display: "flex", gap: 12, marginTop: 20, flexWrap: "wrap" }}>
+        <a href="/pricing">Pricing</a>
+        <a href="/onboarding">Onboarding</a>
+        <a href="/support">Support</a>
+      </div>
+    </main>
   )
 }
 

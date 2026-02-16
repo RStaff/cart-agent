@@ -8,6 +8,7 @@ import { randomBytes, createHmac } from "node:crypto";
 import { PrismaClient, Prisma } from "@prisma/client";
 import applyAbandoDevProxy from "./abandoDevProxy.js";
 import crypto from "crypto";
+import jwt from "jsonwebtoken";
 
 function verifyShopifyWebhookHmac(req) {
   const hmacHeader = req.get("X-Shopify-Hmac-Sha256") || "";
@@ -34,6 +35,76 @@ function verifyShopifyWebhookHmac(req) {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
+const CURRENCY_CODE = process.env.SHOPIFY_BILLING_CURRENCY || "USD";
+const BILLING_TEST_MODE = String(process.env.SHOPIFY_BILLING_TEST_MODE || "1") === "1";
+
+function shopFromRequest(req) {
+  const raw = req.query?.shop || req.headers["x-shopify-shop-domain"] || "";
+  return normalizeShopDomain(raw);
+}
+
+function setEmbeddedFrameAncestors(req, res, next) {
+  const wantsEmbedded =
+    String(req.query?.embedded || "") === "1" ||
+    String(req.query?.embedded || "").toLowerCase() === "true" ||
+    req.path === "/embedded" ||
+    req.path.startsWith("/embedded/") ||
+    req.path === "/app" ||
+    req.path.startsWith("/app/");
+
+  if (!wantsEmbedded) return next();
+
+  const shop = shopFromRequest(req);
+  const ancestors = shop
+    ? `https://${shop} https://admin.shopify.com`
+    : "https://admin.shopify.com https://*.myshopify.com";
+
+  res.setHeader("Content-Security-Policy", `frame-ancestors ${ancestors};`);
+  return next();
+}
+
+const PUBLIC_API_PATHS = new Set([
+  "/api/version",
+  "/api/webhooks/gdpr",
+  "/api/ai/health",
+  "/api/embedded-check",
+]);
+
+function verifyEmbeddedSessionToken(req, res, next) {
+  if (!req.path.startsWith("/api/")) return next();
+  if (PUBLIC_API_PATHS.has(req.path)) return next();
+
+  const auth = req.get("authorization") || "";
+  const bearer = auth.match(/^Bearer\s+(.+)$/i);
+  if (!bearer) return res.status(401).json({ ok: false, error: "missing_session_token" });
+  if (!SHOPIFY_API_SECRET || !SHOPIFY_API_KEY) {
+    return res.status(500).json({ ok: false, error: "shopify_auth_not_configured" });
+  }
+
+  try {
+    const payload = jwt.verify(bearer[1], SHOPIFY_API_SECRET, {
+      algorithms: ["HS256"],
+      audience: SHOPIFY_API_KEY,
+    });
+
+    const dest = String(payload?.dest || "");
+    const tokenShop = normalizeShopDomain(dest);
+    const requestShop = shopFromRequest(req);
+
+    if (!tokenShop.endsWith(".myshopify.com")) {
+      return res.status(401).json({ ok: false, error: "invalid_dest" });
+    }
+    if (requestShop && requestShop !== tokenShop) {
+      return res.status(401).json({ ok: false, error: "shop_mismatch" });
+    }
+
+    req.shopifySession = payload;
+    req.shopifyShop = tokenShop;
+    return next();
+  } catch (_err) {
+    return res.status(401).json({ ok: false, error: "invalid_session_token" });
+  }
+}
 
 // --- Abando Embedded Checks probe (minimal, intentional) ---
 app.get("/api/embedded-check", (req, res) => {
@@ -43,7 +114,7 @@ app.get("/api/embedded-check", (req, res) => {
     res.set("Expires", "0");
 
     const auth = req.get("authorization") || "";
-    const hasBearer = /^Bearers+S+/.test(auth);
+    const hasBearer = /^Bearer\s+\S+/i.test(auth);
 
     console.log("[abando] /api/embedded-check", { hasBearer, ua: req.get("user-agent") });
 
@@ -104,6 +175,7 @@ app.post("/api/webhooks/gdpr", express.raw({ type: "*/*" }), (req, res) => {
 
 applyAbandoDevProxy(app);
 
+app.use(setEmbeddedFrameAncestors);
 
 
 // --- Embedded entrypoint alias (Shopify Application URL) ---
@@ -114,6 +186,7 @@ app.get("/app\/.*", (req,res)=> res.redirect(307, "/embedded"));
 app.use(cookieParser());
 app.use(cors());
 app.use(express.json());
+app.use(verifyEmbeddedSessionToken);
 
 // --- Abando deploy fingerprint (v1) ---
 app.get("/api/version", (_req, res) => {
@@ -229,7 +302,7 @@ app.get("/hello", (_req, res) => res.json({ msg: "Hello from Cart Agent!" }));
 const prisma = new PrismaClient();
 
 // Env
-const APP_URL            = process.env.APP_URL || "https://abando.ai";
+const APP_URL            = process.env.APP_URL || "https://www.abando.ai";
 const SHOPIFY_API_KEY    = process.env.SHOPIFY_API_KEY    || "";
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || "";
 const SHOPIFY_SCOPES     = process.env.SHOPIFY_SCOPES
@@ -264,6 +337,77 @@ async function saveShopToDB(domain, accessToken, scopes) {
         "updatedAt"   = NOW();
     `
   );
+}
+
+async function getShopAccessToken(domain) {
+  const rows = await prisma.$queryRaw(
+    Prisma.sql`SELECT "accessToken" FROM "Shop" WHERE lower("domain") = lower(${domain}) LIMIT 1`
+  );
+  return rows?.[0]?.accessToken || null;
+}
+
+async function createShopifySubscription({ shop, accessToken, amount, planName, returnUrl }) {
+  const endpoint = `https://${shop}/admin/api/2025-07/graphql.json`;
+  const mutation = `
+    mutation AppSubscriptionCreate(
+      $name: String!
+      $returnUrl: URL!
+      $lineItems: [AppSubscriptionLineItemInput!]!
+      $test: Boolean!
+    ) {
+      appSubscriptionCreate(
+        name: $name
+        returnUrl: $returnUrl
+        lineItems: $lineItems
+        test: $test
+      ) {
+        userErrors { field message }
+        appSubscription { id status }
+        confirmationUrl
+      }
+    }
+  `;
+
+  const variables = {
+    name: planName,
+    returnUrl,
+    test: BILLING_TEST_MODE,
+    lineItems: [
+      {
+        plan: {
+          appRecurringPricingDetails: {
+            price: { amount, currencyCode: CURRENCY_CODE },
+            interval: "EVERY_30_DAYS",
+          },
+        },
+      },
+    ],
+  };
+
+  const resp = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Shopify-Access-Token": accessToken,
+    },
+    body: JSON.stringify({ query: mutation, variables }),
+  });
+
+  if (!resp.ok) {
+    const text = await resp.text().catch(() => "");
+    throw new Error(`billing_graphql_http_${resp.status}:${text.slice(0, 200)}`);
+  }
+
+  const json = await resp.json();
+  const payload = json?.data?.appSubscriptionCreate;
+  const errors = payload?.userErrors || [];
+  if (errors.length > 0) {
+    throw new Error(`billing_user_errors:${JSON.stringify(errors)}`);
+  }
+
+  const confirmationUrl = payload?.confirmationUrl;
+  if (!confirmationUrl) throw new Error("missing_confirmation_url");
+  return confirmationUrl;
 }
 
 // Shopify routes
@@ -314,19 +458,57 @@ app.get("/shopify/callback", async (req, res) => {
 });
 
 app.get("/shopify/billing/start", (req, res) => {
-  const shop = normalizeShopDomain(req.query.shop);
-  if (!shop || !shop.endsWith(".myshopify.com")) return res.status(400).send("Invalid shop");
-  return res.redirect(`/shopify/billing/return?shop=${encodeURIComponent(shop)}`);
+  (async () => {
+    const shop = normalizeShopDomain(req.query.shop);
+    if (!shop || !shop.endsWith(".myshopify.com")) return res.status(400).send("Invalid shop");
+
+    const accessToken = await getShopAccessToken(shop);
+    if (!accessToken) {
+      return res.status(400).send("Shop not installed. Reinstall app first.");
+    }
+
+    const plan = String(req.query.plan || "basic").toLowerCase();
+    const planConfig = {
+      basic: { amount: Number(process.env.SHOPIFY_PLAN_BASIC_AMOUNT || "29.99"), name: "Abando Basic" },
+      growth: { amount: Number(process.env.SHOPIFY_PLAN_GROWTH_AMOUNT || "59.99"), name: "Abando Growth" },
+      pro: { amount: Number(process.env.SHOPIFY_PLAN_PRO_AMOUNT || "149.99"), name: "Abando Pro" },
+    }[plan] || { amount: Number(process.env.SHOPIFY_PLAN_BASIC_AMOUNT || "29.99"), name: "Abando Basic" };
+
+    const returnUrl = `${APP_URL.replace(/\/+$/, "")}/shopify/billing/return?shop=${encodeURIComponent(shop)}`;
+    try {
+      const confirmationUrl = await createShopifySubscription({
+        shop,
+        accessToken,
+        amount: planConfig.amount,
+        planName: planConfig.name,
+        returnUrl,
+      });
+      return res.redirect(302, confirmationUrl);
+    } catch (err) {
+      console.error("[shopify] billing create error", err);
+      return res.status(500).send("Unable to create Shopify subscription");
+    }
+  })().catch((err) => {
+    console.error("[shopify] billing start fatal", err);
+    return res.status(500).send("Billing start error");
+  });
 });
-app.get("/shopify/billing/return", (_req, res) => res.redirect("/onboarding"));
+app.get("/shopify/billing/return", (req, res) => {
+  const shop = normalizeShopDomain(req.query.shop);
+  const qs = shop ? `?shop=${encodeURIComponent(shop)}` : "";
+  return res.redirect(`/onboarding${qs}`);
+});
 
 // Start
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 app.listen(PORT, () => console.log(`[server] listening on :${PORT}`));
 export default app;
 
-// Public Stripe checkout (no auth)
+// Public Stripe checkout (disabled for Shopify app review mode by default)
 app.post("/api/billing/checkout", async (req, res) => {
+  if (String(process.env.ALLOW_STRIPE_DIRECT_BILLING || "0") !== "1") {
+    return res.status(501).json({ error: "shopify_billing_required" });
+  }
   try {
     const Stripe = (await import("stripe")).default;
     const stripeKey = process.env.STRIPE_SECRET_KEY;
