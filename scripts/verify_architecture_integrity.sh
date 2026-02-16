@@ -53,8 +53,8 @@ RENDER_HAS_LEGACY="$( (rg -n "abando-frontend|npm --prefix api|npm --prefix back
 RENDER_START="$( (rg -n "startCommand:\\s*npm start" render.backend.yaml || true) | wc -l | tr -d ' ')"
 [[ "$RENDER_START" -ge 1 ]] || fail "render.backend.yaml must start canonical root app via 'npm start'"
 
-SHOPIFY_APP_URL="$( (rg -n '^application_url\s*=\s*"https://www\.abando\.ai"' shopify.app.toml || true) | wc -l | tr -d ' ')"
-[[ "$SHOPIFY_APP_URL" -eq 1 ]] || fail "shopify.app.toml must define application_url as https://www.abando.ai"
+SHOPIFY_APP_URL="$( (rg -n '^application_url\s*=\s*"https://pay\.abando\.ai/embedded"' shopify.app.toml || true) | wc -l | tr -d ' ')"
+[[ "$SHOPIFY_APP_URL" -eq 1 ]] || fail "shopify.app.toml must define application_url as https://pay.abando.ai/embedded"
 
 SHOPIFY_GDPR_URI="$( (rg -n '^\s*uri\s*=\s*"/api/webhooks/gdpr"' shopify.app.toml || true) | wc -l | tr -d ' ')"
 [[ "$SHOPIFY_GDPR_URI" -ge 1 ]] || fail "shopify.app.toml must use /api/webhooks/gdpr for GDPR subscription"

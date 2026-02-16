@@ -2,7 +2,7 @@ client_id = "83114672506075ba4866194fe0160cde"
 name = "cart-agent"
 handle = "cart-agent-1"
 
-application_url = "https://www.abando.ai"
+application_url = "https://pay.abando.ai/embedded"
 embedded = true
 
 [build]
@@ -26,8 +26,8 @@ use_legacy_install_flow = false
 
 [auth]
 redirect_urls = [
-  "https://www.abando.ai/shopify/callback",
-  "https://www.abando.ai/api/auth/callback"
+  "https://pay.abando.ai/shopify/callback",
+  "https://pay.abando.ai/api/auth/callback"
 ]
 
 [pos]
