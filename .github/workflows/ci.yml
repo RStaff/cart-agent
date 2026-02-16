@@ -27,6 +27,9 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
+      - name: Verify canonical architecture wiring
+        shell: bash
+        run: ./scripts/verify_architecture_integrity.sh
       - name: Dependency / lockfile check (self-contained)
         shell: bash
         run: |

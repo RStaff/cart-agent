@@ -6,6 +6,7 @@
   "scripts": {
     "shopify": "shopify",
     "build": "npm --prefix abando-frontend run build",
+    "verify:architecture": "./scripts/verify_architecture_integrity.sh",
     "dev": "shopify app dev",
     "info": "shopify app info",
     "generate": "shopify app generate",
