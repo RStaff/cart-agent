@@ -43,7 +43,20 @@
       statusEl.className = kind || 'muted';
     }
 
+    function getTokenFromUrl() {
+      try {
+        const p = new URLSearchParams(window.location.search);
+        const fromQuery = (p.get('id_token') || '').trim();
+        return fromQuery || null;
+      } catch (_err) {
+        return null;
+      }
+    }
+
     async function getToken() {
+      const queryToken = getTokenFromUrl();
+      if (queryToken) return queryToken;
+
       if (!window.shopify || typeof window.shopify.idToken !== 'function') {
         throw new Error('app_bridge_not_available');
       }
