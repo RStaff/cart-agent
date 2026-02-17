@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="shopify-api-key" content="__SHOPIFY_API_KEY__" />
   <title>Abando Embedded</title>
   <style>
     :root { --bg:#0b1220; --card:#111b31; --text:#e5e7eb; --muted:#94a3b8; --ok:#16a34a; --err:#dc2626; }
@@ -46,7 +47,10 @@
       if (!window.shopify || typeof window.shopify.idToken !== 'function') {
         throw new Error('app_bridge_not_available');
       }
-      return window.shopify.idToken();
+      return Promise.race([
+        window.shopify.idToken(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('id_token_timeout')), 10000)),
+      ]);
     }
 
     async function checkAuth() {
@@ -70,7 +74,12 @@
         }
       } catch (err) {
         setStatus('Error', 'err');
-        outputEl.textContent = JSON.stringify({ error: String(err && err.message ? err.message : err) }, null, 2);
+        outputEl.textContent = JSON.stringify({
+          error: String(err && err.message ? err.message : err),
+          hasShopifyGlobal: typeof window.shopify !== 'undefined',
+          hasIdTokenFn: Boolean(window.shopify && typeof window.shopify.idToken === 'function'),
+          location: window.location.href,
+        }, null, 2);
       }
     }
 

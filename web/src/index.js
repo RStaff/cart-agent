@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { readFileSync } from "node:fs";
 import { randomBytes, createHmac } from "node:crypto";
 import { PrismaClient, Prisma } from "@prisma/client";
 import applyAbandoDevProxy from "./abandoDevProxy.js";
@@ -290,9 +291,14 @@ app.use((req, res, next) => {
 
 
 // Static + simple pages
+app.get("/embedded", (_req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  const templatePath = join(__dirname, "public", "embedded", "index.html");
+  const html = readFileSync(templatePath, "utf8").replace(/__SHOPIFY_API_KEY__/g, SHOPIFY_API_KEY || "");
+  return res.status(200).type("html").send(html);
+});
 app.use(express.static(join(__dirname, "public")));
 app.get("/", (_req,res)=>res.sendFile(join(__dirname,"public","index.html")));
-app.get("/embedded", (_req,res)=>res.sendFile(join(__dirname,"public","embedded","index.html")));
 app.get("/pricing", (_req,res)=>res.sendFile(join(__dirname,"public","pricing","index.html")));
 app.get("/onboarding", (_req,res)=>res.sendFile(join(__dirname,"public","onboarding","index.html")));
 
