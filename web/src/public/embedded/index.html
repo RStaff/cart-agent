@@ -53,17 +53,24 @@
       }
     }
 
-    async function getToken() {
-      const queryToken = getTokenFromUrl();
-      if (queryToken) return queryToken;
-
+    async function getTokenFromShopify(timeoutMs = 4000) {
       if (!window.shopify || typeof window.shopify.idToken !== 'function') {
         throw new Error('app_bridge_not_available');
       }
       return Promise.race([
         window.shopify.idToken(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('id_token_timeout')), 10000)),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('id_token_timeout')), timeoutMs)),
       ]);
+    }
+
+    async function getToken() {
+      try {
+        return await getTokenFromShopify();
+      } catch (_err) {
+        const queryToken = getTokenFromUrl();
+        if (queryToken) return queryToken;
+        throw _err;
+      }
     }
 
     async function checkAuth() {
@@ -72,12 +79,27 @@
         const token = await getToken();
 
         setStatus('Calling protected API…', 'muted');
-        const res = await fetch('/api/shopify/context', {
+        let res = await fetch('/api/shopify/context', {
           method: 'GET',
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        const body = await res.json().catch(() => ({}));
+        let body = await res.json().catch(() => ({}));
+
+        // If a fallback query token was stale, try once with a fresh App Bridge token.
+        if (res.status === 401 && body && body.error === 'invalid_session_token') {
+          try {
+            const freshToken = await getTokenFromShopify(6000);
+            res = await fetch('/api/shopify/context', {
+              method: 'GET',
+              headers: { Authorization: `Bearer ${freshToken}` },
+            });
+            body = await res.json().catch(() => ({}));
+          } catch (_retryErr) {
+            // Keep original 401 response details if refresh token fails.
+          }
+        }
+
         outputEl.textContent = JSON.stringify({ status: res.status, body }, null, 2);
 
         if (res.ok && body && body.ok) {
