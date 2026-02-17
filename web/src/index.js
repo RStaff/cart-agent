@@ -103,8 +103,15 @@ function verifyEmbeddedSessionToken(req, res, next) {
     req.shopifySession = payload;
     req.shopifyShop = tokenShop;
     return next();
-  } catch (_err) {
-    return res.status(401).json({ ok: false, error: "invalid_session_token" });
+  } catch (err) {
+    const decoded = jwt.decode(bearer[1]) || {};
+    return res.status(401).json({
+      ok: false,
+      error: "invalid_session_token",
+      reason: err?.message || "jwt_verify_failed",
+      tokenAud: decoded?.aud || null,
+      expectedAudPrefix: SHOPIFY_API_KEY ? `${SHOPIFY_API_KEY.slice(0, 8)}...` : null,
+    });
   }
 }
 
