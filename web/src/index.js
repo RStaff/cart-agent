@@ -327,12 +327,20 @@ app.use((req, res, next) => {
 });
 
 
+function renderEmbeddedTemplate(filename, res) {
+  const templatePath = join(__dirname, "public", "embedded", filename);
+  const html = readFileSync(templatePath, "utf8").replace(/__SHOPIFY_API_KEY__/g, SHOPIFY_API_KEY || "");
+  return res.status(200).type("html").send(html);
+}
+
 // Static + simple pages
 app.get("/embedded", (_req, res) => {
   res.setHeader("Cache-Control", "no-store");
-  const templatePath = join(__dirname, "public", "embedded", "index.html");
-  const html = readFileSync(templatePath, "utf8").replace(/__SHOPIFY_API_KEY__/g, SHOPIFY_API_KEY || "");
-  return res.status(200).type("html").send(html);
+  return renderEmbeddedTemplate("index.html", res);
+});
+app.get("/embedded/diagnostics", (_req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  return renderEmbeddedTemplate("diagnostics.html", res);
 });
 app.use(express.static(join(__dirname, "public")));
 app.get("/", (_req,res)=>res.sendFile(join(__dirname,"public","index.html")));

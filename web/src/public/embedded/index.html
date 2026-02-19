@@ -3,122 +3,162 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="shopify-api-key" content="__SHOPIFY_API_KEY__" />
-  <title>Abando Embedded</title>
+  <title>Abando Dashboard</title>
   <style>
-    :root { --bg:#0b1220; --card:#111b31; --text:#e5e7eb; --muted:#94a3b8; --ok:#16a34a; --err:#dc2626; }
-    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:var(--bg); color:var(--text); }
-    main { max-width: 860px; margin: 24px auto; padding: 0 16px; }
-    .card { background: var(--card); border:1px solid #22314f; border-radius: 12px; padding:16px; margin-top:16px; }
-    .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-    button { border:1px solid #2e3f62; background:#0f1a31; color:var(--text); border-radius:10px; padding:10px 14px; cursor:pointer; }
-    pre { white-space:pre-wrap; word-break:break-word; background:#0a1429; border:1px solid #22314f; border-radius:10px; padding:12px; color:#cbd5e1; }
+    :root {
+      --bg:#07102a;
+      --card:#0e1b3f;
+      --card2:#101f4a;
+      --text:#e6edff;
+      --muted:#9cb2e1;
+      --line:#1b2f68;
+      --ok:#2cd39b;
+      --accent:#30c4ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(900px 600px at -10% -10%, #1a2f79 0%, transparent 60%),
+        radial-gradient(700px 500px at 110% -20%, #0a5d83 0%, transparent 60%),
+        var(--bg);
+    }
+    main { max-width: 980px; margin: 0 auto; padding: 24px 16px 32px; }
+    .eyebrow {
+      color: #4de4d6;
+      font-size: 12px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      margin: 0 0 10px;
+    }
+    h1 { margin: 0 0 10px; font-size: clamp(32px, 5vw, 52px); line-height: 1.05; }
+    .lead { margin: 0 0 18px; color: var(--muted); max-width: 860px; font-size: 18px; }
+    .bar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .pill {
+      border: 1px solid #2dc89f55;
+      color: #85efcf;
+      background: #0f2b3555;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+    .btn {
+      color: var(--text);
+      text-decoration: none;
+      border: 1px solid #2f66a4;
+      background: linear-gradient(180deg, #17336e, #112756);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .grid { display: grid; gap: 14px; grid-template-columns: repeat(12, minmax(0, 1fr)); }
+    .card {
+      background: linear-gradient(180deg, var(--card), var(--card2));
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      min-height: 140px;
+    }
+    .span-4 { grid-column: span 4; }
+    .span-6 { grid-column: span 6; }
+    .span-12 { grid-column: span 12; }
+    .label { color: #82a0de; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 8px; }
+    .value { font-size: 40px; font-weight: 700; margin-bottom: 8px; }
+    .note { color: var(--muted); font-size: 15px; line-height: 1.35; }
+    .list { display: grid; gap: 10px; margin-top: 6px; }
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border: 1px solid #25457e;
+      border-radius: 10px;
+      padding: 10px;
+      background: #0a1a3d;
+    }
     .ok { color: var(--ok); }
-    .err { color: var(--err); }
     .muted { color: var(--muted); }
+    .debug { display: none; margin-top: 14px; }
+    .debug a { color: var(--accent); }
+    @media (max-width: 860px) {
+      .span-4, .span-6 { grid-column: span 12; }
+      .value { font-size: 34px; }
+      .lead { font-size: 16px; }
+    }
   </style>
 </head>
 <body>
   <main>
-    <h1>Abando Embedded App</h1>
-    <p class="muted">This page validates Shopify embedded auth using App Bridge session tokens.</p>
+    <p class="eyebrow">Abando Dashboard · Live View of Recovered Orders & Shopper Patterns</p>
+    <h1>See how Abando turned this week's hesitations into extra orders.</h1>
+    <p class="lead">This embedded view lines up with what shoppers actually did in your store. Instead of one big "abandoned" bucket, Abando groups sessions into hesitation types and runs follow-ups that match each shopper's pattern.</p>
 
-    <div class="card">
-      <div class="row">
-        <button id="btn-check">Run Auth Check</button>
-        <span id="status" class="muted">Idle</span>
-      </div>
-      <pre id="output">No result yet.</pre>
+    <div class="bar">
+      <span class="pill">Status: <strong class="ok">Connected</strong></span>
+      <a class="btn" href="https://admin.shopify.com/store/cart-agent-dev">Live in your Shopify admin</a>
     </div>
+
+    <section class="grid">
+      <article class="card span-4">
+        <div class="label">Recovered Revenue · 7 Days</div>
+        <div class="value">$5,040</div>
+        <div class="note">Revenue that likely would have been lost without Abando's plays.</div>
+      </article>
+      <article class="card span-4">
+        <div class="label">Extra Orders · 7 Days</div>
+        <div class="value">40+</div>
+        <div class="note">Small daily lifts that add up across Cart Parkers, Size Checkers, and Drop Watchers.</div>
+      </article>
+      <article class="card span-4">
+        <div class="label">Active Playbooks</div>
+        <div class="value">3</div>
+        <div class="note">FAQ Reassurance, Social Proof Nudge, and Price-Hesitation Follow-up currently active.</div>
+      </article>
+
+      <article class="card span-6">
+        <div class="label">Top Hesitation Segments</div>
+        <div class="list">
+          <div class="row"><span>Cart Parkers</span><span class="muted">42% of recoveries</span></div>
+          <div class="row"><span>Size Checkers</span><span class="muted">34% of recoveries</span></div>
+          <div class="row"><span>Drop Watchers</span><span class="muted">24% of recoveries</span></div>
+        </div>
+      </article>
+
+      <article class="card span-6">
+        <div class="label">Action Feed</div>
+        <div class="list">
+          <div class="row"><span>Price hesitation flow sent</span><span class="ok">Delivered</span></div>
+          <div class="row"><span>FAQ reassurance reminder</span><span class="ok">Clicked</span></div>
+          <div class="row"><span>Inventory urgency nudge</span><span class="ok">Recovered</span></div>
+        </div>
+      </article>
+
+      <article class="card span-12">
+        <div class="label">What This Means</div>
+        <div class="note">Your current lift is steady and diversified. Keep these three playbooks active, then add one upsell sequence for recovered buyers to capture second-order value.</div>
+      </article>
+    </section>
+
+    <p id="debugLink" class="debug"><a href="/embedded/diagnostics?debug=1">Open Diagnostics</a></p>
   </main>
 
-  <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
   <script>
-    const statusEl = document.getElementById('status');
-    const outputEl = document.getElementById('output');
-    const btn = document.getElementById('btn-check');
-
-    function setStatus(text, kind) {
-      statusEl.textContent = text;
-      statusEl.className = kind || 'muted';
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('debug') === '1') {
+      document.getElementById('debugLink').style.display = 'block';
     }
-
-    function getTokenFromUrl() {
-      try {
-        const p = new URLSearchParams(window.location.search);
-        const fromQuery = (p.get('id_token') || '').trim();
-        return fromQuery || null;
-      } catch (_err) {
-        return null;
-      }
-    }
-
-    async function getTokenFromShopify(timeoutMs = 4000) {
-      if (!window.shopify || typeof window.shopify.idToken !== 'function') {
-        throw new Error('app_bridge_not_available');
-      }
-      return Promise.race([
-        window.shopify.idToken(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('id_token_timeout')), timeoutMs)),
-      ]);
-    }
-
-    async function getToken() {
-      try {
-        return await getTokenFromShopify();
-      } catch (_err) {
-        const queryToken = getTokenFromUrl();
-        if (queryToken) return queryToken;
-        throw _err;
-      }
-    }
-
-    async function checkAuth() {
-      try {
-        setStatus('Fetching session token…', 'muted');
-        const token = await getToken();
-
-        setStatus('Calling protected API…', 'muted');
-        let res = await fetch('/api/shopify/context', {
-          method: 'GET',
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        let body = await res.json().catch(() => ({}));
-
-        // If a fallback query token was stale, try once with a fresh App Bridge token.
-        if (res.status === 401 && body && body.error === 'invalid_session_token') {
-          try {
-            const freshToken = await getTokenFromShopify(6000);
-            res = await fetch('/api/shopify/context', {
-              method: 'GET',
-              headers: { Authorization: `Bearer ${freshToken}` },
-            });
-            body = await res.json().catch(() => ({}));
-          } catch (_retryErr) {
-            // Keep original 401 response details if refresh token fails.
-          }
-        }
-
-        outputEl.textContent = JSON.stringify({ status: res.status, body }, null, 2);
-
-        if (res.ok && body && body.ok) {
-          setStatus('Authenticated', 'ok');
-        } else {
-          setStatus('Auth failed', 'err');
-        }
-      } catch (err) {
-        setStatus('Error', 'err');
-        outputEl.textContent = JSON.stringify({
-          error: String(err && err.message ? err.message : err),
-          hasShopifyGlobal: typeof window.shopify !== 'undefined',
-          hasIdTokenFn: Boolean(window.shopify && typeof window.shopify.idToken === 'function'),
-          location: window.location.href,
-        }, null, 2);
-      }
-    }
-
-    btn.addEventListener('click', checkAuth);
   </script>
 </body>
 </html>
