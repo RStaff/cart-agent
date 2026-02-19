@@ -215,6 +215,35 @@ app.get("/api/version", (_req, res) => {
 // Optional: ABANDO_LOG_SKIP_REGEX overrides skip filter.
 app.use((req, res, next) => {
   try {
+    const redactUrlForLogs = (input) => {
+      const raw = String(input || "");
+      if (!raw) return raw;
+      try {
+        const parsed = new URL(raw, "https://log.local");
+        const sensitiveKeys = new Set([
+          "id_token",
+          "hmac",
+          "session",
+          "code",
+          "state",
+          "signature",
+          "token",
+          "access_token",
+          "authorization",
+        ]);
+        for (const key of sensitiveKeys) {
+          if (parsed.searchParams.has(key)) {
+            parsed.searchParams.set(key, "[redacted]");
+          }
+        }
+        const path = parsed.pathname || "/";
+        const query = parsed.searchParams.toString();
+        return query ? `${path}?${query}` : path;
+      } catch {
+        return raw;
+      }
+    };
+
     const enabled = process.env.ABANDO_LOG_V1 !== "0";
     if (!enabled) return next();
 
@@ -222,8 +251,9 @@ app.use((req, res, next) => {
       ? new RegExp(process.env.ABANDO_LOG_SKIP_REGEX)
       : /^(?:\/_next\b|\/favicon\.ico$|\/robots\.txt$|\/__nextjs|\/sockjs-node\b|.*\.(?:map|png|jpg|jpeg|gif|svg|ico|css|js)$)/i;
 
-    const url = req.originalUrl || req.url || "";
-    if (skipRe.test(url)) return next();
+    const urlRaw = req.originalUrl || req.url || "";
+    if (skipRe.test(urlRaw)) return next();
+    const url = redactUrlForLogs(urlRaw);
 
     const start = process.hrtime.bigint();
 
@@ -236,7 +266,7 @@ app.use((req, res, next) => {
     const host = req.headers.host || "";
     const xfHost = req.headers["x-forwarded-host"] || "";
     const xfFor = req.headers["x-forwarded-for"] || "";
-    const referer = req.headers.referer || "";
+    const referer = redactUrlForLogs(req.headers.referer || "");
     const ua = req.headers["user-agent"] || "";
     const secFetchDest = req.headers["sec-fetch-dest"] || "";
 
