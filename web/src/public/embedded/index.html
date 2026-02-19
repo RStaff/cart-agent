@@ -39,7 +39,6 @@
       display: flex;
       gap: 12px;
       align-items: center;
-      justify-content: space-between;
       flex-wrap: wrap;
       margin-bottom: 18px;
     }
@@ -50,18 +49,6 @@
       border-radius: 999px;
       padding: 8px 12px;
       font-size: 13px;
-    }
-    .btn {
-      color: var(--text);
-      text-decoration: none;
-      border: 1px solid #2f66a4;
-      background: linear-gradient(180deg, #17336e, #112756);
-      border-radius: 999px;
-      padding: 10px 14px;
-      font-size: 14px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
     }
     .grid { display: grid; gap: 14px; grid-template-columns: repeat(12, minmax(0, 1fr)); }
     .card {
@@ -103,11 +90,12 @@
   <main>
     <p class="eyebrow">Abando Dashboard · Live View of Recovered Orders & Shopper Patterns</p>
     <h1>See how Abando turned this week's hesitations into extra orders.</h1>
-    <p class="lead">This embedded view lines up with what shoppers actually did in your store. Instead of one big "abandoned" bucket, Abando groups sessions into hesitation types and runs follow-ups that match each shopper's pattern.</p>
+    <p class="lead">This dashboard reflects shopper behavior from your store in plain language. Instead of one broad abandoned-cart list, Abando organizes hesitation patterns and triggers the right follow-up for each one.</p>
 
     <div class="bar">
-      <span class="pill">Status: <strong class="ok">Connected</strong></span>
-      <a class="btn" href="https://admin.shopify.com/store/cart-agent-dev">Live in your Shopify admin</a>
+      <span class="pill">Connection: <strong class="ok">Live</strong></span>
+      <span class="pill">Data Freshness: <strong class="ok">Near Real Time</strong></span>
+      <span class="pill">Top Lever: <strong class="ok">Price-Hesitation Follow-up</strong></span>
     </div>
 
     <section class="grid">
@@ -143,6 +131,11 @@
           <div class="row"><span>FAQ reassurance reminder</span><span class="ok">Clicked</span></div>
           <div class="row"><span>Inventory urgency nudge</span><span class="ok">Recovered</span></div>
         </div>
+      </article>
+
+      <article class="card span-12">
+        <div class="label">How Segments Are Defined</div>
+        <div class="note">Cart Parkers add items and pause before checkout. Size Checkers bounce between product details and size info. Drop Watchers revisit products over multiple sessions before buying.</div>
       </article>
 
       <article class="card span-12">
