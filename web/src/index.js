@@ -36,6 +36,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 
+
 // ABANDO_EMBEDDED_ROOT_GUARD_V1
 // If Shopify loads the app in an iframe (embedded=1 or shop=...), make sure "/" routes to the embedded app UI,
 // not the public marketing landing page.
@@ -49,14 +50,15 @@ app.use((req, res, next) => {
       url.searchParams.has("shop") ||
       (req.headers["sec-fetch-dest"] === "iframe");
 
-    // If Shopify iframe-loads "/" but our embedded UI lives at "/app", rewrite internally to "/app".
-    // (Preserves querystring for Shopify context.)
+    // Shopify iframe-loads "/" but our embedded UI lives at "/embedded".
+    // Rewrite internally and preserve querystring for Shopify context.
     if (isEmbedded && (req.path === "/" || req.path === "")) {
       const qs = url.search || "";
-      req.url = "/app" + qs;
+      req.url = "/embedded" + qs;
+
       // Optional debug (enable by setting ABANDO_DEBUG_EMBED=1 in env)
       if (process.env.ABANDO_DEBUG_EMBED === "1") {
-        console.log("[ABANDO_EMBEDDED_ROOT_GUARD_V1] rewrite / -> /app", qs);
+        console.log("[ABANDO_EMBEDDED_ROOT_GUARD_V1] rewrite / -> /embedded", qs);
       }
     }
   } catch (e) {
@@ -65,7 +67,6 @@ app.use((req, res, next) => {
   next();
 });
 // /ABANDO_EMBEDDED_ROOT_GUARD_V1
-
 
 // --- Abando Embedded Checks probe (minimal, intentional) ---
 app.get("/api/embedded-check", (req, res) => {
