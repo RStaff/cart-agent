@@ -38,7 +38,7 @@ const app = express();
 
 
 // ABANDO_EMBEDDED_ROOT_GUARD_V1
-// If Shopify loads the app in an iframe (embedded=1 or shop=...), make sure "/" routes to the embedded app UI,
+// If Shopify loads the app in an iframe (embedded=1 or shop=...), make sure "/" routes to an embedded-safe UI,
 // not the public marketing landing page.
 app.use((req, res, next) => {
   try {
@@ -50,15 +50,13 @@ app.use((req, res, next) => {
       url.searchParams.has("shop") ||
       (req.headers["sec-fetch-dest"] === "iframe");
 
-    // Shopify iframe-loads "/" but our embedded UI lives at "/embedded".
-    // Rewrite internally and preserve querystring for Shopify context.
+    // Shopify iframe-loads "/" during embedded navigation. Route it to an existing embedded-safe page.
     if (isEmbedded && (req.path === "/" || req.path === "")) {
       const qs = url.search || "";
-      req.url = "/embedded" + qs;
+      req.url = "/dashboard" + qs;
 
-      // Optional debug (enable by setting ABANDO_DEBUG_EMBED=1 in env)
       if (process.env.ABANDO_DEBUG_EMBED === "1") {
-        console.log("[ABANDO_EMBEDDED_ROOT_GUARD_V1] rewrite / -> /embedded", qs);
+        console.log("[ABANDO_EMBEDDED_ROOT_GUARD_V1] rewrite / -> /dashboard", qs);
       }
     }
   } catch (e) {
@@ -67,7 +65,6 @@ app.use((req, res, next) => {
   next();
 });
 // /ABANDO_EMBEDDED_ROOT_GUARD_V1
-
 // --- Abando Embedded Checks probe (minimal, intentional) ---
 app.get("/api/embedded-check", (req, res) => {
   try {
@@ -140,9 +137,9 @@ applyAbandoDevProxy(app);
 
 
 // --- Embedded entrypoint alias (Shopify Application URL) ---
-app.get("/app", (req,res)=> res.redirect(307, "/embedded"));
-app.get("/app\/", (req,res)=> res.redirect(307, "/embedded"));
-app.get("/app\/.*", (req,res)=> res.redirect(307, "/embedded"));
+app.get("/app", (req,res)=> res.redirect(307, "/dashboard"));
+app.get("/app\/", (req,res)=> res.redirect(307, "/dashboard"));
+app.get("/app\/.*", (req,res)=> res.redirect(307, "/dashboard"));
 
 app.use(cookieParser());
 app.use(cors());
