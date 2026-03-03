@@ -35,6 +35,38 @@ function verifyShopifyWebhookHmac(req) {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 
+
+// ABANDO_EMBEDDED_ROOT_GUARD_V1
+// If Shopify loads the app in an iframe (embedded=1 or shop=...), make sure "/" routes to the embedded app UI,
+// not the public marketing landing page.
+app.use((req, res, next) => {
+  try {
+    const host = req.headers.host || "localhost";
+    const url = new URL(req.originalUrl || req.url || "/", `https://${host}`);
+
+    const isEmbedded =
+      url.searchParams.get("embedded") === "1" ||
+      url.searchParams.has("shop") ||
+      (req.headers["sec-fetch-dest"] === "iframe");
+
+    // If Shopify iframe-loads "/" but our embedded UI lives at "/app", rewrite internally to "/app".
+    // (Preserves querystring for Shopify context.)
+    if (isEmbedded && (req.path === "/" || req.path === "")) {
+      const qs = url.search || "";
+      req.url = "/app" + qs;
+      // Optional debug (enable by setting ABANDO_DEBUG_EMBED=1 in env)
+      if (process.env.ABANDO_DEBUG_EMBED === "1") {
+        console.log("[ABANDO_EMBEDDED_ROOT_GUARD_V1] rewrite / -> /app", qs);
+      }
+    }
+  } catch (e) {
+    // no-op
+  }
+  next();
+});
+// /ABANDO_EMBEDDED_ROOT_GUARD_V1
+
+
 // --- Abando Embedded Checks probe (minimal, intentional) ---
 app.get("/api/embedded-check", (req, res) => {
   try {
