@@ -87,13 +87,11 @@ model Usage {
   user      User     @relation(fields: [userId], references: [id])
 }
 
-$MARKER
 
 /// Daily per-store aggregates for Abando v1 → StaffordOS exports
 
 
 
-$MARKER
 
 // DailyAggregates + related fields for Abando v1
 model DailyAggregate {
