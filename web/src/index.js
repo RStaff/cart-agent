@@ -43,7 +43,7 @@ app.get("/api/embedded-check", (req, res) => {
     res.set("Expires", "0");
 
     const auth = req.get("authorization") || "";
-    const hasBearer = /^Bearers+S+/.test(auth);
+    const hasBearer = /^Bearer\\s+\\S+/.test(auth);
 
     console.log("[abando] /api/embedded-check", { hasBearer, ua: req.get("user-agent") });
 
@@ -267,6 +267,21 @@ async function saveShopToDB(domain, accessToken, scopes) {
 }
 
 // Shopify routes
+// --- Shopify auth aliases (for Embedded/App Bridge expectations) ---
+app.get("/api/auth", (req, res) => {
+  // Alias used by Shopify embedded flows; redirect into our install route.
+  const shop = String(req.query.shop || "");
+  const qs = shop ? `?shop=${encodeURIComponent(shop)}` : "";
+  return res.redirect(302, `/shopify/install${qs}`);
+});
+
+app.get("/api/auth/callback", (req, res) => {
+  // Preserve Shopify callback params exactly.
+  const i = (req.originalUrl || "").indexOf("?");
+  const qs = i >= 0 ? (req.originalUrl || "").slice(i) : "";
+  return res.redirect(302, `/shopify/callback${qs}`);
+});
+
 app.get("/shopify/install", (req, res) => {
   const shop = normalizeShopDomain(req.query.shop);
   if (!shop || !shop.endsWith(".myshopify.com")) return res.status(400).send("Missing/invalid ?shop=your-store.myshopify.com");
