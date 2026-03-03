@@ -1,7 +1,7 @@
 client_id = "83114672506075ba4866194fe0160cde"
 name = "cart-agent"
 handle = "cart-agent-1"
-application_url = "https://pay.abando.ai"
+application_url = "https://pay.abando.ai/dashboard/"
 embedded = true
 
 [build]
