@@ -7,6 +7,13 @@ import type { NextRequest } from "next/server";
  * - "Short" public routes redirect to their /marketing equivalents
  */
 export function middleware(req: NextRequest) {
+// --- ABANDO_SKIP_SESSION_TOKEN_FOR_AUTH_ALIASES_V1 ---
+  // Allow Shopify to hit these without an App Bridge session token.
+  const pathname = (req as any)?.nextUrl?.pathname || "";
+  if (pathname === "/api/auth" || pathname === "/api/auth/callback") {
+    return NextResponse.next();
+  }
+
   const { pathname } = req.nextUrl;
 
   const map: Record<string, string> = {
