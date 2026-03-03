@@ -116,13 +116,11 @@ app.use(cors());
 app.use(express.json());
 
 // --- Abando deploy fingerprint (v1) ---
+// --- ABANDO_VERSION_DYNAMIC_V1 ---
 app.get("/api/version", (_req, res) => {
-  res.json({
-    ok: true,
-    service: "cart-agent",
-    git: "416588f",
-    built_at_utc: "2026-02-03T20:43:55.754795Z"
-  });
+  const git = process.env.RENDER_GIT_COMMIT || process.env.GIT_COMMIT || process.env.VERCEL_GIT_COMMIT_SHA || "unknown";
+  const built = process.env.BUILT_AT_UTC || new Date().toISOString();
+  res.json({ ok: true, service: "cart-agent", git, built_at_utc: built });
 });
 // --- end fingerprint ---
 
