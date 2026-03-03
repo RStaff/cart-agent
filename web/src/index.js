@@ -51,12 +51,14 @@ app.use((req, res, next) => {
       (req.headers["sec-fetch-dest"] === "iframe");
 
     // Shopify iframe-loads "/" during embedded navigation. Route it to an existing embedded-safe page.
+    // IMPORTANT: use "/dashboard/" to avoid Express/static adding a 301 that can drop query params.
     if (isEmbedded && (req.path === "/" || req.path === "")) {
       const qs = url.search || "";
-      req.url = "/dashboard" + qs;
+      req.url = "/dashboard/" + qs;
 
+      // Optional debug (enable by setting ABANDO_DEBUG_EMBED=1 in env)
       if (process.env.ABANDO_DEBUG_EMBED === "1") {
-        console.log("[ABANDO_EMBEDDED_ROOT_GUARD_V1] rewrite / -> /dashboard", qs);
+        console.log("[ABANDO_EMBEDDED_ROOT_GUARD_V1] rewrite / -> /dashboard/", qs);
       }
     }
   } catch (e) {
@@ -137,9 +139,9 @@ applyAbandoDevProxy(app);
 
 
 // --- Embedded entrypoint alias (Shopify Application URL) ---
-app.get("/app", (req,res)=> res.redirect(307, "/dashboard"));
-app.get("/app\/", (req,res)=> res.redirect(307, "/dashboard"));
-app.get("/app\/.*", (req,res)=> res.redirect(307, "/dashboard"));
+app.get("/app", (req,res)=> res.redirect(307, "/dashboard/"));
+app.get("/app\/", (req,res)=> res.redirect(307, "/dashboard/"));
+app.get("/app\/.*", (req,res)=> res.redirect(307, "/dashboard/"));
 
 app.use(cookieParser());
 app.use(cors());
@@ -244,6 +246,18 @@ app.use((req, res, next) => {
 
 
 // Static + simple pages
+
+// ABANDO_DASHBOARD_NOREDIRECT_V1
+// Serve dashboard HTML directly to avoid /dashboard -> /dashboard/ 301 dropping embedded/shop query params.
+app.get("/dashboard", (req, res) =>
+  res.sendFile(join(__dirname, "public", "dashboard", "index.html"))
+);
+app.get("/dashboard/", (req, res) =>
+  res.sendFile(join(__dirname, "public", "dashboard", "index.html"))
+);
+// /ABANDO_DASHBOARD_NOREDIRECT_V1
+
+
 app.use(express.static(join(__dirname, "public")));
 app.get("/", (_req,res)=>res.sendFile(join(__dirname,"public","index.html")));
 app.get("/pricing", (_req,res)=>res.sendFile(join(__dirname,"public","pricing","index.html")));
