@@ -355,6 +355,19 @@ app.get("/onboarding", (_req,res)=>res.sendFile(join(__dirname,"public","onboard
 
 // Health/hello
 app.get("/healthz", (_req, res) => res.type("text/plain").send("ok"));
+// Ops: identify running service/build (deterministic routing)
+const __ABANDO_STARTED_AT = new Date().toISOString();
+app.get("/ops/whoami", (_req, res) => res.json({
+  ok: true,
+  service_id: process.env.RENDER_SERVICE_ID || null,
+  service_name: process.env.RENDER_SERVICE_NAME || null,
+  git: process.env.RENDER_GIT_COMMIT || process.env.GIT_SHA || null,
+  external_url: process.env.RENDER_EXTERNAL_URL || null,
+  node_env: process.env.NODE_ENV || null,
+  hostname: process.env.HOSTNAME || null,
+  started_at: __ABANDO_STARTED_AT,
+}));
+
 // Health aliases (Render/monitors often hit /health)
 app.get("/health", (_req, res) => res.type("text/plain").send("ok"));
 app.get("/api/health", (_req, res) => res.type("text/plain").send("ok"));
