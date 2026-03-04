@@ -415,7 +415,7 @@ app.get("/shopify/install", (req, res) => {
   const shop = normalizeShop(req.query.shop);
   if (!shop || !shop.endsWith(".myshopify.com")) return res.status(400).send("Missing/invalid ?shop=your-store.myshopify.com");
   const state = randomBytes(16).toString("hex");
-  res.cookie("shopify_state", state, { httpOnly: true, sameSite: "lax", secure: true, path: "/" });
+  res.cookie('shopify_state', state, { httpOnly: true, sameSite: "none", secure: true, path: "/" });
   const redirect_uri = encodeURIComponent(`${APP_URL}/shopify/callback`);
   const authorizeUrl = `https://${shop}/admin/oauth/authorize?client_id=${SHOPIFY_API_KEY}&scope=${encodeURIComponent(SHOPIFY_SCOPES)}&redirect_uri=${redirect_uri}&state=${state}&grant_options[]=per-user`;
   console.log("[shopify] authorize →", authorizeUrl);
@@ -442,8 +442,11 @@ app.get("/shopify/callback", async (req, res) => {
       body: JSON.stringify({ client_id: SHOPIFY_API_KEY, client_secret: SHOPIFY_API_SECRET, code })
     });
     if (!tokenResp.ok) {
-      const txt = await tokenResp.text();
-      console.error("[shopify] token exchange failed", tokenResp.status, txt);
+      const body = await tokenResp.text().catch(() => "");
+      console.error("[OAUTH] Token exchange failed", {
+        status: tokenResp.status,
+        body,
+      });
       return res.status(500).send("Token exchange failed");
     }
     const { access_token, scope } = await tokenResp.json();
