@@ -493,8 +493,6 @@ app.get("/shopify/billing/return", (_req, res) => res.redirect("/onboarding"));
 // Start
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 app.listen(PORT, () => console.log(`[server] listening on :${PORT}`));
-export default app;
-
 // Public Stripe checkout (no auth)
 app.post("/api/billing/checkout", async (req, res) => {
   try {
