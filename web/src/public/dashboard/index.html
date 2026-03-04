@@ -19,7 +19,7 @@
 <section class="section"><div class="container">
   <div class="card" id="shopify-install-banner" style="display:none;align-items:center;justify-content:space-between;gap:.75rem">
     <div><strong>Install Abando in your Shopify store</strong><div class="muted">A few clicks to connect via OAuth.</div></div>
-    <a class="btn btn-primary" data-install-shopify href="#" target="_top" rel="noopener noreferrer">Install via Shopify</a>
+    <a class="btn btn-primary" data-install-shopify href="/api/auth" target="_top" rel="noopener noreferrer">Install via Shopify</a>
   </div>
 </div></section>
 <section class="section"><div class="container grid-2">
@@ -57,34 +57,45 @@
     <a href="/legal/dpa">DPA</a>
   </small>
 </footer>
-<!-- ABANDO_IFRAME_BREAKOUT_V1 -->
+
+<!-- ABANDO_IFRAME_BREAKOUT_V2 -->
 <script>
 (function () {
   try {
     var a = document.querySelector("[data-install-shopify]");
     if (!a) return;
 
-    a.addEventListener("click", function (e) {
-      e.preventDefault();
-
+    function buildAuthUrl() {
       // Preserve Shopify context querystring (shop, host, embedded, hmac, timestamp, etc.)
       var qs = window.location.search || "";
       if (qs && qs[0] !== "?") qs = "?" + qs;
+      return "/api/auth" + qs;
+    }
 
-      var url = "/api/auth" + qs;
+    // Make anchor a real top-level navigation target.
+    var url = buildAuthUrl();
+    a.setAttribute("href", url);
+    a.setAttribute("target", "_top");
+    a.setAttribute("rel", "noopener noreferrer");
 
-      // Break out of the Shopify Admin iframe
+    // Capture-phase click handler to beat other listeners.
+    a.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+
+      var go = buildAuthUrl();
       if (window.top && window.top !== window) {
-        window.top.location.assign(url);
+        window.top.location.replace(go);
       } else {
-        window.location.assign(url);
+        window.location.replace(go);
       }
-    });
+    }, true);
   } catch (err) {
     // no-op
   }
 })();
 </script>
-<!-- /ABANDO_IFRAME_BREAKOUT_V1 -->
+<!-- /ABANDO_IFRAME_BREAKOUT_V2 -->
 
 </body></html>
