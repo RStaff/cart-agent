@@ -271,7 +271,7 @@ app.get("/hello", (_req, res) => res.json({ msg: "Hello from Cart Agent!" }));
 const prisma = new PrismaClient();
 
 // Env
-const APP_URL            = process.env.APP_URL || "https://abando.ai";
+const APP_URL            = process.env.APP_URL || "https://pay.abando.ai";
 const SHOPIFY_API_KEY    = process.env.SHOPIFY_API_KEY    || "";
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || "";
 const SHOPIFY_SCOPES     = process.env.SHOPIFY_SCOPES
