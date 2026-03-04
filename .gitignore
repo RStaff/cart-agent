@@ -153,3 +153,6 @@ scripts/228_*.sh
 
 # dev runtime pids
 .pids/
+
+# local ops scripts
+*.sh
