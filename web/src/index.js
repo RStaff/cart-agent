@@ -1,27 +1,6 @@
 
 // ABANDO_SHOPIFY_HMAC_FIX_V1
 import crypto from "crypto";
-
-function verifyShopifyHmac(query, secret) {
-  const { hmac, signature, ...params } = query;
-
-  const message = Object.keys(params)
-    .sort()
-    .map(k => `${k}=${Array.isArray(params[k]) ? params[k].join(',') : params[k]}`)
-    .join('&');
-
-  const generated = crypto
-    .createHmac("sha256", secret)
-    .update(message)
-    .digest("hex");
-
-  const safeA = Buffer.from(generated, "utf8");
-  const safeB = Buffer.from(hmac || "", "utf8");
-
-  if (safeA.length !== safeB.length) return false;
-
-  return crypto.timingSafeEqual(safeA, safeB);
-}
 // /ABANDO_SHOPIFY_HMAC_FIX_V1
 
 // web/src/index.js — clean ESM server with Shopify OAuth + DB save
@@ -35,27 +14,7 @@ import { PrismaClient, Prisma } from "@prisma/client";
 import applyAbandoDevProxy from "./abandoDevProxy.js";
 import crypto from "crypto";
 
-// ABANDO_VERIFY_SHOPIFY_HMAC_V2
-function verifyShopifyHmac(query, secret) {
-  const { hmac, signature, ...params } = query || {};
 
-  const message = Object.keys(params)
-    .sort()
-    .map((k) => {
-      const v = params[k];
-      if (Array.isArray(v)) return `${k}=${v.join(",")}`;
-      return `${k}=${v}`;
-    })
-    .join("&");
-
-  const generated = crypto.createHmac("sha256", secret).update(message).digest("hex");
-
-  const safeA = Buffer.from(generated, "utf8");
-  const safeB = Buffer.from(String(hmac || ""), "utf8");
-  if (safeA.length !== safeB.length) return false;
-  return crypto.timingSafeEqual(safeA, safeB);
-}
-// /ABANDO_VERIFY_SHOPIFY_HMAC_V2
 
 
 function verifyShopifyWebhookHmac(req) {
@@ -75,7 +34,27 @@ function verifyShopifyWebhookHmac(req) {
 
   const a = Buffer.from(digest, "utf8");
   const b = Buffer.from(hmacHeader, "utf8");
-  if (a.length !== b.length) return false;
+  if (a.length !// ABANDO_VERIFY_SHOPIFY_HMAC_V2
+function verifyShopifyHmac(query, secret) {
+  const { hmac, signature, ...params } = query || {};
+
+  const message = Object.keys(params)
+    .sort()
+    .map((k) => {
+      const v = params[k];
+      if (Array.isArray(v)) return `${k}=${v.join(",")}`;
+      return `${k}=${v}`;
+    })
+    .join("&");
+
+  const generated = crypto.createHmac("sha256", secret).update(message).digest("hex");
+
+  const safeA = Buffer.from(generated, "utf8");
+  const safeB = Buffer.from(String(hmac || ""), "utf8");
+  if (safeA.length !== safeB.length) return false;
+  return crypto.timingSafeEqual(safeA, safeB);
+}
+// /ABANDO_VERIFY_SHOPIFY_HMAC_V2== b.length) return false;
 
   return crypto.timingSafeEqual(a, b);
 }
