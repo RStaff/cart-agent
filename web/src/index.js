@@ -12,7 +12,6 @@ import { dirname, join } from "node:path";
 import { randomBytes, createHmac } from "node:crypto";
 import { PrismaClient, Prisma } from "@prisma/client";
 import applyAbandoDevProxy from "./abandoDevProxy.js";
-import crypto from "crypto";
 
 
 
@@ -34,7 +33,9 @@ function verifyShopifyWebhookHmac(req) {
 
   const a = Buffer.from(digest, "utf8");
   const b = Buffer.from(hmacHeader, "utf8");
-  if (a.length !// ABANDO_VERIFY_SHOPIFY_HMAC_V2
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
+}
 function verifyShopifyHmac(query, secret) {
   const { hmac, signature, ...params } = query || {};
 
@@ -53,10 +54,6 @@ function verifyShopifyHmac(query, secret) {
   const safeB = Buffer.from(String(hmac || ""), "utf8");
   if (safeA.length !== safeB.length) return false;
   return crypto.timingSafeEqual(safeA, safeB);
-}
-// /ABANDO_VERIFY_SHOPIFY_HMAC_V2== b.length) return false;
-
-  return crypto.timingSafeEqual(a, b);
 }
 
 
