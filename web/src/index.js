@@ -12,7 +12,6 @@ import { dirname, join } from "node:path";
 import { randomBytes, createHmac } from "node:crypto";
 import { PrismaClient, Prisma } from "@prisma/client";
 import applyAbandoDevProxy from "./abandoDevProxy.js";
-import crypto from "crypto";
 
 
 
@@ -34,30 +33,93 @@ function verifyShopifyWebhookHmac(req) {
 
   const a = Buffer.from(digest, "utf8");
   const b = Buffer.from(hmacHeader, "utf8");
-  if (a.length !// ABANDO_VERIFY_SHOPIFY_HMAC_V2
-function verifyShopifyHmac(query, secret) {
-  const { hmac, signature, ...params } = query || {};
-
-  const message = Object.keys(params)
-    .sort()
-    .map((k) => {
-      const v = params[k];
-      if (Array.isArray(v)) return `${k}=${v.join(",")}`;
-      return `${k}=${v}`;
-    })
-    .join("&");
-
-  const generated = crypto.createHmac("sha256", secret).update(message).digest("hex");
-
-  const safeA = Buffer.from(generated, "utf8");
-  const safeB = Buffer.from(String(hmac || ""), "utf8");
-  if (safeA.length !== safeB.length) return false;
-  return crypto.timingSafeEqual(safeA, safeB);
-}
-// /ABANDO_VERIFY_SHOPIFY_HMAC_V2== b.length) return false;
-
+  if (a.length !== b.length) return false;
   return crypto.timingSafeEqual(a, b);
 }
+function verifyShopifyHmac(reqOrQuery, secret) {
+  // Shopify OAuth callback HMAC verification (hex)
+  // Accepts either:
+  //  - Express req (preferred; uses raw querystring via req.originalUrl)
+  //  - A plain query object (fallback; uses RFC3986 encoding)
+  try {
+    if (!secret) return false;
+
+    // Preferred path: we were passed an Express req
+    const looksLikeReq =
+      reqOrQuery &&
+      typeof reqOrQuery === "object" &&
+      (typeof reqOrQuery.originalUrl === "string" || typeof reqOrQuery.url === "string");
+
+    let hmac = "";
+    let message = "";
+
+    if (looksLikeReq) {
+      const req = reqOrQuery;
+      const host = req.headers?.host || "localhost";
+      const url = new URL(req.originalUrl || req.url || "/", `https://${host}`);
+
+      const params = new URLSearchParams(url.searchParams);
+      hmac = String(params.get("hmac") || "");
+      params.delete("hmac");
+      params.delete("signature");
+
+      const entries = Array.from(params.entries()).sort(([a], [b]) => a.localeCompare(b));
+      message = entries
+        .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+        .join("&");
+    } else {
+      // Fallback path: we were passed a plain query object
+      const query = (reqOrQuery && typeof reqOrQuery === "object") ? reqOrQuery : {};
+      const { hmac: qHmac, signature, ...params } = query || {};
+      hmac = String(qHmac || "");
+
+      const keys = Object.keys(params).sort();
+      message = keys
+        .map((k) => {
+          const v = params[k];
+          if (Array.isArray(v)) {
+            return v.map((vv) => `${encodeURIComponent(k)}=${encodeURIComponent(String(vv))}`).join("&");
+          }
+          return `${encodeURIComponent(k)}=${encodeURIComponent(String(v ?? ""))}`;
+        })
+        .filter(Boolean)
+        .join("&");
+    }
+
+    const digest = crypto.createHmac("sha256", secret).update(message).digest("hex");
+
+    const a = Buffer.from(digest, "utf8");
+    const b = Buffer.from(hmac, "utf8");
+    if (a.length !== b.length) return false;
+    return crypto.timingSafeEqual(a, b);
+  } catch {
+    return false;
+  }
+}
+
+// ABANDO_SHOP_NORMALIZE_V1
+function normalizeShop(raw) {
+  if (!raw) return "";
+  let v = String(raw).trim().toLowerCase();
+
+  // strip protocol
+  v = v.replace(/^https?:\/\//, "");
+
+  // strip path/query/hash
+  v = v.split("/")[0].split("?")[0].split("#")[0];
+
+  // if user passed "shopname" only, add suffix
+  if (v && !v.includes(".")) v = `${v}.myshopify.com`;
+
+  // allow only *.myshopify.com
+  if (!v.endsWith(".myshopify.com")) return "";
+
+  // basic hostname sanity
+  if (!/^[a-z0-9][a-z0-9-]*\.myshopify\.com$/.test(v)) return "";
+
+  return v;
+}
+// /ABANDO_SHOP_NORMALIZE_V1
 
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -306,9 +368,6 @@ const SHOPIFY_SCOPES     = process.env.SHOPIFY_SCOPES
   || "read_checkouts,read_orders,write_checkouts,read_script_tags,write_script_tags";
 
 // Helpers
-function normalizeShopDomain(raw) {
-  return String(raw || "").trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/+$/, "");
-}
 function signParams(params) {
   const keys = Object.keys(params).filter(k => k !== "hmac").sort();
   const message = keys.map(k => `${k}=${params[k]}`).join("&");
@@ -340,7 +399,7 @@ async function saveShopToDB(domain, accessToken, scopes) {
 // --- Shopify auth aliases (for Embedded/App Bridge expectations) ---
 app.get("/api/auth", (req, res) => {
   // Alias used by Shopify embedded flows; redirect into our install route.
-  const shop = String(req.query.shop || "");
+  const shop = normalizeShop(req.query.shop);
   const qs = shop ? `?shop=${encodeURIComponent(shop)}` : "";
   return res.redirect(302, `/shopify/install${qs}`);
 });
@@ -353,7 +412,7 @@ app.get("/api/auth/callback", (req, res) => {
 });
 
 app.get("/shopify/install", (req, res) => {
-  const shop = normalizeShopDomain(req.query.shop);
+  const shop = normalizeShop(req.query.shop);
   if (!shop || !shop.endsWith(".myshopify.com")) return res.status(400).send("Missing/invalid ?shop=your-store.myshopify.com");
   const state = randomBytes(16).toString("hex");
   res.cookie("shopify_state", state, { httpOnly: true, sameSite: "lax", secure: true, path: "/" });
@@ -365,13 +424,13 @@ app.get("/shopify/install", (req, res) => {
 
 app.get("/shopify/callback", async (req, res) => {
   try {
-    const shop = normalizeShopDomain(req.query.shop);
+    const shop = normalizeShop(req.query.shop);
     const code = String(req.query.code || "");
     const state = String(req.query.state || "");
     const hmac = String(req.query.hmac || "");
     const timestamp = String(req.query.timestamp || "");
 
-    if (!shop || !shop.endsWith(".myshopify.com")) return res.status(400).send("Invalid shop");
+    if (!shop) return res.status(400).send("Invalid shop");
     if (!code || !state || !hmac || !timestamp)   return res.status(400).send("Missing OAuth params");
     if (String(req.cookies?.shopify_state) !== state) return res.status(400).send("State mismatch");
 
@@ -398,8 +457,8 @@ app.get("/shopify/callback", async (req, res) => {
 });
 
 app.get("/shopify/billing/start", (req, res) => {
-  const shop = normalizeShopDomain(req.query.shop);
-  if (!shop || !shop.endsWith(".myshopify.com")) return res.status(400).send("Invalid shop");
+  const shop = normalizeShop(req.query.shop);
+  if (!shop) return res.status(400).send("Invalid shop");
   return res.redirect(`/shopify/billing/return?shop=${encodeURIComponent(shop)}`);
 });
 app.get("/shopify/billing/return", (_req, res) => res.redirect("/onboarding"));
