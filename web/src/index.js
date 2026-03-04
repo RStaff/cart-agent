@@ -36,24 +36,65 @@ function verifyShopifyWebhookHmac(req) {
   if (a.length !== b.length) return false;
   return crypto.timingSafeEqual(a, b);
 }
-function verifyShopifyHmac(query, secret) {
-  const { hmac, signature, ...params } = query || {};
+function verifyShopifyHmac(reqOrQuery, secret) {
+  // Shopify OAuth callback HMAC verification (hex)
+  // Accepts either:
+  //  - Express req (preferred; uses raw querystring via req.originalUrl)
+  //  - A plain query object (fallback; uses RFC3986 encoding)
+  try {
+    if (!secret) return false;
 
-  const message = Object.keys(params)
-    .sort()
-    .map((k) => {
-      const v = params[k];
-      if (Array.isArray(v)) return `${k}=${v.join(",")}`;
-      return `${k}=${v}`;
-    })
-    .join("&");
+    // Preferred path: we were passed an Express req
+    const looksLikeReq =
+      reqOrQuery &&
+      typeof reqOrQuery === "object" &&
+      (typeof reqOrQuery.originalUrl === "string" || typeof reqOrQuery.url === "string");
 
-  const generated = crypto.createHmac("sha256", secret).update(message).digest("hex");
+    let hmac = "";
+    let message = "";
 
-  const safeA = Buffer.from(generated, "utf8");
-  const safeB = Buffer.from(String(hmac || ""), "utf8");
-  if (safeA.length !== safeB.length) return false;
-  return crypto.timingSafeEqual(safeA, safeB);
+    if (looksLikeReq) {
+      const req = reqOrQuery;
+      const host = req.headers?.host || "localhost";
+      const url = new URL(req.originalUrl || req.url || "/", `https://${host}`);
+
+      const params = new URLSearchParams(url.searchParams);
+      hmac = String(params.get("hmac") || "");
+      params.delete("hmac");
+      params.delete("signature");
+
+      const entries = Array.from(params.entries()).sort(([a], [b]) => a.localeCompare(b));
+      message = entries
+        .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+        .join("&");
+    } else {
+      // Fallback path: we were passed a plain query object
+      const query = (reqOrQuery && typeof reqOrQuery === "object") ? reqOrQuery : {};
+      const { hmac: qHmac, signature, ...params } = query || {};
+      hmac = String(qHmac || "");
+
+      const keys = Object.keys(params).sort();
+      message = keys
+        .map((k) => {
+          const v = params[k];
+          if (Array.isArray(v)) {
+            return v.map((vv) => `${encodeURIComponent(k)}=${encodeURIComponent(String(vv))}`).join("&");
+          }
+          return `${encodeURIComponent(k)}=${encodeURIComponent(String(v ?? ""))}`;
+        })
+        .filter(Boolean)
+        .join("&");
+    }
+
+    const digest = crypto.createHmac("sha256", secret).update(message).digest("hex");
+
+    const a = Buffer.from(digest, "utf8");
+    const b = Buffer.from(hmac, "utf8");
+    if (a.length !== b.length) return false;
+    return crypto.timingSafeEqual(a, b);
+  } catch {
+    return false;
+  }
 }
 
 // ABANDO_SHOP_NORMALIZE_V1
