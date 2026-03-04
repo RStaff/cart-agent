@@ -424,6 +424,8 @@ app.get("/shopify/install", (req, res) => {
 
 app.get("/shopify/callback", async (req, res) => {
   try {
+    const trace = `${Date.now().toString(36)}-${Math.random().toString(16).slice(2)}`;
+    console.log('[OAUTH] callback start', { trace });
     const shop = normalizeShop(req.query.shop);
     const code = String(req.query.code || "");
     const state = String(req.query.state || "");
@@ -449,13 +451,30 @@ app.get("/shopify/callback", async (req, res) => {
       });
       return res.status(500).send("Token exchange failed");
     }
+    console.log('[OAUTH] token exchange OK', { trace, status: tokenResp.status });
     const { access_token, scope } = await tokenResp.json();
-    await saveShopToDB(shop, access_token, scope);
+    console.log('[OAUTH] token parsed', { trace, has_access_token: Boolean(access_token), scope });
+    try {
+      console.log('[OAUTH] saving shop token', { trace, shop });
+      await saveShopToDB(shop, access_token, scope);
+      console.log('[OAUTH] saved shop token', { trace, shop });
+    } catch (dbErr) {
+      console.error('[OAUTH] saveShopToDB failed', { trace, shop, err: String(dbErr), stack: dbErr && dbErr.stack ? String(dbErr.stack) : undefined });
+      return res.status(500).send(`OAuth callback error (trace=${trace})`);
+    }
     console.log("[shopify] token stored for", shop);
     return res.redirect(`/shopify/billing/start?shop=${encodeURIComponent(shop)}`);
   } catch (e) {
-    console.error("[shopify] callback error", e);
-    return res.status(500).send("OAuth callback error");
+    console.error('[OAUTH] callback exception', {
+      trace: (typeof trace !== 'undefined' ? trace : undefined),
+      shop: (typeof shop !== 'undefined' ? shop : undefined),
+      has_code: Boolean(req.query && req.query.code),
+      has_state: Boolean(req.query && req.query.state),
+      cookie_state: String(req.cookies?.shopify_state || ''),
+      err: String(e),
+      stack: e && e.stack ? String(e.stack) : undefined,
+    });
+    return res.status(500).send(`OAuth callback error (trace=${(typeof trace !== 'undefined') ? trace : 'na'})`);
   }
 });
 
