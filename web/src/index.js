@@ -35,6 +35,29 @@ import { PrismaClient, Prisma } from "@prisma/client";
 import applyAbandoDevProxy from "./abandoDevProxy.js";
 import crypto from "crypto";
 
+// ABANDO_VERIFY_SHOPIFY_HMAC_V2
+function verifyShopifyHmac(query, secret) {
+  const { hmac, signature, ...params } = query || {};
+
+  const message = Object.keys(params)
+    .sort()
+    .map((k) => {
+      const v = params[k];
+      if (Array.isArray(v)) return `${k}=${v.join(",")}`;
+      return `${k}=${v}`;
+    })
+    .join("&");
+
+  const generated = crypto.createHmac("sha256", secret).update(message).digest("hex");
+
+  const safeA = Buffer.from(generated, "utf8");
+  const safeB = Buffer.from(String(hmac || ""), "utf8");
+  if (safeA.length !== safeB.length) return false;
+  return crypto.timingSafeEqual(safeA, safeB);
+}
+// /ABANDO_VERIFY_SHOPIFY_HMAC_V2
+
+
 function verifyShopifyWebhookHmac(req) {
   const hmacHeader = req.get("X-Shopify-Hmac-Sha256") || "";
   const secret =
@@ -373,8 +396,7 @@ app.get("/shopify/callback", async (req, res) => {
     if (!code || !state || !hmac || !timestamp)   return res.status(400).send("Missing OAuth params");
     if (String(req.cookies?.shopify_state) !== state) return res.status(400).send("State mismatch");
 
-    const expected = signParams({ code, shop, state, timestamp });
-    if (expected !== hmac) return res.status(400).send("HMAC verification failed");
+    if (!verifyShopifyHmac(req.query, SHOPIFY_API_SECRET)) return res.status(400).send("HMAC verification failed");
 
     const tokenResp = await fetch(`https://${shop}/admin/oauth/access_token`, {
       method: "POST",
