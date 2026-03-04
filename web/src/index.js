@@ -621,5 +621,3 @@ app.get("/api/ai/health", async (req, res) => {
     res.status(500).json({ ok: false, error: err.message });
   }
 });
-
-module.exports = app;
