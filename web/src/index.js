@@ -424,11 +424,8 @@ app.get("/shopify/install", (req, res) => {
 
 app.get("/shopify/callback", async (req, res) => {
   try {
-<<<<<<< HEAD
-=======
     const trace = `${Date.now().toString(36)}-${Math.random().toString(16).slice(2)}`;
     console.log('[OAUTH] callback start', { trace });
->>>>>>> fix/shop-normalize-safe
     const shop = normalizeShop(req.query.shop);
     const code = String(req.query.code || "");
     const state = String(req.query.state || "");
