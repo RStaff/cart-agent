@@ -355,6 +355,11 @@ app.get("/onboarding", (_req,res)=>res.sendFile(join(__dirname,"public","onboard
 
 // Health/hello
 app.get("/healthz", (_req, res) => res.type("text/plain").send("ok"));
+// Health aliases (Render/monitors often hit /health)
+app.get("/health", (_req, res) => res.type("text/plain").send("ok"));
+app.get("/api/health", (_req, res) => res.type("text/plain").send("ok"));
+app.get("/api/healthz", (_req, res) => res.type("text/plain").send("ok"));
+
 app.get("/hello", (_req, res) => res.json({ msg: "Hello from Cart Agent!" }));
 
 // Prisma
@@ -616,3 +621,5 @@ app.get("/api/ai/health", async (req, res) => {
     res.status(500).json({ ok: false, error: err.message });
   }
 });
+
+module.exports = app;
