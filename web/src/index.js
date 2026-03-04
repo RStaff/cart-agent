@@ -1,3 +1,29 @@
+
+// ABANDO_SHOPIFY_HMAC_FIX_V1
+import crypto from "crypto";
+
+function verifyShopifyHmac(query, secret) {
+  const { hmac, signature, ...params } = query;
+
+  const message = Object.keys(params)
+    .sort()
+    .map(k => `${k}=${Array.isArray(params[k]) ? params[k].join(',') : params[k]}`)
+    .join('&');
+
+  const generated = crypto
+    .createHmac("sha256", secret)
+    .update(message)
+    .digest("hex");
+
+  const safeA = Buffer.from(generated, "utf8");
+  const safeB = Buffer.from(hmac || "", "utf8");
+
+  if (safeA.length !== safeB.length) return false;
+
+  return crypto.timingSafeEqual(safeA, safeB);
+}
+// /ABANDO_SHOPIFY_HMAC_FIX_V1
+
 // web/src/index.js — clean ESM server with Shopify OAuth + DB save
 import express from "express";
 import cors from "cors";
