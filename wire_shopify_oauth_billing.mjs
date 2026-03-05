@@ -153,7 +153,50 @@ app.get("/shopify/billing/return", (req,res)=>{
   <h2>Billing active</h2>
   <p>Thanks! Your subscription for <b>\${shop}</b> is active. You can close this tab.</p>
   <p><a rel="noopener noreferrer" target="_top" href="/dashboard" style="color:#93c5fd">Back to dashboard</a></p>
-  </body></html>\`);
+  <script>window.__SHOPIFY_API_KEY__ = String(process.env.SHOPIFY_API_KEY || "");</script>
+
+<script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
+<script>
+(function () {
+  try {
+    const params = new URLSearchParams(window.location.search || "");
+    const host = params.get("host") || "";
+    const shop = params.get("shop") || "";
+    const apiKey = (window.__SHOPIFY_API_KEY__ || "").trim();
+
+    // If we're not embedded (no host), fall back to normal top navigation.
+    const fallback = () => {
+      const url = "/api/auth" + (shop ? ("?shop=" + encodeURIComponent(shop)) : "");
+      if (window.top && window.top !== window) window.top.location.href = url;
+      else window.location.href = url;
+    };
+
+    const btn = document.querySelector("[data-install-shopify]");
+    if (!btn) return;
+
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+
+      if (!host || !apiKey) return fallback();
+
+      const AppBridge = window["app-bridge"];
+      const createApp = AppBridge.createApp;
+      const Redirect = AppBridge.actions.Redirect;
+
+      const app = createApp({ apiKey, host, forceRedirect: true });
+      const redirect = Redirect.create(app);
+
+      const url = (window.location.origin || "") + "/api/auth" + (shop ? ("?shop=" + encodeURIComponent(shop)) : "");
+      redirect.dispatch(Redirect.Action.REMOTE, url);
+    }, true);
+  } catch (e) {
+    // last-resort fallback
+    try { window.top.location.href = "/api/auth"; } catch (_) {}
+  }
+})();
+</script>
+
+</body></html>\`);
 });
 
 // Helper: simple install link (for testing)
@@ -183,7 +226,7 @@ function patchDashboard(){
 <section class="section"><div class="container">
   <div class="card" id="shopify-install-banner" style="display:none;align-items:center;justify-content:space-between;gap:.75rem">
     <div><strong>Install Abando in your Shopify store</strong><div class="muted">A few clicks to connect via OAuth.</div></div>
-    <a class="btn btn-primary" data-install-shopify href="/shopify/install" data-install-shopify>Install via Shopify</a>
+    <a class="btn btn-primary" data-install-shopify href="/api/auth" data-install-shopify data-install-shopify>Install via Shopify</a>
   </div>
 </div></section>
 <section class="section">`);
