@@ -395,19 +395,23 @@ async function saveShopToDB(domain, accessToken, scopes) {
   const crypto = require("crypto");
   const id = crypto.randomUUID();
   const now = new Date();
-  const name = domain, key = domain, prov = "shopify";
+  const name = domain;
+  const key = domain;
+  const prov = "shopify";
 
-  return prisma.$executeRaw`
+  // Schema-backed upsert: Shop.key is UNIQUE in web/prisma/schema.prisma
+  await prisma.$executeRaw`
     INSERT INTO "Shop"
-      ("id","key","createdAt","updatedAt","name","provider","accessToken","scopes")
+      ("id","key","createdAt","updatedAt","name","provider","apiKey","emailFrom")
     VALUES
       (${id}, ${key}, ${now}, ${now}, ${name}, ${prov}, ${accessToken ?? ""}, ${scopes ?? ""})
     ON CONFLICT ("key") DO UPDATE SET
-      "updatedAt"   = EXCLUDED."updatedAt",
-      "name"        = EXCLUDED."name",
-      "provider"    = EXCLUDED."provider",
-      "accessToken" = EXCLUDED."accessToken",
-      "scopes"      = EXCLUDED."scopes";
+      "updatedAt" = EXCLUDED."updatedAt",
+      "name"      = EXCLUDED."name",
+      "provider"  = EXCLUDED."provider",
+      "apiKey"    = EXCLUDED."apiKey",
+      "emailFrom" = EXCLUDED."emailFrom";
+  `;
 }
 
 
