@@ -152,7 +152,7 @@ app.get("/shopify/billing/return", (req,res)=>{
   res.send(\`<html><body style="font-family:system-ui;background:#0b142a;color:#e5e7eb;padding:24px">
   <h2>Billing active</h2>
   <p>Thanks! Your subscription for <b>\${shop}</b> is active. You can close this tab.</p>
-  <p><a href="/dashboard" style="color:#93c5fd">Back to dashboard</a></p>
+  <p><a rel="noopener noreferrer" target="_top" href="/dashboard" style="color:#93c5fd">Back to dashboard</a></p>
   </body></html>\`);
 });
 
