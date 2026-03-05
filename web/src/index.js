@@ -477,20 +477,15 @@ app.get("/shopify/callback", async (req, res) => {
       await saveShopToDB(shop, access_token, scope);
       console.log('[OAUTH] saved shop token', { trace, shop });
     } catch (dbErr) {
-      console.error('[OAUTH] saveShopToDB failed', {
-        trace,
-        shop,
-        prisma: {
-          name: dbErr?.name,
-          message: dbErr?.message,
-          code: dbErr?.code,
-          meta: dbErr?.meta,
-          clientVersion: dbErr?.clientVersion,
-        },
-        err_string: String(dbErr),
-        stack: dbErr?.stack ? String(dbErr.stack) : undefined,
-      });
-return res.status(500).send(`OAuth callback error (trace=${trace})`);
+      const prismaInfo = {
+        name: dbErr?.name,
+        code: dbErr?.code,
+        meta: dbErr?.meta,
+        clientVersion: dbErr?.clientVersion,
+        message: String(dbErr?.message || dbErr),
+      };
+      console.error(`[OAUTH] saveShopToDB failed trace=${trace} shop=${shop} prisma=${JSON.stringify(prismaInfo)}`);
+      return res.status(500).send(`OAuth callback error (trace=${trace})`);
     }
     console.log("[shopify] token stored for", shop);
     return res.redirect(`/shopify/billing/start?shop=${encodeURIComponent(shop)}`);
