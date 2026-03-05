@@ -386,6 +386,47 @@ const SHOPIFY_SCOPES     = process.env.SHOPIFY_SCOPES
   || "read_checkouts,read_orders,write_checkouts,read_script_tags,write_script_tags";
 
 // Helpers
+
+function safeJsonParse(s) { try { return JSON.parse(s); } catch { return null; } }
+
+function b64urlDecode(str) {
+  try {
+    str = String(str || "").replace(/-/g, "+").replace(/_/g, "/");
+    while (str.length % 4) str += "=";
+    return Buffer.from(str, "base64").toString("utf8");
+  } catch {
+    return "";
+  }
+}
+
+// id_token payload often contains: { dest: "https://{shop}.myshopify.com", iss: "https://{shop}.myshopify.com/admin", ... }
+function extractShopFromIdToken(idToken) {
+  const t = String(idToken || "");
+  const parts = t.split(".");
+  if (parts.length < 2) return "";
+  const payloadJson = b64urlDecode(parts[1]);
+  const payload = safeJsonParse(payloadJson) || {};
+  const dest = String(payload.dest || "");
+  const iss  = String(payload.iss  || "");
+
+  // Prefer dest hostname
+  try {
+    if (dest) {
+      const u = new URL(dest);
+      if (u.hostname) return u.hostname;
+    }
+  } catch {}
+
+  // Fallback: iss hostname (strip /admin)
+  try {
+    if (iss) {
+      const u = new URL(iss);
+      if (u.hostname) return u.hostname;
+    }
+  } catch {}
+
+  return "";
+}
 function signParams(params) {
   const keys = Object.keys(params).filter(k => k !== "hmac").sort();
   const message = keys.map(k => `${k}=${params[k]}`).join("&");
@@ -420,12 +461,47 @@ async function saveShopToDB(domain, accessToken, scopes) {
 // Shopify routes
 // --- Shopify auth aliases (for Embedded/App Bridge expectations) ---
 app.get("/api/auth", (req, res) => {
-  // Alias used by Shopify embedded flows; redirect into our install route.
-  const shop = normalizeShop(req.query.shop);
-  const qs = shop ? `?shop=${encodeURIComponent(shop)}` : "";
-  return res.redirect(302, `${APP_URL}/shopify/install${qs}`);
-});
+  // Shopify embedded admin loads apps in an iframe.
+  // We must "break out" to top window to start OAuth.
+  let shop = normalizeShop(req.query.shop);
 
+  if (!shop) {
+    // Harden: extract shop from id_token if present (Shopify often supplies it)
+    shop = normalizeShop(extractShopFromIdToken(req.query.id_token));
+  }
+
+  if (!shop || !shop.endsWith(".myshopify.com")) {
+    // If we still can't determine shop, send to onboarding (safe default)
+    return res.redirect(302, "/onboarding/");
+  }
+
+  const target = `${APP_URL}/shopify/install?shop=${encodeURIComponent(shop)}`;
+
+  // If embedded/admin context, return HTML that redirects the TOP frame.
+  // This is the critical difference vs a normal 302 inside an iframe.
+  const embedded = String(req.query.embedded || "") === "1" || !!req.query.host || !!req.query.id_token;
+  if (embedded) {
+    return res
+      .status(200)
+      .type("text/html")
+      .send(`<!doctype html>
+<html>
+  <head><meta charset="utf-8"><title>Redirecting…</title></head>
+  <body>
+    <script>
+      try { window.top.location.href = target; }
+      catch (e) { window.location.href = target; }
+    </script>
+    <noscript>
+      <a href="${target}">Continue</a>
+    </noscript>
+  </body>
+</html>`);
+  }
+
+  // Non-embedded: normal redirect is fine
+  return res.redirect(302, target);
+});
 app.get("/api/auth/callback", (req, res) => {
   // Preserve Shopify callback params exactly.
   const i = (req.originalUrl || "").indexOf("?");
