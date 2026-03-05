@@ -489,8 +489,8 @@ app.get("/api/auth", (req, res) => {
   <head><meta charset="utf-8"><title>Redirecting…</title></head>
   <body>
     <script>
-      try { window.top.location.href = target; }
-      catch (e) { window.location.href = target; }
+      try { window.top.location.href = ${JSON.stringify(target)}; }
+      catch (e) { window.location.href = ${JSON.stringify(target)}; }
     </script>
     <noscript>
       <a href="${target}">Continue</a>
