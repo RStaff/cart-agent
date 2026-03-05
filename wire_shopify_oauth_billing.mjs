@@ -183,7 +183,7 @@ function patchDashboard(){
 <section class="section"><div class="container">
   <div class="card" id="shopify-install-banner" style="display:none;align-items:center;justify-content:space-between;gap:.75rem">
     <div><strong>Install Abando in your Shopify store</strong><div class="muted">A few clicks to connect via OAuth.</div></div>
-    <a class="btn btn-primary" data-install-shopify href="#">Install via Shopify</a>
+    <a class="btn btn-primary" data-install-shopify href="/shopify/install" data-install-shopify>Install via Shopify</a>
   </div>
 </div></section>
 <section class="section">`);
@@ -204,7 +204,6 @@ ${marker}
   const shop = params.get('shop');
   if (!shop) return; // only show when a shop is specified
   const card = document.getElementById('shopify-install-banner'); if (card) card.style.display='flex';
-  btn.addEventListener('click', (e)=>{ e.preventDefault(); location.href = '/shopify/install?shop='+encodeURIComponent(shop); });
 })();
 `;
     W(MAIN, js);
@@ -243,6 +242,29 @@ ${marker}
       e.preventDefault();
       e.stopPropagation();
       goAuth();
+    }, true);
+  } catch (_) {}
+})();
+
+
+
+
+;(() => {
+  try {
+    const q = new URLSearchParams(window.location.search || "");
+    const shop = q.get("shop") || "";
+    const a = document.querySelector("[data-install-shopify]");
+    if (a && shop) a.setAttribute("href", "/shopify/install?shop=" + encodeURIComponent(shop));
+
+    document.addEventListener("click", (e) => {
+      const t = e.target;
+      const el = (t && t.closest) ? t.closest("[data-install-shopify]") : null;
+      if (!el) return;
+
+      e.preventDefault();
+      const href = el.getAttribute("href") || "/shopify/install" + (shop ? ("?shop=" + encodeURIComponent(shop)) : "");
+      if (window.top && window.top !== window) window.top.location.href = href;
+      else window.location.href = href;
     }, true);
   } catch (_) {}
 })();
