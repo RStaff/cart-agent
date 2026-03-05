@@ -392,26 +392,24 @@ function signParams(params) {
   return createHmac("sha256", SHOPIFY_API_SECRET).update(message).digest("hex");
 }
 async function saveShopToDB(domain, accessToken, scopes) {
+  const crypto = require("crypto");
+  const id = crypto.randomUUID();
   const now = new Date();
-  const id  = Math.random().toString(36).slice(2);
   const name = domain, key = domain, prov = "shopify";
-  await prisma.$executeRaw(
-    Prisma.sql`
-      INSERT INTO "Shop"
-        ("id","key","createdAt","updatedAt","name","provider","domain","accessToken","scopes","installedAt")
-      VALUES
-        (${id}, ${key}, ${now}, ${now}, ${name}, ${prov}, ${domain}, ${accessToken ?? ""}, ${scopes ?? ""}, ${now})
-      ON CONFLICT (lower("domain")) DO UPDATE SET
-        "name"        = EXCLUDED."name",
-        "provider"    = EXCLUDED."provider",
-        "domain"      = EXCLUDED."domain",
-        "accessToken" = EXCLUDED."accessToken",
-        "scopes"      = EXCLUDED."scopes",
-        "installedAt" = EXCLUDED."installedAt",
-        "updatedAt"   = NOW();
-    `
-  );
+
+  return prisma.$executeRaw`
+    INSERT INTO "Shop"
+      ("id","key","createdAt","updatedAt","name","provider","accessToken","scopes")
+    VALUES
+      (${id}, ${key}, ${now}, ${now}, ${name}, ${prov}, ${accessToken ?? ""}, ${scopes ?? ""})
+    ON CONFLICT ("key") DO UPDATE SET
+      "updatedAt"   = EXCLUDED."updatedAt",
+      "name"        = EXCLUDED."name",
+      "provider"    = EXCLUDED."provider",
+      "accessToken" = EXCLUDED."accessToken",
+      "scopes"      = EXCLUDED."scopes";
 }
+
 
 // Shopify routes
 // --- Shopify auth aliases (for Embedded/App Bridge expectations) ---
