@@ -423,7 +423,7 @@ app.get("/api/auth", (req, res) => {
   // Alias used by Shopify embedded flows; redirect into our install route.
   const shop = normalizeShop(req.query.shop);
   const qs = shop ? `?shop=${encodeURIComponent(shop)}` : "";
-  return res.redirect(302, `/shopify/install${qs}`);
+  return res.redirect(302, `${APP_URL}/shopify/install${qs}`);
 });
 
 app.get("/api/auth/callback", (req, res) => {
