@@ -392,8 +392,10 @@ function signParams(params) {
   return createHmac("sha256", SHOPIFY_API_SECRET).update(message).digest("hex");
 }
 async function saveShopToDB(domain, accessToken, scopes) {
-  const crypto = require("crypto");
-  const id = crypto.randomUUID();
+  // ESM-safe crypto (Render runs this file as an ES module, so require() is undefined)
+  const { randomUUID } = await import("crypto");
+
+  const id = randomUUID();
   const now = new Date();
   const name = domain;
   const key = domain;
