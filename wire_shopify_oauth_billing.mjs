@@ -217,3 +217,33 @@ ${marker}
   patchDashboard();
   console.log('✅ Shopify OAuth + Billing (dev) wired. Set env: APP_URL, SHOPIFY_API_KEY, SHOPIFY_API_SECRET, SHOPIFY_SCOPES, SHOPIFY_API_VERSION');
 })();
+
+
+
+;(() => {
+  try {
+    const goAuth = () => {
+      const q = new URLSearchParams(window.location.search || "");
+      const shop = q.get("shop") || "";
+      const url = "/api/auth" + (shop ? ("?shop=" + encodeURIComponent(shop)) : "");
+      if (window.top && window.top !== window) window.top.location.href = url;
+      else window.location.href = url;
+    };
+
+    document.addEventListener("click", (e) => {
+      const t = e.target;
+      if (!t) return;
+
+      // Find a nearby clickable element
+      const el = (t.closest && t.closest("a,button,[role='button'],div,span")) || t;
+      const txt = ((el && (el.innerText || el.textContent)) || "").trim();
+
+      if (!/Install\s+via\s+Shopify/i.test(txt)) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      goAuth();
+    }, true);
+  } catch (_) {}
+})();
+
