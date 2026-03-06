@@ -19,7 +19,10 @@
 <section class="section"><div class="container">
   <div class="card" id="shopify-install-banner" style="display:none;align-items:center;justify-content:space-between;gap:.75rem">
     <div><strong>Install Abando in your Shopify store</strong><div class="muted">A few clicks to connect via OAuth.</div></div>
-    <a class="btn btn-primary" data-install-shopify href="/api/auth" target="_top" rel="noopener noreferrer">Install via Shopify</a>
+    <form method="GET" action="https://pay.abando.ai/api/auth" target="_top" id="shopify-install-form" style="margin:0">
+      <input type="hidden" name="shop" id="shopify-install-shop" value="">
+      <button type="submit" class="btn btn-primary" data-install-shopify-btn>Install via Shopify</button>
+    </form>
   </div>
 </div></section>
 <section class="section"><div class="container grid-2">
@@ -59,97 +62,20 @@
 </footer>
 
 
-<!-- ABANDO_IFRAME_BREAKOUT_V3 -->
 <script>
 (function () {
   try {
-    function qs() {
-      var q = window.location.search || "";
-      if (q && q[0] !== "?") q = "?" + q;
-      return q;
-    }
-    function buildAuthUrl() {
-      return "/api/auth" + qs();
-    }
+    var form = document.getElementById("shopify-install-form");
+    var shopInput = document.getElementById("shopify-install-shop");
+    if (!form || !shopInput) return;
 
-    var a = document.querySelector("[data-install-shopify]");
-    if (!a) return;
-
-    // Keep anchor correct even if JS fails later
-    var authUrl = buildAuthUrl();
-    a.setAttribute("href", authUrl);
-    a.setAttribute("target", "_top");
-    a.setAttribute("rel", "noopener noreferrer");
-
-    function fallbackNavigate(url) {
-      try {
-        if (window.top && window.top !== window) {
-          window.top.location.replace(url);
-        } else {
-          window.location.replace(url);
-        }
-      } catch (e) {
-        // last resort
-        window.location.href = url;
-      }
-    }
-
-    function tryAppBridgeRedirect(url) {
-      var params = new URLSearchParams(window.location.search || "");
-      var host = params.get("host");
-      if (!host) return false;
-
-      var AppBridge = window["app-bridge"];
-      if (!AppBridge || !AppBridge.default || !AppBridge.actions) return false;
-
-      var createApp = AppBridge.default;
-      var actions = AppBridge.actions;
-      var Redirect = actions.Redirect;
-
-      var app = createApp({
-        apiKey: "83114672506075ba4866194fe0160cde",
-        host: host,
-        forceRedirect: true
-      });
-
-      Redirect.create(app).dispatch(Redirect.Action.REMOTE, url);
-      return true;
-    }
-
-    // Load App Bridge (preferred) then wire click handler (capture-phase)
-    var s = document.createElement("script");
-    s.src = "https://unpkg.com/@shopify/app-bridge@3/umd/index.js";
-    s.async = true;
-    s.onload = function () {
-      // App Bridge loaded
-    };
-    s.onerror = function () {
-      // ignore
-    };
-    document.head.appendChild(s);
-
-    a.addEventListener("click", function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-
-      var url = buildAuthUrl();
-
-      // Prefer App Bridge escape from iframe; fallback to top nav.
-      var ok = false;
-      try {
-        ok = tryAppBridgeRedirect(url);
-      } catch (err) {
-        ok = false;
-      }
-      if (!ok) fallbackNavigate(url);
-    }, true);
-
+    var params = new URLSearchParams(window.location.search || "");
+    var shop = (params.get("shop") || "").trim();
+    if (shop) shopInput.value = shop;
   } catch (err) {
     // no-op
   }
 })();
 </script>
-<!-- /ABANDO_IFRAME_BREAKOUT_V3 -->
 
 </body></html>
