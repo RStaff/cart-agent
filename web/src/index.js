@@ -588,7 +588,7 @@ app.get("/shopify/billing/start", (req, res) => {
   if (!shop) return res.status(400).send("Invalid shop");
   return res.redirect(`/shopify/billing/return?shop=${encodeURIComponent(shop)}`);
 });
-app.get("/shopify/billing/return", (_req, res) => res.redirect("/onboarding"));
+app.get("/shopify/billing/return", (_req, res) => res.redirect("/dashboard"));
 
 // Start
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
