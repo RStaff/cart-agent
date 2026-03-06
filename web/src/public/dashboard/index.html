@@ -21,6 +21,13 @@
     <div><strong>Install Abando in your Shopify store</strong><div class="muted">A few clicks to connect via OAuth.</div></div>
     <form method="GET" action="https://pay.abando.ai/api/auth" target="_top" id="shopify-install-form" style="margin:0">
       <input type="hidden" name="shop" id="shopify-install-shop" value="">
+      <input type="hidden" name="embedded" id="shopify-install-embedded" value="">
+      <input type="hidden" name="host" id="shopify-install-host" value="">
+      <input type="hidden" name="id_token" id="shopify-install-id_token" value="">
+      <input type="hidden" name="hmac" id="shopify-install-hmac" value="">
+      <input type="hidden" name="timestamp" id="shopify-install-timestamp" value="">
+      <input type="hidden" name="locale" id="shopify-install-locale" value="">
+      <input type="hidden" name="session" id="shopify-install-session" value="">
       <button type="submit" class="btn btn-primary" data-install-shopify-btn>Install via Shopify</button>
     </form>
   </div>
@@ -66,12 +73,24 @@
 (function () {
   try {
     var form = document.getElementById("shopify-install-form");
-    var shopInput = document.getElementById("shopify-install-shop");
-    if (!form || !shopInput) return;
+    if (!form) return;
 
     var params = new URLSearchParams(window.location.search || "");
-    var shop = (params.get("shop") || "").trim();
-    if (shop) shopInput.value = shop;
+
+    function setParam(id, key) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.value = (params.get(key) || "").trim();
+    }
+
+    setParam("shopify-install-shop", "shop");
+    setParam("shopify-install-embedded", "embedded");
+    setParam("shopify-install-host", "host");
+    setParam("shopify-install-id_token", "id_token");
+    setParam("shopify-install-hmac", "hmac");
+    setParam("shopify-install-timestamp", "timestamp");
+    setParam("shopify-install-locale", "locale");
+    setParam("shopify-install-session", "session");
   } catch (err) {
     // no-op
   }
