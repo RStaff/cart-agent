@@ -226,18 +226,23 @@ function patchDashboard(){
 <section class="section"><div class="container">
   <div class="card" id="shopify-install-banner" style="display:none;align-items:center;justify-content:space-between;gap:.75rem">
     <div><strong>Install Abando in your Shopify store</strong><div class="muted">A few clicks to connect via OAuth.</div></div>
-    <a class="btn btn-primary" data-install-shopify href="#"
-onclick="
-  try {
-    var qs = new URLSearchParams(window.location.search || '');
-    var shop = (qs.get('shop') || (document.querySelector('input[name=shop]') && document.querySelector('input[name=shop]').value) || '').trim();
-    var base = 'https://pay.abando.ai';
-    var url = base + '/shopify/install' + (shop ? ('?shop=' + encodeURIComponent(shop)) : '');
-    try { window.top.location.href = url; }
-    catch (e) { window.location.href = url; }
-  } catch (e2) {}
-  return false;
-">Install via Shopify</a>
+    <form method="GET"
+      action="https://pay.abando.ai/api/auth"
+      target="_top"
+      onsubmit="
+        try {
+          var qs = new URLSearchParams(window.location.search || '');
+          var shop = (qs.get('shop') || '').trim();
+          var hidden = this.querySelector('input[name=shop]');
+          if (hidden) hidden.value = shop;
+        } catch (e) {}
+      "
+      style="margin:0; display:inline-block;">
+      <input type="hidden" name="shop" value="">
+      <button type="submit" class="btn btn-primary" data-install-shopify-btn>
+        Install via Shopify
+      </button>
+    </form>
   </div>
 </div></section>
 <section class="section">`);
