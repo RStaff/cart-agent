@@ -588,7 +588,13 @@ app.get("/shopify/billing/start", (req, res) => {
   if (!shop) return res.status(400).send("Invalid shop");
   return res.redirect(`/shopify/billing/return?shop=${encodeURIComponent(shop)}`);
 });
-app.get("/shopify/billing/return", (_req, res) => res.redirect("/dashboard"));
+app.get("/shopify/billing/return", (req, res) => {
+  const shop = normalizeShop(req.query.shop);
+  const qs = new URLSearchParams();
+  if (shop) qs.set("shop", shop);
+  qs.set("installed", "1");
+  return res.redirect(`/dashboard?${qs.toString()}`);
+});
 
 // Start
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;

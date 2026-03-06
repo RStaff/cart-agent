@@ -73,9 +73,12 @@
 (function () {
   try {
     var form = document.getElementById("shopify-install-form");
-    if (!form) return;
+    var banner = document.getElementById("shopify-install-banner");
+    if (!form || !banner) return;
 
     var params = new URLSearchParams(window.location.search || "");
+    var shop = (params.get("shop") || "").trim();
+    var installed = (params.get("installed") || "").trim() === "1";
 
     function setParam(id, key) {
       var el = document.getElementById(id);
@@ -91,6 +94,12 @@
     setParam("shopify-install-timestamp", "timestamp");
     setParam("shopify-install-locale", "locale");
     setParam("shopify-install-session", "session");
+
+    if (installed || !shop) {
+      banner.style.display = "none";
+    } else {
+      banner.style.display = "flex";
+    }
   } catch (err) {
     // no-op
   }
