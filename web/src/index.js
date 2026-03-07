@@ -588,11 +588,53 @@ app.get("/shopify/billing/start", (req, res) => {
   if (!shop) return res.status(400).send("Invalid shop");
   return res.redirect(`/shopify/billing/return?shop=${encodeURIComponent(shop)}`);
 });
-app.get("/shopify/billing/return", (req, res) => {
+app.get("/shopify/billing/return", async (req, res) => {
   const shop = normalizeShop(req.query.shop);
   const qs = new URLSearchParams();
   if (shop) qs.set("shop", shop);
   qs.set("installed", "1");
+
+  if (shop) {
+    const staffordUrl =
+      process.env.STAFFORDOS_URL || "http://127.0.0.1:4000";
+
+    try {
+      const payload = {
+        shopDomain: shop,
+        displayName: shop.replace(/\.myshopify\.com$/, ""),
+        planTier: "free",
+        status: "healthy",
+      };
+
+      const r = await fetch(`${staffordUrl}/abando/merchant`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!r.ok) {
+        const text = await r.text().catch(() => "");
+        console.error("[staffordos] merchant register failed", {
+          shop,
+          status: r.status,
+          body: text,
+        });
+      } else {
+        const data = await r.json().catch(() => ({}));
+        console.log("[staffordos] merchant registered", {
+          shop,
+          ok: true,
+          merchantId: data?.merchant?.id,
+        });
+      }
+    } catch (e) {
+      console.error("[staffordos] merchant register error", {
+        shop,
+        error: e && e.message ? e.message : String(e),
+      });
+    }
+  }
+
   return res.redirect(`/dashboard?${qs.toString()}`);
 });
 
