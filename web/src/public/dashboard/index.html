@@ -18,7 +18,10 @@
 
 <section class="section"><div class="container">
   <div class="card" id="shopify-install-banner" style="display:none;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap">
-    <div><strong>Install Abando in your Shopify store</strong><div class="muted">A few clicks to connect via OAuth.</div></div>
+    <div>
+      <strong>Install Abando in your Shopify store</strong>
+      <div class="muted">A few clicks to connect via OAuth.</div>
+    </div>
     <form method="GET" action="https://pay.abando.ai/api/auth" target="_top" id="shopify-install-form" style="margin:0">
       <input type="hidden" name="shop" id="shopify-install-shop" value="">
       <input type="hidden" name="embedded" id="shopify-install-embedded" value="">
@@ -30,6 +33,17 @@
       <input type="hidden" name="session" id="shopify-install-session" value="">
       <button type="submit" class="btn btn-primary" data-install-shopify-btn>Install via Shopify</button>
     </form>
+  </div>
+
+  <div class="card" id="shopify-success-banner" style="display:none;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap">
+    <div>
+      <strong>Shopify connected successfully</strong>
+      <div class="muted" id="shopify-success-copy">Abando is installed. Next, activate your recovery workflow.</div>
+    </div>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+      <a class="btn btn-primary" href="/onboarding">Continue setup</a>
+      <a class="btn btn-outline" href="/dashboard">Refresh dashboard</a>
+    </div>
   </div>
 </div></section>
 <section class="section"><div class="container grid-2">
@@ -73,18 +87,22 @@
 (function () {
   try {
     var form = document.getElementById("shopify-install-form");
-    var banner = document.getElementById("shopify-install-banner");
-    if (!form || !banner) return;
+    var installBanner = document.getElementById("shopify-install-banner");
+    var successBanner = document.getElementById("shopify-success-banner");
+    var successCopy = document.getElementById("shopify-success-copy");
+    if (!form || !installBanner || !successBanner) return;
 
     var params = new URLSearchParams(window.location.search || "");
-    var shop = (params.get("shop") || "").trim();
-    var installed = (params.get("installed") || "").trim() === "1";
 
     function setParam(id, key) {
       var el = document.getElementById(id);
       if (!el) return;
       el.value = (params.get(key) || "").trim();
     }
+
+    var shop = (params.get("shop") || "").trim();
+    var installed = (params.get("installed") || "").trim();
+    var live = (params.get("live") || "").trim();
 
     setParam("shopify-install-shop", "shop");
     setParam("shopify-install-embedded", "embedded");
@@ -95,11 +113,30 @@
     setParam("shopify-install-locale", "locale");
     setParam("shopify-install-session", "session");
 
-    if (installed || !shop) {
-      banner.style.display = "none";
-    } else {
-      banner.style.display = "flex";
+    installBanner.style.display = "none";
+    successBanner.style.display = "none";
+
+    if (live === "1") {
+      successBanner.style.display = "flex";
+      if (successCopy) {
+        successCopy.textContent = shop
+          ? ("Abando is live for " + shop + ". Recovery monitoring is active.")
+          : "Abando is live. Recovery monitoring is active.";
+      }
+      return;
     }
+
+    if (installed === "1") {
+      successBanner.style.display = "flex";
+      if (successCopy) {
+        successCopy.textContent = shop
+          ? ("Abando is now installed for " + shop + ". Next, activate your recovery workflow.")
+          : "Abando is installed. Next, activate your recovery workflow.";
+      }
+      return;
+    }
+
+    installBanner.style.display = "flex";
   } catch (err) {
     // no-op
   }
