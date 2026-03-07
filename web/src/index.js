@@ -638,6 +638,128 @@ app.get("/shopify/billing/return", async (req, res) => {
   return res.redirect(`/dashboard?${qs.toString()}`);
 });
 
+
+app.post("/api/activate", async (req, res) => {
+  try {
+    const shop = normalizeShop(req.body?.shopDomain || req.body?.shop || "");
+    const playbook = String(req.body?.playbook || "faq_reassurance").trim();
+
+    if (!shop) {
+      return res.status(400).json({ ok: false, error: "invalid_shop" });
+    }
+
+    const allowedPlaybooks = new Set([
+      "faq_reassurance",
+      "shipping_reassurance",
+      "discount_save",
+      "urgency_nudge",
+    ]);
+
+    if (!allowedPlaybooks.has(playbook)) {
+      return res.status(400).json({ ok: false, error: "invalid_playbook" });
+    }
+
+    const staffordUrl = process.env.STAFFORDOS_URL || "http://127.0.0.1:4000";
+    const nowIso = new Date().toISOString();
+
+    let merchantOk = false;
+    let dailyStatOk = false;
+
+    try {
+      const merchantPayload = {
+        shopDomain: shop,
+        displayName: shop.replace(/\.myshopify\.com$/, ""),
+        planTier: "free",
+        status: "healthy",
+        lastSeenAt: nowIso,
+        notes: `defaultPlaybook:${playbook}; activationStatus:live`,
+      };
+
+      const merchantRes = await fetch(`${staffordUrl}/abando/merchant`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(merchantPayload),
+      });
+
+      merchantOk = merchantRes.ok;
+
+      if (!merchantRes.ok) {
+        const text = await merchantRes.text().catch(() => "");
+        console.error("[staffordos] activate merchant upsert failed", {
+          shop,
+          playbook,
+          status: merchantRes.status,
+          body: text,
+        });
+      }
+    } catch (e) {
+      console.error("[staffordos] activate merchant upsert error", {
+        shop,
+        playbook,
+        error: e && e.message ? e.message : String(e),
+      });
+    }
+
+    try {
+      const yyyyMmDd = new Date().toISOString().slice(0, 10);
+      const statPayload = {
+        shopDomain: shop,
+        date: yyyyMmDd,
+        cartsTotal: 0,
+        cartsAbandoned: 0,
+        cartsRecovered: 0,
+        revenueRecoveredCents: 0,
+        exportOk: true,
+        errorsCount: 0,
+        statusFlag: "ok",
+      };
+
+      const statRes = await fetch(`${staffordUrl}/abando/daily-stat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(statPayload),
+      });
+
+      dailyStatOk = statRes.ok;
+
+      if (!statRes.ok) {
+        const text = await statRes.text().catch(() => "");
+        console.error("[staffordos] activate daily-stat failed", {
+          shop,
+          playbook,
+          status: statRes.status,
+          body: text,
+        });
+      }
+    } catch (e) {
+      console.error("[staffordos] activate daily-stat error", {
+        shop,
+        playbook,
+        error: e && e.message ? e.message : String(e),
+      });
+    }
+
+    console.log("[abando] activation recorded", {
+      shop,
+      playbook,
+      merchantOk,
+      dailyStatOk,
+    });
+
+    return res.status(200).json({
+      ok: true,
+      shop,
+      playbook,
+      merchantOk,
+      dailyStatOk,
+      redirectTo: `/dashboard?shop=${encodeURIComponent(shop)}&live=1&playbook=${encodeURIComponent(playbook)}`,
+    });
+  } catch (e) {
+    console.error("[abando] activate error", e);
+    return res.status(500).json({ ok: false, error: "activation_failed" });
+  }
+});
+
 // Start
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 app.listen(PORT, () => console.log(`[server] listening on :${PORT}`));
