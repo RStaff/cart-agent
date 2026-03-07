@@ -37,12 +37,12 @@
 
   <div class="card" id="shopify-success-banner" style="display:none;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap">
     <div>
-      <strong>Shopify connected successfully</strong>
+      <strong id="shopify-success-title">Shopify connected successfully</strong>
       <div class="muted" id="shopify-success-copy">Abando is installed. Next, activate your recovery workflow.</div>
     </div>
-    <div style="display:flex;gap:.5rem;flex-wrap:wrap">
-      <a class="btn btn-primary" href="/onboarding">Continue setup</a>
-      <a class="btn btn-outline" href="/dashboard">Refresh dashboard</a>
+    <div id="shopify-success-actions" style="display:flex;gap:.5rem;flex-wrap:wrap">
+      <a class="btn btn-primary" id="shopify-success-primary" href="/onboarding">Continue setup</a>
+      <a class="btn btn-outline" id="shopify-success-secondary" href="/dashboard">Refresh dashboard</a>
     </div>
   </div>
 </div></section>
@@ -62,13 +62,13 @@
   <div class="card kpi"><div class="kpi-title">CTR</div><div class="kpi-value" id="kpi-ctr">—</div><div id="spark-ctr" class="spark"></div></div>
 </div></section>
 
-<section class="section"><div class="container">
-  <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap">
+<section class="section" id="dashboard-live-cta-section"><div class="container">
+  <div class="card" id="dashboard-live-cta-card" style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap">
     <div>
-      <h3 style="margin:.2rem 0">Ready to go live?</h3>
-      <p class="muted" style="margin:.2rem 0">Connect your store and start recovering carts in under 5 minutes.</p>
+      <h3 id="dashboard-live-cta-title" style="margin:.2rem 0">Ready to go live?</h3>
+      <p class="muted" id="dashboard-live-cta-copy" style="margin:.2rem 0">Connect your store and start recovering carts in under 5 minutes.</p>
     </div>
-    <a class="btn btn-primary" href="/onboarding">Onboard now — under 5 minutes</a>
+    <a class="btn btn-primary" id="dashboard-live-cta-button" href="/onboarding">Onboard now — under 5 minutes</a>
   </div>
 </div></section>
 
@@ -89,7 +89,14 @@
     var form = document.getElementById("shopify-install-form");
     var installBanner = document.getElementById("shopify-install-banner");
     var successBanner = document.getElementById("shopify-success-banner");
+    var successTitle = document.getElementById("shopify-success-title");
     var successCopy = document.getElementById("shopify-success-copy");
+    var successPrimary = document.getElementById("shopify-success-primary");
+    var successSecondary = document.getElementById("shopify-success-secondary");
+    var lowerCtaSection = document.getElementById("dashboard-live-cta-section");
+    var lowerCtaTitle = document.getElementById("dashboard-live-cta-title");
+    var lowerCtaCopy = document.getElementById("dashboard-live-cta-copy");
+    var lowerCtaButton = document.getElementById("dashboard-live-cta-button");
     if (!form || !installBanner || !successBanner) return;
 
     var params = new URLSearchParams(window.location.search || "");
@@ -118,21 +125,74 @@
 
     if (live === "1") {
       successBanner.style.display = "flex";
+
+      if (successTitle) {
+        successTitle.textContent = "Abando is live";
+      }
+
       if (successCopy) {
         successCopy.textContent = shop
           ? ("Abando is live for " + shop + ". Recovery monitoring is active.")
           : "Abando is live. Recovery monitoring is active.";
       }
+
+      if (successPrimary) {
+        successPrimary.textContent = "Manage recovery";
+        successPrimary.setAttribute("href", "/dashboard?shop=" + encodeURIComponent(shop) + "&live=1");
+      }
+
+      if (successSecondary) {
+        successSecondary.textContent = "Change playbook";
+        successSecondary.setAttribute("href", "/onboarding?shop=" + encodeURIComponent(shop));
+      }
+
+      if (lowerCtaSection) {
+        lowerCtaSection.style.display = "none";
+      }
+
       return;
     }
 
     if (installed === "1") {
       successBanner.style.display = "flex";
+
+      if (successTitle) {
+        successTitle.textContent = "Shopify connected successfully";
+      }
+
       if (successCopy) {
         successCopy.textContent = shop
           ? ("Abando is now installed for " + shop + ". Next, activate your recovery workflow.")
           : "Abando is installed. Next, activate your recovery workflow.";
       }
+
+      if (successPrimary) {
+        successPrimary.textContent = "Continue setup";
+        successPrimary.setAttribute("href", "/onboarding?shop=" + encodeURIComponent(shop));
+      }
+
+      if (successSecondary) {
+        successSecondary.textContent = "Refresh dashboard";
+        successSecondary.setAttribute("href", "/dashboard?shop=" + encodeURIComponent(shop) + "&installed=1");
+      }
+
+      if (lowerCtaSection) {
+        lowerCtaSection.style.display = "flex";
+      }
+
+      if (lowerCtaTitle) {
+        lowerCtaTitle.textContent = "Ready to activate?";
+      }
+
+      if (lowerCtaCopy) {
+        lowerCtaCopy.textContent = "Choose your first recovery playbook and launch Abando in under 5 minutes.";
+      }
+
+      if (lowerCtaButton) {
+        lowerCtaButton.textContent = "Activate Abando";
+        lowerCtaButton.setAttribute("href", "/onboarding?shop=" + encodeURIComponent(shop));
+      }
+
       return;
     }
 
