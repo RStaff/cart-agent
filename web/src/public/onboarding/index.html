@@ -1,10 +1,10 @@
 <!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Abando – Onboarding</title><link rel="stylesheet" href="/assets/style.css">
+<title>Abando – Activation Wizard</title><link rel="stylesheet" href="/assets/style.css">
 </head>
 <body>
 <div id="trial-banner" style="display:none;background:#0b142a;border-bottom:1px solid #2d3748;color:#cbd5e1">
-  <div class="container" style="padding:.6rem 0;display:flex;gap:.75rem;align-items:center;justify-content:space-between">
+  <div class="container" style="padding:.6rem 0;display:flex;gap:.75rem;align-items:center;justify-content:space-between;flex-wrap:wrap">
     <div><strong>14-day Free Trial</strong> — no credit card required until you activate billing.</div>
     <a href="/pricing" class="btn btn-outline" style="padding:.4rem .75rem">View plans</a>
   </div>
@@ -13,48 +13,154 @@
 <nav><div class="container">
   <a href="/" class="logo">Abando<sup>™</sup></a>
   <div class="nav-links">
-    <a href="/pricing">Demo</a>
+    <a href="/demo/playground">Demo</a>
     <a href="/pricing">Pricing</a>
-    <a href="/pricing" class="active">Onboarding</a>
+    <a href="/onboarding" class="active">Onboarding</a>
     <a href="/support">Support</a>
   </div>
 </div></nav>
 
-<section class="hero"><div class="container"><h1>Welcome to Abando<sup>™</sup></h1><p class="subheadline">Connect your store and launch your AI Shopping Copilot in minutes.</p></div></section>
-<section class="section"><div class="container grid-2">
-  <div class="card"><h3 style="margin-top:0">Connect your store</h3><p class="subheadline">Link Shopify or your checkout and share a Stripe key so we can create recovery sessions.</p></div>
-  <div class="card"><h3 style="margin-top:0">Customize messaging</h3><p class="subheadline">Set tone, channels and optional offers to entice shoppers back.</p></div>
-  <div class="card"><h3 style="margin-top:0">Go live</h3><p class="subheadline">Activate recovery flows and monitor results in your dashboard.</p></div>
-  <div class="card"><h3 style="margin-top:0">We’ve got you</h3><p class="subheadline">Our onboarding support guides every step.</p></div>
-</div></section>
-<section class="section"><div class="container">
-  <div class="card">
-    <h3 style="margin-top:0">Mini-FAQ</h3>
-    <details><summary>How long to set up?</summary><p>Most stores connect in under 5 minutes.</p></details>
-    <details><summary>Does this replace my current emails?</summary><p>No — Abando<sup>™</sup> complements your existing flows.</p></details>
-    <details><summary>What about privacy?</summary><p>GDPR compliant; we only use what’s needed to recover carts.</p></details>
+<section class="hero">
+  <div class="container">
+    <span class="badge">Activation wizard</span>
+    <h1>Activate Abando<sup>™</sup></h1>
+    <p class="subheadline">Finish setup and launch your AI Shopping Copilot with a default recovery playbook.</p>
   </div>
-  <div class="card" style="margin-top:1rem">
-    <h3 style="margin-top:0">Trust</h3>
-    <p class="subheadline">Stripe Verified Partner • 30-Day Free Returns • Human support on chat</p>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="card" style="margin-bottom:1rem">
+      <h3 style="margin-top:0">Step 1 — Confirm your store</h3>
+      <p class="subheadline" id="store-copy">Checking Shopify store…</p>
+      <div class="muted" id="store-hint">This comes from your install flow.</div>
+    </div>
+
+    <div class="card" style="margin-bottom:1rem">
+      <h3 style="margin-top:0">Step 2 — Choose your recovery playbook</h3>
+      <p class="subheadline">Pick the first strategy Abando should use when shoppers hesitate at checkout.</p>
+
+      <form id="activation-form">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-top:1rem">
+          <label class="card" style="cursor:pointer">
+            <input type="radio" name="playbook" value="faq_reassurance" checked>
+            <strong>FAQ reassurance</strong>
+            <div class="muted">Handles return policy, shipping, sizing, and trust objections.</div>
+          </label>
+
+          <label class="card" style="cursor:pointer">
+            <input type="radio" name="playbook" value="shipping_reassurance">
+            <strong>Shipping reassurance</strong>
+            <div class="muted">Reduces drop-off by clarifying delivery times and shipping confidence.</div>
+          </label>
+
+          <label class="card" style="cursor:pointer">
+            <input type="radio" name="playbook" value="discount_save">
+            <strong>Discount save</strong>
+            <div class="muted">Uses a save-the-sale offer for shoppers who are close to abandoning.</div>
+          </label>
+
+          <label class="card" style="cursor:pointer">
+            <input type="radio" name="playbook" value="urgency_nudge">
+            <strong>Urgency nudge</strong>
+            <div class="muted">Encourages immediate checkout with timing and scarcity-based prompts.</div>
+          </label>
+        </div>
+
+        <div class="card" style="margin-top:1rem">
+          <h3 style="margin-top:0">Step 3 — Activate recovery workflow</h3>
+          <p class="subheadline">This creates your initial live state and sends you back to the dashboard.</p>
+
+          <input type="hidden" id="shop-domain" name="shopDomain" value="">
+
+          <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1rem">
+            <button type="submit" class="btn btn-primary" id="activate-btn">Activate Abando</button>
+            <a class="btn btn-outline" id="back-dashboard-link" href="/dashboard">Back to dashboard</a>
+          </div>
+
+          <div id="activation-status" class="muted" style="margin-top:.75rem"></div>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">What happens next</h3>
+      <ul style="margin:.25rem 0 0 1rem;color:var(--muted)">
+        <li>Abando stores your selected playbook</li>
+        <li>Your dashboard switches to live recovery state</li>
+        <li>Next we wire merchant persistence into StaffordOS Core</li>
+      </ul>
+    </div>
   </div>
-  <div style="text-align:center;margin-top:1rem">
-    <a href="/pricing" class="btn btn-primary">Start a setup</a>
-<a class="btn btn-outline" href="/dashboard">Back to dashboard</a>
-  </div>
-</div></section>
+</section>
 
-
-
-<script id="trial-banner-script">
+<script>
 (function(){
   try{
-    var p=new URLSearchParams(window.location.search);
-    var b=document.getElementById('trial-banner');
-    if(b && (p.get('trial')==='1' || p.get('trial')==='true')){ b.style.display='block'; }
+    var p = new URLSearchParams(window.location.search || "");
+    var b = document.getElementById("trial-banner");
+    if(b && (p.get("trial")==="1" || p.get("trial")==="true")) b.style.display="block";
   }catch(e){}
 })();
 </script>
+
+<script>
+(function () {
+  try {
+    var params = new URLSearchParams(window.location.search || "");
+    var shop = (params.get("shop") || "").trim();
+
+    var storeCopy = document.getElementById("store-copy");
+    var storeHint = document.getElementById("store-hint");
+    var shopInput = document.getElementById("shop-domain");
+    var backLink = document.getElementById("back-dashboard-link");
+    var form = document.getElementById("activation-form");
+    var statusEl = document.getElementById("activation-status");
+    var activateBtn = document.getElementById("activate-btn");
+
+    if (shopInput) shopInput.value = shop;
+
+    if (backLink) {
+      backLink.setAttribute("href", shop ? ("/dashboard?shop=" + encodeURIComponent(shop) + "&installed=1") : "/dashboard");
+    }
+
+    if (storeCopy) {
+      storeCopy.textContent = shop
+        ? ("Connected Shopify store: " + shop)
+        : "No Shopify store was detected in the URL.";
+    }
+
+    if (storeHint) {
+      storeHint.textContent = shop
+        ? "Your install completed successfully. Choose a default playbook to activate Abando."
+        : "Return to the dashboard from a completed install so the store domain is preserved.";
+    }
+
+    if (!form) return;
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      if (!shop) {
+        if (statusEl) statusEl.textContent = "Cannot activate yet: missing Shopify shop domain.";
+        return;
+      }
+
+      var fd = new FormData(form);
+      var playbook = String(fd.get("playbook") || "faq_reassurance");
+
+      if (statusEl) statusEl.textContent = "Activating Abando…";
+      if (activateBtn) activateBtn.disabled = true;
+
+      var target = "/dashboard?shop=" + encodeURIComponent(shop) + "&live=1&playbook=" + encodeURIComponent(playbook);
+      window.location.href = target;
+    });
+  } catch (err) {
+    console.error(err);
+  }
+})();
+</script>
+
 <script src="/assets/main.js"></script>
 <footer class="footer">
   <small>&copy; 2025 Abando<sup>™</sup> ·
