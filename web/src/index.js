@@ -752,7 +752,7 @@ app.post("/api/activate", async (req, res) => {
       playbook,
       merchantOk,
       dailyStatOk,
-      redirectTo: `/dashboard?shop=${encodeURIComponent(shop)}&live=1&playbook=${encodeURIComponent(playbook)}`,
+      redirectTo: `/abando-dashboard?shop=${encodeURIComponent(shop)}&live=1&playbook=${encodeURIComponent(playbook)}`,
     });
   } catch (e) {
     console.error("[abando] activate error", e);
