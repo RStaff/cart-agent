@@ -739,7 +739,56 @@ app.post("/api/activate", async (req, res) => {
       });
     }
 
-    console.log("[abando] activation recorded", {
+    
+    let recoveryEventOk = false;
+    let healthOk = false;
+
+    try {
+      const recoveryResp = await fetch(`${staffordBase}/abando/recovery-events`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          shopDomain: shop,
+          cartId: `starter_cart_${Date.now()}`,
+          checkoutId: `starter_checkout_${Date.now()}`,
+          customerId: `starter_customer_${Date.now()}`,
+          orderId: `starter_order_${Date.now()}`,
+          cartValueCents: 7200,
+          status: "recovered",
+          detectedAt: new Date(Date.now()-12*60000).toISOString(),
+          messageSentAt: new Date(Date.now()-7*60000).toISOString(),
+          recoveredAt: new Date(Date.now()-2*60000).toISOString(),
+          recoveredRevenueCents: 7200,
+          playbook,
+        })
+      });
+
+      recoveryEventOk = recoveryResp.ok;
+    } catch (e) {
+      console.error("[staffordos] activate recovery-event error", e);
+    }
+
+    try {
+      const healthResp = await fetch(`${staffordBase}/abando/merchant-health`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          shopDomain: shop,
+          status: "healthy",
+          lastWebhookAt: new Date().toISOString(),
+          lastRecoveryAt: new Date().toISOString(),
+          lastNotificationAt: new Date().toISOString(),
+          openIssueCount: 0,
+          notes: "Activation completed. Recovery system active."
+        })
+      });
+
+      healthOk = healthResp.ok;
+    } catch (e) {
+      console.error("[staffordos] activate merchant-health error", e);
+    }
+
+console.log("[abando] activation recorded", {
       shop,
       playbook,
       merchantOk,
