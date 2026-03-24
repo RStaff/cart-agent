@@ -1,0 +1,13 @@
+[
+  {
+    "id": "execution__packet__merchant_demo_home__mobile_checkout_simplification__mobile_abandonment_diagnostic_api",
+    "execution_packet_id": "packet__merchant_demo_home__mobile_checkout_simplification__mobile_abandonment_diagnostic_api",
+    "codex_prompt": "Execution packet: packet__merchant_demo_home__mobile_checkout_simplification__mobile_abandonment_diagnostic_api\nSlice: merchant_demo_home__mobile_checkout_simplification__mobile_abandonment_diagnostic_api\n\nObjective:\nQuantify mobile checkout abandonment as a standalone diagnostic.\n\nImplementation summary:\nCreate a merchant-scoped diagnostic API that returns mobile checkout abandonment metrics from existing merchant signals or checkout intelligence data.\n\nTarget files:\n- web/src/index.js\n- web/src/lib/mobile-checkout-diagnostics.js\n\nProposed endpoints:\n- GET /api/mobile-checkout-diagnostics?merchant_id=\n\nData contracts:\n- mobile_checkout_diagnostic_response: merchant_id, mobile_abandonment_rate, sample_size, comparison_window\n\nAcceptance criteria:\n- Endpoint returns mobile abandonment data\n- Response is merchant-specific and readable\n\nVerification steps:\n- POST /api/slices/run has already produced the selected slice\n- GET /api/mobile-checkout-diagnostics?merchant_id= returns merchant-scoped diagnostic data\n- Response is deterministic and does not recompute truth in the client\n\nDependencies:\n- mobile checkout signals\n\nRisk notes:\n- Keep the metric definition narrow and explainable.\n- Do not expand into a broader mobile analytics framework in this slice.",
+    "status": "submitted",
+    "started_at": "2026-03-12T22:29:03.787Z",
+    "completed_at": null,
+    "result_summary": null,
+    "reasoning_summary": "Execution record created from packet packet__merchant_demo_home__mobile_checkout_simplification__mobile_abandonment_diagnostic_api.",
+    "recommended_next_action": "Pass this Codex prompt into the next implementation step."
+  }
+]

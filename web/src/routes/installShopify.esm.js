@@ -1,23 +1,156 @@
-/**
- * Shopify no-manual installer
- * Routes:
- *   GET  /install/shopify          -> landing with Connect + Enable
- *   POST /install/shopify/enable   -> creates/ensures ScriptTag for https://abando.ai/abando.js
- */
-export async function installShopify(app) {
-  // Try to import your Shopify app instance (common template paths)
-  let shopify = null;
-  for (const path of ["../shopify.js","../shopify.mjs","../config/shopify.js","../../shopify.js"]) {
-    try {
-      const mod = await import(path);
-      shopify = mod.default || mod.shopify || mod.app || mod;
-      if (shopify?.api?.rest) break;
-    } catch {}
-  }
-  const HAVE_SDK = Boolean(shopify?.api?.rest);
+const SCRIPT_TAG_BASE = process.env.ABANDO_STOREFRONT_SCRIPT_SRC || "https://abando.ai/abando.js";
+const EVENT_INGEST_BASE =
+  process.env.ABANDO_PUBLIC_APP_ORIGIN ||
+  process.env.NEXT_PUBLIC_ABANDO_PUBLIC_APP_ORIGIN ||
+  process.env.APP_URL ||
+  "https://pay.abando.ai";
 
-  function page({ title, body }) {
-    return `<!doctype html><html lang="en">
+function buildScriptTagSrc({ shop, eventBase = EVENT_INGEST_BASE }) {
+  const normalizedShop = normalizeShop(shop);
+  const url = new URL(SCRIPT_TAG_BASE);
+  let normalizedEventBase = "";
+
+  try {
+    normalizedEventBase = eventBase ? new URL(String(eventBase)).origin : "";
+  } catch {
+    normalizedEventBase = String(eventBase || "").replace(/\/+$/, "");
+  }
+
+  if (normalizedShop) {
+    url.searchParams.set("shop", normalizedShop);
+  }
+
+  if (normalizedEventBase) {
+    url.searchParams.set("event_base", normalizedEventBase);
+  }
+
+  return url.toString();
+}
+
+function isManagedAbandoScriptTag(scriptTag, src) {
+  try {
+    const left = new URL(String(scriptTag?.src || ""));
+    const right = new URL(src);
+    return left.hostname === right.hostname && left.pathname === right.pathname;
+  } catch {
+    return false;
+  }
+}
+
+function normalizeShop(raw) {
+  if (!raw) return "";
+  let value = String(raw).trim().toLowerCase();
+  value = value.replace(/^https?:\/\//, "");
+  value = value.split("/")[0].split("?")[0].split("#")[0];
+  if (value && !value.includes(".")) {
+    value = `${value}.myshopify.com`;
+  }
+  if (!value.endsWith(".myshopify.com")) {
+    return "";
+  }
+  if (!/^[a-z0-9][a-z0-9-]*\.myshopify\.com$/.test(value)) {
+    return "";
+  }
+  return value;
+}
+
+async function shopifyAdminRequest({ shop, accessToken, path, method = "GET", body = null, searchParams = null }) {
+  const normalizedShop = normalizeShop(shop);
+  if (!normalizedShop) {
+    throw new Error("Invalid shop domain for Shopify admin request.");
+  }
+  if (!accessToken) {
+    throw new Error("Missing Shopify access token.");
+  }
+
+  const url = new URL(`https://${normalizedShop}/admin/api/2024-10/${path}`);
+  if (searchParams && typeof searchParams === "object") {
+    for (const [key, value] of Object.entries(searchParams)) {
+      if (value !== undefined && value !== null) {
+        url.searchParams.set(key, String(value));
+      }
+    }
+  }
+
+  const response = await fetch(url, {
+    method,
+    headers: {
+      "X-Shopify-Access-Token": accessToken,
+      "Content-Type": "application/json",
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text().catch(() => "");
+    throw new Error(`Shopify admin request failed (${response.status} ${response.statusText}): ${errorBody}`);
+  }
+
+  if (response.status === 204) {
+    return null;
+  }
+
+  return response.json();
+}
+
+async function ensureScriptTagInstalled({ shop, accessToken, src = buildScriptTagSrc({ shop }) }) {
+  const list = await shopifyAdminRequest({
+    shop,
+    accessToken,
+    path: "script_tags.json",
+    searchParams: { limit: 50 },
+  });
+
+  const existing = (list?.script_tags || []).find((scriptTag) => isManagedAbandoScriptTag(scriptTag, src));
+  if (existing?.id) {
+    const updated = await shopifyAdminRequest({
+      shop,
+      accessToken,
+      path: `script_tags/${existing.id}.json`,
+      method: "PUT",
+      body: {
+        script_tag: {
+          event: "onload",
+          src,
+          display_scope: "online_store",
+        },
+      },
+    });
+
+    return {
+      ok: true,
+      action: "updated",
+      id: existing.id,
+      script_tag: updated?.script_tag || null,
+      src,
+    };
+  }
+
+  const created = await shopifyAdminRequest({
+    shop,
+    accessToken,
+    path: "script_tags.json",
+    method: "POST",
+    body: {
+      script_tag: {
+        event: "onload",
+        src,
+        display_scope: "online_store",
+      },
+    },
+  });
+
+  return {
+    ok: true,
+    action: "created",
+    id: created?.script_tag?.id || null,
+    script_tag: created?.script_tag || null,
+    src,
+  };
+}
+
+function page({ title, body }) {
+  return `<!doctype html><html lang="en">
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>${title}</title>
 <style>
@@ -40,35 +173,39 @@ input[type=text]{width:100%;padding:12px;border-radius:10px;border:1px solid #33
 form{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 </style>
 <body><div class="wrap">${body}</div></body></html>`;
-  }
+}
 
-  // GET /install/shopify
-  app.get("/install/shopify", (_req, res) => {
+export function installShopify(app, { getShopRecord } = {}) {
+  app.get("/install/shopify", (req, res) => {
+    const prefilledShop = normalizeShop(req.query.shop);
+    const inviteId = typeof req.query.invite === "string" ? req.query.invite.trim() : "";
+    const selectedPlan = typeof req.query.plan === "string" ? req.query.plan.trim().toLowerCase() : "";
+    const planLabel = selectedPlan === "starter"
+      ? "Starter"
+      : selectedPlan === "growth"
+        ? "Growth"
+        : "";
     const body = `
       <div class="card">
-        <h1>Install on Shopify (no manual theme edits)</h1>
-        <p class="lead">Click <b>Connect</b>, approve access, then click <b>Enable</b> to auto-inject Abando.</p>
+        <h1>Abando helps you recover lost checkout revenue.</h1>
+        <p class="lead">Connect your store, detect checkout abandonment signals, and activate recovery with a simple merchant view.</p>
+        ${planLabel ? `<p class="small" style="margin-top:8px">Selected plan: ${planLabel}. Billing is not collected on this page. This step only starts the install flow.</p>` : ""}
 
         <div class="row">
-          <div class="kv"><b>Status</b><div>${HAVE_SDK ? "Shopify SDK detected" : "Shopify SDK missing — Enable will explain next steps"}</div></div>
-          <div class="kv"><b>Script URL</b><div>https://abando.ai/abando.js</div></div>
+          <div class="kv"><b>Store connected</b><div>After Shopify approval</div></div>
+          <div class="kv"><b>Checkout signals detected</b><div>After live store activity begins</div></div>
+          <div class="kv"><b>Recovery trigger ready</b><div>Shown in your merchant view</div></div>
         </div>
 
         <div style="margin-top:12px">
           <form method="GET" action="/auth">
-            <input type="text" name="shop" placeholder="your-store.myshopify.com" aria-label="Shop domain" required>
+            <input type="text" name="shop" placeholder="your-store.myshopify.com" aria-label="Shop domain" value="${prefilledShop || ""}" required>
+            ${inviteId ? `<input type="hidden" name="invite" value="${inviteId}">` : ""}
             <button class="cta" type="submit">Connect Shopify</button>
           </form>
         </div>
 
-        <div style="margin-top:12px">
-          <form method="POST" action="/install/shopify/enable">
-            <input type="text" name="shop" placeholder="your-store.myshopify.com" aria-label="Shop domain" required>
-            <button class="ghost" type="submit">Enable ScriptTag</button>
-          </form>
-        </div>
-
-        <p class="small">This creates (or updates) a ScriptTag to load <code>https://abando.ai/abando.js</code> on all storefront pages.</p>
+        <p class="small">After approval, Abando completes storefront activation and sends you to your merchant dashboard. Real checkout evidence begins only after the connected store starts generating activity.${inviteId ? " This install path is being tracked from an Abando invite." : ""}${planLabel ? " Plan selection is being carried through as setup context only." : ""}</p>
       </div>
       <footer>© <span id="y"></span> Abando™</footer>
       <script>document.getElementById("y").textContent = new Date().getFullYear()</script>
@@ -76,49 +213,60 @@ form{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
     res.status(200).type("html").send(page({ title: "Install Abando on Shopify", body }));
   });
 
-  // POST /install/shopify/enable
   app.post("/install/shopify/enable", async (req, res) => {
-    const shop = String(req.body?.shop || req.query?.shop || "").trim();
-    if (!shop) return res.status(400).json({ ok:false, error:"missing shop ?shop=your-store.myshopify.com" });
-    if (!HAVE_SDK) return res.status(500).json({ ok:false, error:"Shopify SDK not detected in server; cannot create ScriptTag yet" });
+    const shop = normalizeShop(req.body?.shop || req.query?.shop || "");
+    if (!shop) {
+      return res.status(400).json({ ok: false, error: "missing shop ?shop=your-store.myshopify.com" });
+    }
+    if (typeof getShopRecord !== "function") {
+      return res.status(500).json({ ok: false, error: "Shop lookup is not configured for manual install enablement." });
+    }
 
     try {
-      // Get an authenticated Admin API client for this shop
-      const sessionId = await shopify.session.getCurrentId({
-        isOnline: true,
-        rawRequest: req,
-        rawResponse: res,
-      });
-      const session = await shopify.session.storage.loadSession(sessionId);
-      if (!session?.shop || session.shop !== shop) {
-        return res.status(401).json({ ok:false, error:"Not authorized for this shop. Use Connect at /install/shopify first." });
+      const shopRecord = await getShopRecord(shop);
+      const accessToken = String(shopRecord?.apiKey || "");
+      if (!shopRecord || !accessToken) {
+        return res.status(401).json({ ok: false, error: "Not authorized for this shop. Complete OAuth at /auth first." });
       }
 
-      const client = new shopify.api.clients.Rest({ session });
-      const SRC = "https://abando.ai/abando.js";
-
-      // Look for existing ScriptTag
-      const list = await client.get({ path: "script_tags", query: { src: SRC, limit: 50 } });
-      const existing = (list?.body?.script_tags || []).find(s => s.src === SRC);
-
-      if (existing) {
-        const updated = await client.put({
-          path: `script_tags/${existing.id}`,
-          data: { script_tag: { event: "onload", src: SRC, display_scope: "online_store" } },
-          type: "application/json",
-        });
-        return res.json({ ok:true, action:"updated", id: existing.id, script_tag: updated?.body?.script_tag || null });
-      }
-
-      // Create new ScriptTag
-      const created = await client.post({
-        path: "script_tags",
-        data: { script_tag: { event: "onload", src: SRC, display_scope: "online_store" } },
-        type: "application/json",
+      const result = await ensureScriptTagInstalled({
+        shop,
+        accessToken,
       });
-      return res.json({ ok:true, action:"created", id: created?.body?.script_tag?.id || null, script_tag: created?.body?.script_tag || null });
-    } catch (e) {
-      return res.status(500).json({ ok:false, error: String((e && e.message) || e) });
+
+      return res.json(result);
+    } catch (error) {
+      return res.status(500).json({
+        ok: false,
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   });
+
+  app.get("/install/shopify/success", (req, res) => {
+    const shop = normalizeShop(req.query.shop);
+    const artifactStatus = String(req.query.artifact_status || "enabled");
+    const body = `
+      <div class="card">
+        <h1>Abando installed successfully</h1>
+        <p class="lead">The Shopify storefront artifact was ${artifactStatus} for ${shop || "your shop"} during setup. Your storefront is ready and your merchant dashboard is live.</p>
+
+        <div class="row">
+          <div class="kv"><b>Shop</b><div>${shop || "Unknown"}</div></div>
+          <div class="kv"><b>Artifact</b><div>ScriptTag for ${SCRIPT_TAG_BASE}</div></div>
+        </div>
+
+        <div style="margin-top:16px">
+          <a class="cta" href="/dashboard?shop=${encodeURIComponent(shop || "")}&installed=1">Open your Abando dashboard</a>
+        </div>
+
+        <p class="small">Revenue attribution appears after paid Shopify orders are matched back to checkout activity.</p>
+      </div>
+      <footer>© <span id="y"></span> Abando™</footer>
+      <script>document.getElementById("y").textContent = new Date().getFullYear()</script>
+    `;
+    res.status(200).type("html").send(page({ title: "Abando Installed", body }));
+  });
 }
+
+export { buildScriptTagSrc, ensureScriptTagInstalled, SCRIPT_TAG_BASE };

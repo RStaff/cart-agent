@@ -5,7 +5,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Abando",
-  description: "Abando – AI cart recovery and checkout agent",
+  description: "Abando – merchant revenue intelligence for Shopify",
 };
 
 export default function RootLayout({

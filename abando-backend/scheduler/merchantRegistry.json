@@ -1,0 +1,62 @@
+[
+  {
+    "shop": "allbirds.com",
+    "installed": true,
+    "plan": "pro",
+    "lastScan": "2026-03-14T11:46:52.997Z",
+    "latestResult": {
+      "issue": "Slow checkout load",
+      "revenueLeakEstimate": 18200,
+      "confidence": 0.52,
+      "scannedAt": "2026-03-14T11:46:52.997Z"
+    }
+  },
+  {
+    "shop": "brooklinen.com",
+    "installed": true,
+    "plan": "free",
+    "lastScan": "2026-03-14T11:46:52.997Z",
+    "latestResult": {
+      "issue": "Slow checkout load",
+      "revenueLeakEstimate": 18200,
+      "confidence": 0.52,
+      "scannedAt": "2026-03-14T11:46:52.997Z"
+    }
+  },
+  {
+    "shop": "bombas.com",
+    "installed": true,
+    "plan": "pro",
+    "lastScan": "2026-03-14T11:46:52.997Z",
+    "latestResult": {
+      "issue": "Slow checkout load",
+      "revenueLeakEstimate": 18200,
+      "confidence": 0.52,
+      "scannedAt": "2026-03-14T11:46:52.997Z"
+    }
+  },
+  {
+    "shop": "colourpop.com",
+    "installed": true,
+    "plan": "free",
+    "lastScan": "2026-03-14T11:46:52.997Z",
+    "latestResult": {
+      "issue": "Slow checkout load",
+      "revenueLeakEstimate": 18200,
+      "confidence": 0.52,
+      "scannedAt": "2026-03-14T11:46:52.997Z"
+    }
+  },
+  {
+    "shop": "gymshark.com",
+    "installed": true,
+    "plan": "pro",
+    "lastScan": "2026-03-14T11:46:52.999Z",
+    "latestResult": {
+      "issue": "Slow checkout load",
+      "revenueLeakEstimate": 18200,
+      "confidence": 0.52,
+      "scannedAt": "2026-03-14T11:46:52.999Z"
+    }
+  }
+]

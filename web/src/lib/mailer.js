@@ -7,19 +7,10 @@ const resend = resendApiKey ? new Resend(resendApiKey) : null;
  * attachments: [{ path, filename?, contentId?, content_type? }]
  */
 export async function sendEmail({ to, subject, html, from, attachments = [] }) {
-  const fromAddr = from || process.env.DEFAULT_FROM || "sales@example.com";
+  const fromAddr = from || process.env.DEFAULT_FROM || "sales@abando.ai";
 
   if (!resend) {
-    console.log("=== FAKE SENT ===");
-    console.log("From:", fromAddr);
-    console.log("To:", to);
-    console.log("Subject:", subject);
-    console.log("HTML:", html);
-    if (attachments?.length) {
-      console.log("Attachments:", attachments);
-    }
-    console.log("=================\n");
-    return { id: "fake-" + Date.now() };
+    throw new Error("email_not_configured");
   }
 
   const { data, error } = await resend.emails.send({
@@ -36,5 +27,8 @@ export async function sendEmail({ to, subject, html, from, attachments = [] }) {
     })),
   });
   if (error) throw new Error(String(error?.message || error));
+  if (!data?.id) {
+    throw new Error("email_send_missing_id");
+  }
   return data;
 }

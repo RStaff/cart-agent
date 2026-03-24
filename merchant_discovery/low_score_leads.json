@@ -1,0 +1,26 @@
+[
+  {
+    "store": "prose.com",
+    "checkout_score": 60,
+    "tier": "Needs Optimization",
+    "percentile": 40,
+    "top_friction": "shipping_cost_surprise",
+    "estimated_revenue_opportunity": 7500,
+    "benchmark_badge": "Shopify Checkout Needs Optimization",
+    "competitor_score": 86,
+    "score_gap": 26,
+    "detected_at": "2026-03-13T14:28:50.694Z"
+  },
+  {
+    "store": "cocokind.com",
+    "checkout_score": 60,
+    "tier": "Needs Optimization",
+    "percentile": 40,
+    "top_friction": "shipping_cost_surprise",
+    "estimated_revenue_opportunity": 7500,
+    "benchmark_badge": "Shopify Checkout Needs Optimization",
+    "competitor_score": 86,
+    "score_gap": 26,
+    "detected_at": "2026-03-13T14:28:51.012Z"
+  }
+]

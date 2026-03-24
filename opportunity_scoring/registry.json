@@ -1,0 +1,52 @@
+[
+  {
+    "id": "opportunity_score__merchant_demo_home__mobile_checkout_simplification",
+    "opportunity_id": "merchant_demo_home__mobile_checkout_simplification",
+    "impact_score": 90,
+    "frequency_score": 80,
+    "ease_score": 75,
+    "strategic_fit_score": 90,
+    "total_score": 84.5,
+    "created_at": "2026-03-13T00:10:18.049Z"
+  },
+  {
+    "id": "opportunity_score__merchant_demo_apparel__shipping_transparency_improvement",
+    "opportunity_id": "merchant_demo_apparel__shipping_transparency_improvement",
+    "impact_score": 70,
+    "frequency_score": 80,
+    "ease_score": 80,
+    "strategic_fit_score": 90,
+    "total_score": 78.5,
+    "created_at": "2026-03-13T00:10:18.053Z"
+  },
+  {
+    "id": "opportunity_score__merchant_demo_apparel__payment_option_optimization",
+    "opportunity_id": "merchant_demo_apparel__payment_option_optimization",
+    "impact_score": 70,
+    "frequency_score": 60,
+    "ease_score": 80,
+    "strategic_fit_score": 90,
+    "total_score": 73.5,
+    "created_at": "2026-03-13T00:10:18.053Z"
+  },
+  {
+    "id": "opportunity_score__merchant_demo_beauty__sms_first_recovery_workflow",
+    "opportunity_id": "merchant_demo_beauty__sms_first_recovery_workflow",
+    "impact_score": 70,
+    "frequency_score": 60,
+    "ease_score": 70,
+    "strategic_fit_score": 85,
+    "total_score": 70.5,
+    "created_at": "2026-03-13T00:10:18.053Z"
+  },
+  {
+    "id": "opportunity_score__merchant_demo_supplements__non_discount_recovery_messaging_test",
+    "opportunity_id": "merchant_demo_supplements__non_discount_recovery_messaging_test",
+    "impact_score": 70,
+    "frequency_score": 60,
+    "ease_score": 70,
+    "strategic_fit_score": 80,
+    "total_score": 69.5,
+    "created_at": "2026-03-13T00:10:18.053Z"
+  }
+]

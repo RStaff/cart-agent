@@ -1,0 +1,16 @@
+[
+  {
+    "store": "prose.com",
+    "subject": "Quick checkout insight for prose.com",
+    "short_message": "Your checkout scored 60 and may be losing about $7500/month due to shipping cost surprise.",
+    "full_message": "Hey — quick heads up.\n\nI ran your Shopify checkout through a benchmark tool I built.\n\nYour checkout scored 60 and appears to be losing about $7500/month due to shipping cost surprise.\n\nYou can review the benchmark here:\nhttps://abando-checkout-grader.vercel.app/checkout_grader.html?store=prose.com\n\nIf useful, Abando can help fix this automatically:\nhttps://abando-checkout-grader.vercel.app/install.html\n\nHappy to share the full analysis.",
+    "generated_at": "2026-03-13T15:44:56.668Z"
+  },
+  {
+    "store": "cocokind.com",
+    "subject": "Quick checkout insight for cocokind.com",
+    "short_message": "Your checkout scored 60 and may be losing about $7500/month due to shipping cost surprise.",
+    "full_message": "Hey — quick heads up.\n\nI ran your Shopify checkout through a benchmark tool I built.\n\nYour checkout scored 60 and appears to be losing about $7500/month due to shipping cost surprise.\n\nYou can review the benchmark here:\nhttps://abando-checkout-grader.vercel.app/checkout_grader.html?store=cocokind.com\n\nIf useful, Abando can help fix this automatically:\nhttps://abando-checkout-grader.vercel.app/install.html\n\nHappy to share the full analysis.",
+    "generated_at": "2026-03-13T15:44:56.669Z"
+  }
+]

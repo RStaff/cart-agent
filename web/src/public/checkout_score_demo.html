@@ -1,0 +1,765 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Abando Checkout Score Demo</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6f3ec;
+        --panel: #fffdf8;
+        --ink: #1e1b16;
+        --muted: #655e54;
+        --line: #d8d0c4;
+        --accent: #14532d;
+        --accent-2: #f1b55b;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        background: linear-gradient(180deg, #f3efe6 0%, var(--bg) 100%);
+        color: var(--ink);
+      }
+
+      .shell {
+        max-width: 760px;
+        margin: 0 auto;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 20px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 28px;
+        box-shadow: 0 20px 50px rgba(30, 27, 22, 0.08);
+        width: 100%;
+        max-width: 620px;
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: 0.95rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        line-height: 1.1;
+        text-align: center;
+      }
+
+      p {
+        margin: 0 0 18px;
+        color: var(--muted);
+        line-height: 1.5;
+        text-align: center;
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        margin: 22px 0 18px;
+      }
+
+      input {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        font: inherit;
+        color: var(--ink);
+        background: #fff;
+      }
+
+      button {
+        border: 0;
+        border-radius: 12px;
+        padding: 14px 18px;
+        font: inherit;
+        font-weight: 700;
+        color: white;
+        background: var(--accent);
+        cursor: pointer;
+      }
+
+      button:disabled {
+        opacity: 0.6;
+        cursor: wait;
+      }
+
+      .status {
+        min-height: 24px;
+        margin-bottom: 10px;
+        color: var(--muted);
+      }
+
+      .error {
+        color: #9f1239;
+      }
+
+      .result {
+        margin-top: 18px;
+        border-top: 1px solid var(--line);
+        padding-top: 18px;
+        display: none;
+      }
+
+      .result.visible {
+        display: block;
+      }
+
+      .metric {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid #efe7da;
+      }
+
+      .metric:last-child {
+        border-bottom: 0;
+      }
+
+      .label {
+        color: var(--muted);
+      }
+
+      .value {
+        font-weight: 700;
+      }
+
+      .hint {
+        margin-top: 16px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: #fbf4e7;
+        color: #6b4f1d;
+      }
+
+      .score-card {
+        margin-top: 18px;
+        display: none;
+        border-top: 1px solid var(--line);
+        padding-top: 24px;
+      }
+
+      .score-card.visible {
+        display: block;
+      }
+
+      .score-panel {
+        background: white;
+        border: 1px solid #ede4d8;
+        border-radius: 20px;
+        box-shadow: 0 24px 60px rgba(30, 27, 22, 0.10);
+        padding: 28px 24px;
+        text-align: center;
+      }
+
+      .score-store {
+        color: var(--muted);
+        font-size: 0.95rem;
+        margin-bottom: 18px;
+      }
+
+      .score-number {
+        font-size: clamp(4rem, 10vw, 5.5rem);
+        line-height: 0.95;
+        font-weight: 700;
+        margin: 0;
+        color: var(--ink);
+      }
+
+      .score-label {
+        margin-top: 8px;
+        margin-bottom: 22px;
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      .score-meta {
+        display: grid;
+        gap: 10px;
+        text-align: left;
+        max-width: 320px;
+        margin: 0 auto;
+      }
+
+      .score-evidence {
+        margin-top: 22px;
+        display: grid;
+        gap: 16px;
+        text-align: left;
+      }
+
+      .revenue-opportunity {
+        margin-top: 20px;
+        background: #f8f6f0;
+        border: 1px solid #ede4d8;
+        border-radius: 16px;
+        padding: 20px 18px;
+        text-align: center;
+      }
+
+      .revenue-opportunity-title {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+      }
+
+      .revenue-opportunity-value {
+        font-size: clamp(2rem, 6vw, 2.8rem);
+        line-height: 1;
+        font-weight: 700;
+        color: var(--accent);
+      }
+
+      .revenue-opportunity-subtitle {
+        margin-top: 8px;
+        color: var(--muted);
+      }
+
+      .comparison-panel {
+        margin-top: 18px;
+        background: white;
+        border: 1px solid #ede4d8;
+        border-radius: 16px;
+        padding: 20px 18px;
+      }
+
+      .comparison-title {
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.95rem;
+        margin-bottom: 14px;
+      }
+
+      .comparison-grid {
+        display: grid;
+        gap: 12px;
+      }
+
+      .comparison-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid #efe7da;
+      }
+
+      .comparison-row:last-child {
+        border-bottom: 0;
+      }
+
+      .comparison-label {
+        color: var(--muted);
+      }
+
+      .comparison-value {
+        font-weight: 700;
+        text-align: right;
+      }
+
+      .recommendation-panel {
+        margin-top: 18px;
+        background: #fff;
+        border: 1px solid #ede4d8;
+        border-radius: 16px;
+        padding: 22px 18px;
+        text-align: center;
+      }
+
+      .recommendation-title {
+        color: var(--muted);
+        font-size: 0.95rem;
+        margin-bottom: 12px;
+      }
+
+      .recommendation-headline {
+        font-size: 1.35rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+
+      .recommendation-description {
+        color: var(--muted);
+        line-height: 1.5;
+        margin-bottom: 16px;
+      }
+
+      .recommendation-lift-label {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .recommendation-lift-value {
+        margin-top: 6px;
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--accent);
+      }
+
+      .recommendation-cta {
+        margin-top: 18px;
+      }
+
+      .recommendation-cta button {
+        width: 100%;
+      }
+
+      .final-cta-card {
+        margin-top: 22px;
+        background: #171411;
+        color: #fffdf8;
+        border-radius: 18px;
+        padding: 28px 22px;
+        text-align: center;
+        box-shadow: 0 24px 60px rgba(23, 20, 17, 0.22);
+      }
+
+      .final-cta-title {
+        font-size: 1.35rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+
+      .final-cta-description {
+        color: rgba(255, 253, 248, 0.82);
+        line-height: 1.6;
+        max-width: 460px;
+        margin: 0 auto 18px;
+      }
+
+      .final-cta-lift-label {
+        color: rgba(255, 253, 248, 0.68);
+        font-size: 0.9rem;
+      }
+
+      .final-cta-lift-value {
+        margin-top: 8px;
+        font-size: 1.7rem;
+        font-weight: 700;
+        color: #86efac;
+      }
+
+      .final-cta-action {
+        margin-top: 20px;
+      }
+
+      .final-cta-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 280px;
+        padding: 16px 24px;
+        border-radius: 14px;
+        background: #15803d;
+        color: white;
+        text-decoration: none;
+        font-weight: 700;
+        box-shadow: 0 12px 28px rgba(21, 128, 61, 0.32);
+      }
+
+      .final-cta-button:hover,
+      .final-cta-button:focus-visible {
+        background: #166534;
+      }
+
+      .badge-panel {
+        margin-top: 18px;
+        background: #fff;
+        border: 1px solid #ede4d8;
+        border-radius: 16px;
+        padding: 22px 18px;
+        text-align: center;
+      }
+
+      .badge-title {
+        color: var(--muted);
+        font-size: 0.95rem;
+        margin-bottom: 12px;
+      }
+
+      .badge-text {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+      }
+
+      .badge-snippet {
+        margin: 0;
+        padding: 14px;
+        border-radius: 12px;
+        background: #f8f6f0;
+        border: 1px solid #ede4d8;
+        text-align: left;
+        white-space: pre-wrap;
+        word-break: break-word;
+        color: var(--ink);
+      }
+
+      .badge-actions {
+        margin-top: 14px;
+      }
+
+      .copy-status {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 0.9rem;
+        min-height: 20px;
+      }
+
+      .score-evidence-block {
+        border-top: 1px solid #efe7da;
+        padding-top: 14px;
+      }
+
+      .score-evidence-title {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+      }
+
+      .score-evidence-list {
+        margin: 0;
+        padding-left: 20px;
+        color: var(--ink);
+      }
+
+      .score-evidence-list li + li {
+        margin-top: 6px;
+      }
+
+      .score-meta-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid #efe7da;
+      }
+
+      .score-meta-row:last-child {
+        border-bottom: 0;
+      }
+
+      .score-meta-label {
+        color: var(--muted);
+      }
+
+      .score-meta-value {
+        font-weight: 700;
+        text-align: right;
+      }
+
+      @media (max-width: 640px) {
+        .controls {
+          grid-template-columns: 1fr;
+        }
+
+        .metric {
+          grid-template-columns: 1fr;
+          gap: 4px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="panel">
+        <h1>Abando Checkout Score</h1>
+        <p>Enter a Shopify store domain to fetch a simplified checkout score report.</p>
+
+        <div class="controls">
+          <input
+            id="store-input"
+            type="text"
+            placeholder="demo.myshopify.com"
+            value="demo.myshopify.com"
+            autocomplete="off"
+          />
+          <button id="check-button" type="button">Check My Checkout Score</button>
+        </div>
+
+        <div id="status" class="status"></div>
+
+        <div id="result" class="result" aria-live="polite" hidden>
+          <div class="metric">
+            <div class="label">Store</div>
+            <div id="result-store" class="value"></div>
+          </div>
+          <div class="metric">
+            <div class="label">Checkout Score</div>
+            <div id="result-score" class="value"></div>
+          </div>
+          <div class="metric">
+            <div class="label">Peer Average</div>
+            <div id="result-peer" class="value"></div>
+          </div>
+          <div class="metric">
+            <div class="label">Top Friction</div>
+            <div id="result-friction" class="value"></div>
+          </div>
+        </div>
+
+        <div id="score-card" class="score-card" aria-live="polite">
+          <div class="score-panel">
+            <div id="card-store" class="score-store"></div>
+            <div id="card-score" class="score-number"></div>
+            <div class="score-label">Checkout Score</div>
+            <div class="score-meta">
+              <div class="score-meta-row">
+                <div class="score-meta-label">Tier</div>
+                <div id="card-tier" class="score-meta-value"></div>
+              </div>
+              <div class="score-meta-row">
+                <div class="score-meta-label">Peer Average</div>
+                <div id="card-peer" class="score-meta-value"></div>
+              </div>
+              <div class="score-meta-row">
+                <div class="score-meta-label">Top Shopify Stores</div>
+                <div id="card-percentile" class="score-meta-value"></div>
+              </div>
+              <div class="score-meta-row">
+                <div class="score-meta-label">Top Friction</div>
+                <div id="card-friction" class="score-meta-value"></div>
+              </div>
+            </div>
+            <div class="score-evidence">
+              <div class="score-evidence-block">
+                <div class="score-evidence-title">Detected Signals</div>
+                <ul id="card-detected" class="score-evidence-list"></ul>
+              </div>
+              <div class="score-evidence-block">
+                <div class="score-evidence-title">Missing Signals</div>
+                <ul id="card-missing" class="score-evidence-list"></ul>
+              </div>
+            </div>
+            <div class="revenue-opportunity">
+              <div class="revenue-opportunity-title">Potential Revenue Recovery</div>
+              <div id="card-revenue-opportunity" class="revenue-opportunity-value"></div>
+              <div class="revenue-opportunity-subtitle">per month</div>
+            </div>
+            <div class="comparison-panel">
+              <div class="comparison-title">Checkout Comparison</div>
+              <div class="comparison-grid">
+                <div class="comparison-row">
+                  <div class="comparison-label">Your Store</div>
+                  <div id="comparison-store-score" class="comparison-value"></div>
+                </div>
+                <div class="comparison-row">
+                  <div id="comparison-competitor-label" class="comparison-label">Top Shopify Brand</div>
+                  <div id="comparison-competitor-score" class="comparison-value"></div>
+                </div>
+                <div class="comparison-row">
+                  <div class="comparison-label">Gap</div>
+                  <div id="comparison-gap" class="comparison-value"></div>
+                </div>
+              </div>
+            </div>
+            <div class="badge-panel">
+              <div class="badge-title">Checkout Benchmark Badge</div>
+              <div id="benchmark-badge-text" class="badge-text"></div>
+              <pre id="benchmark-badge-snippet" class="badge-snippet"></pre>
+              <div class="badge-actions">
+                <button id="copy-badge-button" type="button">Copy Badge HTML</button>
+              </div>
+              <div id="copy-badge-status" class="copy-status"></div>
+            </div>
+            <div class="recommendation-panel">
+              <div class="recommendation-title">Recommended Fix</div>
+              <div id="recommendation-title" class="recommendation-headline"></div>
+              <div id="recommendation-description" class="recommendation-description"></div>
+              <div class="recommendation-lift-label">Estimated Lift</div>
+              <div id="recommendation-lift" class="recommendation-lift-value"></div>
+              <div class="recommendation-cta">
+                <button id="install-abando-button" type="button">Install Abando to Apply This Fix</button>
+              </div>
+            </div>
+            <div class="final-cta-card">
+              <div class="final-cta-title">Fix This Checkout Issue Instantly</div>
+              <div class="final-cta-description">
+                Abando can automatically apply this improvement to your store checkout and reduce abandonment.
+              </div>
+              <div class="final-cta-lift-label">Estimated Lift</div>
+              <div id="final-cta-lift" class="final-cta-lift-value"></div>
+              <div class="final-cta-action">
+                <a class="final-cta-button" href="/install">Fix My Checkout With Abando</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hint">Demo tip: try <strong>demo.myshopify.com</strong>.</div>
+      </section>
+    </main>
+
+    <script>
+      const input = document.getElementById("store-input");
+      const button = document.getElementById("check-button");
+      const status = document.getElementById("status");
+      const result = document.getElementById("result");
+      const resultStore = document.getElementById("result-store");
+      const resultScore = document.getElementById("result-score");
+      const resultPeer = document.getElementById("result-peer");
+      const resultFriction = document.getElementById("result-friction");
+      const scoreCard = document.getElementById("score-card");
+      const cardStore = document.getElementById("card-store");
+      const cardScore = document.getElementById("card-score");
+      const cardTier = document.getElementById("card-tier");
+      const cardPeer = document.getElementById("card-peer");
+      const cardPercentile = document.getElementById("card-percentile");
+      const cardFriction = document.getElementById("card-friction");
+      const cardDetected = document.getElementById("card-detected");
+      const cardMissing = document.getElementById("card-missing");
+      const cardRevenueOpportunity = document.getElementById("card-revenue-opportunity");
+      const comparisonStoreScore = document.getElementById("comparison-store-score");
+      const comparisonCompetitorLabel = document.getElementById("comparison-competitor-label");
+      const comparisonCompetitorScore = document.getElementById("comparison-competitor-score");
+      const comparisonGap = document.getElementById("comparison-gap");
+      const benchmarkBadgeText = document.getElementById("benchmark-badge-text");
+      const benchmarkBadgeSnippet = document.getElementById("benchmark-badge-snippet");
+      const copyBadgeButton = document.getElementById("copy-badge-button");
+      const copyBadgeStatus = document.getElementById("copy-badge-status");
+      const recommendationTitle = document.getElementById("recommendation-title");
+      const recommendationDescription = document.getElementById("recommendation-description");
+      const recommendationLift = document.getElementById("recommendation-lift");
+      const installAbandoButton = document.getElementById("install-abando-button");
+      const finalCtaLift = document.getElementById("final-cta-lift");
+      let currentBadgeSnippet = "";
+
+      function humanizeFriction(value) {
+        return String(value || "")
+          .split("_")
+          .filter(Boolean)
+          .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+          .join(" ");
+      }
+
+      function renderList(target, values) {
+        target.innerHTML = "";
+        const items = Array.isArray(values) && values.length > 0 ? values : ["None"];
+        for (const value of items) {
+          const item = document.createElement("li");
+          item.textContent = value;
+          target.appendChild(item);
+        }
+      }
+
+      function formatCurrency(value) {
+        const numericValue = Number(value) || 0;
+        return new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+          maximumFractionDigits: 0,
+        }).format(numericValue);
+      }
+
+      function buildBadgeSnippet(badgeText) {
+        return `<div class="abando-badge">\n${badgeText}\nVerified by Abando\n</div>`;
+      }
+
+      async function fetchCheckoutScore() {
+        const store = input.value.trim();
+        status.classList.remove("error");
+        result.classList.remove("visible");
+        result.hidden = true;
+        scoreCard.classList.remove("visible");
+
+        if (!store) {
+          status.textContent = "Enter a store domain first.";
+          status.classList.add("error");
+          return;
+        }
+
+        button.disabled = true;
+        status.textContent = "Fetching checkout score...";
+
+        try {
+          const response = await fetch(`/api/checkout-score?store=${encodeURIComponent(store)}`);
+          const payload = await response.json();
+
+          if (!response.ok) {
+            throw new Error(payload.error || "Request failed");
+          }
+
+          resultStore.textContent = payload.store;
+          resultScore.textContent = payload.checkout_score;
+          resultPeer.textContent = payload.peer_average;
+          resultFriction.textContent = humanizeFriction(payload.top_friction);
+          result.classList.add("visible");
+          result.hidden = false;
+
+          cardStore.textContent = payload.store;
+          cardScore.textContent = payload.checkout_score;
+          cardTier.textContent = payload.tier;
+          cardPeer.textContent = payload.peer_average;
+          cardPercentile.textContent = `Top ${payload.percentile}%`;
+          cardFriction.textContent = humanizeFriction(payload.top_friction);
+          renderList(cardDetected, payload.detected_signals);
+          renderList(cardMissing, payload.missing_signals);
+          cardRevenueOpportunity.textContent = formatCurrency(payload.estimated_revenue_opportunity);
+          comparisonStoreScore.textContent = `Score: ${payload.checkout_score}`;
+          comparisonCompetitorLabel.textContent =
+            payload.competitor_comparison?.competitor_name || "Top Shopify Brand";
+          comparisonCompetitorScore.textContent =
+            `Score: ${payload.competitor_comparison?.competitor_score ?? "—"}`;
+          comparisonGap.textContent =
+            `${payload.competitor_comparison?.score_gap ?? "—"} points`;
+          benchmarkBadgeText.textContent = payload.benchmark_badge || "No badge available";
+          currentBadgeSnippet = buildBadgeSnippet(payload.benchmark_badge || "Shopify Checkout Needs Optimization");
+          benchmarkBadgeSnippet.textContent = currentBadgeSnippet;
+          copyBadgeStatus.textContent = "";
+          recommendationTitle.textContent = payload.recommendation?.title || "No recommendation available";
+          recommendationDescription.textContent =
+            payload.recommendation?.description || "No clear fix could be derived from the current signals.";
+          recommendationLift.textContent =
+            payload.recommendation?.estimated_conversion_lift || "Unknown";
+          finalCtaLift.textContent =
+            payload.recommendation?.estimated_conversion_lift || "Unknown";
+          scoreCard.classList.add("visible");
+
+          status.textContent = "Checkout score loaded.";
+        } catch (error) {
+          status.textContent = `Could not load checkout score: ${error.message}`;
+          status.classList.add("error");
+        } finally {
+          button.disabled = false;
+        }
+      }
+
+      button.addEventListener("click", fetchCheckoutScore);
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          fetchCheckoutScore();
+        }
+      });
+
+      installAbandoButton.addEventListener("click", () => {
+        window.location.href = "/";
+      });
+
+      copyBadgeButton.addEventListener("click", async () => {
+        if (!currentBadgeSnippet) {
+          copyBadgeStatus.textContent = "No badge snippet available yet.";
+          return;
+        }
+
+        try {
+          await navigator.clipboard.writeText(currentBadgeSnippet);
+          copyBadgeStatus.textContent = "Badge HTML copied.";
+        } catch (error) {
+          copyBadgeStatus.textContent = "Could not copy badge HTML.";
+        }
+      });
+    </script>
+  </body>
+</html>

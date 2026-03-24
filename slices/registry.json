@@ -1,0 +1,156 @@
+[
+  {
+    "id": "merchant_demo_home__mobile_checkout_simplification__mobile_abandonment_diagnostic_api",
+    "candidate_opportunity_id": "merchant_demo_home__mobile_checkout_simplification",
+    "title": "Mobile Abandonment Diagnostic API",
+    "objective": "Quantify mobile checkout abandonment as a standalone diagnostic.",
+    "scope": "Create a narrow endpoint that returns mobile checkout abandonment breakdown for a merchant.",
+    "acceptance_criteria": [
+      "Endpoint returns mobile abandonment data",
+      "Response is merchant-specific and readable"
+    ],
+    "dependencies": [
+      "mobile checkout signals"
+    ],
+    "effort_size": "small",
+    "shippable": true,
+    "verification_method": "API endpoint returns data",
+    "strategic_value": 100,
+    "recommended_next_action": "Expose the mobile abandonment diagnostic before any deeper mobile workflow changes.",
+    "reasoning_summary": "Generated from candidate opportunity \"Mobile Checkout Simplification\". This slice is intentionally small and insight-first so it can ship independently. Primary verification is: API endpoint returns data.",
+    "status": "selected",
+    "created_at": "2026-03-12T22:06:28.392Z"
+  },
+  {
+    "id": "merchant_demo_home__mobile_checkout_simplification__mobile_checkout_friction_insight_card",
+    "candidate_opportunity_id": "merchant_demo_home__mobile_checkout_simplification",
+    "title": "Mobile Checkout Friction Insight Card",
+    "objective": "Present mobile checkout friction as a merchant-visible insight.",
+    "scope": "Render one insight card based on mobile abandonment diagnostics.",
+    "acceptance_criteria": [
+      "Insight output generated for merchant",
+      "Merchant can see mobile friction trend without manual interpretation"
+    ],
+    "dependencies": [
+      "mobile_abandonment_diagnostic_api"
+    ],
+    "effort_size": "small",
+    "shippable": true,
+    "verification_method": "insight card visible to merchant",
+    "strategic_value": 100,
+    "recommended_next_action": "Use the diagnostic API as the source of truth for the merchant-facing mobile friction card.",
+    "reasoning_summary": "Generated from candidate opportunity \"Mobile Checkout Simplification\". This slice is intentionally small and insight-first so it can ship independently. Primary verification is: insight card visible to merchant.",
+    "status": "queued",
+    "created_at": "2026-03-12T22:06:28.392Z"
+  },
+  {
+    "id": "merchant_demo_apparel__shipping_transparency_improvement__shipping_friction_diagnostic_endpoint",
+    "candidate_opportunity_id": "merchant_demo_apparel__shipping_transparency_improvement",
+    "title": "Shipping Friction Diagnostic Endpoint",
+    "objective": "Expose where shipping-step dropoff is happening for merchants with elevated shipping abandonment.",
+    "scope": "Add a narrow diagnostic API response that summarizes shipping-stage dropoff from existing checkout signals.",
+    "acceptance_criteria": [
+      "API endpoint returns shipping-stage dropoff data",
+      "Merchant-facing consumer can read the diagnostic without recomputing truth"
+    ],
+    "dependencies": [
+      "checkout signal availability"
+    ],
+    "effort_size": "small",
+    "shippable": true,
+    "verification_method": "API endpoint returns data",
+    "strategic_value": 94,
+    "recommended_next_action": "Implement the shipping diagnostic API before any recommendation or automation layer.",
+    "reasoning_summary": "Generated from candidate opportunity \"Shipping Transparency Improvement\". This slice is intentionally small and insight-first so it can ship independently. Primary verification is: API endpoint returns data.",
+    "status": "queued",
+    "created_at": "2026-03-12T22:06:28.392Z"
+  },
+  {
+    "id": "merchant_demo_apparel__shipping_transparency_improvement__shipping_threshold_insight_card",
+    "candidate_opportunity_id": "merchant_demo_apparel__shipping_transparency_improvement",
+    "title": "Shipping Threshold Insight Card",
+    "objective": "Turn shipping transparency findings into one merchant-visible insight card.",
+    "scope": "Render one shipping-threshold insight card from the diagnostic output.",
+    "acceptance_criteria": [
+      "Insight card visible to merchant",
+      "Card explains shipping friction with a clear recommendation"
+    ],
+    "dependencies": [
+      "shipping_friction_diagnostic_endpoint"
+    ],
+    "effort_size": "small",
+    "shippable": true,
+    "verification_method": "insight card visible to merchant",
+    "strategic_value": 94,
+    "recommended_next_action": "Ship the diagnostic first, then render the threshold insight card on top of it.",
+    "reasoning_summary": "Generated from candidate opportunity \"Shipping Transparency Improvement\". This slice is intentionally small and insight-first so it can ship independently. Primary verification is: insight card visible to merchant.",
+    "status": "queued",
+    "created_at": "2026-03-12T22:06:28.392Z"
+  },
+  {
+    "id": "merchant_demo_apparel__payment_option_optimization__payment_failure_insight_api",
+    "candidate_opportunity_id": "merchant_demo_apparel__payment_option_optimization",
+    "title": "Payment Failure Insight API",
+    "objective": "Surface payment failure patterns in a shippable insight-oriented API.",
+    "scope": "Add one API response that summarizes payment failures and likely optimization direction.",
+    "acceptance_criteria": [
+      "API returns payment failure insight",
+      "Output is narrow and merchant-specific"
+    ],
+    "dependencies": [
+      "payment failure signals"
+    ],
+    "effort_size": "small",
+    "shippable": true,
+    "verification_method": "API endpoint returns data",
+    "strategic_value": 62,
+    "recommended_next_action": "Ship the payment failure insight API before any payment workflow experimentation.",
+    "reasoning_summary": "Generated from candidate opportunity \"Payment Option Optimization\". This slice is intentionally small and insight-first so it can ship independently. Primary verification is: API endpoint returns data.",
+    "status": "queued",
+    "created_at": "2026-03-12T22:06:28.392Z"
+  },
+  {
+    "id": "merchant_demo_beauty__sms_first_recovery_workflow__sms_recovery_recommendation_card",
+    "candidate_opportunity_id": "merchant_demo_beauty__sms_first_recovery_workflow",
+    "title": "SMS Recovery Recommendation Card",
+    "objective": "Show merchants when SMS-first recovery appears to outperform alternatives.",
+    "scope": "Render one recommendation card driven by SMS recovery success patterns.",
+    "acceptance_criteria": [
+      "Recommendation card visible to merchant",
+      "Card includes recommendation rationale and confidence"
+    ],
+    "dependencies": [
+      "sms recovery success signal"
+    ],
+    "effort_size": "small",
+    "shippable": true,
+    "verification_method": "insight card visible to merchant",
+    "strategic_value": 57,
+    "recommended_next_action": "Use this recommendation card to validate SMS-first guidance before workflow automation.",
+    "reasoning_summary": "Generated from candidate opportunity \"SMS-First Recovery Workflow\". This slice is intentionally small and insight-first so it can ship independently. Primary verification is: insight card visible to merchant.",
+    "status": "queued",
+    "created_at": "2026-03-12T22:06:28.392Z"
+  },
+  {
+    "id": "merchant_demo_supplements__non_discount_recovery_messaging_test__recovery_strategy_experiment_recommendation",
+    "candidate_opportunity_id": "merchant_demo_supplements__non_discount_recovery_messaging_test",
+    "title": "Recovery Strategy Experiment Recommendation",
+    "objective": "Suggest a non-discount recovery experiment when merchants appear overly discount-dependent.",
+    "scope": "Produce a merchant-readable experiment recommendation from discount dependency signals.",
+    "acceptance_criteria": [
+      "Recommendation output generated",
+      "Experiment suggestion avoids broad automation scope"
+    ],
+    "dependencies": [
+      "discount dependency signal"
+    ],
+    "effort_size": "small",
+    "shippable": true,
+    "verification_method": "diagnostic output generated",
+    "strategic_value": 95,
+    "recommended_next_action": "Generate the experiment recommendation before adding any automated strategy layer.",
+    "reasoning_summary": "Generated from candidate opportunity \"Non-Discount Recovery Messaging Test\". This slice is intentionally small and insight-first so it can ship independently. Primary verification is: diagnostic output generated.",
+    "status": "queued",
+    "created_at": "2026-03-12T22:06:28.391Z"
+  }
+]

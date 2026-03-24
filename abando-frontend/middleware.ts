@@ -14,8 +14,6 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  const { pathname } = req.nextUrl;
-
   const map: Record<string, string> = {
     "/demo/playground": "/marketing/demo/playground",
     "/verticals/women-boutique": "/marketing/verticals/women-boutique",

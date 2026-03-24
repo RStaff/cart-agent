@@ -21,18 +21,27 @@ model Shop {
 }
 
 model Cart {
-  id          String       @id @default(cuid())
-  cartId      String       @unique
-  userEmail   String
-  items       Json
-  status      String       @default("abandoned")
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  shopId      String?
-  shop        Shop?        @relation(fields: [shopId], references: [id])
-  emailQueues EmailQueue[] @relation("Cart_EmailQueue")
+  id                           String       @id @default(cuid())
+  cartId                       String       @unique
+  userEmail                    String
+  items                        Json
+  status                       String       @default("abandoned")
+  createdAt                    DateTime     @default(now())
+  updatedAt                    DateTime     @updatedAt
+  shopId                       String?
+  attributedOrderId            String?
+  attributedOrderValueCents    Int?
+  attributedShopDomain         String?
+  attributedSource             String?
+  attributedCurrency           String?
+  attributionMatchedAt         DateTime?
+  attributionIsSynthetic       Boolean      @default(false)
+  shop                         Shop?        @relation(fields: [shopId], references: [id])
+  emailQueues                  EmailQueue[] @relation("Cart_EmailQueue")
 
   @@index([shopId])
+  @@index([shopId, attributionIsSynthetic])
+  @@index([attributedOrderId])
 }
 
 model EmailQueue {
@@ -61,6 +70,102 @@ enum EmailStatus {
   sending
   sent
   failed
+}
+
+enum JobStatus {
+  queued
+  running
+  succeeded
+  failed
+  dead
+}
+
+enum EventVisibility {
+  system
+  merchant
+}
+
+model Job {
+  id             String    @id @default(cuid())
+  type           String
+  shopDomain     String
+  idempotencyKey String    @unique
+  status         JobStatus @default(queued)
+  payload        Json
+  result         Json?
+  errorKind      String?
+  errorMessage   String?
+  attempts       Int       @default(0)
+  maxAttempts    Int       @default(5)
+  runAt          DateTime  @default(now())
+  lockedAt       DateTime?
+  completedAt    DateTime?
+  failedAt       DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([status, runAt])
+  @@index([type, status, runAt])
+  @@index([shopDomain, createdAt])
+}
+
+model SystemEvent {
+  id           String          @id @default(cuid())
+  shopDomain   String
+  eventType    String
+  visibility   EventVisibility @default(system)
+  relatedJobId String?
+  payload      Json?
+  createdAt    DateTime        @default(now())
+
+  @@index([shopDomain, createdAt])
+  @@index([eventType, createdAt])
+  @@index([relatedJobId, createdAt])
+}
+
+model DecisionLog {
+  id                String   @id @default(cuid())
+  shopDomain        String
+  cartToken         String?
+  trigger           String
+  decision          String
+  decisionReason    String
+  interventionType  String
+  outcome           String   @default("unknown")
+  decisionTimestamp DateTime
+  outcomeTimestamp  DateTime?
+  cartValueCents    Int?
+  sessionMarker     String?
+  validationMode    Boolean  @default(false)
+  relatedEventId    String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([shopDomain, decisionTimestamp])
+  @@index([cartToken, decisionTimestamp])
+  @@index([relatedEventId])
+}
+
+model Invite {
+  id                  String   @id @default(cuid())
+  inviterShopDomain   String
+  targetEmail         String?
+  targetStoreDomain   String?
+  sourceSurface       String
+  createdAt           DateTime @default(now())
+  clickedAt           DateTime?
+  installStartedAt    DateTime?
+  installCompletedAt  DateTime?
+  sessionReachedAt    DateTime?
+  installedShopDomain String?
+  installPath         String?
+  sessionSurface      String?
+  createdInValidation Boolean @default(false)
+
+  @@index([inviterShopDomain, createdAt])
+  @@index([targetEmail])
+  @@index([targetStoreDomain])
+  @@index([installedShopDomain])
 }
 /* --- abando billing + usage models --- */
 model User {
@@ -123,4 +228,3 @@ model DailyAggregate {
   @@unique([storeId, date])
   @@index([storeId, date])
 }
-

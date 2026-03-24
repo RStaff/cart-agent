@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation";
+import { MarketingLandingPage } from "../src/components/MarketingLandingPage";
 
 type Props = {
-  searchParams?: Record<string, string | string[] | undefined>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-function toQuery(searchParams?: Props["searchParams"]) {
+function toQuery(searchParams?: Record<string, string | string[] | undefined>) {
   if (!searchParams) return "";
   const sp = new URLSearchParams();
   for (const [k, v] of Object.entries(searchParams)) {
@@ -15,15 +16,15 @@ function toQuery(searchParams?: Props["searchParams"]) {
   return q ? `?${q}` : "";
 }
 
-export default function RootPage({ searchParams }: Props) {
-  const host = typeof searchParams?.host === "string" ? searchParams?.host : undefined;
-  const embedded = typeof searchParams?.embedded === "string" ? searchParams?.embedded : undefined;
+export default async function RootPage({ searchParams }: Props) {
+  const params = searchParams ? await searchParams : undefined;
+  const host = typeof params?.host === "string" ? params?.host : undefined;
+  const embedded = typeof params?.embedded === "string" ? params?.embedded : undefined;
 
   // Shopify Admin loads embedded apps with host=... (and often embedded=1)
   if (host || embedded === "1") {
-    redirect(`/embedded${toQuery(searchParams)}`);
+    redirect(`/embedded${toQuery(params)}`);
   }
 
-  // Public root becomes your marketing entry point
-  redirect("/marketing");
+  return <MarketingLandingPage />;
 }

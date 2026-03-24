@@ -1,0 +1,87 @@
+[
+  {
+    "id": "snapshot__1773355306164",
+    "generated_at": "2026-03-12T22:41:46.164Z",
+    "signals_count": 5,
+    "candidate_opportunities_count": 5,
+    "slices_count": 7,
+    "build_queue_count": 7,
+    "build_queue_head": {
+      "id": "queue__merchant_demo_home__mobile_checkout_simplification__mobile_abandonment_diagnostic_api",
+      "slice_id": "merchant_demo_home__mobile_checkout_simplification__mobile_abandonment_diagnostic_api",
+      "priority_score": 169,
+      "selection_reason": "Mobile Abandonment Diagnostic API scored 169. It is small effort, shippable, has strategic value 100, and 1 dependency.",
+      "selected_at": "2026-03-12T22:06:47.243Z",
+      "recommended_next_action": "Build Mobile Abandonment Diagnostic API next.",
+      "reasoning_summary": "This is the current best next slice because it is small, shippable, strategically valuable, and lightly dependent."
+    },
+    "execution_packets_count": 1,
+    "latest_execution_packet": {
+      "id": "packet__merchant_demo_home__mobile_checkout_simplification__mobile_abandonment_diagnostic_api",
+      "slice_id": "merchant_demo_home__mobile_checkout_simplification__mobile_abandonment_diagnostic_api",
+      "title": "Mobile Abandonment Diagnostic API",
+      "objective": "Quantify mobile checkout abandonment as a standalone diagnostic.",
+      "implementation_summary": "Create a merchant-scoped diagnostic API that returns mobile checkout abandonment metrics from existing merchant signals or checkout intelligence data.",
+      "target_files": [
+        "web/src/index.js",
+        "web/src/lib/mobile-checkout-diagnostics.js"
+      ],
+      "proposed_endpoints": [
+        "GET /api/mobile-checkout-diagnostics?merchant_id="
+      ],
+      "data_contracts": [
+        {
+          "contract": "mobile_checkout_diagnostic_response",
+          "fields": [
+            "merchant_id",
+            "mobile_abandonment_rate",
+            "sample_size",
+            "comparison_window"
+          ]
+        }
+      ],
+      "acceptance_criteria": [
+        "Endpoint returns mobile abandonment data",
+        "Response is merchant-specific and readable"
+      ],
+      "verification_steps": [
+        "POST /api/slices/run has already produced the selected slice",
+        "GET /api/mobile-checkout-diagnostics?merchant_id= returns merchant-scoped diagnostic data",
+        "Response is deterministic and does not recompute truth in the client"
+      ],
+      "dependencies": [
+        "mobile checkout signals"
+      ],
+      "risk_notes": [
+        "Keep the metric definition narrow and explainable.",
+        "Do not expand into a broader mobile analytics framework in this slice."
+      ],
+      "status": "in_progress",
+      "reasoning_summary": "Packet packet__merchant_demo_home__mobile_checkout_simplification__mobile_abandonment_diagnostic_api has been submitted to the executor and is now ready for Codex implementation.",
+      "recommended_next_action": "Track implementation progress against this submitted packet.",
+      "created_at": "2026-03-12T22:21:06.603Z"
+    },
+    "feedback_count": 1,
+    "latest_feedback": {
+      "id": "feedback__6bd15000-4c7d-478d-b61f-f658f26fe49b",
+      "execution_packet_id": "packet__merchant_demo_home__mobile_checkout_simplification__mobile_abandonment_diagnostic_api",
+      "slice_id": "merchant_demo_home__mobile_checkout_simplification__mobile_abandonment_diagnostic_api",
+      "outcome": "partial",
+      "result_summary": "Diagnostic contract is clear, but merchant-facing comparison window still needs validation.",
+      "success_score": 72,
+      "observed_value": {
+        "api_contract_defined": true,
+        "merchant_visibility_ready": false
+      },
+      "lessons": [
+        "Keep the metric definition narrow.",
+        "Validate the comparison window against real merchant data before shipping."
+      ],
+      "recorded_at": "2026-03-12T22:36:26.790Z"
+    },
+    "recent_success_rate": null,
+    "system_health": "partial",
+    "recommended_next_action": "Use the latest feedback to refine the current slice before expanding scope.",
+    "reasoning_summary": "System has 5 signals, 5 candidate opportunities, 7 slices, 7 queued slices, 1 execution packets, and 1 feedback records. Recent success rate is not yet available. Overall system health is partial."
+  }
+]

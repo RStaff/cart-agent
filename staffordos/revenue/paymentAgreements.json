@@ -1,0 +1,101 @@
+[
+  {
+    "id": "payment_agreement__opp_not_agreed",
+    "opportunityId": "opp_not_agreed",
+    "paymentModel": "FIXED_FEE",
+    "estimatedClientValue": 2400,
+    "agreed": false,
+    "agreementSource": "MANUAL_INTERNAL",
+    "notes": "Pending internal commitment.",
+    "createdAt": "2026-03-18T00:25:05.150Z",
+    "updatedAt": "2026-03-18T00:25:51.962Z"
+  },
+  {
+    "id": "payment_agreement__opp_approved",
+    "opportunityId": "opp_approved",
+    "paymentModel": "FIXED_FEE",
+    "estimatedClientValue": 2400,
+    "agreed": true,
+    "agreementSource": "MANUAL_INTERNAL",
+    "notes": "Approved for controlled execution.",
+    "createdAt": "2026-03-18T00:25:05.152Z",
+    "updatedAt": "2026-03-18T00:25:51.963Z"
+  },
+  {
+    "id": "payment_agreement__opp_high_missing_payment",
+    "opportunityId": "opp_high_missing_payment",
+    "paymentModel": "HYBRID",
+    "estimatedClientValue": 4100,
+    "agreed": true,
+    "agreementSource": "MANUAL_INTERNAL",
+    "notes": "Internal payment path confirmed for escalation.",
+    "createdAt": "2026-03-18T00:25:05.152Z",
+    "updatedAt": "2026-03-18T00:25:51.964Z"
+  },
+  {
+    "id": "payment_agreement__opp_not_accepted",
+    "opportunityId": "opp_not_accepted",
+    "paymentModel": "FIXED_FEE",
+    "estimatedClientValue": 2800,
+    "agreed": false,
+    "agreementSource": "MANUAL_INTERNAL",
+    "notes": "Waiting on approval.",
+    "createdAt": "2026-03-18T00:25:05.592Z",
+    "updatedAt": "2026-03-18T00:25:51.527Z"
+  },
+  {
+    "id": "payment_agreement__opp_accepted",
+    "opportunityId": "opp_accepted",
+    "paymentModel": "HYBRID",
+    "estimatedClientValue": 3600,
+    "agreed": true,
+    "agreementSource": "MERCHANT_ACCEPTED",
+    "notes": "Merchant approved the optimization path.",
+    "createdAt": "2026-03-18T00:25:05.594Z",
+    "updatedAt": "2026-03-18T00:25:51.528Z"
+  },
+  {
+    "id": "payment_agreement__opp_process_unblock",
+    "opportunityId": "opp_process_unblock",
+    "paymentModel": "FIXED_FEE",
+    "estimatedClientValue": 4200,
+    "agreed": true,
+    "agreementSource": "DEFAULT_INTERNAL",
+    "notes": "Default internal agreement for controlled execution.",
+    "createdAt": "2026-03-18T00:25:05.594Z",
+    "updatedAt": "2026-03-18T00:25:05.594Z"
+  },
+  {
+    "id": "payment_agreement__opp_not_accepted_1773793599433",
+    "opportunityId": "opp_not_accepted_1773793599433",
+    "paymentModel": "FIXED_FEE",
+    "estimatedClientValue": 2800,
+    "agreed": false,
+    "agreementSource": "MANUAL_INTERNAL",
+    "notes": "Waiting on approval.",
+    "createdAt": "2026-03-18T00:26:39.433Z",
+    "updatedAt": "2026-03-18T00:26:39.433Z"
+  },
+  {
+    "id": "payment_agreement__opp_accepted_1773793599433",
+    "opportunityId": "opp_accepted_1773793599433",
+    "paymentModel": "HYBRID",
+    "estimatedClientValue": 3600,
+    "agreed": true,
+    "agreementSource": "MERCHANT_ACCEPTED",
+    "notes": "Merchant approved the optimization path.",
+    "createdAt": "2026-03-18T00:26:39.434Z",
+    "updatedAt": "2026-03-18T00:26:39.434Z"
+  },
+  {
+    "id": "payment_agreement__opp_process_unblock_1773793599433",
+    "opportunityId": "opp_process_unblock_1773793599433",
+    "paymentModel": "FIXED_FEE",
+    "estimatedClientValue": 4200,
+    "agreed": true,
+    "agreementSource": "DEFAULT_INTERNAL",
+    "notes": "Default internal agreement for controlled execution.",
+    "createdAt": "2026-03-18T00:26:39.435Z",
+    "updatedAt": "2026-03-18T00:26:39.435Z"
+  }
+]

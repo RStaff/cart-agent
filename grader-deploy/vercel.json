@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/checkout_grader.html",
+      "permanent": false
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+tunnel: YOUR_TUNNEL_ID
+credentials-file: /Users/rossstafford/.cloudflared/YOUR_TUNNEL_ID.json
+
+ingress:
+  - hostname: dev.abando.ai
+    service: http://127.0.0.1:8081
+  - service: http_status:404

@@ -1,0 +1,156 @@
+[
+  {
+    "id": "cross_store_conversion_intelligence_network",
+    "name": "Cross-Store Conversion Intelligence Network",
+    "opportunity_class": "network_intelligence",
+    "priority": "critical",
+    "impact": "high",
+    "expected_value_score": 98,
+    "discovery_source": "founder_thesis",
+    "strategic_anchor": true,
+    "status": "seeded",
+    "description": "Learn recovery patterns across merchants and surface strategy guidance to similar stores.",
+    "first_slice_id": "cross_store_conversion_intelligence_network_v1",
+    "tags": [
+      "network",
+      "moat",
+      "conversion_intelligence"
+    ],
+    "created_at": "2026-03-12T00:00:00.000Z"
+  },
+  {
+    "id": "merchant_benchmark_dashboard",
+    "name": "Merchant Benchmark Dashboard",
+    "opportunity_class": "dashboard",
+    "priority": "high",
+    "impact": "high",
+    "expected_value_score": 90,
+    "discovery_source": "strategic_planning",
+    "strategic_anchor": false,
+    "status": "seeded",
+    "description": "Show merchants how their store performs against comparable peers on recovery and checkout outcomes.",
+    "first_slice_id": "merchant_benchmark_dashboard_v1",
+    "tags": [
+      "benchmarking",
+      "dashboard",
+      "merchant_value"
+    ],
+    "created_at": "2026-03-12T00:00:00.000Z"
+  },
+  {
+    "id": "recovery_pattern_engine",
+    "name": "Recovery Pattern Engine",
+    "opportunity_class": "intelligence_engine",
+    "priority": "high",
+    "impact": "high",
+    "expected_value_score": 88,
+    "discovery_source": "strategic_planning",
+    "strategic_anchor": false,
+    "status": "seeded",
+    "description": "Aggregate recovery outcome patterns and rank which recovery approaches work best by merchant context.",
+    "first_slice_id": "recovery_pattern_engine_v1",
+    "tags": [
+      "patterns",
+      "recovery",
+      "strategy"
+    ],
+    "created_at": "2026-03-12T00:00:00.000Z"
+  },
+  {
+    "id": "checkout_friction_detector",
+    "name": "Checkout Friction Detector",
+    "opportunity_class": "conversion_intelligence",
+    "priority": "high",
+    "impact": "medium",
+    "expected_value_score": 82,
+    "discovery_source": "checkout_signals",
+    "strategic_anchor": false,
+    "status": "seeded",
+    "description": "Detect where checkout friction is causing merchants to lose revenue before abandonment.",
+    "first_slice_id": "checkout_friction_detector_v1",
+    "tags": [
+      "checkout",
+      "friction",
+      "detection"
+    ],
+    "created_at": "2026-03-12T00:00:00.000Z"
+  },
+  {
+    "id": "one_click_cart_recovery",
+    "name": "One-Click Cart Recovery",
+    "opportunity_class": "recovery_workflow",
+    "priority": "medium",
+    "impact": "high",
+    "expected_value_score": 80,
+    "discovery_source": "merchant_feedback",
+    "strategic_anchor": false,
+    "status": "seeded",
+    "description": "Reduce friction between recovery messages and completed checkout with a simplified recovery path.",
+    "first_slice_id": "one_click_cart_recovery_v1",
+    "tags": [
+      "checkout",
+      "recovery",
+      "one_click"
+    ],
+    "created_at": "2026-03-12T00:00:00.000Z"
+  },
+  {
+    "id": "recovered_revenue_card",
+    "name": "Recovered Revenue Card",
+    "opportunity_class": "dashboard",
+    "priority": "medium",
+    "impact": "medium",
+    "expected_value_score": 72,
+    "discovery_source": "merchant_value_visibility",
+    "strategic_anchor": false,
+    "status": "seeded",
+    "description": "Make recovered value visible immediately after install so merchants understand Abando ROI quickly.",
+    "first_slice_id": "recovered_revenue_card_v1",
+    "tags": [
+      "dashboard",
+      "roi",
+      "value_moment"
+    ],
+    "created_at": "2026-03-12T00:00:00.000Z"
+  },
+  {
+    "id": "network_conversion_score",
+    "name": "Network Conversion Score",
+    "opportunity_class": "network_intelligence",
+    "priority": "medium",
+    "impact": "medium",
+    "expected_value_score": 76,
+    "discovery_source": "strategic_planning",
+    "strategic_anchor": false,
+    "status": "seeded",
+    "description": "Give merchants a comparable score that reflects how their recovery and checkout outcomes stack up within the network.",
+    "first_slice_id": "network_conversion_score_v1",
+    "tags": [
+      "network",
+      "score",
+      "benchmarking"
+    ],
+    "created_at": "2026-03-12T00:00:00.000Z"
+  },
+  {
+    "id": "checkout_benchmark_intelligence",
+    "name": "Checkout Benchmark Intelligence",
+    "opportunity_class": "product_moat",
+    "priority": "high",
+    "impact": "merchant_acquisition",
+    "expected_value_score": 92,
+    "discovery_source": "strategic_planning",
+    "strategic_anchor": true,
+    "status": "seeded",
+    "description": "Compare a merchant’s checkout performance against similar stores and recommend the highest-leverage fix first.",
+    "first_slice_id": "slice_checkout_benchmark_report_v1",
+    "tags": [
+      "checkout",
+      "benchmarking",
+      "merchant_insights",
+      "growth",
+      "shopify"
+    ],
+    "created_at": "2026-03-12T00:00:00.000Z"
+  }
+]

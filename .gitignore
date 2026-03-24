@@ -1,6 +1,8 @@
 # Environment Configuration
 .env
 .env.*
+*.env
+staffordos/dev/.env.abando.local
 
 # Dependency directory
 node_modules
@@ -156,3 +158,4 @@ scripts/228_*.sh
 
 # local ops scripts
 *.sh
+.secrets.json

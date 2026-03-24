@@ -1,8 +1,8 @@
-![Cart Agent Demo](assets/demo.svg)
+![Abando Demo](assets/demo.svg)
 
-# Shopify App Template for Node
+# Abando
 
-This is a template for building a [Shopify app](https://shopify.dev/docs/apps/getting-started) using Node and React. It contains the basics for building a Shopify app.
+Abando is a Shopify revenue intelligence product that discovers stores, scores opportunities, runs audits, and turns the output into merchant-facing product surfaces.
 
 Rather than cloning this repo, you can use your preferred package manager and the Shopify CLI with [these steps](#installing-the-template).
 
@@ -198,36 +198,48 @@ When you’re previewing your app or extension, you might see an ngrok interstit
 You are about to visit <id>.ngrok.io: Visit Site
 ```
 
-If you click the `Visit Site` button, but continue to see this page, then you should run dev using an alternate tunnel URL that you run using tunneling software.
-We've validated that [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/run-tunnel/trycloudflare/) works with this template.
+If you click the `Visit Site` button, but continue to see an interstitial page, do not use rotating `trycloudflare.com` quick tunnels for embedded app validation. Use a named Cloudflare Tunnel with one permanent hostname instead.
 
-To do that, you can [install the `cloudflared` CLI tool](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation/), and run:
+Recommended stable dev hostname:
 
-```shell
-# Note that you can also use a different port
-cloudflared tunnel --url http://localhost:3000
+```text
+https://dev.abando.ai
 ```
 
-Out of the logs produced by cloudflare you will notice a https URL where the domain ends with `trycloudflare.com`. This is your tunnel URL. You need to copy this URL as you will need it in the next step.
+The repo now includes a stable-tunnel path:
+
+1. Create a named Cloudflare tunnel once:
 
 ```shell
-2022-11-11T19:57:55Z INF Requesting new quick Tunnel on trycloudflare.com...
-2022-11-11T19:57:58Z INF +--------------------------------------------------------------------------------------------+
-2022-11-11T19:57:58Z INF |  Your quick Tunnel has been created! Visit it at (it may take some time to be reachable):  |
-2022-11-11T19:57:58Z INF |  https://randomly-generated-hostname.trycloudflare.com                                     |
-2022-11-11T19:57:58Z INF +--------------------------------------------------------------------------------------------+
+cloudflared tunnel login
+cloudflared tunnel create abando-dev
+cloudflared tunnel route dns abando-dev dev.abando.ai
 ```
 
-Below you would replace `randomly-generated-hostname` with what you have copied from the terminal. In a different terminal window, navigate to your app's root and with the URL from above you would call:
+2. Export the stable tunnel env vars:
 
 ```shell
-# Using yarn
-yarn dev --tunnel-url https://randomly-generated-hostname.trycloudflare.com:3000
-# or using npm
-npm run dev --tunnel-url https://randomly-generated-hostname.trycloudflare.com:3000
-# or using pnpm
-pnpm dev --tunnel-url https://randomly-generated-hostname.trycloudflare.com:3000
+export ABANDO_DEV_PUBLIC_URL=https://dev.abando.ai
+export ABANDO_CLOUDFLARE_TUNNEL_NAME=abando-dev
+export ABANDO_CLOUDFLARE_TUNNEL_ID=<your-tunnel-id>
+export ABANDO_CLOUDFLARE_CREDENTIALS_FILE=/Users/rossstafford/.cloudflared/<your-tunnel-id>.json
 ```
+
+3. Generate the Shopify dev app config:
+
+```shell
+npm run abando:shopify:dev-config
+```
+
+4. Start local dev:
+
+```shell
+npm run abando:up
+```
+
+5. Use the generated file `.abando-dev/shopify.app.dev.toml` to update Shopify app settings so the dev app URL, callback URLs, and GDPR webhook URL all point at the stable hostname.
+
+See `docs/stable-dev-tunnel.md` for the exact settings and commands.
 
 ## Developer resources
 

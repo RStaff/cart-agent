@@ -1,0 +1,13 @@
+{
+  "store": "demo.myshopify.com",
+  "checkout_score": 72,
+  "estimated_revenue_leak": "$18,000/month",
+  "top_leak": "shipping_cost_surprise",
+  "industry_benchmark": "Top 30% of Shopify checkouts",
+  "fix_priority": [
+    "Show shipping cost or threshold earlier on product and cart pages",
+    "Reduce checkout-stage price surprise",
+    "Retest conversion after shipping visibility changes"
+  ],
+  "generated_at": "2026-03-13T00:00:00.000Z"
+}

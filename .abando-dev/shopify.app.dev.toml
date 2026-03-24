@@ -1,0 +1,34 @@
+client_id = "83114672506075ba4866194fe0160cde"
+name = "cart-agent"
+handle = "cart-agent-1"
+application_url = "https://dev.abando.ai"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = false
+
+[webhooks]
+api_version = "2025-07"
+
+  [[webhooks.subscriptions]]
+  uri = "/api/webhooks/gdpr"
+  compliance_topics = [
+    "customers/data_request",
+    "customers/redact",
+    "shop/redact"
+  ]
+
+[access_scopes]
+scopes = "read_checkouts,read_orders,write_checkouts,read_script_tags,write_script_tags"
+optional_scopes = []
+use_legacy_install_flow = false
+
+[auth]
+redirect_urls = [
+  "https://dev.abando.ai/auth/callback",
+  "https://dev.abando.ai/auth/shopify/callback",
+  "https://dev.abando.ai/api/auth/callback",
+]
+
+[pos]
+embedded = false

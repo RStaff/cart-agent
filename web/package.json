@@ -1,14 +1,16 @@
 {
-  "name": "shopify-app-template-node",
+  "name": "abando-backend",
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "main": "src/index.js",
   "engines": {
     "node": "20.x"
   },
   "scripts": {
     "start:render": "bash scripts/render-start.sh",
     "render:build": "bash -lc \"set -e;   if [ ! -s package-lock.json ]; then     echo \\\"[build] no or empty lockfile — creating with npm install --package-lock-only\\\";     npm install --package-lock-only --include=dev;   fi;   if ! npm ci --include=dev; then     echo \\\"[build] npm ci failed — falling back to npm install\\\";     npm install --include=dev;   fi;   npx prisma generate --schema=prisma/schema.prisma \" ",
+    "dev:safe": "node ../scripts/dev/run_backend_dev_safe.mjs",
     "dev": "node src/index.js",
     "start": "node src/index.js"
   },

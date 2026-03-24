@@ -1,0 +1,47 @@
+[
+  {
+    "id": "packet__merchant_demo_home__mobile_checkout_simplification__mobile_abandonment_diagnostic_api",
+    "slice_id": "merchant_demo_home__mobile_checkout_simplification__mobile_abandonment_diagnostic_api",
+    "title": "Mobile Abandonment Diagnostic API",
+    "objective": "Quantify mobile checkout abandonment as a standalone diagnostic.",
+    "implementation_summary": "Create a merchant-scoped diagnostic API that returns mobile checkout abandonment metrics from existing merchant signals or checkout intelligence data.",
+    "target_files": [
+      "web/src/index.js",
+      "web/src/lib/mobile-checkout-diagnostics.js"
+    ],
+    "proposed_endpoints": [
+      "GET /api/mobile-checkout-diagnostics?merchant_id="
+    ],
+    "data_contracts": [
+      {
+        "contract": "mobile_checkout_diagnostic_response",
+        "fields": [
+          "merchant_id",
+          "mobile_abandonment_rate",
+          "sample_size",
+          "comparison_window"
+        ]
+      }
+    ],
+    "acceptance_criteria": [
+      "Endpoint returns mobile abandonment data",
+      "Response is merchant-specific and readable"
+    ],
+    "verification_steps": [
+      "POST /api/slices/run has already produced the selected slice",
+      "GET /api/mobile-checkout-diagnostics?merchant_id= returns merchant-scoped diagnostic data",
+      "Response is deterministic and does not recompute truth in the client"
+    ],
+    "dependencies": [
+      "mobile checkout signals"
+    ],
+    "risk_notes": [
+      "Keep the metric definition narrow and explainable.",
+      "Do not expand into a broader mobile analytics framework in this slice."
+    ],
+    "status": "in_progress",
+    "reasoning_summary": "Packet packet__merchant_demo_home__mobile_checkout_simplification__mobile_abandonment_diagnostic_api has been submitted to the executor and is now ready for Codex implementation.",
+    "recommended_next_action": "Track implementation progress against this submitted packet.",
+    "created_at": "2026-03-12T22:21:06.603Z"
+  }
+]

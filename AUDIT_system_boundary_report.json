@@ -1,0 +1,537 @@
+{
+  "abando": [
+    {
+      "area": "install_flow",
+      "status": "real_and_working",
+      "evidence": [
+        "web/src/routes/installShopify.esm.js",
+        "web/src/index.js"
+      ],
+      "notes": "Install page, OAuth handoff, success page, and script enable flow exist. Manual shop entry UI still appears, which is an inconsistency risk."
+    },
+    {
+      "area": "connected_listening_state",
+      "status": "real_and_working",
+      "evidence": [
+        "web/src/lib/dashboardSummary.js",
+        "web/src/components/abandoStatusCard.js"
+      ],
+      "notes": "Merchant dashboard reflects connected/listening state from persisted data."
+    },
+    {
+      "area": "checkout_event_ingestion",
+      "status": "real_and_working",
+      "evidence": [
+        "web/src/index.js",
+        "web/src/routes/checkoutSignals.esm.js"
+      ],
+      "notes": "Checkout events are accepted and persisted, and dashboard state updates from those events."
+    },
+    {
+      "area": "abandonment_detection",
+      "status": "real_but_incomplete",
+      "evidence": [
+        "web/src/routes/checkoutSignals.esm.js"
+      ],
+      "notes": "Detection path exists, but current decisioning calls StaffordOS and falls back honestly when unavailable."
+    },
+    {
+      "area": "recovery_ready_state",
+      "status": "real_and_working",
+      "evidence": [
+        "web/src/lib/dashboardSummary.js",
+        "web/src/components/abandoStatusCard.js"
+      ],
+      "notes": "Recovery-ready state is derived from real checkout event state."
+    },
+    {
+      "area": "recovery_action_creation",
+      "status": "real_and_working",
+      "evidence": [
+        "web/src/index.js"
+      ],
+      "notes": "Recovery actions are created and persisted as SystemEvents."
+    },
+    {
+      "area": "recovery_message_preview",
+      "status": "real_and_working",
+      "evidence": [
+        "web/src/lib/recoveryMessageEngine.js"
+      ],
+      "notes": "Email body, subject, SMS text, and return link are deterministic."
+    },
+    {
+      "area": "real_send_pipeline",
+      "status": "real_but_incomplete",
+      "evidence": [
+        "web/src/lib/emailSender.js",
+        "web/src/lib/smsSender.js",
+        "web/src/index.js"
+      ],
+      "notes": "Real sender modules and test endpoints exist, but no provider configuration is present in the audited environment."
+    },
+    {
+      "area": "return_tracking",
+      "status": "real_and_working",
+      "evidence": [
+        "web/src/index.js"
+      ],
+      "notes": "Return events are persisted as abando.customer_return.v1 before redirect."
+    },
+    {
+      "area": "merchant_dashboard_truthfulness",
+      "status": "mostly_real_and_honest",
+      "evidence": [
+        "web/src/lib/dashboardSummary.js",
+        "web/src/components/abandoStatusCard.js"
+      ],
+      "notes": "Dashboard state is derived from persisted events and unconfigured send state is surfaced honestly."
+    }
+  ],
+  "shop_fixer_analyzer": [
+    {
+      "area": "/fix_route",
+      "status": "real_and_connected_but_drifted",
+      "evidence": [
+        "web/src/index.js"
+      ],
+      "notes": "The route is live and captures leads, but it behaves like a storefront/store audit funnel rather than a GitHub repository analyzer."
+    },
+    {
+      "area": "analysis_logic",
+      "status": "mixed",
+      "evidence": [
+        "web/src/lib/storeAnalyzer.js"
+      ],
+      "notes": "Uses storefront HTML and heuristic checks like email capture, exit intent, and slow checkout signals. This is not GitHub repository analysis."
+    },
+    {
+      "area": "scoring_findings_pipeline",
+      "status": "directional_not_repository_grounded",
+      "evidence": [
+        "web/src/lib/storeAnalyzer.js"
+      ],
+      "notes": "Produces non-empty issues and opportunity output, but on storefront heuristics instead of repo analysis."
+    },
+    {
+      "area": "separation_from_abando",
+      "status": "boundary_risk",
+      "evidence": [
+        "web/src/index.js"
+      ],
+      "notes": "The /fix flow feeds into Abando demo/CTA and overlaps with checkout leak messaging."
+    },
+    {
+      "area": "separation_from_staffordos",
+      "status": "boundary_risk",
+      "evidence": [
+        "web/src/lib/storeAnalyzer.js",
+        "web/src/lib/fixCheckout.js"
+      ],
+      "notes": "Analyzer logic imports StaffordOS scorecard code and fix checkout logic imports StaffordOS truth storage directly."
+    }
+  ],
+  "staffordos": [
+    {
+      "route": "/operator",
+      "status": "live_and_connected",
+      "boundary": "safe",
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/operator/page.tsx",
+        "staffordos/ui/operator-frontend/components/operator/OperatorConsole.tsx"
+      ],
+      "notes": "Operator console is live and clearly operator-facing."
+    },
+    {
+      "route": "/operator/capacity",
+      "status": "live_but_stubbed",
+      "boundary": "safe",
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/operator/capacity/page.tsx"
+      ],
+      "notes": "Manual capacity board with placeholder values."
+    },
+    {
+      "route": "/operator/leads",
+      "status": "mixed_real_and_placeholder",
+      "boundary": "mostly_safe",
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/operator/leads/page.tsx",
+        "staffordos/ui/operator-frontend/app/api/leads/queue/route.ts"
+      ],
+      "notes": "Route is live, but queue API returns placeholder data."
+    },
+    {
+      "route": "/operator/revenue-command",
+      "status": "placeholder_only",
+      "boundary": "safe",
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/operator/revenue-command/page.tsx"
+      ],
+      "notes": "Placeholder-only operational surface."
+    },
+    {
+      "route": "/operator/analytics",
+      "status": "placeholder_only",
+      "boundary": "safe",
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/operator/analytics/page.tsx"
+      ],
+      "notes": "Placeholder analytics surface with no real endpoints connected."
+    },
+    {
+      "route": "/operator/products",
+      "status": "mixed_real_and_placeholder",
+      "boundary": "mostly_safe",
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/operator/products/page.tsx",
+        "staffordos/ui/operator-frontend/components/operator/AbandoProductSummaryCard.tsx"
+      ],
+      "notes": "Abando summary is read-only and API-based. Other product cards are placeholder."
+    }
+  ],
+  "send_pipeline": [
+    {
+      "path": "recovery_message_generation",
+      "status": "real",
+      "evidence": [
+        "web/src/lib/recoveryMessageEngine.js"
+      ],
+      "notes": "Deterministic message preview and return link generation exist."
+    },
+    {
+      "path": "email_sender",
+      "status": "real_but_unconfigured",
+      "evidence": [
+        "web/src/lib/emailSender.js"
+      ],
+      "notes": "Nodemailer sender exists. Requires SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and FROM_EMAIL or a fallback sender."
+    },
+    {
+      "path": "sms_sender",
+      "status": "real_but_unconfigured",
+      "evidence": [
+        "web/src/lib/smsSender.js"
+      ],
+      "notes": "Twilio sender exists. Requires TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_FROM or a fallback sender."
+    },
+    {
+      "path": "merchant_test_send_endpoints",
+      "status": "real_and_honest",
+      "evidence": [
+        "web/src/index.js"
+      ],
+      "notes": "POST /api/recovery-actions/send-test and POST /api/recovery-actions/send-live-test report missing provider config instead of faking send success."
+    },
+    {
+      "path": "legacy_mailer",
+      "status": "dangerous_placeholder",
+      "evidence": [
+        "web/src/lib/mailer.js"
+      ],
+      "notes": "Returns a fake email id when Resend is not configured. This is misleading and should not be treated as delivery proof."
+    }
+  ],
+  "env_vars": [
+    {
+      "name": "SMTP_HOST",
+      "used_in": [
+        "web/src/lib/emailSender.js"
+      ],
+      "required": true,
+      "system": "Abando",
+      "surface": "backend",
+      "mismatch_risk": false
+    },
+    {
+      "name": "SMTP_PORT",
+      "used_in": [
+        "web/src/lib/emailSender.js"
+      ],
+      "required": true,
+      "system": "Abando",
+      "surface": "backend",
+      "mismatch_risk": false
+    },
+    {
+      "name": "SMTP_USER",
+      "used_in": [
+        "web/src/lib/emailSender.js"
+      ],
+      "required": true,
+      "system": "Abando",
+      "surface": "backend",
+      "mismatch_risk": false
+    },
+    {
+      "name": "SMTP_PASS",
+      "used_in": [
+        "web/src/lib/emailSender.js"
+      ],
+      "required": true,
+      "system": "Abando",
+      "surface": "backend",
+      "mismatch_risk": false
+    },
+    {
+      "name": "FROM_EMAIL",
+      "used_in": [
+        "web/src/lib/emailSender.js"
+      ],
+      "required": true,
+      "system": "Abando",
+      "surface": "backend",
+      "mismatch_risk": true
+    },
+    {
+      "name": "DEFAULT_FROM",
+      "used_in": [
+        "web/src/lib/emailSender.js",
+        "web/src/lib/mailer.js"
+      ],
+      "required": false,
+      "system": "Abando",
+      "surface": "backend",
+      "mismatch_risk": true
+    },
+    {
+      "name": "SMTP_FROM",
+      "used_in": [
+        "web/src/lib/emailSender.js"
+      ],
+      "required": false,
+      "system": "Abando",
+      "surface": "backend",
+      "mismatch_risk": true
+    },
+    {
+      "name": "TWILIO_ACCOUNT_SID",
+      "used_in": [
+        "web/src/lib/smsSender.js"
+      ],
+      "required": true,
+      "system": "Abando",
+      "surface": "backend",
+      "mismatch_risk": false
+    },
+    {
+      "name": "TWILIO_AUTH_TOKEN",
+      "used_in": [
+        "web/src/lib/smsSender.js"
+      ],
+      "required": true,
+      "system": "Abando",
+      "surface": "backend",
+      "mismatch_risk": false
+    },
+    {
+      "name": "TWILIO_FROM",
+      "used_in": [
+        "web/src/lib/smsSender.js"
+      ],
+      "required": true,
+      "system": "Abando",
+      "surface": "backend",
+      "mismatch_risk": true
+    },
+    {
+      "name": "TWILIO_FROM_NUMBER",
+      "used_in": [
+        "web/src/lib/smsSender.js"
+      ],
+      "required": false,
+      "system": "Abando",
+      "surface": "backend",
+      "mismatch_risk": true
+    },
+    {
+      "name": "STAFFORDOS_URL",
+      "used_in": [
+        "web/src/lib/staffordosUrl.js",
+        "web/src/routes/checkoutSignals.esm.js",
+        "web/src/routes/orderWebhook.esm.js"
+      ],
+      "required": true,
+      "system": "Abando_and_StaffordOS_boundary",
+      "surface": "backend",
+      "mismatch_risk": false
+    },
+    {
+      "name": "ABANDO_API_BASE",
+      "used_in": [
+        "staffordos/ui/operator-frontend/app/operator/products/page.tsx"
+      ],
+      "required": false,
+      "system": "StaffordOS",
+      "surface": "frontend",
+      "mismatch_risk": true
+    },
+    {
+      "name": "NEXT_PUBLIC_ABANDO_API_BASE",
+      "used_in": [
+        "staffordos/ui/operator-frontend/app/operator/products/page.tsx"
+      ],
+      "required": false,
+      "system": "StaffordOS",
+      "surface": "frontend",
+      "mismatch_risk": true
+    },
+    {
+      "name": "GMAIL_USER",
+      "used_in": [
+        "staffordos"
+      ],
+      "required": false,
+      "system": "StaffordOS",
+      "surface": "backend",
+      "mismatch_risk": false
+    },
+    {
+      "name": "GMAIL_APP_PASSWORD",
+      "used_in": [
+        "staffordos"
+      ],
+      "required": false,
+      "system": "StaffordOS",
+      "surface": "backend",
+      "mismatch_risk": false
+    }
+  ],
+  "placeholders": [
+    {
+      "item": "web/src/lib/mailer.js fake id fallback",
+      "category": "dangerous_because_misleading",
+      "system": "Abando",
+      "notes": "Returns a fake email id and logs FAKE SENT when Resend is unconfigured."
+    },
+    {
+      "item": "web/src/index.js checkout placeholder route",
+      "category": "harmless_ui_copy",
+      "system": "Abando",
+      "notes": "Explicit placeholder checkout page used after return link redirect; does not fake order completion."
+    },
+    {
+      "item": "staffordos/ui/operator-frontend/app/operator/analytics/page.tsx",
+      "category": "StaffordOS_placeholder",
+      "system": "StaffordOS",
+      "notes": "Analytics route is explicitly placeholder."
+    },
+    {
+      "item": "staffordos/ui/operator-frontend/app/operator/capacity/page.tsx",
+      "category": "StaffordOS_placeholder",
+      "system": "StaffordOS",
+      "notes": "Capacity route uses manual placeholder values."
+    },
+    {
+      "item": "staffordos/ui/operator-frontend/app/operator/revenue-command/page.tsx",
+      "category": "StaffordOS_placeholder",
+      "system": "StaffordOS",
+      "notes": "Revenue command route is placeholder-only."
+    },
+    {
+      "item": "staffordos/ui/operator-frontend/app/api/leads/queue/route.ts",
+      "category": "StaffordOS_placeholder",
+      "system": "StaffordOS",
+      "notes": "Returns placeholder lead queue data."
+    },
+    {
+      "item": "web/src/lib/storeAnalyzer.js heuristic findings",
+      "category": "Shop_Fixer_Analyzer_placeholder",
+      "system": "Shop Fixer Analyzer",
+      "notes": "Directional storefront heuristics are real output, but not repository-analysis-grounded."
+    }
+  ],
+  "boundary_risks": [
+    {
+      "risk": "Abando execution depends on StaffordOS decisioning",
+      "evidence": [
+        "web/src/routes/checkoutSignals.esm.js"
+      ],
+      "severity": "high",
+      "notes": "Violates the clean product-engine boundary by depending on StaffordOS during execution."
+    },
+    {
+      "risk": "Abando posts recovery events into StaffordOS",
+      "evidence": [
+        "web/src/routes/orderWebhook.esm.js"
+      ],
+      "severity": "medium",
+      "notes": "Pushes execution-path data into the control plane, creating coupling."
+    },
+    {
+      "risk": "Shop Fixer Analyzer imports StaffordOS scorecard logic",
+      "evidence": [
+        "web/src/lib/storeAnalyzer.js"
+      ],
+      "severity": "high",
+      "notes": "Cross-system direct import instead of API boundary."
+    },
+    {
+      "risk": "Shop Fixer payment logic imports StaffordOS truth store",
+      "evidence": [
+        "web/src/lib/fixCheckout.js"
+      ],
+      "severity": "high",
+      "notes": "Direct shared state mutation path across systems."
+    },
+    {
+      "risk": "Abando frontend contains StaffordOS director/control surfaces",
+      "evidence": [
+        "abando-frontend/app/director/page.tsx"
+      ],
+      "severity": "high",
+      "notes": "UI-merging and direct filesystem reads from StaffordOS data violate non-negotiable system boundaries."
+    },
+    {
+      "risk": "/fix product identity drift",
+      "evidence": [
+        "web/src/index.js",
+        "web/src/lib/storeAnalyzer.js"
+      ],
+      "severity": "medium",
+      "notes": "Current implementation acts like a storefront audit funnel and Abando lead hook, not a GitHub repository analyzer."
+    }
+  ],
+  "real_blockers": [
+    {
+      "blocker": "SMTP not configured",
+      "details": [
+        "SMTP_HOST",
+        "SMTP_PORT",
+        "SMTP_USER",
+        "SMTP_PASS",
+        "FROM_EMAIL"
+      ],
+      "system": "Abando",
+      "impact": "Prevents real email delivery proof."
+    },
+    {
+      "blocker": "Twilio not configured",
+      "details": [
+        "TWILIO_ACCOUNT_SID",
+        "TWILIO_AUTH_TOKEN",
+        "TWILIO_FROM"
+      ],
+      "system": "Abando",
+      "impact": "Prevents real SMS delivery proof."
+    },
+    {
+      "blocker": "Shop Fixer Analyzer identity drift",
+      "details": [
+        "Current /fix implementation analyzes storefront/store behavior rather than GitHub repositories."
+      ],
+      "system": "Shop Fixer Analyzer",
+      "impact": "Product boundary and positioning are not clean."
+    },
+    {
+      "blocker": "Cross-system coupling",
+      "details": [
+        "Abando execution paths call StaffordOS APIs",
+        "Shop Fixer imports StaffordOS logic directly",
+        "Abando frontend contains StaffordOS director/control surfaces"
+      ],
+      "system": "All",
+      "impact": "Boundary violations increase maintenance risk and blur product ownership."
+    }
+  ]
+}

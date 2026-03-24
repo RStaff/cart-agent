@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fix Your Shopify Checkout</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f5f1e8;
+        --panel: #fffdf8;
+        --ink: #1c1917;
+        --muted: #6b6257;
+        --line: #e7dccd;
+        --accent: #166534;
+        --accent-dark: #0f3d24;
+        --cta-bg: #171411;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        background:
+          radial-gradient(circle at top, rgba(241, 181, 91, 0.15), transparent 35%),
+          linear-gradient(180deg, #f8f4ec 0%, var(--bg) 100%);
+        color: var(--ink);
+      }
+
+      .shell {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 48px 20px 72px;
+      }
+
+      .hero {
+        text-align: center;
+        max-width: 760px;
+        margin: 0 auto 34px;
+      }
+
+      .eyebrow {
+        margin: 0 0 12px;
+        color: var(--muted);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        font-size: 0.78rem;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.4rem, 6vw, 4.25rem);
+        line-height: 0.96;
+      }
+
+      .hero p {
+        margin: 18px auto 0;
+        font-size: 1.08rem;
+        line-height: 1.65;
+        color: var(--muted);
+        max-width: 640px;
+      }
+
+      .input-shell {
+        margin: 30px auto 0;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+        max-width: 720px;
+        background: rgba(255, 253, 248, 0.78);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 12px;
+        box-shadow: 0 22px 60px rgba(28, 25, 23, 0.08);
+      }
+
+      input {
+        width: 100%;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        padding: 14px 16px;
+        font: inherit;
+        font-size: 1rem;
+        color: var(--ink);
+      }
+
+      button {
+        border: 0;
+        outline: 0;
+        border-radius: 14px;
+        padding: 16px 24px;
+        background: var(--accent);
+        color: white;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+        min-width: 200px;
+        box-shadow: 0 14px 30px rgba(22, 101, 52, 0.28);
+      }
+
+      button:hover,
+      button:focus-visible {
+        background: var(--accent-dark);
+      }
+
+      button:disabled {
+        opacity: 0.7;
+        cursor: wait;
+      }
+
+      .status {
+        min-height: 24px;
+        text-align: center;
+        margin-bottom: 16px;
+        color: var(--muted);
+      }
+
+      .status.error {
+        color: #9f1239;
+      }
+
+      .report {
+        display: none;
+      }
+
+      .report.visible {
+        display: block;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 18px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 20px 50px rgba(28, 25, 23, 0.06);
+      }
+
+      .score-card {
+        text-align: center;
+      }
+
+      .store {
+        color: var(--muted);
+        margin-bottom: 14px;
+      }
+
+      .score {
+        font-size: clamp(4rem, 10vw, 5.5rem);
+        line-height: 0.92;
+        font-weight: 700;
+        margin: 0;
+      }
+
+      .score-label {
+        margin-top: 8px;
+        color: var(--muted);
+      }
+
+      .meta {
+        margin-top: 22px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .meta-row,
+      .comparison-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid #efe6da;
+      }
+
+      .meta-row:last-child,
+      .comparison-row:last-child {
+        border-bottom: 0;
+      }
+
+      .meta-label,
+      .comparison-label,
+      .section-title {
+        color: var(--muted);
+      }
+
+      .meta-value,
+      .comparison-value {
+        font-weight: 700;
+        text-align: right;
+      }
+
+      .section-title {
+        margin: 0 0 14px;
+        font-size: 0.95rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: #fbf4e7;
+        color: #6b4f1d;
+        font-weight: 700;
+      }
+
+      .signal-lists {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      li + li {
+        margin-top: 6px;
+      }
+
+      .revenue {
+        text-align: center;
+      }
+
+      .revenue-value {
+        font-size: clamp(2.1rem, 6vw, 3rem);
+        font-weight: 700;
+        color: var(--accent);
+      }
+
+      .recommendation-title {
+        font-size: 1.35rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+
+      .recommendation-copy {
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .lift {
+        margin-top: 16px;
+      }
+
+      .lift-value {
+        margin-top: 6px;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--accent);
+      }
+
+      .cta {
+        margin-top: 18px;
+        background: var(--cta-bg);
+        color: white;
+        border-radius: 24px;
+        padding: 34px 28px;
+        text-align: center;
+      }
+
+      .cta-title {
+        font-size: 1.7rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+
+      .cta-copy {
+        max-width: 620px;
+        margin: 0 auto;
+        color: rgba(255, 253, 248, 0.84);
+        line-height: 1.6;
+      }
+
+      .cta-lift {
+        margin-top: 18px;
+      }
+
+      .cta-lift-value {
+        margin-top: 6px;
+        font-size: 1.45rem;
+        font-weight: 700;
+        color: #86efac;
+      }
+
+      .cta a {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+        min-width: 280px;
+        padding: 16px 24px;
+        border-radius: 14px;
+        background: #15803d;
+        color: white;
+        text-decoration: none;
+        font-weight: 700;
+        box-shadow: 0 12px 28px rgba(21, 128, 61, 0.32);
+      }
+
+      .cta a:hover,
+      .cta a:focus-visible {
+        background: #166534;
+      }
+
+      @media (max-width: 900px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .signal-lists {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .input-shell {
+          grid-template-columns: 1fr;
+        }
+
+        button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div class="eyebrow">Abando Checkout Intelligence</div>
+        <h1>Fix Your Shopify Checkout</h1>
+        <p>Scan your store and see how your checkout compares to top Shopify brands.</p>
+        <div class="input-shell">
+          <input
+            id="store-input"
+            type="text"
+            placeholder="your-store.myshopify.com"
+            value="demo.myshopify.com"
+            autocomplete="off"
+          />
+          <button id="analyze-button" type="button">Analyze Checkout</button>
+        </div>
+      </section>
+
+      <div id="status" class="status"></div>
+
+      <section id="report" class="report">
+        <div class="grid">
+          <div class="panel score-card">
+            <div id="report-store" class="store"></div>
+            <div id="report-score" class="score"></div>
+            <div class="score-label">Checkout Score</div>
+            <div class="meta">
+              <div class="meta-row">
+                <div class="meta-label">Tier</div>
+                <div id="report-tier" class="meta-value"></div>
+              </div>
+              <div class="meta-row">
+                <div class="meta-label">Top Shopify Stores</div>
+                <div id="report-percentile" class="meta-value"></div>
+              </div>
+              <div class="meta-row">
+                <div class="meta-label">Peer Average</div>
+                <div id="report-peer" class="meta-value"></div>
+              </div>
+              <div class="meta-row">
+                <div class="meta-label">Top Friction</div>
+                <div id="report-friction" class="meta-value"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel revenue">
+            <div class="section-title">Potential Revenue Recovery</div>
+            <div id="report-revenue" class="revenue-value"></div>
+            <div class="score-label">per month</div>
+          </div>
+        </div>
+
+        <div class="grid" style="margin-top: 18px;">
+          <div class="panel">
+            <div class="section-title">Checkout Comparison</div>
+            <div class="comparison-row">
+              <div class="comparison-label">Your Store</div>
+              <div id="comparison-store" class="comparison-value"></div>
+            </div>
+            <div class="comparison-row">
+              <div id="comparison-competitor-name" class="comparison-label">Top Shopify Brand</div>
+              <div id="comparison-competitor-score" class="comparison-value"></div>
+            </div>
+            <div class="comparison-row">
+              <div class="comparison-label">Gap</div>
+              <div id="comparison-gap" class="comparison-value"></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="section-title">Checkout Benchmark Badge</div>
+            <div id="report-badge" class="badge"></div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top: 18px;">
+          <div class="section-title">Signal Evidence</div>
+          <div class="signal-lists">
+            <div>
+              <div class="section-title" style="margin-bottom: 8px;">Detected Signals</div>
+              <ul id="detected-signals"></ul>
+            </div>
+            <div>
+              <div class="section-title" style="margin-bottom: 8px;">Missing Signals</div>
+              <ul id="missing-signals"></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top: 18px;">
+          <div class="section-title">Recommended Fix</div>
+          <div id="recommendation-title" class="recommendation-title"></div>
+          <div id="recommendation-description" class="recommendation-copy"></div>
+          <div class="lift">
+            <div class="section-title" style="margin-bottom: 0;">Estimated Lift</div>
+            <div id="recommendation-lift" class="lift-value"></div>
+          </div>
+        </div>
+
+        <div class="cta">
+          <div class="cta-title">Fix This Checkout Issue Instantly</div>
+          <div class="cta-copy">
+            Abando can automatically apply this improvement to your store checkout and reduce abandonment.
+          </div>
+          <div class="cta-lift">
+            <div class="section-title" style="color: rgba(255, 253, 248, 0.68); margin-bottom: 0;">Estimated Lift</div>
+            <div id="cta-lift" class="cta-lift-value"></div>
+          </div>
+          <a href="/install">Fix My Checkout With Abando</a>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const input = document.getElementById("store-input");
+      const button = document.getElementById("analyze-button");
+      const status = document.getElementById("status");
+      const report = document.getElementById("report");
+
+      const reportStore = document.getElementById("report-store");
+      const reportScore = document.getElementById("report-score");
+      const reportTier = document.getElementById("report-tier");
+      const reportPercentile = document.getElementById("report-percentile");
+      const reportPeer = document.getElementById("report-peer");
+      const reportFriction = document.getElementById("report-friction");
+      const reportRevenue = document.getElementById("report-revenue");
+      const reportBadge = document.getElementById("report-badge");
+
+      const comparisonStore = document.getElementById("comparison-store");
+      const comparisonCompetitorName = document.getElementById("comparison-competitor-name");
+      const comparisonCompetitorScore = document.getElementById("comparison-competitor-score");
+      const comparisonGap = document.getElementById("comparison-gap");
+
+      const detectedSignals = document.getElementById("detected-signals");
+      const missingSignals = document.getElementById("missing-signals");
+
+      const recommendationTitle = document.getElementById("recommendation-title");
+      const recommendationDescription = document.getElementById("recommendation-description");
+      const recommendationLift = document.getElementById("recommendation-lift");
+      const ctaLift = document.getElementById("cta-lift");
+
+      function humanizeFriction(value) {
+        return String(value || "")
+          .split("_")
+          .filter(Boolean)
+          .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+          .join(" ");
+      }
+
+      function formatCurrency(value) {
+        return new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+          maximumFractionDigits: 0,
+        }).format(Number(value) || 0);
+      }
+
+      function renderList(target, items) {
+        target.innerHTML = "";
+        const values = Array.isArray(items) && items.length > 0 ? items : ["None"];
+        for (const value of values) {
+          const item = document.createElement("li");
+          item.textContent = value;
+          target.appendChild(item);
+        }
+      }
+
+      async function analyzeCheckout() {
+        const store = input.value.trim();
+        status.classList.remove("error");
+        report.classList.remove("visible");
+
+        if (!store) {
+          status.textContent = "Enter a Shopify store domain first.";
+          status.classList.add("error");
+          return;
+        }
+
+        button.disabled = true;
+        status.textContent = "Analyzing checkout...";
+
+        try {
+          const response = await fetch(`/api/checkout-score?store=${encodeURIComponent(store)}`);
+          const payload = await response.json();
+
+          if (!response.ok) {
+            throw new Error(payload.error || "Request failed");
+          }
+
+          reportStore.textContent = payload.store;
+          reportScore.textContent = payload.checkout_score;
+          reportTier.textContent = payload.tier;
+          reportPercentile.textContent = `Top ${payload.percentile}%`;
+          reportPeer.textContent = payload.peer_average;
+          reportFriction.textContent = humanizeFriction(payload.top_friction);
+          reportRevenue.textContent = formatCurrency(payload.estimated_revenue_opportunity);
+          reportBadge.textContent = payload.benchmark_badge || "No badge available";
+
+          comparisonStore.textContent = `Score: ${payload.checkout_score}`;
+          comparisonCompetitorName.textContent =
+            payload.competitor_comparison?.competitor_name || "Top Shopify Brand";
+          comparisonCompetitorScore.textContent =
+            `Score: ${payload.competitor_comparison?.competitor_score ?? "—"}`;
+          comparisonGap.textContent =
+            `${payload.competitor_comparison?.score_gap ?? "—"} points`;
+
+          renderList(detectedSignals, payload.detected_signals);
+          renderList(missingSignals, payload.missing_signals);
+
+          recommendationTitle.textContent = payload.recommendation?.title || "No recommendation available";
+          recommendationDescription.textContent =
+            payload.recommendation?.description || "No clear fix could be derived from the current signals.";
+          recommendationLift.textContent =
+            payload.recommendation?.estimated_conversion_lift || "Unknown";
+          ctaLift.textContent = payload.recommendation?.estimated_conversion_lift || "Unknown";
+
+          report.classList.add("visible");
+          status.textContent = "Checkout benchmark loaded.";
+        } catch (error) {
+          status.textContent = `Could not analyze checkout: ${error.message}`;
+          status.classList.add("error");
+        } finally {
+          button.disabled = false;
+        }
+      }
+
+      button.addEventListener("click", analyzeCheckout);
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          analyzeCheckout();
+        }
+      });
+    </script>
+  </body>
+</html>

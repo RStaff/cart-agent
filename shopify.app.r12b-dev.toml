@@ -1,0 +1,33 @@
+# Dev-only Shopify config for R12B proof runs.
+# Local preview omits protected-customer-data webhook subscriptions entirely
+# until the app has Shopify approval for them.
+
+client_id = "83114672506075ba4866194fe0160cde"
+name = "cart-agent"
+application_url = "https://pay.abando.ai/dashboard/"
+embedded = true
+handle = "cart-agent-1"
+
+[build]
+automatically_update_urls_on_dev = true
+
+[webhooks]
+api_version = "2025-07"
+
+  # Dev preview must stay free of protected-customer-data webhook topics until
+  # Shopify approves the app for them. Keep the future-approved intent in
+  # `docs/shopify-approved-webhook-topics.md`.
+
+[access_scopes]
+scopes = "read_checkouts,read_orders,write_checkouts,read_script_tags,write_script_tags"
+optional_scopes = [ ]
+use_legacy_install_flow = false
+
+[auth]
+redirect_urls = [
+  "https://pay.abando.ai/shopify/callback",
+  "https://pay.abando.ai/api/auth/callback"
+]
+
+[pos]
+embedded = false

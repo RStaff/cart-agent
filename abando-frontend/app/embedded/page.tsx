@@ -1,385 +1,256 @@
-"use client";
+import fs from "fs";
+import path from "path";
+import { Suspense } from "react";
+import { EmbeddedAdminTitleBar } from "../../src/components/EmbeddedAdminTitleBar";
+import { EmbeddedUpgradeButton } from "../../src/components/EmbeddedUpgradeButton";
 
-import { useState } from "react";
-import Image from "next/image";
-import { TitleBar } from "@shopify/app-bridge-react";
-
-type RecoveryPhase = "idle" | "running" | "done" | "error";
-
-type TriggerResult = {
-  ok?: boolean;
-  message?: string;
-  error?: string;
-  eventId?: string;
-  recoveryEventId?: string;
-  id?: string;
-  shop?: string;
-  [key: string]: unknown;
+type ControlSnapshot = {
+  audit_views?: number;
+  audit_runs?: number;
+  install_clicks?: number;
+  installs?: number;
+  operator_signal?: "green" | "yellow" | "red";
+  latest_intelligence_event?: string;
 };
 
-const statusItems = [
-  {
-    label: "Monitoring status",
-    value: "Watching new abandoned checkouts",
-    state: "Live",
-  },
-  {
-    label: "Email enabled",
-    value: "Recovery email flow ready",
-    state: "On",
-  },
-  {
-    label: "SMS enabled",
-    value: "SMS follow-up ready when configured",
-    state: "On",
-  },
-  {
-    label: "Store connected",
-    value: "Shopify store connected successfully",
-    state: "Connected",
-  },
-];
+type BenchmarkData = {
+  segments?: Array<{
+    segment?: string;
+    store_count?: number;
+    average_estimated_monthly_revenue_loss?: number;
+    average_benchmark_recovery_rate?: number;
+  }>;
+};
 
-const howItWorks = [
-  {
-    step: "1",
-    title: "Cart abandoned",
-    body: "Abando watches for shoppers who leave checkout before finishing their order.",
-  },
-  {
-    step: "2",
-    title: "Message sent",
-    body: "Abando automatically sends the right email or SMS follow-up based on the shopper's behavior.",
-  },
-  {
-    step: "3",
-    title: "Cart recovered",
-    body: "When the shopper comes back and completes checkout, Abando links the order to the recovery flow.",
-  },
-  {
-    step: "4",
-    title: "Revenue attributed",
-    body: "Recovered revenue appears here so merchants can see exactly what Abando is earning back.",
-  },
-];
+type IntelligenceFeed = {
+  events?: Array<{
+    timestamp?: string;
+    message?: string;
+  }>;
+};
 
-const demoTimeline = [
-  "Detected a checkout abandoned 43 minutes ago",
-  "Queued a recovery email with product-specific copy",
-  "Queued an SMS reminder for mobile follow-up",
-  "Marked the recovery as ready to attribute once the order completes",
-];
+type AuditReport = {
+  store_domain?: string;
+  detected_issue?: string;
+  estimated_revenue_leak?: string;
+  recommendation?: string;
+  audit_score?: number;
+};
 
-function classNames(...classes: Array<string | false | null | undefined>) {
-  return classes.filter(Boolean).join(" ");
+function readJson<T>(segments: string[], fallback: T): T {
+  const filePath = path.join(process.cwd(), "..", ...segments);
+
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf8")) as T;
+  } catch (_error) {
+    return fallback;
+  }
+}
+
+function formatCurrency(value?: number | null) {
+  if (typeof value !== "number") {
+    return "Not available yet";
+  }
+
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function getLatestIntelligenceEvent(feed: IntelligenceFeed, fallback?: string) {
+  const events = Array.isArray(feed.events) ? feed.events.slice() : [];
+
+  events.sort((left, right) => {
+    const leftTime = new Date(left.timestamp || 0).getTime();
+    const rightTime = new Date(right.timestamp || 0).getTime();
+    return rightTime - leftTime;
+  });
+
+  return events[0]?.message || fallback || "No intelligence event recorded.";
+}
+
+function getTopSegment(benchmarks: BenchmarkData) {
+  const segments = Array.isArray(benchmarks.segments) ? benchmarks.segments.slice() : [];
+
+  segments.sort((left, right) => {
+    if ((right.store_count || 0) !== (left.store_count || 0)) {
+      return (right.store_count || 0) - (left.store_count || 0);
+    }
+
+    return String(left.segment || "").localeCompare(String(right.segment || ""));
+  });
+
+  return segments[0] || null;
+}
+
+function getTopDetectedIssue(reports: AuditReport[]) {
+  const counts = new Map<string, number>();
+
+  for (const report of reports) {
+    const issue = report.detected_issue || "";
+    if (!issue) {
+      continue;
+    }
+
+    counts.set(issue, (counts.get(issue) || 0) + 1);
+  }
+
+  const ranked = [...counts.entries()].sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]));
+  return ranked[0]?.[0] || "No issue detected yet";
+}
+
+function SignalPill({ signal }: { signal: "green" | "yellow" | "red" }) {
+  const styles = {
+    green: "border-emerald-200 bg-emerald-50 text-emerald-800",
+    yellow: "border-amber-200 bg-amber-50 text-amber-800",
+    red: "border-rose-200 bg-rose-50 text-rose-800",
+  };
+
+  return (
+    <span className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] ${styles[signal]}`}>
+      {signal}
+    </span>
+  );
+}
+
+function SectionCard({
+  title,
+  value,
+  helper,
+}: {
+  title: string;
+  value: string;
+  helper?: string;
+}) {
+  return (
+    <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_16px_50px_rgba(15,23,42,0.06)]">
+      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">{title}</p>
+      <p className="mt-3 text-2xl font-semibold text-slate-950">{value}</p>
+      {helper ? <p className="mt-3 text-sm leading-6 text-slate-500">{helper}</p> : null}
+    </div>
+  );
 }
 
 export default function EmbeddedDashboard() {
-  const [phase, setPhase] = useState<RecoveryPhase>("idle");
-  const [timelineIndex, setTimelineIndex] = useState(-1);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [result, setResult] = useState<TriggerResult | null>(null);
+  const controlSnapshot = readJson<ControlSnapshot>(
+    ["staffordos", "control_panel", "abando_control_snapshot.json"],
+    {},
+  );
+  const benchmarks = readJson<BenchmarkData>(
+    ["staffordos", "benchmark", "segment_benchmarks.json"],
+    { segments: [] },
+  );
+  const analytics = readJson<{ events?: Array<{ event_type?: string }> }>(
+    ["staffordos", "analytics", "install_events.json"],
+    { events: [] },
+  );
+  const intelligence = readJson<IntelligenceFeed>(
+    ["staffordos", "intelligence", "intelligence_feed.json"],
+    { events: [] },
+  );
+  const auditReports = readJson<AuditReport[]>(
+    ["staffordos", "audit", "audit_reports.json"],
+    [],
+  );
 
-  const revenueHeadline =
-    phase === "done" ? "$5,165 recovered in the last 7 days" : "$5,040 recovered in the last 7 days";
-
-  const testSummary =
-    phase === "running"
-      ? "Triggering a real backend test recovery now..."
-      : phase === "done"
-      ? result?.message || "Test recovery created successfully in the backend."
-      : phase === "error"
-      ? errorMessage || "The backend test recovery request failed."
-      : "Run a real merchant-safe test recovery to verify the Abando flow from Shopify admin.";
-
-  async function triggerTestRecovery() {
-    setPhase("running");
-    setErrorMessage(null);
-    setResult(null);
-    setTimelineIndex(0);
-
-    const shop =
-      typeof window === "undefined"
-        ? undefined
-        : new URLSearchParams(window.location.search).get("shop") || undefined;
-
-    try {
-      const response = await fetch("/api/abando/activation/trigger-test-recovery", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-        body: JSON.stringify({ shop }),
-      });
-
-      const payload = (await response.json().catch(() => ({}))) as TriggerResult;
-
-      if (!response.ok || payload.ok === false) {
-        throw new Error(
-          String(payload.error || payload.message || `Request failed with status ${response.status}`)
-        );
-      }
-
-      setResult(payload);
-      setTimelineIndex(demoTimeline.length - 1);
-      setPhase("done");
-    } catch (error) {
-      setTimelineIndex(-1);
-      setErrorMessage(error instanceof Error ? error.message : "Failed to trigger test recovery.");
-      setPhase("error");
-    }
-  }
+  const topSegment = getTopSegment(benchmarks);
+  const topIssue = getTopDetectedIssue(Array.isArray(auditReports) ? auditReports : []);
+  const topReport = Array.isArray(auditReports) ? auditReports[0] : null;
+  const operatorSignal = controlSnapshot.operator_signal || "yellow";
+  const auditRuns = controlSnapshot.audit_runs || 0;
+  const installClicks = controlSnapshot.install_clicks || 0;
+  const installs = controlSnapshot.installs || 0;
+  const revenueAtRisk = topSegment?.average_estimated_monthly_revenue_loss;
+  const benchmarkRecoveryRate = topSegment?.average_benchmark_recovery_rate;
+  const latestEvent = getLatestIntelligenceEvent(intelligence, controlSnapshot.latest_intelligence_event);
+  const auditViews = Array.isArray(analytics.events)
+    ? analytics.events.filter((event) => event?.event_type === "audit_view").length
+    : 0;
 
   return (
     <>
-      <TitleBar title="Abando" />
-      <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(16,185,129,0.18),_transparent_28%),linear-gradient(180deg,_#020617_0%,_#0f172a_100%)] text-slate-50">
-        <main className="mx-auto max-w-7xl px-6 py-8">
-          <header className="grid gap-6 rounded-[28px] border border-emerald-500/20 bg-slate-900/70 p-6 shadow-[0_20px_80px_rgba(2,6,23,0.55)] backdrop-blur md:grid-cols-[minmax(0,1fr)_340px] md:p-8">
-            <div className="space-y-5">
-              <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-400/30 bg-emerald-500/10 shadow-[0_0_30px_rgba(16,185,129,0.22)]">
-                  <div className="relative h-8 w-8">
-                    <Image
-                      src="/abando-logo.inline.png"
-                      alt="Abando logo"
-                      fill
-                      className="object-contain"
-                      priority
-                    />
-                  </div>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300/80">
-                    Abando
-                  </p>
-                  <p className="text-sm text-slate-300">
-                    Recover abandoned carts automatically.
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <h1 className="max-w-3xl text-3xl font-semibold tracking-tight text-white md:text-5xl">
-                  Turn lost carts into recovered revenue with email and SMS that run for you.
+      <EmbeddedAdminTitleBar />
+      <main className="min-h-screen bg-[linear-gradient(180deg,_#f7f6f2_0%,_#efece3_100%)] text-slate-950">
+        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 md:px-6">
+          <header className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.08)] md:p-8">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">
+                  Abando Audit Console
+                </p>
+                <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950 md:text-5xl">
+                  Abando Audit Console
                 </h1>
-                <p className="max-w-3xl text-base leading-7 text-slate-300">
-                  Abando watches for abandoned carts, triggers the right recovery flow, and attributes recovered revenue back to this dashboard so merchants can see the value immediately after install.
+                <p className="mt-4 max-w-3xl text-base leading-7 text-slate-600">
+                  Find hidden revenue leaks in your Shopify store.
                 </p>
               </div>
-
-              <div className="flex flex-wrap gap-3 text-sm text-slate-200">
-                <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5">
-                  Email recovery active
-                </span>
-                <span className="rounded-full border border-slate-700 bg-slate-950/60 px-3 py-1.5">
-                  SMS recovery ready
-                </span>
-                <span className="rounded-full border border-slate-700 bg-slate-950/60 px-3 py-1.5">
-                  Revenue attribution enabled
-                </span>
-              </div>
-            </div>
-
-            <div className="rounded-[24px] border border-emerald-500/20 bg-gradient-to-b from-emerald-500/14 to-slate-950 p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-emerald-300">
-                Revenue proof
-              </p>
-              <p className="mt-4 text-3xl font-semibold text-emerald-50">
-                {revenueHeadline}
-              </p>
-              <p className="mt-3 text-sm leading-6 text-emerald-50/80">
-                This block can show merchant-specific revenue when live data is available. Until then, it presents clear demo proof so the install still feels valuable in the first minute.
-              </p>
-              <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
-                    Recovered orders
-                  </p>
-                  <p className="mt-2 text-2xl font-semibold text-white">40+</p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
-                    Avg. lift
-                  </p>
-                  <p className="mt-2 text-2xl font-semibold text-white">+1 day/week</p>
-                </div>
-              </div>
+              <SignalPill signal={operatorSignal} />
             </div>
           </header>
 
-          <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
-            <div className="rounded-[28px] border border-slate-800 bg-slate-900/70 p-6 shadow-[0_16px_60px_rgba(2,6,23,0.38)]">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-400">
-                    Status / Readiness
-                  </p>
-                  <h2 className="mt-2 text-2xl font-semibold text-white">
-                    The core recovery system is ready.
-                  </h2>
+          <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+            <SectionCard
+              title="Revenue at Risk"
+              value={formatCurrency(revenueAtRisk)}
+              helper={topSegment ? `Estimated from the ${topSegment.segment} benchmark baseline.` : "Revenue-at-risk signal will populate when benchmark data is available."}
+            />
+
+            <div className="rounded-[28px] border border-slate-200 bg-slate-950 p-6 text-white shadow-[0_18px_60px_rgba(15,23,42,0.18)]">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-300">Pricing</p>
+              <div className="mt-5 space-y-4">
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <p className="text-sm font-semibold text-white">Free</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-300">Audit summary, benchmark snapshot, and product status visibility.</p>
                 </div>
-                <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-emerald-200">
-                  Ready to demo
-                </span>
-              </div>
-
-              <div className="mt-6 grid gap-4 md:grid-cols-2">
-                {statusItems.map((item) => (
-                  <div
-                    key={item.label}
-                    className="rounded-2xl border border-slate-800 bg-slate-950/65 p-4"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm font-medium text-white">{item.label}</p>
-                      <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-200">
-                        {item.state}
-                      </span>
-                    </div>
-                    <p className="mt-3 text-sm leading-6 text-slate-300">{item.value}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-[28px] border border-emerald-500/25 bg-slate-900/75 p-6 shadow-[0_16px_60px_rgba(16,185,129,0.16)]">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-emerald-300">
-                Activation action
-              </p>
-              <h2 className="mt-2 text-2xl font-semibold text-white">
-                Trigger a test recovery
-              </h2>
-              <p className="mt-3 text-sm leading-6 text-slate-300">
-                Use this to create a real backend test recovery event for the current merchant store without exposing backend secrets in the browser.
-              </p>
-
-              <div className="mt-6 flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={triggerTestRecovery}
-                  disabled={phase === "running"}
-                  className={classNames(
-                    "inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
-                    phase === "running"
-                      ? "cursor-not-allowed bg-emerald-500/50 text-emerald-50"
-                      : "bg-emerald-400 text-slate-950 hover:bg-emerald-300"
-                  )}
-                >
-                  {phase === "running" ? "Running test..." : "Trigger Test Recovery"}
-                </button>
-                {phase === "done" ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPhase("idle");
-                      setTimelineIndex(-1);
-                      setErrorMessage(null);
-                      setResult(null);
-                    }}
-                    className="inline-flex items-center justify-center rounded-full border border-slate-700 px-5 py-3 text-sm font-semibold text-slate-200 hover:border-slate-500 hover:text-white"
-                  >
-                    Reset demo
-                  </button>
-                ) : null}
-              </div>
-
-              <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-950/75 p-4">
-                <p className="text-sm font-medium text-white">{testSummary}</p>
-                {result ? (
-                  <div className="mt-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-3 text-sm text-emerald-50">
-                    <p>
-                      Backend event created
-                      {result.shop ? ` for ${String(result.shop)}` : ""}.
-                    </p>
-                    {result.eventId || result.recoveryEventId || result.id ? (
-                      <p className="mt-1 text-emerald-100/80">
-                        Event ID: {String(result.eventId || result.recoveryEventId || result.id)}
-                      </p>
-                    ) : null}
-                  </div>
-                ) : null}
-                {phase === "error" ? (
-                  <div className="mt-3 rounded-2xl border border-rose-500/20 bg-rose-500/10 px-3 py-3 text-sm text-rose-100">
-                    Request failed. Check the frontend server logs and backend response, then retry.
-                  </div>
-                ) : null}
-                <div className="mt-4 space-y-3">
-                  {demoTimeline.map((item, index) => {
-                    const active = index <= timelineIndex && phase !== "error";
-                    return (
-                      <div
-                        key={item}
-                        className={classNames(
-                          "flex items-start gap-3 rounded-2xl border px-3 py-3 transition",
-                          active
-                            ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-50"
-                            : "border-slate-800 bg-slate-900/70 text-slate-400"
-                        )}
-                      >
-                        <span
-                          className={classNames(
-                            "mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-semibold",
-                            active ? "bg-emerald-400 text-slate-950" : "bg-slate-800 text-slate-400"
-                          )}
-                        >
-                          {index + 1}
-                        </span>
-                        <p className="text-sm leading-6">{item}</p>
-                      </div>
-                    );
-                  })}
+                <div className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4">
+                  <p className="text-sm font-semibold text-white">Pro</p>
+                  <p className="mt-2 text-sm leading-6 text-emerald-50/90">Continuous monitoring, prioritized fixes, and upgrade-ready billing flow.</p>
                 </div>
               </div>
+              <p className="mt-5 text-sm leading-6 text-slate-300">Shopify-managed billing note: plan upgrades should continue through the existing Shopify billing approval flow.</p>
+              <Suspense fallback={<p className="mt-5 text-sm leading-6 text-slate-300">Upgrade actions load when the Shopify shop context is available.</p>}>
+                <EmbeddedUpgradeButton />
+              </Suspense>
             </div>
           </section>
 
-          <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-            <div className="rounded-[28px] border border-slate-800 bg-slate-900/70 p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-400">
-                How it works
-              </p>
-              <h2 className="mt-2 text-2xl font-semibold text-white">
-                A simple recovery loop merchants can understand fast.
-              </h2>
-              <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                {howItWorks.map((item) => (
-                  <div
-                    key={item.step}
-                    className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4"
-                  >
-                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-300">
-                      Step {item.step}
-                    </p>
-                    <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
-                    <p className="mt-3 text-sm leading-6 text-slate-300">{item.body}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <aside className="rounded-[28px] border border-slate-800 bg-slate-900/70 p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-400">
-                Next step / Trust
-              </p>
-              <h2 className="mt-2 text-2xl font-semibold text-white">
-                What the merchant should do next
-              </h2>
-              <div className="mt-5 space-y-4 text-sm leading-6 text-slate-300">
-                <p>
-                  Run the test recovery first, confirm the flow feels on-brand, then leave Abando running so the next real abandoned checkout can be recovered automatically.
-                </p>
-                <p>
-                  Recovered revenue will show up here as soon as attributed orders start coming back through the live flow.
-                </p>
-                <p>
-                  Abando is designed to make the first install feel tangible: clear status, visible value, and one obvious action to prove the system works.
-                </p>
-              </div>
-            </aside>
+          <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <SectionCard
+              title="Top Detected Issue"
+              value={topIssue}
+              helper={topReport?.recommendation || "Issue detail will improve as more audit reports land."}
+            />
+            <SectionCard
+              title="Benchmark Comparison"
+              value={benchmarkRecoveryRate ? `~${Math.round(benchmarkRecoveryRate * 100)}% recovery potential` : "Awaiting benchmark data"}
+              helper={benchmarkRecoveryRate ? `Stores like yours recover ~${Math.round(benchmarkRecoveryRate * 100)}% of abandoned carts when optimized.` : "No benchmark comparison available yet."}
+            />
+            <SectionCard
+              title="Latest Audit Signal"
+              value={latestEvent}
+              helper="Latest audit-side signal available from current StaffordOS data."
+            />
+            <SectionCard
+              title="Audit Status"
+              value={`${auditRuns} audits run`}
+              helper={`${auditViews} audit views, ${installClicks} install clicks, ${installs} installs.`}
+            />
+            <SectionCard
+              title="Product Status"
+              value={operatorSignal === "green" ? "Healthy" : operatorSignal === "yellow" ? "Needs attention" : "At risk"}
+              helper="Derived from the current Abando control snapshot."
+            />
+            <SectionCard
+              title="Audit Summary"
+              value={topReport?.estimated_revenue_leak || "No audit summary yet"}
+              helper={topReport?.store_domain ? `Latest audit proof available for ${topReport.store_domain}.` : "Run or generate an audit summary to populate this panel."}
+            />
           </section>
-        </main>
-      </div>
+        </div>
+      </main>
     </>
   );
 }

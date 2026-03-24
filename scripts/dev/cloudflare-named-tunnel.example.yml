@@ -1,0 +1,10 @@
+# Example named Cloudflare tunnel config for Abando local dev.
+# Fill the values via env or by generating a runtime copy under `.tmp/`.
+
+tunnel: <your-cloudflare-tunnel-id>
+credentials-file: /Users/rossstafford/.cloudflared/<your-cloudflare-tunnel-id>.json
+
+ingress:
+  - hostname: dev.abando.ai
+    service: http://127.0.0.1:8081
+  - service: http_status:404

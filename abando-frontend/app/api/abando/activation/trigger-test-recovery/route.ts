@@ -1,52 +1,56 @@
 import { NextRequest, NextResponse } from "next/server";
+import { postBackendJson } from "@/server/abandoBackend";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function backendBase(): string {
-  const base =
-    process.env.CART_AGENT_API_BASE ||
-    process.env.ABANDO_BACKEND_ORIGIN ||
-    process.env.BACKEND_URL;
+export async function POST(req: NextRequest) {
+  const body = await req.json().catch(() => null);
 
-  if (!base) {
-    throw new Error("Missing backend base URL for test recovery proxy.");
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: "Malformed JSON request body.",
+        errorKind: "request_shape",
+      },
+      { status: 400 }
+    );
   }
 
-  return base.replace(/\/+$/, "");
-}
+  const payload: Record<string, unknown> = {
+    ...(body as Record<string, unknown>),
+    source: "shopify_embedded_admin",
+    surface: "embedded_home",
+  };
 
-export async function POST(req: NextRequest) {
-  try {
-    const body = await req.json().catch(() => ({}));
-    const url = `${backendBase()}/abando/activation/trigger-test-recovery`;
-    const devToken = process.env.BACKEND_DEV_AUTH_TOKEN || "";
+  const result = await postBackendJson(
+    "/abando/activation/trigger-test-recovery",
+    payload
+  );
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        ...(devToken ? { Authorization: `Bearer ${devToken}` } : {}),
-      },
-      body: JSON.stringify({
-        ...body,
-        source: "shopify_embedded_admin",
-        surface: "embedded_home",
-      }),
-      cache: "no-store",
+  if (!result.ok) {
+    console.error("[abando:test-recovery] backend request failed", {
+      errorKind: result.error.kind,
+      status: result.status,
+      shop: typeof payload.shop === "string" ? payload.shop : null,
+      message: result.error.message,
+      backendMessage: result.error.backendMessage || null,
     });
 
-    const contentType = response.headers.get("content-type") || "";
-    const isJson = contentType.includes("application/json");
-    const payload = isJson
-      ? await response.json().catch(() => ({ ok: false, error: "invalid_json" }))
-      : { ok: response.ok, message: await response.text().catch(() => "") };
-
-    return NextResponse.json(payload, { status: response.status });
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Failed to trigger test recovery.";
-    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    return NextResponse.json(
+      {
+        ok: false,
+        error: result.error.message,
+        errorKind: result.error.kind,
+        backendStatus: result.status,
+        ...(result.error.backendMessage
+          ? { backendMessage: result.error.backendMessage }
+          : {}),
+      },
+      { status: result.status }
+    );
   }
+
+  return NextResponse.json(result.data, { status: result.status });
 }

@@ -1,0 +1,1363 @@
+[
+  {
+    "id": "execution_packet__checkout_decision_optimization_v1_opp_high_revenue_task_myshopify_com_fixed_fee",
+    "packetId": "checkout_decision_optimization_v1_opp_high_revenue_task_myshopify_com_fixed_fee",
+    "packetType": "CHECKOUT_DECISION_OPTIMIZATION_V1",
+    "taskTitle": "Improve checkout decision conversion",
+    "estimatedTime": "2-3 hours",
+    "basePayout": 160,
+    "bonusStructure": "Performance bonus released only after manual QC and verified revenue lift.",
+    "instructions": [
+      "Review checkout decision email flow",
+      "Replace subject lines using template set",
+      "Update email body copy",
+      "Verify triggers",
+      "Send test email"
+    ],
+    "assets": [
+      "Current checkout decision email flow export",
+      "Approved subject line template set",
+      "Merchant checkout context summary"
+    ],
+    "qcRequirements": [
+      "Screenshot proof of updated flow",
+      "Live link confirmation for the active flow",
+      "Test verification showing the recovery email was triggered"
+    ],
+    "operatorRequirements": [
+      "email",
+      "shopify"
+    ],
+    "decisionScore": 20,
+    "paymentModel": "FIXED_FEE",
+    "opportunityContext": {
+      "id": "opp_high",
+      "shopDomain": "revenue-task.myshopify.com",
+      "cartToken": null,
+      "estimatedClientValue": 3200,
+      "revenuePotential": 2600,
+      "currentRecoveryRate": 2.4,
+      "trafficVolume": 12000,
+      "confidenceScore": 5,
+      "validationMode": false,
+      "notes": "Large upside with weak current recovery performance."
+    },
+    "status": "CREATED",
+    "operatorShortlist": [
+      {
+        "operatorId": "op_1",
+        "name": "Alex",
+        "tier": "TIER_3",
+        "rankingScore": 4.81,
+        "skillMatch": 5,
+        "completionRate": 0.98,
+        "speedScore": 4.2,
+        "qualityScore": 4.8,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      },
+      {
+        "operatorId": "op_3",
+        "name": "Taylor",
+        "tier": "TIER_2",
+        "rankingScore": 4.75,
+        "skillMatch": 5,
+        "completionRate": 0.95,
+        "speedScore": 3.9,
+        "qualityScore": 4.9,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      },
+      {
+        "operatorId": "op_2",
+        "name": "Jordan",
+        "tier": "TIER_2",
+        "rankingScore": 3.66,
+        "skillMatch": 2.5,
+        "completionRate": 0.91,
+        "speedScore": 4.7,
+        "qualityScore": 4.1,
+        "matchedSkills": [
+          "shopify"
+        ]
+      }
+    ],
+    "assignedOperatorId": null,
+    "qcStatus": "NOT_REVIEWED",
+    "submissionData": null,
+    "feedbackMetrics": null,
+    "createdAt": "2026-03-17T23:24:58.634Z",
+    "updatedAt": "2026-03-17T23:24:58.641Z",
+    "completedAt": null
+  },
+  {
+    "id": "execution_packet__checkout_decision_optimization_v1_opp_persist_1773789904525_packet_persistence_myshopify_com_fixed_fee",
+    "packetId": "checkout_decision_optimization_v1_opp_persist_1773789904525_packet_persistence_myshopify_com_fixed_fee",
+    "packetType": "CHECKOUT_DECISION_OPTIMIZATION_V1",
+    "taskTitle": "Improve checkout decision conversion",
+    "estimatedTime": "2-3 hours",
+    "basePayout": 160,
+    "bonusStructure": "Performance bonus released only after manual QC and verified revenue lift.",
+    "instructions": [
+      "Review checkout decision email flow",
+      "Replace subject lines using template set",
+      "Update email body copy",
+      "Verify triggers",
+      "Send test email"
+    ],
+    "assets": [
+      "Current checkout decision email flow export",
+      "Approved subject line template set",
+      "Merchant checkout context summary"
+    ],
+    "qcRequirements": [
+      "Screenshot proof of updated flow",
+      "Live link confirmation for the active flow",
+      "Test verification showing the recovery email was triggered"
+    ],
+    "operatorRequirements": [
+      "email",
+      "shopify"
+    ],
+    "decisionScore": 20,
+    "paymentModel": "FIXED_FEE",
+    "opportunityContext": {
+      "id": "opp_persist_1773789904525",
+      "shopDomain": "packet-persistence.myshopify.com",
+      "cartToken": null,
+      "estimatedClientValue": 3200,
+      "revenuePotential": 2600,
+      "currentRecoveryRate": 2.4,
+      "trafficVolume": 12000,
+      "confidenceScore": 5,
+      "validationMode": false,
+      "notes": null
+    },
+    "status": "REVIEW_PENDING",
+    "operatorShortlist": [
+      {
+        "operatorId": "op_1",
+        "name": "Alex",
+        "tier": "TIER_3",
+        "rankingScore": 4.81,
+        "skillMatch": 5,
+        "completionRate": 0.98,
+        "speedScore": 4.2,
+        "qualityScore": 4.8,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      },
+      {
+        "operatorId": "op_3",
+        "name": "Taylor",
+        "tier": "TIER_2",
+        "rankingScore": 4.75,
+        "skillMatch": 5,
+        "completionRate": 0.95,
+        "speedScore": 3.9,
+        "qualityScore": 4.9,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      },
+      {
+        "operatorId": "op_2",
+        "name": "Jordan",
+        "tier": "TIER_2",
+        "rankingScore": 3.66,
+        "skillMatch": 2.5,
+        "completionRate": 0.91,
+        "speedScore": 4.7,
+        "qualityScore": 4.1,
+        "matchedSkills": [
+          "shopify"
+        ]
+      }
+    ],
+    "assignedOperatorId": null,
+    "qcStatus": "REVISION_REQUIRED",
+    "submissionData": {
+      "screenshots": [
+        "flow.png"
+      ],
+      "liveLinks": [
+        "https://store.example/decision-flow"
+      ],
+      "testVerifications": [
+        "conversion-check-ok"
+      ]
+    },
+    "feedbackMetrics": {
+      "beforeRecoveryRate": 2.4,
+      "afterRecoveryRate": 4.9,
+      "revenueImpact": 1800,
+      "taskSuccess": true,
+      "recordedAt": "2026-03-17T23:25:04.527Z"
+    },
+    "createdAt": "2026-03-17T23:25:04.525Z",
+    "updatedAt": "2026-03-17T23:25:04.527Z",
+    "completedAt": null
+  },
+  {
+    "id": "execution_packet__checkout_decision_optimization_v1_opp_review_approved_1773790434100_review_queue_myshopify_com_fixed_fee",
+    "packetId": "checkout_decision_optimization_v1_opp_review_approved_1773790434100_review_queue_myshopify_com_fixed_fee",
+    "packetType": "CHECKOUT_DECISION_OPTIMIZATION_V1",
+    "taskTitle": "Improve checkout decision conversion",
+    "estimatedTime": "2-3 hours",
+    "basePayout": 160,
+    "bonusStructure": "Performance bonus released only after manual QC and verified revenue lift.",
+    "instructions": [
+      "Review checkout decision email flow",
+      "Replace subject lines using template set",
+      "Update email body copy",
+      "Verify triggers",
+      "Send test email"
+    ],
+    "assets": [
+      "Current checkout decision email flow export",
+      "Approved subject line template set",
+      "Merchant checkout context summary"
+    ],
+    "qcRequirements": [
+      "Screenshot proof of updated flow",
+      "Live link confirmation for the active flow",
+      "Test verification showing the recovery email was triggered"
+    ],
+    "operatorRequirements": [
+      "email",
+      "shopify"
+    ],
+    "decisionScore": 20,
+    "paymentModel": "FIXED_FEE",
+    "opportunityContext": {
+      "id": "opp_review_approved_1773790434100",
+      "shopDomain": "review-queue.myshopify.com",
+      "cartToken": null,
+      "estimatedClientValue": 3200,
+      "revenuePotential": 2600,
+      "currentRecoveryRate": 2.4,
+      "trafficVolume": 12000,
+      "confidenceScore": 5,
+      "validationMode": false,
+      "notes": null
+    },
+    "status": "ASSIGNED",
+    "operatorShortlist": [
+      {
+        "operatorId": "op_t3",
+        "name": "Alex",
+        "tier": "TIER_3",
+        "rankingScore": 4.81,
+        "skillMatch": 5,
+        "completionRate": 0.98,
+        "speedScore": 4.2,
+        "qualityScore": 4.8,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      },
+      {
+        "operatorId": "op_t2",
+        "name": "Taylor",
+        "tier": "TIER_2",
+        "rankingScore": 4.75,
+        "skillMatch": 5,
+        "completionRate": 0.95,
+        "speedScore": 3.9,
+        "qualityScore": 4.9,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      }
+    ],
+    "assignedOperatorId": "op_t3",
+    "qcStatus": "NOT_REVIEWED",
+    "submissionData": null,
+    "feedbackMetrics": null,
+    "lastReviewDecision": "APPROVE_FOR_ASSIGNMENT",
+    "reviewNotes": "Looks good for controlled assignment.",
+    "reviewedAt": "2026-03-17T23:33:54.103Z",
+    "reviewedBy": "codex_reviewer",
+    "createdAt": "2026-03-17T23:33:54.101Z",
+    "updatedAt": "2026-03-17T23:33:54.104Z",
+    "completedAt": null
+  },
+  {
+    "id": "execution_packet__checkout_decision_optimization_v1_opp_review_tier1_only_1773790434104_review_queue_myshopify_com_fixed_fee",
+    "packetId": "checkout_decision_optimization_v1_opp_review_tier1_only_1773790434104_review_queue_myshopify_com_fixed_fee",
+    "packetType": "CHECKOUT_DECISION_OPTIMIZATION_V1",
+    "taskTitle": "Improve checkout decision conversion",
+    "estimatedTime": "2-3 hours",
+    "basePayout": 160,
+    "bonusStructure": "Performance bonus released only after manual QC and verified revenue lift.",
+    "instructions": [
+      "Review checkout decision email flow",
+      "Replace subject lines using template set",
+      "Update email body copy",
+      "Verify triggers",
+      "Send test email"
+    ],
+    "assets": [
+      "Current checkout decision email flow export",
+      "Approved subject line template set",
+      "Merchant checkout context summary"
+    ],
+    "qcRequirements": [
+      "Screenshot proof of updated flow",
+      "Live link confirmation for the active flow",
+      "Test verification showing the recovery email was triggered"
+    ],
+    "operatorRequirements": [
+      "email",
+      "shopify"
+    ],
+    "decisionScore": 20,
+    "paymentModel": "FIXED_FEE",
+    "opportunityContext": {
+      "id": "opp_review_tier1-only_1773790434104",
+      "shopDomain": "review-queue.myshopify.com",
+      "cartToken": null,
+      "estimatedClientValue": 3200,
+      "revenuePotential": 2600,
+      "currentRecoveryRate": 2.4,
+      "trafficVolume": 12000,
+      "confidenceScore": 5,
+      "validationMode": false,
+      "notes": null
+    },
+    "status": "CREATED",
+    "operatorShortlist": [],
+    "assignedOperatorId": null,
+    "qcStatus": "NOT_REVIEWED",
+    "submissionData": null,
+    "feedbackMetrics": null,
+    "lastReviewDecision": null,
+    "reviewNotes": null,
+    "reviewedAt": null,
+    "reviewedBy": null,
+    "createdAt": "2026-03-17T23:33:54.104Z",
+    "updatedAt": "2026-03-17T23:33:54.104Z",
+    "completedAt": null
+  },
+  {
+    "id": "execution_packet__checkout_decision_optimization_v1_opp_review_approved_1773790471732_review_queue_myshopify_com_fixed_fee",
+    "packetId": "checkout_decision_optimization_v1_opp_review_approved_1773790471732_review_queue_myshopify_com_fixed_fee",
+    "packetType": "CHECKOUT_DECISION_OPTIMIZATION_V1",
+    "taskTitle": "Improve checkout decision conversion",
+    "estimatedTime": "2-3 hours",
+    "basePayout": 160,
+    "bonusStructure": "Performance bonus released only after manual QC and verified revenue lift.",
+    "instructions": [
+      "Review checkout decision email flow",
+      "Replace subject lines using template set",
+      "Update email body copy",
+      "Verify triggers",
+      "Send test email"
+    ],
+    "assets": [
+      "Current checkout decision email flow export",
+      "Approved subject line template set",
+      "Merchant checkout context summary"
+    ],
+    "qcRequirements": [
+      "Screenshot proof of updated flow",
+      "Live link confirmation for the active flow",
+      "Test verification showing the recovery email was triggered"
+    ],
+    "operatorRequirements": [
+      "email",
+      "shopify"
+    ],
+    "decisionScore": 20,
+    "paymentModel": "FIXED_FEE",
+    "opportunityContext": {
+      "id": "opp_review_approved_1773790471732",
+      "shopDomain": "review-queue.myshopify.com",
+      "cartToken": null,
+      "estimatedClientValue": 3200,
+      "revenuePotential": 2600,
+      "currentRecoveryRate": 2.4,
+      "trafficVolume": 12000,
+      "confidenceScore": 5,
+      "validationMode": false,
+      "notes": null
+    },
+    "status": "ASSIGNED",
+    "operatorShortlist": [
+      {
+        "operatorId": "op_t3",
+        "name": "Alex",
+        "tier": "TIER_3",
+        "rankingScore": 4.81,
+        "skillMatch": 5,
+        "completionRate": 0.98,
+        "speedScore": 4.2,
+        "qualityScore": 4.8,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      },
+      {
+        "operatorId": "op_t2",
+        "name": "Taylor",
+        "tier": "TIER_2",
+        "rankingScore": 4.75,
+        "skillMatch": 5,
+        "completionRate": 0.95,
+        "speedScore": 3.9,
+        "qualityScore": 4.9,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      }
+    ],
+    "rankedOperators": [
+      {
+        "operatorId": "op_t3",
+        "name": "Alex",
+        "tier": "TIER_3",
+        "rankingScore": 4.81,
+        "skillMatch": 5,
+        "completionRate": 0.98,
+        "speedScore": 4.2,
+        "qualityScore": 4.8,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      },
+      {
+        "operatorId": "op_t2",
+        "name": "Taylor",
+        "tier": "TIER_2",
+        "rankingScore": 4.75,
+        "skillMatch": 5,
+        "completionRate": 0.95,
+        "speedScore": 3.9,
+        "qualityScore": 4.9,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      },
+      {
+        "operatorId": "op_t1",
+        "name": "Morgan",
+        "tier": "TIER_1",
+        "rankingScore": 3.83,
+        "skillMatch": 5,
+        "completionRate": 0.65,
+        "speedScore": 2.8,
+        "qualityScore": 3,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      }
+    ],
+    "assignedOperatorId": "op_t3",
+    "qcStatus": "NOT_REVIEWED",
+    "submissionData": null,
+    "feedbackMetrics": null,
+    "lastReviewDecision": "APPROVE_FOR_ASSIGNMENT",
+    "reviewNotes": "Looks good for controlled assignment.",
+    "reviewedAt": "2026-03-17T23:34:31.734Z",
+    "reviewedBy": "codex_reviewer",
+    "createdAt": "2026-03-17T23:34:31.732Z",
+    "updatedAt": "2026-03-17T23:34:31.735Z",
+    "completedAt": null
+  },
+  {
+    "id": "execution_packet__checkout_decision_optimization_v1_opp_review_tier1_only_1773790471735_review_queue_myshopify_com_fixed_fee",
+    "packetId": "checkout_decision_optimization_v1_opp_review_tier1_only_1773790471735_review_queue_myshopify_com_fixed_fee",
+    "packetType": "CHECKOUT_DECISION_OPTIMIZATION_V1",
+    "taskTitle": "Improve checkout decision conversion",
+    "estimatedTime": "2-3 hours",
+    "basePayout": 160,
+    "bonusStructure": "Performance bonus released only after manual QC and verified revenue lift.",
+    "instructions": [
+      "Review checkout decision email flow",
+      "Replace subject lines using template set",
+      "Update email body copy",
+      "Verify triggers",
+      "Send test email"
+    ],
+    "assets": [
+      "Current checkout decision email flow export",
+      "Approved subject line template set",
+      "Merchant checkout context summary"
+    ],
+    "qcRequirements": [
+      "Screenshot proof of updated flow",
+      "Live link confirmation for the active flow",
+      "Test verification showing the recovery email was triggered"
+    ],
+    "operatorRequirements": [
+      "email",
+      "shopify"
+    ],
+    "decisionScore": 20,
+    "paymentModel": "FIXED_FEE",
+    "opportunityContext": {
+      "id": "opp_review_tier1-only_1773790471735",
+      "shopDomain": "review-queue.myshopify.com",
+      "cartToken": null,
+      "estimatedClientValue": 3200,
+      "revenuePotential": 2600,
+      "currentRecoveryRate": 2.4,
+      "trafficVolume": 12000,
+      "confidenceScore": 5,
+      "validationMode": false,
+      "notes": null
+    },
+    "status": "CREATED",
+    "operatorShortlist": [],
+    "rankedOperators": [
+      {
+        "operatorId": "op_t1",
+        "name": "Morgan",
+        "tier": "TIER_1",
+        "rankingScore": 3.83,
+        "skillMatch": 5,
+        "completionRate": 0.65,
+        "speedScore": 2.8,
+        "qualityScore": 3,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      }
+    ],
+    "assignedOperatorId": null,
+    "qcStatus": "NOT_REVIEWED",
+    "submissionData": null,
+    "feedbackMetrics": null,
+    "lastReviewDecision": null,
+    "reviewNotes": null,
+    "reviewedAt": null,
+    "reviewedBy": null,
+    "createdAt": "2026-03-17T23:34:31.735Z",
+    "updatedAt": "2026-03-17T23:34:31.735Z",
+    "completedAt": null
+  },
+  {
+    "id": "execution_packet__checkout_decision_optimization_v1_opp_review_rejected_1773790471736_review_queue_myshopify_com_fixed_fee",
+    "packetId": "checkout_decision_optimization_v1_opp_review_rejected_1773790471736_review_queue_myshopify_com_fixed_fee",
+    "packetType": "CHECKOUT_DECISION_OPTIMIZATION_V1",
+    "taskTitle": "Improve checkout decision conversion",
+    "estimatedTime": "2-3 hours",
+    "basePayout": 160,
+    "bonusStructure": "Performance bonus released only after manual QC and verified revenue lift.",
+    "instructions": [
+      "Review checkout decision email flow",
+      "Replace subject lines using template set",
+      "Update email body copy",
+      "Verify triggers",
+      "Send test email"
+    ],
+    "assets": [
+      "Current checkout decision email flow export",
+      "Approved subject line template set",
+      "Merchant checkout context summary"
+    ],
+    "qcRequirements": [
+      "Screenshot proof of updated flow",
+      "Live link confirmation for the active flow",
+      "Test verification showing the recovery email was triggered"
+    ],
+    "operatorRequirements": [
+      "email",
+      "shopify"
+    ],
+    "decisionScore": 20,
+    "paymentModel": "FIXED_FEE",
+    "opportunityContext": {
+      "id": "opp_review_rejected_1773790471736",
+      "shopDomain": "review-queue.myshopify.com",
+      "cartToken": null,
+      "estimatedClientValue": 3200,
+      "revenuePotential": 2600,
+      "currentRecoveryRate": 2.4,
+      "trafficVolume": 12000,
+      "confidenceScore": 5,
+      "validationMode": false,
+      "notes": null
+    },
+    "status": "REJECTED",
+    "operatorShortlist": [
+      {
+        "operatorId": "op_t3",
+        "name": "Alex",
+        "tier": "TIER_3",
+        "rankingScore": 4.81,
+        "skillMatch": 5,
+        "completionRate": 0.98,
+        "speedScore": 4.2,
+        "qualityScore": 4.8,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      },
+      {
+        "operatorId": "op_t2",
+        "name": "Taylor",
+        "tier": "TIER_2",
+        "rankingScore": 4.75,
+        "skillMatch": 5,
+        "completionRate": 0.95,
+        "speedScore": 3.9,
+        "qualityScore": 4.9,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      }
+    ],
+    "rankedOperators": [
+      {
+        "operatorId": "op_t3",
+        "name": "Alex",
+        "tier": "TIER_3",
+        "rankingScore": 4.81,
+        "skillMatch": 5,
+        "completionRate": 0.98,
+        "speedScore": 4.2,
+        "qualityScore": 4.8,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      },
+      {
+        "operatorId": "op_t2",
+        "name": "Taylor",
+        "tier": "TIER_2",
+        "rankingScore": 4.75,
+        "skillMatch": 5,
+        "completionRate": 0.95,
+        "speedScore": 3.9,
+        "qualityScore": 4.9,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      },
+      {
+        "operatorId": "op_t1",
+        "name": "Morgan",
+        "tier": "TIER_1",
+        "rankingScore": 3.83,
+        "skillMatch": 5,
+        "completionRate": 0.65,
+        "speedScore": 2.8,
+        "qualityScore": 3,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      }
+    ],
+    "assignedOperatorId": null,
+    "qcStatus": "NOT_REVIEWED",
+    "submissionData": null,
+    "feedbackMetrics": null,
+    "lastReviewDecision": "REJECT_PACKET",
+    "reviewNotes": "Decision packet is not strong enough to advance.",
+    "reviewedAt": "2026-03-17T23:34:31.736Z",
+    "reviewedBy": "codex_reviewer",
+    "createdAt": "2026-03-17T23:34:31.736Z",
+    "updatedAt": "2026-03-17T23:34:31.736Z",
+    "completedAt": null
+  },
+  {
+    "id": "execution_packet__checkout_decision_optimization_v1_opp_human_packet_exec_control_myshopify_com_fixed_fee",
+    "packetId": "checkout_decision_optimization_v1_opp_human_packet_exec_control_myshopify_com_fixed_fee",
+    "packetType": "CHECKOUT_DECISION_OPTIMIZATION_V1",
+    "taskTitle": "Improve checkout decision conversion",
+    "estimatedTime": "2-3 hours",
+    "basePayout": 160,
+    "bonusStructure": "Performance bonus released only after manual QC and verified revenue lift.",
+    "instructions": [
+      "Review checkout decision email flow",
+      "Replace subject lines using template set",
+      "Update email body copy",
+      "Verify triggers",
+      "Send test email"
+    ],
+    "assets": [
+      "Current checkout decision email flow export",
+      "Approved subject line template set",
+      "Merchant checkout context summary"
+    ],
+    "qcRequirements": [
+      "Screenshot proof of updated flow",
+      "Live link confirmation for the active flow",
+      "Test verification showing the recovery email was triggered"
+    ],
+    "operatorRequirements": [
+      "email",
+      "shopify"
+    ],
+    "decisionScore": 20,
+    "paymentModel": "FIXED_FEE",
+    "estimatedRevenueImpact": 3200,
+    "opportunityContext": {
+      "id": "opp_human_packet",
+      "shopDomain": "exec-control.myshopify.com",
+      "cartToken": null,
+      "estimatedRevenueImpact": 3200,
+      "revenuePotential": 2600,
+      "currentRecoveryRate": 2.4,
+      "trafficVolume": 12000,
+      "confidenceScore": 5,
+      "validationMode": false,
+      "notes": null
+    },
+    "status": "CREATED",
+    "operatorShortlist": [
+      {
+        "operatorId": "op_t3",
+        "name": "Alex",
+        "tier": "TIER_3",
+        "rankingScore": 4.81,
+        "skillMatch": 5,
+        "completionRate": 0.98,
+        "speedScore": 4.2,
+        "qualityScore": 4.8,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      },
+      {
+        "operatorId": "op_t2",
+        "name": "Taylor",
+        "tier": "TIER_2",
+        "rankingScore": 4.75,
+        "skillMatch": 5,
+        "completionRate": 0.95,
+        "speedScore": 3.9,
+        "qualityScore": 4.9,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      }
+    ],
+    "rankedOperators": [
+      {
+        "operatorId": "op_t3",
+        "name": "Alex",
+        "tier": "TIER_3",
+        "rankingScore": 4.81,
+        "skillMatch": 5,
+        "completionRate": 0.98,
+        "speedScore": 4.2,
+        "qualityScore": 4.8,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      },
+      {
+        "operatorId": "op_t2",
+        "name": "Taylor",
+        "tier": "TIER_2",
+        "rankingScore": 4.75,
+        "skillMatch": 5,
+        "completionRate": 0.95,
+        "speedScore": 3.9,
+        "qualityScore": 4.9,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      }
+    ],
+    "assignedOperatorId": null,
+    "qcStatus": "NOT_REVIEWED",
+    "submissionData": null,
+    "feedbackMetrics": null,
+    "lastReviewDecision": null,
+    "reviewNotes": null,
+    "reviewedAt": null,
+    "reviewedBy": null,
+    "createdAt": "2026-03-18T00:05:42.634Z",
+    "updatedAt": "2026-03-18T00:05:42.636Z",
+    "completedAt": null
+  },
+  {
+    "id": "execution_packet__checkout_decision_optimization_v1_opp_pricing_force_human_pricing_myshopify_com_fixed_fee",
+    "packetId": "checkout_decision_optimization_v1_opp_pricing_force_human_pricing_myshopify_com_fixed_fee",
+    "packetType": "CHECKOUT_DECISION_OPTIMIZATION_V1",
+    "taskTitle": "Improve checkout decision conversion",
+    "estimatedTime": "2-3 hours",
+    "basePayout": 160,
+    "bonusStructure": "Performance bonus released only after manual QC and verified revenue lift.",
+    "instructions": [
+      "Review checkout decision email flow",
+      "Replace subject lines using template set",
+      "Update email body copy",
+      "Verify triggers",
+      "Send test email"
+    ],
+    "assets": [
+      "Current checkout decision email flow export",
+      "Approved subject line template set",
+      "Merchant checkout context summary"
+    ],
+    "qcRequirements": [
+      "Screenshot proof of updated flow",
+      "Live link confirmation for the active flow",
+      "Test verification showing the recovery email was triggered"
+    ],
+    "operatorRequirements": [
+      "email",
+      "shopify"
+    ],
+    "decisionScore": 20,
+    "paymentModel": "FIXED_FEE",
+    "estimatedRevenueImpact": 3200,
+    "opportunityContext": {
+      "id": "opp_pricing_force_human",
+      "shopDomain": "pricing.myshopify.com",
+      "cartToken": null,
+      "estimatedRevenueImpact": 3200,
+      "revenuePotential": 2600,
+      "currentRecoveryRate": 2.4,
+      "trafficVolume": 12000,
+      "confidenceScore": 5,
+      "validationMode": false,
+      "notes": null
+    },
+    "status": "CREATED",
+    "operatorShortlist": [
+      {
+        "operatorId": "op_t3",
+        "name": "Alex",
+        "tier": "TIER_3",
+        "rankingScore": 4.81,
+        "skillMatch": 5,
+        "completionRate": 0.98,
+        "speedScore": 4.2,
+        "qualityScore": 4.8,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      },
+      {
+        "operatorId": "op_t2",
+        "name": "Taylor",
+        "tier": "TIER_2",
+        "rankingScore": 4.75,
+        "skillMatch": 5,
+        "completionRate": 0.95,
+        "speedScore": 3.9,
+        "qualityScore": 4.9,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      }
+    ],
+    "rankedOperators": [
+      {
+        "operatorId": "op_t3",
+        "name": "Alex",
+        "tier": "TIER_3",
+        "rankingScore": 4.81,
+        "skillMatch": 5,
+        "completionRate": 0.98,
+        "speedScore": 4.2,
+        "qualityScore": 4.8,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      },
+      {
+        "operatorId": "op_t2",
+        "name": "Taylor",
+        "tier": "TIER_2",
+        "rankingScore": 4.75,
+        "skillMatch": 5,
+        "completionRate": 0.95,
+        "speedScore": 3.9,
+        "qualityScore": 4.9,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      }
+    ],
+    "assignedOperatorId": null,
+    "qcStatus": "NOT_REVIEWED",
+    "submissionData": null,
+    "feedbackMetrics": null,
+    "lastReviewDecision": null,
+    "reviewNotes": null,
+    "reviewedAt": null,
+    "reviewedBy": null,
+    "createdAt": "2026-03-18T00:05:42.638Z",
+    "updatedAt": "2026-03-18T00:05:42.638Z",
+    "completedAt": null
+  },
+  {
+    "id": "execution_packet__checkout_decision_optimization_v1_opp_high_missing_payment_revenue_gate_myshopify_com_unknown_payment",
+    "packetId": "checkout_decision_optimization_v1_opp_high_missing_payment_revenue_gate_myshopify_com_unknown_payment",
+    "packetType": "CHECKOUT_DECISION_OPTIMIZATION_V1",
+    "taskTitle": "Improve checkout decision conversion",
+    "estimatedTime": "2-3 hours",
+    "basePayout": 160,
+    "bonusStructure": "Performance bonus released only after manual QC and verified revenue lift.",
+    "instructions": [
+      "Review checkout decision email flow",
+      "Replace subject lines using template set",
+      "Update email body copy",
+      "Verify triggers",
+      "Send test email"
+    ],
+    "assets": [
+      "Current checkout decision email flow export",
+      "Approved subject line template set",
+      "Merchant checkout context summary"
+    ],
+    "qcRequirements": [
+      "Screenshot proof of updated flow",
+      "Live link confirmation for the active flow",
+      "Test verification showing the recovery email was triggered"
+    ],
+    "operatorRequirements": [
+      "email",
+      "shopify"
+    ],
+    "decisionScore": 20,
+    "paymentModel": "",
+    "estimatedRevenueImpact": 2600,
+    "opportunityContext": {
+      "id": "opp_high_missing_payment",
+      "shopDomain": "revenue-gate.myshopify.com",
+      "cartToken": null,
+      "estimatedRevenueImpact": 2600,
+      "revenuePotential": 2600,
+      "currentRecoveryRate": 2.4,
+      "trafficVolume": 12000,
+      "confidenceScore": 5,
+      "validationMode": false,
+      "notes": null
+    },
+    "status": "CREATED",
+    "operatorShortlist": [
+      {
+        "operatorId": "op_1",
+        "name": "Alex",
+        "tier": "TIER_3",
+        "rankingScore": 4.81,
+        "skillMatch": 5,
+        "completionRate": 0.98,
+        "speedScore": 4.2,
+        "qualityScore": 4.8,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      }
+    ],
+    "rankedOperators": [
+      {
+        "operatorId": "op_1",
+        "name": "Alex",
+        "tier": "TIER_3",
+        "rankingScore": 4.81,
+        "skillMatch": 5,
+        "completionRate": 0.98,
+        "speedScore": 4.2,
+        "qualityScore": 4.8,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      }
+    ],
+    "assignedOperatorId": null,
+    "qcStatus": "NOT_REVIEWED",
+    "submissionData": null,
+    "feedbackMetrics": null,
+    "lastReviewDecision": null,
+    "reviewNotes": null,
+    "reviewedAt": null,
+    "reviewedBy": null,
+    "createdAt": "2026-03-18T00:25:05.153Z",
+    "updatedAt": "2026-03-18T00:25:05.153Z",
+    "completedAt": null
+  },
+  {
+    "id": "execution_packet__checkout_decision_optimization_v1_opp_process_unblock_agreement_layer_myshopify_com_unknown_payment",
+    "packetId": "checkout_decision_optimization_v1_opp_process_unblock_agreement_layer_myshopify_com_unknown_payment",
+    "packetType": "CHECKOUT_DECISION_OPTIMIZATION_V1",
+    "taskTitle": "Improve checkout decision conversion",
+    "estimatedTime": "2-3 hours",
+    "basePayout": 160,
+    "bonusStructure": "Performance bonus released only after manual QC and verified revenue lift.",
+    "instructions": [
+      "Review checkout decision email flow",
+      "Replace subject lines using template set",
+      "Update email body copy",
+      "Verify triggers",
+      "Send test email"
+    ],
+    "assets": [
+      "Current checkout decision email flow export",
+      "Approved subject line template set",
+      "Merchant checkout context summary"
+    ],
+    "qcRequirements": [
+      "Screenshot proof of updated flow",
+      "Live link confirmation for the active flow",
+      "Test verification showing the recovery email was triggered"
+    ],
+    "operatorRequirements": [
+      "email",
+      "shopify"
+    ],
+    "decisionScore": 20,
+    "paymentModel": "",
+    "estimatedRevenueImpact": 2600,
+    "opportunityContext": {
+      "id": "opp_process_unblock",
+      "shopDomain": "agreement-layer.myshopify.com",
+      "cartToken": null,
+      "estimatedRevenueImpact": 2600,
+      "revenuePotential": 2600,
+      "currentRecoveryRate": 2.4,
+      "trafficVolume": 12000,
+      "confidenceScore": 5,
+      "validationMode": false,
+      "notes": null
+    },
+    "status": "CREATED",
+    "operatorShortlist": [
+      {
+        "operatorId": "op_1",
+        "name": "Alex",
+        "tier": "TIER_3",
+        "rankingScore": 4.81,
+        "skillMatch": 5,
+        "completionRate": 0.98,
+        "speedScore": 4.2,
+        "qualityScore": 4.8,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      }
+    ],
+    "rankedOperators": [
+      {
+        "operatorId": "op_1",
+        "name": "Alex",
+        "tier": "TIER_3",
+        "rankingScore": 4.81,
+        "skillMatch": 5,
+        "completionRate": 0.98,
+        "speedScore": 4.2,
+        "qualityScore": 4.8,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      }
+    ],
+    "assignedOperatorId": null,
+    "qcStatus": "NOT_REVIEWED",
+    "submissionData": null,
+    "feedbackMetrics": null,
+    "lastReviewDecision": null,
+    "reviewNotes": null,
+    "reviewedAt": null,
+    "reviewedBy": null,
+    "createdAt": "2026-03-18T00:25:05.595Z",
+    "updatedAt": "2026-03-18T00:25:05.595Z",
+    "completedAt": null
+  },
+  {
+    "id": "execution_packet__checkout_decision_optimization_v1_opp_process_unblock_agreement_layer_myshopify_com_fixed_fee",
+    "packetId": "checkout_decision_optimization_v1_opp_process_unblock_agreement_layer_myshopify_com_fixed_fee",
+    "packetType": "CHECKOUT_DECISION_OPTIMIZATION_V1",
+    "taskTitle": "Improve checkout decision conversion",
+    "estimatedTime": "2-3 hours",
+    "basePayout": 160,
+    "bonusStructure": "Performance bonus released only after manual QC and verified revenue lift.",
+    "instructions": [
+      "Review checkout decision email flow",
+      "Replace subject lines using template set",
+      "Update email body copy",
+      "Verify triggers",
+      "Send test email"
+    ],
+    "assets": [
+      "Current checkout decision email flow export",
+      "Approved subject line template set",
+      "Merchant checkout context summary"
+    ],
+    "qcRequirements": [
+      "Screenshot proof of updated flow",
+      "Live link confirmation for the active flow",
+      "Test verification showing the recovery email was triggered"
+    ],
+    "operatorRequirements": [
+      "email",
+      "shopify"
+    ],
+    "decisionScore": 20,
+    "paymentModel": "FIXED_FEE",
+    "estimatedRevenueImpact": 2600,
+    "opportunityContext": {
+      "id": "opp_process_unblock",
+      "shopDomain": "agreement-layer.myshopify.com",
+      "cartToken": null,
+      "estimatedRevenueImpact": 2600,
+      "revenuePotential": 2600,
+      "currentRecoveryRate": 2.4,
+      "trafficVolume": 12000,
+      "confidenceScore": 5,
+      "validationMode": false,
+      "notes": null
+    },
+    "status": "CREATED",
+    "operatorShortlist": [
+      {
+        "operatorId": "op_1",
+        "name": "Alex",
+        "tier": "TIER_3",
+        "rankingScore": 4.81,
+        "skillMatch": 5,
+        "completionRate": 0.98,
+        "speedScore": 4.2,
+        "qualityScore": 4.8,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      }
+    ],
+    "rankedOperators": [
+      {
+        "operatorId": "op_1",
+        "name": "Alex",
+        "tier": "TIER_3",
+        "rankingScore": 4.81,
+        "skillMatch": 5,
+        "completionRate": 0.98,
+        "speedScore": 4.2,
+        "qualityScore": 4.8,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      }
+    ],
+    "assignedOperatorId": null,
+    "qcStatus": "NOT_REVIEWED",
+    "submissionData": null,
+    "feedbackMetrics": null,
+    "lastReviewDecision": null,
+    "reviewNotes": null,
+    "reviewedAt": null,
+    "reviewedBy": null,
+    "createdAt": "2026-03-18T00:25:51.529Z",
+    "updatedAt": "2026-03-18T00:25:51.530Z",
+    "completedAt": null
+  },
+  {
+    "id": "execution_packet__checkout_decision_optimization_v1_opp_high_missing_payment_revenue_gate_myshopify_com_hybrid",
+    "packetId": "checkout_decision_optimization_v1_opp_high_missing_payment_revenue_gate_myshopify_com_hybrid",
+    "packetType": "CHECKOUT_DECISION_OPTIMIZATION_V1",
+    "taskTitle": "Improve checkout decision conversion",
+    "estimatedTime": "2-3 hours",
+    "basePayout": 160,
+    "bonusStructure": "Performance bonus released only after manual QC and verified revenue lift.",
+    "instructions": [
+      "Review checkout decision email flow",
+      "Replace subject lines using template set",
+      "Update email body copy",
+      "Verify triggers",
+      "Send test email"
+    ],
+    "assets": [
+      "Current checkout decision email flow export",
+      "Approved subject line template set",
+      "Merchant checkout context summary"
+    ],
+    "qcRequirements": [
+      "Screenshot proof of updated flow",
+      "Live link confirmation for the active flow",
+      "Test verification showing the recovery email was triggered"
+    ],
+    "operatorRequirements": [
+      "email",
+      "shopify"
+    ],
+    "decisionScore": 20,
+    "paymentModel": "HYBRID",
+    "estimatedRevenueImpact": 2600,
+    "opportunityContext": {
+      "id": "opp_high_missing_payment",
+      "shopDomain": "revenue-gate.myshopify.com",
+      "cartToken": null,
+      "estimatedRevenueImpact": 2600,
+      "revenuePotential": 2600,
+      "currentRecoveryRate": 2.4,
+      "trafficVolume": 12000,
+      "confidenceScore": 5,
+      "validationMode": false,
+      "notes": null
+    },
+    "status": "CREATED",
+    "operatorShortlist": [
+      {
+        "operatorId": "op_1",
+        "name": "Alex",
+        "tier": "TIER_3",
+        "rankingScore": 4.81,
+        "skillMatch": 5,
+        "completionRate": 0.98,
+        "speedScore": 4.2,
+        "qualityScore": 4.8,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      }
+    ],
+    "rankedOperators": [
+      {
+        "operatorId": "op_1",
+        "name": "Alex",
+        "tier": "TIER_3",
+        "rankingScore": 4.81,
+        "skillMatch": 5,
+        "completionRate": 0.98,
+        "speedScore": 4.2,
+        "qualityScore": 4.8,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      }
+    ],
+    "assignedOperatorId": null,
+    "qcStatus": "NOT_REVIEWED",
+    "submissionData": null,
+    "feedbackMetrics": null,
+    "lastReviewDecision": null,
+    "reviewNotes": null,
+    "reviewedAt": null,
+    "reviewedBy": null,
+    "createdAt": "2026-03-18T00:25:51.964Z",
+    "updatedAt": "2026-03-18T00:25:51.965Z",
+    "completedAt": null
+  },
+  {
+    "id": "execution_packet__checkout_decision_optimization_v1_opp_process_unblock_1773793599433_agreement_layer_myshopify_com_fixed_fee",
+    "packetId": "checkout_decision_optimization_v1_opp_process_unblock_1773793599433_agreement_layer_myshopify_com_fixed_fee",
+    "packetType": "CHECKOUT_DECISION_OPTIMIZATION_V1",
+    "taskTitle": "Improve checkout decision conversion",
+    "estimatedTime": "2-3 hours",
+    "basePayout": 160,
+    "bonusStructure": "Performance bonus released only after manual QC and verified revenue lift.",
+    "instructions": [
+      "Review checkout decision email flow",
+      "Replace subject lines using template set",
+      "Update email body copy",
+      "Verify triggers",
+      "Send test email"
+    ],
+    "assets": [
+      "Current checkout decision email flow export",
+      "Approved subject line template set",
+      "Merchant checkout context summary"
+    ],
+    "qcRequirements": [
+      "Screenshot proof of updated flow",
+      "Live link confirmation for the active flow",
+      "Test verification showing the recovery email was triggered"
+    ],
+    "operatorRequirements": [
+      "email",
+      "shopify"
+    ],
+    "decisionScore": 20,
+    "paymentModel": "FIXED_FEE",
+    "estimatedRevenueImpact": 2600,
+    "opportunityContext": {
+      "id": "opp_process_unblock_1773793599433",
+      "shopDomain": "agreement-layer.myshopify.com",
+      "cartToken": null,
+      "estimatedRevenueImpact": 2600,
+      "revenuePotential": 2600,
+      "currentRecoveryRate": 2.4,
+      "trafficVolume": 12000,
+      "confidenceScore": 5,
+      "validationMode": false,
+      "notes": null
+    },
+    "status": "CREATED",
+    "operatorShortlist": [
+      {
+        "operatorId": "op_1",
+        "name": "Alex",
+        "tier": "TIER_3",
+        "rankingScore": 4.81,
+        "skillMatch": 5,
+        "completionRate": 0.98,
+        "speedScore": 4.2,
+        "qualityScore": 4.8,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      }
+    ],
+    "rankedOperators": [
+      {
+        "operatorId": "op_1",
+        "name": "Alex",
+        "tier": "TIER_3",
+        "rankingScore": 4.81,
+        "skillMatch": 5,
+        "completionRate": 0.98,
+        "speedScore": 4.2,
+        "qualityScore": 4.8,
+        "matchedSkills": [
+          "email",
+          "shopify"
+        ]
+      }
+    ],
+    "assignedOperatorId": null,
+    "qcStatus": "NOT_REVIEWED",
+    "submissionData": null,
+    "feedbackMetrics": null,
+    "lastReviewDecision": null,
+    "reviewNotes": null,
+    "reviewedAt": null,
+    "reviewedBy": null,
+    "createdAt": "2026-03-18T00:26:39.435Z",
+    "updatedAt": "2026-03-18T00:26:39.436Z",
+    "completedAt": null
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "execution_gate__operator_decision__snapshot__1773355306164",
+    "operator_decision_id": "operator_decision__snapshot__1773355306164",
+    "action_type": "wait",
+    "target_module": "operator_brain",
+    "allowed": true,
+    "reason": "Waiting is allowed because the current state does not require a new automated action.",
+    "requires_approval": false,
+    "risk_level": "low",
+    "execution_mode": "auto",
+    "created_at": "2026-03-12T23:10:49.995Z"
+  }
+]
