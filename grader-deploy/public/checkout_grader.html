@@ -1,0 +1,1057 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fix Your Shopify Checkout</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f5f1e8;
+        --panel: #fffdf8;
+        --ink: #1c1917;
+        --muted: #6b6257;
+        --line: #e7dccd;
+        --accent: #166534;
+        --accent-dark: #0f3d24;
+        --cta-bg: #171411;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        background:
+          radial-gradient(circle at top, rgba(241, 181, 91, 0.15), transparent 35%),
+          linear-gradient(180deg, #f8f4ec 0%, var(--bg) 100%);
+        color: var(--ink);
+      }
+
+      .shell {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 48px 20px 72px;
+      }
+
+      .hero {
+        text-align: center;
+        max-width: 760px;
+        margin: 0 auto 34px;
+      }
+
+      .eyebrow {
+        margin: 0 0 12px;
+        color: var(--muted);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        font-size: 0.78rem;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.4rem, 6vw, 4.25rem);
+        line-height: 0.96;
+      }
+
+      .hero p {
+        margin: 18px auto 0;
+        font-size: 1.08rem;
+        line-height: 1.65;
+        color: var(--muted);
+        max-width: 640px;
+      }
+
+      .input-shell {
+        margin: 30px auto 0;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+        max-width: 720px;
+        background: rgba(255, 253, 248, 0.78);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 12px;
+        box-shadow: 0 22px 60px rgba(28, 25, 23, 0.08);
+      }
+
+      input {
+        width: 100%;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        padding: 14px 16px;
+        font: inherit;
+        font-size: 1rem;
+        color: var(--ink);
+      }
+
+      button {
+        border: 0;
+        outline: 0;
+        border-radius: 14px;
+        padding: 16px 24px;
+        background: var(--accent);
+        color: white;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+        min-width: 200px;
+        box-shadow: 0 14px 30px rgba(22, 101, 52, 0.28);
+      }
+
+      button:hover,
+      button:focus-visible {
+        background: var(--accent-dark);
+      }
+
+      button:disabled {
+        opacity: 0.7;
+        cursor: wait;
+      }
+
+      .status {
+        min-height: 24px;
+        text-align: center;
+        margin-bottom: 16px;
+        color: var(--muted);
+      }
+
+      .status.error {
+        color: #9f1239;
+      }
+
+      .report {
+        display: none;
+      }
+
+      .report.visible {
+        display: block;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 18px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 20px 50px rgba(28, 25, 23, 0.06);
+      }
+
+      .score-card {
+        text-align: center;
+      }
+
+      .store {
+        color: var(--muted);
+        margin-bottom: 14px;
+      }
+
+      .score {
+        font-size: clamp(4rem, 10vw, 5.5rem);
+        line-height: 0.92;
+        font-weight: 700;
+        margin: 0;
+      }
+
+      .score-label {
+        margin-top: 8px;
+        color: var(--muted);
+      }
+
+      .tier {
+        margin-top: 14px;
+        font-weight: 700;
+      }
+
+      .percentile {
+        margin-top: 6px;
+        color: var(--muted);
+      }
+
+      .meta {
+        margin-top: 22px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .meta-row,
+      .comparison-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid #efe6da;
+      }
+
+      .meta-row:last-child,
+      .comparison-row:last-child {
+        border-bottom: 0;
+      }
+
+      .meta-label,
+      .comparison-label,
+      .section-title {
+        color: var(--muted);
+      }
+
+      .meta-value,
+      .comparison-value {
+        font-weight: 700;
+        text-align: right;
+      }
+
+      .section-title {
+        margin: 0 0 14px;
+        font-size: 0.95rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: #fbf4e7;
+        color: #6b4f1d;
+        font-weight: 700;
+      }
+
+      .signal-lists {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--ink);
+      }
+
+      li + li {
+        margin-top: 8px;
+      }
+
+      .revenue {
+        margin-top: 18px;
+        font-size: 2rem;
+        font-weight: 700;
+      }
+
+      .comparison {
+        display: grid;
+        gap: 8px;
+      }
+
+      .recommendation-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+
+      .recommendation-copy {
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .lift {
+        margin-top: 16px;
+        font-weight: 700;
+      }
+
+      .badge-html {
+        margin-top: 14px;
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px dashed var(--line);
+        background: #faf5ec;
+        font-family: "SFMono-Regular", Menlo, monospace;
+        font-size: 0.92rem;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .copy-button {
+        margin-top: 12px;
+        min-width: 0;
+        padding: 12px 16px;
+      }
+
+      .share-box {
+        width: 100%;
+        min-height: 160px;
+        margin-top: 14px;
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: #faf5ec;
+        font: inherit;
+        color: var(--ink);
+        resize: vertical;
+      }
+
+      .share-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 12px;
+      }
+
+      .share-feedback {
+        min-height: 22px;
+        margin-top: 10px;
+        color: var(--muted);
+      }
+
+      .comparison-hero {
+        margin-top: 18px;
+      }
+
+      .comparison-hero-grid {
+        display: grid;
+        gap: 10px;
+      }
+
+      .comparison-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 16px;
+      }
+
+      .secondary-button {
+        background: transparent;
+        color: var(--ink);
+        border: 1px solid var(--line);
+        box-shadow: none;
+      }
+
+      .secondary-button:hover,
+      .secondary-button:focus-visible {
+        background: #f5ecdf;
+      }
+
+      .rank-card {
+        margin-top: 18px;
+        padding: 18px;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: linear-gradient(180deg, #fff7ea 0%, #f3e0bf 100%);
+        box-shadow: 0 16px 40px rgba(28, 25, 23, 0.08);
+        text-align: left;
+      }
+
+      .rank-card-title {
+        font-size: 0.9rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .rank-card-value {
+        margin-top: 10px;
+        font-size: 1.55rem;
+        font-weight: 700;
+        line-height: 1.2;
+      }
+
+      .verified-badge-card {
+        margin-top: 14px;
+        padding: 18px;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: linear-gradient(180deg, #fffdf8 0%, #f6ecdc 100%);
+      }
+
+      .verified-badge-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+      }
+
+      .verified-badge-subtitle {
+        margin-top: 8px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .verified-badge-score-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-top: 14px;
+      }
+
+      .verified-badge-score-chip {
+        padding: 12px 14px;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.7);
+      }
+
+      .verified-badge-score-chip strong {
+        display: block;
+        font-size: 1.5rem;
+        line-height: 1;
+      }
+
+      .verified-badge-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 14px;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .cta-card {
+        margin-top: 18px;
+        background: var(--cta-bg);
+        color: white;
+        border-radius: 22px;
+        padding: 28px;
+        text-align: center;
+      }
+
+      .cta-card h3 {
+        margin: 0 0 10px;
+        font-size: 1.5rem;
+      }
+
+      .cta-card p {
+        margin: 0;
+        color: rgba(255, 253, 248, 0.82);
+        line-height: 1.7;
+      }
+
+      .cta-card .lift-value {
+        margin-top: 18px;
+        font-size: 1.45rem;
+        font-weight: 700;
+      }
+
+      .cta-card a {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+        border-radius: 14px;
+        padding: 15px 24px;
+        min-width: 260px;
+        text-decoration: none;
+        font-weight: 700;
+        background: #16a34a;
+        color: white;
+        box-shadow: 0 14px 30px rgba(22, 163, 74, 0.28);
+      }
+
+      @media (max-width: 860px) {
+        .grid,
+        .signal-lists {
+          grid-template-columns: 1fr;
+        }
+
+        .input-shell {
+          grid-template-columns: 1fr;
+        }
+
+        button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <p class="eyebrow">Abando Checkout Intelligence</p>
+        <h1>Find Where Your Store Is Leaking Revenue</h1>
+        <p>
+          Abando scans your checkout and estimates how much revenue your store may be losing every month.
+        </p>
+        <div class="input-shell">
+          <input id="store-input" type="text" placeholder="your-store.myshopify.com" value="prose.com" />
+          <button id="analyze-button" type="button">Analyze Checkout</button>
+        </div>
+      </section>
+
+      <div id="status" class="status"></div>
+
+      <section id="report" class="report">
+        <div class="grid">
+          <div class="panel score-card">
+            <div id="store-label" class="store"></div>
+            <div id="score" class="score">--</div>
+            <div class="score-label">Checkout Score</div>
+            <div id="tier" class="tier"></div>
+            <div id="percentile" class="percentile"></div>
+          <div class="meta">
+            <div class="meta-row">
+              <span class="meta-label">Peer Average</span>
+              <span id="peer-average" class="meta-value"></span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">Top Friction</span>
+              <span id="top-friction" class="meta-value"></span>
+            </div>
+          </div>
+
+          <div class="rank-card">
+            <div class="rank-card-title">Checkout Rank</div>
+            <div id="checkout-rank-text" class="rank-card-value"></div>
+          </div>
+        </div>
+
+          <div class="panel">
+            <div class="section-title">Potential Revenue Recovery</div>
+            <div id="revenue" class="revenue">$0 / month</div>
+            <div class="section-title" style="margin-top: 24px;">Checkout Comparison</div>
+            <div class="comparison">
+              <div class="comparison-row">
+                <span class="comparison-label">Your Store</span>
+                <span id="your-score" class="comparison-value"></span>
+              </div>
+              <div class="comparison-row">
+                <span id="competitor-name" class="comparison-label">Top Shopify Brand</span>
+                <span id="competitor-score" class="comparison-value"></span>
+              </div>
+              <div class="comparison-row">
+                <span class="comparison-label">Gap</span>
+                <span id="score-gap" class="comparison-value"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top: 18px;">
+          <div class="section-title">Compare Against a Better Store</div>
+          <div class="comparison-hero-grid">
+            <div class="comparison-row">
+              <span class="comparison-label">Your Store</span>
+              <span id="comparison-your-store" class="comparison-value"></span>
+            </div>
+            <div class="comparison-row">
+              <span class="comparison-label">Top Shopify Brand</span>
+              <span id="comparison-top-store" class="comparison-value"></span>
+            </div>
+            <div class="comparison-row">
+              <span class="comparison-label">Gap</span>
+              <span id="comparison-gap" class="comparison-value"></span>
+            </div>
+          </div>
+          <div class="section-title" style="margin-top: 20px;">What top stores likely do better</div>
+          <ul id="comparison-opportunities"></ul>
+          <div class="comparison-actions">
+            <button id="comparison-scroll-button" type="button" class="copy-button">See What Top Stores Do Differently</button>
+            <button id="copy-comparison-button" type="button" class="copy-button secondary-button">Copy Comparison Summary</button>
+          </div>
+        </div>
+
+        <div id="evidence-section" class="panel" style="margin-top: 18px;">
+          <div class="section-title">Evidence Signals</div>
+          <div class="signal-lists">
+            <div>
+              <div class="section-title">Detected Signals</div>
+              <ul id="detected-signals"></ul>
+            </div>
+            <div>
+              <div class="section-title">Missing Signals</div>
+              <ul id="missing-signals"></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top: 18px;">
+          <div class="section-title">Verified Benchmark Badge</div>
+          <div id="verified-badge-card" class="verified-badge-card">
+            <div id="verified-badge-title" class="verified-badge-title"></div>
+            <div id="verified-badge-subtitle" class="verified-badge-subtitle"></div>
+            <div id="verified-badge-score-row" class="verified-badge-score-row"></div>
+            <ul id="verified-badge-gaps" class="hidden"></ul>
+          </div>
+          <div id="benchmark-badge" class="badge hidden"></div>
+          <div id="badge-html" class="badge-html hidden"></div>
+          <div class="verified-badge-actions">
+            <button id="copy-badge-button" type="button" class="copy-button hidden">Copy Verified Badge HTML</button>
+            <button id="copy-badge-text-button" type="button" class="copy-button hidden">Copy Badge Text</button>
+            <button id="copy-qualification-button" type="button" class="copy-button hidden">Copy Qualification Summary</button>
+          </div>
+        </div>
+
+        <div id="recommendation-section" class="panel" style="margin-top: 18px;">
+          <div class="section-title">Recommended Fix</div>
+          <div id="recommendation-title" class="recommendation-title"></div>
+          <div id="recommendation-description" class="recommendation-copy"></div>
+          <div class="lift">Estimated Lift</div>
+          <div id="estimated-lift" style="margin-top: 6px;"></div>
+        </div>
+
+        <div class="panel" style="margin-top: 18px;">
+          <div class="section-title">Share Your Score</div>
+          <textarea id="share-text" class="share-box" readonly></textarea>
+          <div class="share-actions">
+            <button id="copy-share-button" type="button" class="copy-button">Share My Checkout Rank</button>
+            <button id="copy-link-button" type="button" class="copy-button">Copy Report Link</button>
+          </div>
+          <div id="share-feedback" class="share-feedback"></div>
+        </div>
+
+        <div class="cta-card">
+          <h3>Fix This Checkout Issue Instantly</h3>
+          <p>
+            Abando can automatically apply this improvement to your store checkout and reduce abandonment.
+          </p>
+          <div class="lift-value">
+            Potential Revenue Recovery:
+            <span id="cta-revenue">$0 / month</span>
+          </div>
+          <a href="/install.html">Fix My Checkout With Abando</a>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const statusEl = document.getElementById("status");
+      const reportEl = document.getElementById("report");
+      const storeInput = document.getElementById("store-input");
+      const analyzeButton = document.getElementById("analyze-button");
+      const copyBadgeButton = document.getElementById("copy-badge-button");
+      const copyBadgeTextButton = document.getElementById("copy-badge-text-button");
+      const copyQualificationButton = document.getElementById("copy-qualification-button");
+      const copyShareButton = document.getElementById("copy-share-button");
+      const copyLinkButton = document.getElementById("copy-link-button");
+      const copyComparisonButton = document.getElementById("copy-comparison-button");
+      const comparisonScrollButton = document.getElementById("comparison-scroll-button");
+      const shareTextEl = document.getElementById("share-text");
+      const shareFeedbackEl = document.getElementById("share-feedback");
+      let latestReportData = null;
+
+      function titleCaseFriction(value) {
+        return String(value || "")
+          .split("_")
+          .filter(Boolean)
+          .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+          .join(" ");
+      }
+
+      function formatCurrency(value) {
+        return new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+          maximumFractionDigits: 0,
+        }).format(Number(value || 0));
+      }
+
+      function setShareFeedback(message) {
+        shareFeedbackEl.textContent = message;
+        if (!message) {
+          return;
+        }
+        setTimeout(() => {
+          if (shareFeedbackEl.textContent === message) {
+            shareFeedbackEl.textContent = "";
+          }
+        }, 1500);
+      }
+
+      function buildCurrentReportUrl(store) {
+        const url = new URL(window.location.href);
+        url.searchParams.set("store", store);
+        return url.toString();
+      }
+
+      function buildShareText(data) {
+        const reportUrl = buildCurrentReportUrl(data.store);
+        return `We ran our Shopify checkout through Abando.
+
+Checkout Score: ${data.checkout_score}
+${rankTextFromScore(data.checkout_score)}
+
+Potential revenue recovery detected.
+
+See the report:
+${reportUrl}`;
+      }
+
+      function rankTextFromScore(score) {
+        const numericScore = Number(score) || 0;
+        if (numericScore >= 90) return "Top 5% of Shopify Stores";
+        if (numericScore >= 80) return "Top 15% of Shopify Stores";
+        if (numericScore >= 70) return "Top 30% of Shopify Stores";
+        if (numericScore >= 60) return "Below Average Checkout Performance";
+        return "Bottom 30% of Shopify Stores";
+      }
+
+      function buildComparisonOpportunities(data) {
+        const items = [];
+        const missingSignals = Array.isArray(data.missing_signals) ? data.missing_signals : [];
+        for (const item of missingSignals) {
+          if (items.length >= 3) break;
+          items.push(item);
+        }
+
+        const recommendationTitle = data.recommendation?.title;
+        if (recommendationTitle && items.length < 3 && !items.includes(recommendationTitle)) {
+          items.push(recommendationTitle);
+        }
+
+        if (
+          data.top_friction &&
+          String(data.top_friction).includes("shipping") &&
+          items.length < 3 &&
+          !items.includes("Clear checkout cost preview")
+        ) {
+          items.push("Clear checkout cost preview");
+        }
+
+        return items.slice(0, 3);
+      }
+
+      function buildComparisonSummary(data) {
+        const reportUrl = buildCurrentReportUrl(data.store);
+        const opportunities = buildComparisonOpportunities(data);
+        const bulletBlock = opportunities.length
+          ? opportunities.map((item) => `- ${item}`).join("\n")
+          : "- Review the benchmark report for the next best fix";
+
+        return `${data.store} scored ${data.checkout_score} on the Abando Checkout Benchmark.
+Top Shopify brand benchmark: ${data.competitor_comparison?.competitor_score ?? "--"}.
+Current gap: ${data.competitor_comparison?.score_gap ?? "--"} points.
+
+Biggest improvement opportunities:
+${bulletBlock}
+
+See the full report:
+${reportUrl}`;
+      }
+
+      function percentileTextFromValue(percentile) {
+        if (!percentile) {
+          return "";
+        }
+        return `Top ${percentile}% of Shopify Stores`;
+      }
+
+      function getVerifiedBadgeQualification(score) {
+        const numericScore = Number(score) || 0;
+        if (numericScore >= 90) {
+          return { eligible: true, badgeTitle: "Abando Elite Checkout" };
+        }
+        if (numericScore >= 80) {
+          return { eligible: true, badgeTitle: "Abando Verified Checkout" };
+        }
+        return { eligible: false, badgeTitle: null };
+      }
+
+      function buildQualificationGaps(data) {
+        const gaps = [];
+        const missingSignals = Array.isArray(data.missing_signals) ? data.missing_signals : [];
+        for (const item of missingSignals) {
+          if (gaps.length >= 3) break;
+          gaps.push(item);
+        }
+
+        const recommendationTitle = data.recommendation?.title;
+        if (recommendationTitle && gaps.length < 3 && !gaps.includes(recommendationTitle)) {
+          gaps.push(recommendationTitle);
+        }
+
+        const scoreGap = data.competitor_comparison?.score_gap;
+        if (scoreGap && gaps.length < 3) {
+          gaps.push(`Close the ${scoreGap}-point gap with top-store checkout patterns`);
+        }
+
+        return gaps.slice(0, 3);
+      }
+
+      function buildVerifiedBadgeHtml(data, qualification) {
+        const reportUrl = buildCurrentReportUrl(data.store);
+        return `<a href="${reportUrl}" target="_blank">\n<img src="https://abando-checkout-grader.vercel.app/api/badge?score=${data.checkout_score}" alt="Abando Verified Checkout">\n</a>`;
+      }
+
+      function buildVerifiedBadgeText(data, qualification) {
+        const reportUrl = buildCurrentReportUrl(data.store);
+        const percentileText = percentileTextFromValue(data.percentile);
+        return `${data.store} earned the ${qualification.badgeTitle} from Abando Checkout Intelligence.\nCheckout score: ${data.checkout_score}\n${percentileText}\nSee the benchmark:\n${reportUrl}`;
+      }
+
+      function buildQualificationSummary(data) {
+        const reportUrl = buildCurrentReportUrl(data.store);
+        const gaps = buildQualificationGaps(data);
+        const bulletBlock = gaps.length
+          ? gaps.map((item) => `- ${item}`).join("\n")
+          : "- Review the benchmark report for the next best fix";
+
+        return `${data.store} is not yet eligible for the Abando Verified Checkout badge.\nCurrent score: ${data.checkout_score}\n\nBiggest gaps to fix:\n${bulletBlock}\n\nSee the benchmark:\n${reportUrl}`;
+      }
+
+      function renderVerifiedBadgeSection(data) {
+        const qualification = getVerifiedBadgeQualification(data.checkout_score);
+        const titleEl = document.getElementById("verified-badge-title");
+        const subtitleEl = document.getElementById("verified-badge-subtitle");
+        const scoreRowEl = document.getElementById("verified-badge-score-row");
+        const gapsEl = document.getElementById("verified-badge-gaps");
+        const badgeEl = document.getElementById("benchmark-badge");
+        const badgeHtmlEl = document.getElementById("badge-html");
+
+        if (qualification.eligible) {
+          titleEl.textContent = qualification.badgeTitle;
+          subtitleEl.textContent = "Verified by Abando";
+          scoreRowEl.innerHTML = `
+            <div class="verified-badge-score-chip">
+              <strong>${data.checkout_score}</strong>
+              <span>Score</span>
+            </div>
+            <div class="verified-badge-score-chip">
+              <strong>Top Shopify Checkout</strong>
+              <span>${percentileTextFromValue(data.percentile)}</span>
+            </div>
+          `;
+          gapsEl.innerHTML = "";
+          gapsEl.classList.add("hidden");
+
+          badgeEl.textContent = "ABANDO VERIFIED CHECKOUT";
+          badgeEl.classList.remove("hidden");
+          badgeHtmlEl.textContent = buildVerifiedBadgeHtml(data, qualification);
+          badgeHtmlEl.classList.remove("hidden");
+
+          copyBadgeButton.classList.remove("hidden");
+          copyBadgeTextButton.classList.remove("hidden");
+          copyQualificationButton.classList.add("hidden");
+          copyBadgeButton.textContent = "Copy Verified Badge HTML";
+          copyBadgeTextButton.textContent = "Copy Badge Text";
+        } else {
+          titleEl.textContent = "Not Yet Eligible for Verified Checkout";
+          subtitleEl.textContent = "Improve your checkout score to earn the Abando Verified Checkout badge.";
+          scoreRowEl.innerHTML = `
+            <div class="verified-badge-score-chip">
+              <strong>${data.checkout_score}</strong>
+              <span>Current Score</span>
+            </div>
+          `;
+
+          const gaps = buildQualificationGaps(data);
+          gapsEl.innerHTML = "";
+          gaps.forEach((item) => {
+            const li = document.createElement("li");
+            li.textContent = item;
+            gapsEl.appendChild(li);
+          });
+          gapsEl.classList.remove("hidden");
+
+          badgeEl.textContent = "";
+          badgeEl.classList.add("hidden");
+          badgeHtmlEl.textContent = "";
+          badgeHtmlEl.classList.add("hidden");
+
+          copyBadgeButton.classList.add("hidden");
+          copyBadgeTextButton.classList.add("hidden");
+          copyQualificationButton.classList.remove("hidden");
+          copyQualificationButton.textContent = "Copy Qualification Summary";
+        }
+      }
+
+      function setList(elementId, items) {
+        const el = document.getElementById(elementId);
+        el.innerHTML = "";
+        const safeItems = Array.isArray(items) && items.length > 0 ? items : ["None detected"];
+        for (const item of safeItems) {
+          const li = document.createElement("li");
+          li.textContent = item;
+          el.appendChild(li);
+        }
+      }
+
+      function renderReport(data) {
+        latestReportData = data;
+        document.getElementById("store-label").textContent = data.store;
+        document.getElementById("score").textContent = data.checkout_score;
+        document.getElementById("tier").textContent = data.tier;
+        document.getElementById("percentile").textContent = `Top ${data.percentile}% of Shopify Stores`;
+        document.getElementById("peer-average").textContent = data.peer_average;
+        document.getElementById("top-friction").textContent = titleCaseFriction(data.top_friction);
+        document.getElementById("checkout-rank-text").textContent = rankTextFromScore(data.checkout_score);
+        document.getElementById("revenue").textContent = `${formatCurrency(data.estimated_revenue_opportunity)} / month`;
+        document.getElementById("your-score").textContent = `Score: ${data.checkout_score}`;
+        document.getElementById("competitor-name").textContent = data.competitor_comparison?.competitor_name || "Top Shopify Brand";
+        document.getElementById("competitor-score").textContent = `Score: ${data.competitor_comparison?.competitor_score ?? "--"}`;
+        document.getElementById("score-gap").textContent = `${data.competitor_comparison?.score_gap ?? "--"} points`;
+        document.getElementById("comparison-your-store").textContent = `${data.store} — ${data.checkout_score}`;
+        document.getElementById("comparison-top-store").textContent = `${data.competitor_comparison?.competitor_domain || data.competitor_comparison?.competitor_name || "Top Shopify Brand"} — ${data.competitor_comparison?.competitor_score ?? "--"}`;
+        document.getElementById("comparison-gap").textContent = `${data.competitor_comparison?.score_gap ?? "--"} points`;
+        document.getElementById("recommendation-title").textContent = data.recommendation?.title || "No recommendation available";
+        document.getElementById("recommendation-description").textContent = data.recommendation?.description || "";
+        document.getElementById("estimated-lift").textContent = data.recommendation?.estimated_conversion_lift || "--";
+        document.getElementById("cta-revenue").textContent = `${formatCurrency(data.estimated_revenue_opportunity)} / month`;
+
+        renderVerifiedBadgeSection(data);
+        shareTextEl.value = buildShareText(data);
+        setShareFeedback("");
+        setList("comparison-opportunities", buildComparisonOpportunities(data));
+
+        setList("detected-signals", data.detected_signals);
+        setList("missing-signals", data.missing_signals);
+
+        reportEl.classList.add("visible");
+      }
+
+      async function analyzeCheckout() {
+        const store = storeInput.value.trim();
+        if (!store) {
+          statusEl.textContent = "Enter a store domain first.";
+          statusEl.className = "status error";
+          reportEl.classList.remove("visible");
+          return;
+        }
+
+        analyzeButton.disabled = true;
+        statusEl.textContent = "Analyzing checkout...";
+        statusEl.className = "status";
+        const nextUrl = new URL(window.location.href);
+        nextUrl.searchParams.set("store", store);
+        window.history.replaceState({}, "", nextUrl.toString());
+
+        try {
+          const response = await fetch(`/api/checkout-score?store=${encodeURIComponent(store)}`);
+          const payload = await response.json();
+
+          if (!response.ok) {
+            throw new Error(payload?.error || "benchmark_request_failed");
+          }
+
+          renderReport(payload);
+          statusEl.textContent = "Benchmark report ready.";
+          statusEl.className = "status";
+        } catch (error) {
+          reportEl.classList.remove("visible");
+          statusEl.textContent = `Could not analyze checkout: ${error.message}`;
+          statusEl.className = "status error";
+        } finally {
+          analyzeButton.disabled = false;
+        }
+      }
+
+      analyzeButton.addEventListener("click", analyzeCheckout);
+      storeInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          analyzeCheckout();
+        }
+      });
+
+      function bootstrapFromQuery() {
+        const params = new URLSearchParams(window.location.search);
+        const queryStore = params.get("store");
+        if (!queryStore) {
+          return;
+        }
+
+        storeInput.value = queryStore.trim();
+        statusEl.textContent = "Analyzing checkout...";
+        statusEl.className = "status";
+
+        window.requestAnimationFrame(() => {
+          analyzeCheckout();
+        });
+      }
+
+      copyBadgeButton.addEventListener("click", async () => {
+        const text = document.getElementById("badge-html").textContent;
+        try {
+          await navigator.clipboard.writeText(text);
+          copyBadgeButton.textContent = "Copied";
+          setTimeout(() => {
+            copyBadgeButton.textContent = "Copy Badge HTML";
+          }, 1500);
+        } catch (_error) {
+          copyBadgeButton.textContent = "Copy failed";
+          setTimeout(() => {
+            copyBadgeButton.textContent = "Copy Badge HTML";
+          }, 1500);
+        }
+      });
+
+      copyBadgeTextButton.addEventListener("click", async () => {
+        if (!latestReportData) return;
+        try {
+          const qualification = getVerifiedBadgeQualification(latestReportData.checkout_score);
+          await navigator.clipboard.writeText(buildVerifiedBadgeText(latestReportData, qualification));
+          setShareFeedback("Copied badge text");
+        } catch (_error) {
+          setShareFeedback("Copy failed");
+        }
+      });
+
+      copyQualificationButton.addEventListener("click", async () => {
+        if (!latestReportData) return;
+        try {
+          await navigator.clipboard.writeText(buildQualificationSummary(latestReportData));
+          setShareFeedback("Copied qualification summary");
+        } catch (_error) {
+          setShareFeedback("Copy failed");
+        }
+      });
+
+      copyShareButton.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(shareTextEl.value);
+          setShareFeedback("Copied share text");
+        } catch (_error) {
+          setShareFeedback("Copy failed");
+        }
+      });
+
+      copyLinkButton.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          setShareFeedback("Copied report link");
+        } catch (_error) {
+          setShareFeedback("Copy failed");
+        }
+      });
+
+      comparisonScrollButton.addEventListener("click", () => {
+        const target = document.getElementById("recommendation-section") || document.getElementById("evidence-section");
+        if (target) {
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
+
+      copyComparisonButton.addEventListener("click", async () => {
+        try {
+          const store = storeInput.value.trim();
+          const currentData = {
+            store,
+            checkout_score: document.getElementById("score").textContent,
+            top_friction: document.getElementById("top-friction").textContent.toLowerCase().replace(/\s+/g, "_"),
+            competitor_comparison: {
+              competitor_score: (document.getElementById("competitor-score").textContent.match(/\d+/) || ["--"])[0],
+              score_gap: (document.getElementById("comparison-gap").textContent.match(/\d+/) || ["--"])[0],
+            },
+            missing_signals: Array.from(document.querySelectorAll("#missing-signals li")).map((li) => li.textContent),
+            recommendation: {
+              title: document.getElementById("recommendation-title").textContent,
+            },
+          };
+          await navigator.clipboard.writeText(buildComparisonSummary(currentData));
+          setShareFeedback("Copied comparison summary");
+        } catch (_error) {
+          setShareFeedback("Copy failed");
+        }
+      });
+
+      bootstrapFromQuery();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,67 @@
+[
+  {
+    "id": "interpreted__sig_mobile_checkout_abandonment_home_001",
+    "source_signal_ids": [
+      "sig_mobile_checkout_abandonment_home_001"
+    ],
+    "confidence": "medium",
+    "impact_hint": "high",
+    "frequency_hint": "high",
+    "created_at": "2026-03-12T23:15:07.757Z",
+    "interpretation_type": "mobile_checkout_friction",
+    "pattern_summary": "Mobile checkout abandonment is elevated at 37.0% for merchant merchant_demo_home.",
+    "suggested_problem": "mobile_checkout_simplification"
+  },
+  {
+    "id": "interpreted__sig_discount_dependency_rate_supplements_001",
+    "source_signal_ids": [
+      "sig_discount_dependency_rate_supplements_001"
+    ],
+    "confidence": "medium",
+    "impact_hint": "medium",
+    "frequency_hint": "medium",
+    "created_at": "2026-03-12T23:15:07.757Z",
+    "interpretation_type": "recovery_margin_pressure",
+    "pattern_summary": "Discount dependency is elevated at 44.0% for merchant merchant_demo_supplements.",
+    "suggested_problem": "non_discount_recovery_messaging"
+  },
+  {
+    "id": "interpreted__sig_payment_failure_rate_apparel_001",
+    "source_signal_ids": [
+      "sig_payment_failure_rate_apparel_001"
+    ],
+    "confidence": "medium",
+    "impact_hint": "medium",
+    "frequency_hint": "medium",
+    "created_at": "2026-03-12T23:15:07.757Z",
+    "interpretation_type": "payment_friction",
+    "pattern_summary": "Payment failures are elevated at 12.0% for merchant merchant_demo_apparel.",
+    "suggested_problem": "payment_option_optimization"
+  },
+  {
+    "id": "interpreted__sig_checkout_shipping_dropoff_apparel_001",
+    "source_signal_ids": [
+      "sig_checkout_shipping_dropoff_apparel_001"
+    ],
+    "confidence": "medium",
+    "impact_hint": "medium",
+    "frequency_hint": "high",
+    "created_at": "2026-03-12T23:15:07.753Z",
+    "interpretation_type": "checkout_friction",
+    "pattern_summary": "Shipping-stage checkout friction is elevated at 31.0% for merchant merchant_demo_apparel.",
+    "suggested_problem": "shipping_cost_transparency"
+  },
+  {
+    "id": "interpreted__sig_sms_recovery_success_rate_beauty_001",
+    "source_signal_ids": [
+      "sig_sms_recovery_success_rate_beauty_001"
+    ],
+    "confidence": "medium",
+    "impact_hint": "medium",
+    "frequency_hint": "medium",
+    "created_at": "2026-03-12T23:15:07.757Z",
+    "interpretation_type": "recovery_channel_effectiveness",
+    "pattern_summary": "SMS recovery effectiveness is strong at 19.0% for merchant merchant_demo_beauty.",
+    "suggested_problem": "sms_first_recovery_workflow"
+  }
+]

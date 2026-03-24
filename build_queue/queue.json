@@ -1,0 +1,65 @@
+[
+  {
+    "id": "queue__merchant_demo_home__mobile_checkout_simplification__mobile_abandonment_diagnostic_api",
+    "slice_id": "merchant_demo_home__mobile_checkout_simplification__mobile_abandonment_diagnostic_api",
+    "priority_score": 169,
+    "selection_reason": "Mobile Abandonment Diagnostic API scored 169. It is small effort, shippable, has strategic value 100, and 1 dependency.",
+    "selected_at": "2026-03-12T22:06:47.243Z",
+    "recommended_next_action": "Build Mobile Abandonment Diagnostic API next.",
+    "reasoning_summary": "This is the current best next slice because it is small, shippable, strategically valuable, and lightly dependent."
+  },
+  {
+    "id": "queue__merchant_demo_home__mobile_checkout_simplification__mobile_checkout_friction_insight_card",
+    "slice_id": "merchant_demo_home__mobile_checkout_simplification__mobile_checkout_friction_insight_card",
+    "priority_score": 169,
+    "selection_reason": "Mobile Checkout Friction Insight Card scored 169. It is small effort, shippable, has strategic value 100, and 1 dependency.",
+    "selected_at": null,
+    "recommended_next_action": "Keep Mobile Checkout Friction Insight Card queued behind higher-priority slices.",
+    "reasoning_summary": "This slice remains queued until a higher-ranked slice is completed or deprioritized."
+  },
+  {
+    "id": "queue__merchant_demo_supplements__non_discount_recovery_messaging_test__recovery_strategy_experiment_recommendation",
+    "slice_id": "merchant_demo_supplements__non_discount_recovery_messaging_test__recovery_strategy_experiment_recommendation",
+    "priority_score": 164,
+    "selection_reason": "Recovery Strategy Experiment Recommendation scored 164. It is small effort, shippable, has strategic value 95, and 1 dependency.",
+    "selected_at": null,
+    "recommended_next_action": "Keep Recovery Strategy Experiment Recommendation queued behind higher-priority slices.",
+    "reasoning_summary": "This slice remains queued until a higher-ranked slice is completed or deprioritized."
+  },
+  {
+    "id": "queue__merchant_demo_apparel__shipping_transparency_improvement__shipping_friction_diagnostic_endpoint",
+    "slice_id": "merchant_demo_apparel__shipping_transparency_improvement__shipping_friction_diagnostic_endpoint",
+    "priority_score": 163,
+    "selection_reason": "Shipping Friction Diagnostic Endpoint scored 163. It is small effort, shippable, has strategic value 94, and 1 dependency.",
+    "selected_at": null,
+    "recommended_next_action": "Keep Shipping Friction Diagnostic Endpoint queued behind higher-priority slices.",
+    "reasoning_summary": "This slice remains queued until a higher-ranked slice is completed or deprioritized."
+  },
+  {
+    "id": "queue__merchant_demo_apparel__shipping_transparency_improvement__shipping_threshold_insight_card",
+    "slice_id": "merchant_demo_apparel__shipping_transparency_improvement__shipping_threshold_insight_card",
+    "priority_score": 163,
+    "selection_reason": "Shipping Threshold Insight Card scored 163. It is small effort, shippable, has strategic value 94, and 1 dependency.",
+    "selected_at": null,
+    "recommended_next_action": "Keep Shipping Threshold Insight Card queued behind higher-priority slices.",
+    "reasoning_summary": "This slice remains queued until a higher-ranked slice is completed or deprioritized."
+  },
+  {
+    "id": "queue__merchant_demo_apparel__payment_option_optimization__payment_failure_insight_api",
+    "slice_id": "merchant_demo_apparel__payment_option_optimization__payment_failure_insight_api",
+    "priority_score": 131,
+    "selection_reason": "Payment Failure Insight API scored 131. It is small effort, shippable, has strategic value 62, and 1 dependency.",
+    "selected_at": null,
+    "recommended_next_action": "Keep Payment Failure Insight API queued behind higher-priority slices.",
+    "reasoning_summary": "This slice remains queued until a higher-ranked slice is completed or deprioritized."
+  },
+  {
+    "id": "queue__merchant_demo_beauty__sms_first_recovery_workflow__sms_recovery_recommendation_card",
+    "slice_id": "merchant_demo_beauty__sms_first_recovery_workflow__sms_recovery_recommendation_card",
+    "priority_score": 126,
+    "selection_reason": "SMS Recovery Recommendation Card scored 126. It is small effort, shippable, has strategic value 57, and 1 dependency.",
+    "selected_at": null,
+    "recommended_next_action": "Keep SMS Recovery Recommendation Card queued behind higher-priority slices.",
+    "reasoning_summary": "This slice remains queued until a higher-ranked slice is completed or deprioritized."
+  }
+]

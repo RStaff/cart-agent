@@ -1,0 +1,1250 @@
+{
+  "updatedAt": "2026-03-17T18:39:30.740Z",
+  "events": [
+    {
+      "eventId": "checkout-signal-1773687333000-c05f81",
+      "type": "checkout-risk",
+      "shopDomain": "forge-fitnessco.myshopify.com",
+      "cartToken": "cart-123",
+      "path": "/checkouts/cart-123/information",
+      "ts": "2026-03-16T18:05:45.000Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-16T18:55:33.000Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773687333515-91dcd9",
+      "type": "checkout-start",
+      "shopDomain": "forge-fitnessco.myshopify.com",
+      "cartToken": "cart-123",
+      "path": "/checkouts/cart-123/information",
+      "ts": "2026-03-16T18:05:00.000Z",
+      "reason": null,
+      "receivedAt": "2026-03-16T18:55:33.515Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773689513040-7aba2c",
+      "type": "checkout-risk",
+      "shopDomain": "forge-fitnessco.myshopify.com",
+      "cartToken": "cart-stab-001",
+      "path": "/checkouts/cart-stab-001/information",
+      "ts": "2026-03-16T19:35:00.000Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-16T19:31:53.040Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773689513446-057d46",
+      "type": "checkout-risk",
+      "shopDomain": "forge-fitnessco.myshopify.com",
+      "cartToken": "cart-stab-001",
+      "path": "/checkouts/cart-stab-001/information",
+      "ts": "2026-03-16T19:35:00.000Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-16T19:31:53.446Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773690701202-8e5010",
+      "type": "checkout-risk",
+      "shopDomain": "forge-fitnessco.myshopify.com",
+      "cartToken": "cart-stab-002",
+      "path": "/checkouts/cart-stab-002/information",
+      "ts": "2026-03-16T19:45:00.000Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-16T19:51:41.202Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773690701614-c2167c",
+      "type": "checkout-risk",
+      "shopDomain": "forge-fitnessco.myshopify.com",
+      "cartToken": "cart-stab-002",
+      "path": "/checkouts/cart-stab-002/information",
+      "ts": "2026-03-16T19:45:00.000Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-16T19:51:41.614Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773692573816-6baf47",
+      "type": "checkout-risk",
+      "shopDomain": "forge-fitnessco.myshopify.com",
+      "cartToken": "cart-r9-001",
+      "path": "/checkouts/cart-r9-001/information",
+      "ts": "2026-03-16T20:10:00.000Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-16T20:22:53.816Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773692738213-1abde8",
+      "type": "checkout-risk",
+      "shopDomain": "forge-fitnessco.myshopify.com",
+      "cartToken": "cart-r9-fallback",
+      "path": "/checkouts/cart-r9-fallback/information",
+      "ts": "2026-03-16T20:24:00.000Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-16T20:25:38.213Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773696307325-948b1a",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "proof-cart-001",
+      "path": "/checkouts/proof-cart-001/information",
+      "ts": "2026-03-16T21:25:07.324Z",
+      "reason": "idle",
+      "receivedAt": "2026-03-16T21:25:07.325Z",
+      "metadata": {
+        "ip": "127.0.0.1",
+        "userAgent": "internal-test",
+        "origin": "internal-test"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773747473488-1999e5",
+      "type": "checkout-start",
+      "shopDomain": "cart-agent-dev.myshopify.com",
+      "cartToken": "test-cart-123",
+      "path": "/checkouts/test-cart-123",
+      "ts": "2026-03-17T11:37:53.487Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T11:37:53.488Z",
+      "metadata": {
+        "ip": "::1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773747479998-23b5ca",
+      "type": "checkout-risk",
+      "shopDomain": "cart-agent-dev.myshopify.com",
+      "cartToken": "test-cart-123",
+      "path": "/checkouts/test-cart-123",
+      "ts": "2026-03-17T11:37:59.998Z",
+      "reason": "idle",
+      "receivedAt": "2026-03-17T11:37:59.998Z",
+      "metadata": {
+        "ip": "::1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773750118471-902411",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "proof-cart-r12a",
+      "path": "/checkouts/proof-cart-r12a/information",
+      "ts": "2026-03-17T12:21:58.000Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T12:21:58.471Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773750118488-92bb7c",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "proof-cart-r12a",
+      "path": "/checkouts/proof-cart-r12a/information",
+      "ts": "2026-03-17T12:21:58.000Z",
+      "reason": "idle",
+      "receivedAt": "2026-03-17T12:21:58.488Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773750147315-896976",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "proof-cart-r12a",
+      "path": "/checkouts/proof-cart-r12a/information",
+      "ts": "2026-03-17T12:22:27.000Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T12:22:27.315Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773750147332-5f7e84",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "proof-cart-r12a",
+      "path": "/checkouts/proof-cart-r12a/information",
+      "ts": "2026-03-17T12:22:27.000Z",
+      "reason": "idle",
+      "receivedAt": "2026-03-17T12:22:27.332Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773750182260-ca6194",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "proof-cart-r12a-1773750182",
+      "path": "/checkouts/proof-cart-r12a-1773750182/information",
+      "ts": "2026-03-17T12:23:02.000Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T12:23:02.260Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773750182274-f2b2a7",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "proof-cart-r12a-1773750182",
+      "path": "/checkouts/proof-cart-r12a-1773750182/information",
+      "ts": "2026-03-17T12:23:02.000Z",
+      "reason": "idle",
+      "receivedAt": "2026-03-17T12:23:02.274Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773750303710-b107cd",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "proof-cart-r12a-1773750303",
+      "path": "/checkouts/proof-cart-r12a-1773750303/information",
+      "ts": "2026-03-17T12:25:03.000Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T12:25:03.710Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773750303726-f85e23",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "proof-cart-r12a-1773750303",
+      "path": "/checkouts/proof-cart-r12a-1773750303/information",
+      "ts": "2026-03-17T12:25:03.000Z",
+      "reason": "idle",
+      "receivedAt": "2026-03-17T12:25:03.726Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773751641700-52f9af",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "validation-cart",
+      "path": "/checkouts/validation-cart/information",
+      "ts": "2026-03-17T12:47:21.697Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T12:47:21.700Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773751643057-93334b",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "validation-cart",
+      "path": "/checkouts/validation-cart/information",
+      "ts": "2026-03-17T12:47:23.055Z",
+      "reason": "beforeunload",
+      "receivedAt": "2026-03-17T12:47:23.057Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773751643060-b3c998",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "validation-cart",
+      "path": "/checkouts/validation-cart/information",
+      "ts": "2026-03-17T12:47:23.059Z",
+      "reason": "pagehide",
+      "receivedAt": "2026-03-17T12:47:23.060Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773751643061-70483a",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "validation-cart",
+      "path": "/checkouts/validation-cart/information",
+      "ts": "2026-03-17T12:47:23.059Z",
+      "reason": "visibility_hidden",
+      "receivedAt": "2026-03-17T12:47:23.061Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773751643065-9597ff",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "validation-cart",
+      "path": "/checkouts/validation-cart/information",
+      "ts": "2026-03-17T12:47:23.064Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T12:47:23.065Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773751644137-f49b1f",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "validation-cart",
+      "path": "/checkouts/validation-cart/information",
+      "ts": "2026-03-17T12:47:24.133Z",
+      "reason": "beforeunload",
+      "receivedAt": "2026-03-17T12:47:24.137Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773751644140-60312c",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "validation-cart",
+      "path": "/checkouts/validation-cart/information",
+      "ts": "2026-03-17T12:47:24.139Z",
+      "reason": "pagehide",
+      "receivedAt": "2026-03-17T12:47:24.140Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773751644141-625161",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "validation-cart",
+      "path": "/checkouts/validation-cart/information",
+      "ts": "2026-03-17T12:47:24.139Z",
+      "reason": "visibility_hidden",
+      "receivedAt": "2026-03-17T12:47:24.141Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773751644144-bed69c",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "validation-cart",
+      "path": "/checkouts/validation-cart/information",
+      "ts": "2026-03-17T12:47:24.143Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T12:47:24.144Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773751644893-064282",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "validation-cart",
+      "path": "/checkouts/validation-cart/information",
+      "ts": "2026-03-17T12:47:24.891Z",
+      "reason": "beforeunload",
+      "receivedAt": "2026-03-17T12:47:24.893Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773751644897-01a7ee",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "validation-cart",
+      "path": "/checkouts/validation-cart/information",
+      "ts": "2026-03-17T12:47:24.896Z",
+      "reason": "pagehide",
+      "receivedAt": "2026-03-17T12:47:24.897Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773751644899-53284e",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "validation-cart",
+      "path": "/checkouts/validation-cart/information",
+      "ts": "2026-03-17T12:47:24.896Z",
+      "reason": "visibility_hidden",
+      "receivedAt": "2026-03-17T12:47:24.899Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773751644904-e378df",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "validation-cart",
+      "path": "/checkouts/validation-cart/information",
+      "ts": "2026-03-17T12:47:24.901Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T12:47:24.904Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773751925232-f7d15d",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "real-signal-1773751904",
+      "path": "/checkouts/real-signal-1773751904/information",
+      "ts": "2026-03-17T12:52:05.228Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T12:52:05.232Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773751926132-7d46c9",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "real-signal-1773751904",
+      "path": "/checkouts/real-signal-1773751904/information",
+      "ts": "2026-03-17T12:52:06.130Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-17T12:52:06.132Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773752973884-dc90b8",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "wild-recovery-1773752972555",
+      "path": "/checkouts/wild-recovery-1773752972555/information",
+      "ts": "2026-03-17T13:09:33.881Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T13:09:33.884Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773752974785-ccd20e",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "wild-recovery-1773752972555",
+      "path": "/checkouts/wild-recovery-1773752972555/information",
+      "ts": "2026-03-17T13:09:34.783Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-17T13:09:34.785Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773754414685-791533",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "r14-validation-1773754414498",
+      "path": "/checkouts/r14-validation-1773754414498/information",
+      "ts": "2026-03-17T13:33:34.681Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T13:33:34.685Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773754415586-8edeea",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "r14-validation-1773754414498",
+      "path": "/checkouts/r14-validation-1773754414498/information",
+      "ts": "2026-03-17T13:33:35.584Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-17T13:33:35.586Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773754415900-f6479f",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "r14-validation-1773754414498",
+      "path": "/checkouts/r14-validation-1773754414498/information",
+      "ts": "2026-03-17T13:33:35.896Z",
+      "reason": "beforeunload",
+      "receivedAt": "2026-03-17T13:33:35.900Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773754416432-032606",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "r14-validation-1773754414498",
+      "path": "/checkouts/r14-validation-1773754414498/information",
+      "ts": "2026-03-17T13:33:36.430Z",
+      "reason": "pagehide",
+      "receivedAt": "2026-03-17T13:33:36.432Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773754416434-1fc7b4",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "r14-validation-1773754414498",
+      "path": "/checkouts/r14-validation-1773754414498/information",
+      "ts": "2026-03-17T13:33:36.430Z",
+      "reason": "visibility_hidden",
+      "receivedAt": "2026-03-17T13:33:36.434Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773754416438-7f2a37",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "r14-validation-1773754414498",
+      "path": "/checkouts/r14-validation-1773754414498/information",
+      "ts": "2026-03-17T13:33:36.436Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T13:33:36.438Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773754417341-bd8a21",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "r14-validation-1773754414498",
+      "path": "/checkouts/r14-validation-1773754414498/information",
+      "ts": "2026-03-17T13:33:37.338Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-17T13:33:37.341Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773754417524-e200bf",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "r14-validation-1773754414498",
+      "path": "/checkouts/r14-validation-1773754414498/information",
+      "ts": "2026-03-17T13:33:37.520Z",
+      "reason": "beforeunload",
+      "receivedAt": "2026-03-17T13:33:37.524Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773754417663-b69936",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "r14-validation-1773754414498",
+      "path": "/checkouts/r14-validation-1773754414498/information",
+      "ts": "2026-03-17T13:33:37.661Z",
+      "reason": "pagehide",
+      "receivedAt": "2026-03-17T13:33:37.663Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773754417664-f1fc48",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "r14-validation-1773754414498",
+      "path": "/checkouts/r14-validation-1773754414498/information",
+      "ts": "2026-03-17T13:33:37.661Z",
+      "reason": "visibility_hidden",
+      "receivedAt": "2026-03-17T13:33:37.664Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773754417670-21dc39",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "r14-validation-1773754414498",
+      "path": "/checkouts/r14-validation-1773754414498/information",
+      "ts": "2026-03-17T13:33:37.666Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T13:33:37.670Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773754418635-928524",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "r14-validation-1773754414498",
+      "path": "/checkouts/r14-validation-1773754414498/information",
+      "ts": "2026-03-17T13:33:38.633Z",
+      "reason": "beforeunload",
+      "receivedAt": "2026-03-17T13:33:38.635Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773754418769-edc885",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "r14-validation-1773754414498",
+      "path": "/checkouts/r14-validation-1773754414498/information",
+      "ts": "2026-03-17T13:33:38.767Z",
+      "reason": "pagehide",
+      "receivedAt": "2026-03-17T13:33:38.769Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773754418770-dfce09",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "r14-validation-1773754414498",
+      "path": "/checkouts/r14-validation-1773754414498/information",
+      "ts": "2026-03-17T13:33:38.767Z",
+      "reason": "visibility_hidden",
+      "receivedAt": "2026-03-17T13:33:38.770Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773754418774-55059d",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "r14-validation-1773754414498",
+      "path": "/checkouts/r14-validation-1773754414498/information",
+      "ts": "2026-03-17T13:33:38.772Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T13:33:38.774Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773754419678-1aa4c2",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "r14-validation-1773754414498",
+      "path": "/checkouts/r14-validation-1773754414498/information",
+      "ts": "2026-03-17T13:33:39.675Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-17T13:33:39.678Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773754434946-f2fe66",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "r14-logonly-1773754434464",
+      "path": "/checkouts/r14-logonly-1773754434464/information",
+      "ts": "2026-03-17T13:33:54.944Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T13:33:54.946Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773761482642-f3b0ff",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "storefront-r14-1773761482433",
+      "path": "/checkouts/storefront-r14-1773761482433/information",
+      "ts": "2026-03-17T15:31:22.639Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T15:31:22.642Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773761483543-e35f7e",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "storefront-r14-1773761482433",
+      "path": "/checkouts/storefront-r14-1773761482433/information",
+      "ts": "2026-03-17T15:31:23.542Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-17T15:31:23.543Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773761483855-f81995",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "storefront-r14-1773761482433",
+      "path": "/checkouts/storefront-r14-1773761482433/information",
+      "ts": "2026-03-17T15:31:23.850Z",
+      "reason": "beforeunload",
+      "receivedAt": "2026-03-17T15:31:23.855Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773761484330-03fe1e",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "storefront-r14-1773761482433",
+      "path": "/checkouts/storefront-r14-1773761482433/information",
+      "ts": "2026-03-17T15:31:24.329Z",
+      "reason": "pagehide",
+      "receivedAt": "2026-03-17T15:31:24.330Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773761484331-6b3956",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "storefront-r14-1773761482433",
+      "path": "/checkouts/storefront-r14-1773761482433/information",
+      "ts": "2026-03-17T15:31:24.329Z",
+      "reason": "visibility_hidden",
+      "receivedAt": "2026-03-17T15:31:24.331Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773761484334-d13299",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "storefront-r14-1773761482433",
+      "path": "/checkouts/storefront-r14-1773761482433/information",
+      "ts": "2026-03-17T15:31:24.333Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T15:31:24.334Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773761485238-3284d8",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "storefront-r14-1773761482433",
+      "path": "/checkouts/storefront-r14-1773761482433/information",
+      "ts": "2026-03-17T15:31:25.235Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-17T15:31:25.238Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773761485315-10a014",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "storefront-r14-1773761482433",
+      "path": "/checkouts/storefront-r14-1773761482433/information",
+      "ts": "2026-03-17T15:31:25.313Z",
+      "reason": "beforeunload",
+      "receivedAt": "2026-03-17T15:31:25.315Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773761485452-5a4928",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "storefront-r14-1773761482433",
+      "path": "/checkouts/storefront-r14-1773761482433/information",
+      "ts": "2026-03-17T15:31:25.451Z",
+      "reason": "pagehide",
+      "receivedAt": "2026-03-17T15:31:25.452Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773761485453-57a928",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "storefront-r14-1773761482433",
+      "path": "/checkouts/storefront-r14-1773761482433/information",
+      "ts": "2026-03-17T15:31:25.451Z",
+      "reason": "visibility_hidden",
+      "receivedAt": "2026-03-17T15:31:25.453Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773761485458-6ec262",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "storefront-r14-1773761482433",
+      "path": "/checkouts/storefront-r14-1773761482433/information",
+      "ts": "2026-03-17T15:31:25.456Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T15:31:25.458Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773761756209-1fd0f8",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "real-signal-1773761755384",
+      "path": "/checkouts/real-signal-1773761755384/information",
+      "ts": "2026-03-17T15:35:56.207Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T15:35:56.209Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773761757119-4638ed",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "real-signal-1773761755384",
+      "path": "/checkouts/real-signal-1773761755384/information",
+      "ts": "2026-03-17T15:35:57.108Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-17T15:35:57.119Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773764148428-92a391",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "storefront-r12b-1773764146449",
+      "path": "/checkouts/storefront-r12b-1773764146449/information",
+      "ts": "2026-03-17T16:15:48.422Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T16:15:48.428Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773764149326-fc0fe4",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "storefront-r12b-1773764146449",
+      "path": "/checkouts/storefront-r12b-1773764146449/information",
+      "ts": "2026-03-17T16:15:49.324Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-17T16:15:49.326Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773764213469-7e2bb6",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "storefront-r12b-1773764212388",
+      "path": "/checkouts/storefront-r12b-1773764212388/information",
+      "ts": "2026-03-17T16:16:53.467Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T16:16:53.469Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773764214371-5e5d02",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "storefront-r12b-1773764212388",
+      "path": "/checkouts/storefront-r12b-1773764212388/information",
+      "ts": "2026-03-17T16:16:54.369Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-17T16:16:54.371Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773769157382-62e43e",
+      "type": "checkout-risk",
+      "shopDomain": "real-revenue-test.myshopify.com",
+      "cartToken": "real-attrib-1773769155614",
+      "path": "/checkouts/real-attrib-1773769155614/information",
+      "ts": "2026-03-17T17:39:17.381Z",
+      "reason": "idle",
+      "receivedAt": "2026-03-17T17:39:17.382Z",
+      "metadata": {
+        "ip": "127.0.0.1",
+        "userAgent": "internal-test",
+        "origin": "internal-test"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773769471786-527b49",
+      "type": "checkout-risk",
+      "shopDomain": "real-revenue-test.myshopify.com",
+      "cartToken": "real-attrib-1773769469723",
+      "path": "/checkouts/real-attrib-1773769469723/information",
+      "ts": "2026-03-17T17:44:31.785Z",
+      "reason": "idle",
+      "receivedAt": "2026-03-17T17:44:31.786Z",
+      "metadata": {
+        "ip": "127.0.0.1",
+        "userAgent": "internal-test",
+        "origin": "internal-test"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773769991668-940cb7",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "decision-log-dismiss-1773769990477",
+      "path": "/checkouts/decision-log-dismiss-1773769990477/information",
+      "ts": "2026-03-17T17:53:11.663Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T17:53:11.668Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773769992569-3fc9a1",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "decision-log-dismiss-1773769990477",
+      "path": "/checkouts/decision-log-dismiss-1773769990477/information",
+      "ts": "2026-03-17T17:53:12.567Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-17T17:53:12.569Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773769997021-12c469",
+      "type": "checkout-start",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "decision-log-continue-1773769996004",
+      "path": "/checkouts/decision-log-continue-1773769996004/information",
+      "ts": "2026-03-17T17:53:17.018Z",
+      "reason": null,
+      "receivedAt": "2026-03-17T17:53:17.021Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773769997923-a79c58",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "decision-log-continue-1773769996004",
+      "path": "/checkouts/decision-log-continue-1773769996004/information",
+      "ts": "2026-03-17T17:53:17.921Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-17T17:53:17.923Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+        "origin": "http://127.0.0.1:8081"
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773772450877-a0e7f5",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "score-upgrade-001",
+      "path": "/checkouts/score-upgrade-001/information",
+      "ts": "2026-03-17T18:34:00.000Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-17T18:34:10.877Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773772478972-3243c6",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "score-upgrade-001",
+      "path": "/checkouts/score-upgrade-001/information",
+      "ts": "2026-03-17T18:35:00.000Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-17T18:34:38.972Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773772586335-8e64e3",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "score-upgrade-002",
+      "path": "/checkouts/score-upgrade-002/information",
+      "ts": "2026-03-17T18:36:00.000Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-17T18:36:26.335Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773772609583-cce6ad",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "score-upgrade-002",
+      "path": "/checkouts/score-upgrade-002/information",
+      "ts": "2026-03-17T18:37:00.000Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-17T18:36:49.583Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773772726316-dcb440",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "score-upgrade-003",
+      "path": "/checkouts/score-upgrade-003/information",
+      "ts": "2026-03-17T18:38:00.000Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-17T18:38:46.316Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773772748235-ecdaa0",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "score-upgrade-004",
+      "path": "/checkouts/score-upgrade-004/information",
+      "ts": "2026-03-17T18:39:00.000Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-17T18:39:08.235Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    },
+    {
+      "eventId": "checkout-signal-1773772770740-2cc387",
+      "type": "checkout-risk",
+      "shopDomain": "proof-store.myshopify.com",
+      "cartToken": "score-upgrade-004",
+      "path": "/checkouts/score-upgrade-004/information",
+      "ts": "2026-03-17T18:40:00.000Z",
+      "reason": "idle_45s",
+      "receivedAt": "2026-03-17T18:39:30.740Z",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "curl/8.7.1",
+        "origin": null
+      }
+    }
+  ]
+}

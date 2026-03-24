@@ -1,0 +1,38 @@
+# Dev-only Shopify config for R12B proof runs.
+# Keeps `orders/paid` in canonical config for production truth while using
+# `orders/create` in the live Shopify CLI preview session to avoid protected
+# customer data approval blocking local proof execution.
+
+client_id = "83114672506075ba4866194fe0160cde"
+name = "cart-agent"
+application_url = "https://pay.abando.ai/dashboard/"
+embedded = true
+handle = "cart-agent-1"
+
+[build]
+automatically_update_urls_on_dev = true
+
+[webhooks]
+api_version = "2025-07"
+
+  [[webhooks.subscriptions]]
+  uri = "/api/webhooks/gdpr"
+  compliance_topics = [ "customers/data_request", "customers/redact", "shop/redact" ]
+
+  [[webhooks.subscriptions]]
+  topics = [ "orders/create" ]
+  uri = "/api/webhooks/orders/create"
+
+[access_scopes]
+scopes = "read_checkouts,read_orders,write_checkouts,read_script_tags,write_script_tags"
+optional_scopes = [ ]
+use_legacy_install_flow = false
+
+[auth]
+redirect_urls = [
+  "https://pay.abando.ai/shopify/callback",
+  "https://pay.abando.ai/api/auth/callback"
+]
+
+[pos]
+embedded = false

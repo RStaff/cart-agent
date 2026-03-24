@@ -1,0 +1,112 @@
+[
+  {
+    "id": "merchant_demo_home__mobile_checkout_simplification",
+    "schema_version": "v1",
+    "title": "Mobile Checkout Simplification",
+    "opportunity_class": "checkout_failure_intelligence",
+    "source_signals": [
+      "sig_mobile_checkout_abandonment_home_001"
+    ],
+    "interpreted_signal_ids": [
+      "interpreted__sig_mobile_checkout_abandonment_home_001"
+    ],
+    "pattern_summary": "Mobile checkout abandonment is elevated at 37.0% for merchant merchant_demo_home.",
+    "suggested_solution": "Prioritize a mobile checkout simplification playbook focused on fewer steps and clearer field guidance.",
+    "confidence": "medium",
+    "impact_score": 90,
+    "frequency_score": 80,
+    "ease_score": 75,
+    "strategic_fit_score": 90,
+    "total_score": 335,
+    "status": "generated",
+    "created_at": "2026-03-12T23:51:16.093Z"
+  },
+  {
+    "id": "merchant_demo_apparel__shipping_transparency_improvement",
+    "schema_version": "v1",
+    "title": "Shipping Transparency Improvement",
+    "opportunity_class": "checkout_optimization",
+    "source_signals": [
+      "sig_checkout_shipping_dropoff_apparel_001"
+    ],
+    "interpreted_signal_ids": [
+      "interpreted__sig_checkout_shipping_dropoff_apparel_001"
+    ],
+    "pattern_summary": "Shipping-stage checkout friction is elevated at 31.0% for merchant merchant_demo_apparel.",
+    "suggested_solution": "Test earlier shipping-cost visibility and clearer shipping threshold messaging before checkout.",
+    "confidence": "medium",
+    "impact_score": 70,
+    "frequency_score": 80,
+    "ease_score": 80,
+    "strategic_fit_score": 90,
+    "total_score": 320,
+    "status": "generated",
+    "created_at": "2026-03-12T23:51:16.097Z"
+  },
+  {
+    "id": "merchant_demo_apparel__payment_option_optimization",
+    "schema_version": "v1",
+    "title": "Payment Option Optimization",
+    "opportunity_class": "checkout_failure_intelligence",
+    "source_signals": [
+      "sig_payment_failure_rate_apparel_001"
+    ],
+    "interpreted_signal_ids": [
+      "interpreted__sig_payment_failure_rate_apparel_001"
+    ],
+    "pattern_summary": "Payment failures are elevated at 12.0% for merchant merchant_demo_apparel.",
+    "suggested_solution": "Investigate payment option coverage, retry messaging, and fallback payment methods for failing sessions.",
+    "confidence": "medium",
+    "impact_score": 70,
+    "frequency_score": 60,
+    "ease_score": 80,
+    "strategic_fit_score": 90,
+    "total_score": 300,
+    "status": "generated",
+    "created_at": "2026-03-12T23:51:16.097Z"
+  },
+  {
+    "id": "merchant_demo_beauty__sms_first_recovery_workflow",
+    "schema_version": "v1",
+    "title": "SMS-First Recovery Workflow",
+    "opportunity_class": "merchant_playbook_engine",
+    "source_signals": [
+      "sig_sms_recovery_success_rate_beauty_001"
+    ],
+    "interpreted_signal_ids": [
+      "interpreted__sig_sms_recovery_success_rate_beauty_001"
+    ],
+    "pattern_summary": "SMS recovery effectiveness is strong at 19.0% for merchant merchant_demo_beauty.",
+    "suggested_solution": "Prioritize an SMS-first recovery workflow before discounting for similar checkout contexts.",
+    "confidence": "medium",
+    "impact_score": 70,
+    "frequency_score": 60,
+    "ease_score": 70,
+    "strategic_fit_score": 85,
+    "total_score": 285,
+    "status": "generated",
+    "created_at": "2026-03-12T23:51:16.097Z"
+  },
+  {
+    "id": "merchant_demo_supplements__non_discount_recovery_messaging_test",
+    "schema_version": "v1",
+    "title": "Non-Discount Recovery Messaging Test",
+    "opportunity_class": "merchant_growth_radar",
+    "source_signals": [
+      "sig_discount_dependency_rate_supplements_001"
+    ],
+    "interpreted_signal_ids": [
+      "interpreted__sig_discount_dependency_rate_supplements_001"
+    ],
+    "pattern_summary": "Discount dependency is elevated at 44.0% for merchant merchant_demo_supplements.",
+    "suggested_solution": "Test reassurance and urgency messaging before using discounts so margin loss is not the default recovery path.",
+    "confidence": "medium",
+    "impact_score": 70,
+    "frequency_score": 60,
+    "ease_score": 70,
+    "strategic_fit_score": 80,
+    "total_score": 280,
+    "status": "generated",
+    "created_at": "2026-03-12T23:51:16.097Z"
+  }
+]

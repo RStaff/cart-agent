@@ -1,0 +1,48 @@
+[
+  {
+    "id": "checkout_benchmark_report__merchant_demo_apparel",
+    "merchant_id": "merchant_demo_apparel",
+    "generated_at": "2026-03-12T23:55:43.072Z",
+    "checkout_abandonment_rate": 0.215,
+    "peer_checkout_abandonment_rate": 0.28,
+    "mobile_checkout_completion_rate": null,
+    "peer_mobile_checkout_completion_rate": 0.66,
+    "top_likely_friction": "shipping_cost_transparency",
+    "recommended_first_fix": "Show shipping cost or threshold guidance earlier in the checkout journey.",
+    "confidence": "medium",
+    "field_sources": {
+      "checkout_abandonment_rate": "merchant_signal_derived_proxy",
+      "peer_checkout_abandonment_rate": "heuristic_peer_baseline",
+      "mobile_checkout_completion_rate": "unavailable",
+      "peer_mobile_checkout_completion_rate": "heuristic_peer_baseline"
+    },
+    "reasoning_summary": "Merchant checkout abandonment proxy is 21.5% and mobile checkout completion is unavailable. Peer comparison is based on heuristic_peer_baseline for merchant category apparel. Top likely friction is shipping_cost_transparency, so the first recommended fix is Show shipping cost or threshold guidance earlier in the checkout journey."
+  },
+  {
+    "id": "checkout_benchmark_report__demo-merchant",
+    "merchant_id": "demo-merchant",
+    "generated_at": "2026-03-13T00:28:37.491Z",
+    "checkout_abandonment_rate": 0.267,
+    "peer_checkout_abandonment_rate": 0.215,
+    "mobile_checkout_completion_rate": 0.63,
+    "peer_mobile_checkout_completion_rate": 0.66,
+    "top_likely_friction": "mobile_checkout_friction",
+    "recommended_first_fix": "Simplify mobile checkout steps and reduce mobile form friction first.",
+    "why_this_recommendation": [
+      "checkout abandonment is above the current peer baseline",
+      "interpreted signals rank mobile friction highest",
+      "mobile completion is lagging enough to justify a mobile-first fix"
+    ],
+    "recommended_next_action": "Simplify the mobile checkout flow before testing broader checkout changes.",
+    "confidence": "medium",
+    "field_sources": {
+      "checkout_abandonment_rate": "demo_seeded_signal_proxy",
+      "peer_checkout_abandonment_rate": "real_peer_signal_average",
+      "mobile_checkout_completion_rate": "demo_seeded_signal_derived",
+      "peer_mobile_checkout_completion_rate": "heuristic_peer_baseline",
+      "top_likely_friction": "demo_seeded_interpreted_signal",
+      "recommended_first_fix": "demo_seeded_interpreted_signal_mapping"
+    },
+    "reasoning_summary": "Merchant checkout abandonment proxy is 26.7% and mobile checkout completion is 63.0%. Peer comparison is based on real_peer_signal_average / heuristic_peer_baseline for merchant category apparel. Top likely friction is mobile_checkout_friction, so the first recommended fix is Simplify mobile checkout steps and reduce mobile form friction first."
+  }
+]

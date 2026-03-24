@@ -1,0 +1,89 @@
+{
+  "sites": [
+    {
+      "key": "abando",
+      "product": "abando",
+      "environment": "dev-proof",
+      "domain": "trycloudflare.com",
+      "subdomain": "resort-march-ver-rich",
+      "public_origin": "https://metadata-animal-naples-bent.trycloudflare.com",
+      "provider": "cloudflare_quick_tunnel",
+      "deployment_target": "local_node_backend",
+      "dns_target": "quick_tunnel_ephemeral",
+      "local_port": 8081,
+      "local_origin": "http://127.0.0.1:8081",
+      "public_origin_env_var": "ABANDO_PUBLIC_APP_ORIGIN",
+      "expected_public_origin": "https://metadata-animal-naples-bent.trycloudflare.com",
+      "healthcheck_url": "https://metadata-animal-naples-bent.trycloudflare.com/api/recovery-actions/email-readiness",
+      "smoke_urls_local": [
+        "http://127.0.0.1:8081/api/recovery-actions/email-readiness",
+        "http://127.0.0.1:8081/api/recovery-actions/email-readiness",
+        "http://127.0.0.1:8081/experience?shop=mvp-demo-proof.myshopify.com&eid=proof-loop-check"
+      ],
+      "smoke_urls_public": [
+        "https://metadata-animal-naples-bent.trycloudflare.com/api/recovery-actions/email-readiness",
+        "https://metadata-animal-naples-bent.trycloudflare.com/experience?shop=mvp-demo-proof.myshopify.com&eid=proof-loop-check"
+      ],
+      "recovery_link_test": {
+        "shop": "mvp-demo-proof.myshopify.com",
+        "experience_id": "proof-loop-check",
+        "channel": "email",
+        "expected_path": "/api/recovery/return"
+      },
+      "notes": [
+        "Current public proof loop depends on a Cloudflare quick tunnel.",
+        "SMTP is configured for real email proof.",
+        "SMS is not configured yet."
+      ],
+      "status": "active_proof"
+    },
+    {
+      "key": "staffordos",
+      "product": "staffordos",
+      "environment": "local",
+      "domain": "",
+      "subdomain": "",
+      "public_origin": "",
+      "provider": "local_only",
+      "deployment_target": "operator_local",
+      "dns_target": "",
+      "local_port": 3001,
+      "local_origin": "http://127.0.0.1:3001",
+      "public_origin_env_var": "",
+      "expected_public_origin": "",
+      "healthcheck_url": "",
+      "smoke_urls_local": [],
+      "smoke_urls_public": [],
+      "recovery_link_test": null,
+      "notes": [
+        "Operator/control plane only."
+      ],
+      "status": "placeholder"
+    },
+    {
+      "key": "placeholder-app",
+      "product": "placeholder",
+      "environment": "placeholder",
+      "domain": "example.com",
+      "subdomain": "app",
+      "public_origin": "https://app.example.com",
+      "provider": "unknown",
+      "deployment_target": "unknown",
+      "dns_target": "unknown",
+      "local_port": 0,
+      "local_origin": "",
+      "public_origin_env_var": "EXAMPLE_PUBLIC_ORIGIN",
+      "expected_public_origin": "https://app.example.com",
+      "healthcheck_url": "https://app.example.com/healthz",
+      "smoke_urls_local": [],
+      "smoke_urls_public": [
+        "https://app.example.com/healthz"
+      ],
+      "recovery_link_test": null,
+      "notes": [
+        "Example registry shape only."
+      ],
+      "status": "placeholder"
+    }
+  ]
+}

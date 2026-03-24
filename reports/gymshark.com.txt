@@ -1,0 +1,15 @@
+Abando Checkout Benchmark
+
+Store: gymshark.com
+
+Checkout Score: 100 / 100
+Peer Average: 74
+
+Top Friction Detected:
+none_detected
+
+Recommended Fix:
+No clear checkout friction was detected from the current demo signals.
+
+Estimated Conversion Lift:
+unknown

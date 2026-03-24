@@ -44,6 +44,16 @@ export default function applyAbandoDevProxy(app) {
   app.use((req, res, next) => {
     const p = req.path || "";
     if (
+      p === "/run-audit" ||
+      p.startsWith("/run-audit/") ||
+      p === "/pricing" ||
+      p.startsWith("/pricing/") ||
+      p === "/install/shopify" ||
+      p.startsWith("/install/shopify/") ||
+      p === "/scorecard" ||
+      p.startsWith("/scorecard/") ||
+      p === "/api/auth" ||
+      p.startsWith("/api/auth/") ||
       p === "/embedded" ||
       p.startsWith("/embedded/") ||
       p === "/marketing" ||

@@ -1,0 +1,189 @@
+{
+  "generatedAt": "2026-03-18T12:39:22.529Z",
+  "sourceUpdatedAt": {
+    "audit": "2026-03-16T12:23:22.605Z",
+    "storeScores": "2026-03-16T12:23:22.584Z"
+  },
+  "scorecards": [
+    {
+      "domain": "northstar-outdoors.myshopify.com",
+      "slug": "northstar-outdoors",
+      "publicUrl": "/scorecard/northstar-outdoors",
+      "conversion": "Unavailable",
+      "shopifyMedian": "Unavailable",
+      "revenueOpportunityCents": 2228000,
+      "revenueOpportunityDisplay": "$22,280.00",
+      "opportunityBreakdown": {
+        "checkoutFrictionCents": 2228000,
+        "trustSignalsCents": 0,
+        "faqGapCents": 0,
+        "urgencyGapCents": 0
+      },
+      "topFindings": [
+        "Slow mobile checkout handoff",
+        "This store is performing below roughly 56% of similar Shopify stores on checkout completion and recovery readiness.",
+        "Tighten the mobile checkout path and remove unnecessary handoff friction."
+      ],
+      "installPath": "/install/shopify?shop=northstar-outdoors.myshopify.com",
+      "createdAt": "2026-03-16T12:23:22.605Z",
+      "benchmarkSummary": "This store is performing below roughly 56% of similar Shopify stores on checkout completion and recovery readiness.",
+      "checkoutScore": 64,
+      "confidence": "Early confidence",
+      "source": {
+        "auditId": "audit-015",
+        "scoreBand": "high",
+        "componentBreakdown": {
+          "shopify_confidence": 20,
+          "traffic_likelihood": 18,
+          "catalog_richness": 12,
+          "brand_seriousness": 11,
+          "revenue_opportunity_proxy": 14
+        }
+      }
+    },
+    {
+      "domain": "lumen-homegoods.myshopify.com",
+      "slug": "lumen-homegoods",
+      "publicUrl": "/scorecard/lumen-homegoods",
+      "conversion": "Unavailable",
+      "shopifyMedian": "Unavailable",
+      "revenueOpportunityCents": 2287000,
+      "revenueOpportunityDisplay": "$22,870.00",
+      "opportunityBreakdown": {
+        "checkoutFrictionCents": 2287000,
+        "trustSignalsCents": 0,
+        "faqGapCents": 0,
+        "urgencyGapCents": 0
+      },
+      "topFindings": [
+        "Checkout friction on shipping step",
+        "This store is performing below roughly 57% of similar Shopify stores on checkout completion and recovery readiness.",
+        "Reduce friction on the shipping step and validate the checkout path on mobile first."
+      ],
+      "installPath": "/install/shopify?shop=lumen-homegoods.myshopify.com",
+      "createdAt": "2026-03-16T12:23:22.604Z",
+      "benchmarkSummary": "This store is performing below roughly 57% of similar Shopify stores on checkout completion and recovery readiness.",
+      "checkoutScore": 63,
+      "confidence": "Early confidence",
+      "source": {
+        "auditId": "audit-012",
+        "scoreBand": "high",
+        "componentBreakdown": {
+          "shopify_confidence": 20,
+          "traffic_likelihood": 18,
+          "catalog_richness": 14,
+          "brand_seriousness": 11,
+          "revenue_opportunity_proxy": 14
+        }
+      }
+    },
+    {
+      "domain": "pulse-petcare.myshopify.com",
+      "slug": "pulse-petcare",
+      "publicUrl": "/scorecard/pulse-petcare",
+      "conversion": "Unavailable",
+      "shopifyMedian": "Unavailable",
+      "revenueOpportunityCents": 2228000,
+      "revenueOpportunityDisplay": "$22,280.00",
+      "opportunityBreakdown": {
+        "checkoutFrictionCents": 2228000,
+        "trustSignalsCents": 0,
+        "faqGapCents": 0,
+        "urgencyGapCents": 0
+      },
+      "topFindings": [
+        "Slow mobile checkout handoff",
+        "This store is performing below roughly 56% of similar Shopify stores on checkout completion and recovery readiness.",
+        "Tighten the mobile checkout path and remove unnecessary handoff friction."
+      ],
+      "installPath": "/install/shopify?shop=pulse-petcare.myshopify.com",
+      "createdAt": "2026-03-16T12:23:22.605Z",
+      "benchmarkSummary": "This store is performing below roughly 56% of similar Shopify stores on checkout completion and recovery readiness.",
+      "checkoutScore": 64,
+      "confidence": "Early confidence",
+      "source": {
+        "auditId": "audit-016",
+        "scoreBand": "high",
+        "componentBreakdown": {
+          "shopify_confidence": 20,
+          "traffic_likelihood": 18,
+          "catalog_richness": 14,
+          "brand_seriousness": 9,
+          "revenue_opportunity_proxy": 14
+        }
+      }
+    },
+    {
+      "domain": "atelier-skinlab.myshopify.com",
+      "slug": "atelier-skinlab",
+      "publicUrl": "/scorecard/atelier-skinlab",
+      "conversion": "Unavailable",
+      "shopifyMedian": "Unavailable",
+      "revenueOpportunityCents": 2287000,
+      "revenueOpportunityDisplay": "$22,870.00",
+      "opportunityBreakdown": {
+        "checkoutFrictionCents": 2287000,
+        "trustSignalsCents": 0,
+        "faqGapCents": 0,
+        "urgencyGapCents": 0
+      },
+      "topFindings": [
+        "Checkout friction on shipping step",
+        "This store is performing below roughly 57% of similar Shopify stores on checkout completion and recovery readiness.",
+        "Reduce friction on the shipping step and validate the checkout path on mobile first."
+      ],
+      "installPath": "/install/shopify?shop=atelier-skinlab.myshopify.com",
+      "createdAt": "2026-03-16T12:23:22.604Z",
+      "benchmarkSummary": "This store is performing below roughly 57% of similar Shopify stores on checkout completion and recovery readiness.",
+      "checkoutScore": 63,
+      "confidence": "Early confidence",
+      "source": {
+        "auditId": "audit-013",
+        "scoreBand": "high",
+        "componentBreakdown": {
+          "shopify_confidence": 20,
+          "traffic_likelihood": 18,
+          "catalog_richness": 14,
+          "brand_seriousness": 11,
+          "revenue_opportunity_proxy": 14
+        }
+      }
+    },
+    {
+      "domain": "forge-fitnessco.myshopify.com",
+      "slug": "forge-fitnessco",
+      "publicUrl": "/scorecard/forge-fitnessco",
+      "conversion": "Unavailable",
+      "shopifyMedian": "Unavailable",
+      "revenueOpportunityCents": 2287000,
+      "revenueOpportunityDisplay": "$22,870.00",
+      "opportunityBreakdown": {
+        "checkoutFrictionCents": 2287000,
+        "trustSignalsCents": 0,
+        "faqGapCents": 0,
+        "urgencyGapCents": 0
+      },
+      "topFindings": [
+        "Checkout friction on shipping step",
+        "This store is performing below roughly 57% of similar Shopify stores on checkout completion and recovery readiness.",
+        "Reduce friction on the shipping step and validate the checkout path on mobile first."
+      ],
+      "installPath": "/install/shopify?shop=forge-fitnessco.myshopify.com",
+      "createdAt": "2026-03-16T12:23:22.605Z",
+      "benchmarkSummary": "This store is performing below roughly 57% of similar Shopify stores on checkout completion and recovery readiness.",
+      "checkoutScore": 63,
+      "confidence": "Early confidence",
+      "source": {
+        "auditId": "audit-014",
+        "scoreBand": "high",
+        "componentBreakdown": {
+          "shopify_confidence": 20,
+          "traffic_likelihood": 18,
+          "catalog_richness": 14,
+          "brand_seriousness": 11,
+          "revenue_opportunity_proxy": 14
+        }
+      }
+    }
+  ]
+}

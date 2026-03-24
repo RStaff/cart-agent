@@ -1,122 +1,96 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Idempotent local Abando dev launcher.
+# Repo truth:
+# - frontend: localhost:3000
+# - cart-agent backend: localhost:8081
+# - stable public URL should be https://dev.abando.ai via named Cloudflare tunnel
+
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-NEXT_LOG="/tmp/abando_next.log"
-SHOPIFY_LOG="/tmp/abando_shopify_dev.log"
-NEXT_PID="/tmp/abando_next.pid"
-SHOPIFY_PID="/tmp/abando_shopify.pid"
+mkdir -p logs .tmp
+LOG_FILE="logs/dev_up.log"
+exec > >(tee -a "$LOG_FILE") 2>&1
 
-echo "== Abando Dev Up =="
-echo "Repo: $ROOT"
+echo "== Abando dev_up =="
+echo "root: $ROOT"
+echo "started_at: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+
+if [[ -s "${HOME}/.nvm/nvm.sh" ]]; then
+  # shellcheck disable=SC1090
+  source "${HOME}/.nvm/nvm.sh"
+  nvm use >/dev/null
+fi
+
+if [[ -f ".tmp/named-tunnel.env" ]]; then
+  # shellcheck disable=SC1090
+  source ".tmp/named-tunnel.env"
+fi
+
+export ABANDO_DEV_PUBLIC_URL="${ABANDO_DEV_PUBLIC_URL:-https://dev.abando.ai}"
+export ABANDO_CLOUDFLARE_TUNNEL_NAME="${ABANDO_CLOUDFLARE_TUNNEL_NAME:-abando-dev}"
+STATE_FILE=".tmp/dev-session.json"
+
+validate_session_state() {
+  python3 - "$STATE_FILE" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+state_path = Path(sys.argv[1])
+if not state_path.exists():
+    print("[dev_up][error] missing session artifact .tmp/dev-session.json", file=sys.stderr)
+    raise SystemExit(1)
+
+data = json.loads(state_path.read_text())
+errors = []
+
+if not data.get("ok"):
+    errors.append("session_not_ok")
+if data.get("tunnelMode") != "named":
+    errors.append("tunnel_mode_not_named")
+if data.get("activeTunnelUrl") != "https://dev.abando.ai":
+    errors.append("active_tunnel_url_not_canonical")
+if data.get("activeTunnelHost") != "dev.abando.ai":
+    errors.append("active_tunnel_host_not_canonical")
+if data.get("tunnelLooksStale") is not False:
+    errors.append("tunnel_marked_stale")
+if data.get("missingPrerequisites"):
+    errors.append("missing_prerequisites_present")
+
+if errors:
+    print("[dev_up][error] session artifact failed validation:", ",".join(errors), file=sys.stderr)
+    print(json.dumps(data, indent=2), file=sys.stderr)
+    raise SystemExit(1)
+PY
+}
+
+echo "node: $(node -v)"
+echo "shopify: $(shopify version | head -n 1 || true)"
+echo "cloudflared: $(cloudflared --version | head -n 1 || true)"
+echo "stable_url: ${ABANDO_DEV_PUBLIC_URL}"
+
 echo
+echo "== clean previous dev processes =="
+bash ./scripts/dev_down.sh || true
 
-# --- helpers ---
-kill_pidfile() {
-  local f="$1"
-  if [ -f "$f" ]; then
-    local pid
-    pid="$(cat "$f" 2>/dev/null || true)"
-    if [ -n "${pid:-}" ] && kill -0 "$pid" 2>/dev/null; then
-      echo "Stopping PID $pid from $f"
-      kill "$pid" 2>/dev/null || true
-      sleep 0.5
-      kill -9 "$pid" 2>/dev/null || true
-    fi
-    rm -f "$f"
-  fi
-}
+echo
+echo "== start supervised local services =="
+bash ./scripts/dev_supervisor.sh start
 
-kill_listeners() {
-  # Kill anything listening on the ports we care about (safe reset)
-  for p in 3000 3457; do
-    local pids
-    pids="$(lsof -tiTCP:"$p" -sTCP:LISTEN 2>/dev/null || true)"
-    if [ -n "$pids" ]; then
-      echo "Killing listeners on :$p -> $pids"
-      kill $pids 2>/dev/null || true
-      sleep 0.5
-      kill -9 $pids 2>/dev/null || true
-    fi
-  done
-}
-
-wait_http_200() {
-  local url="$1"
-  local tries="${2:-60}"
-  local i=0
-  while [ $i -lt $tries ]; do
-    if curl -sS -o /dev/null -w "%{http_code}" "$url" 2>/dev/null | grep -q '^200$'; then
-      return 0
-    fi
-    i=$((i+1))
-    sleep 1
-  done
-  return 1
-}
-
-# --- clean start ---
-echo ">> Clean up old processes"
-kill_pidfile "$SHOPIFY_PID"
-kill_pidfile "$NEXT_PID"
-pkill -f cloudflared 2>/dev/null || true
-kill_listeners
-
-: > "$NEXT_LOG"
-: > "$SHOPIFY_LOG"
-
-# --- start Next ---
-echo ">> Start Next.js (abando-frontend) on :3000"
-test -d "abando-frontend" || { echo "❌ Missing abando-frontend/"; exit 1; }
-(
-  cd abando-frontend
-  PORT=3000 nohup npm run dev > "$NEXT_LOG" 2>&1 &
-  echo $! > "$NEXT_PID"
-)
-echo "Next PID: $(cat "$NEXT_PID")"
-echo "Waiting for http://localhost:3000/embedded to return 200..."
-if ! wait_http_200 "http://localhost:3000/embedded" 90; then
-  echo "❌ Next did not become ready. Tail of $NEXT_LOG:"
-  tail -n 80 "$NEXT_LOG" || true
+echo
+echo "== require named tunnel health =="
+if ! bash ./scripts/dev/start_cloudflare_named_tunnel.sh; then
+  echo
+  echo "[dev_up][error] stable named tunnel is not healthy."
+  echo "[dev_up][error] local services may be up, but public dev is not ready."
   exit 1
 fi
-echo "✅ Next is ready."
+
+validate_session_state
+
 echo
-
-# --- start Shopify dev ---
-echo ">> Start Shopify dev (ABANDO_DEV_PROXY=1)"
-command -v shopify >/dev/null || { echo "❌ Shopify CLI not found in PATH"; exit 1; }
-
-# NOTE: we do NOT pass --reset here to avoid interactive prompts every run.
-# If you need a reset, run it manually once.
-(
-  ABANDO_DEV_PROXY=1 nohup shopify app dev > "$SHOPIFY_LOG" 2>&1 &
-  echo $! > "$SHOPIFY_PID"
-)
-echo "Shopify PID: $(cat "$SHOPIFY_PID")"
-echo
-
-echo "Waiting for Shopify to print a trycloudflare URL..."
-for _ in $(seq 1 120); do
-  URL_LINE="$(grep -E 'Using URL:\s+https://.*trycloudflare\.com' -m 1 "$SHOPIFY_LOG" 2>/dev/null || true)"
-  if [ -n "$URL_LINE" ]; then
-    echo "✅ $URL_LINE"
-    TUNNEL="$(echo "$URL_LINE" | sed -E 's/.*(https:\/\/[^ ]+).*/\1/')"
-    echo
-    echo "Try:"
-    echo "  curl -sS -D- \"$TUNNEL/embedded?embedded=1\" -o /dev/null | sed -n '1,12p'"
-    echo
-    echo "Logs:"
-    echo "  tail -f $NEXT_LOG"
-    echo "  tail -f $SHOPIFY_LOG"
-    echo
-    exit 0
-  fi
-  sleep 1
-done
-
-echo "❌ Shopify did not print tunnel URL in time. Tail of $SHOPIFY_LOG:"
-tail -n 120 "$SHOPIFY_LOG" || true
-exit 1
+echo "== current status =="
+bash ./scripts/dev_status.sh

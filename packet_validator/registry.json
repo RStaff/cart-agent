@@ -1,0 +1,17 @@
+[
+  {
+    "id": "packet_validation__packet__merchant_demo_home__mobile_checkout_simplification__mobile_abandonment_diagnostic_api",
+    "execution_packet_id": "packet__merchant_demo_home__mobile_checkout_simplification__mobile_abandonment_diagnostic_api",
+    "valid": true,
+    "validation_score": 100,
+    "issues": [],
+    "warnings": [
+      "system_state_partial"
+    ],
+    "required_fixes": [],
+    "reasoning_summary": "Packet \"Mobile Abandonment Diagnostic API\" passed required checks with warnings and scored 100.",
+    "schema_version": "v1",
+    "status": "passed",
+    "created_at": "2026-03-13T00:06:20.688Z"
+  }
+]

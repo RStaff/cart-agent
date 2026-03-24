@@ -1,0 +1,19 @@
+[
+  {
+    "id": "feedback__6bd15000-4c7d-478d-b61f-f658f26fe49b",
+    "execution_packet_id": "packet__merchant_demo_home__mobile_checkout_simplification__mobile_abandonment_diagnostic_api",
+    "slice_id": "merchant_demo_home__mobile_checkout_simplification__mobile_abandonment_diagnostic_api",
+    "outcome": "partial",
+    "result_summary": "Diagnostic contract is clear, but merchant-facing comparison window still needs validation.",
+    "success_score": 72,
+    "observed_value": {
+      "api_contract_defined": true,
+      "merchant_visibility_ready": false
+    },
+    "lessons": [
+      "Keep the metric definition narrow.",
+      "Validate the comparison window against real merchant data before shipping."
+    ],
+    "recorded_at": "2026-03-12T22:36:26.790Z"
+  }
+]
