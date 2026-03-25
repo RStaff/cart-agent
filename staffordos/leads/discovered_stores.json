@@ -1,0 +1,154 @@
+[
+  {
+    "domain": "example-store.myshopify.com",
+    "source": "manual"
+  },
+  {
+    "domain": "fitgearpro-co.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "fitgearpro-goods.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "fitgearpro-home.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "fitgearpro-shop.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "fitgearpro-store.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "fitgearpro.myshopify.com",
+    "source": "seed"
+  },
+  {
+    "domain": "homegoodsco-co.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "homegoodsco-goods.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "homegoodsco-home.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "homegoodsco-shop.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "homegoodsco-store.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "homegoodsco.myshopify.com",
+    "source": "seed"
+  },
+  {
+    "domain": "luxbath-co.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "luxbath-goods.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "luxbath-home.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "luxbath-shop.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "luxbath-store.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "luxbath.myshopify.com",
+    "source": "seed"
+  },
+  {
+    "domain": "midmarket-home-co.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "midmarket-home-goods.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "midmarket-home-shop.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "midmarket-home-store.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "midmarket-home-usa.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "midmarket-home.myshopify.com",
+    "source": "manual"
+  },
+  {
+    "domain": "modernpets-co.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "modernpets-goods.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "modernpets-home.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "modernpets-shop.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "modernpets-store.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "modernpets.myshopify.com",
+    "source": "seed"
+  },
+  {
+    "domain": "urbankitchen-co.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "urbankitchen-goods.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "urbankitchen-home.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "urbankitchen-shop.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "urbankitchen-store.myshopify.com",
+    "source": "generated"
+  },
+  {
+    "domain": "urbankitchen.myshopify.com",
+    "source": "seed"
+  },
+  {
+    "domain": "visible-recovery-store.myshopify.com",
+    "source": "manual"
+  }
+]

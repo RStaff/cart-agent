@@ -1,0 +1,282 @@
+[
+  {
+    "domain": "fitgearpro-co.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 79,
+    "traffic_signal": "high",
+    "category": "fitness"
+  },
+  {
+    "domain": "fitgearpro-goods.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 65,
+    "traffic_signal": "medium",
+    "category": "home_goods"
+  },
+  {
+    "domain": "fitgearpro-home.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 74,
+    "traffic_signal": "low",
+    "category": "home_goods"
+  },
+  {
+    "domain": "fitgearpro-shop.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 79,
+    "traffic_signal": "high",
+    "category": "fitness"
+  },
+  {
+    "domain": "fitgearpro-store.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 78,
+    "traffic_signal": "medium",
+    "category": "fitness"
+  },
+  {
+    "domain": "fitgearpro.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 70,
+    "traffic_signal": "high",
+    "category": "fitness"
+  },
+  {
+    "domain": "homegoodsco-co.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 65,
+    "traffic_signal": "low",
+    "category": "home_goods"
+  },
+  {
+    "domain": "homegoodsco-goods.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 71,
+    "traffic_signal": "high",
+    "category": "home_goods"
+  },
+  {
+    "domain": "homegoodsco-home.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 68,
+    "traffic_signal": "medium",
+    "category": "home_goods"
+  },
+  {
+    "domain": "homegoodsco-shop.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 75,
+    "traffic_signal": "high",
+    "category": "home_goods"
+  },
+  {
+    "domain": "homegoodsco-store.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 66,
+    "traffic_signal": "low",
+    "category": "home_goods"
+  },
+  {
+    "domain": "homegoodsco.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 62,
+    "traffic_signal": "low",
+    "category": "home_goods"
+  },
+  {
+    "domain": "luxbath-co.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 66,
+    "traffic_signal": "high",
+    "category": "home_goods"
+  },
+  {
+    "domain": "luxbath-goods.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 70,
+    "traffic_signal": "low",
+    "category": "home_goods"
+  },
+  {
+    "domain": "luxbath-home.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 69,
+    "traffic_signal": "medium",
+    "category": "home_goods"
+  },
+  {
+    "domain": "luxbath-shop.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 60,
+    "traffic_signal": "low",
+    "category": "home_goods"
+  },
+  {
+    "domain": "luxbath-store.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 65,
+    "traffic_signal": "low",
+    "category": "home_goods"
+  },
+  {
+    "domain": "luxbath.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 61,
+    "traffic_signal": "high",
+    "category": "home_goods"
+  },
+  {
+    "domain": "midmarket-home-co.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 60,
+    "traffic_signal": "high",
+    "category": "home_goods"
+  },
+  {
+    "domain": "midmarket-home-goods.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 60,
+    "traffic_signal": "low",
+    "category": "home_goods"
+  },
+  {
+    "domain": "midmarket-home-shop.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 70,
+    "traffic_signal": "high",
+    "category": "home_goods"
+  },
+  {
+    "domain": "midmarket-home-store.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 71,
+    "traffic_signal": "low",
+    "category": "home_goods"
+  },
+  {
+    "domain": "midmarket-home-usa.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 73,
+    "traffic_signal": "medium",
+    "category": "home_goods"
+  },
+  {
+    "domain": "modernpets-co.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 51,
+    "traffic_signal": "low",
+    "category": "pets"
+  },
+  {
+    "domain": "modernpets-goods.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 71,
+    "traffic_signal": "medium",
+    "category": "home_goods"
+  },
+  {
+    "domain": "modernpets-home.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 68,
+    "traffic_signal": "medium",
+    "category": "home_goods"
+  },
+  {
+    "domain": "modernpets-shop.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 45,
+    "traffic_signal": "low",
+    "category": "pets"
+  },
+  {
+    "domain": "modernpets-store.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 52,
+    "traffic_signal": "medium",
+    "category": "pets"
+  },
+  {
+    "domain": "modernpets.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 44,
+    "traffic_signal": "high",
+    "category": "pets"
+  },
+  {
+    "domain": "urbankitchen-co.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 66,
+    "traffic_signal": "high",
+    "category": "home_goods"
+  },
+  {
+    "domain": "urbankitchen-goods.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 70,
+    "traffic_signal": "high",
+    "category": "home_goods"
+  },
+  {
+    "domain": "urbankitchen-home.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 69,
+    "traffic_signal": "high",
+    "category": "home_goods"
+  },
+  {
+    "domain": "urbankitchen-shop.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 60,
+    "traffic_signal": "medium",
+    "category": "home_goods"
+  },
+  {
+    "domain": "urbankitchen-store.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 65,
+    "traffic_signal": "high",
+    "category": "home_goods"
+  },
+  {
+    "domain": "urbankitchen.myshopify.com",
+    "has_checkout": true,
+    "has_cart": true,
+    "estimated_aov": 61,
+    "traffic_signal": "low",
+    "category": "home_goods"
+  }
+]

@@ -1,0 +1,37 @@
+[
+  {
+    "domain": "fitgearpro.myshopify.com",
+    "score": 100,
+    "quality": "high",
+    "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro.myshopify.com&eid=auto-1774467114245"
+  },
+  {
+    "domain": "homegoodsco.myshopify.com",
+    "score": 100,
+    "quality": "high",
+    "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco.myshopify.com&eid=auto-1774467114245"
+  },
+  {
+    "domain": "luxbath.myshopify.com",
+    "score": 100,
+    "quality": "high",
+    "audit_link": "https://pay.abando.ai/audit?shop=luxbath.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=luxbath.myshopify.com&eid=auto-1774467114245"
+  },
+  {
+    "domain": "modernpets.myshopify.com",
+    "score": 100,
+    "quality": "high",
+    "audit_link": "https://pay.abando.ai/audit?shop=modernpets.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=modernpets.myshopify.com&eid=auto-1774467114245"
+  },
+  {
+    "domain": "urbankitchen.myshopify.com",
+    "score": 100,
+    "quality": "high",
+    "audit_link": "https://pay.abando.ai/audit?shop=urbankitchen.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen.myshopify.com&eid=auto-1774467114245"
+  }
+]
