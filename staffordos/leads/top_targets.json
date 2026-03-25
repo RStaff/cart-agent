@@ -1,0 +1,44 @@
+[
+  {
+    "domain": "example-store.myshopify.com",
+    "source": "manual",
+    "notes": "",
+    "score": 100,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=example-store.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=example-store.myshopify.com&eid=auto-1774461183045"
+  },
+  {
+    "domain": "midmarket-home.myshopify.com",
+    "source": "manual",
+    "notes": "mid",
+    "score": 100,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=midmarket-home.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home.myshopify.com&eid=auto-1774461183045"
+  },
+  {
+    "domain": "visible-recovery-store.myshopify.com",
+    "source": "manual",
+    "notes": "recovery_visible",
+    "score": 75,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": true,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=visible-recovery-store.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=visible-recovery-store.myshopify.com&eid=auto-1774461183045"
+  }
+]
