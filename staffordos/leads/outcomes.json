@@ -1,0 +1,41 @@
+[
+  {
+    "domain": "example-store.myshopify.com",
+    "score": 100,
+    "audit_link": "https://pay.abando.ai/audit?shop=example-store.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=example-store.myshopify.com&eid=auto-1774461183045",
+    "audit_opened": true,
+    "experience_opened": true,
+    "recovery_sent": true,
+    "return_tracked": true,
+    "status": "return_tracked",
+    "notes": "",
+    "updated_at": "2026-03-25T18:16:16.716Z"
+  },
+  {
+    "domain": "midmarket-home.myshopify.com",
+    "score": 100,
+    "audit_link": "https://pay.abando.ai/audit?shop=midmarket-home.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home.myshopify.com&eid=auto-1774461183045",
+    "audit_opened": false,
+    "experience_opened": false,
+    "recovery_sent": false,
+    "return_tracked": false,
+    "status": "routed",
+    "notes": "",
+    "updated_at": "2026-03-25T18:12:13.641Z"
+  },
+  {
+    "domain": "visible-recovery-store.myshopify.com",
+    "score": 75,
+    "audit_link": "https://pay.abando.ai/audit?shop=visible-recovery-store.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=visible-recovery-store.myshopify.com&eid=auto-1774461183045",
+    "audit_opened": false,
+    "experience_opened": false,
+    "recovery_sent": false,
+    "return_tracked": false,
+    "status": "routed",
+    "notes": "",
+    "updated_at": "2026-03-25T18:12:13.641Z"
+  }
+]

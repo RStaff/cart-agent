@@ -250,6 +250,8 @@ const publicDir = join(__dirname, "public");
 const repoRoot = join(__dirname, "..", "..");
 const devSessionStatePath = join(repoRoot, ".tmp", "dev-session.json");
 const fixAuditLeadsPath = join(repoRoot, ".tmp", "fix_audit_leads.json");
+const leadsTopTargetsPath = join(repoRoot, "staffordos", "leads", "top_targets.json");
+const leadsOutcomesPath = join(repoRoot, "staffordos", "leads", "outcomes.json");
 
 app.set("trust proxy", 1);
 
@@ -294,7 +296,7 @@ function sendRootHtml(req, res) {
     <title>Abando — Recover abandoned checkout revenue automatically.</title>
     <meta
       name="description"
-      content="See the recovery flow, find gaps in your store, and watch customers come back with Abando."
+      content="Abando automatically recovers abandoned checkout revenue."
     />
     <style>
       :root {
@@ -464,7 +466,7 @@ function sendRootHtml(req, res) {
         <div class="brand">Abando</div>
         <div class="nav-links">
           <a class="pill" href="/audit">Run free recovery audit</a>
-          <a class="pill" href="/experience?shop=mvp-demo-proof.myshopify.com&eid=marketing-proof">See the recovery flow live</a>
+          <a class="pill" href="/experience?shop=mvp-demo-proof.myshopify.com&eid=marketing-proof">See recovery in action</a>
         </div>
       </nav>
 
@@ -472,11 +474,11 @@ function sendRootHtml(req, res) {
         <div class="eyebrow">Shopify checkout recovery app</div>
         <h1>Recover abandoned checkout revenue automatically.</h1>
         <p class="lead">
-          See the recovery flow, find gaps in your store, and watch customers come back.
+          Abando automatically recovers abandoned checkout revenue.
         </p>
         <div class="hero-actions">
           <a class="button" href="/audit">Run free recovery audit</a>
-          <a class="button-secondary" href="/experience?shop=mvp-demo-proof.myshopify.com&eid=marketing-proof">See the recovery flow live</a>
+          <a class="button-secondary" href="/experience?shop=mvp-demo-proof.myshopify.com&eid=marketing-proof">See recovery in action</a>
         </div>
       </section>
 
@@ -484,11 +486,11 @@ function sendRootHtml(req, res) {
         <section class="section-card">
           <h2>See Abando recover revenue in real time</h2>
           <p>
-            Watch the live proof loop: recovery sent, clicked, and tracked.
+            Watch recovery happen automatically: recovery sent, return tracked.
           </p>
           <div class="loom-preview">
             <strong>Live proof loop</strong>
-            <p>Recovery sent, customer returned, and the result tracked cleanly through the public Abando experience flow.</p>
+            <p>Recovery sent, return tracked, and revenue recovered automatically after abandoned checkout.</p>
           </div>
           <a class="loom-link" href="https://www.loom.com/share/ca7cfee379ec4d2e816df6068b872d60" target="_blank" rel="noopener">Watch the Loom</a>
         </section>
@@ -496,17 +498,17 @@ function sendRootHtml(req, res) {
         <section class="section-card">
           <h2>Take the next step</h2>
           <p>
-            Start with the audit if you want a simple directional read on likely recovery gaps. Open the live recovery flow if you want to see the exact product path a merchant would verify.
+            Start with the audit to see likely recovery gaps. Open the live recovery page to see recovery in action.
           </p>
           <div class="cta-row">
             <a class="button" href="/audit">Run free recovery audit</a>
-            <a class="button-secondary" href="/experience?shop=mvp-demo-proof.myshopify.com&eid=marketing-proof">See the recovery flow live</a>
+            <a class="button-secondary" href="/experience?shop=mvp-demo-proof.myshopify.com&eid=marketing-proof">See recovery in action</a>
           </div>
         </section>
       </section>
 
       <footer>
-        Abando · © ${year} · Public proof flow: recovery sent, clicked, and tracked.
+        Abando · © ${year} · Abando automatically recovers abandoned checkout revenue.
       </footer>
     </main>
   </body>
@@ -898,6 +900,16 @@ async function createFixAuditLead({ storeUrl, email, analysis }) {
   records.push(record);
   await saveFixAuditLeads(records);
   return record;
+}
+
+async function readJsonArrayFile(filePath) {
+  try {
+    const raw = await readFile(filePath, "utf8");
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
 }
 
 async function getTunnelLooksStale(host) {
@@ -2226,6 +2238,11 @@ app.get("/merchant", async (_req, res) => {
   return res.status(200).type("html").send(renderMerchantPage(merchantState));
 });
 
+app.get("/leads", async (_req, res) => {
+  const leadsState = await getLeadsCommandCenterState();
+  return res.status(200).type("html").send(renderLeadsPage(leadsState));
+});
+
 app.use(
   [
     "/ops",
@@ -2841,7 +2858,7 @@ function renderExperiencePage({
       <div class="status ${hasSent && !hasReturned ? "active" : ""}" data-experience-state="sent">
         <div class="status-title">Recovery sent</div>
         <div class="status-body">Check your email or phone.</div>
-        <div class="status-helper">This is one recovered checkout opportunity.</div>
+        <div class="status-helper">This is a real recovery being sent and tracked.</div>
       </div>
 
       <div class="status waiting ${hasSent && !hasReturned ? "active" : ""}" data-experience-state="waiting">
@@ -2864,7 +2881,7 @@ function renderExperiencePage({
         <div class="status-body">Outbound delivery is not yet enabled.</div>
       </div>
 
-      <div class="fineprint">This is already recovering money you were about to lose.</div>
+      <div class="fineprint">This is already recovering revenue you were about to lose.</div>
     </section>
   </main>
   <script>
@@ -3308,10 +3325,10 @@ function renderAuditPage() {
         </ul>
 
         <div class="result-label">Recommendation</div>
-        <div class="result-copy">Abando helps recover abandoned checkout revenue automatically.</div>
+        <div class="result-copy">Abando automatically recovers abandoned checkout revenue.</div>
 
-        <a href="#" class="result-cta" data-audit-cta>See the recovery flow live</a>
-        <div class="result-note">This audit is directional and designed to surface likely recovery gaps.</div>
+        <a href="#" class="result-cta" data-audit-cta>See recovery in action</a>
+        <div class="result-note">This audit surfaces likely recovery gaps.</div>
       </div>
 
       <div class="fineprint">No private Shopify data is accessed in this audit.</div>
@@ -3552,7 +3569,7 @@ function renderMerchantPage({
     <div class="brand">Abando</div>
     <section class="panel">
       <h1>Abando is active</h1>
-      <p class="lede">Recovery system is running.</p>
+      <p class="lede">Abando is recovering revenue automatically.</p>
 
       <section class="section">
         <div class="section-label">Last recovery</div>
@@ -3563,8 +3580,8 @@ function renderMerchantPage({
       </section>
 
       <section class="section">
-        <div class="section-label">Recovered sessions</div>
-        <div class="section-value">Recovered sessions: ${Number(recoveredSessions || 0)}</div>
+        <div class="section-label">Recoveries completed</div>
+        <div class="section-value">Recoveries completed: ${Number(recoveredSessions || 0)}</div>
       </section>
 
       <section class="section">
@@ -3574,8 +3591,8 @@ function renderMerchantPage({
       </section>
 
       <section class="section">
-        <div class="section-label">Live recovery flow</div>
-        <a class="link" href="/experience?shop=${encodeURIComponent(shop)}&eid=merchant-proof">View live recovery flow</a>
+        <div class="section-label">Live recovery</div>
+        <a class="link" href="/experience?shop=${encodeURIComponent(shop)}&eid=merchant-proof">See recovery in action</a>
       </section>
     </section>
   </main>
@@ -3617,6 +3634,263 @@ function renderMerchantPage({
       });
     })();
   </script>
+</body>
+</html>`;
+}
+
+function deriveLeadNextAction(status = "routed") {
+  if (status === "audit_opened") return "Open experience";
+  if (status === "experience_opened") return "Send recovery";
+  if (status === "recovery_sent") return "Check return";
+  if (status === "return_tracked") return "Review / close";
+  if (status === "closed") return "Complete";
+  return "Open audit";
+}
+
+async function getLeadsCommandCenterState() {
+  const topTargets = await readJsonArrayFile(leadsTopTargetsPath);
+  const outcomes = await readJsonArrayFile(leadsOutcomesPath);
+  const outcomeByDomain = new Map(
+    outcomes.map((entry) => [normalizeStoreInput(entry?.domain || ""), entry]),
+  );
+
+  const rows = topTargets.map((target) => {
+    const domain = normalizeStoreInput(target?.domain || "");
+    const outcome = outcomeByDomain.get(domain) || null;
+    const status = String(outcome?.status || "routed");
+    return {
+      domain,
+      score: Number(outcome?.score ?? target?.score ?? 0),
+      status,
+      audit_link: String(outcome?.audit_link || target?.audit_link || ""),
+      experience_link: String(outcome?.experience_link || target?.experience_link || ""),
+      notes: String(outcome?.notes || target?.notes || "").trim(),
+      nextAction: deriveLeadNextAction(status),
+    };
+  });
+
+  const counts = {
+    routed: 0,
+    audit_opened: 0,
+    experience_opened: 0,
+    recovery_sent: 0,
+    return_tracked: 0,
+  };
+
+  rows.forEach((row) => {
+    if (Object.prototype.hasOwnProperty.call(counts, row.status)) {
+      counts[row.status] += 1;
+    }
+  });
+
+  return { rows, counts };
+}
+
+function renderLeadsPage({ rows, counts }) {
+  const cards = rows.map((row) => `\
+<section class="target-card">
+  <div class="target-top">
+    <div>
+      <div class="target-domain">${escapeHtml(row.domain || "Unknown store")}</div>
+      <div class="target-meta">Score ${Number(row.score || 0)}</div>
+    </div>
+    <div class="status-badge">${escapeHtml(row.status)}</div>
+  </div>
+  <div class="target-grid">
+    <div class="target-line"><span>Audit link</span><a href="${escapeHtml(row.audit_link)}" target="_blank" rel="noopener">Open audit</a></div>
+    <div class="target-line"><span>Experience link</span><a href="${escapeHtml(row.experience_link)}" target="_blank" rel="noopener">Open experience</a></div>
+    <div class="target-line"><span>Notes</span><strong>${escapeHtml(row.notes || "No notes yet.")}</strong></div>
+    <div class="target-line"><span>Next action</span><strong>${escapeHtml(row.nextAction)}</strong></div>
+  </div>
+</section>`).join("");
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Leads Command Center</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, rgba(30, 41, 59, 0.22), transparent 42%), #020617;
+      color: #e5eef8;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: grid;
+      place-items: start center;
+      padding: 28px 18px 60px;
+    }
+    .shell {
+      width: 100%;
+      max-width: 760px;
+    }
+    .brand {
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .panel,
+    .target-card {
+      background: rgba(15, 23, 42, 0.86);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 28px;
+      box-shadow: 0 28px 80px rgba(2, 6, 23, 0.42);
+    }
+    .panel {
+      padding: 30px 24px 24px;
+    }
+    h1 {
+      margin: 0;
+      color: #f8fafc;
+      font-size: clamp(34px, 7vw, 42px);
+      line-height: 1.02;
+      letter-spacing: -0.05em;
+      text-align: center;
+    }
+    .lede {
+      margin: 14px 0 0;
+      color: #94a3b8;
+      font-size: 15px;
+      line-height: 1.6;
+      text-align: center;
+    }
+    .summary-row {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .summary-card {
+      padding: 14px 12px;
+      border-radius: 18px;
+      background: rgba(2, 6, 23, 0.44);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      text-align: center;
+    }
+    .summary-card span {
+      display: block;
+      color: #94a3b8;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .summary-card strong {
+      display: block;
+      margin-top: 8px;
+      color: #f8fafc;
+      font-size: 22px;
+      letter-spacing: -0.03em;
+    }
+    .targets {
+      margin-top: 18px;
+      display: grid;
+      gap: 14px;
+    }
+    .target-card {
+      padding: 18px 18px 16px;
+    }
+    .target-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+    }
+    .target-domain {
+      color: #f8fafc;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      word-break: break-word;
+    }
+    .target-meta {
+      margin-top: 6px;
+      color: #94a3b8;
+      font-size: 13px;
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(2, 6, 23, 0.52);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      color: #cbd5e1;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: lowercase;
+      white-space: nowrap;
+    }
+    .target-grid {
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+    .target-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: start;
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .target-line span {
+      color: #94a3b8;
+      min-width: 110px;
+    }
+    .target-line strong,
+    .target-line a {
+      color: #e5eef8;
+      text-align: right;
+      word-break: break-word;
+    }
+    .empty {
+      margin-top: 18px;
+      padding: 20px 18px;
+      border-radius: 20px;
+      background: rgba(2, 6, 23, 0.44);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      color: #94a3b8;
+      text-align: center;
+    }
+    @media (max-width: 720px) {
+      .summary-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .target-line {
+        flex-direction: column;
+      }
+      .target-line strong,
+      .target-line a {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="brand">Abando</div>
+    <section class="panel">
+      <h1>Leads Command Center</h1>
+      <p class="lede">Routed targets for Abando revenue recovery.</p>
+      <div class="summary-row">
+        <div class="summary-card"><span>routed</span><strong>${counts.routed}</strong></div>
+        <div class="summary-card"><span>audit_opened</span><strong>${counts.audit_opened}</strong></div>
+        <div class="summary-card"><span>experience_opened</span><strong>${counts.experience_opened}</strong></div>
+        <div class="summary-card"><span>recovery_sent</span><strong>${counts.recovery_sent}</strong></div>
+        <div class="summary-card"><span>return_tracked</span><strong>${counts.return_tracked}</strong></div>
+      </div>
+    </section>
+    ${rows.length > 0 ? `<section class="targets">${cards}</section>` : `<section class="empty">No routed targets yet.</section>`}
+  </main>
 </body>
 </html>`;
 }

@@ -1,0 +1,17 @@
+[
+  {
+    "domain": "example-store.myshopify.com",
+    "source": "manual",
+    "notes": ""
+  },
+  {
+    "domain": "midmarket-home.myshopify.com",
+    "source": "manual",
+    "notes": "mid"
+  },
+  {
+    "domain": "visible-recovery-store.myshopify.com",
+    "source": "manual",
+    "notes": "recovery_visible"
+  }
+]
