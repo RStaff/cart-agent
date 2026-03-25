@@ -1,9 +1,43 @@
 [
   {
+    "domain": "store1.myshopify.com",
+    "source": "real_store",
+    "priority": "real",
+    "notes": "real_store",
+    "score": 1100,
+    "quality_rank": 3,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=store1.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=store1.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "store2.com",
+    "source": "real_store",
+    "priority": "real",
+    "notes": "real_store",
+    "score": 1040,
+    "quality_rank": 3,
+    "signals": {
+      "has_products": false,
+      "has_cart": false,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=store2.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=store2.com&eid=auto-1774472993360"
+  },
+  {
     "domain": "example-store.myshopify.com",
     "source": "manual",
+    "priority": "synthetic",
     "notes": "",
     "score": 100,
+    "quality_rank": 2,
     "signals": {
       "has_products": true,
       "has_cart": true,
@@ -11,13 +45,31 @@
       "site_quality": "mid"
     },
     "audit_link": "https://pay.abando.ai/audit?shop=example-store.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=example-store.myshopify.com&eid=auto-1774467114245"
+    "experience_link": "https://pay.abando.ai/experience?shop=example-store.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "midmarket-home.myshopify.com",
+    "source": "manual",
+    "priority": "synthetic",
+    "notes": "mid",
+    "score": 100,
+    "quality_rank": 2,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=midmarket-home.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home.myshopify.com&eid=auto-1774472993360"
   },
   {
     "domain": "fitgearpro-co.myshopify.com",
-    "source": "manual",
+    "source": "generated",
+    "priority": "synthetic",
     "notes": "auto_discovered",
     "score": 100,
+    "quality_rank": 1,
     "signals": {
       "has_products": true,
       "has_cart": true,
@@ -25,13 +77,15 @@
       "site_quality": "mid"
     },
     "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-co.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-co.myshopify.com&eid=auto-1774467114245"
+    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-co.myshopify.com&eid=auto-1774472993360"
   },
   {
     "domain": "fitgearpro-goods.myshopify.com",
-    "source": "manual",
+    "source": "generated",
+    "priority": "synthetic",
     "notes": "auto_discovered",
     "score": 100,
+    "quality_rank": 1,
     "signals": {
       "has_products": true,
       "has_cart": true,
@@ -39,13 +93,15 @@
       "site_quality": "mid"
     },
     "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-goods.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-goods.myshopify.com&eid=auto-1774467114245"
+    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-goods.myshopify.com&eid=auto-1774472993360"
   },
   {
     "domain": "fitgearpro-home.myshopify.com",
-    "source": "manual",
+    "source": "generated",
+    "priority": "synthetic",
     "notes": "auto_discovered",
     "score": 100,
+    "quality_rank": 1,
     "signals": {
       "has_products": true,
       "has_cart": true,
@@ -53,13 +109,15 @@
       "site_quality": "mid"
     },
     "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-home.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-home.myshopify.com&eid=auto-1774467114245"
+    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-home.myshopify.com&eid=auto-1774472993360"
   },
   {
     "domain": "fitgearpro-shop.myshopify.com",
-    "source": "manual",
+    "source": "generated",
+    "priority": "synthetic",
     "notes": "auto_discovered",
     "score": 100,
+    "quality_rank": 1,
     "signals": {
       "has_products": true,
       "has_cart": true,
@@ -67,13 +125,15 @@
       "site_quality": "mid"
     },
     "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-shop.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-shop.myshopify.com&eid=auto-1774467114245"
+    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-shop.myshopify.com&eid=auto-1774472993360"
   },
   {
     "domain": "fitgearpro-store.myshopify.com",
-    "source": "manual",
+    "source": "generated",
+    "priority": "synthetic",
     "notes": "auto_discovered",
     "score": 100,
+    "quality_rank": 1,
     "signals": {
       "has_products": true,
       "has_cart": true,
@@ -81,13 +141,15 @@
       "site_quality": "mid"
     },
     "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-store.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-store.myshopify.com&eid=auto-1774467114245"
+    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-store.myshopify.com&eid=auto-1774472993360"
   },
   {
     "domain": "fitgearpro.myshopify.com",
-    "source": "manual",
+    "source": "seed",
+    "priority": "synthetic",
     "notes": "auto_discovered",
     "score": 100,
+    "quality_rank": 1,
     "signals": {
       "has_products": true,
       "has_cart": true,
@@ -95,48 +157,6 @@
       "site_quality": "mid"
     },
     "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "homegoodsco-co.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco-co.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-co.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "homegoodsco-goods.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco-goods.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-goods.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "homegoodsco-home.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco-home.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-home.myshopify.com&eid=auto-1774467114245"
+    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro.myshopify.com&eid=auto-1774472993360"
   }
 ]

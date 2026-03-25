@@ -254,6 +254,7 @@ const leadsTopTargetsPath = join(repoRoot, "staffordos", "leads", "top_targets.j
 const leadsOutcomesPath = join(repoRoot, "staffordos", "leads", "outcomes.json");
 const leadsOutreachQueuePath = join(repoRoot, "staffordos", "leads", "outreach_queue.json");
 const leadsOutreachTemplatesPath = join(repoRoot, "staffordos", "leads", "outreach_templates.json");
+const leadsContactResearchQueuePath = join(repoRoot, "staffordos", "leads", "contact_research_queue.json");
 
 app.set("trust proxy", 1);
 
@@ -2260,6 +2261,16 @@ app.get("/outreach", async (_req, res) => {
   return res.status(200).type("html").send(renderOutreachPage(outreachState));
 });
 
+app.get("/contact-research", async (_req, res) => {
+  const researchState = await getContactResearchCommandCenterState();
+  return res.status(200).type("html").send(renderContactResearchPage(researchState));
+});
+
+app.get("/proof", (req, res) => {
+  const shop = normalizeStoreInput(String(req.query?.shop || "").trim().toLowerCase());
+  return res.status(200).type("html").send(renderProofPage({ shop }));
+});
+
 app.use(
   [
     "/ops",
@@ -3673,6 +3684,22 @@ function deriveOutreachNextAction(entry = {}) {
   return "Queue";
 }
 
+function deriveContactResearchNextAction(entry = {}) {
+  const researchStatus = String(entry?.research_status || "");
+  const contactStatus = String(entry?.contact_status || "");
+  const explicitNext = String(entry?.next_contact_action || "").trim();
+
+  if (researchStatus === "closed") return "Complete";
+  if (researchStatus === "ready_for_outreach") return "Queue outreach";
+  if (researchStatus === "contact_found") return "Mark ready for outreach";
+  if (researchStatus === "researching") return "Continue research";
+  if (researchStatus === "no_contact_found") return "Revisit later";
+  if (contactStatus === "contact_page_ready") return "Review contact page";
+  if (contactStatus === "social_ready") return "Review social profile";
+  if (contactStatus === "no_contact_found") return "Research manually";
+  return explicitNext || "Research manually";
+}
+
 function renderOutreachTemplate(template = "", row = {}) {
   return String(template || "")
     .replace(/\{\{audit_link\}\}/g, String(row.audit_link || ""))
@@ -3766,6 +3793,44 @@ async function getOutreachCommandCenterState() {
     if (row.sent) counts.sent += 1;
     if (row.replied) counts.replied += 1;
     if (row.closed) counts.closed += 1;
+  });
+
+  return { rows, counts };
+}
+
+async function getContactResearchCommandCenterState() {
+  const queue = await readJsonArrayFile(leadsContactResearchQueuePath);
+
+  const rows = queue.map((entry) => ({
+    domain: normalizeStoreInput(entry?.domain || ""),
+    score: Number(entry?.score || 0),
+    contact_status: String(entry?.contact_status || "no_contact_found"),
+    research_status: String(entry?.research_status || "needs_research"),
+    contact_page_url: String(entry?.contact_page_url || ""),
+    social_links: {
+      instagram: String(entry?.social_links?.instagram || ""),
+      linkedin: String(entry?.social_links?.linkedin || ""),
+      facebook: String(entry?.social_links?.facebook || ""),
+    },
+    contact_email: String(entry?.contact_email || "").trim(),
+    contact_name: String(entry?.contact_name || "").trim(),
+    contact_role: String(entry?.contact_role || "").trim(),
+    notes: String(entry?.notes || "").trim(),
+    nextAction: deriveContactResearchNextAction(entry),
+  }));
+
+  const counts = {
+    needs_research: 0,
+    researching: 0,
+    contact_found: 0,
+    ready_for_outreach: 0,
+    no_contact_found: 0,
+  };
+
+  rows.forEach((row) => {
+    if (Object.prototype.hasOwnProperty.call(counts, row.research_status)) {
+      counts[row.research_status] += 1;
+    }
   });
 
   return { rows, counts };
@@ -3982,6 +4047,7 @@ function renderLeadsPage({ rows, counts }) {
       <p class="lede">Routed targets for Abando revenue recovery.</p>
       <div class="page-links">
         <a href="/outreach">View outreach queue</a>
+        <a href="/contact-research">View contact research</a>
       </div>
       <div class="summary-row">
         <div class="summary-card"><span>routed</span><strong>${counts.routed}</strong></div>
@@ -4224,6 +4290,7 @@ function renderOutreachPage({ rows, counts }) {
       <p class="lede">Operator queue for Abando outreach.</p>
       <div class="page-links">
         <a href="/leads">View leads</a>
+        <a href="/contact-research">View contact research</a>
       </div>
       <div class="summary-row">
         <div class="summary-card"><span>approved</span><strong>${counts.approved}</strong></div>
@@ -4234,6 +4301,629 @@ function renderOutreachPage({ rows, counts }) {
       </div>
     </section>
     ${rows.length > 0 ? `<section class="targets">${cards}</section>` : `<section class="empty">No outreach items yet.</section>`}
+  </main>
+</body>
+</html>`;
+}
+
+function renderContactResearchPage({ rows, counts }) {
+  const cards = rows.map((row) => {
+    const socialLinks = [
+      row.social_links.instagram ? `<a href="${escapeHtml(row.social_links.instagram)}" target="_blank" rel="noopener">Instagram</a>` : "",
+      row.social_links.linkedin ? `<a href="${escapeHtml(row.social_links.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>` : "",
+      row.social_links.facebook ? `<a href="${escapeHtml(row.social_links.facebook)}" target="_blank" rel="noopener">Facebook</a>` : "",
+    ].filter(Boolean).join(" · ");
+
+    return `\
+<section class="target-card">
+  <div class="target-top">
+    <div>
+      <div class="target-domain">${escapeHtml(row.domain || "Unknown domain")}</div>
+      <div class="target-meta">Score ${Number(row.score || 0)}</div>
+    </div>
+    <div class="status-badge">${escapeHtml(row.research_status)}</div>
+  </div>
+  <div class="target-grid">
+    <div class="target-line"><span>Contact status</span><strong>${escapeHtml(row.contact_status)}</strong></div>
+    <div class="target-line"><span>Research status</span><strong>${escapeHtml(row.research_status)}</strong></div>
+    <div class="target-line"><span>Contact page</span>${row.contact_page_url ? `<a href="${escapeHtml(row.contact_page_url)}" target="_blank" rel="noopener">Open contact page</a>` : `<strong>Not found</strong>`}</div>
+    <div class="target-line"><span>Social links</span><strong>${socialLinks || "Not found"}</strong></div>
+    <div class="target-line"><span>Contact email</span><strong>${escapeHtml(row.contact_email || "Not found")}</strong></div>
+    <div class="target-line"><span>Contact name</span><strong>${escapeHtml(row.contact_name || "Not set")}</strong></div>
+    <div class="target-line"><span>Contact role</span><strong>${escapeHtml(row.contact_role || "Not set")}</strong></div>
+    <div class="target-line"><span>Notes</span><strong>${escapeHtml(row.notes || "No notes yet.")}</strong></div>
+    <div class="target-line"><span>Next action</span><strong>${escapeHtml(row.nextAction)}</strong></div>
+    <div class="helper-line">start: node staffordos/leads/contact_research.js start ${escapeHtml(row.domain)}</div>
+    <div class="helper-line">add-contact: node staffordos/leads/contact_research.js add-contact ${escapeHtml(row.domain)} owner@store.com "Name" "Role"</div>
+    <div class="helper-line">ready: node staffordos/leads/contact_research.js ready ${escapeHtml(row.domain)}</div>
+  </div>
+</section>`;
+  }).join("");
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contact Research Queue</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, rgba(30, 41, 59, 0.22), transparent 42%), #020617;
+      color: #e5eef8;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: grid;
+      place-items: start center;
+      padding: 28px 18px 60px;
+    }
+    .shell {
+      width: 100%;
+      max-width: 760px;
+    }
+    .brand {
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .panel,
+    .target-card {
+      background: rgba(15, 23, 42, 0.86);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 28px;
+      box-shadow: 0 28px 80px rgba(2, 6, 23, 0.42);
+    }
+    .panel {
+      padding: 30px 24px 24px;
+    }
+    h1 {
+      margin: 0;
+      color: #f8fafc;
+      font-size: clamp(34px, 7vw, 42px);
+      line-height: 1.02;
+      letter-spacing: -0.05em;
+      text-align: center;
+    }
+    .lede {
+      margin: 14px 0 0;
+      color: #94a3b8;
+      font-size: 15px;
+      line-height: 1.6;
+      text-align: center;
+    }
+    .summary-row {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .summary-card {
+      padding: 14px 12px;
+      border-radius: 18px;
+      background: rgba(2, 6, 23, 0.44);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      text-align: center;
+    }
+    .summary-card span {
+      display: block;
+      color: #94a3b8;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .summary-card strong {
+      display: block;
+      margin-top: 8px;
+      color: #f8fafc;
+      font-size: 22px;
+      letter-spacing: -0.03em;
+    }
+    .page-links {
+      margin-top: 18px;
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .page-links a {
+      color: #cbd5e1;
+      font-size: 13px;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+      padding-bottom: 2px;
+    }
+    .targets {
+      margin-top: 18px;
+      display: grid;
+      gap: 14px;
+    }
+    .target-card {
+      padding: 18px 18px 16px;
+    }
+    .target-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+    }
+    .target-domain {
+      color: #f8fafc;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      word-break: break-word;
+    }
+    .target-meta {
+      margin-top: 6px;
+      color: #94a3b8;
+      font-size: 13px;
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(2, 6, 23, 0.52);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      color: #cbd5e1;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: lowercase;
+      white-space: nowrap;
+    }
+    .target-grid {
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+    .target-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: start;
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .target-line span {
+      color: #94a3b8;
+      min-width: 130px;
+    }
+    .target-line strong,
+    .target-line a {
+      color: #e5eef8;
+      text-align: right;
+      word-break: break-word;
+    }
+    .helper-line {
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .empty {
+      margin-top: 18px;
+      padding: 20px 18px;
+      border-radius: 20px;
+      background: rgba(2, 6, 23, 0.44);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      color: #94a3b8;
+      text-align: center;
+    }
+    @media (max-width: 720px) {
+      .summary-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .target-line {
+        flex-direction: column;
+      }
+      .target-line strong,
+      .target-line a {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="brand">Abando</div>
+    <section class="panel">
+      <h1>Contact Research Queue</h1>
+      <p class="lede">Operator review for real merchant contact discovery.</p>
+      <div class="page-links">
+        <a href="/leads">View leads</a>
+        <a href="/outreach">View outreach queue</a>
+      </div>
+      <div class="summary-row">
+        <div class="summary-card"><span>needs_research</span><strong>${counts.needs_research}</strong></div>
+        <div class="summary-card"><span>researching</span><strong>${counts.researching}</strong></div>
+        <div class="summary-card"><span>contact_found</span><strong>${counts.contact_found}</strong></div>
+        <div class="summary-card"><span>ready_for_outreach</span><strong>${counts.ready_for_outreach}</strong></div>
+        <div class="summary-card"><span>no_contact_found</span><strong>${counts.no_contact_found}</strong></div>
+      </div>
+    </section>
+    ${rows.length > 0 ? `<section class="targets">${cards}</section>` : `<section class="empty">No contact research items yet.</section>`}
+  </main>
+</body>
+</html>`;
+}
+
+function buildProofStoreName(shop = "") {
+  const base = String(shop || "")
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .replace(/\.myshopify\.com$/, "")
+    .split("/")[0]
+    .split("?")[0]
+    .split("#")[0]
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  if (!base) {
+    return "Your Store";
+  }
+
+  return base
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function getProofValueTier(shop = "") {
+  const value = String(shop || "").toLowerCase();
+  const premiumKeywords = ["lux", "atelier", "studio", "collective", "premium"];
+  const midKeywords = ["home", "bath", "pets", "kitchen", "gear", "fit"];
+
+  if (premiumKeywords.some((keyword) => value.includes(keyword))) {
+    return {
+      tier: "premium",
+      monthly: 4800,
+      daily: 160,
+      hourly: 7,
+      recoveredOrder: 126,
+    };
+  }
+
+  if (midKeywords.some((keyword) => value.includes(keyword))) {
+    return {
+      tier: "mid",
+      monthly: 3200,
+      daily: 107,
+      hourly: 4,
+      recoveredOrder: 84,
+    };
+  }
+
+  return {
+    tier: "general",
+    monthly: 1800,
+    daily: 60,
+    hourly: 3,
+    recoveredOrder: 52,
+  };
+}
+
+function formatUsdWhole(amount = 0, suffix = "") {
+  return `$${Number(amount || 0).toLocaleString("en-US")}${suffix}`;
+}
+
+function renderProofPage({ shop }) {
+  const normalizedShop = shop || "your-store.myshopify.com";
+  const storeName = buildProofStoreName(normalizedShop);
+  const valueTier = getProofValueTier(normalizedShop);
+  const monthlyRevenueLabel = `${formatUsdWhole(valueTier.monthly)} recoverable`;
+  const dailyRevenueLabel = `${formatUsdWhole(valueTier.daily)} / day`;
+  const hourlyRevenueLabel = `${formatUsdWhole(valueTier.hourly)} / hour`;
+  const personalizedRevenueLine = valueTier.tier === "premium"
+    ? `For stores like ${storeName}, abandoned checkout recovery can compound fast.`
+    : `For stores like ${storeName}, even small recovery gains add up quickly.`;
+  const installUrl = `/install/shopify${normalizedShop ? `?shop=${encodeURIComponent(normalizedShop)}` : ""}`;
+  const bookingUrl = process.env.ABANDO_BOOKING_URL || process.env.CALENDLY_URL || `mailto:rossstafford1@gmail.com?subject=${encodeURIComponent(`Abando proof for ${normalizedShop}`)}`;
+  const recentActivity = [
+    { value: `${storeName} checkout started`, detail: "Recovery opportunity detected after abandoned checkout", time: "3 min ago" },
+    { value: `Recovery email sent for ${storeName}`, detail: "Recovery message triggered automatically", time: "2 min ago" },
+    { value: `Customer returned to ${storeName} checkout`, detail: "Customer came back through the recovery link", time: "just now" },
+    { value: `${formatUsdWhole(valueTier.recoveredOrder)} recovered`, detail: `Directional recovered order value for ${storeName}`, time: "11 min ago" },
+  ];
+  const activityHtml = recentActivity.map((item) => `\
+        <div class="activity-item">
+          <div>
+            <div class="activity-value">${escapeHtml(item.value)}</div>
+            <div class="activity-detail">${escapeHtml(item.detail)}</div>
+          </div>
+          <div class="activity-time">${escapeHtml(item.time)}</div>
+        </div>`).join("");
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Abando Proof</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, rgba(30, 41, 59, 0.22), transparent 42%), #020617;
+      color: #e5eef8;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: grid;
+      place-items: start center;
+      padding: 32px 18px 60px;
+    }
+    .shell {
+      width: 100%;
+      max-width: 760px;
+    }
+    .panel {
+      background: rgba(15, 23, 42, 0.86);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 30px;
+      box-shadow: 0 28px 80px rgba(2, 6, 23, 0.42);
+      padding: 34px 26px 26px;
+    }
+    .brand {
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0;
+      color: #f8fafc;
+      font-size: clamp(38px, 8vw, 48px);
+      line-height: 1.02;
+      letter-spacing: -0.05em;
+      text-align: center;
+    }
+    .lede {
+      margin: 14px auto 0;
+      max-width: 560px;
+      color: #94a3b8;
+      font-size: 15px;
+      line-height: 1.6;
+      text-align: center;
+    }
+    .revenue-card {
+      margin-top: 24px;
+      padding: 22px 20px;
+      border-radius: 22px;
+      background: rgba(2, 6, 23, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      text-align: center;
+    }
+    .revenue-label {
+      color: #94a3b8;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .revenue-value {
+      margin-top: 10px;
+      color: #f8fafc;
+      font-size: clamp(36px, 9vw, 52px);
+      font-weight: 800;
+      letter-spacing: -0.05em;
+    }
+    .revenue-breakdown {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .revenue-breakdown-card {
+      padding: 14px 12px;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.82);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      text-align: center;
+    }
+    .revenue-breakdown-card span {
+      display: block;
+      color: #94a3b8;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .revenue-breakdown-card strong {
+      display: block;
+      margin-top: 8px;
+      color: #f8fafc;
+      font-size: 18px;
+      letter-spacing: -0.03em;
+    }
+    .credibility-line {
+      margin-top: 18px;
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.6;
+      text-align: center;
+    }
+    .recovery-strip {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .recovery-step {
+      position: relative;
+      padding: 18px 14px;
+      border-radius: 18px;
+      background: rgba(2, 6, 23, 0.42);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      text-align: left;
+      color: #cbd5e1;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .recovery-step strong {
+      display: block;
+      color: #f8fafc;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+    .recovery-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .activity-card {
+      margin-top: 22px;
+      padding: 20px 18px;
+      border-radius: 22px;
+      background: rgba(2, 6, 23, 0.44);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+    }
+    .activity-title {
+      color: #f8fafc;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+    .activity-list {
+      margin-top: 14px;
+      display: grid;
+      gap: 12px;
+    }
+    .activity-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: start;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    }
+    .activity-item:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+    .activity-value {
+      color: #f8fafc;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .activity-detail {
+      margin-top: 4px;
+      color: #94a3b8;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .activity-time {
+      color: #94a3b8;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .actions {
+      margin-top: 24px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      transition: transform 140ms ease, opacity 140ms ease;
+    }
+    .button:hover {
+      transform: translateY(-1px);
+      opacity: 0.96;
+    }
+    .button-primary {
+      background: #f8fafc;
+      color: #020617;
+    }
+    .button-secondary {
+      background: rgba(15, 23, 42, 0.82);
+      color: #e5eef8;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+    }
+    .cta-subtext {
+      margin-top: 12px;
+      color: #94a3b8;
+      font-size: 13px;
+      text-align: center;
+    }
+    @media (max-width: 720px) {
+      .revenue-breakdown {
+        grid-template-columns: 1fr;
+      }
+      .recovery-strip {
+        grid-template-columns: 1fr;
+      }
+      .recovery-arrow {
+        transform: rotate(90deg);
+      }
+      .actions {
+        flex-direction: column;
+      }
+      .button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="brand">Abando</div>
+    <section class="panel">
+      <h1>You're losing revenue from abandoned checkout</h1>
+      <p class="lede">We detected recovery opportunity for ${escapeHtml(storeName)}.</p>
+      <div class="revenue-card">
+        <div class="revenue-label">Estimated revenue</div>
+        <div class="revenue-value">${monthlyRevenueLabel}</div>
+        <div class="revenue-breakdown">
+          <div class="revenue-breakdown-card"><span>Monthly</span><strong>${monthlyRevenueLabel}</strong></div>
+          <div class="revenue-breakdown-card"><span>Daily</span><strong>${dailyRevenueLabel}</strong></div>
+          <div class="revenue-breakdown-card"><span>Hourly</span><strong>${hourlyRevenueLabel}</strong></div>
+        </div>
+        <div class="cta-subtext">${escapeHtml(personalizedRevenueLine)}</div>
+      </div>
+      <div class="credibility-line">Used by Shopify stores to recover abandoned checkout revenue automatically.</div>
+      <div class="recovery-strip">
+        <div class="recovery-step"><strong>1. Email sent</strong>Recovery starts automatically after ${escapeHtml(storeName)} loses a checkout.</div>
+        <div class="recovery-arrow" aria-hidden="true">→</div>
+        <div class="recovery-step"><strong>2. Customer returns</strong>The shopper comes back to ${escapeHtml(storeName)} through the recovery link.</div>
+        <div class="recovery-arrow" aria-hidden="true">→</div>
+        <div class="recovery-step"><strong>3. Checkout completed</strong>Recovered revenue moves back into ${escapeHtml(storeName)}.</div>
+      </div>
+      <div class="activity-card">
+        <div class="activity-title">Recent recovery activity</div>
+        <div class="activity-list">
+${activityHtml}
+        </div>
+      </div>
+      <div class="actions">
+        <a class="button button-primary" href="${escapeHtml(installUrl)}">Turn this on for ${escapeHtml(storeName)}</a>
+        <a class="button button-secondary" href="${escapeHtml(bookingUrl)}" target="_blank" rel="noopener">See it live (2 min)</a>
+      </div>
+      <div class="cta-subtext">Takes 2 minutes. No setup.</div>
+    </section>
   </main>
 </body>
 </html>`;

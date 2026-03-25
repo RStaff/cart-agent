@@ -10,6 +10,7 @@ const SCORED_PATH = path.join(LEADS_DIR, "scored_stores.json");
 const TOP_TARGETS_PATH = path.join(LEADS_DIR, "top_targets.json");
 const TOP_TARGET_LIMIT = 10;
 const ABANDO_PUBLIC_BASE = "https://pay.abando.ai";
+const REAL_PRIORITY_BOOST = 1000;
 
 function readJson(filePath, fallback) {
   try {
@@ -73,16 +74,35 @@ function scoreSignals(signals) {
   return score;
 }
 
+function getPriority(candidate = {}) {
+  return String(candidate?.priority || (String(candidate?.source || "").toLowerCase() === "real_store" ? "real" : "synthetic")).toLowerCase();
+}
+
+function getPriorityRank(priority = "") {
+  return priority === "real" ? 2 : 1;
+}
+
+function getQualityRank(candidate = {}, signals = {}) {
+  if (getPriority(candidate) === "real") return 3;
+  if (String(candidate?.source || "").toLowerCase() === "manual") return 2;
+  if (signals.site_quality === "mid") return 1;
+  return 0;
+}
+
 function buildTarget(candidate, runStamp) {
   const domain = normalizeDomain(candidate?.domain);
   const signals = inferSignals(candidate);
-  const score = scoreSignals(signals);
+  const priority = getPriority(candidate);
+  const score = scoreSignals(signals) + (priority === "real" ? REAL_PRIORITY_BOOST : 0);
+  const qualityRank = getQualityRank(candidate, signals);
 
   return {
     domain,
     source: String(candidate?.source || "manual"),
+    priority,
     notes: String(candidate?.notes || ""),
     score,
+    quality_rank: qualityRank,
     signals: {
       has_products: signals.has_products,
       has_cart: signals.has_cart,
@@ -94,6 +114,15 @@ function buildTarget(candidate, runStamp) {
   };
 }
 
+function compareTargets(a, b) {
+  return (
+    getPriorityRank(b.priority) - getPriorityRank(a.priority) ||
+    b.score - a.score ||
+    (b.quality_rank || 0) - (a.quality_rank || 0) ||
+    a.domain.localeCompare(b.domain)
+  );
+}
+
 function main() {
   const candidates = readJson(CANDIDATES_PATH, []);
   const runStamp = Date.now();
@@ -101,19 +130,36 @@ function main() {
   const scored = candidates
     .map((candidate) => buildTarget(candidate, runStamp))
     .filter((candidate) => candidate.domain)
-    .sort((a, b) => b.score - a.score || a.domain.localeCompare(b.domain));
+    .sort(compareTargets);
 
-  const topTargets = scored.slice(0, TOP_TARGET_LIMIT);
+  const realTargets = scored.filter((target) => target.priority === "real");
+  const syntheticTargets = scored.filter((target) => target.priority !== "real");
+  const topTargets = [...realTargets, ...syntheticTargets].slice(0, TOP_TARGET_LIMIT);
 
   writeJson(SCORED_PATH, scored);
   writeJson(TOP_TARGETS_PATH, topTargets);
 
-  console.log("Top Targets:\n");
-  topTargets.forEach((target, index) => {
+  console.log("REAL TARGETS:\n");
+  realTargets.slice(0, TOP_TARGET_LIMIT).forEach((target, index) => {
     console.log(`${index + 1}. ${target.domain} → score ${target.score}`);
     console.log(`   audit: ${target.audit_link}`);
     console.log(`   experience: ${target.experience_link}`);
   });
+
+  if (realTargets.length === 0) {
+    console.log("None");
+  }
+
+  console.log("\nSYNTHETIC TARGETS:\n");
+  syntheticTargets.slice(0, TOP_TARGET_LIMIT).forEach((target, index) => {
+    console.log(`${index + 1}. ${target.domain} → score ${target.score}`);
+    console.log(`   audit: ${target.audit_link}`);
+    console.log(`   experience: ${target.experience_link}`);
+  });
+
+  if (syntheticTargets.length === 0) {
+    console.log("None");
+  }
 
   if (topTargets.length === 0) {
     console.log("No candidate stores found.");

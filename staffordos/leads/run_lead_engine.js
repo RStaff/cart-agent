@@ -10,6 +10,7 @@ const QUALIFIED_PATH = path.join(LEADS_DIR, "qualified_targets.json");
 const CANDIDATES_PATH = path.join(LEADS_DIR, "candidate_stores.json");
 
 const STEPS = [
+  ["real_store_intake.js", "sync"],
   "discover_stores.js",
   "enrich_stores.js",
   "ingest_candidates.js",
@@ -17,9 +18,11 @@ const STEPS = [
   "quality_filter.js",
 ];
 
-function runStep(scriptName) {
+function runStep(step) {
+  const parts = Array.isArray(step) ? step : [step];
+  const [scriptName, ...args] = parts;
   const scriptPath = path.join(LEADS_DIR, scriptName);
-  const result = spawnSync(process.execPath, [scriptPath], {
+  const result = spawnSync(process.execPath, [scriptPath, ...args], {
     cwd: ROOT,
     stdio: "inherit",
   });

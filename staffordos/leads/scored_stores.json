@@ -1,9 +1,43 @@
 [
   {
+    "domain": "store1.myshopify.com",
+    "source": "real_store",
+    "priority": "real",
+    "notes": "real_store",
+    "score": 1100,
+    "quality_rank": 3,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=store1.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=store1.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "store2.com",
+    "source": "real_store",
+    "priority": "real",
+    "notes": "real_store",
+    "score": 1040,
+    "quality_rank": 3,
+    "signals": {
+      "has_products": false,
+      "has_cart": false,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=store2.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=store2.com&eid=auto-1774472993360"
+  },
+  {
     "domain": "example-store.myshopify.com",
     "source": "manual",
+    "priority": "synthetic",
     "notes": "",
     "score": 100,
+    "quality_rank": 2,
     "signals": {
       "has_products": true,
       "has_cart": true,
@@ -11,335 +45,15 @@
       "site_quality": "mid"
     },
     "audit_link": "https://pay.abando.ai/audit?shop=example-store.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=example-store.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "fitgearpro-co.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-co.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-co.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "fitgearpro-goods.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-goods.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-goods.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "fitgearpro-home.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-home.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-home.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "fitgearpro-shop.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-shop.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-shop.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "fitgearpro-store.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-store.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-store.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "fitgearpro.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "homegoodsco-co.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco-co.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-co.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "homegoodsco-goods.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco-goods.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-goods.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "homegoodsco-home.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco-home.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-home.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "homegoodsco-shop.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco-shop.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-shop.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "homegoodsco-store.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco-store.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-store.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "homegoodsco.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "luxbath-co.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=luxbath-co.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=luxbath-co.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "luxbath-goods.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=luxbath-goods.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=luxbath-goods.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "luxbath-home.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=luxbath-home.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=luxbath-home.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "luxbath-shop.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=luxbath-shop.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=luxbath-shop.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "luxbath-store.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=luxbath-store.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=luxbath-store.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "luxbath.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=luxbath.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=luxbath.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "midmarket-home-co.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=midmarket-home-co.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home-co.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "midmarket-home-goods.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=midmarket-home-goods.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home-goods.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "midmarket-home-shop.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=midmarket-home-shop.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home-shop.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "midmarket-home-store.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=midmarket-home-store.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home-store.myshopify.com&eid=auto-1774467114245"
-  },
-  {
-    "domain": "midmarket-home-usa.myshopify.com",
-    "source": "manual",
-    "notes": "auto_discovered",
-    "score": 100,
-    "signals": {
-      "has_products": true,
-      "has_cart": true,
-      "recovery_visible": false,
-      "site_quality": "mid"
-    },
-    "audit_link": "https://pay.abando.ai/audit?shop=midmarket-home-usa.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home-usa.myshopify.com&eid=auto-1774467114245"
+    "experience_link": "https://pay.abando.ai/experience?shop=example-store.myshopify.com&eid=auto-1774472993360"
   },
   {
     "domain": "midmarket-home.myshopify.com",
     "source": "manual",
+    "priority": "synthetic",
     "notes": "mid",
     "score": 100,
+    "quality_rank": 2,
     "signals": {
       "has_products": true,
       "has_cart": true,
@@ -347,13 +61,383 @@
       "site_quality": "mid"
     },
     "audit_link": "https://pay.abando.ai/audit?shop=midmarket-home.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home.myshopify.com&eid=auto-1774467114245"
+    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "fitgearpro-co.myshopify.com",
+    "source": "generated",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-co.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-co.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "fitgearpro-goods.myshopify.com",
+    "source": "generated",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-goods.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-goods.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "fitgearpro-home.myshopify.com",
+    "source": "generated",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-home.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-home.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "fitgearpro-shop.myshopify.com",
+    "source": "generated",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-shop.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-shop.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "fitgearpro-store.myshopify.com",
+    "source": "generated",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-store.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-store.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "fitgearpro.myshopify.com",
+    "source": "seed",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "homegoodsco-co.myshopify.com",
+    "source": "generated",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco-co.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-co.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "homegoodsco-goods.myshopify.com",
+    "source": "generated",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco-goods.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-goods.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "homegoodsco-home.myshopify.com",
+    "source": "generated",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco-home.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-home.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "homegoodsco-shop.myshopify.com",
+    "source": "generated",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco-shop.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-shop.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "homegoodsco-store.myshopify.com",
+    "source": "generated",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco-store.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-store.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "homegoodsco.myshopify.com",
+    "source": "seed",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "luxbath-co.myshopify.com",
+    "source": "generated",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=luxbath-co.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=luxbath-co.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "luxbath-goods.myshopify.com",
+    "source": "generated",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=luxbath-goods.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=luxbath-goods.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "luxbath-home.myshopify.com",
+    "source": "generated",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=luxbath-home.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=luxbath-home.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "luxbath-shop.myshopify.com",
+    "source": "generated",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=luxbath-shop.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=luxbath-shop.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "luxbath-store.myshopify.com",
+    "source": "generated",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=luxbath-store.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=luxbath-store.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "luxbath.myshopify.com",
+    "source": "seed",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=luxbath.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=luxbath.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "midmarket-home-co.myshopify.com",
+    "source": "generated",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=midmarket-home-co.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home-co.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "midmarket-home-goods.myshopify.com",
+    "source": "generated",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=midmarket-home-goods.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home-goods.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "midmarket-home-shop.myshopify.com",
+    "source": "generated",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=midmarket-home-shop.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home-shop.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "midmarket-home-store.myshopify.com",
+    "source": "generated",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=midmarket-home-store.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home-store.myshopify.com&eid=auto-1774472993360"
+  },
+  {
+    "domain": "midmarket-home-usa.myshopify.com",
+    "source": "generated",
+    "priority": "synthetic",
+    "notes": "auto_discovered",
+    "score": 100,
+    "quality_rank": 1,
+    "signals": {
+      "has_products": true,
+      "has_cart": true,
+      "recovery_visible": false,
+      "site_quality": "mid"
+    },
+    "audit_link": "https://pay.abando.ai/audit?shop=midmarket-home-usa.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home-usa.myshopify.com&eid=auto-1774472993360"
   },
   {
     "domain": "modernpets-co.myshopify.com",
-    "source": "manual",
+    "source": "generated",
+    "priority": "synthetic",
     "notes": "auto_discovered",
     "score": 100,
+    "quality_rank": 1,
     "signals": {
       "has_products": true,
       "has_cart": true,
@@ -361,13 +445,15 @@
       "site_quality": "mid"
     },
     "audit_link": "https://pay.abando.ai/audit?shop=modernpets-co.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=modernpets-co.myshopify.com&eid=auto-1774467114245"
+    "experience_link": "https://pay.abando.ai/experience?shop=modernpets-co.myshopify.com&eid=auto-1774472993360"
   },
   {
     "domain": "modernpets-goods.myshopify.com",
-    "source": "manual",
+    "source": "generated",
+    "priority": "synthetic",
     "notes": "auto_discovered",
     "score": 100,
+    "quality_rank": 1,
     "signals": {
       "has_products": true,
       "has_cart": true,
@@ -375,13 +461,15 @@
       "site_quality": "mid"
     },
     "audit_link": "https://pay.abando.ai/audit?shop=modernpets-goods.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=modernpets-goods.myshopify.com&eid=auto-1774467114245"
+    "experience_link": "https://pay.abando.ai/experience?shop=modernpets-goods.myshopify.com&eid=auto-1774472993360"
   },
   {
     "domain": "modernpets-home.myshopify.com",
-    "source": "manual",
+    "source": "generated",
+    "priority": "synthetic",
     "notes": "auto_discovered",
     "score": 100,
+    "quality_rank": 1,
     "signals": {
       "has_products": true,
       "has_cart": true,
@@ -389,13 +477,15 @@
       "site_quality": "mid"
     },
     "audit_link": "https://pay.abando.ai/audit?shop=modernpets-home.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=modernpets-home.myshopify.com&eid=auto-1774467114245"
+    "experience_link": "https://pay.abando.ai/experience?shop=modernpets-home.myshopify.com&eid=auto-1774472993360"
   },
   {
     "domain": "modernpets-shop.myshopify.com",
-    "source": "manual",
+    "source": "generated",
+    "priority": "synthetic",
     "notes": "auto_discovered",
     "score": 100,
+    "quality_rank": 1,
     "signals": {
       "has_products": true,
       "has_cart": true,
@@ -403,13 +493,15 @@
       "site_quality": "mid"
     },
     "audit_link": "https://pay.abando.ai/audit?shop=modernpets-shop.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=modernpets-shop.myshopify.com&eid=auto-1774467114245"
+    "experience_link": "https://pay.abando.ai/experience?shop=modernpets-shop.myshopify.com&eid=auto-1774472993360"
   },
   {
     "domain": "modernpets-store.myshopify.com",
-    "source": "manual",
+    "source": "generated",
+    "priority": "synthetic",
     "notes": "auto_discovered",
     "score": 100,
+    "quality_rank": 1,
     "signals": {
       "has_products": true,
       "has_cart": true,
@@ -417,13 +509,15 @@
       "site_quality": "mid"
     },
     "audit_link": "https://pay.abando.ai/audit?shop=modernpets-store.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=modernpets-store.myshopify.com&eid=auto-1774467114245"
+    "experience_link": "https://pay.abando.ai/experience?shop=modernpets-store.myshopify.com&eid=auto-1774472993360"
   },
   {
     "domain": "modernpets.myshopify.com",
-    "source": "manual",
+    "source": "seed",
+    "priority": "synthetic",
     "notes": "auto_discovered",
     "score": 100,
+    "quality_rank": 1,
     "signals": {
       "has_products": true,
       "has_cart": true,
@@ -431,13 +525,15 @@
       "site_quality": "mid"
     },
     "audit_link": "https://pay.abando.ai/audit?shop=modernpets.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=modernpets.myshopify.com&eid=auto-1774467114245"
+    "experience_link": "https://pay.abando.ai/experience?shop=modernpets.myshopify.com&eid=auto-1774472993360"
   },
   {
     "domain": "urbankitchen-co.myshopify.com",
-    "source": "manual",
+    "source": "generated",
+    "priority": "synthetic",
     "notes": "auto_discovered",
     "score": 100,
+    "quality_rank": 1,
     "signals": {
       "has_products": true,
       "has_cart": true,
@@ -445,13 +541,15 @@
       "site_quality": "mid"
     },
     "audit_link": "https://pay.abando.ai/audit?shop=urbankitchen-co.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen-co.myshopify.com&eid=auto-1774467114245"
+    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen-co.myshopify.com&eid=auto-1774472993360"
   },
   {
     "domain": "urbankitchen-goods.myshopify.com",
-    "source": "manual",
+    "source": "generated",
+    "priority": "synthetic",
     "notes": "auto_discovered",
     "score": 100,
+    "quality_rank": 1,
     "signals": {
       "has_products": true,
       "has_cart": true,
@@ -459,13 +557,15 @@
       "site_quality": "mid"
     },
     "audit_link": "https://pay.abando.ai/audit?shop=urbankitchen-goods.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen-goods.myshopify.com&eid=auto-1774467114245"
+    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen-goods.myshopify.com&eid=auto-1774472993360"
   },
   {
     "domain": "urbankitchen-home.myshopify.com",
-    "source": "manual",
+    "source": "generated",
+    "priority": "synthetic",
     "notes": "auto_discovered",
     "score": 100,
+    "quality_rank": 1,
     "signals": {
       "has_products": true,
       "has_cart": true,
@@ -473,13 +573,15 @@
       "site_quality": "mid"
     },
     "audit_link": "https://pay.abando.ai/audit?shop=urbankitchen-home.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen-home.myshopify.com&eid=auto-1774467114245"
+    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen-home.myshopify.com&eid=auto-1774472993360"
   },
   {
     "domain": "urbankitchen-shop.myshopify.com",
-    "source": "manual",
+    "source": "generated",
+    "priority": "synthetic",
     "notes": "auto_discovered",
     "score": 100,
+    "quality_rank": 1,
     "signals": {
       "has_products": true,
       "has_cart": true,
@@ -487,13 +589,15 @@
       "site_quality": "mid"
     },
     "audit_link": "https://pay.abando.ai/audit?shop=urbankitchen-shop.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen-shop.myshopify.com&eid=auto-1774467114245"
+    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen-shop.myshopify.com&eid=auto-1774472993360"
   },
   {
     "domain": "urbankitchen-store.myshopify.com",
-    "source": "manual",
+    "source": "generated",
+    "priority": "synthetic",
     "notes": "auto_discovered",
     "score": 100,
+    "quality_rank": 1,
     "signals": {
       "has_products": true,
       "has_cart": true,
@@ -501,13 +605,15 @@
       "site_quality": "mid"
     },
     "audit_link": "https://pay.abando.ai/audit?shop=urbankitchen-store.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen-store.myshopify.com&eid=auto-1774467114245"
+    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen-store.myshopify.com&eid=auto-1774472993360"
   },
   {
     "domain": "urbankitchen.myshopify.com",
-    "source": "manual",
+    "source": "seed",
+    "priority": "synthetic",
     "notes": "auto_discovered",
     "score": 100,
+    "quality_rank": 1,
     "signals": {
       "has_products": true,
       "has_cart": true,
@@ -515,13 +621,15 @@
       "site_quality": "mid"
     },
     "audit_link": "https://pay.abando.ai/audit?shop=urbankitchen.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen.myshopify.com&eid=auto-1774467114245"
+    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen.myshopify.com&eid=auto-1774472993360"
   },
   {
     "domain": "visible-recovery-store.myshopify.com",
     "source": "manual",
+    "priority": "synthetic",
     "notes": "recovery_visible",
     "score": 75,
+    "quality_rank": 2,
     "signals": {
       "has_products": true,
       "has_cart": true,
@@ -529,6 +637,6 @@
       "site_quality": "mid"
     },
     "audit_link": "https://pay.abando.ai/audit?shop=visible-recovery-store.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=visible-recovery-store.myshopify.com&eid=auto-1774467114245"
+    "experience_link": "https://pay.abando.ai/experience?shop=visible-recovery-store.myshopify.com&eid=auto-1774472993360"
   }
 ]

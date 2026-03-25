@@ -49,6 +49,8 @@ function main() {
 
     candidates.push({
       domain,
+      source: String(entry?.source || "generated"),
+      priority: String(entry?.priority || "synthetic"),
       notes: "auto_discovered",
       status: "new",
     });
