@@ -252,6 +252,8 @@ const devSessionStatePath = join(repoRoot, ".tmp", "dev-session.json");
 const fixAuditLeadsPath = join(repoRoot, ".tmp", "fix_audit_leads.json");
 const leadsTopTargetsPath = join(repoRoot, "staffordos", "leads", "top_targets.json");
 const leadsOutcomesPath = join(repoRoot, "staffordos", "leads", "outcomes.json");
+const leadsOutreachQueuePath = join(repoRoot, "staffordos", "leads", "outreach_queue.json");
+const leadsOutreachTemplatesPath = join(repoRoot, "staffordos", "leads", "outreach_templates.json");
 
 app.set("trust proxy", 1);
 
@@ -909,6 +911,16 @@ async function readJsonArrayFile(filePath) {
     return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
+  }
+}
+
+async function readJsonObjectFile(filePath) {
+  try {
+    const raw = await readFile(filePath, "utf8");
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
   }
 }
 
@@ -2241,6 +2253,11 @@ app.get("/merchant", async (_req, res) => {
 app.get("/leads", async (_req, res) => {
   const leadsState = await getLeadsCommandCenterState();
   return res.status(200).type("html").send(renderLeadsPage(leadsState));
+});
+
+app.get("/outreach", async (_req, res) => {
+  const outreachState = await getOutreachCommandCenterState();
+  return res.status(200).type("html").send(renderOutreachPage(outreachState));
 });
 
 app.use(
@@ -3647,6 +3664,30 @@ function deriveLeadNextAction(status = "routed") {
   return "Open audit";
 }
 
+function deriveOutreachNextAction(entry = {}) {
+  if (!entry?.approved) return "Approve";
+  if (entry?.closed) return "Complete";
+  if (entry?.replied && !entry?.closed) return "Review / close";
+  if (entry?.sent && !entry?.replied) return "Wait / follow up";
+  if (entry?.status === "queued" && !entry?.sent) return "Send";
+  return "Queue";
+}
+
+function renderOutreachTemplate(template = "", row = {}) {
+  return String(template || "")
+    .replace(/\{\{audit_link\}\}/g, String(row.audit_link || ""))
+    .replace(/\{\{experience_link\}\}/g, String(row.experience_link || ""));
+}
+
+function buildOutreachBodyPreview(body = "", maxLength = 240) {
+  const normalized = String(body || "").trim();
+  if (!normalized) {
+    return "No rendered message yet.";
+  }
+  const clipped = normalized.length > maxLength ? `${normalized.slice(0, maxLength).trimEnd()}...` : normalized;
+  return escapeHtml(clipped).replace(/\n/g, "<br />");
+}
+
 async function getLeadsCommandCenterState() {
   const topTargets = await readJsonArrayFile(leadsTopTargetsPath);
   const outcomes = await readJsonArrayFile(leadsOutcomesPath);
@@ -3681,6 +3722,50 @@ async function getLeadsCommandCenterState() {
     if (Object.prototype.hasOwnProperty.call(counts, row.status)) {
       counts[row.status] += 1;
     }
+  });
+
+  return { rows, counts };
+}
+
+async function getOutreachCommandCenterState() {
+  const queue = await readJsonArrayFile(leadsOutreachQueuePath);
+  const templates = await readJsonObjectFile(leadsOutreachTemplatesPath);
+
+  const rows = queue.map((entry) => {
+    const messageType = String(entry?.message_type || "abando_audit_invite");
+    const template = templates[messageType] || {};
+    const subject = String(entry?.subject || template.subject || "").trim();
+    const body = String(entry?.body || renderOutreachTemplate(template.body, entry) || "").trim();
+    return {
+      domain: normalizeStoreInput(entry?.domain || ""),
+      status: String(entry?.status || "routed"),
+      approved: Boolean(entry?.approved),
+      sent: Boolean(entry?.sent),
+      replied: Boolean(entry?.replied),
+      closed: Boolean(entry?.closed),
+      subject,
+      body,
+      audit_link: String(entry?.audit_link || ""),
+      experience_link: String(entry?.experience_link || ""),
+      notes: String(entry?.notes || "").trim(),
+      nextAction: deriveOutreachNextAction(entry),
+    };
+  });
+
+  const counts = {
+    approved: 0,
+    queued: 0,
+    sent: 0,
+    replied: 0,
+    closed: 0,
+  };
+
+  rows.forEach((row) => {
+    if (row.approved) counts.approved += 1;
+    if (row.status === "queued") counts.queued += 1;
+    if (row.sent) counts.sent += 1;
+    if (row.replied) counts.replied += 1;
+    if (row.closed) counts.closed += 1;
   });
 
   return { rows, counts };
@@ -3788,6 +3873,20 @@ function renderLeadsPage({ rows, counts }) {
       font-size: 22px;
       letter-spacing: -0.03em;
     }
+    .page-links {
+      margin-top: 18px;
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .page-links a {
+      color: #cbd5e1;
+      font-size: 13px;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+      padding-bottom: 2px;
+    }
     .targets {
       margin-top: 18px;
       display: grid;
@@ -3881,6 +3980,9 @@ function renderLeadsPage({ rows, counts }) {
     <section class="panel">
       <h1>Leads Command Center</h1>
       <p class="lede">Routed targets for Abando revenue recovery.</p>
+      <div class="page-links">
+        <a href="/outreach">View outreach queue</a>
+      </div>
       <div class="summary-row">
         <div class="summary-card"><span>routed</span><strong>${counts.routed}</strong></div>
         <div class="summary-card"><span>audit_opened</span><strong>${counts.audit_opened}</strong></div>
@@ -3890,6 +3992,248 @@ function renderLeadsPage({ rows, counts }) {
       </div>
     </section>
     ${rows.length > 0 ? `<section class="targets">${cards}</section>` : `<section class="empty">No routed targets yet.</section>`}
+  </main>
+</body>
+</html>`;
+}
+
+function renderOutreachPage({ rows, counts }) {
+  const cards = rows.map((row) => `\
+<section class="target-card">
+  <div class="target-top">
+    <div>
+      <div class="target-domain">${escapeHtml(row.domain || "Unknown domain")}</div>
+      <div class="target-meta">${escapeHtml(row.subject || "No subject yet")}</div>
+    </div>
+    <div class="status-badge">${escapeHtml(row.status)}</div>
+  </div>
+  <div class="target-grid">
+    <div class="target-line"><span>Body</span><div class="body-preview">${buildOutreachBodyPreview(row.body)}</div></div>
+    <div class="target-line"><span>Audit link</span><a href="${escapeHtml(row.audit_link)}" target="_blank" rel="noopener">Open audit</a></div>
+    <div class="target-line"><span>Experience link</span><a href="${escapeHtml(row.experience_link)}" target="_blank" rel="noopener">Open experience</a></div>
+    <div class="target-line"><span>Notes</span><strong>${escapeHtml(row.notes || "No notes yet.")}</strong></div>
+    <div class="target-line"><span>Next action</span><strong>${escapeHtml(row.nextAction)}</strong></div>
+    <div class="helper-line">approve: node staffordos/leads/outreach.js approve ${escapeHtml(row.domain)}</div>
+    <div class="helper-line">queue: node staffordos/leads/outreach.js queue ${escapeHtml(row.domain)}</div>
+    <div class="helper-line">mark-sent: node staffordos/leads/outreach.js mark-sent ${escapeHtml(row.domain)}</div>
+  </div>
+</section>`).join("");
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Outreach Command Center</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, rgba(30, 41, 59, 0.22), transparent 42%), #020617;
+      color: #e5eef8;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: grid;
+      place-items: start center;
+      padding: 28px 18px 60px;
+    }
+    .shell {
+      width: 100%;
+      max-width: 760px;
+    }
+    .brand {
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .panel,
+    .target-card {
+      background: rgba(15, 23, 42, 0.86);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 28px;
+      box-shadow: 0 28px 80px rgba(2, 6, 23, 0.42);
+    }
+    .panel {
+      padding: 30px 24px 24px;
+    }
+    h1 {
+      margin: 0;
+      color: #f8fafc;
+      font-size: clamp(34px, 7vw, 42px);
+      line-height: 1.02;
+      letter-spacing: -0.05em;
+      text-align: center;
+    }
+    .lede {
+      margin: 14px 0 0;
+      color: #94a3b8;
+      font-size: 15px;
+      line-height: 1.6;
+      text-align: center;
+    }
+    .summary-row {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .summary-card {
+      padding: 14px 12px;
+      border-radius: 18px;
+      background: rgba(2, 6, 23, 0.44);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      text-align: center;
+    }
+    .summary-card span {
+      display: block;
+      color: #94a3b8;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .summary-card strong {
+      display: block;
+      margin-top: 8px;
+      color: #f8fafc;
+      font-size: 22px;
+      letter-spacing: -0.03em;
+    }
+    .page-links {
+      margin-top: 18px;
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .page-links a {
+      color: #cbd5e1;
+      font-size: 13px;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+      padding-bottom: 2px;
+    }
+    .targets {
+      margin-top: 18px;
+      display: grid;
+      gap: 14px;
+    }
+    .target-card {
+      padding: 18px 18px 16px;
+    }
+    .target-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+    }
+    .target-domain {
+      color: #f8fafc;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      word-break: break-word;
+    }
+    .target-meta {
+      margin-top: 6px;
+      color: #94a3b8;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(2, 6, 23, 0.52);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      color: #cbd5e1;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: lowercase;
+      white-space: nowrap;
+    }
+    .target-grid {
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+    .target-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: start;
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .target-line span {
+      color: #94a3b8;
+      min-width: 110px;
+    }
+    .target-line strong,
+    .target-line a,
+    .body-preview {
+      color: #e5eef8;
+      text-align: right;
+      word-break: break-word;
+    }
+    .body-preview {
+      max-width: 420px;
+    }
+    .helper-line {
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .empty {
+      margin-top: 18px;
+      padding: 20px 18px;
+      border-radius: 20px;
+      background: rgba(2, 6, 23, 0.44);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      color: #94a3b8;
+      text-align: center;
+    }
+    @media (max-width: 720px) {
+      .summary-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .target-line {
+        flex-direction: column;
+      }
+      .target-line strong,
+      .target-line a,
+      .body-preview {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="brand">Abando</div>
+    <section class="panel">
+      <h1>Outreach Command Center</h1>
+      <p class="lede">Operator queue for Abando outreach.</p>
+      <div class="page-links">
+        <a href="/leads">View leads</a>
+      </div>
+      <div class="summary-row">
+        <div class="summary-card"><span>approved</span><strong>${counts.approved}</strong></div>
+        <div class="summary-card"><span>queued</span><strong>${counts.queued}</strong></div>
+        <div class="summary-card"><span>sent</span><strong>${counts.sent}</strong></div>
+        <div class="summary-card"><span>replied</span><strong>${counts.replied}</strong></div>
+        <div class="summary-card"><span>closed</span><strong>${counts.closed}</strong></div>
+      </div>
+    </section>
+    ${rows.length > 0 ? `<section class="targets">${cards}</section>` : `<section class="empty">No outreach items yet.</section>`}
   </main>
 </body>
 </html>`;

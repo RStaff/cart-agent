@@ -1,0 +1,10 @@
+{
+  "abando_audit_invite": {
+    "subject": "Recover abandoned checkout revenue",
+    "body": "Quick question — are you recovering abandoned checkouts today?\n\nI built a simple system that automatically recovers abandoned checkout revenue.\n\nRun the recovery audit here:\n{{audit_link}}\n\nIf it looks relevant, I can show you the recovery flow live:\n{{experience_link}}"
+  },
+  "abando_followup": {
+    "subject": "Quick follow-up on checkout recovery",
+    "body": "Following up in case this is useful.\n\nAudit:\n{{audit_link}}\n\nLive recovery flow:\n{{experience_link}}"
+  }
+}

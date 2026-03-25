@@ -13,5 +13,180 @@
     "domain": "visible-recovery-store.myshopify.com",
     "source": "manual",
     "notes": "recovery_visible"
+  },
+  {
+    "domain": "fitgearpro-co.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "fitgearpro-goods.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "fitgearpro-home.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "fitgearpro-shop.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "fitgearpro-store.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "fitgearpro.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "homegoodsco-co.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "homegoodsco-goods.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "homegoodsco-home.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "homegoodsco-shop.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "homegoodsco-store.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "homegoodsco.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "luxbath-co.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "luxbath-goods.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "luxbath-home.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "luxbath-shop.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "luxbath-store.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "luxbath.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "midmarket-home-co.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "midmarket-home-goods.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "midmarket-home-shop.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "midmarket-home-store.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "midmarket-home-usa.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "modernpets-co.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "modernpets-goods.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "modernpets-home.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "modernpets-shop.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "modernpets-store.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "modernpets.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "urbankitchen-co.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "urbankitchen-goods.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "urbankitchen-home.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "urbankitchen-shop.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "urbankitchen-store.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
+  },
+  {
+    "domain": "urbankitchen.myshopify.com",
+    "notes": "auto_discovered",
+    "status": "new"
   }
 ]
