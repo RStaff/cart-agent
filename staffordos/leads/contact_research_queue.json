@@ -1,0 +1,149 @@
+[
+  {
+    "domain": "fitgearpro.myshopify.com",
+    "score": 100,
+    "quality": "high",
+    "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro.myshopify.com&eid=auto-1774472993360",
+    "contact_status": "no_contact_found",
+    "next_contact_action": "Review contact surface",
+    "contact_page_url": "",
+    "social_links": {
+      "instagram": "",
+      "linkedin": "",
+      "facebook": ""
+    },
+    "contact_email": "",
+    "contact_name": "",
+    "contact_role": "",
+    "research_status": "needs_research",
+    "notes": "",
+    "updated_at": "2026-03-25T21:19:13.481Z"
+  },
+  {
+    "domain": "homegoodsco.myshopify.com",
+    "score": 100,
+    "quality": "high",
+    "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco.myshopify.com&eid=auto-1774472993360",
+    "contact_status": "no_contact_found",
+    "next_contact_action": "Review contact surface",
+    "contact_page_url": "",
+    "social_links": {
+      "instagram": "",
+      "linkedin": "",
+      "facebook": ""
+    },
+    "contact_email": "",
+    "contact_name": "",
+    "contact_role": "",
+    "research_status": "needs_research",
+    "notes": "",
+    "updated_at": "2026-03-25T21:19:13.481Z"
+  },
+  {
+    "domain": "luxbath.myshopify.com",
+    "score": 100,
+    "quality": "high",
+    "audit_link": "https://pay.abando.ai/audit?shop=luxbath.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=luxbath.myshopify.com&eid=auto-1774472993360",
+    "contact_status": "no_contact_found",
+    "next_contact_action": "Review contact surface",
+    "contact_page_url": "",
+    "social_links": {
+      "instagram": "",
+      "linkedin": "",
+      "facebook": ""
+    },
+    "contact_email": "",
+    "contact_name": "",
+    "contact_role": "",
+    "research_status": "needs_research",
+    "notes": "",
+    "updated_at": "2026-03-25T21:19:13.481Z"
+  },
+  {
+    "domain": "modernpets.myshopify.com",
+    "score": 100,
+    "quality": "high",
+    "audit_link": "https://pay.abando.ai/audit?shop=modernpets.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=modernpets.myshopify.com&eid=auto-1774472993360",
+    "contact_status": "no_contact_found",
+    "next_contact_action": "Review contact surface",
+    "contact_page_url": "",
+    "social_links": {
+      "instagram": "",
+      "linkedin": "",
+      "facebook": ""
+    },
+    "contact_email": "",
+    "contact_name": "",
+    "contact_role": "",
+    "research_status": "needs_research",
+    "notes": "",
+    "updated_at": "2026-03-25T21:19:13.481Z"
+  },
+  {
+    "domain": "store1.myshopify.com",
+    "score": 1100,
+    "quality": "high",
+    "audit_link": "https://pay.abando.ai/audit?shop=store1.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=store1.myshopify.com&eid=auto-1774472993360",
+    "contact_status": "contact_page_ready",
+    "next_contact_action": "Queue outreach",
+    "contact_page_url": "https://store1.myshopify.com/contact",
+    "social_links": {
+      "instagram": "",
+      "linkedin": "",
+      "facebook": ""
+    },
+    "contact_email": "owner@store1.com",
+    "contact_name": "Jane Smith",
+    "contact_role": "Founder",
+    "research_status": "ready_for_outreach",
+    "notes": "Contact page exists; review manually",
+    "updated_at": "2026-03-25T21:22:53.962Z"
+  },
+  {
+    "domain": "store2.com",
+    "score": 1040,
+    "quality": "high",
+    "audit_link": "https://pay.abando.ai/audit?shop=store2.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=store2.com&eid=auto-1774472993360",
+    "contact_status": "no_contact_found",
+    "next_contact_action": "Review contact surface",
+    "contact_page_url": "",
+    "social_links": {
+      "instagram": "",
+      "linkedin": "",
+      "facebook": ""
+    },
+    "contact_email": "",
+    "contact_name": "",
+    "contact_role": "",
+    "research_status": "needs_research",
+    "notes": "",
+    "updated_at": "2026-03-25T21:19:13.481Z"
+  },
+  {
+    "domain": "urbankitchen.myshopify.com",
+    "score": 100,
+    "quality": "high",
+    "audit_link": "https://pay.abando.ai/audit?shop=urbankitchen.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen.myshopify.com&eid=auto-1774472993360",
+    "contact_status": "no_contact_found",
+    "next_contact_action": "Review contact surface",
+    "contact_page_url": "",
+    "social_links": {
+      "instagram": "",
+      "linkedin": "",
+      "facebook": ""
+    },
+    "contact_email": "",
+    "contact_name": "",
+    "contact_role": "",
+    "research_status": "needs_research",
+    "notes": "",
+    "updated_at": "2026-03-25T21:19:13.481Z"
+  }
+]

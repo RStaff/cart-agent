@@ -7,6 +7,8 @@ const ROOT = "/Users/rossstafford/projects/cart-agent";
 const LEADS_DIR = path.join(ROOT, "staffordos", "leads");
 const TOP_TARGETS_PATH = path.join(LEADS_DIR, "top_targets.json");
 const QUALIFIED_TARGETS_PATH = path.join(LEADS_DIR, "qualified_targets.json");
+const CONTACT_TARGETS_PATH = path.join(LEADS_DIR, "contact_targets.json");
+const CONTACT_RESEARCH_QUEUE_PATH = path.join(LEADS_DIR, "contact_research_queue.json");
 const OUTCOMES_PATH = path.join(LEADS_DIR, "outcomes.json");
 const QUEUE_PATH = path.join(LEADS_DIR, "outreach_queue.json");
 const TEMPLATES_PATH = path.join(LEADS_DIR, "outreach_templates.json");
@@ -48,6 +50,7 @@ function findByDomain(entries, domain) {
 function ensureQueueEntryShape(target = {}, existing = null) {
   return {
     domain: normalizeDomain(existing?.domain || target?.domain || ""),
+    email: String(target?.email || existing?.email || "").trim().toLowerCase(),
     status: existing?.status || "routed",
     channel: existing?.channel || "email",
     message_type: existing?.message_type || "abando_audit_invite",
@@ -70,6 +73,8 @@ function loadState() {
   return {
     qualifiedTargets,
     topTargets,
+    contacts: readJson(CONTACT_TARGETS_PATH, []),
+    contactResearchQueue: readJson(CONTACT_RESEARCH_QUEUE_PATH, []),
     outcomes: readJson(OUTCOMES_PATH, []),
     queue: readJson(QUEUE_PATH, []),
     templates: readJson(TEMPLATES_PATH, {}),
@@ -92,6 +97,7 @@ function renderTemplate(template, entry) {
 }
 
 function nextAction(entry) {
+  if (!entry?.email) return "Find contact";
   if (!entry?.approved) return "Approve";
   if (entry?.approved && entry?.status === "routed") return "Queue";
   if (entry?.status === "queued" && !entry?.sent) return "Send";
@@ -116,10 +122,16 @@ function printUsageAndExit() {
 }
 
 function commandSeed() {
-  const { qualifiedTargets, topTargets, outcomes, queue } = loadState();
+  const { qualifiedTargets, topTargets, contacts, contactResearchQueue, outcomes, queue } = loadState();
   const sourceTargets = Array.isArray(qualifiedTargets) && qualifiedTargets.length > 0 ? qualifiedTargets : topTargets;
   const allowedDomains = new Set(
     sourceTargets.map((entry) => normalizeDomain(entry?.domain || "")).filter(Boolean),
+  );
+  const contactByDomain = new Map(
+    contacts.map((entry) => [normalizeDomain(entry?.domain || ""), entry]),
+  );
+  const researchByDomain = new Map(
+    contactResearchQueue.map((entry) => [normalizeDomain(entry?.domain || ""), entry]),
   );
   const queueByDomain = new Map();
   let created = 0;
@@ -140,11 +152,14 @@ function commandSeed() {
     if (!domain) return;
     const existing = queueByDomain.get(domain) || null;
     const outcome = findByDomain(outcomes, domain);
+    const contact = contactByDomain.get(domain) || null;
+    const research = researchByDomain.get(domain) || null;
     const merged = ensureQueueEntryShape(
       {
         ...target,
+        email: research?.contact_email || contact?.contact?.email || contact?.email || "",
         approved: outcome?.approved || target?.approved || false,
-        notes: outcome?.notes || target?.notes || "",
+        notes: research?.notes || outcome?.notes || target?.notes || "",
       },
       existing,
     );
@@ -195,6 +210,10 @@ function commandQueue(domain) {
     console.error(`Target is not approved: ${entry.domain}`);
     process.exit(1);
   }
+  if (!entry.email) {
+    console.error(`No contact email found for ${entry.domain}`);
+    process.exit(1);
+  }
   const template = templates[entry.message_type] || templates.abando_audit_invite;
   const rendered = renderTemplate(template, entry);
   entry.subject = rendered.subject;
@@ -240,6 +259,7 @@ function commandRender(domain) {
   const template = templates[entry.message_type] || templates.abando_audit_invite;
   const rendered = renderTemplate(template, entry);
   console.log(`Domain: ${entry.domain}`);
+  console.log(`Email: ${entry.email || "not found"}`);
   console.log(`Status: ${entry.status}`);
   console.log(`Approved: ${entry.approved ? "yes" : "no"}`);
   console.log("");

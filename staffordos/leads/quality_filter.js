@@ -76,11 +76,25 @@ function isLowQualityDomain(domain = "") {
 function toQualifiedEntry(entry) {
   return {
     domain: normalizeDomain(entry?.domain || ""),
+    source: String(entry?.source || ""),
+    priority: String(entry?.priority || "synthetic"),
     score: Number(entry?.score || 0),
     quality: "high",
     audit_link: String(entry?.audit_link || ""),
     experience_link: String(entry?.experience_link || ""),
   };
+}
+
+function getPriorityRank(entry = {}) {
+  return String(entry?.priority || "").toLowerCase() === "real" ? 2 : 1;
+}
+
+function compareQualifiedCandidates(a, b) {
+  return (
+    getPriorityRank(b) - getPriorityRank(a) ||
+    Number(b?.score || 0) - Number(a?.score || 0) ||
+    a.domain.localeCompare(b.domain)
+  );
 }
 
 function main() {
@@ -105,7 +119,8 @@ function main() {
   });
 
   const filteredTopTargets = combined
-    .filter((entry) => !isLowQualityDomain(entry?.domain || ""))
+    .filter((entry) => String(entry?.priority || "").toLowerCase() === "real" || !isLowQualityDomain(entry?.domain || ""))
+    .sort(compareQualifiedCandidates)
     .slice(0, QUALIFIED_LIMIT);
 
   const qualifiedTargets = filteredTopTargets.map((entry) =>

@@ -65,10 +65,10 @@ function toDomain(slug = "") {
   return normalized ? `${normalized}.myshopify.com` : "";
 }
 
-function addCandidate(map, slug, source) {
+function addCandidate(map, slug, source, priority = "synthetic") {
   const domain = toDomain(slug);
   if (!domain || map.has(domain)) return;
-  map.set(domain, { domain, source });
+  map.set(domain, { domain, source, priority });
 }
 
 function tokenizeSlug(slug = "") {
@@ -103,13 +103,14 @@ function isCleanGeneratedSlug(slug = "") {
   return true;
 }
 
-function shouldExpandBase(slug = "", source = "", notes = "") {
+function shouldExpandBase(slug = "", source = "", notes = "", priority = "") {
   const normalized = slugify(slug);
   if (!normalized) return false;
   if (hasFillerToken(normalized)) return false;
   if (!isCleanGeneratedSlug(normalized)) return false;
   if (String(notes || "").toLowerCase().includes("auto_discovered")) return false;
   if (String(source || "").toLowerCase() === "generated") return false;
+  if (String(source || "").toLowerCase() === "real_store" || String(priority || "").toLowerCase() === "real") return false;
   return true;
 }
 
@@ -179,25 +180,31 @@ function main() {
   const outcomes = readJson(OUTCOMES_PATH, []);
 
   SEED_LIST.forEach((seed) => {
-    addCandidate(discovered, seed, "seed");
-    buildBaseVariants(seed).forEach((variant) => addCandidate(discovered, variant, "generated"));
+    addCandidate(discovered, seed, "seed", "synthetic");
+    buildBaseVariants(seed).forEach((variant) => addCandidate(discovered, variant, "generated", "synthetic"));
   });
 
   candidates.forEach((candidate) => {
     const base = slugify(candidate?.domain || "");
     if (!base) return;
     const source = String(candidate?.source || "");
+    const priority = String(candidate?.priority || "");
     const notes = String(candidate?.notes || "");
+    const isRealStore = source.toLowerCase() === "real_store" || priority.toLowerCase() === "real";
 
-    if (!notes.toLowerCase().includes("auto_discovered")) {
-      addCandidate(discovered, base, source || "existing");
-    }
-
-    if (!shouldExpandBase(base, source, notes)) {
+    if (isRealStore) {
       return;
     }
 
-    buildBaseVariants(base).forEach((variant) => addCandidate(discovered, variant, "generated"));
+    if (!notes.toLowerCase().includes("auto_discovered")) {
+      addCandidate(discovered, base, source || "existing", priority || "synthetic");
+    }
+
+    if (!shouldExpandBase(base, source, notes, priority)) {
+      return;
+    }
+
+    buildBaseVariants(base).forEach((variant) => addCandidate(discovered, variant, "generated", "synthetic"));
   });
 
   outcomes
@@ -205,7 +212,7 @@ function main() {
     .forEach((entry) => {
       const keywords = extractOutcomeKeywords(entry?.domain || "");
       generateOutcomeVariants(keywords).forEach((slug) => {
-        addCandidate(discovered, slug, "outcome_generated");
+        addCandidate(discovered, slug, "outcome_generated", "synthetic");
       });
     });
 

@@ -1,0 +1,12 @@
+[
+  {
+    "domain": "store1.myshopify.com",
+    "source": "real_store",
+    "priority": "real"
+  },
+  {
+    "domain": "store2.com",
+    "source": "real_store",
+    "priority": "real"
+  }
+]

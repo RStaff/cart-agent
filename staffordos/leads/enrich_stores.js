@@ -69,12 +69,15 @@ function inferEstimatedAov(domain, category, hash) {
   return 50 + (hash % 15);
 }
 
-function enrichDomain(domain) {
+function enrichDomain(entry) {
+  const domain = normalizeDomain(entry?.domain || entry || "");
   const hash = hashString(domain);
   const category = inferCategory(domain);
 
   return {
     domain,
+    source: String(entry?.source || "generated"),
+    priority: String(entry?.priority || "synthetic"),
     has_checkout: true,
     has_cart: true,
     estimated_aov: inferEstimatedAov(domain, category, hash),
@@ -91,10 +94,14 @@ function main() {
   );
 
   const enriched = discovered
-    .map((entry) => normalizeDomain(entry?.domain || ""))
-    .filter(Boolean)
-    .filter((domain) => !candidateDomains.has(domain))
-    .map((domain) => enrichDomain(domain));
+    .map((entry) => ({
+      domain: normalizeDomain(entry?.domain || ""),
+      source: String(entry?.source || "generated"),
+      priority: String(entry?.priority || "synthetic"),
+    }))
+    .filter((entry) => entry.domain)
+    .filter((entry) => !candidateDomains.has(entry.domain))
+    .map((entry) => enrichDomain(entry));
 
   writeJson(ENRICHED_PATH, enriched);
 

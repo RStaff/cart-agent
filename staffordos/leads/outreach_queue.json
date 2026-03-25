@@ -1,11 +1,12 @@
 [
   {
     "domain": "fitgearpro.myshopify.com",
+    "email": "",
     "status": "routed",
     "channel": "email",
     "message_type": "abando_audit_invite",
     "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro.myshopify.com&eid=auto-1774467114245",
+    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro.myshopify.com&eid=auto-1774472993360",
     "subject": "",
     "body": "",
     "approved": false,
@@ -13,15 +14,16 @@
     "replied": false,
     "closed": false,
     "notes": "auto_discovered",
-    "updated_at": "2026-03-25T19:31:54.336Z"
+    "updated_at": "2026-03-25T21:22:54.015Z"
   },
   {
     "domain": "homegoodsco.myshopify.com",
+    "email": "",
     "status": "routed",
     "channel": "email",
     "message_type": "abando_audit_invite",
     "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco.myshopify.com&eid=auto-1774467114245",
+    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco.myshopify.com&eid=auto-1774472993360",
     "subject": "",
     "body": "",
     "approved": false,
@@ -29,15 +31,16 @@
     "replied": false,
     "closed": false,
     "notes": "auto_discovered",
-    "updated_at": "2026-03-25T19:31:54.336Z"
+    "updated_at": "2026-03-25T21:22:54.015Z"
   },
   {
     "domain": "luxbath.myshopify.com",
+    "email": "",
     "status": "routed",
     "channel": "email",
     "message_type": "abando_audit_invite",
     "audit_link": "https://pay.abando.ai/audit?shop=luxbath.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=luxbath.myshopify.com&eid=auto-1774467114245",
+    "experience_link": "https://pay.abando.ai/experience?shop=luxbath.myshopify.com&eid=auto-1774472993360",
     "subject": "",
     "body": "",
     "approved": false,
@@ -45,15 +48,16 @@
     "replied": false,
     "closed": false,
     "notes": "auto_discovered",
-    "updated_at": "2026-03-25T19:31:54.336Z"
+    "updated_at": "2026-03-25T21:22:54.015Z"
   },
   {
     "domain": "modernpets.myshopify.com",
+    "email": "",
     "status": "routed",
     "channel": "email",
     "message_type": "abando_audit_invite",
     "audit_link": "https://pay.abando.ai/audit?shop=modernpets.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=modernpets.myshopify.com&eid=auto-1774467114245",
+    "experience_link": "https://pay.abando.ai/experience?shop=modernpets.myshopify.com&eid=auto-1774472993360",
     "subject": "",
     "body": "",
     "approved": false,
@@ -61,15 +65,50 @@
     "replied": false,
     "closed": false,
     "notes": "auto_discovered",
-    "updated_at": "2026-03-25T19:31:54.336Z"
+    "updated_at": "2026-03-25T21:22:54.015Z"
+  },
+  {
+    "domain": "store1.myshopify.com",
+    "email": "owner@store1.com",
+    "status": "routed",
+    "channel": "email",
+    "message_type": "abando_audit_invite",
+    "audit_link": "https://pay.abando.ai/audit?shop=store1.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=store1.myshopify.com&eid=auto-1774472993360",
+    "subject": "",
+    "body": "",
+    "approved": false,
+    "sent": false,
+    "replied": false,
+    "closed": false,
+    "notes": "Contact page exists; review manually",
+    "updated_at": "2026-03-25T21:22:54.015Z"
+  },
+  {
+    "domain": "store2.com",
+    "email": "",
+    "status": "routed",
+    "channel": "email",
+    "message_type": "abando_audit_invite",
+    "audit_link": "https://pay.abando.ai/audit?shop=store2.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=store2.com&eid=auto-1774472993360",
+    "subject": "",
+    "body": "",
+    "approved": false,
+    "sent": false,
+    "replied": false,
+    "closed": false,
+    "notes": "",
+    "updated_at": "2026-03-25T21:22:54.015Z"
   },
   {
     "domain": "urbankitchen.myshopify.com",
+    "email": "",
     "status": "routed",
     "channel": "email",
     "message_type": "abando_audit_invite",
     "audit_link": "https://pay.abando.ai/audit?shop=urbankitchen.myshopify.com",
-    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen.myshopify.com&eid=auto-1774467114245",
+    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen.myshopify.com&eid=auto-1774472993360",
     "subject": "",
     "body": "",
     "approved": false,
@@ -77,6 +116,6 @@
     "replied": false,
     "closed": false,
     "notes": "auto_discovered",
-    "updated_at": "2026-03-25T19:31:54.336Z"
+    "updated_at": "2026-03-25T21:22:54.015Z"
   }
 ]
