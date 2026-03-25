@@ -291,35 +291,35 @@ function sendRootHtml(req, res) {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Abando — Recover lost revenue from checkout drop-offs</title>
+    <title>Abando — Recover abandoned checkout revenue automatically.</title>
     <meta
       name="description"
-      content="Abando detects checkout signals, prepares recovery messages, and tracks customer return flow for Shopify stores."
+      content="See the recovery flow, find gaps in your store, and watch customers come back with Abando."
     />
     <style>
       :root {
-        color-scheme: light;
-        --bg: #f8fafc;
-        --card: #ffffff;
-        --line: #dbe3ef;
-        --text: #0f172a;
-        --muted: #475569;
-        --accent: #0f766e;
-        --accent-2: #0f172a;
-        --soft: #f1f5f9;
+        color-scheme: dark;
+        --bg: #020617;
+        --card: rgba(15, 23, 42, 0.88);
+        --line: rgba(148, 163, 184, 0.16);
+        --text: #f8fafc;
+        --muted: #94a3b8;
+        --accent: #cbd5e1;
+        --accent-2: #e2e8f0;
+        --soft: rgba(2, 6, 23, 0.52);
       }
       * { box-sizing: border-box; }
       body {
         margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         background:
-          radial-gradient(circle at top, rgba(15, 118, 110, 0.08), transparent 28%),
+          radial-gradient(circle at top, rgba(30, 41, 59, 0.22), transparent 32%),
           var(--bg);
         color: var(--text);
       }
       a { color: inherit; }
       .shell {
-        max-width: 1120px;
+        max-width: 960px;
         margin: 0 auto;
         padding: 28px 20px 72px;
       }
@@ -345,30 +345,20 @@ function sendRootHtml(req, res) {
         padding: 8px 12px;
         border-radius: 999px;
         border: 1px solid var(--line);
-        background: rgba(255,255,255,0.76);
+        background: rgba(15, 23, 42, 0.7);
         color: var(--muted);
         font-size: 13px;
         font-weight: 600;
         text-decoration: none;
       }
-      .hero {
-        display: grid;
-        grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
-        gap: 24px;
-        align-items: start;
+      .hero,
+      .section-card {
         margin-top: 34px;
-      }
-      .hero-copy,
-      .hero-demo,
-      .section-card,
-      .demo-card {
         background: var(--card);
         border: 1px solid var(--line);
-        border-radius: 24px;
-        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
-      }
-      .hero-copy {
-        padding: 34px;
+        border-radius: 28px;
+        box-shadow: 0 28px 80px rgba(2, 6, 23, 0.42);
+        padding: 34px 30px;
       }
       .eyebrow {
         display: inline-flex;
@@ -388,7 +378,7 @@ function sendRootHtml(req, res) {
       }
       .lead {
         margin: 0;
-        max-width: 50ch;
+        max-width: 42ch;
         color: var(--muted);
         font-size: 1.08rem;
         line-height: 1.7;
@@ -401,7 +391,8 @@ function sendRootHtml(req, res) {
         flex-wrap: wrap;
       }
       .button,
-      .button-secondary {
+      .button-secondary,
+      .loom-link {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -412,49 +403,26 @@ function sendRootHtml(req, res) {
         font-weight: 700;
       }
       .button {
-        background: var(--accent-2);
-        color: white;
+        background: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%);
+        color: #020617;
       }
       .button-secondary {
         border: 1px solid var(--line);
-        background: white;
+        background: rgba(15, 23, 42, 0.7);
         color: var(--text);
       }
-      .hero-demo {
-        padding: 22px;
-        display: grid;
-        gap: 14px;
-      }
-      .status-box {
-        padding: 16px 18px;
-        border-radius: 16px;
-        border: 1px solid #bfdbfe;
-        background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
-      }
-      .status-label {
-        font-size: 12px;
+      .loom-link {
+        margin-top: 18px;
+        border: 1px solid var(--line);
+        background: var(--soft);
+        color: var(--text);
+        text-decoration: none;
         font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: #1d4ed8;
-      }
-      .status-value {
-        margin-top: 8px;
-        font-size: 1.2rem;
-        font-weight: 800;
-      }
-      .status-sub {
-        margin-top: 6px;
-        color: var(--muted);
-        line-height: 1.6;
       }
       .section-grid {
         display: grid;
         gap: 20px;
-        margin-top: 24px;
-      }
-      .section-card {
-        padding: 28px;
+        margin-top: 20px;
       }
       .section-card h2 {
         margin: 0 0 10px;
@@ -466,65 +434,27 @@ function sendRootHtml(req, res) {
         color: var(--muted);
         line-height: 1.7;
       }
-      .three-up {
-        margin-top: 20px;
-        display: grid;
-        gap: 14px;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-      .mini {
-        padding: 18px;
-        border-radius: 18px;
-        border: 1px solid var(--line);
+      .loom-preview {
+        margin: 12px 0 0;
         background: var(--soft);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 18px;
       }
-      .mini strong {
+      .loom-preview strong {
         display: block;
         margin-bottom: 8px;
         font-size: 1rem;
       }
-      .demo-grid {
-        display: grid;
-        gap: 16px;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        margin-top: 18px;
-      }
-      .demo-card {
-        padding: 20px;
-      }
-      .demo-card h3 {
-        margin: 0 0 10px;
-        font-size: 1.02rem;
-      }
-      .demo-card p,
-      .demo-card pre,
-      .demo-card code {
+      .loom-preview p {
+        margin: 0;
         color: var(--muted);
-      }
-      pre {
-        margin: 12px 0 0;
-        white-space: pre-wrap;
-        word-break: break-word;
-        font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
-        background: var(--soft);
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        padding: 14px;
-      }
-      code.inline {
-        font: 12px ui-monospace, SFMono-Regular, Menlo, monospace;
+        line-height: 1.6;
       }
       footer {
         margin-top: 28px;
         color: #64748b;
         font-size: 13px;
-      }
-      @media (max-width: 900px) {
-        .hero,
-        .demo-grid,
-        .three-up {
-          grid-template-columns: 1fr;
-        }
       }
     </style>
   </head>
@@ -533,109 +463,50 @@ function sendRootHtml(req, res) {
       <nav class="nav">
         <div class="brand">Abando</div>
         <div class="nav-links">
-          <a class="pill" href="/fix">Try audit</a>
-          <a class="pill" href="/install/shopify">Install Abando</a>
-          <a class="pill" href="/demo/playground">Open demo</a>
+          <a class="pill" href="/audit">Run free recovery audit</a>
+          <a class="pill" href="/experience?shop=mvp-demo-proof.myshopify.com&eid=marketing-proof">See the recovery flow live</a>
         </div>
       </nav>
 
       <section class="hero">
-        <div class="hero-copy">
-          <div class="eyebrow">Shopify checkout recovery app</div>
-          <h1>Recover lost revenue from checkout drop-offs</h1>
-          <p class="lead">
-            Abando detects checkout activity, prepares recovery messages, and tracks whether customers return.
-            The product stays honest: no fake recovery counts, no fake revenue, and no claims beyond the live system.
-          </p>
-          <div class="hero-actions">
-            <a class="button" href="/fix">Try audit</a>
-            <a class="button-secondary" href="/install/shopify">Install Abando</a>
-          </div>
-        </div>
-
-        <div class="hero-demo">
-          <div class="status-box">
-            <div class="status-label">Live merchant state</div>
-            <div class="status-value">Recovery ready</div>
-            <div class="status-sub">A checkout signal was detected. Abando can now preview recovery and track customer return.</div>
-          </div>
-          <div class="status-box">
-            <div class="status-label">What merchants see</div>
-            <div class="status-value">Message preview + return link</div>
-            <div class="status-sub">The dashboard shows the recovery message, the real return URL, and whether a customer came back.</div>
-          </div>
+        <div class="eyebrow">Shopify checkout recovery app</div>
+        <h1>Recover abandoned checkout revenue automatically.</h1>
+        <p class="lead">
+          See the recovery flow, find gaps in your store, and watch customers come back.
+        </p>
+        <div class="hero-actions">
+          <a class="button" href="/audit">Run free recovery audit</a>
+          <a class="button-secondary" href="/experience?shop=mvp-demo-proof.myshopify.com&eid=marketing-proof">See the recovery flow live</a>
         </div>
       </section>
 
       <section class="section-grid">
         <section class="section-card">
-          <h2>Customers leave. You lose money.</h2>
+          <h2>See Abando recover revenue in real time</h2>
           <p>
-            Checkout drop-off is expensive because intent is already present. If nothing happens after the shopper leaves,
-            revenue disappears quietly. Abando is built to catch that moment, prepare recovery, and show the merchant exactly what happened.
+            Watch the live proof loop: recovery sent, clicked, and tracked.
           </p>
-          <div class="three-up">
-            <div class="mini">
-              <strong>Signal detected</strong>
-              Abando records checkout-related activity instead of waiting for a completed order.
-            </div>
-            <div class="mini">
-              <strong>Recovery prepared</strong>
-              The merchant gets a real preview of the recovery message and return flow.
-            </div>
-            <div class="mini">
-              <strong>Return tracked</strong>
-              If the customer comes back through the recovery link, the return event is logged.
-            </div>
+          <div class="loom-preview">
+            <strong>Live proof loop</strong>
+            <p>Recovery sent, customer returned, and the result tracked cleanly through the public Abando experience flow.</p>
           </div>
+          <a class="loom-link" href="https://www.loom.com/share/ca7cfee379ec4d2e816df6068b872d60" target="_blank" rel="noopener">Watch the Loom</a>
         </section>
 
         <section class="section-card">
-          <h2>Recovery message + return flow</h2>
+          <h2>Take the next step</h2>
           <p>
-            Abando’s recovery layer is already real. Merchants can preview the message, see the return link, and verify customer return activity without inflating the result into fake revenue.
-          </p>
-          <div class="demo-grid">
-            <div class="demo-card">
-              <h3>Recovery ready</h3>
-              <p>The dashboard moves from listening to recovery ready after a real checkout signal arrives.</p>
-              <pre>Store Status: Connected
-Recovery Status: Recovery ready
-Last Event Seen: checkout_started</pre>
-            </div>
-            <div class="demo-card">
-              <h3>Message preview</h3>
-              <p>This preview comes from the same deterministic recovery message engine the product uses.</p>
-              <pre>Subject: ${preview.emailSubject}
-
-${preview.emailBody}</pre>
-            </div>
-            <div class="demo-card">
-              <h3>Return flow</h3>
-              <p>The return link is real and logs a customer return event before redirecting to the checkout placeholder.</p>
-              <pre>Return link:
-<code class="inline">${preview.returnLink}</code>
-
-Customer return:
-abando.customer_return.v1</pre>
-            </div>
-          </div>
-        </section>
-
-        <section class="section-card">
-          <h2>See the real product path</h2>
-          <p>
-            Start with the audit if you want to see likely checkout leaks on a store. Install Abando if you want the merchant dashboard, signal detection, recovery preview, and return tracking.
+            Start with the audit if you want a simple directional read on likely recovery gaps. Open the live recovery flow if you want to see the exact product path a merchant would verify.
           </p>
           <div class="cta-row">
-            <a class="button" href="/fix">Try audit</a>
-            <a class="button-secondary" href="/install/shopify">Install Abando</a>
+            <a class="button" href="/audit">Run free recovery audit</a>
+            <a class="button-secondary" href="/experience?shop=mvp-demo-proof.myshopify.com&eid=marketing-proof">See the recovery flow live</a>
           </div>
         </section>
       </section>
 
       <footer>
-        Abando · © ${year} · Merchant-facing copy matches the live MVP: checkout signals, recovery preview, and customer return tracking.
+        Abando · © ${year} · Public proof flow: recovery sent, clicked, and tracked.
       </footer>
     </main>
   </body>
@@ -759,13 +630,16 @@ function buildExperienceRecoveryMessage({ req, shop, eventData, timestamp, exper
     emailReturnLink,
     smsReturnLink,
     returnLink: emailReturnLink,
+    emailSubject: "Complete your order",
     emailBody: [
-      "You were close to finishing checkout.",
+      "You left something behind.",
       "",
-      "Use this recovery link to come back:",
+      "Complete your order using the secure link below.",
       emailReturnLink,
       "",
-      `Signal captured: ${String(eventData?.event_type || "checkout_started")} at ${new Date(timestamp || Date.now()).toISOString()}.`,
+      "If you already returned, you can ignore this message.",
+      "",
+      "This is the exact recovery email your customer would receive.",
     ].join("\n"),
     smsText: `You can return to checkout here: ${smsReturnLink}`,
   };
@@ -2343,6 +2217,15 @@ app.get("/experience/returned", async (req, res) => {
   );
 });
 
+app.get("/audit", (_req, res) => {
+  return res.status(200).type("html").send(renderAuditPage());
+});
+
+app.get("/merchant", async (_req, res) => {
+  const merchantState = await getMerchantSurfaceState("mvp-demo-proof.myshopify.com");
+  return res.status(200).type("html").send(renderMerchantPage(merchantState));
+});
+
 app.use(
   [
     "/ops",
@@ -2736,6 +2619,103 @@ function renderExperiencePage({
       line-height: 1.6;
       text-align: center;
     }
+    .operator-action {
+      margin-top: 18px;
+      display: grid;
+      justify-items: center;
+      gap: 8px;
+    }
+    .operator-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      background: rgba(15, 23, 42, 0.66);
+      color: #cbd5e1;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+    }
+    .operator-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .operator-feedback {
+      min-height: 18px;
+      color: #94a3b8;
+      font-size: 12px;
+      line-height: 1.4;
+      text-align: center;
+      word-break: break-word;
+    }
+    .proof-strip {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .automation-line {
+      margin-top: 12px;
+      color: #94a3b8;
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: center;
+    }
+    .proof-step {
+      min-height: 72px;
+      padding: 12px 12px 10px;
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      background: rgba(2, 6, 23, 0.34);
+      display: grid;
+      gap: 8px;
+      align-content: start;
+      transition: border-color 140ms ease, background 140ms ease, color 140ms ease;
+    }
+    .proof-step-marker {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      color: #64748b;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .proof-step-label {
+      color: #94a3b8;
+      font-size: 12px;
+      line-height: 1.45;
+      letter-spacing: -0.01em;
+    }
+    .proof-step.is-active {
+      border-color: rgba(226, 232, 240, 0.18);
+      background: rgba(15, 23, 42, 0.72);
+    }
+    .proof-step.is-active .proof-step-marker {
+      border-color: rgba(226, 232, 240, 0.22);
+      color: #e2e8f0;
+      background: rgba(148, 163, 184, 0.08);
+    }
+    .proof-step.is-active .proof-step-label {
+      color: #e2e8f0;
+    }
+    .proof-step.is-complete .proof-step-marker {
+      border-color: rgba(125, 211, 252, 0.18);
+      background: rgba(14, 116, 144, 0.24);
+      color: #bae6fd;
+    }
+    .proof-step.is-complete .proof-step-label {
+      color: #cbd5e1;
+    }
     .label {
       display: block;
       margin-top: 28px;
@@ -2828,6 +2808,27 @@ function renderExperiencePage({
     <section class="panel">
       <h1>See how much revenue you're leaving behind.</h1>
       <p class="lede">Send yourself the exact recovery your customers receive when they abandon checkout.</p>
+      <div class="operator-action">
+        <button type="button" class="operator-button" id="generateProofLinkButton" ${shop ? "" : "disabled"}>Generate new proof link</button>
+        <div class="operator-feedback" data-generate-proof-feedback></div>
+      </div>
+      <div class="proof-strip" data-proof-strip>
+        <div class="proof-step" data-proof-step="1">
+          <div class="proof-step-marker" data-proof-marker="1">1</div>
+          <div class="proof-step-label">Abandoned checkout detected</div>
+        </div>
+        <div class="proof-step" data-proof-step="2">
+          <div class="proof-step-marker" data-proof-marker="2">2</div>
+          <div class="proof-step-label">Recovery sent</div>
+        </div>
+        <div class="proof-step" data-proof-step="3">
+          <div class="proof-step-marker" data-proof-marker="3">3</div>
+          <div class="proof-step-label">Customer returned</div>
+        </div>
+      </div>
+      <div class="automation-line">
+        This entire flow runs automatically once installed.
+      </div>
       ${hasParams ? "" : `<div class="status active"><div class="status-title">Not configured</div><div class="status-body">This experience link is incomplete.</div></div>`}
       <label class="label" for="experienceTarget">Send a real recovery to yourself</label>
       <input id="experienceTarget" class="input" type="text" placeholder="Enter your email or phone" inputmode="email" ${hasParams ? "" : "disabled"} />
@@ -2863,7 +2864,7 @@ function renderExperiencePage({
         <div class="status-body">Outbound delivery is not yet enabled.</div>
       </div>
 
-      <div class="fineprint">Real delivery only. Nothing is marked sent unless a provider succeeds.</div>
+      <div class="fineprint">This is already recovering money you were about to lose.</div>
     </section>
   </main>
   <script>
@@ -2872,12 +2873,37 @@ function renderExperiencePage({
       var experienceId = ${JSON.stringify(experienceId)};
       var pollTimer = null;
 
+      function setProofStepState(next) {
+        var activeStep = 1;
+        var completedUntil = 0;
+
+        if (next === "sent") {
+          activeStep = 2;
+          completedUntil = 1;
+        } else if (next === "returned") {
+          activeStep = 3;
+          completedUntil = 2;
+        }
+
+        document.querySelectorAll("[data-proof-step]").forEach(function (node) {
+          var step = Number(node.getAttribute("data-proof-step") || "0");
+          node.classList.toggle("is-active", step === activeStep);
+          node.classList.toggle("is-complete", step <= completedUntil);
+        });
+
+        document.querySelectorAll("[data-proof-marker]").forEach(function (node) {
+          var step = Number(node.getAttribute("data-proof-marker") || "0");
+          node.textContent = step <= completedUntil ? "✓" : String(step);
+        });
+      }
+
       function setActiveState(next) {
         document.querySelectorAll("[data-experience-state]").forEach(function (node) {
           var state = node.getAttribute("data-experience-state");
           var isActive = state === next || (next === "sent" && state === "waiting");
           node.classList.toggle("active", isActive);
         });
+        setProofStepState(next);
       }
 
       function updateStatusUi(payload) {
@@ -2914,6 +2940,8 @@ function renderExperiencePage({
 
       var button = document.getElementById("experienceSendButton");
       var targetInput = document.getElementById("experienceTarget");
+      var generateProofButton = document.getElementById("generateProofLinkButton");
+      var generateProofFeedback = document.querySelector("[data-generate-proof-feedback]");
 
       if (button) {
         button.addEventListener("click", async function () {
@@ -2968,6 +2996,32 @@ function renderExperiencePage({
           }
         });
       }
+
+      if (generateProofButton) {
+        generateProofButton.addEventListener("click", async function () {
+          if (!shop) return;
+
+          var eid = "proof-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+          var url = window.location.origin + "/experience?shop=" + encodeURIComponent(shop) + "&eid=" + encodeURIComponent(eid);
+
+          try {
+            if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+              await navigator.clipboard.writeText(url);
+              if (generateProofFeedback) {
+                generateProofFeedback.textContent = "New proof link copied";
+              }
+            } else if (generateProofFeedback) {
+              generateProofFeedback.textContent = url;
+            }
+          } catch (_error) {
+            if (generateProofFeedback) {
+              generateProofFeedback.textContent = url;
+            }
+          }
+        });
+      }
+
+      setProofStepState(${JSON.stringify(initialState)});
 
       if (${JSON.stringify(hasSent && !hasReturned)}) {
         startPolling();
@@ -3061,6 +3115,508 @@ function renderExperienceReturnedPage({
       <a href="/experience?shop=${encodeURIComponent(shop || "")}&eid=${encodeURIComponent(experienceId || "")}">Back to experience</a>
     </section>
   </main>
+</body>
+</html>`;
+}
+
+function renderAuditPage() {
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Abando Audit</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, rgba(30, 41, 59, 0.22), transparent 42%), #020617;
+      color: #e5eef8;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: grid;
+      place-items: center;
+      padding: 28px 18px;
+    }
+    .shell {
+      width: 100%;
+      max-width: 460px;
+    }
+    .brand {
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .panel {
+      background: rgba(15, 23, 42, 0.86);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 28px;
+      padding: 30px 24px 24px;
+      box-shadow: 0 28px 80px rgba(2, 6, 23, 0.42);
+    }
+    h1 {
+      margin: 0;
+      color: #f8fafc;
+      font-size: clamp(34px, 7vw, 44px);
+      line-height: 1.02;
+      letter-spacing: -0.05em;
+      text-align: center;
+    }
+    .lede {
+      margin: 14px 0 0;
+      color: #94a3b8;
+      font-size: 15px;
+      line-height: 1.6;
+      text-align: center;
+    }
+    .label {
+      display: block;
+      margin-top: 28px;
+      margin-bottom: 10px;
+      color: #cbd5e1;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .input {
+      width: 100%;
+      min-height: 52px;
+      padding: 0 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(2, 6, 23, 0.54);
+      color: #f8fafc;
+      font: inherit;
+      outline: none;
+    }
+    .input::placeholder {
+      color: #64748b;
+    }
+    .input:focus {
+      border-color: rgba(125, 211, 252, 0.5);
+      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.08);
+    }
+    .button {
+      width: 100%;
+      margin-top: 14px;
+      min-height: 52px;
+      border: 0;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%);
+      color: #020617;
+      font: inherit;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+    }
+    .error {
+      display: none;
+      margin-top: 12px;
+      color: #fca5a5;
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: center;
+    }
+    .error.active {
+      display: block;
+    }
+    .result {
+      display: none;
+      margin-top: 20px;
+      padding: 18px 16px;
+      border-radius: 20px;
+      background: rgba(2, 6, 23, 0.44);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+    }
+    .result.active {
+      display: block;
+    }
+    .result-title {
+      color: #f8fafc;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .result-copy,
+    .result-list,
+    .result-note {
+      margin-top: 10px;
+      color: #cbd5e1;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    .result-list {
+      padding-left: 18px;
+    }
+    .result-list li + li {
+      margin-top: 6px;
+    }
+    .result-label {
+      margin-top: 14px;
+      color: #94a3b8;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .result-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 16px;
+      min-height: 46px;
+      padding: 0 16px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%);
+      color: #020617;
+      text-decoration: none;
+      font-weight: 800;
+    }
+    .fineprint {
+      margin-top: 18px;
+      text-align: center;
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="brand">Abando</div>
+    <section class="panel">
+      <h1>Find revenue recovery gaps in your store</h1>
+      <p class="lede">Run a quick audit to see where abandoned checkout revenue may be leaking.</p>
+      <label class="label" for="auditShopInput">Enter your Shopify store URL</label>
+      <input id="auditShopInput" class="input" type="text" placeholder="Enter your Shopify store URL" inputmode="url" />
+      <button type="button" class="button" id="auditSubmitButton">Run free recovery audit</button>
+      <div class="error" data-audit-error></div>
+
+      <div class="result" data-audit-result>
+        <div class="result-title">Recovery audit complete</div>
+        <div class="result-copy">Your store may be losing revenue when checkout is abandoned.</div>
+
+        <div class="result-label">Detected recovery gaps</div>
+        <ul class="result-list">
+          <li>Recovery email flow not verified</li>
+          <li>SMS recovery not enabled</li>
+          <li>Return tracking not visible in this audit</li>
+          <li>Checkout recovery sequence may be under-optimized</li>
+        </ul>
+
+        <div class="result-label">Recommendation</div>
+        <div class="result-copy">Abando helps recover abandoned checkout revenue automatically.</div>
+
+        <a href="#" class="result-cta" data-audit-cta>See the recovery flow live</a>
+        <div class="result-note">This audit is directional and designed to surface likely recovery gaps.</div>
+      </div>
+
+      <div class="fineprint">No private Shopify data is accessed in this audit.</div>
+    </section>
+  </main>
+  <script>
+    (function () {
+      var input = document.getElementById("auditShopInput");
+      var button = document.getElementById("auditSubmitButton");
+      var errorNode = document.querySelector("[data-audit-error]");
+      var resultNode = document.querySelector("[data-audit-result]");
+      var ctaNode = document.querySelector("[data-audit-cta]");
+
+      function normalizeAuditShop(value) {
+        var normalized = String(value || "").trim().toLowerCase();
+        if (!normalized) return "";
+        normalized = normalized.replace(/^https?:\\/\\//, "");
+        normalized = normalized.split("/")[0].split("?")[0].split("#")[0].replace(/\\/+$/, "");
+        if (normalized && normalized.indexOf(".") === -1) {
+          normalized = normalized + ".myshopify.com";
+        }
+        return normalized;
+      }
+
+      if (!button) return;
+
+      button.addEventListener("click", function () {
+        var normalizedShop = normalizeAuditShop(input ? input.value : "");
+
+        if (!normalizedShop) {
+          if (errorNode) {
+            errorNode.textContent = "Enter a Shopify store URL to continue.";
+            errorNode.classList.add("active");
+          }
+          if (resultNode) {
+            resultNode.classList.remove("active");
+          }
+          return;
+        }
+
+        if (errorNode) {
+          errorNode.textContent = "";
+          errorNode.classList.remove("active");
+        }
+
+        var eid = "proof-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+        var experienceUrl = window.location.origin + "/experience?shop=" + encodeURIComponent(normalizedShop) + "&eid=" + encodeURIComponent(eid);
+
+        if (ctaNode) {
+          ctaNode.setAttribute("href", experienceUrl);
+        }
+        if (resultNode) {
+          resultNode.classList.add("active");
+        }
+      });
+    })();
+  </script>
+</body>
+</html>`;
+}
+
+async function getMerchantSurfaceState(shop = "mvp-demo-proof.myshopify.com") {
+  const latestSendEvent = await prisma.systemEvent.findFirst({
+    where: {
+      shopDomain: shop,
+      eventType: "abando.experience_send.v1",
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const latestReturnEvent = await prisma.systemEvent.findFirst({
+    where: {
+      shopDomain: shop,
+      eventType: "abando.customer_return.v1",
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const recoveredSessions = await prisma.systemEvent.count({
+    where: {
+      shopDomain: shop,
+      eventType: "abando.customer_return.v1",
+    },
+  });
+
+  const latestSendPayload = latestSendEvent?.payload && typeof latestSendEvent.payload === "object"
+    ? latestSendEvent.payload
+    : null;
+
+  return {
+    shop,
+    lastRecoverySent: latestSendPayload?.channel ? String(latestSendPayload.channel) : null,
+    lastRecoveryReturned: Boolean(latestReturnEvent),
+    recoveredSessions: Number(recoveredSessions || 0),
+  };
+}
+
+function renderMerchantPage({
+  shop,
+  lastRecoverySent,
+  lastRecoveryReturned,
+  recoveredSessions,
+}) {
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Abando Merchant</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, rgba(30, 41, 59, 0.22), transparent 42%), #020617;
+      color: #e5eef8;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: grid;
+      place-items: center;
+      padding: 28px 18px;
+    }
+    .shell {
+      width: 100%;
+      max-width: 520px;
+    }
+    .brand {
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .panel {
+      background: rgba(15, 23, 42, 0.86);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 28px;
+      padding: 30px 24px 24px;
+      box-shadow: 0 28px 80px rgba(2, 6, 23, 0.42);
+    }
+    h1 {
+      margin: 0;
+      color: #f8fafc;
+      font-size: clamp(34px, 7vw, 42px);
+      line-height: 1.02;
+      letter-spacing: -0.05em;
+      text-align: center;
+    }
+    .lede {
+      margin: 14px 0 0;
+      color: #94a3b8;
+      font-size: 15px;
+      line-height: 1.6;
+      text-align: center;
+    }
+    .section {
+      margin-top: 18px;
+      padding: 18px 16px;
+      border-radius: 20px;
+      background: rgba(2, 6, 23, 0.44);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+    }
+    .section-label {
+      color: #94a3b8;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .section-value {
+      margin-top: 10px;
+      color: #f8fafc;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+    .section-copy {
+      margin-top: 8px;
+      color: #cbd5e1;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    .row {
+      margin-top: 12px;
+      display: grid;
+      gap: 10px;
+    }
+    .row-line {
+      color: #cbd5e1;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    .row-line strong {
+      color: #f8fafc;
+    }
+    .button,
+    .link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 14px;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .button {
+      width: 100%;
+      margin-top: 14px;
+      border: 0;
+      background: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%);
+      color: #020617;
+      font: inherit;
+      cursor: pointer;
+    }
+    .button:disabled {
+      opacity: 0.72;
+      cursor: wait;
+    }
+    .button-status {
+      margin-top: 10px;
+      color: #94a3b8;
+      font-size: 13px;
+      text-align: center;
+      min-height: 18px;
+    }
+    .link {
+      margin-top: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      background: rgba(15, 23, 42, 0.66);
+      color: #e5eef8;
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="brand">Abando</div>
+    <section class="panel">
+      <h1>Abando is active</h1>
+      <p class="lede">Recovery system is running.</p>
+
+      <section class="section">
+        <div class="section-label">Last recovery</div>
+        <div class="row">
+          <div class="row-line"><strong>Sent:</strong> ${escapeHtml(lastRecoverySent || "not yet")}</div>
+          <div class="row-line"><strong>Returned:</strong> ${lastRecoveryReturned ? "yes" : "not yet"}</div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-label">Recovered sessions</div>
+        <div class="section-value">Recovered sessions: ${Number(recoveredSessions || 0)}</div>
+      </section>
+
+      <section class="section">
+        <div class="section-label">Action</div>
+        <button type="button" class="button" id="merchantSendTestRecovery">Send test recovery</button>
+        <div class="button-status" data-merchant-send-status></div>
+      </section>
+
+      <section class="section">
+        <div class="section-label">Live recovery flow</div>
+        <a class="link" href="/experience?shop=${encodeURIComponent(shop)}&eid=merchant-proof">View live recovery flow</a>
+      </section>
+    </section>
+  </main>
+  <script>
+    (function () {
+      var button = document.getElementById("merchantSendTestRecovery");
+      var statusNode = document.querySelector("[data-merchant-send-status]");
+
+      if (!button) return;
+
+      button.addEventListener("click", async function () {
+        button.disabled = true;
+        button.textContent = "Sending…";
+        if (statusNode) statusNode.textContent = "";
+
+        try {
+          var response = await fetch("/api/recovery-actions/send-live-test", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              shop: ${JSON.stringify(shop)},
+              email: "rossstafford1@gmail.com",
+              experienceId: "merchant-test-" + Date.now()
+            })
+          });
+          var data = await response.json();
+          if (!response.ok || !data.success) {
+            throw new Error((data && (data.error || data.message)) || "send_live_test_failed");
+          }
+          if (statusNode) statusNode.textContent = "Recovery sent";
+        } catch (error) {
+          if (statusNode) {
+            statusNode.textContent = error && error.message ? error.message : "send_live_test_failed";
+          }
+        } finally {
+          button.disabled = false;
+          button.textContent = "Send test recovery";
+        }
+      });
+    })();
+  </script>
 </body>
 </html>`;
 }
