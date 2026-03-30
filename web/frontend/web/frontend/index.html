@@ -1,0 +1,12 @@
+<!doctype html><html><head>
+<meta charset="UTF-8" />
+<title>Cart Agent</title>
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  const id=(import.meta?.env?.VITE_RUN_ID)||"local";
+  document.title=(document.title||"Cart Agent")+" • run "+id;
+});
+</script>
+</head><body><div id="root"></div>
+<script type="module" src="/src/main.tsx"></script>
+</body></html>

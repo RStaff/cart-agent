@@ -1,0 +1,33 @@
+name: Frontend preview smoke
+on:
+  push: { branches: ["**"] }
+  pull_request: { branches: ["**"] }
+  workflow_dispatch: {}
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+      - name: Install (web/frontend)
+        run: |
+          if [ -f web/frontend/package-lock.json ]; then
+            npm --prefix web/frontend ci
+          else
+            npm --prefix web/frontend install
+          fi
+      - name: Build (web/frontend)
+        env:
+          VITE_RUN_ID: ${{ github.run_id }}
+          VITE_RUN_NUMBER: ${{ github.run_number }}
+        run: npm --prefix web/frontend run build
+      - name: Serve preview
+        run: |
+          npx vite preview --port 4173 --host 127.0.0.1 > log.txt 2>&1 &
+          for i in {1..20}; do
+            curl -fsS http://127.0.0.1:4173/ && break
+            sleep 1
+          done
+          echo "✅ Preview responded"
