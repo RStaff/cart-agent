@@ -1,0 +1,46 @@
+name: Pages post-deploy check
+on:
+  deployment_status:
+    types: [created, success]
+  workflow_dispatch: {}
+
+jobs:
+  verify:
+    if: github.event.deployment_status.state == 'success' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compute Pages URL
+        id: url
+        run: |
+          OWNER="${{ github.repository_owner }}"
+          REPO="$(basename "${{ github.repository }}")"
+          echo "url=https://${OWNER}.github.io/${REPO}/" >> "$GITHUB_OUTPUT"
+
+      - name: Curl live site
+        id: curl
+        run: |
+          set -euo pipefail
+          URL="${{ steps.url.outputs.url }}"
+          echo "Checking: $URL"
+          # Try a few times in case CDN is still warming
+          code=0
+          for i in {1..10}; do
+            code="$(curl -sS -o /tmp/idx.html -w "%{http_code}" "$URL" || true)"
+            [ "$code" = "200" ] && break
+            sleep 3
+          done
+          echo "HTTP: $code"
+          test "$code" = "200"
+          # Ensure asset paths are prefixed with /$REPO/
+          REPO="$(basename "${{ github.repository }}")"
+          if ! grep -q "/$REPO/assets/" /tmp/idx.html; then
+            echo "Expected asset base '/$REPO/' not found in HTML"
+            exit 1
+          fi
+          echo "OK: live HTML references /$REPO/ assets"
+
+      - name: Show first lines of HTML (debug)
+        if: always()
+        run: sed -n '1,30p' /tmp/idx.html || true
