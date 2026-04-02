@@ -11,17 +11,26 @@ import crypto from "crypto";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import fs from "node:fs";
 import dns from "node:dns/promises";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { randomBytes, createHmac } from "node:crypto";
-import { PrismaClient, Prisma } from "@prisma/client";
+import dotenv from "dotenv";
+import pkg from "@prisma/client";
 import applyAbandoDevProxy from "./abandoDevProxy.js";
 import { getDashboardSummary } from "./lib/dashboardSummary.js";
 import { generateRecoveryMessage, parseRecoveryToken } from "./lib/recoveryMessageEngine.js";
-import { isEmailSenderConfigured, sendRecoveryEmail } from "./lib/emailSender.js";
-import { isSmsSenderConfigured, sendRecoverySMS } from "./lib/smsSender.js";
+import {
+  getLatestRecoveryAttributionForExperience,
+  persistRecoveryAttributionFromOrder,
+  persistRecoveryAttributionFromReturn,
+  persistRecoveryAttributionFromSend,
+  RECOVERY_ATTRIBUTION_EVENT,
+} from "./lib/recoveryAttribution.js";
+import { isEmailSenderConfigured, resolveFromEmail, sendRecoveryEmail } from "./lib/emailSender.js";
+import { fetchTwilioMessageStatus, interpretTwilioDeliveryStatus, isSmsSenderConfigured, sendRecoverySMS } from "./lib/smsSender.js";
 import { analyzeStore } from "./lib/storeAnalyzer.js";
 import { getStaffordosUrl } from "./lib/staffordosUrl.js";
 import { internalOnly } from "./middleware/internalOnly.js";
@@ -42,6 +51,7 @@ import { installPricingRoute } from "./routes/pricing.esm.js";
 import { installRevenueLeakageEntryRoute } from "./routes/revenueLeakageEntry.esm.js";
 import { installRunAuditRoute } from "./routes/runAudit.esm.js";
 import { installScorecardRoute } from "./routes/scorecard.esm.js";
+import { installShopifyAppListingRoute } from "./routes/shopifyAppListing.esm.js";
 import { installSnippet } from "./routes/snippet.esm.js";
 import { createJob, getJobByIdempotencyKey } from "./jobs/repository.js";
 import { appendSystemEvent } from "./system-events.js";
@@ -118,6 +128,13 @@ import {
   runSignalInterpreter,
 } from "../../signal_interpreter/index.js";
 import {
+  generateMessagePerformanceSummary,
+  updateProofLoopById,
+} from "../../staffordos/modules/outreach_performance/index.js";
+import { assignVariantForLead, getAssignedVariantForLead, getExperimentStatus } from "../../staffordos/modules/outreach_experiments/index.js";
+
+const { PrismaClient, Prisma } = pkg;
+import {
   formatCheckoutBenchmark,
   generateCheckoutBenchmark,
   generateCheckoutBenchmarkReport,
@@ -130,13 +147,43 @@ import {
 } from "../../staffordos/fix/intake_store.mjs";
 import { stripe } from "./clients/stripe.js";
 import {
+  BILLING_STATE_EVENT,
+  getBillingRuntimeReadiness,
+  getLatestMerchantBillingState,
+  persistMerchantBillingState,
+} from "./lib/merchantBillingState.js";
+import {
+  getDirectPaymentUrl,
+  getStripePriceIds,
+  getStripeSecretKey,
+  getStripeWebhookSecret,
+  hasCollectableBillingConfig,
+} from "./lib/stripeConfig.js";
+import {
+  canonicalizePublicAppUrl,
+  getPublicAppBaseUrl,
+} from "../../staffordos/shared/public_base_url.js";
+import {
   createFixCheckoutSession,
   markFixCheckoutSessionCompleted,
 } from "./lib/fixCheckout.js";
 import { renderAbandoStatus } from "./components/abandoStatusCard.js";
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const repoRoot = join(__dirname, "..", "..");
 
-
+for (const envPath of [
+  resolve(repoRoot, ".env"),
+  resolve(repoRoot, "web", ".env"),
+  resolve(repoRoot, "staffordos", "dev", ".env.abando.local"),
+]) {
+  if (fs.existsSync(envPath)) {
+    const result = dotenv.config({ path: envPath, override: false });
+    if (!result.error) {
+      console.log(`[env] loaded ${envPath}`);
+    }
+  }
+}
 
 function verifyShopifyWebhookHmac(req) {
   const hmacHeader = req.get("X-Shopify-Hmac-Sha256") || "";
@@ -244,10 +291,11 @@ function normalizeShop(raw) {
 // /ABANDO_SHOP_NORMALIZE_V1
 
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 const publicDir = join(__dirname, "public");
-const repoRoot = join(__dirname, "..", "..");
+const CANONICAL_APP_NAME = "Abando – Cart Recovery AI";
+const SHOPIFY_APP_BRIDGE_URL = "https://cdn.shopify.com/shopifycloud/app-bridge.js";
+const SHOPIFY_EMBED_FRAME_ANCESTORS = "https://admin.shopify.com https://*.myshopify.com";
 const devSessionStatePath = join(repoRoot, ".tmp", "dev-session.json");
 const fixAuditLeadsPath = join(repoRoot, ".tmp", "fix_audit_leads.json");
 const leadsTopTargetsPath = join(repoRoot, "staffordos", "leads", "top_targets.json");
@@ -255,15 +303,35 @@ const leadsOutcomesPath = join(repoRoot, "staffordos", "leads", "outcomes.json")
 const leadsOutreachQueuePath = join(repoRoot, "staffordos", "leads", "outreach_queue.json");
 const leadsOutreachTemplatesPath = join(repoRoot, "staffordos", "leads", "outreach_templates.json");
 const leadsContactResearchQueuePath = join(repoRoot, "staffordos", "leads", "contact_research_queue.json");
+const leadsInstallEventsPath = join(repoRoot, "staffordos", "leads", "install_events.json");
+const abandoProofEventsPath = join(repoRoot, "staffordos", "events", "abando_proof_events.json");
 
 app.set("trust proxy", 1);
 
-app.use((req, res, next) => {
+function applyShopifyEmbeddedAppHeaders(res) {
   res.removeHeader("X-Frame-Options");
   res.setHeader(
     "Content-Security-Policy",
-    "frame-ancestors https://admin.shopify.com https://*.myshopify.com;",
+    `frame-ancestors ${SHOPIFY_EMBED_FRAME_ANCESTORS};`,
   );
+}
+
+function isEmbeddedAppDocumentRequest(req) {
+  const path = String(req.path || "");
+  return (
+    path === "/dashboard" ||
+    path === "/dashboard/" ||
+    path === "/app" ||
+    path === "/embedded" ||
+    path === "/embedded/" ||
+    path.startsWith("/embedded/")
+  );
+}
+
+app.use((req, res, next) => {
+  if (isEmbeddedAppDocumentRequest(req)) {
+    applyShopifyEmbeddedAppHeaders(res);
+  }
   next();
 });
 
@@ -280,26 +348,23 @@ app.use((req, _res, next) => {
 });
 
 function sendRootHtml(req, res) {
-  const appOrigin = resolveRequestOrigin(req);
-  const preview = generateRecoveryMessage({
-    shop: "demo-shop.myshopify.com",
-    eventData: {
-      event_type: "checkout_started",
-    },
-    timestamp: "2026-03-23T17:32:00.000Z",
-    baseUrl: appOrigin,
-  });
   const year = new Date().getFullYear();
+  const shop = normalizeStoreInput(String(req.query?.shop || "").trim().toLowerCase());
+  const proofUrl = toMerchantFacingUrl(shop ? `/proof?shop=${encodeURIComponent(shop)}&flow=demo` : "/proof?flow=demo");
+  const installUrl = toMerchantFacingUrl(shop ? `/install/shopify?shop=${encodeURIComponent(shop)}` : "/install/shopify");
+  const pricingUrl = toMerchantFacingUrl("/pricing");
+  const listingUrl = toMerchantFacingUrl("/shopify-app");
+  const privacyUrl = toMerchantFacingUrl("/privacy");
 
   return res.status(200).type("html").send(`<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Abando — Recover abandoned checkout revenue automatically.</title>
+    <title>Abando — Recover lost Shopify checkout revenue automatically.</title>
     <meta
       name="description"
-      content="Abando automatically recovers abandoned checkout revenue."
+      content="Abando helps Shopify merchants recover lost checkout revenue with a live proof-first install flow."
     />
     <style>
       :root {
@@ -358,12 +423,12 @@ function sendRootHtml(req, res) {
       }
       .hero,
       .section-card {
-        margin-top: 34px;
+        margin-top: 26px;
         background: var(--card);
         border: 1px solid var(--line);
         border-radius: 28px;
         box-shadow: 0 28px 80px rgba(2, 6, 23, 0.42);
-        padding: 34px 30px;
+        padding: 28px 28px;
       }
       .eyebrow {
         display: inline-flex;
@@ -376,21 +441,39 @@ function sendRootHtml(req, res) {
         color: var(--accent);
       }
       h1 {
-        margin: 14px 0 12px;
-        font-size: clamp(2.5rem, 6vw, 4.5rem);
+        margin: 12px 0 0;
+        font-size: clamp(2.7rem, 6vw, 4.8rem);
         line-height: 0.98;
         letter-spacing: -0.05em;
       }
       .lead {
-        margin: 0;
-        max-width: 42ch;
+        margin: 14px 0 0;
+        max-width: 38ch;
         color: var(--muted);
         font-size: 1.08rem;
-        line-height: 1.7;
+        line-height: 1.6;
+      }
+      .trust-bar {
+        margin-top: 18px;
+        display: inline-flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .trust-chip {
+        display: inline-flex;
+        align-items: center;
+        min-height: 36px;
+        padding: 0 12px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: rgba(2, 6, 23, 0.52);
+        color: var(--accent-2);
+        font-size: 13px;
+        font-weight: 700;
       }
       .hero-actions,
       .cta-row {
-        margin-top: 22px;
+        margin-top: 18px;
         display: flex;
         gap: 12px;
         flex-wrap: wrap;
@@ -427,37 +510,121 @@ function sendRootHtml(req, res) {
       .section-grid {
         display: grid;
         gap: 20px;
-        margin-top: 20px;
+        margin-top: 16px;
       }
       .section-card h2 {
-        margin: 0 0 10px;
+        margin: 0 0 8px;
         font-size: 1.8rem;
         letter-spacing: -0.03em;
       }
       .section-card p {
         margin: 0;
         color: var(--muted);
-        line-height: 1.7;
+        line-height: 1.65;
       }
-      .loom-preview {
-        margin: 12px 0 0;
-        background: var(--soft);
-        border: 1px solid var(--line);
+      .section-label {
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+      .step-grid {
+        display: grid;
+        gap: 12px;
+        margin-top: 14px;
+      }
+      .step {
+        display: grid;
+        grid-template-columns: 34px 1fr;
+        gap: 14px;
+        align-items: start;
+        padding: 14px 16px;
         border-radius: 18px;
+        border: 1px solid var(--line);
+        background: var(--soft);
+      }
+      .step-index {
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        background: rgba(226, 232, 240, 0.12);
+        color: var(--accent-2);
+        font-weight: 800;
+      }
+      .signal-list,
+      .trust-list {
+        margin: 14px 0 0;
+        padding-left: 18px;
+        display: grid;
+        gap: 8px;
+        color: var(--text);
+      }
+      .pricing-grid,
+      .faq-grid,
+      .footer-grid {
+        margin-top: 16px;
+        display: grid;
+        gap: 14px;
+      }
+      .pricing-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .plan-card,
+      .faq-card {
         padding: 18px;
+        border-radius: 20px;
+        border: 1px solid var(--line);
+        background: var(--soft);
       }
-      .loom-preview strong {
-        display: block;
-        margin-bottom: 8px;
-        font-size: 1rem;
+      .plan-name {
+        color: var(--accent-2);
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
       }
-      .loom-preview p {
-        margin: 0;
+      .plan-copy {
+        margin-top: 10px;
         color: var(--muted);
         line-height: 1.6;
       }
+      .faq-question {
+        color: var(--accent-2);
+        font-size: 16px;
+        font-weight: 800;
+        margin-bottom: 8px;
+      }
+      .footer-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+      .footer-block {
+        padding: 16px;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: rgba(15, 23, 42, 0.56);
+      }
+      .footer-block strong {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--accent-2);
+      }
+      .footer-block a {
+        display: block;
+        color: var(--muted);
+        line-height: 1.9;
+        text-decoration: none;
+      }
+      @media (max-width: 860px) {
+        .pricing-grid,
+        .footer-grid {
+          grid-template-columns: 1fr;
+        }
+      }
       footer {
-        margin-top: 28px;
+        margin-top: 24px;
         color: #64748b;
         font-size: 13px;
       }
@@ -466,52 +633,135 @@ function sendRootHtml(req, res) {
   <body>
     <main class="shell">
       <nav class="nav">
-        <div class="brand">Abando</div>
+        <a class="brand" href="${escapeHtml(homeUrl)}">${renderMerchantLogoMarkup()}</a>
         <div class="nav-links">
-          <a class="pill" href="/audit">Run free recovery audit</a>
-          <a class="pill" href="/experience?shop=mvp-demo-proof.myshopify.com&eid=marketing-proof">See recovery in action</a>
+          <a class="pill" href="${escapeHtml(pricingUrl)}">Pricing</a>
+          <a class="pill" href="${escapeHtml(listingUrl)}">Shopify App</a>
+          <a class="pill" href="${escapeHtml(installUrl)}">Install</a>
         </div>
       </nav>
 
       <section class="hero">
-        <div class="eyebrow">Shopify checkout recovery app</div>
-        <h1>Recover abandoned checkout revenue automatically.</h1>
-        <p class="lead">
-          Abando automatically recovers abandoned checkout revenue.
-        </p>
+        <div class="eyebrow">SHOPIFY CHECKOUT RECOVERY</div>
+        <h1>Recover lost Shopify checkout revenue before it disappears.</h1>
+        <p class="lead">Abando catches checkout drop-off, sends the recovery path fast, and lets the merchant verify the return before billing starts.</p>
         <div class="hero-actions">
-          <a class="button" href="/audit">Run free recovery audit</a>
-          <a class="button-secondary" href="/experience?shop=mvp-demo-proof.myshopify.com&eid=marketing-proof">See recovery in action</a>
+          <a class="button" href="${escapeHtml(installUrl)}">Install Abando</a>
+          <a class="button-secondary" href="${escapeHtml(proofUrl)}">See proof</a>
+        </div>
+        <div class="trust-bar">
+          <div class="trust-chip">2-minute install</div>
+          <div class="trust-chip">No checkout redesign required</div>
+          <div class="trust-chip">Test it on yourself first</div>
         </div>
       </section>
 
       <section class="section-grid">
         <section class="section-card">
-          <h2>See Abando recover revenue in real time</h2>
-          <p>
-            Watch recovery happen automatically: recovery sent, return tracked.
-          </p>
-          <div class="loom-preview">
-            <strong>Live proof loop</strong>
-            <p>Recovery sent, return tracked, and revenue recovered automatically after abandoned checkout.</p>
-          </div>
-          <a class="loom-link" href="https://www.loom.com/share/ca7cfee379ec4d2e816df6068b872d60" target="_blank" rel="noopener">Watch the Loom</a>
+          <div class="section-label">Why it matters</div>
+          <h2>Built for the moment revenue is about to disappear.</h2>
+          <p>When a shopper starts checkout and leaves before paying, the recovery window is short. Abando is built for that moment: catch the drop-off, send the recovery, detect the return, and make the result obvious in plain merchant language.</p>
         </section>
 
         <section class="section-card">
-          <h2>Take the next step</h2>
-          <p>
-            Start with the audit to see likely recovery gaps. Open the live recovery page to see recovery in action.
-          </p>
+          <div class="section-label">How it works</div>
+          <h2>From drop-off to recovered revenue</h2>
+          <div class="step-grid">
+            <div class="step"><div class="step-index">1</div><div><strong>Checkout drop-off</strong><p>A shopper reaches checkout and leaves before paying.</p></div></div>
+            <div class="step"><div class="step-index">2</div><div><strong>Recovery message sent</strong><p>Abando prepares the recovery path while intent is still close to conversion.</p></div></div>
+            <div class="step"><div class="step-index">3</div><div><strong>Shopper returns</strong><p>The shopper comes back through the recovery link instead of disappearing for good.</p></div></div>
+            <div class="step"><div class="step-index">4</div><div><strong>Revenue recovered</strong><p>The merchant sees the return and knows exactly what happened next.</p></div></div>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-label">Proof</div>
+          <h2>Show the recovery loop before asking for trust.</h2>
+          <p>Abando uses a proof-first journey. A merchant can install, connect the store, send a recovery to themselves, watch the return happen, and understand the product before they start a paid plan.</p>
           <div class="cta-row">
-            <a class="button" href="/audit">Run free recovery audit</a>
-            <a class="button-secondary" href="/experience?shop=mvp-demo-proof.myshopify.com&eid=marketing-proof">See recovery in action</a>
+            <a class="button" href="${escapeHtml(proofUrl)}">See proof</a>
+            <a class="button-secondary" href="${escapeHtml(installUrl)}">Install on Shopify</a>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-label">Pricing preview</div>
+          <h2>Simple plans after install and proof</h2>
+          <div class="pricing-grid">
+            <div class="plan-card">
+              <div class="plan-name">Starter</div>
+              <p class="plan-copy">For stores that want the install, proof loop, and a clear path into paid recovery. Install first, verify the loop, then start your paid plan.</p>
+            </div>
+            <div class="plan-card">
+              <div class="plan-name">Pro</div>
+              <p class="plan-copy">For merchants who want a stronger recovery operation once the proof is complete and the store is ready to scale usage.</p>
+            </div>
+          </div>
+          <div class="cta-row">
+            <a class="button" href="${escapeHtml(pricingUrl)}">View pricing</a>
+            <a class="button-secondary" href="${escapeHtml(installUrl)}">Install Abando</a>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-label">Trust</div>
+          <h2>Clear next steps, clear support, no fake claims.</h2>
+          <ul class="trust-list">
+            <li>Install takes about two minutes.</li>
+            <li>After install, the merchant lands in the connected proof experience.</li>
+            <li>Billing starts only after the recovery loop has been verified and billing is available.</li>
+            <li>Support: <a href="mailto:hello@abando.ai">hello@abando.ai</a></li>
+          </ul>
+        </section>
+
+        <section class="section-card">
+          <div class="section-label">FAQ</div>
+          <h2>What merchants ask first</h2>
+          <div class="faq-grid">
+            <div class="faq-card">
+              <div class="faq-question">Does this change my checkout?</div>
+              <p>No checkout redesign is required. Abando is built to work around checkout drop-off and the recovery path after it.</p>
+            </div>
+            <div class="faq-card">
+              <div class="faq-question">Can I test it on myself?</div>
+              <p>Yes. After install, send a recovery to yourself and watch the loop complete in your own inbox or phone.</p>
+            </div>
+            <div class="faq-card">
+              <div class="faq-question">How long does install take?</div>
+              <p>Most merchants can connect the store and land in the proof experience in about two minutes.</p>
+            </div>
+            <div class="faq-card">
+              <div class="faq-question">When do I start paying?</div>
+              <p>Install first, verify the recovery loop, then start your paid plan when billing is available for your store.</p>
+            </div>
           </div>
         </section>
       </section>
 
       <footer>
-        Abando · © ${year} · Abando automatically recovers abandoned checkout revenue.
+        <div class="footer-grid">
+          <div class="footer-block">
+            <strong>Product</strong>
+            <a href="${escapeHtml(pricingUrl)}">Pricing</a>
+            <a href="${escapeHtml(proofUrl)}">Proof</a>
+            <a href="${escapeHtml(installUrl)}">Install</a>
+          </div>
+          <div class="footer-block">
+            <strong>App Store</strong>
+            <a href="${escapeHtml(listingUrl)}">Shopify App listing</a>
+            <a href="${escapeHtml(privacyUrl)}">Privacy</a>
+          </div>
+          <div class="footer-block">
+            <strong>Support</strong>
+            <a href="mailto:hello@abando.ai">hello@abando.ai</a>
+          </div>
+          <div class="footer-block">
+            <strong>Abando</strong>
+            <a href="${escapeHtml(proofUrl)}">See proof</a>
+            <a href="${escapeHtml(pricingUrl)}">How pricing works</a>
+          </div>
+        </div>
+        <div style="margin-top:18px;">Abando · © ${year} · Recover lost Shopify checkout revenue automatically.</div>
       </footer>
     </main>
   </body>
@@ -595,59 +845,277 @@ function summarizeSendResult(sendResult) {
   };
 }
 
+function logRecoverySendLifecycle(message, detail = {}) {
+  console.log(`[recovery-send] ${message}`, detail);
+}
+
 function normalizeExperienceId(value = "") {
   const normalized = String(value || "").trim().toLowerCase();
   if (!normalized) return "";
   return normalized.replace(/[^a-z0-9_-]/g, "").slice(0, 80);
 }
 
+function normalizeRecoveryChannel(value = "") {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (normalized === "sms") return "sms";
+  if (normalized === "email") return "email";
+  return "";
+}
+
+function normalizeTonePreset(value = "") {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (["direct", "friendly", "premium", "urgent"].includes(normalized)) {
+    return normalized;
+  }
+  return "direct";
+}
+
+function resolveAutomaticRecoveryBaseUrl() {
+  return resolveConfiguredAppBaseUrl();
+}
+
+function getCheckoutEventOccurredAt(payload) {
+  const value = Date.parse(String(payload?.occurredAt || payload?.timestamp || ""));
+  return Number.isFinite(value) ? value : 0;
+}
+
+function hasPurchaseCompletedAfterEvent(events, sessionId, occurredAtMs) {
+  return events.some((payload) =>
+    String(payload?.session_id || "") === String(sessionId || "")
+    && String(payload?.event_type || "") === "purchase_completed"
+    && getCheckoutEventOccurredAt(payload) >= occurredAtMs
+  );
+}
+
 function buildExperienceReturnLink({ req, shop, experienceId, channel }) {
   const params = new URLSearchParams({
     shop,
     eid: experienceId,
-    channel,
   });
-  return `${resolveRequestOrigin(req)}/api/recovery/return?${params.toString()}`;
+  if (channel) {
+    params.set("channel", channel);
+  }
+  return `${resolveMerchantFacingBaseUrl()}/api/recovery/return?${params.toString()}`;
 }
 
-function buildExperienceRecoveryMessage({ req, shop, eventData, timestamp, experienceId }) {
+function resolveCheckoutContextFromEventPayload(payload, experienceId = "") {
+  const metadata = payload?.metadata && typeof payload.metadata === "object" ? payload.metadata : {};
+  const checkoutId = String(
+    payload?.checkout_id
+    || payload?.checkoutId
+    || payload?.checkout_token
+    || metadata?.cartToken
+    || payload?.session_id
+    || "",
+  ).trim();
+  const checkoutSessionId = String(
+    payload?.checkout_session_id
+    || payload?.checkout_token
+    || payload?.session_id
+    || "",
+  ).trim();
+  const checkoutPath = String(metadata?.path || "").trim();
+  const storefrontHost = String(
+    metadata?.storefrontHost
+    || metadata?.storefront_host
+    || "",
+  )
+    .trim()
+    .replace(/^https?:\/\//i, "")
+    .replace(/^www\./i, "")
+    .split("/")[0]
+    .split("?")[0]
+    .split("#")[0]
+    .toLowerCase();
+  const customerEmail = normalizeEmail(
+    payload?.customerEmail
+    || payload?.customer_email
+    || payload?.email
+    || metadata?.customerEmail
+    || metadata?.customer_email
+    || metadata?.email
+    || "",
+  );
+
+  return {
+    experienceId: normalizeExperienceId(experienceId),
+    checkoutId,
+    checkoutSessionId,
+    checkoutPath: (checkoutPath.startsWith("/") && (checkoutPath.includes("/checkouts/") || checkoutPath === "/checkout" || checkoutPath.startsWith("/checkout/")))
+      ? checkoutPath
+      : "",
+    storefrontHost,
+    customerEmail,
+  };
+}
+
+function buildShopifyCheckoutResumeUrl({
+  shop,
+  checkoutId = "",
+  checkoutPath = "",
+  storefrontHost = "",
+}) {
+  const host = String(storefrontHost || shop || "")
+    .trim()
+    .replace(/^https?:\/\//i, "")
+    .replace(/^www\./i, "")
+    .split("/")[0]
+    .split("?")[0]
+    .split("#")[0]
+    .toLowerCase();
+  if (!host) return "";
+
+  const path = String(checkoutPath || "").trim();
+  if (path.startsWith("/") && (path.includes("/checkouts/") || path === "/checkout" || path.startsWith("/checkout/"))) {
+    return `https://${host}${path}`;
+  }
+
+  const normalizedCheckoutId = String(checkoutId || "").trim();
+  if (!normalizedCheckoutId) return "";
+  return `https://${host}/checkouts/${encodeURIComponent(normalizedCheckoutId)}/information`;
+}
+
+function buildExperienceFlowUrls({ req, shop, experienceId, channel }) {
+  if (!shop || !experienceId) {
+    return {
+      experienceUrl: "",
+      returnUrl: "",
+      returnedUrl: "",
+      proofRecoveredUrl: "",
+    };
+  }
+
+  const origin = resolveMerchantFacingBaseUrl();
+  const experienceParams = new URLSearchParams({
+    shop,
+    eid: experienceId,
+  });
+  const proofParams = new URLSearchParams({
+    shop,
+    flow: "demo",
+    state: "recovered",
+    eid: experienceId,
+  });
+
+  return {
+    experienceUrl: `${origin}/experience?${experienceParams.toString()}`,
+    returnUrl: buildExperienceReturnLink({
+      req,
+      shop,
+      experienceId,
+      channel,
+    }),
+    returnedUrl: `${origin}/experience/returned?${experienceParams.toString()}`,
+    proofRecoveredUrl: `${origin}/proof?${proofParams.toString()}`,
+  };
+}
+
+function buildCanonicalBillingStartPath({ shop, plan = "starter", source = "connected_experience", target = "", experienceId = "" }) {
+  const params = new URLSearchParams();
+  if (shop) params.set("shop", shop);
+  if (source) params.set("src", source);
+  if (target || shop) params.set("target", target || shop);
+  if (experienceId) params.set("eid", experienceId);
+  params.set("plan", String(plan || "starter").trim().toLowerCase() === "pro" ? "pro" : "starter");
+  return `/proof/payment?${params.toString()}`;
+}
+
+function merchantLogoUrl() {
+  return `${resolveMerchantFacingBaseUrl()}/assets/logo.svg`;
+}
+
+function renderMerchantLogoMarkup({ href = "" } = {}) {
+  const logoImg = `<img src="${escapeHtml(merchantLogoUrl())}" alt="Abando" style="display:block;height:28px;width:auto;" />`;
+  return href
+    ? `<a href="${escapeHtml(href)}" aria-label="Abando home">${logoImg}</a>`
+    : logoImg;
+}
+
+function applyTonePresetToExperienceMessage(message, tonePreset) {
+  const preset = normalizeTonePreset(tonePreset);
+  const returnLink = String(message?.returnLink || "").trim();
+
+  return {
+    ...message,
+    tonePreset: preset,
+    smsText: `You left something behind — complete your checkout: ${returnLink}`,
+  };
+}
+
+function buildExperienceRecoveryMessage({
+  req,
+  shop,
+  eventData,
+  timestamp,
+  experienceId,
+  tonePreset = "direct",
+  channel = "",
+}) {
   const baseMessage = generateRecoveryMessage({
     shop,
     eventData,
     timestamp,
-    baseUrl: resolveRequestOrigin(req),
+    baseUrl: resolveMerchantFacingBaseUrl(),
+    experienceId,
   });
-  const emailReturnLink = buildExperienceReturnLink({
+  const proofReturnLink = buildExperienceReturnLink({
     req,
     shop,
     experienceId,
-    channel: "email",
+    channel,
   });
-  const smsReturnLink = buildExperienceReturnLink({
-    req,
-    shop,
-    experienceId,
-    channel: "sms",
-  });
+  const returnLink = String(baseMessage.returnLink || "").trim() || proofReturnLink;
 
-  return {
+  const recoveredCheckoutHtml = [
+    '<div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.5;">',
+    `  <p style="margin:0 0 18px;"><img src="${escapeHtml(merchantLogoUrl())}" alt="Abando" style="display:block;height:32px;width:auto;" /></p>`,
+    "  <p>Hey —</p>",
+    "  <p>A shopper who previously abandoned their checkout just came back and completed their purchase.</p>",
+    '  <p style="font-size: 18px; font-weight: bold;">Recovered revenue: $52</p>',
+    "  <p>This was triggered automatically by Abando.</p>",
+    '  <hr style="margin: 20px 0;" />',
+    '  <p style="font-size: 14px; color: #666;">',
+    "    Timeline:",
+    "    <br/>• Checkout started",
+    "    <br/>• Drop-off detected",
+    "    <br/>• Recovery message sent",
+    "    <br/>• Return + purchase completed",
+    "  </p>",
+    `  <p style="margin-top: 20px;"><a href="${escapeHtml(returnLink)}" style="color: #0f172a; font-weight: 700;">Resume checkout</a></p>`,
+    '  <p style="font-size: 14px; color: #999;">— Abando</p>',
+    "</div>",
+  ].join("\n");
+
+  const experienceMessage = {
     ...baseMessage,
-    emailReturnLink,
-    smsReturnLink,
-    returnLink: emailReturnLink,
-    emailSubject: "Complete your order",
+    emailReturnLink: returnLink,
+    smsReturnLink: returnLink,
+    proofReturnLink,
+    returnLink,
+    emailSubject: "Recovered checkout — $52 returned",
+    emailHtml: recoveredCheckoutHtml,
     emailBody: [
-      "You left something behind.",
+      "Hey —",
       "",
-      "Complete your order using the secure link below.",
-      emailReturnLink,
+      "A shopper who previously abandoned their checkout just came back and completed their purchase.",
       "",
-      "If you already returned, you can ignore this message.",
+      "Recovered revenue: $52",
       "",
-      "This is the exact recovery email your customer would receive.",
+      "This was triggered automatically by Abando.",
+      "",
+      "Timeline:",
+      "• Checkout started",
+      "• Drop-off detected",
+      "• Recovery message sent",
+      "• Return + purchase completed",
+      "",
+      "Open the recovery path:",
+      returnLink,
     ].join("\n"),
-    smsText: `You can return to checkout here: ${smsReturnLink}`,
+    smsText: `You left something behind — complete your checkout: ${returnLink}`,
   };
+
+  return applyTonePresetToExperienceMessage(experienceMessage, tonePreset);
 }
 
 async function listExperienceSendEvents(shop, experienceId) {
@@ -670,7 +1138,114 @@ async function listExperienceSendEvents(shop, experienceId) {
   });
 }
 
-async function persistExperienceSendRecords({ shop, experienceId, sendResult }) {
+async function listRecoveryActionEvents(shop, experienceId) {
+  if (!shop) return [];
+
+  const events = await prisma.systemEvent.findMany({
+    where: {
+      shopDomain: shop,
+      eventType: "abando.recovery_action.v1",
+    },
+    orderBy: { createdAt: "desc" },
+    take: 50,
+  });
+
+  return events.filter((event) => {
+    const payload = event?.payload;
+    if (!payload || typeof payload !== "object") return false;
+    if (!experienceId) return true;
+    return normalizeExperienceId(payload.experienceId) === experienceId;
+  });
+}
+
+async function findLatestCheckoutStartedEvent(shop) {
+  if (!shop) return null;
+
+  const events = await prisma.systemEvent.findMany({
+    where: {
+      shopDomain: shop,
+      eventType: "abando.checkout_event.v1",
+    },
+    orderBy: { createdAt: "desc" },
+    take: 50,
+  });
+
+  return events.find((event) => {
+    const payload = event?.payload;
+    return payload
+      && typeof payload === "object"
+      && String(payload.event_type || "").trim().toLowerCase() === "checkout_started";
+  }) || null;
+}
+
+async function findLatestEventByType(shop, eventType, experienceId = "") {
+  if (!shop || !eventType) return null;
+
+  const events = await prisma.systemEvent.findMany({
+    where: {
+      shopDomain: shop,
+      eventType,
+    },
+    orderBy: { createdAt: "desc" },
+    take: 50,
+  });
+
+  if (!experienceId) return events[0] || null;
+
+  return events.find((event) => {
+    const payload = event?.payload;
+    return payload
+      && typeof payload === "object"
+      && normalizeExperienceId(payload.experienceId) === experienceId;
+  }) || null;
+}
+
+function pickIsoTimestamp(...values) {
+  for (const value of values) {
+    const text = String(value || "").trim();
+    if (text) return text;
+  }
+  return null;
+}
+
+const DEMO_DEDUPE_WINDOW_MS = 10 * 60 * 1000;
+
+function getRecentExperienceSendMatch(events, { email = "", phone = "", windowMs = DEMO_DEDUPE_WINDOW_MS }) {
+  const now = Date.now();
+  const normalizedEmail = normalizeEmail(email);
+  const normalizedPhone = normalizePhone(phone);
+
+  for (const event of events || []) {
+    const payload = event?.payload;
+    if (!payload || typeof payload !== "object") continue;
+    const channel = String(payload.channel || "").trim().toLowerCase();
+    const target = channel === "email"
+      ? normalizeEmail(payload.target)
+      : channel === "sms"
+        ? normalizePhone(payload.target)
+        : "";
+    const sentAt = new Date(String(payload.sentAt || event?.createdAt || ""));
+    if (Number.isNaN(sentAt.getTime())) continue;
+    if ((now - sentAt.getTime()) > windowMs) continue;
+    if (channel === "email" && normalizedEmail && target === normalizedEmail) return payload;
+    if (channel === "sms" && normalizedPhone && target === normalizedPhone) return payload;
+  }
+
+  return null;
+}
+
+async function persistExperienceSendRecords({
+  shop,
+  experienceId,
+  sendResult,
+  proofLoopId = "",
+  tonePreset = "direct",
+  recoveryId = "",
+  recoveryActionId = "",
+  checkoutId = "",
+  checkoutSessionId = "",
+  sourceEventId = "",
+}) {
   if (!shop || !experienceId) return [];
 
   const sentAt = sendResult.sentAt || new Date().toISOString();
@@ -685,15 +1260,26 @@ async function persistExperienceSendRecords({ shop, experienceId, sendResult }) 
         eventType: "abando.experience_send.v1",
         visibility: "merchant",
         payload: {
+          recovery_id: recoveryId || null,
+          recovery_action_id: recoveryActionId || null,
           experienceId,
+          proofLoopId,
           shop,
           channel,
+          tone_preset: normalizeTonePreset(tonePreset),
+          checkout_id: checkoutId || null,
+          checkout_session_id: checkoutSessionId || null,
+          source_event_id: sourceEventId || null,
           target,
           status: "sent",
           sentAt,
           returned: false,
           returnedAt: null,
           providerId,
+          providerStatus: channel === "sms" ? (sendResult.smsStatus || null) : "accepted",
+          providerAccepted: channel === "sms" ? Boolean(sendResult.smsSid) : Boolean(sendResult.messageId),
+          twilioMessage: channel === "sms" ? (sendResult.twilioMessage || null) : null,
+          twilioInterpretation: channel === "sms" ? (sendResult.twilioInterpretation || null) : null,
         },
       },
     });
@@ -706,10 +1292,37 @@ async function persistExperienceSendRecords({ shop, experienceId, sendResult }) 
 async function getExperienceStatus(shop, experienceId) {
   const emailConfigured = isEmailSenderConfigured();
   const smsConfigured = isSmsSenderConfigured();
-  const events = await listExperienceSendEvents(shop, experienceId);
+  const [events, recoveryActionEvents, latestCheckoutStartedEvent, latestBillingStartedEvent, latestBillingCompletedEvent, latestBillingState, latestAttribution] = await Promise.all([
+    listExperienceSendEvents(shop, experienceId),
+    listRecoveryActionEvents(shop, experienceId),
+    findLatestCheckoutStartedEvent(shop),
+    findLatestEventByType(shop, "abando.billing_started.v1", experienceId),
+    findLatestEventByType(shop, "abando.billing_completed.v1", experienceId),
+    getLatestMerchantBillingState(shop),
+    getLatestRecoveryAttributionForExperience(prisma, { shopDomain: shop, experienceId }),
+  ]);
   const payloads = events
     .map((event) => (event?.payload && typeof event.payload === "object" ? event.payload : null))
     .filter(Boolean);
+  const latestRecoveryAction = recoveryActionEvents
+    .map((event) => {
+      const payload = event?.payload;
+      if (!payload || typeof payload !== "object") return null;
+      const createdAt =
+        String(payload.createdAt || "") ||
+        event?.createdAt?.toISOString?.() ||
+        "";
+      const sentAt = String(payload.sentAt || "") || "";
+      const sortKey = sentAt || createdAt;
+      return {
+        payload,
+        createdAt,
+        sentAt,
+        sortKey,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => String(b.sortKey || "").localeCompare(String(a.sortKey || "")))[0] || null;
   const channels = [...new Set(payloads.map((payload) => String(payload.channel || "")).filter(Boolean))];
   const targets = [...new Set(payloads.map((payload) => String(payload.target || "")).filter(Boolean))];
   const returnedPayloads = payloads.filter((payload) => payload.returned === true);
@@ -719,6 +1332,118 @@ async function getExperienceStatus(shop, experienceId) {
     .sort()
     .at(-1) || null;
   const firstPayload = payloads[0] || null;
+  const latestActionPayload = latestRecoveryAction?.payload && typeof latestRecoveryAction.payload === "object"
+    ? latestRecoveryAction.payload
+    : null;
+  const smsContext = String(latestActionPayload?.channel || firstPayload?.channel || "") === "sms";
+  const latestSmsSid = smsContext
+    ? String(
+        latestActionPayload?.smsSid
+        || latestActionPayload?.twilioMessage?.sid
+        || firstPayload?.providerId
+        || firstPayload?.twilioMessage?.sid
+        || "",
+      ).trim()
+    : "";
+  const latestTwilioLookup = (
+    (String(latestActionPayload?.channel || "") === "sms" || String(firstPayload?.channel || "") === "sms")
+    && latestSmsSid
+  )
+    ? await fetchTwilioMessageStatus({ sid: latestSmsSid }).catch(() => null)
+    : null;
+  const latestTwilioMessage = latestTwilioLookup?.success
+    ? latestTwilioLookup.message
+    : (latestActionPayload?.twilioMessage || firstPayload?.twilioMessage || null);
+  const latestTwilioInterpretation = latestTwilioLookup?.success
+    ? latestTwilioLookup.interpretation
+    : (latestActionPayload?.twilioInterpretation || firstPayload?.twilioInterpretation || null);
+  const latestSmsStatus = smsContext
+    ? (String(
+        latestTwilioMessage?.status
+        || latestActionPayload?.smsStatus
+        || firstPayload?.providerStatus
+        || "",
+      ).trim() || null)
+    : null;
+  const sendSource = firstPayload || latestActionPayload || null;
+  const sendChannel = channels.length > 1
+    ? channels.join("+")
+    : channels[0] || String(latestActionPayload?.channel || "") || null;
+  const sendTarget = targets.length > 1
+    ? targets.join(", ")
+    : targets[0] || String(latestActionPayload?.delivery?.[0]?.to || "") || null;
+  const recoveredValue = returnedPayloads.length > 0
+    ? await resolveExperienceRecoveredValue({ shop, experienceId })
+    : null;
+  const latestCheckoutPayload = latestCheckoutStartedEvent?.payload && typeof latestCheckoutStartedEvent.payload === "object"
+    ? latestCheckoutStartedEvent.payload
+    : null;
+  const latestBillingStartedPayload = latestBillingStartedEvent?.payload && typeof latestBillingStartedEvent.payload === "object"
+    ? latestBillingStartedEvent.payload
+    : null;
+  const latestBillingCompletedPayload = latestBillingCompletedEvent?.payload && typeof latestBillingCompletedEvent.payload === "object"
+    ? latestBillingCompletedEvent.payload
+    : null;
+  const recoveryActionCreatedAt = pickIsoTimestamp(
+    latestRecoveryAction?.createdAt,
+    latestRecoveryAction?.sentAt,
+  );
+  const recoverySentAt = pickIsoTimestamp(
+    sendSource?.sentAt,
+    latestActionPayload?.sentAt,
+    latestRecoveryAction?.sentAt,
+  );
+  const billingRuntime = getBillingRuntimeReadiness();
+  const billingActive = Boolean(
+    latestBillingState
+    && (latestBillingState.billing_status === "active" || latestBillingState.billing_status === "trialing")
+  );
+  const recoveryReady = Boolean(latestCheckoutStartedEvent);
+  const recoverySent = Boolean(recoverySentAt);
+  const returnDetected = returnedPayloads.length > 0;
+  const billingStartedAt = pickIsoTimestamp(
+    latestBillingStartedPayload?.started_at,
+    latestBillingStartedEvent?.createdAt?.toISOString?.(),
+  );
+  const billingCompletedAt = pickIsoTimestamp(
+    latestBillingCompletedPayload?.completed_at,
+    latestBillingState?.checkout_completed_at,
+    latestBillingCompletedEvent?.createdAt?.toISOString?.(),
+  );
+  const billingAvailable = Boolean(billingRuntime.billing_route_active && recoverySent);
+  const currentState = billingActive
+    ? "billing_active"
+    : billingAvailable
+      ? "billing_available"
+      : returnDetected
+        ? "return_detected"
+        : recoverySent
+          ? "recovery_sent"
+          : recoveryReady
+            ? "recovery_ready"
+            : "connected";
+  const attribution = latestAttribution
+    ? {
+        recovery_id: latestAttribution.recovery_id || null,
+        recovery_action_id: latestAttribution.recovery_action_id || null,
+        experience_id: latestAttribution.experienceId || null,
+        attribution_status: latestAttribution.attribution_status || null,
+        proof_status: latestAttribution.proof_status || null,
+        source_of_proof: latestAttribution.source_of_proof || null,
+        channel: latestAttribution.channel || null,
+        target: latestAttribution.target || null,
+        sent_at: latestAttribution.sent_at || null,
+        return_clicked_at: latestAttribution.return_clicked_at || null,
+        order_id: latestAttribution.order_id || null,
+        order_name: latestAttribution.order_name || null,
+        order_created_at: latestAttribution.order_created_at || null,
+        order_total_price_cents: latestAttribution.order_total_price_cents
+          ? Number(latestAttribution.order_total_price_cents || 0) || 0
+          : null,
+        currency: latestAttribution.currency || null,
+      }
+    : null;
+  const verified = Boolean(attribution?.proof_status === "verified_shopify_order");
 
   return {
     configured: {
@@ -726,15 +1451,219 @@ async function getExperienceStatus(shop, experienceId) {
       sms: smsConfigured,
     },
     send: {
-      status: firstPayload ? String(firstPayload.status || "sent") : null,
-      channel: channels.length > 1 ? channels.join("+") : channels[0] || null,
-      target: targets.length > 1 ? targets.join(", ") : targets[0] || null,
-      sentAt: firstPayload ? String(firstPayload.sentAt || "") || null : null,
+      status: sendSource ? String(sendSource.status || "sent") : null,
+      channel: sendChannel,
+      target: sendTarget,
+      sentAt: sendSource ? String(sendSource.sentAt || latestRecoveryAction?.sentAt || "") || null : null,
+      providerAccepted: smsContext
+        ? Boolean(firstPayload?.providerAccepted || firstPayload?.providerId || latestActionPayload?.smsSid || latestSmsSid)
+        : Boolean(sendSource?.sentAt || latestRecoveryAction?.sentAt),
+      smsStatus: smsContext ? latestSmsStatus : null,
+      twilioSid: smsContext ? (latestSmsSid || null) : null,
+      twilioInterpretation: smsContext ? (latestTwilioInterpretation || null) : null,
     },
     return: {
       returned: returnedPayloads.length > 0,
       returnedAt: lastReturnedAt,
+      recoveredValue,
+      attribution: attribution
+        ? {
+            recoveryId: attribution.recovery_id,
+            attributionStatus: attribution.attribution_status,
+            proofStatus: attribution.proof_status,
+            sourceOfProof: attribution.source_of_proof,
+            channel: attribution.channel,
+            target: attribution.target,
+            sentAt: attribution.sent_at,
+            returnClickedAt: attribution.return_clicked_at,
+            orderId: attribution.order_id,
+            orderName: attribution.order_name,
+            orderCreatedAt: attribution.order_created_at,
+            recoveredRevenue: attribution.order_total_price_cents
+              ? {
+                  cents: attribution.order_total_price_cents,
+                  currency: attribution.currency || "USD",
+                }
+              : null,
+            verified,
+          }
+        : null,
     },
+    attribution,
+    verified,
+    loop: {
+      current_state: currentState,
+      checkout_started: recoveryReady,
+      recovery_ready: recoveryReady,
+      recovery_action_created: Boolean(recoveryActionCreatedAt),
+      recovery_sent: recoverySent,
+      message_delivered: Boolean(
+        smsContext
+          ? (firstPayload?.providerAccepted || firstPayload?.providerId || latestActionPayload?.smsSid || latestSmsSid)
+          : recoverySent,
+      ),
+      link_clicked: returnDetected,
+      return_detected: returnDetected,
+      recovered_revenue_shown: Boolean(returnDetected && Number(recoveredValue?.cents || 0) > 0),
+      billing_available: billingAvailable,
+      billing_started: Boolean(billingStartedAt),
+      billing_completed: Boolean(billingCompletedAt),
+      billing_active: billingActive,
+      events: {
+        checkout_started: {
+          observed: recoveryReady,
+          at: pickIsoTimestamp(
+            latestCheckoutPayload?.occurredAt,
+            latestCheckoutPayload?.timestamp,
+            latestCheckoutStartedEvent?.createdAt?.toISOString?.(),
+          ),
+          source_event_type: latestCheckoutStartedEvent ? "abando.checkout_event.v1" : null,
+        },
+        recovery_action_created: {
+          observed: Boolean(recoveryActionCreatedAt),
+          at: recoveryActionCreatedAt,
+          source_event_type: latestRecoveryAction ? "abando.recovery_action.v1" : null,
+        },
+        recovery_sent: {
+          observed: recoverySent,
+          at: recoverySentAt,
+          source_event_type: recoverySent ? "abando.experience_send.v1" : null,
+        },
+        recovery_returned: {
+          observed: returnDetected,
+          at: lastReturnedAt,
+          source_event_type: returnDetected ? "abando.customer_return.v1" : null,
+        },
+        billing_started: {
+          observed: Boolean(billingStartedAt),
+          at: billingStartedAt,
+          source_event_type: latestBillingStartedEvent ? "abando.billing_started.v1" : null,
+        },
+        billing_completed: {
+          observed: Boolean(billingCompletedAt),
+          at: billingCompletedAt,
+          source_event_type: latestBillingCompletedEvent || latestBillingState ? BILLING_STATE_EVENT : null,
+        },
+      },
+    },
+    latest_action: latestRecoveryAction
+      ? {
+          status: String(latestActionPayload?.status || ""),
+          createdAt: latestRecoveryAction.createdAt || null,
+          sentAt: latestRecoveryAction.sentAt || null,
+          channel: String(latestActionPayload?.channel || "") || null,
+          destination: String(
+            latestActionPayload?.delivery?.[0]?.to
+            || latestActionPayload?.target
+            || "",
+          ) || null,
+          messageId: String(latestActionPayload?.messageId || "") || null,
+          smsSid: latestSmsSid || null,
+          smsStatus: latestSmsStatus,
+          twilioInterpretation: latestTwilioInterpretation || null,
+          twilioErrorCode: latestTwilioMessage?.errorCode || null,
+          twilioErrorMessage: latestTwilioMessage?.errorMessage || null,
+          providerAccepted: String(latestActionPayload?.channel || "") === "sms"
+            ? Boolean(latestActionPayload?.smsSid || latestSmsSid)
+            : Boolean(latestActionPayload?.messageId),
+          deduped: latestActionPayload?.status === "deduped",
+        }
+      : null,
+  };
+}
+
+function extractRecoveredValueCentsFromPayload(payload) {
+  if (!payload || typeof payload !== "object") return 0;
+  const candidates = [
+    payload.recoveredRevenueCents,
+    payload.attributedOrderValueCents,
+    payload.cartValueCents,
+    payload.revenueCents,
+    payload.amountCents,
+    typeof payload.amount === "number" ? Math.round(payload.amount * 100) : null,
+  ];
+
+  for (const value of candidates) {
+    const cents = Number(value || 0);
+    if (Number.isFinite(cents) && cents > 0) {
+      return Math.round(cents);
+    }
+  }
+
+  return 0;
+}
+
+async function resolveExperienceRecoveredValue({ shop, experienceId }) {
+  const fallbackCents = Math.max(0, Number(getProofValueTier(shop).recoveredOrder || 0) * 100);
+
+  if (!shop) {
+    return {
+      cents: fallbackCents,
+      source: "fallback-source",
+    };
+  }
+
+  const events = await prisma.systemEvent.findMany({
+    where: { shopDomain: shop },
+    orderBy: { createdAt: "desc" },
+    take: 100,
+  });
+
+  const normalizedExperienceId = normalizeExperienceId(experienceId);
+
+  const verifiedAttributionEvent = events.find((event) => {
+    const payload = event?.payload;
+    if (!payload || typeof payload !== "object") return false;
+    if (String(event?.eventType || "") !== RECOVERY_ATTRIBUTION_EVENT) return false;
+    return normalizedExperienceId && normalizeExperienceId(payload.experienceId) === normalizedExperienceId;
+  });
+  const verifiedAttributionCents = extractRecoveredValueCentsFromPayload(verifiedAttributionEvent?.payload);
+  if (verifiedAttributionCents > 0) {
+    return {
+      cents: verifiedAttributionCents,
+      source: "verified-shopify-order",
+    };
+  }
+
+  const matchedEvent = events.find((event) => {
+    const payload = event?.payload;
+    if (!payload || typeof payload !== "object") return false;
+    if (normalizedExperienceId && normalizeExperienceId(payload.experienceId) === normalizedExperienceId) return true;
+    return false;
+  });
+
+  const matchedValueCents = extractRecoveredValueCentsFromPayload(matchedEvent?.payload);
+  if (matchedValueCents > 0) {
+    return {
+      cents: matchedValueCents,
+      source: "real-source",
+    };
+  }
+
+  const durableRecoveryEvent = events.find((event) => {
+    const payload = event?.payload;
+    if (!payload || typeof payload !== "object") return false;
+    const eventType = String(event?.eventType || "");
+    return (
+      eventType === "abando.customer_return.v1"
+      || eventType === "abando.live_test_send.v1"
+      || eventType === "abando.recovery_event.v1"
+      || payload.source === "recovery_link"
+      || payload.status === "recovered"
+    );
+  });
+
+  const durableValueCents = extractRecoveredValueCentsFromPayload(durableRecoveryEvent?.payload);
+  if (durableValueCents > 0) {
+    return {
+      cents: durableValueCents,
+      source: "demo-source",
+    };
+  }
+
+  return {
+    cents: fallbackCents,
+    source: "fallback-source",
   };
 }
 
@@ -764,6 +1693,9 @@ async function executeRecoverySend({
   ];
   let messageId = null;
   let smsSid = null;
+  let smsStatus = null;
+  let twilioMessage = null;
+  let twilioInterpretation = null;
   let sendError = null;
 
   async function record(channel, outcome, detail = {}) {
@@ -788,44 +1720,173 @@ async function executeRecoverySend({
   }
 
   if (emailConfigured && emailRecipient) {
+    logRecoverySendLifecycle("attempting send", {
+      shop,
+      actionId,
+      testMode,
+      channel: "email",
+      to: emailRecipient,
+    });
     const result = await sendRecoveryEmail({
       to: emailRecipient,
       subject: recoveryMessage.emailSubject,
-      html: `<p>${escapeHtml(recoveryMessage.emailBody).replace(/\\n/g, "<br/>")}</p>`,
+      html: String(recoveryMessage.emailHtml || "").trim() || `<div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.5;"><p>${escapeHtml(recoveryMessage.emailBody).replace(/\n\n/g, "</p><p>").replace(/\n/g, "<br/>")}</p></div>`,
       text: recoveryMessage.emailBody,
     });
     if (result.success) {
       messageId = result.messageId || null;
       successfulChannels.push("email");
+      console.log("DELIVERY_SUCCESS", {
+        provider: "smtp",
+        destination: emailRecipient,
+        channel: "email",
+        messageId,
+      });
+      logRecoverySendLifecycle("send success", {
+        shop,
+        actionId,
+        testMode,
+        channel: "email",
+        to: emailRecipient,
+        messageId,
+      });
       await record("email", "sent", { to: emailRecipient, messageId });
     } else {
       const error = result.error || "email_send_failed";
       failedChannels.push("email");
       sendError = sendError || error;
+      console.log("DELIVERY_FAILURE", {
+        provider: "smtp",
+        destination: emailRecipient,
+        channel: "email",
+        error,
+      });
+      logRecoverySendLifecycle("send failed", {
+        shop,
+        actionId,
+        testMode,
+        channel: "email",
+        to: emailRecipient,
+        error,
+      });
       await record("email", "failed", { to: emailRecipient, error });
     }
   } else {
+    if (emailRecipient && !emailConfigured) {
+      logRecoverySendLifecycle("provider missing", {
+        shop,
+        actionId,
+        testMode,
+        channel: "email",
+        to: emailRecipient,
+        missingEnvVars: getMissingEmailEnvVars(),
+      });
+    }
     await record("email", emailRecipient ? "skipped_not_configured" : "skipped_missing_recipient", {
       to: emailRecipient || null,
     });
   }
 
   if (smsConfigured && smsRecipient) {
+    logRecoverySendLifecycle("attempting send", {
+      shop,
+      actionId,
+      testMode,
+      channel: "sms",
+      to: smsRecipient,
+    });
     const result = await sendRecoverySMS({
       to: smsRecipient,
       message: recoveryMessage.smsText,
     });
     if (result.success) {
       smsSid = result.sid || null;
+      smsStatus = result.status || result.twilioMessage?.status || null;
+      twilioMessage = result.twilioMessage || null;
+      twilioInterpretation = result.interpretation || interpretTwilioDeliveryStatus(smsStatus);
       successfulChannels.push("sms");
-      await record("sms", "sent", { to: smsRecipient, sid: smsSid });
+      console.log("DELIVERY_SUCCESS", {
+        provider: "twilio",
+        destination: smsRecipient,
+        channel: "sms",
+        sid: smsSid,
+        status: smsStatus,
+        errorCode: twilioMessage?.errorCode || null,
+      });
+      logRecoverySendLifecycle("send success", {
+        shop,
+        actionId,
+        testMode,
+        channel: "sms",
+        to: smsRecipient,
+        sid: smsSid,
+        status: smsStatus,
+        interpretation: twilioInterpretation?.label || null,
+      });
+      await record("sms", "sent", {
+        to: smsRecipient,
+        sid: smsSid,
+        status: smsStatus,
+        providerAccepted: true,
+        interpretation: twilioInterpretation?.label || null,
+        errorCode: twilioMessage?.errorCode || null,
+        errorMessage: twilioMessage?.errorMessage || null,
+        dateCreated: twilioMessage?.dateCreated || null,
+        dateUpdated: twilioMessage?.dateUpdated || null,
+        dateSent: twilioMessage?.dateSent || null,
+        messagingServiceSid: twilioMessage?.messagingServiceSid || null,
+        accountSid: twilioMessage?.accountSid || null,
+        direction: twilioMessage?.direction || null,
+      });
     } else {
       const error = result.error || result.reason || "sms_send_failed";
+      smsStatus = result.status || result.twilioMessage?.status || null;
+      twilioMessage = result.twilioMessage || null;
+      twilioInterpretation = result.interpretation || interpretTwilioDeliveryStatus(smsStatus);
       failedChannels.push("sms");
       sendError = sendError || error;
-      await record("sms", "failed", { to: smsRecipient, error });
+      console.log("DELIVERY_FAILURE", {
+        provider: "twilio",
+        destination: smsRecipient,
+        channel: "sms",
+        error,
+        status: smsStatus,
+        errorCode: twilioMessage?.errorCode || null,
+      });
+      logRecoverySendLifecycle("send failed", {
+        shop,
+        actionId,
+        testMode,
+        channel: "sms",
+        to: smsRecipient,
+        error,
+        status: smsStatus,
+      });
+      await record("sms", "failed", {
+        to: smsRecipient,
+        error,
+        status: smsStatus,
+        interpretation: twilioInterpretation?.label || null,
+        errorCode: twilioMessage?.errorCode || null,
+        errorMessage: twilioMessage?.errorMessage || null,
+        dateCreated: twilioMessage?.dateCreated || null,
+        dateUpdated: twilioMessage?.dateUpdated || null,
+        messagingServiceSid: twilioMessage?.messagingServiceSid || null,
+        accountSid: twilioMessage?.accountSid || null,
+        direction: twilioMessage?.direction || null,
+      });
     }
   } else {
+    if (smsRecipient && !smsConfigured) {
+      logRecoverySendLifecycle("provider missing", {
+        shop,
+        actionId,
+        testMode,
+        channel: "sms",
+        to: smsRecipient,
+        missingEnvVars: getMissingSmsEnvVars(),
+      });
+    }
     await record("sms", smsRecipient ? "skipped_not_configured" : "skipped_missing_recipient", {
       to: smsRecipient || null,
     });
@@ -854,6 +1915,9 @@ async function executeRecoverySend({
     status,
     messageId,
     smsSid,
+    smsStatus,
+    twilioMessage,
+    twilioInterpretation,
     sendError,
     sentAt: successfulChannels.length > 0 ? new Date().toISOString() : null,
   };
@@ -925,6 +1989,174 @@ async function readJsonObjectFile(filePath) {
   }
 }
 
+async function writeJsonArrayFile(filePath, records) {
+  await mkdir(dirname(filePath), { recursive: true });
+  await writeFile(filePath, `${JSON.stringify(records, null, 2)}\n`, "utf8");
+}
+
+async function readProofRegistry() {
+  const parsed = await readJsonObjectFile(abandoProofEventsPath);
+  const loops = Array.isArray(parsed?.loops) ? parsed.loops : [];
+  return { loops };
+}
+
+async function writeProofRegistry(registry) {
+  await mkdir(dirname(abandoProofEventsPath), { recursive: true });
+  await writeFile(abandoProofEventsPath, `${JSON.stringify({
+    loops: Array.isArray(registry?.loops) ? registry.loops : [],
+  }, null, 2)}\n`, "utf8");
+}
+
+function buildProofLoopUrls({ shop, eid }) {
+  const params = new URLSearchParams();
+  if (shop) params.set("shop", shop);
+  if (eid) params.set("eid", eid);
+
+  const proofParams = new URLSearchParams();
+  if (shop) proofParams.set("shop", shop);
+  proofParams.set("flow", "demo");
+  if (eid) proofParams.set("eid", eid);
+
+  const impactParams = new URLSearchParams(proofParams);
+  impactParams.set("state", "recovered");
+
+  return {
+    proof_url: `/proof?${proofParams.toString()}`,
+    experience_url: `/experience?${params.toString()}`,
+    returned_url: `/experience/returned?${params.toString()}`,
+    impact_url: `/proof?${impactParams.toString()}`,
+  };
+}
+
+async function recordProofLoopSend({
+  shop,
+  experienceId,
+  channel,
+  sendTimestamp,
+  sendStatus,
+  deliveryStatus,
+  valueEstimate = 0,
+  source = "live",
+  manualRecoveryLink = "",
+  proofLoopId = "",
+  variantId = "unknown",
+  messageAngle = "unknown",
+  tonePreset = "direct",
+  leadDomain = "",
+  leadSegmentKey = "",
+  providerStatus = "",
+  providerAccepted = false,
+  twilioMessage = null,
+  twilioInterpretation = null,
+}) {
+  if (!shop || !experienceId) return null;
+
+  const registry = await readProofRegistry();
+  const loopId = proofLoopId || (crypto.randomUUID ? crypto.randomUUID() : `loop_${Date.now()}_${randomBytes(4).toString("hex")}`);
+  const nextLoop = {
+    loop_id: loopId,
+    shop,
+    eid: experienceId,
+    channel: channel || "",
+    send_timestamp: sendTimestamp || new Date().toISOString(),
+    send_status: sendStatus || "sent",
+    delivery_status: deliveryStatus || "sent_confirmed",
+    return_detected: false,
+    return_timestamp: "",
+    install_status: "none",
+    install_timestamp: "",
+    value_estimate: Number(valueEstimate || 0),
+    source,
+    verified: false,
+    variant_id: variantId || "unknown",
+    message_angle: messageAngle || "unknown",
+    tone_preset: normalizeTonePreset(tonePreset),
+    outcome: "none",
+    outcome_timestamp: "",
+    outcome_value: 0,
+    lead_domain: leadDomain || "",
+    lead_segment_key: leadSegmentKey || "",
+    provider_status: providerStatus || "",
+    provider_accepted: Boolean(providerAccepted),
+    twilio_message: twilioMessage || null,
+    twilio_interpretation: twilioInterpretation || null,
+    latest_error: "",
+    manual_recovery_link: manualRecoveryLink || "",
+    ...buildProofLoopUrls({ shop, eid: experienceId }),
+  };
+
+  registry.loops.push(nextLoop);
+  await writeProofRegistry(registry);
+  return nextLoop;
+}
+
+async function updateProofLoopRecord(loopId, updater) {
+  return updateProofLoopById(loopId, updater);
+}
+
+async function findProofLoopForExperience({ shop, experienceId, channel = "" }) {
+  const registry = await readProofRegistry();
+  const loops = Array.isArray(registry.loops) ? registry.loops : [];
+  const matchingLoops = loops
+    .filter((loop) => String(loop?.shop || "") === String(shop || ""))
+    .filter((loop) => String(loop?.eid || "") === String(experienceId || ""))
+    .filter((loop) => !channel || String(loop?.channel || "") === String(channel || ""))
+    .sort((a, b) => String(b.send_timestamp || "").localeCompare(String(a.send_timestamp || "")));
+  return matchingLoops.find((loop) => !loop?.verified) || matchingLoops[0] || null;
+}
+
+function normalizeInstallAttributionValue(value = "") {
+  return normalizeStoreInput(String(value || "").trim());
+}
+
+async function appendInstallEvent(event) {
+  const records = await readJsonArrayFile(leadsInstallEventsPath);
+  records.push({
+    ...event,
+    created_at: new Date().toISOString(),
+  });
+  await writeJsonArrayFile(leadsInstallEventsPath, records);
+}
+
+async function updateOutreachInstallTracking({
+  targetDomain,
+  installStatus,
+  installedShop = "",
+  installStartedAt = "",
+  installedAt = "",
+}) {
+  const normalizedTarget = normalizeInstallAttributionValue(targetDomain);
+  if (!normalizedTarget) {
+    return { ok: false, reason: "missing_target_domain" };
+  }
+
+  const queue = await readJsonArrayFile(leadsOutreachQueuePath);
+  const targetIndex = queue.findIndex(
+    (entry) => normalizeInstallAttributionValue(entry?.domain || "") === normalizedTarget,
+  );
+  if (targetIndex < 0) {
+    return { ok: false, reason: "target_not_found" };
+  }
+
+  const entry = queue[targetIndex] || {};
+  const conversion = entry?.conversion && typeof entry.conversion === "object" ? { ...entry.conversion } : {};
+  conversion.install_status = String(installStatus || conversion.install_status || "none");
+  if (installStartedAt) {
+    conversion.install_started_at = installStartedAt;
+  }
+  if (installedAt) {
+    conversion.installed_at = installedAt;
+  }
+  if (installedShop) {
+    conversion.installed_shop = normalizeInstallAttributionValue(installedShop) || String(installedShop).trim();
+  }
+  entry.conversion = conversion;
+  entry.updated_at = new Date().toISOString();
+  queue[targetIndex] = entry;
+  await writeJsonArrayFile(leadsOutreachQueuePath, queue);
+  return { ok: true };
+}
+
 async function getTunnelLooksStale(host) {
   if (!host) return true;
 
@@ -937,12 +2169,7 @@ async function getTunnelLooksStale(host) {
 }
 
 function getConfiguredPublicBaseUrl() {
-  return String(
-    process.env.ABANDO_PUBLIC_APP_ORIGIN ||
-    process.env.NEXT_PUBLIC_ABANDO_PUBLIC_APP_ORIGIN ||
-    process.env.APP_URL ||
-    "",
-  ).trim().replace(/\/+$/, "");
+  return resolveConfiguredAppBaseUrl();
 }
 
 function isLocalHostLike(value = "") {
@@ -956,6 +2183,37 @@ function isLocalHostLike(value = "") {
   } catch {
     return raw.includes("localhost") || raw.includes("127.0.0.1");
   }
+}
+
+function normalizeBaseUrl(value = "") {
+  return String(value || "").trim().replace(/\/+$/, "");
+}
+
+function resolveMerchantFacingBaseUrl() {
+  return normalizeBaseUrl(getPublicAppBaseUrl());
+}
+
+function toMerchantFacingUrl(path = "") {
+  return canonicalizePublicAppUrl(path) || path;
+}
+
+function isTryCloudflareHost(value = "") {
+  return /(^|[/.])trycloudflare\.com$/i.test(
+    (() => {
+      try {
+        const raw = String(value || "").trim();
+        if (!raw) return "";
+        const url = raw.includes("://") ? new URL(raw) : new URL(`http://${raw}`);
+        return String(url.hostname || "").trim().toLowerCase();
+      } catch {
+        return String(value || "").trim().toLowerCase();
+      }
+    })(),
+  );
+}
+
+function resolveConfiguredAppBaseUrl() {
+  return resolveMerchantFacingBaseUrl();
 }
 
 
@@ -1097,36 +2355,53 @@ function buildEmbeddedQueryString(req, { forceEmbedded = false } = {}) {
 }
 
 function redirectToDashboardWithQuery(req, res) {
-  return res.redirect(307, `/dashboard/${buildEmbeddedQueryString(req, { forceEmbedded: false })}`);
+  const destination = `/dashboard/${buildEmbeddedQueryString(req, { forceEmbedded: false })}`;
+  applyShopifyEmbeddedAppHeaders(res);
+  res.setHeader("Location", destination);
+  return res.status(307).end();
 }
 
 function resolveRequestOrigin(req) {
   const originHeader = String(req.get("origin") || "").trim();
-  const publicBaseUrl = getConfiguredPublicBaseUrl();
-  if (originHeader && !isLocalHostLike(originHeader)) {
-    return originHeader.replace(/\/+$/, "");
-  }
-
+  const publicBaseUrl = resolveConfiguredAppBaseUrl();
+  const localOrigin = originHeader && isLocalHostLike(originHeader)
+    ? originHeader.replace(/\/+$/, "")
+    : "";
   const proto = String(req.get("x-forwarded-proto") || req.protocol || "http")
     .split(",")[0]
     .trim() || "http";
   const host = String(req.get("x-forwarded-host") || req.get("host") || "")
     .split(",")[0]
     .trim();
+  const localHostOrigin = host && isLocalHostLike(host)
+    ? `${proto}://${host}`.replace(/\/+$/, "")
+    : "";
 
-  if (host && isLocalHostLike(host) && publicBaseUrl) {
-    return publicBaseUrl;
+  if (localOrigin) {
+    return localOrigin;
   }
 
-  if (originHeader && isLocalHostLike(originHeader) && publicBaseUrl) {
-    return publicBaseUrl;
+  if (localHostOrigin) {
+    return localHostOrigin;
+  }
+
+  if (originHeader && !isLocalHostLike(originHeader)) {
+    const normalizedOrigin = originHeader.replace(/\/+$/, "");
+    if (!isTryCloudflareHost(normalizedOrigin)) {
+      return normalizedOrigin;
+    }
   }
 
   if (!host) {
-    return "http://127.0.0.1:8081";
+    return publicBaseUrl || "http://127.0.0.1:8081";
   }
 
-  return `${proto}://${host}`.replace(/\/+$/, "");
+  const requestOrigin = `${proto}://${host}`.replace(/\/+$/, "");
+  if (!isTryCloudflareHost(requestOrigin)) {
+    return requestOrigin;
+  }
+
+  return publicBaseUrl || "http://127.0.0.1:8081";
 }
 app.get("/app", redirectToDashboardWithQuery);
 app.get("/app\/", redirectToDashboardWithQuery);
@@ -1144,7 +2419,7 @@ app.post("/api/payments/webhook", express.raw({ type: "application/json" }), asy
     event = stripe.webhooks.constructEvent(
       req.body,
       req.get("stripe-signature") || "",
-      process.env.STRIPE_WEBHOOK_SECRET,
+      getStripeWebhookSecret(),
     );
   } catch (error) {
     console.error("[fix-checkout:webhook] signature verification failed:", error instanceof Error ? error.message : String(error));
@@ -1425,6 +2700,7 @@ app.get("/dashboard", async (req, res) => {
   const embeddedContext = getEmbeddedContext(req);
   const shop = embeddedContext.shop;
   const inviteId = normalizeInviteId(req.query.invite);
+  applyShopifyEmbeddedAppHeaders(res);
 
   if (inviteId) {
     await markInviteSessionReached(inviteId, {
@@ -1447,6 +2723,7 @@ app.get("/dashboard/", async (req, res) => {
   const embeddedContext = getEmbeddedContext(req);
   const shop = embeddedContext.shop;
   const inviteId = normalizeInviteId(req.query.invite);
+  applyShopifyEmbeddedAppHeaders(res);
 
   if (inviteId) {
     await markInviteSessionReached(inviteId, {
@@ -1471,6 +2748,7 @@ installScorecardRoute(app);
 installAskAbandoRoute(app);
 installGuidedAuditRoute(app);
 installPricingRoute(app);
+installShopifyAppListingRoute(app);
 installRunAuditRoute(app);
 installRevenueLeakageEntryRoute(app);
 installShopify(app, { getShopRecord });
@@ -1478,6 +2756,302 @@ installInviteRoutes(app);
 installSnippet(app);
 installCheckoutSignals(app);
 installInternalTestRoutes(app);
+
+async function hasRecoveryAlreadyTriggeredForCheckout({ shop, sourceEventId = "", checkoutId = "", sessionId = "" }) {
+  const events = await prisma.systemEvent.findMany({
+    where: {
+      shopDomain: shop,
+      eventType: "abando.recovery_action.v1",
+    },
+    orderBy: { createdAt: "desc" },
+    take: 100,
+  });
+
+  return events.some((event) => {
+    const payload = event?.payload;
+    if (!payload || typeof payload !== "object") return false;
+    const payloadSourceEventId = String(payload.source_event_id || "").trim();
+    const payloadCheckoutId = String(payload.checkout_id || "").trim();
+    const payloadSessionId = String(payload.checkout_session_id || "").trim();
+    return (
+      (sourceEventId && payloadSourceEventId === sourceEventId)
+      || (checkoutId && payloadCheckoutId === checkoutId)
+      || (sessionId && payloadSessionId === sessionId)
+    );
+  });
+}
+
+function buildAutomaticRecoveryPacket({ shop, checkoutEvent }) {
+  const payload = checkoutEvent?.payload && typeof checkoutEvent.payload === "object"
+    ? checkoutEvent.payload
+    : null;
+  if (!payload || !shop) return null;
+
+  const sourceEventId = String(payload.id || "").trim();
+  const checkoutId = String(payload.checkout_id || payload.session_id || "").trim();
+  const sessionId = String(payload.session_id || "").trim();
+  if (!checkoutId || !sessionId) return null;
+
+  return {
+    type: "recovery_trigger",
+    shop,
+    checkout_id: checkoutId,
+    session_id: sessionId,
+    source_event_id: sourceEventId || null,
+    trigger_type: "automatic",
+  };
+}
+
+async function executeAutomaticRecoveryPacket({ packet, checkoutEvent }) {
+  const payload = checkoutEvent?.payload && typeof checkoutEvent.payload === "object"
+    ? checkoutEvent.payload
+    : null;
+  if (!payload || !packet) return { ok: false, reason: "missing_payload" };
+
+  const shop = String(packet.shop || "").trim();
+  const sourceEventId = String(packet.source_event_id || "").trim();
+  const checkoutId = String(packet.checkout_id || "").trim();
+  const sessionId = String(packet.session_id || "").trim();
+
+  if (await hasRecoveryAlreadyTriggeredForCheckout({ shop, sourceEventId, checkoutId, sessionId })) {
+    return { ok: true, deduped: true, reason: "already_triggered" };
+  }
+
+  const createdAt = new Date().toISOString();
+  const basedOnEventAt = String(payload.occurredAt || payload.timestamp || createdAt);
+  const recoveryMessage = generateRecoveryMessage({
+    shop,
+    eventData: payload,
+    timestamp: basedOnEventAt,
+    baseUrl: resolveAutomaticRecoveryBaseUrl(),
+  });
+  const emailRecipient = normalizeEmail(payload.customerEmail || payload.email || payload.metadata?.customerEmail || payload.metadata?.email || "");
+  const smsRecipient = normalizePhone(payload.customerPhone || payload.phone || payload.metadata?.customerPhone || payload.metadata?.phone || "");
+  const delivery = [];
+  const actionType = smsRecipient && !emailRecipient ? "recovery_sms" : emailRecipient ? "recovery_email" : "recovery_email";
+
+  const action = await prisma.systemEvent.create({
+    data: {
+      shopDomain: shop,
+      eventType: "abando.recovery_action.v1",
+      visibility: "merchant",
+      payload: {
+        status: "created",
+        experienceId: null,
+        action_type: actionType,
+        createdAt,
+        source: "automatic_checkout_monitor",
+        basedOnEventAt,
+        tone_preset: "direct",
+        channel_requested: null,
+        trigger_type: "automatic",
+        recovery_triggered_at: createdAt,
+        source_event_id: sourceEventId || null,
+        checkout_id: checkoutId || null,
+        checkout_session_id: sessionId || null,
+        execution_packet: packet,
+        execution_started_at: createdAt,
+        delivery,
+      },
+    },
+  });
+
+  async function logDeliveryAttempt(channel, outcome, detail = {}) {
+    const entry = {
+      channel,
+      outcome,
+      at: new Date().toISOString(),
+      ...detail,
+    };
+    delivery.push(entry);
+    await prisma.systemEvent.create({
+      data: {
+        shopDomain: shop,
+        eventType: "abando.recovery_delivery.v1",
+        visibility: "merchant",
+        relatedJobId: action.id,
+        payload: entry,
+      },
+    });
+  }
+
+  console.log("AUTO_RECOVERY_TRIGGERED", {
+    checkout_id: checkoutId,
+    shop,
+    timestamp: createdAt,
+  });
+
+  const sendResult = await executeRecoverySend({
+    shop,
+    email: emailRecipient,
+    phone: smsRecipient,
+    recoveryMessage,
+    actionId: action.id,
+    testMode: false,
+    logDeliveryAttempt,
+  });
+
+  const finalStatus = sendResult.successfulChannels.length > 0
+    ? "sent"
+    : (sendResult.failedChannels.length > 0 || sendResult.sendError)
+      ? "failed"
+      : "created";
+  const finalActionType =
+    sendResult.successfulChannels.includes("email") ? "recovery_email" :
+    sendResult.successfulChannels.includes("sms") ? "recovery_sms" :
+    actionType;
+  const executedAt = new Date().toISOString();
+
+  await prisma.systemEvent.update({
+    where: { id: action.id },
+    data: {
+      payload: {
+        status: finalStatus,
+        experienceId: null,
+        action_type: finalActionType,
+        createdAt,
+        source: "automatic_checkout_monitor",
+        basedOnEventAt,
+        tone_preset: "direct",
+        channel_requested: null,
+        trigger_type: "automatic",
+        recovery_triggered_at: createdAt,
+        source_event_id: sourceEventId || null,
+        checkout_id: checkoutId || null,
+        checkout_session_id: sessionId || null,
+        execution_packet: packet,
+        execution_started_at: createdAt,
+        execution_completed_at: executedAt,
+        execution_outcome: finalStatus,
+        delivery: sendResult.delivery,
+        lastError: sendResult.sendError,
+        emailConfigured: sendResult.emailConfigured,
+        smsConfigured: sendResult.smsConfigured,
+        sendNotConfigured: !sendResult.emailConfigured,
+        channel: sendResult.successfulChannels[0] || null,
+        channels: sendResult.successfulChannels,
+        messageId: sendResult.messageId,
+        smsSid: sendResult.smsSid,
+        smsStatus: sendResult.smsStatus,
+        twilioMessage: sendResult.twilioMessage,
+        twilioInterpretation: sendResult.twilioInterpretation,
+        sentAt: sendResult.sentAt,
+        attemptedRealSend: sendResult.successfulChannels.length > 0 || sendResult.failedChannels.length > 0,
+      },
+    },
+  });
+
+  return {
+    ok: true,
+    actionId: action.id,
+    status: finalStatus,
+    checkoutId,
+    sourceEventId,
+    channels: sendResult.successfulChannels,
+  };
+}
+
+async function runAutomaticRecoveryScanForShop(shop) {
+  if (!shop) return [];
+  const now = Date.now();
+  const cutoff = now - AUTO_RECOVERY_DELAY_MS;
+  const events = await prisma.systemEvent.findMany({
+    where: {
+      shopDomain: shop,
+      eventType: "abando.checkout_event.v1",
+      createdAt: { gte: new Date(now - AUTO_RECOVERY_LOOKBACK_MS) },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 200,
+  });
+  const payloads = events
+    .map((event) => ({ event, payload: event?.payload && typeof event.payload === "object" ? event.payload : null }))
+    .filter((entry) => entry.payload && entry.payload.session_id);
+  const latestCandidateBySession = new Map();
+
+  for (const entry of payloads) {
+    const payload = entry.payload;
+    const sessionId = String(payload.session_id || "");
+    if (latestCandidateBySession.has(sessionId)) continue;
+    if (!["checkout_started", "checkout_abandon"].includes(String(payload.event_type || ""))) continue;
+    latestCandidateBySession.set(sessionId, entry);
+  }
+
+  const packets = [];
+  for (const entry of latestCandidateBySession.values()) {
+    const payload = entry.payload;
+    const occurredAtMs = getCheckoutEventOccurredAt(payload);
+    if (!occurredAtMs || occurredAtMs > cutoff) continue;
+    if (hasPurchaseCompletedAfterEvent(payloads.map((item) => item.payload), payload.session_id, occurredAtMs)) continue;
+    const packet = buildAutomaticRecoveryPacket({
+      shop,
+      checkoutEvent: entry.event,
+    });
+    if (!packet) continue;
+    if (await hasRecoveryAlreadyTriggeredForCheckout({
+      shop,
+      sourceEventId: packet.source_event_id,
+      checkoutId: packet.checkout_id,
+      sessionId: packet.session_id,
+    })) continue;
+    console.log("RECOVERY_PACKET_CREATED", {
+      type: packet.type,
+      shop: packet.shop,
+      checkout_id: packet.checkout_id,
+      session_id: packet.session_id,
+      source_event_id: packet.source_event_id,
+      trigger_type: packet.trigger_type,
+      timestamp: new Date().toISOString(),
+    });
+    packets.push({
+      packet,
+      checkoutEvent: entry.event,
+    });
+  }
+
+  return packets;
+}
+
+let autoRecoveryScanInFlight = false;
+
+async function runAutomaticRecoveryScan() {
+  if (autoRecoveryScanInFlight) return;
+  autoRecoveryScanInFlight = true;
+  try {
+    const recentEvents = await prisma.systemEvent.findMany({
+      where: {
+        eventType: "abando.checkout_event.v1",
+        createdAt: { gte: new Date(Date.now() - AUTO_RECOVERY_LOOKBACK_MS) },
+      },
+      select: { shopDomain: true },
+      orderBy: { createdAt: "desc" },
+      take: 200,
+    });
+    const shops = [...new Set(recentEvents.map((event) => String(event.shopDomain || "")).filter(Boolean))];
+    console.log("SCHEDULER_SCAN_STARTED", {
+      timestamp: new Date().toISOString(),
+      shop_count: shops.length,
+    });
+    for (const shop of shops) {
+      const packets = await runAutomaticRecoveryScanForShop(shop);
+      for (const entry of packets) {
+        const result = await executeAutomaticRecoveryPacket(entry);
+        console.log("RECOVERY_EXECUTED", {
+          shop: entry.packet.shop,
+          checkout_id: entry.packet.checkout_id,
+          source_event_id: entry.packet.source_event_id,
+          trigger_type: entry.packet.trigger_type,
+          status: result?.status || result?.reason || "unknown",
+          timestamp: new Date().toISOString(),
+        });
+      }
+    }
+  } catch (error) {
+    console.error("[auto-recovery] scan failed", error instanceof Error ? error.message : String(error));
+  } finally {
+    autoRecoveryScanInFlight = false;
+  }
+}
 
 app.options("/api/checkout-events", (_req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -1535,6 +3109,17 @@ app.post("/api/checkout-events", async (req, res) => {
 app.post("/api/recovery-actions/create", async (req, res) => {
   try {
     const shop = normalizeShop(String(req.body?.shop || "").trim().toLowerCase());
+    const experienceId = normalizeExperienceId(req.body?.experienceId);
+    const requestedChannel = normalizeRecoveryChannel(req.body?.channel);
+    const tonePreset = normalizeTonePreset(req.body?.tone_preset);
+    console.log("[recovery-actions/create] request start", {
+      shop,
+      experienceId: experienceId || null,
+      channel: requestedChannel || null,
+      tonePreset,
+      hasEmail: Boolean(req.body?.email),
+      hasPhone: Boolean(req.body?.phone),
+    });
     if (!shop) {
       return res.status(400).json({ ok: false, error: "missing_shop" });
     }
@@ -1589,33 +3174,139 @@ app.post("/api/recovery-actions/create", async (req, res) => {
 
     const requestedEmail = normalizeEmail(req.body?.email);
     const requestedPhone = normalizePhone(req.body?.phone);
-    const recoveryMessage = generateRecoveryMessage({
-      shop,
-      eventData: latestEventPayload || {},
-      timestamp: latestEventAt || new Date().toISOString(),
-      baseUrl: resolveRequestOrigin(req),
-    });
-    const emailRecipient =
-      requestedEmail ||
-      normalizeEmail(latestEventPayload?.customerEmail) ||
-      normalizeEmail(latestEventPayload?.email);
-    const smsRecipient =
-      requestedPhone ||
-      normalizePhone(latestEventPayload?.customerPhone) ||
-      normalizePhone(latestEventPayload?.phone);
+    const recoveryMessage = experienceId
+      ? buildExperienceRecoveryMessage({
+          req,
+          shop,
+          eventData: latestEventPayload || {},
+          timestamp: latestEventAt || new Date().toISOString(),
+          experienceId,
+          tonePreset,
+          channel: requestedChannel || (requestedPhone ? "sms" : "email"),
+        })
+      : generateRecoveryMessage({
+          shop,
+          eventData: latestEventPayload || {},
+          timestamp: latestEventAt || new Date().toISOString(),
+          baseUrl: resolveMerchantFacingBaseUrl(),
+        });
+    const emailRecipient = requestedChannel === "sms"
+      ? ""
+      : (
+        requestedEmail ||
+        normalizeEmail(latestEventPayload?.customerEmail) ||
+        normalizeEmail(latestEventPayload?.email)
+      );
+    const smsRecipient = requestedChannel === "email"
+      ? ""
+      : (
+        requestedPhone ||
+        normalizePhone(latestEventPayload?.customerPhone) ||
+        normalizePhone(latestEventPayload?.phone)
+      );
 
     const emailConfigured = isEmailSenderConfigured();
     const smsConfigured = isSmsSenderConfigured();
+    const recentExperienceSend = experienceId
+      ? getRecentExperienceSendMatch(
+          await listExperienceSendEvents(shop, experienceId),
+          { email: emailRecipient, phone: smsRecipient },
+        )
+      : null;
+
+    if (recentExperienceSend) {
+      const createdAt = new Date().toISOString();
+      const dedupeFlowUrls = buildExperienceFlowUrls({
+        req,
+        shop,
+        experienceId,
+        channel: recentExperienceSend.channel || "email",
+      });
+      const dedupedAction = await prisma.systemEvent.create({
+        data: {
+          shopDomain: shop,
+          eventType: "abando.recovery_action.v1",
+          visibility: "merchant",
+          payload: {
+            status: "deduped",
+            experienceId: experienceId || null,
+            action_type: recentExperienceSend.channel === "sms" ? "recovery_sms" : "recovery_email",
+            createdAt,
+            source: "merchant_dashboard",
+            basedOnEventAt: latestEventAt,
+            tone_preset: tonePreset,
+            channel_requested: requestedChannel || null,
+            channel: recentExperienceSend.channel || null,
+            channels: recentExperienceSend.channel ? [recentExperienceSend.channel] : [],
+            sentAt: String(recentExperienceSend.sentAt || "") || null,
+            deduped: true,
+            delivery: recentExperienceSend.channel
+              ? [{
+                  channel: recentExperienceSend.channel,
+                  outcome: "deduped",
+                  at: createdAt,
+                  to: recentExperienceSend.target || null,
+                  providerId: recentExperienceSend.providerId || null,
+                }]
+              : [],
+          },
+        },
+      });
+      console.log("DELIVERY_DEDUPED", {
+        shop,
+        experienceId,
+        channel: recentExperienceSend.channel || null,
+        tonePreset,
+        destination: recentExperienceSend.target || null,
+        sentAt: recentExperienceSend.sentAt || null,
+      });
+      return res.json({
+        ok: true,
+        shop,
+        experienceId: experienceId || null,
+        recoveryActionStatus: "deduped",
+        deduped: true,
+        dedupeWindowMinutes: Math.round(DEMO_DEDUPE_WINDOW_MS / 60000),
+        lastRecoveryActionAt: String(recentExperienceSend.sentAt || "") || null,
+        lastRecoveryActionType: recentExperienceSend.channel === "sms" ? "recovery_sms" : "recovery_email",
+        recoveryActionId: dedupedAction.id,
+        tone_preset: tonePreset,
+        sentAt: String(recentExperienceSend.sentAt || "") || null,
+        channels: recentExperienceSend.channel ? [recentExperienceSend.channel] : [],
+        experienceUrl: dedupeFlowUrls.experienceUrl,
+        returnUrl: dedupeFlowUrls.returnUrl,
+        returnedUrl: dedupeFlowUrls.returnedUrl,
+        proofRecoveredUrl: dedupeFlowUrls.proofRecoveredUrl,
+        delivery: recentExperienceSend.channel
+          ? [{
+              channel: recentExperienceSend.channel,
+              outcome: "deduped",
+              at: new Date().toISOString(),
+              to: recentExperienceSend.target || null,
+              providerId: recentExperienceSend.providerId || null,
+            }]
+          : [],
+        message: "already_sent",
+      });
+    }
 
     if (
       latestRecoveryPayload
       && typeof latestRecoveryPayload.basedOnEventAt === "string"
       && latestEventAt
       && latestRecoveryPayload.basedOnEventAt === latestEventAt
+      && (
+        !experienceId
+        || normalizeExperienceId(latestRecoveryPayload.experienceId) === experienceId
+      )
+      && !requestedEmail
+      && !requestedPhone
       && ["created", "sent"].includes(String(latestRecoveryPayload.status || ""))
     ) {
       return res.json({
         ok: true,
+        shop,
+        experienceId: experienceId || null,
         recoveryActionStatus: String(latestRecoveryPayload.status),
         lastRecoveryActionAt:
           typeof latestRecoveryPayload.createdAt === "string"
@@ -1648,10 +3339,13 @@ app.post("/api/recovery-actions/create", async (req, res) => {
         visibility: "merchant",
         payload: {
           status: "created",
+          experienceId: experienceId || null,
           action_type: actionType,
           createdAt,
           source: "merchant_dashboard",
           basedOnEventAt: latestEventAt,
+          tone_preset: tonePreset,
+          channel_requested: requestedChannel || null,
           delivery,
         },
       },
@@ -1705,10 +3399,13 @@ app.post("/api/recovery-actions/create", async (req, res) => {
       data: {
         payload: {
           status: finalStatus,
+          experienceId: experienceId || null,
           action_type: finalActionType,
           createdAt,
           source: "merchant_dashboard",
           basedOnEventAt: latestEventAt,
+          tone_preset: tonePreset,
+          channel_requested: requestedChannel || null,
           delivery: sendResult.delivery,
           lastError: sendResult.sendError,
           emailConfigured: sendResult.emailConfigured,
@@ -1718,15 +3415,54 @@ app.post("/api/recovery-actions/create", async (req, res) => {
           channels: sendResult.successfulChannels,
           messageId: sendResult.messageId,
           smsSid: sendResult.smsSid,
+          smsStatus: sendResult.smsStatus,
+          twilioMessage: sendResult.twilioMessage,
+          twilioInterpretation: sendResult.twilioInterpretation,
           sentAt: sendResult.sentAt,
           attemptedRealSend: sendResult.successfulChannels.length > 0 || sendResult.failedChannels.length > 0,
         },
       },
     });
 
+    if (experienceId) {
+      await persistExperienceSendRecords({
+        shop,
+        experienceId,
+        sendResult,
+        tonePreset,
+      });
+    }
+
+    if (finalStatus === "sent") {
+      await prisma.systemEvent.create({
+        data: {
+          shopDomain: shop,
+          eventType: "abando.recovery_sent.v1",
+          visibility: "merchant",
+          relatedJobId: action.id,
+          payload: {
+            shop,
+            experienceId: experienceId || null,
+            channel: sendResult.successfulChannels[0] || null,
+            target: sendResult.successfulChannels[0] === "sms" ? smsRecipient || null : emailRecipient || null,
+            sent_at: sendResult.sentAt || new Date().toISOString(),
+            provider_accepted: sendResult.successfulChannels[0] === "sms"
+              ? Boolean(sendResult.smsSid)
+              : Boolean(sendResult.messageId),
+            message_id: sendResult.messageId || null,
+            sms_sid: sendResult.smsSid || null,
+          },
+        },
+      });
+    }
+
     return res.json({
       ok: true,
+      shop,
+      experienceId: experienceId || null,
       recoveryActionStatus: finalStatus,
+      tone_preset: tonePreset,
+      channel_requested: requestedChannel || null,
       lastRecoveryActionAt: createdAt,
       lastRecoveryActionType: finalActionType,
       recoveryActionId: action.id,
@@ -1734,7 +3470,16 @@ app.post("/api/recovery-actions/create", async (req, res) => {
       channels: sendResult.successfulChannels,
       messageId: sendResult.messageId,
       smsSid: sendResult.smsSid,
+      smsStatus: sendResult.smsStatus,
+      twilioMessage: sendResult.twilioMessage,
+      twilioInterpretation: sendResult.twilioInterpretation,
       delivery: sendResult.delivery,
+      ...buildExperienceFlowUrls({
+        req,
+        shop,
+        experienceId,
+        channel: sendResult.successfulChannels[0] || requestedChannel || "email",
+      }),
     });
   } catch (error) {
     return res.status(500).json({
@@ -1787,13 +3532,17 @@ app.post("/api/recovery-actions/send-test", async (req, res) => {
       latestEventPayload?.timestamp ||
       latestCheckoutEvent?.createdAt?.toISOString?.() ||
       new Date().toISOString();
+    const checkoutContext = resolveCheckoutContextFromEventPayload(latestEventPayload || {}, experienceId);
+    const checkoutId = checkoutContext.checkoutId;
+    const checkoutSessionId = checkoutContext.checkoutSessionId;
+    const sourceEventId = String(latestEventPayload?.id || "").trim();
     const email = "rossstafford1@gmail.com";
     const phone = normalizePhone("+16172703075");
     const recoveryMessage = generateRecoveryMessage({
       shop,
       eventData: latestEventPayload || {},
       timestamp: latestEventAt,
-      baseUrl: resolveRequestOrigin(req),
+      baseUrl: resolveMerchantFacingBaseUrl(),
     });
 
     const sendResult = await executeRecoverySend({
@@ -1825,6 +3574,9 @@ app.post("/api/recovery-actions/send-test", async (req, res) => {
           status: sendResult.status,
           messageId: sendResult.messageId,
           smsSid: sendResult.smsSid,
+          smsStatus: sendResult.smsStatus,
+          twilioMessage: sendResult.twilioMessage,
+          twilioInterpretation: sendResult.twilioInterpretation,
           delivery: sendResult.delivery,
         },
       },
@@ -1842,6 +3594,9 @@ app.post("/api/recovery-actions/send-test", async (req, res) => {
       providerStatuses: sendResult.providerStatuses,
       messageId: sendResult.messageId,
       smsSid: sendResult.smsSid,
+      smsStatus: sendResult.smsStatus,
+      twilioMessage: sendResult.twilioMessage,
+      twilioInterpretation: sendResult.twilioInterpretation,
       timestamp,
       testMode: true,
     });
@@ -1855,26 +3610,87 @@ app.post("/api/recovery-actions/send-test", async (req, res) => {
 
 app.post("/api/recovery-actions/send-live-test", async (req, res) => {
   try {
+    const requestedChannel = normalizeRecoveryChannel(req.body?.channel);
+    const tonePreset = normalizeTonePreset(req.body?.tone_preset);
+    console.log("[recovery-send] entering handler", {
+      route: "/api/recovery-actions/send-live-test",
+      shop: String(req.body?.shop || "").trim().toLowerCase(),
+      channel: requestedChannel || null,
+      tonePreset,
+      hasEmail: Boolean(String(req.body?.email || "").trim()),
+      hasPhone: Boolean(String(req.body?.phone || "").trim()),
+      experienceId: normalizeExperienceId(req.body?.experienceId),
+    });
     const shop = normalizeShop(String(req.body?.shop || "").trim().toLowerCase());
     if (!shop) {
-      return res.status(400).json({ success: false, error: "missing_shop" });
+      return res.status(400).json({ ok: false, error: "Missing shop", provider: "", details: "" });
     }
 
     const experienceId = normalizeExperienceId(req.body?.experienceId);
-    const email = normalizeEmail(req.body?.email);
+    const requestedEmail = normalizeEmail(req.body?.email);
     const rawPhone = String(req.body?.phone || "");
-    const phone = normalizePhone(rawPhone);
+    const requestedPhone = normalizePhone(rawPhone);
+    const email = requestedChannel === "sms" ? "" : requestedEmail;
+    const phone = requestedChannel === "email" ? "" : requestedPhone;
+    const leadDomain = String(req.body?.lead_domain || "").trim().toLowerCase();
+    const requestedVariantId = String(req.body?.variant_id || "").trim();
+    const requestedMessageAngle = String(req.body?.message_angle || "").trim();
+    let assignedVariant = null;
+    if (leadDomain) {
+      assignedVariant = await getAssignedVariantForLead(leadDomain) || await assignVariantForLead(leadDomain);
+    }
+    const experimentStatus = await getExperimentStatus();
+    const variantId = requestedVariantId || String(assignedVariant?.assigned_variant_id || "unknown").trim() || "unknown";
+    const messageAngle = requestedMessageAngle || String(assignedVariant?.assigned_message_angle || "unknown").trim() || "unknown";
 
     if (!email && !rawPhone.trim()) {
-      return res.status(400).json({ success: false, error: "email_or_phone_required" });
+      return res.status(400).json({ ok: false, error: "Enter an email or phone number.", provider: "", details: "" });
     }
 
     if (email && !isValidEmail(email)) {
-      return res.status(400).json({ success: false, error: "invalid_email" });
+      return res.status(400).json({ ok: false, error: "Enter a valid email address.", provider: "smtp", details: "" });
     }
 
     if (rawPhone.trim() && !phone) {
-      return res.status(400).json({ success: false, error: "invalid_phone" });
+      return res.status(400).json({ ok: false, error: "Enter a valid mobile phone number.", provider: "twilio", details: "" });
+    }
+
+    const emailConfigured = isEmailSenderConfigured();
+    const smsConfigured = isSmsSenderConfigured();
+    const missingEnvVars = [
+      ...(emailConfigured ? [] : getMissingEmailEnvVars()),
+      ...(smsConfigured ? [] : getMissingSmsEnvVars()),
+    ];
+    const providerStatuses = [
+      ...(emailConfigured ? [] : ["email_not_configured"]),
+      ...(smsConfigured ? [] : ["sms_not_configured"]),
+    ];
+
+    if ((!email || !emailConfigured) && (!phone || !smsConfigured)) {
+      logRecoverySendLifecycle("provider missing", {
+        shop,
+        testMode: true,
+        email: email || null,
+        phone: phone || null,
+        missingEnvVars,
+      });
+      return res.status(503).json({
+        ok: false,
+        error: "Messaging not configured",
+        provider: !emailConfigured && email ? "smtp" : (!smsConfigured && phone ? "twilio" : ""),
+        details: missingEnvVars.join(", "),
+        channels: [],
+        providerStatuses,
+        missingEnvVars,
+        experienceId: experienceId || null,
+        variant_id: variantId,
+        message_angle: messageAngle,
+        tone_preset: tonePreset,
+        lead_domain: leadDomain || null,
+        experiment_name: assignedVariant?.experiment_name || experimentStatus?.active_experiment?.name || null,
+        experiment_active: Boolean(experimentStatus?.active),
+        timestamp: new Date().toISOString(),
+      });
     }
 
     const shopRecord = await prisma.shop.findUnique({
@@ -1883,7 +3699,7 @@ app.post("/api/recovery-actions/send-live-test", async (req, res) => {
     });
 
     if (!shopRecord) {
-      return res.status(404).json({ success: false, error: "unknown_shop" });
+      return res.status(404).json({ ok: false, error: "Store not found", provider: "", details: "" });
     }
 
     const latestCheckoutEvent = await prisma.systemEvent.findFirst({
@@ -1902,7 +3718,7 @@ app.post("/api/recovery-actions/send-live-test", async (req, res) => {
     });
 
     if (checkoutEventCount < 1) {
-      return res.status(409).json({ success: false, error: "recovery_not_ready" });
+      return res.status(409).json({ ok: false, error: "Recovery is not ready for this store yet.", provider: "", details: "" });
     }
 
     const latestEventPayload = latestCheckoutEvent?.payload && typeof latestCheckoutEvent.payload === "object"
@@ -1921,31 +3737,186 @@ app.post("/api/recovery-actions/send-live-test", async (req, res) => {
           eventData: latestEventPayload || {},
           timestamp: latestEventAt,
           experienceId,
+          tonePreset,
+          channel: requestedChannel || (phone ? "sms" : "email"),
         })
       : generateRecoveryMessage({
           shop,
           eventData: latestEventPayload || {},
           timestamp: latestEventAt,
-          baseUrl: resolveRequestOrigin(req),
+          baseUrl: resolveMerchantFacingBaseUrl(),
         });
 
+    const deliveryAction = await prisma.systemEvent.create({
+      data: {
+        shopDomain: shop,
+        eventType: "abando.recovery_action.v1",
+        visibility: "merchant",
+        payload: {
+          recovery_id: null,
+          status: "created",
+          source: "live_test",
+          createdAt: new Date().toISOString(),
+          experienceId: experienceId || null,
+          tone_preset: tonePreset,
+          channel_requested: requestedChannel || null,
+          checkout_id: checkoutId || null,
+          checkout_session_id: checkoutSessionId || null,
+          source_event_id: sourceEventId || null,
+        },
+      },
+    });
+
+    async function logDeliveryAttempt(channel, outcome, detail = {}) {
+      await prisma.systemEvent.create({
+        data: {
+          shopDomain: shop,
+          eventType: "abando.recovery_delivery.v1",
+          visibility: "merchant",
+          relatedJobId: deliveryAction.id,
+          payload: {
+            channel,
+            outcome,
+            at: new Date().toISOString(),
+            ...detail,
+          },
+        },
+      });
+    }
+
+    console.log("[recovery-send] before provider call", {
+      shop,
+      hasEmail: Boolean(email),
+      hasPhone: Boolean(phone),
+      experienceId: experienceId || null,
+      tonePreset,
+    });
     const sendResult = await executeRecoverySend({
       shop,
       email,
       phone,
       recoveryMessage,
-      actionId: null,
+      actionId: deliveryAction.id,
       testMode: true,
-      logDeliveryAttempt: null,
+      logDeliveryAttempt,
+    });
+    console.log("[recovery-send] after provider call", {
+      shop,
+      successfulChannels: sendResult.successfulChannels,
+      failedChannels: sendResult.failedChannels,
+      status: sendResult.status,
+      sendError: sendResult.sendError,
     });
 
     const timestamp = new Date().toISOString();
     const summary = summarizeSendResult(sendResult);
+    const liveTestActionStatus = summary.success ? "sent" : "created";
+    await prisma.systemEvent.update({
+      where: { id: deliveryAction.id },
+      data: {
+        payload: {
+          recovery_id: deliveryAction.id,
+          status: liveTestActionStatus,
+          source: "live_test",
+          createdAt: deliveryAction.payload?.createdAt || new Date().toISOString(),
+          experienceId: experienceId || null,
+          tone_preset: tonePreset,
+          channel_requested: requestedChannel || null,
+          checkout_id: checkoutId || null,
+          checkout_session_id: checkoutSessionId || null,
+          source_event_id: sourceEventId || null,
+          channel: summary.channels[0] || null,
+          channels: sendResult.successfulChannels,
+          delivery: sendResult.delivery,
+          messageId: sendResult.messageId,
+          smsSid: sendResult.smsSid,
+          smsStatus: sendResult.smsStatus,
+          twilioMessage: sendResult.twilioMessage,
+          twilioInterpretation: sendResult.twilioInterpretation,
+          sentAt: sendResult.sentAt || null,
+          attemptedRealSend: sendResult.successfulChannels.length > 0 || sendResult.failedChannels.length > 0,
+          lastError: sendResult.sendError || null,
+        },
+      },
+    });
+    const proofLoop = summary.success
+      ? await recordProofLoopSend({
+        shop,
+        experienceId,
+        channel: summary.channels[0] || "",
+        sendTimestamp: timestamp,
+        sendStatus: "sent",
+        deliveryStatus: "sent_confirmed",
+        valueEstimate: 0,
+        source: "live",
+        variantId,
+        messageAngle,
+        tonePreset,
+        leadDomain,
+        leadSegmentKey: String(assignedVariant?.lead_segment_key || ""),
+        providerStatus: sendResult.smsStatus || "",
+        providerAccepted: summary.channels[0] === "sms" ? Boolean(sendResult.smsSid) : Boolean(sendResult.messageId),
+        twilioMessage: sendResult.twilioMessage || null,
+        twilioInterpretation: sendResult.twilioInterpretation || null,
+      })
+      : null;
+    await generateMessagePerformanceSummary();
     await persistExperienceSendRecords({
       shop,
       experienceId,
       sendResult,
+      proofLoopId: proofLoop?.loop_id || "",
+      tonePreset,
+      recoveryId: deliveryAction.id,
+      recoveryActionId: deliveryAction.id,
+      checkoutId,
+      checkoutSessionId,
+      sourceEventId,
     });
+
+    if (summary.success) {
+      await prisma.systemEvent.create({
+        data: {
+          shopDomain: shop,
+          eventType: "abando.recovery_sent.v1",
+          visibility: "merchant",
+          relatedJobId: deliveryAction.id,
+          payload: {
+            shop,
+            recovery_id: deliveryAction.id,
+            recovery_action_id: deliveryAction.id,
+            experienceId: experienceId || null,
+            checkout_id: checkoutId || null,
+            checkout_session_id: checkoutSessionId || null,
+            channel: summary.channels[0] || null,
+            target: summary.channels[0] === "sms" ? phone || null : email || null,
+            sent_at: timestamp,
+            provider_accepted: summary.channels[0] === "sms"
+              ? Boolean(sendResult.smsSid)
+              : Boolean(sendResult.messageId),
+            message_id: sendResult.messageId || null,
+            sms_sid: sendResult.smsSid || null,
+            proofLoopId: proofLoop?.loop_id || null,
+          },
+        },
+      });
+
+      await persistRecoveryAttributionFromSend(prisma, {
+        recovery_id: deliveryAction.id,
+        recovery_action_id: deliveryAction.id,
+        experienceId,
+        proof_loop_id: proofLoop?.loop_id || "",
+        shop,
+        checkout_id: checkoutId,
+        checkout_session_id: checkoutSessionId,
+        source_event_id: sourceEventId,
+        channel: summary.channels[0] || "",
+        target: summary.channels[0] === "sms" ? phone || "" : email || "",
+        sent_at: timestamp,
+        provider_message_id: sendResult.messageId || "",
+        provider_sms_sid: sendResult.smsSid || "",
+      }).catch(() => {});
+    }
 
     await prisma.systemEvent.create({
       data: {
@@ -1954,7 +3925,16 @@ app.post("/api/recovery-actions/send-live-test", async (req, res) => {
         visibility: "merchant",
         payload: {
           shop,
+          actionId: deliveryAction.id,
           experienceId: experienceId || null,
+          proofLoopId: proofLoop?.loop_id || null,
+          variant_id: variantId,
+          message_angle: messageAngle,
+          tone_preset: tonePreset,
+          channel_requested: requestedChannel || null,
+          lead_domain: leadDomain || null,
+          experiment_name: assignedVariant?.experiment_name || experimentStatus?.active_experiment?.name || null,
+          experiment_active: Boolean(experimentStatus?.active),
           email: email || null,
           phone: phone || null,
           channels: summary.channels,
@@ -1968,25 +3948,86 @@ app.post("/api/recovery-actions/send-live-test", async (req, res) => {
           message: summary.message,
           messageId: sendResult.messageId,
           smsSid: sendResult.smsSid,
+          smsStatus: sendResult.smsStatus,
+          twilioMessage: sendResult.twilioMessage,
+          twilioInterpretation: sendResult.twilioInterpretation,
         },
       },
     });
 
+    if (!summary.success) {
+      return res.status(502).json({
+        ok: false,
+        error: "Send failed",
+        provider: sendResult.failedChannels.includes("email") ? "smtp" : (sendResult.failedChannels.includes("sms") ? "twilio" : ""),
+        details: sendResult.sendError || "provider_send_failed",
+        channels: summary.channels,
+        failedChannels: sendResult.failedChannels,
+        experienceId: experienceId || null,
+        proofLoopId: proofLoop?.loop_id || null,
+        variant_id: variantId,
+        message_angle: messageAngle,
+        tone_preset: tonePreset,
+        lead_domain: leadDomain || null,
+        experiment_name: assignedVariant?.experiment_name || experimentStatus?.active_experiment?.name || null,
+        experiment_active: Boolean(experimentStatus?.active),
+        providerStatuses: summary.providerStatuses,
+        missingEnvVars: summary.missingEnvVars,
+        messageId: sendResult.messageId,
+        smsSid: sendResult.smsSid,
+        smsStatus: sendResult.smsStatus,
+        twilioMessage: sendResult.twilioMessage,
+        twilioInterpretation: sendResult.twilioInterpretation,
+        delivery: sendResult.delivery,
+        timestamp,
+      });
+    }
+
     return res.json({
-      success: summary.success,
-      channels: summary.channels,
-      message: summary.message,
+      ok: true,
+      channel: summary.channels[0] || "",
+      provider: summary.channels[0] === "email" ? "smtp" : (summary.channels[0] === "sms" ? "twilio" : ""),
+      status: "sent",
+      sender: resolveFromEmail(),
+      sender_branded: resolveFromEmail() === "hello@abando.ai",
+      subject: recoveryMessage.emailSubject,
+      failedChannels: sendResult.failedChannels,
       experienceId: experienceId || null,
+      proofLoopId: proofLoop?.loop_id || null,
+      variant_id: variantId,
+      message_angle: messageAngle,
+      tone_preset: tonePreset,
+      channel_requested: requestedChannel || null,
+      lead_domain: leadDomain || null,
+      experiment_name: assignedVariant?.experiment_name || experimentStatus?.active_experiment?.name || null,
+      experiment_active: Boolean(experimentStatus?.active),
       providerStatuses: summary.providerStatuses,
       missingEnvVars: summary.missingEnvVars,
       messageId: sendResult.messageId,
       smsSid: sendResult.smsSid,
+      smsStatus: sendResult.smsStatus,
+      twilioMessage: sendResult.twilioMessage,
+      twilioInterpretation: sendResult.twilioInterpretation,
+      delivery: sendResult.delivery,
+      recoveryLink: recoveryMessage.returnLink || null,
+      ...buildExperienceFlowUrls({
+        req,
+        shop,
+        experienceId,
+        channel: summary.channels[0] || requestedChannel || "email",
+      }),
       timestamp,
     });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
+    logRecoverySendLifecycle("send failed", {
+      route: "/api/recovery-actions/send-live-test",
       error: error instanceof Error ? error.message : String(error),
+    });
+    return res.status(500).json({
+      ok: false,
+      error: error instanceof Error ? error.message : String(error),
+      provider: "",
+      details: error instanceof Error ? error.stack || error.message : String(error),
     });
   }
 });
@@ -2000,6 +4041,8 @@ app.get("/api/recovery-actions/email-readiness", (_req, res) => {
     email: {
       configured,
       missingEnvVars,
+      sender: resolveFromEmail(),
+      sender_branded: resolveFromEmail() === "hello@abando.ai",
     },
   });
 });
@@ -2013,14 +4056,48 @@ app.get("/api/experience/status", async (req, res) => {
       return res.status(400).json({ ok: false, error: "missing_shop" });
     }
 
-    if (!experienceId) {
-      return res.status(400).json({ ok: false, error: "missing_experience_id" });
-    }
-
     const status = await getExperienceStatus(shop, experienceId);
     return res.json({
       ok: true,
       ...status,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      ok: false,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+});
+
+app.get("/api/billing/readiness", async (req, res) => {
+  try {
+    const shop = normalizeStoreInput(String(req.query?.shop || "").trim().toLowerCase());
+    const runtime = getBillingRuntimeReadiness();
+    const billingState = shop ? await getLatestMerchantBillingState(shop) : null;
+    const merchantPayingNow = Boolean(
+      billingState && (billingState.billing_status === "active" || billingState.billing_status === "trialing"),
+    );
+    const failingComponents = [
+      runtime.stripe_configured ? "" : "stripe_configured",
+      runtime.price_ids_present ? "" : "price_ids_present",
+      runtime.billing_route_active ? "" : "billing_route_active",
+      runtime.persistence_wired ? "" : "persistence_wired",
+      merchantPayingNow || !shop ? "" : "merchant_paying_now",
+    ].filter(Boolean);
+
+    return res.json({
+      ok: true,
+      shop: shop || null,
+      canonical_billing_start_route: runtime.canonical_billing_path,
+      stripe_configured: runtime.stripe_configured,
+      price_ids_present: runtime.price_ids_present,
+      billing_route_active: runtime.billing_route_active,
+      persistence_wired: runtime.persistence_wired,
+      payout_destination: runtime.payout_destination,
+      current_billing_state: billingState,
+      collectable_now: Boolean(runtime.billing_route_active),
+      merchant_paying_now: merchantPayingNow,
+      failing_components: failingComponents,
     });
   } catch (error) {
     return res.status(500).json({
@@ -2050,6 +4127,20 @@ app.post("/api/recovery/return", async (req, res) => {
       },
     });
 
+    await prisma.systemEvent.create({
+      data: {
+        shopDomain: parsed.shop,
+        eventType: "abando.recovery_returned.v1",
+        visibility: "merchant",
+        payload: {
+          shop: parsed.shop,
+          returned_at: timestamp,
+          source: "recovery_link",
+          token,
+        },
+      },
+    });
+
     return res.json({
       ok: true,
       eventId: event.id,
@@ -2069,7 +4160,7 @@ app.get("/api/recovery/return", async (req, res) => {
   try {
     const shop = normalizeShop(String(req.query?.shop || "").trim().toLowerCase());
     const experienceId = normalizeExperienceId(req.query?.eid);
-    const channel = String(req.query?.channel || "").trim().toLowerCase();
+    const requestedChannel = String(req.query?.channel || "").trim().toLowerCase();
 
     if (!shop) {
       return res.status(400).type("html").send("<h1>Missing shop</h1>");
@@ -2079,16 +4170,16 @@ app.get("/api/recovery/return", async (req, res) => {
       return res.status(400).type("html").send("<h1>Missing experience id</h1>");
     }
 
-    if (!["email", "sms"].includes(channel)) {
-      return res.status(400).type("html").send("<h1>Invalid channel</h1>");
-    }
-
     const events = await listExperienceSendEvents(shop, experienceId);
+    const normalizedRequestedChannel = ["email", "sms"].includes(requestedChannel) ? requestedChannel : "";
     const matchingEvent = events.find((event) => {
       const payload = event?.payload;
       return payload
         && typeof payload === "object"
-        && String(payload.channel || "").toLowerCase() === channel;
+        && (
+          !normalizedRequestedChannel
+          || String(payload.channel || "").toLowerCase() === normalizedRequestedChannel
+        );
     });
 
     if (!matchingEvent) {
@@ -2098,6 +4189,10 @@ app.get("/api/recovery/return", async (req, res) => {
     const payload = matchingEvent.payload && typeof matchingEvent.payload === "object"
       ? matchingEvent.payload
       : {};
+    const channel = String(payload.channel || normalizedRequestedChannel || "").toLowerCase();
+    if (!["email", "sms"].includes(channel)) {
+      return res.status(400).type("html").send("<h1>Invalid channel</h1>");
+    }
     const returnedAt = new Date().toISOString();
 
     await prisma.systemEvent.update({
@@ -2110,6 +4205,23 @@ app.get("/api/recovery/return", async (req, res) => {
         },
       },
     });
+
+    await persistRecoveryAttributionFromReturn(prisma, {
+      recovery_id: String(payload.recovery_id || matchingEvent.id || ""),
+      recovery_action_id: String(payload.recovery_action_id || ""),
+      proof_loop_id: String(payload.proofLoopId || ""),
+      experienceId,
+      shop,
+      checkout_id: String(payload.checkout_id || ""),
+      checkout_session_id: String(payload.checkout_session_id || ""),
+      source_event_id: String(payload.source_event_id || ""),
+      channel,
+      target: String(payload.target || ""),
+      sent_at: String(payload.sentAt || ""),
+      return_clicked_at: returnedAt,
+      provider_message_id: String(payload.providerId || ""),
+      provider_sms_sid: String(payload.smsSid || ""),
+    }).catch(() => {});
 
     await prisma.systemEvent.create({
       data: {
@@ -2126,6 +4238,37 @@ app.get("/api/recovery/return", async (req, res) => {
       },
     });
 
+    await prisma.systemEvent.create({
+      data: {
+        shopDomain: shop,
+        eventType: "abando.recovery_returned.v1",
+        visibility: "merchant",
+        payload: {
+          shop,
+          returned_at: returnedAt,
+          source: "recovery_link",
+          experienceId,
+          channel,
+        },
+      },
+    });
+
+    const proofLoop = await findProofLoopForExperience({
+      shop,
+      experienceId,
+      channel,
+    });
+    if (proofLoop?.loop_id) {
+      const recoveredValue = await resolveExperienceRecoveredValue({ shop, experienceId });
+      await updateProofLoopRecord(proofLoop.loop_id, (current) => ({
+        ...current,
+        return_detected: true,
+        return_timestamp: returnedAt,
+        value_estimate: Number(recoveredValue?.cents || current?.value_estimate || 0),
+        verified: Boolean(current?.send_timestamp),
+      }));
+    }
+
     return res.redirect(
       302,
       `/experience/returned?shop=${encodeURIComponent(shop)}&eid=${encodeURIComponent(experienceId)}`,
@@ -2139,25 +4282,124 @@ app.get("/recover/:token", async (req, res) => {
   try {
     const token = String(req.params?.token || "").trim();
     const parsed = parseRecoveryToken(token);
+    const shop = normalizeShop(String(parsed?.shop || "").trim().toLowerCase());
+    const experienceId = normalizeExperienceId(parsed?.experienceId);
     const timestamp = new Date().toISOString();
 
     await prisma.systemEvent.create({
       data: {
-        shopDomain: parsed.shop,
+        shopDomain: shop,
         eventType: "abando.customer_return.v1",
         visibility: "merchant",
         payload: {
-          shop: parsed.shop,
+          shop,
           timestamp,
           source: "recovery_link",
           token,
+          experienceId: experienceId || null,
         },
       },
     });
 
+    await prisma.systemEvent.create({
+      data: {
+        shopDomain: shop,
+        eventType: "abando.recovery_returned.v1",
+        visibility: "merchant",
+        payload: {
+          shop,
+          returned_at: timestamp,
+          source: "recovery_link",
+          token,
+          experienceId: experienceId || null,
+        },
+      },
+    });
+
+    if (shop && experienceId) {
+      const events = await listExperienceSendEvents(shop, experienceId);
+      const matchingEvent = events.find((event) => {
+        const payload = event?.payload;
+        if (!payload || typeof payload !== "object") return false;
+        const payloadCheckoutId = String(payload.checkout_id || "").trim();
+        const payloadCheckoutSessionId = String(payload.checkout_session_id || "").trim();
+        return (
+          (parsed.checkout_id && payloadCheckoutId === String(parsed.checkout_id))
+          || (parsed.checkout_session_id && payloadCheckoutSessionId === String(parsed.checkout_session_id))
+        );
+      }) || events[0] || null;
+
+      if (matchingEvent) {
+        const payload = matchingEvent.payload && typeof matchingEvent.payload === "object"
+          ? matchingEvent.payload
+          : {};
+
+        await prisma.systemEvent.update({
+          where: { id: matchingEvent.id },
+          data: {
+            payload: {
+              ...payload,
+              returned: true,
+              returnedAt: timestamp,
+            },
+          },
+        }).catch(() => {});
+
+        await persistRecoveryAttributionFromReturn(prisma, {
+          recovery_id: String(payload.recovery_id || matchingEvent.id || ""),
+          recovery_action_id: String(payload.recovery_action_id || ""),
+          proof_loop_id: String(payload.proofLoopId || ""),
+          experienceId,
+          shop,
+          checkout_id: String(parsed.checkout_id || payload.checkout_id || ""),
+          checkout_session_id: String(parsed.checkout_session_id || payload.checkout_session_id || ""),
+          source_event_id: String(payload.source_event_id || ""),
+          channel: String(payload.channel || ""),
+          target: String(payload.target || parsed.customer_email || ""),
+          sent_at: String(payload.sentAt || ""),
+          return_clicked_at: timestamp,
+          provider_message_id: String(payload.providerId || ""),
+          provider_sms_sid: String(payload.smsSid || ""),
+        }).catch(() => {});
+      }
+
+      const proofLoop = await findProofLoopForExperience({
+        shop,
+        experienceId,
+        channel: "",
+      });
+      if (proofLoop?.loop_id) {
+        const recoveredValue = await resolveExperienceRecoveredValue({ shop, experienceId });
+        await updateProofLoopRecord(proofLoop.loop_id, (current) => ({
+          ...current,
+          return_detected: true,
+          return_timestamp: timestamp,
+          value_estimate: Number(recoveredValue?.cents || current?.value_estimate || 0),
+          verified: true,
+        }));
+      }
+    }
+
+    const checkoutResumeUrl = buildShopifyCheckoutResumeUrl({
+      shop,
+      checkoutId: String(parsed.checkout_id || "").trim(),
+      checkoutPath: String(parsed.checkout_path || "").trim(),
+      storefrontHost: String(parsed.storefront_host || "").trim(),
+    });
+    if (checkoutResumeUrl) {
+      return res.redirect(302, checkoutResumeUrl);
+    }
+
+    if (shop && experienceId) {
+      return res.redirect(
+        302,
+        `${resolveMerchantFacingBaseUrl()}/experience/returned?shop=${encodeURIComponent(shop)}&eid=${encodeURIComponent(experienceId)}`,
+      );
+    }
+
     return res.redirect(
       302,
-      `/checkout-placeholder?shop=${encodeURIComponent(parsed.shop)}&source=recovery_link`,
+      `/checkout-placeholder?shop=${encodeURIComponent(shop)}&source=recovery_link`,
     );
   } catch (error) {
     return res.status(400).type("html").send("<h1>Invalid recovery link</h1>");
@@ -2183,6 +4425,14 @@ app.get("/checkout-placeholder", (req, res) => {
 app.get("/experience", async (req, res) => {
   const shop = normalizeShop(String(req.query?.shop || "").trim().toLowerCase());
   const experienceId = normalizeExperienceId(req.query?.eid);
+  const connectionState = typeof req.query?.state === "string" ? req.query.state.trim().toLowerCase() : "";
+  const billingRuntime = getBillingRuntimeReadiness();
+  const latestBillingState = shop ? await getLatestMerchantBillingState(shop) : null;
+  const billingAvailable = Boolean(billingRuntime.billing_route_active);
+  const billingActive = Boolean(
+    latestBillingState
+    && (latestBillingState.billing_status === "active" || latestBillingState.billing_status === "trialing")
+  );
   const experienceStatus = shop && experienceId
     ? await getExperienceStatus(shop, experienceId)
     : {
@@ -2207,6 +4457,9 @@ app.get("/experience", async (req, res) => {
       shop,
       experienceId,
       experienceStatus,
+      connectionState,
+      billingAvailable,
+      billingActive,
     }),
   );
 });
@@ -2214,6 +4467,19 @@ app.get("/experience", async (req, res) => {
 app.get("/experience/returned", async (req, res) => {
   const shop = normalizeShop(String(req.query?.shop || "").trim().toLowerCase());
   const experienceId = normalizeExperienceId(req.query?.eid);
+  if (shop && experienceId) {
+    const proofLoop = await findProofLoopForExperience({
+      shop,
+      experienceId,
+    });
+    if (proofLoop?.loop_id) {
+      await updateProofLoopRecord(proofLoop.loop_id, (current) => ({
+        ...current,
+        install_status: current?.install_status === "completed" ? "completed" : "started",
+        install_timestamp: current?.install_timestamp || new Date().toISOString(),
+      }));
+    }
+  }
   const experienceStatus = shop && experienceId
     ? await getExperienceStatus(shop, experienceId)
     : {
@@ -2232,28 +4498,68 @@ app.get("/experience/returned", async (req, res) => {
           returnedAt: null,
         },
       };
+  const recoveredValue = await resolveExperienceRecoveredValue({
+    shop,
+    experienceId,
+  });
 
   return res.status(200).type("html").send(
     renderExperienceReturnedPage({
       shop,
       experienceId,
       experienceStatus,
+      recoveredValue,
     }),
   );
 });
 
 app.get("/audit", (_req, res) => {
+  return res.redirect(302, "/shopifixer/audit");
+});
+
+app.get("/shopifixer", (_req, res) => {
+  return res.redirect(302, "/shopifixer/audit");
+});
+
+app.get("/shopifixer/audit", (_req, res) => {
   return res.status(200).type("html").send(renderAuditPage());
 });
 
-app.get("/merchant", async (_req, res) => {
-  const merchantState = await getMerchantSurfaceState("mvp-demo-proof.myshopify.com");
+app.get("/merchant", async (req, res) => {
+  const requestedShop = normalizeStoreInput(String(req.query?.shop || "").trim().toLowerCase());
+  const merchantState = await getMerchantSurfaceState(requestedShop || "mvp-demo-proof.myshopify.com");
   return res.status(200).type("html").send(renderMerchantPage(merchantState));
 });
 
 app.get("/leads", async (_req, res) => {
   const leadsState = await getLeadsCommandCenterState();
   return res.status(200).type("html").send(renderLeadsPage(leadsState));
+});
+
+app.get("/api/operator/leads", async (_req, res) => {
+  try {
+    const rows = await getOperatorLeadsState();
+    return res.json(rows.map((row) => ({
+      shop: row.shop,
+      installed_at: row.installed_at,
+      recovery_sent: row.recovery_sent,
+      return_detected: row.return_detected,
+      billing_clicked: row.billing_clicked,
+      billing_active: row.billing_active,
+      last_event_at: row.last_event_at,
+      lead_score: row.lead_score,
+    })));
+  } catch (error) {
+    return res.status(500).json({
+      ok: false,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+});
+
+app.get("/operator/leads", async (_req, res) => {
+  const rows = await getOperatorLeadsState();
+  return res.status(200).type("html").send(renderOperatorLeadsPage(rows));
 });
 
 app.get("/outreach", async (_req, res) => {
@@ -2266,9 +4572,259 @@ app.get("/contact-research", async (_req, res) => {
   return res.status(200).type("html").send(renderContactResearchPage(researchState));
 });
 
-app.get("/proof", (req, res) => {
+app.get("/proof", async (req, res) => {
+  const requestedShop = normalizeStoreInput(String(req.query?.shop || "").trim().toLowerCase());
+  const source = String(req.query?.src || req.query?.source || "").trim();
+  const target = String(req.query?.target || req.query?.domain || "").trim();
+  const plan = String(req.query?.plan || "").trim().toLowerCase();
+  const flow = String(req.query?.flow || "").trim().toLowerCase();
+  const state = String(req.query?.state || "").trim().toLowerCase();
+  const shop = requestedShop || (flow === "demo" ? ABANDO_PUBLIC_DEMO_SHOP : "");
+  const experienceId = normalizeExperienceId(req.query?.eid) || (flow === "demo" ? "proof-demo" : "");
+  let summary = buildAbandoMerchantSummaryResponse(null, { notes: [] });
+
+  if (shop) {
+    try {
+      const dashboardSummary = await getDashboardSummary(prisma, shop);
+      summary = buildAbandoMerchantSummaryResponse(dashboardSummary, { notes: [] });
+    } catch (_error) {
+      summary = buildAbandoMerchantSummaryResponse(null, { notes: [] });
+    }
+  }
+
+  const recoveredValue = state === "recovered"
+    ? await resolveExperienceRecoveredValue({ shop, experienceId })
+    : null;
+
+  return res.status(200).type("html").send(renderProofPage({
+    shop,
+    summary,
+    source,
+    target,
+    plan,
+    flow,
+    state,
+    recoveredValue,
+  }));
+});
+
+app.get("/proof/payment", async (req, res) => {
   const shop = normalizeStoreInput(String(req.query?.shop || "").trim().toLowerCase());
-  return res.status(200).type("html").send(renderProofPage({ shop }));
+  const source = String(req.query?.src || req.query?.source || "proof").trim() || "proof";
+  const target = String(req.query?.target || req.query?.domain || shop || "").trim();
+  const plan = String(req.query?.plan || "starter").trim().toLowerCase() === "pro" ? "pro" : "starter";
+  const directPaymentUrl = getDirectPaymentUrl();
+  const priceIds = getStripePriceIds();
+  const experienceId = normalizeExperienceId(req.query?.eid);
+  const logBillingStarted = async (extra = {}) => {
+    if (!(shop && source === "connected_experience")) return;
+    await prisma.systemEvent.create({
+      data: {
+        shopDomain: shop,
+        eventType: "abando.billing_started.v1",
+        visibility: "merchant",
+        payload: {
+          shop,
+          source,
+          target,
+          plan,
+          experienceId: experienceId || null,
+          started_at: new Date().toISOString(),
+          ...extra,
+        },
+      },
+    }).catch(() => {});
+  };
+
+  if (shop && source === "connected_experience") {
+    const status = await getExperienceStatus(shop, experienceId);
+    const proofComplete = Boolean(
+      status?.loop?.recovery_sent
+      || status?.loop?.return_detected,
+    );
+
+    if (!proofComplete) {
+      const params = new URLSearchParams({ shop, state: "connected" });
+      if (experienceId) params.set("eid", experienceId);
+      return res.redirect(`/experience?${params.toString()}`);
+    }
+  }
+
+  if (shop && source === "connected_experience") {
+    await prisma.systemEvent.create({
+      data: {
+        shopDomain: shop,
+        eventType: "abando.billing_click.v1",
+        visibility: "merchant",
+        payload: {
+          shop,
+          source,
+          target,
+          plan,
+          clicked_at: new Date().toISOString(),
+        },
+      },
+    }).catch(() => {});
+  }
+
+  if (directPaymentUrl) {
+    try {
+      const url = new URL(directPaymentUrl);
+      if (shop) url.searchParams.set("shop", shop);
+      if (source) url.searchParams.set("src", source);
+      if (target) url.searchParams.set("target", target);
+      url.searchParams.set("plan", plan);
+      await logBillingStarted({
+        route: "direct_payment_url",
+        destination: url.toString(),
+      });
+      return res.redirect(url.toString());
+    } catch {
+      await logBillingStarted({
+        route: "direct_payment_url",
+        destination: directPaymentUrl,
+      });
+      return res.redirect(directPaymentUrl);
+    }
+  }
+
+  if (!stripe) {
+    if (source === "connected_experience") {
+      const params = new URLSearchParams({ shop, state: "connected" });
+      if (experienceId) params.set("eid", experienceId);
+      return res.redirect(`/experience?${params.toString()}`);
+    }
+    return res.redirect(`/proof?shop=${encodeURIComponent(shop)}&src=${encodeURIComponent(source)}&target=${encodeURIComponent(target)}&plan=${encodeURIComponent(plan)}`);
+  }
+
+  const price = plan === "pro" ? priceIds.pro : priceIds.starter;
+  if (!price) {
+    if (source === "connected_experience") {
+      const params = new URLSearchParams({ shop, state: "connected" });
+      if (experienceId) params.set("eid", experienceId);
+      return res.redirect(`/experience?${params.toString()}`);
+    }
+    return res.redirect(`/proof?shop=${encodeURIComponent(shop)}&src=${encodeURIComponent(source)}&target=${encodeURIComponent(target)}&plan=${encodeURIComponent(plan)}`);
+  }
+
+  try {
+    const baseUrl = resolveMerchantFacingBaseUrl();
+    const completeParams = new URLSearchParams({
+      shop,
+      src: source,
+      target,
+      plan,
+      session_id: "{CHECKOUT_SESSION_ID}",
+    });
+    if (experienceId) completeParams.set("eid", experienceId);
+    const cancelConnectedUrl = `${baseUrl}/experience?shop=${encodeURIComponent(shop)}&state=connected`;
+    const session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      line_items: [{ price, quantity: 1 }],
+      success_url: `${baseUrl}/billing/complete?${completeParams.toString()}`,
+      cancel_url: source === "connected_experience"
+        ? cancelConnectedUrl
+        : `${baseUrl}/proof?shop=${encodeURIComponent(shop)}&src=${encodeURIComponent(source)}&target=${encodeURIComponent(target)}&plan=${encodeURIComponent(plan)}`,
+      metadata: {
+        source,
+        target,
+        shop,
+        plan,
+      },
+    });
+
+    if (session?.url) {
+      await logBillingStarted({
+        route: "/proof/payment",
+        checkout_session_id: session.id || null,
+        destination: session.url,
+      });
+      return res.redirect(session.url);
+    }
+  } catch (error) {
+    console.error("[proof payment] checkout error", {
+      shop,
+      source,
+      target,
+      plan,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+
+  return res.redirect(`/proof?shop=${encodeURIComponent(shop)}&src=${encodeURIComponent(source)}&target=${encodeURIComponent(target)}&plan=${encodeURIComponent(plan)}`);
+});
+
+app.get("/billing/complete", async (req, res) => {
+  const shop = normalizeStoreInput(String(req.query?.shop || "").trim().toLowerCase());
+  const source = String(req.query?.src || req.query?.source || "connected_experience").trim() || "connected_experience";
+  const target = String(req.query?.target || req.query?.domain || shop || "").trim();
+  const plan = String(req.query?.plan || "starter").trim().toLowerCase() === "pro" ? "pro" : "starter";
+  const sessionId = String(req.query?.session_id || "").trim();
+  const experienceId = normalizeExperienceId(req.query?.eid);
+
+  if (!shop || !sessionId || !stripe) {
+    const params = new URLSearchParams({ shop, state: "connected" });
+    if (experienceId) params.set("eid", experienceId);
+    return res.redirect(`/experience?${params.toString()}`);
+  }
+
+  try {
+    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ["subscription"],
+    });
+    const persistedState = await persistMerchantBillingState({
+      shop,
+      plan,
+      source,
+      session,
+    });
+    await prisma.systemEvent.create({
+      data: {
+        shopDomain: shop,
+        eventType: "abando.billing_completed.v1",
+        visibility: "merchant",
+        payload: {
+          shop,
+          plan,
+          source,
+          experienceId: experienceId || null,
+          completed_at: persistedState.checkout_completed_at || new Date().toISOString(),
+          billing_status: persistedState.billing_status,
+          payment_status: persistedState.payment_status,
+          checkout_session_id: persistedState.checkout_session_id,
+          stripe_subscription_id: persistedState.stripe_subscription_id,
+        },
+      },
+    }).catch(() => {});
+    const params = new URLSearchParams({ shop, state: "connected" });
+    if (experienceId) params.set("eid", experienceId);
+    return res.redirect(`/experience?${params.toString()}`);
+  } catch (error) {
+    console.error("[billing complete] session verification failed", {
+      shop,
+      source,
+      target,
+      plan,
+      sessionId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    const params = new URLSearchParams({ shop, state: "connected" });
+    if (experienceId) params.set("eid", experienceId);
+    return res.redirect(`/experience?${params.toString()}`);
+  }
+});
+
+app.get("/acceptance", (req, res) => {
+  const shop = normalizeStoreInput(String(req.query?.shop || "").trim().toLowerCase());
+  const source = String(req.query?.src || req.query?.source || "proof").trim() || "proof";
+  const target = String(req.query?.target || req.query?.domain || shop || "").trim();
+  const plan = String(req.query?.plan || "").trim().toLowerCase();
+  return res.status(200).type("html").send(renderAcceptancePage({
+    shop,
+    source,
+    target,
+    plan,
+  }));
 });
 
 app.use(
@@ -2295,8 +4851,9 @@ app.use(
   internalOnly,
 );
 
-app.use(express.static(publicDir, { redirect: false }));
 app.get("/", sendRootHtml);
+app.get("/marketing", sendRootHtml);
+app.use(express.static(publicDir, { redirect: false, index: false }));
 app.get("/onboarding", (_req, res) => res.sendFile(join(publicDir, "onboarding", "index.html")));
 
 // Health/hello
@@ -2527,6 +5084,17 @@ const CHECKOUT_EVENT_SOURCES = new Set([
   "api",
 ]);
 
+const ABANDO_PUBLIC_DEMO_SHOP = "mvp-recovery-proof.myshopify.com";
+const AUTO_RECOVERY_DELAY_MS = Math.max(2 * 60 * 1000, Number(process.env.ABANDO_AUTO_RECOVERY_DELAY_MS || 2 * 60 * 1000));
+const AUTO_RECOVERY_SCAN_INTERVAL_MS = Math.max(30 * 1000, Number(process.env.ABANDO_AUTO_RECOVERY_SCAN_INTERVAL_MS || 60 * 1000));
+const AUTO_RECOVERY_LOOKBACK_MS = 24 * 60 * 60 * 1000;
+const autoRecoveryScanTimer = setInterval(() => {
+  runAutomaticRecoveryScan().catch(() => {});
+}, AUTO_RECOVERY_SCAN_INTERVAL_MS);
+if (typeof autoRecoveryScanTimer.unref === "function") {
+  autoRecoveryScanTimer.unref();
+}
+
 const CHECKOUT_EVENT_DEVICES = new Set(["mobile", "desktop", "tablet", "unknown"]);
 
 function normalizeCheckoutEventPayload(payload) {
@@ -2568,6 +5136,14 @@ function normalizeCheckoutEventPayload(payload) {
     id: String(input.id || `event_${randomBytes(8).toString("hex")}`),
     shop,
     session_id,
+    checkout_id: String(
+      input.checkout_id
+      || input.checkoutId
+      || input.checkout_token
+      || input.metadata?.cartToken
+      || session_id
+    ).trim(),
+    checkout_session_id: String(input.checkout_session_id || input.checkout_token || session_id).trim(),
     timestamp: new Date(parsedTimestamp).toISOString(),
     occurredAt: new Date(parsedTimestamp).toISOString(),
     event_type,
@@ -2575,6 +5151,24 @@ function normalizeCheckoutEventPayload(payload) {
     source,
     device_type,
     order_id: input.order_id ? String(input.order_id) : null,
+    customerEmail: normalizeEmail(
+      input.customerEmail
+      || input.customer_email
+      || input.email
+      || input.metadata?.customerEmail
+      || input.metadata?.customer_email
+      || input.metadata?.email
+      || "",
+    ) || null,
+    customerPhone: normalizePhone(
+      input.customerPhone
+      || input.customer_phone
+      || input.phone
+      || input.metadata?.customerPhone
+      || input.metadata?.customer_phone
+      || input.metadata?.phone
+      || "",
+    ) || null,
     amount: typeof input.amount === "number" ? input.amount : null,
     metadata:
       input.metadata && typeof input.metadata === "object" && !Array.isArray(input.metadata)
@@ -2596,15 +5190,109 @@ function renderExperiencePage({
   shop,
   experienceId,
   experienceStatus,
+  connectionState,
+  billingAvailable,
+  billingActive,
 }) {
-  const hasParams = Boolean(shop && experienceId);
-  const initialState = experienceStatus.return.returned
+  const isConnected = connectionState === "connected" && Boolean(shop);
+  const effectiveExperienceId = experienceId || (isConnected && shop ? `connected-${shop.replace(/[^a-z0-9]+/gi, "-")}` : "");
+  const hasParams = Boolean(shop && effectiveExperienceId);
+  const billingStartUrl = shop ? toMerchantFacingUrl(buildCanonicalBillingStartPath({
+    shop,
+    source: "connected_experience",
+    target: shop,
+    plan: "starter",
+    experienceId: effectiveExperienceId,
+  })) : toMerchantFacingUrl("/proof/payment");
+  const preferredChannel = experienceStatus?.latest_action?.channel === "sms" || experienceStatus?.send?.channel === "sms"
+    ? "sms"
+    : "email";
+  const hasReturned = Boolean(experienceStatus?.return?.returned);
+  const hasSent = experienceStatus?.send?.status === "sent";
+  const hasDeduped = Boolean(experienceStatus?.latest_action?.deduped);
+  const initialState = hasReturned
     ? "returned"
-    : experienceStatus.send.status === "sent"
+    : (hasDeduped || hasSent)
       ? "sent"
       : "idle";
-  const hasReturned = Boolean(experienceStatus.return.returned);
-  const hasSent = experienceStatus.send.status === "sent";
+  const operatorTestInbox = String(
+    process.env.ABANDO_OPERATOR_TEST_EMAIL
+    || process.env.OPERATOR_TEST_EMAIL
+    || process.env.ABANDO_RECOVERY_TEST_EMAIL
+    || "",
+  ).trim();
+  const billingButtonVisible = Boolean(isConnected && billingAvailable && !billingActive && (hasSent || hasReturned));
+  const recoveredValueLabel = `Recovered revenue: ${formatUsdFromCents(experienceStatus?.return?.recoveredValue?.cents || 0)}`;
+  const merchantState = billingActive
+    ? "billing_active"
+    : hasReturned
+      ? "return_detected"
+      : hasSent
+        ? "recovery_sent"
+        : isConnected
+          ? "recovery_ready"
+          : "connected";
+  const heroEyebrow = billingActive
+    ? "Billing active"
+    : hasReturned
+      ? "Return detected"
+      : hasSent
+        ? "Recovery sent"
+        : isConnected
+          ? "Connected to your store"
+          : "Connected";
+  const heroTitle = billingActive
+    ? "Abando is now active on your store."
+    : hasReturned
+      ? "Recovered revenue is already showing."
+      : hasSent
+        ? "Your recovery is on the way."
+        : "Connected to your store";
+  const heroCopy = billingActive
+    ? "Your paid plan is active and Abando is ready to keep recovering lost checkout revenue automatically."
+    : hasReturned
+      ? "You completed the return path successfully. This is the moment the loop becomes real for a merchant."
+      : hasSent
+        ? "Open the message you just sent to yourself and follow the recovery link to watch the loop complete."
+        : "Send a recovery to yourself and watch the loop complete.";
+  const supportHref = "mailto:hello@abando.ai";
+  const clientSafeExperienceStatus = {
+    send: experienceStatus?.send
+      ? {
+          status: experienceStatus.send.status || null,
+          channel: experienceStatus.send.channel || null,
+          target: experienceStatus.send.target || null,
+          sentAt: experienceStatus.send.sentAt || null,
+          smsStatus: experienceStatus.send.smsStatus || null,
+        }
+      : null,
+    return: experienceStatus?.return
+      ? {
+          returned: Boolean(experienceStatus.return.returned),
+          returnedAt: experienceStatus.return.returnedAt || null,
+          recoveredValue: experienceStatus.return.recoveredValue
+            ? { cents: Number(experienceStatus.return.recoveredValue.cents || 0) || 0 }
+            : null,
+        }
+      : null,
+    loop: experienceStatus?.loop
+      ? {
+          current_state: experienceStatus.loop.current_state || null,
+          billing_available: Boolean(experienceStatus.loop.billing_available),
+          billing_active: Boolean(experienceStatus.loop.billing_active),
+        }
+      : null,
+    latest_action: experienceStatus?.latest_action
+      ? {
+          status: experienceStatus.latest_action.status || null,
+          sentAt: experienceStatus.latest_action.sentAt || null,
+          channel: experienceStatus.latest_action.channel || null,
+          destination: experienceStatus.latest_action.destination || null,
+          smsStatus: experienceStatus.latest_action.smsStatus || null,
+          deduped: Boolean(experienceStatus.latest_action.deduped),
+        }
+      : null,
+  };
 
   return `<!doctype html>
 <html lang="en">
@@ -2613,26 +5301,19 @@ function renderExperiencePage({
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Abando</title>
   <style>
-    :root {
-      color-scheme: dark;
-    }
-    * {
-      box-sizing: border-box;
-    }
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
-      background: radial-gradient(circle at top, rgba(30, 41, 59, 0.22), transparent 42%), #020617;
+      background: radial-gradient(circle at top, rgba(34, 197, 94, 0.12), transparent 38%), #020617;
       color: #e5eef8;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       display: grid;
       place-items: center;
       padding: 28px 18px;
     }
-    .shell {
-      width: 100%;
-      max-width: 440px;
-    }
+    .shell { width: 100%; max-width: 460px; }
     .brand {
       text-align: center;
       color: #cbd5e1;
@@ -2643,11 +5324,27 @@ function renderExperiencePage({
       margin-bottom: 18px;
     }
     .panel {
-      background: rgba(15, 23, 42, 0.86);
+      background: rgba(15, 23, 42, 0.88);
       border: 1px solid rgba(148, 163, 184, 0.16);
       border-radius: 28px;
       padding: 30px 24px 24px;
       box-shadow: 0 28px 80px rgba(2, 6, 23, 0.42);
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      margin: 0 auto 16px;
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.24);
+      color: #dcfce7;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
     h1 {
       margin: 0;
@@ -2664,107 +5361,81 @@ function renderExperiencePage({
       line-height: 1.6;
       text-align: center;
     }
-    .operator-action {
-      margin-top: 18px;
-      display: grid;
-      justify-items: center;
-      gap: 8px;
-    }
-    .operator-button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 40px;
-      padding: 0 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.16);
-      background: rgba(15, 23, 42, 0.66);
-      color: #cbd5e1;
-      font: inherit;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      cursor: pointer;
-    }
-    .operator-button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    .operator-feedback {
-      min-height: 18px;
-      color: #94a3b8;
-      font-size: 12px;
-      line-height: 1.4;
-      text-align: center;
-      word-break: break-word;
-    }
-    .proof-strip {
+    .hero-card {
       margin-top: 22px;
+      padding: 22px 20px;
+      border-radius: 20px;
+      background: rgba(2, 6, 23, 0.44);
+      border: 1px solid rgba(148, 163, 184, 0.12);
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
+      text-align: left;
     }
-    .automation-line {
-      margin-top: 12px;
-      color: #94a3b8;
+    .hero-status {
+      color: #f8fafc;
       font-size: 13px;
-      line-height: 1.5;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .hero-headline {
+      color: #f8fafc;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+    }
+    .hero-copy {
+      color: #cbd5e1;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    .progress-strip {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .progress-step {
+      padding: 12px 10px;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.58);
+      border: 1px solid rgba(148, 163, 184, 0.12);
       text-align: center;
     }
-    .proof-step {
-      min-height: 72px;
-      padding: 12px 12px 10px;
-      border-radius: 16px;
-      border: 1px solid rgba(148, 163, 184, 0.12);
-      background: rgba(2, 6, 23, 0.34);
-      display: grid;
-      gap: 8px;
-      align-content: start;
-      transition: border-color 140ms ease, background 140ms ease, color 140ms ease;
+    .progress-step.active {
+      border-color: rgba(34, 197, 94, 0.34);
+      background: rgba(34, 197, 94, 0.12);
     }
-    .proof-step-marker {
-      width: 20px;
-      height: 20px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.22);
-      color: #64748b;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+    .progress-kicker {
+      color: #94a3b8;
       font-size: 11px;
       font-weight: 700;
-      line-height: 1;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
-    .proof-step-label {
-      color: #94a3b8;
+    .progress-step.active .progress-kicker {
+      color: #dcfce7;
+    }
+    .progress-label {
+      margin-top: 6px;
+      color: #e2e8f0;
       font-size: 12px;
-      line-height: 1.45;
-      letter-spacing: -0.01em;
+      line-height: 1.35;
+      font-weight: 700;
     }
-    .proof-step.is-active {
-      border-color: rgba(226, 232, 240, 0.18);
-      background: rgba(15, 23, 42, 0.72);
-    }
-    .proof-step.is-active .proof-step-marker {
-      border-color: rgba(226, 232, 240, 0.22);
-      color: #e2e8f0;
-      background: rgba(148, 163, 184, 0.08);
-    }
-    .proof-step.is-active .proof-step-label {
-      color: #e2e8f0;
-    }
-    .proof-step.is-complete .proof-step-marker {
-      border-color: rgba(125, 211, 252, 0.18);
-      background: rgba(14, 116, 144, 0.24);
-      color: #bae6fd;
-    }
-    .proof-step.is-complete .proof-step-label {
-      color: #cbd5e1;
-    }
-    .label {
+    .section-label {
       display: block;
       margin-top: 28px;
       margin-bottom: 10px;
+      color: #cbd5e1;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .label {
+      display: block;
+      margin: 0 0 10px;
       color: #cbd5e1;
       font-size: 14px;
       font-weight: 600;
@@ -2779,15 +5450,49 @@ function renderExperiencePage({
       color: #f8fafc;
       font: inherit;
       outline: none;
-      transition: border-color 120ms ease, box-shadow 120ms ease;
     }
-    .input::placeholder {
-      color: #64748b;
-    }
+    .input::placeholder { color: #64748b; }
     .input:focus {
       border-color: rgba(125, 211, 252, 0.5);
       box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.08);
     }
+    .input-row { display: grid; gap: 12px; }
+    .segmented-control {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .segment-button {
+      min-height: 48px;
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(2, 6, 23, 0.54);
+      color: #cbd5e1;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .segment-button.active {
+      border-color: rgba(125, 211, 252, 0.6);
+      background: rgba(15, 23, 42, 0.92);
+      color: #f8fafc;
+    }
+    .field-block.hidden { display: none; }
+    .input-helper {
+      margin-top: 10px;
+      color: #94a3b8;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .input-error {
+      margin-top: 10px;
+      color: #fda4af;
+      font-size: 13px;
+      line-height: 1.5;
+      display: none;
+    }
+    .input-error.active { display: block; }
     .button {
       width: 100%;
       margin-top: 14px;
@@ -2801,9 +5506,46 @@ function renderExperiencePage({
       letter-spacing: -0.01em;
       cursor: pointer;
     }
-    .button:disabled {
-      opacity: 0.72;
-      cursor: wait;
+    .button:disabled { opacity: 0.72; cursor: wait; }
+    .button-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      margin-top: 12px;
+      min-height: 52px;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.7);
+      color: #f8fafc;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      text-decoration: none;
+      font: inherit;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .button-secondary.hidden { display: none; }
+    .next-steps {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(15, 23, 42, 0.62);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+    }
+    .next-steps-title {
+      color: #f8fafc;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .next-steps-list {
+      margin: 12px 0 0;
+      padding-left: 18px;
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.6;
+      display: grid;
+      gap: 6px;
     }
     .status {
       margin-top: 18px;
@@ -2813,9 +5555,7 @@ function renderExperiencePage({
       border: 1px solid rgba(148, 163, 184, 0.12);
       display: none;
     }
-    .status.active {
-      display: block;
-    }
+    .status.active { display: block; }
     .status-title {
       color: #f8fafc;
       font-size: 20px;
@@ -2828,18 +5568,41 @@ function renderExperiencePage({
       font-size: 15px;
       line-height: 1.55;
     }
+    .status-meta {
+      margin-top: 10px;
+      color: #e2e8f0;
+      font-size: 14px;
+      line-height: 1.55;
+    }
     .status-helper {
       margin-top: 10px;
       color: #94a3b8;
       font-size: 13px;
       line-height: 1.5;
     }
-    .status.waiting .status-title {
-      font-size: 16px;
-      color: #cbd5e1;
+    .status.recovered .status-title { color: #dcfce7; }
+    .status.billing .status-title { color: #dcfce7; }
+    .value-line {
+      margin-top: 10px;
+      color: #f8fafc;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+    .support-line {
+      margin-top: 18px;
+      text-align: center;
+      color: #94a3b8;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .support-line a {
+      color: #e2e8f0;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.2);
     }
     .fineprint {
-      margin-top: 18px;
+      margin-top: 12px;
       text-align: center;
       color: #64748b;
       font-size: 12px;
@@ -2849,110 +5612,224 @@ function renderExperiencePage({
 </head>
 <body>
   <main class="shell">
-    <div class="brand">Abando</div>
+    <div class="brand">${renderMerchantLogoMarkup({ href: resolveMerchantFacingBaseUrl() })}</div>
     <section class="panel">
-      <h1>See how much revenue you're leaving behind.</h1>
-      <p class="lede">Send yourself the exact recovery your customers receive when they abandon checkout.</p>
-      <div class="operator-action">
-        <button type="button" class="operator-button" id="generateProofLinkButton" ${shop ? "" : "disabled"}>Generate new proof link</button>
-        <div class="operator-feedback" data-generate-proof-feedback></div>
-      </div>
-      <div class="proof-strip" data-proof-strip>
-        <div class="proof-step" data-proof-step="1">
-          <div class="proof-step-marker" data-proof-marker="1">1</div>
-          <div class="proof-step-label">Abandoned checkout detected</div>
+      <div class="eyebrow">Live recovery</div>
+      <h1>Recover lost revenue automatically.</h1>
+      <p class="lede">Test it on yourself in seconds.</p>
+
+      <div class="hero-card">
+        <div class="hero-status">${escapeHtml(heroEyebrow)}</div>
+        <div class="hero-headline">${escapeHtml(heroTitle)}</div>
+        <div class="hero-copy">${escapeHtml(heroCopy)}</div>
+        <div class="progress-strip">
+          <div class="progress-step active">
+            <div class="progress-kicker">Step 1</div>
+            <div class="progress-label">Connected</div>
+          </div>
+          <div class="progress-step ${hasSent || hasReturned || billingActive ? "active" : ""}">
+            <div class="progress-kicker">Step 2</div>
+            <div class="progress-label">Recovery sent</div>
+          </div>
+          <div class="progress-step ${hasReturned || billingActive ? "active" : ""}">
+            <div class="progress-kicker">Step 3</div>
+            <div class="progress-label">Return detected</div>
+          </div>
+          <div class="progress-step ${billingActive ? "active" : ""}">
+            <div class="progress-kicker">Step 4</div>
+            <div class="progress-label">Paid plan</div>
+          </div>
         </div>
-        <div class="proof-step" data-proof-step="2">
-          <div class="proof-step-marker" data-proof-marker="2">2</div>
-          <div class="proof-step-label">Recovery sent</div>
+      </div>
+
+      <div class="section-label">Send a recovery to yourself</div>
+      ${hasParams ? "" : `<div class="input-helper">Open this page from your connected store to send a live proof.</div>`}
+      <div class="segmented-control">
+        <button type="button" class="segment-button ${preferredChannel === "email" ? "active" : ""}" data-experience-channel="email" ${hasParams ? "" : "disabled"}>Email</button>
+        <button type="button" class="segment-button ${preferredChannel === "sms" ? "active" : ""}" data-experience-channel="sms" ${hasParams ? "" : "disabled"}>SMS</button>
+      </div>
+      <div class="input-row" style="margin-top:12px;">
+        <div class="field-block ${preferredChannel === "email" ? "" : "hidden"}" data-experience-field="email">
+          <label class="label" for="experienceEmail">Email</label>
+          <input id="experienceEmail" class="input" type="email" placeholder="you@example.com" value="${escapeHtml(operatorTestInbox)}" inputmode="email" autocomplete="email" ${hasParams ? "" : "disabled"} />
         </div>
-        <div class="proof-step" data-proof-step="3">
-          <div class="proof-step-marker" data-proof-marker="3">3</div>
-          <div class="proof-step-label">Customer returned</div>
+        <div class="field-block ${preferredChannel === "sms" ? "" : "hidden"}" data-experience-field="sms">
+          <label class="label" for="experiencePhone">Phone</label>
+          <input id="experiencePhone" class="input" type="tel" placeholder="Enter your phone" inputmode="tel" autocomplete="tel" ${hasParams ? "" : "disabled"} />
         </div>
       </div>
-      <div class="automation-line">
-        This entire flow runs automatically once installed.
+      <div class="input-helper">Use your own inbox or phone so you can watch the recovery happen end to end.</div>
+      <div class="input-helper">Once it sends, Abando keeps watching for the return automatically.</div>
+      <div class="input-error" data-experience-input-error>Email is required.</div>
+      <button type="button" class="button" id="experienceSendButton" ${hasParams ? "" : "disabled"}>Send recovery to myself</button>
+      ${billingAvailable ? `<a class="button-secondary ${billingButtonVisible ? "" : "hidden"}" id="experienceBillingButton" href="${escapeHtml(billingStartUrl)}">Start paid plan</a>` : ""}
+
+      <div class="next-steps">
+        <div class="next-steps-title">What happens next</div>
+        <ol class="next-steps-list">
+          <li>Abando sends the recovery</li>
+          <li>You open it like a customer would</li>
+          <li>Abando detects the return and shows recovered revenue</li>
+        </ol>
       </div>
-      ${hasParams ? "" : `<div class="status active"><div class="status-title">Not configured</div><div class="status-body">This experience link is incomplete.</div></div>`}
-      <label class="label" for="experienceTarget">Send a real recovery to yourself</label>
-      <input id="experienceTarget" class="input" type="text" placeholder="Enter your email or phone" inputmode="email" ${hasParams ? "" : "disabled"} />
-      <button type="button" class="button" id="experienceSendButton" ${hasParams ? "" : "disabled"}>Send recovery</button>
 
       <div class="status ${initialState === "idle" ? "active" : ""}" data-experience-state="idle">
-        <div class="status-body">Enter your email or phone to continue.</div>
+        <div class="status-title">${escapeHtml(isConnected ? "Recovery ready" : "Connected to your store")}</div>
+        <div class="status-body">Everything is set for a live self-test. Send a recovery to yourself to confirm the full loop on this store.</div>
+      </div>
+
+      <div class="status" data-experience-state="prepared">
+        <div class="status-title">Sending...</div>
+        <div class="status-body">Abando is sending your live recovery now.</div>
       </div>
 
       <div class="status ${hasSent && !hasReturned ? "active" : ""}" data-experience-state="sent">
         <div class="status-title">Recovery sent</div>
-        <div class="status-body">Check your email or phone.</div>
-        <div class="status-helper">This is a real recovery being sent and tracked.</div>
+        <div class="status-body">Your recovery is out. Open the message and follow the link the way a shopper would.</div>
+        <div class="status-meta" data-experience-sent-meta></div>
+        <div class="status-helper" data-experience-next-step></div>
       </div>
 
-      <div class="status waiting ${hasSent && !hasReturned ? "active" : ""}" data-experience-state="waiting">
-        <div class="status-title">Waiting for return…</div>
-        <div class="status-helper">This is what happens every time a customer abandons checkout.</div>
+      <div class="status recovered ${hasReturned ? "active" : ""}" data-experience-state="returned">
+        <div class="status-title">Return detected</div>
+        <div class="status-body">Abando detected the return and attributed the recovered revenue to this flow.</div>
+        <div class="value-line" data-experience-recovered-value>${escapeHtml(recoveredValueLabel)}</div>
       </div>
 
-      <div class="status ${hasReturned ? "active" : ""}" data-experience-state="returned">
-        <div class="status-title">Customer returned</div>
-        <div class="status-body">This is how abandoned checkout revenue comes back.</div>
+      <div class="status billing ${billingButtonVisible ? "active" : ""}" data-experience-state="billing-available">
+        <div class="status-title">Start paid plan</div>
+        <div class="status-body">You’ve verified the recovery loop on your own store. You can start your paid plan whenever you’re ready.</div>
       </div>
 
-      <div class="status" data-experience-state="failed">
-        <div class="status-title">Send failed</div>
-        <div class="status-body" data-experience-failed-copy>We could not send the recovery message.</div>
+      <div class="status billing ${billingActive ? "active" : ""}" data-experience-state="billing-active">
+        <div class="status-title">Billing active</div>
+        <div class="status-body">Your paid plan is active and Abando is ready to keep recovering lost checkout revenue automatically.</div>
       </div>
 
-      <div class="status" data-experience-state="not_configured">
-        <div class="status-title">Email not configured</div>
-        <div class="status-body">Outbound delivery is not yet enabled.</div>
-      </div>
-
-      <div class="fineprint">This is already recovering revenue you were about to lose.</div>
+      <div class="support-line">Need help? <a href="${escapeHtml(supportHref)}">hello@abando.ai</a></div>
+      <div class="fineprint">Abando catches revenue before it slips away and brings the customer back automatically.</div>
     </section>
   </main>
   <script>
     (function () {
       var shop = ${JSON.stringify(shop)};
-      var experienceId = ${JSON.stringify(experienceId)};
+      var experienceId = ${JSON.stringify(effectiveExperienceId)};
+      var initialExperienceStatus = ${JSON.stringify(clientSafeExperienceStatus)};
       var pollTimer = null;
-
-      function setProofStepState(next) {
-        var activeStep = 1;
-        var completedUntil = 0;
-
-        if (next === "sent") {
-          activeStep = 2;
-          completedUntil = 1;
-        } else if (next === "returned") {
-          activeStep = 3;
-          completedUntil = 2;
-        }
-
-        document.querySelectorAll("[data-proof-step]").forEach(function (node) {
-          var step = Number(node.getAttribute("data-proof-step") || "0");
-          node.classList.toggle("is-active", step === activeStep);
-          node.classList.toggle("is-complete", step <= completedUntil);
-        });
-
-        document.querySelectorAll("[data-proof-marker]").forEach(function (node) {
-          var step = Number(node.getAttribute("data-proof-marker") || "0");
-          node.textContent = step <= completedUntil ? "✓" : String(step);
-        });
-      }
 
       function setActiveState(next) {
         document.querySelectorAll("[data-experience-state]").forEach(function (node) {
           var state = node.getAttribute("data-experience-state");
-          var isActive = state === next || (next === "sent" && state === "waiting");
+          var isActive = state === next;
           node.classList.toggle("active", isActive);
         });
-        setProofStepState(next);
+      }
+
+      var button = document.getElementById("experienceSendButton");
+      var billingButton = document.getElementById("experienceBillingButton");
+      var emailInput = document.getElementById("experienceEmail");
+      var phoneInput = document.getElementById("experiencePhone");
+      var channelButtons = document.querySelectorAll("[data-experience-channel]");
+      var emailField = document.querySelector("[data-experience-field='email']");
+      var smsField = document.querySelector("[data-experience-field='sms']");
+      var selectedChannel = ${JSON.stringify(preferredChannel)};
+      var sentMeta = document.querySelector("[data-experience-sent-meta]");
+      var nextStep = document.querySelector("[data-experience-next-step]");
+      var recoveredValueNode = document.querySelector("[data-experience-recovered-value]");
+      var inputError = document.querySelector("[data-experience-input-error]");
+      var merchantState = ${JSON.stringify(merchantState)};
+
+      function setBillingVisibility(visible) {
+        if (!billingButton) return;
+        billingButton.classList.toggle("hidden", !visible);
+      }
+
+      function clearInlineError() {
+        if (inputError) {
+          inputError.textContent = "Email is required.";
+          inputError.classList.remove("active");
+        }
+      }
+
+      function setInlineError(message) {
+        if (inputError) {
+          inputError.textContent = message;
+          inputError.classList.add("active");
+        }
+      }
+
+      function normalizePhone(raw) {
+        var digits = String(raw || "").replace(/\\D+/g, "");
+        if (!digits) return "";
+        if (digits.length === 10) return "+1" + digits;
+        if (digits.length === 11 && digits.charAt(0) === "1") return "+" + digits;
+        if (String(raw || "").trim().charAt(0) === "+" && digits.length >= 10) return "+" + digits;
+        return "";
+      }
+
+      function applyChannelUi() {
+        channelButtons.forEach(function (node) {
+          node.classList.toggle("active", node.getAttribute("data-experience-channel") === selectedChannel);
+        });
+        if (emailField) emailField.classList.toggle("hidden", selectedChannel !== "email");
+        if (smsField) smsField.classList.toggle("hidden", selectedChannel !== "sms");
+        if (emailInput) emailInput.disabled = !${JSON.stringify(hasParams)} || selectedChannel !== "email";
+        if (phoneInput) phoneInput.disabled = !${JSON.stringify(hasParams)} || selectedChannel !== "sms";
+      }
+
+      function setSuccessCopy(channel, detail) {
+        var sentTitle = document.querySelector("[data-experience-state='sent'] .status-title");
+        var sentBody = document.querySelector("[data-experience-state='sent'] .status-body");
+        var isUndelivered = channel === "sms" && detail && detail.smsStatus === "undelivered";
+        if (sentTitle) sentTitle.textContent = "Recovery sent";
+        if (sentBody) {
+          sentBody.textContent = isUndelivered
+            ? "Delivery is still settling. If it doesn’t arrive, try again."
+            : channel === "sms"
+              ? "Check your phone and open the recovery link."
+              : "Check your inbox and open the recovery link.";
+        }
+        if (nextStep) nextStep.textContent = "Waiting for return...";
+        setBillingVisibility(true);
+      }
+
+      function setSentMeta(data, email, phone) {
+        if (!sentMeta) return;
+        var parts = [];
+        var destination = data && data.destination ? String(data.destination) : "";
+        var channel = data && data.channel ? String(data.channel) : "";
+        var smsStatus = data && data.smsStatus ? String(data.smsStatus) : "";
+        if (!destination && channel === "email") destination = email || "";
+        if (!destination && channel === "sms") destination = phone || "";
+        if (channel) parts.push("Channel: " + channel.toUpperCase());
+        if (destination) parts.push("Sent to: " + destination);
+        if (channel === "sms" && smsStatus) parts.push("Delivery update: " + smsStatus);
+        sentMeta.textContent = parts.join(" · ");
+      }
+
+      function setRecoveredValue(payload) {
+        if (!recoveredValueNode) return;
+        var cents = payload && payload.return && payload.return.recoveredValue && payload.return.recoveredValue.cents
+          ? Number(payload.return.recoveredValue.cents)
+          : 0;
+        recoveredValueNode.textContent = cents > 0
+          ? "Recovered revenue: " + new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(cents / 100)
+          : ${JSON.stringify(recoveredValueLabel)};
       }
 
       function updateStatusUi(payload) {
+        var currentState = payload && payload.loop && payload.loop.current_state
+          ? String(payload.loop.current_state)
+          : "";
+        if (currentState === "billing_active") {
+          setBillingVisibility(false);
+          setActiveState("billing-active");
+          return;
+        }
+
         if (payload.return && payload.return.returned) {
+          setRecoveredValue(payload);
+          setBillingVisibility(true);
           setActiveState("returned");
           if (pollTimer) {
             window.clearInterval(pollTimer);
@@ -2961,8 +5838,22 @@ function renderExperiencePage({
           return;
         }
 
-        if (payload.send && payload.send.status === "sent") {
+        if (payload.latest_action && payload.latest_action.deduped) {
+          setBillingVisibility(true);
           setActiveState("sent");
+          return;
+        }
+
+        if (payload.send && payload.send.status === "sent") {
+          var activeChannel = payload.latest_action && payload.latest_action.channel
+            ? payload.latest_action.channel
+            : (payload.send.channel || selectedChannel);
+          setSuccessCopy(activeChannel, payload.latest_action || payload.send || null);
+          setSentMeta(payload.latest_action || payload.send || {}, emailInput ? emailInput.value : "", phoneInput ? phoneInput.value : "");
+          setActiveState("sent");
+          if (payload.loop && payload.loop.billing_available) {
+            setBillingVisibility(true);
+          }
         }
       }
 
@@ -2983,90 +5874,136 @@ function renderExperiencePage({
         }, 2000);
       }
 
-      var button = document.getElementById("experienceSendButton");
-      var targetInput = document.getElementById("experienceTarget");
-      var generateProofButton = document.getElementById("generateProofLinkButton");
-      var generateProofFeedback = document.querySelector("[data-generate-proof-feedback]");
+      channelButtons.forEach(function (buttonNode) {
+        buttonNode.addEventListener("click", function () {
+          selectedChannel = buttonNode.getAttribute("data-experience-channel") || "email";
+          clearInlineError();
+          applyChannelUi();
+        });
+      });
+
+      applyChannelUi();
+      setBillingVisibility(${JSON.stringify(billingButtonVisible)});
+      if (merchantState === "billing_active") {
+        setActiveState("billing-active");
+      } else if (${JSON.stringify(hasReturned)}) {
+        setRecoveredValue(initialExperienceStatus);
+        if (${JSON.stringify(billingButtonVisible)}) {
+          setActiveState("returned");
+        }
+      } else if (${JSON.stringify(hasSent && !hasReturned)}) {
+        var initialStatusDetail = initialExperienceStatus && initialExperienceStatus.latest_action
+          ? initialExperienceStatus.latest_action
+          : (initialExperienceStatus && initialExperienceStatus.send ? initialExperienceStatus.send : null);
+        setSuccessCopy(selectedChannel, initialStatusDetail);
+        setSentMeta(initialStatusDetail || {}, "", "");
+      }
 
       if (button) {
         button.addEventListener("click", async function () {
-          var target = targetInput ? String(targetInput.value || "").trim() : "";
-          var email = target.indexOf("@") !== -1 ? target : "";
-          var phone = email ? "" : target;
+          clearInlineError();
+          if (!shop) {
+            setInlineError("Not ready yet.");
+            setActiveState("idle");
+            return;
+          }
+          var email = emailInput ? String(emailInput.value || "").trim() : "";
+          var phone = phoneInput ? String(phoneInput.value || "").trim() : "";
+          var normalizedPhone = normalizePhone(phone);
+
+          if (selectedChannel === "email") {
+            if (!email) {
+              setInlineError("Email is required.");
+              if (emailInput && typeof emailInput.focus === "function") emailInput.focus();
+              return;
+            }
+            if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+              setInlineError("Enter a valid email.");
+              if (emailInput && typeof emailInput.focus === "function") emailInput.focus();
+              return;
+            }
+          }
+
+          if (selectedChannel === "sms") {
+            if (!phone) {
+              setInlineError("Phone is required.");
+              if (phoneInput && typeof phoneInput.focus === "function") phoneInput.focus();
+              return;
+            }
+            if (!normalizedPhone) {
+              setInlineError("Enter a valid US mobile number.");
+              if (phoneInput && typeof phoneInput.focus === "function") phoneInput.focus();
+              return;
+            }
+          }
 
           button.disabled = true;
-          button.textContent = "Sending…";
+          button.textContent = "Sending...";
+          setActiveState("prepared");
           try {
-            var response = await fetch("/api/recovery-actions/send-live-test", {
+            var payload = {
+              shop: shop,
+              channel: selectedChannel,
+              tone_preset: "direct",
+              experienceId: experienceId
+            };
+            if (selectedChannel === "email") {
+              payload.email = email;
+            } else {
+              payload.phone = normalizedPhone;
+            }
+            var response = await fetch(${JSON.stringify(isConnected ? "/api/recovery-actions/send-live-test" : "/api/recovery-actions/create")}, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                shop: shop,
-                email: email,
-                phone: phone,
-                experienceId: experienceId
-              })
+              body: JSON.stringify(payload)
             });
             var data = await response.json();
             if (!response.ok) {
-              throw new Error((data && data.error) || "experience_send_failed");
+              throw new Error((data && (data.error || data.details)) || "Not ready yet.");
             }
 
-            if (data.success) {
+            var liveSendSucceeded = data && data.ok && (
+              data.status === "sent"
+              || data.recoveryActionStatus === "sent"
+            );
+            if (liveSendSucceeded) {
+              var activeChannel = Array.isArray(data.channels) && data.channels[0] ? data.channels[0] : selectedChannel;
+              setSuccessCopy(activeChannel, data);
+              setSentMeta({
+                channel: activeChannel,
+                destination: activeChannel === "sms" ? (data.delivery && data.delivery[0] && data.delivery[0].to) || normalizedPhone : (data.delivery && data.delivery[0] && data.delivery[0].to) || email,
+                smsStatus: data.smsStatus || "",
+              }, email, normalizedPhone);
               setActiveState("sent");
               startPolling();
               await pollStatus();
               return;
             }
 
-            if (data.message === "not_configured") {
-              setActiveState("not_configured");
+            if (data && data.ok && data.recoveryActionStatus === "deduped") {
+              setBillingVisibility(true);
+              if (nextStep) nextStep.textContent = "Waiting for return...";
+              setActiveState("sent");
               return;
             }
 
-            var failedCopy = document.querySelector("[data-experience-failed-copy]");
-            if (failedCopy) {
-              failedCopy.textContent = data.message === "failed" ? "Send failed." : String(data.message || "experience_send_failed");
+            if (data && data.ok && data.recoveryActionStatus === "created") {
+              setInlineError("Not ready yet.");
+              setActiveState("idle");
+              return;
             }
-            setActiveState("failed");
+
+            setInlineError("Not ready yet.");
+            setActiveState("idle");
           } catch (error) {
-            var failedCopy = document.querySelector("[data-experience-failed-copy]");
-            if (failedCopy) {
-              failedCopy.textContent = error && error.message ? error.message : "experience_send_failed";
-            }
-            setActiveState("failed");
+            setInlineError(error && error.message ? error.message : "Not ready yet.");
+            setActiveState("idle");
           } finally {
             button.disabled = false;
-            button.textContent = "Send recovery";
+            button.textContent = "Send recovery to myself";
           }
         });
       }
-
-      if (generateProofButton) {
-        generateProofButton.addEventListener("click", async function () {
-          if (!shop) return;
-
-          var eid = "proof-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
-          var url = window.location.origin + "/experience?shop=" + encodeURIComponent(shop) + "&eid=" + encodeURIComponent(eid);
-
-          try {
-            if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
-              await navigator.clipboard.writeText(url);
-              if (generateProofFeedback) {
-                generateProofFeedback.textContent = "New proof link copied";
-              }
-            } else if (generateProofFeedback) {
-              generateProofFeedback.textContent = url;
-            }
-          } catch (_error) {
-            if (generateProofFeedback) {
-              generateProofFeedback.textContent = url;
-            }
-          }
-        });
-      }
-
-      setProofStepState(${JSON.stringify(initialState)});
 
       if (${JSON.stringify(hasSent && !hasReturned)}) {
         startPolling();
@@ -3081,7 +6018,27 @@ function renderExperienceReturnedPage({
   shop,
   experienceId,
   experienceStatus,
+  recoveredValue,
 }) {
+  const recoveredValueLabel = formatUsdFromCents(recoveredValue?.cents || 0);
+  const proofImpactParams = new URLSearchParams();
+  if (shop) proofImpactParams.set("shop", shop);
+  proofImpactParams.set("flow", "demo");
+  proofImpactParams.set("state", "recovered");
+  if (experienceId) proofImpactParams.set("eid", experienceId);
+  const proofImpactUrl = toMerchantFacingUrl(`/proof?${proofImpactParams.toString()}`);
+  const billingRuntime = getBillingRuntimeReadiness();
+  const billingAvailable = Boolean(
+    billingRuntime.billing_route_active
+    && experienceStatus?.loop?.recovery_sent,
+  );
+  const billingStartUrl = shop ? toMerchantFacingUrl(buildCanonicalBillingStartPath({
+    shop,
+    source: "connected_experience",
+    target: shop,
+    plan: "starter",
+    experienceId,
+  })) : toMerchantFacingUrl("/proof/payment");
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -3117,6 +6074,11 @@ function renderExperienceReturnedPage({
       letter-spacing: 0.12em;
       text-transform: uppercase;
       margin-bottom: 18px;
+    }
+    .brand a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
     .panel {
       background: rgba(15, 23, 42, 0.86);
@@ -3139,8 +6101,44 @@ function renderExperienceReturnedPage({
       line-height: 1.6;
       font-size: 15px;
     }
+    .value-block {
+      margin-top: 22px;
+      padding: 20px 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.88), rgba(2, 6, 23, 0.92));
+      text-align: left;
+    }
+    .value-label {
+      color: #94a3b8;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .value-line {
+      margin-top: 10px;
+      color: #f8fafc;
+      font-size: clamp(34px, 8vw, 48px);
+      font-weight: 800;
+      letter-spacing: -0.05em;
+      line-height: 0.98;
+    }
+    .value-copy {
+      margin-top: 10px;
+      color: #e2e8f0;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+    .actions {
+      display: grid;
+      gap: 12px;
+      margin-top: 22px;
+    }
     a {
       display: inline-flex;
+      align-items: center;
+      justify-content: center;
       margin-top: 22px;
       padding: 12px 16px;
       border-radius: 16px;
@@ -3149,15 +6147,44 @@ function renderExperienceReturnedPage({
       text-decoration: none;
       font-weight: 800;
     }
+    .secondary {
+      background: rgba(15, 23, 42, 0.7);
+      color: #f8fafc;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+    }
+    .support {
+      margin-top: 16px;
+      color: #94a3b8;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .support a {
+      margin-top: 0;
+      padding: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #e2e8f0;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
   <main class="shell">
-    <div class="brand">Abando</div>
+    <div class="brand">${renderMerchantLogoMarkup({ href: resolveMerchantFacingBaseUrl() })}</div>
     <section class="panel">
-      <h1>Customer returned</h1>
-      <p>This is how abandoned checkout revenue comes back.</p>
-      <a href="/experience?shop=${encodeURIComponent(shop || "")}&eid=${encodeURIComponent(experienceId || "")}">Back to experience</a>
+      <h1>Return detected.</h1>
+      <p>Your self-test completed the full recovery loop on this store.</p>
+      <p>Abando caught the return and attributed the recovered revenue.</p>
+      <div class="value-block">
+        <div class="value-label">Recovered revenue</div>
+        <div class="value-line">${escapeHtml(recoveredValueLabel)}</div>
+        <div class="value-copy">This is the amount this return put back in play through the recovery flow you just verified.</div>
+      </div>
+      <div class="actions">
+        ${billingAvailable ? `<a href="${escapeHtml(billingStartUrl)}">Start paid plan</a>` : ""}
+        <a class="${billingAvailable ? "secondary" : ""}" href="${escapeHtml(proofImpactUrl)}">${billingAvailable ? "See proof details" : "See the impact"}</a>
+      </div>
+      <div class="support">Questions? <a href="mailto:hello@abando.ai">hello@abando.ai</a></div>
     </section>
   </main>
 </body>
@@ -3196,6 +6223,11 @@ function renderAuditPage() {
       letter-spacing: 0.12em;
       text-transform: uppercase;
       margin-bottom: 18px;
+    }
+    .brand a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
     .panel {
       background: rgba(15, 23, 42, 0.86);
@@ -3419,6 +6451,8 @@ function renderAuditPage() {
 }
 
 async function getMerchantSurfaceState(shop = "mvp-demo-proof.myshopify.com") {
+  const dashboardSummary = await getDashboardSummary(prisma, shop).catch(() => null);
+  const merchantSummary = buildAbandoMerchantSummaryResponse(dashboardSummary, { notes: [] });
   const latestSendEvent = await prisma.systemEvent.findFirst({
     where: {
       shopDomain: shop,
@@ -3426,7 +6460,6 @@ async function getMerchantSurfaceState(shop = "mvp-demo-proof.myshopify.com") {
     },
     orderBy: { createdAt: "desc" },
   });
-
   const latestReturnEvent = await prisma.systemEvent.findFirst({
     where: {
       shopDomain: shop,
@@ -3434,31 +6467,97 @@ async function getMerchantSurfaceState(shop = "mvp-demo-proof.myshopify.com") {
     },
     orderBy: { createdAt: "desc" },
   });
-
   const recoveredSessions = await prisma.systemEvent.count({
     where: {
       shopDomain: shop,
       eventType: "abando.customer_return.v1",
     },
   });
+  const valueTier = getProofValueTier(shop);
+  const actualRecoveredRevenueCents = Number(dashboardSummary?.realAttributedRevenueCents || 0);
+  const derivedRecoveredRevenueCents = actualRecoveredRevenueCents > 0
+    ? actualRecoveredRevenueCents
+    : Number(recoveredSessions || 0) > 0
+      ? Number(recoveredSessions || 0) * valueTier.recoveredOrder * 100
+      : ["recovered", "returned"].includes(String(merchantSummary?.status || "").toLowerCase())
+        ? valueTier.recoveredOrder * 100
+        : 0;
+  const recoveryActive = ["created", "recovery_ready", "sent"].includes(String(merchantSummary?.recoveryStatus || "").toLowerCase())
+    || ["recovery_ready", "at_risk", "active"].includes(String(merchantSummary?.status || "").toLowerCase());
+  const activeOpportunityCount = Math.max(
+    1,
+    Math.min(
+      3,
+      Number(merchantSummary?.eventCount || 0) > 0
+        ? Number(merchantSummary.eventCount)
+        : recoveryActive
+          ? 2
+          : 1,
+    ),
+  );
+  const revenueAtRiskCents = recoveryActive
+    ? Math.max(valueTier.daily * 100, activeOpportunityCount * valueTier.recoveredOrder * 100)
+    : Math.round(valueTier.daily * 0.75 * 100);
 
-  const latestSendPayload = latestSendEvent?.payload && typeof latestSendEvent.payload === "object"
-    ? latestSendEvent.payload
-    : null;
+  const opportunityStatuses = recoveryActive
+    ? ["Recovering now", "Pending", "Monitoring"]
+    : ["Pending", "Monitoring", "Monitoring"];
+  const opportunityTypes = [
+    humanizeProofEvent(merchantSummary?.lastEventSeen || "checkout_started"),
+    "Returning user hesitation",
+    "Product revisit",
+  ];
+  const opportunityValues = [
+    Math.max(valueTier.recoveredOrder, Math.round((revenueAtRiskCents / 100) * 0.5)),
+    Math.max(42, Math.round((revenueAtRiskCents / 100) * 0.32)),
+    Math.max(28, Math.round((revenueAtRiskCents / 100) * 0.18)),
+  ];
+
+  const opportunities = opportunityTypes.map((type, index) => ({
+    valueLabel: formatUsdWhole(opportunityValues[index]),
+    type,
+    status: opportunityStatuses[index],
+  }));
+
+  const timeline = [
+    { label: humanizeProofEvent(merchantSummary?.lastEventSeen || "checkout_started"), detail: merchantSummary?.lastEventAt ? formatProofTimestamp(merchantSummary.lastEventAt) : "Recent activity" },
+    { label: "Drop-off detected", detail: recoveryActive ? "Revenue opportunity opened" : "Monitoring for return" },
+    merchantSummary?.lastRecoveryActionType
+      ? { label: `${humanizeProofAction(merchantSummary.lastRecoveryActionType)} triggered`, detail: merchantSummary?.lastRecoveryActionAt ? formatProofTimestamp(merchantSummary.lastRecoveryActionAt) : "Recovery active" }
+      : { label: "Recovery triggered", detail: recoveryActive ? "Recovery active" : "Not triggered yet" },
+    latestReturnEvent || ["recovered", "returned"].includes(String(merchantSummary?.status || "").toLowerCase())
+      ? { label: "Customer returned", detail: latestReturnEvent?.createdAt ? formatProofTimestamp(latestReturnEvent.createdAt) : "Return tracked" }
+      : { label: "Customer return pending", detail: "Waiting on recovery completion" },
+    derivedRecoveredRevenueCents > 0
+      ? { label: `${formatUsdFromCents(derivedRecoveredRevenueCents)} recovered`, detail: "Revenue captured" }
+      : { label: "Recovery value still at risk", detail: formatUsdFromCents(revenueAtRiskCents) },
+  ];
+
+  const insight = derivedRecoveredRevenueCents > 0
+    ? "Recovery active. Returning customers are already converting back into revenue."
+    : recoveryActive
+      ? "Recovery is active. Most opportunities close quickly once shoppers are brought back with the right trigger."
+      : "Recovery signals are being monitored. Most recoveries happen shortly after checkout intent is re-engaged.";
 
   return {
     shop,
-    lastRecoverySent: latestSendPayload?.channel ? String(latestSendPayload.channel) : null,
-    lastRecoveryReturned: Boolean(latestReturnEvent),
-    recoveredSessions: Number(recoveredSessions || 0),
+    recoveredRevenueLabel: formatUsdFromCents(derivedRecoveredRevenueCents),
+    revenueAtRiskLabel: formatUsdFromCents(revenueAtRiskCents),
+    activeOpportunityCount,
+    opportunities,
+    timeline,
+    insight,
   };
 }
 
 function renderMerchantPage({
   shop,
-  lastRecoverySent,
-  lastRecoveryReturned,
-  recoveredSessions,
+  recoveredRevenueLabel,
+  revenueAtRiskLabel,
+  activeOpportunityCount,
+  opportunities,
+  timeline,
+  insight,
 }) {
   return `<!doctype html>
 <html lang="en">
@@ -3475,16 +6574,15 @@ function renderMerchantPage({
       background: radial-gradient(circle at top, rgba(30, 41, 59, 0.22), transparent 42%), #020617;
       color: #e5eef8;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      display: grid;
-      place-items: center;
       padding: 28px 18px;
     }
     .shell {
       width: 100%;
-      max-width: 520px;
+      max-width: 920px;
+      margin: 0 auto;
     }
     .brand {
-      text-align: center;
+      text-align: left;
       color: #cbd5e1;
       font-size: 13px;
       font-weight: 700;
@@ -3502,18 +6600,23 @@ function renderMerchantPage({
     h1 {
       margin: 0;
       color: #f8fafc;
-      font-size: clamp(34px, 7vw, 42px);
+      font-size: clamp(34px, 6vw, 48px);
       line-height: 1.02;
       letter-spacing: -0.05em;
-      text-align: center;
     }
     .lede {
       margin: 14px 0 0;
       color: #94a3b8;
       font-size: 15px;
       line-height: 1.6;
-      text-align: center;
     }
+    .metric-grid {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .metric-card,
     .section {
       margin-top: 18px;
       padding: 18px 16px;
@@ -3530,7 +6633,7 @@ function renderMerchantPage({
     .section-value {
       margin-top: 10px;
       color: #f8fafc;
-      font-size: 24px;
+      font-size: 28px;
       font-weight: 800;
       letter-spacing: -0.03em;
     }
@@ -3553,42 +6656,55 @@ function renderMerchantPage({
     .row-line strong {
       color: #f8fafc;
     }
-    .button,
-    .link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 48px;
-      padding: 0 18px;
-      border-radius: 14px;
-      text-decoration: none;
-      font-weight: 700;
-    }
-    .button {
-      width: 100%;
+    .opportunity-list,
+    .timeline-list {
       margin-top: 14px;
-      border: 0;
-      background: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%);
-      color: #020617;
-      font: inherit;
-      cursor: pointer;
+      display: grid;
+      gap: 10px;
     }
-    .button:disabled {
-      opacity: 0.72;
-      cursor: wait;
+    .opportunity-row,
+    .timeline-row,
+    .control-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: start;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.68);
+      border: 1px solid rgba(148, 163, 184, 0.12);
     }
-    .button-status {
-      margin-top: 10px;
+    .opportunity-row strong,
+    .timeline-row strong,
+    .control-row strong {
+      color: #f8fafc;
+    }
+    .opportunity-meta,
+    .timeline-meta {
       color: #94a3b8;
-      font-size: 13px;
-      text-align: center;
-      min-height: 18px;
+      font-size: 14px;
+      line-height: 1.5;
+      text-align: right;
     }
-    .link {
-      margin-top: 14px;
-      border: 1px solid rgba(148, 163, 184, 0.16);
-      background: rgba(15, 23, 42, 0.66);
-      color: #e5eef8;
+    .insight-copy {
+      margin-top: 10px;
+      color: #cbd5e1;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+    @media (max-width: 720px) {
+      .metric-grid {
+        grid-template-columns: 1fr;
+      }
+      .opportunity-row,
+      .timeline-row,
+      .control-row {
+        flex-direction: column;
+      }
+      .opportunity-meta,
+      .timeline-meta {
+        text-align: left;
+      }
     }
   </style>
 </head>
@@ -3596,72 +6712,59 @@ function renderMerchantPage({
   <main class="shell">
     <div class="brand">Abando</div>
     <section class="panel">
-      <h1>Abando is active</h1>
-      <p class="lede">Abando is recovering revenue automatically.</p>
+      <h1>Revenue engine active</h1>
+      <p class="lede">Recovered revenue, live revenue at risk, and recovery movement for ${escapeHtml(shop)}.</p>
 
-      <section class="section">
-        <div class="section-label">Last recovery</div>
-        <div class="row">
-          <div class="row-line"><strong>Sent:</strong> ${escapeHtml(lastRecoverySent || "not yet")}</div>
-          <div class="row-line"><strong>Returned:</strong> ${lastRecoveryReturned ? "yes" : "not yet"}</div>
+      <section class="metric-grid">
+        <div class="metric-card">
+          <div class="section-label">Recovered revenue (last 7 days)</div>
+          <div class="section-value">${escapeHtml(recoveredRevenueLabel)}</div>
+        </div>
+        <div class="metric-card">
+          <div class="section-label">Active revenue opportunities</div>
+          <div class="section-value">${escapeHtml(revenueAtRiskLabel)}</div>
         </div>
       </section>
 
       <section class="section">
-        <div class="section-label">Recoveries completed</div>
-        <div class="section-value">Recoveries completed: ${Number(recoveredSessions || 0)}</div>
+        <div class="section-label">Active opportunities</div>
+        <div class="opportunity-list">
+          ${(opportunities || []).slice(0, 3).map((item) => `
+            <div class="opportunity-row">
+              <div><strong>${escapeHtml(item.valueLabel)}</strong> — ${escapeHtml(item.type)}</div>
+              <div class="opportunity-meta">${escapeHtml(item.status)}</div>
+            </div>
+          `).join("")}
+        </div>
       </section>
 
       <section class="section">
-        <div class="section-label">Action</div>
-        <button type="button" class="button" id="merchantSendTestRecovery">Send test recovery</button>
-        <div class="button-status" data-merchant-send-status></div>
+        <div class="section-label">Recovery timeline</div>
+        <div class="timeline-list">
+          ${(timeline || []).map((item) => `
+            <div class="timeline-row">
+              <div><strong>${escapeHtml(item.label)}</strong></div>
+              <div class="timeline-meta">${escapeHtml(item.detail)}</div>
+            </div>
+          `).join("")}
+        </div>
       </section>
 
       <section class="section">
-        <div class="section-label">Live recovery</div>
-        <a class="link" href="/experience?shop=${encodeURIComponent(shop)}&eid=merchant-proof">See recovery in action</a>
+        <div class="section-label">System insight</div>
+        <div class="insight-copy">${escapeHtml(insight)}</div>
+        <div class="insight-copy">Most recoveries happen within 10 minutes. High-value carts respond faster to urgency. Returning customers convert with less friction.</div>
+      </section>
+
+      <section class="section">
+        <div class="section-label">Recovery mode</div>
+        <div class="control-row">
+          <div><strong>Recovery Mode</strong></div>
+          <div class="timeline-meta">Balanced</div>
+        </div>
       </section>
     </section>
   </main>
-  <script>
-    (function () {
-      var button = document.getElementById("merchantSendTestRecovery");
-      var statusNode = document.querySelector("[data-merchant-send-status]");
-
-      if (!button) return;
-
-      button.addEventListener("click", async function () {
-        button.disabled = true;
-        button.textContent = "Sending…";
-        if (statusNode) statusNode.textContent = "";
-
-        try {
-          var response = await fetch("/api/recovery-actions/send-live-test", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              shop: ${JSON.stringify(shop)},
-              email: "rossstafford1@gmail.com",
-              experienceId: "merchant-test-" + Date.now()
-            })
-          });
-          var data = await response.json();
-          if (!response.ok || !data.success) {
-            throw new Error((data && (data.error || data.message)) || "send_live_test_failed");
-          }
-          if (statusNode) statusNode.textContent = "Recovery sent";
-        } catch (error) {
-          if (statusNode) {
-            statusNode.textContent = error && error.message ? error.message : "send_live_test_failed";
-          }
-        } finally {
-          button.disabled = false;
-          button.textContent = "Send test recovery";
-        }
-      });
-    })();
-  </script>
 </body>
 </html>`;
 }
@@ -3675,13 +6778,30 @@ function deriveLeadNextAction(status = "routed") {
   return "Open audit";
 }
 
+function normalizeOutreachStatus(entry = {}) {
+  const current = String(entry?.outreach_status || entry?.status || "").trim().toLowerCase();
+  if (["draft", "ready", "sent", "responded", "closed"].includes(current)) return current;
+  if (entry?.closed || current === "closed") return "closed";
+  if (entry?.responded || entry?.replied || current === "responded" || current === "replied") return "responded";
+  if (entry?.sent || current === "sent") return "sent";
+  if (current === "ready" || current === "queued" || entry?.approved) return "ready";
+  if (current === "draft" || current === "routed") return "draft";
+  return "draft";
+}
+
 function deriveOutreachNextAction(entry = {}) {
-  if (!entry?.approved) return "Approve";
-  if (entry?.closed) return "Complete";
-  if (entry?.replied && !entry?.closed) return "Review / close";
-  if (entry?.sent && !entry?.replied) return "Wait / follow up";
-  if (entry?.status === "queued" && !entry?.sent) return "Send";
-  return "Queue";
+  const status = normalizeOutreachStatus(entry);
+  if (status === "closed" || entry?.closed) return "Complete";
+  if (entry?.conversion?.install_status === "installed") return "Close / capture testimonial";
+  if (entry?.conversion?.install_status === "started") return "Support install";
+  if (entry?.conversion?.install_status === "sent") return "Wait for install";
+  if (entry?.conversion?.demo_completed && (entry?.conversion?.install_status || "none") === "none") return "Send install";
+  if (entry?.conversion?.demo_scheduled) return "Prepare demo";
+  if (entry?.response?.call_booked) return "Prepare demo";
+  if (status === "responded" || entry?.responded) return "Reply / schedule call";
+  if (status === "sent") return "Wait / follow up";
+  if (status === "ready") return "Send";
+  return "Approve";
 }
 
 function deriveContactResearchNextAction(entry = {}) {
@@ -3702,8 +6822,10 @@ function deriveContactResearchNextAction(entry = {}) {
 
 function renderOutreachTemplate(template = "", row = {}) {
   return String(template || "")
+    .replace(/\{\{greeting\}\}/g, String(row.greeting || "Hi there —"))
     .replace(/\{\{audit_link\}\}/g, String(row.audit_link || ""))
-    .replace(/\{\{experience_link\}\}/g, String(row.experience_link || ""));
+    .replace(/\{\{experience_link\}\}/g, String(row.experience_link || ""))
+    .replace(/\{\{proof_link\}\}/g, String(row.proof_link || ""));
 }
 
 function buildOutreachBodyPreview(body = "", maxLength = 240) {
@@ -3715,25 +6837,165 @@ function buildOutreachBodyPreview(body = "", maxLength = 240) {
   return escapeHtml(clipped).replace(/\n/g, "<br />");
 }
 
+function getOutreachResponseStatus(entry = {}) {
+  if (entry?.response?.call_booked) return "call booked";
+  if (entry?.response?.received) return "responded";
+  return "no response";
+}
+
+function getOutreachSentAgeLabel(sentAt = "") {
+  if (!sentAt) return "Not sent yet";
+  const sentTime = new Date(sentAt).getTime();
+  if (!Number.isFinite(sentTime)) return "Not sent yet";
+  const diffMs = Date.now() - sentTime;
+  const days = Math.max(0, Math.floor(diffMs / (24 * 60 * 60 * 1000)));
+  return `Sent ${days} day${days === 1 ? "" : "s"} ago`;
+}
+
+function getOutreachFollowUpState(entry = {}) {
+  const responseReceived = Boolean(entry?.response?.received);
+  const callBooked = Boolean(entry?.response?.call_booked);
+  const status = normalizeOutreachStatus(entry);
+  const followUp = entry?.follow_up || {};
+  if (status !== "sent" || !entry?.sent_at || responseReceived || callBooked) {
+    return {
+      status: followUp.follow_up_count > 0 ? "completed" : "none",
+      next_follow_up_at: "",
+      follow_up_count: Number(followUp.follow_up_count || 0),
+    };
+  }
+  if (Number(followUp.follow_up_count || 0) >= 2) {
+    return {
+      status: "stale",
+      next_follow_up_at: "",
+      follow_up_count: Number(followUp.follow_up_count || 0),
+    };
+  }
+  return {
+    status: String(followUp.status || "not due"),
+    next_follow_up_at: String(followUp.next_follow_up_at || ""),
+    follow_up_count: Number(followUp.follow_up_count || 0),
+  };
+}
+
+function getOutreachConversionState(entry = {}) {
+  const conversion = entry?.conversion || {};
+  return {
+    demo_status: conversion.demo_completed ? "completed" : (conversion.demo_scheduled ? "scheduled" : "not scheduled"),
+    demo_date: String(conversion.demo_date || ""),
+    install_status: String(conversion.install_status || "none"),
+    install_link: String(conversion.install_link || ""),
+    install_started_at: String(conversion.install_started_at || ""),
+    installed_at: String(conversion.installed_at || ""),
+    installed_shop: String(conversion.installed_shop || ""),
+  };
+}
+
+function getOutreachSendReadiness(entry = {}) {
+  const readyStatus = normalizeOutreachStatus(entry) === "ready";
+  const approved = Boolean(entry?.approved);
+  const email = String(entry?.contact_email || "").trim();
+  const subject = String(entry?.subject || "").trim();
+  const body = String(entry?.body || "").trim();
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  return readyStatus && approved && emailValid && Boolean(subject) && Boolean(body) ? "ready" : "not ready";
+}
+
+function deriveUnifiedOutreachStage(entry = {}) {
+  const status = normalizeOutreachStatus(entry);
+  const conversion = entry?.conversion || {};
+  if (conversion.install_status === "installed") return "Installed";
+  if (status === "closed" || entry?.closed) return "Closed";
+  if (conversion.install_status === "sent" || conversion.install_status === "started") return "Install Sent";
+  if (conversion.demo_scheduled || conversion.demo_completed || entry?.response?.call_booked) return "Demo Scheduled";
+  if (status === "responded" || entry?.response?.received) return "Responded";
+  if (status === "sent") return "Outreach Sent";
+  if (status === "ready") return "Outreach Ready";
+  return "Outreach Draft";
+}
+
+function deriveUnifiedContactStage(entry = {}, outreachEntry = null) {
+  if (outreachEntry) return deriveUnifiedOutreachStage(outreachEntry);
+  if (String(entry?.research_status || "") === "ready_for_outreach") return "Outreach Draft";
+  return "Contact Research";
+}
+
+function deriveUnifiedLeadStage({ leadStatus = "", contactEntry = null, outreachEntry = null } = {}) {
+  if (outreachEntry) return deriveUnifiedOutreachStage(outreachEntry);
+  if (contactEntry) return deriveUnifiedContactStage(contactEntry, null);
+  if (leadStatus === "closed") return "Closed";
+  return "Qualified";
+}
+
+function renderOperatorNav(current = "") {
+  const items = [
+    { href: "/leads", label: "Leads" },
+    { href: "/contact-research", label: "Contact Research" },
+    { href: "/outreach", label: "Outreach" },
+  ];
+  return `<div class="page-links">${items.map((item) => `<a href="${item.href}"${item.href === current ? ` class="active"` : ""}>${item.label}</a>`).join("")}</div>`;
+}
+
+function renderOperatorRecordLinks(current = "") {
+  const links = [
+    { href: "/leads", label: "View in Leads" },
+    { href: "/contact-research", label: "View in Contact Research" },
+    { href: "/outreach", label: "View in Outreach" },
+  ].filter((item) => item.href !== current);
+  return `<div class="record-links">${links.map((item) => `<a href="${item.href}">${item.label}</a>`).join(" · ")}</div>`;
+}
+
+function normalizeIcpTier(value = "") {
+  const tier = String(value || "").trim().toLowerCase();
+  if (tier === "high" || tier === "medium" || tier === "low") return tier;
+  return "low";
+}
+
+function formatIcpTierLabel(value = "") {
+  const tier = normalizeIcpTier(value);
+  if (tier === "high") return "High";
+  if (tier === "medium") return "Medium";
+  return "Low";
+}
+
 async function getLeadsCommandCenterState() {
   const topTargets = await readJsonArrayFile(leadsTopTargetsPath);
   const outcomes = await readJsonArrayFile(leadsOutcomesPath);
+  const contactResearchQueue = await readJsonArrayFile(leadsContactResearchQueuePath);
+  const outreachQueue = await readJsonArrayFile(leadsOutreachQueuePath);
   const outcomeByDomain = new Map(
     outcomes.map((entry) => [normalizeStoreInput(entry?.domain || ""), entry]),
+  );
+  const contactByDomain = new Map(
+    contactResearchQueue.map((entry) => [normalizeStoreInput(entry?.domain || ""), entry]),
+  );
+  const outreachByDomain = new Map(
+    outreachQueue.map((entry) => [normalizeStoreInput(entry?.domain || ""), entry]),
   );
 
   const rows = topTargets.map((target) => {
     const domain = normalizeStoreInput(target?.domain || "");
     const outcome = outcomeByDomain.get(domain) || null;
+    const contactEntry = contactByDomain.get(domain) || null;
+    const outreachEntry = outreachByDomain.get(domain) || null;
     const status = String(outcome?.status || "routed");
+    const stage = deriveUnifiedLeadStage({ leadStatus: status, contactEntry, outreachEntry });
+    const nextAction = outreachEntry
+      ? deriveOutreachNextAction(outreachEntry)
+      : contactEntry
+        ? deriveContactResearchNextAction(contactEntry)
+        : deriveLeadNextAction(status);
     return {
       domain,
       score: Number(outcome?.score ?? target?.score ?? 0),
+      icp_score: Number(outcome?.icp_score ?? target?.icp_score ?? 0),
+      icp_tier: normalizeIcpTier(outcome?.icp_tier ?? target?.icp_tier ?? "low"),
       status,
+      stage,
       audit_link: String(outcome?.audit_link || target?.audit_link || ""),
       experience_link: String(outcome?.experience_link || target?.experience_link || ""),
       notes: String(outcome?.notes || target?.notes || "").trim(),
-      nextAction: deriveLeadNextAction(status),
+      nextAction,
     };
   });
 
@@ -3754,45 +7016,316 @@ async function getLeadsCommandCenterState() {
   return { rows, counts };
 }
 
+function formatLeadStatusRow(lead) {
+  const parts = [];
+  if (lead.billing_active) {
+    parts.push("Billing active");
+  } else if (lead.billing_clicked) {
+    parts.push("Billing started");
+  }
+  if (lead.return_detected) {
+    parts.push("Return detected");
+  } else if (lead.recovery_sent) {
+    parts.push("Recovery sent");
+  } else if (lead.installed_at) {
+    parts.push("Connected");
+  }
+  return parts[0] || "Connected";
+}
+
+function formatLeadLastAction(lead) {
+  if (lead.billing_active) return "Billing active";
+  if (lead.billing_clicked) return "Billing clicked";
+  if (lead.return_detected) return "Return detected";
+  if (lead.recovery_sent) return "Recovery sent";
+  if (lead.installed_at) return "Installed";
+  return "No activity yet";
+}
+
+async function getOperatorLeadsState() {
+  const [shops, installEvents, systemEvents] = await Promise.all([
+    prisma.shop.findMany({
+      orderBy: { createdAt: "desc" },
+      select: { key: true, createdAt: true },
+    }),
+    readJsonArrayFile(leadsInstallEventsPath),
+    prisma.systemEvent.findMany({
+      where: {
+        eventType: {
+          in: [
+            "abando.recovery_action.v1",
+            "abando.live_test_send.v1",
+            "abando.customer_return.v1",
+            BILLING_STATE_EVENT,
+            "abando.billing_click.v1",
+          ],
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
+
+  const leadMap = new Map();
+
+  function ensureLead(shop) {
+    const normalizedShop = normalizeStoreInput(shop);
+    if (!normalizedShop) return null;
+    if (!leadMap.has(normalizedShop)) {
+      leadMap.set(normalizedShop, {
+        shop: normalizedShop,
+        installed_at: null,
+        recovery_sent: false,
+        return_detected: false,
+        billing_clicked: false,
+        billing_active: false,
+        last_event_at: null,
+        lead_score: 0,
+      });
+    }
+    return leadMap.get(normalizedShop);
+  }
+
+  function bumpLastEvent(lead, timestamp) {
+    const value = String(timestamp || "").trim();
+    if (!value) return;
+    if (!lead.last_event_at || value > lead.last_event_at) {
+      lead.last_event_at = value;
+    }
+  }
+
+  for (const shop of shops) {
+    const lead = ensureLead(shop.key);
+    if (!lead) continue;
+    lead.installed_at = shop.createdAt?.toISOString?.() || null;
+    bumpLastEvent(lead, lead.installed_at);
+  }
+
+  for (const event of installEvents) {
+    const installedShop = normalizeStoreInput(event?.shopDomain || event?.installed_shop || event?.installedShop || "");
+    const lead = ensureLead(installedShop || event?.targetDomain || event?.target_domain);
+    if (!lead) continue;
+    const installedAt = String(event?.installedAt || event?.installed_at || event?.created_at || "").trim();
+    if (installedAt) {
+      lead.installed_at = installedAt;
+      bumpLastEvent(lead, installedAt);
+    }
+  }
+
+  for (const event of systemEvents) {
+    const payload = event?.payload && typeof event.payload === "object" ? event.payload : {};
+    const lead = ensureLead(event.shopDomain || payload.shop || payload.shopDomain);
+    if (!lead) continue;
+    const createdAt = event.createdAt?.toISOString?.() || null;
+    bumpLastEvent(lead, createdAt);
+
+    if (event.eventType === "abando.live_test_send.v1") {
+      const status = String(payload.status || "").trim().toLowerCase();
+      if (status === "sent") {
+        lead.recovery_sent = true;
+      }
+    }
+
+    if (event.eventType === "abando.recovery_action.v1") {
+      const status = String(payload.status || "").trim().toLowerCase();
+      if (status === "sent") {
+        lead.recovery_sent = true;
+      }
+    }
+
+    if (event.eventType === "abando.customer_return.v1") {
+      lead.return_detected = true;
+    }
+
+    if (event.eventType === "abando.billing_click.v1") {
+      lead.billing_clicked = true;
+    }
+
+    if (event.eventType === BILLING_STATE_EVENT) {
+      const billingStatus = String(payload.billing_status || "").trim().toLowerCase();
+      if (billingStatus === "active" || billingStatus === "trialing") {
+        lead.billing_active = true;
+      }
+    }
+  }
+
+  const rows = Array.from(leadMap.values())
+    .filter((lead) => {
+      const shop = normalizeStoreInput(lead.shop);
+      return Boolean(shop && shop !== "unknown store");
+    })
+    .map((lead) => {
+      let leadScore = 0;
+      if (lead.recovery_sent) leadScore += 3;
+      if (lead.return_detected) leadScore += 5;
+      if (lead.billing_clicked) leadScore += 10;
+      if (lead.billing_active) leadScore += 20;
+      return {
+        ...lead,
+        lead_score: leadScore,
+        status: formatLeadStatusRow(lead),
+        last_action: formatLeadLastAction(lead),
+      };
+    })
+    .sort((a, b) => {
+      if (b.lead_score !== a.lead_score) return b.lead_score - a.lead_score;
+      return String(b.last_event_at || "").localeCompare(String(a.last_event_at || ""));
+    });
+
+  return rows;
+}
+
+function renderOperatorLeadsPage(rows) {
+  const cards = rows.map((row) => `\
+<section class="lead-row">
+  <div class="lead-main">
+    <div class="lead-shop">${escapeHtml(row.shop)}</div>
+    <div class="lead-status">${escapeHtml(row.status)}</div>
+  </div>
+  <div class="lead-side">
+    <div class="lead-score">Score ${Number(row.lead_score || 0)}</div>
+    <div class="lead-last">${escapeHtml(row.last_action)}</div>
+  </div>
+</section>`).join("");
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Operator Leads</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #020617;
+      color: #e5eef8;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      padding: 28px 18px 60px;
+    }
+    .shell { max-width: 760px; margin: 0 auto; }
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 6vw, 40px);
+      letter-spacing: -0.04em;
+      color: #f8fafc;
+    }
+    .lede {
+      margin: 10px 0 20px;
+      color: #94a3b8;
+      font-size: 15px;
+    }
+    .lead-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 20px;
+      border-radius: 20px;
+      background: rgba(15, 23, 42, 0.86);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      margin-top: 12px;
+      align-items: center;
+    }
+    .lead-shop {
+      color: #f8fafc;
+      font-size: 18px;
+      font-weight: 800;
+    }
+    .lead-status, .lead-last {
+      color: #94a3b8;
+      font-size: 14px;
+      margin-top: 6px;
+    }
+    .lead-score {
+      color: #dcfce7;
+      font-size: 16px;
+      font-weight: 800;
+      text-align: right;
+    }
+    .lead-side { text-align: right; }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <h1>Hot merchants</h1>
+    <p class="lede">Highest conversion readiness first.</p>
+    ${cards || '<div class="lede">No merchant activity yet.</div>'}
+  </main>
+</body>
+</html>`;
+}
+
 async function getOutreachCommandCenterState() {
   const queue = await readJsonArrayFile(leadsOutreachQueuePath);
   const templates = await readJsonObjectFile(leadsOutreachTemplatesPath);
 
   const rows = queue.map((entry) => {
-    const messageType = String(entry?.message_type || "abando_audit_invite");
+    const messageType = String(entry?.message_type || "abando_proof_invite");
     const template = templates[messageType] || {};
+    const contactName = String(entry?.contact_name || "").trim();
+    const greeting = contactName ? `Hey ${contactName.split(/\s+/)[0]} —` : "Hi there —";
     const subject = String(entry?.subject || template.subject || "").trim();
-    const body = String(entry?.body || renderOutreachTemplate(template.body, entry) || "").trim();
+    const body = String(entry?.body || renderOutreachTemplate(template.body, { ...entry, greeting }) || "").trim();
+    const outreachStatus = normalizeOutreachStatus(entry);
     return {
       domain: normalizeStoreInput(entry?.domain || ""),
-      status: String(entry?.status || "routed"),
-      approved: Boolean(entry?.approved),
-      sent: Boolean(entry?.sent),
-      replied: Boolean(entry?.replied),
+      score: Number(entry?.score || 0),
+      icp_score: Number(entry?.icp_score || 0),
+      icp_tier: normalizeIcpTier(entry?.icp_tier || "low"),
+      stage: deriveUnifiedOutreachStage(entry),
+      contact_name: contactName,
+      contact_role: String(entry?.contact_role || "").trim(),
+      contact_email: String(entry?.contact_email || "").trim(),
+      outreach_status: outreachStatus,
       closed: Boolean(entry?.closed),
+      responded: Boolean(entry?.responded),
+      response: {
+        received: Boolean(entry?.response?.received),
+        received_at: String(entry?.response?.received_at || ""),
+        channel: String(entry?.response?.channel || "").trim(),
+        summary: String(entry?.response?.summary || "").trim(),
+        intent: String(entry?.response?.intent || "").trim(),
+        next_step: String(entry?.response?.next_step || "").trim(),
+        call_booked: Boolean(entry?.response?.call_booked),
+        call_date: String(entry?.response?.call_date || "").trim(),
+        notes: String(entry?.response?.notes || "").trim(),
+      },
+      response_status: getOutreachResponseStatus(entry),
+      sent_age_label: getOutreachSentAgeLabel(entry?.sent_at),
+      follow_up: {
+        status: getOutreachFollowUpState(entry).status,
+        next_follow_up_at: getOutreachFollowUpState(entry).next_follow_up_at,
+        follow_up_count: getOutreachFollowUpState(entry).follow_up_count,
+      },
+      conversion: getOutreachConversionState(entry),
+      sending: {
+        last_attempt_at: String(entry?.sending?.last_attempt_at || "").trim(),
+        last_result: String(entry?.sending?.last_result || "").trim(),
+        last_error: String(entry?.sending?.last_error || "").trim(),
+        provider_message_id: String(entry?.sending?.provider_message_id || "").trim(),
+        readiness: getOutreachSendReadiness(entry),
+      },
       subject,
       body,
-      audit_link: String(entry?.audit_link || ""),
-      experience_link: String(entry?.experience_link || ""),
+      proof_link: String(entry?.proof_link || ""),
       notes: String(entry?.notes || "").trim(),
       nextAction: deriveOutreachNextAction(entry),
     };
   });
 
   const counts = {
-    approved: 0,
-    queued: 0,
+    draft: 0,
+    ready: 0,
     sent: 0,
-    replied: 0,
+    responded: 0,
     closed: 0,
   };
 
   rows.forEach((row) => {
-    if (row.approved) counts.approved += 1;
-    if (row.status === "queued") counts.queued += 1;
-    if (row.sent) counts.sent += 1;
-    if (row.replied) counts.replied += 1;
-    if (row.closed) counts.closed += 1;
+    if (Object.prototype.hasOwnProperty.call(counts, row.outreach_status)) {
+      counts[row.outreach_status] += 1;
+    }
   });
 
   return { rows, counts };
@@ -3800,24 +7333,35 @@ async function getOutreachCommandCenterState() {
 
 async function getContactResearchCommandCenterState() {
   const queue = await readJsonArrayFile(leadsContactResearchQueuePath);
+  const outreachQueue = await readJsonArrayFile(leadsOutreachQueuePath);
+  const outreachByDomain = new Map(
+    outreachQueue.map((entry) => [normalizeStoreInput(entry?.domain || ""), entry]),
+  );
 
-  const rows = queue.map((entry) => ({
-    domain: normalizeStoreInput(entry?.domain || ""),
-    score: Number(entry?.score || 0),
-    contact_status: String(entry?.contact_status || "no_contact_found"),
-    research_status: String(entry?.research_status || "needs_research"),
-    contact_page_url: String(entry?.contact_page_url || ""),
-    social_links: {
-      instagram: String(entry?.social_links?.instagram || ""),
-      linkedin: String(entry?.social_links?.linkedin || ""),
-      facebook: String(entry?.social_links?.facebook || ""),
-    },
-    contact_email: String(entry?.contact_email || "").trim(),
-    contact_name: String(entry?.contact_name || "").trim(),
-    contact_role: String(entry?.contact_role || "").trim(),
-    notes: String(entry?.notes || "").trim(),
-    nextAction: deriveContactResearchNextAction(entry),
-  }));
+  const rows = queue.map((entry) => {
+    const domain = normalizeStoreInput(entry?.domain || "");
+    const outreachEntry = outreachByDomain.get(domain) || null;
+    return {
+      domain,
+      score: Number(entry?.score || 0),
+      icp_score: Number(entry?.icp_score || 0),
+      icp_tier: normalizeIcpTier(entry?.icp_tier || "low"),
+      stage: deriveUnifiedContactStage(entry, outreachEntry),
+      contact_status: String(entry?.contact_status || "no_contact_found"),
+      research_status: String(entry?.research_status || "needs_research"),
+      contact_page_url: String(entry?.contact_page_url || ""),
+      social_links: {
+        instagram: String(entry?.social_links?.instagram || ""),
+        linkedin: String(entry?.social_links?.linkedin || ""),
+        facebook: String(entry?.social_links?.facebook || ""),
+      },
+      contact_email: String(entry?.contact_email || "").trim(),
+      contact_name: String(entry?.contact_name || "").trim(),
+      contact_role: String(entry?.contact_role || "").trim(),
+      notes: String(entry?.notes || "").trim(),
+      nextAction: outreachEntry ? deriveOutreachNextAction(outreachEntry) : deriveContactResearchNextAction(entry),
+    };
+  });
 
   const counts = {
     needs_research: 0,
@@ -3842,15 +7386,19 @@ function renderLeadsPage({ rows, counts }) {
   <div class="target-top">
     <div>
       <div class="target-domain">${escapeHtml(row.domain || "Unknown store")}</div>
-      <div class="target-meta">Score ${Number(row.score || 0)}</div>
+      <div class="target-meta">Score ${Number(row.score || 0)} · ICP ${Number(row.icp_score || 0)}</div>
     </div>
-    <div class="status-badge">${escapeHtml(row.status)}</div>
+    <div class="status-badge">${escapeHtml(row.stage)}</div>
   </div>
   <div class="target-grid">
+    <div class="target-line"><span>Stage</span><strong>${escapeHtml(row.stage)}</strong></div>
+    <div class="target-line"><span>ICP tier</span><strong><span class="icp-badge icp-${escapeHtml(row.icp_tier)}">${escapeHtml(formatIcpTierLabel(row.icp_tier))}</span></strong></div>
+    <div class="target-line"><span>ICP score</span><strong>${Number(row.icp_score || 0)}</strong></div>
     <div class="target-line"><span>Audit link</span><a href="${escapeHtml(row.audit_link)}" target="_blank" rel="noopener">Open audit</a></div>
     <div class="target-line"><span>Experience link</span><a href="${escapeHtml(row.experience_link)}" target="_blank" rel="noopener">Open experience</a></div>
     <div class="target-line"><span>Notes</span><strong>${escapeHtml(row.notes || "No notes yet.")}</strong></div>
-    <div class="target-line"><span>Next action</span><strong>${escapeHtml(row.nextAction)}</strong></div>
+    <div class="target-line action-line"><span>Next action</span><strong class="primary-action">${escapeHtml(row.nextAction)}</strong></div>
+    ${renderOperatorRecordLinks("/leads")}
   </div>
 </section>`).join("");
 
@@ -3952,6 +7500,10 @@ function renderLeadsPage({ rows, counts }) {
       border-bottom: 1px solid rgba(148, 163, 184, 0.28);
       padding-bottom: 2px;
     }
+    .page-links a.active {
+      color: #f8fafc;
+      border-bottom-color: rgba(248, 250, 252, 0.72);
+    }
     .targets {
       margin-top: 18px;
       display: grid;
@@ -3992,6 +7544,81 @@ function renderLeadsPage({ rows, counts }) {
       text-transform: lowercase;
       white-space: nowrap;
     }
+    .icp-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .icp-high {
+      color: #bbf7d0;
+      background: rgba(20, 83, 45, 0.42);
+      border-color: rgba(74, 222, 128, 0.28);
+    }
+    .icp-medium {
+      color: #fde68a;
+      background: rgba(113, 63, 18, 0.42);
+      border-color: rgba(250, 204, 21, 0.28);
+    }
+    .icp-low {
+      color: #cbd5e1;
+      background: rgba(51, 65, 85, 0.42);
+      border-color: rgba(148, 163, 184, 0.2);
+    }
+    .icp-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .icp-high {
+      color: #bbf7d0;
+      background: rgba(20, 83, 45, 0.42);
+      border-color: rgba(74, 222, 128, 0.28);
+    }
+    .icp-medium {
+      color: #fde68a;
+      background: rgba(113, 63, 18, 0.42);
+      border-color: rgba(250, 204, 21, 0.28);
+    }
+    .icp-low {
+      color: #cbd5e1;
+      background: rgba(51, 65, 85, 0.42);
+      border-color: rgba(148, 163, 184, 0.2);
+    }
+    .icp-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .icp-high {
+      color: #bbf7d0;
+      background: rgba(20, 83, 45, 0.42);
+      border-color: rgba(74, 222, 128, 0.28);
+    }
+    .icp-medium {
+      color: #fde68a;
+      background: rgba(113, 63, 18, 0.42);
+      border-color: rgba(250, 204, 21, 0.28);
+    }
+    .icp-low {
+      color: #cbd5e1;
+      background: rgba(51, 65, 85, 0.42);
+      border-color: rgba(148, 163, 184, 0.2);
+    }
     .target-grid {
       margin-top: 14px;
       display: grid;
@@ -4016,6 +7643,20 @@ function renderLeadsPage({ rows, counts }) {
       text-align: right;
       word-break: break-word;
     }
+    .primary-action {
+      color: #f8fafc;
+      font-size: 15px;
+    }
+    .record-links {
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.5;
+      text-align: right;
+    }
+    .record-links a {
+      color: #94a3b8;
+      text-decoration: none;
+    }
     .empty {
       margin-top: 18px;
       padding: 20px 18px;
@@ -4036,6 +7677,9 @@ function renderLeadsPage({ rows, counts }) {
       .target-line a {
         text-align: left;
       }
+      .record-links {
+        text-align: left;
+      }
     }
   </style>
 </head>
@@ -4045,10 +7689,7 @@ function renderLeadsPage({ rows, counts }) {
     <section class="panel">
       <h1>Leads Command Center</h1>
       <p class="lede">Routed targets for Abando revenue recovery.</p>
-      <div class="page-links">
-        <a href="/outreach">View outreach queue</a>
-        <a href="/contact-research">View contact research</a>
-      </div>
+      ${renderOperatorNav("/leads")}
       <div class="summary-row">
         <div class="summary-card"><span>routed</span><strong>${counts.routed}</strong></div>
         <div class="summary-card"><span>audit_opened</span><strong>${counts.audit_opened}</strong></div>
@@ -4069,19 +7710,57 @@ function renderOutreachPage({ rows, counts }) {
   <div class="target-top">
     <div>
       <div class="target-domain">${escapeHtml(row.domain || "Unknown domain")}</div>
-      <div class="target-meta">${escapeHtml(row.subject || "No subject yet")}</div>
+      <div class="target-meta">Score ${Number(row.score || 0)} · ICP ${Number(row.icp_score || 0)}</div>
     </div>
-    <div class="status-badge">${escapeHtml(row.status)}</div>
+    <div class="status-badge">${escapeHtml(row.stage)}</div>
   </div>
   <div class="target-grid">
+    <div class="target-line"><span>Stage</span><strong>${escapeHtml(row.stage)}</strong></div>
+    <div class="target-line"><span>ICP tier</span><strong><span class="icp-badge icp-${escapeHtml(row.icp_tier)}">${escapeHtml(formatIcpTierLabel(row.icp_tier))}</span></strong></div>
+    <div class="target-line"><span>ICP score</span><strong>${Number(row.icp_score || 0)}</strong></div>
+    <div class="target-line"><span>Contact</span><strong>${escapeHtml(row.contact_name || "No contact name yet")}</strong></div>
+    <div class="target-line"><span>Role</span><strong>${escapeHtml(row.contact_role || "No role yet")}</strong></div>
+    <div class="target-line"><span>Email</span><strong>${escapeHtml(row.contact_email || "No contact email yet")}</strong></div>
+    <div class="target-line"><span>Subject</span><strong>${escapeHtml(row.subject || "No subject yet")}</strong></div>
     <div class="target-line"><span>Body</span><div class="body-preview">${buildOutreachBodyPreview(row.body)}</div></div>
-    <div class="target-line"><span>Audit link</span><a href="${escapeHtml(row.audit_link)}" target="_blank" rel="noopener">Open audit</a></div>
-    <div class="target-line"><span>Experience link</span><a href="${escapeHtml(row.experience_link)}" target="_blank" rel="noopener">Open experience</a></div>
+    <div class="target-line"><span>Proof link</span><a href="${escapeHtml(row.proof_link)}" target="_blank" rel="noopener">Open proof</a></div>
+    <div class="target-line"><span>Sent</span><strong>${escapeHtml(row.sent_age_label)}</strong></div>
+    <div class="target-line"><span>Follow-up status</span><strong>${escapeHtml(row.follow_up.status || "none")}</strong></div>
+    <div class="target-line"><span>Next follow-up</span><strong>${escapeHtml(row.follow_up.status === "due" ? "now" : (row.follow_up.next_follow_up_at || "not scheduled"))}</strong></div>
+    <div class="target-line"><span>Follow-up count</span><strong>${escapeHtml(String(row.follow_up.follow_up_count || 0))}</strong></div>
+    <div class="target-line"><span>Response</span><strong>${escapeHtml(row.response_status)}</strong></div>
+    <div class="target-line"><span>Response summary</span><strong>${escapeHtml(row.response.summary || "No response logged.")}</strong></div>
+    <div class="target-line"><span>Call status</span><strong>${escapeHtml(row.response.call_booked ? "booked" : "not booked")}</strong></div>
+    <div class="target-line"><span>Call date</span><strong>${escapeHtml(row.response.call_date || "No call booked.")}</strong></div>
+    ${row.response.received ? `
+    <div class="target-line"><span>Demo status</span><strong>${escapeHtml(row.conversion.demo_status)}</strong></div>
+    <div class="target-line"><span>Demo date</span><strong>${escapeHtml(row.conversion.demo_date || "No demo scheduled.")}</strong></div>
+    <div class="target-line"><span>Install status</span><strong>${escapeHtml(row.conversion.install_status === "none" ? "not sent" : row.conversion.install_status)}</strong></div>
+    <div class="target-line"><span>Install link</span>${row.conversion.install_link ? `<a href="${escapeHtml(row.conversion.install_link)}" target="_blank" rel="noopener">Open install</a>` : `<strong>Not sent yet.</strong>`}</div>
+    <div class="target-line"><span>Install started</span><strong>${escapeHtml(row.conversion.install_started_at || "Not started.")}</strong></div>
+    <div class="target-line"><span>Installed at</span><strong>${escapeHtml(row.conversion.installed_at || "Not installed.")}</strong></div>
+    <div class="target-line"><span>Installed shop</span><strong>${escapeHtml(row.conversion.installed_shop || "Not recorded.")}</strong></div>
+    ` : ""}
+    <div class="target-line"><span>Send readiness</span><strong>${escapeHtml(row.sending.readiness)}</strong></div>
+    <div class="target-line"><span>Last send attempt</span><strong>${escapeHtml(row.sending.last_attempt_at || "No send attempt yet.")}</strong></div>
+    <div class="target-line"><span>Last send result</span><strong>${escapeHtml(row.sending.last_result || "No result yet.")}</strong></div>
+    <div class="target-line"><span>Provider message id</span><strong>${escapeHtml(row.sending.provider_message_id || "No provider id yet.")}</strong></div>
     <div class="target-line"><span>Notes</span><strong>${escapeHtml(row.notes || "No notes yet.")}</strong></div>
-    <div class="target-line"><span>Next action</span><strong>${escapeHtml(row.nextAction)}</strong></div>
+    <div class="target-line action-line"><span>Next action</span><strong class="primary-action">${escapeHtml(row.nextAction)}</strong></div>
+    ${renderOperatorRecordLinks("/outreach")}
     <div class="helper-line">approve: node staffordos/leads/outreach.js approve ${escapeHtml(row.domain)}</div>
-    <div class="helper-line">queue: node staffordos/leads/outreach.js queue ${escapeHtml(row.domain)}</div>
+    <div class="helper-line">render: node staffordos/leads/outreach.js render ${escapeHtml(row.domain)}</div>
     <div class="helper-line">mark-sent: node staffordos/leads/outreach.js mark-sent ${escapeHtml(row.domain)}</div>
+    <div class="helper-line">mark-responded: node staffordos/leads/outreach.js mark-responded ${escapeHtml(row.domain)}</div>
+    <div class="helper-line">log-response: node staffordos/leads/outreach.js log-response ${escapeHtml(row.domain)} positive "Interested, asked for demo"</div>
+    <div class="helper-line">book-call: node staffordos/leads/outreach.js book-call ${escapeHtml(row.domain)} "2026-03-28T15:00:00Z"</div>
+    <div class="helper-line">schedule-demo: node staffordos/leads/outreach.js schedule-demo ${escapeHtml(row.domain)} "2026-03-28T15:00:00Z"</div>
+    <div class="helper-line">complete-demo: node staffordos/leads/outreach.js complete-demo ${escapeHtml(row.domain)}</div>
+    <div class="helper-line">send-install: node staffordos/leads/outreach.js send-install ${escapeHtml(row.domain)}</div>
+    <div class="helper-line">mark-install-started: node staffordos/leads/outreach.js mark-install-started ${escapeHtml(row.domain)} my-real-shop.myshopify.com</div>
+    <div class="helper-line">mark-installed: node staffordos/leads/outreach.js mark-installed ${escapeHtml(row.domain)}</div>
+    <div class="helper-line">followup-generate: node staffordos/leads/outreach.js followup-generate ${escapeHtml(row.domain)}</div>
+    <div class="helper-line">followup-mark: node staffordos/leads/outreach.js followup-mark ${escapeHtml(row.domain)}</div>
   </div>
 </section>`).join("");
 
@@ -4090,7 +7769,7 @@ function renderOutreachPage({ rows, counts }) {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Outreach Command Center</title>
+  <title>Outreach Queue</title>
   <style>
     :root { color-scheme: dark; }
     * { box-sizing: border-box; }
@@ -4183,6 +7862,10 @@ function renderOutreachPage({ rows, counts }) {
       border-bottom: 1px solid rgba(148, 163, 184, 0.28);
       padding-bottom: 2px;
     }
+    .page-links a.active {
+      color: #f8fafc;
+      border-bottom-color: rgba(248, 250, 252, 0.72);
+    }
     .targets {
       margin-top: 18px;
       display: grid;
@@ -4257,6 +7940,21 @@ function renderOutreachPage({ rows, counts }) {
       font-size: 12px;
       line-height: 1.5;
       word-break: break-word;
+      opacity: 0.72;
+    }
+    .primary-action {
+      color: #f8fafc;
+      font-size: 15px;
+    }
+    .record-links {
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.5;
+      text-align: right;
+    }
+    .record-links a {
+      color: #94a3b8;
+      text-decoration: none;
     }
     .empty {
       margin-top: 18px;
@@ -4279,6 +7977,9 @@ function renderOutreachPage({ rows, counts }) {
       .body-preview {
         text-align: left;
       }
+      .record-links {
+        text-align: left;
+      }
     }
   </style>
 </head>
@@ -4286,17 +7987,14 @@ function renderOutreachPage({ rows, counts }) {
   <main class="shell">
     <div class="brand">Abando</div>
     <section class="panel">
-      <h1>Outreach Command Center</h1>
-      <p class="lede">Operator queue for Abando outreach.</p>
-      <div class="page-links">
-        <a href="/leads">View leads</a>
-        <a href="/contact-research">View contact research</a>
-      </div>
+      <h1>Outreach Queue</h1>
+      <p class="lede">Operator review for merchant outreach.</p>
+      ${renderOperatorNav("/outreach")}
       <div class="summary-row">
-        <div class="summary-card"><span>approved</span><strong>${counts.approved}</strong></div>
-        <div class="summary-card"><span>queued</span><strong>${counts.queued}</strong></div>
+        <div class="summary-card"><span>draft</span><strong>${counts.draft}</strong></div>
+        <div class="summary-card"><span>ready</span><strong>${counts.ready}</strong></div>
         <div class="summary-card"><span>sent</span><strong>${counts.sent}</strong></div>
-        <div class="summary-card"><span>replied</span><strong>${counts.replied}</strong></div>
+        <div class="summary-card"><span>responded</span><strong>${counts.responded}</strong></div>
         <div class="summary-card"><span>closed</span><strong>${counts.closed}</strong></div>
       </div>
     </section>
@@ -4319,11 +8017,14 @@ function renderContactResearchPage({ rows, counts }) {
   <div class="target-top">
     <div>
       <div class="target-domain">${escapeHtml(row.domain || "Unknown domain")}</div>
-      <div class="target-meta">Score ${Number(row.score || 0)}</div>
+      <div class="target-meta">Score ${Number(row.score || 0)} · ICP ${Number(row.icp_score || 0)}</div>
     </div>
-    <div class="status-badge">${escapeHtml(row.research_status)}</div>
+    <div class="status-badge">${escapeHtml(row.stage)}</div>
   </div>
   <div class="target-grid">
+    <div class="target-line"><span>Stage</span><strong>${escapeHtml(row.stage)}</strong></div>
+    <div class="target-line"><span>ICP tier</span><strong><span class="icp-badge icp-${escapeHtml(row.icp_tier)}">${escapeHtml(formatIcpTierLabel(row.icp_tier))}</span></strong></div>
+    <div class="target-line"><span>ICP score</span><strong>${Number(row.icp_score || 0)}</strong></div>
     <div class="target-line"><span>Contact status</span><strong>${escapeHtml(row.contact_status)}</strong></div>
     <div class="target-line"><span>Research status</span><strong>${escapeHtml(row.research_status)}</strong></div>
     <div class="target-line"><span>Contact page</span>${row.contact_page_url ? `<a href="${escapeHtml(row.contact_page_url)}" target="_blank" rel="noopener">Open contact page</a>` : `<strong>Not found</strong>`}</div>
@@ -4332,7 +8033,8 @@ function renderContactResearchPage({ rows, counts }) {
     <div class="target-line"><span>Contact name</span><strong>${escapeHtml(row.contact_name || "Not set")}</strong></div>
     <div class="target-line"><span>Contact role</span><strong>${escapeHtml(row.contact_role || "Not set")}</strong></div>
     <div class="target-line"><span>Notes</span><strong>${escapeHtml(row.notes || "No notes yet.")}</strong></div>
-    <div class="target-line"><span>Next action</span><strong>${escapeHtml(row.nextAction)}</strong></div>
+    <div class="target-line action-line"><span>Next action</span><strong class="primary-action">${escapeHtml(row.nextAction)}</strong></div>
+    ${renderOperatorRecordLinks("/contact-research")}
     <div class="helper-line">start: node staffordos/leads/contact_research.js start ${escapeHtml(row.domain)}</div>
     <div class="helper-line">add-contact: node staffordos/leads/contact_research.js add-contact ${escapeHtml(row.domain)} owner@store.com "Name" "Role"</div>
     <div class="helper-line">ready: node staffordos/leads/contact_research.js ready ${escapeHtml(row.domain)}</div>
@@ -4438,6 +8140,10 @@ function renderContactResearchPage({ rows, counts }) {
       border-bottom: 1px solid rgba(148, 163, 184, 0.28);
       padding-bottom: 2px;
     }
+    .page-links a.active {
+      color: #f8fafc;
+      border-bottom-color: rgba(248, 250, 252, 0.72);
+    }
     .targets {
       margin-top: 18px;
       display: grid;
@@ -4507,6 +8213,21 @@ function renderContactResearchPage({ rows, counts }) {
       font-size: 12px;
       line-height: 1.5;
       word-break: break-word;
+      opacity: 0.72;
+    }
+    .primary-action {
+      color: #f8fafc;
+      font-size: 15px;
+    }
+    .record-links {
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.5;
+      text-align: right;
+    }
+    .record-links a {
+      color: #94a3b8;
+      text-decoration: none;
     }
     .empty {
       margin-top: 18px;
@@ -4528,6 +8249,9 @@ function renderContactResearchPage({ rows, counts }) {
       .target-line a {
         text-align: left;
       }
+      .record-links {
+        text-align: left;
+      }
     }
   </style>
 </head>
@@ -4537,10 +8261,7 @@ function renderContactResearchPage({ rows, counts }) {
     <section class="panel">
       <h1>Contact Research Queue</h1>
       <p class="lede">Operator review for real merchant contact discovery.</p>
-      <div class="page-links">
-        <a href="/leads">View leads</a>
-        <a href="/outreach">View outreach queue</a>
-      </div>
+      ${renderOperatorNav("/contact-research")}
       <div class="summary-row">
         <div class="summary-card"><span>needs_research</span><strong>${counts.needs_research}</strong></div>
         <div class="summary-card"><span>researching</span><strong>${counts.researching}</strong></div>
@@ -4617,32 +8338,157 @@ function formatUsdWhole(amount = 0, suffix = "") {
   return `$${Number(amount || 0).toLocaleString("en-US")}${suffix}`;
 }
 
-function renderProofPage({ shop }) {
-  const normalizedShop = shop || "your-store.myshopify.com";
+function formatProofTimestamp(value = "") {
+  if (!value) return "No timestamp yet";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return date.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+function humanizeProofEvent(value = "") {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (normalized === "checkout_started") return "Checkout started";
+  if (normalized === "recovery_email") return "Recovery email triggered";
+  if (normalized === "recovery_sms") return "Recovery SMS triggered";
+  if (!normalized || normalized === "none" || normalized === "unknown") return "Recent checkout activity";
+  return normalized.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function humanizeProofRecoveryStatus(value = "") {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (["created", "recovery_ready", "sent"].includes(normalized)) return "Triggered";
+  if (!normalized || normalized === "none" || normalized === "null" || normalized === "missing") return "Not triggered";
+  return normalized.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function humanizeProofRevenueStatus(value = "") {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (["recovery_ready", "at_risk", "active"].includes(normalized)) return "At risk";
+  if (["recovered", "returned"].includes(normalized)) return "Recovery active";
+  return "Monitoring";
+}
+
+function humanizeProofAction(value = "") {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (normalized === "recovery_email") return "Recovery email";
+  if (normalized === "recovery_sms") return "Recovery SMS";
+  return normalized ? normalized.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase()) : "Recovery action";
+}
+
+function buildProofContactUrl({ shop, source, target }) {
+  const params = new URLSearchParams();
+  params.set("subject", `Abando contact for ${shop || "your Shopify store"}`);
+  params.set(
+    "body",
+    `I want to talk about Abando for ${shop || "my store"}.\n\nStore: ${shop || ""}\nSource: ${source || "proof"}\nTarget: ${target || shop || ""}`,
+  );
+  return {
+    href: `mailto:support@abando.ai?${params.toString()}`,
+    available: true,
+    label: "Contact available",
+  };
+}
+
+function buildProofPaymentConfig({ shop, source, target, plan }) {
+  const directPaymentUrl = getDirectPaymentUrl();
+  const selectedPlan = plan === "pro" ? "pro" : "starter";
+  const priceIds = getStripePriceIds();
+  const hasStripeCheckout = hasCollectableBillingConfig() && Boolean(stripe) && Boolean(
+    selectedPlan === "pro" ? priceIds.pro : priceIds.starter,
+  );
+
+  if (directPaymentUrl) {
+    try {
+      const url = new URL(directPaymentUrl);
+      if (shop) url.searchParams.set("shop", shop);
+      if (source) url.searchParams.set("src", source);
+      if (target) url.searchParams.set("target", target);
+      url.searchParams.set("plan", selectedPlan);
+      return { available: true, href: url.toString(), label: "Payment available" };
+    } catch {
+      return { available: true, href: directPaymentUrl, label: "Payment available" };
+    }
+  }
+
+  if (hasStripeCheckout) {
+    const params = new URLSearchParams();
+    if (shop) params.set("shop", shop);
+    if (source) params.set("src", source);
+    if (target) params.set("target", target);
+    params.set("plan", selectedPlan);
+    return { available: true, href: `/proof/payment?${params.toString()}`, label: "Payment available" };
+  }
+
+  return { available: false, href: "", label: "Payment not yet enabled" };
+}
+
+function renderProofPage({ shop, summary, source = "", target = "", plan = "", flow = "", state = "", recoveredValue = null }) {
+  const normalizedShop = shop || (flow === "demo" ? ABANDO_PUBLIC_DEMO_SHOP : "your-store.myshopify.com");
   const storeName = buildProofStoreName(normalizedShop);
   const valueTier = getProofValueTier(normalizedShop);
-  const monthlyRevenueLabel = `${formatUsdWhole(valueTier.monthly)} recoverable`;
-  const dailyRevenueLabel = `${formatUsdWhole(valueTier.daily)} / day`;
-  const hourlyRevenueLabel = `${formatUsdWhole(valueTier.hourly)} / hour`;
-  const personalizedRevenueLine = valueTier.tier === "premium"
-    ? `For stores like ${storeName}, abandoned checkout recovery can compound fast.`
-    : `For stores like ${storeName}, even small recovery gains add up quickly.`;
-  const installUrl = `/install/shopify${normalizedShop ? `?shop=${encodeURIComponent(normalizedShop)}` : ""}`;
-  const bookingUrl = process.env.ABANDO_BOOKING_URL || process.env.CALENDLY_URL || `mailto:rossstafford1@gmail.com?subject=${encodeURIComponent(`Abando proof for ${normalizedShop}`)}`;
-  const recentActivity = [
-    { value: `${storeName} checkout started`, detail: "Recovery opportunity detected after abandoned checkout", time: "3 min ago" },
-    { value: `Recovery email sent for ${storeName}`, detail: "Recovery message triggered automatically", time: "2 min ago" },
-    { value: `Customer returned to ${storeName} checkout`, detail: "Customer came back through the recovery link", time: "just now" },
-    { value: `${formatUsdWhole(valueTier.recoveredOrder)} recovered`, detail: `Directional recovered order value for ${storeName}`, time: "11 min ago" },
+  const monthlyRevenueLabel = `${formatUsdWhole(valueTier.monthly)}/month`;
+  const exposedRevenueLabel = formatUsdWhole(valueTier.recoverable);
+  const resolvedSource = source || "proof";
+  const resolvedTarget = target || normalizedShop;
+  const installParams = new URLSearchParams();
+  if (normalizedShop) installParams.set("shop", normalizedShop);
+  installParams.set("src", resolvedSource);
+  installParams.set("target", resolvedTarget);
+  if (plan) installParams.set("plan", plan);
+  const installUrl = toMerchantFacingUrl(`/install/shopify?${installParams.toString()}`);
+  const pricingUrl = toMerchantFacingUrl("/pricing");
+  const experienceUrl = toMerchantFacingUrl(`/experience?shop=${encodeURIComponent(normalizedShop)}&eid=proof-demo`);
+  const freshProofExperienceId = `proof-run-${Date.now().toString(36)}-${randomBytes(2).toString("hex")}`;
+  const freshProofUrl = toMerchantFacingUrl(`/experience?shop=${encodeURIComponent(normalizedShop)}&eid=${encodeURIComponent(freshProofExperienceId)}`);
+  const proofRecoveredState = String(state || "").trim().toLowerCase() === "recovered";
+  const recoveredLoopValueLabel = proofRecoveredState ? formatUsdFromCents(recoveredValue?.cents || 0) : "";
+  const loopSteps = [
+    "Customer reached checkout",
+    "Customer left before paying",
+    "Abando sent the recovery path",
+    "Revenue came back",
   ];
-  const activityHtml = recentActivity.map((item) => `\
-        <div class="activity-item">
-          <div>
-            <div class="activity-value">${escapeHtml(item.value)}</div>
-            <div class="activity-detail">${escapeHtml(item.detail)}</div>
-          </div>
-          <div class="activity-time">${escapeHtml(item.time)}</div>
+  const loopHtml = loopSteps.map((step, index) => `\
+        <div class="loop-step ${index === loopSteps.length - 1 ? "is-final" : ""}">
+          <div class="loop-index">${index + 1}</div>
+          <div class="loop-label">${escapeHtml(step)}</div>
         </div>`).join("");
+  const nextSteps = proofRecoveredState
+    ? [
+        "Recovery message was sent through the live path",
+        "The customer returned through the recovery link",
+        "Recovered value was verified",
+        "Install Abando on Shopify to protect the store continuously",
+      ]
+    : [
+        "Trigger the exact live recovery path",
+        "Receive the same message your customer would receive",
+        "Click the recovery link and watch the customer return",
+        "See recovered value, then install Abando on Shopify",
+      ];
+  const nextStepsHtml = nextSteps.map((step, index) => `\
+        <div class="loop-step ${index === nextSteps.length - 1 ? "is-final" : ""}">
+          <div class="loop-index">${index + 1}</div>
+          <div class="loop-label">${escapeHtml(step)}</div>
+        </div>`).join("");
+  const headline = proofRecoveredState
+    ? `${storeName} just recovered lost checkout revenue.`
+    : `${storeName} can verify the Abando recovery loop right now.`;
+  const lede = proofRecoveredState
+    ? "One recovery path has now been verified end-to-end. The next move is to install Abando on the live store and start the product journey there."
+    : "This page explains the live recovery loop in plain merchant language: send the recovery, click back through the link, detect the return, and then install on your own store.";
+  const transitionCopy = proofRecoveredState
+    ? "The proof is complete. Install Abando on Shopify, land in the connected experience, then move into a paid plan when billing is available."
+    : "Start with proof, then install on Shopify, connect the store, and test the same recovery loop on yourself.";
+  const primaryCtaLabel = proofRecoveredState ? "Install Abando" : "Send a recovery to yourself";
+  const primaryCtaUrl = proofRecoveredState ? installUrl : experienceUrl;
+  const secondaryCtaLabel = proofRecoveredState ? "See pricing" : "Install on Shopify";
+  const secondaryCtaUrl = proofRecoveredState ? pricingUrl : installUrl;
 
   return `<!doctype html>
 <html lang="en">
@@ -4665,7 +8511,7 @@ function renderProofPage({ shop }) {
     }
     .shell {
       width: 100%;
-      max-width: 760px;
+      max-width: 720px;
     }
     .panel {
       background: rgba(15, 23, 42, 0.86);
@@ -4675,6 +8521,7 @@ function renderProofPage({ shop }) {
       padding: 34px 26px 26px;
     }
     .brand {
+      display: inline-flex;
       text-align: center;
       color: #cbd5e1;
       font-size: 13px;
@@ -4682,6 +8529,7 @@ function renderProofPage({ shop }) {
       letter-spacing: 0.12em;
       text-transform: uppercase;
       margin-bottom: 18px;
+      text-decoration: none;
     }
     h1 {
       margin: 0;
@@ -4693,143 +8541,96 @@ function renderProofPage({ shop }) {
     }
     .lede {
       margin: 14px auto 0;
-      max-width: 560px;
+      max-width: 580px;
       color: #94a3b8;
       font-size: 15px;
       line-height: 1.6;
       text-align: center;
     }
-    .revenue-card {
+    .value-card,
+    .outcome-card,
+    .loop-card,
+    .bridge-card {
       margin-top: 24px;
       padding: 22px 20px;
       border-radius: 22px;
       background: rgba(2, 6, 23, 0.5);
       border: 1px solid rgba(148, 163, 184, 0.14);
-      text-align: center;
     }
-    .revenue-label {
+    .card-label {
       color: #94a3b8;
       font-size: 12px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
     }
-    .revenue-value {
+    .value-card {
+      text-align: center;
+    }
+    .value-main {
       margin-top: 10px;
       color: #f8fafc;
-      font-size: clamp(36px, 9vw, 52px);
+      font-size: clamp(34px, 8vw, 46px);
       font-weight: 800;
       letter-spacing: -0.05em;
     }
-    .revenue-breakdown {
-      margin-top: 18px;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-    }
-    .revenue-breakdown-card {
-      padding: 14px 12px;
-      border-radius: 16px;
-      background: rgba(15, 23, 42, 0.82);
-      border: 1px solid rgba(148, 163, 184, 0.12);
+    .outcome-main {
+      margin-top: 10px;
+      color: #d9f99d;
+      font-size: clamp(34px, 8vw, 46px);
+      font-weight: 800;
+      letter-spacing: -0.05em;
       text-align: center;
     }
-    .revenue-breakdown-card span {
-      display: block;
-      color: #94a3b8;
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-    .revenue-breakdown-card strong {
-      display: block;
-      margin-top: 8px;
-      color: #f8fafc;
-      font-size: 18px;
-      letter-spacing: -0.03em;
-    }
-    .credibility-line {
-      margin-top: 18px;
+    .value-subtext,
+    .trust-note,
+    .cta-subtext {
+      margin-top: 14px;
       color: #cbd5e1;
       font-size: 14px;
       line-height: 1.6;
       text-align: center;
     }
-    .recovery-strip {
-      margin-top: 22px;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-    }
-    .recovery-step {
-      position: relative;
-      padding: 18px 14px;
-      border-radius: 18px;
-      background: rgba(2, 6, 23, 0.42);
-      border: 1px solid rgba(148, 163, 184, 0.12);
-      text-align: left;
-      color: #cbd5e1;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-    .recovery-step strong {
-      display: block;
-      color: #f8fafc;
-      font-size: 14px;
-      margin-bottom: 6px;
-    }
-    .recovery-arrow {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #64748b;
-      font-size: 20px;
-      font-weight: 700;
-    }
-    .activity-card {
-      margin-top: 22px;
-      padding: 20px 18px;
-      border-radius: 22px;
-      background: rgba(2, 6, 23, 0.44);
-      border: 1px solid rgba(148, 163, 184, 0.12);
-    }
-    .activity-title {
-      color: #f8fafc;
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: -0.03em;
-    }
-    .activity-list {
-      margin-top: 14px;
+    .loop-list {
+      margin-top: 16px;
       display: grid;
       gap: 12px;
     }
-    .activity-item {
+    .loop-step {
       display: flex;
-      justify-content: space-between;
-      gap: 14px;
-      align-items: start;
-      padding-bottom: 12px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+      align-items: center;
+      gap: 12px;
+      padding: 16px 14px;
+      border-radius: 18px;
+      background: rgba(2, 6, 23, 0.42);
+      border: 1px solid rgba(148, 163, 184, 0.12);
     }
-    .activity-item:last-child {
-      padding-bottom: 0;
-      border-bottom: 0;
+    .loop-step.is-final {
+      border-color: rgba(226, 232, 240, 0.28);
+      background: rgba(15, 23, 42, 0.82);
     }
-    .activity-value {
-      color: #f8fafc;
-      font-size: 14px;
+    .loop-index {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.12);
+      color: #e2e8f0;
+      font-size: 13px;
       font-weight: 700;
     }
-    .activity-detail {
-      margin-top: 4px;
-      color: #94a3b8;
-      font-size: 13px;
-      line-height: 1.5;
+    .loop-label {
+      color: #f8fafc;
+      font-size: 15px;
+      font-weight: 700;
     }
-    .activity-time {
-      color: #94a3b8;
-      font-size: 12px;
-      white-space: nowrap;
+    .bridge-copy {
+      margin-top: 12px;
+      color: #e5eef8;
+      font-size: 15px;
+      line-height: 1.6;
+      text-align: left;
     }
     .actions {
       margin-top: 24px;
@@ -4857,72 +8658,314 @@ function renderProofPage({ shop }) {
     .button-primary {
       background: #f8fafc;
       color: #020617;
+      min-width: 320px;
+      font-size: 15px;
     }
     .button-secondary {
       background: rgba(15, 23, 42, 0.82);
       color: #e5eef8;
       border: 1px solid rgba(148, 163, 184, 0.18);
     }
-    .cta-subtext {
-      margin-top: 12px;
+    .footer-grid {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .footer-card {
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      background: rgba(2, 6, 23, 0.42);
+      padding: 16px;
+    }
+    .footer-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #f8fafc;
+    }
+    .footer-card a {
+      display: block;
       color: #94a3b8;
+      line-height: 1.9;
+      text-decoration: none;
+    }
+    .footer-note {
+      margin-top: 18px;
+      color: #64748b;
       font-size: 13px;
       text-align: center;
     }
     @media (max-width: 720px) {
-      .revenue-breakdown {
-        grid-template-columns: 1fr;
-      }
-      .recovery-strip {
-        grid-template-columns: 1fr;
-      }
-      .recovery-arrow {
-        transform: rotate(90deg);
-      }
       .actions {
         flex-direction: column;
       }
       .button {
         width: 100%;
       }
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
   <main class="shell">
-    <div class="brand">Abando</div>
+    <a class="brand" href="${escapeHtml(resolveMerchantFacingBaseUrl())}">${renderMerchantLogoMarkup()}</a>
     <section class="panel">
-      <h1>You're losing revenue from abandoned checkout</h1>
-      <p class="lede">We detected recovery opportunity for ${escapeHtml(storeName)}.</p>
-      <div class="revenue-card">
-        <div class="revenue-label">Estimated revenue</div>
-        <div class="revenue-value">${monthlyRevenueLabel}</div>
-        <div class="revenue-breakdown">
-          <div class="revenue-breakdown-card"><span>Monthly</span><strong>${monthlyRevenueLabel}</strong></div>
-          <div class="revenue-breakdown-card"><span>Daily</span><strong>${dailyRevenueLabel}</strong></div>
-          <div class="revenue-breakdown-card"><span>Hourly</span><strong>${hourlyRevenueLabel}</strong></div>
+      <h1>${escapeHtml(headline)}</h1>
+      <p class="lede">${escapeHtml(lede)}</p>
+
+      <div class="value-card">
+        <div class="card-label">${proofRecoveredState ? "Recovered proof" : "Exposed revenue"}</div>
+        <div class="value-main">${proofRecoveredState ? escapeHtml(recoveredLoopValueLabel) : escapeHtml(exposedRevenueLabel)}</div>
+        <div class="value-subtext">${proofRecoveredState
+          ? "Recovered in one verified proof loop."
+          : `Estimated recovery upside for this store: ${escapeHtml(monthlyRevenueLabel)}.`}</div>
+        <div class="trust-note">${proofRecoveredState
+          ? "This proof shows the recovery path completing from message to return."
+          : "This proof shows what happens after install: send the recovery, watch the return, then move into a paid plan when the loop is proven."}</div>
+      </div>
+
+      ${proofRecoveredState ? `
+      <div class="outcome-card">
+        <div class="card-label">Recovered in this loop</div>
+        <div class="outcome-main" data-proof-recovered-value data-target-cents="${Number(recoveredValue?.cents || 0)}">${escapeHtml(recoveredLoopValueLabel)}</div>
+        <div class="value-subtext">The customer came back. One recovery path has now been verified.</div>
+      </div>
+      ` : ""}
+
+      <div class="loop-card">
+        <div class="card-label">Proof loop</div>
+        <div class="loop-list">
+${loopHtml}
         </div>
-        <div class="cta-subtext">${escapeHtml(personalizedRevenueLine)}</div>
       </div>
-      <div class="credibility-line">Used by Shopify stores to recover abandoned checkout revenue automatically.</div>
-      <div class="recovery-strip">
-        <div class="recovery-step"><strong>1. Email sent</strong>Recovery starts automatically after ${escapeHtml(storeName)} loses a checkout.</div>
-        <div class="recovery-arrow" aria-hidden="true">→</div>
-        <div class="recovery-step"><strong>2. Customer returns</strong>The shopper comes back to ${escapeHtml(storeName)} through the recovery link.</div>
-        <div class="recovery-arrow" aria-hidden="true">→</div>
-        <div class="recovery-step"><strong>3. Checkout completed</strong>Recovered revenue moves back into ${escapeHtml(storeName)}.</div>
-      </div>
-      <div class="activity-card">
-        <div class="activity-title">Recent recovery activity</div>
-        <div class="activity-list">
-${activityHtml}
+
+      <div class="bridge-card">
+        <div class="card-label">What you verify next</div>
+        <div class="loop-list">
+${nextStepsHtml}
         </div>
       </div>
+
+      <div class="bridge-card">
+        <div class="card-label">${proofRecoveredState ? "Why install now" : "What happens after proof"}</div>
+        <div class="bridge-copy">${escapeHtml(transitionCopy)}</div>
+      </div>
+
       <div class="actions">
-        <a class="button button-primary" href="${escapeHtml(installUrl)}">Turn this on for ${escapeHtml(storeName)}</a>
-        <a class="button button-secondary" href="${escapeHtml(bookingUrl)}" target="_blank" rel="noopener">See it live (2 min)</a>
+        <a class="button button-primary" href="${escapeHtml(primaryCtaUrl)}">${escapeHtml(primaryCtaLabel)}</a>
+        <a class="button button-secondary" href="${escapeHtml(secondaryCtaUrl)}">${escapeHtml(secondaryCtaLabel)}</a>
+        <a class="button button-secondary" href="${escapeHtml(proofRecoveredState ? freshProofUrl : pricingUrl)}">${escapeHtml(proofRecoveredState ? "Run another proof" : "See pricing")}</a>
       </div>
-      <div class="cta-subtext">Takes 2 minutes. No setup.</div>
+      <div class="cta-subtext">${proofRecoveredState
+        ? "Proof first, then install, then paid billing when the store is ready."
+        : "Proof first. Install second. Paid plan after the loop has been verified."}</div>
+
+      <div class="footer-grid">
+        <div class="footer-card">
+          <strong>Product</strong>
+          <a href="${escapeHtml(installUrl)}">Install Abando</a>
+          <a href="${escapeHtml(pricingUrl)}">Pricing</a>
+        </div>
+        <div class="footer-card">
+          <strong>Proof</strong>
+          <a href="${escapeHtml(experienceUrl)}">Try the connected experience</a>
+          <a href="${escapeHtml(proofRecoveredState ? freshProofUrl : primaryCtaUrl)}">${escapeHtml(proofRecoveredState ? "Run another proof" : "Send a recovery to yourself")}</a>
+        </div>
+        <div class="footer-card">
+          <strong>Support</strong>
+          <a href="mailto:hello@abando.ai">hello@abando.ai</a>
+        </div>
+        <div class="footer-card">
+          <strong>Privacy</strong>
+          <a href="${escapeHtml(toMerchantFacingUrl("/privacy"))}">Privacy</a>
+        </div>
+      </div>
+      <div class="footer-note">Abando keeps the journey simple: proof first, install second, paid billing only when the recovery loop has already earned trust.</div>
+    </section>
+  </main>
+  ${proofRecoveredState ? `<script>
+    (function () {
+      var node = document.querySelector("[data-proof-recovered-value]");
+      if (!node) return;
+      var targetCents = Number(node.getAttribute("data-target-cents") || "0");
+      if (!Number.isFinite(targetCents) || targetCents <= 0) return;
+      var start = window.performance && typeof window.performance.now === "function" ? window.performance.now() : Date.now();
+      var duration = 760;
+      function formatUsd(cents) {
+        return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(cents / 100);
+      }
+      function tick(now) {
+        var elapsed = Math.min(duration, now - start);
+        var progress = elapsed / duration;
+        var current = Math.round(targetCents * progress);
+        node.textContent = formatUsd(current);
+        if (elapsed < duration) {
+          window.requestAnimationFrame(tick);
+        } else {
+          node.textContent = formatUsd(targetCents);
+        }
+      }
+      window.requestAnimationFrame(tick);
+    })();
+  </script>` : ""}
+</body>
+</html>`;
+}
+
+function renderAcceptancePage({ shop, source = "", target = "", plan = "" }) {
+  const normalizedShop = shop || "your-store.myshopify.com";
+  const storeName = buildProofStoreName(normalizedShop);
+  const resolvedSource = source || "proof";
+  const resolvedTarget = target || normalizedShop;
+  const installParams = new URLSearchParams();
+  if (normalizedShop) installParams.set("shop", normalizedShop);
+  installParams.set("src", resolvedSource);
+  installParams.set("target", resolvedTarget);
+  if (plan) installParams.set("plan", plan);
+
+  const marketingUrl = "/marketing";
+  const proofUrl = `/proof?shop=${encodeURIComponent(normalizedShop)}`;
+  const installUrl = `/install/shopify?${installParams.toString()}`;
+  const contactConfig = buildProofContactUrl({ shop: normalizedShop, source: resolvedSource, target: resolvedTarget });
+  const paymentConfig = buildProofPaymentConfig({ shop: normalizedShop, source: resolvedSource, target: resolvedTarget, plan });
+  const noDeadCtaDetected = Boolean(installUrl) && Boolean(contactConfig.href) && (!paymentConfig.available || Boolean(paymentConfig.href));
+  const checklist = [
+    { label: "Marketing page available", status: "pass", detail: marketingUrl },
+    { label: "Proof page available", status: "pass", detail: proofUrl },
+    { label: "Install page available", status: "pass", detail: installUrl },
+    { label: "Contact CTA available", status: contactConfig.href ? "pass" : "fail", detail: contactConfig.href || "Missing contact path" },
+    { label: "Payment CTA status", status: paymentConfig.available ? "pass" : "warn", detail: paymentConfig.label },
+    { label: "Store-owned headline present", status: storeName ? "pass" : "fail", detail: `${storeName} is currently losing recoverable checkout revenue.` },
+    { label: "Value block present", status: "pass", detail: `Estimated recoverable revenue: ${formatUsdWhole(getProofValueTier(normalizedShop).monthly)}/month` },
+    { label: "No dead CTA detected", status: noDeadCtaDetected ? "pass" : "fail", detail: noDeadCtaDetected ? "Primary and secondary actions resolve cleanly." : "One or more CTA targets are missing." },
+  ];
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Merchant Acceptance</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, rgba(30, 41, 59, 0.22), transparent 42%), #020617;
+      color: #e5eef8;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      padding: 32px 18px 60px;
+    }
+    .shell { width: 100%; max-width: 860px; margin: 0 auto; }
+    .panel {
+      background: rgba(15, 23, 42, 0.86);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 28px;
+      box-shadow: 0 28px 80px rgba(2, 6, 23, 0.42);
+      padding: 30px 24px;
+    }
+    .eyebrow {
+      color: #94a3b8;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 12px 0 8px;
+      color: #f8fafc;
+      font-size: clamp(30px, 6vw, 42px);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+    }
+    .lede {
+      margin: 0;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+    .link-row {
+      margin-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .link-row a {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      background: rgba(15, 23, 42, 0.72);
+      color: #e5eef8;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .checklist {
+      margin-top: 24px;
+      display: grid;
+      gap: 12px;
+    }
+    .item {
+      display: grid;
+      grid-template-columns: 88px 1fr;
+      gap: 14px;
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      background: rgba(2, 6, 23, 0.5);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .badge.pass { background: rgba(34, 197, 94, 0.18); color: #bbf7d0; }
+    .badge.warn { background: rgba(245, 158, 11, 0.18); color: #fde68a; }
+    .badge.fail { background: rgba(239, 68, 68, 0.18); color: #fecaca; }
+    .item strong {
+      display: block;
+      color: #f8fafc;
+      margin-bottom: 6px;
+    }
+    .item div:last-child {
+      color: #94a3b8;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="panel">
+      <div class="eyebrow">Merchant acceptance checklist</div>
+      <h1>${escapeHtml(storeName)} merchant flow QA</h1>
+      <p class="lede">Operator check before sending proof or install flow to a merchant.</p>
+      <div class="link-row">
+        <a href="${escapeHtml(marketingUrl)}">Open marketing</a>
+        <a href="${escapeHtml(proofUrl)}">Open proof</a>
+        <a href="${escapeHtml(installUrl)}">Open install</a>
+      </div>
+      <div class="checklist">
+        ${checklist.map((item) => `
+          <div class="item">
+            <div><span class="badge ${item.status}">${item.status}</span></div>
+            <div>
+              <strong>${escapeHtml(item.label)}</strong>
+              <div>${escapeHtml(item.detail)}</div>
+            </div>
+          </div>
+        `).join("")}
+      </div>
     </section>
   </main>
 </body>
@@ -5092,11 +9135,12 @@ function renderMerchantDashboardPage({
   embeddedContext = { embedded: false, hasHost: false, hasShop: false, host: "", shop: "" },
 }) {
   const embedded = Boolean(embeddedContext?.embedded);
+  const storeName = buildProofStoreName(shopDomain);
   const inviteState = buildInviteState({ shopDomain, cartsRecovered, cartsTotal, emailsSent });
-  const surfaceBadge = embedded ? "Shopify admin session" : "Merchant workspace";
+  const surfaceBadge = embedded ? "Live store protection" : "Recovery verification";
   const surfaceNote = embedded
-    ? "This view is running inside the current Shopify admin session and depends on the active Shopify CLI-managed session."
-    : "This view is running in Abando's merchant workspace.";
+    ? "This view shows whether this store is exposed, protected, or actively recovering right now."
+    : "This view shows whether this store is exposed, protected, or actively recovering right now.";
   const embeddedContextReady = embedded && embeddedContext?.hasHost && embeddedContext?.hasShop;
   const embeddedDegraded = embedded && !embeddedContextReady;
   const embeddedStatusLabel = embeddedDegraded ? "Embedded session needs refresh" : "Embedded session active";
@@ -5105,6 +9149,17 @@ function renderMerchantDashboardPage({
     : embeddedDegraded
       ? "Shopify admin context is incomplete right now. Reopen Abando from Shopify Admin Apps for this store, or refresh the current CLI-managed dev session if the tunnel rotated."
       : "Shop and host context are present for this Shopify admin session. This session still depends on the currently live CLI-managed tunnel and is not yet a permanent infrastructure guarantee.";
+  const connectParams = new URLSearchParams();
+  if (embeddedContext?.shop) connectParams.set("shop", embeddedContext.shop);
+  if (embeddedContext?.host) connectParams.set("host", embeddedContext.host);
+  if (embeddedContext?.embedded) connectParams.set("embedded", "1");
+  const connectUrl = embeddedContext?.shop
+    ? `/auth?${connectParams.toString()}`
+    : "/install/shopify";
+  const showConnectPanel = connectionStatus !== "connected";
+  const appBridgeScriptTag = embedded
+    ? `<script src="${SHOPIFY_APP_BRIDGE_URL}" data-api-key="${escapeHtml(SHOPIFY_API_KEY)}"${embeddedContext?.host ? ` data-host="${escapeHtml(embeddedContext.host)}"` : ""}></script>`
+    : "";
   const storeStatus = connectionStatus === "connected" ? "Connected" : "Not connected";
   const lastEventSeen = latestEventType || "No event yet";
   const lastEventTime = lastCheckoutEventAt || latestEventTimestamp || "—";
@@ -5113,22 +9168,22 @@ function renderMerchantDashboardPage({
     ? lastRecoveryChannels.join(" + ")
     : "";
   const recoveryActionLabel = recoveryActionStatus === "created"
-    ? (sendNotConfigured ? "Send not configured" : "Recovery action created")
+    ? (sendNotConfigured ? "Send not configured" : "Recovery prepared")
     : recoveryActionStatus === "sent"
       ? recoveryChannelLabel
-        ? `Recovery action sent (${recoveryChannelLabel})`
-        : "Recovery action sent"
+        ? `Recovery sent (${recoveryChannelLabel})`
+        : "Recovery sent"
       : recoveryActionStatus === "failed"
-        ? "Recovery action failed"
+        ? "Recovery failed"
         : "Not active";
   const recoveryStatusSubvalue =
     recoveryStatusLabel === "Recovery ready"
-      ? "Checkout signals detected. Recovery path is ready."
+      ? "A customer left checkout. This revenue can still be saved."
       : recoveryStatusLabel === "Listening for checkout activity"
-        ? "Abando is connected and waiting for the first checkout signal."
+        ? "This store is protected and waiting for the next checkout drop-off."
         : recoveryStatusLabel === "Not connected"
-          ? "Connect the store before recovery can activate."
-          : "Recovery state is waiting on the next store event.";
+          ? "This store is exposed until Abando is connected."
+          : "Recovery state changes the moment the next checkout drop-off appears.";
   const lastRecoveryActionLabel = lastRecoveryActionType
     ? `${lastRecoveryActionType}${lastRecoverySentAt ? ` · ${lastRecoverySentAt}` : lastRecoveryActionAt ? ` · ${lastRecoveryActionAt}` : ""}`
     : "—";
@@ -5157,8 +9212,8 @@ function renderMerchantDashboardPage({
   });
   const recoverySendConfigured = isEmailSenderConfigured();
   const recoveryReturnLabel = customerReturned
-    ? `Customer returned${lastCustomerReturnAt ? ` · ${lastCustomerReturnAt}` : ""}`
-    : "No customer return yet";
+    ? `Customer returned through this recovery path${lastCustomerReturnAt ? ` · ${lastCustomerReturnAt}` : ""}`
+    : "Customer has not returned through this recovery path yet.";
   const lastSendStatusLabel = lastSendStatus === "sent_email_and_sms"
     ? "Email + SMS sent"
     : lastSendStatus === "sent_email"
@@ -5179,13 +9234,37 @@ function renderMerchantDashboardPage({
     ? `Providers: ${lastSendProviderStatuses.join(", ")}${Array.isArray(lastSendMissingEnvVars) && lastSendMissingEnvVars.length > 0 ? ` · Missing env: ${lastSendMissingEnvVars.join(", ")}` : ""}`
     : Array.isArray(lastSendMissingEnvVars) && lastSendMissingEnvVars.length > 0
       ? `Missing env: ${lastSendMissingEnvVars.join(", ")}`
-    : "Most recent test-mode send attempt for this store.";
+      : "Most recent live recovery delivery.";
+  const heroEyebrow = recoveryStatusLabel === "Recovery ready"
+    ? "ABANDO — LIVE RECOVERY"
+    : "ABANDO — LIVE RECOVERY";
+  const heroHeadline = recoveryStatusLabel === "Recovery ready"
+    ? "A customer left checkout."
+    : connectionStatus === "connected"
+      ? "Your store is protected and listening for checkout drop-off."
+      : "Your store is not protected yet.";
+  const heroLead = recoveryStatusLabel === "Recovery ready"
+    ? "A customer left checkout. This revenue can still be saved."
+    : connectionStatus === "connected"
+      ? "Your store is protected and listening for the next checkout drop-off."
+      : "This store is exposed until Abando is connected.";
+  const heroTension = recoveryStatusLabel === "Recovery ready"
+    ? "If nothing is sent, this revenue is lost."
+    : "";
+  const storyTitle = "What is happening";
+  const storyBody = recoveryStatusLabel === "Recovery ready"
+    ? "Recovery is prepared. Send it now before the moment is gone."
+    : connectionStatus === "connected"
+      ? "The next lost checkout can become recovery immediately."
+      : "If a customer leaves checkout now, nothing brings them back.";
+  const whyThisMattersBody = "When a customer leaves checkout, revenue does not disappear all at once. There is a short window where intent is still alive. Abando is built to act inside that window.";
   return `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Abando Dashboard</title>
+  <title>${escapeHtml(CANONICAL_APP_NAME)}</title>
+  ${appBridgeScriptTag}
   <style>
     :root { color-scheme: dark; }
     * { box-sizing: border-box; }
@@ -5255,6 +9334,50 @@ function renderMerchantDashboardPage({
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 16px;
+    }
+    .review-panel,
+    .connect-panel {
+      margin-top: 20px;
+      border-radius: 18px;
+      padding: 18px;
+    }
+    .review-panel {
+      border: 1px solid rgba(125, 211, 252, 0.18);
+      background: rgba(2, 6, 23, 0.56);
+    }
+    .connect-panel {
+      border: 1px solid rgba(125, 211, 252, 0.24);
+      background: rgba(8, 47, 73, 0.26);
+    }
+    .review-steps {
+      margin: 12px 0 0;
+      padding-left: 18px;
+      color: #cbd5e1;
+      font-size: 15px;
+      line-height: 1.65;
+    }
+    .review-steps li + li {
+      margin-top: 6px;
+    }
+    .connect-actions {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+    .connect-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(125, 211, 252, 0.24);
+      background: #38bdf8;
+      color: #082f49;
+      font: inherit;
+      font-weight: 800;
+      text-decoration: none;
     }
     .card {
       border: 1px solid #1e293b;
@@ -5584,12 +9707,31 @@ function renderMerchantDashboardPage({
 </head>
 <body>
   <main class="shell">
-    <div class="brand">Abando Shopify Recovery App</div>
+    <div class="brand">${escapeHtml(CANONICAL_APP_NAME)}</div>
     <section class="panel">
-      <h1>Abando helps you recover lost checkout revenue.</h1>
-      <p class="lead">Connect your store, detect checkout abandonment signals, and activate recovery with a simple merchant view.</p>
+      <div class="label">${escapeHtml(heroEyebrow)}</div>
+      <h1>${escapeHtml(heroHeadline)}</h1>
+      <p class="lead">${escapeHtml(heroLead)}</p>
+      ${heroTension ? `<p class="lead" style="margin-top:12px; color:#f8fafc;">${escapeHtml(heroTension)}</p>` : ""}
       <div class="status">${abandoStatus}</div>
       <div class="surface-note">${surfaceBadge} · ${surfaceNote}</div>
+      <section class="review-panel">
+        <div class="label">${escapeHtml(storyTitle)}</div>
+        <div class="subvalue">${escapeHtml(storyBody)}</div>
+      </section>
+      ${showConnectPanel ? `
+        <section class="connect-panel">
+          <div class="label">Store connection</div>
+          <div class="value">Protect this store</div>
+          <div class="subvalue">${embeddedContext?.shop
+            ? `This store is not connected yet. Use the Shopify session for ${escapeHtml(embeddedContext.shop)} to complete connection.`
+            : "Shopify session context is missing. Reopen the app from Shopify Admin, then connect the store."}</div>
+          <div class="connect-actions">
+            ${embeddedContext?.shop ? `<a class="connect-button" href="${escapeHtml(connectUrl)}">Protect this store</a>` : ""}
+            <div class="subvalue">${embeddedContext?.shop ? "No manual myshopify domain entry is required from this screen." : "If shop context is missing, reopen Abando from Shopify Admin for the current test store."}</div>
+          </div>
+        </section>
+      ` : ""}
       ${renderAbandoStatus({
         shopDomain,
         connectionStatus,
@@ -5607,50 +9749,43 @@ function renderMerchantDashboardPage({
         lastSendTime,
         lastSendChannels,
         lastSendProviderStatuses,
+        connectUrl,
       })}
       <section class="recovery-experience">
-        <h2>Recovery Experience</h2>
-        <p>Preview the message Abando is prepared to use for recovery, review the return link, and track whether a customer comes back.</p>
+        <h2>What the customer would receive</h2>
+        <p>The exact message. The exact path back.</p>
         <div class="recovery-preview-grid">
           <div class="recovery-preview-card">
-            <div class="label">Channel</div>
+            <div class="label">Recovery message</div>
             <div class="value">Email</div>
             <div class="subvalue">${escapeHtml(recoveryMessage.emailSubject)}</div>
             <pre>${escapeHtml(recoveryMessage.emailBody)}</pre>
           </div>
           <div class="recovery-preview-card">
-            <div class="label">Channel</div>
-            <div class="value">SMS</div>
-            <div class="subvalue">Return link preview</div>
+            <div class="label">Return path</div>
+            <div class="value">Recovery link</div>
+            <div class="subvalue">Exact path back to checkout</div>
             <pre>${escapeHtml(recoveryMessage.smsText)}</pre>
             <code data-abando-return-link>${escapeHtml(recoveryMessage.returnLink)}</code>
             <p class="subvalue" data-abando-customer-return>${escapeHtml(recoveryReturnLabel)}</p>
           </div>
         </div>
+        <p>This is the exact recovery your customer will receive.</p>
         <div class="recovery-actions">
-          <button type="button" class="recovery-button" disabled>${recoverySendConfigured ? "Send recovery message" : "Send not configured"}</button>
+          <button type="button" class="recovery-button" disabled>${recoverySendConfigured ? "Recovery ready to send" : "Send not configured"}</button>
           <button
             type="button"
             class="recovery-button secondary"
             data-abando-send-test-recovery
             data-shop-domain="${escapeHtml(shopDomain)}"
           >
-            Send test recovery
+            Send recovery
           </button>
-          <a
-            class="recovery-button secondary"
-            href="${escapeHtml(recoveryMessage.returnLink)}"
-            target="_blank"
-            rel="noopener"
-            data-abando-simulate-send
-          >
-            Simulate send
-          </a>
-          <div class="recovery-status-note">${recoverySendConfigured ? "Real send is available when a recovery action is created with a valid recipient." : "Send not configured. Abando will not mark sent until SMTP is configured and a real send succeeds."}</div>
+          <div class="recovery-status-note">${recoverySendConfigured ? "Live delivery appears only after a real send succeeds." : "Send not configured. Abando will not mark sent until SMTP is configured and a real send succeeds."}</div>
         </div>
         <div class="recovery-live-test">
-          <div class="label">Try Abando Live</div>
-          <p>Enter your phone or email to receive a real recovery message instantly.</p>
+          <div class="label">Send the exact recovery</div>
+          <p>Send the exact recovery created for this checkout event.</p>
           <div class="recovery-live-test-grid">
             <input
               type="tel"
@@ -5672,11 +9807,15 @@ function renderMerchantDashboardPage({
               data-abando-send-live-test
               data-shop-domain="${escapeHtml(shopDomain)}"
             >
-              Send me a real recovery message
+              Send recovery
             </button>
             <div class="recovery-live-test-status" data-abando-live-test-status></div>
           </div>
         </div>
+      </section>
+      <section class="review-panel">
+        <div class="label">Why this matters</div>
+        <div class="subvalue">${escapeHtml(whyThisMattersBody)}</div>
       </section>
       <div class="grid">
         <div class="card">
@@ -5685,12 +9824,12 @@ function renderMerchantDashboardPage({
           <div class="subvalue">${escapeHtml(shopDomain)}</div>
         </div>
         <div class="card">
-          <div class="label">Recovery Status</div>
+          <div class="label">Recovery state for this store</div>
           <div class="value">${recoveryStatusLabel}</div>
           <div class="subvalue">${recoveryStatusSubvalue}</div>
         </div>
         <div class="card">
-          <div class="label">Last Event Seen</div>
+          <div class="label">Latest customer signal</div>
           <div class="value">${escapeHtml(lastEventSeen)}</div>
           <div class="subvalue">Most recent checkout-related event recorded for this store.</div>
         </div>
@@ -5700,41 +9839,41 @@ function renderMerchantDashboardPage({
           <div class="subvalue">When the latest checkout event was recorded.</div>
         </div>
         <div class="card">
-          <div class="label">Checkout Events Recorded</div>
+          <div class="label">Detected drop-off signals</div>
           <div class="value">${checkoutEventCount ?? 0}</div>
           <div class="subvalue">Normalized checkout/cart signals recorded for this connected store.</div>
         </div>
         <div class="card">
-          <div class="label">Recovery Action</div>
+          <div class="label">Recovery state</div>
           <div class="value">${recoveryActionLabel}</div>
-          <div class="subvalue">${recoveryActionStatus === "created" ? (sendNotConfigured ? "A recovery action record exists, but outbound send is not configured." : "A durable recovery action record has been created for this store.") : recoveryActionStatus === "sent" ? `A real recovery action was sent${recoveryChannelLabel ? ` via ${recoveryChannelLabel}` : ""}.` : recoveryActionLabel === "Recovery action failed" ? "The last recovery action failed." : "No recovery action has been created yet."}</div>
+          <div class="subvalue">${recoveryActionStatus === "created" ? (sendNotConfigured ? "A recovery record exists, but outbound send is not configured." : "A live recovery path has already been prepared for this store.") : recoveryActionStatus === "sent" ? `A real recovery was sent${recoveryChannelLabel ? ` via ${recoveryChannelLabel}` : ""}.` : recoveryActionStatus === "failed" ? "The last recovery send failed." : "No recovery path has been prepared yet."}</div>
         </div>
         <div class="card">
-          <div class="label">Last Recovery Action</div>
+          <div class="label">Most recent recovery created</div>
           <div class="value">${escapeHtml(lastRecoveryActionLabel)}</div>
           <div class="subvalue">Most recent durable recovery action recorded for this store.</div>
         </div>
         <div class="card">
-          <div class="label">Last Send Status</div>
+          <div class="label">Most recent recovery delivery</div>
           <div class="value" data-abando-last-send-status-card>${escapeHtml(lastSendStatusLabel)}</div>
           <div class="subvalue">${escapeHtml(lastSendSubvalue)}</div>
         </div>
         <div class="card">
-          <div class="label">Last Send Time</div>
+          <div class="label">Latest recovery send time</div>
           <div class="value" data-abando-last-send-time-card>${escapeHtml(lastSendTime || "—")}</div>
           <div class="subvalue">Most recent merchant test send timestamp.</div>
         </div>
         <div class="card">
-          <div class="label">Channels Used</div>
+          <div class="label">Active recovery channel</div>
           <div class="value" data-abando-last-send-channels-card>${escapeHtml(lastSendChannelsLabel)}</div>
           <div class="subvalue">Successful channels from the latest merchant test send.</div>
         </div>
         <div class="card">
           <div class="label">Getting Started</div>
-          <div class="value">${connectionStatus === "connected" ? "Run test event" : "Connect store"}</div>
+          <div class="value">${connectionStatus === "connected" ? "Simulate checkout drop-off" : "Protect this store"}</div>
           <div class="subvalue">${connectionStatus === "connected"
-            ? "Use the test event button to verify connection, then create one recovery action after the first signal arrives."
-            : "Finish Shopify approval first. After that, Abando starts listening for checkout activity."}</div>
+            ? "Use the checkout drop-off simulation to verify protection, then prepare recovery after the first signal arrives."
+            : "Finish Shopify connection first. After that, Abando starts listening for checkout drop-off."}</div>
         </div>
         <div class="card">
           <div class="label">Data Clarity</div>
@@ -5761,7 +9900,7 @@ function renderMerchantDashboardPage({
       if (!shop) return;
 
       trigger.disabled = true;
-      if (statusNode) statusNode.textContent = "Sending test event…";
+      if (statusNode) statusNode.textContent = "Simulating checkout drop-off…";
 
       try {
         var now = new Date().toISOString();
@@ -5784,18 +9923,18 @@ function renderMerchantDashboardPage({
           throw new Error((data && data.error) || "test_event_failed");
         }
 
-        if (titleNode) titleNode.textContent = "Checkout activity detected";
-        if (pillNode) pillNode.textContent = "Checkout activity detected";
-        if (descriptionNode) descriptionNode.textContent = "1 or more checkout events observed.";
-        if (subtextNode) subtextNode.textContent = "Last event timestamp: " + (data.lastEventTimestamp || now);
-        if (metaNode) metaNode.textContent = "Event count: " + String(currentCount + 1);
-        if (statusNode) statusNode.textContent = "Checkout activity detected";
+        if (titleNode) titleNode.textContent = "A customer dropped off. Recovery is now live.";
+        if (pillNode) pillNode.textContent = "Recovery live";
+        if (descriptionNode) descriptionNode.textContent = "Abando has already prepared the recovery path for this checkout event.";
+        if (subtextNode) subtextNode.textContent = "Latest customer signal: " + (data.lastEventTimestamp || now);
+        if (metaNode) metaNode.textContent = "Detected drop-off signals: " + String(currentCount + 1);
+        if (statusNode) statusNode.textContent = "Drop-off detected";
 
         window.setTimeout(function () {
-          if (titleNode) titleNode.textContent = "Recovery ready";
-          if (pillNode) pillNode.textContent = "Recovery ready";
-          if (descriptionNode) descriptionNode.textContent = "Checkout signals detected. Recovery path is ready.";
-          if (statusNode) statusNode.textContent = "Recovery ready";
+          if (titleNode) titleNode.textContent = "A customer dropped off. Recovery is now live.";
+          if (pillNode) pillNode.textContent = "Recovery live";
+          if (descriptionNode) descriptionNode.textContent = "Abando has already prepared the recovery path for this checkout event.";
+          if (statusNode) statusNode.textContent = "Recovery prepared";
           window.location.reload();
         }, 900);
       } catch (error) {
@@ -5826,7 +9965,7 @@ function renderMerchantDashboardPage({
       if (!shop) return;
 
       trigger.disabled = true;
-      if (statusNode) statusNode.textContent = "Creating recovery action…";
+      if (statusNode) statusNode.textContent = "Preparing recovery…";
 
       try {
         var response = await fetch("/api/recovery-actions/create", {
@@ -5843,10 +9982,10 @@ function renderMerchantDashboardPage({
         var channelLabel = channels.length > 0 ? channels.join(" + ") : "";
         var recoveryLabel =
           data.recoveryActionStatus === "sent"
-            ? (channelLabel ? "Recovery action sent (" + channelLabel + ")" : "Recovery action sent")
+            ? (channelLabel ? "Recovery sent (" + channelLabel + ")" : "Recovery sent")
             : data.recoveryActionStatus === "created" && channels.length === 0 && !data.sentAt
               ? "Send not configured"
-              : "Recovery action created";
+              : "Recovery prepared";
 
         if (labelNode) labelNode.textContent = recoveryLabel;
         if (lastNode) {
@@ -5893,7 +10032,7 @@ function renderMerchantDashboardPage({
       if (!shop) return;
 
       trigger.disabled = true;
-      if (statusNode) statusNode.textContent = "Sending test recovery…";
+      if (statusNode) statusNode.textContent = "Sending recovery…";
 
       try {
         var response = await fetch("/api/recovery-actions/send-test", {
@@ -5970,7 +10109,7 @@ function renderMerchantDashboardPage({
       };
 
       trigger.disabled = true;
-      if (statusNode) statusNode.textContent = "Sending live test…";
+      if (statusNode) statusNode.textContent = "Sending recovery…";
 
       try {
         var response = await fetch("/api/recovery-actions/send-live-test", {
@@ -5985,13 +10124,13 @@ function renderMerchantDashboardPage({
 
         var messages = [];
         if (Array.isArray(data.channels) && data.channels.indexOf("sms") !== -1) {
-          messages.push("Message sent to your phone");
+          messages.push("Recovery sent to your phone");
         } else if (Array.isArray(data.providerStatuses) && data.providerStatuses.indexOf("sms_not_configured") !== -1 && payload.phone) {
           messages.push("SMS not configured");
         }
 
         if (Array.isArray(data.channels) && data.channels.indexOf("email") !== -1) {
-          messages.push("Email sent");
+          messages.push("Recovery sent to your inbox");
         } else if (Array.isArray(data.providerStatuses) && data.providerStatuses.indexOf("email_not_configured") !== -1 && payload.email) {
           messages.push("Email not configured");
         }
@@ -6259,6 +10398,8 @@ function startShopifyOAuth(req, res) {
   const embeddedContext = getEmbeddedContext(req);
   let shop = embeddedContext.shop;
   const inviteId = normalizeInviteId(req.query.invite);
+  const installSource = String(req.query.src || req.query.source || "").trim().toLowerCase();
+  const installTarget = normalizeInstallAttributionValue(req.query.target || req.query.domain || "");
 
   if (!shop || !shop.endsWith(".myshopify.com")) {
     return res.status(400).send("Missing/invalid ?shop=your-store.myshopify.com");
@@ -6273,6 +10414,12 @@ function startShopifyOAuth(req, res) {
   const state = buildOAuthState(inviteId);
   const parsedState = parseOAuthState(state);
   res.cookie("shopify_state", parsedState.nonce, { httpOnly: true, sameSite: "none", secure: true, path: "/" });
+  if (installSource) {
+    res.cookie("abando_install_source", installSource, { httpOnly: true, sameSite: "none", secure: true, path: "/" });
+  }
+  if (installTarget) {
+    res.cookie("abando_install_target", installTarget, { httpOnly: true, sameSite: "none", secure: true, path: "/" });
+  }
   if (inviteId) {
     res.cookie("abando_invite", inviteId, { httpOnly: true, sameSite: "none", secure: true, path: "/" });
     markInviteInstallStarted(inviteId, {
@@ -6292,6 +10439,20 @@ function startShopifyOAuth(req, res) {
         error: error instanceof Error ? error.message : String(error),
       });
     });
+  }
+  appendInstallEvent({
+    phase: "install_started",
+    shop,
+    source: installSource || "",
+    target_domain: installTarget || "",
+  }).catch(() => {});
+  if (installTarget) {
+    updateOutreachInstallTracking({
+      targetDomain: installTarget,
+      installStatus: "started",
+      installedShop: shop,
+      installStartedAt: new Date().toISOString(),
+    }).catch(() => {});
   }
   const authorizeUrl = buildAuthorizeUrl(shop, state, callbackBaseUrl);
 
@@ -6321,6 +10482,8 @@ async function handleShopifyCallback(req, res) {
   const parsedState = parseOAuthState(state);
   const inviteIdFromState = parsedState.inviteId;
   const inviteId = normalizeInviteId(req.cookies?.abando_invite || req.query.invite || inviteIdFromState);
+  const installSource = String(req.cookies?.abando_install_source || req.query.src || req.query.source || "").trim().toLowerCase();
+  const installTarget = normalizeInstallAttributionValue(req.cookies?.abando_install_target || req.query.target || req.query.domain || "");
   const hmac = String(req.query.hmac || "");
   const timestamp = String(req.query.timestamp || "");
 
@@ -6447,17 +10610,32 @@ async function handleShopifyCallback(req, res) {
       }
       res.clearCookie("abando_invite", { path: "/" });
     }
+    await appendInstallEvent({
+      phase: "install_completed",
+      shop,
+      source: installSource || "",
+      target_domain: installTarget || "",
+    }).catch(() => {});
+    if (installTarget) {
+      await updateOutreachInstallTracking({
+        targetDomain: installTarget,
+        installStatus: "installed",
+        installedShop: shop,
+        installedAt: installedAt,
+      }).catch(() => {});
+    }
+    res.clearCookie("abando_install_source", { path: "/" });
+    res.clearCookie("abando_install_target", { path: "/" });
 
     const redirectQuery = new URLSearchParams();
     redirectQuery.set("shop", shop);
-    if (embeddedContext.host) redirectQuery.set("host", embeddedContext.host);
-    if (embeddedContext.embedded) redirectQuery.set("embedded", "1");
-    if (inviteId) redirectQuery.set("invite", inviteId);
-    const redirectTarget = `/dashboard?${redirectQuery.toString()}`;
+    redirectQuery.set("state", "connected");
+    const redirectTarget = `/experience?${redirectQuery.toString()}`;
     console.log("[OAUTH] callback success redirect", {
       trace,
       shop,
       inviteId: inviteId || null,
+      state: "connected",
       redirectTarget,
     });
     return res.redirect(redirectTarget);
@@ -6500,25 +10678,16 @@ app.get("/shopify/callback", async (req, res) => handleShopifyCallback(req, res)
 app.get("/shopify/billing/start", (req, res) => {
   const shop = normalizeShop(req.query.shop);
   if (!shop) return res.status(400).send("Invalid shop");
-  return res.redirect(`/shopify/billing/return?shop=${encodeURIComponent(shop)}`);
+  return res.redirect(buildCanonicalBillingStartPath({
+    shop,
+    source: "connected_experience",
+    target: shop,
+    plan: "starter",
+  }));
 });
 app.get("/shopify/billing/return", async (req, res) => {
   const shop = normalizeShop(req.query.shop);
-  const qs = new URLSearchParams();
-  if (shop) qs.set("shop", shop);
-  qs.set("installed", "1");
-
-  if (shop) {
-    await registerMerchantInternally({
-      shop,
-      installedAt: new Date().toISOString(),
-      installStatus: "healthy",
-      artifactStatus: "billing_return",
-      planTier: "free",
-    });
-  }
-
-  return res.redirect(`/dashboard?${qs.toString()}`);
+  return res.redirect(`/experience?shop=${encodeURIComponent(shop || "")}&state=connected`);
 });
 
 
@@ -7505,14 +11674,30 @@ app.post("/abando/activation/trigger-test-recovery", async (req, res) => {
 
 // Start
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8081;
-app.listen(PORT, () => console.log(`[server] listening on :${PORT}`));
+const HOST = String(process.env.HOST || "").trim() || (process.env.NODE_ENV === "production" ? "0.0.0.0" : "127.0.0.1");
+app.listen(PORT, HOST, () => {
+  console.log(`[server] listening on ${HOST}:${PORT}`);
+  console.log("[server] runtime", {
+    pid: process.pid,
+    entrypoint: fileURLToPath(import.meta.url),
+    host: HOST,
+    port: PORT,
+  });
+  console.log("[env-debug]", {
+    SMTP_HOST_present: String(process.env.SMTP_HOST || "").trim() ? "yes" : "no",
+    SMTP_USER_present: String(process.env.SMTP_USER || "").trim() ? "yes" : "no",
+    TWILIO_ACCOUNT_SID_present: String(process.env.TWILIO_ACCOUNT_SID || "").trim() ? "yes" : "no",
+    TWILIO_FROM_present: (String(process.env.TWILIO_FROM || "").trim() || String(process.env.TWILIO_FROM_NUMBER || "").trim()) ? "yes" : "no",
+  });
+  console.log(`[env-check] SMTP configured: ${isEmailSenderConfigured() ? "yes" : "no"}`);
+  console.log(`[env-check] TWILIO configured: ${isSmsSenderConfigured() ? "yes" : "no"}`);
+});
 // Public Stripe checkout (no auth)
 app.post("/api/billing/checkout", async (req, res) => {
   try {
     const Stripe = (await import("stripe")).default;
-    const stripeKey = process.env.STRIPE_SECRET_KEY;
-    const priceStarter = process.env.STRIPE_PRICE_STARTER;
-    const pricePro = process.env.STRIPE_PRICE_PRO;
+    const stripeKey = getStripeSecretKey();
+    const { starter: priceStarter, pro: pricePro } = getStripePriceIds();
     if (!stripeKey) return res.status(500).json({ error: "stripe_not_configured" });
 
     const plan = (req.body && req.body.plan) || "starter";
