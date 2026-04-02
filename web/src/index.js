@@ -1108,17 +1108,10 @@ function getCanonicalMerchantFacingBaseUrl() {
   try {
     const parsed = new URL(configured);
     const hostname = String(parsed.hostname || "").trim().toLowerCase();
-    if (
-      hostname === "localhost"
-      || hostname === "127.0.0.1"
-      || hostname === "dev.abando.ai"
-      || hostname === "cart-agent-api.onrender.com"
-      || hostname.endsWith(".onrender.com")
-      || hostname.endsWith(".trycloudflare.com")
-    ) {
+    if (hostname === "app.abando.ai") {
       return "https://app.abando.ai";
     }
-    return configured;
+    return "https://app.abando.ai";
   } catch {
     return "https://app.abando.ai";
   }
