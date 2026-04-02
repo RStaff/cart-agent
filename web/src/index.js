@@ -613,7 +613,7 @@ function buildExperienceReturnLink({ req, shop, experienceId, channel }) {
     eid: experienceId,
     channel,
   });
-  return `${resolveRequestOrigin(req)}/api/recovery/return?${params.toString()}`;
+  return `${getCanonicalMerchantFacingBaseUrl()}/api/recovery/return?${params.toString()}`;
 }
 
 function buildExperienceRecoveryMessage({ req, shop, eventData, timestamp, experienceId }) {
@@ -1097,6 +1097,31 @@ function getConfiguredPublicBaseUrl() {
     process.env.APP_URL ||
     "",
   ).trim().replace(/\/+$/, "");
+}
+
+function getCanonicalMerchantFacingBaseUrl() {
+  const configured = getConfiguredPublicBaseUrl();
+  if (!configured) {
+    return "https://app.abando.ai";
+  }
+
+  try {
+    const parsed = new URL(configured);
+    const hostname = String(parsed.hostname || "").trim().toLowerCase();
+    if (
+      hostname === "localhost"
+      || hostname === "127.0.0.1"
+      || hostname === "dev.abando.ai"
+      || hostname === "cart-agent-api.onrender.com"
+      || hostname.endsWith(".onrender.com")
+      || hostname.endsWith(".trycloudflare.com")
+    ) {
+      return "https://app.abando.ai";
+    }
+    return configured;
+  } catch {
+    return "https://app.abando.ai";
+  }
 }
 
 function isLocalHostLike(value = "") {
@@ -2308,7 +2333,7 @@ app.get("/api/recovery/return", async (req, res) => {
 
     return res.redirect(
       302,
-      `/experience/returned?shop=${encodeURIComponent(shop)}&eid=${encodeURIComponent(experienceId)}`,
+      `${getCanonicalMerchantFacingBaseUrl()}/experience/returned?shop=${encodeURIComponent(shop)}&eid=${encodeURIComponent(experienceId)}`,
     );
   } catch (error) {
     return res.status(400).type("html").send(`<h1>${escapeHtml(error instanceof Error ? error.message : String(error))}</h1>`);
