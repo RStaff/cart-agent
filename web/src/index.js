@@ -20,6 +20,12 @@ import { PrismaClient, Prisma } from "@prisma/client";
 import applyAbandoDevProxy from "./abandoDevProxy.js";
 import { getDashboardSummary } from "./lib/dashboardSummary.js";
 import { generateRecoveryMessage, parseRecoveryToken } from "./lib/recoveryMessageEngine.js";
+import {
+  getLatestRecoveryAttributionForExperience,
+  persistRecoveryAttributionFromReturn,
+  persistRecoveryAttributionFromSend,
+  RECOVERY_ATTRIBUTION_EVENT,
+} from "./lib/recoveryAttribution.js";
 import { isEmailSenderConfigured, sendRecoveryEmail } from "./lib/emailSender.js";
 import { isSmsSenderConfigured, sendRecoverySMS } from "./lib/smsSender.js";
 import { analyzeStore } from "./lib/storeAnalyzer.js";
@@ -706,7 +712,10 @@ async function persistExperienceSendRecords({ shop, experienceId, sendResult }) 
 async function getExperienceStatus(shop, experienceId) {
   const emailConfigured = isEmailSenderConfigured();
   const smsConfigured = isSmsSenderConfigured();
-  const events = await listExperienceSendEvents(shop, experienceId);
+  const [events, latestAttribution] = await Promise.all([
+    listExperienceSendEvents(shop, experienceId),
+    getLatestRecoveryAttributionForExperience(prisma, { shopDomain: shop, experienceId }),
+  ]);
   const payloads = events
     .map((event) => (event?.payload && typeof event.payload === "object" ? event.payload : null))
     .filter(Boolean);
@@ -719,6 +728,31 @@ async function getExperienceStatus(shop, experienceId) {
     .sort()
     .at(-1) || null;
   const firstPayload = payloads[0] || null;
+  const recoveredValue = returnedPayloads.length > 0
+    ? await resolveExperienceRecoveredValue({ shop, experienceId })
+    : null;
+  const attribution = latestAttribution
+    ? {
+        recovery_id: latestAttribution.recovery_id || null,
+        recovery_action_id: latestAttribution.recovery_action_id || null,
+        experience_id: latestAttribution.experienceId || null,
+        attribution_status: latestAttribution.attribution_status || null,
+        proof_status: latestAttribution.proof_status || null,
+        source_of_proof: latestAttribution.source_of_proof || null,
+        channel: latestAttribution.channel || null,
+        target: latestAttribution.target || null,
+        sent_at: latestAttribution.sent_at || null,
+        return_clicked_at: latestAttribution.return_clicked_at || null,
+        order_id: latestAttribution.order_id || null,
+        order_name: latestAttribution.order_name || null,
+        order_created_at: latestAttribution.order_created_at || null,
+        order_total_price_cents: latestAttribution.order_total_price_cents
+          ? Number(latestAttribution.order_total_price_cents || 0) || 0
+          : null,
+        currency: latestAttribution.currency || null,
+      }
+    : null;
+  const verified = Boolean(attribution?.proof_status === "verified_shopify_order");
 
   return {
     configured: {
@@ -734,7 +768,127 @@ async function getExperienceStatus(shop, experienceId) {
     return: {
       returned: returnedPayloads.length > 0,
       returnedAt: lastReturnedAt,
+      recoveredValue,
+      attribution: attribution
+        ? {
+            recoveryId: attribution.recovery_id,
+            attributionStatus: attribution.attribution_status,
+            proofStatus: attribution.proof_status,
+            sourceOfProof: attribution.source_of_proof,
+            channel: attribution.channel,
+            target: attribution.target,
+            sentAt: attribution.sent_at,
+            returnClickedAt: attribution.return_clicked_at,
+            orderId: attribution.order_id,
+            orderName: attribution.order_name,
+            orderCreatedAt: attribution.order_created_at,
+            recoveredRevenue: attribution.order_total_price_cents
+              ? {
+                  cents: attribution.order_total_price_cents,
+                  currency: attribution.currency || "USD",
+                }
+              : null,
+            verified,
+          }
+        : null,
     },
+    attribution,
+    verified,
+  };
+}
+
+function extractRecoveredValueCentsFromPayload(payload) {
+  if (!payload || typeof payload !== "object") return 0;
+  const candidates = [
+    payload.recoveredRevenueCents,
+    payload.attributedOrderValueCents,
+    payload.cartValueCents,
+    payload.revenueCents,
+    payload.amountCents,
+    typeof payload.amount === "number" ? Math.round(payload.amount * 100) : null,
+  ];
+
+  for (const value of candidates) {
+    const cents = Number(value || 0);
+    if (Number.isFinite(cents) && cents > 0) {
+      return Math.round(cents);
+    }
+  }
+
+  return 0;
+}
+
+async function resolveExperienceRecoveredValue({ shop, experienceId }) {
+  const fallbackCents = Math.max(0, Number(getProofValueTier(shop).recoveredOrder || 0) * 100);
+
+  if (!shop) {
+    return {
+      cents: fallbackCents,
+      source: "fallback-source",
+    };
+  }
+
+  const events = await prisma.systemEvent.findMany({
+    where: { shopDomain: shop },
+    orderBy: { createdAt: "desc" },
+    take: 100,
+  });
+
+  const normalizedExperienceId = normalizeExperienceId(experienceId);
+
+  const verifiedAttributionEvent = events.find((event) => {
+    const payload = event?.payload;
+    if (!payload || typeof payload !== "object") return false;
+    if (String(event?.eventType || "") !== RECOVERY_ATTRIBUTION_EVENT) return false;
+    return normalizedExperienceId && normalizeExperienceId(payload.experienceId) === normalizedExperienceId;
+  });
+  const verifiedAttributionCents = extractRecoveredValueCentsFromPayload(verifiedAttributionEvent?.payload);
+  if (verifiedAttributionCents > 0) {
+    return {
+      cents: verifiedAttributionCents,
+      source: "verified-shopify-order",
+    };
+  }
+
+  const matchedEvent = events.find((event) => {
+    const payload = event?.payload;
+    if (!payload || typeof payload !== "object") return false;
+    if (normalizedExperienceId && normalizeExperienceId(payload.experienceId) === normalizedExperienceId) return true;
+    return false;
+  });
+
+  const matchedValueCents = extractRecoveredValueCentsFromPayload(matchedEvent?.payload);
+  if (matchedValueCents > 0) {
+    return {
+      cents: matchedValueCents,
+      source: "real-source",
+    };
+  }
+
+  const durableRecoveryEvent = events.find((event) => {
+    const payload = event?.payload;
+    if (!payload || typeof payload !== "object") return false;
+    const eventType = String(event?.eventType || "");
+    return (
+      eventType === "abando.customer_return.v1"
+      || eventType === "abando.live_test_send.v1"
+      || eventType === "abando.recovery_event.v1"
+      || payload.source === "recovery_link"
+      || payload.status === "recovered"
+    );
+  });
+
+  const durableValueCents = extractRecoveredValueCentsFromPayload(durableRecoveryEvent?.payload);
+  if (durableValueCents > 0) {
+    return {
+      cents: durableValueCents,
+      source: "demo-source",
+    };
+  }
+
+  return {
+    cents: fallbackCents,
+    source: "fallback-source",
   };
 }
 
@@ -1947,6 +2101,18 @@ app.post("/api/recovery-actions/send-live-test", async (req, res) => {
       sendResult,
     });
 
+    if (summary.success) {
+      await persistRecoveryAttributionFromSend(prisma, {
+        experienceId,
+        shop,
+        channel: summary.channels[0] || "",
+        target: summary.channels[0] === "sms" ? phone || "" : email || "",
+        sent_at: timestamp,
+        provider_message_id: sendResult.messageId || "",
+        provider_sms_sid: sendResult.smsSid || "",
+      }).catch(() => {});
+    }
+
     await prisma.systemEvent.create({
       data: {
         shopDomain: shop,
@@ -2110,6 +2276,20 @@ app.get("/api/recovery/return", async (req, res) => {
         },
       },
     });
+
+    await persistRecoveryAttributionFromReturn(prisma, {
+      recovery_id: String(payload.recovery_id || matchingEvent.id || ""),
+      experienceId,
+      shop,
+      checkout_id: String(payload.checkout_id || ""),
+      checkout_session_id: String(payload.checkout_session_id || ""),
+      channel,
+      target: String(payload.target || ""),
+      sent_at: String(payload.sentAt || ""),
+      return_clicked_at: returnedAt,
+      provider_message_id: String(payload.providerId || ""),
+      provider_sms_sid: String(payload.smsSid || ""),
+    }).catch(() => {});
 
     await prisma.systemEvent.create({
       data: {

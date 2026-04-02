@@ -2,6 +2,7 @@ import crypto from "crypto";
 import express from "express";
 import { prisma } from "../clients/prisma.js";
 import { getStaffordosUrl } from "../lib/staffordosUrl.js";
+import { persistRecoveryAttributionFromOrder } from "../lib/recoveryAttribution.js";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -366,6 +367,27 @@ async function processShopifyOrderPayload(payload, reqHeaders = {}) {
         channel: "shopify",
         source: recoverySource,
       });
+
+  await persistRecoveryAttributionFromOrder(prisma, {
+    shop: shopDomain,
+    checkout_id: cartToken || recoveredCart.cartId || "",
+    checkout_session_id: checkoutToken || "",
+    customer_email: customerEmail || recoveredCart.userEmail || "",
+    order_id: orderId,
+    order_name: typeof payload?.name === "string" ? payload.name : "",
+    order_created_at: recoveredAt,
+    order_total_price_cents: revenueCents,
+    currency,
+    source_of_proof: synthetic ? "synthetic_validation_order" : "verified_shopify_order",
+    synthetic,
+  }).catch((error) => {
+    console.error("[orders-webhook] recovery attribution persist failed", {
+      topic: webhookTopic,
+      shopDomain,
+      orderId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  });
 
   return {
     ok: true,
