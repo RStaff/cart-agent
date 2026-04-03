@@ -5013,7 +5013,12 @@ app.get("/hello", (_req, res) => res.json({ msg: "Hello from Abando!" }));
 const prisma = new PrismaClient();
 
 // Env
-const APP_URL            = process.env.APP_URL || "https://pay.abando.ai";
+const APP_URL            =
+  process.env.APP_URL ||
+  process.env.ABANDO_PUBLIC_APP_ORIGIN ||
+  process.env.NEXT_PUBLIC_ABANDO_PUBLIC_APP_ORIGIN ||
+  process.env.RENDER_EXTERNAL_URL ||
+  "https://cart-agent-api.onrender.com";
 const SHOPIFY_API_KEY    = process.env.SHOPIFY_API_KEY    || "";
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || "";
 const SHOPIFY_SCOPES     = process.env.SHOPIFY_SCOPES
@@ -10521,7 +10526,7 @@ function startShopifyOAuth(req, res) {
   }
 
   const embedded = embeddedContext.embedded;
-  const callbackBaseUrl = getRequestBaseUrl(req);
+  const callbackBaseUrl = getConfiguredPublicBaseUrl() || APP_URL;
   const state = buildOAuthState(inviteId);
   const parsedState = parseOAuthState(state);
   res.cookie("shopify_state", parsedState.nonce, { httpOnly: true, sameSite: "none", secure: true, path: "/" });
