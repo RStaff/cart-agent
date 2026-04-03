@@ -16,7 +16,7 @@ function getStorefrontCheckoutDetectorScript() {
         return chosen.replace(/\\/+$/, '');
       }
       var SIGNAL_BASE = (s && s.getAttribute('data-signal-base')) || (location.origin || '');
-      var EVENT_BASE = normalizeBaseUrl((s && s.getAttribute('data-event-base')) || readScriptQueryParam('event_base'), 'https://pay.abando.ai');
+      var EVENT_BASE = normalizeBaseUrl((s && s.getAttribute('data-event-base')) || readScriptQueryParam('event_base'), 'https://cart-agent-api.onrender.com');
       var SHOP_DOMAIN = (s && s.getAttribute('data-shop-domain')) || readScriptQueryParam('shop') || location.hostname || '';
       var VALIDATION_MODE = (s && s.getAttribute('data-validation-mode')) || '';
       var checkoutStartSent = false;
