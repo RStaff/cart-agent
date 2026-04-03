@@ -231,7 +231,7 @@ export async function persistRecoveryAttributionFromOrder(prisma, input) {
     order_created_at: input.order_created_at,
     order_total_price_cents: input.order_total_price_cents,
     currency: input.currency,
-    attribution_status: "revenue_verified",
+    attribution_status: "verified_order_matched",
     proof_status: input.synthetic ? "synthetic_validation_order" : "verified_shopify_order",
     source_of_proof: input.source_of_proof,
     source_event_id: input.source_event_id || context?.payload?.source_event_id || "",

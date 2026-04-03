@@ -611,9 +611,88 @@ function buildExperienceReturnLink({ req, shop, experienceId, channel }) {
   const params = new URLSearchParams({
     shop,
     eid: experienceId,
-    channel,
   });
+  if (channel) {
+    params.set("channel", channel);
+  }
   return `${getCanonicalMerchantFacingBaseUrl()}/api/recovery/return?${params.toString()}`;
+}
+
+function resolveCheckoutContextFromEventPayload(payload, experienceId = "") {
+  const metadata = payload?.metadata && typeof payload.metadata === "object" ? payload.metadata : {};
+  const checkoutId = String(
+    payload?.checkout_id
+    || payload?.checkoutId
+    || payload?.checkout_token
+    || metadata?.cartToken
+    || payload?.session_id
+    || ""
+  ).trim();
+  const checkoutSessionId = String(
+    payload?.checkout_session_id
+    || payload?.checkout_token
+    || payload?.session_id
+    || ""
+  ).trim();
+  const checkoutPath = String(metadata?.path || "").trim();
+  const storefrontHost = String(
+    metadata?.storefrontHost
+    || metadata?.storefront_host
+    || ""
+  )
+    .trim()
+    .replace(/^https?:\/\//i, "")
+    .replace(/^www\./i, "")
+    .split("/")[0]
+    .split("?")[0]
+    .split("#")[0]
+    .toLowerCase();
+  const customerEmail = normalizeEmail(
+    payload?.customerEmail
+    || payload?.customer_email
+    || payload?.email
+    || metadata?.customerEmail
+    || metadata?.customer_email
+    || metadata?.email
+    || ""
+  );
+
+  return {
+    experienceId: normalizeExperienceId(experienceId),
+    checkoutId,
+    checkoutSessionId,
+    checkoutPath: (checkoutPath.startsWith("/") && (checkoutPath.includes("/checkouts/") || checkoutPath === "/checkout" || checkoutPath.startsWith("/checkout/")))
+      ? checkoutPath
+      : "",
+    storefrontHost,
+    customerEmail,
+  };
+}
+
+function buildShopifyCheckoutResumeUrl({
+  shop,
+  checkoutId = "",
+  checkoutPath = "",
+  storefrontHost = "",
+}) {
+  const host = String(storefrontHost || shop || "")
+    .trim()
+    .replace(/^https?:\/\//i, "")
+    .replace(/^www\./i, "")
+    .split("/")[0]
+    .split("?")[0]
+    .split("#")[0]
+    .toLowerCase();
+  if (!host) return "";
+
+  const path = String(checkoutPath || "").trim();
+  if (path.startsWith("/") && (path.includes("/checkouts/") || path === "/checkout" || path.startsWith("/checkout/"))) {
+    return `https://${host}${path}`;
+  }
+
+  const normalizedCheckoutId = String(checkoutId || "").trim();
+  if (!normalizedCheckoutId) return "";
+  return `https://${host}/checkouts/${encodeURIComponent(normalizedCheckoutId)}/information`;
 }
 
 function buildExperienceRecoveryMessage({ req, shop, eventData, timestamp, experienceId }) {
@@ -621,38 +700,35 @@ function buildExperienceRecoveryMessage({ req, shop, eventData, timestamp, exper
     shop,
     eventData,
     timestamp,
-    baseUrl: resolveRequestOrigin(req),
+    baseUrl: getCanonicalMerchantFacingBaseUrl(),
+    experienceId,
   });
-  const emailReturnLink = buildExperienceReturnLink({
+  const proofReturnLink = buildExperienceReturnLink({
     req,
     shop,
     experienceId,
     channel: "email",
   });
-  const smsReturnLink = buildExperienceReturnLink({
-    req,
-    shop,
-    experienceId,
-    channel: "sms",
-  });
+  const returnLink = String(baseMessage.returnLink || "").trim() || proofReturnLink;
 
   return {
     ...baseMessage,
-    emailReturnLink,
-    smsReturnLink,
-    returnLink: emailReturnLink,
+    emailReturnLink: returnLink,
+    smsReturnLink: returnLink,
+    proofReturnLink,
+    returnLink,
     emailSubject: "Complete your order",
     emailBody: [
       "You left something behind.",
       "",
       "Complete your order using the secure link below.",
-      emailReturnLink,
+      returnLink,
       "",
       "If you already returned, you can ignore this message.",
       "",
       "This is the exact recovery email your customer would receive.",
     ].join("\n"),
-    smsText: `You can return to checkout here: ${smsReturnLink}`,
+    smsText: `You can return to checkout here: ${returnLink}`,
   };
 }
 
@@ -676,7 +752,14 @@ async function listExperienceSendEvents(shop, experienceId) {
   });
 }
 
-async function persistExperienceSendRecords({ shop, experienceId, sendResult }) {
+async function persistExperienceSendRecords({
+  shop,
+  experienceId,
+  sendResult,
+  checkoutId = "",
+  checkoutSessionId = "",
+  sourceEventId = "",
+}) {
   if (!shop || !experienceId) return [];
 
   const sentAt = sendResult.sentAt || new Date().toISOString();
@@ -694,6 +777,9 @@ async function persistExperienceSendRecords({ shop, experienceId, sendResult }) 
           experienceId,
           shop,
           channel,
+          checkout_id: checkoutId || null,
+          checkout_session_id: checkoutSessionId || null,
+          source_event_id: sourceEventId || null,
           target,
           status: "sent",
           sentAt,
@@ -2085,6 +2171,10 @@ app.post("/api/recovery-actions/send-live-test", async (req, res) => {
       latestEventPayload?.timestamp ||
       latestCheckoutEvent?.createdAt?.toISOString?.() ||
       new Date().toISOString();
+    const checkoutContext = resolveCheckoutContextFromEventPayload(latestEventPayload || {}, experienceId);
+    const checkoutId = checkoutContext.checkoutId;
+    const checkoutSessionId = checkoutContext.checkoutSessionId;
+    const sourceEventId = String(latestEventPayload?.id || "").trim();
 
     const recoveryMessage = experienceId
       ? buildExperienceRecoveryMessage({
@@ -2117,12 +2207,18 @@ app.post("/api/recovery-actions/send-live-test", async (req, res) => {
       shop,
       experienceId,
       sendResult,
+      checkoutId,
+      checkoutSessionId,
+      sourceEventId,
     });
 
     if (summary.success) {
       await persistRecoveryAttributionFromSend(prisma, {
         experienceId,
         shop,
+        checkout_id: checkoutId,
+        checkout_session_id: checkoutSessionId,
+        source_event_id: sourceEventId,
         channel: summary.channels[0] || "",
         target: summary.channels[0] === "sms" ? phone || "" : email || "",
         sent_at: timestamp,
@@ -2165,6 +2261,7 @@ app.post("/api/recovery-actions/send-live-test", async (req, res) => {
       missingEnvVars: summary.missingEnvVars,
       messageId: sendResult.messageId,
       smsSid: sendResult.smsSid,
+      recoveryLink: recoveryMessage.returnLink || null,
       timestamp,
     });
   } catch (error) {
@@ -2337,25 +2434,107 @@ app.get("/recover/:token", async (req, res) => {
   try {
     const token = String(req.params?.token || "").trim();
     const parsed = parseRecoveryToken(token);
+    const shop = normalizeShop(String(parsed?.shop || "").trim().toLowerCase());
+    const experienceId = normalizeExperienceId(parsed?.experienceId);
     const timestamp = new Date().toISOString();
 
     await prisma.systemEvent.create({
       data: {
-        shopDomain: parsed.shop,
+        shopDomain: shop,
         eventType: "abando.customer_return.v1",
         visibility: "merchant",
         payload: {
-          shop: parsed.shop,
+          shop,
           timestamp,
           source: "recovery_link",
           token,
+          experienceId: experienceId || null,
         },
       },
     });
 
+    await prisma.systemEvent.create({
+      data: {
+        shopDomain: shop,
+        eventType: "abando.recovery_returned.v1",
+        visibility: "merchant",
+        payload: {
+          shop,
+          returned_at: timestamp,
+          source: "recovery_link",
+          token,
+          experienceId: experienceId || null,
+        },
+      },
+    }).catch(() => {});
+
+    if (shop && experienceId) {
+      const events = await listExperienceSendEvents(shop, experienceId);
+      const matchingEvent = events.find((event) => {
+        const payload = event?.payload;
+        if (!payload || typeof payload !== "object") return false;
+        const payloadCheckoutId = String(payload.checkout_id || "").trim();
+        const payloadCheckoutSessionId = String(payload.checkout_session_id || "").trim();
+        return (
+          (parsed.checkout_id && payloadCheckoutId === String(parsed.checkout_id))
+          || (parsed.checkout_session_id && payloadCheckoutSessionId === String(parsed.checkout_session_id))
+        );
+      }) || events[0] || null;
+
+      if (matchingEvent) {
+        const payload = matchingEvent.payload && typeof matchingEvent.payload === "object"
+          ? matchingEvent.payload
+          : {};
+        await prisma.systemEvent.update({
+          where: { id: matchingEvent.id },
+          data: {
+            payload: {
+              ...payload,
+              returned: true,
+              returnedAt: timestamp,
+            },
+          },
+        }).catch(() => {});
+
+        await persistRecoveryAttributionFromReturn(prisma, {
+          recovery_id: String(payload.recovery_id || matchingEvent.id || ""),
+          recovery_action_id: String(payload.recovery_action_id || ""),
+          proof_loop_id: String(payload.proofLoopId || ""),
+          experienceId,
+          shop,
+          checkout_id: String(parsed.checkout_id || payload.checkout_id || ""),
+          checkout_session_id: String(parsed.checkout_session_id || payload.checkout_session_id || ""),
+          source_event_id: String(payload.source_event_id || ""),
+          channel: String(payload.channel || ""),
+          target: String(payload.target || parsed.customer_email || ""),
+          sent_at: String(payload.sentAt || ""),
+          return_clicked_at: timestamp,
+          provider_message_id: String(payload.providerId || ""),
+          provider_sms_sid: String(payload.smsSid || ""),
+        }).catch(() => {});
+      }
+    }
+
+    const checkoutResumeUrl = buildShopifyCheckoutResumeUrl({
+      shop,
+      checkoutId: String(parsed.checkout_id || "").trim(),
+      checkoutPath: String(parsed.checkout_path || "").trim(),
+      storefrontHost: String(parsed.storefront_host || "").trim(),
+    });
+    if (checkoutResumeUrl) {
+      return res.redirect(302, checkoutResumeUrl);
+    }
+
+    if (shop && experienceId) {
+      return res.redirect(
+        302,
+        `${getCanonicalMerchantFacingBaseUrl()}/experience/returned?shop=${encodeURIComponent(shop)}&eid=${encodeURIComponent(experienceId)}`,
+      );
+    }
+
     return res.redirect(
       302,
-      `/checkout-placeholder?shop=${encodeURIComponent(parsed.shop)}&source=recovery_link`,
+      `/checkout-placeholder?shop=${encodeURIComponent(shop)}&source=recovery_link`,
     );
   } catch (error) {
     return res.status(400).type("html").send("<h1>Invalid recovery link</h1>");
@@ -2766,6 +2945,14 @@ function normalizeCheckoutEventPayload(payload) {
     id: String(input.id || `event_${randomBytes(8).toString("hex")}`),
     shop,
     session_id,
+    checkout_id: String(
+      input.checkout_id
+      || input.checkoutId
+      || input.checkout_token
+      || input.metadata?.cartToken
+      || session_id
+    ).trim(),
+    checkout_session_id: String(input.checkout_session_id || input.checkout_token || session_id).trim(),
     timestamp: new Date(parsedTimestamp).toISOString(),
     occurredAt: new Date(parsedTimestamp).toISOString(),
     event_type,
