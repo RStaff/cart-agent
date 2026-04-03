@@ -10510,6 +10510,10 @@ function buildAuthorizeUrl(shop, state, callbackBaseUrl) {
   return `https://${shop}/admin/oauth/authorize?client_id=${SHOPIFY_API_KEY}&scope=${encodeURIComponent(SHOPIFY_SCOPES)}&redirect_uri=${redirectUri}&state=${state}&grant_options[]=per-user`;
 }
 
+function getCanonicalShopifyOAuthBaseUrl() {
+  return "https://app.abando.ai";
+}
+
 function startShopifyOAuth(req, res) {
   const embeddedContext = getEmbeddedContext(req);
   let shop = embeddedContext.shop;
@@ -10526,7 +10530,7 @@ function startShopifyOAuth(req, res) {
   }
 
   const embedded = embeddedContext.embedded;
-  const callbackBaseUrl = getConfiguredPublicBaseUrl() || APP_URL;
+  const callbackBaseUrl = getCanonicalShopifyOAuthBaseUrl();
   const state = buildOAuthState(inviteId);
   const parsedState = parseOAuthState(state);
   res.cookie("shopify_state", parsedState.nonce, { httpOnly: true, sameSite: "none", secure: true, path: "/" });
