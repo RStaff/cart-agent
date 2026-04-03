@@ -975,6 +975,45 @@ function buildShopifyCheckoutResumeUrl({
   return `https://${host}/checkouts/${encodeURIComponent(normalizedCheckoutId)}/information`;
 }
 
+async function verifyShopifyCheckoutResumeUrl(url = "") {
+  const target = String(url || "").trim();
+  if (!target) {
+    return { ok: false, status: 0, error: "missing_checkout_resume_url" };
+  }
+
+  const attempt = async (method) => {
+    const response = await fetch(target, {
+      method,
+      redirect: "follow",
+    });
+    return {
+      ok: response.status >= 200 && response.status < 400,
+      status: response.status,
+      finalUrl: response.url || target,
+    };
+  };
+
+  try {
+    const headResult = await attempt("HEAD");
+    if (headResult.ok || headResult.status !== 405) {
+      return headResult;
+    }
+  } catch (error) {
+    // Fall through to GET so storefronts that reject HEAD can still be verified.
+  }
+
+  try {
+    return await attempt("GET");
+  } catch (error) {
+    return {
+      ok: false,
+      status: 0,
+      error: error instanceof Error ? error.message : String(error),
+      finalUrl: target,
+    };
+  }
+}
+
 function buildExperienceFlowUrls({ req, shop, experienceId, channel }) {
   if (!shop || !experienceId) {
     return {
@@ -1158,7 +1197,31 @@ async function listRecoveryActionEvents(shop, experienceId) {
   });
 }
 
-async function findLatestCheckoutStartedEvent(shop) {
+function isSyntheticCheckoutValue(value = "") {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (!normalized) return false;
+  return normalized.startsWith("auto-proof-")
+    || normalized.startsWith("abando-test-")
+    || normalized.startsWith("proof-cart-")
+    || normalized.startsWith("validation-cart")
+    || normalized.startsWith("test-cart-");
+}
+
+function isRealStorefrontCheckoutPayload(payload) {
+  if (!payload || typeof payload !== "object") return false;
+  if (String(payload.event_type || "").trim().toLowerCase() !== "checkout_started") return false;
+  if (String(payload.source || "").trim().toLowerCase() !== "live_storefront") return false;
+
+  const context = resolveCheckoutContextFromEventPayload(payload);
+  if (!context.storefrontHost) return false;
+  if (!context.checkoutId && !context.checkoutPath) return false;
+  if (isSyntheticCheckoutValue(context.checkoutId) || isSyntheticCheckoutValue(context.checkoutSessionId)) return false;
+  if (context.checkoutPath && !context.checkoutPath.includes("/checkouts/")) return false;
+
+  return true;
+}
+
+async function findLatestCheckoutStartedEvent(shop, { requireRealStorefront = false } = {}) {
   if (!shop) return null;
 
   const events = await prisma.systemEvent.findMany({
@@ -1167,15 +1230,25 @@ async function findLatestCheckoutStartedEvent(shop) {
       eventType: "abando.checkout_event.v1",
     },
     orderBy: { createdAt: "desc" },
-    take: 50,
+    take: 200,
   });
 
-  return events.find((event) => {
+  const checkoutStartedEvents = events.filter((event) => {
     const payload = event?.payload;
     return payload
       && typeof payload === "object"
       && String(payload.event_type || "").trim().toLowerCase() === "checkout_started";
-  }) || null;
+  });
+
+  const latestRealStorefrontEvent = checkoutStartedEvents.find((event) =>
+    isRealStorefrontCheckoutPayload(event?.payload),
+  ) || null;
+
+  if (requireRealStorefront) {
+    return latestRealStorefrontEvent;
+  }
+
+  return latestRealStorefrontEvent || checkoutStartedEvents[0] || null;
 }
 
 async function findLatestEventByType(shop, eventType, experienceId = "") {
@@ -3702,14 +3775,6 @@ app.post("/api/recovery-actions/send-live-test", async (req, res) => {
       return res.status(404).json({ ok: false, error: "Store not found", provider: "", details: "" });
     }
 
-    const latestCheckoutEvent = await prisma.systemEvent.findFirst({
-      where: {
-        shopDomain: shop,
-        eventType: "abando.checkout_event.v1",
-      },
-      orderBy: { createdAt: "desc" },
-    });
-
     const checkoutEventCount = await prisma.systemEvent.count({
       where: {
         shopDomain: shop,
@@ -3721,6 +3786,21 @@ app.post("/api/recovery-actions/send-live-test", async (req, res) => {
       return res.status(409).json({ ok: false, error: "Recovery is not ready for this store yet.", provider: "", details: "" });
     }
 
+    const latestCheckoutEvent = await findLatestCheckoutStartedEvent(shop, {
+      requireRealStorefront: true,
+    });
+
+    if (!latestCheckoutEvent) {
+      return res.status(409).json({
+        ok: false,
+        error: "real_checkout_not_captured",
+        provider: "",
+        details: "No live storefront checkout has been captured for this store yet.",
+        experienceId: experienceId || null,
+        timestamp: new Date().toISOString(),
+      });
+    }
+
     const latestEventPayload = latestCheckoutEvent?.payload && typeof latestCheckoutEvent.payload === "object"
       ? latestCheckoutEvent.payload
       : null;
@@ -3729,6 +3809,33 @@ app.post("/api/recovery-actions/send-live-test", async (req, res) => {
       latestEventPayload?.timestamp ||
       latestCheckoutEvent?.createdAt?.toISOString?.() ||
       new Date().toISOString();
+    const checkoutContext = resolveCheckoutContextFromEventPayload(latestEventPayload || {}, experienceId);
+    const checkoutId = checkoutContext.checkoutId;
+    const checkoutSessionId = checkoutContext.checkoutSessionId;
+    const sourceEventId = String(latestEventPayload?.id || "").trim();
+    const checkoutResumeUrl = buildShopifyCheckoutResumeUrl({
+      shop,
+      checkoutId,
+      checkoutPath: checkoutContext.checkoutPath,
+      storefrontHost: checkoutContext.storefrontHost,
+    });
+    const checkoutVerification = await verifyShopifyCheckoutResumeUrl(checkoutResumeUrl);
+
+    if (!checkoutVerification.ok) {
+      return res.status(409).json({
+        ok: false,
+        error: "real_checkout_not_resumable",
+        provider: "",
+        details: checkoutVerification.error || `Shopify checkout returned HTTP ${checkoutVerification.status || 0}.`,
+        experienceId: experienceId || null,
+        checkout_source: String(latestEventPayload?.source || "").trim().toLowerCase() || null,
+        checkout_id: checkoutId || null,
+        checkout_session_id: checkoutSessionId || null,
+        checkout_resume_url: checkoutResumeUrl || null,
+        checkout_resume_status: checkoutVerification.status || 0,
+        timestamp: new Date().toISOString(),
+      });
+    }
 
     const recoveryMessage = experienceId
       ? buildExperienceRecoveryMessage({
@@ -4009,6 +4116,10 @@ app.post("/api/recovery-actions/send-live-test", async (req, res) => {
       twilioMessage: sendResult.twilioMessage,
       twilioInterpretation: sendResult.twilioInterpretation,
       delivery: sendResult.delivery,
+      checkout_source: String(latestEventPayload?.source || "").trim().toLowerCase() || null,
+      checkout_id: checkoutId || null,
+      checkout_session_id: checkoutSessionId || null,
+      checkout_resume_url: checkoutVerification.finalUrl || checkoutResumeUrl || null,
       recoveryLink: recoveryMessage.returnLink || null,
       ...buildExperienceFlowUrls({
         req,
