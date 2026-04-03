@@ -10,9 +10,12 @@ function isLocalValidationRequest(req) {
 
 function eventIngestBase() {
   const value =
+    process.env.ABANDO_STOREFRONT_EVENT_BASE ||
+    process.env.ABANDO_STOREFRONT_CAPTURE_BASE ||
+    process.env.RENDER_EXTERNAL_URL ||
     process.env.ABANDO_PUBLIC_APP_ORIGIN ||
     process.env.NEXT_PUBLIC_ABANDO_PUBLIC_APP_ORIGIN ||
-    "http://127.0.0.1:3000";
+    "https://cart-agent-api.onrender.com";
   try {
     return new URL(String(value)).origin;
   } catch {
@@ -255,7 +258,7 @@ ${detectorScript}
 
   // ---------- /install (copy/paste) ----------
   app.get("/install", (_req, res) => {
-    const SNIP = `<script src="https://abando.ai/abando.js" defer></script>`;
+    const SNIP = `<script src="${eventIngestBase()}/abando.js" defer></script>`;
     res.status(200).type("html").send(`<!doctype html><html lang="en"><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Install Abando</title>
 <style>

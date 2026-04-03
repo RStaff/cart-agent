@@ -1,9 +1,13 @@
-const SCRIPT_TAG_BASE = process.env.ABANDO_STOREFRONT_SCRIPT_SRC || "https://abando.ai/abando.js";
+const STOREFRONT_CAPTURE_BASE =
+  process.env.ABANDO_STOREFRONT_CAPTURE_BASE ||
+  process.env.RENDER_EXTERNAL_URL ||
+  "https://cart-agent-api.onrender.com";
+const SCRIPT_TAG_BASE = process.env.ABANDO_STOREFRONT_SCRIPT_SRC || `${String(STOREFRONT_CAPTURE_BASE).replace(/\/+$/, "")}/abando.js`;
 const EVENT_INGEST_BASE =
-  process.env.ABANDO_PUBLIC_APP_ORIGIN ||
-  process.env.NEXT_PUBLIC_ABANDO_PUBLIC_APP_ORIGIN ||
-  process.env.APP_URL ||
-  "https://pay.abando.ai";
+  process.env.ABANDO_STOREFRONT_EVENT_BASE ||
+  process.env.ABANDO_STOREFRONT_CAPTURE_BASE ||
+  process.env.RENDER_EXTERNAL_URL ||
+  "https://cart-agent-api.onrender.com";
 
 function buildScriptTagSrc({ shop, eventBase = EVENT_INGEST_BASE }) {
   const normalizedShop = normalizeShop(shop);
