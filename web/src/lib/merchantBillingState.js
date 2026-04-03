@@ -1,4 +1,4 @@
-import prisma from "../clients/prisma.js";
+import { prisma } from "../clients/prisma.js";
 import { stripe } from "../clients/stripe.js";
 import {
   getStripePriceIds,
