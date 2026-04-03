@@ -10526,7 +10526,7 @@ function startShopifyOAuth(req, res) {
   }
 
   const embedded = embeddedContext.embedded;
-  const callbackBaseUrl = getRequestBaseUrl(req);
+  const callbackBaseUrl = getConfiguredPublicBaseUrl() || APP_URL;
   const state = buildOAuthState(inviteId);
   const parsedState = parseOAuthState(state);
   res.cookie("shopify_state", parsedState.nonce, { httpOnly: true, sameSite: "none", secure: true, path: "/" });
