@@ -1,0 +1,49 @@
+{
+  "app_name": "Abando",
+  "app_tagline": "Recover lost Shopify checkout revenue before it disappears.",
+  "short_description": "Abando catches checkout drop-off, sends recovery, and shows the return path in one clean loop.",
+  "full_description": "Abando helps Shopify merchants recover lost checkout revenue by acting in the short window after a shopper leaves before paying. Install the app, connect your store, send a recovery to yourself, and watch the loop complete from message delivery through return detection. Abando is built to show merchants exactly what happens after install: the store connects, the recovery path becomes ready, the merchant can run proof on their own inbox or phone, and paid billing only starts after the recovery loop has been verified.",
+  "key_benefits": [
+    "Catch checkout drop-off quickly and send the shopper back through a live recovery path.",
+    "Test the recovery loop on yourself before you decide to start a paid plan.",
+    "See recovered revenue and billing readiness in plain merchant language."
+  ],
+  "benefit_bullets": [
+    "Recover lost revenue without redesigning checkout.",
+    "Install in minutes and verify the loop on your own device.",
+    "Move from proof to paid plan only after the product earns it."
+  ],
+  "faq": [
+    {
+      "question": "Does this change my checkout?",
+      "answer": "No checkout redesign is required. Abando connects to your store, watches for checkout drop-off, and runs the recovery path around that moment."
+    },
+    {
+      "question": "Can I test it on myself?",
+      "answer": "Yes. After install, you can send a live recovery to your own inbox or phone and watch the return happen."
+    },
+    {
+      "question": "How long does install take?",
+      "answer": "Most merchants can connect their store in about two minutes."
+    },
+    {
+      "question": "When do I start paying?",
+      "answer": "Install first, verify the recovery loop, then start your paid plan when billing is available for your store."
+    }
+  ],
+  "support_email": "hello@abando.ai",
+  "support_url": "mailto:hello@abando.ai",
+  "privacy_url": "https://app.abando.ai/privacy",
+  "logo_url": "https://app.abando.ai/assets/logo.svg",
+  "app_icon_url": "https://app.abando.ai/assets/logo.svg",
+  "install_url_template": "https://app.abando.ai/install/shopify?shop={shop}",
+  "pricing_summary": "Install first, verify the recovery loop, then start your paid plan. No checkout redesign required.",
+  "subtitle": "Shopify checkout recovery that proves itself before billing starts.",
+  "who_its_for": "Shopify merchants who want a faster, clearer way to recover checkout revenue without rebuilding checkout.",
+  "how_it_works": [
+    "A shopper starts checkout and leaves before paying.",
+    "Abando prepares and sends a recovery message.",
+    "The shopper returns through the recovery link.",
+    "The merchant sees recovered revenue and can start a paid plan."
+  ]
+}
