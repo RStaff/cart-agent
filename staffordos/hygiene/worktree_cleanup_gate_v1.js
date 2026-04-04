@@ -234,7 +234,15 @@ ${toBulletList(result.recommendedActions)}
 }
 
 export function writeWorktreeCleanupGateReport(markdown) {
+  fs.mkdirSync(path.dirname(REPORT_PATH), { recursive: true });
   fs.writeFileSync(REPORT_PATH, markdown, "utf8");
+  if (!fs.existsSync(REPORT_PATH)) {
+    throw new Error(`worktree_cleanup_gate_report.md was not created at ${REPORT_PATH}`);
+  }
+  const stats = fs.statSync(REPORT_PATH);
+  if (!stats.isFile()) {
+    throw new Error(`worktree_cleanup_gate_report.md path is not a file: ${REPORT_PATH}`);
+  }
   return REPORT_PATH;
 }
 
