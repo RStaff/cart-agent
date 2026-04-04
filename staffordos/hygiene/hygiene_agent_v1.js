@@ -186,10 +186,27 @@ function collectLockfiles() {
   return [...new Set(results)].sort();
 }
 
-function collectGeneratedNoise() {
+function collectGeneratedNoise(candidatePaths = []) {
   const results = [];
   walkDirs(CANONICAL_ROOT, results, 0, 3);
-  return [...new Set(results)].sort();
+  if (!candidatePaths.length) {
+    return [...new Set(results)].sort();
+  }
+
+  const normalizedCandidates = new Set(
+    candidatePaths.map((item) => String(item || "").replace(/\\/g, "/")),
+  );
+
+  return [...new Set(results)]
+    .filter((fullPath) => {
+      const normalizedFullPath = String(fullPath || "").replace(/\\/g, "/");
+      const relativePath = path.relative(CANONICAL_ROOT, fullPath).replace(/\\/g, "/");
+      return (
+        normalizedCandidates.has(normalizedFullPath) ||
+        normalizedCandidates.has(relativePath)
+      );
+    })
+    .sort();
 }
 
 function collectDeployBlockers() {
@@ -259,7 +276,7 @@ export function runHygieneAgentCheck() {
   const branch = runGit(["branch", "--show-current"]);
   const porcelain = runGitRaw(["status", "--porcelain=v1"]);
   const { staged, unstaged, untracked } = parsePorcelain(porcelain);
-  const generatedNoise = collectGeneratedNoise();
+  const generatedNoise = collectGeneratedNoise([...staged, ...unstaged, ...untracked]);
   const envFiles = collectEnvFiles();
   const lockfiles = collectLockfiles();
   const deployBlockers = collectDeployBlockers();
