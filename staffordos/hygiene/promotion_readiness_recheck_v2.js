@@ -1,5 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
+import {
+  renderBranchScopeReport,
+  runBranchScopeGate,
+  writeBranchScopeReport,
+} from "./branch_scope_gate_v1.js";
 
 const CANONICAL_ROOT = "/Users/rossstafford/projects/cart-agent";
 const HYGIENE_DIR = path.join(CANONICAL_ROOT, "staffordos/hygiene");
@@ -14,6 +19,24 @@ function readJson(filePath) {
 
 function readText(filePath) {
   return fs.readFileSync(filePath, "utf8");
+}
+
+function ensureBranchScopeReport() {
+  if (fs.existsSync(BRANCH_SCOPE_REPORT_PATH)) {
+    return readText(BRANCH_SCOPE_REPORT_PATH);
+  }
+
+  try {
+    const branchScopeResult = runBranchScopeGate();
+    const outputPath = writeBranchScopeReport(renderBranchScopeReport(branchScopeResult));
+    if (!fs.existsSync(outputPath)) {
+      throw new Error(`branch_scope_report.md was not created at ${outputPath}`);
+    }
+    return readText(outputPath);
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    throw new Error(`Branch scope dependency unavailable: ${detail}`);
+  }
 }
 
 function extractSingle(markdown, pattern, fallback = "UNKNOWN") {
@@ -161,7 +184,7 @@ function writeReport(markdown) {
 
 const hygiene = readJson(HYGIENE_REPORT_PATH);
 const cleanupGateReport = readText(CLEANUP_GATE_REPORT_PATH);
-const branchScopeReport = readText(BRANCH_SCOPE_REPORT_PATH);
+const branchScopeReport = ensureBranchScopeReport();
 
 const blockers = categorizeBlockers(hygiene, cleanupGateReport, branchScopeReport);
 const finalStatus = determineFinalStatus(blockers);
