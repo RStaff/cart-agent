@@ -84,12 +84,31 @@ function extractNoLongerBlocks(markdown) {
   return extractBullets(markdown, "##", "What No Longer Blocks");
 }
 
-function determineExactNextAction(resolutionOrder) {
+function determineExactNextAction({
+  machineRole,
+  deploymentState,
+  merchantProofState,
+  resolutionOrder,
+}) {
+  if (
+    machineRole === "BUILD_TEST_ONLY" &&
+    deploymentState === "BLOCKED_ON_THIS_MACHINE_ONLY" &&
+    merchantProofState !== "COMPLETE"
+  ) {
+    const merchantProofAction = resolutionOrder.find(
+      (item) =>
+        /proof loop|storefront checkout|send-live-test|return flow|attribution/i.test(item),
+    );
+    if (merchantProofAction) {
+      return merchantProofAction;
+    }
+  }
+
   return resolutionOrder[0] || "No action required.";
 }
 
-function determineSecondaryActions(resolutionOrder) {
-  return resolutionOrder.slice(1, 4);
+function determineSecondaryActions(resolutionOrder, exactNextAction) {
+  return resolutionOrder.filter((item) => item !== exactNextAction).slice(0, 3);
 }
 
 function relevantArtifacts() {
@@ -132,8 +151,13 @@ export function runOperatorFrontDoor() {
 
   const resolutionOrder = extractTopBlockers(promotionBlockerBreakdown);
   const noLongerBlocks = extractNoLongerBlocks(promotionBlockerBreakdown);
-  const exactNextAction = determineExactNextAction(resolutionOrder);
-  const secondaryActions = determineSecondaryActions(resolutionOrder);
+  const exactNextAction = determineExactNextAction({
+    machineRole,
+    deploymentState,
+    merchantProofState,
+    resolutionOrder,
+  });
+  const secondaryActions = determineSecondaryActions(resolutionOrder, exactNextAction);
   const artifacts = relevantArtifacts();
 
   const markdown = `# Operator Front Door Report
