@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 
 const CANONICAL_ROOT = "/Users/rossstafford/projects/cart-agent";
 const HYGIENE_DIR = path.join(CANONICAL_ROOT, "staffordos/hygiene");
@@ -15,6 +16,28 @@ function readJson(filePath) {
 
 function readText(filePath) {
   return fs.readFileSync(filePath, "utf8");
+}
+
+function ensurePromotionReadinessReport() {
+  if (fs.existsSync(PROMOTION_READINESS_REPORT_PATH)) {
+    return readText(PROMOTION_READINESS_REPORT_PATH);
+  }
+
+  try {
+    execFileSync("node", [path.join(HYGIENE_DIR, "promotion_readiness_recheck_v2.js")], {
+      cwd: CANONICAL_ROOT,
+      stdio: "inherit",
+    });
+
+    if (!fs.existsSync(PROMOTION_READINESS_REPORT_PATH)) {
+      throw new Error(`promotion_readiness_report_v2.md was not created at ${PROMOTION_READINESS_REPORT_PATH}`);
+    }
+
+    return readText(PROMOTION_READINESS_REPORT_PATH);
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    throw new Error(`Promotion readiness dependency unavailable: ${detail}`);
+  }
 }
 
 function extractSingle(markdown, pattern, fallback = "UNKNOWN") {
@@ -245,7 +268,7 @@ function writeReport(markdown) {
 export function runPromotionBlockerBreakdown() {
   const hygiene = readJson(HYGIENE_REPORT_PATH);
   const cleanupGateReport = readText(CLEANUP_GATE_REPORT_PATH);
-  const readinessReport = readText(PROMOTION_READINESS_REPORT_PATH);
+  const readinessReport = ensurePromotionReadinessReport();
   const branchScopeReport = readText(BRANCH_SCOPE_REPORT_PATH);
 
   const breakdown = buildBreakdown(hygiene, cleanupGateReport, readinessReport, branchScopeReport);
