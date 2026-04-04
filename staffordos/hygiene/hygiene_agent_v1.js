@@ -298,6 +298,13 @@ export function runHygieneAgentCheck() {
 export function writeHygieneReport(report) {
   fs.mkdirSync(path.dirname(REPORT_PATH), { recursive: true });
   fs.writeFileSync(REPORT_PATH, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  if (!fs.existsSync(REPORT_PATH)) {
+    throw new Error(`hygiene_report_v1.json was not created at ${REPORT_PATH}`);
+  }
+  const stats = fs.statSync(REPORT_PATH);
+  if (!stats.isFile()) {
+    throw new Error(`hygiene_report_v1.json path is not a file: ${REPORT_PATH}`);
+  }
   return REPORT_PATH;
 }
 

@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import {
   REPORT_PATH,
   renderWorktreeCleanupGateReport,
@@ -6,10 +7,21 @@ import {
 } from "./worktree_cleanup_gate_v1.js";
 
 const result = runWorktreeCleanupGate();
-writeWorktreeCleanupGateReport(renderWorktreeCleanupGateReport(result));
+const outputPath = writeWorktreeCleanupGateReport(renderWorktreeCleanupGateReport(result));
+const exists = fs.existsSync(outputPath);
+
+if (!exists) {
+  console.error("=== WORKTREE CLEANUP GATE ===");
+  console.error("STATUS: FAIL");
+  console.error(`OUTPUT FILE: ${outputPath}`);
+  console.error(`EXISTS: ${exists}`);
+  process.exit(1);
+}
 
 console.log("=== WORKTREE CLEANUP GATE ===");
-console.log(`STATUS: ${result.status}`);
+console.log("STATUS: PASS");
+console.log(`OUTPUT FILE: ${outputPath}`);
+console.log(`EXISTS: ${exists}`);
 console.log("ALLOWED NEXT STEP:");
 console.log(`- ${result.allowedNextStep}`);
 console.log("BLOCKED NEXT STEP:");

@@ -242,7 +242,17 @@ export function runCleanupExecutionPack() {
 }
 
 export function writeCleanupExecutionPlan(markdown) {
+  fs.mkdirSync(path.dirname(OUTPUT_PLAN_PATH), { recursive: true });
   fs.writeFileSync(OUTPUT_PLAN_PATH, markdown, "utf8");
+  if (!fs.existsSync(OUTPUT_PLAN_PATH)) {
+    throw new Error(`cleanup_execution_plan.md was not created at ${OUTPUT_PLAN_PATH}`);
+  }
+
+  const stats = fs.statSync(OUTPUT_PLAN_PATH);
+  if (!stats.isFile()) {
+    throw new Error(`cleanup_execution_plan.md path is not a file: ${OUTPUT_PLAN_PATH}`);
+  }
+
   return OUTPUT_PLAN_PATH;
 }
 
