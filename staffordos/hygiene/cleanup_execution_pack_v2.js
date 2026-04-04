@@ -1,13 +1,13 @@
 import fs from "node:fs";
 import path from "node:path";
+import { CANONICAL_ROOT, getHygieneOutputPath } from "./runtime_support_v1.js";
 
-const CANONICAL_ROOT = "/Users/rossstafford/projects/cart-agent";
 const HYGIENE_DIR = path.join(CANONICAL_ROOT, "staffordos/hygiene");
-const HYGIENE_REPORT_PATH = path.join(HYGIENE_DIR, "hygiene_report_v1.json");
-const CLEANUP_GATE_REPORT_PATH = path.join(HYGIENE_DIR, "worktree_cleanup_gate_report.md");
-const WORKTREE_REDUCTION_PLAN_PATH = path.join(HYGIENE_DIR, "worktree_reduction_plan.md");
-const BRANCH_SCOPE_REPORT_PATH = path.join(HYGIENE_DIR, "branch_scope_report.md");
-const OUTPUT_PATH = path.join(HYGIENE_DIR, "cleanup_execution_pack_v2.md");
+const HYGIENE_REPORT_PATH = getHygieneOutputPath("hygiene_report_v1.json");
+const CLEANUP_GATE_REPORT_PATH = getHygieneOutputPath("worktree_cleanup_gate_report.md");
+const WORKTREE_REDUCTION_PLAN_PATH = getHygieneOutputPath("worktree_reduction_plan.md");
+const BRANCH_SCOPE_REPORT_PATH = getHygieneOutputPath("branch_scope_report.md");
+const OUTPUT_PATH = getHygieneOutputPath("cleanup_execution_pack_v2.md");
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
@@ -152,8 +152,15 @@ node /Users/rossstafford/projects/cart-agent/staffordos/hygiene/run_hygiene_cont
 
 Commands:
 \`\`\`bash
-node /Users/rossstafford/projects/cart-agent/staffordos/hygiene/promotion_readiness_recheck_v1.js
+node /Users/rossstafford/projects/cart-agent/staffordos/hygiene/promotion_readiness_recheck_v2.js
 \`\`\`
+
+### Operating State Interpretation
+
+- Current Operating State: ${hygieneReport.current_operating_state || hygieneReport.status}
+- Deployment State: ${hygieneReport.deployment_state || "UNKNOWN"}
+- Merchant Proof State: ${hygieneReport.merchant_proof_state || "NOT_EVALUATED"}
+- Promotion State: ${hygieneReport.promotion_state || "UNKNOWN"}
 
 ## Expected End-State
 

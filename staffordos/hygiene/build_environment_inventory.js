@@ -1,15 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
+import { getHygieneOutputPath, resolveMachineRole } from "./runtime_support_v1.js";
 
 const CANONICAL_ROOT = "/Users/rossstafford/projects/cart-agent";
-const INVENTORY_PATH = path.join(
-  CANONICAL_ROOT,
-  "staffordos/hygiene/environment_inventory_v1.json",
-);
-const HYGIENE_REPORT_PATH = path.join(
-  CANONICAL_ROOT,
-  "staffordos/hygiene/hygiene_report_v1.json",
-);
+const INVENTORY_PATH = getHygieneOutputPath("environment_inventory_v1.json");
+const HYGIENE_REPORT_PATH = getHygieneOutputPath("hygiene_report_v1.json");
 
 function readJson(filePath) {
   try {
@@ -28,12 +23,15 @@ function hasDeployBlocker(hygieneReport, text) {
 
 function buildInventory() {
   const hygieneReport = readJson(HYGIENE_REPORT_PATH);
+  const machineRole = resolveMachineRole();
   const vercelBlocked = hasDeployBlocker(hygieneReport, "VERCEL_TOKEN");
 
   return {
     generated_at: new Date().toISOString(),
     inventory_version: "environment_inventory_v1",
     note: "Inventory only. This file documents current environment ownership and current known issues. It is not a new policy source.",
+    machine_role: machineRole.role,
+    machine_role_source: machineRole.source,
     environments: [
       {
         environment_id: "LOCAL_FRONTEND",

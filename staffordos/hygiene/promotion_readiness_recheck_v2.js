@@ -1,17 +1,18 @@
 import fs from "node:fs";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 import {
   renderBranchScopeReport,
   runBranchScopeGate,
   writeBranchScopeReport,
 } from "./branch_scope_gate_v1.js";
+import { CANONICAL_ROOT, getHygieneOutputPath } from "./runtime_support_v1.js";
 
-const CANONICAL_ROOT = "/Users/rossstafford/projects/cart-agent";
 const HYGIENE_DIR = path.join(CANONICAL_ROOT, "staffordos/hygiene");
-const HYGIENE_REPORT_PATH = path.join(HYGIENE_DIR, "hygiene_report_v1.json");
-const CLEANUP_GATE_REPORT_PATH = path.join(HYGIENE_DIR, "worktree_cleanup_gate_report.md");
-const BRANCH_SCOPE_REPORT_PATH = path.join(HYGIENE_DIR, "branch_scope_report.md");
-const OUTPUT_REPORT_PATH = path.join(HYGIENE_DIR, "promotion_readiness_report_v2.md");
+const HYGIENE_REPORT_PATH = getHygieneOutputPath("hygiene_report_v1.json");
+const CLEANUP_GATE_REPORT_PATH = getHygieneOutputPath("worktree_cleanup_gate_report.md");
+const BRANCH_SCOPE_REPORT_PATH = getHygieneOutputPath("branch_scope_report.md");
+const OUTPUT_REPORT_PATH = getHygieneOutputPath("promotion_readiness_report_v2.md");
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
@@ -19,6 +20,28 @@ function readJson(filePath) {
 
 function readText(filePath) {
   return fs.readFileSync(filePath, "utf8");
+}
+
+function runNode(scriptName) {
+  execFileSync("node", [path.join(HYGIENE_DIR, scriptName)], {
+    cwd: CANONICAL_ROOT,
+    stdio: "inherit",
+  });
+}
+
+function ensureCoreReports() {
+  if (fs.existsSync(HYGIENE_REPORT_PATH) && fs.existsSync(CLEANUP_GATE_REPORT_PATH)) {
+    return;
+  }
+
+  runNode("run_hygiene_control_loop.js");
+
+  if (!fs.existsSync(HYGIENE_REPORT_PATH)) {
+    throw new Error(`Hygiene dependency unavailable: ${HYGIENE_REPORT_PATH}`);
+  }
+  if (!fs.existsSync(CLEANUP_GATE_REPORT_PATH)) {
+    throw new Error(`Cleanup gate dependency unavailable: ${CLEANUP_GATE_REPORT_PATH}`);
+  }
 }
 
 function ensureBranchScopeReport() {
@@ -182,6 +205,8 @@ function writeReport(markdown) {
   return OUTPUT_REPORT_PATH;
 }
 
+ensureCoreReports();
+
 const hygiene = readJson(HYGIENE_REPORT_PATH);
 const cleanupGateReport = readText(CLEANUP_GATE_REPORT_PATH);
 const branchScopeReport = ensureBranchScopeReport();
@@ -190,6 +215,9 @@ const blockers = categorizeBlockers(hygiene, cleanupGateReport, branchScopeRepor
 const finalStatus = determineFinalStatus(blockers);
 const reasoning = buildReasoning(blockers);
 const nextStep = buildNextStep(finalStatus);
+const currentOperatingState = hygiene.current_operating_state || hygiene.status || "UNKNOWN";
+const deploymentState = hygiene.deployment_state || "UNKNOWN";
+const merchantProofState = blockers.productBlockers.length > 0 ? "INCOMPLETE" : "READY";
 
 const markdown = `# Promotion Readiness Report V2
 
@@ -198,6 +226,10 @@ const markdown = `# Promotion Readiness Report V2
 ### Final Status
 
 - Final Status: \`${finalStatus}\`
+- Current Operating State: \`${currentOperatingState}\`
+- Deployment State: \`${deploymentState}\`
+- Merchant Proof State: \`${merchantProofState}\`
+- Promotion State: \`${finalStatus}\`
 
 ### Explicit Reasoning
 
@@ -239,5 +271,9 @@ console.log("=== PROMOTION READINESS RECHECK V2 ===");
 console.log("STATUS: PASS");
 console.log(`OUTPUT FILE: ${outputPath}`);
 console.log(`EXISTS: ${exists}`);
+console.log(`CURRENT OPERATING STATE: ${currentOperatingState}`);
+console.log(`DEPLOYMENT STATE: ${deploymentState}`);
+console.log(`MERCHANT PROOF STATE: ${merchantProofState}`);
+console.log(`PROMOTION STATE: ${finalStatus}`);
 console.log(`FINAL STATUS: ${finalStatus}`);
 console.log(`REPORT: ${OUTPUT_REPORT_PATH}`);

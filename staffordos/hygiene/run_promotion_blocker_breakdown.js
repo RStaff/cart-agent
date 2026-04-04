@@ -27,6 +27,10 @@ const topBlockers = [
 
 console.log("=== PROMOTION BLOCKER BREAKDOWN ===");
 console.log(`STATUS: ${result.status}`);
+console.log(`CURRENT OPERATING STATE: ${result.currentOperatingState}`);
+console.log(`DEPLOYMENT STATE: ${result.deploymentState}`);
+console.log(`MERCHANT PROOF STATE: ${result.merchantProofState}`);
+console.log(`PROMOTION STATE: ${result.status}`);
 console.log("TOP BLOCKERS:");
 for (const blocker of topBlockers) {
   console.log(`- ${blocker.blockerName}`);

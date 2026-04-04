@@ -2,9 +2,15 @@ import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { classifyNoisePath, classifyNoisePaths } from "./noise_classifier_v1.js";
+import {
+  CANONICAL_ROOT,
+  getHygieneOutputPath,
+  isHygieneOutputPath,
+  MACHINE_ROLES,
+  resolveMachineRole,
+} from "./runtime_support_v1.js";
 
-const CANONICAL_ROOT = "/Users/rossstafford/projects/cart-agent";
-const REPORT_PATH = path.join(CANONICAL_ROOT, "staffordos/hygiene/hygiene_report_v1.json");
+const REPORT_PATH = getHygieneOutputPath("hygiene_report_v1.json");
 
 function runGit(args) {
   return execFileSync("git", ["-C", CANONICAL_ROOT, ...args], {
@@ -106,6 +112,7 @@ function parsePorcelain(output) {
 
   for (const line of lines) {
     const parsed = parsePorcelainLine(line);
+    if (isHygieneOutputPath(parsed.path)) continue;
     if (parsed.indexStatus === "?" && parsed.worktreeStatus === "?") {
       untracked.push(parsed.path);
       continue;
@@ -239,8 +246,8 @@ function buildRecommendedActions({
   return actions;
 }
 
-function determineStatus({ staged, unstaged, untracked, deployBlockers, mixedConcernRisk, generatedNoise }) {
-  if (deployBlockers.length > 0) return "BLOCKED";
+function determineStatus({ staged, unstaged, untracked, deployBlockers, mixedConcernRisk, generatedNoise, machineRole }) {
+  if (deployBlockers.length > 0 && machineRole === MACHINE_ROLES.DEPLOYMENT_CAPABLE) return "BLOCKED";
   const totalChanges = staged.length + unstaged.length + untracked.length;
   if (totalChanges === 0 && generatedNoise.length === 0) return "CLEAN";
   if (mixedConcernRisk.count > 8 || totalChanges > 80) return "BLOCKED";
@@ -248,6 +255,7 @@ function determineStatus({ staged, unstaged, untracked, deployBlockers, mixedCon
 }
 
 export function runHygieneAgentCheck() {
+  const machineRole = resolveMachineRole();
   const branch = runGit(["branch", "--show-current"]);
   const porcelain = runGitRaw(["status", "--porcelain=v1"]);
   const { staged, unstaged, untracked } = parsePorcelain(porcelain);
@@ -272,15 +280,34 @@ export function runHygieneAgentCheck() {
     lockfiles,
   });
 
+  const currentOperatingState = determineStatus({
+    staged,
+    unstaged,
+    untracked,
+    deployBlockers,
+    mixedConcernRisk,
+    generatedNoise,
+    machineRole: machineRole.role,
+  });
+
   const report = {
-    status: determineStatus({
-      staged,
-      unstaged,
-      untracked,
-      deployBlockers,
-      mixedConcernRisk,
-      generatedNoise,
-    }),
+    status: currentOperatingState,
+    machine_role: machineRole.role,
+    machine_role_source: machineRole.source,
+    current_operating_state: currentOperatingState,
+    deployment_state:
+      deployBlockers.length > 0
+        ? machineRole.role === MACHINE_ROLES.DEPLOYMENT_CAPABLE
+          ? "BLOCKED"
+          : "BLOCKED_ON_THIS_MACHINE_ONLY"
+        : "READY",
+    merchant_proof_state: "NOT_EVALUATED",
+    promotion_state:
+      currentOperatingState === "CLEAN" &&
+      generatedNoise.length === 0 &&
+      !(deployBlockers.length > 0 && machineRole.role === MACHINE_ROLES.DEPLOYMENT_CAPABLE)
+        ? "POTENTIALLY_READY"
+        : "BLOCKED",
     branch,
     staged,
     unstaged,

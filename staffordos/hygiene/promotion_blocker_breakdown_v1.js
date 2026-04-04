@@ -1,14 +1,14 @@
 import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
+import { CANONICAL_ROOT, getHygieneOutputPath } from "./runtime_support_v1.js";
 
-const CANONICAL_ROOT = "/Users/rossstafford/projects/cart-agent";
 const HYGIENE_DIR = path.join(CANONICAL_ROOT, "staffordos/hygiene");
-const HYGIENE_REPORT_PATH = path.join(HYGIENE_DIR, "hygiene_report_v1.json");
-const CLEANUP_GATE_REPORT_PATH = path.join(HYGIENE_DIR, "worktree_cleanup_gate_report.md");
-const PROMOTION_READINESS_REPORT_PATH = path.join(HYGIENE_DIR, "promotion_readiness_report_v2.md");
-const BRANCH_SCOPE_REPORT_PATH = path.join(HYGIENE_DIR, "branch_scope_report.md");
-const OUTPUT_PATH = path.join(HYGIENE_DIR, "promotion_blocker_breakdown.md");
+const HYGIENE_REPORT_PATH = getHygieneOutputPath("hygiene_report_v1.json");
+const CLEANUP_GATE_REPORT_PATH = getHygieneOutputPath("worktree_cleanup_gate_report.md");
+const PROMOTION_READINESS_REPORT_PATH = getHygieneOutputPath("promotion_readiness_report_v2.md");
+const BRANCH_SCOPE_REPORT_PATH = getHygieneOutputPath("branch_scope_report.md");
+const OUTPUT_PATH = getHygieneOutputPath("promotion_blocker_breakdown.md");
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
@@ -16,6 +16,21 @@ function readJson(filePath) {
 
 function readText(filePath) {
   return fs.readFileSync(filePath, "utf8");
+}
+
+function ensureCoreReports() {
+  if (fs.existsSync(HYGIENE_REPORT_PATH) && fs.existsSync(CLEANUP_GATE_REPORT_PATH) && fs.existsSync(BRANCH_SCOPE_REPORT_PATH)) {
+    return;
+  }
+
+  execFileSync("node", [path.join(HYGIENE_DIR, "run_hygiene_control_loop.js")], {
+    cwd: CANONICAL_ROOT,
+    stdio: "inherit",
+  });
+  execFileSync("node", [path.join(HYGIENE_DIR, "run_branch_scope_gate.js")], {
+    cwd: CANONICAL_ROOT,
+    stdio: "inherit",
+  });
 }
 
 function ensurePromotionReadinessReport() {
@@ -266,6 +281,7 @@ function writeReport(markdown) {
 }
 
 export function runPromotionBlockerBreakdown() {
+  ensureCoreReports();
   const hygiene = readJson(HYGIENE_REPORT_PATH);
   const cleanupGateReport = readText(CLEANUP_GATE_REPORT_PATH);
   const readinessReport = ensurePromotionReadinessReport();
@@ -276,12 +292,19 @@ export function runPromotionBlockerBreakdown() {
   const nextOrder = resolutionOrder(grouped);
   const allowedNextStep = "targeted blocker resolution in priority order";
   const blockedNextStep = "promotion";
+  const currentOperatingState = hygiene.current_operating_state || hygiene.status || "UNKNOWN";
+  const deploymentState = hygiene.deployment_state || "UNKNOWN";
+  const merchantProofState = grouped.PRODUCT_BLOCKERS.length > 0 ? "INCOMPLETE" : "READY";
 
   const markdown = `# Promotion Blocker Breakdown
 
 ## Current Promotion Status
 
 - Status: \`${breakdown.promotionStatus}\`
+- Current Operating State: \`${currentOperatingState}\`
+- Deployment State: \`${deploymentState}\`
+- Merchant Proof State: \`${merchantProofState}\`
+- Promotion State: \`${breakdown.promotionStatus}\`
 
 ## Blocker Categories
 
@@ -318,6 +341,9 @@ ${nextOrder.map((item) => `- ${item}`).join("\n")}
 
   return {
     status: breakdown.promotionStatus,
+    currentOperatingState,
+    deploymentState,
+    merchantProofState,
     grouped,
     nextOrder,
     markdown,

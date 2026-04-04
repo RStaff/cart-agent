@@ -44,6 +44,11 @@ console.log("");
 console.log("STATUS: PASS");
 console.log(`OUTPUT FILE: ${outputPath}`);
 console.log(`EXISTS: ${exists}`);
+console.log(`MACHINE ROLE: ${report.machine_role} (${report.machine_role_source})`);
+console.log(`CURRENT OPERATING STATE: ${report.current_operating_state}`);
+console.log(`DEPLOYMENT STATE: ${report.deployment_state}`);
+console.log(`MERCHANT PROOF STATE: ${report.merchant_proof_state}`);
+console.log(`PROMOTION STATE: ${report.promotion_state}`);
 console.log(`BRANCH: ${report.branch}`);
 console.log("");
 
