@@ -2,12 +2,16 @@ import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { classifyNoisePath } from "./noise_classifier_v1.js";
+import {
+  CANONICAL_ROOT,
+  getHygieneOutputPath,
+  isHygieneOutputPath,
+} from "./runtime_support_v1.js";
 
-const CANONICAL_ROOT = "/Users/rossstafford/projects/cart-agent";
 const HYGIENE_DIR = path.join(CANONICAL_ROOT, "staffordos/hygiene");
-const HYGIENE_REPORT_PATH = path.join(HYGIENE_DIR, "hygiene_report_v1.json");
-const CLEANUP_GATE_REPORT_PATH = path.join(HYGIENE_DIR, "worktree_cleanup_gate_report.md");
-const OUTPUT_PLAN_PATH = path.join(HYGIENE_DIR, "worktree_reduction_plan.md");
+const HYGIENE_REPORT_PATH = getHygieneOutputPath("hygiene_report_v1.json");
+const CLEANUP_GATE_REPORT_PATH = getHygieneOutputPath("worktree_cleanup_gate_report.md");
+const OUTPUT_PLAN_PATH = getHygieneOutputPath("worktree_reduction_plan.md");
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
@@ -187,18 +191,20 @@ function buildRows(hygieneReport) {
   );
   const changedPaths = buildChangedPathSet(hygieneReport, porcelainEntries);
 
-  return changedPaths.map((filePath) => {
-    const concern = concernFor(filePath);
-    const gitState = gitStateMap.get(filePath) || "GENERATED_ONLY";
-    const action = actionFor(filePath, concern, gitState);
-    return {
-      path: filePath,
-      concern,
-      gitState,
-      action,
-      reason: reasonFor(action, concern, gitState, filePath),
-    };
-  });
+  return changedPaths
+    .filter((filePath) => !isHygieneOutputPath(filePath))
+    .map((filePath) => {
+      const concern = concernFor(filePath);
+      const gitState = gitStateMap.get(filePath) || "GENERATED_ONLY";
+      const action = actionFor(filePath, concern, gitState);
+      return {
+        path: filePath,
+        concern,
+        gitState,
+        action,
+        reason: reasonFor(action, concern, gitState, filePath),
+      };
+    });
 }
 
 function groupByAction(rows) {

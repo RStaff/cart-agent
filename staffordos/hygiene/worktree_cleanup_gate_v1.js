@@ -1,19 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
+import { CANONICAL_ROOT, getHygieneOutputPath, MACHINE_ROLES } from "./runtime_support_v1.js";
 
-const CANONICAL_ROOT = "/Users/rossstafford/projects/cart-agent";
-const HYGIENE_REPORT_PATH = path.join(
-  CANONICAL_ROOT,
-  "staffordos/hygiene/hygiene_report_v1.json",
-);
-const ENVIRONMENT_INVENTORY_PATH = path.join(
-  CANONICAL_ROOT,
-  "staffordos/hygiene/environment_inventory_v1.json",
-);
-const REPORT_PATH = path.join(
-  CANONICAL_ROOT,
-  "staffordos/hygiene/worktree_cleanup_gate_report.md",
-);
+const HYGIENE_REPORT_PATH = getHygieneOutputPath("hygiene_report_v1.json");
+const ENVIRONMENT_INVENTORY_PATH = getHygieneOutputPath("environment_inventory_v1.json");
+const REPORT_PATH = getHygieneOutputPath("worktree_cleanup_gate_report.md");
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
@@ -96,9 +87,10 @@ function classifyState(hygiene, inventory) {
   const repoRisks = buildRepoHygieneRisks(hygiene);
   const environmentRisks = buildEnvironmentRisks(hygiene, inventory);
   const hasDeployBlockers = (hygiene?.deploy_blockers || []).length > 0;
+  const deploymentCapable = hygiene?.machine_role === MACHINE_ROLES.DEPLOYMENT_CAPABLE;
   const hasUnsafePromotion =
     hygiene?.status === "BLOCKED" ||
-    hasDeployBlockers ||
+    (hasDeployBlockers && deploymentCapable) ||
     repoRisks.some((risk) => risk.includes("Mixed concerns")) ||
     (hygiene?.unstaged || []).length > 80 ||
     (hygiene?.untracked || []).length > 50;
@@ -187,6 +179,16 @@ export function runWorktreeCleanupGate() {
 
   return {
     status: classification.status,
+    currentOperatingState:
+      hygiene?.status === "CLEAN" && (hygiene?.generated_noise || []).length === 0
+        ? "READY_TO_WORK"
+        : "SCOPED_CLEANUP_REQUIRED",
+    deploymentState: hygiene?.deployment_state || "UNKNOWN",
+    merchantProofState:
+      classification.environmentRisks.some((risk) => risk.includes("proof loop"))
+        ? "INCOMPLETE"
+        : "UNKNOWN",
+    promotionState: classification.status,
     allowedNextStep: classification.allowedNextStep,
     blockedNextStep: classification.blockedNextStep,
     reasons,
@@ -203,6 +205,10 @@ export function renderWorktreeCleanupGateReport(result) {
 ## Current Status
 
 - Status: \`${result.status}\`
+- Current Operating State: \`${result.currentOperatingState}\`
+- Deployment State: \`${result.deploymentState}\`
+- Merchant Proof State: \`${result.merchantProofState}\`
+- Promotion State: \`${result.promotionState}\`
 - Branch: \`${result.hygiene.branch}\`
 - Allowed Next Step: ${result.allowedNextStep}
 - Blocked Next Step: ${result.blockedNextStep}

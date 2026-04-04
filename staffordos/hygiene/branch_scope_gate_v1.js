@@ -2,10 +2,14 @@ import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { classifyNoisePath } from "./noise_classifier_v1.js";
+import {
+  CANONICAL_ROOT,
+  getHygieneOutputPath,
+  isHygieneOutputPath,
+} from "./runtime_support_v1.js";
 
-const CANONICAL_ROOT = "/Users/rossstafford/projects/cart-agent";
 const HYGIENE_DIR = path.join(CANONICAL_ROOT, "staffordos/hygiene");
-const REPORT_PATH = path.join(HYGIENE_DIR, "branch_scope_report.md");
+const REPORT_PATH = getHygieneOutputPath("branch_scope_report.md");
 
 function runGit(args) {
   return execFileSync("git", ["-C", CANONICAL_ROOT, ...args], {
@@ -141,7 +145,8 @@ export function runBranchScopeGate() {
     porcelain
       .split("\n")
       .filter(Boolean)
-      .map(parsePorcelainLine),
+      .map(parsePorcelainLine)
+      .filter((filePath) => !isHygieneOutputPath(filePath)),
   );
   const concernMap = buildConcernMap(changedPaths);
   const scopeSummary = summarizeScope(concernMap);
