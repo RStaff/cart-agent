@@ -190,7 +190,7 @@ function collectGeneratedNoise(candidatePaths = []) {
   const results = [];
   walkDirs(CANONICAL_ROOT, results, 0, 3);
   if (!candidatePaths.length) {
-    return [...new Set(results)].sort();
+    return [];
   }
 
   const normalizedCandidates = new Set(
