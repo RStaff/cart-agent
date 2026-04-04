@@ -9,6 +9,7 @@ export const MACHINE_ROLES = {
   DEPLOYMENT_CAPABLE: "DEPLOYMENT_CAPABLE",
 };
 export const LEGACY_HYGIENE_OUTPUT_RELATIVE_PATHS = new Set([
+  "staffordos/operator_frontdoor/operator_frontdoor_report.md",
   "staffordos/hygiene/branch_scope_report.md",
   "staffordos/hygiene/cleanup_execution_pack_v2.md",
   "staffordos/hygiene/cleanup_execution_plan.md",
