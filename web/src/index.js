@@ -350,6 +350,7 @@ app.use((req, _res, next) => {
 function sendRootHtml(req, res) {
   const year = new Date().getFullYear();
   const shop = normalizeStoreInput(String(req.query?.shop || "").trim().toLowerCase());
+  const homeUrl = toMerchantFacingUrl("/");
   const proofUrl = toMerchantFacingUrl(shop ? `/proof?shop=${encodeURIComponent(shop)}&flow=demo` : "/proof?flow=demo");
   const installUrl = toMerchantFacingUrl(shop ? `/install/shopify?shop=${encodeURIComponent(shop)}` : "/install/shopify");
   const pricingUrl = toMerchantFacingUrl("/pricing");
@@ -4144,16 +4145,24 @@ app.post("/api/recovery-actions/send-live-test", async (req, res) => {
 });
 
 app.get("/api/recovery-actions/email-readiness", (_req, res) => {
-  const configured = isEmailSenderConfigured();
-  const missingEnvVars = configured ? [] : getMissingEmailEnvVars();
+  const emailConfigured = isEmailSenderConfigured();
+  const smsConfigured = isSmsSenderConfigured();
+  const emailMissingEnvVars = emailConfigured ? [] : getMissingEmailEnvVars();
+  const smsMissingEnvVars = smsConfigured ? [] : getMissingSmsEnvVars();
 
   return res.json({
     ok: true,
+    configured: emailConfigured,
     email: {
-      configured,
-      missingEnvVars,
+      configured: emailConfigured,
+      missingEnvVars: emailMissingEnvVars,
       sender: resolveFromEmail(),
       sender_branded: resolveFromEmail() === "hello@abando.ai",
+    },
+    sms: {
+      configured: smsConfigured,
+      missingEnvVars: smsMissingEnvVars,
+      intentionallyDisabled: !smsConfigured && smsMissingEnvVars.length > 0,
     },
   });
 });
@@ -5017,8 +5026,10 @@ const APP_URL            =
   process.env.APP_URL ||
   process.env.ABANDO_PUBLIC_APP_ORIGIN ||
   process.env.NEXT_PUBLIC_ABANDO_PUBLIC_APP_ORIGIN ||
-  process.env.RENDER_EXTERNAL_URL ||
-  "https://cart-agent-api.onrender.com";
+  process.env.APP_BASE_URL ||
+  process.env.ABANDO_PUBLIC_BASE_URL ||
+  process.env.PUBLIC_BASE_URL ||
+  "https://app.abando.ai";
 const SHOPIFY_API_KEY    = process.env.SHOPIFY_API_KEY    || "";
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || "";
 const SHOPIFY_SCOPES     = process.env.SHOPIFY_SCOPES
@@ -9098,7 +9109,7 @@ function buildShopSlug(shopDomain) {
 }
 
 function buildInviteState({ shopDomain, cartsRecovered, cartsTotal, emailsSent }) {
-  const appBase = String(APP_URL || "https://pay.abando.ai").replace(/\/+$/, "");
+  const appBase = String(resolveConfiguredAppBaseUrl() || APP_URL || "https://app.abando.ai").replace(/\/+$/, "");
   const installUrl = `${appBase}/install/shopify`;
   const scorecardUrl = `${appBase}/scorecard/${encodeURIComponent(buildShopSlug(shopDomain))}`;
   const hasValueProof = Number(cartsRecovered || 0) > 0;
@@ -10510,10 +10521,6 @@ function buildAuthorizeUrl(shop, state, callbackBaseUrl) {
   return `https://${shop}/admin/oauth/authorize?client_id=${SHOPIFY_API_KEY}&scope=${encodeURIComponent(SHOPIFY_SCOPES)}&redirect_uri=${redirectUri}&state=${state}&grant_options[]=per-user`;
 }
 
-function getCanonicalShopifyOAuthBaseUrl() {
-  return "https://app.abando.ai";
-}
-
 function startShopifyOAuth(req, res) {
   const embeddedContext = getEmbeddedContext(req);
   let shop = embeddedContext.shop;
@@ -10530,7 +10537,7 @@ function startShopifyOAuth(req, res) {
   }
 
   const embedded = embeddedContext.embedded;
-  const callbackBaseUrl = getCanonicalShopifyOAuthBaseUrl();
+  const callbackBaseUrl = getConfiguredPublicBaseUrl() || APP_URL;
   const state = buildOAuthState(inviteId);
   const parsedState = parseOAuthState(state);
   res.cookie("shopify_state", parsedState.nonce, { httpOnly: true, sameSite: "none", secure: true, path: "/" });
