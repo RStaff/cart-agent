@@ -54,6 +54,17 @@ textarea {
   box-shadow: 0 16px 48px rgba(2, 6, 23, 0.32);
 }
 
+.dailyBriefPanel {
+  border-color: rgba(34, 211, 238, 0.32);
+  background:
+    linear-gradient(180deg, rgba(8, 47, 73, 0.4), rgba(15, 23, 42, 0.9)),
+    rgba(15, 23, 42, 0.9);
+}
+
+.secondaryPanel {
+  background: rgba(15, 23, 42, 0.68);
+}
+
 .panelInner {
   padding: 24px;
 }
@@ -171,6 +182,67 @@ textarea {
   color: #94a3b8;
 }
 
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(100, 116, 139, 0.4);
+  background: rgba(2, 6, 23, 0.6);
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.statusPillReady {
+  border-color: rgba(45, 212, 191, 0.5);
+  color: #ccfbf1;
+}
+
+.statusPillPartial {
+  border-color: rgba(251, 191, 36, 0.5);
+  color: #fde68a;
+}
+
+.statusPillStale {
+  border-color: rgba(251, 191, 36, 0.5);
+  color: #fde68a;
+}
+
+.statusPillDegraded,
+.statusPillMissing,
+.statusPillInvalid {
+  border-color: rgba(248, 113, 113, 0.45);
+  color: #fecaca;
+}
+
+.statusPillLoading {
+  border-color: rgba(56, 189, 248, 0.45);
+  color: #bae6fd;
+}
+
+.commandHero {
+  border-radius: 22px;
+  border: 1px solid rgba(34, 211, 238, 0.32);
+  background:
+    linear-gradient(135deg, rgba(8, 47, 73, 0.95), rgba(2, 6, 23, 0.92)),
+    rgba(2, 6, 23, 0.92);
+  padding: 22px;
+  font-size: clamp(18px, 2vw, 24px);
+  line-height: 1.35;
+  color: #ecfeff;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  box-shadow: inset 0 1px 0 rgba(103, 232, 249, 0.12);
+}
+
+.commandHeroMobile {
+  overflow-x: auto;
+  word-break: break-word;
+}
+
 .grid {
   display: grid;
   gap: 20px;
@@ -199,6 +271,23 @@ textarea {
 
 .kv strong {
   color: #f8fafc;
+}
+
+.commandCenterKv {
+  line-height: 1.55;
+}
+
+.commandCenterTruthText {
+  font-size: 16px;
+}
+
+.surfaceMarkdown {
+  display: grid;
+  gap: 2px;
+}
+
+.surfaceMarkdownLine {
+  overflow-wrap: anywhere;
 }
 
 .pre {
@@ -333,10 +422,223 @@ textarea {
   color: #cbd5e1;
 }
 
+.todaySummaryRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.todayStat {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(8, 47, 73, 0.72);
+  border: 1px solid rgba(34, 211, 238, 0.22);
+  font-size: 12px;
+  color: #cffafe;
+}
+
+.todayQueueCards {
+  display: grid;
+  gap: 14px;
+}
+
+.todayQueueCard {
+  border: 1px solid rgba(100, 116, 139, 0.22);
+  border-radius: 18px;
+  background: rgba(2, 6, 23, 0.7);
+  padding: 16px;
+}
+
+.recommendedActionCard {
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(34, 211, 238, 0.22);
+  background: rgba(2, 6, 23, 0.68);
+}
+
+.recommendedActionText {
+  margin: 0 0 10px;
+  font-size: 20px;
+  line-height: 1.4;
+  color: #f8fafc;
+}
+
+.queueTier {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(100, 116, 139, 0.34);
+  font-size: 12px;
+  color: #f8fafc;
+}
+
+.todayNotes {
+  min-height: 88px;
+  margin-top: 14px;
+}
+
+.inlineLink {
+  color: #67e8f9;
+  text-decoration: none;
+}
+
+.inlineLink:hover {
+  text-decoration: underline;
+}
+
+.modulePanelBody {
+  border: 1px solid rgba(100, 116, 139, 0.18);
+  border-radius: 18px;
+  background: rgba(2, 6, 23, 0.52);
+  padding: 16px;
+}
+
+.healthSubpanel {
+  background: rgba(2, 6, 23, 0.4);
+}
+
+.healthBadge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  background: rgba(51, 65, 85, 0.8);
+  color: #e2e8f0;
+}
+
+.healthGood {
+  background: rgba(20, 83, 45, 0.85);
+  color: #dcfce7;
+}
+
+.healthWarn {
+  background: rgba(133, 77, 14, 0.9);
+  color: #fef3c7;
+}
+
+.healthCritical {
+  background: rgba(127, 29, 29, 0.9);
+  color: #fee2e2;
+}
+
 @media (max-width: 860px) {
   .gridTwo,
   .roadmapGrid,
   .capacityBoard {
     grid-template-columns: 1fr;
+  }
+
+  .shell {
+    padding: 18px 12px 32px;
+  }
+
+  .container {
+    gap: 14px;
+  }
+
+  .panel {
+    border-radius: 20px;
+  }
+
+  .panelInner {
+    padding: 18px;
+  }
+
+  .title {
+    font-size: clamp(28px, 8vw, 36px);
+  }
+
+  .subtitle,
+  .commandCenterTruthText {
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  .commandCenterStatusRow {
+    gap: 8px;
+  }
+
+  .statusPill {
+    width: 100%;
+    justify-content: center;
+    padding: 9px 12px;
+  }
+
+  .commandCenterCardTitle {
+    font-size: 20px;
+    line-height: 1.3;
+  }
+
+  .commandHero {
+    padding: 18px 16px;
+    border-radius: 18px;
+    font-size: clamp(16px, 4.8vw, 20px);
+    line-height: 1.45;
+  }
+
+  .commandCenterKv {
+    gap: 10px;
+    font-size: 13px;
+  }
+
+  .commandCenterPanel .eyebrow,
+  .commandCenterCard .eyebrow {
+    margin-bottom: 10px;
+  }
+
+  .surfaceMarkdown .sectionTitle {
+    font-size: 16px;
+    line-height: 1.35;
+  }
+
+  .surfaceMarkdown .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+  }
+
+  .surfaceMarkdownLine,
+  .surfaceMarkdown .hint,
+  .surfaceMarkdown .emptyStateText {
+    font-size: 13px;
+    line-height: 1.65;
+  }
+}
+
+@media (max-width: 520px) {
+  .shell {
+    padding: 14px 10px 24px;
+  }
+
+  .panelInner {
+    padding: 16px 14px;
+  }
+
+  .navRow,
+  .row {
+    gap: 8px;
+  }
+
+  .chip {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .commandHero {
+    font-size: 15px;
+  }
+
+  .commandCenterKv {
+    font-size: 12.5px;
   }
 }

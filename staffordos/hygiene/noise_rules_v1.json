@@ -1,0 +1,22 @@
+{
+  "generated_noise_patterns": [
+    ".next/",
+    "node_modules/",
+    "dist/",
+    "build/",
+    "*.log"
+  ],
+  "suspicious_noise": [
+    "tmp/",
+    "cache/",
+    "*.tmp"
+  ],
+  "never_ignore": [
+    ".env.example",
+    "package.json",
+    "package-lock.json",
+    "prisma/",
+    "web/src/",
+    "abando-frontend/app/"
+  ]
+}
