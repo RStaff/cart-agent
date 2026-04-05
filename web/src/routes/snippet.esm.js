@@ -204,7 +204,10 @@ export function installSnippet(app) {
   // ---------- /abando.js (embeddable) ----------
   app.get("/abando.js", (_req, res) => {
     const detectorScript = getStorefrontCheckoutDetectorScript();
-    res.type("application/javascript").send(`(function(){
+    res
+      .status(200)
+      .set("Content-Type", "application/javascript; charset=utf-8")
+      .send(`(function(){
       if (window.__abandoLoaded) return; window.__abandoLoaded = true;
       var s=document.currentScript||(function(){var a=document.getElementsByTagName('script');return a[a.length-1]||null})();
       var cfg={
@@ -255,7 +258,7 @@ ${detectorScript}
 
   // ---------- /install (copy/paste) ----------
   app.get("/install", (_req, res) => {
-    const SNIP = `<script src="https://abando.ai/abando.js" defer></script>`;
+    const SNIP = `<script src="https://www.abando.ai/abando.js" defer></script>`;
     res.status(200).type("html").send(`<!doctype html><html lang="en"><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Install Abando</title>
 <style>

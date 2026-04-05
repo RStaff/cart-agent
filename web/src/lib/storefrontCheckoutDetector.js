@@ -144,11 +144,67 @@ function getStorefrontCheckoutDetectorScript() {
         } catch (e) {}
         return true;
       }
+      function normalizeTargetPath(value) {
+        try {
+          var raw = String(value || '').trim();
+          if (!raw) return '';
+          var parsed = new URL(raw, location.origin);
+          if (parsed.origin !== location.origin) return '';
+          return parsed.pathname || '';
+        } catch (e) {
+          return '';
+        }
+      }
+      function extractCheckoutIdFromPath(pathValue) {
+        try {
+          var path = String(pathValue || '').trim();
+          if (!path) return '';
+          var parts = path.split('/');
+          var checkoutIndex = parts.indexOf('checkouts');
+          if (checkoutIndex >= 0 && parts[checkoutIndex + 1]) {
+            return String(parts[checkoutIndex + 1] || '').trim();
+          }
+        } catch (e) {}
+        return '';
+      }
+      function isCheckoutTargetPath(pathValue) {
+        var path = String(pathValue || '').trim().toLowerCase();
+        return path.indexOf('/checkouts/') >= 0 || path === '/checkout' || path.indexOf('/checkout/') >= 0;
+      }
+      function isCartTargetPath(pathValue) {
+        var path = String(pathValue || '').trim().toLowerCase();
+        return path === '/cart' || path.indexOf('/cart/') === 0;
+      }
+      function submitterLooksLikeCheckoutIntent(submitter) {
+        if (!submitter || typeof submitter !== 'object') return false;
+        try {
+          var text = String(
+            submitter.getAttribute('name')
+            || submitter.getAttribute('value')
+            || submitter.textContent
+            || ''
+          ).trim().toLowerCase();
+          return text === 'checkout' || text.indexOf('checkout') >= 0;
+        } catch (e) {
+          return false;
+        }
+      }
       function buildNormalizedCheckoutEvent(eventType, stage, extra) {
         extra = extra || {};
+        var normalizedPath = normalizeTargetPath(extra.checkoutPath) || location.pathname || '/';
+        var normalizedHost = location.hostname || null;
+        var normalizedCheckoutId = extra.checkoutId || extractCheckoutIdFromPath(normalizedPath) || cartToken || null;
+        var preCheckoutIntent = extra.preCheckoutIntent === true;
+        var captureMode = preCheckoutIntent ? 'pre_checkout_intent' : 'checkout_runtime';
         return {
           shop: SHOP_DOMAIN || null,
           session_id: getSessionMarker(),
+          checkout_id: normalizedCheckoutId,
+          checkout_session_id: normalizedCheckoutId || getSessionMarker(),
+          checkoutPath: normalizedPath,
+          storefrontHost: normalizedHost,
+          proofCaptureStage: captureMode,
+          checkoutPageReached: !preCheckoutIntent && isCheckoutLikePath(),
           timestamp: new Date().toISOString(),
           event_type: eventType,
           stage: stage,
@@ -161,11 +217,67 @@ function getStorefrontCheckoutDetectorScript() {
             reason: extra.reason || null,
             cartToken: cartToken || null,
             storefrontHost: location.hostname || null,
+            preCheckoutIntent: preCheckoutIntent,
+            checkoutPageReached: !preCheckoutIntent && isCheckoutLikePath(),
+            intentSource: extra.intentSource || null,
+            checkoutTargetPath: normalizedPath,
+            proofCaptureStage: captureMode,
             signalBase: SIGNAL_BASE || null,
             validationMode: isValidationMode(),
             emittedBy: 'abando.js'
           }
         };
+      }
+      function sendPreCheckoutIntent(extra) {
+        extra = extra || {};
+        var targetPath = normalizeTargetPath(extra.checkoutPath || '');
+        if (!SHOP_DOMAIN || !EVENT_BASE || !targetPath || !isCheckoutTargetPath(targetPath)) {
+          return false;
+        }
+        updateStorefrontProof({
+          lastAttemptedEvent: 'checkout_started',
+          lastPostStatus: 'pre_checkout_intent',
+          lastPostTimestamp: new Date().toISOString()
+        });
+        setBodyMarker('abando-pre-checkout-intent', targetPath);
+        return sendNormalizedCheckoutEvent('checkout_started', 'checkout', {
+          preCheckoutIntent: true,
+          intentSource: extra.intentSource || 'checkout_transition',
+          checkoutPath: targetPath,
+          checkoutId: extractCheckoutIdFromPath(targetPath) || null
+        });
+      }
+      function detectCheckoutIntentFromClick(target) {
+        if (!target || typeof target.closest !== 'function') return null;
+        var anchor = target.closest('a[href]');
+        if (anchor) {
+          var anchorPath = normalizeTargetPath(anchor.getAttribute('href'));
+          if (isCheckoutTargetPath(anchorPath)) {
+            return { checkoutPath: anchorPath, intentSource: 'checkout_link_click' };
+          }
+        }
+        var formOwner = target.form || target.closest('form');
+        if (formOwner) {
+          var formAction = normalizeTargetPath(formOwner.getAttribute('action') || formOwner.action || '');
+          if (isCheckoutTargetPath(formAction)) {
+            return { checkoutPath: formAction, intentSource: 'checkout_form_click' };
+          }
+          if (isCartTargetPath(formAction) && submitterLooksLikeCheckoutIntent(target)) {
+            return { checkoutPath: '/checkout', intentSource: 'cart_checkout_click' };
+          }
+        }
+        return null;
+      }
+      function detectCheckoutIntentFromSubmit(form, submitter) {
+        if (!form || typeof form !== 'object') return null;
+        var formAction = normalizeTargetPath(form.getAttribute('action') || form.action || '');
+        if (isCheckoutTargetPath(formAction)) {
+          return { checkoutPath: formAction, intentSource: 'checkout_form_submit' };
+        }
+        if (isCartTargetPath(formAction) && submitterLooksLikeCheckoutIntent(submitter || document.activeElement)) {
+          return { checkoutPath: '/checkout', intentSource: 'cart_checkout_submit' };
+        }
+        return null;
       }
       function sendNormalizedCheckoutEvent(eventType, stage, extra) {
         if (!SHOP_DOMAIN || !EVENT_BASE) {
@@ -748,6 +860,18 @@ function getStorefrontCheckoutDetectorScript() {
           }
           armIdleRisk();
         }
+        document.addEventListener('click', function(event) {
+          var intent = detectCheckoutIntentFromClick(event.target);
+          if (intent) {
+            sendPreCheckoutIntent(intent);
+          }
+        }, true);
+        document.addEventListener('submit', function(event) {
+          var intent = detectCheckoutIntentFromSubmit(event.target, event.submitter);
+          if (intent) {
+            sendPreCheckoutIntent(intent);
+          }
+        }, true);
         document.addEventListener('visibilitychange', function() {
           if (document.visibilityState === 'hidden') sendCheckoutRisk('visibility_hidden');
           else if (isCheckoutLikePath()) armIdleRisk();

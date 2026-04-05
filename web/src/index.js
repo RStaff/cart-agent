@@ -29,7 +29,13 @@ import {
   persistRecoveryAttributionFromSend,
   RECOVERY_ATTRIBUTION_EVENT,
 } from "./lib/recoveryAttribution.js";
-import { isEmailSenderConfigured, resolveFromEmail, sendRecoveryEmail } from "./lib/emailSender.js";
+import {
+  getEmailReadiness,
+  getMissingEmailEnvVars as getEmailSenderMissingEnvVars,
+  isEmailSenderConfigured,
+  resolveFromEmail,
+  sendRecoveryEmail,
+} from "./lib/emailSender.js";
 import { fetchTwilioMessageStatus, interpretTwilioDeliveryStatus, isSmsSenderConfigured, sendRecoverySMS } from "./lib/smsSender.js";
 import { analyzeStore } from "./lib/storeAnalyzer.js";
 import { getStaffordosUrl } from "./lib/staffordosUrl.js";
@@ -811,8 +817,7 @@ function normalizePhone(value = "") {
 }
 
 function getMissingEmailEnvVars() {
-  const required = ["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS", "FROM_EMAIL"];
-  return required.filter((name) => !String(process.env[name] || "").trim());
+  return getEmailSenderMissingEnvVars();
 }
 
 function getMissingSmsEnvVars() {
@@ -910,13 +915,21 @@ function resolveCheckoutContextFromEventPayload(payload, experienceId = "") {
   ).trim();
   const checkoutSessionId = String(
     payload?.checkout_session_id
+    || payload?.checkoutSessionId
     || payload?.checkout_token
     || payload?.session_id
     || "",
   ).trim();
-  const checkoutPath = String(metadata?.path || "").trim();
+  const checkoutPath = String(
+    payload?.checkoutPath
+    || payload?.checkout_path
+    || metadata?.path
+    || "",
+  ).trim();
   const storefrontHost = String(
-    metadata?.storefrontHost
+    payload?.storefrontHost
+    || payload?.storefront_host
+    || metadata?.storefrontHost
     || metadata?.storefront_host
     || "",
   )
@@ -1035,6 +1048,10 @@ function buildExperienceFlowUrls({ req, shop, experienceId, channel }) {
     state: "recovered",
     eid: experienceId,
   });
+  const recoveryProofParams = new URLSearchParams({
+    shop,
+    eid: experienceId,
+  });
 
   return {
     experienceUrl: `${origin}/experience?${experienceParams.toString()}`,
@@ -1045,7 +1062,7 @@ function buildExperienceFlowUrls({ req, shop, experienceId, channel }) {
       channel,
     }),
     returnedUrl: `${origin}/experience/returned?${experienceParams.toString()}`,
-    proofRecoveredUrl: `${origin}/proof?${proofParams.toString()}`,
+    proofRecoveredUrl: `${origin}/proof/recovery?${recoveryProofParams.toString()}`,
   };
 }
 
@@ -1103,7 +1120,7 @@ function buildExperienceRecoveryMessage({
     experienceId,
     channel,
   });
-  const returnLink = String(baseMessage.returnLink || "").trim() || proofReturnLink;
+  const returnLink = proofReturnLink || String(baseMessage.returnLink || "").trim();
 
   const recoveredCheckoutHtml = [
     '<div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.5;">',
@@ -1197,6 +1214,63 @@ async function listRecoveryActionEvents(shop, experienceId) {
   });
 }
 
+async function findShopForExperienceId(experienceId) {
+  const normalizedExperienceId = normalizeExperienceId(experienceId);
+  if (!normalizedExperienceId) return "";
+
+  const events = await prisma.systemEvent.findMany({
+    where: {
+      eventType: {
+        in: [
+          "abando.experience_send.v1",
+          "abando.recovery_action.v1",
+          "abando.recovery_sent.v1",
+          "abando.customer_return.v1",
+          "abando.recovery_returned.v1",
+          "abando.recovery_attribution.v1",
+        ],
+      },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 250,
+  });
+
+  for (const event of events) {
+    const payload = event?.payload;
+    if (!payload || typeof payload !== "object") continue;
+    if (normalizeExperienceId(payload.experienceId) !== normalizedExperienceId) continue;
+    const shopDomain = normalizeShop(String(event.shopDomain || payload.shop || "").trim().toLowerCase());
+    if (shopDomain) return shopDomain;
+  }
+
+  return "";
+}
+
+function buildPublicExperienceStatus(status) {
+  const returned = Boolean(status?.return?.returned);
+  const returnedAt = status?.return?.returnedAt || null;
+  const orderRevenueCents = Number(
+    status?.return?.attribution?.recoveredRevenue?.cents
+    || status?.attribution?.order_total_price_cents
+    || 0,
+  ) || 0;
+  const purchased = Boolean(
+    status?.verified
+    || status?.return?.attribution?.verified
+    || status?.attribution?.proof_status === "verified_shopify_order",
+  );
+
+  return {
+    returned,
+    returnedAt,
+    purchased,
+    revenue: purchased && orderRevenueCents > 0
+      ? Number((orderRevenueCents / 100).toFixed(2))
+      : null,
+    channel: status?.return?.attribution?.channel || status?.send?.channel || null,
+  };
+}
+
 function isSyntheticCheckoutValue(value = "") {
   const normalized = String(value || "").trim().toLowerCase();
   if (!normalized) return false;
@@ -1207,12 +1281,36 @@ function isSyntheticCheckoutValue(value = "") {
     || normalized.startsWith("test-cart-");
 }
 
-function isRealStorefrontCheckoutPayload(payload) {
+function isPreCheckoutIntentStorefrontPayload(payload) {
   if (!payload || typeof payload !== "object") return false;
   if (String(payload.event_type || "").trim().toLowerCase() !== "checkout_started") return false;
   if (String(payload.source || "").trim().toLowerCase() !== "live_storefront") return false;
 
   const context = resolveCheckoutContextFromEventPayload(payload);
+  const metadata = payload?.metadata && typeof payload.metadata === "object" ? payload.metadata : {};
+  const checkoutPath = String(payload?.checkoutPath || payload?.checkout_path || context.checkoutPath || "").trim();
+  const proofCaptureStage = String(payload?.proofCaptureStage || metadata?.proofCaptureStage || "").trim().toLowerCase();
+  const preCheckoutIntent = payload?.checkoutPageReached === false
+    || metadata?.checkoutPageReached === false
+    || payload?.preCheckoutIntent === true
+    || metadata?.preCheckoutIntent === true
+    || proofCaptureStage === "pre_checkout_intent";
+
+  if (!preCheckoutIntent) return false;
+  if (!context.storefrontHost) return false;
+  if (!checkoutPath.startsWith("/") || (!checkoutPath.startsWith("/checkout") && !checkoutPath.includes("/checkouts/"))) {
+    return false;
+  }
+  return true;
+}
+
+function isRealStorefrontCheckoutPayload(payload, { allowPreCheckoutIntent = false } = {}) {
+  if (!payload || typeof payload !== "object") return false;
+  if (String(payload.event_type || "").trim().toLowerCase() !== "checkout_started") return false;
+  if (String(payload.source || "").trim().toLowerCase() !== "live_storefront") return false;
+
+  const context = resolveCheckoutContextFromEventPayload(payload);
+  if (allowPreCheckoutIntent && isPreCheckoutIntentStorefrontPayload(payload)) return true;
   if (!context.storefrontHost) return false;
   if (!context.checkoutId && !context.checkoutPath) return false;
   if (isSyntheticCheckoutValue(context.checkoutId) || isSyntheticCheckoutValue(context.checkoutSessionId)) return false;
@@ -1221,7 +1319,7 @@ function isRealStorefrontCheckoutPayload(payload) {
   return true;
 }
 
-async function findLatestCheckoutStartedEvent(shop, { requireRealStorefront = false } = {}) {
+async function findLatestCheckoutStartedEvent(shop, { requireRealStorefront = false, allowPreCheckoutIntent = false } = {}) {
   if (!shop) return null;
 
   const events = await prisma.systemEvent.findMany({
@@ -1241,7 +1339,7 @@ async function findLatestCheckoutStartedEvent(shop, { requireRealStorefront = fa
   });
 
   const latestRealStorefrontEvent = checkoutStartedEvents.find((event) =>
-    isRealStorefrontCheckoutPayload(event?.payload),
+    isRealStorefrontCheckoutPayload(event?.payload, { allowPreCheckoutIntent }),
   ) || null;
 
   if (requireRealStorefront) {
@@ -1249,6 +1347,354 @@ async function findLatestCheckoutStartedEvent(shop, { requireRealStorefront = fa
   }
 
   return latestRealStorefrontEvent || checkoutStartedEvents[0] || null;
+}
+
+async function findLatestRecoveryActionEvent(shop) {
+  if (!shop) return null;
+
+  return prisma.systemEvent.findFirst({
+    where: {
+      shopDomain: shop,
+      eventType: "abando.recovery_action.v1",
+    },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+function generateQuickstartExperienceId() {
+  return `quickstart-${Date.now().toString(36)}-${randomBytes(2).toString("hex")}`;
+}
+
+async function createQuickstartCheckoutEvent({ shop, experienceId }) {
+  const occurredAt = new Date().toISOString();
+  const checkoutId = `quickstart_checkout_${randomBytes(6).toString("hex")}`;
+  const sessionId = `quickstart_session_${randomBytes(6).toString("hex")}`;
+
+  const event = await prisma.systemEvent.create({
+    data: {
+      shopDomain: shop,
+      eventType: "abando.checkout_event.v1",
+      visibility: "merchant",
+      payload: {
+        id: `quickstart_event_${randomBytes(8).toString("hex")}`,
+        shop,
+        experienceId,
+        session_id: sessionId,
+        checkout_id: checkoutId,
+        checkout_session_id: sessionId,
+        checkoutPath: "/checkout",
+        storefrontHost: shop,
+        timestamp: occurredAt,
+        occurredAt,
+        event_type: "checkout_started",
+        stage: "checkout",
+        source: "live_storefront",
+        device_type: "unknown",
+        checkoutPageReached: false,
+        preCheckoutIntent: true,
+        proofCaptureStage: "pre_checkout_intent",
+        metadata: {
+          path: "/checkout",
+          storefrontHost: shop,
+          emittedBy: "api/quickstart/run",
+          quickstart: true,
+          preCheckoutIntent: true,
+          checkoutPageReached: false,
+          proofCaptureStage: "pre_checkout_intent",
+        },
+      },
+    },
+  });
+
+  console.log("[QUICKSTART] injected checkout event", {
+    shop,
+    experienceId,
+    eventId: event.id,
+  });
+
+  return event;
+}
+
+async function ensureQuickstartCheckoutEvent({ shop, experienceId }) {
+  const latestCheckoutEvent = await findLatestCheckoutStartedEvent(shop, {
+    requireRealStorefront: true,
+    allowPreCheckoutIntent: true,
+  });
+
+  if (latestCheckoutEvent) {
+    return latestCheckoutEvent;
+  }
+
+  return createQuickstartCheckoutEvent({ shop, experienceId });
+}
+
+async function runQuickstartFlow({ req, shop, email }) {
+  const normalizedShop = normalizeShop(String(shop || "").trim().toLowerCase());
+  const normalizedEmail = normalizeEmail(email);
+  const emailReadiness = getEmailReadiness();
+
+  console.log("[QUICKSTART] started", {
+    shop: normalizedShop || null,
+    email: normalizedEmail || null,
+  });
+
+  if (!normalizedShop) {
+    return { ok: false, status: 400, error: "Missing shop" };
+  }
+
+  if (!normalizedEmail || !isValidEmail(normalizedEmail)) {
+    return { ok: false, status: 400, error: "Enter a valid email address." };
+  }
+
+  if (!emailReadiness.ready) {
+    return {
+      ok: false,
+      status: 503,
+      error: "Email not configured",
+      missing: emailReadiness.missing,
+    };
+  }
+
+  const shopRecord = await prisma.shop.findUnique({
+    where: { key: normalizedShop },
+    select: { key: true },
+  });
+
+  if (!shopRecord) {
+    return { ok: false, status: 404, error: "Store not found" };
+  }
+
+  const experienceId = generateQuickstartExperienceId();
+  const checkoutEvent = await ensureQuickstartCheckoutEvent({
+    shop: normalizedShop,
+    experienceId,
+  });
+  const checkoutPayload = checkoutEvent?.payload && typeof checkoutEvent.payload === "object"
+    ? checkoutEvent.payload
+    : {};
+  const checkoutOccurredAt =
+    String(checkoutPayload.occurredAt || checkoutPayload.timestamp || checkoutEvent?.createdAt?.toISOString?.() || new Date().toISOString());
+  const checkoutContext = resolveCheckoutContextFromEventPayload(checkoutPayload, experienceId);
+
+  console.log("[QUICKSTART] event ready", {
+    shop: normalizedShop,
+    experienceId,
+    checkoutEventId: checkoutEvent.id,
+    source: checkoutPayload.source || null,
+  });
+
+  const recoveryMessage = buildExperienceRecoveryMessage({
+    req,
+    shop: normalizedShop,
+    eventData: checkoutPayload,
+    timestamp: checkoutOccurredAt,
+    experienceId,
+    tonePreset: "direct",
+    channel: "email",
+  });
+
+  const deliveryAction = await prisma.systemEvent.create({
+    data: {
+      shopDomain: normalizedShop,
+      eventType: "abando.recovery_action.v1",
+      visibility: "merchant",
+      payload: {
+        recovery_id: null,
+        status: "created",
+        source: "quickstart",
+        createdAt: new Date().toISOString(),
+        experienceId,
+        tone_preset: "direct",
+        channel_requested: "email",
+        checkout_id: checkoutContext.checkoutId || null,
+        checkout_session_id: checkoutContext.checkoutSessionId || null,
+        source_event_id: String(checkoutPayload.id || "").trim() || null,
+      },
+    },
+  });
+
+  async function logDeliveryAttempt(channel, outcome, detail = {}) {
+    await prisma.systemEvent.create({
+      data: {
+        shopDomain: normalizedShop,
+        eventType: "abando.recovery_delivery.v1",
+        visibility: "merchant",
+        relatedJobId: deliveryAction.id,
+        payload: {
+          channel,
+          outcome,
+          at: new Date().toISOString(),
+          quickstart: true,
+          ...detail,
+        },
+      },
+    });
+  }
+
+  console.log("[QUICKSTART] recovery triggered", {
+    shop: normalizedShop,
+    experienceId,
+    email: normalizedEmail,
+  });
+
+  const sendResult = await executeRecoverySend({
+    shop: normalizedShop,
+    email: normalizedEmail,
+    phone: "",
+    recoveryMessage,
+    actionId: deliveryAction.id,
+    testMode: true,
+    logDeliveryAttempt,
+  });
+  const summary = summarizeSendResult(sendResult);
+  const timestamp = new Date().toISOString();
+
+  await prisma.systemEvent.update({
+    where: { id: deliveryAction.id },
+    data: {
+      payload: {
+        recovery_id: deliveryAction.id,
+        status: summary.success ? "sent" : "created",
+        source: "quickstart",
+        createdAt: deliveryAction.payload?.createdAt || new Date().toISOString(),
+        experienceId,
+        tone_preset: "direct",
+        channel_requested: "email",
+        checkout_id: checkoutContext.checkoutId || null,
+        checkout_session_id: checkoutContext.checkoutSessionId || null,
+        source_event_id: String(checkoutPayload.id || "").trim() || null,
+        channel: summary.channels[0] || "email",
+        channels: sendResult.successfulChannels,
+        delivery: sendResult.delivery,
+        messageId: sendResult.messageId,
+        sentAt: sendResult.sentAt || null,
+        attemptedRealSend: sendResult.successfulChannels.length > 0 || sendResult.failedChannels.length > 0,
+        lastError: sendResult.sendError || null,
+      },
+    },
+  });
+
+  if (!summary.success) {
+    return {
+      ok: false,
+      status: 502,
+      error: "Send failed",
+      details: sendResult.sendError || "provider_send_failed",
+      experienceId,
+      proofUrl: `/proof/recovery?eid=${encodeURIComponent(experienceId)}`,
+    };
+  }
+
+  const proofLoop = await recordProofLoopSend({
+    shop: normalizedShop,
+    experienceId,
+    channel: "email",
+    sendTimestamp: timestamp,
+    sendStatus: "sent",
+    deliveryStatus: "sent_confirmed",
+    valueEstimate: 0,
+    source: "quickstart",
+    variantId: "quickstart",
+    messageAngle: "quickstart",
+    tonePreset: "direct",
+    leadDomain: "",
+    leadSegmentKey: "",
+    providerAccepted: Boolean(sendResult.messageId),
+  });
+
+  await persistExperienceSendRecords({
+    shop: normalizedShop,
+    experienceId,
+    sendResult,
+    proofLoopId: proofLoop?.loop_id || "",
+    tonePreset: "direct",
+    recoveryId: deliveryAction.id,
+    recoveryActionId: deliveryAction.id,
+    checkoutId: checkoutContext.checkoutId,
+    checkoutSessionId: checkoutContext.checkoutSessionId,
+    sourceEventId: String(checkoutPayload.id || "").trim(),
+  });
+
+  await prisma.systemEvent.create({
+    data: {
+      shopDomain: normalizedShop,
+      eventType: "abando.recovery_sent.v1",
+      visibility: "merchant",
+      relatedJobId: deliveryAction.id,
+      payload: {
+        shop: normalizedShop,
+        recovery_id: deliveryAction.id,
+        recovery_action_id: deliveryAction.id,
+        experienceId,
+        checkout_id: checkoutContext.checkoutId || null,
+        checkout_session_id: checkoutContext.checkoutSessionId || null,
+        channel: "email",
+        target: normalizedEmail,
+        sent_at: timestamp,
+        provider_accepted: Boolean(sendResult.messageId),
+        message_id: sendResult.messageId || null,
+        proofLoopId: proofLoop?.loop_id || null,
+        source: "quickstart",
+      },
+    },
+  });
+
+  await persistRecoveryAttributionFromSend(prisma, {
+    recovery_id: deliveryAction.id,
+    recovery_action_id: deliveryAction.id,
+    experienceId,
+    proof_loop_id: proofLoop?.loop_id || "",
+    shop: normalizedShop,
+    checkout_id: checkoutContext.checkoutId,
+    checkout_session_id: checkoutContext.checkoutSessionId,
+    source_event_id: String(checkoutPayload.id || "").trim(),
+    channel: "email",
+    target: normalizedEmail,
+    sent_at: timestamp,
+    provider_message_id: sendResult.messageId || "",
+  }).catch(() => {});
+
+  const proofUrl = `/proof/recovery?eid=${encodeURIComponent(experienceId)}`;
+
+  await prisma.systemEvent.create({
+    data: {
+      shopDomain: normalizedShop,
+      eventType: "abando.quickstart.v1",
+      visibility: "merchant",
+      relatedJobId: deliveryAction.id,
+      payload: {
+        shop: normalizedShop,
+        experienceId,
+        email: normalizedEmail,
+        proofUrl,
+        messageId: sendResult.messageId || null,
+        sent_at: timestamp,
+      },
+    },
+  });
+
+  console.log("[QUICKSTART] recovery sent", {
+    shop: normalizedShop,
+    experienceId,
+    email: normalizedEmail,
+    messageId: sendResult.messageId || null,
+  });
+  console.log("[QUICKSTART] proof generated", {
+    shop: normalizedShop,
+    experienceId,
+    proofUrl,
+  });
+
+  return {
+    ok: true,
+    status: 200,
+    shop: normalizedShop,
+    experienceId,
+    sent: true,
+    proofUrl,
+    recoveryLink: recoveryMessage.returnLink || null,
+    messageId: sendResult.messageId || null,
+  };
 }
 
 async function findLatestEventByType(shop, eventType, experienceId = "") {
@@ -2533,8 +2979,12 @@ function resolveDashboardShopFromRequest(req) {
 
 function buildAbandoMerchantSummaryResponse(summary, { notes = [] } = {}) {
   const checkoutEventCount = Number(summary?.checkoutEventCount || summary?.checkoutEventsCount || 0);
+  const preCheckoutCaptured = Boolean(summary?.preCheckoutCaptured);
+  const checkoutPageReached = Boolean(summary?.checkoutPageReached);
+  const sendReady = Boolean(summary?.sendReady);
+  const proofCaptureStage = String(summary?.proofCaptureStage || "none");
   const status = summary?.connectionStatus === "connected"
-    ? checkoutEventCount >= 1
+    ? sendReady || checkoutEventCount >= 1
       ? "recovery_ready"
       : "listening"
     : "not_connected";
@@ -2553,6 +3003,10 @@ function buildAbandoMerchantSummaryResponse(summary, { notes = [] } = {}) {
     eventCount: checkoutEventCount,
     lastEventSeen,
     lastEventAt: summary?.latestEventTimestamp || summary?.lastCheckoutEventAt || null,
+    proofCaptureStage,
+    preCheckoutCaptured,
+    checkoutPageReached,
+    sendReady,
     lastRecoveryActionAt: summary?.lastRecoveryActionAt || null,
     lastRecoveryActionType: summary?.lastRecoveryActionType || null,
     notes: Array.isArray(notes) ? notes : [],
@@ -3165,6 +3619,18 @@ app.post("/api/checkout-events", async (req, res) => {
         })),
     );
 
+    for (const event of events) {
+      if (String(event?.event_type || "").trim().toLowerCase() === "checkout_started") {
+        console.log("[EVENT] checkout_started received", {
+          shop: event.shop,
+          source: event.source,
+          occurredAt: event.occurredAt || event.timestamp || null,
+          checkoutId: event.checkout_id || null,
+          checkoutPath: event.checkoutPath || event.metadata?.path || null,
+        });
+      }
+    }
+
     return res.json({
       ok: true,
       saved: events.length,
@@ -3173,6 +3639,222 @@ app.post("/api/checkout-events", async (req, res) => {
     });
   } catch (error) {
     return res.status(400).json({
+      ok: false,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+});
+
+app.get("/api/debug/recovery-state", async (req, res) => {
+  try {
+    const shop = normalizeShop(String(req.query?.shop || "").trim().toLowerCase());
+    if (!shop) {
+      return res.status(400).json({ ok: false, error: "missing_shop" });
+    }
+
+    const latestCheckoutEvent = await findLatestCheckoutStartedEvent(shop, {
+      requireRealStorefront: true,
+      allowPreCheckoutIntent: true,
+    });
+    const latestRecoveryAction = await findLatestRecoveryActionEvent(shop);
+    const latestCheckoutPayload = latestCheckoutEvent?.payload && typeof latestCheckoutEvent.payload === "object"
+      ? latestCheckoutEvent.payload
+      : null;
+    const latestRecoveryPayload = latestRecoveryAction?.payload && typeof latestRecoveryAction.payload === "object"
+      ? latestRecoveryAction.payload
+      : null;
+    const lastCheckoutEventAt =
+      latestCheckoutPayload?.occurredAt ||
+      latestCheckoutPayload?.timestamp ||
+      latestCheckoutEvent?.createdAt?.toISOString?.() ||
+      null;
+    const lastRecoveryActionAt =
+      latestRecoveryPayload?.createdAt ||
+      latestRecoveryPayload?.sentAt ||
+      latestRecoveryAction?.createdAt?.toISOString?.() ||
+      null;
+    const recoveryReady = Boolean(latestCheckoutEvent);
+
+    if (recoveryReady) {
+      console.log(`[RECOVERY] ready for shop: ${shop}`, {
+        lastCheckoutEventAt,
+      });
+    }
+
+    return res.json({
+      shop,
+      hasCheckoutEvent: Boolean(latestCheckoutEvent),
+      lastCheckoutEventAt,
+      hasRecoveryAction: Boolean(latestRecoveryAction),
+      lastRecoveryActionAt,
+      recoveryReady,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      ok: false,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+});
+
+app.post("/api/debug/trigger-recovery", async (req, res) => {
+  try {
+    const shop = normalizeShop(String(req.body?.shop || "").trim().toLowerCase());
+    if (!shop) {
+      return res.status(400).json({ ok: false, error: "missing_shop" });
+    }
+
+    const latestCheckoutEvent = await findLatestCheckoutStartedEvent(shop, {
+      requireRealStorefront: true,
+      allowPreCheckoutIntent: true,
+    });
+
+    if (!latestCheckoutEvent) {
+      return res.status(409).json({
+        ok: false,
+        error: "no_checkout_event",
+        details: "No qualifying checkout_started event exists for this shop.",
+      });
+    }
+
+    const latestCheckoutPayload = latestCheckoutEvent?.payload && typeof latestCheckoutEvent.payload === "object"
+      ? latestCheckoutEvent.payload
+      : null;
+    const latestEventAt =
+      latestCheckoutPayload?.occurredAt ||
+      latestCheckoutPayload?.timestamp ||
+      latestCheckoutEvent?.createdAt?.toISOString?.() ||
+      new Date().toISOString();
+    const action = await prisma.systemEvent.create({
+      data: {
+        shopDomain: shop,
+        eventType: "abando.recovery_action.v1",
+        visibility: "merchant",
+        payload: {
+          status: "created",
+          action_type: "debug_recovery_trigger",
+          createdAt: new Date().toISOString(),
+          source: "debug_trigger",
+          basedOnEventAt: latestEventAt,
+          debug: true,
+        },
+      },
+    });
+
+    console.log(`[DEBUG] recovery triggered for shop: ${shop}`, {
+      recoveryActionId: action.id,
+      basedOnEventAt: latestEventAt,
+    });
+    console.log(`[RECOVERY] triggered for shop: ${shop}`, {
+      recoveryActionId: action.id,
+      basedOnEventAt: latestEventAt,
+    });
+
+    return res.json({
+      ok: true,
+      triggered: true,
+      shop,
+      recoveryActionId: action.id,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      ok: false,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+});
+
+app.post("/api/debug/inject-checkout", async (req, res) => {
+  try {
+    const shop = normalizeShop(String(req.body?.shop || "").trim().toLowerCase());
+    if (!shop) {
+      return res.status(400).json({ ok: false, error: "missing_shop" });
+    }
+
+    const injectedEvent = await prisma.systemEvent.create({
+      data: {
+        shopDomain: shop,
+        eventType: "abando.checkout_event.v1",
+        visibility: "merchant",
+        payload: {
+          id: `debug_checkout_${randomBytes(8).toString("hex")}`,
+          shop,
+          session_id: `debug_session_${randomBytes(8).toString("hex")}`,
+          checkout_id: `debug_checkout_${randomBytes(6).toString("hex")}`,
+          checkout_session_id: `debug_checkout_${randomBytes(6).toString("hex")}`,
+          checkoutPath: "/checkout",
+          storefrontHost: shop,
+          timestamp: new Date().toISOString(),
+          occurredAt: new Date().toISOString(),
+          event_type: "checkout_started",
+          stage: "checkout",
+          source: "manual_dev",
+          device_type: "unknown",
+          order_id: null,
+          customerEmail: null,
+          customerPhone: null,
+          metadata: {
+            path: "/checkout",
+            storefrontHost: shop,
+            emittedBy: "api/debug/inject-checkout",
+            debug: true,
+          },
+        },
+      },
+    });
+
+    console.log("[EVENT] checkout_started received", {
+      shop,
+      source: "manual_dev",
+      occurredAt: injectedEvent.createdAt?.toISOString?.() || null,
+      checkoutId: "debug_injected",
+      checkoutPath: "/checkout",
+    });
+
+    return res.json({
+      ok: true,
+      injected: true,
+      shop,
+      eventId: injectedEvent.id,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      ok: false,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+});
+
+app.post("/api/quickstart/run", async (req, res) => {
+  try {
+    const result = await runQuickstartFlow({
+      req,
+      shop: String(req.body?.shop || ""),
+      email: String(req.body?.email || ""),
+    });
+
+    if (!result.ok) {
+      return res.status(result.status || 500).json({
+        ok: false,
+        error: result.error || "quickstart_failed",
+        details: result.details || "",
+        missing: result.missing || [],
+        experienceId: result.experienceId || null,
+        proofUrl: result.proofUrl || null,
+      });
+    }
+
+    return res.json({
+      ok: true,
+      shop: result.shop,
+      experienceId: result.experienceId,
+      sent: true,
+      proofUrl: result.proofUrl,
+      recoveryLink: result.recoveryLink,
+      messageId: result.messageId || null,
+    });
+  } catch (error) {
+    return res.status(500).json({
       ok: false,
       error: error instanceof Error ? error.message : String(error),
     });
@@ -3728,10 +4410,11 @@ app.post("/api/recovery-actions/send-live-test", async (req, res) => {
       return res.status(400).json({ ok: false, error: "Enter a valid mobile phone number.", provider: "twilio", details: "" });
     }
 
-    const emailConfigured = isEmailSenderConfigured();
+    const emailReadiness = getEmailReadiness();
+    const emailConfigured = emailReadiness.ready;
     const smsConfigured = isSmsSenderConfigured();
     const missingEnvVars = [
-      ...(emailConfigured ? [] : getMissingEmailEnvVars()),
+      ...(emailConfigured ? [] : emailReadiness.missing),
       ...(smsConfigured ? [] : getMissingSmsEnvVars()),
     ];
     const providerStatuses = [
@@ -3749,9 +4432,11 @@ app.post("/api/recovery-actions/send-live-test", async (req, res) => {
       });
       return res.status(503).json({
         ok: false,
-        error: "Messaging not configured",
+        error: "Send not configured",
         provider: !emailConfigured && email ? "smtp" : (!smsConfigured && phone ? "twilio" : ""),
         details: missingEnvVars.join(", "),
+        sent: false,
+        missing: missingEnvVars,
         channels: [],
         providerStatuses,
         missingEnvVars,
@@ -3788,6 +4473,7 @@ app.post("/api/recovery-actions/send-live-test", async (req, res) => {
 
     const latestCheckoutEvent = await findLatestCheckoutStartedEvent(shop, {
       requireRealStorefront: true,
+      allowPreCheckoutIntent: true,
     });
 
     if (!latestCheckoutEvent) {
@@ -4092,6 +4778,7 @@ app.post("/api/recovery-actions/send-live-test", async (req, res) => {
 
     return res.json({
       ok: true,
+      sent: true,
       channel: summary.channels[0] || "",
       provider: summary.channels[0] === "email" ? "smtp" : (summary.channels[0] === "sms" ? "twilio" : ""),
       status: "sent",
@@ -4144,15 +4831,18 @@ app.post("/api/recovery-actions/send-live-test", async (req, res) => {
 });
 
 app.get("/api/recovery-actions/email-readiness", (_req, res) => {
-  const configured = isEmailSenderConfigured();
-  const missingEnvVars = configured ? [] : getMissingEmailEnvVars();
+  const readiness = getEmailReadiness();
+  const configured = readiness.ready;
+  const missingEnvVars = readiness.missing;
 
   return res.json({
     ok: true,
+    ready: configured,
+    missing: missingEnvVars,
     email: {
       configured,
       missingEnvVars,
-      sender: resolveFromEmail(),
+      sender: readiness.sender || resolveFromEmail(),
       sender_branded: resolveFromEmail() === "hello@abando.ai",
     },
   });
@@ -4160,16 +4850,40 @@ app.get("/api/recovery-actions/email-readiness", (_req, res) => {
 
 app.get("/api/experience/status", async (req, res) => {
   try {
-    const shop = normalizeShop(String(req.query?.shop || "").trim().toLowerCase());
+    let shop = normalizeShop(String(req.query?.shop || "").trim().toLowerCase());
     const experienceId = normalizeExperienceId(req.query?.eid);
+
+    if (!shop && experienceId) {
+      shop = await findShopForExperienceId(experienceId);
+    }
 
     if (!shop) {
       return res.status(400).json({ ok: false, error: "missing_shop" });
     }
 
     const status = await getExperienceStatus(shop, experienceId);
+    const publicStatus = buildPublicExperienceStatus(status);
+
+    if (publicStatus.purchased) {
+      console.log(`[PURCHASE] matched to experienceId=${experienceId || "unknown"}`, {
+        shop,
+        revenue: publicStatus.revenue,
+        returnedAt: publicStatus.returnedAt,
+      });
+      if (publicStatus.revenue !== null) {
+        console.log(`[RECOVERED] revenue=${publicStatus.revenue}`, {
+          shop,
+          experienceId: experienceId || null,
+          channel: publicStatus.channel,
+        });
+      }
+    }
+
     return res.json({
       ok: true,
+      shop,
+      experienceId: experienceId || null,
+      ...publicStatus,
       ...status,
     });
   } catch (error) {
@@ -4269,9 +4983,13 @@ app.post("/api/recovery/return", async (req, res) => {
 
 app.get("/api/recovery/return", async (req, res) => {
   try {
-    const shop = normalizeShop(String(req.query?.shop || "").trim().toLowerCase());
+    let shop = normalizeShop(String(req.query?.shop || "").trim().toLowerCase());
     const experienceId = normalizeExperienceId(req.query?.eid);
     const requestedChannel = String(req.query?.channel || "").trim().toLowerCase();
+
+    if (!shop && experienceId) {
+      shop = await findShopForExperienceId(experienceId);
+    }
 
     if (!shop) {
       return res.status(400).type("html").send("<h1>Missing shop</h1>");
@@ -4377,13 +5095,43 @@ app.get("/api/recovery/return", async (req, res) => {
         return_timestamp: returnedAt,
         value_estimate: Number(recoveredValue?.cents || current?.value_estimate || 0),
         verified: Boolean(current?.send_timestamp),
-      }));
+        }));
     }
 
-    return res.redirect(
-      302,
-      `/experience/returned?shop=${encodeURIComponent(shop)}&eid=${encodeURIComponent(experienceId)}`,
-    );
+    const latestCheckoutStartedEvent = await findLatestCheckoutStartedEvent(shop, {
+      requireRealStorefront: false,
+      allowPreCheckoutIntent: true,
+    });
+    const latestCheckoutPayload = latestCheckoutStartedEvent?.payload && typeof latestCheckoutStartedEvent.payload === "object"
+      ? latestCheckoutStartedEvent.payload
+      : {};
+    const checkoutContext = resolveCheckoutContextFromEventPayload({
+      ...latestCheckoutPayload,
+      checkout_id: String(payload.checkout_id || latestCheckoutPayload.checkout_id || latestCheckoutPayload.checkoutId || ""),
+      checkout_session_id: String(payload.checkout_session_id || latestCheckoutPayload.checkout_session_id || latestCheckoutPayload.session_id || ""),
+    }, experienceId);
+    const checkoutResumeUrl = buildShopifyCheckoutResumeUrl({
+      shop,
+      checkoutId: checkoutContext.checkoutId,
+      checkoutPath: checkoutContext.checkoutPath,
+      storefrontHost: checkoutContext.storefrontHost,
+    });
+    const returnedUrl = `${resolveMerchantFacingBaseUrl()}/experience/returned?shop=${encodeURIComponent(shop)}&eid=${encodeURIComponent(experienceId)}`;
+
+    console.log("[RETURN] user returned via recovery link", {
+      shop,
+      experienceId,
+      channel,
+      returnedAt,
+      redirectTo: checkoutResumeUrl || returnedUrl,
+    });
+    console.log(`[RETURN] experienceId=${experienceId}`, {
+      shop,
+      channel,
+      returnedAt,
+    });
+
+    return res.redirect(302, checkoutResumeUrl || returnedUrl);
   } catch (error) {
     return res.status(400).type("html").send(`<h1>${escapeHtml(error instanceof Error ? error.message : String(error))}</h1>`);
   }
@@ -4716,6 +5464,64 @@ app.get("/proof", async (req, res) => {
     flow,
     state,
     recoveredValue,
+  }));
+});
+
+app.get("/proof/leak", async (req, res) => {
+  const shop = normalizeStoreInput(String(req.query?.shop || "").trim().toLowerCase());
+  const emailReadiness = getEmailReadiness();
+  let summary = buildAbandoMerchantSummaryResponse(null, { notes: [] });
+
+  if (shop) {
+    try {
+      const dashboardSummary = await getDashboardSummary(prisma, shop);
+      summary = buildAbandoMerchantSummaryResponse(dashboardSummary, { notes: [] });
+    } catch (_error) {
+      summary = buildAbandoMerchantSummaryResponse(null, { notes: [] });
+    }
+  }
+
+  console.log("[PROOF] leak map viewed", {
+    shop: shop || null,
+    status: summary?.status || null,
+    eventCount: Number(summary?.eventCount || 0),
+  });
+
+  return res.status(200).type("html").send(renderProofLeakPage({
+    shop,
+    summary,
+    emailReadiness,
+  }));
+});
+
+app.get("/proof/recovery", async (req, res) => {
+  const requestedShop = normalizeStoreInput(String(req.query?.shop || "").trim().toLowerCase());
+  const experienceId = normalizeExperienceId(req.query?.eid);
+  const shop = requestedShop || await findShopForExperienceId(experienceId);
+
+  if (!experienceId) {
+    return res.status(400).type("html").send("<h1>Missing experience id</h1>");
+  }
+
+  if (!shop) {
+    return res.status(404).type("html").send("<h1>Recovery proof not found</h1>");
+  }
+
+  const status = await getExperienceStatus(shop, experienceId);
+  const publicStatus = buildPublicExperienceStatus(status);
+
+  console.log("[PROOF] recovery receipt viewed", {
+    shop,
+    experienceId,
+    returned: publicStatus.returned,
+    purchased: publicStatus.purchased,
+    revenue: publicStatus.revenue,
+  });
+
+  return res.status(200).type("html").send(renderProofRecoveryPage({
+    shop,
+    experienceId,
+    publicStatus,
   }));
 });
 
@@ -5259,7 +6065,32 @@ function normalizeCheckoutEventPayload(payload) {
       || input.metadata?.cartToken
       || session_id
     ).trim(),
-    checkout_session_id: String(input.checkout_session_id || input.checkout_token || session_id).trim(),
+    checkout_session_id: String(
+      input.checkout_session_id
+      || input.checkoutSessionId
+      || input.checkout_token
+      || session_id
+    ).trim(),
+    checkoutPath: String(
+      input.checkoutPath
+      || input.checkout_path
+      || input.metadata?.path
+      || ""
+    ).trim(),
+    storefrontHost: String(
+      input.storefrontHost
+      || input.storefront_host
+      || input.metadata?.storefrontHost
+      || input.metadata?.storefront_host
+      || ""
+    )
+      .trim()
+      .replace(/^https?:\/\//i, "")
+      .replace(/^www\./i, "")
+      .split("/")[0]
+      .split("?")[0]
+      .split("#")[0]
+      .toLowerCase(),
     timestamp: new Date(parsedTimestamp).toISOString(),
     occurredAt: new Date(parsedTimestamp).toISOString(),
     event_type,
@@ -6137,6 +6968,29 @@ function renderExperienceReturnedPage({
   recoveredValue,
 }) {
   const recoveredValueLabel = formatUsdFromCents(recoveredValue?.cents || 0);
+  const returnedChannel = String(
+    experienceStatus?.return?.attribution?.channel
+    || experienceStatus?.send?.channel
+    || "",
+  ).trim().toLowerCase();
+  const returnedAt = String(
+    experienceStatus?.return?.attribution?.returnClickedAt
+    || experienceStatus?.return?.returnedAt
+    || "",
+  ).trim();
+  const receiptTimestamp = returnedAt
+    ? new Date(returnedAt).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })
+    : "";
+  const purchaseVerified = Boolean(
+    experienceStatus?.verified
+    || experienceStatus?.return?.attribution?.verified,
+  );
+  const receiptLabel = returnedChannel
+    ? `Channel: ${returnedChannel.toUpperCase()}`
+    : "Channel: recovery link";
+  const receiptTimestampLabel = receiptTimestamp
+    ? `Timestamp: ${receiptTimestamp}`
+    : "Timestamp: pending";
   const proofImpactParams = new URLSearchParams();
   if (shop) proofImpactParams.set("shop", shop);
   proofImpactParams.set("flow", "demo");
@@ -6282,6 +7136,26 @@ function renderExperienceReturnedPage({
       color: #e2e8f0;
       font-weight: 600;
     }
+    .receipt {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      background: rgba(15, 23, 42, 0.56);
+      text-align: left;
+    }
+    .receipt strong {
+      display: block;
+      color: #f8fafc;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+    .receipt span {
+      display: block;
+      color: #cbd5e1;
+      font-size: 13px;
+      line-height: 1.55;
+    }
   </style>
 </head>
 <body>
@@ -6290,7 +7164,12 @@ function renderExperienceReturnedPage({
     <section class="panel">
       <h1>Return detected.</h1>
       <p>Your self-test completed the full recovery loop on this store.</p>
-      <p>Abando caught the return and attributed the recovered revenue.</p>
+      <p>${purchaseVerified ? "This purchase was recovered by Abando." : "This return was recovered by Abando."}</p>
+      <div class="receipt">
+        <strong>${purchaseVerified ? "Recovered purchase receipt" : "Recovered return receipt"}</strong>
+        <span>${receiptLabel}</span>
+        <span>${receiptTimestampLabel}</span>
+      </div>
       <div class="value-block">
         <div class="value-label">Recovered revenue</div>
         <div class="value-line">${escapeHtml(recoveredValueLabel)}</div>
@@ -6301,6 +7180,333 @@ function renderExperienceReturnedPage({
         <a class="${billingAvailable ? "secondary" : ""}" href="${escapeHtml(proofImpactUrl)}">${billingAvailable ? "See proof details" : "See the impact"}</a>
       </div>
       <div class="support">Questions? <a href="mailto:hello@abando.ai">hello@abando.ai</a></div>
+    </section>
+  </main>
+</body>
+</html>`;
+}
+
+function humanizeLeakStatus(status) {
+  const normalized = String(status || "").trim().toLowerCase();
+  if (normalized === "recovery_ready") return "Recovery Ready";
+  if (normalized === "listening") return "Listening";
+  if (normalized === "connected") return "Connected";
+  if (normalized === "not_connected") return "Connected";
+  return "Connected";
+}
+
+function renderProofLeakPage({
+  shop,
+  summary,
+  emailReadiness,
+}) {
+  const statusLabel = humanizeLeakStatus(summary?.status);
+  const eventCount = Number(summary?.eventCount || 0);
+  const lastEventAt = summary?.lastEventAt ? formatProofTimestamp(summary.lastEventAt) : "No checkout event detected yet";
+  const recoveryReadiness = summary?.sendReady || summary?.status === "recovery_ready" ? "Ready" : "Not ready";
+  const lastRecoveryAction = summary?.lastRecoveryActionAt
+    ? `${humanizeProofAction(summary?.lastRecoveryActionType || "recovery_email")} · ${formatProofTimestamp(summary.lastRecoveryActionAt)}`
+    : "No recovery action recorded yet";
+  const emailState = emailReadiness?.ready ? "Configured" : "Not configured";
+  const missingEmail = Array.isArray(emailReadiness?.missing) && emailReadiness.missing.length > 0
+    ? emailReadiness.missing.join(", ")
+    : "";
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Abando Leak Map</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top, rgba(59, 130, 246, 0.16), transparent 38%),
+        linear-gradient(180deg, #020617 0%, #0f172a 100%);
+      color: #e2e8f0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: grid;
+      place-items: center;
+      padding: 28px 18px;
+    }
+    .shell {
+      width: 100%;
+      max-width: 760px;
+    }
+    .brand {
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .panel {
+      background: rgba(15, 23, 42, 0.86);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 28px;
+      padding: 30px 24px 24px;
+      box-shadow: 0 28px 80px rgba(2, 6, 23, 0.42);
+    }
+    h1 {
+      margin: 0;
+      color: #f8fafc;
+      font-size: clamp(34px, 6vw, 52px);
+      line-height: 1.02;
+      letter-spacing: -0.05em;
+      text-align: center;
+    }
+    .lede {
+      margin: 14px auto 0;
+      max-width: 560px;
+      color: #cbd5e1;
+      line-height: 1.6;
+      font-size: 16px;
+      text-align: center;
+    }
+    .hero {
+      margin-top: 24px;
+      padding: 22px 20px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.78), rgba(15, 23, 42, 0.94));
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      text-align: center;
+    }
+    .hero-label {
+      color: #93c5fd;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .hero-value {
+      margin-top: 12px;
+      font-size: clamp(34px, 7vw, 54px);
+      font-weight: 800;
+      color: #f8fafc;
+      letter-spacing: -0.06em;
+      line-height: 0.96;
+    }
+    .hero-copy {
+      margin-top: 10px;
+      color: #cbd5e1;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+    .card {
+      padding: 18px 16px;
+      border-radius: 20px;
+      background: rgba(15, 23, 42, 0.72);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+    }
+    .card-label {
+      color: #94a3b8;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .card-value {
+      margin-top: 10px;
+      color: #f8fafc;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+    }
+    .card-copy {
+      margin-top: 8px;
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .fineprint {
+      margin-top: 18px;
+      text-align: center;
+      color: #94a3b8;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="brand">Abando Leak Map</div>
+    <section class="panel">
+      <h1>Recover lost revenue automatically.</h1>
+      <p class="lede">Open this page to see whether your store is detecting abandoned checkouts, whether recovery is ready, and whether delivery can actually fire.</p>
+      <div class="hero">
+        <div class="hero-label">Status</div>
+        <div class="hero-value">${escapeHtml(statusLabel)}</div>
+        <div class="hero-copy">Your store is ${eventCount > 0 ? "detecting abandoned checkouts." : "connected, but no qualifying checkout activity has been captured yet."}</div>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <div class="card-label">Checkout Events</div>
+          <div class="card-value">${escapeHtml(String(eventCount))}</div>
+          <div class="card-copy">Last event: ${escapeHtml(lastEventAt)}</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Recovery State</div>
+          <div class="card-value">${escapeHtml(recoveryReadiness)}</div>
+          <div class="card-copy">Last recovery action: ${escapeHtml(lastRecoveryAction)}</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Message Delivery</div>
+          <div class="card-value">${escapeHtml(emailState)}</div>
+          <div class="card-copy">${escapeHtml(missingEmail ? `Missing env: ${missingEmail}` : "Email delivery is configured and ready for recovery sends.")}</div>
+        </div>
+      </div>
+      <div class="fineprint">Shop: ${escapeHtml(shop || "Unknown store")} · Screenshot-ready proof of leak visibility and recovery readiness.</div>
+    </section>
+  </main>
+</body>
+</html>`;
+}
+
+function renderProofRecoveryPage({
+  shop,
+  experienceId,
+  publicStatus,
+}) {
+  const returnedLabel = publicStatus?.returned ? "Yes" : "No";
+  const returnedAtLabel = publicStatus?.returnedAt ? formatProofTimestamp(publicStatus.returnedAt) : "Not yet";
+  const purchasedLabel = publicStatus?.purchased ? "Yes" : "Unknown / not yet matched";
+  const revenueLabel = publicStatus?.revenue !== null && publicStatus?.revenue !== undefined
+    ? new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(publicStatus.revenue || 0))
+    : "Revenue not verified yet";
+  const channelLabel = String(publicStatus?.channel || "").trim() ? String(publicStatus.channel).toUpperCase() : "UNKNOWN";
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Abando Recovery Receipt</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top, rgba(16, 185, 129, 0.16), transparent 38%),
+        linear-gradient(180deg, #020617 0%, #0f172a 100%);
+      color: #e2e8f0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: grid;
+      place-items: center;
+      padding: 28px 18px;
+    }
+    .shell {
+      width: 100%;
+      max-width: 560px;
+    }
+    .brand {
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .panel {
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 28px;
+      padding: 30px 24px 24px;
+      box-shadow: 0 28px 80px rgba(2, 6, 23, 0.42);
+      text-align: center;
+    }
+    h1 {
+      margin: 0;
+      color: #f8fafc;
+      font-size: clamp(34px, 7vw, 48px);
+      line-height: 1.02;
+      letter-spacing: -0.05em;
+    }
+    p {
+      margin: 14px 0 0;
+      color: #cbd5e1;
+      line-height: 1.6;
+      font-size: 15px;
+    }
+    .grid {
+      display: grid;
+      gap: 12px;
+      margin-top: 22px;
+      text-align: left;
+    }
+    .row {
+      padding: 16px 16px;
+      border-radius: 18px;
+      background: rgba(15, 23, 42, 0.72);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+    }
+    .row-label {
+      color: #94a3b8;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .row-value {
+      margin-top: 8px;
+      color: #f8fafc;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.15;
+    }
+    .footer {
+      margin-top: 18px;
+      color: #94a3b8;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="brand">Abando Recovery Receipt</div>
+    <section class="panel">
+      <h1>Recovery Completed</h1>
+      <p>This customer returned through an Abando recovery.</p>
+      <div class="grid">
+        <div class="row">
+          <div class="row-label">Returned</div>
+          <div class="row-value">${escapeHtml(returnedLabel)}</div>
+        </div>
+        <div class="row">
+          <div class="row-label">Returned At</div>
+          <div class="row-value">${escapeHtml(returnedAtLabel)}</div>
+        </div>
+        <div class="row">
+          <div class="row-label">Channel</div>
+          <div class="row-value">${escapeHtml(channelLabel)}</div>
+        </div>
+        <div class="row">
+          <div class="row-label">Purchased</div>
+          <div class="row-value">${escapeHtml(purchasedLabel)}</div>
+        </div>
+        <div class="row">
+          <div class="row-label">Revenue</div>
+          <div class="row-value">${escapeHtml(revenueLabel)}</div>
+        </div>
+      </div>
+      <div class="footer">Powered by Abando · Shop: ${escapeHtml(shop || "Unknown store")} · Experience: ${escapeHtml(experienceId || "Unknown")}</div>
     </section>
   </main>
 </body>
@@ -10506,7 +11712,8 @@ function statesMatchByNonce(storedState, receivedState) {
 }
 
 function buildAuthorizeUrl(shop, state, callbackBaseUrl) {
-  const redirectUri = encodeURIComponent(`${callbackBaseUrl.replace(/\/+$/, "")}/auth/callback`);
+  const redirectUri = encodeURIComponent("https://app.abando.ai/auth/callback");
+  console.log("[OAUTH] redirect_uri FIXED → https://app.abando.ai/auth/callback");
   return `https://${shop}/admin/oauth/authorize?client_id=${SHOPIFY_API_KEY}&scope=${encodeURIComponent(SHOPIFY_SCOPES)}&redirect_uri=${redirectUri}&state=${state}&grant_options[]=per-user`;
 }
 
