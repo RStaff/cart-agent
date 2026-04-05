@@ -10,14 +10,33 @@ function fromEmail() {
   return env("FROM_EMAIL") || env("DEFAULT_FROM") || env("SMTP_FROM");
 }
 
-export function isEmailSenderConfigured() {
-  return Boolean(
-    env("SMTP_HOST") &&
-    env("SMTP_PORT") &&
-    env("SMTP_USER") &&
-    env("SMTP_PASS") &&
-    fromEmail()
+export function resolveFromEmail() {
+  return fromEmail();
+}
+
+export function getMissingEmailEnvVars() {
+  const missing = ["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS"].filter(
+    (name) => !env(name),
   );
+
+  if (!fromEmail()) {
+    missing.push("FROM_EMAIL");
+  }
+
+  return missing;
+}
+
+export function getEmailReadiness() {
+  const missing = getMissingEmailEnvVars();
+  return {
+    ready: missing.length === 0,
+    missing,
+    sender: resolveFromEmail(),
+  };
+}
+
+export function isEmailSenderConfigured() {
+  return getEmailReadiness().ready;
 }
 
 async function getTransporter() {
@@ -54,6 +73,7 @@ export async function sendRecoveryEmail({ to, subject, html, text = "" }) {
   }
 
   try {
+    console.log("[EMAIL] sending to:", { email: recipient });
     const info = await transporter.sendMail({
       from: fromEmail(),
       to: recipient,
@@ -62,11 +82,17 @@ export async function sendRecoveryEmail({ to, subject, html, text = "" }) {
       text: String(text || "").trim() || undefined,
     });
 
+    console.log("[EMAIL] sent successfully", {
+      email: recipient,
+      messageId: info?.messageId || null,
+    });
+
     return {
       success: true,
       messageId: info?.messageId || null,
     };
   } catch (error) {
+    console.log("[EMAIL] failed:", error instanceof Error ? error.message : String(error));
     return {
       success: false,
       error: error instanceof Error ? error.message : String(error),

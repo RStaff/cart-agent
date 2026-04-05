@@ -97,6 +97,35 @@ export async function getDashboardSummary(prisma, shop) {
   const latestEventPayload = latestCheckoutEvent?.payload && typeof latestCheckoutEvent.payload === "object"
     ? latestCheckoutEvent.payload
     : null;
+  const latestCheckoutPath = String(
+    latestEventPayload?.checkoutPath
+    || latestEventPayload?.checkout_path
+    || latestEventPayload?.metadata?.path
+    || ""
+  ).trim();
+  const latestProofCaptureStage = String(
+    latestEventPayload?.proofCaptureStage
+    || latestEventPayload?.metadata?.proofCaptureStage
+    || ""
+  ).trim().toLowerCase();
+  const preCheckoutCaptured = Boolean(
+    latestEventPayload
+    && (
+      latestEventPayload?.preCheckoutIntent === true
+      || latestEventPayload?.metadata?.preCheckoutIntent === true
+      || latestProofCaptureStage === "pre_checkout_intent"
+    )
+    && latestCheckoutPath.startsWith("/checkout")
+  );
+  const checkoutPageReached = Boolean(
+    latestEventPayload
+    && (
+      latestEventPayload?.checkoutPageReached === true
+      || latestEventPayload?.metadata?.checkoutPageReached === true
+      || latestCheckoutPath.includes("/checkouts/")
+    )
+  );
+  const sendReady = Boolean(preCheckoutCaptured || checkoutPageReached);
   const latestRecoveryActionPayload = latestRecoveryAction?.payload && typeof latestRecoveryAction.payload === "object"
     ? latestRecoveryAction.payload
     : null;
@@ -190,6 +219,14 @@ export async function getDashboardSummary(prisma, shop) {
         : "Not connected",
     latestEventType: latestEventPayload?.event_type || null,
     latestEventTimestamp: lastCheckoutEventAt,
+    preCheckoutCaptured,
+    checkoutPageReached,
+    sendReady,
+    proofCaptureStage: checkoutPageReached
+      ? "checkout_page_reached"
+      : preCheckoutCaptured
+        ? "pre_checkout_captured"
+        : "none",
     checkoutEventCount,
     cartsTotal,
     cartsRecovered,

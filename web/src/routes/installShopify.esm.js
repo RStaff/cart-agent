@@ -1,9 +1,15 @@
-const SCRIPT_TAG_BASE = process.env.ABANDO_STOREFRONT_SCRIPT_SRC || "https://abando.ai/abando.js";
+const SCRIPT_TAG_BASE = process.env.ABANDO_STOREFRONT_SCRIPT_SRC || "https://pay.abando.ai/abando.js";
 const EVENT_INGEST_BASE =
   process.env.ABANDO_PUBLIC_APP_ORIGIN ||
   process.env.NEXT_PUBLIC_ABANDO_PUBLIC_APP_ORIGIN ||
   process.env.APP_URL ||
   "https://pay.abando.ai";
+const MANAGED_ABANDO_SCRIPT_HOSTS = new Set([
+  "abando.ai",
+  "www.abando.ai",
+  "pay.abando.ai",
+]);
+const MANAGED_ABANDO_SCRIPT_PATH = "/abando.js";
 
 function buildScriptTagSrc({ shop, eventBase = EVENT_INGEST_BASE }) {
   const normalizedShop = normalizeShop(shop);
@@ -27,14 +33,25 @@ function buildScriptTagSrc({ shop, eventBase = EVENT_INGEST_BASE }) {
   return url.toString();
 }
 
-function isManagedAbandoScriptTag(scriptTag, src) {
+function normalizeScriptTagUrl(value) {
   try {
-    const left = new URL(String(scriptTag?.src || ""));
-    const right = new URL(src);
-    return left.hostname === right.hostname && left.pathname === right.pathname;
+    return new URL(String(value || ""));
   } catch {
-    return false;
+    return null;
   }
+}
+
+function isManagedAbandoScriptTag(scriptTag, src = SCRIPT_TAG_BASE) {
+  const left = normalizeScriptTagUrl(scriptTag?.src || "");
+  const right = normalizeScriptTagUrl(src);
+  if (!left || !right) return false;
+
+  return (
+    left.pathname === MANAGED_ABANDO_SCRIPT_PATH &&
+    right.pathname === MANAGED_ABANDO_SCRIPT_PATH &&
+    MANAGED_ABANDO_SCRIPT_HOSTS.has(left.hostname) &&
+    MANAGED_ABANDO_SCRIPT_HOSTS.has(right.hostname)
+  );
 }
 
 function normalizeShop(raw) {
@@ -101,7 +118,47 @@ async function ensureScriptTagInstalled({ shop, accessToken, src = buildScriptTa
     searchParams: { limit: 50 },
   });
 
-  const existing = (list?.script_tags || []).find((scriptTag) => isManagedAbandoScriptTag(scriptTag, src));
+  const desiredUrl = normalizeScriptTagUrl(src);
+  if (!desiredUrl) {
+    throw new Error("Invalid desired ScriptTag source.");
+  }
+
+  const managedTags = (list?.script_tags || []).filter((scriptTag) =>
+    isManagedAbandoScriptTag(scriptTag, src),
+  );
+
+  const exactMatches = managedTags.filter((scriptTag) => {
+    const existingUrl = normalizeScriptTagUrl(scriptTag?.src || "");
+    return existingUrl && existingUrl.toString() === desiredUrl.toString();
+  });
+
+  const staleManagedTags = managedTags.filter((scriptTag) => {
+    const existingUrl = normalizeScriptTagUrl(scriptTag?.src || "");
+    return !existingUrl || existingUrl.toString() !== desiredUrl.toString();
+  });
+
+  for (const staleTag of staleManagedTags) {
+    if (!staleTag?.id) continue;
+    await shopifyAdminRequest({
+      shop,
+      accessToken,
+      path: `script_tags/${staleTag.id}.json`,
+      method: "DELETE",
+    });
+  }
+
+  const existing = exactMatches[0] || null;
+  const duplicateExactMatches = exactMatches.slice(1);
+  for (const duplicateTag of duplicateExactMatches) {
+    if (!duplicateTag?.id) continue;
+    await shopifyAdminRequest({
+      shop,
+      accessToken,
+      path: `script_tags/${duplicateTag.id}.json`,
+      method: "DELETE",
+    });
+  }
+
   if (existing?.id) {
     const updated = await shopifyAdminRequest({
       shop,
@@ -123,6 +180,8 @@ async function ensureScriptTagInstalled({ shop, accessToken, src = buildScriptTa
       id: existing.id,
       script_tag: updated?.script_tag || null,
       src,
+      removedLegacyTagIds: staleManagedTags.map((tag) => tag?.id).filter(Boolean),
+      removedDuplicateTagIds: duplicateExactMatches.map((tag) => tag?.id).filter(Boolean),
     };
   }
 
@@ -146,6 +205,8 @@ async function ensureScriptTagInstalled({ shop, accessToken, src = buildScriptTa
     id: created?.script_tag?.id || null,
     script_tag: created?.script_tag || null,
     src,
+    removedLegacyTagIds: staleManagedTags.map((tag) => tag?.id).filter(Boolean),
+    removedDuplicateTagIds: duplicateExactMatches.map((tag) => tag?.id).filter(Boolean),
   };
 }
 

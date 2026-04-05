@@ -320,6 +320,102 @@ function validateBasePayload(payload, { requireReason }) {
   };
 }
 
+function buildStorefrontCheckoutStartedPayload(normalized, reqMeta = {}) {
+  const occurredAt = typeof normalized.ts === "string" && normalized.ts.trim()
+    ? new Date(normalized.ts).toISOString()
+    : new Date().toISOString();
+  const checkoutPath = sanitizeSignalPath(normalized.path || "");
+  const checkoutId = typeof normalized.cartToken === "string" && normalized.cartToken.trim()
+    ? normalized.cartToken.trim()
+    : typeof normalized.sessionMarker === "string" && normalized.sessionMarker.trim()
+      ? normalized.sessionMarker.trim()
+      : "";
+
+  return {
+    id: `signal_checkout_started_${Date.now().toString(36)}`,
+    shop: normalized.shopDomain,
+    session_id: normalized.sessionMarker || checkoutId || `session_${Date.now().toString(36)}`,
+    checkout_id: checkoutId || null,
+    checkout_session_id: checkoutId || normalized.sessionMarker || null,
+    timestamp: occurredAt,
+    occurredAt,
+    event_type: "checkout_started",
+    stage: "checkout",
+    source: "live_storefront",
+    device_type: "unknown",
+    order_id: null,
+    customerEmail: null,
+    customerPhone: null,
+    metadata: {
+      path: checkoutPath || null,
+      cartToken: checkoutId || null,
+      storefrontHost: normalized.shopDomain || null,
+      validationMode: normalized.validationMode === true,
+      emittedBy: "signal/checkout-start",
+      origin: reqMeta.origin || "",
+      ip: reqMeta.ip || "",
+      userAgent: reqMeta.userAgent || "",
+    },
+  };
+}
+
+function isQualifyingStorefrontCheckoutStartedPayload(payload) {
+  if (!payload || typeof payload !== "object") return false;
+  if (String(payload.event_type || "").trim().toLowerCase() !== "checkout_started") return false;
+  if (String(payload.source || "").trim().toLowerCase() !== "live_storefront") return false;
+
+  const checkoutId = String(
+    payload.checkout_id
+    || payload.checkoutId
+    || payload.checkout_token
+    || payload.metadata?.cartToken
+    || "",
+  ).trim();
+  const checkoutPath = String(payload.metadata?.path || "").trim();
+  const storefrontHost = String(payload.metadata?.storefrontHost || "").trim();
+
+  if (!storefrontHost) return false;
+  if (!checkoutId && !checkoutPath) return false;
+  if (checkoutPath && !checkoutPath.includes("/checkouts/")) return false;
+  return true;
+}
+
+async function persistCheckoutStartSystemEvent(normalized, reqMeta = {}) {
+  const payload = buildStorefrontCheckoutStartedPayload(normalized, reqMeta);
+  const shopKey = normalizeShopDomain(payload.shop);
+  if (!shopKey) {
+    return { ok: false, reason: "missing_shop" };
+  }
+
+  const shopRecord = await prisma.shop.findUnique({
+    where: { key: shopKey },
+    select: { key: true },
+  });
+
+  if (!shopRecord) {
+    return { ok: false, reason: "unknown_shop" };
+  }
+
+  if (!isQualifyingStorefrontCheckoutStartedPayload(payload)) {
+    return { ok: false, reason: "non_qualifying_checkout_start" };
+  }
+
+  const systemEvent = await prisma.systemEvent.create({
+    data: {
+      shopDomain: shopKey,
+      eventType: "abando.checkout_event.v1",
+      visibility: "merchant",
+      payload,
+    },
+  });
+
+  return {
+    ok: true,
+    systemEventId: systemEvent.id,
+    payload,
+  };
+}
+
 async function processCheckoutRiskPayload(payload, reqMeta = {}) {
   const { errors, normalized } = validateBasePayload(payload, { requireReason: true });
   if (errors.length > 0) {
@@ -453,7 +549,7 @@ function installCheckoutSignals(app) {
     res.status(204).end();
   });
 
-  app.post("/signal/checkout-start", express.text({ type: "*/*", limit: "32kb" }), (req, res) => {
+  app.post("/signal/checkout-start", express.text({ type: "*/*", limit: "32kb" }), async (req, res) => {
     setCors(res);
     const payload = parseSignalBody(req);
     const { errors, normalized } = validateBasePayload(payload, { requireReason: false });
@@ -473,14 +569,36 @@ function installCheckoutSignals(app) {
       },
     });
 
+    const persisted = await persistCheckoutStartSystemEvent(normalized, {
+      ip: (req.headers["x-forwarded-for"] || req.ip || "").toString(),
+      userAgent: req.get("user-agent") || "",
+      origin: req.get("origin") || "",
+    }).catch((error) => {
+      console.error("[signal] checkout-start system event persist failed", {
+        shopDomain: normalized.shopDomain,
+        cartToken: normalized.cartToken,
+        path: normalized.path,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return { ok: false, reason: "persist_failed" };
+    });
+
     console.log("[signal] checkout-start captured", {
       shopDomain: event.shopDomain,
       cartToken: event.cartToken,
       path: event.path,
       ts: event.ts,
+      persistedCheckoutEvent: persisted.ok,
+      persistedReason: persisted.ok ? null : persisted.reason,
     });
 
-    return res.status(202).json({ ok: true, eventId: event.eventId });
+    return res.status(202).json({
+      ok: true,
+      eventId: event.eventId,
+      persistedCheckoutEvent: persisted.ok,
+      persistedReason: persisted.ok ? null : persisted.reason,
+      systemEventId: persisted.ok ? persisted.systemEventId : null,
+    });
   });
 
   app.post("/signal/checkout-risk", express.text({ type: "*/*", limit: "32kb" }), async (req, res) => {

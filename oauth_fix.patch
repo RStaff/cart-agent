@@ -1,0 +1,161 @@
+diff --git a/web/src/index.js b/web/src/index.js
+index 5d4c99c..1e5258a 100644
+--- a/web/src/index.js
++++ b/web/src/index.js
+@@ -910,13 +910,21 @@ function resolveCheckoutContextFromEventPayload(payload, experienceId = "") {
+   ).trim();
+   const checkoutSessionId = String(
+     payload?.checkout_session_id
++    || payload?.checkoutSessionId
+     || payload?.checkout_token
+     || payload?.session_id
+     || "",
+   ).trim();
+-  const checkoutPath = String(metadata?.path || "").trim();
++  const checkoutPath = String(
++    payload?.checkoutPath
++    || payload?.checkout_path
++    || metadata?.path
++    || "",
++  ).trim();
+   const storefrontHost = String(
+-    metadata?.storefrontHost
++    payload?.storefrontHost
++    || payload?.storefront_host
++    || metadata?.storefrontHost
+     || metadata?.storefront_host
+     || "",
+   )
+@@ -1207,12 +1215,36 @@ function isSyntheticCheckoutValue(value = "") {
+     || normalized.startsWith("test-cart-");
+ }
+ 
+-function isRealStorefrontCheckoutPayload(payload) {
++function isPreCheckoutIntentStorefrontPayload(payload) {
++  if (!payload || typeof payload !== "object") return false;
++  if (String(payload.event_type || "").trim().toLowerCase() !== "checkout_started") return false;
++  if (String(payload.source || "").trim().toLowerCase() !== "live_storefront") return false;
++
++  const context = resolveCheckoutContextFromEventPayload(payload);
++  const metadata = payload?.metadata && typeof payload.metadata === "object" ? payload.metadata : {};
++  const checkoutPath = String(payload?.checkoutPath || payload?.checkout_path || context.checkoutPath || "").trim();
++  const proofCaptureStage = String(payload?.proofCaptureStage || metadata?.proofCaptureStage || "").trim().toLowerCase();
++  const preCheckoutIntent = payload?.checkoutPageReached === false
++    || metadata?.checkoutPageReached === false
++    || payload?.preCheckoutIntent === true
++    || metadata?.preCheckoutIntent === true
++    || proofCaptureStage === "pre_checkout_intent";
++
++  if (!preCheckoutIntent) return false;
++  if (!context.storefrontHost) return false;
++  if (!checkoutPath.startsWith("/") || (!checkoutPath.startsWith("/checkout") && !checkoutPath.includes("/checkouts/"))) {
++    return false;
++  }
++  return true;
++}
++
++function isRealStorefrontCheckoutPayload(payload, { allowPreCheckoutIntent = false } = {}) {
+   if (!payload || typeof payload !== "object") return false;
+   if (String(payload.event_type || "").trim().toLowerCase() !== "checkout_started") return false;
+   if (String(payload.source || "").trim().toLowerCase() !== "live_storefront") return false;
+ 
+   const context = resolveCheckoutContextFromEventPayload(payload);
++  if (allowPreCheckoutIntent && isPreCheckoutIntentStorefrontPayload(payload)) return true;
+   if (!context.storefrontHost) return false;
+   if (!context.checkoutId && !context.checkoutPath) return false;
+   if (isSyntheticCheckoutValue(context.checkoutId) || isSyntheticCheckoutValue(context.checkoutSessionId)) return false;
+@@ -1221,7 +1253,7 @@ function isRealStorefrontCheckoutPayload(payload) {
+   return true;
+ }
+ 
+-async function findLatestCheckoutStartedEvent(shop, { requireRealStorefront = false } = {}) {
++async function findLatestCheckoutStartedEvent(shop, { requireRealStorefront = false, allowPreCheckoutIntent = false } = {}) {
+   if (!shop) return null;
+ 
+   const events = await prisma.systemEvent.findMany({
+@@ -1241,7 +1273,7 @@ async function findLatestCheckoutStartedEvent(shop, { requireRealStorefront = fa
+   });
+ 
+   const latestRealStorefrontEvent = checkoutStartedEvents.find((event) =>
+-    isRealStorefrontCheckoutPayload(event?.payload),
++    isRealStorefrontCheckoutPayload(event?.payload, { allowPreCheckoutIntent }),
+   ) || null;
+ 
+   if (requireRealStorefront) {
+@@ -2533,8 +2565,12 @@ function resolveDashboardShopFromRequest(req) {
+ 
+ function buildAbandoMerchantSummaryResponse(summary, { notes = [] } = {}) {
+   const checkoutEventCount = Number(summary?.checkoutEventCount || summary?.checkoutEventsCount || 0);
++  const preCheckoutCaptured = Boolean(summary?.preCheckoutCaptured);
++  const checkoutPageReached = Boolean(summary?.checkoutPageReached);
++  const sendReady = Boolean(summary?.sendReady);
++  const proofCaptureStage = String(summary?.proofCaptureStage || "none");
+   const status = summary?.connectionStatus === "connected"
+-    ? checkoutEventCount >= 1
++    ? sendReady || checkoutEventCount >= 1
+       ? "recovery_ready"
+       : "listening"
+     : "not_connected";
+@@ -2553,6 +2589,10 @@ function buildAbandoMerchantSummaryResponse(summary, { notes = [] } = {}) {
+     eventCount: checkoutEventCount,
+     lastEventSeen,
+     lastEventAt: summary?.latestEventTimestamp || summary?.lastCheckoutEventAt || null,
++    proofCaptureStage,
++    preCheckoutCaptured,
++    checkoutPageReached,
++    sendReady,
+     lastRecoveryActionAt: summary?.lastRecoveryActionAt || null,
+     lastRecoveryActionType: summary?.lastRecoveryActionType || null,
+     notes: Array.isArray(notes) ? notes : [],
+@@ -3788,6 +3828,7 @@ app.post("/api/recovery-actions/send-live-test", async (req, res) => {
+ 
+     const latestCheckoutEvent = await findLatestCheckoutStartedEvent(shop, {
+       requireRealStorefront: true,
++      allowPreCheckoutIntent: true,
+     });
+ 
+     if (!latestCheckoutEvent) {
+@@ -5259,7 +5300,32 @@ function normalizeCheckoutEventPayload(payload) {
+       || input.metadata?.cartToken
+       || session_id
+     ).trim(),
+-    checkout_session_id: String(input.checkout_session_id || input.checkout_token || session_id).trim(),
++    checkout_session_id: String(
++      input.checkout_session_id
++      || input.checkoutSessionId
++      || input.checkout_token
++      || session_id
++    ).trim(),
++    checkoutPath: String(
++      input.checkoutPath
++      || input.checkout_path
++      || input.metadata?.path
++      || ""
++    ).trim(),
++    storefrontHost: String(
++      input.storefrontHost
++      || input.storefront_host
++      || input.metadata?.storefrontHost
++      || input.metadata?.storefront_host
++      || ""
++    )
++      .trim()
++      .replace(/^https?:\/\//i, "")
++      .replace(/^www\./i, "")
++      .split("/")[0]
++      .split("?")[0]
++      .split("#")[0]
++      .toLowerCase(),
+     timestamp: new Date(parsedTimestamp).toISOString(),
+     occurredAt: new Date(parsedTimestamp).toISOString(),
+     event_type,
+@@ -10506,7 +10572,8 @@ function statesMatchByNonce(storedState, receivedState) {
+ }
+ 
+ function buildAuthorizeUrl(shop, state, callbackBaseUrl) {
+-  const redirectUri = encodeURIComponent(`${callbackBaseUrl.replace(/\/+$/, "")}/auth/callback`);
++  const redirectUri = encodeURIComponent("https://app.abando.ai/auth/callback");
++  console.log("[OAUTH] redirect_uri FIXED → https://app.abando.ai/auth/callback");
+   return `https://${shop}/admin/oauth/authorize?client_id=${SHOPIFY_API_KEY}&scope=${encodeURIComponent(SHOPIFY_SCOPES)}&redirect_uri=${redirectUri}&state=${state}&grant_options[]=per-user`;
+ }
+ 
