@@ -13126,10 +13126,39 @@ app.post("/api/fix-audit", async (req, res) => {
       analysis,
     });
 
+    const emailContent = formatFixAuditEmailContent({ storeUrl, analysis });
+    const emailReadiness = getEmailReadiness();
+    console.log("[SHOPIFIXER EMAIL] attempt", {
+      storeUrl,
+      email,
+      smtpReady: emailReadiness.ready,
+      smtpEnvPresent: emailReadiness.missing.length === 0,
+    });
+    const emailResult = await sendRecoveryEmail({
+      to: email,
+      subject: emailContent.subject,
+      html: emailContent.html,
+      text: emailContent.text,
+    });
+
+    if (emailResult?.success) {
+      console.log("[SHOPIFIXER EMAIL] sent", {
+        messageId: emailResult?.messageId || null,
+      });
+    } else {
+      console.error("[SHOPIFIXER EMAIL ERROR]", {
+        error: String(emailResult?.error || "unknown_email_error"),
+        stack: emailResult?.stack || null,
+      });
+    }
+
     return res.json({
       ok: true,
       leadId: lead.leadId,
       analysis,
+      emailAttempted: true,
+      emailSent: Boolean(emailResult?.success),
+      emailError: emailResult?.success ? "" : String(emailResult?.error || ""),
     });
   } catch (error) {
     console.error("[fix-audit] error:", error);
