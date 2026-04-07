@@ -264,4 +264,14 @@ app.post("/api/fix-audit", async (req, res) => {
   }
 });
 
+const port = Number(process.env.PORT || 8081);
+
+if (Number.isNaN(port) || port <= 0) {
+  throw new Error(`invalid_port:${process.env.PORT || ""}`);
+}
+
+app.listen(port, () => {
+  console.log(`[server] listening on :${port}`);
+});
+
 export default app;
