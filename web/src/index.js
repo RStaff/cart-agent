@@ -132,11 +132,6 @@ import {
   listInterpretedSignals,
   runSignalInterpreter,
 } from "../../signal_interpreter/index.js";
-import {
-  generateMessagePerformanceSummary,
-  updateProofLoopById,
-} from "../../staffordos/modules/outreach_performance/index.js";
-import { assignVariantForLead, getAssignedVariantForLead, getExperimentStatus } from "../../staffordos/modules/outreach_experiments/index.js";
 
 const { PrismaClient, Prisma } = pkg;
 import {
@@ -2608,10 +2603,6 @@ async function recordProofLoopSend({
   return nextLoop;
 }
 
-async function updateProofLoopRecord(loopId, updater) {
-  return updateProofLoopById(loopId, updater);
-}
-
 async function findProofLoopForExperience({ shop, experienceId, channel = "" }) {
   const registry = await readProofRegistry();
   const loops = Array.isArray(registry.loops) ? registry.loops : [];
@@ -4389,12 +4380,9 @@ app.post("/api/recovery-actions/send-live-test", async (req, res) => {
     const requestedVariantId = String(req.body?.variant_id || "").trim();
     const requestedMessageAngle = String(req.body?.message_angle || "").trim();
     let assignedVariant = null;
-    if (leadDomain) {
-      assignedVariant = await getAssignedVariantForLead(leadDomain) || await assignVariantForLead(leadDomain);
-    }
-    const experimentStatus = await getExperimentStatus();
-    const variantId = requestedVariantId || String(assignedVariant?.assigned_variant_id || "unknown").trim() || "unknown";
-    const messageAngle = requestedMessageAngle || String(assignedVariant?.assigned_message_angle || "unknown").trim() || "unknown";
+    const experimentStatus = null;
+    const variantId = requestedVariantId || "unknown";
+    const messageAngle = requestedMessageAngle || "unknown";
 
     if (!email && !rawPhone.trim()) {
       return res.status(400).json({ ok: false, error: "Enter an email or phone number.", provider: "", details: "" });
@@ -4651,7 +4639,6 @@ app.post("/api/recovery-actions/send-live-test", async (req, res) => {
         twilioInterpretation: sendResult.twilioInterpretation || null,
       })
       : null;
-    await generateMessagePerformanceSummary();
     await persistExperienceSendRecords({
       shop,
       experienceId,
