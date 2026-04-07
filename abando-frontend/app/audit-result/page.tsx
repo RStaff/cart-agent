@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { notFound } from "next/navigation";
 import AuditResultPage from "@/components/audit/AuditResultPage";
 
 type AuditResultSnapshot = {
@@ -31,6 +32,12 @@ function readSnapshot(filePath: string): AuditResultSnapshot {
 
 export default function AuditResultRoute() {
   const rootDir = findCanonicalRoot();
-  const snapshot = readSnapshot(join(rootDir, "staffordos", "audit", "audit_result_surface.json"));
+  const snapshotPath = join(rootDir, "staffordos", "audit", "audit_result_surface.json");
+
+  if (!existsSync(snapshotPath)) {
+    notFound();
+  }
+
+  const snapshot = readSnapshot(snapshotPath);
   return <AuditResultPage snapshot={snapshot} />;
 }

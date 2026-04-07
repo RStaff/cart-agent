@@ -1,4 +1,3 @@
-import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { NextResponse } from "next/server";
@@ -18,22 +17,9 @@ function findCanonicalRoot() {
   return process.cwd();
 }
 
-function generateSignals(rootDir: string) {
-  try {
-    execFileSync("node", [join(rootDir, "staffordos", "signals", "generate_signals.js")], {
-      cwd: rootDir,
-      stdio: "ignore",
-    });
-  } catch {
-    // Fall back to the last successfully generated registry if generation fails.
-  }
-}
-
 export async function GET() {
   const rootDir = findCanonicalRoot();
   const registryPath = join(rootDir, "staffordos", "signals", "signal_registry.json");
-
-  generateSignals(rootDir);
 
   try {
     const registry = JSON.parse(readFileSync(registryPath, "utf8"));
