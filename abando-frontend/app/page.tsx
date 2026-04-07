@@ -20,11 +20,12 @@ export default async function RootPage({ searchParams }: Props) {
   const params = searchParams ? await searchParams : undefined;
   const host = typeof params?.host === "string" ? params?.host : undefined;
   const embedded = typeof params?.embedded === "string" ? params?.embedded : undefined;
+  const shop = typeof params?.shop === "string" ? params.shop : "";
 
   // Shopify Admin loads embedded apps with host=... (and often embedded=1)
   if (host || embedded === "1") {
     redirect(`/embedded${toQuery(params)}`);
   }
 
-  return <MarketingLandingPage />;
+  return <MarketingLandingPage shop={shop} />;
 }

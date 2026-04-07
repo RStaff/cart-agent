@@ -1,4 +1,3 @@
-import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { NextRequest, NextResponse } from "next/server";
@@ -47,22 +46,9 @@ function approvalIdFor(experimentId: string) {
   return `approval-${experimentId}`;
 }
 
-function generateRecommendations(rootDir: string) {
-  try {
-    execFileSync("node", [join(rootDir, "staffordos", "experiments", "generate_experiment_recommendations.js")], {
-      cwd: rootDir,
-      stdio: "ignore",
-    });
-  } catch {
-    // Use existing registry when generation cannot run.
-  }
-}
-
 export async function GET() {
   const rootDir = findCanonicalRoot();
   const registryPath = join(rootDir, "staffordos", "experiments", "experiment_registry.json");
-
-  generateRecommendations(rootDir);
 
   const registry = readJson(registryPath, { generated_at: "", experiments: [] as ExperimentEntry[] });
   return NextResponse.json(registry, { headers: { "Cache-Control": "no-store" } });
