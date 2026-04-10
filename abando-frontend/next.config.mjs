@@ -8,6 +8,7 @@ const __dirname = dirname(__filename);
 const nextConfig = {
 
   reactStrictMode: true,
+  outputFileTracingRoot: __dirname,
 
   // ✅ Let the app build on Vercel even if ESLint complains
   // ✅ Allow Shopify to embed /embedded inside admin.shopify.com + *.myshopify.com

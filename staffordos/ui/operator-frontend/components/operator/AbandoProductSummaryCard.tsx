@@ -56,7 +56,13 @@ export function AbandoProductSummaryCard({
             </p>
           </div>
         )}
+        <div className="row" style={{ marginTop: 14 }}>
+          <Link href="/operator/products/abando/recovery" className="button buttonPrimary">
+            Open Recovery Queue
+          </Link>
+        </div>
       </div>
     </section>
   );
 }
+import Link from "next/link";

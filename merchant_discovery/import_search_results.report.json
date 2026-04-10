@@ -1,0 +1,25 @@
+{
+  "mode": "replace",
+  "input_count": 5,
+  "valid_count": 3,
+  "invalid_count": 2,
+  "deduped_count": 0,
+  "final_total": 3,
+  "accepted_domains": [
+    "glossier.com",
+    "summerfridays.com",
+    "oseamalibu.com"
+  ],
+  "rejected_domains": [
+    {
+      "input": "https://instagram.com/oseamalibu",
+      "domain": "instagram.com",
+      "reason": "blocked_domain"
+    },
+    {
+      "input": "https://help.shopify.com/en/manual",
+      "domain": "help.shopify.com",
+      "reason": "blocked_domain"
+    }
+  ]
+}

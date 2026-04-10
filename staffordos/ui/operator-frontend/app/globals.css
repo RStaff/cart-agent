@@ -30,21 +30,32 @@ body {
 }
 
 button,
-textarea {
+textarea,
+input {
   font: inherit;
 }
 
 .shell {
   min-height: 100vh;
-  padding: 32px 16px 48px;
+  padding: 20px 16px 40px;
 }
 
 .container {
   margin: 0 auto;
-  max-width: 1040px;
+  max-width: 1400px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
+}
+
+.shopifixerShell {
+  background:
+    radial-gradient(circle at top right, rgba(34, 211, 238, 0.08), transparent 32%),
+    linear-gradient(180deg, #020617 0%, #09111f 100%);
+}
+
+.shopifixerContainer {
+  gap: 14px;
 }
 
 .panel {
@@ -67,6 +78,979 @@ textarea {
 
 .panelInner {
   padding: 24px;
+}
+
+.shopifixerHeader {
+  border-color: rgba(34, 211, 238, 0.24);
+  background:
+    linear-gradient(135deg, rgba(8, 47, 73, 0.92), rgba(2, 6, 23, 0.94)),
+    rgba(2, 6, 23, 0.94);
+}
+
+.shopifixerHeaderInner {
+  padding: 18px 22px;
+}
+
+.shopifixerBrand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.shopifixerLogo {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.shopifixerTitle {
+  font-size: clamp(28px, 3.2vw, 38px);
+}
+
+.shopifixerHeaderCopy {
+  margin: 10px 0 0;
+  max-width: 640px;
+  color: #dbeafe;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.operatorGrid {
+  display: grid;
+  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.queueRail {
+  align-self: start;
+  position: sticky;
+  top: 16px;
+  border-color: rgba(148, 163, 184, 0.16);
+  background:
+    linear-gradient(180deg, rgba(9, 14, 26, 0.95), rgba(15, 23, 42, 0.92)),
+    rgba(15, 23, 42, 0.92);
+}
+
+.queueRailInner {
+  padding: 18px;
+}
+
+.queueRailHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.queueRailTitle {
+  margin: 0;
+  font-size: 22px;
+  color: #f8fafc;
+}
+
+.queueRailHint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #94a3b8;
+}
+
+.leadViewPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.leadViewPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(2, 6, 23, 0.42);
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.leadViewPillActive {
+  border-color: rgba(34, 211, 238, 0.42);
+  background: rgba(8, 47, 73, 0.56);
+  color: #ecfeff;
+}
+
+.leadViewPillCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.72);
+  color: inherit;
+}
+
+.queueRailControls {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.queueRailRefillLabel {
+  flex: 0 0 112px;
+  margin-bottom: 0;
+}
+
+.queueCountRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.queueCountCard {
+  padding: 12px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(2, 6, 23, 0.48);
+}
+
+.queueCountLabel {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #7dd3fc;
+}
+
+.queueCountValue {
+  display: block;
+  margin-top: 4px;
+  font-size: 24px;
+  color: #f8fafc;
+}
+
+.queueStatusBanner {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(34, 211, 238, 0.16);
+  background: rgba(8, 47, 73, 0.35);
+  color: #dbeafe;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.queueStatusBannerError {
+  border-color: rgba(248, 113, 113, 0.24);
+  background: rgba(127, 29, 29, 0.28);
+  color: #fee2e2;
+}
+
+.queueSectionBlock {
+  margin-top: 16px;
+}
+
+.queueSectionHeader {
+  margin-bottom: 10px;
+}
+
+.queueSectionTitle {
+  margin: 4px 0 0;
+  color: #f8fafc;
+  font-size: 18px;
+}
+
+.compactTableWrap {
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(2, 6, 23, 0.42);
+}
+
+.compactTable th,
+.compactTable td {
+  padding: 10px 12px;
+  font-size: 12px;
+}
+
+.queueLeadName {
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.queueLeadMeta {
+  margin-top: 3px;
+  color: #94a3b8;
+  font-size: 11px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.queueRowSelected {
+  background: rgba(8, 47, 73, 0.72);
+}
+
+.queueInlineHint,
+.queueLoadingText {
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.selectedWorkspace {
+  border-color: rgba(34, 211, 238, 0.28);
+  box-shadow:
+    0 24px 64px rgba(2, 6, 23, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.selectedWorkspaceInner {
+  padding: 20px 24px 24px;
+}
+
+.selectedWorkspaceEmpty {
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.86)),
+    rgba(15, 23, 42, 0.9);
+}
+
+.selectedWorkspaceReview {
+  background:
+    linear-gradient(180deg, rgba(69, 26, 3, 0.62), rgba(15, 23, 42, 0.94)),
+    rgba(15, 23, 42, 0.92);
+  border-color: rgba(251, 191, 36, 0.34);
+}
+
+.selectedWorkspaceWork {
+  background:
+    linear-gradient(180deg, rgba(8, 47, 73, 0.68), rgba(15, 23, 42, 0.94)),
+    rgba(15, 23, 42, 0.92);
+  border-color: rgba(34, 211, 238, 0.38);
+}
+
+.selectedWorkspaceSent {
+  background:
+    linear-gradient(180deg, rgba(20, 83, 45, 0.58), rgba(15, 23, 42, 0.94)),
+    rgba(15, 23, 42, 0.92);
+  border-color: rgba(74, 222, 128, 0.34);
+}
+
+.selectedWorkspaceHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.selectedWorkspaceTitle {
+  margin: 0;
+  font-size: clamp(30px, 4vw, 42px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: #f8fafc;
+}
+
+.selectedWorkspaceMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.workspaceChip {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(2, 6, 23, 0.48);
+  color: #e2e8f0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.workspaceChipStatus.workspaceStatReview {
+  border-color: rgba(251, 191, 36, 0.42);
+  background: rgba(120, 53, 15, 0.4);
+  color: #fde68a;
+}
+
+.workspaceChipStatus.workspaceStatWork {
+  border-color: rgba(34, 211, 238, 0.42);
+  background: rgba(8, 47, 73, 0.52);
+  color: #cffafe;
+}
+
+.workspaceChipStatus.workspaceStatSent {
+  border-color: rgba(74, 222, 128, 0.42);
+  background: rgba(20, 83, 45, 0.42);
+  color: #dcfce7;
+}
+
+.workspaceChipStatus.workspaceStatEmpty {
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+.workspaceStateBar {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  border-radius: 22px;
+  padding: 14px;
+  margin-bottom: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.stateBarEmpty {
+  background: rgba(2, 6, 23, 0.45);
+}
+
+.stateBarReview {
+  background:
+    linear-gradient(135deg, rgba(120, 53, 15, 0.34), rgba(15, 23, 42, 0.7)),
+    rgba(15, 23, 42, 0.76);
+  border-color: rgba(251, 191, 36, 0.28);
+}
+
+.stateBarWork {
+  background:
+    linear-gradient(135deg, rgba(8, 47, 73, 0.42), rgba(15, 23, 42, 0.76)),
+    rgba(15, 23, 42, 0.76);
+  border-color: rgba(34, 211, 238, 0.28);
+}
+
+.stateBarSent {
+  background:
+    linear-gradient(135deg, rgba(20, 83, 45, 0.38), rgba(15, 23, 42, 0.76)),
+    rgba(15, 23, 42, 0.76);
+  border-color: rgba(74, 222, 128, 0.28);
+}
+
+.workspaceStateBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.workspaceStateBlockPrimary {
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(2, 6, 23, 0.42);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.workspaceStateLabel,
+.workspaceSectionEyebrow,
+.workspaceMetricLabel {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #93c5fd;
+}
+
+.workspaceStateValue,
+.workspaceMetricValue {
+  color: #f8fafc;
+  font-size: 17px;
+  line-height: 1.35;
+}
+
+.workspaceSection,
+.workspaceActionGroup {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 22px;
+  padding: 20px;
+  background: rgba(2, 6, 23, 0.34);
+  margin-top: 16px;
+}
+
+.workspaceSectionDraft {
+  background:
+    linear-gradient(180deg, rgba(8, 47, 73, 0.28), rgba(2, 6, 23, 0.34)),
+    rgba(2, 6, 23, 0.34);
+}
+
+.workspaceSectionReadOnly {
+  background:
+    linear-gradient(180deg, rgba(20, 83, 45, 0.18), rgba(2, 6, 23, 0.34)),
+    rgba(2, 6, 23, 0.34);
+}
+
+.workspaceSectionHeader {
+  margin-bottom: 16px;
+}
+
+.workspaceSectionTitle {
+  margin: 6px 0 0;
+  color: #f8fafc;
+  font-size: 22px;
+  line-height: 1.15;
+}
+
+.workspaceMetricsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.workspaceMetricCard {
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(15, 23, 42, 0.72);
+}
+
+.workspaceDataList {
+  gap: 12px 18px;
+}
+
+.workspaceFormGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 14px;
+}
+
+.secondaryTools {
+  border-style: dashed;
+  border-color: rgba(148, 163, 184, 0.24);
+  background: rgba(15, 23, 42, 0.74);
+}
+
+.secondaryToolsSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 22px;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.secondaryToolsSummary::-webkit-details-marker {
+  display: none;
+}
+
+.secondaryToolsInner {
+  padding-top: 0;
+}
+
+.secondaryToolsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.secondaryToolCard {
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(2, 6, 23, 0.38);
+}
+
+.hiddenFileInput {
+  display: none;
+}
+
+.workspaceRefillCard {
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(34, 211, 238, 0.22);
+  background:
+    linear-gradient(180deg, rgba(8, 47, 73, 0.32), rgba(2, 6, 23, 0.4)),
+    rgba(2, 6, 23, 0.4);
+}
+
+.workspaceRefillGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 12px;
+}
+
+.workspaceRefillActions {
+  margin-top: 8px;
+}
+
+.workspaceRefillHint {
+  margin-top: 10px;
+}
+
+.leadBacklogSection {
+  display: grid;
+  gap: 14px;
+}
+
+.leadBacklogHeader {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.leadBacklogGrid {
+  display: grid;
+  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.leadIntakePanel {
+  align-self: start;
+  position: sticky;
+  top: 16px;
+}
+
+.leadPipelinePanel,
+.leadDetailPanel {
+  border-color: rgba(148, 163, 184, 0.18);
+  background:
+    linear-gradient(180deg, rgba(9, 14, 26, 0.94), rgba(15, 23, 42, 0.9)),
+    rgba(15, 23, 42, 0.9);
+}
+
+.leadPipelineStatusList {
+  display: grid;
+  gap: 16px;
+}
+
+.leadPipelineBucket {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 18px;
+  padding: 16px;
+  background: rgba(2, 6, 23, 0.38);
+}
+
+.leadPipelineBucketHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.leadPipelineBucketTitle {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 17px;
+}
+
+.leadPipelineCards {
+  display: grid;
+  gap: 10px;
+}
+
+.queueRailIntake {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.leadPipelineCard {
+  width: 100%;
+  text-align: left;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(15, 23, 42, 0.72);
+  color: #e2e8f0;
+  cursor: pointer;
+}
+
+.leadPipelineCard:hover,
+.leadPipelineCardSelected {
+  border-color: rgba(34, 211, 238, 0.46);
+  background: rgba(8, 47, 73, 0.58);
+}
+
+.leadPipelineCardTop,
+.leadPipelineCardMeta,
+.leadDetailMeta,
+.leadStatusRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.leadPipelineCardUrl,
+.leadPipelineIssue,
+.shopifixerLandingBody,
+.shopifixerLandingList li {
+  margin: 0;
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+
+.leadPipelineCardUrl {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #94a3b8;
+  word-break: break-word;
+}
+
+.leadPipelineCardMeta {
+  margin-top: 10px;
+}
+
+.leadPipelineIssue {
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.leadBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.leadBadgeHigh,
+.leadQualityBadgeStrong {
+  border-color: rgba(74, 222, 128, 0.42);
+  color: #dcfce7;
+  background: rgba(20, 83, 45, 0.42);
+}
+
+.leadBadgeMedium,
+.leadQualityBadgeMaybe {
+  border-color: rgba(251, 191, 36, 0.42);
+  color: #fde68a;
+  background: rgba(120, 53, 15, 0.38);
+}
+
+.leadBadgeLow,
+.leadQualityBadgeWeak {
+  border-color: rgba(248, 113, 113, 0.38);
+  color: #fecaca;
+  background: rgba(127, 29, 29, 0.34);
+}
+
+.leadPipelineStatus {
+  font-size: 12px;
+  color: #93c5fd;
+  font-weight: 700;
+}
+
+.leadDetailMeta {
+  margin-bottom: 16px;
+}
+
+.leadStatusLabel {
+  flex: 1 1 240px;
+  margin-bottom: 0;
+}
+
+.leadTimestampList {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.leadDetailActions {
+  margin-top: 18px;
+}
+
+.workspaceSectionBridge {
+  border-color: rgba(34, 211, 238, 0.24);
+  background:
+    linear-gradient(180deg, rgba(8, 47, 73, 0.24), rgba(2, 6, 23, 0.34)),
+    rgba(2, 6, 23, 0.34);
+}
+
+.shopifixerLandingShell {
+  min-height: 100vh;
+  padding: 28px 16px 56px;
+  background:
+    radial-gradient(circle at top left, rgba(14, 165, 233, 0.12), transparent 28%),
+    linear-gradient(180deg, #f8fafc 0%, #dbe7f3 100%);
+}
+
+.shopifixerLandingContainer {
+  max-width: 1160px;
+  margin: 0 auto;
+  display: grid;
+  gap: 16px;
+}
+
+.shopifixerLandingHeader,
+.shopifixerLandingCard,
+.shopifixerLandingScoreCard {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.08);
+}
+
+.shopifixerLandingHeader {
+  padding: 30px;
+  border-color: rgba(15, 23, 42, 0.12);
+  background:
+    radial-gradient(circle at top right, rgba(14, 165, 233, 0.12), transparent 26%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 250, 253, 0.96));
+}
+
+.shopifixerLandingBrand {
+  display: flex;
+  align-items: start;
+  gap: 14px;
+}
+
+.shopifixerLandingHeader .eyebrow,
+.shopifixerLandingCard .workspaceSectionEyebrow {
+  color: #0f766e;
+}
+
+.shopifixerLandingLogo {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+}
+
+.shopifixerLandingTitle {
+  margin: 0;
+  max-width: 840px;
+  color: #0f172a;
+  font-size: clamp(38px, 5vw, 62px);
+  line-height: 0.94;
+  letter-spacing: -0.04em;
+}
+
+.shopifixerLandingSubtitle {
+  margin: 14px 0 0;
+  max-width: 660px;
+  color: #172554;
+  font-size: 21px;
+  line-height: 1.45;
+  font-weight: 500;
+}
+
+.shopifixerLandingHeroActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 18px;
+  margin-top: 18px;
+}
+
+.shopifixerLandingCta {
+  display: inline-flex;
+}
+
+.shopifixerLandingSupportLine {
+  margin: 0;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.shopifixerLandingScoreBand {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.shopifixerLandingEvidenceRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 16px;
+}
+
+.shopifixerLandingCard .panelInner,
+.shopifixerLandingScoreCard .panelInner {
+  padding: 24px;
+}
+
+.shopifixerLandingCard .workspaceSectionTitle,
+.shopifixerLandingCard .workspaceSectionEyebrow,
+.shopifixerLandingScoreCard .workspaceSectionTitle,
+.shopifixerLandingScoreCard .workspaceSectionEyebrow {
+  color: #0f172a;
+}
+
+.shopifixerLandingCard .workspaceSectionEyebrow,
+.shopifixerLandingScoreCard .workspaceSectionEyebrow {
+  opacity: 0.82;
+}
+
+.shopifixerLandingScoreCard {
+  border-color: rgba(14, 165, 233, 0.22);
+  background:
+    linear-gradient(180deg, rgba(239, 246, 255, 0.98), rgba(255, 255, 255, 0.98)),
+    rgba(255, 255, 255, 0.98);
+}
+
+.shopifixerScorePreview {
+  display: grid;
+  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+  gap: 22px;
+  align-items: center;
+}
+
+.shopifixerScoreDial {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 190px;
+  border-radius: 28px;
+  border: 1px solid rgba(14, 165, 233, 0.22);
+  background:
+    radial-gradient(circle at top, rgba(14, 165, 233, 0.18), transparent 52%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(239, 246, 255, 0.98));
+}
+
+.shopifixerScoreValue {
+  color: #0f172a;
+  font-size: clamp(54px, 6vw, 80px);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.06em;
+}
+
+.shopifixerScoreLabel {
+  margin-top: 8px;
+  color: #0f766e;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.shopifixerScoreNotes {
+  display: grid;
+  gap: 14px;
+}
+
+.shopifixerLandingBodyStrong {
+  margin: 0;
+  color: #0f172a;
+  font-size: 18px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.shopifixerSignalList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.shopifixerSignalList li {
+  color: #1e293b;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.shopifixerLandingList {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 10px;
+}
+
+.shopifixerLandingListTight li {
+  color: #0f172a;
+  font-weight: 500;
+}
+
+.shopifixerLandingCtaCard {
+  border-color: rgba(14, 165, 233, 0.24);
+  background:
+    linear-gradient(180deg, rgba(8, 47, 73, 0.98), rgba(15, 23, 42, 0.98)),
+    rgba(15, 23, 42, 0.98);
+}
+
+.shopifixerLandingForm {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.shopifixerLandingCard .label,
+.shopifixerLandingCard .input,
+.shopifixerLandingScoreCard .label,
+.shopifixerLandingScoreCard .input {
+  color: #0f172a;
+}
+
+.shopifixerLandingCard .input,
+.shopifixerLandingScoreCard .input {
+  background: rgba(248, 250, 252, 0.9);
+  border-color: rgba(148, 163, 184, 0.42);
+}
+
+.shopifixerLandingCtaCard .workspaceSectionEyebrow,
+.shopifixerLandingCtaCard .workspaceSectionTitle,
+.shopifixerLandingCtaCard .label,
+.shopifixerLandingCtaCard .shopifixerLandingBodyStrong,
+.shopifixerLandingCtaCard .shopifixerLandingMicrocopy {
+  color: #f8fafc;
+}
+
+.shopifixerLandingCtaCard .workspaceSectionEyebrow {
+  color: #67e8f9;
+}
+
+.shopifixerLandingCtaCard .input {
+  background: rgba(2, 6, 23, 0.55);
+  border-color: rgba(103, 232, 249, 0.22);
+  color: #f8fafc;
+}
+
+.shopifixerLandingCtaCard .input::placeholder {
+  color: rgba(226, 232, 240, 0.58);
+}
+
+.shopifixerLandingMicrocopy {
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #cbd5e1;
+}
+
+.shopifixerLandingNotice {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.shopifixerLandingNoticeOk {
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  background: rgba(240, 253, 244, 0.96);
+  color: #166534;
+}
+
+.shopifixerLandingNoticeError {
+  border: 1px solid rgba(239, 68, 68, 0.22);
+  background: rgba(254, 242, 242, 0.96);
+  color: #991b1b;
 }
 
 .eyebrow {
@@ -114,6 +1098,22 @@ textarea {
 }
 
 .textarea:focus {
+  border-color: rgba(34, 211, 238, 0.7);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.18);
+}
+
+.input {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid rgba(100, 116, 139, 0.45);
+  border-radius: 18px;
+  background: rgba(2, 6, 23, 0.85);
+  color: #f8fafc;
+  padding: 12px 16px;
+  outline: none;
+}
+
+.input:focus {
   border-color: rgba(34, 211, 238, 0.7);
   box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.18);
 }
@@ -182,6 +1182,12 @@ textarea {
   color: #94a3b8;
 }
 
+.emptyStateText {
+  font-size: 18px;
+  line-height: 1.6;
+  color: #dbeafe;
+}
+
 .statusPill {
   display: inline-flex;
   align-items: center;
@@ -243,6 +1249,45 @@ textarea {
   word-break: break-word;
 }
 
+@media (max-width: 900px) {
+  .operatorGrid,
+  .leadBacklogGrid,
+  .shopifixerLandingScoreBand,
+  .shopifixerLandingEvidenceRow,
+  .secondaryToolsGrid,
+  .workspaceStateBar,
+  .workspaceMetricsGrid,
+  .workspaceFormGrid,
+  .workspaceRefillGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .shopifixerScorePreview {
+    grid-template-columns: 1fr;
+  }
+
+  .queueRail {
+    position: static;
+  }
+
+  .queueRailControls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .queueRailRefillLabel {
+    flex: 1 1 auto;
+  }
+
+  .leadIntakePanel {
+    position: static;
+  }
+
+  .selectedWorkspaceInner {
+    padding: 22px;
+  }
+}
+
 .grid {
   display: grid;
   gap: 20px;
@@ -299,6 +1344,23 @@ textarea {
   font-size: 12px;
   line-height: 1.6;
   color: #cbd5e1;
+}
+
+.promptTextarea {
+  min-height: 280px;
+  font-family:
+    "SFMono-Regular",
+    ui-monospace,
+    "Cascadia Code",
+    "Source Code Pro",
+    Menlo,
+    monospace;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.compactTextarea {
+  min-height: 88px;
 }
 
 .emptyState {

@@ -1,13 +1,19 @@
+import Link from "next/link";
+
 type ProductSummaryPlaceholderCardProps = {
   title: string;
   description: string;
   placeholderNote: string;
+  actionHref?: string;
+  actionLabel?: string;
 };
 
 export function ProductSummaryPlaceholderCard({
   title,
   description,
   placeholderNote,
+  actionHref,
+  actionLabel,
 }: ProductSummaryPlaceholderCardProps) {
   return (
     <section className="panel">
@@ -20,6 +26,13 @@ export function ProductSummaryPlaceholderCard({
           <p className="emptyStateLabel">Placeholder</p>
           <p className="emptyStateText">{placeholderNote}</p>
         </div>
+        {actionHref && actionLabel ? (
+          <div className="row" style={{ marginTop: 14 }}>
+            <Link href={actionHref} className="button buttonPrimary">
+              {actionLabel}
+            </Link>
+          </div>
+        ) : null}
       </div>
     </section>
   );

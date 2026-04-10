@@ -1,0 +1,19 @@
+[
+  {
+    "id": "rec_001",
+    "shop": "veloura-style.com",
+    "customer_email": "jane@example.com",
+    "customer_phone": "",
+    "channel": "email",
+    "cart_value": 120,
+    "currency": "USD",
+    "event_type": "checkout_abandoned",
+    "experience_id": "exp_001",
+    "recovery_url": "https://pay.abando.ai/recover?token=sample",
+    "message_angle": "simple_reminder",
+    "subject": "A quick reminder about your cart",
+    "body": "Hi Jane, your cart at veloura-style.com is still available if you want to finish checking out. You can return here: https://pay.abando.ai/recover?token=sample. If now is not the right time, you can come back whenever you’re ready.",
+    "status": "returned",
+    "notes": "High intent cart"
+  }
+]

@@ -5,6 +5,7 @@ const CONTROL_PLANE_ROUTES = [
   { href: "/operator/command-center", label: "Command Center" },
   { href: "/operator/capacity", label: "Capacity" },
   { href: "/operator/leads", label: "Leads" },
+  { href: "/operator/job-search", label: "Job Search" },
   { href: "/operator/revenue-command", label: "Revenue Command" },
   { href: "/operator/analytics", label: "Analytics" },
   { href: "/operator/products", label: "Products" },

@@ -1,0 +1,15 @@
+{
+  "input_count": 5,
+  "valid_count": 5,
+  "duplicate_in_canonical_count": 0,
+  "duplicate_in_store_list_count": 0,
+  "accepted_count": 5,
+  "accepted_domains": [
+    "seed.com",
+    "maude.co",
+    "ourplace.com",
+    "iliabeauty.com",
+    "kyliecosmetics.com"
+  ],
+  "rejected": []
+}

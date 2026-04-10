@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AbandoProductSummaryCard } from "../../../components/operator/AbandoProductSummaryCard";
 import { OperatorNav } from "../../../components/operator/OperatorNav";
 import { ProductSummaryPlaceholderCard } from "../../../components/operator/ProductSummaryPlaceholderCard";
@@ -88,6 +89,11 @@ export default async function OperatorProductsPage() {
               <div><strong>Embedded product workflows:</strong> None</div>
               <div><strong>Metric policy:</strong> No fake metrics or synthetic product dashboards</div>
             </div>
+            <div className="row" style={{ marginTop: 14 }}>
+              <Link href="/operator/products/shopifixer/outreach" className="button buttonPrimary">
+                Open Shopifixer Outreach Console
+              </Link>
+            </div>
           </div>
         </section>
 
@@ -96,8 +102,10 @@ export default async function OperatorProductsPage() {
 
           <ProductSummaryPlaceholderCard
             title="Shopifixer"
-            description="Shopifixer should appear here only as a control-plane summary once a product summary endpoint exists."
-            placeholderNote="No Shopifixer product summary endpoint is connected yet."
+            description="Shopifixer outreach now has a thin StaffordOS operator console for draft generation, Gmail compose handoff, and explicit outreach logging."
+            placeholderNote="Use the Outreach Console for first-touch drafts and explicit status logging."
+            actionHref="/operator/products/shopifixer/outreach"
+            actionLabel="Open Outreach Console"
           />
 
           <ProductSummaryPlaceholderCard

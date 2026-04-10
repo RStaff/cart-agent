@@ -1,0 +1,18 @@
+{
+  "input_count": 7,
+  "imported_count": 3,
+  "duplicate_count": 4,
+  "skipped_count": 0,
+  "imported_domains": [
+    "seed.com",
+    "maude.co",
+    "ourplace.com"
+  ],
+  "duplicate_domains": [
+    "typology.com",
+    "tower28beauty.com",
+    "gymshark.com",
+    "bombas.com"
+  ],
+  "skipped_inputs": []
+}

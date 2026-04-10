@@ -1,0 +1,14 @@
+{
+  "mode": "replace",
+  "input_count": 3,
+  "valid_count": 3,
+  "invalid_count": 0,
+  "deduped_count": 0,
+  "final_total": 3,
+  "accepted_domains": [
+    "glossier.com",
+    "summerfridays.com",
+    "oseamalibu.com"
+  ],
+  "rejected_inputs": []
+}
