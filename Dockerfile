@@ -23,6 +23,7 @@ COPY packet_validator packet_validator
 COPY feedback_registry feedback_registry
 COPY slices slices
 COPY build_queue build_queue
+COPY system_state system_state
 COPY checkout_signal_extractor.js checkout_signal_extractor.js
 RUN cd web && npx prisma generate --schema=prisma/schema.prisma
 
