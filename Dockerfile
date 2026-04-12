@@ -8,7 +8,7 @@ FROM node:20-alpine AS build
 WORKDIR /app
 COPY --from=deps /app /app
 COPY web web
-RUN npx prisma generate --schema=web/prisma/schema.prisma
+RUN cd web && npx prisma generate --schema=prisma/schema.prisma
 
 FROM node:20-alpine
 WORKDIR /app
