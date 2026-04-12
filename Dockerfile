@@ -2,7 +2,7 @@ FROM node:20-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY web/package.json web/package.json
-RUN apk add --no-cache bash && npm ci
+RUN npm ci --ignore-scripts
 
 FROM node:20-alpine AS build
 WORKDIR /app
