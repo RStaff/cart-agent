@@ -16,7 +16,7 @@ spec:
           image: ghcr.io/RStaff/cart-agent:${GIT_SHA}
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 3000
+            - containerPort: 8081
           env:
             - name: NODE_ENV
               value: "production"
@@ -41,10 +41,10 @@ spec:
             - name: WEBHOOK_SECRET
               valueFrom: { secretKeyRef: { name: cart-agent-secrets, key: WEBHOOK_SECRET } }
           readinessProbe:
-            httpGet: { path: /health, port: 3000 }
+            httpGet: { path: /healthz, port: 8081 }
             initialDelaySeconds: 5
             periodSeconds: 10
           livenessProbe:
-            httpGet: { path: /health, port: 3000 }
+            httpGet: { path: /healthz, port: 8081 }
             initialDelaySeconds: 15
             periodSeconds: 20
