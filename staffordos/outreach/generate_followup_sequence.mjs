@@ -7,6 +7,20 @@ import { fileURLToPath } from "node:url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const LEADS_PATH = resolve(__dirname, "leads.json");
 const OUTPUT_PATH = resolve(__dirname, "outreach_ready.json");
+const PROOF_REGISTRY_PATH = resolve(__dirname, "..", "shopifixer", "proof_registry.json");
+
+async function readProofRegistry() {
+  try {
+    const raw = await readFile(PROOF_REGISTRY_PATH, "utf8");
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (error) {
+    if (error && error.code === "ENOENT") {
+      return {};
+    }
+    throw error;
+  }
+}
 
 async function readLeads() {
   const raw = await readFile(LEADS_PATH, "utf8");
@@ -157,25 +171,54 @@ function performanceLeadLine(lead) {
   return parts.join(", ");
 }
 
+function firstFixLine(lead) {
+  const issue = normalizeInsight(lead?.primaryIssue || lead?.topFriction).toLowerCase();
+
+  if (issue.includes("email capture")) {
+    return "First fix I’d test: add or strengthen email capture before purchase drop-off.";
+  }
+
+  if (issue.includes("returns")) {
+    return "First fix I’d test: make returns and reassurance clearer before checkout.";
+  }
+
+  if (issue.includes("shipping")) {
+    return "First fix I’d test: reduce shipping-step friction before checkout completion.";
+  }
+
+  if (issue.includes("mobile")) {
+    return "First fix I’d test: reduce mobile load delay on the path to purchase.";
+  }
+
+  return "First fix I’d test: address the strongest hesitation point before checkout completion.";
+}
+
 function generateFirstEmail(lead) {
   const storeUrl = String(lead?.storeUrl || "").trim();
   const cleanDomain = cleanStoreDomain(storeUrl);
   const auditLink = buildAuditLink(cleanDomain);
   const perfLine = performanceLeadLine(lead);
+  const issue = bestInsight(lead);
+  const lossHigh = Number(lead?.estimatedLossHigh || 0);
+  const opportunityLine = lossHigh > 0
+    ? `Estimated upside: up to ${formatMoney(lossHigh)} in monthly opportunity.`
+    : null;
 
   return {
     firstEmailSubject: `Quick audit result for ${cleanDomain}`,
     firstEmailBody: [
-      `Hey — I ran a quick audit on ${cleanDomain} and found the first place I’d look for lost conversions.`,
-      perfLine ? "" : null,
+      `Hey — I ran a quick audit on ${cleanDomain} and found the clearest issue I’d look at first.`,
+      "",
+      `Top issue: ${issue}.`,
       perfLine ? `One real signal: ${perfLine}.` : null,
+      opportunityLine,
+      firstFixLine(lead),
       "",
       "I put the result here:",
       auditLink,
       "",
       "If I’m off, ignore this.",
-      "",
-      "If I’m right, you can grab the exact first fix from there.",
+      "If I’m right, the page shows the exact fix I’d start with.",
       "",
       "– Ross",
     ].filter(Boolean).join("\n"),
@@ -241,10 +284,13 @@ function generateThirdEmail(lead) {
   };
 }
 
-function buildSequence(lead) {
+function buildSequence(lead, proofRegistry) {
+  const cleanDomain = cleanStoreDomain(String(lead?.storeUrl || ""));
+  const proof = proofRegistry?.[cleanDomain] || null;
+
   return {
     ...lead,
-    ...generateFirstEmail(lead),
+    ...generateFirstEmail(lead, proof),
     ...generateSecondEmail(lead),
     ...generateThirdEmail(lead),
   };
@@ -252,8 +298,9 @@ function buildSequence(lead) {
 
 async function main() {
   const leads = await readLeads();
+  const proofRegistry = await readProofRegistry();
   const outreachReady = leads.map((lead) => {
-    const withSequence = buildSequence(lead);
+    const withSequence = buildSequence(lead, proofRegistry);
     console.log("GENERATED:", withSequence.storeUrl);
     return withSequence;
   });

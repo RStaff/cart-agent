@@ -12,13 +12,15 @@ type AuditResultSnapshot = {
   benchmark_summary: string;
   recommended_action: string;
   updated_at: string;
+  evidence_summary: string;
+  screenshot_url?: string;
 };
 
 function findCanonicalRoot() {
   const candidates = [process.cwd(), resolve(process.cwd(), ".."), resolve(process.cwd(), "../..")];
 
   for (const candidate of candidates) {
-    if (existsSync(join(candidate, "staffordos", "audit", "audit_result_surface.json"))) {
+    if (existsSync(join(candidate, "staffordos", "shopifixer", "proof_registry.json"))) {
       return candidate;
     }
   }
@@ -26,18 +28,44 @@ function findCanonicalRoot() {
   return process.cwd();
 }
 
-function readSnapshot(filePath: string): AuditResultSnapshot {
-  return JSON.parse(readFileSync(filePath, "utf8")) as AuditResultSnapshot;
+function cleanStoreDomain(value: string) {
+  return String(value || "")
+    .trim()
+    .replace(/^https?:\/\//i, "")
+    .replace(/^www\./i, "")
+    .replace(/\/.*$/, "")
+    .toLowerCase();
 }
 
-export default function AuditResultRoute() {
-  const rootDir = findCanonicalRoot();
-  const snapshotPath = join(rootDir, "staffordos", "audit", "audit_result_surface.json");
+function readJsonFile<T>(filePath: string): T {
+  return JSON.parse(readFileSync(filePath, "utf8")) as T;
+}
 
-  if (!existsSync(snapshotPath)) {
+export default async function AuditResultRoute({
+  searchParams,
+}: {
+  searchParams?: Promise<{ store?: string }>;
+}) {
+  const params = (await searchParams) || {};
+  const requestedStore = cleanStoreDomain(params.store || "");
+
+  if (!requestedStore) {
     notFound();
   }
 
-  const snapshot = readSnapshot(snapshotPath);
+  const rootDir = findCanonicalRoot();
+  const registryPath = join(rootDir, "staffordos", "shopifixer", "proof_registry.json");
+
+  if (!existsSync(registryPath)) {
+    notFound();
+  }
+
+  const registry = readJsonFile<Record<string, AuditResultSnapshot>>(registryPath);
+  const snapshot = registry[requestedStore];
+
+  if (!snapshot) {
+    notFound();
+  }
+
   return <AuditResultPage snapshot={snapshot} />;
 }
