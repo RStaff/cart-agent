@@ -11,10 +11,12 @@ import {
   getEmailReadiness,
   sendRecoveryEmail,
 } from "./lib/emailSender.js";
+import { installGuidedAuditRoute } from "./routes/guidedAudit.esm.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, "..", "..");
 const fixAuditLeadsPath = join(repoRoot, ".tmp", "fix_audit_leads.json");
+const fixAuditPayloadsPath = join(repoRoot, ".tmp", "fix_audit_payloads.json");
 
 for (const envPath of [
   resolve(repoRoot, ".env"),
@@ -42,15 +44,6 @@ function normalizeStoreInput(value = "") {
 function normalizeEmail(value = "") {
   const email = String(value || "").trim().toLowerCase();
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : "";
-}
-
-function escapeHtml(value) {
-  return String(value || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
 }
 
 async function readFixAuditLeads() {
@@ -86,102 +79,101 @@ async function createFixAuditLead({ storeUrl, email, analysis }) {
   return record;
 }
 
+async function readFixAuditPayloads() {
+  try {
+    const raw = await readFile(fixAuditPayloadsPath, "utf8");
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") {
+      return { byStore: {}, lastPayload: null };
+    }
+    return {
+      byStore: parsed.byStore && typeof parsed.byStore === "object" ? parsed.byStore : {},
+      lastPayload: parsed.lastPayload || null,
+    };
+  } catch (error) {
+    if (error && error.code === "ENOENT") {
+      return { byStore: {}, lastPayload: null };
+    }
+    throw error;
+  }
+}
+
+async function saveFixAuditPayloads(registry) {
+  await mkdir(join(repoRoot, ".tmp"), { recursive: true });
+  await writeFile(fixAuditPayloadsPath, `${JSON.stringify(registry, null, 2)}\n`, "utf8");
+}
+
+async function saveCanonicalPayload(payload) {
+  const registry = await readFixAuditPayloads();
+  registry.byStore[payload.store_domain] = payload;
+  registry.lastPayload = payload;
+  await saveFixAuditPayloads(registry);
+}
+
 function summarizeFixAuditIssues(issues) {
   if (!Array.isArray(issues)) return [];
   return issues
     .filter((issue) => issue && typeof issue === "object")
     .slice(0, 3)
     .map((issue) => ({
-      title: String(issue.title || "Issue").trim(),
+      title: String(issue.title || "").trim(),
       detail: String(issue.detail || "").trim(),
       severity: String(issue.severity || "").trim(),
-    }));
+    }))
+    .filter((issue) => issue.title);
 }
 
-function formatFixAuditEmailContent({ storeUrl, analysis }) {
+function buildCanonicalPayload({ storeUrl, analysis }) {
   const normalizedStore = normalizeStoreInput(storeUrl);
-  const opportunityScore = Number(analysis?.opportunityScore || 0);
-  const estimatedLoss = String(analysis?.estimatedLoss?.display || "Not available").trim();
-  const topFriction = String(analysis?.benchmark?.topFriction || "Not detected").trim().replace(/_/g, " ");
-  const recommendation = String(analysis?.benchmark?.recommendation || "No recommendation available").trim();
-  const issueSummary = summarizeFixAuditIssues(analysis?.issues);
-  const paymentUrl = "https://buy.stripe.com/28E3cw7G4brNg1Vg0d00000";
-
-  const issueLines = issueSummary.length > 0
-    ? issueSummary.map((issue) => {
-        const parts = [issue.title];
-        if (issue.detail) parts.push(issue.detail);
-        if (issue.severity) parts.push(`Severity: ${issue.severity}`);
-        return `- ${parts.join(" — ")}`;
-      }).join("\n")
-    : "- No specific issues were returned.";
-
-  const text = [
-    `Your Shopifixer audit for ${normalizedStore}`,
-    "",
-    `Store: ${normalizedStore}`,
-    `Opportunity Score: ${opportunityScore}`,
-    `Estimated Revenue Loss: ${estimatedLoss}`,
-    `Top Friction: ${topFriction}`,
-    "",
-    "Top issues:",
-    issueLines,
-    "",
-    `Recommended next fix: ${recommendation}`,
-    "",
-    "I can fix your highest-impact issue within 48 hours.",
-    "",
-    "This is not just a report — I implement the fix for you (or provide exact steps if access isn’t available).",
-    "",
-    "What you get:",
-    "- one high-impact conversion fix",
-    "- clear before/after explanation",
-    "- delivered within 48 hours",
-    "",
-    `Flat $99: ${paymentUrl}`,
-  ].join("\n");
-
-  const issueHtml = issueSummary.length > 0
-    ? issueSummary.map((issue) => {
-        const detail = issue.detail ? `<div style="color:#475569;margin-top:4px;">${escapeHtml(issue.detail)}</div>` : "";
-        const severity = issue.severity ? `<div style="color:#64748b;margin-top:4px;font-size:13px;">Severity: ${escapeHtml(issue.severity)}</div>` : "";
-        return `<li style="margin:0 0 12px;"><strong>${escapeHtml(issue.title)}</strong>${detail}${severity}</li>`;
-      }).join("")
-    : `<li style="margin:0 0 12px;">No specific issues were returned.</li>`;
-
-  const html = `<!doctype html>
-<html lang="en">
-  <body style="margin:0;padding:24px;background:#f8fafc;color:#0f172a;font-family:Inter,Arial,sans-serif;">
-    <div style="max-width:640px;margin:0 auto;background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;">
-      <h1 style="margin:0 0 16px;font-size:24px;line-height:1.2;">Your Shopifixer audit for ${escapeHtml(normalizedStore)}</h1>
-      <p style="margin:0 0 8px;"><strong>Store:</strong> ${escapeHtml(normalizedStore)}</p>
-      <p style="margin:0 0 8px;"><strong>Opportunity Score:</strong> ${escapeHtml(String(opportunityScore))}</p>
-      <p style="margin:0 0 8px;"><strong>Estimated Revenue Loss:</strong> ${escapeHtml(estimatedLoss)}</p>
-      <p style="margin:0 0 20px;"><strong>Top Friction:</strong> ${escapeHtml(topFriction)}</p>
-      <h2 style="margin:0 0 12px;font-size:18px;">Top issues</h2>
-      <ul style="padding-left:20px;margin:0 0 20px;">${issueHtml}</ul>
-      <p style="margin:0 0 20px;"><strong>Recommended next fix:</strong> ${escapeHtml(recommendation)}</p>
-      <div style="margin-top:24px;padding:20px;border:1px solid #cbd5e1;border-radius:14px;background:#f8fafc;">
-        <p style="margin:0 0 12px;color:#0f172a;font-weight:700;">I can fix your highest-impact issue within 48 hours.</p>
-        <p style="margin:0 0 12px;color:#334155;">This is not just a report — I implement the fix for you (or provide exact steps if access isn’t available).</p>
-        <p style="margin:0 0 8px;color:#0f172a;font-weight:700;">What you get:</p>
-        <ul style="padding-left:20px;margin:0 0 16px;color:#334155;">
-          <li style="margin:0 0 8px;">one high-impact conversion fix</li>
-          <li style="margin:0 0 8px;">clear before/after explanation</li>
-          <li style="margin:0;">delivered within 48 hours</li>
-        </ul>
-        <p style="margin:0 0 8px;color:#0f172a;font-weight:700;">Flat $99</p>
-        <p style="margin:0;"><a href="${paymentUrl}" style="color:#0f172a;font-weight:700;">${paymentUrl}</a></p>
-      </div>
-    </div>
-  </body>
-</html>`;
-
-  return {
-    subject: `Your Shopifixer audit for ${normalizedStore}`,
-    text,
-    html,
+  const issues = summarizeFixAuditIssues(analysis?.issues);
+  const payload = {
+    store_domain: normalizedStore,
+    audit_score: Number(analysis?.opportunityScore),
+    estimated_revenue_loss: String(analysis?.estimatedLoss?.display || "").trim(),
+    top_issue: String(issues[0]?.title || "").trim(),
+    recommended_action: String(analysis?.benchmark?.recommendation || "").trim(),
+    issues: issues.map((issue) => issue.title),
+    generated_at: new Date().toISOString(),
   };
+
+  assertCanonicalPayload(payload);
+  return payload;
+}
+
+function assertCanonicalPayload(payload) {
+  if (!payload || typeof payload !== "object") {
+    throw new Error("INVALID_AUDIT_PAYLOAD");
+  }
+
+  if (typeof payload.store_domain !== "string" || payload.store_domain.trim() === "") {
+    throw new Error("INVALID_AUDIT_PAYLOAD");
+  }
+
+  if (typeof payload.audit_score !== "number" || Number.isNaN(payload.audit_score)) {
+    throw new Error("INVALID_AUDIT_PAYLOAD");
+  }
+
+  if (typeof payload.estimated_revenue_loss !== "string" || payload.estimated_revenue_loss.trim() === "") {
+    throw new Error("INVALID_AUDIT_PAYLOAD");
+  }
+
+  if (typeof payload.top_issue !== "string" || payload.top_issue.trim() === "") {
+    throw new Error("INVALID_AUDIT_PAYLOAD");
+  }
+
+  if (typeof payload.recommended_action !== "string" || payload.recommended_action.trim() === "") {
+    throw new Error("INVALID_AUDIT_PAYLOAD");
+  }
+
+  if (!Array.isArray(payload.issues) || payload.issues.some((issue) => typeof issue !== "string" || issue.trim() === "")) {
+    throw new Error("INVALID_AUDIT_PAYLOAD");
+  }
+
+  if (typeof payload.generated_at !== "string" || payload.generated_at.trim() === "") {
+    throw new Error("INVALID_AUDIT_PAYLOAD");
+  }
+
+  return payload;
 }
 
 const app = express();
@@ -215,6 +207,44 @@ app.get("/api/runtime-proof", (_req, res) => {
   });
 });
 
+app.get("/api/debug-last-payload", async (req, res) => {
+  try {
+    const registry = await readFixAuditPayloads();
+    const store = normalizeStoreInput(req.query?.store || "");
+    const payload = store ? registry.byStore[store] || null : registry.lastPayload;
+
+    if (!payload) {
+      return res.status(404).json({ ok: false, error: "payload_not_found" });
+    }
+
+    return res.status(200).json({ ok: true, payload });
+  } catch (error) {
+    console.error("[debug-last-payload] error:", error);
+    return res.status(500).json({ ok: false, error: "debug_payload_failed" });
+  }
+});
+
+app.get("/api/fix-audit", async (req, res) => {
+  try {
+    const storeUrl = normalizeStoreInput(req.query?.store || "");
+    if (!storeUrl) {
+      return res.status(400).json({ ok: false, error: "invalid_fix_audit_store" });
+    }
+
+    const registry = await readFixAuditPayloads();
+    const payload = registry.byStore[storeUrl] || null;
+
+    if (!payload) {
+      return res.status(404).json({ ok: false, error: "audit_payload_not_found" });
+    }
+
+    return res.status(200).json({ ok: true, payload });
+  } catch (error) {
+    console.error("[fix-audit:get] error:", error);
+    return res.status(500).json({ ok: false, error: "fix_audit_failed" });
+  }
+});
+
 app.post("/api/fix-audit", async (req, res) => {
   try {
     const storeUrl = normalizeStoreInput(req.body?.storeUrl);
@@ -226,8 +256,9 @@ app.post("/api/fix-audit", async (req, res) => {
 
     const analysis = await analyzeStore(storeUrl);
     const lead = await createFixAuditLead({ storeUrl, email, analysis });
+    const payload = buildCanonicalPayload({ storeUrl, analysis });
+    await saveCanonicalPayload(payload);
 
-    const emailContent = formatFixAuditEmailContent({ storeUrl, analysis });
     const emailReadiness = getEmailReadiness();
     console.log("[SHOPIFIXER EMAIL] attempt", {
       storeUrl,
@@ -238,9 +269,7 @@ app.post("/api/fix-audit", async (req, res) => {
 
     const emailResult = await sendRecoveryEmail({
       to: email,
-      subject: emailContent.subject,
-      html: emailContent.html,
-      text: emailContent.text,
+      payload,
     });
 
     if (emailResult?.success) {
@@ -250,7 +279,6 @@ app.post("/api/fix-audit", async (req, res) => {
     } else {
       console.error("[SHOPIFIXER EMAIL ERROR]", {
         error: String(emailResult?.error || "unknown_email_error"),
-        stack: emailResult?.stack || null,
       });
     }
 
@@ -258,6 +286,7 @@ app.post("/api/fix-audit", async (req, res) => {
       ok: true,
       leadId: lead.leadId,
       analysis,
+      payload,
       emailAttempted: true,
       emailSent: Boolean(emailResult?.success),
       emailError: emailResult?.success ? "" : String(emailResult?.error || ""),
@@ -273,6 +302,7 @@ const port = Number(process.env.PORT || 8081);
 if (Number.isNaN(port) || port <= 0) {
   throw new Error(`invalid_port:${process.env.PORT || ""}`);
 }
+installGuidedAuditRoute(app);
 
 app.listen(port, () => {
   console.log(`[server] listening on :${port}`);
