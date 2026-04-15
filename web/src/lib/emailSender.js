@@ -1,101 +1,83 @@
-import nodemailer from "nodemailer";
+const nodemailer = require("nodemailer");
 
-let transporterPromise = null;
+function buildAuditResultUrl(store) {
+  const clean = String(store || "")
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .replace(/\/.*$/, "");
 
-function env(name) {
-  return String(process.env[name] || "").trim();
+  return `https://staffordmedia.ai/audit-result?store=${encodeURIComponent(clean)}`;
 }
 
-function fromEmail() {
-  return env("FROM_EMAIL") || env("DEFAULT_FROM") || env("SMTP_FROM");
+function buildEmailBody(payload) {
+  const store = payload.store_domain || "your store";
+  const score = payload.audit_score || "N/A";
+  const issue = payload.top_issue || "Key issue detected";
+  const action = payload.recommended_action || "Recommended fix available";
+
+  const auditUrl = buildAuditResultUrl(store);
+
+  return `
+We ran a quick audit on your store.
+
+Store: ${store}
+Score: ${score}
+
+Top Issue:
+${issue}
+
+Why it matters:
+This issue is likely blocking conversions or repeat buyers.
+
+👉 View your full audit:
+${auditUrl}
+
+We’ll show you the strongest first fix to test:
+
+${action}
+
+— ShopiFixer
+`;
 }
 
-export function resolveFromEmail() {
-  return fromEmail();
-}
-
-export function getMissingEmailEnvVars() {
-  const missing = ["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS"].filter(
-    (name) => !env(name),
-  );
-
-  if (!fromEmail()) {
-    missing.push("FROM_EMAIL");
+async function sendRecoveryEmail({ to, payload }) {
+  if (!process.env.SMTP_HOST) {
+    console.log("EMAIL NOT SENT — SMTP NOT CONFIGURED");
+    console.log("PAYLOAD:", payload);
+    return { ok: false, reason: "smtp_not_configured" };
   }
 
-  return missing;
-}
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT || 587),
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
 
-export function getEmailReadiness() {
-  const missing = getMissingEmailEnvVars();
-  return {
-    ready: missing.length === 0,
-    missing,
-    sender: resolveFromEmail(),
+  const store = payload.store_domain || "your store";
+
+  const mailOptions = {
+    from: process.env.FROM_EMAIL || "support@staffordmedia.ai",
+    to,
+    subject: `We found a revenue leak in ${store}`,
+    text: buildEmailBody(payload),
   };
-}
-
-export function isEmailSenderConfigured() {
-  return getEmailReadiness().ready;
-}
-
-async function getTransporter() {
-  if (!isEmailSenderConfigured()) {
-    return null;
-  }
-
-  if (!transporterPromise) {
-    transporterPromise = Promise.resolve(
-      nodemailer.createTransport({
-        host: env("SMTP_HOST"),
-        port: Number(env("SMTP_PORT") || 587),
-        secure: String(env("SMTP_SECURE") || "").trim() === "true",
-        auth: {
-          user: env("SMTP_USER"),
-          pass: env("SMTP_PASS"),
-        },
-      }),
-    );
-  }
-
-  return transporterPromise;
-}
-
-export async function sendRecoveryEmail({ to, subject, html, text = "" }) {
-  const recipient = String(to || "").trim();
-  if (!recipient) {
-    return { success: false, error: "missing_email_recipient" };
-  }
-
-  const transporter = await getTransporter();
-  if (!transporter) {
-    return { success: false, error: "email_not_configured" };
-  }
 
   try {
-    console.log("[EMAIL] sending to:", { email: recipient });
-    const info = await transporter.sendMail({
-      from: fromEmail(),
-      to: recipient,
-      subject: String(subject || "").trim(),
-      html: String(html || "").trim(),
-      text: String(text || "").trim() || undefined,
-    });
-
-    console.log("[EMAIL] sent successfully", {
-      email: recipient,
-      messageId: info?.messageId || null,
-    });
-
-    return {
-      success: true,
-      messageId: info?.messageId || null,
-    };
-  } catch (error) {
-    console.log("[EMAIL] failed:", error instanceof Error ? error.message : String(error));
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : String(error),
-    };
+    const info = await transporter.sendMail(mailOptions);
+    console.log("EMAIL SENT:", info.messageId);
+    return { ok: true };
+  } catch (err) {
+    console.error("EMAIL ERROR:", err);
+    return { ok: false, error: err.message };
   }
 }
+
+module.exports = {
+  sendRecoveryEmail,
+};
