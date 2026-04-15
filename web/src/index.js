@@ -309,3 +309,12 @@ app.listen(port, () => {
 });
 
 export default app;
+
+app.get('/__build-check', (req, res) => {
+  res.json({
+    status: 'ok',
+    marker: 'build-check-v1',
+    time: new Date().toISOString()
+  });
+});
+
