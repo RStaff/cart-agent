@@ -1,101 +1,131 @@
 import nodemailer from "nodemailer";
 
-let transporterPromise = null;
+function buildAuditResultUrl(store) {
+  const clean = String(store || "")
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .replace(/\/.*$/, "");
 
-function env(name) {
-  return String(process.env[name] || "").trim();
+  return `https://staffordmedia.ai/audit-result?store=${encodeURIComponent(clean)}`;
 }
 
-function fromEmail() {
-  return env("FROM_EMAIL") || env("DEFAULT_FROM") || env("SMTP_FROM");
-}
-
-export function resolveFromEmail() {
-  return fromEmail();
-}
-
-export function getMissingEmailEnvVars() {
-  const missing = ["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS"].filter(
-    (name) => !env(name),
-  );
-
-  if (!fromEmail()) {
-    missing.push("FROM_EMAIL");
+function assertAuditPayload(payload) {
+  if (!payload || typeof payload !== "object") {
+    throw new Error("INVALID_AUDIT_PAYLOAD");
   }
 
-  return missing;
+  if (typeof payload.store_domain !== "string" || payload.store_domain.trim() === "") {
+    throw new Error("INVALID_AUDIT_PAYLOAD");
+  }
+
+  if (typeof payload.audit_score !== "number" || Number.isNaN(payload.audit_score)) {
+    throw new Error("INVALID_AUDIT_PAYLOAD");
+  }
+
+  if (typeof payload.estimated_revenue_loss !== "string" || payload.estimated_revenue_loss.trim() === "") {
+    throw new Error("INVALID_AUDIT_PAYLOAD");
+  }
+
+  if (typeof payload.top_issue !== "string" || payload.top_issue.trim() === "") {
+    throw new Error("INVALID_AUDIT_PAYLOAD");
+  }
+
+  if (typeof payload.recommended_action !== "string" || payload.recommended_action.trim() === "") {
+    throw new Error("INVALID_AUDIT_PAYLOAD");
+  }
+
+  if (!Array.isArray(payload.issues) || payload.issues.some((issue) => typeof issue !== "string" || issue.trim() === "")) {
+    throw new Error("INVALID_AUDIT_PAYLOAD");
+  }
+
+  if (typeof payload.generated_at !== "string" || payload.generated_at.trim() === "") {
+    throw new Error("INVALID_AUDIT_PAYLOAD");
+  }
+
+  return payload;
 }
 
-export function getEmailReadiness() {
-  const missing = getMissingEmailEnvVars();
+function buildEmailBody(payload) {
+  const auditPayload = assertAuditPayload(payload);
+  const auditUrl = buildAuditResultUrl(auditPayload.store_domain);
+
+  return [
+    `Your ShopiFixer audit for ${auditPayload.store_domain}`,
+    "",
+    `Audit score: ${auditPayload.audit_score}`,
+    `Estimated revenue loss: ${auditPayload.estimated_revenue_loss}`,
+    `Top issue: ${auditPayload.top_issue}`,
+    `Recommended action: ${auditPayload.recommended_action}`,
+    "",
+    "Issues:",
+    ...auditPayload.issues.map((issue) => `- ${issue}`),
+    "",
+    `View the same audit result: ${auditUrl}`,
+    "",
+    `Generated at: ${auditPayload.generated_at}`,
+    "",
+    "— ShopiFixer",
+  ].join("\n");
+}
+
+function getEmailReadiness() {
+  const missing = [];
+
+  if (!process.env.SMTP_HOST) missing.push("SMTP_HOST");
+  if (!process.env.SMTP_PORT) missing.push("SMTP_PORT");
+  if (!process.env.SMTP_USER) missing.push("SMTP_USER");
+  if (!process.env.SMTP_PASS) missing.push("SMTP_PASS");
+
   return {
     ready: missing.length === 0,
     missing,
-    sender: resolveFromEmail(),
+    sender: process.env.FROM_EMAIL || "support@staffordmedia.ai",
   };
 }
 
-export function isEmailSenderConfigured() {
-  return getEmailReadiness().ready;
-}
+async function sendRecoveryEmail({ to, payload }) {
+  const auditPayload = assertAuditPayload(payload);
+  const readiness = getEmailReadiness();
 
-async function getTransporter() {
-  if (!isEmailSenderConfigured()) {
-    return null;
+  if (!readiness.ready) {
+    console.log("EMAIL NOT SENT — SMTP NOT CONFIGURED");
+    console.log("PAYLOAD:", auditPayload);
+    return { success: false, error: "smtp_not_configured" };
   }
 
-  if (!transporterPromise) {
-    transporterPromise = Promise.resolve(
-      nodemailer.createTransport({
-        host: env("SMTP_HOST"),
-        port: Number(env("SMTP_PORT") || 587),
-        secure: String(env("SMTP_SECURE") || "").trim() === "true",
-        auth: {
-          user: env("SMTP_USER"),
-          pass: env("SMTP_PASS"),
-        },
-      }),
-    );
-  }
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT || 587),
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
 
-  return transporterPromise;
-}
-
-export async function sendRecoveryEmail({ to, subject, html, text = "" }) {
-  const recipient = String(to || "").trim();
-  if (!recipient) {
-    return { success: false, error: "missing_email_recipient" };
-  }
-
-  const transporter = await getTransporter();
-  if (!transporter) {
-    return { success: false, error: "email_not_configured" };
-  }
+  const mailOptions = {
+    from: process.env.FROM_EMAIL || "support@staffordmedia.ai",
+    to,
+    subject: `Your ShopiFixer audit for ${auditPayload.store_domain}`,
+    text: buildEmailBody(auditPayload),
+  };
 
   try {
-    console.log("[EMAIL] sending to:", { email: recipient });
-    const info = await transporter.sendMail({
-      from: fromEmail(),
-      to: recipient,
-      subject: String(subject || "").trim(),
-      html: String(html || "").trim(),
-      text: String(text || "").trim() || undefined,
-    });
-
-    console.log("[EMAIL] sent successfully", {
-      email: recipient,
-      messageId: info?.messageId || null,
-    });
-
-    return {
-      success: true,
-      messageId: info?.messageId || null,
-    };
-  } catch (error) {
-    console.log("[EMAIL] failed:", error instanceof Error ? error.message : String(error));
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : String(error),
-    };
+    const info = await transporter.sendMail(mailOptions);
+    console.log("EMAIL SENT:", info.messageId);
+    return { success: true, messageId: info.messageId || null };
+  } catch (err) {
+    console.error("EMAIL ERROR:", err);
+    return { success: false, error: err instanceof Error ? err.message : String(err) };
   }
 }
+
+export {
+  assertAuditPayload,
+  buildAuditResultUrl,
+  buildEmailBody,
+  getEmailReadiness,
+  sendRecoveryEmail,
+};
