@@ -10,6 +10,7 @@ grep -R -n -E '^(<<<<<<< .+|=======$|>>>>>>> .+)$' . \
   --exclude-dir=.next \
   --exclude-dir=dist \
   --exclude-dir=build \
+  --exclude-dir=coverage \
   --exclude-dir=staffordos/output \
   --exclude-dir=.hygiene-quarantine \
   --exclude="*.bak" \

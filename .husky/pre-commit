@@ -3,6 +3,16 @@ set -euo pipefail
 
 bash scripts/block-merge-markers.sh
 
+if command -v gitleaks >/dev/null 2>&1; then
+  echo "🔍 running gitleaks..."
+  gitleaks detect --source . --no-git --redact
+elif npx --yes gitleaks version >/dev/null 2>&1; then
+  echo "🔍 running gitleaks via npx..."
+  npx --yes gitleaks detect --source . --no-git --redact
+else
+  echo "ℹ️ gitleaks not installed; skipping"
+fi
+
 if [ -f .lintstagedrc.json ] || grep -q '"lint-staged"' package.json 2>/dev/null; then
   echo "🧹 running lint-staged..."
   npx --yes lint-staged --concurrent false

@@ -1,166 +1,17 @@
-# Environment Configuration
-.env
-.env.*
-*.env
-staffordos/dev/.env.abando.local
 
-# Dependency directory
-node_modules
-# Test coverage directory
-coverage
-# Ignore Apple macOS Desktop Services Store
-.DS_Store
-# Logs
-logs
-*.log
-# ngrok tunnel file
-config/tunnel.pid
-# vite build output
-dist/
-# extensions build output
-extensions/*/build
-# Node library SQLite database
-web/database.sqlite
-# Ignore shopify files created during app dev
-.shopify/*
-.shopify.lockweb/.env
-web/.env
-!web/.env.example
-# DB & local artifacts
-*.sqlite
-*.db
-prisma/*.db
-web/prisma/*.db
-web/dev.db
-dev.db
-# logs & temp
-dev.log
-*.tmp
-.vercel
-web/prisma/schema.prisma.bak.*
-web/src/**/*.bak.*
-*.bak.*
-abando-frontend/.env.local
-abando-frontend/.next.pid*
-staffordmedia-site/
-
-# --- Abando backups / scratch files (must never ship) ---
-*.before_built_for_swap_*.tsx
-*.before_built_for_swap_*.ts
-*.bak_*.tsx
-*.bak_*.ts
-*.bak_*
-
-# editor / safety backups
-*.before_*.tsx
-*.before_*.ts
-*.bak_*
-
-# local scratch / backups - never deploy
-_scratch/
-.backup/
-**/.backup/
-*.bak
-*.bak_*
-*.backup
-*.log
-*.pid
-node_modules/
-_scratch/
-.backup/
-**/.backup/
-*.bak
-*.bak_*
-*.backup
-*.log
-*.pid
-.env*.local
-abando-frontend/package-lock.json
-
-# local backups
-**/__bak_*
-**/*.__bak_*
-**/*.bak_*
-
-# local ops scripts (keep repo clean)
-scripts/0*
-scripts/9*
-scripts/10*
-scripts/11*
-scripts/12*
-scripts/13*
-scripts/14*
-
-# local/uncommitted next routes (WIP)
-abando-frontend/app/onboarding/
-abando-frontend/app/pricing/
-abando-frontend/app/support/
-
-# local helper scripts
-scripts/verify_lockfiles.sh
-*.DISABLED
-
-# Next build output
-.next/
-
-# Local nested folder (not part of this repo)
-cart-agent/
-
-# GH Actions downloaded artifacts (never commit)
-frontend-dist/
-assets/
-index.html
-vite.svg
-/tmp/abando_shopify_dev.log
-
-# Allow selected Abando dev control scripts (override scripts/11* ignore)
-!scripts/110_dev_up_bg.sh
-!scripts/112_dev_status.sh
-!scripts/114_print_shopify_webhook_urls.sh
-!scripts/115_show_current_ports.sh
-!scripts/93_verify_gdpr_endpoint_is_from_this_backend.sh
-
-# --- ignore backup/dupe trees ---
-_bak*/
-**/_bak*/
-*.bak-*
-*.backup.*
-backup*/
-**/backup*/
-*.dump
-
-# Local one-off debug scripts (do not commit)
-scripts/201_*.sh
-scripts/202_*.sh
-scripts/203_*.sh
-scripts/204_*.sh
-scripts/207_*.sh
-scripts/208_*.sh
-scripts/209_*.sh
-scripts/210_*.sh
-scripts/212_*.sh
-scripts/214_*.sh
-scripts/215_*.sh
-scripts/216_*.sh
-scripts/218_*.sh
-scripts/219_*.sh
-scripts/220_*.sh
-scripts/222_*.sh
-scripts/223_*.sh
-scripts/224_*.sh
-scripts/225_*.sh
-scripts/226_*.sh
-scripts/227_*.sh
-scripts/228_*.sh
-
-# dev runtime pids
-.pids/
-
-# local ops scripts
-*.sh
-.secrets.json
-
-# secrets
+# local secrets
 .env
 .env.local
 .env.*.local
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+
+# local build noise
+.next
+dist
+build
+coverage
+.hygiene-quarantine
