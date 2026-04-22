@@ -159,3 +159,8 @@ scripts/228_*.sh
 # local ops scripts
 *.sh
 .secrets.json
+
+# secrets
+.env
+.env.local
+.env.*.local
