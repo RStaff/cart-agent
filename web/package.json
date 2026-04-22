@@ -20,12 +20,12 @@
     "cors": "2.8.5",
     "cross-env": "^7.0.3",
     "dotenv": "^16.6.1",
-    "express": "4.21.2",
+    "express": "4.22.1",
     "express-rate-limit": "^7.4.0",
     "helmet": "8.1.0",
     "morgan": "1.10.1",
     "node-fetch": "^2.7.0",
-    "nodemailer": "^7.0.6",
+    "nodemailer": "^8.0.5",
     "pino": "^9.2.0",
     "resend": "^6.0.2",
     "stripe": "18.5.0",
@@ -35,6 +35,6 @@
   "devDependencies": {
     "concurrently": "^9.2.1",
     "nodemon": "^3.1.0",
-    "prisma": "6.16.0"
+    "prisma": "6.19.3"
   }
 }
