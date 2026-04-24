@@ -41,10 +41,10 @@ spec:
             - name: WEBHOOK_SECRET
               valueFrom: { secretKeyRef: { name: cart-agent-secrets, key: WEBHOOK_SECRET } }
           readinessProbe:
-            httpGet: { path: /health, port: 3000 }
+            httpGet: { path: /health, port: 8081 }
             initialDelaySeconds: 5
             periodSeconds: 10
           livenessProbe:
-            httpGet: { path: /health, port: 3000 }
+            httpGet: { path: /health, port: 8081 }
             initialDelaySeconds: 15
             periodSeconds: 20
