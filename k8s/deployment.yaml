@@ -13,10 +13,10 @@ spec:
     spec:
       containers:
         - name: web
-          image: ghcr.io/RStaff/cart-agent:${GIT_SHA}
+          image: ghcr.io/rstaff/cart-agent:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 3000
+            - containerPort: 8081
           env:
             - name: NODE_ENV
               value: "production"
