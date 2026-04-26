@@ -17,7 +17,7 @@
     "execution_entry": "staffordos/agents/run_agent_v1.mjs",
     "product_surface": "abando-frontend/app/shopifixer/page.tsx",
     "surface_packets": "staffordos/surfaces/",
-    "outreach_queue": "staffordos/outreach/"
+    "outreach_queue": "staffordos/leads/outreach_queue.json"
   },
   "required_flow": [
     "audit_lead_captured",
