@@ -1,0 +1,40 @@
+{
+  "packet_id": "shopifixer_governed_outreach_packet_v1",
+  "created_at": "2026-04-26T21:43:25.175Z",
+  "request": "Connect ShopiFixer audit lead capture to governed outreach packet path so approved leads can move from audit result to outreach queue without direct product patching.",
+  "classification": "PRODUCT_SURFACE_CHANGE",
+  "branch": "surface/shopifixer/governed-outreach-packet-v1",
+  "goal": "Create a governed path from audit lead capture to approved outreach queue.",
+  "non_goals": [
+    "Do not send outreach automatically.",
+    "Do not mutate production data directly.",
+    "Do not bypass approval.",
+    "Do not change Abando recovery engine."
+  ],
+  "owners": {
+    "control_plane": "staffordos/loop/staffordos_loop_v1.mjs",
+    "agent_registry": "staffordos/agents/agent_registry_v1.json",
+    "execution_entry": "staffordos/agents/run_agent_v1.mjs",
+    "product_surface": "abando-frontend/app/shopifixer/page.tsx",
+    "surface_packets": "staffordos/surfaces/",
+    "outreach_queue": "staffordos/leads/outreach_queue.json"
+  },
+  "required_flow": [
+    "audit_lead_captured",
+    "lead_classified",
+    "outreach_packet_created",
+    "operator_approval_required",
+    "queue_write_after_approval",
+    "verification",
+    "truth_update"
+  ],
+  "verification_contract": {
+    "must_preserve_clean_worktree_before_execution": true,
+    "must_require_operator_approval_before_send": true,
+    "must_create_machine_readable_packet": true,
+    "must_not_commit_runtime_output": true,
+    "must_pass_pr_checks": true
+  },
+  "gate_decision": "PACKET_CREATED_REVIEW_ONLY",
+  "next_action": "Review packet, then route through existing StaffordOS agents before any product code change."
+}
