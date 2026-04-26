@@ -45,11 +45,75 @@ const requiredOwners = {
   runtime_policy: "staffordos/system_inventory/source_runtime_policy_register_v1.md"
 };
 
+function loadRegistry() {
+  try {
+    const raw = fs.readFileSync("staffordos/agents/agent_registry_v1.json", "utf8");
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed.agents) ? parsed.agents : [];
+  } catch {
+    return [];
+  }
+}
+
+function requiredAgentsForClassification(classification) {
+  if (classification === "PRODUCT_SURFACE_CHANGE") {
+    return [
+      "surface_patch_agent_v1",
+      "change_pipeline_v1"
+    ];
+  }
+
+  if (classification === "SYSTEM_GOVERNANCE_CHANGE") {
+    return [
+      "run_agent_v1"
+    ];
+  }
+
+  if (classification === "DELIVERY_PIPELINE_CHANGE") {
+    return [
+      "run_agent_v1"
+    ];
+  }
+
+  return [];
+}
+
+function verifyScopedRegistry(classification) {
+  const agents = loadRegistry();
+  const requiredIds = requiredAgentsForClassification(classification);
+
+  const missing = requiredIds.flatMap((id) => {
+    const agent = agents.find((a) => a.id === id);
+    if (!agent) {
+      return [{ id, reason: "missing_registry_entry" }];
+    }
+
+    if (!agent.entrypoint || !fs.existsSync(agent.entrypoint)) {
+      return [{
+        id,
+        reason: "missing_entrypoint",
+        entrypoint: agent.entrypoint || ""
+      }];
+    }
+
+    return [];
+  });
+
+  return {
+    required_agent_ids: requiredIds,
+    missing
+  };
+}
+
+
 const ownerStatus = Object.fromEntries(
   Object.entries(requiredOwners).map(([key, path]) => [key, { path, exists: exists(path) }])
 );
 
 const missingOwners = Object.values(ownerStatus).filter((x) => !x.exists).map((x) => x.path);
+
+const classification = classify(request);
+const scopedRegistry = verifyScopedRegistry(classification);
 
 const issues = [];
 
@@ -71,7 +135,9 @@ if (missingOwners.length) {
   issues.push(`STOP: required StaffordOS owners missing:\n${missingOwners.join("\n")}`);
 }
 
-const classification = classify(request);
+if (scopedRegistry.missing.length) {
+  issues.push(`STOP: scoped registry gate failed:\n${JSON.stringify(scopedRegistry.missing, null, 2)}`);
+}
 
 if (classification === "UNKNOWN_REVIEW_REQUIRED") {
   issues.push("REVIEW_ONLY: request classification is unknown.");
@@ -111,6 +177,7 @@ const report = {
   mode: "governed_change_control_loop",
   generated_at: timestamp,
   owner_status: ownerStatus,
+  scoped_registry_gate: scopedRegistry,
   packet
 };
 
