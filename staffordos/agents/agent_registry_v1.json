@@ -1,0 +1,645 @@
+{
+  "version": "agent_registry_v1",
+  "generated_at": "2026-04-25T20:50:02.928Z",
+  "counts": {
+    "agents": 15,
+    "high_risk": 2,
+    "medium_risk": 11,
+    "low_risk": 0
+  },
+  "agents": [
+    {
+      "id": "run_agent_v1",
+      "version": "v1",
+      "department": "unknown",
+      "purpose": "run agent v1",
+      "entrypoint": "staffordos/agents/run_agent_v1.mjs",
+      "reads_from": [
+        "staffordos/agents/agent_registry_v1.json",
+        "staffordos/agents/agent_execution_log_v1.json"
+      ],
+      "writes_to": [
+        "staffordos/agents/agent_registry_v1.json",
+        "staffordos/agents/agent_execution_log_v1.json"
+      ],
+      "allowed_actions": [
+        "read_truth",
+        "write_log",
+        "write_truth"
+      ],
+      "forbidden_actions": [
+        "write_outside_declared_scope",
+        "modify_product_boundary_without_approval",
+        "send_email",
+        "approve_message",
+        "generate_message"
+      ],
+      "requires_approval": true,
+      "risk_level": "high",
+      "verification_command": "node staffordos/agents/run_agent_v1.mjs",
+      "status": "registered",
+      "constraints": [
+        "no_cross_domain_writes",
+        "must_use_existing_data_structures",
+        "no_schema_drift",
+        "no_fake_success"
+      ],
+      "auto_repair": {
+        "enabled": false,
+        "strategy": "manual_review_first"
+      }
+    },
+    {
+      "id": "approval_decision_agent_v1",
+      "version": "v1",
+      "department": "revenue",
+      "purpose": "approval decision agent v1",
+      "entrypoint": "staffordos/leads/approval_decision_agent_v1.mjs",
+      "reads_from": [
+        "staffordos/leads/outreach_queue.json",
+        "staffordos/leads/approval_queue_v1.json",
+        "staffordos/leads/approval_decision_log_v1.json"
+      ],
+      "writes_to": [
+        "staffordos/leads/outreach_queue.json",
+        "staffordos/leads/approval_queue_v1.json",
+        "staffordos/leads/approval_decision_log_v1.json"
+      ],
+      "allowed_actions": [
+        "read_truth",
+        "write_log",
+        "approval_decision",
+        "write_truth"
+      ],
+      "forbidden_actions": [
+        "write_outside_declared_scope",
+        "modify_product_boundary_without_approval",
+        "send_email",
+        "generate_message"
+      ],
+      "requires_approval": false,
+      "risk_level": "medium",
+      "verification_command": "node staffordos/leads/approval_decision_agent_v1.mjs",
+      "status": "registered",
+      "constraints": [
+        "no_cross_domain_writes",
+        "must_use_existing_data_structures",
+        "no_schema_drift",
+        "no_fake_success"
+      ],
+      "auto_repair": {
+        "enabled": false,
+        "strategy": "manual_review_first"
+      }
+    },
+    {
+      "id": "contact_enrichment_agent_v1",
+      "version": "v1",
+      "department": "revenue",
+      "purpose": "contact enrichment agent v1",
+      "entrypoint": "staffordos/leads/contact_enrichment_agent_v1.mjs",
+      "reads_from": [
+        "staffordos/leads/outreach_queue.json",
+        "staffordos/leads/contact_enrichment_log_v1.json",
+        "staffordos/leads/contact_research_queue_v1.json"
+      ],
+      "writes_to": [
+        "staffordos/leads/outreach_queue.json",
+        "staffordos/leads/contact_enrichment_log_v1.json",
+        "staffordos/leads/contact_research_queue_v1.json"
+      ],
+      "allowed_actions": [
+        "read_truth",
+        "write_log",
+        "contact_research",
+        "write_truth"
+      ],
+      "forbidden_actions": [
+        "write_outside_declared_scope",
+        "modify_product_boundary_without_approval",
+        "send_email",
+        "approve_message",
+        "generate_message"
+      ],
+      "requires_approval": false,
+      "risk_level": "medium",
+      "verification_command": "node staffordos/leads/contact_enrichment_agent_v1.mjs",
+      "status": "registered",
+      "constraints": [
+        "no_cross_domain_writes",
+        "must_use_existing_data_structures",
+        "no_schema_drift",
+        "no_fake_success"
+      ],
+      "auto_repair": {
+        "enabled": false,
+        "strategy": "manual_review_first"
+      }
+    },
+    {
+      "id": "contact_research_agent_v1",
+      "version": "v1",
+      "department": "revenue",
+      "purpose": "contact research agent v1",
+      "entrypoint": "staffordos/leads/contact_research_agent_v1.mjs",
+      "reads_from": [
+        "staffordos/leads/outreach_queue.json",
+        "staffordos/leads/contact_research_queue_v1.json",
+        "staffordos/leads/contact_research_log_v1.json"
+      ],
+      "writes_to": [
+        "staffordos/leads/outreach_queue.json",
+        "staffordos/leads/contact_research_queue_v1.json",
+        "staffordos/leads/contact_research_log_v1.json"
+      ],
+      "allowed_actions": [
+        "read_truth",
+        "write_log",
+        "contact_research",
+        "write_truth"
+      ],
+      "forbidden_actions": [
+        "write_outside_declared_scope",
+        "modify_product_boundary_without_approval",
+        "send_email",
+        "approve_message",
+        "generate_message"
+      ],
+      "requires_approval": false,
+      "risk_level": "medium",
+      "verification_command": "node staffordos/leads/contact_research_agent_v1.mjs",
+      "status": "registered",
+      "constraints": [
+        "no_cross_domain_writes",
+        "must_use_existing_data_structures",
+        "no_schema_drift",
+        "no_fake_success"
+      ],
+      "auto_repair": {
+        "enabled": false,
+        "strategy": "manual_review_first"
+      }
+    },
+    {
+      "id": "followup_agent_v1",
+      "version": "v1",
+      "department": "revenue",
+      "purpose": "followup agent v1",
+      "entrypoint": "staffordos/leads/followup_agent_v1.mjs",
+      "reads_from": [
+        "staffordos/leads/send_ledger_v1.json",
+        "staffordos/leads/approval_queue_v1.json",
+        "staffordos/leads/followup_log_v1.json"
+      ],
+      "writes_to": [
+        "staffordos/leads/send_ledger_v1.json",
+        "staffordos/leads/approval_queue_v1.json",
+        "staffordos/leads/followup_log_v1.json"
+      ],
+      "allowed_actions": [
+        "read_truth",
+        "write_log",
+        "draft_followup",
+        "write_truth"
+      ],
+      "forbidden_actions": [
+        "write_outside_declared_scope",
+        "modify_product_boundary_without_approval",
+        "send_email",
+        "approve_message"
+      ],
+      "requires_approval": false,
+      "risk_level": "medium",
+      "verification_command": "node staffordos/leads/followup_agent_v1.mjs",
+      "status": "registered",
+      "constraints": [
+        "no_cross_domain_writes",
+        "must_use_existing_data_structures",
+        "no_schema_drift",
+        "no_fake_success"
+      ],
+      "auto_repair": {
+        "enabled": false,
+        "strategy": "manual_review_first"
+      }
+    },
+    {
+      "id": "message_generation_agent_v1",
+      "version": "v1",
+      "department": "revenue",
+      "purpose": "message generation agent v1",
+      "entrypoint": "staffordos/leads/message_generation_agent_v1.mjs",
+      "reads_from": [
+        "staffordos/leads/outreach_queue.json",
+        "staffordos/leads/message_generation_log_v1.json"
+      ],
+      "writes_to": [
+        "staffordos/leads/outreach_queue.json",
+        "staffordos/leads/message_generation_log_v1.json"
+      ],
+      "allowed_actions": [
+        "read_truth",
+        "write_log",
+        "generate_message",
+        "write_truth"
+      ],
+      "forbidden_actions": [
+        "write_outside_declared_scope",
+        "modify_product_boundary_without_approval",
+        "send_email",
+        "approve_message"
+      ],
+      "requires_approval": false,
+      "risk_level": "medium",
+      "verification_command": "node staffordos/leads/message_generation_agent_v1.mjs",
+      "status": "registered",
+      "constraints": [
+        "no_cross_domain_writes",
+        "must_use_existing_data_structures",
+        "no_schema_drift",
+        "no_fake_success"
+      ],
+      "auto_repair": {
+        "enabled": false,
+        "strategy": "manual_review_first"
+      }
+    },
+    {
+      "id": "message_validation_agent_v1",
+      "version": "v1",
+      "department": "revenue",
+      "purpose": "message validation agent v1",
+      "entrypoint": "staffordos/leads/message_validation_agent_v1.mjs",
+      "reads_from": [
+        "staffordos/leads/outreach_queue.json",
+        "staffordos/leads/message_validation_log_v1.json"
+      ],
+      "writes_to": [
+        "staffordos/leads/outreach_queue.json",
+        "staffordos/leads/message_validation_log_v1.json"
+      ],
+      "allowed_actions": [
+        "read_truth",
+        "write_log",
+        "validate_message",
+        "write_truth"
+      ],
+      "forbidden_actions": [
+        "write_outside_declared_scope",
+        "modify_product_boundary_without_approval",
+        "send_email",
+        "approve_message",
+        "generate_message"
+      ],
+      "requires_approval": false,
+      "risk_level": "medium",
+      "verification_command": "node staffordos/leads/message_validation_agent_v1.mjs",
+      "status": "registered",
+      "constraints": [
+        "no_cross_domain_writes",
+        "must_use_existing_data_structures",
+        "no_schema_drift",
+        "no_fake_success"
+      ],
+      "auto_repair": {
+        "enabled": false,
+        "strategy": "manual_review_first"
+      }
+    },
+    {
+      "id": "reply_detection_agent_v1",
+      "version": "v1",
+      "department": "revenue",
+      "purpose": "reply detection agent v1",
+      "entrypoint": "staffordos/leads/reply_detection_agent_v1.mjs",
+      "reads_from": [
+        "staffordos/leads/send_ledger_v1.json",
+        "staffordos/leads/outreach_queue.json",
+        "staffordos/leads/reply_detection_log_v1.json"
+      ],
+      "writes_to": [
+        "staffordos/leads/send_ledger_v1.json",
+        "staffordos/leads/outreach_queue.json",
+        "staffordos/leads/reply_detection_log_v1.json"
+      ],
+      "allowed_actions": [
+        "read_truth",
+        "write_log",
+        "detect_reply",
+        "write_truth"
+      ],
+      "forbidden_actions": [
+        "write_outside_declared_scope",
+        "modify_product_boundary_without_approval",
+        "send_email",
+        "approve_message",
+        "generate_message"
+      ],
+      "requires_approval": false,
+      "risk_level": "medium",
+      "verification_command": "node staffordos/leads/reply_detection_agent_v1.mjs",
+      "status": "registered",
+      "constraints": [
+        "no_cross_domain_writes",
+        "must_use_existing_data_structures",
+        "no_schema_drift",
+        "no_fake_success"
+      ],
+      "auto_repair": {
+        "enabled": false,
+        "strategy": "manual_review_first"
+      }
+    },
+    {
+      "id": "reply_interpretation_agent_v1",
+      "version": "v1",
+      "department": "revenue",
+      "purpose": "reply interpretation agent v1",
+      "entrypoint": "staffordos/leads/reply_interpretation_agent_v1.mjs",
+      "reads_from": [
+        "staffordos/leads/send_ledger_v1.json",
+        "staffordos/leads/reply_interpretation_v1.json",
+        "staffordos/leads/reply_interpretation_log_v1.json"
+      ],
+      "writes_to": [
+        "staffordos/leads/send_ledger_v1.json",
+        "staffordos/leads/reply_interpretation_v1.json",
+        "staffordos/leads/reply_interpretation_log_v1.json"
+      ],
+      "allowed_actions": [
+        "read_truth",
+        "write_log",
+        "interpret_reply",
+        "write_truth"
+      ],
+      "forbidden_actions": [
+        "write_outside_declared_scope",
+        "modify_product_boundary_without_approval",
+        "send_email",
+        "approve_message",
+        "generate_message"
+      ],
+      "requires_approval": false,
+      "risk_level": "medium",
+      "verification_command": "node staffordos/leads/reply_interpretation_agent_v1.mjs",
+      "status": "registered",
+      "constraints": [
+        "no_cross_domain_writes",
+        "must_use_existing_data_structures",
+        "no_schema_drift",
+        "no_fake_success"
+      ],
+      "auto_repair": {
+        "enabled": false,
+        "strategy": "manual_review_first"
+      }
+    },
+    {
+      "id": "reply_response_agent_v1",
+      "version": "v1",
+      "department": "revenue",
+      "purpose": "reply response agent v1",
+      "entrypoint": "staffordos/leads/reply_response_agent_v1.mjs",
+      "reads_from": [
+        "staffordos/leads/reply_interpretation_v1.json",
+        "staffordos/leads/approval_queue_v1.json",
+        "staffordos/leads/reply_response_log_v1.json"
+      ],
+      "writes_to": [
+        "staffordos/leads/reply_interpretation_v1.json",
+        "staffordos/leads/approval_queue_v1.json",
+        "staffordos/leads/reply_response_log_v1.json"
+      ],
+      "allowed_actions": [
+        "read_truth",
+        "write_log",
+        "draft_reply_response",
+        "write_truth"
+      ],
+      "forbidden_actions": [
+        "write_outside_declared_scope",
+        "modify_product_boundary_without_approval",
+        "send_email",
+        "approve_message"
+      ],
+      "requires_approval": false,
+      "risk_level": "medium",
+      "verification_command": "node staffordos/leads/reply_response_agent_v1.mjs",
+      "status": "registered",
+      "constraints": [
+        "no_cross_domain_writes",
+        "must_use_existing_data_structures",
+        "no_schema_drift",
+        "no_fake_success"
+      ],
+      "auto_repair": {
+        "enabled": false,
+        "strategy": "manual_review_first"
+      }
+    },
+    {
+      "id": "send_execution_agent_v1",
+      "version": "v1",
+      "department": "revenue",
+      "purpose": "send execution agent v1",
+      "entrypoint": "staffordos/leads/send_execution_agent_v1.mjs",
+      "reads_from": [
+        "staffordos/leads/send_ledger_v1.json",
+        "staffordos/leads/send_execution_log_v1.json"
+      ],
+      "writes_to": [
+        "staffordos/leads/send_ledger_v1.json",
+        "staffordos/leads/send_execution_log_v1.json"
+      ],
+      "allowed_actions": [
+        "read_truth",
+        "write_log",
+        "send_email",
+        "write_truth"
+      ],
+      "forbidden_actions": [
+        "write_outside_declared_scope",
+        "modify_product_boundary_without_approval",
+        "approve_message",
+        "generate_message"
+      ],
+      "requires_approval": true,
+      "risk_level": "high",
+      "verification_command": "node staffordos/leads/send_execution_agent_v1.mjs",
+      "status": "registered",
+      "constraints": [
+        "no_cross_domain_writes",
+        "must_use_existing_data_structures",
+        "no_schema_drift",
+        "no_fake_success"
+      ],
+      "auto_repair": {
+        "enabled": false,
+        "strategy": "manual_review_first"
+      }
+    },
+    {
+      "id": "send_ledger_agent_v1",
+      "version": "v1",
+      "department": "revenue",
+      "purpose": "send ledger agent v1",
+      "entrypoint": "staffordos/leads/send_ledger_agent_v1.mjs",
+      "reads_from": [
+        "staffordos/leads/approval_queue_v1.json",
+        "staffordos/leads/send_ledger_v1.json",
+        "staffordos/leads/send_ledger_log_v1.json"
+      ],
+      "writes_to": [
+        "staffordos/leads/approval_queue_v1.json",
+        "staffordos/leads/send_ledger_v1.json",
+        "staffordos/leads/send_ledger_log_v1.json"
+      ],
+      "allowed_actions": [
+        "read_truth",
+        "write_log",
+        "write_truth"
+      ],
+      "forbidden_actions": [
+        "write_outside_declared_scope",
+        "modify_product_boundary_without_approval",
+        "send_email",
+        "approve_message",
+        "generate_message"
+      ],
+      "requires_approval": false,
+      "risk_level": "medium",
+      "verification_command": "node staffordos/leads/send_ledger_agent_v1.mjs",
+      "status": "registered",
+      "constraints": [
+        "no_cross_domain_writes",
+        "must_use_existing_data_structures",
+        "no_schema_drift",
+        "no_fake_success"
+      ],
+      "auto_repair": {
+        "enabled": false,
+        "strategy": "manual_review_first"
+      }
+    },
+    {
+      "id": "revenue_agent_v1",
+      "version": "v1",
+      "department": "revenue",
+      "purpose": "revenue agent v1",
+      "entrypoint": "staffordos/revenue/revenue_agent_v1.mjs",
+      "reads_from": [
+        "staffordos/revenue/revenue_truth_v1.json",
+        "staffordos/revenue/revenue_execution_packet_v1.json",
+        "staffordos/leads/outreach_queue.json",
+        "staffordos/revenue/revenue_agent_execution_log_v1.json"
+      ],
+      "writes_to": [
+        "staffordos/revenue/revenue_truth_v1.json",
+        "staffordos/revenue/revenue_execution_packet_v1.json",
+        "staffordos/leads/outreach_queue.json",
+        "staffordos/revenue/revenue_agent_execution_log_v1.json"
+      ],
+      "allowed_actions": [
+        "read_truth",
+        "write_log",
+        "write_truth"
+      ],
+      "forbidden_actions": [
+        "write_outside_declared_scope",
+        "modify_product_boundary_without_approval",
+        "send_email",
+        "approve_message",
+        "generate_message"
+      ],
+      "requires_approval": false,
+      "risk_level": "medium",
+      "verification_command": "node staffordos/revenue/revenue_agent_v1.mjs",
+      "status": "registered",
+      "constraints": [
+        "no_cross_domain_writes",
+        "must_use_existing_data_structures",
+        "no_schema_drift",
+        "no_fake_success"
+      ],
+      "auto_repair": {
+        "enabled": false,
+        "strategy": "manual_review_first"
+      }
+    },
+    {
+      "id": "surface_patch_agent_v1",
+      "version": "v1",
+      "department": "surface",
+      "purpose": "Inspect and minimally patch conversion surfaces using system map + registry awareness.",
+      "entrypoint": "staffordos/agents/surface_patch_agent_v1.mjs",
+      "reads_from": [
+        "staffordos/system_map/system_map_truth_v1.json",
+        "staffordos/surfaces/conversion_surface_registry_v1.json",
+        "staffordos/system_inventory/shopifixer_http_bridge_design_v1.md"
+      ],
+      "writes_to": [
+        "staffordos/surfaces/*_surface_patch_report_v1.json"
+      ],
+      "allowed_actions": [
+        "read_truth",
+        "write_log",
+        "surface_inspect"
+      ],
+      "forbidden_actions": [
+        "write_outside_declared_scope",
+        "modify_product_boundary_without_approval",
+        "send_email",
+        "approve_message",
+        "generate_message"
+      ],
+      "requires_approval": false,
+      "risk_level": "medium",
+      "verification_command": "node staffordos/agents/run_agent_v1.mjs surface_patch_agent_v1 shopifixer",
+      "status": "registered",
+      "constraints": [
+        "must_use_system_map",
+        "must_use_surface_registry",
+        "no_full_rewrites",
+        "patch_owner_only",
+        "no_fake_success"
+      ],
+      "auto_repair": {
+        "enabled": false,
+        "strategy": "inspect_then_propose_patch"
+      }
+    },
+    {
+      "id": "change_pipeline_v1",
+      "version": "v1",
+      "department": "system",
+      "purpose": "Create governed change branches from approved patch proposals.",
+      "entrypoint": "staffordos/agents/change_pipeline_v1.mjs",
+      "reads_from": [
+        "staffordos/surfaces/*_patch_proposals_v1.json"
+      ],
+      "writes_to": [
+        "staffordos/surfaces/*_change_pipeline_v1.json"
+      ],
+      "allowed_actions": [
+        "read_truth",
+        "write_log",
+        "git_branch_create"
+      ],
+      "forbidden_actions": [
+        "modify_files",
+        "deploy",
+        "send_email",
+        "approve_message"
+      ],
+      "requires_approval": false,
+      "risk_level": "low",
+      "verification_command": "node staffordos/agents/run_agent_v1.mjs change_pipeline_v1 shopifixer wire_hero_cta_to_existing_runAudit",
+      "status": "registered",
+      "constraints": [
+        "branch_only_no_patch",
+        "no_direct_main_edits",
+        "must_use_existing_proposals"
+      ]
+    }
+  ]
+}
