@@ -1,0 +1,8 @@
+{
+  "version": "shopifixer_page_upgrade_packet_v2",
+  "target": "abando-frontend/app/shopifixer/page.tsx",
+  "goal": "premium conversion-ready ShopiFixer page",
+  "positioning": "ShopiFixer is the diagnostic audit. Stafford Media implements the fix. Abando recovers revenue after the issue is fixed.",
+  "primary_cta": "Run ShopiFixer Audit",
+  "secondary_cta": "View Example Audit"
+}

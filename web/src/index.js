@@ -12,6 +12,7 @@ import {
   sendRecoveryEmail,
 } from "./lib/emailSender.js";
 import { installGuidedAuditRoute } from "./routes/guidedAudit.esm.js";
+import { installSmcAlign } from "./smc-align.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, "..", "..");
@@ -177,6 +178,7 @@ function assertCanonicalPayload(payload) {
 }
 
 const app = express();
+installSmcAlign(app);
 
 app.disable("x-powered-by");
 app.use(cors());

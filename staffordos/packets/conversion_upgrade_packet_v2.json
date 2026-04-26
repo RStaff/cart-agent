@@ -1,0 +1,27 @@
+{
+  "id": "conversion_upgrade_packet_v2",
+  "surface": "shopifixer_landing",
+  "goal": "premium conversion-ready ShopiFixer landing page",
+  "headline": "Fix Your Shopify Store’s Hidden Revenue Leaks in 24 Hours",
+  "subhead": "ShopiFixer scans your storefront for checkout friction, trust gaps, and conversion leaks—then shows the first fixes that can help recover missed revenue.",
+  "primary_cta": "Scan My Store Now",
+  "secondary_cta": "See What It Finds",
+  "trust_line": "Built by Stafford Media Consulting — AI, automation, analytics, and Shopify revenue recovery systems.",
+  "example_output": {
+    "title": "Example ShopiFixer Output",
+    "items": [
+      "5 conversion leaks detected",
+      "2 checkout friction issues found",
+      "3 trust gaps reducing buyer confidence",
+      "First fix recommended in plain English"
+    ]
+  },
+  "sections": [
+    "hero",
+    "problem",
+    "solution",
+    "example_output",
+    "trust",
+    "cta"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "primary_surface": {
+    "id": "shopifixer_landing",
+    "url": "https://staffordmediaconsulting.com/shopifixer",
+    "type": "landing_page",
+    "goal": "capture_lead_or_install"
+  },
+  "fallback_surface": {
+    "id": "stafford_home",
+    "url": "https://staffordmediaconsulting.com",
+    "type": "homepage",
+    "goal": "redirect_to_primary"
+  },
+  "product_surface": {
+    "id": "abando",
+    "url": "https://www.abando.ai",
+    "type": "product",
+    "goal": "secondary_trust"
+  }
+}
