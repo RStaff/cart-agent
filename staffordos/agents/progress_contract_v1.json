@@ -1,0 +1,149 @@
+{
+  "version": "progress_contract_v1",
+  "generated_at": "2026-04-25T20:50:03.045080Z",
+  "contracts": [
+    {
+      "agent_id": "contact_enrichment_agent_v1",
+      "expected_progress": [
+        {
+          "metric": "contact_needed",
+          "direction": "decrease_or_annotation_added",
+          "description": "Missing-contact records should either decrease or be marked for research."
+        }
+      ],
+      "acceptable_no_progress_reason": "All unresolved contacts require manual research or external lookup."
+    },
+    {
+      "agent_id": "contact_research_agent_v2",
+      "expected_progress": [
+        {
+          "metric": "contact_needed",
+          "direction": "decrease",
+          "description": "Resolvable non-Shopify domains should gain candidate emails."
+        }
+      ],
+      "acceptable_no_progress_reason": "Remaining targets are myshopify.com subdomains or need manual research."
+    },
+    {
+      "agent_id": "message_generation_agent_v1",
+      "expected_progress": [
+        {
+          "metric": "message_needed",
+          "direction": "decrease",
+          "description": "Eligible records with emails should receive subject/body."
+        }
+      ],
+      "acceptable_no_progress_reason": "No eligible records or product boundary blocked generation."
+    },
+    {
+      "agent_id": "message_validation_agent_v1",
+      "expected_progress": [
+        {
+          "metric": "approval_needed",
+          "direction": "increase",
+          "description": "Valid generated messages should become ready for approval."
+        }
+      ],
+      "acceptable_no_progress_reason": "No generated messages or validation failed safely."
+    },
+    {
+      "agent_id": "approval_decision_agent_v1",
+      "expected_progress": [
+        {
+          "metric": "send_ready",
+          "direction": "increase",
+          "description": "Approved messages should become ready to send."
+        }
+      ],
+      "acceptable_no_progress_reason": "No approval command was provided."
+    },
+    {
+      "agent_id": "send_ledger_agent_v1",
+      "expected_progress": [
+        {
+          "metric": "pending_send",
+          "direction": "increase",
+          "description": "Approved sends should be added to the send ledger."
+        }
+      ],
+      "acceptable_no_progress_reason": "No approved messages not already in the ledger."
+    },
+    {
+      "agent_id": "send_execution_agent_v1",
+      "expected_progress": [
+        {
+          "metric": "sent",
+          "direction": "increase",
+          "description": "Pending ledger entries should be sent via SMTP."
+        }
+      ],
+      "acceptable_no_progress_reason": "SMTP not ready, dry run only, or high-risk approval missing."
+    },
+    {
+      "agent_id": "reply_detection_agent_v1",
+      "expected_progress": [
+        {
+          "metric": "replies",
+          "direction": "increase_or_checked",
+          "description": "Sent messages should be checked for replies."
+        }
+      ],
+      "acceptable_no_progress_reason": "No replies detected yet."
+    },
+    {
+      "agent_id": "reply_interpretation_agent_v1",
+      "expected_progress": [
+        {
+          "metric": "interpreted_replies",
+          "direction": "increase",
+          "description": "Detected replies should receive intent classification."
+        }
+      ],
+      "acceptable_no_progress_reason": "No replied ledger entries."
+    },
+    {
+      "agent_id": "reply_response_agent_v1",
+      "expected_progress": [
+        {
+          "metric": "approval_needed",
+          "direction": "increase",
+          "description": "Actionable interpreted replies should create response drafts for approval."
+        }
+      ],
+      "acceptable_no_progress_reason": "No actionable interpreted replies."
+    },
+    {
+      "agent_id": "followup_agent_v1",
+      "expected_progress": [
+        {
+          "metric": "approval_needed",
+          "direction": "increase",
+          "description": "Due follow-ups should create approval queue drafts."
+        }
+      ],
+      "acceptable_no_progress_reason": "No sent messages are due for follow-up."
+    },
+    {
+      "agent_id": "revenue_agent_v1",
+      "expected_progress": [
+        {
+          "metric": "revenue_truth_refreshed",
+          "direction": "updated_or_confirmed",
+          "description": "Revenue truth should refresh current bottleneck and next action state."
+        }
+      ],
+      "acceptable_no_progress_reason": "Revenue state was already current or no actionable state change exists."
+    },
+    {
+      "agent_id": "contact_research_agent_v1",
+      "expected_progress": [
+        {
+          "metric": "contact_needed",
+          "direction": "decrease_or_reclassified",
+          "description": "Publicly discovered emails should reduce contact_needed; unresolved records should be reclassified with a specific reason."
+        }
+      ],
+      "acceptable_no_progress_reason": "No public email was found, or remaining records require a storefront domain or manual research."
+    }
+  ]
+}
