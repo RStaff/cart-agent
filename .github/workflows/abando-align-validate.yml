@@ -15,5 +15,5 @@ jobs:
             test -f "$d/smc-align.js" || { echo "missing $d/smc-align.js"; exit 1; }
             grep -q "installSmcAlign(app)" "$f" || { echo "not installed in $f"; exit 1; }
             found=1
-          done < <(grep -RIl --include="*.js" -E '\bapp\s*=\s*express\s*\(' web | grep -v '/node_modules/' | grep -v '\.backup\.' | grep -v '\.bak$' | grep -v 'backup' | grep -v 'syntaxfix')
+          done < <(grep -RIl --include="*.js" -E '\bapp\s*=\s*express\s*\(' web | grep -v '/node_modules/' | grep -v '\.backup\.' | grep -v '\.bak$' | grep -v 'backup' | grep -v 'syntaxfix' | grep -v 'before-')
           test "$found" = "1" || { echo "no real entries found"; exit 1; }

@@ -5,9 +5,9 @@ import { useState } from "react";
 export default function ShopiFixerPage() {
 
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState<Record<string, unknown> | null>(null);
 
-  const trackEvent = (eventName, payload = {}) => {
+  const trackEvent = (eventName: string, payload: Record<string, unknown> = {}) => {
     const event = {
       surface: "shopifixer",
       event: eventName,
