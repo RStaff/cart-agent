@@ -2,10 +2,16 @@
 
 import { useState } from "react";
 
+type ShopiFixerResult = {
+  leak: string;
+  loss: string;
+  fix: string;
+};
+
 export default function ShopiFixerPage() {
 
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<Record<string, unknown> | null>(null);
+  const [result, setResult] = useState<ShopiFixerResult | null>(null);
 
   const trackEvent = (eventName: string, payload: Record<string, unknown> = {}) => {
     const event = {
