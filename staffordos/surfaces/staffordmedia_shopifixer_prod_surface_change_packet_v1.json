@@ -1,0 +1,58 @@
+{
+  "ok": true,
+  "agent": "prod_surface_change_packet_v1",
+  "mode": "proposal_only",
+  "generated_at": "2026-04-26T14:23:44.565Z",
+  "source_root": "/Users/rossstafford/projects/StaffordMediaConsulting/apps/website",
+  "surface": "staffordmedia_shopifixer",
+  "route": "/shopifixer",
+  "owner": "src/app/shopifixer/page.tsx",
+  "component_owners": {
+    "page": "src/app/shopifixer/page.tsx",
+    "hero": "src/components/shopifixer/AuditHero.tsx",
+    "form": "src/components/shopifixer/AuditFormCard.tsx",
+    "preview": "src/components/shopifixer/AuditReadPreview.tsx",
+    "nextStep": "src/components/shopifixer/AuditNextStep.tsx",
+    "benefits": "src/components/shopifixer/AuditBenefitsRow.tsx",
+    "result": "src/app/shopifixer/result/page.tsx"
+  },
+  "current_truth": {
+    "real_page_exists": true,
+    "real_form_flow_exists": true,
+    "real_fix_audit_bridge_exists": true,
+    "real_lead_save_exists": true,
+    "real_outreach_trigger_exists": true,
+    "result_page_exists": true
+  },
+  "reuse_rules": [
+    "Do not rebuild /shopifixer page.",
+    "Do not create a duplicate audit API.",
+    "Do not create fake scan flow on production source.",
+    "Keep existing server action submitAudit.",
+    "Patch component owners only."
+  ],
+  "proposed_component_level_changes": [
+    {
+      "id": "hero_copy_sharpening",
+      "owner": "src/components/shopifixer/AuditHero.tsx",
+      "risk": "low",
+      "intent": "Improve above-the-fold urgency without changing layout or flow.",
+      "status": "proposal_only"
+    },
+    {
+      "id": "preview_proof_strengthening",
+      "owner": "src/components/shopifixer/AuditReadPreview.tsx",
+      "risk": "low",
+      "intent": "Make the read preview feel more concrete while preserving existing component.",
+      "status": "proposal_only"
+    },
+    {
+      "id": "logo_asset_review",
+      "owner": "public/brand/shopifixer-logo-final.png",
+      "risk": "medium",
+      "intent": "Confirm dirty logo asset is intentional before committing.",
+      "status": "review_required"
+    }
+  ],
+  "next_step": "Review packet, then create branch in StaffordMedia repo before applying any component patch."
+}
