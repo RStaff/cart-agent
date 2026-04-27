@@ -1,6 +1,6 @@
 {
   "version": "system_map_truth_v1",
-  "generated_at": "2026-04-25T20:41:43.976Z",
+  "generated_at": "2026-04-27T11:28:42.920Z",
   "sources": {
     "local_repo": "~/projects/cart-agent",
     "home_server_repo": "/home/ross/projects/cart-agent",
@@ -189,5 +189,270 @@
       "issue": "Home-server repo has uncommitted or untracked changes.",
       "action": "Review server git status before treating server repo as deploy-clean."
     }
-  ]
+  ],
+  "ok": true,
+  "artifact": "system_map_truth_v1",
+  "source": "system_truth_sync_agent_v1",
+  "system_status": {
+    "capability_matrix_ok": true,
+    "capability_summary": {
+      "total": 11,
+      "ready": 11,
+      "ready_to_packet_only": 0,
+      "needs_connector": 0,
+      "needs_agent_repair": 0,
+      "blocked_by_missing_capability": 0
+    },
+    "revenue_truth_ok": true,
+    "current_bottleneck": "lead_supply_or_contact_quality",
+    "next_actions": [
+      {
+        "priority": 1,
+        "action": "Add stronger real leads or valid contact emails.",
+        "expected_outcome": "Move at least one item to the next real funnel state."
+      }
+    ]
+  },
+  "latest_revenue_truth": {
+    "ok": true,
+    "artifact": "revenue_truth_v1",
+    "generated_at": "2026-04-27T11:28:42.909Z",
+    "funnel": {
+      "outreach_queue": 7,
+      "approval_items": 0,
+      "send_ledger_items": 0,
+      "outcomes": 3
+    },
+    "stages": {
+      "captured": 0,
+      "message_generated": 0,
+      "integrity_passed": 0,
+      "approval_needed": 0,
+      "approved": 0,
+      "send_ready": 0,
+      "pending_send": 0,
+      "dry_run_ready": 0,
+      "sent": 0,
+      "replies": 0,
+      "customers": 0
+    },
+    "current_bottleneck": "lead_supply_or_contact_quality",
+    "next_actions": [
+      {
+        "priority": 1,
+        "action": "Add stronger real leads or valid contact emails.",
+        "expected_outcome": "Move at least one item to the next real funnel state."
+      }
+    ],
+    "sources": {
+      "outreach_queue": "staffordos/leads/outreach_queue.json",
+      "approval_queue": "staffordos/leads/approval_queue_v1.json",
+      "send_ledger": "staffordos/leads/send_ledger_v1.json",
+      "outcomes": "staffordos/leads/outcomes.json"
+    }
+  },
+  "latest_capability_matrix": {
+    "ok": true,
+    "artifact": "capability_matrix_v1",
+    "generated_at": "2026-04-27T11:28:42.835Z",
+    "summary": {
+      "total": 11,
+      "ready": 11,
+      "ready_to_packet_only": 0,
+      "needs_connector": 0,
+      "needs_agent_repair": 0,
+      "blocked_by_missing_capability": 0
+    },
+    "decision": {
+      "next_safe_action": "Connector already exists. Verify before proceeding.",
+      "blocked_actions": [
+        "Do not send outreach until send_execution_agent_v1 exists and approval path is proven.",
+        "Do not modify ShopiFixer UI until connector contract is verified.",
+        "Do not treat registered missing agents as executable."
+      ]
+    },
+    "capabilities": [
+      {
+        "id": "shopifixer_audit_surface",
+        "purpose": "ShopiFixer public audit/surface page exists.",
+        "required_files": [
+          "abando-frontend/app/shopifixer/page.tsx"
+        ],
+        "maturity_rule": "READY",
+        "status": "READY",
+        "files": [
+          {
+            "path": "abando-frontend/app/shopifixer/page.tsx",
+            "exists": true
+          }
+        ],
+        "content_present": true
+      },
+      {
+        "id": "governed_change_loop",
+        "purpose": "StaffordOS can classify requests, verify owners, gate protected branches, and require verification.",
+        "required_files": [
+          "staffordos/loop/staffordos_loop_v1.mjs"
+        ],
+        "maturity_rule": "READY",
+        "status": "READY",
+        "files": [
+          {
+            "path": "staffordos/loop/staffordos_loop_v1.mjs",
+            "exists": true
+          }
+        ],
+        "content_present": true
+      },
+      {
+        "id": "registry_reality_audit",
+        "purpose": "StaffordOS can verify whether registered agents have real entrypoints.",
+        "required_files": [
+          "staffordos/system_inventory/registry_reality_audit_v1.mjs"
+        ],
+        "maturity_rule": "READY",
+        "status": "READY",
+        "files": [
+          {
+            "path": "staffordos/system_inventory/registry_reality_audit_v1.mjs",
+            "exists": true
+          }
+        ],
+        "content_present": true
+      },
+      {
+        "id": "scoped_registry_gate",
+        "purpose": "StaffordOS can block only on agents required for a scoped request.",
+        "required_files": [
+          "staffordos/loop/staffordos_loop_v1.mjs"
+        ],
+        "required_content": [
+          "scoped_registry_gate",
+          "verifyScopedRegistry"
+        ],
+        "maturity_rule": "READY",
+        "status": "READY",
+        "files": [
+          {
+            "path": "staffordos/loop/staffordos_loop_v1.mjs",
+            "exists": true
+          }
+        ],
+        "content_present": true
+      },
+      {
+        "id": "governed_outreach_packet",
+        "purpose": "ShopiFixer audit-to-outreach intent exists as approved packet path.",
+        "required_files": [
+          "staffordos/packets/shopifixer_governed_outreach_packet_v1.json"
+        ],
+        "maturity_rule": "READY_TO_PACKET_ONLY",
+        "status": "READY",
+        "files": [
+          {
+            "path": "staffordos/packets/shopifixer_governed_outreach_packet_v1.json",
+            "exists": true
+          }
+        ],
+        "content_present": true
+      },
+      {
+        "id": "lead_outreach_queue",
+        "purpose": "Existing queue where outreach candidates are stored.",
+        "required_files": [
+          "staffordos/leads/outreach_queue.json"
+        ],
+        "maturity_rule": "READY",
+        "status": "READY",
+        "files": [
+          {
+            "path": "staffordos/leads/outreach_queue.json",
+            "exists": true
+          }
+        ],
+        "content_present": true
+      },
+      {
+        "id": "approval_interface",
+        "purpose": "Operator can list/show/approve/reject/hold approval items.",
+        "required_files": [
+          "staffordos/agents/approval_interface_v1.mjs"
+        ],
+        "maturity_rule": "READY",
+        "status": "READY",
+        "files": [
+          {
+            "path": "staffordos/agents/approval_interface_v1.mjs",
+            "exists": true
+          }
+        ],
+        "content_present": true
+      },
+      {
+        "id": "audit_to_outreach_connector",
+        "purpose": "Connector from ShopiFixer audit result into governed outreach queue path.",
+        "required_files": [
+          "staffordos/connectors/shopifixer_audit_to_outreach_v1.mjs"
+        ],
+        "maturity_rule": "NEEDS_CONNECTOR",
+        "status": "READY",
+        "files": [
+          {
+            "path": "staffordos/connectors/shopifixer_audit_to_outreach_v1.mjs",
+            "exists": true
+          }
+        ],
+        "content_present": true
+      },
+      {
+        "id": "message_generation_agent",
+        "purpose": "Generates outbound message drafts from outreach queue.",
+        "required_files": [
+          "staffordos/leads/message_generation_agent_v1.mjs"
+        ],
+        "maturity_rule": "NEEDS_AGENT_REPAIR",
+        "status": "READY",
+        "files": [
+          {
+            "path": "staffordos/leads/message_generation_agent_v1.mjs",
+            "exists": true
+          }
+        ],
+        "content_present": true
+      },
+      {
+        "id": "message_validation_agent",
+        "purpose": "Validates generated outbound messages before approval/send.",
+        "required_files": [
+          "staffordos/leads/message_validation_agent_v1.mjs"
+        ],
+        "maturity_rule": "NEEDS_AGENT_REPAIR",
+        "status": "READY",
+        "files": [
+          {
+            "path": "staffordos/leads/message_validation_agent_v1.mjs",
+            "exists": true
+          }
+        ],
+        "content_present": true
+      },
+      {
+        "id": "send_execution_agent",
+        "purpose": "Sends approved messages only after approval gate.",
+        "required_files": [
+          "staffordos/leads/send_execution_agent_v1.mjs"
+        ],
+        "maturity_rule": "BLOCKED_BY_MISSING_CAPABILITY",
+        "status": "READY",
+        "files": [
+          {
+            "path": "staffordos/leads/send_execution_agent_v1.mjs",
+            "exists": true
+          }
+        ],
+        "content_present": true
+      }
+    ]
+  },
+  "operating_rule": "System truth reflects local StaffordOS files only. No fake metrics."
 }
