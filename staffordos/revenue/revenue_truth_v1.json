@@ -1,109 +1,38 @@
 {
   "ok": true,
-  "generated_at": "2026-04-25T20:41:43.940Z",
+  "artifact": "revenue_truth_v1",
+  "generated_at": "2026-04-27T09:47:22.103Z",
   "funnel": {
-    "leads": 7,
-    "qualified": 7,
-    "queue": 7,
-    "sent": 1,
+    "outreach_queue": 7,
+    "approval_items": 0,
+    "send_ledger_items": 0,
+    "outcomes": 3
+  },
+  "stages": {
+    "captured": 0,
+    "message_generated": 0,
+    "integrity_passed": 0,
+    "approval_needed": 0,
+    "approved": 0,
+    "send_ready": 0,
+    "pending_send": 0,
+    "dry_run_ready": 0,
+    "sent": 0,
     "replies": 0,
-    "meetings": 0,
     "customers": 0
   },
-  "derived_rates": {
-    "reply_rate": 0,
-    "meeting_rate": 0,
-    "close_rate": 0
-  },
-  "outreach_classification": {
-    "stages": {
-      "contact_needed": 5,
-      "message_needed": 0,
-      "approval_needed": 0,
-      "send_ready": 1,
-      "sent": 1
-    },
-    "blocker": "contact_data",
-    "next_action": "Find or add valid contact emails before generating or sending outreach.",
-    "classified_preview": [
-      {
-        "domain": "fitgearpro.myshopify.com",
-        "email": "",
-        "status": "routed",
-        "approved": false,
-        "sent": false,
-        "stage": "contact_needed"
-      },
-      {
-        "domain": "homegoodsco.myshopify.com",
-        "email": "",
-        "status": "routed",
-        "approved": false,
-        "sent": false,
-        "stage": "contact_needed"
-      },
-      {
-        "domain": "luxbath.myshopify.com",
-        "email": "",
-        "status": "routed",
-        "approved": false,
-        "sent": false,
-        "stage": "contact_needed"
-      },
-      {
-        "domain": "modernpets.myshopify.com",
-        "email": "",
-        "status": "routed",
-        "approved": false,
-        "sent": false,
-        "stage": "contact_needed"
-      },
-      {
-        "domain": "store1.myshopify.com",
-        "email": "owner@store1.com",
-        "status": "sent",
-        "approved": true,
-        "sent": true,
-        "stage": "sent"
-      },
-      {
-        "domain": "store2.com",
-        "email": "hello@store2.com",
-        "status": "approved_for_send",
-        "approved": true,
-        "sent": false,
-        "stage": "send_ready"
-      },
-      {
-        "domain": "urbankitchen.myshopify.com",
-        "email": "",
-        "status": "routed",
-        "approved": false,
-        "sent": false,
-        "stage": "contact_needed"
-      }
-    ]
-  },
-  "current_bottleneck": "message",
+  "current_bottleneck": "lead_supply_or_contact_quality",
   "next_actions": [
     {
       "priority": 1,
-      "action": "Find or add valid contact emails before generating or sending outreach.",
-      "expected_outcome": "valid contact emails > 0"
+      "action": "Add stronger real leads or valid contact emails.",
+      "expected_outcome": "Move at least one item to the next real funnel state."
     }
   ],
-  "day_over_day": {
-    "today": "2026-04-25",
-    "yesterday": "2026-04-24",
-    "today_progress_events": 1,
-    "yesterday_progress_events": 0,
-    "closer_to_revenue_today_than_yesterday": true,
-    "reason": "More real funnel-progress events were recorded today than yesterday."
-  },
   "sources": {
-    "contact_targets": "/Users/rossstafford/projects/cart-agent/staffordos/leads/contact_targets.json",
-    "qualified_targets": "/Users/rossstafford/projects/cart-agent/staffordos/leads/qualified_targets.json",
-    "outreach_queue": "/Users/rossstafford/projects/cart-agent/staffordos/leads/outreach_queue.json",
-    "outcomes": "/Users/rossstafford/projects/cart-agent/staffordos/leads/outcomes.json"
+    "outreach_queue": "staffordos/leads/outreach_queue.json",
+    "approval_queue": "staffordos/leads/approval_queue_v1.json",
+    "send_ledger": "staffordos/leads/send_ledger_v1.json",
+    "outcomes": "staffordos/leads/outcomes.json"
   }
 }
