@@ -5,6 +5,7 @@ const CONTACT_RESEARCH = "staffordos/leads/contact_research_queue.json";
 const APPROVAL_QUEUE = "staffordos/leads/approval_queue_v1.json";
 const SEND_LEDGER = "staffordos/leads/send_ledger_v1.json";
 const REPLY_INTERPRETATION = "staffordos/leads/reply_interpretation_v1.json";
+const OUTCOMES = "staffordos/leads/outcomes.json";
 const REGISTRY = "staffordos/leads/lead_registry_v1.json";
 const EVENTS = "staffordos/leads/lead_events_v1.json";
 const ROUTING_POLICY = "staffordos/leads/lead_routing_policy_v1.json";
@@ -80,6 +81,21 @@ function currentStage({ outreachItem, contactItem, approvals, ledgerItems, repli
   if (outreachItem?.subject && outreachItem?.body) return "message_ready";
   if (!outreachItem?.email && !contactItem?.contact_email) return "contact_needed";
   return "cold";
+}
+
+function outcomeForDomain(domain) {
+  const normalized = normalizeDomain(domain);
+  return outcomes.find((entry) => normalizeDomain(entry?.domain || "") === normalized) || null;
+}
+
+function abandoSignalsForOutcome(outcome = null) {
+  return {
+    audit_viewed: Boolean(outcome?.audit_opened),
+    experience_viewed: Boolean(outcome?.experience_opened),
+    recovery_sent: Boolean(outcome?.recovery_sent),
+    return_tracked: Boolean(outcome?.return_tracked),
+    status: String(outcome?.status || "")
+  };
 }
 
 function bottleneckFor(stage) {
@@ -198,6 +214,14 @@ for (const domain of domains) {
       event_type: "lead_registered",
       product_intent: next.product_intent,
       source: "lead_registry_sync_agent_v1",
+      observed_sources: {
+        outreach_queue: Boolean(outreachItem),
+        contact_research_queue: Boolean(contactItem),
+        approval_queue: approvals.length > 0,
+        send_ledger: ledgerItems.length > 0,
+        reply_interpretation: replies.length > 0,
+        outcomes: Boolean(outcomeItem)
+      },
       created_at: now
     });
   }
