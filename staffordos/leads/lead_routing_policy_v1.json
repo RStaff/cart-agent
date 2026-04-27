@@ -1,0 +1,58 @@
+{
+  "version": "lead_routing_policy_v1",
+  "purpose": "Canonical product routing policy for StaffordOS leads. Prevents overlap and cannibalization across ShopiFixer, Abando, and Stafford Media.",
+  "default_product_intent": "shopifixer",
+  "products": {
+    "shopifixer": {
+      "product_surface": "staffordmedia_shopifixer",
+      "primary_offer": "shopifixer_audit",
+      "secondary_offer": "abando_recovery",
+      "do_not_cross_sell_until": "qualified"
+    },
+    "abando": {
+      "product_surface": "abando_marketing",
+      "primary_offer": "abando_recovery",
+      "secondary_offer": "staffordmedia_services",
+      "do_not_cross_sell_until": "recovery_interest"
+    },
+    "staffordmedia": {
+      "product_surface": "staffordmedia_services",
+      "primary_offer": "automation_consulting",
+      "secondary_offer": "shopifixer_audit",
+      "do_not_cross_sell_until": "problem_confirmed"
+    }
+  },
+  "intent_rules": [
+    {
+      "match_any": [
+        "shopifixer",
+        "shopifix",
+        "fix audit",
+        "shopify fix",
+        "checkout leak",
+        "staffordmedia_shopifixer"
+      ],
+      "product_intent": "shopifixer"
+    },
+    {
+      "match_any": [
+        "abando_recovery",
+        "recovery engine",
+        "see recovery",
+        "checkout recovery",
+        "abando_checkout_install"
+      ],
+      "product_intent": "abando"
+    },
+    {
+      "match_any": [
+        "stafford media",
+        "staffordmedia",
+        "automation consulting",
+        "consulting",
+        "agency"
+      ],
+      "product_intent": "staffordmedia"
+    }
+  ]
+}

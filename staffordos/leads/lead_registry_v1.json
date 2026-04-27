@@ -1,0 +1,285 @@
+{
+  "version": "lead_registry_v1",
+  "items": [
+    {
+      "lead_id": "lead_fitgearpro_myshopify_com",
+      "domain": "fitgearpro.myshopify.com",
+      "source": "staffordos",
+      "lead_state": "contact_needed",
+      "product_intent": "shopifixer",
+      "product_surface": "staffordmedia_shopifixer",
+      "contact": {
+        "email": "",
+        "name": "",
+        "role": "",
+        "confidence": "no_contact_found"
+      },
+      "engagement": {
+        "audit_viewed": false,
+        "experience_viewed": false,
+        "replied": false,
+        "approved_for_send": false,
+        "dry_run_ready": false,
+        "sent": false
+      },
+      "routing": {
+        "primary_offer": "shopifixer_audit",
+        "secondary_offer": "abando_recovery",
+        "do_not_cross_sell_until": "qualified"
+      },
+      "status": {
+        "current_stage": "contact_needed",
+        "current_bottleneck": "contact",
+        "next_action": "Find or add valid contact email."
+      },
+      "refs": {
+        "outreach_queue": true,
+        "approval_queue_ids": [],
+        "send_ledger_ids": [],
+        "reply_ids": []
+      },
+      "created_at": "2026-04-27T14:41:00.252Z",
+      "updated_at": "2026-04-27T14:41:00.252Z"
+    },
+    {
+      "lead_id": "lead_homegoodsco_myshopify_com",
+      "domain": "homegoodsco.myshopify.com",
+      "source": "staffordos",
+      "lead_state": "contact_needed",
+      "product_intent": "shopifixer",
+      "product_surface": "staffordmedia_shopifixer",
+      "contact": {
+        "email": "",
+        "name": "",
+        "role": "",
+        "confidence": "no_contact_found"
+      },
+      "engagement": {
+        "audit_viewed": false,
+        "experience_viewed": false,
+        "replied": false,
+        "approved_for_send": false,
+        "dry_run_ready": false,
+        "sent": false
+      },
+      "routing": {
+        "primary_offer": "shopifixer_audit",
+        "secondary_offer": "abando_recovery",
+        "do_not_cross_sell_until": "qualified"
+      },
+      "status": {
+        "current_stage": "contact_needed",
+        "current_bottleneck": "contact",
+        "next_action": "Find or add valid contact email."
+      },
+      "refs": {
+        "outreach_queue": true,
+        "approval_queue_ids": [],
+        "send_ledger_ids": [],
+        "reply_ids": []
+      },
+      "created_at": "2026-04-27T14:41:00.253Z",
+      "updated_at": "2026-04-27T14:41:00.253Z"
+    },
+    {
+      "lead_id": "lead_luxbath_myshopify_com",
+      "domain": "luxbath.myshopify.com",
+      "source": "staffordos",
+      "lead_state": "contact_needed",
+      "product_intent": "shopifixer",
+      "product_surface": "staffordmedia_shopifixer",
+      "contact": {
+        "email": "",
+        "name": "",
+        "role": "",
+        "confidence": "no_contact_found"
+      },
+      "engagement": {
+        "audit_viewed": false,
+        "experience_viewed": false,
+        "replied": false,
+        "approved_for_send": false,
+        "dry_run_ready": false,
+        "sent": false
+      },
+      "routing": {
+        "primary_offer": "shopifixer_audit",
+        "secondary_offer": "abando_recovery",
+        "do_not_cross_sell_until": "qualified"
+      },
+      "status": {
+        "current_stage": "contact_needed",
+        "current_bottleneck": "contact",
+        "next_action": "Find or add valid contact email."
+      },
+      "refs": {
+        "outreach_queue": true,
+        "approval_queue_ids": [],
+        "send_ledger_ids": [],
+        "reply_ids": []
+      },
+      "created_at": "2026-04-27T14:41:00.253Z",
+      "updated_at": "2026-04-27T14:41:00.253Z"
+    },
+    {
+      "lead_id": "lead_modernpets_myshopify_com",
+      "domain": "modernpets.myshopify.com",
+      "source": "staffordos",
+      "lead_state": "contact_needed",
+      "product_intent": "shopifixer",
+      "product_surface": "staffordmedia_shopifixer",
+      "contact": {
+        "email": "",
+        "name": "",
+        "role": "",
+        "confidence": "no_contact_found"
+      },
+      "engagement": {
+        "audit_viewed": false,
+        "experience_viewed": false,
+        "replied": false,
+        "approved_for_send": false,
+        "dry_run_ready": false,
+        "sent": false
+      },
+      "routing": {
+        "primary_offer": "shopifixer_audit",
+        "secondary_offer": "abando_recovery",
+        "do_not_cross_sell_until": "qualified"
+      },
+      "status": {
+        "current_stage": "contact_needed",
+        "current_bottleneck": "contact",
+        "next_action": "Find or add valid contact email."
+      },
+      "refs": {
+        "outreach_queue": true,
+        "approval_queue_ids": [],
+        "send_ledger_ids": [],
+        "reply_ids": []
+      },
+      "created_at": "2026-04-27T14:41:00.253Z",
+      "updated_at": "2026-04-27T14:41:00.253Z"
+    },
+    {
+      "lead_id": "lead_store1_myshopify_com",
+      "domain": "store1.myshopify.com",
+      "source": "staffordos",
+      "lead_state": "cold",
+      "product_intent": "shopifixer",
+      "product_surface": "staffordmedia_shopifixer",
+      "contact": {
+        "email": "owner@store1.com",
+        "name": "Jane Smith",
+        "role": "Founder",
+        "confidence": "contact_page_ready"
+      },
+      "engagement": {
+        "audit_viewed": false,
+        "experience_viewed": false,
+        "replied": false,
+        "approved_for_send": false,
+        "dry_run_ready": false,
+        "sent": false
+      },
+      "routing": {
+        "primary_offer": "shopifixer_audit",
+        "secondary_offer": "abando_recovery",
+        "do_not_cross_sell_until": "qualified"
+      },
+      "status": {
+        "current_stage": "cold",
+        "current_bottleneck": "routing",
+        "next_action": "Move lead into contact or message workflow."
+      },
+      "refs": {
+        "outreach_queue": true,
+        "approval_queue_ids": [],
+        "send_ledger_ids": [],
+        "reply_ids": []
+      },
+      "created_at": "2026-04-27T14:41:00.253Z",
+      "updated_at": "2026-04-27T14:41:00.253Z"
+    },
+    {
+      "lead_id": "lead_store2_com",
+      "domain": "store2.com",
+      "source": "staffordos",
+      "lead_state": "contact_needed",
+      "product_intent": "shopifixer",
+      "product_surface": "staffordmedia_shopifixer",
+      "contact": {
+        "email": "",
+        "name": "",
+        "role": "",
+        "confidence": "no_contact_found"
+      },
+      "engagement": {
+        "audit_viewed": false,
+        "experience_viewed": false,
+        "replied": false,
+        "approved_for_send": false,
+        "dry_run_ready": false,
+        "sent": false
+      },
+      "routing": {
+        "primary_offer": "shopifixer_audit",
+        "secondary_offer": "abando_recovery",
+        "do_not_cross_sell_until": "qualified"
+      },
+      "status": {
+        "current_stage": "contact_needed",
+        "current_bottleneck": "contact",
+        "next_action": "Find or add valid contact email."
+      },
+      "refs": {
+        "outreach_queue": true,
+        "approval_queue_ids": [],
+        "send_ledger_ids": [],
+        "reply_ids": []
+      },
+      "created_at": "2026-04-27T14:41:00.253Z",
+      "updated_at": "2026-04-27T14:41:00.253Z"
+    },
+    {
+      "lead_id": "lead_urbankitchen_myshopify_com",
+      "domain": "urbankitchen.myshopify.com",
+      "source": "staffordos",
+      "lead_state": "contact_needed",
+      "product_intent": "shopifixer",
+      "product_surface": "staffordmedia_shopifixer",
+      "contact": {
+        "email": "",
+        "name": "",
+        "role": "",
+        "confidence": "no_contact_found"
+      },
+      "engagement": {
+        "audit_viewed": false,
+        "experience_viewed": false,
+        "replied": false,
+        "approved_for_send": false,
+        "dry_run_ready": false,
+        "sent": false
+      },
+      "routing": {
+        "primary_offer": "shopifixer_audit",
+        "secondary_offer": "abando_recovery",
+        "do_not_cross_sell_until": "qualified"
+      },
+      "status": {
+        "current_stage": "contact_needed",
+        "current_bottleneck": "contact",
+        "next_action": "Find or add valid contact email."
+      },
+      "refs": {
+        "outreach_queue": true,
+        "approval_queue_ids": [],
+        "send_ledger_ids": [],
+        "reply_ids": []
+      },
+      "created_at": "2026-04-27T14:41:00.253Z",
+      "updated_at": "2026-04-27T14:41:00.253Z"
+    }
+  ]
+}

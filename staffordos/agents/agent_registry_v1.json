@@ -677,6 +677,50 @@
         "enabled": false,
         "strategy": "manual_review_first"
       }
+    },
+    {
+      "id": "lead_registry_sync_agent_v1",
+      "version": "v1",
+      "department": "revenue",
+      "purpose": "Sync existing StaffordOS lead queues into canonical lead lifecycle registry.",
+      "entrypoint": "staffordos/leads/lead_registry_sync_agent_v1.mjs",
+      "reads_from": [
+        "staffordos/leads/outreach_queue.json",
+        "staffordos/leads/contact_research_queue.json",
+        "staffordos/leads/approval_queue_v1.json",
+        "staffordos/leads/send_ledger_v1.json",
+        "staffordos/leads/reply_interpretation_v1.json"
+      ],
+      "writes_to": [
+        "staffordos/leads/lead_registry_v1.json",
+        "staffordos/leads/lead_events_v1.json",
+        "staffordos/leads/lead_registry_sync_log_v1.json"
+      ],
+      "allowed_actions": [
+        "read_truth",
+        "write_truth",
+        "write_log"
+      ],
+      "forbidden_actions": [
+        "send_email",
+        "approve_message",
+        "modify_product_boundary_without_approval",
+        "write_outside_declared_scope"
+      ],
+      "requires_approval": false,
+      "risk_level": "medium",
+      "verification_command": "node staffordos/agents/run_agent_v1.mjs lead_registry_sync_agent_v1",
+      "status": "registered",
+      "constraints": [
+        "no_rebuild",
+        "canonical_lifecycle_layer_only",
+        "no_send",
+        "no_product_surface_patch"
+      ],
+      "auto_repair": {
+        "enabled": false,
+        "strategy": "manual_review_first"
+      }
     }
   ]
 }
