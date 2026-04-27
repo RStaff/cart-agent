@@ -14,6 +14,14 @@ type LeadRegistryItem = {
     current_bottleneck?: string;
     next_action?: string;
   };
+  engagement?: {
+    recovered_revenue?: {
+      amount_cents?: number;
+      currency?: string;
+      source?: string;
+      confidence?: string;
+    } | null;
+  };
 };
 
 type LeadRegistryResponse = {
@@ -66,6 +74,21 @@ function topEntries(record: Record<string, number>) {
   return Object.entries(record).sort((a, b) => b[1] - a[1]);
 }
 
+
+function recoveredRevenueCents(leads: LeadRegistryItem[]) {
+  return leads.reduce((sum, lead) => {
+    const cents = Number(lead.engagement?.recovered_revenue?.amount_cents || 0);
+    return Number.isFinite(cents) ? sum + cents : sum;
+  }, 0);
+}
+
+function formatUsdFromCents(cents: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD"
+  }).format(cents / 100);
+}
+
 export default async function OperatorRevenueCommandPage() {
   const payload = await getLeadRegistry();
   const leads = payload.registry?.items || [];
@@ -79,6 +102,7 @@ export default async function OperatorRevenueCommandPage() {
   const dryRunReady = countBy(leads, (lead) => lead.lead_state === "dry_run_ready");
   const sent = countBy(leads, (lead) => lead.lead_state === "sent");
   const engaged = countBy(leads, (lead) => lead.lead_state === "engaged");
+  const recoveredCents = recoveredRevenueCents(leads);
 
   const primaryBottleneck = topEntries(bottleneckCounts)[0]?.[0] || "unknown";
   const nextAction =
@@ -139,6 +163,7 @@ export default async function OperatorRevenueCommandPage() {
                 <div><strong>Dry-run ready:</strong> {dryRunReady}</div>
                 <div><strong>Sent:</strong> {sent}</div>
                 <div><strong>Engaged:</strong> {engaged}</div>
+                <div><strong>Recovered revenue:</strong> {formatUsdFromCents(recoveredCents)}</div>
               </div>
             </div>
           </section>
