@@ -22,7 +22,7 @@ const log = readJson(LOG, []);
 let created = 0;
 
 for (const lead of queue) {
-  const valid = Boolean(lead.domain && lead.subject && lead.body && !lead.sent);
+  const valid = Boolean(lead.domain && lead.subject && lead.body && !lead.sent && lead.integrity_status === "pass");
   if (!valid) continue;
 
   const id = `approval_${String(lead.domain).replace(/[^a-z0-9]/gi, "_")}_${lead.message_type || "outreach"}`;
