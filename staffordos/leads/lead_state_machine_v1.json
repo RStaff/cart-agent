@@ -1,0 +1,51 @@
+{
+  "version": "lead_state_machine_v1",
+  "states": [
+    "cold",
+    "contact_needed",
+    "message_ready",
+    "pending_approval",
+    "approved",
+    "ledgered",
+    "dry_run_ready",
+    "sent",
+    "engaged",
+    "qualified",
+    "customer",
+    "stopped"
+  ],
+  "transitions": {
+    "cold": ["contact_needed", "message_ready"],
+    "contact_needed": ["message_ready", "stopped"],
+    "message_ready": ["pending_approval"],
+    "pending_approval": ["approved", "stopped"],
+    "approved": ["ledgered"],
+    "ledgered": ["dry_run_ready", "sent"],
+    "dry_run_ready": ["sent", "engaged"],
+    "sent": ["engaged", "stopped"],
+    "engaged": ["qualified", "stopped"],
+    "qualified": ["customer", "stopped"],
+    "customer": [],
+    "stopped": []
+  },
+  "routing_rules": {
+    "shopifixer": {
+      "primary_surface": "staffordmedia_shopifixer",
+      "primary_offer": "shopifixer_audit",
+      "secondary_offer": "abando_recovery",
+      "cross_sell_rule": "Only introduce Abando after audit interest, reply, or qualified intent."
+    },
+    "abando": {
+      "primary_surface": "abando_marketing",
+      "primary_offer": "abando_recovery",
+      "secondary_offer": "staffordmedia_services",
+      "cross_sell_rule": "Do not dilute Abando with generic agency messaging."
+    },
+    "staffordmedia": {
+      "primary_surface": "staffordmedia_home",
+      "primary_offer": "diagnostic_service",
+      "secondary_offer": "shopifixer_or_abando",
+      "cross_sell_rule": "Route based on merchant pain: audit/fix vs recovery automation."
+    }
+  }
+}
