@@ -105,6 +105,47 @@ function verifyScopedRegistry(classification) {
   };
 }
 
+function runCapabilityMatrixGate() {
+  try {
+    const raw = execSync("node staffordos/capabilities/capability_matrix_v1.mjs", {
+      encoding: "utf8"
+    }).trim();
+
+    const parsed = JSON.parse(raw);
+    const blockingStatuses = new Set([
+      "NEEDS_CONNECTOR",
+      "NEEDS_AGENT_REPAIR",
+      "BLOCKED_BY_MISSING_CAPABILITY"
+    ]);
+
+    const blocking = Array.isArray(parsed.capabilities)
+      ? parsed.capabilities.filter((capability) => blockingStatuses.has(capability.status))
+      : [];
+
+    return {
+      ok: blocking.length === 0,
+      summary: parsed.summary || {},
+      blocking: blocking.map((capability) => ({
+        id: capability.id,
+        status: capability.status,
+        purpose: capability.purpose,
+        files: capability.files || []
+      }))
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      summary: {},
+      blocking: [{
+        id: "capability_matrix_v1",
+        status: "CAPABILITY_MATRIX_FAILED",
+        purpose: "Capability matrix must run before StaffordOS loop execution.",
+        error: error instanceof Error ? error.message : String(error)
+      }]
+    };
+  }
+}
+
 
 const ownerStatus = Object.fromEntries(
   Object.entries(requiredOwners).map(([key, path]) => [key, { path, exists: exists(path) }])
@@ -114,6 +155,7 @@ const missingOwners = Object.values(ownerStatus).filter((x) => !x.exists).map((x
 
 const classification = classify(request);
 const scopedRegistry = verifyScopedRegistry(classification);
+const capabilityMatrixGate = runCapabilityMatrixGate();
 
 const issues = [];
 
@@ -123,7 +165,7 @@ if (branch === "main") {
 
 const statusLines = status ? status.split("\n").filter(Boolean) : [];
 const nonBootstrapDirty = statusLines.filter((line) => {
-  const file = line.replace(/^..\s+/, "");
+  const file = line.replace(/^.{1,3}\s+/, "");
   return !file.startsWith("staffordos/loop/");
 });
 
@@ -137,6 +179,10 @@ if (missingOwners.length) {
 
 if (scopedRegistry.missing.length) {
   issues.push(`STOP: scoped registry gate failed:\n${JSON.stringify(scopedRegistry.missing, null, 2)}`);
+}
+
+if (!capabilityMatrixGate.ok) {
+  issues.push(`STOP: capability matrix gate failed:\n${JSON.stringify(capabilityMatrixGate.blocking, null, 2)}`);
 }
 
 if (classification === "UNKNOWN_REVIEW_REQUIRED") {
@@ -178,6 +224,7 @@ const report = {
   generated_at: timestamp,
   owner_status: ownerStatus,
   scoped_registry_gate: scopedRegistry,
+  capability_matrix_gate: capabilityMatrixGate,
   packet
 };
 
