@@ -125,6 +125,7 @@ const ledgerDoc = readJson(SEND_LEDGER, { version: "send_ledger_v1", items: [] }
 const ledger = Array.isArray(ledgerDoc.items) ? ledgerDoc.items : [];
 const replyDoc = readJson(REPLY_INTERPRETATION, { version: "reply_interpretation_v1", items: [] });
 const replies = Array.isArray(replyDoc.items) ? replyDoc.items : [];
+const outcomes = readJson(OUTCOMES, []);
 
 const routingPolicy = readJson(ROUTING_POLICY, {
   default_product_intent: "shopifixer",
@@ -147,7 +148,8 @@ const domains = new Set([
   ...contactResearch.map(x => normalizeDomain(x.domain)),
   ...approvals.map(x => normalizeDomain(x.domain)),
   ...ledger.map(x => normalizeDomain(x.domain)),
-  ...replies.map(x => normalizeDomain(x.domain))
+  ...replies.map(x => normalizeDomain(x.domain)),
+  ...outcomes.map(x => normalizeDomain(x.domain))
 ].filter(Boolean));
 
 let created = 0;
@@ -159,9 +161,15 @@ for (const domain of domains) {
   const approvalItems = approvals.filter(x => normalizeDomain(x.domain) === domain);
   const ledgerItems = ledger.filter(x => normalizeDomain(x.domain) === domain);
   const replyItems = replies.filter(x => normalizeDomain(x.domain) === domain);
+  const outcomeItem = outcomes.find(x => normalizeDomain(x.domain) === domain) || null;
 
   const existing = byDomain.get(domain) || null;
-  const intent = inferProductIntent(outreachItem);
+  let intent = inferProductIntent(outreachItem);
+
+  // Override intent if Abando outcome signals exist (source-of-truth correction)
+  if (outcomeItem && (outcomeItem.recovery_sent || outcomeItem.return_tracked)) {
+    intent = "abando";
+  }
   const stage = currentStage({ outreachItem, contactItem, approvals: approvalItems, ledgerItems, replies: replyItems });
   const status = bottleneckFor(stage);
   const now = new Date().toISOString();
@@ -180,12 +188,14 @@ for (const domain of domains) {
       confidence: contactItem.contact_status || existing?.contact?.confidence || "none"
     },
     engagement: {
-      audit_viewed: Boolean(existing?.engagement?.audit_viewed),
-      experience_viewed: Boolean(existing?.engagement?.experience_viewed),
+      audit_viewed: Boolean(outcomeItem?.audit_opened || existing?.engagement?.audit_viewed),
+      experience_viewed: Boolean(outcomeItem?.experience_opened || existing?.engagement?.experience_viewed),
       replied: replyItems.length > 0 || Boolean(outreachItem.replied),
       approved_for_send: approvalItems.some(x => x.status === "approved"),
       dry_run_ready: ledgerItems.some(x => x.status === "dry_run_ready"),
-      sent: ledgerItems.some(x => x.status === "sent") || Boolean(outreachItem.sent)
+      sent: ledgerItems.some(x => x.status === "sent") || Boolean(outreachItem.sent),
+      recovery_sent: Boolean(outcomeItem?.recovery_sent || existing?.engagement?.recovery_sent),
+      return_tracked: Boolean(outcomeItem?.return_tracked || existing?.engagement?.return_tracked)
     },
     routing: routingFor(intent),
     status: {
@@ -196,7 +206,8 @@ for (const domain of domains) {
       outreach_queue: Boolean(outreachItem.domain),
       approval_queue_ids: approvalItems.map(x => x.id).filter(Boolean),
       send_ledger_ids: ledgerItems.map(x => x.id).filter(Boolean),
-      reply_ids: replyItems.map(x => x.id).filter(Boolean)
+      reply_ids: replyItems.map(x => x.id).filter(Boolean),
+      outcome: Boolean(outcomeItem)
     },
     created_at: existing?.created_at || now,
     updated_at: now
