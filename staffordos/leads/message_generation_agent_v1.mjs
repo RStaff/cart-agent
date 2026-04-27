@@ -24,7 +24,15 @@ for (const lead of queue) {
     });
 
     lead.subject = generated.subject || lead.subject || "Quick idea for recovering missed checkout revenue";
-    lead.body = generated.body || lead.body || generated.message || "";
+    lead.body = generated.body || lead.body || generated.message || [
+      `Hi — I noticed ${lead.domain} may be leaving checkout recovery revenue on the table.`,
+      "",
+      "I built ShopiFixer to surface checkout leaks and point merchants toward the fastest recovery opportunities.",
+      "",
+      `Here is the audit link: ${lead.audit_link || ""}`,
+      "",
+      "If helpful, I can send over the quick findings."
+    ].join("\n");
     lead.status = lead.status || "message_generated";
     lead.updated_at = new Date().toISOString();
     updated += 1;
