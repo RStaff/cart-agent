@@ -214,7 +214,7 @@ function commandQueue(domain) {
     console.error(`No contact email found for ${entry.domain}`);
     process.exit(1);
   }
-  const template = templates[entry.message_type] || templates.abando_audit_invite;
+  const template = templates[entry.message_type] || templates.shopifixer_audit_invite || templates.abando_audit_invite;
   const rendered = renderTemplate(template, entry);
   entry.subject = rendered.subject;
   entry.body = rendered.body;
@@ -256,7 +256,7 @@ function commandNote(domain, noteText) {
 function commandRender(domain) {
   const { queue, templates } = loadState();
   const entry = requireEntry(queue, domain);
-  const template = templates[entry.message_type] || templates.abando_audit_invite;
+  const template = templates[entry.message_type] || templates.shopifixer_audit_invite || templates.abando_audit_invite;
   const rendered = renderTemplate(template, entry);
   console.log(`Domain: ${entry.domain}`);
   console.log(`Email: ${entry.email || "not found"}`);

@@ -6,5 +6,9 @@
   "abando_followup": {
     "subject": "Quick follow-up on checkout recovery",
     "body": "Following up in case this is useful.\n\nAudit:\n{{audit_link}}\n\nLive recovery flow:\n{{experience_link}}"
+  },
+  "shopifixer_audit_invite": {
+    "subject": "Quick ShopiFixer audit for {{domain}}",
+    "body": "Hi — I noticed {{domain}} may be leaving checkout revenue on the table.\n\nI built ShopiFixer through Stafford Media Consulting to surface checkout leaks and point merchants toward the fastest recovery opportunities.\n\nHere is the audit link:\n{{audit_link}}\n\nIf helpful, I can send over the quick findings."
   }
 }
