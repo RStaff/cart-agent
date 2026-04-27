@@ -12,7 +12,11 @@ function writeJson(path, value) {
 }
 
 const queue = readJson(QUEUE, []);
-const approvals = readJson(APPROVAL_QUEUE, []);
+const approvalQueue = readJson(APPROVAL_QUEUE, {
+  version: "approval_queue_v1",
+  items: []
+});
+const approvals = Array.isArray(approvalQueue.items) ? approvalQueue.items : [];
 const log = readJson(LOG, []);
 
 let created = 0;
@@ -45,7 +49,7 @@ for (const lead of queue) {
 }
 
 writeJson(QUEUE, queue);
-writeJson(APPROVAL_QUEUE, approvals);
+writeJson(APPROVAL_QUEUE, { version: "approval_queue_v1", items: approvals });
 log.push({ agent: "message_validation_agent_v1", approvals_created: created, at: new Date().toISOString() });
 writeJson(LOG, log);
 
