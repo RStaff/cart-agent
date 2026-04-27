@@ -1,32 +1,56 @@
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
 import { OperatorNav } from "../../../components/operator/OperatorNav";
 
+const ROOT = path.resolve(process.cwd(), "../../..");
+
+function readJson<T>(filePath: string, fallback: T): T {
+  try {
+    if (!existsSync(filePath)) return fallback;
+    return JSON.parse(readFileSync(filePath, "utf8")) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+type RevenueTruth = {
+  current_bottleneck?: string;
+  next_actions?: Array<{ priority?: number; action?: string; expected_outcome?: string }>;
+  funnel?: Record<string, number>;
+  stages?: Record<string, number>;
+  generated_at?: string;
+};
+
+type ApprovalQueue = {
+  items?: Array<{ status?: string }>;
+};
+
+type SendLedger = {
+  items?: Array<{ status?: string }>;
+};
+
 export default function OperatorRevenueCommandPage() {
-  const sections = [
-    {
-      title: "Active Opportunities",
-      description:
-        "Cross-product opportunities that still need operator action, routing, or qualification should appear here.",
-      status: "No Revenue Command opportunity API is connected yet.",
-    },
-    {
-      title: "Follow-Up Queue",
-      description:
-        "This queue should hold operator-owned outreach and follow-up work across products without pushing product execution into StaffordOS.",
-      status: "No follow-up queue API is connected yet.",
-    },
-    {
-      title: "Closing Pipeline",
-      description:
-        "This stage should track deals moving toward agreement, approval, or final operator confirmation.",
-      status: "No closing pipeline API is connected yet.",
-    },
-    {
-      title: "Payment Handoff",
-      description:
-        "This area should track internal payment-ready handoffs and confirmation steps without claiming payment or revenue that has not been verified.",
-      status: "No payment handoff API is connected yet.",
-    },
-  ];
+  const revenueTruth = readJson<RevenueTruth>(
+    path.join(ROOT, "staffordos/revenue/revenue_truth_v1.json"),
+    {}
+  );
+
+  const approvals = readJson<ApprovalQueue>(
+    path.join(ROOT, "staffordos/leads/approval_queue_v1.json"),
+    { items: [] }
+  );
+
+  const ledger = readJson<SendLedger>(
+    path.join(ROOT, "staffordos/leads/send_ledger_v1.json"),
+    { items: [] }
+  );
+
+  const pendingApprovals = approvals.items?.filter((x) => x.status === "pending_review").length || 0;
+  const approved = approvals.items?.filter((x) => x.status === "approved").length || 0;
+  const pendingSend = ledger.items?.filter((x) => x.status === "pending_send").length || 0;
+  const dryRunReady = ledger.items?.filter((x) => x.status === "dry_run_ready").length || 0;
+
+  const nextAction = revenueTruth.next_actions?.[0]?.action || "Run revenue_agent_v1 to refresh current truth.";
 
   return (
     <main className="shell">
@@ -36,7 +60,7 @@ export default function OperatorRevenueCommandPage() {
             <p className="eyebrow">StaffordOS Revenue</p>
             <h1 className="title">Revenue Command</h1>
             <p className="subtitle">
-              Internal funnel control for outreach, follow-up, closing, payment handoff, and cross-product pipeline management.
+              Live operator view from local StaffordOS truth files. No fake metrics.
             </p>
             <OperatorNav activeHref="/operator/revenue-command" />
           </div>
@@ -44,33 +68,37 @@ export default function OperatorRevenueCommandPage() {
 
         <section className="panel">
           <div className="panelInner">
-            <h2 className="sectionTitle">Module Status</h2>
+            <h2 className="sectionTitle">Current Bottleneck</h2>
             <p className="subtitle" style={{ marginTop: 0 }}>
-              Minimal control-plane page is live. Structured Revenue Command APIs are not connected yet, so all sections below are explicit empty states.
+              {revenueTruth.current_bottleneck || "Unknown"}
             </p>
             <div className="kv">
-              <div><strong>Merchant-facing:</strong> No</div>
-              <div><strong>Product execution logic:</strong> Kept out of this route</div>
-              <div><strong>Reused API:</strong> None for structured funnel data</div>
+              <div><strong>Next action:</strong> {nextAction}</div>
+              <div><strong>Truth updated:</strong> {revenueTruth.generated_at || "Unavailable"}</div>
             </div>
           </div>
         </section>
 
         <div className="grid gridTwo">
-          {sections.map((section) => (
-            <section className="panel" key={section.title}>
-              <div className="panelInner">
-                <h2 className="sectionTitle">{section.title}</h2>
-                <p className="subtitle" style={{ marginTop: 0 }}>
-                  {section.description}
-                </p>
-                <div className="emptyState">
-                  <p className="emptyStateLabel">Placeholder</p>
-                  <p className="emptyStateText">{section.status}</p>
-                </div>
+          <section className="panel">
+            <div className="panelInner">
+              <h2 className="sectionTitle">Approval Queue</h2>
+              <div className="kv">
+                <div><strong>Pending review:</strong> {pendingApprovals}</div>
+                <div><strong>Approved:</strong> {approved}</div>
               </div>
-            </section>
-          ))}
+            </div>
+          </section>
+
+          <section className="panel">
+            <div className="panelInner">
+              <h2 className="sectionTitle">Send Ledger</h2>
+              <div className="kv">
+                <div><strong>Pending send:</strong> {pendingSend}</div>
+                <div><strong>Dry-run ready:</strong> {dryRunReady}</div>
+              </div>
+            </div>
+          </section>
         </div>
       </div>
     </main>
