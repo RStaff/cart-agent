@@ -640,6 +640,43 @@
         "no_direct_main_edits",
         "must_use_existing_proposals"
       ]
+    },
+    {
+      "id": "dev_task_integrity_agent_v1",
+      "version": "v1",
+      "department": "governance",
+      "purpose": "Inspect pending dev task changes for anti-slop integrity before commit or merge.",
+      "entrypoint": "staffordos/agents/dev_task_integrity_agent_v1.mjs",
+      "reads_from": [
+        "git status",
+        "staffordos/agents/agent_registry_v1.json"
+      ],
+      "writes_to": [
+        "staffordos/agents/dev_task_integrity_log_v1.json"
+      ],
+      "allowed_actions": [
+        "read_truth",
+        "write_log"
+      ],
+      "forbidden_actions": [
+        "send_email",
+        "modify_product_boundary_without_approval",
+        "write_outside_declared_scope"
+      ],
+      "requires_approval": false,
+      "risk_level": "low",
+      "verification_command": "node staffordos/agents/run_agent_v1.mjs dev_task_integrity_agent_v1",
+      "status": "registered",
+      "constraints": [
+        "inspect_only",
+        "no_runtime_output_commit",
+        "no_fake_success",
+        "minimal_patch_preferred"
+      ],
+      "auto_repair": {
+        "enabled": false,
+        "strategy": "manual_review_first"
+      }
     }
   ]
 }
