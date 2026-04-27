@@ -195,7 +195,8 @@ for (const domain of domains) {
       dry_run_ready: ledgerItems.some(x => x.status === "dry_run_ready"),
       sent: ledgerItems.some(x => x.status === "sent") || Boolean(outreachItem.sent),
       recovery_sent: Boolean(outcomeItem?.recovery_sent || existing?.engagement?.recovery_sent),
-      return_tracked: Boolean(outcomeItem?.return_tracked || existing?.engagement?.return_tracked)
+      return_tracked: Boolean(outcomeItem?.return_tracked || existing?.engagement?.return_tracked),
+      recovered_revenue: outcomeItem?.recovered_revenue || existing?.engagement?.recovered_revenue || null
     },
     routing: routingFor(intent),
     status: {

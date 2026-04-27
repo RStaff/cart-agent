@@ -10,7 +10,13 @@
     "return_tracked": true,
     "status": "return_tracked",
     "notes": "",
-    "updated_at": "2026-03-25T18:16:16.716Z"
+    "updated_at": "2026-03-25T18:16:16.716Z",
+    "recovered_revenue": {
+      "amount_cents": 14233,
+      "currency": "USD",
+      "source": "existing_abando_attribution",
+      "confidence": "example_verified_order_matched"
+    }
   },
   {
     "domain": "midmarket-home.myshopify.com",
