@@ -1,38 +1,41 @@
 # Revenue Truth v1
 
-Generated at: 2026-04-25T20:41:43.940Z
+Generated at: 2026-04-27T09:47:22.103Z
 
-## Real State
+## Funnel
 
-- Leads: 7
-- Qualified: 7
-- Queue: 7
-- Sent: 1
-- Replies: 0
-- Meetings: 0
-- Customers: 0
+- Outreach queue: 7
+- Approval items: 0
+- Send ledger items: 0
+- Outcomes: 3
 
-## Derived Rates
+## Stages
 
-- Reply rate: 0
-- Meeting rate: 0
-- Close rate: 0
+- captured: 0
+- message_generated: 0
+- integrity_passed: 0
+- approval_needed: 0
+- approved: 0
+- send_ready: 0
+- pending_send: 0
+- dry_run_ready: 0
+- sent: 0
+- replies: 0
+- customers: 0
 
-## Bottleneck
+## Current Bottleneck
 
-- Current bottleneck: message
-- Highest-priority next action: Find or add valid contact emails before generating or sending outreach.
+- lead_supply_or_contact_quality
 
-## Day-over-Day Read
+## Next Action
 
-- Closer to revenue today than yesterday: true
-- Reason: More real funnel-progress events were recorded today than yesterday.
+- Add stronger real leads or valid contact emails.
 
-## Evidence
+## Sources
 
-- Contact targets source: /Users/rossstafford/projects/cart-agent/staffordos/leads/contact_targets.json
-- Qualified targets source: /Users/rossstafford/projects/cart-agent/staffordos/leads/qualified_targets.json
-- Outreach queue source: /Users/rossstafford/projects/cart-agent/staffordos/leads/outreach_queue.json
-- Outcomes source: /Users/rossstafford/projects/cart-agent/staffordos/leads/outcomes.json
+- staffordos/leads/outreach_queue.json
+- staffordos/leads/approval_queue_v1.json
+- staffordos/leads/send_ledger_v1.json
+- staffordos/leads/outcomes.json
 
-This file reflects real local files only. Missing datasets default to zero and are not simulated.
+No fake metrics. This reflects local truth files only.
