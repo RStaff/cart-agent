@@ -43,7 +43,8 @@
     "leads:console:update": "node scripts/leads/update_send_console_status.mjs",
     "leads:command-center": "node scripts/leads/run_command_center.mjs",
     "start": "bash -lc 'set -a; [ -f .render/env.sh ] && . .render/env.sh; set +a; node --require ./web/smc-preload.cjs web/src/index.js'",
-    "postinstall": "bash scripts/render-postinstall.sh"
+    "postinstall": "bash scripts/render-postinstall.sh",
+    "leads:sync-registry": "node scripts/leads/sync_runtime_to_lead_registry.mjs"
   },
   "author": "rossstafford",
   "private": true,
