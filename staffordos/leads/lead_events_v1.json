@@ -303,6 +303,26 @@
       "send_ledger_id": null,
       "source": "operator_leads_ui",
       "created_at": "2026-04-28T18:15:34.724Z"
+    },
+    {
+      "id": "event_1777404604007_1",
+      "lead_id": "lead_04826b2d41a8",
+      "type": "send_proof_bound_to_registry",
+      "send_ledger_ids": [
+        "send_lead_04826b2d41a8_1777400114883"
+      ],
+      "source": "bind_send_proof_to_registry_refs",
+      "created_at": "2026-04-28T19:30:04.007Z"
+    },
+    {
+      "id": "event_1777404604007_2",
+      "lead_id": "lead_260c01e80ad4",
+      "type": "send_proof_bound_to_registry",
+      "send_ledger_ids": [
+        "send_lead_260c01e80ad4_1777400127662"
+      ],
+      "source": "bind_send_proof_to_registry_refs",
+      "created_at": "2026-04-28T19:30:04.007Z"
     }
   ]
 }

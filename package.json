@@ -45,7 +45,8 @@
     "start": "bash -lc 'set -a; [ -f .render/env.sh ] && . .render/env.sh; set +a; node --require ./web/smc-preload.cjs web/src/index.js'",
     "postinstall": "bash scripts/render-postinstall.sh",
     "leads:sync-registry": "node scripts/leads/sync_runtime_to_lead_registry.mjs",
-    "leads:normalize-registry": "node scripts/leads/normalize_lead_registry_shape.mjs"
+    "leads:normalize-registry": "node scripts/leads/normalize_lead_registry_shape.mjs",
+    "leads:bind-send-proof": "node scripts/leads/bind_send_proof_to_registry_refs.mjs"
   },
   "author": "rossstafford",
   "private": true,
