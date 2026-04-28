@@ -83,6 +83,7 @@ export function LeadQueue() {
                 <th>Product</th>
                 <th>Stage</th>
                 <th>Next Action</th>
+                <th>Send Proof</th>
                 <th>Operator Action</th>
               </tr>
             </thead>
@@ -96,6 +97,15 @@ export function LeadQueue() {
                     <td>{l.product || "unknown"}</td>
                     <td>{stage}</td>
                     <td>{l.status?.next_action || "Review"}</td>
+                    <td>
+                      {l.execution?.latest_send_proof_id ? (
+                        <span className="hint">
+                          {l.execution.latest_send_proof_status || "proof_recorded"} / {l.execution.latest_send_proof_id}
+                        </span>
+                      ) : (
+                        <span className="hint">No proof</span>
+                      )}
+                    </td>
                     <td>
                       {stage === "contact_needed" || stage === "cold" ? (
                         <button className="chip" onClick={() => runAction(l.id, "move_to_outreach")}>
