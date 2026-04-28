@@ -2,141 +2,123 @@
 
 import { useEffect, useState } from "react";
 
-type LeadItem = {
+type Lead = {
   id: string;
-  leadName: string;
-  productSource: string;
-  status: string;
-  lastActivity: string;
-  nextAction: string;
-};
-
-type LeadQueueResponse = {
-  ok?: boolean;
-  placeholder?: boolean;
-  source?: string;
-  leads?: LeadItem[];
+  name?: string;
+  domain?: string;
+  product?: string;
+  lifecycle_stage?: string;
+  status?: {
+    current_stage?: string;
+    next_action?: string;
+  };
 };
 
 export function LeadQueue() {
-  const [data, setData] = useState<LeadQueueResponse | null>(null);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    let isMounted = true;
+  async function load() {
+    const res = await fetch("/api/operator/lead-registry", { cache: "no-store" });
+    const json = await res.json();
 
-    async function loadQueue() {
-      try {
-        const response = await fetch("/api/leads/queue", {
-          method: "GET",
-          cache: "no-store",
-        });
-        const payload = (await response.json()) as LeadQueueResponse;
-
-        if (!response.ok || !payload?.ok) {
-          throw new Error("Lead queue request failed.");
-        }
-
-        if (isMounted) {
-          setData(payload);
-        }
-      } catch (err) {
-        if (isMounted) {
-          setError(err instanceof Error ? err.message : "Could not load the leads queue.");
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
+    if (!res.ok || !json?.ok) {
+      throw new Error("Failed to load canonical lead registry");
     }
 
-    void loadQueue();
+    setLeads(json.registry?.items || []);
+  }
+
+  async function runAction(leadId: string, action: string) {
+    const res = await fetch("/api/operator/lead-registry/action", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ leadId, action })
+    });
+
+    const json = await res.json();
+
+    if (!res.ok || !json?.ok) {
+      throw new Error(json?.error || "Action failed");
+    }
+
+    await load();
+  }
+
+  useEffect(() => {
+    let mounted = true;
+
+    load()
+      .catch((err) => {
+        if (mounted) setError(err instanceof Error ? err.message : "Load failed");
+      })
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
 
     return () => {
-      isMounted = false;
+      mounted = false;
     };
   }, []);
 
-  if (isLoading) {
-    return (
-      <section className="panel">
-        <div className="panelInner">
-          <h2 className="sectionTitle">Lead Queue</h2>
-          <p className="subtitle" style={{ marginTop: 0 }}>
-            Loading StaffordOS lead queue.
-          </p>
-        </div>
-      </section>
-    );
+  if (loading) {
+    return <div className="panel"><div className="panelInner">Loading leads…</div></div>;
   }
 
   if (error) {
-    return (
-      <section className="panel errorPanel">
-        <div className="panelInner">
-          <h2 className="sectionTitle">Lead Queue</h2>
-          <p className="subtitle" style={{ marginTop: 0 }}>
-            {error}
-          </p>
-        </div>
-      </section>
-    );
+    return <div className="panel"><div className="panelInner">{error}</div></div>;
   }
-
-  const leads = Array.isArray(data?.leads) ? data.leads : [];
 
   return (
     <section className="panel">
       <div className="panelInner">
-        <div className="row" style={{ justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-          <h2 className="sectionTitle" style={{ marginBottom: 0 }}>
-            Lead Queue
-          </h2>
-          <p className="hint">{data?.placeholder ? "Placeholder queue data" : "Live queue data"}</p>
-        </div>
+        <h2 className="sectionTitle">Lead Queue (Canonical)</h2>
 
-        {data?.placeholder ? (
-          <div className="emptyState" style={{ marginTop: 0, marginBottom: 16 }}>
-            <p className="emptyStateLabel">Stub endpoint</p>
-            <p className="emptyStateText">
-              `GET /api/leads/queue` is currently a StaffordOS stub endpoint. Replace it with a real cross-product queue when the leads backend is ready.
-            </p>
-          </div>
-        ) : null}
+        <div className="tableWrap">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Product</th>
+                <th>Stage</th>
+                <th>Next Action</th>
+                <th>Operator Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {leads.map((l) => {
+                const stage = l.lifecycle_stage || l.status?.current_stage || "unknown";
 
-        {leads.length === 0 ? (
-          <div className="emptyState" style={{ marginTop: 0 }}>
-            <p className="emptyStateLabel">Empty queue</p>
-            <p className="emptyStateText">No leads are currently available.</p>
-          </div>
-        ) : (
-          <div className="tableWrap">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Lead Name</th>
-                  <th>Product Source</th>
-                  <th>Status</th>
-                  <th>Last Activity</th>
-                  <th>Next Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {leads.map((lead) => (
-                  <tr key={lead.id}>
-                    <td>{lead.leadName}</td>
-                    <td>{lead.productSource}</td>
-                    <td>{lead.status}</td>
-                    <td>{lead.lastActivity}</td>
-                    <td>{lead.nextAction}</td>
+                return (
+                  <tr key={l.id}>
+                    <td>{l.name || l.domain || l.id}</td>
+                    <td>{l.product || "unknown"}</td>
+                    <td>{stage}</td>
+                    <td>{l.status?.next_action || "Review"}</td>
+                    <td>
+                      {stage === "contact_needed" || stage === "cold" ? (
+                        <button className="chip" onClick={() => runAction(l.id, "move_to_outreach")}>
+                          Move to outreach
+                        </button>
+                      ) : stage === "send_initial_outreach" ? (
+                        <button className="chip" onClick={() => runAction(l.id, "mark_sent")}>
+                          Mark sent
+                        </button>
+                      ) : stage === "sent" ? (
+                        <button className="chip" onClick={() => runAction(l.id, "mark_engaged")}>
+                          Mark engaged
+                        </button>
+                      ) : (
+                        <span className="hint">No action</span>
+                      )}
+                    </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   );
