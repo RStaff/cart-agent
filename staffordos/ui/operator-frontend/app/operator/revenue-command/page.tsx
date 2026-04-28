@@ -116,15 +116,28 @@ export default async function RevenueCommandPage() {
 
             <div className="kv" style={{ marginTop: 16 }}>
               {(sendProof.latest_proofs || []).map((proof: any) => (
-                <div key={proof.id}>
-                  <strong>{proof.lead_name || proof.lead_id}</strong>
-                  {" — "}
-                  {proof.status}
-                  {" / "}
-                  {proof.proof_type}
-                  {" / "}
-                  {proof.id}
-                </div>
+                <details key={proof.id} style={{ marginBottom: 10 }}>
+                  <summary>
+                    <strong>{proof.lead_name || proof.lead_id}</strong>
+                    {" — "}
+                    {proof.status}
+                    {" / "}
+                    {proof.proof_type}
+                    {" / "}
+                    {proof.id}
+                    {" — View Proof"}
+                  </summary>
+
+                  <div style={{ marginTop: 8, padding: 8, border: "1px solid #333", borderRadius: 6, fontSize: 12, lineHeight: 1.4 }}>
+                    <div><strong>Target:</strong> {proof.send_target || "n/a"}</div>
+                    <div style={{ marginTop: 6 }}>
+                      <strong>Message:</strong>
+                      <pre style={{ whiteSpace: "pre-wrap", marginTop: 4 }}>
+                        {proof.message || "No message recorded."}
+                      </pre>
+                    </div>
+                  </div>
+                </details>
               ))}
             </div>
           </div>
