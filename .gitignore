@@ -1,18 +1,39 @@
+# =========================
+# NODE / PACKAGE ARTIFACTS
+# =========================
+node_modules/
+**/node_modules/
 
-# local secrets
+# =========================
+# BUILD / RUNTIME OUTPUT
+# =========================
+.next/
+dist/
+build/
+coverage/
+out/
+
+# =========================
+# LOCAL TEMP / SYSTEM FILES
+# =========================
+.tmp/
+*.log
+.DS_Store
+
+# =========================
+# ENV FILES
+# =========================
 .env
 .env.local
 .env.*.local
-*.pem
-*.key
-*.p12
-*.pfx
-*.crt
 
-# local build noise
-.next
-dist
-build
-coverage
-.hygiene-quarantine
-staffordos/loop/output/
+# =========================
+# EDITOR / OS
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# OPTIONAL: CACHE
+# =========================
+.cache/
