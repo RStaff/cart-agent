@@ -12,6 +12,10 @@ type Lead = {
     current_stage?: string;
     next_action?: string;
   };
+  execution?: {
+    latest_send_proof_id?: string;
+    latest_send_proof_status?: string;
+  };
 };
 
 export function LeadQueue() {
