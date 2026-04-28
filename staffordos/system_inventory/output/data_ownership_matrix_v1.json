@@ -1,0 +1,106 @@
+[
+  {
+    "name": "lead_registry",
+    "path": "staffordos/leads/lead_registry_v1.json",
+    "exists": true,
+    "purpose": "source of truth for all leads",
+    "writers": [
+      "lead ingestion",
+      "lead sync agent"
+    ],
+    "readers": [
+      "leads UI",
+      "revenue engine",
+      "send system"
+    ]
+  },
+  {
+    "name": "lead_events",
+    "path": "staffordos/leads/lead_events_v1.json",
+    "exists": true,
+    "purpose": "event history of leads",
+    "writers": [
+      "unknown"
+    ],
+    "readers": [
+      "unknown"
+    ]
+  },
+  {
+    "name": "send_ledger",
+    "path": "staffordos/leads/send_ledger_v1.json",
+    "exists": true,
+    "purpose": "proof of outreach execution",
+    "writers": [
+      "send_execution_agent",
+      "manual mark_sent"
+    ],
+    "readers": [
+      "revenue command",
+      "proof display"
+    ]
+  },
+  {
+    "name": "send_execution_log",
+    "path": "staffordos/leads/send_execution_log_v1.json",
+    "exists": true,
+    "purpose": "execution log of sends",
+    "writers": [
+      "unknown"
+    ],
+    "readers": [
+      "unknown"
+    ]
+  },
+  {
+    "name": "revenue_truth",
+    "path": "staffordos/revenue/revenue_truth_v1.json",
+    "exists": true,
+    "purpose": "revenue funnel + bottleneck truth",
+    "writers": [
+      "revenue_agent"
+    ],
+    "readers": [
+      "command center",
+      "analytics"
+    ]
+  },
+  {
+    "name": "agent_registry",
+    "path": "staffordos/agents/agent_registry_v1.json",
+    "exists": true,
+    "purpose": "declared agent system",
+    "writers": [
+      "developer / system"
+    ],
+    "readers": [
+      "command center",
+      "system map"
+    ]
+  },
+  {
+    "name": "environment_inventory",
+    "path": "staffordos/hygiene/environment_inventory_v1.json",
+    "exists": true,
+    "purpose": "runtime environment truth",
+    "writers": [
+      "unknown"
+    ],
+    "readers": [
+      "unknown"
+    ]
+  },
+  {
+    "name": "system_map_truth",
+    "path": "staffordos/system_map/system_map_truth_v1.json",
+    "exists": true,
+    "purpose": "full system snapshot",
+    "writers": [
+      "system audit tools"
+    ],
+    "readers": [
+      "system map UI",
+      "operator"
+    ]
+  }
+]
