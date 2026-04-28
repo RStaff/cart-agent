@@ -404,11 +404,11 @@
       "product": "shopifixer",
       "product_surface": "staffordmedia_shopifixer",
       "source": "unknown",
-      "lifecycle_stage": "send_initial_outreach",
+      "lifecycle_stage": "engaged",
       "status": {
-        "current_stage": "send_initial_outreach",
+        "current_stage": "engaged",
         "current_bottleneck": null,
-        "next_action": "send_initial_outreach"
+        "next_action": "Qualify reply and prepare offer"
       },
       "score": 0,
       "contact": {
@@ -420,10 +420,10 @@
       "engagement": {
         "audit_viewed": false,
         "experience_viewed": false,
-        "replied": false,
+        "replied": true,
         "approved_for_send": false,
         "dry_run_ready": false,
-        "sent": false
+        "sent": true
       },
       "routing": {
         "primary_offer": "shopifixer",
@@ -434,7 +434,9 @@
       "refs": {
         "outreach_queue": true,
         "approval_queue_ids": [],
-        "send_ledger_ids": [],
+        "send_ledger_ids": [
+          "send_lead_04826b2d41a8_1777400114883"
+        ],
         "reply_ids": []
       },
       "execution": {
@@ -450,7 +452,7 @@
       "problem_summary": "Shopify CLI dev workflow issue",
       "runtime_source": ".tmp/send_console_data.json",
       "created_at": "2026-04-28T14:34:49.479Z",
-      "updated_at": "2026-04-28T15:55:03.630Z"
+      "updated_at": "2026-04-28T18:15:34.724Z"
     },
     {
       "id": "lead_260c01e80ad4",
@@ -460,11 +462,11 @@
       "product": "shopifixer",
       "product_surface": "staffordmedia_shopifixer",
       "source": "unknown",
-      "lifecycle_stage": "send_initial_outreach",
+      "lifecycle_stage": "sent",
       "status": {
-        "current_stage": "send_initial_outreach",
+        "current_stage": "sent",
         "current_bottleneck": null,
-        "next_action": "send_initial_outreach"
+        "next_action": "Wait for reply"
       },
       "score": 0,
       "contact": {
@@ -479,7 +481,7 @@
         "replied": false,
         "approved_for_send": false,
         "dry_run_ready": false,
-        "sent": false
+        "sent": true
       },
       "routing": {
         "primary_offer": "shopifixer",
@@ -490,7 +492,9 @@
       "refs": {
         "outreach_queue": true,
         "approval_queue_ids": [],
-        "send_ledger_ids": [],
+        "send_ledger_ids": [
+          "send_lead_260c01e80ad4_1777400127662"
+        ],
         "reply_ids": []
       },
       "execution": {
@@ -506,7 +510,7 @@
       "problem_summary": "Tunnel or Cloudflare issue during Shopify app development",
       "runtime_source": ".tmp/send_console_data.json",
       "created_at": "2026-04-28T14:34:49.480Z",
-      "updated_at": "2026-04-28T15:55:03.631Z"
+      "updated_at": "2026-04-28T18:15:27.662Z"
     },
     {
       "id": "lead_52c0b97afddf",
@@ -1237,5 +1241,5 @@
       "updated_at": "2026-04-28T15:55:03.631Z"
     }
   ],
-  "updated_at": "2026-04-28T17:52:52.654Z"
+  "updated_at": "2026-04-28T18:15:34.724Z"
 }

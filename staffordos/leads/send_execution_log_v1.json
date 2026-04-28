@@ -1,0 +1,22 @@
+[
+  {
+    "id": "send_execution_1777400114883",
+    "lead_id": "lead_04826b2d41a8",
+    "send_id": "send_lead_04826b2d41a8_1777400114883",
+    "agent": "operator_lead_action_api",
+    "mode": "dry_run_proof_only",
+    "live_send_attempted": false,
+    "result": "registry_writeback_allowed_with_dry_run_proof",
+    "at": "2026-04-28T18:15:14.883Z"
+  },
+  {
+    "id": "send_execution_1777400127663",
+    "lead_id": "lead_260c01e80ad4",
+    "send_id": "send_lead_260c01e80ad4_1777400127662",
+    "agent": "operator_lead_action_api",
+    "mode": "dry_run_proof_only",
+    "live_send_attempted": false,
+    "result": "registry_writeback_allowed_with_dry_run_proof",
+    "at": "2026-04-28T18:15:27.662Z"
+  }
+]
