@@ -1,0 +1,59 @@
+{
+  "personal_objectives": [
+    "Provide for daughters",
+    "Time flexibility",
+    "Build scalable income",
+    "Operate with control"
+  ],
+  "business_objectives": [
+    "Close deals",
+    "Generate revenue",
+    "Automate operations"
+  ],
+  "business_requirements": {
+    "close_deals": [
+      "lead discovery",
+      "outreach",
+      "response tracking",
+      "conversion tracking"
+    ],
+    "generate_revenue": [
+      "event detection",
+      "recovery trigger",
+      "message sending",
+      "conversion attribution"
+    ],
+    "operate_system": [
+      "blocker detection",
+      "next action clarity",
+      "execution tracking"
+    ]
+  },
+  "functional_requirements": {
+    "leads_engine": [
+      "lead storage",
+      "lifecycle tracking",
+      "outreach tracking"
+    ],
+    "send_engine": [
+      "email sending",
+      "sms sending",
+      "send logging"
+    ],
+    "decision_engine": [
+      "current blocker",
+      "next action",
+      "readiness state"
+    ]
+  },
+  "ui_binding": {
+    "console": "operator interface",
+    "command_center": "decision engine",
+    "capacity": "service execution",
+    "leads": "deal engine",
+    "revenue_command": "revenue truth",
+    "analytics": "feedback loop",
+    "products": "product summaries",
+    "system_map": "system truth"
+  }
+}

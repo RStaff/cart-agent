@@ -40,7 +40,7 @@ export async function GET() {
         : sent === 0
         ? "No outreach executed"
         : "Awaiting replies",
-    next_actions: leads.slice(0, 10).map(l => ({
+    next_actions: leads.slice(0, 10).map((l: any) => ({
       id: l.id,
       name: l.name,
       action: l.status?.next_action || "Review lead",
