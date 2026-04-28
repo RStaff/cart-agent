@@ -1,0 +1,273 @@
+{
+  "generated_at": "2026-04-28T23:20:33.468Z",
+  "matrix": [
+    {
+      "capability": "Local System Truth",
+      "status": "REAL",
+      "evidence": [
+        "staffordos/system_map/system_map_truth_v1.json"
+      ],
+      "reason": "Local machine, branch, status, and recent commit truth exist."
+    },
+    {
+      "capability": "Server / Kubernetes / ArgoCD Truth",
+      "status": "REAL",
+      "evidence": [
+        "staffordos/system_map/system_map_truth_v1.json"
+      ],
+      "reason": "Server, Kubernetes, cart-agent deployment, and ArgoCD truth exist."
+    },
+    {
+      "capability": "Lead Registry",
+      "status": "REAL",
+      "evidence": [
+        "staffordos/leads/lead_registry_v1.json"
+      ],
+      "reason": "22 leads found in canonical registry."
+    },
+    {
+      "capability": "Lead Events",
+      "status": "REAL",
+      "evidence": [
+        "staffordos/leads/lead_events_v1.json"
+      ],
+      "reason": "Lead event artifact exists and records lifecycle movement."
+    },
+    {
+      "capability": "Send Proof",
+      "status": "PARTIAL",
+      "evidence": [
+        "staffordos/leads/send_ledger_v1.json"
+      ],
+      "reason": "2 send proofs found; 2 dry-run proofs; 0 live sends proven."
+    },
+    {
+      "capability": "Real Email Send",
+      "status": "PARTIAL",
+      "evidence": [
+        "staffordos/leads/send_ledger_v1.json",
+        "staffordos/leads/send_execution_log_v1.json"
+      ],
+      "reason": "Current proof chain does not prove real provider-backed email send."
+    },
+    {
+      "capability": "Real SMS Send",
+      "status": "PARTIAL",
+      "evidence": [
+        "staffordos/leads/send_ledger_v1.json"
+      ],
+      "reason": "SMS delivery is not proven by current send proof records."
+    },
+    {
+      "capability": "Revenue Truth",
+      "status": "PARTIAL",
+      "evidence": [
+        "staffordos/revenue/revenue_truth_v1.json",
+        "staffordos/revenue/revenue_truth_v1.md"
+      ],
+      "reason": "Revenue truth artifact exists, but paid conversion/recovered revenue is not yet fully operationalized."
+    },
+    {
+      "capability": "Agent Registry",
+      "status": "PARTIAL",
+      "evidence": [
+        "staffordos/agents/agent_registry_v1.json"
+      ],
+      "reason": "Agents are discovered, but not yet controlled, trusted, or surfaced."
+    },
+    {
+      "capability": "Command Center",
+      "status": "PARTIAL",
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/operator/command-center"
+      ],
+      "reason": "UI exists, but is not yet fully driven by objective binding, agent control, and complete system truth."
+    },
+    {
+      "capability": "Leads Surface",
+      "status": "REAL",
+      "evidence": [
+        "staffordos/ui/operator-frontend/components/operator/LeadQueue.tsx"
+      ],
+      "reason": "Leads surface is bound to canonical registry and shows row-level proof fields."
+    },
+    {
+      "capability": "Revenue Command Surface",
+      "status": "PARTIAL",
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/operator/revenue-command/page.tsx"
+      ],
+      "reason": "Revenue Command shows lead lifecycle and send proof, but not full income truth yet."
+    },
+    {
+      "capability": "Capacity Surface",
+      "status": "PLACEHOLDER",
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/operator/capacity"
+      ],
+      "reason": "Capacity is not yet bound to Shopifixer client onboarding or service packs."
+    },
+    {
+      "capability": "Analytics Surface",
+      "status": "PLACEHOLDER",
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/operator/analytics"
+      ],
+      "reason": "Analytics is not yet bound to product, revenue, send, or agent performance data."
+    },
+    {
+      "capability": "Products Surface",
+      "status": "PLACEHOLDER",
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/operator/products"
+      ],
+      "reason": "Products page is not yet bound to Abando, Shopifixer, StaffordOS product truth."
+    },
+    {
+      "capability": "System Map Surface",
+      "status": "PARTIAL",
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/operator/system-map/page.tsx"
+      ],
+      "reason": "System Map exists but must ingest deeper audit outputs and product/agent/data matrices."
+    }
+  ],
+  "grouped": {
+    "REAL": [
+      {
+        "capability": "Local System Truth",
+        "status": "REAL",
+        "evidence": [
+          "staffordos/system_map/system_map_truth_v1.json"
+        ],
+        "reason": "Local machine, branch, status, and recent commit truth exist."
+      },
+      {
+        "capability": "Server / Kubernetes / ArgoCD Truth",
+        "status": "REAL",
+        "evidence": [
+          "staffordos/system_map/system_map_truth_v1.json"
+        ],
+        "reason": "Server, Kubernetes, cart-agent deployment, and ArgoCD truth exist."
+      },
+      {
+        "capability": "Lead Registry",
+        "status": "REAL",
+        "evidence": [
+          "staffordos/leads/lead_registry_v1.json"
+        ],
+        "reason": "22 leads found in canonical registry."
+      },
+      {
+        "capability": "Lead Events",
+        "status": "REAL",
+        "evidence": [
+          "staffordos/leads/lead_events_v1.json"
+        ],
+        "reason": "Lead event artifact exists and records lifecycle movement."
+      },
+      {
+        "capability": "Leads Surface",
+        "status": "REAL",
+        "evidence": [
+          "staffordos/ui/operator-frontend/components/operator/LeadQueue.tsx"
+        ],
+        "reason": "Leads surface is bound to canonical registry and shows row-level proof fields."
+      }
+    ],
+    "PARTIAL": [
+      {
+        "capability": "Send Proof",
+        "status": "PARTIAL",
+        "evidence": [
+          "staffordos/leads/send_ledger_v1.json"
+        ],
+        "reason": "2 send proofs found; 2 dry-run proofs; 0 live sends proven."
+      },
+      {
+        "capability": "Real Email Send",
+        "status": "PARTIAL",
+        "evidence": [
+          "staffordos/leads/send_ledger_v1.json",
+          "staffordos/leads/send_execution_log_v1.json"
+        ],
+        "reason": "Current proof chain does not prove real provider-backed email send."
+      },
+      {
+        "capability": "Real SMS Send",
+        "status": "PARTIAL",
+        "evidence": [
+          "staffordos/leads/send_ledger_v1.json"
+        ],
+        "reason": "SMS delivery is not proven by current send proof records."
+      },
+      {
+        "capability": "Revenue Truth",
+        "status": "PARTIAL",
+        "evidence": [
+          "staffordos/revenue/revenue_truth_v1.json",
+          "staffordos/revenue/revenue_truth_v1.md"
+        ],
+        "reason": "Revenue truth artifact exists, but paid conversion/recovered revenue is not yet fully operationalized."
+      },
+      {
+        "capability": "Agent Registry",
+        "status": "PARTIAL",
+        "evidence": [
+          "staffordos/agents/agent_registry_v1.json"
+        ],
+        "reason": "Agents are discovered, but not yet controlled, trusted, or surfaced."
+      },
+      {
+        "capability": "Command Center",
+        "status": "PARTIAL",
+        "evidence": [
+          "staffordos/ui/operator-frontend/app/operator/command-center"
+        ],
+        "reason": "UI exists, but is not yet fully driven by objective binding, agent control, and complete system truth."
+      },
+      {
+        "capability": "Revenue Command Surface",
+        "status": "PARTIAL",
+        "evidence": [
+          "staffordos/ui/operator-frontend/app/operator/revenue-command/page.tsx"
+        ],
+        "reason": "Revenue Command shows lead lifecycle and send proof, but not full income truth yet."
+      },
+      {
+        "capability": "System Map Surface",
+        "status": "PARTIAL",
+        "evidence": [
+          "staffordos/ui/operator-frontend/app/operator/system-map/page.tsx"
+        ],
+        "reason": "System Map exists but must ingest deeper audit outputs and product/agent/data matrices."
+      }
+    ],
+    "PLACEHOLDER": [
+      {
+        "capability": "Capacity Surface",
+        "status": "PLACEHOLDER",
+        "evidence": [
+          "staffordos/ui/operator-frontend/app/operator/capacity"
+        ],
+        "reason": "Capacity is not yet bound to Shopifixer client onboarding or service packs."
+      },
+      {
+        "capability": "Analytics Surface",
+        "status": "PLACEHOLDER",
+        "evidence": [
+          "staffordos/ui/operator-frontend/app/operator/analytics"
+        ],
+        "reason": "Analytics is not yet bound to product, revenue, send, or agent performance data."
+      },
+      {
+        "capability": "Products Surface",
+        "status": "PLACEHOLDER",
+        "evidence": [
+          "staffordos/ui/operator-frontend/app/operator/products"
+        ],
+        "reason": "Products page is not yet bound to Abando, Shopifixer, StaffordOS product truth."
+      }
+    ]
+  }
+}
