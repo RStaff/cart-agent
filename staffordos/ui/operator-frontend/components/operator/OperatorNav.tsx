@@ -8,6 +8,7 @@ const CONTROL_PLANE_ROUTES = [
   { href: "/operator/revenue-command", label: "Revenue Command" },
   { href: "/operator/analytics", label: "Analytics" },
   { href: "/operator/products", label: "Products" },
+  { href: "/operator/system-map", label: "System Map" },
 ] as const;
 
 export function OperatorNav({ activeHref }: { activeHref: string }) {
