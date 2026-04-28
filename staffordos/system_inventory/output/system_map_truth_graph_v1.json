@@ -1,0 +1,895 @@
+{
+  "version": "system_map_truth_graph_v1",
+  "generated_at": "2026-04-28T23:39:40.296Z",
+  "source_policy": "Derived only from existing audit/truth artifacts. No manual claims without source evidence.",
+  "sources": [
+    {
+      "key": "systemMapTruth",
+      "path": "staffordos/system_map/system_map_truth_v1.json",
+      "exists": true
+    },
+    {
+      "key": "auditIndex",
+      "path": "staffordos/system_inventory/output/audit_artifact_index_v1.md",
+      "exists": true
+    },
+    {
+      "key": "expansionPlan",
+      "path": "staffordos/system_inventory/output/system_map_expansion_plan_v1.md",
+      "exists": true
+    },
+    {
+      "key": "expansionPass1",
+      "path": "staffordos/system_inventory/output/system_map_expansion_pass_1.md",
+      "exists": true
+    },
+    {
+      "key": "capabilityDecomposition",
+      "path": "staffordos/system_inventory/output/capability_decomposition_v1.md",
+      "exists": true
+    },
+    {
+      "key": "brdFrdBinding",
+      "path": "staffordos/system_inventory/output/brd_frd_command_center_binding_v1.md",
+      "exists": true
+    },
+    {
+      "key": "objectiveBinding",
+      "path": "staffordos/system_inventory/objective_binding_v1.json",
+      "exists": true
+    },
+    {
+      "key": "agentDecomposition",
+      "path": "staffordos/system_inventory/output/agent_role_decomposition_v1.json",
+      "exists": true
+    },
+    {
+      "key": "agentControlRequirements",
+      "path": "staffordos/system_inventory/output/agent_control_requirements_v1.md",
+      "exists": true
+    },
+    {
+      "key": "dataOwnership",
+      "path": "staffordos/system_inventory/output/data_ownership_matrix_v1.json",
+      "exists": true
+    },
+    {
+      "key": "realPartialPlaceholder",
+      "path": "staffordos/system_inventory/output/real_partial_placeholder_matrix_v1.json",
+      "exists": true
+    },
+    {
+      "key": "leadRegistry",
+      "path": "staffordos/leads/lead_registry_v1.json",
+      "exists": true
+    },
+    {
+      "key": "sendLedger",
+      "path": "staffordos/leads/send_ledger_v1.json",
+      "exists": true
+    },
+    {
+      "key": "revenueTruth",
+      "path": "staffordos/revenue/revenue_truth_v1.json",
+      "exists": true
+    },
+    {
+      "key": "agentRegistry",
+      "path": "staffordos/agents/agent_registry_v1.json",
+      "exists": true
+    }
+  ],
+  "metrics": {
+    "leads": 22,
+    "send_proofs": 2,
+    "agents": 29,
+    "capabilities": 16,
+    "real_capabilities": 5,
+    "partial_capabilities": 8,
+    "placeholder_capabilities": 3
+  },
+  "nodes": [
+    {
+      "id": "local_system",
+      "label": "Local System",
+      "type": "runtime",
+      "status": "REAL",
+      "evidence": [
+        "staffordos/system_map/system_map_truth_v1.json"
+      ],
+      "summary": "Local repo/runtime truth from committed system map truth artifact."
+    },
+    {
+      "id": "server_infra",
+      "label": "Server / Kubernetes / ArgoCD",
+      "type": "runtime",
+      "status": "REAL",
+      "evidence": [
+        "staffordos/system_map/system_map_truth_v1.json"
+      ],
+      "summary": "Server, Kubernetes, and ArgoCD truth."
+    },
+    {
+      "id": "lead_registry",
+      "label": "Lead Registry",
+      "type": "data_store",
+      "status": "REAL",
+      "count": 22,
+      "evidence": [
+        "staffordos/leads/lead_registry_v1.json"
+      ],
+      "summary": "Canonical lead registry."
+    },
+    {
+      "id": "send_proof",
+      "label": "Send Proof Ledger",
+      "type": "data_store",
+      "status": "PARTIAL",
+      "count": 2,
+      "evidence": [
+        "staffordos/leads/send_ledger_v1.json"
+      ],
+      "summary": "Proof ledger for outreach. Current records may be dry-run/operator proof unless live provider proof exists."
+    },
+    {
+      "id": "revenue_truth",
+      "label": "Revenue Truth",
+      "type": "business_engine",
+      "status": "PARTIAL",
+      "evidence": [
+        "staffordos/revenue/revenue_truth_v1.json"
+      ],
+      "summary": "Revenue funnel and blocker truth."
+    },
+    {
+      "id": "agent_system",
+      "label": "Agent System",
+      "type": "automation_layer",
+      "status": "PARTIAL",
+      "count": 29,
+      "evidence": [
+        "staffordos/system_inventory/output/agent_role_decomposition_v1.json",
+        "staffordos/agents/agent_registry_v1.json"
+      ],
+      "summary": "Discovered agents/capabilities, not yet fully controlled."
+    },
+    {
+      "id": "objective_binding",
+      "label": "Objective / BRD / FRD Binding",
+      "type": "strategy_layer",
+      "status": "REAL",
+      "evidence": [
+        "staffordos/system_inventory/objective_binding_v1.json",
+        "staffordos/system_inventory/output/brd_frd_command_center_binding_v1.md"
+      ],
+      "summary": "Personal objectives, business objectives, requirements, and UI binding."
+    },
+    {
+      "id": "capability_local_system_truth",
+      "label": "Local System Truth",
+      "type": "capability",
+      "status": "REAL",
+      "evidence": [
+        "staffordos/system_map/system_map_truth_v1.json"
+      ],
+      "summary": "Local machine, branch, status, and recent commit truth exist."
+    },
+    {
+      "id": "capability_server_kubernetes_argocd_truth",
+      "label": "Server / Kubernetes / ArgoCD Truth",
+      "type": "capability",
+      "status": "REAL",
+      "evidence": [
+        "staffordos/system_map/system_map_truth_v1.json"
+      ],
+      "summary": "Server, Kubernetes, cart-agent deployment, and ArgoCD truth exist."
+    },
+    {
+      "id": "capability_lead_registry",
+      "label": "Lead Registry",
+      "type": "capability",
+      "status": "REAL",
+      "evidence": [
+        "staffordos/leads/lead_registry_v1.json"
+      ],
+      "summary": "22 leads found in canonical registry."
+    },
+    {
+      "id": "capability_lead_events",
+      "label": "Lead Events",
+      "type": "capability",
+      "status": "REAL",
+      "evidence": [
+        "staffordos/leads/lead_events_v1.json"
+      ],
+      "summary": "Lead event artifact exists and records lifecycle movement."
+    },
+    {
+      "id": "capability_send_proof",
+      "label": "Send Proof",
+      "type": "capability",
+      "status": "PARTIAL",
+      "evidence": [
+        "staffordos/leads/send_ledger_v1.json"
+      ],
+      "summary": "2 send proofs found; 2 dry-run proofs; 0 live sends proven."
+    },
+    {
+      "id": "capability_real_email_send",
+      "label": "Real Email Send",
+      "type": "capability",
+      "status": "PARTIAL",
+      "evidence": [
+        "staffordos/leads/send_ledger_v1.json",
+        "staffordos/leads/send_execution_log_v1.json"
+      ],
+      "summary": "Current proof chain does not prove real provider-backed email send."
+    },
+    {
+      "id": "capability_real_sms_send",
+      "label": "Real SMS Send",
+      "type": "capability",
+      "status": "PARTIAL",
+      "evidence": [
+        "staffordos/leads/send_ledger_v1.json"
+      ],
+      "summary": "SMS delivery is not proven by current send proof records."
+    },
+    {
+      "id": "capability_revenue_truth",
+      "label": "Revenue Truth",
+      "type": "capability",
+      "status": "PARTIAL",
+      "evidence": [
+        "staffordos/revenue/revenue_truth_v1.json",
+        "staffordos/revenue/revenue_truth_v1.md"
+      ],
+      "summary": "Revenue truth artifact exists, but paid conversion/recovered revenue is not yet fully operationalized."
+    },
+    {
+      "id": "capability_agent_registry",
+      "label": "Agent Registry",
+      "type": "capability",
+      "status": "PARTIAL",
+      "evidence": [
+        "staffordos/agents/agent_registry_v1.json"
+      ],
+      "summary": "Agents are discovered, but not yet controlled, trusted, or surfaced."
+    },
+    {
+      "id": "capability_command_center",
+      "label": "Command Center",
+      "type": "capability",
+      "status": "PARTIAL",
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/operator/command-center"
+      ],
+      "summary": "UI exists, but is not yet fully driven by objective binding, agent control, and complete system truth."
+    },
+    {
+      "id": "capability_leads_surface",
+      "label": "Leads Surface",
+      "type": "capability",
+      "status": "REAL",
+      "evidence": [
+        "staffordos/ui/operator-frontend/components/operator/LeadQueue.tsx"
+      ],
+      "summary": "Leads surface is bound to canonical registry and shows row-level proof fields."
+    },
+    {
+      "id": "capability_revenue_command_surface",
+      "label": "Revenue Command Surface",
+      "type": "capability",
+      "status": "PARTIAL",
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/operator/revenue-command/page.tsx"
+      ],
+      "summary": "Revenue Command shows lead lifecycle and send proof, but not full income truth yet."
+    },
+    {
+      "id": "capability_capacity_surface",
+      "label": "Capacity Surface",
+      "type": "capability",
+      "status": "PLACEHOLDER",
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/operator/capacity"
+      ],
+      "summary": "Capacity is not yet bound to Shopifixer client onboarding or service packs."
+    },
+    {
+      "id": "capability_analytics_surface",
+      "label": "Analytics Surface",
+      "type": "capability",
+      "status": "PLACEHOLDER",
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/operator/analytics"
+      ],
+      "summary": "Analytics is not yet bound to product, revenue, send, or agent performance data."
+    },
+    {
+      "id": "capability_products_surface",
+      "label": "Products Surface",
+      "type": "capability",
+      "status": "PLACEHOLDER",
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/operator/products"
+      ],
+      "summary": "Products page is not yet bound to Abando, Shopifixer, StaffordOS product truth."
+    },
+    {
+      "id": "capability_system_map_surface",
+      "label": "System Map Surface",
+      "type": "capability",
+      "status": "PARTIAL",
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/operator/system-map/page.tsx"
+      ],
+      "summary": "System Map exists but must ingest deeper audit outputs and product/agent/data matrices."
+    }
+  ],
+  "edges": [
+    {
+      "from": "local_system",
+      "to": "system_map",
+      "relationship": "feeds truth"
+    },
+    {
+      "from": "server_infra",
+      "to": "system_map",
+      "relationship": "feeds truth"
+    },
+    {
+      "from": "lead_registry",
+      "to": "send_proof",
+      "relationship": "lead actions create proof"
+    },
+    {
+      "from": "send_proof",
+      "to": "revenue_truth",
+      "relationship": "send proof informs revenue progress"
+    },
+    {
+      "from": "lead_registry",
+      "to": "revenue_truth",
+      "relationship": "lead lifecycle informs revenue state"
+    },
+    {
+      "from": "agent_system",
+      "to": "command_center",
+      "relationship": "future controllable workforce"
+    },
+    {
+      "from": "objective_binding",
+      "to": "command_center",
+      "relationship": "defines command center purpose"
+    },
+    {
+      "from": "objective_binding",
+      "to": "system_map",
+      "relationship": "defines why assets matter"
+    },
+    {
+      "from": "data_ownership",
+      "to": "system_map",
+      "relationship": "defines readers/writers"
+    },
+    {
+      "from": "real_partial_placeholder",
+      "to": "system_map",
+      "relationship": "defines capability truth status"
+    }
+  ],
+  "data_ownership": [
+    {
+      "name": "lead_registry",
+      "path": "staffordos/leads/lead_registry_v1.json",
+      "exists": true,
+      "purpose": "source of truth for all leads",
+      "writers": [
+        "lead ingestion",
+        "lead sync agent"
+      ],
+      "readers": [
+        "leads UI",
+        "revenue engine",
+        "send system"
+      ]
+    },
+    {
+      "name": "lead_events",
+      "path": "staffordos/leads/lead_events_v1.json",
+      "exists": true,
+      "purpose": "event history of leads",
+      "writers": [
+        "unknown"
+      ],
+      "readers": [
+        "unknown"
+      ]
+    },
+    {
+      "name": "send_ledger",
+      "path": "staffordos/leads/send_ledger_v1.json",
+      "exists": true,
+      "purpose": "proof of outreach execution",
+      "writers": [
+        "send_execution_agent",
+        "manual mark_sent"
+      ],
+      "readers": [
+        "revenue command",
+        "proof display"
+      ]
+    },
+    {
+      "name": "send_execution_log",
+      "path": "staffordos/leads/send_execution_log_v1.json",
+      "exists": true,
+      "purpose": "execution log of sends",
+      "writers": [
+        "unknown"
+      ],
+      "readers": [
+        "unknown"
+      ]
+    },
+    {
+      "name": "revenue_truth",
+      "path": "staffordos/revenue/revenue_truth_v1.json",
+      "exists": true,
+      "purpose": "revenue funnel + bottleneck truth",
+      "writers": [
+        "revenue_agent"
+      ],
+      "readers": [
+        "command center",
+        "analytics"
+      ]
+    },
+    {
+      "name": "agent_registry",
+      "path": "staffordos/agents/agent_registry_v1.json",
+      "exists": true,
+      "purpose": "declared agent system",
+      "writers": [
+        "developer / system"
+      ],
+      "readers": [
+        "command center",
+        "system map"
+      ]
+    },
+    {
+      "name": "environment_inventory",
+      "path": "staffordos/hygiene/environment_inventory_v1.json",
+      "exists": true,
+      "purpose": "runtime environment truth",
+      "writers": [
+        "unknown"
+      ],
+      "readers": [
+        "unknown"
+      ]
+    },
+    {
+      "name": "system_map_truth",
+      "path": "staffordos/system_map/system_map_truth_v1.json",
+      "exists": true,
+      "purpose": "full system snapshot",
+      "writers": [
+        "system audit tools"
+      ],
+      "readers": [
+        "system map UI",
+        "operator"
+      ]
+    }
+  ],
+  "agent_groups": {
+    "unclassified": [
+      {
+        "id": "run_agent_v1",
+        "name": "run_agent_v1",
+        "path": null,
+        "category": "unclassified",
+        "command_center_surface": "System Map",
+        "evidence_source": "staffordos/agents/agent_registry_v1.json",
+        "reads_data": false,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Needs classification."
+      },
+      {
+        "id": "followup_agent_v1",
+        "name": "followup_agent_v1",
+        "path": null,
+        "category": "unclassified",
+        "command_center_surface": "System Map",
+        "evidence_source": "staffordos/agents/agent_registry_v1.json",
+        "reads_data": false,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Needs classification."
+      },
+      {
+        "id": "message_generation_agent_v1",
+        "name": "message_generation_agent_v1",
+        "path": null,
+        "category": "unclassified",
+        "command_center_surface": "System Map",
+        "evidence_source": "staffordos/agents/agent_registry_v1.json",
+        "reads_data": false,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Needs classification."
+      },
+      {
+        "id": "message_validation_agent_v1",
+        "name": "message_validation_agent_v1",
+        "path": null,
+        "category": "unclassified",
+        "command_center_surface": "System Map",
+        "evidence_source": "staffordos/agents/agent_registry_v1.json",
+        "reads_data": false,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Needs classification."
+      },
+      {
+        "id": "send_ledger_agent_v1",
+        "name": "send_ledger_agent_v1",
+        "path": null,
+        "category": "unclassified",
+        "command_center_surface": "System Map",
+        "evidence_source": "staffordos/agents/agent_registry_v1.json",
+        "reads_data": false,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Needs classification."
+      },
+      {
+        "id": "surface_patch_agent_v1",
+        "name": "surface_patch_agent_v1",
+        "path": null,
+        "category": "unclassified",
+        "command_center_surface": "System Map",
+        "evidence_source": "staffordos/agents/agent_registry_v1.json",
+        "reads_data": false,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Needs classification."
+      },
+      {
+        "id": "change_pipeline_v1",
+        "name": "change_pipeline_v1",
+        "path": null,
+        "category": "unclassified",
+        "command_center_surface": "System Map",
+        "evidence_source": "staffordos/agents/agent_registry_v1.json",
+        "reads_data": false,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Needs classification."
+      },
+      {
+        "id": "dev_task_integrity_agent_v1",
+        "name": "dev_task_integrity_agent_v1",
+        "path": null,
+        "category": "unclassified",
+        "command_center_surface": "System Map",
+        "evidence_source": "staffordos/agents/agent_registry_v1.json",
+        "reads_data": false,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Needs classification."
+      },
+      {
+        "id": "approval_interface_v1",
+        "name": "approval_interface_v1.mjs",
+        "path": "staffordos/agents/approval_interface_v1.mjs",
+        "category": "unclassified",
+        "command_center_surface": "System Map",
+        "evidence_source": "filesystem_detected",
+        "reads_data": true,
+        "writes_data": true,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Needs classification."
+      }
+    ],
+    "execution / governance": [
+      {
+        "id": "approval_decision_agent_v1",
+        "name": "approval_decision_agent_v1",
+        "path": null,
+        "category": "execution / governance",
+        "command_center_surface": "Command Center",
+        "evidence_source": "staffordos/agents/agent_registry_v1.json",
+        "reads_data": false,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Supports safe execution and blocker/action control."
+      },
+      {
+        "id": "send_execution_agent_v1",
+        "name": "send_execution_agent_v1",
+        "path": null,
+        "category": "execution / governance",
+        "command_center_surface": "Command Center",
+        "evidence_source": "staffordos/agents/agent_registry_v1.json",
+        "reads_data": false,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Supports safe execution and blocker/action control."
+      },
+      {
+        "id": "execution_driver_v1",
+        "name": "execution_driver_v1.mjs",
+        "path": "staffordos/agents/execution_driver_v1.mjs",
+        "category": "execution / governance",
+        "command_center_surface": "Command Center",
+        "evidence_source": "filesystem_detected",
+        "reads_data": false,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Supports safe execution and blocker/action control."
+      }
+    ],
+    "revenue / marketing": [
+      {
+        "id": "contact_enrichment_agent_v1",
+        "name": "contact_enrichment_agent_v1",
+        "path": null,
+        "category": "revenue / marketing",
+        "command_center_surface": "Leads / Revenue Command",
+        "evidence_source": "staffordos/agents/agent_registry_v1.json",
+        "reads_data": false,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Supports closing deals and revenue creation."
+      },
+      {
+        "id": "contact_research_agent_v1",
+        "name": "contact_research_agent_v1",
+        "path": null,
+        "category": "revenue / marketing",
+        "command_center_surface": "Leads / Revenue Command",
+        "evidence_source": "staffordos/agents/agent_registry_v1.json",
+        "reads_data": false,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Supports closing deals and revenue creation."
+      },
+      {
+        "id": "reply_detection_agent_v1",
+        "name": "reply_detection_agent_v1",
+        "path": null,
+        "category": "revenue / marketing",
+        "command_center_surface": "Leads / Revenue Command",
+        "evidence_source": "staffordos/agents/agent_registry_v1.json",
+        "reads_data": false,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Supports closing deals and revenue creation."
+      },
+      {
+        "id": "reply_interpretation_agent_v1",
+        "name": "reply_interpretation_agent_v1",
+        "path": null,
+        "category": "revenue / marketing",
+        "command_center_surface": "Leads / Revenue Command",
+        "evidence_source": "staffordos/agents/agent_registry_v1.json",
+        "reads_data": false,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Supports closing deals and revenue creation."
+      },
+      {
+        "id": "reply_response_agent_v1",
+        "name": "reply_response_agent_v1",
+        "path": null,
+        "category": "revenue / marketing",
+        "command_center_surface": "Leads / Revenue Command",
+        "evidence_source": "staffordos/agents/agent_registry_v1.json",
+        "reads_data": false,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Supports closing deals and revenue creation."
+      },
+      {
+        "id": "revenue_agent_v1",
+        "name": "revenue_agent_v1",
+        "path": null,
+        "category": "revenue / marketing",
+        "command_center_surface": "Leads / Revenue Command",
+        "evidence_source": "staffordos/agents/agent_registry_v1.json",
+        "reads_data": false,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Supports closing deals and revenue creation."
+      },
+      {
+        "id": "lead_registry_sync_agent_v1",
+        "name": "lead_registry_sync_agent_v1",
+        "path": null,
+        "category": "revenue / marketing",
+        "command_center_surface": "Leads / Revenue Command",
+        "evidence_source": "staffordos/agents/agent_registry_v1.json",
+        "reads_data": false,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Supports closing deals and revenue creation."
+      },
+      {
+        "id": "revenue_truth_v1",
+        "name": "revenue_truth_v1.json",
+        "path": "staffordos/revenue/revenue_truth_v1.json",
+        "category": "revenue / marketing",
+        "command_center_surface": "Leads / Revenue Command",
+        "evidence_source": "filesystem_detected",
+        "reads_data": false,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Supports closing deals and revenue creation."
+      },
+      {
+        "id": "shopifixer_audit_to_outreach_v1",
+        "name": "shopifixer_audit_to_outreach_v1.mjs",
+        "path": "staffordos/connectors/shopifixer_audit_to_outreach_v1.mjs",
+        "category": "revenue / marketing",
+        "command_center_surface": "Leads / Revenue Command",
+        "evidence_source": "filesystem_detected",
+        "reads_data": true,
+        "writes_data": true,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Supports closing deals and revenue creation."
+      }
+    ],
+    "system truth / hygiene": [
+      {
+        "id": "system_truth_sync_agent_v1",
+        "name": "system_truth_sync_agent_v1.mjs",
+        "path": "staffordos/agents/system_truth_sync_agent_v1.mjs",
+        "category": "system truth / hygiene",
+        "command_center_surface": "System Map / Command Center",
+        "evidence_source": "filesystem_detected",
+        "reads_data": true,
+        "writes_data": true,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Supports trusted operation and prevents fake system state."
+      },
+      {
+        "id": "registry_reality_audit_v1",
+        "name": "registry_reality_audit_v1.mjs",
+        "path": "staffordos/system_inventory/registry_reality_audit_v1.mjs",
+        "category": "system truth / hygiene",
+        "command_center_surface": "System Map / Command Center",
+        "evidence_source": "filesystem_detected",
+        "reads_data": true,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Supports trusted operation and prevents fake system state."
+      },
+      {
+        "id": "shape_map_v1",
+        "name": "shape_map_v1.mjs",
+        "path": "staffordos/system_inventory/shape_map_v1.mjs",
+        "category": "system truth / hygiene",
+        "command_center_surface": "System Map / Command Center",
+        "evidence_source": "filesystem_detected",
+        "reads_data": true,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Supports trusted operation and prevents fake system state."
+      },
+      {
+        "id": "shape_runtime_v1",
+        "name": "shape_runtime_v1.mjs",
+        "path": "staffordos/system_inventory/shape_runtime_v1.mjs",
+        "category": "system truth / hygiene",
+        "command_center_surface": "System Map / Command Center",
+        "evidence_source": "filesystem_detected",
+        "reads_data": true,
+        "writes_data": true,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Supports trusted operation and prevents fake system state."
+      },
+      {
+        "id": "shape_diff_v1",
+        "name": "shape_diff_v1.mjs",
+        "path": "staffordos/system_inventory/shape_diff_v1.mjs",
+        "category": "system truth / hygiene",
+        "command_center_surface": "System Map / Command Center",
+        "evidence_source": "filesystem_detected",
+        "reads_data": true,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Supports trusted operation and prevents fake system state."
+      },
+      {
+        "id": "patch_gate_v1",
+        "name": "patch_gate_v1.mjs",
+        "path": "staffordos/system_inventory/patch_gate_v1.mjs",
+        "category": "system truth / hygiene",
+        "command_center_surface": "System Map / Command Center",
+        "evidence_source": "filesystem_detected",
+        "reads_data": true,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Supports trusted operation and prevents fake system state."
+      }
+    ],
+    "audit / diagnostic": [
+      {
+        "id": "guidedAuditEngine",
+        "name": "guidedAuditEngine.js",
+        "path": "staffordos/scorecards/guidedAuditEngine.js",
+        "category": "audit / diagnostic",
+        "command_center_surface": "Capacity / System Map",
+        "evidence_source": "filesystem_detected",
+        "reads_data": true,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Supports client/system diagnosis and service packaging."
+      },
+      {
+        "id": "runAuditResolver",
+        "name": "runAuditResolver.js",
+        "path": "staffordos/scorecards/runAuditResolver.js",
+        "category": "audit / diagnostic",
+        "command_center_surface": "Capacity / System Map",
+        "evidence_source": "filesystem_detected",
+        "reads_data": true,
+        "writes_data": false,
+        "control_status": "not_yet_operator_controlled",
+        "decomposition_status": "needs_input_output_contract",
+        "business_relevance": "Supports client/system diagnosis and service packaging."
+      }
+    ]
+  },
+  "command_center_destinations": {
+    "console": "operator interface",
+    "command_center": "decision engine",
+    "capacity": "service execution",
+    "leads": "deal engine",
+    "revenue_command": "revenue truth",
+    "analytics": "feedback loop",
+    "products": "product summaries",
+    "system_map": "system truth"
+  },
+  "known_gaps": [
+    "System Map UI is not yet fully driven by this truth graph.",
+    "Agent control is defined but not yet implemented.",
+    "Abando capability still needs dedicated product decomposition.",
+    "Real email/SMS provider-backed send proof still needs confirmation.",
+    "Capacity is not yet bound to Shopifixer onboarding/service-pack workflow.",
+    "Analytics and Products are not yet bound to capability truth."
+  ]
+}
