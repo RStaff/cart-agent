@@ -12,11 +12,11 @@
       "product": "shopifixer",
       "product_surface": "staffordmedia_shopifixer",
       "source": "staffordos",
-      "lifecycle_stage": "contact_needed",
+      "lifecycle_stage": "engaged",
       "status": {
-        "current_stage": "contact_needed",
+        "current_stage": "engaged",
         "current_bottleneck": "contact",
-        "next_action": "Find or add valid contact email."
+        "next_action": "Qualify reply and prepare offer"
       },
       "score": 0,
       "contact": {
@@ -58,7 +58,7 @@
       "problem_summary": null,
       "runtime_source": null,
       "created_at": "2026-04-27T14:41:00.252Z",
-      "updated_at": "2026-04-28T15:55:03.630Z"
+      "updated_at": "2026-04-28T17:52:46.786Z"
     },
     {
       "id": "lead_homegoodsco_myshopify_com",
@@ -68,11 +68,11 @@
       "product": "shopifixer",
       "product_surface": "staffordmedia_shopifixer",
       "source": "staffordos",
-      "lifecycle_stage": "contact_needed",
+      "lifecycle_stage": "engaged",
       "status": {
-        "current_stage": "contact_needed",
+        "current_stage": "engaged",
         "current_bottleneck": "contact",
-        "next_action": "Find or add valid contact email."
+        "next_action": "Qualify reply and prepare offer"
       },
       "score": 0,
       "contact": {
@@ -114,7 +114,7 @@
       "problem_summary": null,
       "runtime_source": null,
       "created_at": "2026-04-27T14:41:00.253Z",
-      "updated_at": "2026-04-28T15:55:03.630Z"
+      "updated_at": "2026-04-28T17:52:52.654Z"
     },
     {
       "id": "lead_luxbath_myshopify_com",
@@ -516,11 +516,11 @@
       "product": "shopifixer",
       "product_surface": "staffordmedia_shopifixer",
       "source": "unknown",
-      "lifecycle_stage": "send_initial_outreach",
+      "lifecycle_stage": "sent",
       "status": {
-        "current_stage": "send_initial_outreach",
+        "current_stage": "sent",
         "current_bottleneck": null,
-        "next_action": "send_initial_outreach"
+        "next_action": "Wait for reply"
       },
       "score": 0,
       "contact": {
@@ -562,7 +562,7 @@
       "problem_summary": "Shopify CLI dev workflow issue",
       "runtime_source": ".tmp/send_console_data.json",
       "created_at": "2026-04-28T14:34:49.480Z",
-      "updated_at": "2026-04-28T15:55:03.631Z"
+      "updated_at": "2026-04-28T17:52:39.013Z"
     },
     {
       "id": "lead_5cc9f25726db",
@@ -1236,5 +1236,6 @@
       "created_at": "2026-04-28T14:34:49.480Z",
       "updated_at": "2026-04-28T15:55:03.631Z"
     }
-  ]
+  ],
+  "updated_at": "2026-04-28T17:52:52.654Z"
 }

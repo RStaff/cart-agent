@@ -210,6 +210,69 @@
       "type": "lead_registry_updated",
       "source": ".tmp/send_console_data.json",
       "created_at": "2026-04-28T15:46:39.821Z"
+    },
+    {
+      "id": "event_1777398724212",
+      "lead_id": "lead_fitgearpro_myshopify_com",
+      "type": "move_to_outreach",
+      "from_stage": "contact_needed",
+      "to_stage": "send_initial_outreach",
+      "source": "operator_leads_ui",
+      "created_at": "2026-04-28T17:52:04.212Z"
+    },
+    {
+      "id": "event_1777398741841",
+      "lead_id": "lead_homegoodsco_myshopify_com",
+      "type": "move_to_outreach",
+      "from_stage": "contact_needed",
+      "to_stage": "send_initial_outreach",
+      "source": "operator_leads_ui",
+      "created_at": "2026-04-28T17:52:21.840Z"
+    },
+    {
+      "id": "event_1777398759014",
+      "lead_id": "lead_52c0b97afddf",
+      "type": "mark_sent",
+      "from_stage": "send_initial_outreach",
+      "to_stage": "sent",
+      "source": "operator_leads_ui",
+      "created_at": "2026-04-28T17:52:39.013Z"
+    },
+    {
+      "id": "event_1777398761491",
+      "lead_id": "lead_fitgearpro_myshopify_com",
+      "type": "mark_sent",
+      "from_stage": "send_initial_outreach",
+      "to_stage": "sent",
+      "source": "operator_leads_ui",
+      "created_at": "2026-04-28T17:52:41.490Z"
+    },
+    {
+      "id": "event_1777398766787",
+      "lead_id": "lead_fitgearpro_myshopify_com",
+      "type": "mark_engaged",
+      "from_stage": "sent",
+      "to_stage": "engaged",
+      "source": "operator_leads_ui",
+      "created_at": "2026-04-28T17:52:46.786Z"
+    },
+    {
+      "id": "event_1777398772113",
+      "lead_id": "lead_homegoodsco_myshopify_com",
+      "type": "mark_sent",
+      "from_stage": "send_initial_outreach",
+      "to_stage": "sent",
+      "source": "operator_leads_ui",
+      "created_at": "2026-04-28T17:52:52.111Z"
+    },
+    {
+      "id": "event_1777398772654",
+      "lead_id": "lead_homegoodsco_myshopify_com",
+      "type": "mark_engaged",
+      "from_stage": "sent",
+      "to_stage": "engaged",
+      "source": "operator_leads_ui",
+      "created_at": "2026-04-28T17:52:52.654Z"
     }
   ]
 }
