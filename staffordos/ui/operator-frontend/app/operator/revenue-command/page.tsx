@@ -1,34 +1,50 @@
 import { OperatorNav } from "../../../components/operator/OperatorNav";
 
-type ApiLead = {
-  id?: string;
-  name?: string;
-  domain?: string;
-  product?: string;
-  stage?: string;
-  next_action?: string;
+type ApiResponse = {
+  ok?: boolean;
+  source?: string;
+  registry?: any;
+  lifecycle_counts?: any;
+  product_routing?: Record<string, number>;
+  priority_leads?: any[];
+  bottleneck?: any;
 };
 
-async function getRegistryCommand() {
-  const res = await fetch("http://localhost:3000/api/operator/lead-registry", {
+type SendProofResponse = {
+  ok?: boolean;
+  source?: string;
+  proof_count?: number;
+  dry_run_proof_count?: number;
+  live_send_attempted_count?: number;
+  latest_proofs?: any[];
+};
+
+async function loadRevenueCommand() {
+  const registryResponse = await fetch("http://localhost:3000/api/operator/lead-registry", {
     cache: "no-store",
   });
 
-  if (!res.ok) {
-    throw new Error("Failed to load lead registry command data");
-  }
+  const proofResponse = await fetch("http://localhost:3000/api/operator/send-proof", {
+    cache: "no-store",
+  });
 
-  return res.json();
+  const data = (await registryResponse.json()) as ApiResponse;
+  const sendProof = (await proofResponse.json()) as SendProofResponse;
+
+  return { data, sendProof };
 }
 
 export default async function RevenueCommandPage() {
-  const data = await getRegistryCommand();
+  const { data, sendProof } = await loadRevenueCommand();
 
   const registry = data.registry || {};
   const lifecycle = data.lifecycle_counts || {};
   const routing = data.product_routing || {};
-  const priorityLeads: ApiLead[] = data.priority_leads || [];
-  const bottleneck = data.bottleneck || {};
+  const priorityLeads = data.priority_leads || [];
+  const bottleneck = data.bottleneck || {
+    stage: "unknown",
+    next_action: "Run lead registry sync and inspect lifecycle state.",
+  };
 
   return (
     <main className="shell">
@@ -47,14 +63,12 @@ export default async function RevenueCommandPage() {
         <section className="panel">
           <div className="panelInner">
             <h2 className="sectionTitle">Current Bottleneck</h2>
-            <p className="subtitle" style={{ marginTop: 0 }}>
-              {bottleneck.stage || "none"}
-            </p>
+            <p className="subtitle" style={{ marginTop: 0 }}>{bottleneck.stage}</p>
             <div className="kv">
-              <div><strong>Next action:</strong> {bottleneck.next_action || "Review registry."}</div>
+              <div><strong>Next action:</strong> {bottleneck.next_action}</div>
               <div><strong>Total leads:</strong> {registry.items?.length || 0}</div>
-              <div><strong>Registry version:</strong> {registry.version || "unknown"}</div>
-              <div><strong>Schema:</strong> {registry.schema || "unknown"}</div>
+              <div><strong>Registry version:</strong> {registry.version}</div>
+              <div><strong>Schema:</strong> {registry.schema}</div>
               <div><strong>Read source:</strong> staffordos/leads/lead_registry_v1.json</div>
             </div>
           </div>
@@ -92,9 +106,35 @@ export default async function RevenueCommandPage() {
 
         <section className="panel">
           <div className="panelInner">
+            <h2 className="sectionTitle">Send Proof</h2>
+            <div className="kv">
+              <div><strong>Total proof records:</strong> {sendProof.proof_count || 0}</div>
+              <div><strong>Dry-run proofs:</strong> {sendProof.dry_run_proof_count || 0}</div>
+              <div><strong>Live sends attempted:</strong> {sendProof.live_send_attempted_count || 0}</div>
+              <div><strong>Read source:</strong> {sendProof.source}</div>
+            </div>
+
+            <div className="kv" style={{ marginTop: 16 }}>
+              {(sendProof.latest_proofs || []).map((proof: any) => (
+                <div key={proof.id}>
+                  <strong>{proof.lead_name || proof.lead_id}</strong>
+                  {" — "}
+                  {proof.status}
+                  {" / "}
+                  {proof.proof_type}
+                  {" / "}
+                  {proof.id}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="panel">
+          <div className="panelInner">
             <h2 className="sectionTitle">Priority Leads</h2>
             <div className="kv">
-              {priorityLeads.map((lead) => (
+              {priorityLeads.map((lead: any) => (
                 <div key={lead.id || lead.name || lead.domain}>
                   <strong>{lead.name || lead.domain || lead.id}</strong> —{" "}
                   {lead.product || "unknown"} / {lead.stage || "unknown"} /{" "}
