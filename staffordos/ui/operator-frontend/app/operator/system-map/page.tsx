@@ -1,3 +1,5 @@
+import PrimaryBlockerActionPanel from "../../../components/system-map/PrimaryBlockerActionPanel";
+import SystemMapManifestPanel from "../../../components/system-map/SystemMapManifestPanel";
 import { OperatorNav } from "../../../components/operator/OperatorNav";
 
 async function getSystemMap() {
@@ -29,6 +31,29 @@ export default async function SystemMapPage() {
 
         <section className="panel">
           <div className="panelInner">
+            <h2 className="sectionTitle">Operator Status</h2>
+            <SystemMapManifestPanel />
+          </div>
+        </section>
+
+        <section className="panel">
+          <div className="panelInner">
+            <h2 className="sectionTitle">Primary Blocker</h2>
+            <div className="kv">
+              <div><strong>Target:</strong> Abando Recovery Loop</div>
+              <div><strong>Status:</strong> Partially Proven — Runtime Confirmation Required</div>
+              <div><strong>Required proof:</strong> checkout captured → message delivered → return tracked → conversion/revenue attributed</div>
+              <div><strong>Next action:</strong> Build and run controlled proof runner only after this UI slice is verified.</div>
+            </div>
+          </div>
+        </section>
+
+
+        <PrimaryBlockerActionPanel />
+
+
+        <section className="panel">
+          <div className="panelInner">
             <h2 className="sectionTitle">System Policy</h2>
             <div className="kv">
               <div><strong>Map version:</strong> {data.map_version}</div>
@@ -37,6 +62,10 @@ export default async function SystemMapPage() {
             </div>
           </div>
         </section>
+
+        <details className="panel">
+          <summary className="sectionTitle cursor-pointer">System Details (Raw Map)</summary>
+          <div className="panelInner space-y-6">
 
         <section className="panel">
           <div className="panelInner">
@@ -93,7 +122,10 @@ export default async function SystemMapPage() {
             </div>
           </div>
         </section>
+
+          </div>
+        </details>
       </div>
-    </main>
+      </main>
   );
 }

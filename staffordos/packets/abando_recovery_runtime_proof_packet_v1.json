@@ -1,0 +1,69 @@
+{
+  "packet_id": "abando_recovery_runtime_proof_packet_v1",
+  "created_at": "2026-04-29T07:45:00-04:00",
+  "classification": "RUNTIME_PROOF_EXECUTION",
+  "surface": "abando_recovery_loop",
+  "request": "Wire proof run action to the real Abando recovery runtime path so the system can execute a controlled proof attempt, send a real message, log evidence, and return proof status.",
+  "goal": "Connect Proof Run → Abando Worker → Send Real Message → Log → Return Proof without marking proof as PROVEN until runtime evidence confirms full loop.",
+  "owners": {
+    "proof_action_route": "staffordos/ui/operator-frontend/app/api/proof/abando-recovery/run/route.ts",
+    "proof_action_component": "staffordos/ui/operator-frontend/components/system-map/PrimaryBlockerActionPanel.tsx",
+    "proof_run_output_dir": "staffordos/system_inventory/output/proof_runs",
+    "proof_register": "staffordos/system_inventory/output/execution_proof_register_v1.json",
+    "manifest": "staffordos/system_inventory/output/system_map_ui_input_manifest_v1.json",
+    "abando_backend_entry": "web/src/index.js"
+  },
+  "required_flow": [
+    "validate_packet_owner_files",
+    "inspect_existing_abando_runtime_routes",
+    "identify_real recovery/send endpoint",
+    "call existing runtime path from proof route",
+    "send real message only through provider-backed path",
+    "write proof artifact with request, response, evidence, and remaining gaps",
+    "return structured proof result to UI"
+  ],
+  "non_goals": [
+    "Do not mark proof_abando_recovery_loop as PROVEN.",
+    "Do not fabricate checkout or conversion evidence.",
+    "Do not rewrite Abando recovery engine.",
+    "Do not add a new send system.",
+    "Do not change Shopify app runtime behavior.",
+    "Do not bypass integrity checks."
+  ],
+  "integrity_layer": {
+    "runs_before_operational_loop": true,
+    "checks": [
+      "owner files exist",
+      "backend route exists",
+      "proof route exists",
+      "worktree changes are narrow",
+      "runtime send path is identified before patch",
+      "rollback path exists"
+    ]
+  },
+  "operational_layer": {
+    "runs_after_integrity_pass": true,
+    "target_runtime": "existing Abando recovery/send path",
+    "required_runtime_evidence": [
+      "checkout event or eligible recovery input found",
+      "recovery action created or selected",
+      "real email or SMS send attempted through configured provider",
+      "send result logged",
+      "proof_run artifact written"
+    ]
+  },
+  "verification_contract": {
+    "must_not_mark_proven": true,
+    "must_return_200_for_system_map": true,
+    "must_return_ok_true_for_proof_route": true,
+    "must_write_proof_run_artifact": true,
+    "commands": [
+      "test -f staffordos/ui/operator-frontend/app/api/proof/abando-recovery/run/route.ts",
+      "test -f web/src/index.js",
+      "grep -RIn \"send-live-test\\|recovery\\|checkout-events\\|merchant-summary\\|recovery_email\" web/src staffordos abando-frontend | head -100",
+      "curl -s -o /tmp/system-map.html -w \"%{http_code}\\n\" http://localhost:3000/operator/system-map"
+    ]
+  },
+  "gate_decision": "PACKET_CREATED_REVIEW_ONLY",
+  "next_action": "Inspect existing Abando runtime routes before wiring proof route."
+}

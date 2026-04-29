@@ -1,0 +1,73 @@
+{
+  "packet_id": "system_map_ux_operator_cockpit_packet_v1",
+  "created_at": "2026-04-28T22:30:00-04:00",
+  "request": "Clean up /operator/system-map into an operator-first cockpit without breaking existing truth artifacts, proof register, manifest API, or system map data.",
+  "classification": "OPERATOR_UI_SURFACE_CHANGE",
+  "surface": "staffordos_operator_system_map",
+  "branch": "infra/operator-system-map-ux-cockpit-v1",
+  "goal": "Make the System Map page usable as an operator cockpit: show primary blocker, proof state, manifest summary, and keep raw system details accessible without visual noise.",
+  "non_goals": [
+    "Do not rebuild StaffordOS architecture.",
+    "Do not create a new control spine.",
+    "Do not change execution_proof_register_v1.json schema.",
+    "Do not change system_map_ui_input_manifest_v1.json schema.",
+    "Do not add Run Proof backend route in this packet.",
+    "Do not change Abando recovery engine.",
+    "Do not change /api/operator/system-map backend behavior."
+  ],
+  "owners": {
+    "operator_page": "staffordos/ui/operator-frontend/app/operator/system-map/page.tsx",
+    "truth_manifest_component": "staffordos/ui/operator-frontend/components/system-map/SystemMapManifestPanel.tsx",
+    "truth_manifest_api": "staffordos/ui/operator-frontend/app/api/system-map/manifest/route.ts",
+    "truth_manifest_loader": "staffordos/ui/operator-frontend/lib/system-map/loadSystemMapManifest.ts",
+    "truth_manifest_artifact": "staffordos/system_inventory/output/system_map_ui_input_manifest_v1.json",
+    "proof_register": "staffordos/system_inventory/output/execution_proof_register_v1.json"
+  },
+  "current_verified_state": {
+    "operator_system_map_route": "returns_200_after_restore",
+    "manifest_api": "returns_ok_true",
+    "proof_status": "PARTIALLY_PROVEN_REQUIRES_RUNTIME_CONFIRMATION: 6",
+    "discovery_sync_status": "MANUAL_SCRIPTED_NOT_SCHEDULED",
+    "discovery_runner_ready_for_scheduler": true
+  },
+  "required_flow": [
+    "inspect_current_page",
+    "confirm_manifest_component_exists",
+    "confirm_manifest_api_returns_truth",
+    "patch_only_operator_page_layout",
+    "preserve_raw_tables_inside_collapsed_system_details",
+    "verify_page_returns_200",
+    "verify_manifest_api_still_reports_partial_proof_count",
+    "record outcome"
+  ],
+  "allowed_changes": [
+    "Move SystemMapManifestPanel higher in page hierarchy.",
+    "Add operator-facing primary blocker section.",
+    "Collapse Capabilities / Known Data Flow / Source Inventory into System Details.",
+    "Improve labels and hierarchy.",
+    "Keep existing data rendering intact."
+  ],
+  "forbidden_changes": [
+    "No proof promotion to PROVEN.",
+    "No schema changes.",
+    "No new backend route.",
+    "No changes to Abando runtime.",
+    "No deletion of existing tables.",
+    "No creation of new control systems."
+  ],
+  "verification_contract": {
+    "must_backup_page_before_patch": true,
+    "must_validate_owner_files_exist_before_patch": true,
+    "must_preserve_manifest_api": true,
+    "must_return_200": true,
+    "must_be_reversible": true,
+    "commands": [
+      "test -f staffordos/ui/operator-frontend/app/operator/system-map/page.tsx",
+      "test -f staffordos/ui/operator-frontend/components/system-map/SystemMapManifestPanel.tsx",
+      "curl -s -o /tmp/system-map.html -w \"%{http_code}\\n\" http://localhost:3000/operator/system-map",
+      "curl -s http://localhost:3000/api/system-map/manifest | python3 -m json.tool | grep -A5 proof_status_counts"
+    ]
+  },
+  "gate_decision": "PACKET_CREATED_REVIEW_ONLY",
+  "next_action": "Validate this packet against existing files before patching /operator/system-map."
+}
