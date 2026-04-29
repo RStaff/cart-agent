@@ -1,5 +1,5 @@
 {
-  "version": "system_map_truth_graph_v1",
+  "version": "system_map_truth_graph_v1_pass4_p1_p2_merged",
   "generated_at": "2026-04-28T23:39:40.296Z",
   "source_policy": "Derived only from existing audit/truth artifacts. No manual claims without source evidence.",
   "sources": [
@@ -325,6 +325,140 @@
         "staffordos/ui/operator-frontend/app/operator/system-map/page.tsx"
       ],
       "summary": "System Map exists but must ingest deeper audit outputs and product/agent/data matrices."
+    },
+    {
+      "id": "pass4_revenue_engine",
+      "label": "Revenue Engine",
+      "type": "income_capability",
+      "status": "DISCOVERED_REQUIRES_REVIEW",
+      "count": 9,
+      "evidence": [
+        "staffordos/revenue/revenue_agent_v1.mjs",
+        "staffordos/revenue/verifyPaymentAgreementLayer.js",
+        "staffordos/revenue/paymentAgreements.json",
+        "staffordos/revenue/paymentAgreementRepository.js",
+        "staffordos/scorecards/verify_revenue_leakage_entry.js",
+        "web/src/routes/revenueLeakageEntry.esm.js",
+        "abando-frontend/src/components/audit/RevenueOpportunityRow.tsx",
+        "abando-frontend/src/components/audit/RevenueOpportunityMap.tsx",
+        "abando-frontend/src/lib/revenueRisk.ts"
+      ],
+      "summary": "P1 income asset group discovered by asset triage; requires evidence review before UI trust."
+    },
+    {
+      "id": "pass4_checkout_events",
+      "label": "Checkout Event System",
+      "type": "income_capability",
+      "status": "DISCOVERED_REQUIRES_REVIEW",
+      "count": 11,
+      "evidence": [
+        "abando-frontend/app/api/checkout-events/route.ts",
+        "abando-frontend/web/src/dev/checkoutPublic.cjs",
+        "abando-frontend/.bak/checkout.ts.20250930-095443",
+        "abando-frontend/src/app_legacy/api/checkout/route.ts",
+        "abando-frontend/src/components/dashboard/CheckoutFlow.tsx",
+        "abando-frontend/src/components/scorecard/CheckoutFlowDiagram.tsx",
+        "abando-frontend/src/lib/checkout.ts",
+        "abando-frontend/src/lib/dashboard/confirmation/getSeededCheckoutEvents.ts",
+        "abando-frontend/src/lib/dashboard/storage/getCheckoutEventsForShop.ts",
+        "abando-frontend/src/lib/dashboard/storage/checkoutEventValidator.ts",
+        "abando-frontend/src/lib/dashboard/storage/saveCheckoutEvents.ts"
+      ],
+      "summary": "P1 income asset group discovered by asset triage; requires evidence review before UI trust."
+    },
+    {
+      "id": "pass4_shopifixer_revenue",
+      "label": "ShopiFixer Revenue / Fix System",
+      "type": "income_capability",
+      "status": "DISCOVERED_REQUIRES_REVIEW",
+      "count": 1,
+      "evidence": [
+        "abando-frontend/app/shopifixer/page.tsx"
+      ],
+      "summary": "P1 income asset group discovered by asset triage; requires evidence review before UI trust."
+    },
+    {
+      "id": "pass4_agent_workforce",
+      "label": "Agent Workforce",
+      "type": "operations_capability",
+      "status": "DISCOVERED_REQUIRES_REVIEW",
+      "count": 31,
+      "evidence": [
+        "staffordos/system_inventory/output/agent_role_decomposition_v1.md",
+        "staffordos/leads/reply_interpretation_agent_v1.mjs",
+        "staffordos/leads/reply_response_agent_v1.mjs",
+        "staffordos/leads/contact_enrichment_agent_v1.mjs",
+        "staffordos/leads/reply_detection_agent_v1.mjs",
+        "staffordos/leads/message_generation_agent_v1.mjs",
+        "staffordos/leads/contact_research_agent_v1.mjs",
+        "staffordos/leads/send_execution_agent_v1.mjs",
+        "staffordos/leads/message_integrity_agent_v1.mjs",
+        "staffordos/leads/lead_registry_sync_agent_v1.mjs",
+        "staffordos/leads/approval_decision_agent_v1.mjs",
+        "staffordos/leads/followup_agent_v1.mjs",
+        "staffordos/leads/send_ledger_agent_v1.mjs",
+        "staffordos/leads/message_validation_agent_v1.mjs",
+        "staffordos/agents/dev_task_integrity_agent_v1.mjs",
+        "staffordos/agents/prod_parity_agent_v1.mjs",
+        "staffordos/agents/prod_surface_change_packet_v1.mjs",
+        "staffordos/agents/surface_patch_agent_v1.mjs",
+        "staffordos/agents/run_agent_v1.mjs",
+        "staffordos/agents/progress_contract_loader_v1.mjs",
+        "staffordos/agents/progress_contract_v1.json",
+        "staffordos/agents/approval_interface_v1.mjs",
+        "staffordos/agents/validate_progress_contract_v1.mjs",
+        "staffordos/agents/system_truth_sync_agent_v1.mjs",
+        "staffordos/agents/apply_patch_mode_v1.mjs",
+        "staffordos/agents/change_pipeline_v1.mjs",
+        "staffordos/hygiene/hygiene_agent_v1.js",
+        "scripts/agent_role_decomposition_v1.mjs",
+        "scripts/diag_cart_agent_api.sh",
+        "scripts/sync_cart_agent_api_base.sh",
+        "abando-frontend/src/components/director/AgentControls.tsx"
+      ],
+      "summary": "P2 operations asset group discovered by asset triage; requires control/read-write mapping before UI trust."
+    },
+    {
+      "id": "pass4_runtime_loops",
+      "label": "Runtime Loops",
+      "type": "operations_capability",
+      "status": "DISCOVERED_REQUIRES_REVIEW",
+      "count": 2,
+      "evidence": [
+        "staffordos/deploy/check_abando_proof_loop.js",
+        "staffordos/proof_loop/merchant_proof_loop_completion_pack.md"
+      ],
+      "summary": "P2 operations asset group discovered by asset triage; requires control/read-write mapping before UI trust."
+    },
+    {
+      "id": "pass4_execution_packets",
+      "label": "Execution Packets",
+      "type": "operations_capability",
+      "status": "DISCOVERED_REQUIRES_REVIEW",
+      "count": 6,
+      "evidence": [
+        "staffordos/planning/Execution_Board_Template.md",
+        "staffordos/hygiene/cleanup_execution_plan.md",
+        "staffordos/hygiene/cleanup_execution_pack_v1.js",
+        "staffordos/hygiene/run_cleanup_execution_pack.js",
+        "staffordos/hygiene/cleanup_execution_pack_v2.js",
+        "staffordos/hygiene/run_cleanup_execution_pack_v2.js"
+      ],
+      "summary": "P2 operations asset group discovered by asset triage; requires control/read-write mapping before UI trust."
+    },
+    {
+      "id": "pass4_execution_gates",
+      "label": "Execution Gates",
+      "type": "operations_capability",
+      "status": "DISCOVERED_REQUIRES_REVIEW",
+      "count": 4,
+      "evidence": [
+        "staffordos/hygiene/output/worktree_cleanup_gate_report.md",
+        "staffordos/hygiene/worktree_cleanup_gate_report.md",
+        "staffordos/hygiene/worktree_cleanup_gate_v1.js",
+        "scripts/patch_allow_webhook_paths_in_gate.sh"
+      ],
+      "summary": "P2 operations asset group discovered by asset triage; requires control/read-write mapping before UI trust."
     }
   ],
   "edges": [
@@ -377,6 +511,46 @@
       "from": "real_partial_placeholder",
       "to": "system_map",
       "relationship": "defines capability truth status"
+    },
+    {
+      "from": "pass4_revenue_engine",
+      "to": "revenue_truth",
+      "relationship": "income asset may contribute to revenue truth after review"
+    },
+    {
+      "from": "pass4_checkout_events",
+      "to": "revenue_truth",
+      "relationship": "income asset may contribute to revenue truth after review"
+    },
+    {
+      "from": "pass4_shopifixer_revenue",
+      "to": "revenue_truth",
+      "relationship": "income asset may contribute to revenue truth after review"
+    },
+    {
+      "from": "pass4_agent_workforce",
+      "to": "agent_system",
+      "relationship": "operations asset may contribute to agent/control system after review"
+    },
+    {
+      "from": "pass4_runtime_loops",
+      "to": "agent_system",
+      "relationship": "operations asset may contribute to agent/control system after review"
+    },
+    {
+      "from": "pass4_execution_packets",
+      "to": "agent_system",
+      "relationship": "operations asset may contribute to agent/control system after review"
+    },
+    {
+      "from": "pass4_execution_gates",
+      "to": "agent_system",
+      "relationship": "operations asset may contribute to agent/control system after review"
+    },
+    {
+      "from": "asset_triage",
+      "to": "system_map",
+      "relationship": "discovers unmapped assets for graph review"
     }
   ],
   "data_ownership": [
@@ -891,5 +1065,55 @@
     "Real email/SMS provider-backed send proof still needs confirmation.",
     "Capacity is not yet bound to Shopifixer onboarding/service-pack workflow.",
     "Analytics and Products are not yet bound to capability truth."
-  ]
+  ],
+  "updated_at": "2026-04-29T01:09:25.593Z",
+  "pass4_summary": {
+    "p1_income_assets": 21,
+    "p2_operations_assets": 43,
+    "new_nodes_added": 0,
+    "merged_groups": [
+      {
+        "id": "pass4_revenue_engine",
+        "label": "Revenue Engine",
+        "type": "income_capability",
+        "files": 9
+      },
+      {
+        "id": "pass4_checkout_events",
+        "label": "Checkout Event System",
+        "type": "income_capability",
+        "files": 11
+      },
+      {
+        "id": "pass4_shopifixer_revenue",
+        "label": "ShopiFixer Revenue / Fix System",
+        "type": "income_capability",
+        "files": 1
+      },
+      {
+        "id": "pass4_agent_workforce",
+        "label": "Agent Workforce",
+        "type": "operations_capability",
+        "files": 31
+      },
+      {
+        "id": "pass4_runtime_loops",
+        "label": "Runtime Loops",
+        "type": "operations_capability",
+        "files": 2
+      },
+      {
+        "id": "pass4_execution_packets",
+        "label": "Execution Packets",
+        "type": "operations_capability",
+        "files": 6
+      },
+      {
+        "id": "pass4_execution_gates",
+        "label": "Execution Gates",
+        "type": "operations_capability",
+        "files": 4
+      }
+    ]
+  }
 }
