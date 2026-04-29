@@ -23,16 +23,65 @@ function writeJson(filePath: string, value: any) {
   writeFileSync(filePath, JSON.stringify(value, null, 2) + "\n");
 }
 
-function nextState(action: string) {
+function nextState(action: string, lead?: any) {
+  const currentStage = String(
+    lead?.lifecycle_stage || lead?.status?.current_stage || "new"
+  );
+
+  const hasEmail = Boolean(
+    lead?.contact?.email || lead?.email || lead?.execution?.send_target
+  );
+
   if (action === "move_to_outreach") {
-    return { stage: "send_initial_outreach", next_action: "Send initial outreach" };
+    if (!hasEmail && currentStage === "contact_needed") {
+      return {
+        ok: false,
+        error: "contact_required_before_outreach",
+        stage: currentStage,
+        next_action: "Find or add valid contact email."
+      };
+    }
+
+    return {
+      ok: true,
+      stage: "outreach_ready",
+      next_action: "Send initial outreach"
+    };
   }
+
   if (action === "mark_sent") {
-    return { stage: "sent", next_action: "Wait for reply" };
+    if (!hasEmail && !lead?.execution?.message) {
+      return {
+        ok: false,
+        error: "cannot_mark_sent_without_contact_or_message",
+        stage: currentStage,
+        next_action: "Add contact or message before marking sent."
+      };
+    }
+
+    return {
+      ok: true,
+      stage: "sent",
+      next_action: "Wait for reply"
+    };
   }
+
   if (action === "mark_engaged") {
-    return { stage: "engaged", next_action: "Qualify reply and prepare offer" };
+    return {
+      ok: true,
+      stage: "engaged",
+      next_action: "Qualify reply and prepare offer"
+    };
   }
+
+  if (action === "mark_converted") {
+    return {
+      ok: true,
+      stage: "converted",
+      next_action: "Begin onboarding and capture result"
+    };
+  }
+
   return null;
 }
 
@@ -82,9 +131,8 @@ export async function POST(req: Request) {
   const body = await req.json();
   const leadId = String(body?.leadId || "");
   const action = String(body?.action || "");
-  const transition = nextState(action);
 
-  if (!leadId || !transition) {
+  if (!leadId || !action) {
     return NextResponse.json({ ok: false, error: "Invalid leadId or action" }, { status: 400 });
   }
 
@@ -104,6 +152,16 @@ export async function POST(req: Request) {
   const now = new Date().toISOString();
   const lead = items[idx];
   const previousStage = lead.lifecycle_stage || lead.status?.current_stage || "unknown";
+  const transition = nextState(action, lead);
+
+  if (!transition || !transition.ok) {
+    return NextResponse.json({
+      ok: false,
+      error: transition?.error || "Invalid lifecycle transition",
+      current_stage: previousStage,
+      next_action: transition?.next_action || null
+    }, { status: 409 });
+  }
 
   let sendLedgerId: string | null = null;
   if (action === "mark_sent") {

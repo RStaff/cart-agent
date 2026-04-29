@@ -13,6 +13,8 @@ import {
 } from "./lib/emailSender.js";
 import { installGuidedAuditRoute } from "./routes/guidedAudit.esm.js";
 import { installSmcAlign } from "./smc-align.js";
+import { upsertShopifixerLead } from "./lib/shopifixerLeadRegistry.js";
+import { trackShopifixerLifecycle } from "./lib/shopifixerLifecycleTracker.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, "..", "..");
@@ -247,6 +249,26 @@ app.get("/api/fix-audit", async (req, res) => {
   }
 });
 
+
+app.post("/api/shopifixer/track", async (req, res) => {
+  try {
+    const store = normalizeStoreInput(req.body?.store || req.body?.storeUrl || req.body?.domain);
+    const eventType = String(req.body?.eventType || req.body?.event || "").trim();
+
+    const result = trackShopifixerLifecycle({
+      repoRoot,
+      store,
+      eventType,
+      metadata: req.body?.metadata || {}
+    });
+
+    return res.status(result.ok ? 200 : 400).json(result);
+  } catch (error) {
+    console.error("[shopifixer:track] error:", error);
+    return res.status(500).json({ ok: false, error: "shopifixer_track_failed" });
+  }
+});
+
 app.post("/api/fix-audit", async (req, res) => {
   try {
     const storeUrl = normalizeStoreInput(req.body?.storeUrl);
@@ -258,6 +280,12 @@ app.post("/api/fix-audit", async (req, res) => {
 
     const analysis = await analyzeStore(storeUrl);
     const lead = await createFixAuditLead({ storeUrl, email, analysis });
+    const registryResult = upsertShopifixerLead({
+      repoRoot,
+      storeUrl,
+      email,
+      analysis
+    });
     const payload = buildCanonicalPayload({ storeUrl, analysis });
     await saveCanonicalPayload(payload);
 
@@ -287,6 +315,7 @@ app.post("/api/fix-audit", async (req, res) => {
     return res.status(200).json({
       ok: true,
       leadId: lead.leadId,
+      registryLeadId: registryResult.leadId,
       analysis,
       payload,
       emailAttempted: true,
@@ -304,6 +333,11 @@ const port = Number(process.env.PORT || 8081);
 if (Number.isNaN(port) || port <= 0) {
   throw new Error(`invalid_port:${process.env.PORT || ""}`);
 }
+
+app.get("/operator/send-console", (req, res) => {
+  res.sendFile(resolve(repoRoot, "staffordos/ui/send-console/index.html"));
+});
+
 installGuidedAuditRoute(app);
 
 app.listen(port, () => {

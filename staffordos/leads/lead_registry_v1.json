@@ -1,9 +1,64 @@
 {
   "version": "lead_registry_v1",
   "schema": "canonical_lead_registry_v1",
-  "normalized_at": "2026-04-28T15:55:03.631Z",
-  "source": ".tmp/send_console_data.json",
+  "normalized_at": "2026-04-29T17:31:28.388Z",
+  "source": "staffordmedia_shopifixer_inbound",
   "items": [
+    {
+      "id": "lead_step5_test_store_myshopify_com",
+      "lead_id": "lead_step5_test_store_myshopify_com",
+      "name": "step5-test-store.myshopify.com",
+      "domain": "step5-test-store.myshopify.com",
+      "product": "shopifixer",
+      "product_surface": "staffordmedia_shopifixer",
+      "source": "staffordmedia",
+      "lifecycle_stage": "onboarding_started",
+      "status": {
+        "current_stage": "onboarding_started",
+        "current_bottleneck": "delivery",
+        "next_action": "Begin fix intake and capture baseline"
+      },
+      "score": 0,
+      "contact": {
+        "email": "rossstafford1@gmail.com",
+        "confidence": "submitted_by_visitor"
+      },
+      "engagement": {
+        "audit_viewed": true,
+        "experience_viewed": true,
+        "replied": false,
+        "approved_for_send": false,
+        "dry_run_ready": false,
+        "sent": false,
+        "onboarding_started": true
+      },
+      "routing": {
+        "primary_offer": "shopifixer_audit",
+        "secondary_offer": "abando_recovery",
+        "do_not_cross_sell_until": "qualified",
+        "rule": "ShopiFixer first; Abando only after leak diagnosed"
+      },
+      "refs": {
+        "outreach_queue": false,
+        "approval_queue_ids": [],
+        "send_ledger_ids": [],
+        "reply_ids": []
+      },
+      "execution": {
+        "channel": "inbound_form",
+        "send_target": "rossstafford1@gmail.com",
+        "message": null,
+        "follow_up_message": null
+      },
+      "payment": {
+        "status": null,
+        "url": null
+      },
+      "problem_summary": null,
+      "runtime_source": "web/src/index.js:/api/fix-audit",
+      "created_at": "2026-04-29T17:26:23.137Z",
+      "updated_at": "2026-04-29T17:31:28.388Z"
+    },
     {
       "id": "lead_fitgearpro_myshopify_com",
       "lead_id": "lead_fitgearpro_myshopify_com",
@@ -28,7 +83,7 @@
       "engagement": {
         "audit_viewed": false,
         "experience_viewed": false,
-        "replied": false,
+        "replied": true,
         "approved_for_send": false,
         "dry_run_ready": false,
         "sent": false
@@ -58,7 +113,7 @@
       "problem_summary": null,
       "runtime_source": null,
       "created_at": "2026-04-27T14:41:00.252Z",
-      "updated_at": "2026-04-28T17:52:46.786Z"
+      "updated_at": "2026-04-29T16:51:58.603Z"
     },
     {
       "id": "lead_homegoodsco_myshopify_com",
@@ -84,7 +139,7 @@
       "engagement": {
         "audit_viewed": false,
         "experience_viewed": false,
-        "replied": false,
+        "replied": true,
         "approved_for_send": false,
         "dry_run_ready": false,
         "sent": false
@@ -114,7 +169,7 @@
       "problem_summary": null,
       "runtime_source": null,
       "created_at": "2026-04-27T14:41:00.253Z",
-      "updated_at": "2026-04-28T17:52:52.654Z"
+      "updated_at": "2026-04-29T16:52:08.833Z"
     },
     {
       "id": "lead_luxbath_myshopify_com",
@@ -236,11 +291,11 @@
       "product": "shopifixer",
       "product_surface": "staffordmedia_shopifixer",
       "source": "staffordos",
-      "lifecycle_stage": "cold",
+      "lifecycle_stage": "engaged",
       "status": {
-        "current_stage": "cold",
+        "current_stage": "engaged",
         "current_bottleneck": "routing",
-        "next_action": "Move lead into contact or message workflow."
+        "next_action": "Qualify reply and prepare offer"
       },
       "score": 0,
       "contact": {
@@ -252,7 +307,7 @@
       "engagement": {
         "audit_viewed": false,
         "experience_viewed": false,
-        "replied": false,
+        "replied": true,
         "approved_for_send": false,
         "dry_run_ready": false,
         "sent": false
@@ -282,7 +337,7 @@
       "problem_summary": null,
       "runtime_source": null,
       "created_at": "2026-04-27T14:41:00.253Z",
-      "updated_at": "2026-04-28T15:55:03.630Z"
+      "updated_at": "2026-04-29T17:11:28.609Z"
     },
     {
       "id": "lead_store2_com",
@@ -1247,6 +1302,6 @@
       "updated_at": "2026-04-28T15:55:03.631Z"
     }
   ],
-  "updated_at": "2026-04-28T19:30:04.007Z",
+  "updated_at": "2026-04-29T17:11:28.609Z",
   "send_proof_bound_at": "2026-04-28T19:30:04.007Z"
 }

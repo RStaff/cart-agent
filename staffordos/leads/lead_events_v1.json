@@ -323,6 +323,107 @@
       ],
       "source": "bind_send_proof_to_registry_refs",
       "created_at": "2026-04-28T19:30:04.007Z"
+    },
+    {
+      "id": "event_1777481302867",
+      "lead_id": "lead_fitgearpro_myshopify_com",
+      "type": "mark_engaged",
+      "from_stage": "engaged",
+      "to_stage": "engaged",
+      "send_ledger_id": null,
+      "source": "operator_leads_ui",
+      "created_at": "2026-04-29T16:48:22.858Z"
+    },
+    {
+      "id": "event_1777481518631",
+      "lead_id": "lead_fitgearpro_myshopify_com",
+      "type": "mark_engaged",
+      "from_stage": "engaged",
+      "to_stage": "engaged",
+      "send_ledger_id": null,
+      "source": "operator_leads_ui",
+      "created_at": "2026-04-29T16:51:58.603Z"
+    },
+    {
+      "id": "event_1777481525490",
+      "lead_id": "lead_homegoodsco_myshopify_com",
+      "type": "mark_engaged",
+      "from_stage": "engaged",
+      "to_stage": "engaged",
+      "send_ledger_id": null,
+      "source": "operator_leads_ui",
+      "created_at": "2026-04-29T16:52:05.489Z"
+    },
+    {
+      "id": "event_1777481528835",
+      "lead_id": "lead_homegoodsco_myshopify_com",
+      "type": "mark_engaged",
+      "from_stage": "engaged",
+      "to_stage": "engaged",
+      "send_ledger_id": null,
+      "source": "operator_leads_ui",
+      "created_at": "2026-04-29T16:52:08.833Z"
+    },
+    {
+      "id": "event_1777482688610",
+      "lead_id": "lead_store1_myshopify_com",
+      "type": "mark_engaged",
+      "from_stage": "cold",
+      "to_stage": "engaged",
+      "send_ledger_id": null,
+      "source": "operator_leads_ui",
+      "created_at": "2026-04-29T17:11:28.609Z"
+    },
+    {
+      "id": "event_lead_step5_test_store_myshopify_com_1777483583138",
+      "lead_id": "lead_step5_test_store_myshopify_com",
+      "event_type": "shopifixer_lead_created",
+      "source": "staffordmedia_shopifixer",
+      "payload": {
+        "storeUrl": "step5-test-store.myshopify.com",
+        "email_present": true,
+        "analysis_present": true
+      },
+      "created_at": "2026-04-29T17:26:23.137Z"
+    },
+    {
+      "id": "event_lead_step5_test_store_myshopify_com_1777483878572",
+      "lead_id": "lead_step5_test_store_myshopify_com",
+      "event_type": "audit_result_viewed",
+      "source": "staffordmedia_shopifixer",
+      "payload": {
+        "store": "step5-test-store.myshopify.com",
+        "metadata": {
+          "source": "step6_test"
+        }
+      },
+      "created_at": "2026-04-29T17:31:18.570Z"
+    },
+    {
+      "id": "event_lead_step5_test_store_myshopify_com_1777483888347",
+      "lead_id": "lead_step5_test_store_myshopify_com",
+      "event_type": "pricing_viewed",
+      "source": "staffordmedia_shopifixer",
+      "payload": {
+        "store": "step5-test-store.myshopify.com",
+        "metadata": {
+          "source": "step6_test"
+        }
+      },
+      "created_at": "2026-04-29T17:31:28.346Z"
+    },
+    {
+      "id": "event_lead_step5_test_store_myshopify_com_1777483888388",
+      "lead_id": "lead_step5_test_store_myshopify_com",
+      "event_type": "onboarding_started",
+      "source": "staffordmedia_shopifixer",
+      "payload": {
+        "store": "step5-test-store.myshopify.com",
+        "metadata": {
+          "source": "step6_test"
+        }
+      },
+      "created_at": "2026-04-29T17:31:28.388Z"
     }
   ]
 }
