@@ -28,6 +28,8 @@ function normalizeLead(input: any) {
     lifecycle_stage: String(input.lifecycle_stage || status.current_stage || input.status || "new"),
     next_action: String(status.next_action || input.nextAction || input.next_action || "Review lead"),
     score: typeof input.score === "number" ? input.score : null,
+    temperature: input.temperature || input.status?.temperature || "cold",
+    conversion_score: input.conversion_score || input.status?.conversion_score || input.score || 0,
     outreach_ready: Boolean(contact.email || input.email || input.send_target || input.message || input.nextMessage),
     queued: Boolean(input.refs?.outreach_queue || input.queued || input.status === "queued"),
     sent: Boolean(engagement.sent || input.sent),
@@ -68,6 +70,7 @@ export async function loadOperatorLeads() {
   }
 
   const leads = Array.from(byId.values());
+  leads.sort((a, b) => (b.conversion_score || b.score || 0) - (a.conversion_score || a.score || 0));
 
   const summary = {
     total_leads: leads.length,

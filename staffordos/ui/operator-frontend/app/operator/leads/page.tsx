@@ -9,6 +9,8 @@ type Lead = {
   lifecycle_stage: string;
   next_action: string;
   score: number | null;
+  temperature?: string;
+  conversion_score?: number;
   outreach_ready: boolean;
   queued: boolean;
   sent: boolean;
@@ -85,7 +87,7 @@ export default async function OperatorLeadsPage() {
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
           <thead>
             <tr style={{ background: "#f5f5f5", textAlign: "left" }}>
-              {["Lead", "Domain", "Email", "Stage", "Next Action", "Score", "Status", "Actions"].map((h) => (
+              {["Lead", "Domain", "Email", "Stage", "Next Action", "Score", "Temp", "Status", "Actions"].map((h) => (
                 <th key={h} style={{ padding: 12, borderBottom: "1px solid #ddd" }}>{h}</th>
               ))}
             </tr>
@@ -109,7 +111,10 @@ export default async function OperatorLeadsPage() {
                   {lead.next_action}
                 </td>
                 <td style={{ padding: 12, borderBottom: "1px solid #eee" }}>
-                  {lead.score ?? "—"}
+                  {lead.conversion_score ?? lead.score ?? "—"}
+                </td>
+                <td style={{ padding: 12, borderBottom: "1px solid #eee", fontWeight: 700 }}>
+                  {(lead.temperature || "cold").toUpperCase()}
                 </td>
                 <td style={{ padding: 12, borderBottom: "1px solid #eee" }}>
                   {lead.sent ? "Sent" : lead.queued ? "Queued" : lead.outreach_ready ? "Ready" : "Blocked"}

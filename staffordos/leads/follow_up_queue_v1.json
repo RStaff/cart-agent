@@ -1,0 +1,26 @@
+{
+  "version": "follow_up_queue_v1",
+  "generated_at": "2026-04-29T17:52:29.392Z",
+  "source": "staffordos/leads/followup_planner_v1.mjs",
+  "count": 1,
+  "items": [
+    {
+      "id": "followup_lead_step5_test_store_myshopify_com",
+      "lead_id": "lead_step5_test_store_myshopify_com",
+      "lead_name": "step5-test-store.myshopify.com",
+      "domain": "step5-test-store.myshopify.com",
+      "email": "rossstafford1@gmail.com",
+      "lifecycle_stage": "pricing_viewed",
+      "temperature": "hot",
+      "conversion_score": 100,
+      "latest_event_at": "2026-04-29T17:50:32.996Z",
+      "status": "needs_review",
+      "generated_at": "2026-04-29T17:52:29.392Z",
+      "priority": "high",
+      "reason": "hot_lead_with_conversion_intent",
+      "channel": "email",
+      "subject": "Quick next step for step5-test-store.myshopify.com",
+      "message": "Hi — I saw you reviewed the ShopiFixer audit/pricing path. The next best step is to lock the first fix, capture the baseline, and start the improvement work."
+    }
+  ]
+}

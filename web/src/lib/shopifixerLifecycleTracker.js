@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { computeShopifixerScore, classifyShopifixerTemperature } from "./shopifixerScoring.js";
 
 function readJson(filePath, fallback) {
   try {
@@ -123,6 +124,21 @@ export function trackShopifixerLifecycle({ repoRoot, store, eventType, metadata 
     payload: { store: domain, metadata },
     created_at: now
   });
+
+  const leadEvents = events.events.filter((event) => event.lead_id === leadId);
+  const conversionScore = computeShopifixerScore(leadEvents, lead);
+  const temperature = classifyShopifixerTemperature(conversionScore);
+
+  lead.score = conversionScore;
+  lead.temperature = temperature;
+  lead.conversion_score = conversionScore;
+  lead.status = {
+    ...(lead.status || {}),
+    temperature,
+    conversion_score: conversionScore
+  };
+
+  registry.items[idx] = lead;
 
   writeJson(registryPath, registry);
   writeJson(eventsPath, events);
