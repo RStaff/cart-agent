@@ -37,3 +37,14 @@ out/
 # OPTIONAL: CACHE
 # =========================
 .cache/
+
+# StaffordOS runtime / generated outputs
+staffordos/system_inventory/output/
+staffordos/system_inventory/runtime_truth_v2.json
+
+# Hygiene outputs
+staffordos/hygiene/output/
+
+# Agent logs
+staffordos/agents/*.json
+
