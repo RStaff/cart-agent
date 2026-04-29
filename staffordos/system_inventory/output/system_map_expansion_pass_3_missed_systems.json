@@ -1,0 +1,389 @@
+{
+  "version": "system_map_expansion_pass_3_missed_systems_v1",
+  "generated_at": "2026-04-29T00:10:16.292Z",
+  "purpose": "Convert missed systems discovery into capability groups that can be merged into the truth graph and eventually rendered in System Map.",
+  "groups": [
+    {
+      "id": "loops",
+      "label": "Control / Worker Loops",
+      "business_value": "Keeps system processes running, checking, or completing work.",
+      "command_center_surface": "Command Center / System Map",
+      "files": [
+        {
+          "path": "staffordos/loop/staffordos_loop_v1.mjs",
+          "exists": true
+        },
+        {
+          "path": "staffordos/loop/STAFFORDOS_LOOP_V1.md",
+          "exists": true
+        },
+        {
+          "path": "staffordos/hygiene/run_hygiene_control_loop.js",
+          "exists": true
+        },
+        {
+          "path": "staffordos/proof_loop/run_merchant_proof_loop_completion_pack.js",
+          "exists": true
+        },
+        {
+          "path": "staffordos/proof_loop/merchant_proof_loop_completion_pack_v1.js",
+          "exists": true
+        },
+        {
+          "path": "web/src/lib/send-worker-loop.js",
+          "exists": true
+        }
+      ],
+      "found_count": 6,
+      "total_count": 6,
+      "status": "REAL"
+    },
+    {
+      "id": "shopifixer_audit",
+      "label": "ShopiFixer Audit / Diagnostic System",
+      "business_value": "Finds storefront issues and creates a paid fix path.",
+      "command_center_surface": "Capacity / Products / Revenue Command",
+      "files": [
+        {
+          "path": "staffordos/connectors/shopifixer_audit_to_outreach_v1.mjs",
+          "exists": true
+        },
+        {
+          "path": "staffordos/scorecards/guidedAuditEngine.js",
+          "exists": true
+        },
+        {
+          "path": "staffordos/scorecards/runAuditResolver.js",
+          "exists": true
+        },
+        {
+          "path": "staffordos/scorecards/verify_guided_audit.js",
+          "exists": true
+        },
+        {
+          "path": "staffordos/scorecards/verify_run_audit.js",
+          "exists": true
+        },
+        {
+          "path": "web/src/routes/runAudit.esm.js",
+          "exists": true
+        },
+        {
+          "path": "web/src/routes/guidedAudit.esm.js",
+          "exists": true
+        },
+        {
+          "path": "abando-frontend/app/run-audit/page.tsx",
+          "exists": true
+        },
+        {
+          "path": "abando-frontend/app/free-audit/page.tsx",
+          "exists": true
+        },
+        {
+          "path": "abando-frontend/app/audit-result/page.tsx",
+          "exists": true
+        },
+        {
+          "path": "abando-frontend/app/api/audit/start/route.ts",
+          "exists": true
+        },
+        {
+          "path": "abando-frontend/app/api/audit/status/route.ts",
+          "exists": true
+        },
+        {
+          "path": "abando-frontend/app/api/audit/preview/[storeId]/route.ts",
+          "exists": true
+        }
+      ],
+      "found_count": 13,
+      "total_count": 13,
+      "status": "REAL"
+    },
+    {
+      "id": "shopifixer_execution",
+      "label": "ShopiFixer Execution / Page Upgrade System",
+      "business_value": "Turns audit findings into actual fixes or upgrade packets.",
+      "command_center_surface": "Capacity / Command Center",
+      "files": [
+        {
+          "path": "staffordos/agents/apply_shopifixer_conversion_v2.mjs",
+          "exists": true
+        },
+        {
+          "path": "staffordos/agents/apply_shopifixer_page_upgrade_v2.mjs",
+          "exists": true
+        },
+        {
+          "path": "staffordos/packets/shopifixer_governed_outreach_packet_v1.json",
+          "exists": true
+        },
+        {
+          "path": "staffordos/packets/shopifixer_page_upgrade_packet_v2.json",
+          "exists": true
+        },
+        {
+          "path": "staffordos/surfaces/staffordmedia_shopifixer_prod_surface_change_packet_v1.json",
+          "exists": true
+        }
+      ],
+      "found_count": 5,
+      "total_count": 5,
+      "status": "REAL"
+    },
+    {
+      "id": "execution_packets",
+      "label": "Execution Packet System",
+      "business_value": "Packages decisions into governed work units.",
+      "command_center_surface": "Command Center",
+      "files": [
+        {
+          "path": "staffordos/optimization/packetTemplates.js",
+          "exists": true
+        },
+        {
+          "path": "staffordos/optimization/executionPacketGenerator.js",
+          "exists": true
+        },
+        {
+          "path": "staffordos/optimization/executionPacketRepository.js",
+          "exists": true
+        },
+        {
+          "path": "staffordos/optimization/verifyExecutionPacketPersistence.js",
+          "exists": true
+        },
+        {
+          "path": "staffordos/optimization/persistExecutionPacket.js",
+          "exists": true
+        },
+        {
+          "path": "staffordos/optimization/executionPacketRegistry.json",
+          "exists": true
+        },
+        {
+          "path": "staffordos/packets/conversion_upgrade_packet_v2.json",
+          "exists": true
+        }
+      ],
+      "found_count": 7,
+      "total_count": 7,
+      "status": "REAL"
+    },
+    {
+      "id": "gates",
+      "label": "Execution / Revenue / Patch Gates",
+      "business_value": "Prevents unsafe execution and validates readiness.",
+      "command_center_surface": "Command Center / System Map",
+      "files": [
+        {
+          "path": "staffordos/gates/revenue_gate_v1.mjs",
+          "exists": true
+        },
+        {
+          "path": "staffordos/system_inventory/patch_gate_v1.mjs",
+          "exists": true
+        },
+        {
+          "path": "staffordos/optimization/paymentGate.js",
+          "exists": true
+        },
+        {
+          "path": "staffordos/hygiene/branch_scope_gate_v1.js",
+          "exists": true
+        },
+        {
+          "path": "staffordos/hygiene/run_branch_scope_gate.js",
+          "exists": true
+        },
+        {
+          "path": "staffordos/hygiene/run_worktree_cleanup_gate.js",
+          "exists": true
+        },
+        {
+          "path": "staffordos/revenue/revenue_gate.js",
+          "exists": true
+        },
+        {
+          "path": "staffordos/revenue/verify_revenue_gate.js",
+          "exists": true
+        },
+        {
+          "path": "web/src/middleware/usageGate.js",
+          "exists": true
+        }
+      ],
+      "found_count": 9,
+      "total_count": 9,
+      "status": "REAL"
+    },
+    {
+      "id": "onboarding",
+      "label": "Onboarding System",
+      "business_value": "Collects client/store setup information for service or app activation.",
+      "command_center_surface": "Capacity / Products",
+      "files": [
+        {
+          "path": "scripts/leads/send_onboarding_message.mjs",
+          "exists": true
+        },
+        {
+          "path": "scripts/patch_onboarding_page.sh",
+          "exists": true
+        },
+        {
+          "path": "web/src/public/onboarding/index.html",
+          "exists": true
+        },
+        {
+          "path": "abando-frontend/src/app_legacy/onboarding/OnboardingForm.tsx",
+          "exists": true
+        },
+        {
+          "path": "abando-frontend/src/app_legacy/onboarding/Client.tsx",
+          "exists": true
+        },
+        {
+          "path": "abando-frontend/src/app_legacy/onboarding/page.tsx",
+          "exists": true
+        }
+      ],
+      "found_count": 6,
+      "total_count": 6,
+      "status": "REAL"
+    },
+    {
+      "id": "recovery",
+      "label": "Abando Recovery System",
+      "business_value": "Recovers abandoned carts and attributes revenue.",
+      "command_center_surface": "Products / Revenue Command / Analytics",
+      "files": [
+        {
+          "path": "staffordos/deploy/check_recovery_link_base.js",
+          "exists": true
+        },
+        {
+          "path": "web/lib/composeRecoveryMessage.js",
+          "exists": true
+        },
+        {
+          "path": "web/src/lib/recoveryAttribution.js",
+          "exists": true
+        },
+        {
+          "path": "web/src/lib/recoveryMessageEngine.js",
+          "exists": true
+        },
+        {
+          "path": "abando-frontend/app/api/abando/activation/trigger-test-recovery/route.ts",
+          "exists": true
+        },
+        {
+          "path": "abando-frontend/src/components/dashboard/RecoveryOpportunityCard.tsx",
+          "exists": true
+        },
+        {
+          "path": "abando-frontend/src/components/RecoveryEntryCta.tsx",
+          "exists": true
+        }
+      ],
+      "found_count": 7,
+      "total_count": 7,
+      "status": "REAL"
+    },
+    {
+      "id": "routers",
+      "label": "Routing System",
+      "business_value": "Routes leads, stores, tasks, or actions to the correct workflow.",
+      "command_center_surface": "System Map / Command Center",
+      "files": [
+        {
+          "path": "staffordos/leads/router.js",
+          "exists": true
+        },
+        {
+          "path": "staffordos/router/router_v1_real_store_worksheet.mjs",
+          "exists": true
+        },
+        {
+          "path": "staffordos/router/router_v1_harness.mjs",
+          "exists": true
+        },
+        {
+          "path": "staffordos/router/router_v1_1.js",
+          "exists": true
+        },
+        {
+          "path": "staffordos/router/router_v1.js",
+          "exists": true
+        }
+      ],
+      "found_count": 5,
+      "total_count": 5,
+      "status": "REAL"
+    },
+    {
+      "id": "execution_control",
+      "label": "Execution Control System",
+      "business_value": "Determines allowed automation scope and execution mode.",
+      "command_center_surface": "Command Center",
+      "files": [
+        {
+          "path": "staffordos/execution/verifyExecutionControl.js",
+          "exists": true
+        },
+        {
+          "path": "staffordos/execution/automationScope.js",
+          "exists": true
+        },
+        {
+          "path": "staffordos/execution/resolveExecutionMode.js",
+          "exists": true
+        },
+        {
+          "path": "staffordos/agents/execution_driver_v1.mjs",
+          "exists": true
+        }
+      ],
+      "found_count": 4,
+      "total_count": 4,
+      "status": "REAL"
+    },
+    {
+      "id": "legacy_command_center",
+      "label": "Legacy / Earlier Command Center Surfaces",
+      "business_value": "Older UI assets that may contain useful UX or state patterns.",
+      "command_center_surface": "System Map / Command Center",
+      "files": [
+        {
+          "path": "staffordos/ui/command-center/styles.css",
+          "exists": true
+        },
+        {
+          "path": "staffordos/ui/command-center/app.js",
+          "exists": true
+        },
+        {
+          "path": "staffordos/ui/operator-frontend/app/api/operator/ross-command-center/route.ts",
+          "exists": true
+        },
+        {
+          "path": "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx",
+          "exists": true
+        },
+        {
+          "path": "abando-frontend/src/app_legacy/command-center/StatusPanel.tsx",
+          "exists": true
+        },
+        {
+          "path": "abando-frontend/src/app_legacy/command-center/page.tsx",
+          "exists": true
+        }
+      ],
+      "found_count": 6,
+      "total_count": 6,
+      "status": "REAL"
+    }
+  ]
+}
