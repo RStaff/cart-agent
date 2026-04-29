@@ -424,6 +424,45 @@
         }
       },
       "created_at": "2026-04-29T17:31:28.388Z"
+    },
+    {
+      "id": "event_lead_step5_test_store_myshopify_com_1777484644560",
+      "lead_id": "lead_step5_test_store_myshopify_com",
+      "event_type": "audit_result_viewed",
+      "source": "staffordmedia_shopifixer",
+      "payload": {
+        "store": "step5-test-store.myshopify.com",
+        "metadata": {
+          "source": "email_click"
+        }
+      },
+      "created_at": "2026-04-29T17:44:04.558Z"
+    },
+    {
+      "id": "event_lead_step5_test_store_myshopify_com_1777485032998",
+      "lead_id": "lead_step5_test_store_myshopify_com",
+      "event_type": "pricing_viewed",
+      "source": "staffordmedia_shopifixer",
+      "payload": {
+        "store": "step5-test-store.myshopify.com",
+        "metadata": {
+          "source": "step8_scoring_test"
+        }
+      },
+      "created_at": "2026-04-29T17:50:32.996Z"
+    },
+    {
+      "id": "event_lead_step5_test_store_myshopify_com_hot_followup_auto_sent_1777486986568",
+      "lead_id": "lead_step5_test_store_myshopify_com",
+      "event_type": "hot_followup_auto_sent",
+      "source": "staffordos_hot_followup_auto_sender",
+      "payload": {
+        "followup_id": "followup_lead_step5_test_store_myshopify_com",
+        "provider": "resend",
+        "provider_id": "ef452a1f-00e8-4085-87f5-c4abc24e2b36",
+        "email_present": true
+      },
+      "created_at": "2026-04-29T18:23:06.193Z"
     }
   ]
 }

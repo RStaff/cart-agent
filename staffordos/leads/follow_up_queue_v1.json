@@ -1,6 +1,6 @@
 {
   "version": "follow_up_queue_v1",
-  "generated_at": "2026-04-29T17:52:29.392Z",
+  "generated_at": "2026-04-29T18:23:06.193Z",
   "source": "staffordos/leads/followup_planner_v1.mjs",
   "count": 1,
   "items": [
@@ -14,13 +14,16 @@
       "temperature": "hot",
       "conversion_score": 100,
       "latest_event_at": "2026-04-29T17:50:32.996Z",
-      "status": "needs_review",
-      "generated_at": "2026-04-29T17:52:29.392Z",
+      "status": "sent",
+      "generated_at": "2026-04-29T18:01:48.412Z",
       "priority": "high",
       "reason": "hot_lead_with_conversion_intent",
       "channel": "email",
       "subject": "Quick next step for step5-test-store.myshopify.com",
-      "message": "Hi — I saw you reviewed the ShopiFixer audit/pricing path. The next best step is to lock the first fix, capture the baseline, and start the improvement work."
+      "message": "Hi — I saw you reviewed the ShopiFixer audit/pricing path. The next best step is to lock the first fix, capture the baseline, and start the improvement work.",
+      "sent_at": "2026-04-29T18:23:06.193Z",
+      "provider": "resend",
+      "provider_id": "ef452a1f-00e8-4085-87f5-c4abc24e2b36"
     }
   ]
 }

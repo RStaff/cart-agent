@@ -1,7 +1,7 @@
 {
   "version": "lead_registry_v1",
   "schema": "canonical_lead_registry_v1",
-  "normalized_at": "2026-04-29T17:31:28.388Z",
+  "normalized_at": "2026-04-29T17:50:32.996Z",
   "source": "staffordmedia_shopifixer_inbound",
   "items": [
     {
@@ -12,13 +12,15 @@
       "product": "shopifixer",
       "product_surface": "staffordmedia_shopifixer",
       "source": "staffordmedia",
-      "lifecycle_stage": "onboarding_started",
+      "lifecycle_stage": "followup_sent",
       "status": {
-        "current_stage": "onboarding_started",
-        "current_bottleneck": "delivery",
-        "next_action": "Begin fix intake and capture baseline"
+        "current_stage": "followup_sent",
+        "current_bottleneck": "reply",
+        "next_action": "Wait for reply or track next click",
+        "temperature": "hot",
+        "conversion_score": 100
       },
-      "score": 0,
+      "score": 100,
       "contact": {
         "email": "rossstafford1@gmail.com",
         "confidence": "submitted_by_visitor"
@@ -29,7 +31,7 @@
         "replied": false,
         "approved_for_send": false,
         "dry_run_ready": false,
-        "sent": false,
+        "sent": true,
         "onboarding_started": true
       },
       "routing": {
@@ -57,7 +59,9 @@
       "problem_summary": null,
       "runtime_source": "web/src/index.js:/api/fix-audit",
       "created_at": "2026-04-29T17:26:23.137Z",
-      "updated_at": "2026-04-29T17:31:28.388Z"
+      "updated_at": "2026-04-29T18:23:06.193Z",
+      "temperature": "hot",
+      "conversion_score": 100
     },
     {
       "id": "lead_fitgearpro_myshopify_com",
