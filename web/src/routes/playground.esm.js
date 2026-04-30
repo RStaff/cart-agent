@@ -78,7 +78,8 @@ export function installPlayground(app) {
       '</div>',
       '<footer class="small" style="opacity:.6;margin-top:18px">© <span id="y"></span> Abando™</footer>',
       '<script>document.getElementById("y").textContent=(new Date()).getFullYear()</script>',
-      '<script src="/demo/playground.js" defer></script>'
+      '<script src="/demo/playground.js" defer></script>',
+      '<script src="/demo/recovery-proof.js" defer></script>'
     ].join('');
     res.status(200).type('html').send(page({ title: 'Abando – Playground', body }));
   });
