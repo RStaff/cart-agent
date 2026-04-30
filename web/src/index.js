@@ -15,6 +15,9 @@ import { installGuidedAuditRoute } from "./routes/guidedAudit.esm.js";
 import { installSmcAlign } from "./smc-align.js";
 import { upsertShopifixerLead } from "./lib/shopifixerLeadRegistry.js";
 import { trackShopifixerLifecycle } from "./lib/shopifixerLifecycleTracker.js";
+import checkoutPublic from "./checkout-public.js";
+import { installPlayground } from "./routes/playground.esm.js";
+import { installAskAbandoRoute } from "./routes/askAbando.esm.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, "..", "..");
@@ -186,6 +189,23 @@ app.disable("x-powered-by");
 app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 
+// Execute public checkout installer (source-of-truth)
+checkoutPublic(app);
+
+
+// Public checkout money path — mounted only after source-of-truth audit.
+
+
+
+
+
+// ===== ABANDO RECOVERY / PLAYGROUND ROUTES =====
+// Source of truth: web/src/routes/playground.esm.js
+installPlayground(app);
+
+// Ask Abando API route
+installAskAbandoRoute(app);
+
 app.get("/", (_req, res) => {
   res.status(200).json({ ok: true, service: "cart-agent-api", route: "/" });
 });
@@ -249,6 +269,35 @@ app.get("/api/fix-audit", async (req, res) => {
   }
 });
 
+
+
+app.get("/api/shopifixer/track-redirect", async (req, res) => {
+  try {
+    const store = normalizeStoreInput(req.query.store);
+    const eventType = String(req.query.eventType || "").trim();
+
+    const result = trackShopifixerLifecycle({
+      repoRoot,
+      store,
+      eventType,
+      metadata: { source: "email_click" }
+    });
+
+    // redirect mapping
+    let redirectPath = "/";
+
+    if (eventType === "audit_result_viewed") {
+      redirectPath = `/audit-result?store=${store}`;
+    } else if (eventType === "pricing_viewed") {
+      redirectPath = `/pricing?store=${store}`;
+    }
+
+    return res.redirect(302, redirectPath);
+  } catch (error) {
+    console.error("[track-redirect] error:", error);
+    return res.redirect(302, "/");
+  }
+});
 
 app.post("/api/shopifixer/track", async (req, res) => {
   try {
@@ -339,6 +388,8 @@ app.get("/operator/send-console", (req, res) => {
 });
 
 installGuidedAuditRoute(app);
+
+
 
 app.listen(port, () => {
   console.log(`[server] listening on :${port}`);
