@@ -3,7 +3,7 @@ set -euo pipefail
 ATTEMPTS=${ATTEMPTS:-20}
 SLEEP=${SLEEP:-5}
 
-echo "[migrate] waiting for DB: $DATABASE_URL"
+echo "[migrate] waiting for DB: DATABASE_URL is set"
 for i in $(seq 1 "$ATTEMPTS"); do
   if npx prisma migrate deploy --schema=prisma/schema.prisma; then
     echo "[migrate] success"

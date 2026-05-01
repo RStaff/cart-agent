@@ -4,7 +4,7 @@ set -euo pipefail
 if [[ -z "${DATABASE_URL:-}" ]]; then
   echo "❌ DATABASE_URL is not set."
   echo "   Export your Render Postgres URL, e.g.:"
-  echo "   export DATABASE_URL='postgres://user:pass@host:port/dbname'"
+  echo "   export DATABASE_URL=[REDACTED]"
   exit 1
 fi
 

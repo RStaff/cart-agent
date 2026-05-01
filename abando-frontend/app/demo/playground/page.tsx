@@ -97,6 +97,51 @@ export default function DemoPlaygroundPage() {
   const [activeDayId, setActiveDayId] = useState<Day["id"]>("sat");
   const activeDay = DAYS.find((d) => d.id === activeDayId) ?? DAYS[0];
 
+  const [recoveryChannel, setRecoveryChannel] = useState<"email" | "sms">("email");
+  const [recoveryTarget, setRecoveryTarget] = useState("rossstafford1@gmail.com");
+  const [recoveryBusy, setRecoveryBusy] = useState(false);
+  const [recoveryError, setRecoveryError] = useState("");
+  const [recoveryProof, setRecoveryProof] = useState<any>(null);
+
+  async function runRecoveryProof() {
+    setRecoveryBusy(true);
+    setRecoveryError("");
+    setRecoveryProof(null);
+
+    const apiBase =
+      process.env.NEXT_PUBLIC_ABANDO_PROOF_API_BASE ||
+      process.env.NEXT_PUBLIC_ABANDO_API_BASE ||
+      "https://pay.abando.ai";
+
+    const payload = {
+      shop: "demo-shop.myshopify.com",
+      email: recoveryChannel === "email" ? recoveryTarget : "",
+      phone: recoveryChannel === "sms" ? recoveryTarget : "",
+      channel: recoveryChannel,
+      experienceId: `polished-demo-${Date.now()}`
+    };
+
+    try {
+      const response = await fetch(`${apiBase.replace(/\/$/, "")}/api/recovery-actions/send-live-test`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok || !data?.ok) {
+        throw new Error(data?.error || data?.status || `Recovery proof failed with HTTP ${response.status}`);
+      }
+
+      setRecoveryProof(data);
+    } catch (error: any) {
+      setRecoveryError(error?.message || "Recovery proof failed.");
+    } finally {
+      setRecoveryBusy(false);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-slate-950 text-slate-50">
       {/* HERO */}
@@ -288,6 +333,88 @@ export default function DemoPlaygroundPage() {
               account, this roll-up ties directly to your real recovered
               orders.
             </p>
+          </div>
+
+          <div className="mt-8 rounded-3xl border border-sky-400/40 bg-sky-500/10 p-6 shadow-[0_0_55px_rgba(56,189,248,0.28)] lg:p-8">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-sky-300">
+              Live recovery proof
+            </p>
+
+            <h3 className="mt-3 text-xl font-semibold tracking-tight text-white">
+              Send the recovery message to yourself.
+            </h3>
+
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-300">
+              This connects the polished demo to the real Abando recovery sender. Choose email or SMS, send the proof,
+              and see the exact message Abando generated for the recovery loop.
+            </p>
+
+            <div className="mt-6 grid gap-3 md:grid-cols-[140px_minmax(0,1fr)_auto]">
+              <select
+                value={recoveryChannel}
+                onChange={(event) => setRecoveryChannel(event.target.value as "email" | "sms")}
+                className="rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm font-semibold text-white outline-none"
+              >
+                <option value="email">Email</option>
+                <option value="sms">SMS</option>
+              </select>
+
+              <input
+                value={recoveryTarget}
+                onChange={(event) => setRecoveryTarget(event.target.value)}
+                placeholder={recoveryChannel === "email" ? "you@store.com" : "+15555555555"}
+                className="rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm font-semibold text-white outline-none placeholder:text-slate-500"
+              />
+
+              <button
+                type="button"
+                onClick={runRecoveryProof}
+                disabled={recoveryBusy || !recoveryTarget.trim()}
+                className="rounded-2xl bg-white px-5 py-3 text-sm font-black text-slate-950 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {recoveryBusy ? "Sending..." : "Send recovery proof"}
+              </button>
+            </div>
+
+            {recoveryError ? (
+              <div className="mt-5 rounded-2xl border border-red-400/30 bg-red-500/10 p-4 text-sm font-semibold text-red-200">
+                {recoveryError}
+              </div>
+            ) : null}
+
+            {recoveryProof ? (
+              <div className="mt-6 grid gap-4 lg:grid-cols-3">
+                <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-emerald-300">Status</p>
+                  <p className="mt-2 text-sm font-black text-white">{recoveryProof.status || "SEND_COMPLETE"}</p>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400">Provider</p>
+                  <p className="mt-2 text-sm font-black text-white">
+                    {recoveryProof.sends?.[0]?.provider || recoveryChannel}
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400">Target</p>
+                  <p className="mt-2 break-all text-sm font-black text-white">
+                    {recoveryProof.sends?.[0]?.to || recoveryTarget}
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-4 lg:col-span-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400">
+                    Recovery message
+                  </p>
+                  <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-200">
+                    {recoveryChannel === "sms"
+                      ? recoveryProof.recovery_message?.smsText
+                      : recoveryProof.recovery_message?.emailBody}
+                  </p>
+                </div>
+              </div>
+            ) : null}
           </div>
 
           {/* Pills for each day */}

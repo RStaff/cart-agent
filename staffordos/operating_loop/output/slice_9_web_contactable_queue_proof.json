@@ -1,0 +1,55 @@
+{
+  "slice_id": "web_contactable_queue_proof",
+  "generated_at": "2026-05-01T00:36:44.617465+00:00",
+  "ok": true,
+  "queue_count": 15,
+  "web_contactable_count": 15,
+  "sample": [
+    {
+      "id": "lead_04826b2d41a8",
+      "name": "yxengine",
+      "score": 0,
+      "status": "new",
+      "nextAction": "send_initial_outreach",
+      "channel": "web",
+      "sendTarget": "https://github.com/Shopify/cli/issues/5698",
+      "message": "Hey yxengine \u2014 saw your issue about a Shopify app dev issue.\n\nI\u2019ve been fixing a lot of Shopify app dev problems like this lately, especially around tunnels, preview URLs, and embedded apps not loading.\n\nIf you want, I can take a quick look and help you get it stable.",
+      "offerTrigger": "after_reply",
+      "priorityRank": 1,
+      "issueTitle": null,
+      "source": "unknown",
+      "generatedAt": "2026-05-01T00:30:00.302Z"
+    },
+    {
+      "id": "lead_260c01e80ad4",
+      "name": "nboliver-ventureweb",
+      "score": 0,
+      "status": "new",
+      "nextAction": "send_initial_outreach",
+      "channel": "web",
+      "sendTarget": "https://github.com/barrel/shopify-vite/issues/238",
+      "message": "Hey nboliver-ventureweb \u2014 saw your issue about a Shopify app dev issue.\n\nI\u2019ve been fixing a lot of Shopify app dev problems like this lately, especially around tunnels, preview URLs, and embedded apps not loading.\n\nIf you want, I can take a quick look and help you get it stable.",
+      "offerTrigger": "after_reply",
+      "priorityRank": 2,
+      "issueTitle": null,
+      "source": "unknown",
+      "generatedAt": "2026-05-01T00:30:00.304Z"
+    },
+    {
+      "id": "lead_52c0b97afddf",
+      "name": "sidhs",
+      "score": 0,
+      "status": "new",
+      "nextAction": "send_initial_outreach",
+      "channel": "web",
+      "sendTarget": "https://github.com/microsoft/vscode/issues/311862",
+      "message": "Hey sidhs \u2014 saw your issue about a Shopify app dev issue.\n\nI\u2019ve been fixing a lot of Shopify app dev problems like this lately, especially around tunnels, preview URLs, and embedded apps not loading.\n\nIf you want, I can take a quick look and help you get it stable.",
+      "offerTrigger": "after_reply",
+      "priorityRank": 3,
+      "issueTitle": null,
+      "source": "unknown",
+      "generatedAt": "2026-05-01T00:30:00.304Z"
+    }
+  ],
+  "rule": "No provider send. Proof only. Queue has web-contactable targets."
+}

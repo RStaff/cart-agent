@@ -5,10 +5,7 @@ export async function GET() {
   try {
     const data = await loadOperatorLeads();
 
-    return NextResponse.json({
-      ok: true,
-      ...data
-    });
+    return NextResponse.json(data);
   } catch (err: any) {
     return NextResponse.json({
       ok: false,

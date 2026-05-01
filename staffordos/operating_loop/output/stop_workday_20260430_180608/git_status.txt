@@ -1,0 +1,14 @@
+ M scripts/create_events_table.sh
+ M scripts/migrations_make.sh
+ M scripts/test_unified_events.sh
+ M staffordos/leads/hot_followup_auto_sender_v1.mjs
+ M staffordos/ui/operator-frontend/app/api/proof/abando-recovery/run/route.ts
+ M staffordos/ui/operator-frontend/next-env.d.ts
+ M web/scripts/prisma-wait-and-migrate.sh
+ M web/src/index.js
+ M web/src/jobs/worker.js
+?? staffordos/operating_loop/
+?? staffordos/system_inventory/abando_canonical_proof_path_map_v1.mjs
+?? staffordos/system_inventory/scheduler/
+?? web/src/lib/recoveryLedger.js
+?? web/src/routes/recoveryLedger.esm.js

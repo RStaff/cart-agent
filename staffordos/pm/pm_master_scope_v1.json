@@ -1,0 +1,100 @@
+{
+  "artifact": "pm_master_scope_v1",
+  "status": "active",
+  "created_at": "2026-05-01T13:46:43.032877+00:00",
+  "owner": "Ross Stafford",
+  "role": "PM Agent canonical scope brain",
+  "primary_objective": "Turn StaffordOS into a truth-bound operating system that helps Ross move from idea to verified revenue-producing execution with less rework.",
+  "current_business_priority": {
+    "priority_1": "Stabilize and publish the correct Stafford Media / ShopiFixer revenue path",
+    "priority_2": "Use StaffordOS to manage leads, outreach, proof, and execution slices",
+    "priority_3": "Prepare ShopiFixer as a client-facing rapid diagnosis and fix service",
+    "priority_4": "Keep Abando as the recovery system that follows after diagnosis and fix path clarity"
+  },
+  "approved_operating_model": {
+    "operator": "Ross makes decisions only",
+    "pm_agent": "Defines objectives, requirements, work packets, and slice boundaries",
+    "architect_agent": "Chooses safest technical approach based on truth artifacts and current code shape",
+    "shape_finder": "Finds real files, routes, JSX, assets, and surrounding code before patching",
+    "executor_agent": "Patches only approved blocks",
+    "verifier_agent": "Builds, tests routes, captures screenshot/runtime proof",
+    "truth_binder": "Writes verified result back to slice registry, system map, and proof artifacts"
+  },
+  "canonical_truth_inputs": {
+    "system_map_manifest": "staffordos/system_inventory/output/system_map_ui_input_manifest_v1.json",
+    "system_map_slice_truth": "staffordos/system_inventory/output/system_map_slice_truth_v1.json",
+    "slice_registry": "staffordos/slices/slice_registry.json",
+    "slice_verification_report": "staffordos/slices/slice_verification_report.json",
+    "operator_lock": "staffordos/slices/operator_lock_state.json",
+    "lead_registry": "staffordos/leads/lead_registry_v1.json",
+    "execution_proof_register": "staffordos/system_inventory/output/execution_proof_register_v1.json"
+  },
+  "current_projects": [
+    {
+      "project_id": "staffordmedia_shopifixer_live_path",
+      "name": "Stafford Media / ShopiFixer Live Revenue Path",
+      "goal": "Make the correct StaffordMedia site live with clear ShopiFixer audit, result, pricing, and Abando recovery routing.",
+      "status": "active",
+      "required_outputs": [
+        "Correct homepage hero and CTA path",
+        "Working /shopifixer form",
+        "Working /shopifixer/result summary page",
+        "Working /audit-result full review page",
+        "Working /pricing checkout path",
+        "Clear Abando recovery positioning"
+      ]
+    },
+    {
+      "project_id": "staffordos_operator_system",
+      "name": "StaffordOS Operator System",
+      "goal": "Use slices, locks, verification, and system map truth to prevent drift and rework.",
+      "status": "active",
+      "required_outputs": [
+        "PM Master Scope",
+        "Architect Intake Contract",
+        "Slice Registry",
+        "Verifier",
+        "Operator Lock",
+        "System Map truth binding"
+      ]
+    },
+    {
+      "project_id": "shopifixer_client_service_pack",
+      "name": "ShopiFixer Client Service Pack",
+      "goal": "Turn ShopiFixer into a service package that diagnoses a client's Shopify issue, scopes a fix, verifies the result, and creates a proof artifact.",
+      "status": "planned",
+      "required_outputs": [
+        "Client intake",
+        "Audit result",
+        "Fix recommendation",
+        "Work packet",
+        "Slice-based execution",
+        "Verification proof"
+      ]
+    },
+    {
+      "project_id": "lead_outreach_system",
+      "name": "Lead and Outreach System",
+      "goal": "Use lead registry, send queue, and manual/controlled outreach proof to create a real path to first sale.",
+      "status": "active_after_site_path_verified",
+      "required_outputs": [
+        "Lead registry",
+        "Qualified queue",
+        "Message preview",
+        "Manual/send-safe outreach",
+        "Response tracking",
+        "Revenue opportunity log"
+      ]
+    }
+  ],
+  "pm_rules": [
+    "Do not create new work if an active blocker exists.",
+    "Do not patch code before Shape Finder identifies the true owner file.",
+    "Do not let Executor decide scope.",
+    "Do not let Architect mutate files.",
+    "Do not promote UI state beyond verified proof.",
+    "Every slice must have an objective, owner, output proof, and verification method.",
+    "System Map is the authority for current operational truth."
+  ],
+  "next_recommended_step": "Create Architect Intake Contract v1 connected to PM Master Scope and System Map truth."
+}

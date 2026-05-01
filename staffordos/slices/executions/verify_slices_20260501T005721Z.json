@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "status": "EXECUTED",
+  "slice_command": "verify_slices",
+  "command": [
+    "python3",
+    "staffordos/slices/verify_slices_v1.py"
+  ],
+  "returncode": 0,
+  "started_at": "2026-05-01T00:57:21.346332+00:00",
+  "completed_at": "2026-05-01T00:57:21.378859+00:00",
+  "stdout": "{\n  \"ok\": true,\n  \"total\": 3,\n  \"verified\": 2,\n  \"failed\": 1,\n  \"results\": [\n    {\n      \"slice_id\": \"slice_5_send_simulation_proof\",\n      \"proof\": \"staffordos/operating_loop/output/slice_5_send_simulation_proof.json\",\n      \"status\": \"failed\",\n      \"reason\": \"ok_not_true\"\n    },\n    {\n      \"slice_id\": \"slice_9_web_contactable_queue_proof\",\n      \"proof\": \"staffordos/operating_loop/output/slice_9_web_contactable_queue_proof.json\",\n      \"status\": \"verified\",\n      \"reason\": \"ok_true\"\n    },\n    {\n      \"slice_id\": \"slice_10_send_execution_simulation\",\n      \"proof\": \"staffordos/operating_loop/output/slice_10_send_execution_log.json\",\n      \"status\": \"verified\",\n      \"reason\": \"ok_true\"\n    }\n  ]\n}\n",
+  "stderr": "",
+  "proof": "staffordos/slices/executions/verify_slices_20260501T005721Z.json"
+}

@@ -1,0 +1,26 @@
+{
+  "ok": true,
+  "total": 3,
+  "verified": 3,
+  "failed": 0,
+  "results": [
+    {
+      "slice_id": "slice_5_send_simulation_proof",
+      "proof": "staffordos/operating_loop/output/slice_5_send_simulation_proof.json",
+      "status": "verified",
+      "reason": "ok_true"
+    },
+    {
+      "slice_id": "slice_9_web_contactable_queue_proof",
+      "proof": "staffordos/operating_loop/output/slice_9_web_contactable_queue_proof.json",
+      "status": "verified",
+      "reason": "ok_true"
+    },
+    {
+      "slice_id": "slice_10_send_execution_simulation",
+      "proof": "staffordos/operating_loop/output/slice_10_send_execution_log.json",
+      "status": "verified",
+      "reason": "ok_true"
+    }
+  ]
+}

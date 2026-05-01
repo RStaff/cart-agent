@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "generated_at": "2026-05-01T01:30:12.575182+00:00",
+  "active_slice": null,
+  "reason": "NO_BLOCKERS_ALL_VERIFIED",
+  "rules": [
+    "Operator may only act on active_slice",
+    "No new slice creation if failed slice exists",
+    "All slices must produce proof < 1MB",
+    "System Map truth is source of authority"
+  ]
+}

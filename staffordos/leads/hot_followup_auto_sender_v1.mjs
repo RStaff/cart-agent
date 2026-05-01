@@ -94,7 +94,7 @@ for (const item of items) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      from: DEFAULT_FROM,
+      from: SHOPIFIXER_FROM_EMAIL,
       to: item.email,
       subject: item.subject,
       html

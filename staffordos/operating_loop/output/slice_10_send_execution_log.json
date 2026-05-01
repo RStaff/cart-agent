@@ -1,0 +1,42 @@
+{
+  "slice_id": "send_execution_simulation",
+  "generated_at": "2026-05-01T00:38:24.466323+00:00",
+  "ok": true,
+  "simulated_count": 3,
+  "executions": [
+    {
+      "execution_id": "f2d75d6e-ef09-41c4-8526-75f35a978435",
+      "timestamp": "2026-05-01T00:38:24.466070+00:00",
+      "lead_id": "lead_04826b2d41a8",
+      "name": "yxengine",
+      "channel": "web",
+      "target": "https://github.com/Shopify/cli/issues/5698",
+      "message_preview": "Hey yxengine \u2014 saw your issue about a Shopify app dev issue.\n\nI\u2019ve been fixing a lot of Shopify app dev problems like th",
+      "status": "SIMULATED_SENT",
+      "mode": "NO_PROVIDER_CALL"
+    },
+    {
+      "execution_id": "d2097e8c-53b6-470c-ab15-32a81dcf1960",
+      "timestamp": "2026-05-01T00:38:24.466312+00:00",
+      "lead_id": "lead_260c01e80ad4",
+      "name": "nboliver-ventureweb",
+      "channel": "web",
+      "target": "https://github.com/barrel/shopify-vite/issues/238",
+      "message_preview": "Hey nboliver-ventureweb \u2014 saw your issue about a Shopify app dev issue.\n\nI\u2019ve been fixing a lot of Shopify app dev probl",
+      "status": "SIMULATED_SENT",
+      "mode": "NO_PROVIDER_CALL"
+    },
+    {
+      "execution_id": "b44e50cd-499c-41d5-a996-8221cd772b51",
+      "timestamp": "2026-05-01T00:38:24.466321+00:00",
+      "lead_id": "lead_52c0b97afddf",
+      "name": "sidhs",
+      "channel": "web",
+      "target": "https://github.com/microsoft/vscode/issues/311862",
+      "message_preview": "Hey sidhs \u2014 saw your issue about a Shopify app dev issue.\n\nI\u2019ve been fixing a lot of Shopify app dev problems like this ",
+      "status": "SIMULATED_SENT",
+      "mode": "NO_PROVIDER_CALL"
+    }
+  ],
+  "rule": "Simulation only. No external send."
+}

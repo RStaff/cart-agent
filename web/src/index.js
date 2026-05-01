@@ -18,6 +18,7 @@ import { trackShopifixerLifecycle } from "./lib/shopifixerLifecycleTracker.js";
 import checkoutPublic from "./checkout-public.js";
 import { installPlayground } from "./routes/playground.esm.js";
 import { installAskAbandoRoute } from "./routes/askAbando.esm.js";
+import { installRecoveryLedgerRoute } from './routes/recoveryLedger.esm.js';
 import { installRecoveryLiveTestRoute } from "./routes/recoveryLiveTest.esm.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -207,6 +208,7 @@ installPlayground(app);
 // Ask Abando API route
 installAskAbandoRoute(app);
 installRecoveryLiveTestRoute(app, { repoRoot });
+installRecoveryLedgerRoute(app);
 
 app.get("/", (_req, res) => {
   res.status(200).json({ ok: true, service: "cart-agent-api", route: "/" });

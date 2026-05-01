@@ -1,0 +1,95 @@
+import { headers } from "next/headers";
+
+type PageProps = {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
+
+function first(v: string | string[] | undefined): string {
+  return Array.isArray(v) ? v[0] || "" : v || "";
+}
+
+async function getProof(shop: string, eid: string) {
+  const h = await headers();
+  const host = h.get("x-forwarded-host") || h.get("host") || "localhost:3000";
+  const proto = h.get("x-forwarded-proto") || "http";
+  const origin = `${proto}://${host}`;
+
+  try {
+    const res = await fetch(
+      `${origin}/api/abando/merchant-summary?shop=${encodeURIComponent(shop)}`,
+      { cache: "no-store" }
+    );
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+export default async function ExperiencePage({ searchParams }: PageProps) {
+  const params = (await searchParams) || {};
+  const shop = first(params.shop) || "mvp-recovery-proof.myshopify.com";
+  const eid = first(params.eid) || "proof-audit-1";
+
+  const data = await getProof(shop, eid);
+
+  const returned = Boolean(data?.lastCustomerReturnAt);
+  const revenue =
+    data?.value?.recoveredRevenueLabel ||
+    (data?.value?.recoveredRevenueCents
+      ? `$${(data.value.recoveredRevenueCents / 100).toFixed(2)}`
+      : "$0");
+
+  return (
+    <main className="min-h-screen bg-black text-white p-6">
+      <div className="max-w-xl mx-auto">
+
+        <h1 className="text-4xl font-bold mb-4">
+          {returned ? "Return detected" : "Connected to your store"}
+        </h1>
+
+        <p className="mb-6 text-gray-300">
+          {returned
+            ? "Abando detected a real shopper return."
+            : "Send a recovery and watch the loop complete."}
+        </p>
+
+        <div className="border p-4 rounded mb-6">
+          <div className="text-sm text-gray-400">Recovered revenue</div>
+          <div className="text-3xl font-bold">{revenue}</div>
+        </div>
+
+        {!returned && (
+          <form
+            action="/api/recovery-actions/send-live-test"
+            method="POST"
+            className="mb-4"
+          >
+            <input type="hidden" name="shop" value={shop} />
+            <input type="hidden" name="experienceId" value={eid} />
+
+            <input
+              name="email"
+              placeholder="Enter your email"
+              className="w-full p-3 rounded text-black mb-3"
+            />
+
+            <button className="w-full bg-white text-black p-3 rounded font-bold">
+              Send recovery to myself
+            </button>
+          </form>
+        )}
+
+        {returned && (
+          <a
+            href="/merchant"
+            className="block w-full text-center bg-white text-black p-3 rounded font-bold"
+          >
+            Start paid plan
+          </a>
+        )}
+
+      </div>
+    </main>
+  );
+}

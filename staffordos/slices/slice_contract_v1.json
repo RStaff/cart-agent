@@ -1,0 +1,18 @@
+{
+  "description": "Canonical definition of a StaffordOS slice",
+  "fields": {
+    "slice_id": "string",
+    "goal": "string",
+    "input": "string",
+    "action": "string",
+    "output_proof": "string (file path)",
+    "done_definition": "string"
+  },
+  "rules": [
+    "No slice runs without writing proof",
+    "Proof must be under 1MB",
+    "No external side effects unless explicitly allowed",
+    "Slice must be independently executable",
+    "Slice must be verifiable by system"
+  ]
+}

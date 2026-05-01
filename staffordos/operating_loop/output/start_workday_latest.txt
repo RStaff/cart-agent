@@ -1,0 +1,71 @@
+=== DATE ===
+Thu Apr 30 18:16:31 EDT 2026
+
+=== GIT STATUS ===
+ M scripts/create_events_table.sh
+ M scripts/migrations_make.sh
+ M scripts/test_unified_events.sh
+ M staffordos/leads/hot_followup_auto_sender_v1.mjs
+ M staffordos/ui/operator-frontend/app/api/proof/abando-recovery/run/route.ts
+ M web/scripts/prisma-wait-and-migrate.sh
+ M web/src/index.js
+ M web/src/jobs/worker.js
+?? staffordos/operating_loop/
+?? staffordos/system_inventory/abando_canonical_proof_path_map_v1.mjs
+?? staffordos/system_inventory/scheduler/
+?? staffordos/ui/operator-frontend/app/api/operator/cron-status/
+?? staffordos/ui/operator-frontend/app/api/operator/discovery-status/
+?? staffordos/ui/operator-frontend/app/api/operator/workday/
+?? staffordos/ui/operator-frontend/app/operator/cockpit/
+?? web/src/lib/recoveryLedger.js
+?? web/src/routes/recoveryLedger.esm.js
+
+=== CURRENT BRANCH ===
+main
+
+=== RUNTIME CHECK ===
+200
+{"ok":true,"service":"cart-agent-api"}
+=== PLAYGROUND CHECK ===
+200
+=== EXISTING GOVERNANCE ARTIFACTS ===
+-rw-r--r--   1 rossstafford  staff   2.3K Apr 28 19:07 data_ownership_matrix_v1.md
+-rw-r--r--   1 rossstafford  staff   939B Apr 28 21:41 discovery_sync_manifest_v1.json
+-rw-r--r--   1 rossstafford  staff   510B Apr 28 21:41 discovery_sync_manifest_v1.md
+-rw-r--r--   1 rossstafford  staff   1.2K Apr 30 18:15 discovery_sync_runner_status_v1.json
+-rw-r--r--   1 rossstafford  staff   869B Apr 30 18:15 discovery_sync_runner_status_v1.md
+-rw-r--r--   1 rossstafford  staff   5.5M Apr 30 16:19 execution_governance_audit_v1.txt
+-rw-r--r--   1 rossstafford  staff    18K Apr 29 15:12 execution_proof_register_pass_5_rebound_v1.json
+-rw-r--r--   1 rossstafford  staff    16K Apr 28 21:59 execution_proof_register_v1.json
+-rw-r--r--   1 rossstafford  staff   1.9K Apr 28 21:59 execution_proof_register_v1.md
+drwxr-xr-x   5 rossstafford  staff   160B Apr 30 17:02 local_discovery_v2
+-rw-r--r--   1 rossstafford  staff   6.8K Apr 28 19:46 missed_systems_discovery_pass_v1.md
+-rw-r--r--   1 rossstafford  staff   9.6K Apr 28 21:33 pass_4_binding_v1.json
+-rw-r--r--   1 rossstafford  staff   2.1K Apr 28 21:33 pass_4_binding_v1.md
+-rw-r--r--   1 rossstafford  staff   7.3K Apr 28 21:33 pass_4_classification_v1.json
+-rw-r--r--   1 rossstafford  staff   1.2K Apr 28 21:33 pass_4_classification_v1.md
+drwxr-xr-x   6 rossstafford  staff   192B Apr 30 17:18 project_tree_audit_v2
+-rw-r--r--   1 rossstafford  staff   210K Apr 28 21:55 proof_evidence_scan_v1.json
+-rw-r--r--   1 rossstafford  staff   1.6K Apr 28 21:55 proof_evidence_scan_v1.md
+-rw-r--r--   1 rossstafford  staff    14K Apr 28 21:57 proof_review_artifact_v1.json
+-rw-r--r--   1 rossstafford  staff   4.9K Apr 28 21:57 proof_review_artifact_v1.md
+drwxr-xr-x  25 rossstafford  staff   800B Apr 30 14:59 proof_runs
+-rw-r--r--   1 rossstafford  staff   8.7K Apr 28 19:20 real_partial_placeholder_matrix_v1.json
+-rw-r--r--   1 rossstafford  staff   4.2K Apr 28 19:20 real_partial_placeholder_matrix_v1.md
+-rw-r--r--   1 rossstafford  staff    42B Apr 30 15:52 recovery_ledger_v1.json
+-rw-r--r--   1 rossstafford  staff   5.3K Apr 29 08:43 runtime_proof_wiring_plan_v1.json
+-rw-r--r--   1 rossstafford  staff   3.7K Apr 29 08:43 runtime_proof_wiring_plan_v1.md
+-rw-r--r--   1 rossstafford  staff   5.0K Apr 28 18:43 system_map_expansion_pass_1.md
+-rw-r--r--   1 rossstafford  staff   8.5K Apr 28 19:39 system_map_expansion_pass_2_truth_graph.md
+-rw-r--r--   1 rossstafford  staff    11K Apr 28 20:10 system_map_expansion_pass_3_missed_systems.json
+-rw-r--r--   1 rossstafford  staff   6.8K Apr 28 20:10 system_map_expansion_pass_3_missed_systems.md
+-rw-r--r--   1 rossstafford  staff   4.1K Apr 28 18:31 system_map_expansion_plan_v1.md
+-rw-r--r--   1 rossstafford  staff    39K Apr 28 21:09 system_map_truth_graph_v1.json
+-rw-r--r--   1 rossstafford  staff   3.5K Apr 28 21:59 system_map_ui_input_manifest_v1.json
+-rw-r--r--   1 rossstafford  staff   1.3K Apr 28 21:45 system_map_ui_input_manifest_v1.md
+-rw-r--r--   1 rossstafford  staff   5.2K Apr 28 21:09 truth_graph_merge_pass_4_p1_p2.json
+-rw-r--r--   1 rossstafford  staff   5.0K Apr 28 21:09 truth_graph_merge_pass_4_p1_p2.md
+-rw-r--r--   1 rossstafford  staff   9.9K Apr 28 21:37 truth_graph_pass_4_promoted_v1.json
+-rw-r--r--   1 rossstafford  staff   1.7K Apr 28 21:37 truth_graph_pass_4_promoted_v1.md
+-rw-r--r--   1 rossstafford  staff   5.2K Apr 29 15:12 truth_graph_pass_5_rebound_v1.json
+-rw-r--r--   1 rossstafford  staff   1.9K Apr 29 15:12 truth_graph_pass_5_rebound_v1.md

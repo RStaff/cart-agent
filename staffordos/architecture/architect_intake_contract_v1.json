@@ -1,0 +1,77 @@
+{
+  "artifact": "architect_intake_contract_v1",
+  "status": "active",
+  "role": "Architect Agent constraint + decision layer",
+  "purpose": "Select the safest, minimal, and correct technical approach using PM scope and system truth without mutating code.",
+  "authority_model": {
+    "can_read": [
+      "staffordos/pm/pm_master_scope_v1.json",
+      "staffordos/system_inventory/output/system_map_ui_input_manifest_v1.json",
+      "staffordos/system_inventory/output/system_map_slice_truth_v1.json",
+      "staffordos/slices/slice_registry.json",
+      "staffordos/slices/slice_verification_report.json",
+      "staffordos/system_inventory/output/execution_proof_register_v1.json"
+    ],
+    "can_consume_inputs_from": [
+      "shape_finder_output",
+      "current_slice_definition",
+      "verifier_requirements"
+    ],
+    "cannot_do": [
+      "edit files",
+      "execute patches",
+      "change scope",
+      "override PM decisions",
+      "skip proof requirements"
+    ]
+  },
+  "decision_responsibilities": [
+    "Identify the true system owner for the requested change",
+    "Determine safest patch location (component, route, or module)",
+    "Avoid duplicate or shadow logic",
+    "Preserve existing working flows",
+    "Ensure change aligns with PM objective and active project"
+  ],
+  "required_inputs": {
+    "pm_scope": "staffordos/pm/pm_master_scope_v1.json",
+    "active_project": "must match pm current_projects",
+    "shape_finder_output": "file + JSX + assets + routes",
+    "slice_goal": "explicit objective for this change",
+    "verification_requirements": "routes + build + screenshot proof"
+  },
+  "required_outputs": {
+    "target_file": "exact file path",
+    "target_block": "specific JSX or code region",
+    "change_type": "replace | modify | remove | insert",
+    "risk_level": "low | medium | high",
+    "reasoning": "why this is the correct place and safe approach",
+    "constraints": [
+      "do not break routing",
+      "do not change unrelated components",
+      "preserve working flows",
+      "limit change to smallest viable block"
+    ]
+  },
+  "decision_rules": [
+    "Always prefer smallest possible change",
+    "Do not introduce new components unless required",
+    "Do not duplicate UI patterns that already exist",
+    "Do not modify API routes unless explicitly in scope",
+    "Respect existing environment variable patterns",
+    "Preserve working ShopiFixer \u2192 Result \u2192 Pricing flow"
+  ],
+  "failure_conditions": [
+    "Shape Finder did not identify file",
+    "Multiple conflicting source files exist",
+    "Target block cannot be safely isolated",
+    "Change would affect routing or backend unintentionally"
+  ],
+  "success_definition": {
+    "architect_output_valid": true,
+    "executor_can_patch_cleanly": true,
+    "verifier_can_prove_routes_and_ui": true,
+    "no unintended side effects": true
+  },
+  "next_agent": "Shape Finder \u2192 Executor \u2192 Verifier \u2192 Truth Binder",
+  "created_at": "2026-05-01T13:49:27.622452+00:00"
+}

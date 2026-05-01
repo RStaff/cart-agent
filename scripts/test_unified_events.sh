@@ -37,7 +37,7 @@ if [[ -z "${DATABASE_URL:-}" ]]; then
 fi
 
 echo "✅ Using backend service: $BACKEND_SERVICE"
-echo "✅ Using DB: $DATABASE_URL"
+echo "✅ DATABASE_URL is set"
 echo
 
 ########################################

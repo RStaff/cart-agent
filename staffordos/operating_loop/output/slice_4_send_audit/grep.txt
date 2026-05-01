@@ -1,0 +1,200 @@
+staffordos/connectors/shopifixer_audit_to_outreach_v1.mjs:4:const QUEUE_PATH = path.resolve("staffordos/leads/outreach_queue.json");
+staffordos/connectors/shopifixer_audit_to_outreach_v1.mjs:15:function saveQueue(queue) {
+staffordos/connectors/shopifixer_audit_to_outreach_v1.mjs:16:  fs.writeFileSync(QUEUE_PATH, JSON.stringify(queue, null, 2) + "\n");
+staffordos/connectors/shopifixer_audit_to_outreach_v1.mjs:39:function existsInQueue(queue, domain) {
+staffordos/connectors/shopifixer_audit_to_outreach_v1.mjs:40:  return queue.some((x) => x.domain === domain);
+staffordos/connectors/shopifixer_audit_to_outreach_v1.mjs:49:  const queue = loadQueue();
+staffordos/connectors/shopifixer_audit_to_outreach_v1.mjs:51:  if (existsInQueue(queue, domain)) {
+staffordos/connectors/shopifixer_audit_to_outreach_v1.mjs:52:    console.log("⚠️ already exists in queue:", domain);
+staffordos/connectors/shopifixer_audit_to_outreach_v1.mjs:57:  queue.push(lead);
+staffordos/connectors/shopifixer_audit_to_outreach_v1.mjs:58:  saveQueue(queue);
+staffordos/connectors/shopifixer_audit_to_outreach_v1.mjs:60:  console.log("✅ added to outreach queue:", domain);
+staffordos/ui/command-center/app.js:181:    setBanner("Payment link generated. Record it as sent only after you actually send it.");
+staffordos/ui/command-center/app.js:197:    setBanner(payload?.error || "Could not generate outreach.", "error");
+staffordos/ui/command-center/app.js:218:  if (!lead?.sendTarget) return;
+staffordos/ui/command-center/app.js:219:  window.open(lead.sendTarget, "_blank", "noopener,noreferrer");
+staffordos/ui/command-center/app.js:344:async function sendPaymentLinkTruth() {
+staffordos/ui/command-center/app.js:348:    "/api/truth/send-payment-link",
+staffordos/ui/command-center/app.js:442:        <div><strong>GitHub issue:</strong> ${lead.sendTarget ? `<a href="${escapeHtml(lead.sendTarget)}" target="_blank" rel="noreferrer">Open issue</a>` : "n/a"}</div>
+staffordos/ui/command-center/app.js:495:    buttons.push(`<button class="button-primary" id="sendPaymentLinkBtn">Send Payment Link</button>`);
+staffordos/ui/command-center/app.js:516:      ${!lead.availablePaymentUrl && lead.latestCheckoutExpired ? `<div class="muted section-copy">The latest checkout session is expired. Generate a fresh payment link before sending it.</div>` : ""}
+staffordos/ui/command-center/app.js:517:      ${!lead.availablePaymentUrl && !lead.latestCheckoutExpired ? `<div class="muted section-copy">No fresh checkout session exists yet. Generate one before sending a payment link.</div>` : ""}
+staffordos/ui/command-center/app.js:654:  document.getElementById("sendPaymentLinkBtn")?.addEventListener("click", sendPaymentLinkTruth);
+staffordos/ui/operator-frontend/app/api/proof/abando-recovery/run/route.ts:50:      "queued recovery_email job exists",
+staffordos/ui/operator-frontend/app/api/proof/abando-recovery/run/route.ts:52:      "email send attempted through Resend mailer",
+staffordos/ui/operator-frontend/app/api/proof/abando-recovery/run/route.ts:67:      email_send_attempted: false,
+staffordos/ui/operator-frontend/app/api/proof/abando-recovery/run/route.ts:103:  artifact.inferred_result.email_send_attempted = combined.includes("sending recovery email");
+staffordos/ui/operator-frontend/app/api/proof/abando-recovery/run/route.ts:110:  if (artifact.inferred_result.job_succeeded && artifact.inferred_result.email_send_attempted) {
+staffordos/ui/operator-frontend/app/api/leads/queue/route.ts:8:const SEND_CONSOLE_DATA_PATH = path.join(ROOT, ".tmp/send_console_data.json");
+staffordos/ui/operator-frontend/app/api/leads/queue/route.ts:9:const SEND_READY_PATH = path.join(ROOT, ".tmp/send_ready.json");
+staffordos/ui/operator-frontend/app/api/leads/queue/route.ts:60:    sendTarget: item.execution?.send_target || item.send_target || item.sendTarget || item.url || item.website || null,
+staffordos/ui/operator-frontend/app/api/leads/queue/route.ts:77:      label: ".tmp/send_console_data.json",
+staffordos/ui/operator-frontend/app/api/leads/queue/route.ts:81:      label: ".tmp/send_ready.json",
+staffordos/ui/operator-frontend/app/api/operator/followups/route.ts:6:const QUEUE_PATH = path.join(ROOT, "staffordos/leads/follow_up_queue_v1.json");
+staffordos/ui/operator-frontend/app/api/operator/followups/route.ts:13:        source: "staffordos/leads/follow_up_queue_v1.json",
+staffordos/ui/operator-frontend/app/api/operator/followups/route.ts:19:    const queue = JSON.parse(fs.readFileSync(QUEUE_PATH, "utf8"));
+staffordos/ui/operator-frontend/app/api/operator/followups/route.ts:23:      source: "staffordos/leads/follow_up_queue_v1.json",
+staffordos/ui/operator-frontend/app/api/operator/followups/route.ts:24:      ...queue
+staffordos/ui/operator-frontend/app/api/operator/system-truth/route.ts:8:const LEDGER_PATH = path.join(ROOT, "staffordos/leads/send_ledger_v1.json");
+staffordos/ui/operator-frontend/app/api/operator/system-truth/route.ts:41:        ? "No outreach executed"
+staffordos/ui/operator-frontend/app/api/operator/system-truth/route.ts:51:      ledger: "send_ledger_v1.json"
+staffordos/ui/operator-frontend/app/api/operator/send-proof/route.ts:6:const LEDGER_PATH = path.join(ROOT, "staffordos/leads/send_ledger_v1.json");
+staffordos/ui/operator-frontend/app/api/operator/send-proof/route.ts:18:  const ledger = readJson(LEDGER_PATH, { version: "send_ledger_v1", items: [] });
+staffordos/ui/operator-frontend/app/api/operator/send-proof/route.ts:22:  const live = items.filter((i: any) => i.live_send_attempted === true);
+staffordos/ui/operator-frontend/app/api/operator/send-proof/route.ts:26:    source: "staffordos/leads/send_ledger_v1.json",
+staffordos/ui/operator-frontend/app/api/operator/send-proof/route.ts:29:    live_send_attempted_count: live.length,
+staffordos/ui/operator-frontend/app/api/operator/system-map/route.ts:10:  "staffordos/leads/send_ledger_v1.json",
+staffordos/ui/operator-frontend/app/api/operator/system-map/route.ts:11:  "staffordos/leads/send_execution_log_v1.json",
+staffordos/ui/operator-frontend/app/api/operator/system-map/route.ts:37:  const sendLedger = readJson("staffordos/leads/send_ledger_v1.json");
+staffordos/ui/operator-frontend/app/api/operator/system-map/route.ts:41:  const proofs = Array.isArray(sendLedger?.items) ? sendLedger.items : [];
+staffordos/ui/operator-frontend/app/api/operator/system-map/route.ts:83:        purpose: "Cross-product lead routing, prioritization, outreach state, and operator follow-up.",
+staffordos/ui/operator-frontend/app/api/operator/system-map/route.ts:88:        id: "send_proof",
+staffordos/ui/operator-frontend/app/api/operator/system-map/route.ts:92:        purpose: "Proof-backed outreach ledger. Current records are dry-run/operator-marked unless live send is proven.",
+staffordos/ui/operator-frontend/app/api/operator/system-map/route.ts:94:        evidence: ["staffordos/leads/send_ledger_v1.json"]
+staffordos/ui/operator-frontend/app/api/operator/system-map/route.ts:101:        purpose: "Revenue-facing view. Currently lead registry + send proof; should evolve into pipeline/revenue truth.",
+staffordos/ui/operator-frontend/app/api/operator/system-map/route.ts:131:      { from: "leads", to: "send_proof", label: "mark_sent creates proof" },
+staffordos/ui/operator-frontend/app/api/operator/system-map/route.ts:132:      { from: "send_proof", to: "revenue_command", label: "proof displayed in revenue command" },
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:9:const SEND_LEDGER_PATH = path.join(LEADS_DIR, "send_ledger_v1.json");
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:10:const SEND_EXECUTION_LOG_PATH = path.join(LEADS_DIR, "send_execution_log_v1.json");
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:32:    lead?.contact?.email || lead?.email || lead?.execution?.send_target
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:35:  if (action === "move_to_outreach") {
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:39:        error: "contact_required_before_outreach",
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:47:      stage: "outreach_ready",
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:48:      next_action: "Send initial outreach"
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:89:  const ledger = readJson(SEND_LEDGER_PATH, { version: "send_ledger_v1", items: [] });
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:92:  const sendId = `send_${lead.id || lead.lead_id}_${Date.now()}`;
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:95:    id: sendId,
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:99:    send_target: lead.execution?.send_target || lead.contact?.email || null,
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:103:    live_send_attempted: false,
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:115:    id: `send_execution_${Date.now()}`,
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:117:    send_id: sendId,
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:120:    live_send_attempted: false,
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:127:  return sendId;
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:166:  let sendLedgerId: string | null = null;
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:168:    sendLedgerId = recordDryRunSendProof(lead, now);
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:186:      send_ledger_ids: sendLedgerId
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:187:        ? [...(Array.isArray(lead.refs?.send_ledger_ids) ? lead.refs.send_ledger_ids : []), sendLedgerId]
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:188:        : (Array.isArray(lead.refs?.send_ledger_ids) ? lead.refs.send_ledger_ids : [])
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:206:    send_ledger_id: sendLedgerId,
+staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:216:    send_ledger_id: sendLedgerId
+staffordos/ui/operator-frontend/app/globals.css:470:.queueTier {
+staffordos/ui/operator-frontend/app/operator/revenue-command/page.tsx:18:  live_send_attempted_count?: number;
+staffordos/ui/operator-frontend/app/operator/revenue-command/page.tsx:27:  const proofResponse = await fetch("http://localhost:3000/api/operator/send-proof", {
+staffordos/ui/operator-frontend/app/operator/revenue-command/page.tsx:32:  const sendProof = (await proofResponse.json()) as SendProofResponse;
+staffordos/ui/operator-frontend/app/operator/revenue-command/page.tsx:34:  return { data, sendProof };
+staffordos/ui/operator-frontend/app/operator/revenue-command/page.tsx:38:  const { data, sendProof } = await loadRevenueCommand();
+staffordos/ui/operator-frontend/app/operator/revenue-command/page.tsx:83:                <div><strong>Send initial outreach:</strong> {lifecycle.send_initial_outreach || 0}</div>
+staffordos/ui/operator-frontend/app/operator/revenue-command/page.tsx:111:              <div><strong>Total proof records:</strong> {sendProof.proof_count || 0}</div>
+staffordos/ui/operator-frontend/app/operator/revenue-command/page.tsx:112:              <div><strong>Dry-run proofs:</strong> {sendProof.dry_run_proof_count || 0}</div>
+staffordos/ui/operator-frontend/app/operator/revenue-command/page.tsx:113:              <div><strong>Live sends attempted:</strong> {sendProof.live_send_attempted_count || 0}</div>
+staffordos/ui/operator-frontend/app/operator/revenue-command/page.tsx:114:              <div><strong>Read source:</strong> {sendProof.source}</div>
+staffordos/ui/operator-frontend/app/operator/revenue-command/page.tsx:118:              {(sendProof.latest_proofs || []).map((proof: any) => (
+staffordos/ui/operator-frontend/app/operator/revenue-command/page.tsx:132:                    <div><strong>Target:</strong> {proof.send_target || "n/a"}</div>
+staffordos/ui/operator-frontend/app/operator/leads/LeadActions.tsx:21:      <button onClick={() => run("move_to_outreach")}>Move</button>
+staffordos/ui/operator-frontend/app/operator/leads/page.tsx:14:  outreach_ready: boolean;
+staffordos/ui/operator-frontend/app/operator/leads/page.tsx:15:  queued: boolean;
+staffordos/ui/operator-frontend/app/operator/leads/page.tsx:43:        Real lead registry, queue, readiness, send ledger, and event counts. No placeholder lead data.
+staffordos/ui/operator-frontend/app/operator/leads/page.tsx:57:          ["Outreach Ready", summary.outreach_ready],
+staffordos/ui/operator-frontend/app/operator/leads/page.tsx:58:          ["Queued", summary.queued],
+staffordos/ui/operator-frontend/app/operator/leads/page.tsx:83:            Source policy: {data.source_policy} · Registry + send queue + send ready + send console.
+staffordos/ui/operator-frontend/app/operator/leads/page.tsx:120:                  {lead.sent ? "Sent" : lead.queued ? "Queued" : lead.outreach_ready ? "Ready" : "Blocked"}
+staffordos/ui/operator-frontend/app/operator/leads/page.tsx:132:            No real leads found in the current registry or queue files.
+staffordos/ui/operator-frontend/app/operator/analytics/page.tsx:9:        "Operator analytics should summarize cross-product workload, queue health, and handoff visibility for the control plane.",
+staffordos/ui/operator-frontend/components/operator/LeadQueue.tsx:16:    latest_send_proof_id?: string;
+staffordos/ui/operator-frontend/components/operator/LeadQueue.tsx:17:    latest_send_proof_status?: string;
+staffordos/ui/operator-frontend/components/operator/LeadQueue.tsx:105:                      {l.execution?.latest_send_proof_id ? (
+staffordos/ui/operator-frontend/components/operator/LeadQueue.tsx:107:                          {l.execution.latest_send_proof_status || "proof_recorded"} / {l.execution.latest_send_proof_id}
+staffordos/ui/operator-frontend/components/operator/LeadQueue.tsx:115:                        <button className="chip" onClick={() => runAction(l.id, "move_to_outreach")}>
+staffordos/ui/operator-frontend/components/operator/LeadQueue.tsx:116:                          Move to outreach
+staffordos/ui/operator-frontend/components/operator/LeadQueue.tsx:118:                      ) : stage === "send_initial_outreach" ? (
+staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts:26:    email: contact.email || input.email || input.send_target || null,
+staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts:33:    outreach_ready: Boolean(contact.email || input.email || input.send_target || input.message || input.nextMessage),
+staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts:34:    queued: Boolean(input.refs?.outreach_queue || input.queued || input.status === "queued"),
+staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts:44:  const sendLedger = readJson("staffordos/leads/send_ledger_v1.json", { items: [] });
+staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts:46:  const sendQueue = readJson(".tmp/send_queue.json", []);
+staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts:47:  const sendReady = readJson(".tmp/send_ready.json", []);
+staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts:48:  const sendConsole = readJson(".tmp/send_console_data.json", []);
+staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts:51:  const queueItems = Array.isArray(sendQueue) ? sendQueue : [];
+staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts:52:  const readyItems = Array.isArray(sendReady) ? sendReady : [];
+staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts:53:  const consoleItems = Array.isArray(sendConsole) ? sendConsole : [];
+staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts:57:  for (const item of [...registryItems, ...queueItems, ...readyItems, ...consoleItems]) {
+staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts:67:      queued: Boolean(existing?.queued || lead.queued),
+staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts:68:      outreach_ready: Boolean(existing?.outreach_ready || lead.outreach_ready)
+staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts:78:    outreach_ready: leads.filter((l) => l.outreach_ready).length,
+staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts:79:    queued: leads.filter((l) => l.queued).length,
+staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts:82:    blocked: leads.filter((l) => !l.email && !l.outreach_ready).length,
+staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts:83:    send_ledger_items: Array.isArray(sendLedger.items) ? sendLedger.items.length : 0,
+staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts:95:      send_queue: ".tmp/send_queue.json",
+staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts:96:      send_ready: ".tmp/send_ready.json",
+staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts:97:      send_console: ".tmp/send_console_data.json",
+staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts:98:      send_ledger: "staffordos/leads/send_ledger_v1.json"
+staffordos/ui/send-console/index.html:15:<p>Real send queue → execution</p>
+staffordos/ui/send-console/index.html:38:    .filter(l => l.outreach_ready && !l.sent)
+staffordos/ui/send-console/index.html:47:          <button onclick="send('${lead.id}')">Send</button>
+staffordos/ui/send-console/index.html:55:async function send(leadId) {
+staffordos/ui/send-console/app.js:2:const queueBody = document.getElementById("queueBody");
+staffordos/ui/send-console/app.js:13:    ready: items.filter((item) => item.nextAction === "send_initial_outreach").length,
+staffordos/ui/send-console/app.js:51:  queueBody.innerHTML = items
+staffordos/ui/send-console/app.js:67:  for (const row of queueBody.querySelectorAll("tr")) {
+staffordos/ui/send-console/app.js:113:    detailPanel.innerHTML = `<p class="subtle">Select a lead to see the outreach copy and actions.</p>`;
+staffordos/ui/send-console/app.js:134:      <a class="button-link secondary" href="${escapeHtml(item.sendTarget)}" target="_blank" rel="noreferrer">Open Target</a>
+staffordos/ui/send-console/app.js:213:    const response = await fetch("/api/send-console-data");
+staffordos/capabilities/capability_matrix_v1.mjs:34:    id: "governed_outreach_packet",
+staffordos/capabilities/capability_matrix_v1.mjs:35:    purpose: "ShopiFixer audit-to-outreach intent exists as approved packet path.",
+staffordos/capabilities/capability_matrix_v1.mjs:36:    required_files: ["staffordos/packets/shopifixer_governed_outreach_packet_v1.json"],
+staffordos/capabilities/capability_matrix_v1.mjs:40:    id: "lead_outreach_queue",
+staffordos/capabilities/capability_matrix_v1.mjs:41:    purpose: "Existing queue where outreach candidates are stored.",
+staffordos/capabilities/capability_matrix_v1.mjs:42:    required_files: ["staffordos/leads/outreach_queue.json"],
+staffordos/capabilities/capability_matrix_v1.mjs:52:    id: "audit_to_outreach_connector",
+staffordos/capabilities/capability_matrix_v1.mjs:53:    purpose: "Connector from ShopiFixer audit result into governed outreach queue path.",
+staffordos/capabilities/capability_matrix_v1.mjs:54:    required_files: ["staffordos/connectors/shopifixer_audit_to_outreach_v1.mjs"],
+staffordos/capabilities/capability_matrix_v1.mjs:59:    purpose: "Generates outbound message drafts from outreach queue.",
+staffordos/capabilities/capability_matrix_v1.mjs:65:    purpose: "Validates generated outbound messages before approval/send.",
+staffordos/capabilities/capability_matrix_v1.mjs:70:    id: "send_execution_agent",
+staffordos/capabilities/capability_matrix_v1.mjs:72:    required_files: ["staffordos/leads/send_execution_agent_v1.mjs"],
+staffordos/capabilities/capability_matrix_v1.mjs:121:    next_safe_action: evaluated.find((x) => x.id === "audit_to_outreach_connector")?.status === "NEEDS_CONNECTOR"
+staffordos/capabilities/capability_matrix_v1.mjs:122:      ? "Build the thin audit_to_outreach_connector only. Do not build send automation yet."
+staffordos/capabilities/capability_matrix_v1.mjs:125:      "Do not send outreach until send_execution_agent_v1 exists and approval path is proven.",
+staffordos/system_inventory/proof/proof_evidence_scanner_v1.mjs:26:  proof_real_email_send: [
+staffordos/system_inventory/proof/proof_evidence_scanner_v1.mjs:28:    /resend/i,
+staffordos/system_inventory/proof/proof_evidence_scanner_v1.mjs:29:    /send_ledger/i,
+staffordos/system_inventory/proof/proof_evidence_scanner_v1.mjs:35:  proof_real_sms_send: [
+staffordos/system_inventory/proof/proof_evidence_scanner_v1.mjs:37:    /send_ledger/i,
+staffordos/system_inventory/source_runtime_policy_register_v1.mjs:29:    meaning: "Generated report, log, queue, ledger, score, snapshot, or audit output.",
+staffordos/system_inventory/source_runtime_policy_register_v1.mjs:34:      "staffordos/**/*queue*.json",
+staffordos/system_inventory/output/system_map_expansion_pass_2_truth_graph.md:26:- FOUND: staffordos/leads/send_ledger_v1.json
+staffordos/system_inventory/output/system_map_expansion_pass_2_truth_graph.md:72:- ID: send_proof
+staffordos/system_inventory/output/system_map_expansion_pass_2_truth_graph.md:76:- Summary: Proof ledger for outreach. Current records may be dry-run/operator proof unless live provider proof exists.
+staffordos/system_inventory/output/system_map_expansion_pass_2_truth_graph.md:78:  - staffordos/leads/send_ledger_v1.json
+staffordos/system_inventory/output/system_map_expansion_pass_2_truth_graph.md:146:- ID: capability_send_proof
+staffordos/system_inventory/output/system_map_expansion_pass_2_truth_graph.md:150:- Summary: 2 send proofs found; 2 dry-run proofs; 0 live sends proven.
+staffordos/system_inventory/output/system_map_expansion_pass_2_truth_graph.md:152:  - staffordos/leads/send_ledger_v1.json
+staffordos/system_inventory/output/system_map_expansion_pass_2_truth_graph.md:155:- ID: capability_real_email_send
+staffordos/system_inventory/output/system_map_expansion_pass_2_truth_graph.md:159:- Summary: Current proof chain does not prove real provider-backed email send.
+staffordos/system_inventory/output/system_map_expansion_pass_2_truth_graph.md:161:  - staffordos/leads/send_ledger_v1.json
+staffordos/system_inventory/output/system_map_expansion_pass_2_truth_graph.md:162:  - staffordos/leads/send_execution_log_v1.json
+staffordos/system_inventory/output/system_map_expansion_pass_2_truth_graph.md:165:- ID: capability_real_sms_send
+staffordos/system_inventory/output/system_map_expansion_pass_2_truth_graph.md:169:- Summary: SMS delivery is not proven by current send proof records.
+staffordos/system_inventory/output/system_map_expansion_pass_2_truth_graph.md:171:  - staffordos/leads/send_ledger_v1.json
+staffordos/system_inventory/output/system_map_expansion_pass_2_truth_graph.md:215:- Summary: Revenue Command shows lead lifecycle and send proof, but not full income truth yet.
+staffordos/system_inventory/output/system_map_expansion_pass_2_truth_graph.md:233:- Summary: Analytics is not yet bound to product, revenue, send, or agent performance data.
+staffordos/system_inventory/output/system_map_expansion_pass_2_truth_graph.md:261:- lead_registry → send_proof: lead actions create proof
+staffordos/system_inventory/output/system_map_expansion_pass_2_truth_graph.md:262:- send_proof → revenue_truth: send proof informs revenue progress
+staffordos/system_inventory/output/system_map_expansion_pass_2_truth_graph.md:276:- Real email/SMS provider-backed send proof still needs confirmation.
+staffordos/system_inventory/output/truth_graph_pass_5_rebound_v1.md:18:- pass5_hot_followup_auto_sender: REAL_OPERATIONAL_CAPABILITY
+staffordos/system_inventory/output/truth_graph_pass_5_rebound_v1.md:25:- proof_shopifixer_followup_queue: PROVEN_RUNTIME
+staffordos/system_inventory/output/truth_graph_pass_5_rebound_v1.md:26:- proof_hot_followup_auto_send: PROVEN_RUNTIME
+staffordos/system_inventory/output/truth_graph_pass_5_rebound_v1.md:34:- staffordos/leads/hot_followup_auto_sender_v1.mjs: FOUND
+staffordos/system_inventory/output/truth_graph_pass_5_rebound_v1.md:37:- staffordos/leads/follow_up_queue_v1.json: FOUND
+staffordos/system_inventory/output/truth_graph_pass_5_rebound_v1.md:43:- staffordos/ui/send-console/index.html: FOUND
+staffordos/system_inventory/output/runtime_proof_wiring_plan_v1.json:42:      "term": "sendRecoveryEmail",
+staffordos/system_inventory/output/runtime_proof_wiring_plan_v1.json:43:      "text": "sendRecoveryEmail,"
+staffordos/system_inventory/output/runtime_proof_wiring_plan_v1.json:48:      "term": "sendRecoveryEmail",
+staffordos/system_inventory/output/runtime_proof_wiring_plan_v1.json:49:      "text": "const emailResult = await sendRecoveryEmail({"
+staffordos/system_inventory/output/runtime_proof_wiring_plan_v1.json:54:      "term": "enqueueRecoveryEmailJob",
+staffordos/system_inventory/output/runtime_proof_wiring_plan_v1.json:55:      "text": "async function enqueueRecoveryEmailJob(event, decisionResult) {"
+staffordos/system_inventory/output/runtime_proof_wiring_plan_v1.json:66:      "term": "enqueueRecoveryEmailJob",
+staffordos/system_inventory/output/runtime_proof_wiring_plan_v1.json:67:      "text": "const recoveryJob = await enqueueRecoveryEmailJob(event, decisionResult).catch((error) => {"
+staffordos/system_inventory/output/runtime_proof_wiring_plan_v1.json:96:      "term": "sendRecoveryEmail",
+staffordos/system_inventory/output/runtime_proof_wiring_plan_v1.json:97:      "text": "async function sendRecoveryEmail({ to, payload }) {"
+staffordos/system_inventory/output/runtime_proof_wiring_plan_v1.json:102:      "term": "sendRecoveryEmail",

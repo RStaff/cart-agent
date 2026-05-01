@@ -1,0 +1,13 @@
+{
+  "slice_id": "send_simulation_only",
+  "generated_at": "2026-05-01T01:30:12.433002+00:00",
+  "mode": "SIMULATION_ONLY_NO_SEND",
+  "ok": true,
+  "lead_id": "lead_04826b2d41a8",
+  "lead_name": "yxengine",
+  "channel": "web",
+  "sendTarget": "https://github.com/Shopify/cli/issues/5698",
+  "message_preview": "Hey yxengine \u2014 saw your issue about a Shopify app dev issue.\n\nI\u2019ve been fixing a lot of Shopify app dev problems like this lately, especially around tunnels, preview URLs, and embedded apps not loading.\n\nIf you want, I can take a quick look and help you get it stable.",
+  "missing_fields": [],
+  "rule": "No provider call. No email sent. No SMS sent."
+}
