@@ -64,3 +64,7 @@ abando_surface_audit_*
 # --- Node ---
 node_modules/
 
+
+# local safety backups
+*.bak_before_*
+*.bak_before_real_send_*
