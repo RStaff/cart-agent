@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-05-02T17:49:21.287Z",
+  "status": "PASSED",
+  "found_truth_files": [
+    "staffordos/system_inventory/output/truth_graph_pass_4_promoted_v1.json",
+    "staffordos/system_inventory/output/execution_proof_register_v1.json",
+    "staffordos/system_inventory/abando_canonical_proof_path_map_v1.mjs",
+    "staffordos/system_map/system_map_truth_v1.json"
+  ],
+  "required_owners": [
+    "web/src/routes/recoveryLiveTest.esm.js",
+    "web/src/lib/abandoRecoverySender.js",
+    "staffordos/guards/check_recovery_route_guardrail.mjs"
+  ],
+  "failures": []
+}

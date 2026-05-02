@@ -1,0 +1,19 @@
+{
+  "generated_at": "2026-05-02T17:44:07.811Z",
+  "command": "npm --prefix web run dev",
+  "operatorApproved": true,
+  "stages": [
+    "mode_resolved",
+    "operator_override_accepted",
+    "guardrails_passed",
+    "runtime_prepared"
+  ],
+  "status": "EXECUTING",
+  "mode": {
+    "decision": "IGNORE",
+    "executionMode": "AUTO",
+    "reasons": [
+      "Score is below the automation threshold."
+    ]
+  }
+}
