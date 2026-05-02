@@ -1,0 +1,13 @@
+{
+  "generated_at": "2026-05-02T21:57:06.404Z",
+  "check_name": "production_hmac_positive_test_v1",
+  "url": "https://pay.abando.ai/api/shopify/webhooks/orders-paid",
+  "http_status": 401,
+  "response_json": {
+    "ok": false,
+    "error": "invalid_shopify_hmac"
+  },
+  "response_sample": null,
+  "status": "PRODUCTION_HMAC_POSITIVE_TEST_FAILED",
+  "truth_claim": "Production HMAC positive proof requires a correctly signed payload accepted by pay.abando.ai."
+}
