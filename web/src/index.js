@@ -1,3 +1,5 @@
+import { recordRevenueProof } from "./lib/abandoRevenueRegister.js";
+import { recordReturnAttribution } from "./lib/abandoReturnAttribution.js";
 import express from "express";
 import cors from "cors";
 import fs from "node:fs";
@@ -409,3 +411,39 @@ app.get('/__build-check', (req, res) => {
   });
 });
 
+
+
+app.get("/api/recovery/return", async (req, res) => {
+  try {
+    const shop = String(req.query.shop || "").trim();
+    const experienceId = String(req.query.eid || req.query.experienceId || "").trim();
+    const revenue = Number(req.query.revenue || 100);
+
+    if (!shop || !experienceId) {
+      return res.status(400).json({
+        ok: false,
+        error: "missing_shop_or_experience_id"
+      });
+    }
+
+    const attribution = await recordReturnAttribution({
+      repoRoot,
+      payload: { experienceId, shop, revenue }
+    });
+
+    recordRevenueProof({ repoRoot, attribution });
+
+    return res.status(200).json({
+      ok: true,
+      status: "REVENUE_ATTRIBUTED",
+      attribution
+    });
+  } catch (error) {
+    console.error("[abando:return-attribution] failed", error);
+    return res.status(500).json({
+      ok: false,
+      error: "return_attribution_failed",
+      detail: error instanceof Error ? error.message : String(error)
+    });
+  }
+});

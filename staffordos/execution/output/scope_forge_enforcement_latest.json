@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-02T19:46:21.301Z",
+  "generated_at": "2026-05-02T20:33:01.195Z",
   "status": "PASSED",
   "command": "npm --prefix web run dev",
   "inferred_system_id": "abando",

@@ -1,0 +1,22 @@
+{
+  "generated_at": "2026-05-02T20:33:05.367Z",
+  "completed_at": "2026-05-02T20:33:05.418Z",
+  "qa_profile": "abando_return_attribution",
+  "status": "PASSED",
+  "result": {
+    "endpoint": "/api/recovery/return",
+    "status": "PASSED",
+    "json": {
+      "ok": true,
+      "status": "REVENUE_ATTRIBUTED",
+      "attribution": {
+        "timestamp": "2026-05-02T20:33:05.408Z",
+        "experienceId": "staffordos-runtime-qa-return",
+        "shop": "demo-shop.myshopify.com",
+        "returned": true,
+        "revenue": 100,
+        "currency": "USD"
+      }
+    }
+  }
+}
