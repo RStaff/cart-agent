@@ -1,0 +1,196 @@
+{
+  "generated_at": "2026-05-02T19:38:20.305Z",
+  "owner": "Ross Stafford (Operator/CEO)",
+  "version": "scope_forge_v1",
+  "systems": [
+    {
+      "id": "abando",
+      "name": "Abando Recovery Engine",
+      "status": "REAL_SEND_PROVEN",
+      "goal": "Recover abandoned checkout revenue via automated email/SMS",
+      "proof_required": [
+        "checkout_event_captured",
+        "recovery_message_generated",
+        "real_email_sent",
+        "return_link_clicked",
+        "revenue_attributed"
+      ],
+      "current_proof": [
+        "real_email_sent",
+        "proof_writeback",
+        "tracked_summary"
+      ],
+      "next_slice": "return_flow_and_revenue_attribution_v1",
+      "owners": [
+        "pm",
+        "architect",
+        "executor",
+        "qa",
+        "revenue",
+        "truth"
+      ]
+    },
+    {
+      "id": "shopifixer",
+      "name": "ShopiFixer Audit + Fix System",
+      "status": "PARTIAL",
+      "goal": "Diagnose conversion leaks and sell fixes",
+      "proof_required": [
+        "audit_generated",
+        "email_delivered",
+        "user_views_full_audit",
+        "pricing_page_loaded",
+        "payment_completed"
+      ],
+      "current_proof": [
+        "audit_generation",
+        "email_send_path"
+      ],
+      "next_slice": "pricing_to_payment_proof_v1",
+      "owners": [
+        "pm",
+        "architect",
+        "executor",
+        "qa",
+        "revenue",
+        "truth"
+      ]
+    },
+    {
+      "id": "staffordmedia",
+      "name": "Stafford Media Consulting Site",
+      "status": "PARTIAL",
+      "goal": "Top-level funnel and credibility layer",
+      "proof_required": [
+        "user_lands",
+        "audit_started",
+        "email_captured",
+        "conversion_to_shopifixer"
+      ],
+      "current_proof": [],
+      "next_slice": "homepage_conversion_path_v1",
+      "owners": [
+        "pm",
+        "architect",
+        "executor",
+        "qa",
+        "revenue"
+      ]
+    },
+    {
+      "id": "outreach",
+      "name": "Lead + Outreach System",
+      "status": "PARTIAL",
+      "goal": "Generate and convert leads into paying clients",
+      "proof_required": [
+        "lead_generated",
+        "lead_scored",
+        "message_sent",
+        "response_received",
+        "meeting_booked"
+      ],
+      "current_proof": [
+        "lead_generation"
+      ],
+      "next_slice": "reply_tracking_and_conversion_v1",
+      "owners": [
+        "pm",
+        "architect",
+        "executor",
+        "qa",
+        "revenue"
+      ]
+    },
+    {
+      "id": "revenue",
+      "name": "Revenue Path System",
+      "status": "NOT_PROVEN",
+      "goal": "Ensure full money loop is functional",
+      "proof_required": [
+        "user_pays",
+        "payment_recorded",
+        "service_triggered",
+        "delivery_completed"
+      ],
+      "current_proof": [],
+      "next_slice": "first_paid_customer_proof_v1",
+      "owners": [
+        "pm",
+        "architect",
+        "executor",
+        "qa",
+        "revenue"
+      ]
+    },
+    {
+      "id": "staffordos",
+      "name": "StaffordOS Core",
+      "status": "PARTIAL_REAL",
+      "goal": "Control all execution with truth, guardrails, and proof",
+      "proof_required": [
+        "execution_gate_enforced",
+        "truth_map_verified",
+        "guardrails_enforced",
+        "proof_written",
+        "proof_tracked"
+      ],
+      "current_proof": [
+        "execution_gate",
+        "truth_map_preflight",
+        "guardrails",
+        "proof_register_writeback"
+      ],
+      "next_slice": "multi-system_execution_orchestration_v1",
+      "owners": [
+        "pm",
+        "architect",
+        "executor",
+        "qa",
+        "truth"
+      ]
+    },
+    {
+      "id": "agent_system",
+      "name": "Agent Execution System",
+      "status": "PARTIAL",
+      "goal": "Autonomous execution with oversight",
+      "proof_required": [
+        "pm_generates_slice",
+        "architect_maps_files",
+        "executor_runs_change",
+        "qa_verifies_runtime",
+        "truth_updates_registry"
+      ],
+      "current_proof": [
+        "execution_loop",
+        "operator_override"
+      ],
+      "next_slice": "agent_chain_full_activation_v1",
+      "owners": [
+        "pm",
+        "architect",
+        "executor",
+        "qa",
+        "truth"
+      ]
+    },
+    {
+      "id": "personal_os",
+      "name": "Ross Personal OS",
+      "status": "NOT_STARTED",
+      "goal": "Integrate life + business into unified system",
+      "proof_required": [
+        "daily_decision_support",
+        "memory_layer",
+        "goal_tracking",
+        "priority_execution"
+      ],
+      "current_proof": [],
+      "next_slice": "personal_command_center_v1",
+      "owners": [
+        "pm",
+        "architect"
+      ]
+    }
+  ]
+}
