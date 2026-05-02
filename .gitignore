@@ -48,3 +48,19 @@ staffordos/hygiene/output/
 # Agent logs
 staffordos/agents/*.json
 
+
+# --- Abando audit / temp / artifacts ---
+abando_surface_audit_*
+*.zip
+*.tgz
+*.log
+/tmp/
+*.bak
+*.backup
+
+# --- OS junk ---
+.DS_Store
+
+# --- Node ---
+node_modules/
+
