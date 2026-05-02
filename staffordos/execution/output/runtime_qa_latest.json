@@ -1,21 +1,26 @@
 {
-  "generated_at": "2026-05-02T20:33:05.367Z",
-  "completed_at": "2026-05-02T20:33:05.418Z",
-  "qa_profile": "abando_return_attribution",
+  "generated_at": "2026-05-02T20:41:39.995Z",
+  "completed_at": "2026-05-02T20:41:40.053Z",
+  "qa_profile": "abando_order_attribution",
   "status": "PASSED",
   "result": {
-    "endpoint": "/api/recovery/return",
+    "endpoint": "/api/shopify/order-paid/attribution-test",
     "status": "PASSED",
     "json": {
       "ok": true,
-      "status": "REVENUE_ATTRIBUTED",
+      "status": "ORDER_REVENUE_ATTRIBUTED",
       "attribution": {
-        "timestamp": "2026-05-02T20:33:05.408Z",
-        "experienceId": "staffordos-runtime-qa-return",
+        "timestamp": "2026-05-02T20:41:40.045Z",
+        "status": "ORDER_REVENUE_ATTRIBUTED",
+        "proof_type": "synthetic_shopify_order_webhook_attribution",
+        "order_id": "qa-order-1001",
+        "checkout_id": "",
+        "checkout_token": "staffordos-runtime-qa-return",
+        "email": "rossstafford1@gmail.com",
         "shop": "demo-shop.myshopify.com",
-        "returned": true,
         "revenue": 100,
-        "currency": "USD"
+        "currency": "USD",
+        "source": "/api/shopify/order-paid/attribution-test"
       }
     }
   }

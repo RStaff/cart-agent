@@ -58,6 +58,27 @@ const profiles = {
     assert(json.attribution?.returned === true, "Return attribution did not mark returned=true");
 
     return { endpoint: "/api/recovery/return", status: "PASSED", json };
+  },
+
+  async abando_order_attribution() {
+    const { response, json } = await requestJson(`${baseUrl}/api/shopify/order-paid/attribution-test`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: "qa-order-1001",
+        checkout_token: "staffordos-runtime-qa-return",
+        email: "rossstafford1@gmail.com",
+        total_price: "100.00",
+        currency: "USD",
+        shop: "demo-shop.myshopify.com"
+      })
+    });
+
+    assert(response.status === 200, "Order attribution did not return 200");
+    assert(json.status === "ORDER_REVENUE_ATTRIBUTED", "Order attribution did not return ORDER_REVENUE_ATTRIBUTED");
+    assert(Number(json.attribution?.revenue) === 100, "Order attribution did not record revenue=100");
+
+    return { endpoint: "/api/shopify/order-paid/attribution-test", status: "PASSED", json };
   }
 };
 

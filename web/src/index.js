@@ -1,3 +1,4 @@
+import { recordShopifyOrderAttribution } from "./lib/abandoOrderAttribution.js";
 import { recordRevenueProof } from "./lib/abandoRevenueRegister.js";
 import { recordReturnAttribution } from "./lib/abandoReturnAttribution.js";
 import express from "express";
@@ -443,6 +444,29 @@ app.get("/api/recovery/return", async (req, res) => {
     return res.status(500).json({
       ok: false,
       error: "return_attribution_failed",
+      detail: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
+
+app.post("/api/shopify/order-paid/attribution-test", async (req, res) => {
+  try {
+    const attribution = recordShopifyOrderAttribution({
+      repoRoot,
+      order: req.body || {}
+    });
+
+    return res.status(200).json({
+      ok: true,
+      status: "ORDER_REVENUE_ATTRIBUTED",
+      attribution
+    });
+  } catch (error) {
+    console.error("[abando:order-attribution] failed", error);
+    return res.status(500).json({
+      ok: false,
+      error: "order_attribution_failed",
       detail: error instanceof Error ? error.message : String(error)
     });
   }
