@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { writeFileSync, mkdirSync } from "node:fs";
 
 const profile = process.argv[2] || "";
@@ -79,6 +80,39 @@ const profiles = {
     assert(Number(json.attribution?.revenue) === 100, "Order attribution did not record revenue=100");
 
     return { endpoint: "/api/shopify/order-paid/attribution-test", status: "PASSED", json };
+  },
+
+  async abando_real_shopify_hmac_order_attribution() {
+    const secret = process.env.SHOPIFY_API_SECRET || process.env.SHOPIFY_SHARED_SECRET || "staffordos-hmac-test-secret";
+
+    const body = JSON.stringify({
+      id: "real-hmac-qa-order-1001",
+      checkout_token: "staffordos-runtime-qa-return",
+      email: "rossstafford1@gmail.com",
+      total_price: "125.00",
+      currency: "USD"
+    });
+
+    const hmac = crypto
+      .createHmac("sha256", secret)
+      .update(Buffer.from(body))
+      .digest("base64");
+
+    const { response, json } = await requestJson(`${baseUrl}/api/shopify/webhooks/orders-paid`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-shopify-hmac-sha256": hmac,
+        "x-shopify-shop-domain": "demo-shop.myshopify.com"
+      },
+      body
+    });
+
+    assert(response.status === 200, "Real Shopify HMAC webhook did not return 200");
+    assert(json.status === "REAL_SHOPIFY_HMAC_ORDER_REVENUE_ATTRIBUTED", "Real Shopify HMAC webhook did not attribute revenue");
+    assert(Number(json.attribution?.revenue) === 125, "Real Shopify HMAC webhook did not record revenue=125");
+
+    return { endpoint: "/api/shopify/webhooks/orders-paid", status: "PASSED", json };
   }
 };
 

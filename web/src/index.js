@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { recordShopifyOrderAttribution } from "./lib/abandoOrderAttribution.js";
 import { recordRevenueProof } from "./lib/abandoRevenueRegister.js";
 import { recordReturnAttribution } from "./lib/abandoReturnAttribution.js";
@@ -192,6 +193,60 @@ installSmcAlign(app);
 
 app.disable("x-powered-by");
 app.use(cors());
+
+app.post("/api/shopify/webhooks/orders-paid", express.raw({ type: "application/json" }), async (req, res) => {
+  try {
+    const secret = process.env.SHOPIFY_API_SECRET || process.env.SHOPIFY_SHARED_SECRET || "";
+    if (!secret) {
+      return res.status(503).json({
+        ok: false,
+        error: "missing_shopify_webhook_secret"
+      });
+    }
+
+    const rawBody = Buffer.isBuffer(req.body) ? req.body : Buffer.from(String(req.body || ""));
+    const receivedHmac = String(req.get("x-shopify-hmac-sha256") || "").trim();
+
+    const digest = crypto
+      .createHmac("sha256", secret)
+      .update(rawBody)
+      .digest("base64");
+
+    const valid =
+      receivedHmac.length === digest.length &&
+      crypto.timingSafeEqual(Buffer.from(receivedHmac), Buffer.from(digest));
+
+    if (!valid) {
+      return res.status(401).json({
+        ok: false,
+        error: "invalid_shopify_hmac"
+      });
+    }
+
+    const order = JSON.parse(rawBody.toString("utf8"));
+    const attribution = recordShopifyOrderAttribution({
+      repoRoot,
+      order: {
+        ...order,
+        shop: req.get("x-shopify-shop-domain") || order.shop || order.shop_domain
+      }
+    });
+
+    return res.status(200).json({
+      ok: true,
+      status: "REAL_SHOPIFY_HMAC_ORDER_REVENUE_ATTRIBUTED",
+      attribution
+    });
+  } catch (error) {
+    console.error("[abando:real-shopify-hmac-order-webhook] failed", error);
+    return res.status(500).json({
+      ok: false,
+      error: "real_shopify_hmac_order_webhook_failed",
+      detail: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
 app.use(express.json({ limit: "1mb" }));
 
 // Execute public checkout installer (source-of-truth)

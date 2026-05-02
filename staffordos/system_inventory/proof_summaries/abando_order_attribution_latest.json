@@ -1,13 +1,13 @@
 {
-  "generated_at": "2026-05-02T20:41:40.047Z",
+  "generated_at": "2026-05-02T20:54:39.389Z",
   "proof_name": "abando_order_attribution_latest",
   "status": "ORDER_REVENUE_ATTRIBUTED",
   "proof_type": "synthetic_shopify_order_webhook_attribution",
-  "order_id": "qa-order-1001",
+  "order_id": "real-hmac-qa-order-1001",
   "checkout_token": "staffordos-runtime-qa-return",
   "email": "rossstafford1@gmail.com",
   "shop": "demo-shop.myshopify.com",
-  "revenue": 100,
+  "revenue": 125,
   "currency": "USD",
   "truth_claim": "Synthetic Shopify order webhook payload was attributed to Abando revenue proof register."
 }
