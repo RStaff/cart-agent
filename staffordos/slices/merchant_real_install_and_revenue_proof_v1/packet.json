@@ -1,0 +1,30 @@
+{
+  "slice": "merchant_real_install_and_revenue_proof_v1",
+  "status": "READY_FOR_OPERATOR_APPROVAL",
+  "objective": "Prove Abando can recover revenue on a real Shopify merchant install, not synthetic QA.",
+  "required_truth_chain": [
+    "real_merchant_store_selected",
+    "abando_installed_on_store",
+    "checkout_event_captured_from_real_store",
+    "recovery_message_generated",
+    "real_email_or_sms_sent",
+    "customer_or_operator_clicks_recovery_link",
+    "order_completed",
+    "orders_paid_webhook_received",
+    "shopify_hmac_verified",
+    "revenue_attributed",
+    "proof_summary_recorded"
+  ],
+  "blocked_until": [
+    "merchant/store selected",
+    "Shopify app install confirmed",
+    "production secrets rotated or accepted as temporarily valid",
+    "test order plan approved"
+  ],
+  "success_criteria": {
+    "production_webhook_status": "REAL_SHOPIFY_HMAC_ORDER_REVENUE_ATTRIBUTED",
+    "merchant_dashboard_reflects_revenue": true,
+    "proof_artifact_tracked": true
+  },
+  "next_operator_action": "Choose the real Shopify store for first proof run."
+}
