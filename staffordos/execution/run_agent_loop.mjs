@@ -43,7 +43,7 @@ const proof = {
 console.log("\n1) Resolving execution mode...");
 const mode = resolveExecutionMode({ command });
 proof.mode = mode;
-proof.stages.push("mode_resolved");
+proof.stages.push("mode_resolved", "scope_forge_enforced");
 
 console.log("Mode:", mode);
 
@@ -68,7 +68,10 @@ if (blockedDecision && operatorApproved) {
   proof.stages.push("operator_override_accepted");
 }
 
-console.log("\n2) Running truth map preflight...");
+console.log("\n2) Running Scope Forge enforcement...");
+run(`node staffordos/guards/check_scope_forge_enforcement.mjs "${command.replace(/"/g, "\\\"")}"`);
+
+console.log("\n3) Running truth map preflight...");
 run("node staffordos/guards/check_truth_map_preflight.mjs");
 
 console.log("\n3) Running guardrails...");

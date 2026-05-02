@@ -1,0 +1,30 @@
+{
+  "generated_at": "2026-05-02T19:46:21.301Z",
+  "status": "PASSED",
+  "command": "npm --prefix web run dev",
+  "inferred_system_id": "abando",
+  "system_name": "Abando Recovery Engine",
+  "system_status": "REAL_SEND_PROVEN",
+  "next_slice": "return_flow_and_revenue_attribution_v1",
+  "owners": [
+    "pm",
+    "architect",
+    "executor",
+    "qa",
+    "revenue",
+    "truth"
+  ],
+  "proof_required": [
+    "checkout_event_captured",
+    "recovery_message_generated",
+    "real_email_sent",
+    "return_link_clicked",
+    "revenue_attributed"
+  ],
+  "current_proof": [
+    "real_email_sent",
+    "proof_writeback",
+    "tracked_summary"
+  ],
+  "failures": []
+}
