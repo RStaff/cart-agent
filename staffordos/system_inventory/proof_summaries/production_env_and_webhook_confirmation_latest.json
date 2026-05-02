@@ -1,0 +1,58 @@
+{
+  "generated_at": "2026-05-02T21:29:57.046Z",
+  "check_name": "production_env_and_webhook_confirmation_v1",
+  "production_base": "https://pay.abando.ai",
+  "expected_webhook_topic": "orders/paid",
+  "expected_webhook_url": "https://pay.abando.ai/api/shopify/webhooks/orders-paid",
+  "route_probe": {
+    "reachable": true,
+    "status": 404,
+    "content_type": "text/html; charset=utf-8",
+    "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot GET /api/shopify/webhooks/orders-paid</pre>\n</bod"
+  },
+  "local_env_status": {
+    "status": "LOCAL_ENV_INCOMPLETE",
+    "missing_required": [
+      "SHOPIFY_API_SECRET",
+      "SMTP_HOST",
+      "SMTP_PORT",
+      "SMTP_USER",
+      "SMTP_PASS"
+    ],
+    "observed": {
+      "SHOPIFY_API_SECRET": "missing",
+      "SMTP_HOST": "missing",
+      "SMTP_PORT": "missing",
+      "SMTP_USER": "missing",
+      "SMTP_PASS": "missing",
+      "SHOPIFY_API_KEY": "missing",
+      "SHOPIFY_APP_URL": "missing",
+      "ABANDO_PUBLIC_APP_ORIGIN": "missing",
+      "APP_URL": "missing",
+      "PUBLIC_APP_URL": "missing",
+      "FROM_EMAIL": "missing",
+      "TWILIO_ACCOUNT_SID": "missing",
+      "TWILIO_AUTH_TOKEN": "missing",
+      "TWILIO_FROM": "missing"
+    }
+  },
+  "production_confirmation_required": [
+    {
+      "item": "Render/env confirmation",
+      "required": true,
+      "expected": "SHOPIFY_API_SECRET and SMTP env vars present in production runtime"
+    },
+    {
+      "item": "Shopify webhook registration",
+      "required": true,
+      "expected": "orders/paid callback URL equals https://pay.abando.ai/api/shopify/webhooks/orders-paid"
+    },
+    {
+      "item": "Shopify HMAC live proof",
+      "required": true,
+      "expected": "Real Shopify test webhook or real test order reaches production and returns 200"
+    }
+  ],
+  "current_truth_status": "PRODUCTION_ROUTE_REACHABLE_BUT_ENV_AND_SHOPIFY_REGISTRATION_NOT_CONFIRMED",
+  "truth_claim": "Production webhook cannot be marked proven until production env and Shopify Partner Dashboard registration are confirmed."
+}
