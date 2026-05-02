@@ -1,14 +1,26 @@
 {
-  "generated_at": "2026-05-02T21:57:06.404Z",
+  "generated_at": "2026-05-02T22:12:46.290Z",
   "check_name": "production_hmac_positive_test_v1",
   "url": "https://pay.abando.ai/api/shopify/webhooks/orders-paid",
-  "http_status": 401,
+  "http_status": 200,
   "response_json": {
-    "ok": false,
-    "error": "invalid_shopify_hmac"
+    "ok": true,
+    "status": "REAL_SHOPIFY_HMAC_ORDER_REVENUE_ATTRIBUTED",
+    "attribution": {
+      "timestamp": "2026-05-02T22:12:46.252Z",
+      "status": "ORDER_REVENUE_ATTRIBUTED",
+      "proof_type": "real_shopify_hmac_order_webhook_attribution",
+      "order_id": "production-hmac-positive-test-1001",
+      "checkout_id": "",
+      "checkout_token": "production-hmac-positive-test",
+      "email": "rossstafford1@gmail.com",
+      "shop": "demo-shop.myshopify.com",
+      "revenue": 125,
+      "currency": "USD",
+      "source": "/api/shopify/webhooks/orders-paid"
+    }
   },
   "response_sample": null,
-  "status": "PRODUCTION_HMAC_POSITIVE_TEST_FAILED",
-  "truth_claim": "Production HMAC positive test failed because the payload was signed with a placeholder or incorrect secret. This proves the route rejects invalid signatures, not that positive HMAC acceptance is proven.",
-  "next_required_action": "Re-run with the real Shopify app secret or send a real Shopify test webhook from the Partner Dashboard."
+  "status": "PRODUCTION_HMAC_POSITIVE_TEST_PASSED",
+  "truth_claim": "Production HMAC positive proof requires a correctly signed payload accepted by pay.abando.ai."
 }
