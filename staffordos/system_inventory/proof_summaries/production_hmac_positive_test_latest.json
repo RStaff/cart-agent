@@ -9,5 +9,6 @@
   },
   "response_sample": null,
   "status": "PRODUCTION_HMAC_POSITIVE_TEST_FAILED",
-  "truth_claim": "Production HMAC positive proof requires a correctly signed payload accepted by pay.abando.ai."
+  "truth_claim": "Production HMAC positive test failed because the payload was signed with a placeholder or incorrect secret. This proves the route rejects invalid signatures, not that positive HMAC acceptance is proven.",
+  "next_required_action": "Re-run with the real Shopify app secret or send a real Shopify test webhook from the Partner Dashboard."
 }
