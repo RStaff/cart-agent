@@ -3,6 +3,7 @@ import { sendAbandoRecoveryEmail } from "../lib/abandoRecoverySender.js";
 import { sendRecoveryEmail, getEmailReadiness } from "../lib/emailSender.js";
 import { sendRecoverySMS } from "../lib/smsSender.js";
 import { generateRecoveryMessage } from "../lib/recoveryMessageEngine.js";
+import { recordAbandoRealSendProof } from "../lib/staffordosProofRegister.js";
 import { join } from "node:path";
 
 export function installRecoveryLiveTestRoute(app, { repoRoot }) {
@@ -129,6 +130,7 @@ export function installRecoveryLiveTestRoute(app, { repoRoot }) {
     };
 
     await saveProof(proof);
+    await recordAbandoRealSendProof({ repoRoot, proof });
     res.status(anySuccess ? 200 : 409).json(proof);
   });
 

@@ -1,10 +1,11 @@
 {
-  "generated_at": "2026-05-02T17:44:07.811Z",
+  "generated_at": "2026-05-02T18:57:39.265Z",
   "command": "npm --prefix web run dev",
   "operatorApproved": true,
   "stages": [
     "mode_resolved",
     "operator_override_accepted",
+    "truth_map_preflight_passed",
     "guardrails_passed",
     "runtime_prepared"
   ],

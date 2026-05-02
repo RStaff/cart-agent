@@ -1,0 +1,12 @@
+{
+  "generated_at": "2026-05-02T18:57:39.107Z",
+  "slice": "proof_register_writeback_v1",
+  "owner": "StaffordOS PM + Architect",
+  "intent": "After Abando REAL_SEND_SUCCEEDED, write proof back into StaffordOS execution proof register and append-only proof log.",
+  "files": [
+    "web/src/lib/staffordosProofRegister.js",
+    "web/src/routes/recoveryLiveTest.esm.js",
+    "staffordos/system_inventory/output/execution_proof_register_v1.json",
+    "staffordos/system_inventory/output/abando_real_send_proof_log_v1.json"
+  ]
+}
