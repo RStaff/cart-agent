@@ -15,7 +15,7 @@ export default async function ReturnedPage({ searchParams }: PageProps) {
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.18),transparent_32%),linear-gradient(180deg,#07111f_0%,#020617_100%)] px-5 py-10 text-white">
       <section className="mx-auto max-w-[560px] rounded-[34px] border border-white/10 bg-slate-900/80 p-6 shadow-[0_30px_90px_rgba(0,0,0,0.45)] backdrop-blur">
         <div className="mx-auto mb-5 flex w-fit items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3">
-          <img src="/brand/abando-logo-transparent.png" alt="Abando" className="h-6 w-6" />
+          <img src="/abando-logo-transparent.png" alt="Abando" className="h-6 w-6" />
           <span className="text-sm font-black tracking-wide">Abando™</span>
         </div>
 

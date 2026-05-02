@@ -1,0 +1,28 @@
+{
+  "generated_at": "2026-05-02T21:17:52.653Z",
+  "check_name": "shopify_webhook_production_registration_check_v1",
+  "status": "NEEDS_ENV",
+  "expected_topic": "orders/paid",
+  "expected_callback_url": "https://pay.abando.ai/api/shopify/webhooks/orders-paid",
+  "expected_route": "/api/shopify/webhooks/orders-paid",
+  "hmac_secret_required": "SHOPIFY_API_SECRET",
+  "missing_required_env": [
+    "SHOPIFY_API_SECRET"
+  ],
+  "observed_env": {
+    "SHOPIFY_API_SECRET": "missing",
+    "SHOPIFY_API_KEY": "missing",
+    "SHOPIFY_APP_URL": "missing",
+    "ABANDO_PUBLIC_APP_ORIGIN": "missing",
+    "APP_URL": "missing",
+    "PUBLIC_APP_URL": "missing"
+  },
+  "manual_confirmation_required": [
+    "Open Shopify Partner Dashboard",
+    "Open Abando app",
+    "Confirm orders/paid webhook points to expected_callback_url",
+    "Confirm production runtime has SHOPIFY_API_SECRET set",
+    "Send Shopify test webhook or create test order after install"
+  ],
+  "truth_claim": "Code route is ready for real Shopify HMAC webhook attribution; production registration still requires Shopify dashboard/app configuration confirmation."
+}

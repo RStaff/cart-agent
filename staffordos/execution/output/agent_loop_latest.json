@@ -1,0 +1,23 @@
+{
+  "generated_at": "2026-05-02T20:33:01.155Z",
+  "command": "npm --prefix web run dev",
+  "operatorApproved": true,
+  "qaProfile": "abando_return_attribution",
+  "stages": [
+    "mode_resolved",
+    "operator_override_accepted",
+    "scope_forge_enforced",
+    "truth_map_preflight_passed",
+    "guardrails_passed",
+    "runtime_prepared",
+    "runtime_qa_passed"
+  ],
+  "status": "EXECUTING_WITH_QA_PASSED",
+  "mode": {
+    "decision": "IGNORE",
+    "executionMode": "AUTO",
+    "reasons": [
+      "Score is below the automation threshold."
+    ]
+  }
+}

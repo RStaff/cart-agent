@@ -1,0 +1,27 @@
+{
+  "generated_at": "2026-05-02T21:12:50.141Z",
+  "completed_at": "2026-05-02T21:12:50.200Z",
+  "qa_profile": "abando_real_shopify_hmac_order_attribution",
+  "status": "PASSED",
+  "result": {
+    "endpoint": "/api/shopify/webhooks/orders-paid",
+    "status": "PASSED",
+    "json": {
+      "ok": true,
+      "status": "REAL_SHOPIFY_HMAC_ORDER_REVENUE_ATTRIBUTED",
+      "attribution": {
+        "timestamp": "2026-05-02T21:12:50.190Z",
+        "status": "ORDER_REVENUE_ATTRIBUTED",
+        "proof_type": "real_shopify_hmac_order_webhook_attribution",
+        "order_id": "real-hmac-qa-order-1001",
+        "checkout_id": "",
+        "checkout_token": "staffordos-runtime-qa-return",
+        "email": "rossstafford1@gmail.com",
+        "shop": "demo-shop.myshopify.com",
+        "revenue": 125,
+        "currency": "USD",
+        "source": "/api/shopify/webhooks/orders-paid"
+      }
+    }
+  }
+}

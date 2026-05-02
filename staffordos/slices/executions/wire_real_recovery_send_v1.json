@@ -1,0 +1,14 @@
+{
+  "generated_at": "2026-05-02T16:53:19.963Z",
+  "slice": "wire_real_recovery_send_v1",
+  "owner": "StaffordOS PM + Architect",
+  "source_of_truth_files": [
+    "web/src/routes/recoveryLiveTest.esm.js",
+    "web/src/lib/emailSender.js",
+    "web/src/lib/smsSender.js",
+    "web/src/lib/recoveryMessageEngine.js"
+  ],
+  "change": "Connected playground proof route to real SMTP/Twilio sender path.",
+  "guardrail": "No fake PASS proof. Route now returns REAL_SEND_SUCCEEDED only when provider send succeeds.",
+  "backup": "web/src/routes/recoveryLiveTest.esm.js.bak_before_real_send_1777740799962"
+}\n

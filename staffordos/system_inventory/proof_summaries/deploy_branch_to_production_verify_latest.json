@@ -1,0 +1,25 @@
+{
+  "generated_at": "2026-05-02T21:33:10.240Z",
+  "check_name": "deploy_branch_to_production_and_verify_route_v1",
+  "branch": "staffordos/wire-real-recovery-send-20260502_125319",
+  "expected_latest_commit": "89e98047",
+  "production_base": "https://pay.abando.ai",
+  "expected_route": "/api/shopify/webhooks/orders-paid",
+  "expected_url": "https://pay.abando.ai/api/shopify/webhooks/orders-paid",
+  "route_probe": {
+    "reachable": true,
+    "status": 404,
+    "content_type": "text/html; charset=utf-8",
+    "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot GET /api/shopify/webhooks/orders-paid</pre>\n</body>\n</html>\n"
+  },
+  "production_status": "ROUTE_NOT_DEPLOYED_OR_NOT_REGISTERED",
+  "required_next_actions": [
+    "Open GitHub PR from staffordos/wire-real-recovery-send-20260502_125319 into main",
+    "Merge only after reviewing commits",
+    "Confirm Render deploy starts from main or selected deploy branch",
+    "Confirm production env has SHOPIFY_API_SECRET",
+    "Re-run this check after deploy",
+    "Then run real Shopify HMAC webhook test"
+  ],
+  "truth_claim": "Production route is only proven after merged/deployed code responds on pay.abando.ai and HMAC test passes."
+}

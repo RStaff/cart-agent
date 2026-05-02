@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-05-02T19:15:29.806Z",
+  "proof_name": "abando_real_send_proof_latest",
+  "status": "REAL_SEND_SUCCEEDED",
+  "proof_type": "abando_real_sender_attempt",
+  "route": "/api/recovery-actions/send-live-test",
+  "source": "/demo/playground",
+  "channel": "email",
+  "provider": "smtp",
+  "messageId": "<cebdcc35-adca-996c-1708-54d10f374f5c@staffordmedia.ai>",
+  "accepted": [
+    "rossstafford1@gmail.com"
+  ],
+  "rejected": [],
+  "truth_claim": "Abando recovery proof route successfully sent real SMTP email and recorded proof write-back."
+}
