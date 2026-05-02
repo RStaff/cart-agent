@@ -228,6 +228,8 @@ app.post("/api/shopify/webhooks/orders-paid", express.raw({ type: "application/j
       repoRoot,
       order: {
         ...order,
+        proof_type: "real_shopify_hmac_order_webhook_attribution",
+        source: "/api/shopify/webhooks/orders-paid",
         shop: req.get("x-shopify-shop-domain") || order.shop || order.shop_domain
       }
     });

@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-02T20:54:39.347Z",
-  "completed_at": "2026-05-02T20:54:39.395Z",
+  "generated_at": "2026-05-02T21:12:50.141Z",
+  "completed_at": "2026-05-02T21:12:50.200Z",
   "qa_profile": "abando_real_shopify_hmac_order_attribution",
   "status": "PASSED",
   "result": {
@@ -10,9 +10,9 @@
       "ok": true,
       "status": "REAL_SHOPIFY_HMAC_ORDER_REVENUE_ATTRIBUTED",
       "attribution": {
-        "timestamp": "2026-05-02T20:54:39.387Z",
+        "timestamp": "2026-05-02T21:12:50.190Z",
         "status": "ORDER_REVENUE_ATTRIBUTED",
-        "proof_type": "synthetic_shopify_order_webhook_attribution",
+        "proof_type": "real_shopify_hmac_order_webhook_attribution",
         "order_id": "real-hmac-qa-order-1001",
         "checkout_id": "",
         "checkout_token": "staffordos-runtime-qa-return",
@@ -20,7 +20,7 @@
         "shop": "demo-shop.myshopify.com",
         "revenue": 125,
         "currency": "USD",
-        "source": "/api/shopify/order-paid/attribution-test"
+        "source": "/api/shopify/webhooks/orders-paid"
       }
     }
   }

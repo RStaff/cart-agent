@@ -29,7 +29,7 @@ export function recordShopifyOrderAttribution({ repoRoot, order }) {
   const entry = {
     timestamp: new Date().toISOString(),
     status: "ORDER_REVENUE_ATTRIBUTED",
-    proof_type: "synthetic_shopify_order_webhook_attribution",
+    proof_type: order?.proof_type || "synthetic_shopify_order_webhook_attribution",
     order_id: String(order?.id || order?.order_id || ""),
     checkout_id: String(order?.checkout_id || ""),
     checkout_token: String(order?.checkout_token || order?.cart_token || ""),
@@ -37,7 +37,7 @@ export function recordShopifyOrderAttribution({ repoRoot, order }) {
     shop: String(order?.shop || order?.shop_domain || "demo-shop.myshopify.com"),
     revenue: amount,
     currency: String(order?.currency || "USD"),
-    source: "/api/shopify/order-paid/attribution-test"
+    source: order?.source || "/api/shopify/order-paid/attribution-test"
   };
 
   const log = readJson(orderLogFile, []);
