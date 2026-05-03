@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "storage": "database",
+  "count": 1,
+  "latest": {
+    "id": 1,
+    "shop": "cart-agent-dev.myshopify.com",
+    "event_type": "checkout_started",
+    "checkout_token": "proof-checkout-1777837847",
+    "cart_token": "proof-cart-1777837847",
+    "email": "rossstafford1@gmail.com",
+    "source": "staffordos_webhook_event_ingestion_proof",
+    "created_at": "2026-05-03T19:50:48.061Z"
+  },
+  "events": [
+    {
+      "id": 1,
+      "shop": "cart-agent-dev.myshopify.com",
+      "event_type": "checkout_started",
+      "checkout_token": "proof-checkout-1777837847",
+      "cart_token": "proof-cart-1777837847",
+      "email": "rossstafford1@gmail.com",
+      "source": "staffordos_webhook_event_ingestion_proof",
+      "created_at": "2026-05-03T19:50:48.061Z"
+    }
+  ]
+}
