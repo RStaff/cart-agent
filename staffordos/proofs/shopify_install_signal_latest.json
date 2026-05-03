@@ -1,13 +1,13 @@
 {
   "signal_id": "shopify_install_status_v1",
-  "generated_at": "2026-05-03T18:55:06.579Z",
+  "generated_at": "2026-05-03T19:06:39.845Z",
   "product": "abando",
   "shop": "cart-agent-dev.myshopify.com",
   "source_url": "https://pay.abando.ai/api/install/status?shop=cart-agent-dev.myshopify.com",
-  "status": "RED",
-  "installed": false,
-  "token": false,
-  "installed_at": null,
-  "operator_message": "Shopify OAuth install is not yet proven live.",
-  "next_action": "Complete OAuth install before continuing."
+  "status": "GREEN",
+  "installed": true,
+  "token": true,
+  "installed_at": "2026-05-03T19:05:11.284Z",
+  "operator_message": "Shopify OAuth install is proven live: token received and install state is true.",
+  "next_action": "Move to webhook/event ingestion proof."
 }

@@ -1,0 +1,9 @@
+{
+  "installed": true,
+  "token": true,
+  "shop": "cart-agent-dev.myshopify.com",
+  "installed_at": "2026-05-03T19:05:11.284Z",
+  "updated_at": "2026-05-03T19:05:42.971Z",
+  "scope": "read_orders,write_checkouts,write_script_tags",
+  "storage": "database"
+}
