@@ -25,6 +25,7 @@ import { installAskAbandoRoute } from "./routes/askAbando.esm.js";
 import { installRecoveryLedgerRoute } from './routes/recoveryLedger.esm.js';
 import { installRecoveryLiveTestRoute } from "./routes/recoveryLiveTest.esm.js";
 import { installShopify } from "./routes/installShopify.esm.js";
+import { installAuthShopify } from "./routes/authShopify.esm.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, "..", "..");
@@ -265,6 +266,7 @@ checkoutPublic(app);
 // ===== ABANDO RECOVERY / PLAYGROUND ROUTES =====
 // Source of truth: web/src/routes/playground.esm.js
 installShopify(app);
+installAuthShopify(app);
 installPlayground(app);
 
 // Ask Abando API route
