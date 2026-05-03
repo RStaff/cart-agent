@@ -1,56 +1,89 @@
 import crypto from "node:crypto";
-import fs from "node:fs";
-import path from "node:path";
+import { PrismaClient } from "@prisma/client";
 
-const INSTALL_STORE_PATH = "staffordos/proofs/abando_shopify_installs.json";
+const prisma = new PrismaClient();
 
-function normalizeShop(shop) {
-  return String(shop || "").trim().toLowerCase();
+const SHOPIFY_SCOPES =
+  process.env.SHOPIFY_SCOPES ||
+  "read_checkouts,read_orders,read_script_tags,write_checkouts,write_script_tags";
+
+function normalizeAppUrl() {
+  return String(process.env.APP_URL || "https://pay.abando.ai").replace(/\/+$/, "");
 }
 
-function readInstalls() {
-  try {
-    if (!fs.existsSync(INSTALL_STORE_PATH)) return {};
-    return JSON.parse(fs.readFileSync(INSTALL_STORE_PATH, "utf8"));
-  } catch {
-    return {};
-  }
+async function ensureInstallTable() {
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS shopify_installs (
+      shop TEXT PRIMARY KEY,
+      access_token TEXT NOT NULL,
+      scope TEXT,
+      installed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+  `);
 }
 
-function writeInstalls(data) {
-  fs.writeFileSync(INSTALL_STORE_PATH, JSON.stringify(data, null, 2));
+async function saveInstall({ shop, accessToken, scope }) {
+  await ensureInstallTable();
+
+  await prisma.$executeRawUnsafe(
+    `
+    INSERT INTO shopify_installs (shop, access_token, scope, installed_at, updated_at)
+    VALUES ($1, $2, $3, NOW(), NOW())
+    ON CONFLICT (shop)
+    DO UPDATE SET
+      access_token = EXCLUDED.access_token,
+      scope = EXCLUDED.scope,
+      updated_at = NOW();
+    `,
+    shop,
+    accessToken,
+    scope || null
+  );
+}
+
+async function getInstall(shop) {
+  await ensureInstallTable();
+
+  const rows = await prisma.$queryRawUnsafe(
+    `
+    SELECT shop, scope, installed_at, updated_at
+    FROM shopify_installs
+    WHERE shop = $1
+    LIMIT 1;
+    `,
+    shop
+  );
+
+  return rows?.[0] || null;
 }
 
 export function installAuthShopify(app) {
   app.get("/auth", async (req, res) => {
-    const shop = normalizeShop(req.query.shop);
+    const shop = req.query.shop;
 
-    if (!shop || !shop.endsWith(".myshopify.com")) {
+    if (!shop || !String(shop).endsWith(".myshopify.com")) {
       return res.status(400).send("Invalid shop");
     }
 
     const apiKey = process.env.SHOPIFY_API_KEY;
-    const scopes =
-      process.env.SHOPIFY_SCOPES ||
-      "read_checkouts,read_orders,read_script_tags,write_checkouts,write_script_tags";
-
-    const appUrl = String(process.env.APP_URL || "https://pay.abando.ai").replace(/\/+$/, "");
-    const redirectUri = `${appUrl}/auth/callback`;
+    const redirectUri = `${normalizeAppUrl()}/auth/callback`;
     const state = crypto.randomBytes(16).toString("hex");
 
     const installUrl =
       `https://${shop}/admin/oauth/authorize?` +
-      `client_id=${encodeURIComponent(apiKey)}` +
-      `&scope=${encodeURIComponent(scopes)}` +
-      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-      `&state=${encodeURIComponent(state)}`;
+      new URLSearchParams({
+        client_id: apiKey,
+        scope: SHOPIFY_SCOPES,
+        redirect_uri: redirectUri,
+        state
+      }).toString();
 
     return res.redirect(installUrl);
   });
 
   app.get("/auth/callback", async (req, res) => {
-    const shop = normalizeShop(req.query.shop);
-    const code = req.query.code;
+    const { shop, code } = req.query;
 
     if (!shop || !code) {
       return res.status(400).send("Missing shop or code");
@@ -74,23 +107,18 @@ export function installAuthShopify(app) {
         return res.status(500).send("Token exchange failed");
       }
 
-      const installs = readInstalls();
+      await saveInstall({
+        shop,
+        accessToken: data.access_token,
+        scope: data.scope || SHOPIFY_SCOPES
+      });
 
-      installs[shop] = {
-        installed: true,
-        token: true,
-        scope: data.scope || null,
-        installed_at: new Date().toISOString()
-      };
-
-      writeInstalls(installs);
-
-      console.log("✅ INSTALL STORED:", shop);
+      console.log("✅ INSTALL STORED IN DATABASE:", shop);
 
       return res.send(`
         <h1>✅ Abando Installed</h1>
         <p>Shop: ${shop}</p>
-        <p>Status: Token received + stored</p>
+        <p>Status: Token received + stored in database</p>
       `);
     } catch (err) {
       console.error("❌ TOKEN EXCHANGE ERROR:", err);
@@ -98,26 +126,42 @@ export function installAuthShopify(app) {
     }
   });
 
-  app.get("/api/install/status", (req, res) => {
-    const shop = normalizeShop(req.query.shop);
-    const installs = readInstalls();
-    const record = installs[shop];
+  app.get("/api/install/status", async (req, res) => {
+    const shop = req.query.shop;
 
-    if (!record) {
-      return res.json({
-        installed: false,
-        shop,
-        store_path: INSTALL_STORE_PATH,
-        known_shops: Object.keys(installs)
-      });
+    if (!shop) {
+      return res.status(400).json({ installed: false, error: "missing_shop" });
     }
 
-    return res.json({
-      installed: true,
-      token: true,
-      shop,
-      installed_at: record.installed_at,
-      scope: record.scope
-    });
+    try {
+      const record = await getInstall(shop);
+
+      if (!record) {
+        return res.json({
+          installed: false,
+          shop,
+          storage: "database",
+          known: false
+        });
+      }
+
+      return res.json({
+        installed: true,
+        token: true,
+        shop: record.shop,
+        installed_at: record.installed_at,
+        updated_at: record.updated_at,
+        scope: record.scope,
+        storage: "database"
+      });
+    } catch (err) {
+      console.error("❌ INSTALL STATUS ERROR:", err);
+      return res.status(500).json({
+        installed: false,
+        shop,
+        storage: "database",
+        error: "install_status_query_failed"
+      });
+    }
   });
 }
