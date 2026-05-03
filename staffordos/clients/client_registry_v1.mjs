@@ -1,0 +1,130 @@
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { dirname } from "node:path";
+
+const REGISTRY_PATH = "staffordos/clients/client_registry_v1.json";
+
+function now() {
+  return new Date().toISOString();
+}
+
+function ensureRegistry() {
+  mkdirSync(dirname(REGISTRY_PATH), { recursive: true });
+
+  if (!existsSync(REGISTRY_PATH)) {
+    writeFileSync(
+      REGISTRY_PATH,
+      JSON.stringify({
+        schema: "staffordos.client_registry.v1",
+        purpose:
+          "Canonical registry for StaffordOS clients, separating Stafford Media business revenue from ShopiFixer audit/fix data and Abando merchant performance data.",
+        generated_at: now(),
+        clients: []
+      }, null, 2)
+    );
+  }
+}
+
+export function readClientRegistry() {
+  ensureRegistry();
+  return JSON.parse(readFileSync(REGISTRY_PATH, "utf8"));
+}
+
+export function writeClientRegistry(registry) {
+  registry.generated_at = now();
+  writeFileSync(REGISTRY_PATH, JSON.stringify(registry, null, 2) + "\n");
+}
+
+export function upsertClient({
+  client_id,
+  merchant_shop,
+  source = "unknown",
+  status = "prospect",
+  contact = {},
+  deal = {},
+  shopifixer = {},
+  abando = {},
+  business = {},
+  notes = []
+}) {
+  if (!client_id && !merchant_shop) {
+    throw new Error("client_id_or_merchant_shop_required");
+  }
+
+  const id = client_id || merchant_shop;
+  const registry = readClientRegistry();
+
+  const existingIndex = registry.clients.findIndex(
+    (client) => client.client_id === id || client.merchant_shop === merchant_shop
+  );
+
+  const existing = existingIndex >= 0 ? registry.clients[existingIndex] : {};
+
+  const merged = {
+    client_id: id,
+    merchant_shop: merchant_shop || existing.merchant_shop || null,
+    source: source || existing.source || "unknown",
+    status: status || existing.status || "prospect",
+    created_at: existing.created_at || now(),
+    updated_at: now(),
+
+    contact: {
+      ...(existing.contact || {}),
+      ...contact
+    },
+
+    deal: {
+      type: null,
+      value: 0,
+      currency: "USD",
+      closed_at: null,
+      payment_status: "unpaid",
+      ...(existing.deal || {}),
+      ...deal
+    },
+
+    shopifixer: {
+      audit_status: "not_started",
+      audit_score: null,
+      primary_problem: null,
+      fix_status: "not_started",
+      latest_audit_at: null,
+      ...(existing.shopifixer || {}),
+      ...shopifixer
+    },
+
+    abando: {
+      installed: false,
+      install_status: "unknown",
+      checkout_events: 0,
+      recovery_actions: 0,
+      merchant_revenue_recovered: 0,
+      currency: "USD",
+      last_recovery_at: null,
+      ...(existing.abando || {}),
+      ...abando
+    },
+
+    business: {
+      stafford_revenue_earned: 0,
+      stafford_recurring_revenue: 0,
+      lifetime_value: 0,
+      next_action: null,
+      ...(existing.business || {}),
+      ...business
+    },
+
+    notes: [
+      ...(existing.notes || []),
+      ...notes
+    ]
+  };
+
+  if (existingIndex >= 0) {
+    registry.clients[existingIndex] = merged;
+  } else {
+    registry.clients.push(merged);
+  }
+
+  writeClientRegistry(registry);
+  return merged;
+}

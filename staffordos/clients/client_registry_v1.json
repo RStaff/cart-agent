@@ -1,0 +1,54 @@
+{
+  "schema": "staffordos.client_registry.v1",
+  "purpose": "Canonical registry for StaffordOS clients, separating Stafford Media business revenue from ShopiFixer audit/fix data and Abando merchant performance data.",
+  "generated_at": "2026-05-03T22:38:50.701Z",
+  "clients": [
+    {
+      "client_id": "cart-agent-dev.myshopify.com",
+      "merchant_shop": "cart-agent-dev.myshopify.com",
+      "source": "abando_proof_loop",
+      "status": "proof_client",
+      "created_at": "2026-05-03T22:38:50.701Z",
+      "updated_at": "2026-05-03T22:38:50.701Z",
+      "contact": {
+        "email": "rossstafford1@gmail.com"
+      },
+      "deal": {
+        "type": "internal_proof",
+        "value": 0,
+        "currency": "USD",
+        "closed_at": null,
+        "payment_status": "not_billable"
+      },
+      "shopifixer": {
+        "audit_status": "not_started",
+        "audit_score": null,
+        "primary_problem": null,
+        "fix_status": "not_started",
+        "latest_audit_at": null
+      },
+      "abando": {
+        "installed": true,
+        "install_status": "db_backed_green",
+        "checkout_events": 1,
+        "recovery_actions": 1,
+        "merchant_revenue_recovered": 100,
+        "currency": "USD",
+        "last_recovery_at": "2026-05-03T22:38:50.700Z"
+      },
+      "business": {
+        "stafford_revenue_earned": 0,
+        "stafford_recurring_revenue": 0,
+        "lifetime_value": 0,
+        "next_action": "Use proof loop to sell first external merchant."
+      },
+      "notes": [
+        {
+          "at": "2026-05-03T22:38:50.701Z",
+          "type": "proof",
+          "text": "Abando proof loop completed: install, checkout event, decision, trigger, email send, return, and revenue attribution."
+        }
+      ]
+    }
+  ]
+}
