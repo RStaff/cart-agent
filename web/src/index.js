@@ -28,6 +28,7 @@ import { installShopify } from "./routes/installShopify.esm.js";
 import { installAuthShopify } from "./routes/authShopify.esm.js";
 import { installCheckoutSignals } from "./routes/checkoutSignals.esm.js";
 import { installCheckoutEventProof } from "./routes/checkoutEventProof.esm.js";
+import { installMerchantSummary } from "./routes/merchantSummary.esm.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, "..", "..");
@@ -270,6 +271,7 @@ checkoutPublic(app);
 installShopify(app);
 installAuthShopify(app);
 installCheckoutEventProof(app);
+installMerchantSummary(app);
 installCheckoutSignals(app);
 installPlayground(app);
 
