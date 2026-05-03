@@ -2,7 +2,7 @@
 
 client_id = "83114672506075ba4866194fe0160cde"
 name = "cart-agent"
-application_url = "https://dev.abando.ai"
+application_url = "https://pay.abando.ai"
 embedded = true
 handle = "cart-agent-1"
 
@@ -12,26 +12,17 @@ automatically_update_urls_on_dev = true
 [webhooks]
 api_version = "2025-07"
 
-  # Dev-safe local preview config:
-  # Shopify CLI dev preview currently fails before startup when the app config
-  # requests webhook topics that Shopify treats as protected-customer-data
-  # subscriptions without approval.
-  #
-  # Future approved/production intent is preserved in
-  # `docs/shopify-approved-webhook-topics.md` and should be restored once the
-  # app has the required protected data access.
-
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "read_checkouts,read_orders,write_checkouts,read_script_tags,write_script_tags"
+scopes = "read_checkouts,read_orders,read_script_tags,write_checkouts,write_script_tags"
 optional_scopes = [ ]
 use_legacy_install_flow = false
 
 [auth]
 redirect_urls = [
-  "https://dev.abando.ai/auth/callback",
+  "https://pay.abando.ai/auth/callback",
   "https://dev.abando.ai/auth/shopify/callback",
-  "https://dev.abando.ai/api/auth/callback"
+  "https://pay.abando.ai/api/auth/callback"
 ]
 
 [pos]
