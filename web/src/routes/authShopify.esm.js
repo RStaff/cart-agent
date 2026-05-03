@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
-const INSTALL_STORE_PATH = "/tmp/abando_shopify_installs.json";
+const INSTALL_STORE_PATH = "staffordos/proofs/abando_shopify_installs.json";
 
 function normalizeShop(shop) {
   return String(shop || "").trim().toLowerCase();
