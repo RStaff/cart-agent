@@ -29,6 +29,7 @@ import { installAuthShopify } from "./routes/authShopify.esm.js";
 import { installCheckoutSignals } from "./routes/checkoutSignals.esm.js";
 import { installCheckoutEventProof } from "./routes/checkoutEventProof.esm.js";
 import { installMerchantSummary } from "./routes/merchantSummary.esm.js";
+import { installRecoveryTrigger } from "./routes/recoveryTrigger.esm.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, "..", "..");
@@ -272,6 +273,7 @@ installShopify(app);
 installAuthShopify(app);
 installCheckoutEventProof(app);
 installMerchantSummary(app);
+installRecoveryTrigger(app);
 installCheckoutSignals(app);
 installPlayground(app);
 
