@@ -6,6 +6,112 @@ function now() {
   return new Date().toISOString();
 }
 
+
+function computePriorityScore(client) {
+  const revenue = client.revenue || {};
+  const abando = client.abando || {};
+  const lifecycle = client.lifecycle || {};
+  const nextAction = client.next_action || {};
+
+  const revenuePotential =
+    Number(revenue.shopifixer_one_time || 0) +
+    Number(revenue.abando_recurring_mrr || 0) * 12 +
+    Number(abando.merchant_revenue_recovered || 0);
+
+  const easeOfClose =
+    lifecycle.stage === "revenue_active" ? 95 :
+    lifecycle.stage === "deal_won" ? 90 :
+    lifecycle.stage === "proposal_sent" ? 75 :
+    lifecycle.stage === "audit_completed" ? 65 :
+    lifecycle.stage === "lead" ? 40 :
+    50;
+
+  const timeToCash =
+    nextAction.type === "collect_payment" ? 95 :
+    nextAction.type === "close" ? 85 :
+    nextAction.type === "proposal" ? 70 :
+    nextAction.type === "outreach" ? 45 :
+    nextAction.type === "monitor" ? 35 :
+    50;
+
+  const health = client.system_health || {};
+  const greenCount = Object.entries(health)
+    .filter(([key, value]) => key !== "last_verified_at" && value === "green")
+    .length;
+
+  const systemConfidence = Math.min(100, greenCount * 20);
+
+  const total =
+    Math.round(
+      (Math.min(100, revenuePotential) * 0.35) +
+      (easeOfClose * 0.25) +
+      (timeToCash * 0.25) +
+      (systemConfidence * 0.15)
+    );
+
+  return {
+    revenue_potential: Math.min(100, revenuePotential),
+    ease_of_close: easeOfClose,
+    time_to_cash: timeToCash,
+    system_confidence: systemConfidence,
+    total
+  };
+}
+
+function detectBlockers(client) {
+  const blockers = [];
+
+  const health = client.system_health || {};
+  for (const [key, value] of Object.entries(health)) {
+    if (key !== "last_verified_at" && value === "red") {
+      blockers.push({
+        type: "system_health",
+        severity: "high",
+        source: key,
+        message: `${key} is red`
+      });
+    }
+  }
+
+  if (client.lifecycle?.stage === "proposal_sent" && client.deal?.payment_status !== "paid") {
+    blockers.push({
+      type: "payment",
+      severity: "medium",
+      source: "deal.payment_status",
+      message: "Proposal sent but payment is not collected"
+    });
+  }
+
+  if (client.lifecycle?.stage === "fix_in_progress" && client.shopifixer?.fix_status !== "completed") {
+    blockers.push({
+      type: "execution",
+      severity: "medium",
+      source: "shopifixer.fix_status",
+      message: "Fix is in progress and not yet completed"
+    });
+  }
+
+  if (client.abando?.installed === true && Number(client.abando?.checkout_events || 0) > 0 && Number(client.abando?.recovery_actions || 0) === 0) {
+    blockers.push({
+      type: "recovery",
+      severity: "high",
+      source: "abando.recovery_actions",
+      message: "Checkout events exist but no recovery action has fired"
+    });
+  }
+
+  return {
+    blocked: blockers.length > 0,
+    blocker_count: blockers.length,
+    highest_severity:
+      blockers.some((b) => b.severity === "high") ? "high" :
+      blockers.some((b) => b.severity === "medium") ? "medium" :
+      blockers.length ? "low" : null,
+    blockers
+  };
+}
+
+
 function computeNextAction(client) {
   const stage = client.lifecycle?.stage || "lead";
   const auditStatus = client.shopifixer?.audit_status || "not_started";
@@ -203,6 +309,32 @@ function run() {
         ...decision.next_action,
         updated_at: timestamp
       },
+      priority_score: computePriorityScore({
+        ...client,
+        lifecycle: {
+          ...(client.lifecycle || {}),
+          stage: decision.lifecycle_stage,
+          blocked: decision.blocked,
+          block_reason: decision.block_reason
+        },
+        next_action: {
+          ...(client.next_action || {}),
+          ...decision.next_action
+        }
+      }),
+      blocker_detection: detectBlockers({
+        ...client,
+        lifecycle: {
+          ...(client.lifecycle || {}),
+          stage: decision.lifecycle_stage,
+          blocked: decision.blocked,
+          block_reason: decision.block_reason
+        },
+        next_action: {
+          ...(client.next_action || {}),
+          ...decision.next_action
+        }
+      }),
       decision_trace: {
         engine: "next_action_engine_v1",
         evaluated_at: timestamp,
@@ -227,7 +359,9 @@ function run() {
       blocked: client.lifecycle.blocked,
       next_action: client.next_action.type,
       owner: client.next_action.owner,
-      instructions: client.next_action.instructions
+      instructions: client.next_action.instructions,
+      priority_total: client.priority_score?.total,
+      blocker_count: client.blocker_detection?.blocker_count
     }))
   }, null, 2));
 }
