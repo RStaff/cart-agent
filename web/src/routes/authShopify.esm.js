@@ -13,7 +13,8 @@ export function installAuthShopify(app) {
 
     const apiKey = process.env.SHOPIFY_API_KEY;
     const scopes = process.env.SHOPIFY_SCOPES;
-    const redirectUri = `${process.env.APP_URL}/auth/callback`;
+    const appUrl = String(process.env.APP_URL || "https://pay.abando.ai").replace(/\/+$/, "");
+    const redirectUri = `${appUrl}/auth/callback`;
 
     const state = crypto.randomBytes(16).toString("hex");
 
