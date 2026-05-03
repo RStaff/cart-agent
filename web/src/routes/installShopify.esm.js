@@ -259,7 +259,7 @@ export function installShopify(app, { getShopRecord } = {}) {
         </div>
 
         <div style="margin-top:12px">
-          <form method="GET" action="/auth">
+          <form method="GET" action="/auth/shopify">
             <input type="text" name="shop" placeholder="your-store.myshopify.com" aria-label="Shop domain" value="${prefilledShop || ""}" required>
             ${inviteId ? `<input type="hidden" name="invite" value="${inviteId}">` : ""}
             <button class="cta" type="submit">Connect Shopify</button>
