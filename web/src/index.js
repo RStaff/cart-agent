@@ -27,6 +27,7 @@ import { installRecoveryLiveTestRoute } from "./routes/recoveryLiveTest.esm.js";
 import { installShopify } from "./routes/installShopify.esm.js";
 import { installAuthShopify } from "./routes/authShopify.esm.js";
 import { installCheckoutSignals } from "./routes/checkoutSignals.esm.js";
+import { installCheckoutEventProof } from "./routes/checkoutEventProof.esm.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, "..", "..");
@@ -268,6 +269,7 @@ checkoutPublic(app);
 // Source of truth: web/src/routes/playground.esm.js
 installShopify(app);
 installAuthShopify(app);
+installCheckoutEventProof(app);
 installCheckoutSignals(app);
 installPlayground(app);
 
