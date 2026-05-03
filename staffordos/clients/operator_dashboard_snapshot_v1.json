@@ -1,7 +1,34 @@
 {
   "schema": "staffordos.operator_dashboard_snapshot.v1",
-  "generated_at": "2026-05-03T23:21:14.741Z",
+  "generated_at": "2026-05-03T23:36:29.987Z",
   "source": "staffordos/clients/client_registry_v1.json",
+  "primary_focus": {
+    "client_id": "cart-agent-dev.myshopify.com",
+    "merchant_shop": "cart-agent-dev.myshopify.com",
+    "reason": "Merchant value has been proven but Stafford revenue has not been captured.",
+    "action": "Convert recovered merchant value into paid plan or case-study close.",
+    "priority_total": 83,
+    "blocked": false,
+    "next_action": {
+      "type": "monitor",
+      "owner": "system",
+      "due_at": null,
+      "instructions": "Monitor recovered revenue and prepare upsell or case study.",
+      "auto_executable": true,
+      "created_at": "2026-05-03T22:50:11.281Z",
+      "updated_at": "2026-05-03T23:09:47.062Z"
+    }
+  },
+  "revenue_gaps": [
+    {
+      "client_id": "cart-agent-dev.myshopify.com",
+      "merchant_shop": "cart-agent-dev.myshopify.com",
+      "merchant_revenue": 100,
+      "stafford_revenue": 0,
+      "gap": 100,
+      "action": "Convert proof/recovery value into paid ShopiFixer or Abando plan."
+    }
+  ],
   "top_metrics": {
     "total_clients": 1,
     "active_revenue_clients": 1,
