@@ -1,0 +1,54 @@
+{
+  "schema": "staffordos.operator_dashboard_snapshot.v1",
+  "generated_at": "2026-05-03T23:21:14.741Z",
+  "source": "staffordos/clients/client_registry_v1.json",
+  "top_metrics": {
+    "total_clients": 1,
+    "active_revenue_clients": 1,
+    "blocked_clients": 0,
+    "total_stafford_revenue": 0,
+    "total_merchant_revenue_recovered": 100
+  },
+  "revenue_summary": {
+    "stafford_revenue": 0,
+    "merchant_revenue_recovered": 100,
+    "recurring_mrr": 0,
+    "currency": "USD"
+  },
+  "system_health_summary": {
+    "green": 1,
+    "red": 0,
+    "unknown": 0
+  },
+  "priority_clients": [
+    {
+      "client_id": "cart-agent-dev.myshopify.com",
+      "merchant_shop": "cart-agent-dev.myshopify.com",
+      "lifecycle_stage": "revenue_active",
+      "priority_total": 83,
+      "next_action": {
+        "type": "monitor",
+        "owner": "system",
+        "due_at": null,
+        "instructions": "Monitor recovered revenue and prepare upsell or case study.",
+        "auto_executable": true,
+        "created_at": "2026-05-03T22:50:11.281Z",
+        "updated_at": "2026-05-03T23:09:47.062Z"
+      },
+      "blocked": false,
+      "merchant_revenue_recovered": 100,
+      "stafford_ltv": 0
+    }
+  ],
+  "blocked_clients": [],
+  "next_actions": [
+    {
+      "client_id": "cart-agent-dev.myshopify.com",
+      "owner": "system",
+      "type": "monitor",
+      "instructions": "Monitor recovered revenue and prepare upsell or case study.",
+      "auto_executable": true,
+      "priority_total": 83
+    }
+  ]
+}
