@@ -37,6 +37,21 @@ function computeNextAction(client) {
     };
   }
 
+  if (merchantRevenueRecovered > 0) {
+    return {
+      lifecycle_stage: "revenue_active",
+      blocked: false,
+      block_reason: null,
+      next_action: {
+        type: "monitor",
+        owner: "system",
+        due_at: null,
+        instructions: "Monitor recovered revenue and prepare upsell or case study.",
+        auto_executable: true
+      }
+    };
+  }
+
   if (stage === "lead") {
     return {
       lifecycle_stage: "lead",
@@ -137,21 +152,6 @@ function computeNextAction(client) {
         owner: "system",
         due_at: null,
         instructions: "Trigger recovery action for latest checkout event.",
-        auto_executable: true
-      }
-    };
-  }
-
-  if (merchantRevenueRecovered > 0) {
-    return {
-      lifecycle_stage: "revenue_active",
-      blocked: false,
-      block_reason: null,
-      next_action: {
-        type: "monitor",
-        owner: "system",
-        due_at: null,
-        instructions: "Monitor recovered revenue and prepare upsell or case study.",
         auto_executable: true
       }
     };

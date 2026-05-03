@@ -1,7 +1,7 @@
 {
   "schema": "staffordos.client_registry.v1",
   "purpose": "Canonical registry for StaffordOS clients, separating Stafford Media business revenue from ShopiFixer audit/fix data and Abando merchant performance data.",
-  "generated_at": "2026-05-03T22:58:23.039Z",
+  "generated_at": "2026-05-03T23:01:19.260Z",
   "clients": [
     {
       "client_id": "cart-agent-dev.myshopify.com",
@@ -9,7 +9,7 @@
       "source": "abando_proof_loop",
       "status": "proof_client",
       "created_at": "2026-05-03T22:38:50.701Z",
-      "updated_at": "2026-05-03T22:58:23.039Z",
+      "updated_at": "2026-05-03T23:01:19.260Z",
       "contact": {
         "email": "rossstafford1@gmail.com"
       },
@@ -49,19 +49,19 @@
         }
       ],
       "lifecycle": {
-        "stage": "audit_requested",
-        "stage_updated_at": "2026-05-03T22:58:23.039Z",
+        "stage": "revenue_active",
+        "stage_updated_at": "2026-05-03T23:01:19.260Z",
         "blocked": false,
         "block_reason": null
       },
       "next_action": {
-        "type": "audit",
+        "type": "monitor",
         "owner": "system",
         "due_at": null,
-        "instructions": "Run ShopiFixer audit and write findings to client record.",
+        "instructions": "Monitor recovered revenue and prepare upsell or case study.",
         "auto_executable": true,
         "created_at": "2026-05-03T22:50:11.281Z",
-        "updated_at": "2026-05-03T22:58:23.039Z"
+        "updated_at": "2026-05-03T23:01:19.260Z"
       },
       "revenue": {
         "shopifixer_one_time": 0,
@@ -88,9 +88,9 @@
       },
       "decision_trace": {
         "engine": "next_action_engine_v1",
-        "evaluated_at": "2026-05-03T22:58:23.039Z",
-        "lifecycle_stage": "audit_requested",
-        "next_action_type": "audit",
+        "evaluated_at": "2026-05-03T23:01:19.260Z",
+        "lifecycle_stage": "revenue_active",
+        "next_action_type": "monitor",
         "blocked": false,
         "block_reason": null
       }
@@ -135,7 +135,7 @@
   },
   "decision_engine": {
     "name": "staffordos.next_action_engine_v1",
-    "generated_at": "2026-05-03T22:58:23.039Z",
+    "generated_at": "2026-05-03T23:01:19.260Z",
     "rule": "Deterministically derive lifecycle, blocker state, and next action from client truth."
   }
 }
