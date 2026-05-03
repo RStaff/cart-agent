@@ -1,7 +1,7 @@
 {
   "schema": "staffordos.client_registry.v1",
   "purpose": "Canonical registry for StaffordOS clients, separating Stafford Media business revenue from ShopiFixer audit/fix data and Abando merchant performance data.",
-  "generated_at": "2026-05-03T22:38:50.701Z",
+  "generated_at": "2026-05-03T22:50:11.281Z",
   "clients": [
     {
       "client_id": "cart-agent-dev.myshopify.com",
@@ -9,7 +9,7 @@
       "source": "abando_proof_loop",
       "status": "proof_client",
       "created_at": "2026-05-03T22:38:50.701Z",
-      "updated_at": "2026-05-03T22:38:50.701Z",
+      "updated_at": "2026-05-03T22:50:11.281Z",
       "contact": {
         "email": "rossstafford1@gmail.com"
       },
@@ -39,8 +39,7 @@
       "business": {
         "stafford_revenue_earned": 0,
         "stafford_recurring_revenue": 0,
-        "lifetime_value": 0,
-        "next_action": "Use proof loop to sell first external merchant."
+        "lifetime_value": 0
       },
       "notes": [
         {
@@ -48,7 +47,82 @@
           "type": "proof",
           "text": "Abando proof loop completed: install, checkout event, decision, trigger, email send, return, and revenue attribution."
         }
-      ]
+      ],
+      "lifecycle": {
+        "stage": "revenue_active",
+        "stage_updated_at": "2026-05-03T22:50:11.281Z",
+        "blocked": false,
+        "block_reason": null
+      },
+      "next_action": {
+        "type": "followup",
+        "owner": "ross",
+        "due_at": null,
+        "instructions": "Use proof loop to sell first external merchant.",
+        "auto_executable": false,
+        "created_at": "2026-05-03T22:50:11.281Z",
+        "updated_at": "2026-05-03T22:50:11.281Z"
+      },
+      "revenue": {
+        "shopifixer_one_time": 0,
+        "shopifixer_collected": false,
+        "abando_recurring_mrr": 0,
+        "abando_percentage": 0,
+        "total_lifetime_value": 0,
+        "currency": "USD"
+      },
+      "problem_profile": {
+        "type": null,
+        "severity": null,
+        "detected_by": null,
+        "recommended_fix": null,
+        "fix_template_id": null
+      },
+      "system_health": {
+        "abando_install": "green",
+        "event_ingestion": "green",
+        "recovery_trigger": "green",
+        "email_send": "green",
+        "return_tracking": "green",
+        "last_verified_at": "2026-05-03T22:50:11.281Z"
+      }
     }
-  ]
+  ],
+  "operating_model": {
+    "version": "operating_model_v1",
+    "purpose": "Separate StaffordOS business truth from ShopiFixer service truth and Abando merchant performance truth.",
+    "rules": [
+      "Abando revenue is merchant revenue, not Stafford revenue.",
+      "ShopiFixer tracks diagnosis and fix lifecycle.",
+      "StaffordOS tracks client lifecycle, deal state, next actions, business revenue, and system health.",
+      "Every client must have one lifecycle stage and one primary next action."
+    ],
+    "lifecycle_stages": [
+      "lead",
+      "audit_requested",
+      "audit_completed",
+      "proposal_sent",
+      "deal_won",
+      "fix_in_progress",
+      "fix_completed",
+      "abando_installed",
+      "revenue_active",
+      "paused",
+      "lost"
+    ],
+    "next_action_types": [
+      "discover",
+      "outreach",
+      "audit",
+      "proposal",
+      "close",
+      "collect_payment",
+      "fix",
+      "install_abando",
+      "trigger_recovery",
+      "followup",
+      "monitor",
+      "none"
+    ]
+  }
 }
