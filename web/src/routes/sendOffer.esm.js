@@ -43,19 +43,17 @@ export function installSendOffer(app) {
       return res.status(200).json({
         ok: true,
         status: "OFFER_SENT",
-        to: email,
-        provider: "smtp",
-        messageId: info.messageId || null,
-        accepted: info.accepted || [],
-        rejected: info.rejected || []
+        messageId: info.messageId
       });
 
     } catch (err) {
-      console.error("[send-offer] error:", err);
+      console.error("🔥 SMTP ERROR:", err);
+
       return res.status(500).json({
         ok: false,
         error: "offer_send_failed",
-        detail: err instanceof Error ? err.message : String(err)
+        detail: err.message,
+        code: err.code
       });
     }
   });
