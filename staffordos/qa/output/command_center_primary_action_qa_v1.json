@@ -1,12 +1,19 @@
 {
   "schema": "staffordos.command_center_qa_gate.v1",
-  "generated_at": "2026-05-04T19:15:10.665Z",
+  "generated_at": "2026-05-04T19:39:55.756Z",
   "page": "/operator/command-center",
   "version": "operator_home_v1",
   "verdict": "pass",
-  "score": 100,
-  "findings": [],
-  "required_next_move": "Proceed to CTA execution wiring or Loop D review.",
+  "score": 88,
+  "findings": [
+    {
+      "severity": "high",
+      "area": "cta",
+      "finding": "Operator Home does not expose a clear prepare/execute CTA.",
+      "recommendation": "Add one clear button for the resolved primary action."
+    }
+  ],
+  "required_next_move": "Resolve QA findings before CTA execution.",
   "snapshot_primary_action": {
     "action_id": "primary_1777922106443",
     "action_label": "Follow up on real ShopiFixer offer and close payment.",

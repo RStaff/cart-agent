@@ -51,7 +51,7 @@ for (const banned of ["ActionFirstDashboard", "LeadQueue", "RossCommandCenterSur
   }
 }
 
-if (!operatorHome.includes("Prepare / execute action")) {
+if (!operatorHome.includes("Execute now action")) {
   add(
     "high",
     "cta",

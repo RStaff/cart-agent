@@ -146,7 +146,7 @@ export function OperatorHomeV1({
 
               <div className="operatorHomeCTAGroup">
                 <Link className="button buttonPrimary" href="/operator/leads">
-                  Prepare / execute action
+                  Execute now
                 </Link>
                 <Link className="button" href="/operator/revenue-command">
                   View revenue context
@@ -154,7 +154,14 @@ export function OperatorHomeV1({
               </div>
 
               <p className="hint">
-                Expected outcome: {action.expected_outcome || "Outcome not yet defined."}
+                
+      <div className="operatorMicroProof">
+        <span className="badge success">Revenue path</span>
+        <span className="badge success">Not blocked</span>
+        <span className="badge warn">Human judgment</span>
+      </div>
+    
+Expected outcome: {action.expected_outcome || "Outcome not yet defined."}
               </p>
             </article>
           </div>
@@ -162,7 +169,7 @@ export function OperatorHomeV1({
 
         <section className="grid gridTwo">
           <details className="panel operatorHomeDetails">
-            <summary>Why this action?</summary>
+            <summary>Why this action? (hidden)</summary>
             <div className="panelInner">
               {evidence.length ? (
                 <ul>
@@ -177,7 +184,7 @@ export function OperatorHomeV1({
           </details>
 
           <details className="panel operatorHomeDetails">
-            <summary>Guardrails / risks</summary>
+            <summary>Guardrails / risks (hidden)</summary>
             <div className="panelInner">
               {risk.length ? (
                 <ul>
@@ -193,7 +200,7 @@ export function OperatorHomeV1({
         </section>
 
         <details className="panel operatorHomeDetails">
-          <summary>Supporting system context</summary>
+          <summary>Supporting system context (hidden)</summary>
           <div className="panelInner">
             <div className="operatorHomeSummaryPills">
               <span>Domains: {summary.domains ?? 0}</span>
