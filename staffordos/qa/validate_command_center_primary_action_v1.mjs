@@ -51,11 +51,11 @@ for (const banned of ["ActionFirstDashboard", "LeadQueue", "RossCommandCenterSur
   }
 }
 
-if (!operatorHome.includes("Execute now action")) {
+if (!operatorHome.includes("Execute now")) {
   add(
     "high",
     "cta",
-    "Operator Home does not expose a clear prepare/execute CTA.",
+    "Operator Home does not expose a clear execution CTA.",
     "Add one clear button for the resolved primary action."
   );
 }
