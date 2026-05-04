@@ -1,0 +1,71 @@
+{
+  "schema": "staffordos.ux_integrity_report.v1",
+  "generated_at": "2026-05-04T16:55:46.886Z",
+  "page": "/operator/command-center",
+  "verdict": "not_sufficient",
+  "score": {
+    "architecture": 78,
+    "ux": 37,
+    "evidence_quality": 72
+  },
+  "findings": [
+    {
+      "severity": "high",
+      "area": "command_center_composition",
+      "finding": "Command center renders old artifact command center before the newer revenue/unit action surfaces.",
+      "evidence": "RossCommandCenterSurface appears before ActionFirstDashboard and UnitWorkSnapshotPanel.",
+      "recommendation": "Either promote current unit/revenue action to the top or clearly label the old artifact section as Legacy Build Artifact."
+    },
+    {
+      "severity": "medium",
+      "area": "action_alignment",
+      "finding": "Revenue dashboard and unit work currently agree on follow-up/close as the business action, but they render in separate sections.",
+      "evidence": {
+        "revenueAction": "Follow up on real ShopiFixer offer and close payment.",
+        "unitActions": [
+          "Follow up on real ShopiFixer offer and close payment.",
+          "Wait for payment or follow up before starting fix delivery.",
+          "Use schema foundation to connect Ask, Operate, Memory, Opportunity, Issue, Delivery, and Outcome layers.",
+          "Follow up on real ShopiFixer offer and close payment."
+        ]
+      },
+      "recommendation": "Merge into one primary action block instead of separate competing panels."
+    },
+    {
+      "severity": "medium",
+      "area": "unit_prioritization",
+      "finding": "Unit panel picks the first sorted item by local UI priority rules, not a canonical priority score.",
+      "evidence": "getPriority() is defined inside UI component.",
+      "recommendation": "Move priority decision into a unit snapshot builder/engine, not the UI."
+    },
+    {
+      "severity": "low",
+      "area": "progressive_disclosure",
+      "finding": "Background work is collapsed, which is good.",
+      "evidence": "UnitWorkSnapshotPanel uses details/summary for background work.",
+      "recommendation": "Keep this pattern."
+    },
+    {
+      "severity": "medium",
+      "area": "page_scope",
+      "finding": "Command center includes lead queue after revenue/unit panels, making the page long and mixed-purpose.",
+      "evidence": "LeadQueue is embedded directly in command-center page.",
+      "recommendation": "Command center should show lead summary and link to Lead Command, not full lead table."
+    },
+    {
+      "severity": "high",
+      "area": "duplicate_primary_question",
+      "finding": "Two sections ask versions of the same primary question.",
+      "evidence": "ActionFirstDashboard and UnitWorkSnapshotPanel both frame the next action.",
+      "recommendation": "Create one unified primary action section driven by unit/revenue truth."
+    },
+    {
+      "severity": "medium",
+      "area": "navigation_ownership",
+      "finding": "Navigation appears owned by nested components rather than a single page shell.",
+      "evidence": "OperatorNav is inside RossCommandCenterSurface, not clearly page-level.",
+      "recommendation": "Create one OperatorShell so every page has consistent navigation and layout."
+    }
+  ],
+  "recommended_next_move": "Build a canonical primary_action_snapshot_v1 from dashboard + unit truth, then make command center top section consume that single source instead of old artifact truth."
+}
