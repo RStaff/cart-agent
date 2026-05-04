@@ -1,17 +1,6 @@
 {
   "schema": "staffordos.preflight_report.v1",
-  "generated_at": "2026-05-04T18:16:56.615Z",
-  "status": "BLOCKED",
-  "findings": [
-    {
-      "severity": "critical",
-      "missing": "agent_inventory",
-      "path": "staffordos/system_inventory/output/agent_inventory_v1.json"
-    },
-    {
-      "severity": "critical",
-      "missing": "validator_map",
-      "path": "staffordos/qa/validator_map_v1.json"
-    }
-  ]
+  "generated_at": "2026-05-04T18:23:27.852Z",
+  "status": "GO",
+  "findings": []
 }
