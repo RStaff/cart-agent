@@ -1,0 +1,53 @@
+{
+  "schema": "staffordos.agent_performance.v1",
+  "generated_at": "2026-05-04T19:15:10.708Z",
+  "summary": {
+    "total_agents_detected": 75,
+    "validators_detected": 16,
+    "active_agents_in_this_loop": 5,
+    "utilization_percent_this_loop": 7
+  },
+  "agents": [
+    {
+      "agent_id": "staffordos_decision_resolve_primary_action_v1.mjs",
+      "path": "staffordos/decision/resolve_primary_action_v1.mjs",
+      "role": "decision_resolver",
+      "used_in_current_loop": true,
+      "output_quality": "effective",
+      "contribution_score": 30
+    },
+    {
+      "agent_id": "staffordos_preflight_run_preflight_check_v1.mjs",
+      "path": "staffordos/preflight/run_preflight_check_v1.mjs",
+      "role": "execution_gate",
+      "used_in_current_loop": true,
+      "output_quality": "effective",
+      "contribution_score": 25
+    },
+    {
+      "agent_id": "staffordos_system_inventory_build_agent_inventory_v1.mjs",
+      "path": "staffordos/system_inventory/build_agent_inventory_v1.mjs",
+      "role": "resource_inventory",
+      "used_in_current_loop": true,
+      "output_quality": "effective",
+      "contribution_score": 10
+    },
+    {
+      "agent_id": "staffordos_qa_build_validator_map_v1.mjs",
+      "path": "staffordos/qa/build_validator_map_v1.mjs",
+      "role": "validator_router",
+      "used_in_current_loop": true,
+      "output_quality": "effective",
+      "contribution_score": 10
+    },
+    {
+      "agent_id": "staffordos_qa_validate_command_center_primary_action_v1.mjs",
+      "path": "staffordos/qa/validate_command_center_primary_action_v1.mjs",
+      "role": "qa_validator",
+      "used_in_current_loop": true,
+      "output_quality": "effective",
+      "contribution_score": 25
+    }
+  ],
+  "note": "Utilization should not target 100% of all agents. It should target 100% of required agents for the active task."
+}
