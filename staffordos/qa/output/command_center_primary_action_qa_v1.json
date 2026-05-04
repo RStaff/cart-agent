@@ -1,0 +1,73 @@
+{
+  "schema": "staffordos.command_center_qa_gate.v1",
+  "generated_at": "2026-05-04T18:05:07.897Z",
+  "page": "/operator/command-center",
+  "verdict": "fail",
+  "score": 58,
+  "findings": [
+    {
+      "severity": "high",
+      "area": "visual_hierarchy",
+      "finding": "Legacy RossCommandCenterSurface appears before canonical primary action.",
+      "recommendation": "Primary action must appear before legacy artifact panels."
+    },
+    {
+      "severity": "high",
+      "area": "duplicate_action",
+      "finding": "Old ActionFirstDashboard is still rendered and asks a duplicate 'what should Ross do next?' question.",
+      "recommendation": "Remove or demote ActionFirstDashboard from Command Center."
+    },
+    {
+      "severity": "medium",
+      "area": "duplicate_unit_question",
+      "finding": "UnitWorkSnapshotPanel still appears on Command Center and can compete with primary action.",
+      "recommendation": "Show unit work only as collapsed supporting context or move to separate page."
+    },
+    {
+      "severity": "high",
+      "area": "page_scope",
+      "finding": "Full LeadQueue is still embedded on Command Center.",
+      "recommendation": "Replace with lead summary/link; keep full table on /operator/leads."
+    }
+  ],
+  "required_next_move": "Remove duplicate ActionFirstDashboard and full LeadQueue from Command Center; keep canonical PrimaryActionPanel as the only top decision.",
+  "snapshot_primary_action": {
+    "action_id": "primary_1777916948311",
+    "action_label": "Follow up on real ShopiFixer offer and close payment.",
+    "action_type": "revenue_close",
+    "domain_id": "shopifixer",
+    "product_id": "shopifixer",
+    "linked_units": [
+      "opp_cart-agent-dev.myshopify.com"
+    ],
+    "owner": "ross",
+    "priority_score": 100,
+    "urgency": "high",
+    "confidence": 0.82,
+    "confidence_band": "medium_high_human_validated",
+    "evidence": [
+      "Active proposal has direct revenue capture potential.",
+      "ShopiFixer is the current immediate one-time revenue path.",
+      "Ross-owned action can be advanced immediately.",
+      "Next action explicitly targets payment close.",
+      "Follow-up is the active bottleneck after offer send.",
+      "Merchant value proven: $100 gap between recovered value and Stafford revenue captured.",
+      "Current UX integrity score is 37; decision layer needed before further UI polish."
+    ],
+    "risk": [
+      "Do not start delivery work before payment is captured.",
+      "Do not treat merchant recovered value as Stafford revenue.",
+      "Human judgment required before executing irreversible actions."
+    ],
+    "next_step": "Follow up on real ShopiFixer offer and close payment.",
+    "expected_outcome": "Move active ShopiFixer proposal toward paid client status.",
+    "source_snapshots": [
+      "staffordos/snapshots/unit_work_snapshot_v1.json",
+      "staffordos/clients/operator_dashboard_snapshot_v1.json",
+      "staffordos/clients/client_registry_v1.json",
+      "staffordos/gates/confidence_gate_v1.json",
+      "staffordos/ux_audit/output/operator_command_center_ux_integrity_v1.json"
+    ],
+    "generated_at": "2026-05-04T17:49:08.309Z"
+  }
+}
