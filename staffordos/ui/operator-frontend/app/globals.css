@@ -1350,3 +1350,28 @@ textarea {
   color: #eab308;
 }
 
+
+.operatorExecuteWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.operatorExecuteStatus {
+  margin: 0;
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.operatorExecuteStatussuccess {
+  color: #34d399;
+}
+
+.operatorExecuteStatuserror {
+  color: #fca5a5;
+}
+
+.operatorExecuteStatusrunning {
+  color: #fde68a;
+}
+

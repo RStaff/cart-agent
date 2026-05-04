@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { OperatorNav } from "./OperatorNav";
+import { ExecutePrimaryActionButton } from "./ExecutePrimaryActionButton";
 
 type PrimaryActionSnapshot = {
   schema?: string;
@@ -145,9 +146,7 @@ export function OperatorHomeV1({
               </div>
 
               <div className="operatorHomeCTAGroup">
-                <Link className="button buttonPrimary" href="/operator/leads">
-                  Execute now
-                </Link>
+                <ExecutePrimaryActionButton />
                 <Link className="button" href="/operator/revenue-command">
                   View revenue context
                 </Link>

@@ -1,12 +1,12 @@
 {
   "schema": "staffordos.command_center_qa_gate.v1",
-  "generated_at": "2026-05-04T19:54:48.162Z",
+  "generated_at": "2026-05-04T20:09:43.209Z",
   "page": "/operator/command-center",
-  "version": "operator_home_v1",
+  "version": "operator_home_v1_cta_execution",
   "verdict": "pass",
   "score": 100,
   "findings": [],
-  "required_next_move": "Proceed to CTA execution wiring or Loop D review.",
+  "required_next_move": "CTA execution wiring is validated. Next: connect specific action handlers such as follow-up send/payment close.",
   "snapshot_primary_action": {
     "action_id": "primary_1777922106443",
     "action_label": "Follow up on real ShopiFixer offer and close payment.",
