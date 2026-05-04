@@ -1375,3 +1375,98 @@ textarea {
   color: #fde68a;
 }
 
+
+/* Execution Log */
+.executionLogContainer {
+  max-width: 1120px;
+}
+
+.executionMetricGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.executionMetric {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.72);
+  padding: 16px;
+}
+
+.executionMetric span {
+  display: block;
+  color: #94a3b8;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: 8px;
+}
+
+.executionMetric strong {
+  color: #f8fafc;
+  font-size: 28px;
+}
+
+.executionList {
+  display: grid;
+  gap: 12px;
+}
+
+.executionItem {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 16px;
+  padding: 14px;
+  background: rgba(15, 23, 42, 0.62);
+}
+
+.executionItem strong {
+  color: #f8fafc;
+  overflow-wrap: anywhere;
+}
+
+.executionItem p {
+  color: #cbd5e1;
+  margin: 8px 0;
+}
+
+.executionItem small {
+  color: #94a3b8;
+  overflow-wrap: anywhere;
+}
+
+.executionRuleGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.executionRuleCard {
+  border: 1px solid rgba(250, 204, 21, 0.22);
+  border-radius: 18px;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.72);
+}
+
+.executionRuleCard strong {
+  display: block;
+  color: #f8fafc;
+  line-height: 1.35;
+}
+
+.executionRuleCard p {
+  color: #cbd5e1;
+  line-height: 1.55;
+}
+
+.executionRuleCard small {
+  color: #94a3b8;
+}
+
+@media (max-width: 900px) {
+  .executionMetricGrid,
+  .executionRuleGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -3,6 +3,7 @@ import Link from "next/link";
 const CONTROL_PLANE_ROUTES = [
   { href: "/operator", label: "Console" },
   { href: "/operator/command-center", label: "Command Center" },
+  { href: "/operator/execution-log", label: "Execution Log" },
   { href: "/operator/capacity", label: "Capacity" },
   { href: "/operator/leads", label: "Leads" },
   { href: "/operator/revenue-command", label: "Revenue Command" },
