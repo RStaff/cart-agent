@@ -1,5 +1,20 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
+
+function appendJsonEvent(path, event) {
+  let existing = [];
+  if (existsSync(path)) {
+    try {
+      const raw = JSON.parse(readFileSync(path, "utf8"));
+      existing = Array.isArray(raw) ? raw : [raw];
+    } catch {
+      existing = [];
+    }
+  }
+  existing.push(event);
+  writeFileSync(path, JSON.stringify(existing, null, 2) + "\n");
+}
+
 const now = new Date().toISOString();
 
 mkdirSync("staffordos/events", { recursive: true });
