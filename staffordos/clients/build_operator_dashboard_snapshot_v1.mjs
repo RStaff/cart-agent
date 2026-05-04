@@ -125,7 +125,8 @@ const snapshot = {
       next_action: c.next_action,
       blocked: c.blocker_detection?.blocked || false,
       merchant_revenue_recovered: c.abando?.merchant_revenue_recovered || 0,
-      stafford_ltv: c.revenue?.total_lifetime_value || 0
+      stafford_ltv: c.revenue?.total_lifetime_value || 0,
+      close_engine: c.close_engine || null
     })),
 
   blocked_clients: clients
@@ -144,7 +145,8 @@ const snapshot = {
       type: c.next_action?.type,
       instructions: c.next_action?.instructions,
       auto_executable: c.next_action?.auto_executable,
-      priority_total: c.priority_score?.total || 0
+      priority_total: c.priority_score?.total || 0,
+      close_engine: c.close_engine || null
     }))
     .sort((a, b) => money(b.priority_total) - money(a.priority_total))
 };

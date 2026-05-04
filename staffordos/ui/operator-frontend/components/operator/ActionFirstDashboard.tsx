@@ -98,6 +98,37 @@ export function ActionFirstDashboard({ snapshot }: { snapshot: Snapshot }) {
             ))}
           </Card>
 
+          <Card title="Close Engine">
+            {snapshot.next_actions.map((action: any) => (
+              <div key={action.client_id} style={{ padding: "14px 0", borderTop: "1px solid rgba(148,163,184,.16)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                  <strong>{action.client_id}</strong>
+                  <Pill>{action.close_engine?.urgency || "no close signal"}</Pill>
+                </div>
+
+                {action.close_engine?.followup_ready ? (
+                  <>
+                    <p style={{ color: "#facc15", margin: "10px 0 8px", fontWeight: 700 }}>
+                      Follow-up ready · {action.close_engine.hours_since_proposal}h since proposal
+                    </p>
+                    <pre style={{
+                      whiteSpace: "pre-wrap",
+                      color: "#e2e8f0",
+                      background: "rgba(2,6,23,.72)",
+                      border: "1px solid rgba(148,163,184,.18)",
+                      borderRadius: 14,
+                      padding: 14,
+                      fontFamily: "inherit",
+                      lineHeight: 1.55
+                    }}>{action.close_engine.suggested_message}</pre>
+                  </>
+                ) : (
+                  <p style={{ color: "#94a3b8", margin: "8px 0 0" }}>No close follow-up ready.</p>
+                )}
+              </div>
+            ))}
+          </Card>
+
           <Card title="Next Actions">
             {snapshot.next_actions.map((action: any) => (
               <div key={action.client_id} style={{ padding: "14px 0", borderTop: "1px solid rgba(148,163,184,.16)" }}>
