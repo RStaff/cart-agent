@@ -1,6 +1,4 @@
 import { RossCommandCenterSurface } from "../../../components/operator/RossCommandCenterSurface";
-import { ActionFirstDashboard } from "../../../components/operator/ActionFirstDashboard";
-import { LeadQueue } from "../../../components/operator/LeadQueue";
 import { loadDashboardSnapshot } from "../../../lib/operator/loadDashboardSnapshot";
 import { loadUnitWorkSnapshot } from "../../../lib/operator/loadUnitWorkSnapshot";
 import { loadPrimaryActionSnapshot } from "../../../lib/operator/loadPrimaryActionSnapshot";
@@ -15,8 +13,13 @@ export default function RossCommandCenterPage() {
   return (
     <>
       <PrimaryActionPanel snapshot={primaryActionSnapshot} />
-      <RossCommandCenterSurface />
-      <ActionFirstDashboard snapshot={snapshot} />
+      <details style={{ marginTop: 20 }}>
+  <summary style={{ cursor: "pointer", color: "#94a3b8" }}>
+    Legacy Command Center (collapsed)
+  </summary>
+  <RossCommandCenterSurface />
+</details>
+      
       <main className="shell">
         <div className="container">
           <UnitWorkSnapshotPanel snapshot={unitWorkSnapshot} />
@@ -24,7 +27,7 @@ export default function RossCommandCenterPage() {
       </main>
       <main className="shell">
         <div className="container">
-          <LeadQueue />
+          
         </div>
       </main>
     </>
