@@ -95,7 +95,7 @@ export async function POST() {
   let loopDStatus = "not_run";
 
   try {
-    execFileSync("node", ["staffordos/loop_d/build_loop_d_feedback_v1.mjs"], {
+    execFileSync("node", [path.join(repoRoot, "staffordos", "loop_d", "build_loop_d_feedback_v1.mjs")], {
       cwd: repoRoot,
       stdio: "ignore"
     });
