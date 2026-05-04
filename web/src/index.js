@@ -31,6 +31,7 @@ import { installCheckoutEventProof } from "./routes/checkoutEventProof.esm.js";
 import { installMerchantSummary } from "./routes/merchantSummary.esm.js";
 import { installRecoveryTrigger } from "./routes/recoveryTrigger.esm.js";
 import { installRecoveryExecution } from "./routes/recoveryExecution.esm.js";
+import { installSendOffer } from "./routes/sendOffer.esm.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, "..", "..");
@@ -276,6 +277,7 @@ installCheckoutEventProof(app);
 installMerchantSummary(app);
 installRecoveryTrigger(app);
 installRecoveryExecution(app);
+installSendOffer(app);
 installCheckoutSignals(app);
 installPlayground(app);
 
