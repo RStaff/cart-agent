@@ -152,7 +152,7 @@ export function OperatorHomeV1({
                 </Link>
               </div>
 
-              <p className="hint">
+              <div className="hint">
                 
       <div className="operatorMicroProof">
         <span className="badge success">Revenue path</span>
@@ -161,7 +161,7 @@ export function OperatorHomeV1({
       </div>
     
 Expected outcome: {action.expected_outcome || "Outcome not yet defined."}
-              </p>
+              </div>
             </article>
           </div>
         </section>
