@@ -1,4 +1,5 @@
-import { getEmailReadiness, sendRecoveryEmail } from "../lib/emailSender.js";
+import nodemailer from "nodemailer";
+import { getEmailReadiness } from "../lib/emailSender.js";
 
 export function installSendOffer(app) {
   app.post("/api/shopifixer/send-offer", async (req, res) => {
@@ -22,7 +23,18 @@ export function installSendOffer(app) {
         });
       }
 
-      const result = await sendRecoveryEmail({
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT || 587),
+        secure: false,
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS
+        }
+      });
+
+      const info = await transporter.sendMail({
+        from: process.env.FROM_EMAIL || "support@staffordmedia.ai",
         to: email,
         subject,
         text: body
@@ -33,14 +45,17 @@ export function installSendOffer(app) {
         status: "OFFER_SENT",
         to: email,
         provider: "smtp",
-        result
+        messageId: info.messageId || null,
+        accepted: info.accepted || [],
+        rejected: info.rejected || []
       });
 
     } catch (err) {
       console.error("[send-offer] error:", err);
       return res.status(500).json({
         ok: false,
-        error: "offer_send_failed"
+        error: "offer_send_failed",
+        detail: err instanceof Error ? err.message : String(err)
       });
     }
   });
