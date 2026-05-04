@@ -119,6 +119,13 @@
         "blocker_count": 0,
         "highest_severity": null,
         "blockers": []
+      },
+      "close_engine": {
+        "last_evaluated_at": "2026-05-04T12:45:15.675Z",
+        "hours_since_proposal": 0,
+        "followup_ready": true,
+        "suggested_message": "Quick follow-up — we already recovered $100 from your store.\n\nWant me to lock this in so it runs consistently?",
+        "urgency": "low"
       }
     }
   ],
