@@ -1,0 +1,29 @@
+{
+  "schema": "staffordos.preflight_rules.v1",
+  "rules": [
+    {
+      "id": "pf_001",
+      "name": "agent_inventory_required",
+      "required": true,
+      "description": "All tasks must start with agent/resource inventory."
+    },
+    {
+      "id": "pf_002",
+      "name": "validator_map_required",
+      "required": true,
+      "description": "Task must define which agents validate output."
+    },
+    {
+      "id": "pf_003",
+      "name": "qa_gate_required",
+      "required": true,
+      "description": "Task must have QA/integrity validation before completion."
+    },
+    {
+      "id": "pf_004",
+      "name": "no_ui_before_decision",
+      "required": true,
+      "description": "UI cannot be modified before decision layer exists."
+    }
+  ]
+}
