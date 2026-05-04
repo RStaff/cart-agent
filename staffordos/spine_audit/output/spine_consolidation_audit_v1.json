@@ -1,0 +1,537 @@
+{
+  "schema": "staffordos.spine_consolidation_audit.v1",
+  "generated_at": "2026-05-04T23:55:19.497Z",
+  "summary": {
+    "candidates_checked": 18,
+    "existing": 18,
+    "missing": 0,
+    "categories": {
+      "candidate_canonical_spine": 1,
+      "execution_driver": 1,
+      "agent_gate": 1,
+      "preflight_gate": 1,
+      "safe_landing_gate": 2,
+      "qa_gate": 2,
+      "runtime_sync": 3,
+      "slice_precision_layer": 2,
+      "learning_feedback_loop": 1,
+      "agent_selection_contract": 2,
+      "supporting_artifact": 2
+    }
+  },
+  "likely_canonical_spine_stack": [
+    {
+      "path": "staffordos/execution/run_agent_loop.mjs",
+      "exists": true,
+      "category": "candidate_canonical_spine",
+      "size_bytes": 4225,
+      "leverage_score": 85,
+      "signals": {
+        "imports_fs": true,
+        "runs_process": true,
+        "writes_output": true,
+        "has_schema": false,
+        "has_status": false,
+        "has_gate_language": false,
+        "has_runtime_language": true,
+        "has_slice_language": true
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/execution/validate_required_agents_v1.mjs",
+      "exists": true,
+      "category": "agent_gate",
+      "size_bytes": 1409,
+      "leverage_score": 65,
+      "signals": {
+        "imports_fs": true,
+        "runs_process": true,
+        "writes_output": true,
+        "has_schema": true,
+        "has_status": true,
+        "has_gate_language": true,
+        "has_runtime_language": true,
+        "has_slice_language": false
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/system_inventory/output/execution_support_agent_search_v1/execution_support_agents_inventory_v1.json",
+      "exists": true,
+      "category": "supporting_artifact",
+      "size_bytes": 15234,
+      "leverage_score": 65,
+      "signals": {
+        "imports_fs": false,
+        "runs_process": true,
+        "writes_output": false,
+        "has_schema": true,
+        "has_status": false,
+        "has_gate_language": true,
+        "has_runtime_language": true,
+        "has_slice_language": true
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/preflight/run_preflight_check_v1.mjs",
+      "exists": true,
+      "category": "preflight_gate",
+      "size_bytes": 1148,
+      "leverage_score": 55,
+      "signals": {
+        "imports_fs": true,
+        "runs_process": false,
+        "writes_output": true,
+        "has_schema": true,
+        "has_status": true,
+        "has_gate_language": true,
+        "has_runtime_language": true,
+        "has_slice_language": false
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/system_inventory/patch_gate_v1.mjs",
+      "exists": true,
+      "category": "safe_landing_gate",
+      "size_bytes": 2238,
+      "leverage_score": 55,
+      "signals": {
+        "imports_fs": false,
+        "runs_process": true,
+        "writes_output": false,
+        "has_schema": false,
+        "has_status": true,
+        "has_gate_language": true,
+        "has_runtime_language": true,
+        "has_slice_language": false
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/slices/run_slice_v1.py",
+      "exists": true,
+      "category": "slice_precision_layer",
+      "size_bytes": 1636,
+      "leverage_score": 55,
+      "signals": {
+        "imports_fs": false,
+        "runs_process": true,
+        "writes_output": false,
+        "has_schema": false,
+        "has_status": true,
+        "has_gate_language": true,
+        "has_runtime_language": false,
+        "has_slice_language": true
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/qa/runtime_qa_agent_v1.mjs",
+      "exists": true,
+      "category": "qa_gate",
+      "size_bytes": 5436,
+      "leverage_score": 50,
+      "signals": {
+        "imports_fs": true,
+        "runs_process": false,
+        "writes_output": true,
+        "has_schema": false,
+        "has_status": true,
+        "has_gate_language": false,
+        "has_runtime_language": true,
+        "has_slice_language": true
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/qa/validate_command_center_primary_action_v1.mjs",
+      "exists": true,
+      "category": "qa_gate",
+      "size_bytes": 4894,
+      "leverage_score": 50,
+      "signals": {
+        "imports_fs": true,
+        "runs_process": true,
+        "writes_output": true,
+        "has_schema": false,
+        "has_status": false,
+        "has_gate_language": false,
+        "has_runtime_language": true,
+        "has_slice_language": false
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    }
+  ],
+  "categories": {
+    "candidate_canonical_spine": [
+      "staffordos/execution/run_agent_loop.mjs"
+    ],
+    "execution_driver": [
+      "staffordos/agents/execution_driver_v1.mjs"
+    ],
+    "agent_gate": [
+      "staffordos/execution/validate_required_agents_v1.mjs"
+    ],
+    "preflight_gate": [
+      "staffordos/preflight/run_preflight_check_v1.mjs"
+    ],
+    "safe_landing_gate": [
+      "staffordos/system_inventory/shape_runtime_v1.mjs",
+      "staffordos/system_inventory/patch_gate_v1.mjs"
+    ],
+    "qa_gate": [
+      "staffordos/qa/runtime_qa_agent_v1.mjs",
+      "staffordos/qa/validate_command_center_primary_action_v1.mjs"
+    ],
+    "runtime_sync": [
+      "staffordos/agents/system_truth_sync_agent_v1.mjs",
+      "staffordos/leads/lead_registry_sync_agent_v1.mjs",
+      "staffordos/system_inventory/runners/discovery_sync_runner_v1.mjs"
+    ],
+    "slice_precision_layer": [
+      "staffordos/slices/run_slice_v1.py",
+      "staffordos/slices/verify_slices_v1.py"
+    ],
+    "learning_feedback_loop": [
+      "staffordos/loop_d/build_loop_d_feedback_v1.mjs"
+    ],
+    "agent_selection_contract": [
+      "staffordos/agents/agent_selector_v1.json",
+      "staffordos/agents/task_to_agent_map_v1.json"
+    ],
+    "supporting_artifact": [
+      "staffordos/qa/validator_map_v1.json",
+      "staffordos/system_inventory/output/execution_support_agent_search_v1/execution_support_agents_inventory_v1.json"
+    ]
+  },
+  "items": [
+    {
+      "path": "staffordos/execution/run_agent_loop.mjs",
+      "exists": true,
+      "category": "candidate_canonical_spine",
+      "size_bytes": 4225,
+      "leverage_score": 85,
+      "signals": {
+        "imports_fs": true,
+        "runs_process": true,
+        "writes_output": true,
+        "has_schema": false,
+        "has_status": false,
+        "has_gate_language": false,
+        "has_runtime_language": true,
+        "has_slice_language": true
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/agents/execution_driver_v1.mjs",
+      "exists": true,
+      "category": "execution_driver",
+      "size_bytes": 1484,
+      "leverage_score": 40,
+      "signals": {
+        "imports_fs": false,
+        "runs_process": true,
+        "writes_output": false,
+        "has_schema": false,
+        "has_status": false,
+        "has_gate_language": false,
+        "has_runtime_language": true,
+        "has_slice_language": false
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/execution/validate_required_agents_v1.mjs",
+      "exists": true,
+      "category": "agent_gate",
+      "size_bytes": 1409,
+      "leverage_score": 65,
+      "signals": {
+        "imports_fs": true,
+        "runs_process": true,
+        "writes_output": true,
+        "has_schema": true,
+        "has_status": true,
+        "has_gate_language": true,
+        "has_runtime_language": true,
+        "has_slice_language": false
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/preflight/run_preflight_check_v1.mjs",
+      "exists": true,
+      "category": "preflight_gate",
+      "size_bytes": 1148,
+      "leverage_score": 55,
+      "signals": {
+        "imports_fs": true,
+        "runs_process": false,
+        "writes_output": true,
+        "has_schema": true,
+        "has_status": true,
+        "has_gate_language": true,
+        "has_runtime_language": true,
+        "has_slice_language": false
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/system_inventory/shape_runtime_v1.mjs",
+      "exists": true,
+      "category": "safe_landing_gate",
+      "size_bytes": 930,
+      "leverage_score": 30,
+      "signals": {
+        "imports_fs": false,
+        "runs_process": false,
+        "writes_output": false,
+        "has_schema": false,
+        "has_status": true,
+        "has_gate_language": false,
+        "has_runtime_language": true,
+        "has_slice_language": false
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/system_inventory/patch_gate_v1.mjs",
+      "exists": true,
+      "category": "safe_landing_gate",
+      "size_bytes": 2238,
+      "leverage_score": 55,
+      "signals": {
+        "imports_fs": false,
+        "runs_process": true,
+        "writes_output": false,
+        "has_schema": false,
+        "has_status": true,
+        "has_gate_language": true,
+        "has_runtime_language": true,
+        "has_slice_language": false
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/qa/runtime_qa_agent_v1.mjs",
+      "exists": true,
+      "category": "qa_gate",
+      "size_bytes": 5436,
+      "leverage_score": 50,
+      "signals": {
+        "imports_fs": true,
+        "runs_process": false,
+        "writes_output": true,
+        "has_schema": false,
+        "has_status": true,
+        "has_gate_language": false,
+        "has_runtime_language": true,
+        "has_slice_language": true
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/qa/validate_command_center_primary_action_v1.mjs",
+      "exists": true,
+      "category": "qa_gate",
+      "size_bytes": 4894,
+      "leverage_score": 50,
+      "signals": {
+        "imports_fs": true,
+        "runs_process": true,
+        "writes_output": true,
+        "has_schema": false,
+        "has_status": false,
+        "has_gate_language": false,
+        "has_runtime_language": true,
+        "has_slice_language": false
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/agents/system_truth_sync_agent_v1.mjs",
+      "exists": true,
+      "category": "runtime_sync",
+      "size_bytes": 2180,
+      "leverage_score": 50,
+      "signals": {
+        "imports_fs": true,
+        "runs_process": true,
+        "writes_output": true,
+        "has_schema": false,
+        "has_status": true,
+        "has_gate_language": false,
+        "has_runtime_language": true,
+        "has_slice_language": false
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/leads/lead_registry_sync_agent_v1.mjs",
+      "exists": true,
+      "category": "runtime_sync",
+      "size_bytes": 10269,
+      "leverage_score": 40,
+      "signals": {
+        "imports_fs": true,
+        "runs_process": false,
+        "writes_output": true,
+        "has_schema": false,
+        "has_status": false,
+        "has_gate_language": false,
+        "has_runtime_language": true,
+        "has_slice_language": false
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/system_inventory/runners/discovery_sync_runner_v1.mjs",
+      "exists": true,
+      "category": "runtime_sync",
+      "size_bytes": 1828,
+      "leverage_score": 50,
+      "signals": {
+        "imports_fs": true,
+        "runs_process": true,
+        "writes_output": true,
+        "has_schema": false,
+        "has_status": true,
+        "has_gate_language": false,
+        "has_runtime_language": true,
+        "has_slice_language": false
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/slices/run_slice_v1.py",
+      "exists": true,
+      "category": "slice_precision_layer",
+      "size_bytes": 1636,
+      "leverage_score": 55,
+      "signals": {
+        "imports_fs": false,
+        "runs_process": true,
+        "writes_output": false,
+        "has_schema": false,
+        "has_status": true,
+        "has_gate_language": true,
+        "has_runtime_language": false,
+        "has_slice_language": true
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/slices/verify_slices_v1.py",
+      "exists": true,
+      "category": "slice_precision_layer",
+      "size_bytes": 1639,
+      "leverage_score": 30,
+      "signals": {
+        "imports_fs": false,
+        "runs_process": false,
+        "writes_output": false,
+        "has_schema": false,
+        "has_status": true,
+        "has_gate_language": false,
+        "has_runtime_language": false,
+        "has_slice_language": true
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/loop_d/build_loop_d_feedback_v1.mjs",
+      "exists": true,
+      "category": "learning_feedback_loop",
+      "size_bytes": 6456,
+      "leverage_score": 40,
+      "signals": {
+        "imports_fs": true,
+        "runs_process": false,
+        "writes_output": true,
+        "has_schema": false,
+        "has_status": false,
+        "has_gate_language": false,
+        "has_runtime_language": true,
+        "has_slice_language": false
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/agents/agent_selector_v1.json",
+      "exists": true,
+      "category": "agent_selection_contract",
+      "size_bytes": 1496,
+      "leverage_score": 45,
+      "signals": {
+        "imports_fs": false,
+        "runs_process": true,
+        "writes_output": false,
+        "has_schema": true,
+        "has_status": false,
+        "has_gate_language": true,
+        "has_runtime_language": false,
+        "has_slice_language": false
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/agents/task_to_agent_map_v1.json",
+      "exists": true,
+      "category": "agent_selection_contract",
+      "size_bytes": 1515,
+      "leverage_score": 50,
+      "signals": {
+        "imports_fs": false,
+        "runs_process": true,
+        "writes_output": false,
+        "has_schema": true,
+        "has_status": false,
+        "has_gate_language": false,
+        "has_runtime_language": false,
+        "has_slice_language": false
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/qa/validator_map_v1.json",
+      "exists": true,
+      "category": "supporting_artifact",
+      "size_bytes": 3243,
+      "leverage_score": 45,
+      "signals": {
+        "imports_fs": false,
+        "runs_process": true,
+        "writes_output": false,
+        "has_schema": true,
+        "has_status": false,
+        "has_gate_language": true,
+        "has_runtime_language": false,
+        "has_slice_language": false
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    },
+    {
+      "path": "staffordos/system_inventory/output/execution_support_agent_search_v1/execution_support_agents_inventory_v1.json",
+      "exists": true,
+      "category": "supporting_artifact",
+      "size_bytes": 15234,
+      "leverage_score": 65,
+      "signals": {
+        "imports_fs": false,
+        "runs_process": true,
+        "writes_output": false,
+        "has_schema": true,
+        "has_status": false,
+        "has_gate_language": true,
+        "has_runtime_language": true,
+        "has_slice_language": true
+      },
+      "recommendation": "inspect_and_promote_or_wire"
+    }
+  ],
+  "recommended_next_move": "Open and inspect run_agent_loop.mjs, execution_driver_v1.mjs, shape_runtime_v1.mjs, patch_gate_v1.mjs, runtime_qa_agent_v1.mjs, and verify_slices_v1.py. Promote one canonical spine and wire partial high-leverage gates into it instead of creating another spine."
+}
