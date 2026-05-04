@@ -1,0 +1,27 @@
+{
+  "schema": "staffordos.rule_suggestions.v1",
+  "generated_at": "2026-05-04T19:15:10.708Z",
+  "suggestions": [
+    {
+      "rule_id": "rs_001",
+      "severity": "high",
+      "suggestion": "Before UI work, require primary_action_snapshot_v1.json to exist and pass QA.",
+      "reason": "Command Center UX degraded when UI was built before the decision layer was resolved.",
+      "status": "satisfied_currently"
+    },
+    {
+      "rule_id": "rs_002",
+      "severity": "medium",
+      "suggestion": "Keep full diagnostic context collapsed by default on Operator Home.",
+      "reason": "Operator UX should show only one action first; evidence and internals should be available but secondary.",
+      "status": "active_design_rule"
+    },
+    {
+      "rule_id": "rs_003",
+      "severity": "medium",
+      "suggestion": "Track required-agent utilization per task, not total-agent utilization.",
+      "reason": "Using all agents all the time would create noise and slow execution.",
+      "status": "active_operating_rule"
+    }
+  ]
+}

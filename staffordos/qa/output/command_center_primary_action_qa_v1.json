@@ -1,13 +1,14 @@
 {
   "schema": "staffordos.command_center_qa_gate.v1",
-  "generated_at": "2026-05-04T18:38:34.536Z",
+  "generated_at": "2026-05-04T19:15:10.665Z",
   "page": "/operator/command-center",
+  "version": "operator_home_v1",
   "verdict": "pass",
   "score": 100,
   "findings": [],
-  "required_next_move": "Proceed to visual polish and revalidation.",
+  "required_next_move": "Proceed to CTA execution wiring or Loop D review.",
   "snapshot_primary_action": {
-    "action_id": "primary_1777916948311",
+    "action_id": "primary_1777922106443",
     "action_label": "Follow up on real ShopiFixer offer and close payment.",
     "action_type": "revenue_close",
     "domain_id": "shopifixer",
@@ -43,6 +44,6 @@
       "staffordos/gates/confidence_gate_v1.json",
       "staffordos/ux_audit/output/operator_command_center_ux_integrity_v1.json"
     ],
-    "generated_at": "2026-05-04T17:49:08.309Z"
+    "generated_at": "2026-05-04T19:15:06.441Z"
   }
 }

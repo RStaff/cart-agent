@@ -1,0 +1,25 @@
+{
+  "schema": "staffordos.outcome_scores.v1",
+  "generated_at": "2026-05-04T19:15:10.708Z",
+  "scores": [
+    {
+      "outcome_id": "outcome_1777922110709",
+      "source_action_id": "primary_1777922106443",
+      "action_label": "Follow up on real ShopiFixer offer and close payment.",
+      "score": 96,
+      "status": "strong",
+      "dimensions": {
+        "qa_passed": true,
+        "preflight_go": true,
+        "confidence": 0.82,
+        "priority": 100
+      },
+      "notes": [
+        "QA gate passed.",
+        "Preflight gate passed.",
+        "Confidence recorded at 82%.",
+        "Priority recorded at 100."
+      ]
+    }
+  ]
+}

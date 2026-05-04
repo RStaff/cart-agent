@@ -1,0 +1,13 @@
+{
+  "schema": "staffordos.loop_d_feedback_report.v1",
+  "generated_at": "2026-05-04T19:15:10.708Z",
+  "outcome_score": 96,
+  "agent_utilization_percent_this_loop": 7,
+  "qa_verdict": "pass",
+  "preflight_status": "GO",
+  "outputs": [
+    "staffordos/events/outcome_scores_v1.json",
+    "staffordos/agents/agent_performance_v1.json",
+    "staffordos/rules/rule_suggestions_v1.json"
+  ]
+}

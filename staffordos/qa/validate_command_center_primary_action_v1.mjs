@@ -1,100 +1,123 @@
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const now = new Date().toISOString();
 
+mkdirSync("staffordos/qa/output", { recursive: true });
+
 function read(path) {
-  return existsSync(path) ? readFileSync(path, "utf8") : "";
+  try {
+    return readFileSync(path, "utf8");
+  } catch {
+    return "";
+  }
 }
 
-function json(path) {
-  return JSON.parse(readFileSync(path, "utf8"));
+function readJson(path, fallback = {}) {
+  try {
+    if (!existsSync(path)) return fallback;
+    return JSON.parse(readFileSync(path, "utf8"));
+  } catch {
+    return fallback;
+  }
 }
 
-const files = {
-  page: "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx",
-  primaryPanel: "staffordos/ui/operator-frontend/components/operator/PrimaryActionPanel.tsx",
-  unitPanel: "staffordos/ui/operator-frontend/components/operator/UnitWorkSnapshotPanel.tsx",
-  actionDashboard: "staffordos/ui/operator-frontend/components/operator/ActionFirstDashboard.tsx",
-  loader: "staffordos/ui/operator-frontend/lib/operator/loadPrimaryActionSnapshot.ts",
-  snapshot: "staffordos/snapshots/primary_action_snapshot_v1.json",
-  uxReport: "staffordos/ux_audit/output/operator_command_center_ux_integrity_v1.json"
-};
-
-const content = Object.fromEntries(Object.entries(files).map(([k, p]) => [k, read(p)]));
-const snapshot = json(files.snapshot);
-
+const commandPage = read("staffordos/ui/operator-frontend/app/operator/command-center/page.tsx");
+const operatorHome = read("staffordos/ui/operator-frontend/components/operator/OperatorHomeV1.tsx");
+const snapshot = readJson("staffordos/snapshots/primary_action_snapshot_v1.json");
+const preflight = readJson("staffordos/preflight/output/preflight_report_v1.json");
 const findings = [];
 
 function add(severity, area, finding, recommendation) {
   findings.push({ severity, area, finding, recommendation });
 }
 
-if (!content.page.includes("PrimaryActionPanel")) {
-  add("critical", "primary_action", "Command Center does not render PrimaryActionPanel.", "Render canonical PrimaryActionPanel at top.");
+if (!commandPage.includes("OperatorHomeV1")) {
+  add(
+    "critical",
+    "composition",
+    "Command Center does not render OperatorHomeV1.",
+    "Command Center must use OperatorHomeV1 as the front door."
+  );
 }
 
-if (!content.page.includes("loadPrimaryActionSnapshot")) {
-  add("critical", "snapshot_binding", "Command Center does not load primary_action_snapshot_v1.", "Bind top action to primary_action_snapshot_v1.");
+for (const banned of ["ActionFirstDashboard", "LeadQueue", "RossCommandCenterSurface", "PrimaryActionPanel"]) {
+  if (commandPage.includes(banned)) {
+    add(
+      "high",
+      "page_scope",
+      `Command Center page still directly renders or imports ${banned}.`,
+      "Keep Command Center to OperatorHomeV1 only; move old surfaces behind separate routes or collapsed diagnostics."
+    );
+  }
 }
 
-const renderStart = content.page.indexOf("return (");
-const renderBody = renderStart >= 0 ? content.page.slice(renderStart) : content.page;
-const primaryRenderIndex = renderBody.indexOf("<PrimaryActionPanel");
-const legacyRenderIndex = renderBody.indexOf("<RossCommandCenterSurface");
-
-if (primaryRenderIndex < 0) {
-  add("critical", "visual_hierarchy", "PrimaryActionPanel is not rendered in the Command Center return tree.", "Render PrimaryActionPanel first.");
-} else if (legacyRenderIndex >= 0 && primaryRenderIndex > legacyRenderIndex) {
-  add("high", "visual_hierarchy", "Legacy RossCommandCenterSurface renders before canonical primary action.", "Primary action must render before legacy artifact panels.");
+if (!operatorHome.includes("Prepare / execute action")) {
+  add(
+    "high",
+    "cta",
+    "Operator Home does not expose a clear prepare/execute CTA.",
+    "Add one clear button for the resolved primary action."
+  );
 }
 
-if (content.page.includes("<ActionFirstDashboard")) {
-  add("high", "duplicate_action", "Old ActionFirstDashboard is still rendered and asks a duplicate 'what should Ross do next?' question.", "Remove or demote ActionFirstDashboard from Command Center.");
+if (!operatorHome.includes("operatorHomeProofRow")) {
+  add(
+    "medium",
+    "proof_badges",
+    "Operator Home does not expose the three proof badges.",
+    "Show Preflight, QA Gate, and Confidence proof badges."
+  );
 }
 
-if (content.page.includes("<UnitWorkSnapshotPanel") && !content.page.includes("Supporting Unit Work")) {
-  add("medium", "duplicate_unit_question", "UnitWorkSnapshotPanel still appears on Command Center and can compete with primary action.", "Show unit work only as collapsed supporting context or move to separate page.");
-}
-
-if (content.page.includes("<LeadQueue")) {
-  add("high", "page_scope", "Full LeadQueue is still embedded on Command Center.", "Replace with lead summary/link; keep full table on /operator/leads.");
-}
-
-if (content.primaryPanel.includes("React components must not invent") || content.primaryPanel.includes("priority_score")) {
-  // acceptable
-} else {
-  add("medium", "priority_display", "PrimaryActionPanel may not clearly expose canonical priority.", "Display priority, confidence, urgency, owner, evidence, and risk.");
+if (!operatorHome.includes("<details")) {
+  add(
+    "medium",
+    "progressive_disclosure",
+    "Supporting system context is not collapsed.",
+    "Keep evidence, risks, and supporting work collapsed by default."
+  );
 }
 
 if (!snapshot.primary_action?.action_label || !snapshot.primary_action?.next_step) {
-  add("critical", "snapshot_contract", "Primary action snapshot is missing action_label or next_step.", "Fix resolver output before UI work.");
+  add(
+    "critical",
+    "snapshot_contract",
+    "Primary action snapshot is missing action_label or next_step.",
+    "Fix resolve_primary_action_v1.mjs before UI work."
+  );
 }
 
-if ((snapshot.primary_action?.confidence || 0) < 0.9 && !String(snapshot.primary_action?.confidence_band || "").includes("human")) {
-  add("medium", "confidence_gate", "Confidence below auto-execution threshold but human validation is not clearly indicated.", "Show human validation required when confidence < 0.9.");
+if (String(preflight.status || "").toUpperCase() !== "GO") {
+  add(
+    "critical",
+    "preflight",
+    "Preflight status is not GO.",
+    "Run inventory, validator map, and preflight before completion."
+  );
 }
 
-const severityPenalty = findings.reduce((sum, f) => {
-  if (f.severity === "critical") return sum + 20;
+const penalty = findings.reduce((sum, f) => {
+  if (f.severity === "critical") return sum + 25;
   if (f.severity === "high") return sum + 12;
   if (f.severity === "medium") return sum + 6;
   return sum + 2;
 }, 0);
 
-const score = Math.max(0, Math.min(100, 100 - severityPenalty));
+const score = Math.max(0, Math.min(100, 100 - penalty));
 
 const report = {
   schema: "staffordos.command_center_qa_gate.v1",
   generated_at: now,
   page: "/operator/command-center",
+  version: "operator_home_v1",
   verdict: score >= 80 ? "pass" : score >= 65 ? "partial" : "fail",
   score,
   findings,
   required_next_move:
-    findings.some(f => f.area === "duplicate_action" || f.area === "page_scope")
-      ? "Remove duplicate ActionFirstDashboard and full LeadQueue from Command Center; keep canonical PrimaryActionPanel as the only top decision."
-      : "Proceed to visual polish and revalidation.",
-  snapshot_primary_action: snapshot.primary_action
+    findings.length === 0
+      ? "Proceed to CTA execution wiring or Loop D review."
+      : "Resolve QA findings before CTA execution.",
+  snapshot_primary_action: snapshot.primary_action || null
 };
 
 writeFileSync(
@@ -103,3 +126,7 @@ writeFileSync(
 );
 
 console.log(JSON.stringify(report, null, 2));
+
+if (report.verdict !== "pass") {
+  process.exit(1);
+}

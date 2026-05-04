@@ -1,40 +1,21 @@
-import { RossCommandCenterSurface } from "../../../components/operator/RossCommandCenterSurface";
-import { loadDashboardSnapshot } from "../../../lib/operator/loadDashboardSnapshot";
-import { loadUnitWorkSnapshot } from "../../../lib/operator/loadUnitWorkSnapshot";
+import { OperatorHomeV1 } from "../../../components/operator/OperatorHomeV1";
 import { loadPrimaryActionSnapshot } from "../../../lib/operator/loadPrimaryActionSnapshot";
-import { PrimaryActionPanel } from "../../../components/operator/PrimaryActionPanel";
-import { UnitWorkSnapshotPanel } from "../../../components/operator/UnitWorkSnapshotPanel";
+import { loadPreflightReport } from "../../../lib/operator/loadPreflightReport";
+import { loadCommandCenterQaReport } from "../../../lib/operator/loadCommandCenterQaReport";
+import { loadUnitWorkSnapshot } from "../../../lib/operator/loadUnitWorkSnapshot";
 
 export default function RossCommandCenterPage() {
-  const snapshot = loadDashboardSnapshot();
-  const unitWorkSnapshot = loadUnitWorkSnapshot();
   const primaryActionSnapshot = loadPrimaryActionSnapshot();
+  const preflightReport = loadPreflightReport();
+  const qaReport = loadCommandCenterQaReport();
+  const unitWorkSnapshot = loadUnitWorkSnapshot();
 
   return (
-    <>
-      <PrimaryActionPanel snapshot={primaryActionSnapshot} />
-      <details style={{ marginTop: 20 }}>
-  <summary style={{ cursor: "pointer", color: "#94a3b8" }}>
-    Legacy Command Center (collapsed)
-  </summary>
-  <RossCommandCenterSurface />
-</details>
-      
-      <main className="shell">
-        <div className="container">
-          <details style={{ marginTop: 20 }}>
-            <summary style={{ cursor: "pointer", color: "#94a3b8", fontWeight: 700 }}>
-              Supporting Unit Work
-            </summary>
-            <UnitWorkSnapshotPanel snapshot={unitWorkSnapshot} />
-          </details>
-        </div>
-      </main>
-      <main className="shell">
-        <div className="container">
-          
-        </div>
-      </main>
-    </>
+    <OperatorHomeV1
+      primaryActionSnapshot={primaryActionSnapshot}
+      preflightReport={preflightReport}
+      qaReport={qaReport}
+      unitWorkSnapshot={unitWorkSnapshot}
+    />
   );
 }
