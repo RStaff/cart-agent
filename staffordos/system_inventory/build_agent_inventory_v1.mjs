@@ -10,6 +10,16 @@ const ROOTS = [
   "ross_operator"
 ];
 
+const EXCLUDE_DIRS = [
+  "node_modules",
+  ".next",
+  ".git",
+  "output",
+  "proof_runs",
+  "dist",
+  "build"
+];
+
 const AGENT_PATTERNS = [
   "agent",
   "engine",
@@ -25,15 +35,23 @@ const AGENT_PATTERNS = [
 
 const agents = [];
 
+function shouldExclude(fullPath) {
+  return EXCLUDE_DIRS.some(part => fullPath.split(path.sep).includes(part));
+}
+
 function walk(dir) {
   let results = [];
+  if (shouldExclude(dir)) return results;
+
   for (const file of readdirSync(dir)) {
     const full = path.join(dir, file);
+    if (shouldExclude(full)) continue;
+
     try {
       const stat = statSync(full);
       if (stat.isDirectory()) {
         results = results.concat(walk(full));
-      } else {
+      } else if (/\.(mjs|js|ts|tsx|json|md)$/.test(full)) {
         results.push(full);
       }
     } catch {}
@@ -64,12 +82,13 @@ const inventory = {
   schema: "staffordos.agent_inventory.v1",
   generated_at: now,
   total_agents: agents.length,
+  excluded_dirs: EXCLUDE_DIRS,
   agents
 };
 
 writeFileSync(
   "staffordos/system_inventory/output/agent_inventory_v1.json",
-  JSON.stringify(inventory, null, 2)
+  JSON.stringify(inventory, null, 2) + "\n"
 );
 
 console.log(JSON.stringify({

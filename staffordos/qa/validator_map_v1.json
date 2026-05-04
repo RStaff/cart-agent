@@ -1,7 +1,7 @@
 {
   "schema": "staffordos.validator_map.v1",
-  "generated_at": "2026-05-04T18:23:14.081Z",
-  "total_validators": 37,
+  "generated_at": "2026-05-04T18:28:45.463Z",
+  "total_validators": 16,
   "validators": [
     {
       "validator_id": "staffordos_agents_validate_progress_contract_v1.mjs",
@@ -29,11 +29,6 @@
       "type": "validator"
     },
     {
-      "validator_id": "staffordos_hygiene_output_worktree_cleanup_gate_report.md",
-      "path": "staffordos/hygiene/output/worktree_cleanup_gate_report.md",
-      "type": "validator"
-    },
-    {
       "validator_id": "staffordos_hygiene_run_branch_scope_gate.js",
       "path": "staffordos/hygiene/run_branch_scope_gate.js",
       "type": "validator"
@@ -54,8 +49,18 @@
       "type": "validator"
     },
     {
+      "validator_id": "staffordos_qa_build_validator_map_v1.mjs",
+      "path": "staffordos/qa/build_validator_map_v1.mjs",
+      "type": "validator"
+    },
+    {
       "validator_id": "staffordos_qa_runtime_qa_agent_v1.mjs",
       "path": "staffordos/qa/runtime_qa_agent_v1.mjs",
+      "type": "validator"
+    },
+    {
+      "validator_id": "staffordos_qa_validator_map_v1.json",
+      "path": "staffordos/qa/validator_map_v1.json",
       "type": "validator"
     },
     {
@@ -76,116 +81,6 @@
     {
       "validator_id": "staffordos_system_inventory_patch_gate_v1.mjs",
       "path": "staffordos/system_inventory/patch_gate_v1.mjs",
-      "type": "validator"
-    },
-    {
-      "validator_id": "staffordos_ui_operator-frontend_node_modules_@swc_helpers____async_generator_delegate_package.json",
-      "path": "staffordos/ui/operator-frontend/node_modules/@swc/helpers/_/_async_generator_delegate/package.json",
-      "type": "validator"
-    },
-    {
-      "validator_id": "staffordos_ui_operator-frontend_node_modules_@swc_helpers_cjs__async_generator_delegate.cjs",
-      "path": "staffordos/ui/operator-frontend/node_modules/@swc/helpers/cjs/_async_generator_delegate.cjs",
-      "type": "validator"
-    },
-    {
-      "validator_id": "staffordos_ui_operator-frontend_node_modules_@swc_helpers_esm__async_generator_delegate.js",
-      "path": "staffordos/ui/operator-frontend/node_modules/@swc/helpers/esm/_async_generator_delegate.js",
-      "type": "validator"
-    },
-    {
-      "validator_id": "staffordos_ui_operator-frontend_node_modules_@swc_helpers_src__async_generator_delegate.mjs",
-      "path": "staffordos/ui/operator-frontend/node_modules/@swc/helpers/src/_async_generator_delegate.mjs",
-      "type": "validator"
-    },
-    {
-      "validator_id": "staffordos_ui_operator-frontend_node_modules_next_dist_client_components_router-reducer_reducers_navigate-reducer.d.ts",
-      "path": "staffordos/ui/operator-frontend/node_modules/next/dist/client/components/router-reducer/reducers/navigate-reducer.d.ts",
-      "type": "validator"
-    },
-    {
-      "validator_id": "staffordos_ui_operator-frontend_node_modules_next_dist_client_components_router-reducer_reducers_navigate-reducer.js",
-      "path": "staffordos/ui/operator-frontend/node_modules/next/dist/client/components/router-reducer/reducers/navigate-reducer.js",
-      "type": "validator"
-    },
-    {
-      "validator_id": "staffordos_ui_operator-frontend_node_modules_next_dist_client_components_router-reducer_reducers_navigate-reducer.js.map",
-      "path": "staffordos/ui/operator-frontend/node_modules/next/dist/client/components/router-reducer/reducers/navigate-reducer.js.map",
-      "type": "validator"
-    },
-    {
-      "validator_id": "staffordos_ui_operator-frontend_node_modules_next_dist_client_components_router-reducer_should-hard-navigate.d.ts",
-      "path": "staffordos/ui/operator-frontend/node_modules/next/dist/client/components/router-reducer/should-hard-navigate.d.ts",
-      "type": "validator"
-    },
-    {
-      "validator_id": "staffordos_ui_operator-frontend_node_modules_next_dist_client_components_router-reducer_should-hard-navigate.js",
-      "path": "staffordos/ui/operator-frontend/node_modules/next/dist/client/components/router-reducer/should-hard-navigate.js",
-      "type": "validator"
-    },
-    {
-      "validator_id": "staffordos_ui_operator-frontend_node_modules_next_dist_client_components_router-reducer_should-hard-navigate.js.map",
-      "path": "staffordos/ui/operator-frontend/node_modules/next/dist/client/components/router-reducer/should-hard-navigate.js.map",
-      "type": "validator"
-    },
-    {
-      "validator_id": "staffordos_ui_operator-frontend_node_modules_next_dist_compiled_@babel_runtime_helpers_asyncGeneratorDelegate.js",
-      "path": "staffordos/ui/operator-frontend/node_modules/next/dist/compiled/@babel/runtime/helpers/asyncGeneratorDelegate.js",
-      "type": "validator"
-    },
-    {
-      "validator_id": "staffordos_ui_operator-frontend_node_modules_next_dist_compiled_@babel_runtime_helpers_esm_asyncGeneratorDelegate.js",
-      "path": "staffordos/ui/operator-frontend/node_modules/next/dist/compiled/@babel/runtime/helpers/esm/asyncGeneratorDelegate.js",
-      "type": "validator"
-    },
-    {
-      "validator_id": "staffordos_ui_operator-frontend_node_modules_next_dist_esm_client_components_router-reducer_reducers_navigate-reducer.js",
-      "path": "staffordos/ui/operator-frontend/node_modules/next/dist/esm/client/components/router-reducer/reducers/navigate-reducer.js",
-      "type": "validator"
-    },
-    {
-      "validator_id": "staffordos_ui_operator-frontend_node_modules_next_dist_esm_client_components_router-reducer_reducers_navigate-reducer.js.map",
-      "path": "staffordos/ui/operator-frontend/node_modules/next/dist/esm/client/components/router-reducer/reducers/navigate-reducer.js.map",
-      "type": "validator"
-    },
-    {
-      "validator_id": "staffordos_ui_operator-frontend_node_modules_next_dist_esm_client_components_router-reducer_should-hard-navigate.js",
-      "path": "staffordos/ui/operator-frontend/node_modules/next/dist/esm/client/components/router-reducer/should-hard-navigate.js",
-      "type": "validator"
-    },
-    {
-      "validator_id": "staffordos_ui_operator-frontend_node_modules_next_dist_esm_client_components_router-reducer_should-hard-navigate.js.map",
-      "path": "staffordos/ui/operator-frontend/node_modules/next/dist/esm/client/components/router-reducer/should-hard-navigate.js.map",
-      "type": "validator"
-    },
-    {
-      "validator_id": "staffordos_ui_operator-frontend_node_modules_next_dist_esm_server_app-render_parse-and-validate-flight-router-state.js",
-      "path": "staffordos/ui/operator-frontend/node_modules/next/dist/esm/server/app-render/parse-and-validate-flight-router-state.js",
-      "type": "validator"
-    },
-    {
-      "validator_id": "staffordos_ui_operator-frontend_node_modules_next_dist_esm_server_app-render_parse-and-validate-flight-router-state.js.map",
-      "path": "staffordos/ui/operator-frontend/node_modules/next/dist/esm/server/app-render/parse-and-validate-flight-router-state.js.map",
-      "type": "validator"
-    },
-    {
-      "validator_id": "staffordos_ui_operator-frontend_node_modules_next_dist_server_app-render_parse-and-validate-flight-router-state.d.ts",
-      "path": "staffordos/ui/operator-frontend/node_modules/next/dist/server/app-render/parse-and-validate-flight-router-state.d.ts",
-      "type": "validator"
-    },
-    {
-      "validator_id": "staffordos_ui_operator-frontend_node_modules_next_dist_server_app-render_parse-and-validate-flight-router-state.js",
-      "path": "staffordos/ui/operator-frontend/node_modules/next/dist/server/app-render/parse-and-validate-flight-router-state.js",
-      "type": "validator"
-    },
-    {
-      "validator_id": "staffordos_ui_operator-frontend_node_modules_next_dist_server_app-render_parse-and-validate-flight-router-state.js.map",
-      "path": "staffordos/ui/operator-frontend/node_modules/next/dist/server/app-render/parse-and-validate-flight-router-state.js.map",
-      "type": "validator"
-    },
-    {
-      "validator_id": "scripts_patch_allow_webhook_paths_in_gate.sh",
-      "path": "scripts/patch_allow_webhook_paths_in_gate.sh",
       "type": "validator"
     }
   ],
