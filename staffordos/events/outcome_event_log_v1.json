@@ -1,0 +1,19 @@
+{
+  "schema": "staffordos.outcome_event_log.v1",
+  "purpose": "Append-only event log for actions, offers, replies, payments, fixes, verification, failures, and learning outcomes.",
+  "generated_at": "2026-05-04T15:06:21.177Z",
+  "events": [
+    {
+      "event_id": "evt_schema_foundation_1777907181179",
+      "event_type": "schema_foundation_locked",
+      "domain_id": "system",
+      "linked_units": [
+        "delivery_internal_dev_schema_foundation_v1"
+      ],
+      "actor": "system",
+      "summary": "Non-destructive schema foundation created for domains, opportunities, issues, delivery, actions, memory, confidence gates, and outcomes.",
+      "outcome": "created",
+      "created_at": "2026-05-04T15:06:21.177Z"
+    }
+  ]
+}

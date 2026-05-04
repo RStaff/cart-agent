@@ -1,0 +1,48 @@
+{
+  "schema": "staffordos.delivery_units.v1",
+  "purpose": "Active execution units for paid or internal work. Supports client fixes, Abando installs, internal dev work, legal/family/career tasks.",
+  "generated_at": "2026-05-04T15:06:21.177Z",
+  "rules": [
+    "Delivery units should be created after deal_closed, internal_dev_approved, or explicit Ross approval.",
+    "Client-facing delivery requires proof before completion.",
+    "Internal dev delivery requires build/test/proof before done."
+  ],
+  "units": [
+    {
+      "unit_id": "delivery_cart-agent-dev.myshopify.com_shopifixer",
+      "unit_type": "delivery",
+      "delivery_type": "client_fix",
+      "domain_id": "shopifixer",
+      "client_id": "cart-agent-dev.myshopify.com",
+      "status": "waiting_for_payment",
+      "stage": "pre_delivery",
+      "owner": "ross",
+      "issue_refs": [
+        "issue_cart-agent-dev.myshopify.com_recovery_gap"
+      ],
+      "opportunity_ref": "opp_cart-agent-dev.myshopify.com",
+      "proof_required": true,
+      "proof_status": "not_started",
+      "next_action": "Wait for payment or follow up before starting fix delivery.",
+      "created_at": "2026-05-04T15:06:21.177Z",
+      "updated_at": "2026-05-04T15:06:21.177Z"
+    },
+    {
+      "unit_id": "delivery_internal_dev_schema_foundation_v1",
+      "unit_type": "delivery",
+      "delivery_type": "internal_dev",
+      "domain_id": "internal_dev",
+      "client_id": null,
+      "status": "active",
+      "stage": "schema_foundation",
+      "owner": "system",
+      "issue_refs": [],
+      "opportunity_ref": null,
+      "proof_required": true,
+      "proof_status": "created",
+      "next_action": "Use schema foundation to connect Ask, Operate, Memory, Opportunity, Issue, Delivery, and Outcome layers.",
+      "created_at": "2026-05-04T15:06:21.177Z",
+      "updated_at": "2026-05-04T15:06:21.177Z"
+    }
+  ]
+}

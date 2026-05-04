@@ -1,0 +1,38 @@
+{
+  "schema": "staffordos.opportunity_units.v1",
+  "purpose": "Sales/revenue opportunities. Opportunity is distinct from client, lead, issue, and delivery.",
+  "generated_at": "2026-05-04T15:06:21.177Z",
+  "units": [
+    {
+      "unit_id": "opp_cart-agent-dev.myshopify.com",
+      "unit_type": "opportunity",
+      "domain_id": "shopifixer",
+      "client_id": "cart-agent-dev.myshopify.com",
+      "title": "Convert cart-agent-dev.myshopify.com into paid ShopiFixer / Abando revenue",
+      "stage": "proposal_sent",
+      "status": "open",
+      "owner": "ross",
+      "value": {
+        "one_time": 950,
+        "recurring_mrr": 0,
+        "currency": "USD"
+      },
+      "probability": 0.45,
+      "confidence": 0.72,
+      "source_refs": [
+        "staffordos/clients/client_registry_v1.json"
+      ],
+      "next_action": {
+        "type": "followup",
+        "owner": "ross",
+        "due_at": null,
+        "instructions": "Follow up on real ShopiFixer offer and close payment.",
+        "auto_executable": false,
+        "updated_at": "2026-05-04T12:26:57.688Z"
+      },
+      "proof_required": true,
+      "created_at": "2026-05-04T15:06:21.177Z",
+      "updated_at": "2026-05-04T15:06:21.177Z"
+    }
+  ]
+}

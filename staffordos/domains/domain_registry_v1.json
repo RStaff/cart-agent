@@ -1,0 +1,101 @@
+{
+  "schema": "staffordos.domain_registry.v1",
+  "purpose": "Master domain map for RossOS / StaffordOS across life, business, products, clients, internal dev work, and system operations.",
+  "generated_at": "2026-05-04T15:06:21.177Z",
+  "domains": [
+    {
+      "domain_id": "self",
+      "type": "life",
+      "label": "Self",
+      "privacy_level": "private",
+      "active": true
+    },
+    {
+      "domain_id": "family",
+      "type": "life",
+      "label": "Family",
+      "privacy_level": "high",
+      "active": true
+    },
+    {
+      "domain_id": "health",
+      "type": "life",
+      "label": "Health",
+      "privacy_level": "high",
+      "active": true
+    },
+    {
+      "domain_id": "career",
+      "type": "life",
+      "label": "Career",
+      "privacy_level": "private",
+      "active": true
+    },
+    {
+      "domain_id": "legal",
+      "type": "life",
+      "label": "Legal",
+      "privacy_level": "high",
+      "active": true
+    },
+    {
+      "domain_id": "finance",
+      "type": "life",
+      "label": "Finance",
+      "privacy_level": "high",
+      "active": true
+    },
+    {
+      "domain_id": "time",
+      "type": "life",
+      "label": "Time",
+      "privacy_level": "private",
+      "active": true
+    },
+    {
+      "domain_id": "knowledge",
+      "type": "life",
+      "label": "Knowledge",
+      "privacy_level": "private",
+      "active": true
+    },
+    {
+      "domain_id": "stafford_media",
+      "type": "business",
+      "label": "Stafford Media Consulting",
+      "privacy_level": "business",
+      "active": true
+    },
+    {
+      "domain_id": "shopifixer",
+      "type": "business_service",
+      "label": "ShopiFixer",
+      "revenue_model": "one_time_service",
+      "privacy_level": "business",
+      "active": true
+    },
+    {
+      "domain_id": "abando",
+      "type": "business_product",
+      "label": "Abando",
+      "revenue_model": "monthly_subscription",
+      "default_mrr": 49,
+      "privacy_level": "business",
+      "active": true
+    },
+    {
+      "domain_id": "internal_dev",
+      "type": "execution",
+      "label": "Internal Dev Work",
+      "privacy_level": "business",
+      "active": true
+    },
+    {
+      "domain_id": "system",
+      "type": "system",
+      "label": "StaffordOS System",
+      "privacy_level": "system",
+      "active": true
+    }
+  ]
+}

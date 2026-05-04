@@ -1,0 +1,23 @@
+{
+  "schema": "staffordos.memory_units.v1",
+  "purpose": "Structured memory for life and business. Memory is explicit, typed, domain-scoped, and source-aware.",
+  "generated_at": "2026-05-04T15:06:21.177Z",
+  "rules": [
+    "Do not mix family/private memory with business execution unless explicitly linked.",
+    "Personal or family memory should be explicit and source-aware.",
+    "Memory can be fact, event, insight, preference, or decision."
+  ],
+  "units": [
+    {
+      "memory_id": "mem_staffordos_architecture_units_of_work_v1",
+      "memory_type": "decision",
+      "domain_id": "system",
+      "entity_id": "staffordos",
+      "summary": "StaffordOS should use domains and units of work as its scalable abstraction across life, business, client work, and internal dev work.",
+      "confidence": 0.95,
+      "source": "conversation_and_repo_inventory",
+      "created_at": "2026-05-04T15:06:21.177Z",
+      "updated_at": "2026-05-04T15:06:21.177Z"
+    }
+  ]
+}

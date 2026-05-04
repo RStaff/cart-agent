@@ -1,0 +1,50 @@
+{
+  "schema": "staffordos.unit_work_snapshot.v1",
+  "generated_at": "2026-05-04T15:06:21.177Z",
+  "summary": {
+    "domains": 13,
+    "opportunities": 1,
+    "issues": 1,
+    "delivery_units": 2,
+    "actions": 1,
+    "memory_units": 1,
+    "outcome_events": 1
+  },
+  "open_work": [
+    {
+      "unit_id": "opp_cart-agent-dev.myshopify.com",
+      "type": "opportunity",
+      "domain_id": "shopifixer",
+      "status": "open",
+      "stage": "proposal_sent",
+      "owner": "ross",
+      "next_action": "Follow up on real ShopiFixer offer and close payment."
+    },
+    {
+      "unit_id": "delivery_cart-agent-dev.myshopify.com_shopifixer",
+      "type": "delivery",
+      "domain_id": "shopifixer",
+      "status": "waiting_for_payment",
+      "stage": "pre_delivery",
+      "owner": "ross",
+      "next_action": "Wait for payment or follow up before starting fix delivery."
+    },
+    {
+      "unit_id": "delivery_internal_dev_schema_foundation_v1",
+      "type": "delivery",
+      "domain_id": "internal_dev",
+      "status": "active",
+      "stage": "schema_foundation",
+      "owner": "system",
+      "next_action": "Use schema foundation to connect Ask, Operate, Memory, Opportunity, Issue, Delivery, and Outcome layers."
+    },
+    {
+      "unit_id": "action_cart-agent-dev.myshopify.com_followup_offer",
+      "type": "action",
+      "domain_id": "shopifixer",
+      "status": "open",
+      "owner": "ross",
+      "next_action": "Follow up on real ShopiFixer offer and close payment."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "schema": "staffordos.confidence_gate.v1",
+  "purpose": "Prevents low-confidence audit findings from becoming fix execution without validation.",
+  "generated_at": "2026-05-04T15:06:21.177Z",
+  "thresholds": {
+    "auto_fix_allowed_min_confidence": 0.9,
+    "human_validation_required_below": 0.9,
+    "block_below": 0.55
+  },
+  "rules": [
+    {
+      "rule_id": "audit_to_issue",
+      "description": "Free audit output may create issue units, but issue units remain suspected until validated.",
+      "required_fields": [
+        "issue_type",
+        "confidence",
+        "evidence",
+        "validation_required"
+      ]
+    },
+    {
+      "rule_id": "issue_to_delivery",
+      "description": "Issue cannot move into fix execution unless confidence >= 0.9 or Ross approves validation.",
+      "hard_gate": true
+    },
+    {
+      "rule_id": "delivery_to_done",
+      "description": "Delivery cannot be marked done without proof_status = verified or explicit exception.",
+      "hard_gate": true
+    }
+  ]
+}

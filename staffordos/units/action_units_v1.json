@@ -1,0 +1,25 @@
+{
+  "schema": "staffordos.action_units.v1",
+  "purpose": "Atomic executable actions across life and business. Actions should be linked to opportunities, issues, delivery units, or memory units.",
+  "generated_at": "2026-05-04T15:06:21.177Z",
+  "units": [
+    {
+      "unit_id": "action_cart-agent-dev.myshopify.com_followup_offer",
+      "unit_type": "action",
+      "domain_id": "shopifixer",
+      "linked_units": [
+        "opp_cart-agent-dev.myshopify.com",
+        "delivery_cart-agent-dev.myshopify.com_shopifixer"
+      ],
+      "owner": "ross",
+      "status": "open",
+      "action_type": "followup",
+      "instructions": "Follow up on real ShopiFixer offer and close payment.",
+      "due_at": null,
+      "proof_required": true,
+      "proof_status": "offer_sent_logged",
+      "created_at": "2026-05-04T15:06:21.177Z",
+      "updated_at": "2026-05-04T15:06:21.177Z"
+    }
+  ]
+}

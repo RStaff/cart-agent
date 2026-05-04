@@ -1,0 +1,40 @@
+{
+  "schema": "staffordos.issue_units.v1",
+  "purpose": "Issue-level execution units. Audits create suspected issues; validation promotes issues into fixable work.",
+  "generated_at": "2026-05-04T15:06:21.177Z",
+  "rules": [
+    "Free audit output may create suspected issues only.",
+    "Suspected issues require confidence and validation before fix execution.",
+    "No issue may move to fix_in_progress unless confidence_gate.status is pass or human_override is recorded."
+  ],
+  "units": [
+    {
+      "unit_id": "issue_cart-agent-dev.myshopify.com_recovery_gap",
+      "unit_type": "issue",
+      "domain_id": "shopifixer",
+      "client_id": "cart-agent-dev.myshopify.com",
+      "issue_type": "recovery_value_not_monetized",
+      "title": "Recovered merchant value has not been converted into Stafford revenue.",
+      "status": "suspected",
+      "confidence": 0.78,
+      "confidence_band": "medium_high",
+      "evidence": [
+        {
+          "type": "abando_recovery_proof",
+          "value": 100,
+          "source": "client_registry_v1"
+        },
+        {
+          "type": "stafford_revenue",
+          "value": 0,
+          "source": "client_registry_v1"
+        }
+      ],
+      "validation_required": true,
+      "recommended_fix": "Follow up on proposal and close payment before delivery execution.",
+      "known_risk": "Recovered revenue is proof of value, not proof of willingness to pay.",
+      "created_at": "2026-05-04T15:06:21.177Z",
+      "updated_at": "2026-05-04T15:06:21.177Z"
+    }
+  ]
+}
