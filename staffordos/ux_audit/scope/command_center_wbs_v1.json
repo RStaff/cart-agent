@@ -13,14 +13,14 @@
       "id": "ccux_002",
       "name": "Primary Action Snapshot Contract",
       "owner": "system_architect",
-      "status": "not_started",
+      "status": "done",
       "output": "staffordos/snapshots/primary_action_snapshot_v1.json"
     },
     {
       "id": "ccux_003",
       "name": "Primary Action Snapshot Builder",
       "owner": "execution_agent",
-      "status": "not_started",
+      "status": "done",
       "output": "staffordos/snapshots/build_primary_action_snapshot_v1.mjs"
     },
     {
@@ -51,5 +51,10 @@
     "no_full_lead_table_on_command_center": true,
     "legacy_artifacts_collapsed_or_secondary": true,
     "ui_priority_logic_removed": true
-  }
+  },
+  "updated_at": "2026-05-04T17:49:08.364Z",
+  "latest_completed": [
+    "ccux_002 primary_action_snapshot_v1.json created and verified",
+    "ccux_003 resolve_primary_action_v1.mjs created and executed successfully"
+  ]
 }
