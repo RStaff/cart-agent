@@ -1,0 +1,17 @@
+{
+  "client_id": "cart-agent-dev.myshopify.com",
+  "merchant_shop": "cart-agent-dev.myshopify.com",
+  "email": "rossstafford1@gmail.com",
+  "offer": {
+    "subject": "We found a revenue leak in your store (cart-agent-dev.myshopify.com)",
+    "body": "\nHi,\n\nI took a look at your store and found a revenue leak in your checkout flow.\n\nWe actually recovered $100 in lost revenue already.\n\nRight now, that recovery is not running consistently — it's just a one-time proof.\n\nHere’s what I can do for you:\n\n1. Fix the underlying issue causing the drop-off\n2. Implement the correction directly in your store\n3. Activate continuous recovery so this runs automatically\n\n→ One-time fix: $150\n\nOptional:\n→ Ongoing recovery system (Abando): $49/month\n\nThis turns what we already proved into something that runs every day.\n\nWant me to set this up for you?\n\n– Ross\nStafford Media Consulting\n",
+    "pricing": {
+      "shopifixer_one_time": 150,
+      "abando_mrr": 49
+    },
+    "context": {
+      "recovered_revenue": 100,
+      "proof_present": true
+    }
+  }
+}

@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.operator_dashboard_snapshot.v1",
-  "generated_at": "2026-05-03T23:36:29.987Z",
+  "generated_at": "2026-05-04T12:26:57.738Z",
   "source": "staffordos/clients/client_registry_v1.json",
   "primary_focus": {
     "client_id": "cart-agent-dev.myshopify.com",
@@ -10,13 +10,12 @@
     "priority_total": 83,
     "blocked": false,
     "next_action": {
-      "type": "monitor",
-      "owner": "system",
+      "type": "followup",
+      "owner": "ross",
       "due_at": null,
-      "instructions": "Monitor recovered revenue and prepare upsell or case study.",
-      "auto_executable": true,
-      "created_at": "2026-05-03T22:50:11.281Z",
-      "updated_at": "2026-05-03T23:09:47.062Z"
+      "instructions": "Follow up on real ShopiFixer offer and close payment.",
+      "auto_executable": false,
+      "updated_at": "2026-05-04T12:26:57.688Z"
     }
   },
   "revenue_gaps": [
@@ -31,7 +30,7 @@
   ],
   "top_metrics": {
     "total_clients": 1,
-    "active_revenue_clients": 1,
+    "active_revenue_clients": 0,
     "blocked_clients": 0,
     "total_stafford_revenue": 0,
     "total_merchant_revenue_recovered": 100
@@ -51,16 +50,15 @@
     {
       "client_id": "cart-agent-dev.myshopify.com",
       "merchant_shop": "cart-agent-dev.myshopify.com",
-      "lifecycle_stage": "revenue_active",
+      "lifecycle_stage": "proposal_sent",
       "priority_total": 83,
       "next_action": {
-        "type": "monitor",
-        "owner": "system",
+        "type": "followup",
+        "owner": "ross",
         "due_at": null,
-        "instructions": "Monitor recovered revenue and prepare upsell or case study.",
-        "auto_executable": true,
-        "created_at": "2026-05-03T22:50:11.281Z",
-        "updated_at": "2026-05-03T23:09:47.062Z"
+        "instructions": "Follow up on real ShopiFixer offer and close payment.",
+        "auto_executable": false,
+        "updated_at": "2026-05-04T12:26:57.688Z"
       },
       "blocked": false,
       "merchant_revenue_recovered": 100,
@@ -71,10 +69,10 @@
   "next_actions": [
     {
       "client_id": "cart-agent-dev.myshopify.com",
-      "owner": "system",
-      "type": "monitor",
-      "instructions": "Monitor recovered revenue and prepare upsell or case study.",
-      "auto_executable": true,
+      "owner": "ross",
+      "type": "followup",
+      "instructions": "Follow up on real ShopiFixer offer and close payment.",
+      "auto_executable": false,
       "priority_total": 83
     }
   ]

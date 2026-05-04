@@ -51,20 +51,30 @@
           "at": "2026-05-04T11:46:52.282Z",
           "type": "offer_send_failed",
           "text": "ShopiFixer offer send attempted but endpoint returned HTTP 500. Corrected false offer_sent state."
+        },
+        {
+          "at": "2026-05-04T12:26:57.688Z",
+          "type": "offer_sent",
+          "text": "Real ShopiFixer offer email sent successfully via /api/shopifixer/send-offer.",
+          "proof": {
+            "status": "OFFER_SENT",
+            "messageId": "<abaca249-3dff-6e3e-cddf-160c83db8d78@gmail.com>"
+          }
         }
       ],
       "lifecycle": {
-        "stage": "revenue_active",
-        "stage_updated_at": "2026-05-04T11:46:52.282Z",
+        "stage": "proposal_sent",
+        "stage_updated_at": "2026-05-04T12:26:57.688Z",
         "blocked": false,
         "block_reason": null
       },
       "next_action": {
-        "type": "send_offer",
-        "owner": "system",
-        "instructions": "Send real ShopiFixer offer email using generated offer content.",
-        "auto_executable": true,
-        "updated_at": "2026-05-04T11:46:52.282Z"
+        "type": "followup",
+        "owner": "ross",
+        "due_at": null,
+        "instructions": "Follow up on real ShopiFixer offer and close payment.",
+        "auto_executable": false,
+        "updated_at": "2026-05-04T12:26:57.688Z"
       },
       "revenue": {
         "shopifixer_one_time": 0,
