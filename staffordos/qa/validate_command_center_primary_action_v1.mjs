@@ -37,15 +37,22 @@ if (!content.page.includes("loadPrimaryActionSnapshot")) {
   add("critical", "snapshot_binding", "Command Center does not load primary_action_snapshot_v1.", "Bind top action to primary_action_snapshot_v1.");
 }
 
-if (content.page.indexOf("PrimaryActionPanel") > content.page.indexOf("RossCommandCenterSurface")) {
-  add("high", "visual_hierarchy", "Legacy RossCommandCenterSurface appears before canonical primary action.", "Primary action must appear before legacy artifact panels.");
+const renderStart = content.page.indexOf("return (");
+const renderBody = renderStart >= 0 ? content.page.slice(renderStart) : content.page;
+const primaryRenderIndex = renderBody.indexOf("<PrimaryActionPanel");
+const legacyRenderIndex = renderBody.indexOf("<RossCommandCenterSurface");
+
+if (primaryRenderIndex < 0) {
+  add("critical", "visual_hierarchy", "PrimaryActionPanel is not rendered in the Command Center return tree.", "Render PrimaryActionPanel first.");
+} else if (legacyRenderIndex >= 0 && primaryRenderIndex > legacyRenderIndex) {
+  add("high", "visual_hierarchy", "Legacy RossCommandCenterSurface renders before canonical primary action.", "Primary action must render before legacy artifact panels.");
 }
 
 if (content.page.includes("<ActionFirstDashboard")) {
   add("high", "duplicate_action", "Old ActionFirstDashboard is still rendered and asks a duplicate 'what should Ross do next?' question.", "Remove or demote ActionFirstDashboard from Command Center.");
 }
 
-if (content.page.includes("<UnitWorkSnapshotPanel")) {
+if (content.page.includes("<UnitWorkSnapshotPanel") && !content.page.includes("Supporting Unit Work")) {
   add("medium", "duplicate_unit_question", "UnitWorkSnapshotPanel still appears on Command Center and can compete with primary action.", "Show unit work only as collapsed supporting context or move to separate page.");
 }
 

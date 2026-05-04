@@ -22,7 +22,12 @@ export default function RossCommandCenterPage() {
       
       <main className="shell">
         <div className="container">
-          <UnitWorkSnapshotPanel snapshot={unitWorkSnapshot} />
+          <details style={{ marginTop: 20 }}>
+            <summary style={{ cursor: "pointer", color: "#94a3b8", fontWeight: 700 }}>
+              Supporting Unit Work
+            </summary>
+            <UnitWorkSnapshotPanel snapshot={unitWorkSnapshot} />
+          </details>
         </div>
       </main>
       <main className="shell">

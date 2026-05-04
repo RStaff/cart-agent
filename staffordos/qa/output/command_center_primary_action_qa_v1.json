@@ -1,36 +1,11 @@
 {
   "schema": "staffordos.command_center_qa_gate.v1",
-  "generated_at": "2026-05-04T18:05:07.897Z",
+  "generated_at": "2026-05-04T18:38:34.536Z",
   "page": "/operator/command-center",
-  "verdict": "fail",
-  "score": 58,
-  "findings": [
-    {
-      "severity": "high",
-      "area": "visual_hierarchy",
-      "finding": "Legacy RossCommandCenterSurface appears before canonical primary action.",
-      "recommendation": "Primary action must appear before legacy artifact panels."
-    },
-    {
-      "severity": "high",
-      "area": "duplicate_action",
-      "finding": "Old ActionFirstDashboard is still rendered and asks a duplicate 'what should Ross do next?' question.",
-      "recommendation": "Remove or demote ActionFirstDashboard from Command Center."
-    },
-    {
-      "severity": "medium",
-      "area": "duplicate_unit_question",
-      "finding": "UnitWorkSnapshotPanel still appears on Command Center and can compete with primary action.",
-      "recommendation": "Show unit work only as collapsed supporting context or move to separate page."
-    },
-    {
-      "severity": "high",
-      "area": "page_scope",
-      "finding": "Full LeadQueue is still embedded on Command Center.",
-      "recommendation": "Replace with lead summary/link; keep full table on /operator/leads."
-    }
-  ],
-  "required_next_move": "Remove duplicate ActionFirstDashboard and full LeadQueue from Command Center; keep canonical PrimaryActionPanel as the only top decision.",
+  "verdict": "pass",
+  "score": 100,
+  "findings": [],
+  "required_next_move": "Proceed to visual polish and revalidation.",
   "snapshot_primary_action": {
     "action_id": "primary_1777916948311",
     "action_label": "Follow up on real ShopiFixer offer and close payment.",
