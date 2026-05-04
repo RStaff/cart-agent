@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import fs from "node:fs";
 import path from "node:path";
-import { execFileSync } from "node:child_process";
 
 function readJson(filePath: string, fallback: any) {
   try {
@@ -95,10 +94,14 @@ export async function POST() {
   let loopDStatus = "not_run";
 
   try {
-    execFileSync("node", [path.join(repoRoot, "staffordos", "loop_d", "build_loop_d_feedback_v1.mjs")], {
+    const childProcess = await import("node:child_process");
+    const loopDFile = path.join(repoRoot, ["staffordos", "loop_d", "build_loop_d_feedback_v1.mjs"].join(path.sep));
+
+    childProcess.execFileSync("node", [loopDFile], {
       cwd: repoRoot,
       stdio: "ignore"
     });
+
     loopDStatus = "refreshed";
   } catch {
     loopDStatus = "refresh_failed";
