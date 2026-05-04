@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.command_center_qa_gate.v1",
-  "generated_at": "2026-05-04T20:09:43.209Z",
+  "generated_at": "2026-05-04T22:25:00.537Z",
   "page": "/operator/command-center",
   "version": "operator_home_v1_cta_execution",
   "verdict": "pass",

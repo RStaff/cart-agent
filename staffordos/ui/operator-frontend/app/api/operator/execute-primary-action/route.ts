@@ -29,11 +29,58 @@ function appendEvent(filePath: string, event: any) {
   writeJson(filePath, current);
 }
 
+function validateRequiredAgents(staffordRoot: string, taskType: string) {
+  const selectorPath = path.join(staffordRoot, "agents/agent_selector_v1.json");
+  const mapPath = path.join(staffordRoot, "agents/task_to_agent_map_v1.json");
+
+  const selector = readJson(selectorPath, { agents: [] });
+  const taskMap = readJson(mapPath, { task_mappings: [] });
+
+  const mapping = Array.isArray(taskMap.task_mappings)
+    ? taskMap.task_mappings.find((item: any) => item.task_type === taskType)
+    : null;
+
+  const availableAgents = new Set(
+    Array.isArray(selector.agents)
+      ? selector.agents.map((agent: any) => agent.agent_id)
+      : []
+  );
+
+  const requiredAgents = Array.isArray(mapping?.required_agents)
+    ? mapping.required_agents
+    : [];
+
+  const missingAgents = requiredAgents.filter((agentId: string) => !availableAgents.has(agentId));
+
+  return {
+    ok: Boolean(mapping) && missingAgents.length === 0,
+    task_type: taskType,
+    mapping_found: Boolean(mapping),
+    required_agents: requiredAgents,
+    missing_agents: missingAgents
+  };
+}
+
 export async function POST() {
   const now = new Date().toISOString();
 
   const repoRoot = path.resolve(process.cwd(), "../../..");
   const staffordRoot = path.resolve(process.cwd(), "../..");
+
+  const requiredAgentValidation = validateRequiredAgents(staffordRoot, "primary_action_execution");
+
+  if (!requiredAgentValidation.ok) {
+    return NextResponse.json(
+      {
+        ok: false,
+        status: "blocked",
+        reason: "Required agent gate failed.",
+        required_agent_validation: requiredAgentValidation
+      },
+      { status: 409 }
+    );
+  }
+
 
   const primaryPath = path.join(staffordRoot, "snapshots/primary_action_snapshot_v1.json");
   const preflightPath = path.join(staffordRoot, "preflight/output/preflight_report_v1.json");

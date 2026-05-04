@@ -1,0 +1,17 @@
+{
+  "schema": "staffordos.required_agent_validation.v1",
+  "generated_at": "2026-05-04T22:24:56.491Z",
+  "task_type": "primary_action_execution",
+  "status": "GO",
+  "required_agents": [
+    "preflight_agent",
+    "pm_agent",
+    "architect_agent",
+    "shape_checker",
+    "execution_agent",
+    "qa_validator",
+    "loop_d_agent"
+  ],
+  "missing_agents": [],
+  "mapping_found": true
+}

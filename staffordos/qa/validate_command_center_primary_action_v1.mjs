@@ -52,6 +52,16 @@ if (!hasClearCta) {
   add("high", "cta", "Operator Home does not expose a wired execution CTA.", "Wire Execute now to /api/operator/execute-primary-action.");
 }
 
+
+if (!executeRoute.includes("validateRequiredAgents") || !executeRoute.includes("required_agent_validation")) {
+  add(
+    "high",
+    "required_agent_gate",
+    "Execute route does not enforce required task agents.",
+    "Load task_to_agent_map_v1 and agent_selector_v1 before allowing execution."
+  );
+}
+
 if (!executeRoute.includes("operator_action_events_v1.json")) {
   add("high", "outcome_logging", "Execute route does not write an operator action event.", "Write execution evidence to staffordos/events/operator_action_events_v1.json.");
 }
