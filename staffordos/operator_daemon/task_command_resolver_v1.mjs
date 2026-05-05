@@ -243,6 +243,16 @@ const COMMANDS = {
     system: "staffordos",
     revenue_action: false,
     reason: "Bind StaffordOS gated runner to existing local SMTP env source without printing secrets or sending."
+  },
+
+  real_smtp_dry_run: {
+    task_type: "real_smtp_dry_run",
+    command: "node staffordos/operator_daemon/write_real_smtp_dry_run_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "smtp_dry_run",
+    system: "shopifixer",
+    revenue_action: false,
+    reason: "Validate SMTP send path without executing real send."
   }
 };
 
