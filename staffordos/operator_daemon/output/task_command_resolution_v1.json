@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T14:16:29.615Z",
-  "task_type": "real_smtp_dry_run_actual",
+  "generated_at": "2026-05-05T14:16:41.890Z",
+  "task_type": "real_send_allowlist_and_ledger",
   "status": "resolved",
   "resolution": {
-    "task_type": "real_smtp_dry_run_actual",
-    "command": "node staffordos/operator_daemon/write_real_smtp_dry_run_actual_v1.mjs",
+    "task_type": "real_send_allowlist_and_ledger",
+    "command": "node staffordos/operator_daemon/write_real_send_allowlist_and_ledger_v1.mjs",
     "approval_level": "operator_safe",
-    "execution_class": "smtp_actual_sender_dry_run",
+    "execution_class": "real_send_allowlist_manifest",
     "system": "shopifixer",
     "revenue_action": false,
-    "reason": "Validate actual SMTP sender module and target without sending."
+    "reason": "Create disabled-by-default real-send allowlist and immutable ledger contract."
   },
   "failures": []
 }

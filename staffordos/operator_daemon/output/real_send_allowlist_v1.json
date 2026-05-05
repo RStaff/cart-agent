@@ -1,0 +1,25 @@
+{
+  "schema": "staffordos.real_send_allowlist.v1",
+  "generated_at": "2026-05-05T14:16:42.053Z",
+  "status": "created_disabled_by_default",
+  "allowed_task_type": "operator_confirmed_real_send",
+  "enablement_flag_required": "STAFFORDOS_ALLOW_REAL_SEND=true",
+  "hard_requirements": [
+    "operator_confirmed_real_send_manifest exists",
+    "real_smtp_dry_run_actual status is actual_sender_path_validated_no_send",
+    "real_smtp_send_gate status is smtp_ready_but_send_not_executed",
+    "product_boundary_validator status is passed",
+    "recipient is present and not test@example.com",
+    "max one lead",
+    "immutable send ledger entry is written"
+  ],
+  "auto_select_allowed": false,
+  "batch_send_allowed": false,
+  "proof": {
+    "allowlist_created": true,
+    "allowlist_enabled_now": false,
+    "real_send": false,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}

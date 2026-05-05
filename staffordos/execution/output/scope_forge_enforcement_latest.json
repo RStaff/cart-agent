@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-05-05T14:16:29.678Z",
+  "generated_at": "2026-05-05T14:16:41.952Z",
   "status": "PASSED",
-  "command": "node staffordos/operator_daemon/write_real_smtp_dry_run_actual_v1.mjs",
+  "command": "node staffordos/operator_daemon/write_real_send_allowlist_and_ledger_v1.mjs",
   "inferred_system_id": "staffordos",
   "system_name": "StaffordOS Core",
   "system_status": "PARTIAL_REAL",
