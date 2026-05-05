@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.followup_draft_batch.v1",
-  "generated_at": "2026-05-05T11:23:36.079Z",
+  "generated_at": "2026-05-05T12:25:30.236Z",
   "system": "shopifixer",
   "status": "drafts_created",
   "source": "staffordos/outreach/leads.json",
@@ -17,7 +17,7 @@
         "phone": ""
       },
       "subject": "Quick follow-up on Example Shopify Store",
-      "body": "Hi there — I took a look at Example Shopify Store (https://examplestore.com) and noticed a few possible conversion gaps that may be affecting abandoned carts. I can share a quick ShopiFixer breakdown if helpful.",
+      "body": "Hi there — I took a quick look at Example Shopify Store (https://examplestore.com) and noticed a few possible conversion gaps that may be costing the store sales. I can share a short ShopiFixer breakdown if helpful.",
       "proof": {
         "drafted": true,
         "sent": false,

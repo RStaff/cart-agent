@@ -28,7 +28,7 @@ const drafts = leads.map((lead) => {
     website,
     contact: lead.contact || {},
     subject: `Quick follow-up on ${company}`,
-    body: `Hi ${contactName} — I took a look at ${company}${website ? ` (${website})` : ""} and noticed a few possible conversion gaps that may be affecting abandoned carts. I can share a quick ShopiFixer breakdown if helpful.`,
+    body: `Hi ${contactName} — I took a quick look at ${company}${website ? ` (${website})` : ""} and noticed a few possible conversion gaps that may be costing the store sales. I can share a short ShopiFixer breakdown if helpful.`,
     proof: {
       drafted: true,
       sent: false,
