@@ -1,0 +1,36 @@
+{
+  "schema": "staffordos.approved_outreach_queue.v1",
+  "generated_at": "2026-05-05T12:31:13.414Z",
+  "source": "staffordos/operator_daemon/output/shopifixer_followup_draft_v1.json",
+  "approved_count": 1,
+  "items": [
+    {
+      "lead_id": "lead_001",
+      "company": "Example Shopify Store",
+      "website": "https://examplestore.com",
+      "contact": {
+        "name": "Unknown",
+        "email": "",
+        "phone": ""
+      },
+      "subject": "Quick follow-up on Example Shopify Store",
+      "body": "Hi there — I took a quick look at Example Shopify Store (https://examplestore.com) and noticed a few possible conversion gaps that may be costing the store sales. I can share a short ShopiFixer breakdown if helpful.",
+      "proof": {
+        "drafted": true,
+        "sent": false,
+        "revenue_action": false
+      },
+      "approval": {
+        "status": "approved",
+        "approved_at": "2026-05-05T12:31:13.413Z",
+        "approved_by": "operator"
+      }
+    }
+  ],
+  "proof": {
+    "drafts_read": true,
+    "approved_items_created": true,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}

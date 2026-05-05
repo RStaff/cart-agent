@@ -32,7 +32,7 @@ const COMMANDS = {
     execution_class: "lead_sync",
     system: "shopifixer",
     revenue_action: false,
-    reason: "Refresh lead pipeline and update lead registry artifacts."
+    reason: "Refresh lead registry status artifacts."
   },
 
   shopifixer_followup_draft: {
@@ -42,8 +42,8 @@ const COMMANDS = {
     execution_class: "outreach_prep",
     system: "shopifixer",
     revenue_action: false,
-    reason: "Prepare follow-up message draft (NO sending)."
-  }
+    reason: "Prepare follow-up message draft from canonical leads (NO sending)."
+  },
 
   shopifixer_followup_approve: {
     task_type: "shopifixer_followup_approve",
@@ -53,8 +53,7 @@ const COMMANDS = {
     system: "shopifixer",
     revenue_action: false,
     reason: "Move drafted outreach into approved queue (NO sending)."
-  },
-
+  }
 };
 
 const resolved = COMMANDS[taskType];
@@ -66,17 +65,6 @@ const result = {
   status: resolved ? "resolved" : "unresolved",
   resolution: resolved || null,
   failures: []
-
-  shopifixer_followup_approve: {
-    task_type: "shopifixer_followup_approve",
-    command: "node staffordos/operator_daemon/write_approved_outreach_queue_v1.mjs",
-    approval_level: "operator_explicit",
-    execution_class: "approval_gate",
-    system: "shopifixer",
-    revenue_action: false,
-    reason: "Move drafted outreach into approved queue (NO sending)."
-  },
-
 };
 
 if (!resolved) {
