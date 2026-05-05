@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-05T13:49:16.268Z",
-  "command": "node staffordos/operator_daemon/write_router_to_gated_runner_binding_v1.mjs",
+  "generated_at": "2026-05-05T13:49:28.627Z",
+  "command": "node staffordos/operator_daemon/write_console_ingestion_binding_v1.mjs",
   "operatorApproved": true,
   "qaProfile": "operator_runtime",
   "stages": [
@@ -20,6 +20,6 @@
       "Score is below the automation threshold."
     ]
   },
-  "completed_at": "2026-05-05T13:49:16.406Z",
+  "completed_at": "2026-05-05T13:49:28.759Z",
   "exit_code": 0
 }

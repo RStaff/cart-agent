@@ -3,7 +3,7 @@
   "loop_interval_ms": 10000,
   "safe_mode": true,
   "auto_execute": false,
-  "task_type": "router_to_gated_runner_binding",
+  "task_type": "console_ingestion_binding",
   "qa_profile": "operator_runtime",
   "max_loops": 1
 }

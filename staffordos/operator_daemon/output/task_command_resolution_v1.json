@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T13:49:16.234Z",
-  "task_type": "router_to_gated_runner_binding",
+  "generated_at": "2026-05-05T13:49:28.595Z",
+  "task_type": "console_ingestion_binding",
   "status": "resolved",
   "resolution": {
-    "task_type": "router_to_gated_runner_binding",
-    "command": "node staffordos/operator_daemon/write_router_to_gated_runner_binding_v1.mjs",
+    "task_type": "console_ingestion_binding",
+    "command": "node staffordos/operator_daemon/write_console_ingestion_binding_v1.mjs",
     "approval_level": "operator_safe",
-    "execution_class": "router_binding_manifest",
+    "execution_class": "console_binding_manifest",
     "system": "staffordos",
     "revenue_action": false,
-    "reason": "Bind router decisions to gated runner contract."
+    "reason": "Define console ingestion contract into gated runner path."
   },
   "failures": []
 }
