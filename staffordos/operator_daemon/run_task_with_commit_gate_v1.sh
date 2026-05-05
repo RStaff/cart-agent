@@ -73,6 +73,8 @@ echo "===== EXISTING COMMIT GATE ====="
 bash staffordos/operator_daemon/commit_gate_v1.sh
 
 echo "===== COMMIT ONLY AFTER PASSING QA ====="
+export STAFFORDOS_GATED=true
+
 git add staffordos
 if git diff --cached --quiet; then
   echo "✅ No changes to commit"

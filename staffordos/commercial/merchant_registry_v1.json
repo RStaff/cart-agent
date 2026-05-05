@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.merchant_registry.v1",
-  "generated_at": "2026-05-05T13:14:01.590Z",
+  "generated_at": "2026-05-05T13:16:44.600Z",
   "merchant_count": 1,
   "merchants": [
     {
@@ -37,7 +37,7 @@
           "revenue_action": false
         },
         {
-          "at": "2026-05-05T13:14:01.590Z",
+          "at": "2026-05-05T13:16:44.599Z",
           "event": "merchant_registry_mapped",
           "recommended_offer": "shopifixer",
           "sent_messages": false,

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-05T13:14:01.459Z",
+  "generated_at": "2026-05-05T13:16:44.474Z",
   "command": "node staffordos/commercial/build_merchant_registry_v1.mjs",
   "operatorApproved": true,
   "qaProfile": "operator_runtime",
@@ -20,6 +20,6 @@
       "Score is below the automation threshold."
     ]
   },
-  "completed_at": "2026-05-05T13:14:01.597Z",
+  "completed_at": "2026-05-05T13:16:44.605Z",
   "exit_code": 0
 }

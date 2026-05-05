@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-05T13:14:01.489Z",
+  "generated_at": "2026-05-05T13:16:44.504Z",
   "status": "PASSED",
   "command": "node staffordos/commercial/build_merchant_registry_v1.mjs",
   "inferred_system_id": "staffordos",

@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T13:14:01.427Z",
+  "generated_at": "2026-05-05T13:16:44.441Z",
   "task_type": "merchant_registry_build",
   "status": "resolved",
   "resolution": {
