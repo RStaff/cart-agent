@@ -44,6 +44,17 @@ const COMMANDS = {
     revenue_action: false,
     reason: "Prepare follow-up message draft (NO sending)."
   }
+
+  shopifixer_followup_approve: {
+    task_type: "shopifixer_followup_approve",
+    command: "node staffordos/operator_daemon/write_approved_outreach_queue_v1.mjs",
+    approval_level: "operator_explicit",
+    execution_class: "approval_gate",
+    system: "shopifixer",
+    revenue_action: false,
+    reason: "Move drafted outreach into approved queue (NO sending)."
+  },
+
 };
 
 const resolved = COMMANDS[taskType];
@@ -55,6 +66,17 @@ const result = {
   status: resolved ? "resolved" : "unresolved",
   resolution: resolved || null,
   failures: []
+
+  shopifixer_followup_approve: {
+    task_type: "shopifixer_followup_approve",
+    command: "node staffordos/operator_daemon/write_approved_outreach_queue_v1.mjs",
+    approval_level: "operator_explicit",
+    execution_class: "approval_gate",
+    system: "shopifixer",
+    revenue_action: false,
+    reason: "Move drafted outreach into approved queue (NO sending)."
+  },
+
 };
 
 if (!resolved) {

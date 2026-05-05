@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T11:02:10.700Z",
-  "task_type": "lead_registry_sync",
+  "generated_at": "2026-05-05T12:25:30.075Z",
+  "task_type": "shopifixer_followup_draft",
   "status": "resolved",
   "resolution": {
-    "task_type": "lead_registry_sync",
-    "command": "node staffordos/operator_daemon/write_lead_registry_sync_v1.mjs",
-    "approval_level": "operator_safe",
-    "execution_class": "lead_sync",
+    "task_type": "shopifixer_followup_draft",
+    "command": "node staffordos/operator_daemon/write_followup_draft_v1.mjs",
+    "approval_level": "operator_review_required",
+    "execution_class": "outreach_prep",
     "system": "shopifixer",
     "revenue_action": false,
-    "reason": "Refresh lead pipeline and update lead registry artifacts."
+    "reason": "Prepare follow-up message draft (NO sending)."
   },
   "failures": []
 }

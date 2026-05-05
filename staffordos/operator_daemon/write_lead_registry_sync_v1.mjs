@@ -48,5 +48,4 @@ writeFileSync(
   JSON.stringify(result, null, 2)
 );
 
-console.log("✅ lead registry sync status written");
-console.log(JSON.stringify(result, null, 2));
+console.log("✅ lead registry sync written");

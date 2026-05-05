@@ -1,12 +1,13 @@
 {
   "schema": "staffordos.lead_registry_sync.v1",
-  "generated_at": "2026-05-05T11:02:10.861Z",
+  "generated_at": "2026-05-05T11:15:36.951Z",
   "system": "shopifixer",
   "status": "synced_status_only",
   "mode": "safe_non_revenue_sync",
-  "found_lead_sources": [],
+  "found_lead_sources": [
+    "staffordos/outreach/leads.json"
+  ],
   "missing_lead_sources": [
-    "staffordos/outreach/leads.json",
     "staffordos/products/shopifixer/assisted/leads.json",
     "staffordos/truth/lead_truth_store.json"
   ],
@@ -15,5 +16,12 @@
     "wrote_sync_artifact": true,
     "sent_messages": false,
     "revenue_action": false
-  }
+  },
+  "source_summaries": [
+    {
+      "path": "staffordos/outreach/leads.json",
+      "type": "array",
+      "count": 1
+    }
+  ]
 }
