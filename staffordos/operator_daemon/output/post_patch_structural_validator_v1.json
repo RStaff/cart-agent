@@ -1,8 +1,8 @@
 {
   "schema": "staffordos.post_patch_structural_validator.v1",
-  "generated_at": "2026-05-05T19:21:14.538Z",
-  "task_type": "resolver_preflight_guard_self_check",
-  "expected_artifact": "staffordos/operator_daemon/output/resolver_preflight_guard_v1.json",
+  "generated_at": "2026-05-05T19:39:14.731Z",
+  "task_type": "spine_deep_consistency_validator",
+  "expected_artifact": "staffordos/operator_daemon/output/spine_deep_consistency_validator_v1.json",
   "status": "passed",
   "checks": {
     "hidden_character_check": true,

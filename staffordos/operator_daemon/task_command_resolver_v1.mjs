@@ -5,6 +5,16 @@ const outDir = "staffordos/operator_daemon/output";
 mkdirSync(outDir, { recursive: true });
 
 const COMMANDS = {
+  spine_deep_consistency_validator: {
+    task_type: "spine_deep_consistency_validator",
+    command: "node staffordos/spine_authority/spine_deep_consistency_validator_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "spine_consistency_validation",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Validate consistency between resolver tasks, validator map, task-agent map, agent registry, and gated runner bindings."
+  },
+
   operator_confirmed_real_send: {
     task_type: "operator_confirmed_real_send",
     command: "node staffordos/operator_daemon/write_operator_confirmed_real_send_v1.mjs",

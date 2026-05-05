@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-05-05T19:21:04.045Z",
+  "generated_at": "2026-05-05T19:39:04.332Z",
   "status": "PASSED",
-  "command": "node staffordos/operator_daemon/resolver_preflight_guard_v1.mjs resolver_preflight_guard_self_check",
+  "command": "node staffordos/spine_authority/spine_deep_consistency_validator_v1.mjs",
   "inferred_system_id": "staffordos",
   "system_name": "StaffordOS Core",
   "system_status": "PARTIAL_REAL",

@@ -4,31 +4,24 @@ const outDir = "staffordos/operator_daemon/output";
 mkdirSync(outDir, { recursive: true });
 
 const paths = {
-  manifest: "staffordos/spine_authority/spine_authority_manifest_v1.json",
   resolver: "staffordos/operator_daemon/task_command_resolver_v1.mjs",
   taskToAgentMap: "staffordos/agents/task_to_agent_map_v1.json",
   agentRegistry: "staffordos/agents/agent_registry_v1.json",
   validatorMap: "staffordos/operator_daemon/output/validator_map_refresh_v1.json",
   routerBinding: "staffordos/operator_daemon/output/router_to_gated_runner_binding_v1.json",
-  routerDecisionAgentBinding: "staffordos/operator_daemon/output/router_decision_agent_binding_v1.json"
+  routerDecisionAgentBinding: "staffordos/operator_daemon/output/router_decision_agent_binding_v1.json",
+  aliasMap: "staffordos/spine_authority/agent_role_alias_map_v1.json"
 };
 
 function readJson(p) {
-  if (!existsSync(p)) return null;
-  return JSON.parse(readFileSync(p, "utf8"));
+  return existsSync(p) ? JSON.parse(readFileSync(p, "utf8")) : null;
 }
 
 function readText(p) {
-  return existsSync(p) ? readFileSync(p, "utf8").replace(/\u00a0/g, " ") : "";
+  return existsSync(p)
+    ? readFileSync(p, "utf8").replace(/\u00a0/g, " ")
+    : "";
 }
-
-const manifest = readJson(paths.manifest);
-const taskMap = readJson(paths.taskToAgentMap);
-const agentRegistry = readJson(paths.agentRegistry);
-const validatorMap = readJson(paths.validatorMap);
-const routerBinding = readJson(paths.routerBinding);
-const routerDecision = readJson(paths.routerDecisionAgentBinding);
-const resolverText = readText(paths.resolver);
 
 const failures = [];
 const warnings = [];
@@ -36,61 +29,74 @@ const warnings = [];
 function fail(x) { failures.push(x); }
 function warn(x) { warnings.push(x); }
 
-for (const [k, p] of Object.entries(paths)) {
-  if (!existsSync(p)) fail(`missing_file:${k}:${p}`);
+for (const [key, p] of Object.entries(paths)) {
+  if (!existsSync(p)) fail(`missing_file:${key}:${p}`);
 }
 
-const resolverTaskMatches = [...resolverText.matchAll(/^\s*([a-zA-Z0-9_]+):\s*\{/gm)]
-  .map(m => m[1])
-  .filter(t => !["schema", "proof", "checks", "binding", "sources", "enforcement"].includes(t));
+const resolverText = readText(paths.resolver);
+const taskMap = readJson(paths.taskToAgentMap);
+const agentRegistry = readJson(paths.agentRegistry);
+const validatorMap = readJson(paths.validatorMap);
+const routerBinding = readJson(paths.routerBinding);
+const routerDecision = readJson(paths.routerDecisionAgentBinding);
+const aliasMap = readJson(paths.aliasMap)?.aliases || {};
 
-const resolverTasks = Array.from(new Set(resolverTaskMatches));
+const resolverTasks = Array.from(
+  new Set(
+    [...resolverText.matchAll(/^\s*([a-zA-Z0-9_]+):\s*\{/gm)]
+      .map(m => m[1])
+      .filter(t => !["schema", "proof", "checks", "binding", "sources", "enforcement"].includes(t))
+  )
+);
 
 const taskMappings = Array.isArray(taskMap?.task_mappings) ? taskMap.task_mappings : [];
 const mappedTasks = taskMappings.map(t => t.task_type).filter(Boolean);
-
 const registeredAgents = new Set((agentRegistry?.agents || []).map(a => a.id));
 const validatorTasks = Object.keys(validatorMap?.task_validators || {});
 
-for (const t of resolverTasks) {
-  if (!validatorTasks.includes(t)) {
-    warn(`resolver_task_missing_validator_map:${t}`);
+function resolveAgentRole(role) {
+  if (Object.prototype.hasOwnProperty.call(aliasMap, role)) {
+    return aliasMap[role];
   }
-}
-
-for (const t of validatorTasks) {
-  if (!resolverTasks.includes(t)) {
-    warn(`validator_map_task_missing_resolver_mapping:${t}`);
-  }
-}
-
-for (const t of mappedTasks) {
-  if (!resolverTasks.includes(t)) {
-    warn(`task_to_agent_task_missing_resolver_mapping:${t}`);
-  }
-}
-
-for (const t of resolverTasks) {
-  if (!mappedTasks.includes(t)) {
-    warn(`resolver_task_missing_required_agent_mapping:${t}`);
-  }
+  return role;
 }
 
 for (const mapping of taskMappings) {
-  for (const agent of mapping.required_agents || []) {
-    if (!registeredAgents.has(agent)) {
-      fail(`required_agent_not_registered:${mapping.task_type}:${agent}`);
+  for (const role of mapping.required_agents || []) {
+    const resolved = resolveAgentRole(role);
+
+    if (resolved === null) {
+      warn(`agent_role_alias_unresolved:${mapping.task_type}:${role}`);
+    } else if (!registeredAgents.has(resolved)) {
+      fail(`agent_role_alias_points_to_missing_agent:${mapping.task_type}:${role}->${resolved}`);
     }
   }
 }
 
+for (const task of resolverTasks) {
+  if (!validatorTasks.includes(task)) {
+    warn(`resolver_task_missing_validator_map:${task}`);
+  }
+  if (!mappedTasks.includes(task)) {
+    warn(`resolver_task_missing_required_agent_mapping:${task}`);
+  }
+}
+
+for (const task of validatorTasks) {
+  if (!resolverTasks.includes(task)) {
+    warn(`validator_map_task_missing_resolver_mapping:${task}`);
+  }
+}
+
+for (const task of mappedTasks) {
+  if (!resolverTasks.includes(task)) {
+    warn(`task_to_agent_task_missing_resolver_mapping:${task}`);
+  }
+}
+
 for (const [task, config] of Object.entries(validatorMap?.task_validators || {})) {
-  if (!config.expected_artifact) {
-    fail(`validator_missing_expected_artifact:${task}`);
-  }
-  if (!config.validation_owner) {
-    fail(`validator_missing_validation_owner:${task}`);
-  }
+  if (!config.expected_artifact) fail(`validator_missing_expected_artifact:${task}`);
+  if (!config.validation_owner) fail(`validator_missing_validation_owner:${task}`);
 }
 
 if (routerBinding?.binding?.execution_path !== "staffordos/operator_daemon/run_task_with_commit_gate_v1.sh") {

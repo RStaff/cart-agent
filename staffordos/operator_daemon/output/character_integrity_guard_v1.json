@@ -1,12 +1,12 @@
 {
   "schema": "staffordos.character_integrity_guard.v1",
-  "generated_at": "2026-05-05T19:21:03.502Z",
+  "generated_at": "2026-05-05T19:39:03.814Z",
   "mode": "normalize-task",
-  "status": "normalized_hidden_characters",
+  "status": "passed",
   "input": {
-    "task_raw_length": 37,
-    "task_normalized": "resolver_preflight_guard_self_check",
-    "hidden_characters_detected": true
+    "task_raw_length": 34,
+    "task_normalized": "fix runner arg normalization order",
+    "hidden_characters_detected": false
   },
   "proof": {
     "character_integrity_checked": true,

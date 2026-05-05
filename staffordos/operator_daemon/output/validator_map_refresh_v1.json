@@ -24,6 +24,10 @@
     "real_smtp_send_gate": {
       "expected_artifact": "staffordos/operator_daemon/output/real_smtp_send_gate_v1.json",
       "validation_owner": "send_safety"
+    },
+    "spine_deep_consistency_validator": {
+      "expected_artifact": "staffordos/operator_daemon/output/spine_deep_consistency_validator_v1.json",
+      "validation_owner": "spine_authority"
     }
   },
   "proof": {

@@ -1,0 +1,19 @@
+{
+  "schema": "staffordos.agent_role_alias_map.v1",
+  "generated_at": null,
+  "aliases": {
+    "preflight_agent": null,
+    "pm_agent": null,
+    "architect_agent": null,
+    "shape_checker": null,
+    "execution_agent": "run_agent_v1",
+    "qa_validator": null,
+    "loop_d_agent": null
+  },
+  "rules": [
+    "Alias must resolve to a registered agent id OR remain null if intentionally unimplemented",
+    "Validator must not fail if alias exists but is null (warning only)",
+    "Validator must fail if alias resolves to non-existent agent",
+    "No direct role names allowed in execution \u2014 must resolve through alias or mapping"
+  ]
+}

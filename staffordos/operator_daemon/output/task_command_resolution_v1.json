@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T19:21:04.202Z",
-  "task_type": "resolver_preflight_guard_self_check",
+  "generated_at": "2026-05-05T19:39:04.269Z",
+  "task_type": "spine_deep_consistency_validator",
   "status": "resolved",
   "resolution": {
-    "task_type": "resolver_preflight_guard_self_check",
-    "command": "node staffordos/operator_daemon/resolver_preflight_guard_v1.mjs resolver_preflight_guard_self_check",
+    "task_type": "spine_deep_consistency_validator",
+    "command": "node staffordos/spine_authority/spine_deep_consistency_validator_v1.mjs",
     "approval_level": "operator_safe",
-    "execution_class": "resolver_integrity_guard",
+    "execution_class": "spine_consistency_validation",
     "system": "staffordos",
     "revenue_action": false,
-    "reason": "Validate resolver preflight guard exists and is callable."
+    "reason": "Validate consistency between resolver tasks, validator map, task-agent map, agent registry, and gated runner bindings."
   },
   "failures": []
 }
