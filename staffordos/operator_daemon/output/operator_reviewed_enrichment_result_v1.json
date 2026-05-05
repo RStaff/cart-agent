@@ -1,0 +1,19 @@
+{
+  "schema": "staffordos.operator_reviewed_enrichment_result.v1",
+  "generated_at": "2026-05-05T12:41:56.608Z",
+  "status": "operator_reviewed",
+  "lead_id": "lead_001",
+  "verified_contact": {
+    "email": "test@example.com",
+    "phone": "",
+    "contact_form_url": "",
+    "source_url": "operator_review_manual_seed",
+    "confidence": 0.75
+  },
+  "proof": {
+    "operator_reviewed": true,
+    "external_lookup_performed_by_system": false,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}

@@ -83,6 +83,16 @@ const COMMANDS = {
     system: "shopifixer",
     revenue_action: false,
     reason: "Create contact enrichment task packet from enrichment_needed_queue (NO external lookup/send)."
+  },
+
+  operator_reviewed_enrichment_result: {
+    task_type: "operator_reviewed_enrichment_result",
+    command: "node staffordos/operator_daemon/apply_operator_reviewed_enrichment_v1.mjs",
+    approval_level: "operator_explicit",
+    execution_class: "lead_enrichment_writeback",
+    system: "shopifixer",
+    revenue_action: false,
+    reason: "Apply operator-reviewed contact enrichment to canonical leads.json (NO lookup/send)."
   }
 };
 

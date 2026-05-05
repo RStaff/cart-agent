@@ -8,7 +8,7 @@
     "website": "https://examplestore.com",
     "contact": {
       "name": "Unknown",
-      "email": "",
+      "email": "test@example.com",
       "phone": ""
     },
     "shopify_detected": true,
@@ -21,6 +21,19 @@
       "confidence": 0.5
     },
     "next_action": "draft_followup",
-    "history": []
+    "history": [
+      {
+        "at": "2026-05-05T12:41:56.608Z",
+        "event": "operator_reviewed_enrichment_applied",
+        "sent_messages": false,
+        "revenue_action": false
+      }
+    ],
+    "enrichment": {
+      "status": "verified",
+      "source_url": "operator_review_manual_seed",
+      "confidence": 0.75,
+      "reviewed_at": "2026-05-05T12:41:56.608Z"
+    }
   }
 ]
