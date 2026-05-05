@@ -273,6 +273,26 @@ const COMMANDS = {
     system: "shopifixer",
     revenue_action: false,
     reason: "Create future real-send gate manifest only. Does not enable or perform real send."
+  },
+
+  real_smtp_dry_run_actual: {
+    task_type: "real_smtp_dry_run_actual",
+    command: "node staffordos/operator_daemon/write_real_smtp_dry_run_actual_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "smtp_actual_sender_dry_run",
+    system: "shopifixer",
+    revenue_action: false,
+    reason: "Validate actual SMTP sender module and target without sending."
+  },
+
+  real_send_allowlist_and_ledger: {
+    task_type: "real_send_allowlist_and_ledger",
+    command: "node staffordos/operator_daemon/write_real_send_allowlist_and_ledger_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "real_send_allowlist_manifest",
+    system: "shopifixer",
+    revenue_action: false,
+    reason: "Create disabled-by-default real-send allowlist and immutable ledger contract."
   }
 };
 

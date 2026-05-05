@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-05T14:08:29.363Z",
-  "command": "node staffordos/operator_daemon/write_operator_confirmed_real_send_manifest_v1.mjs",
+  "generated_at": "2026-05-05T14:16:29.648Z",
+  "command": "node staffordos/operator_daemon/write_real_smtp_dry_run_actual_v1.mjs",
   "operatorApproved": true,
   "qaProfile": "operator_runtime",
   "stages": [
@@ -20,6 +20,6 @@
       "Score is below the automation threshold."
     ]
   },
-  "completed_at": "2026-05-05T14:08:29.511Z",
+  "completed_at": "2026-05-05T14:16:29.810Z",
   "exit_code": 0
 }

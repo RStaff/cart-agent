@@ -30,11 +30,51 @@ for f in "${REQUIRED_FILES[@]}"; do
   fi
 done
 
-echo "→ Check 4: No forbidden actions"
+echo "→ Check 4: No forbidden actions, except narrow real-send allowlist"
 
-if grep -RinE '"sent": true|"sent_messages": true|"revenue_action": true' staffordos/operator_daemon/output 2>/dev/null; then
-  echo "❌ Forbidden action detected"
-  FAIL=1
+FORBIDDEN_MATCHES=$(grep -RinE '"sent": true|"sent_messages": true|"revenue_action": true' staffordos/operator_daemon/output 2>/dev/null || true)
+
+if [ -n "$FORBIDDEN_MATCHES" ]; then
+  if [ "${STAFFORDOS_ALLOW_REAL_SEND:-}" = "true" ]; then
+    echo "⚠️ Forbidden-looking action found, checking narrow real-send allowlist"
+
+    node - <<'NODE' || FAIL=1
+const fs = require("fs");
+
+function read(p) {
+  if (!fs.existsSync(p)) throw new Error(`Missing ${p}`);
+  return JSON.parse(fs.readFileSync(p, "utf8"));
+}
+
+const resolution = read("staffordos/operator_daemon/output/task_command_resolution_v1.json");
+const allowlist = read("staffordos/operator_daemon/output/real_send_allowlist_v1.json");
+const dryRun = read("staffordos/operator_daemon/output/real_smtp_dry_run_actual_v1.json");
+const smtpGate = read("staffordos/operator_daemon/output/real_smtp_send_gate_v1.json");
+const boundary = read("staffordos/operator_daemon/output/product_boundary_validator_v1.json");
+
+if (resolution.task_type !== "operator_confirmed_real_send") {
+  throw new Error(`Real send allowlist denied: task_type=${resolution.task_type}`);
+}
+if (allowlist.allowed_task_type !== "operator_confirmed_real_send") {
+  throw new Error("Real send allowlist denied: allowlist task mismatch");
+}
+if (dryRun.status !== "actual_sender_path_validated_no_send") {
+  throw new Error(`Real send allowlist denied: dry run status=${dryRun.status}`);
+}
+if (smtpGate.status !== "smtp_ready_but_send_not_executed") {
+  throw new Error(`Real send allowlist denied: smtp gate status=${smtpGate.status}`);
+}
+if (boundary.status !== "passed") {
+  throw new Error(`Real send allowlist denied: product boundary status=${boundary.status}`);
+}
+
+console.log("✅ Narrow real-send allowlist checks passed");
+NODE
+  else
+    echo "$FORBIDDEN_MATCHES"
+    echo "❌ Forbidden action detected"
+    FAIL=1
+  fi
 else
   echo "✅ No send / revenue action"
 fi

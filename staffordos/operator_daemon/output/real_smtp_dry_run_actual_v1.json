@@ -1,0 +1,37 @@
+{
+  "schema": "staffordos.real_smtp_dry_run_actual.v1",
+  "generated_at": "2026-05-05T14:16:29.805Z",
+  "status": "blocked_or_incomplete_no_send",
+  "checks": {
+    "sender_module_path": "web/src/lib/emailSender.js",
+    "sender_module_exists": true,
+    "sender_syntax_check": {
+      "attempted": true,
+      "passed": true,
+      "error": null
+    },
+    "sender_mentions_required_env_keys": [
+      "SMTP_HOST",
+      "SMTP_PORT",
+      "SMTP_USER",
+      "SMTP_PASS",
+      "FROM_EMAIL"
+    ],
+    "sender_has_send_function_shape": true,
+    "approved_queue_present": true,
+    "product_boundary_passed": true,
+    "smtp_gate_ready": true,
+    "recipient_present": true,
+    "recipient_is_placeholder": true
+  },
+  "blocking_reasons": [
+    "recipient_is_placeholder_test_email"
+  ],
+  "proof": {
+    "actual_sender_module_validated": true,
+    "send_function_invoked": false,
+    "real_send": false,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}
