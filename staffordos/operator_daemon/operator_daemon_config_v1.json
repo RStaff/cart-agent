@@ -3,7 +3,7 @@
   "loop_interval_ms": 10000,
   "safe_mode": true,
   "auto_execute": false,
-  "task_type": "console_ingestion_binding",
+  "task_type": "real_smtp_send_gate",
   "qa_profile": "operator_runtime",
   "max_loops": 1
 }

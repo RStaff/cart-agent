@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T13:49:28.595Z",
-  "task_type": "console_ingestion_binding",
+  "generated_at": "2026-05-05T13:49:41.205Z",
+  "task_type": "real_smtp_send_gate",
   "status": "resolved",
   "resolution": {
-    "task_type": "console_ingestion_binding",
-    "command": "node staffordos/operator_daemon/write_console_ingestion_binding_v1.mjs",
-    "approval_level": "operator_safe",
-    "execution_class": "console_binding_manifest",
-    "system": "staffordos",
+    "task_type": "real_smtp_send_gate",
+    "command": "node staffordos/operator_daemon/write_real_smtp_send_gate_v1.mjs",
+    "approval_level": "operator_explicit",
+    "execution_class": "smtp_send_readiness_gate",
+    "system": "shopifixer",
     "revenue_action": false,
-    "reason": "Define console ingestion contract into gated runner path."
+    "reason": "Evaluate real SMTP readiness without sending."
   },
   "failures": []
 }
