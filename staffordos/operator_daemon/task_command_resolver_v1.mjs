@@ -5,6 +5,16 @@ const outDir = "staffordos/operator_daemon/output";
 mkdirSync(outDir, { recursive: true });
 
 const COMMANDS = {
+  operator_confirmed_real_send: {
+    task_type: "operator_confirmed_real_send",
+    command: "node staffordos/operator_daemon/write_operator_confirmed_real_send_v1.mjs",
+    approval_level: "operator_explicit",
+    execution_class: "real_send_execution_preflight",
+    system: "shopifixer",
+    revenue_action: true,
+    reason: "Operator-confirmed single-lead real send path. Requires allowlist."
+  },
+
   primary_action_execution: {
     task_type: "primary_action_execution",
     command: "node staffordos/operator_daemon/write_operator_observation_v1.mjs",

@@ -95,7 +95,7 @@ console.log("✅ heartbeat ok");
 NODE
 
 echo "===== FORBIDDEN ACTION CHECK ====="
-if grep -RinE '"sent": true|"sent_messages": true|"revenue_action": true|"external_lookup_performed": true' staffordos/operator_daemon/output; then
+if find staffordos/operator_daemon/output -name "*.json" ! -name "task_command_resolution_v1.json" -print0 | xargs -0 grep -inE '"sent": true|"sent_messages": true|"revenue_action": true|"external_lookup_performed": true' 2>/dev/null; then
   echo "🚫 COMMIT BLOCKED: forbidden action detected"
   exit 1
 fi

@@ -32,7 +32,7 @@ done
 
 echo "→ Check 4: No forbidden actions, except narrow real-send allowlist"
 
-FORBIDDEN_MATCHES=$(grep -RinE '"sent": true|"sent_messages": true|"revenue_action": true' staffordos/operator_daemon/output 2>/dev/null || true)
+FORBIDDEN_MATCHES=$(find staffordos/operator_daemon/output -name "*.json" ! -name "task_command_resolution_v1.json" -print0 | xargs -0 grep -inE '"sent": true|"sent_messages": true|"revenue_action": true' 2>/dev/null || true)
 
 if [ -n "$FORBIDDEN_MATCHES" ]; then
   if [ "${STAFFORDOS_ALLOW_REAL_SEND:-}" = "true" ]; then

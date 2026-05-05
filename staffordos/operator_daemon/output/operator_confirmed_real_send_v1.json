@@ -1,0 +1,22 @@
+{
+  "schema": "staffordos.operator_confirmed_real_send.v1",
+  "generated_at": "2026-05-05T15:21:09.198Z",
+  "execution": {
+    "mode": "single_lead_only",
+    "lead_id": "lead_f8c0c8b4e640",
+    "channel": "email",
+    "send_attempted": false,
+    "send_status": "ready_for_real_send_not_executed"
+  },
+  "constraints": {
+    "max_leads": 1,
+    "operator_confirmed": true,
+    "allowlist_required": true
+  },
+  "proof": {
+    "preflight_only": true,
+    "real_send": false,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}
