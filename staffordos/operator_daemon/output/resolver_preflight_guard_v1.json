@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.resolver_preflight_guard.v1",
-  "generated_at": "2026-05-05T20:47:46.330Z",
+  "generated_at": "2026-05-05T20:50:02.489Z",
   "task_type": "revenue_conversion_surface_validator",
   "status": "passed",
   "checks": {

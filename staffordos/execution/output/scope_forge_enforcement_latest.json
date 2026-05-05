@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-05T20:47:46.719Z",
+  "generated_at": "2026-05-05T20:50:02.875Z",
   "status": "PASSED",
   "command": "node staffordos/revenue_authority/revenue_conversion_surface_validator_v1.mjs",
   "inferred_system_id": "revenue",

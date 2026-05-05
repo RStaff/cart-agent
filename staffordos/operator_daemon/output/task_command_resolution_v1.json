@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T20:47:46.658Z",
+  "generated_at": "2026-05-05T20:50:02.805Z",
   "task_type": "revenue_conversion_surface_validator",
   "status": "resolved",
   "resolution": {

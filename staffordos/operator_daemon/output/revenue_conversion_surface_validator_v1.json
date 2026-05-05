@@ -1,7 +1,7 @@
 {
   "schema": "staffordos.revenue_conversion_surface_validator.v1",
-  "generated_at": "2026-05-05T20:47:46.818Z",
-  "status": "passed_with_warnings",
+  "generated_at": "2026-05-05T20:50:02.979Z",
+  "status": "passed",
   "surfaces_checked": {
     "shopifixer": [
       "runAudit",
@@ -15,9 +15,7 @@
     ]
   },
   "failures": [],
-  "warnings": [
-    "missing_optional_conversion_signal:audit_result_email_handoff:email|full audit|check your email"
-  ],
+  "warnings": [],
   "proof": {
     "validation_only": true,
     "routes_executed": false,
