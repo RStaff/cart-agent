@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-05-05T13:37:30.648Z",
+  "generated_at": "2026-05-05T13:42:24.707Z",
   "status": "PASSED",
-  "command": "node staffordos/operator_daemon/write_router_decision_agent_binding_v1.mjs",
+  "command": "node staffordos/operator_daemon/write_product_boundary_validator_v1.mjs",
   "inferred_system_id": "staffordos",
   "system_name": "StaffordOS Core",
   "system_status": "PARTIAL_REAL",

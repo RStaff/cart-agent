@@ -163,6 +163,26 @@ const COMMANDS = {
     system: "staffordos",
     revenue_action: false,
     reason: "Bind existing router, decision, and agent assets into gated runner operating model."
+  },
+
+  product_boundary_validator: {
+    task_type: "product_boundary_validator",
+    command: "node staffordos/operator_daemon/write_product_boundary_validator_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "commercial_integrity_gate",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Validate ShopiFixer/Abando product boundaries before send."
+  },
+
+  router_binding_plan: {
+    task_type: "router_binding_plan",
+    command: "node staffordos/operator_daemon/write_router_binding_plan_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "router_binding_planning",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Create binding plan for existing router, decision, agent, and gated runner assets."
   }
 };
 

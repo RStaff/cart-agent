@@ -1,0 +1,29 @@
+{
+  "schema": "staffordos.product_boundary_validator.v1",
+  "generated_at": "2026-05-05T13:42:24.807Z",
+  "status": "passed",
+  "checked_drafts": 1,
+  "checked_merchants": 1,
+  "violations": [],
+  "warnings": [],
+  "boundaries": {
+    "shopifixer": {
+      "type": "service",
+      "price": 950,
+      "rule": "ShopiFixer first-touch outreach sells diagnosis/fix service only. No Abando, no subscription, no abandoned-cart-first framing."
+    },
+    "abando": {
+      "type": "subscription_product",
+      "price_monthly": 50,
+      "rule": "Abando outreach sells revenue recovery/re-engagement product. It is not the $950 ShopiFixer service."
+    },
+    "bridge": {
+      "rule": "Abando may be offered after ShopiFixer completion or explicit recovery-demo intent."
+    }
+  },
+  "proof": {
+    "product_boundary_checked": true,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}

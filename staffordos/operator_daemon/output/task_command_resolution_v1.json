@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T13:37:30.584Z",
-  "task_type": "router_decision_agent_binding",
+  "generated_at": "2026-05-05T13:42:24.643Z",
+  "task_type": "product_boundary_validator",
   "status": "resolved",
   "resolution": {
-    "task_type": "router_decision_agent_binding",
-    "command": "node staffordos/operator_daemon/write_router_decision_agent_binding_v1.mjs",
+    "task_type": "product_boundary_validator",
+    "command": "node staffordos/operator_daemon/write_product_boundary_validator_v1.mjs",
     "approval_level": "operator_safe",
-    "execution_class": "router_decision_agent_binding",
+    "execution_class": "commercial_integrity_gate",
     "system": "staffordos",
     "revenue_action": false,
-    "reason": "Bind existing router, decision, and agent assets into gated runner operating model."
+    "reason": "Validate ShopiFixer/Abando product boundaries before send."
   },
   "failures": []
 }
