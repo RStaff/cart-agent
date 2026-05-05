@@ -1,0 +1,13 @@
+{
+  "schema": "staffordos.operator_heartbeat.v1",
+  "generated_at": "2026-05-05T10:35:50.055Z",
+  "loop": 2,
+  "status": "error",
+  "stages": [
+    "preflight",
+    "agent_validation",
+    "primary_action"
+  ],
+  "safe_mode": true,
+  "auto_execute": false
+}

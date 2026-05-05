@@ -1,0 +1,9 @@
+{
+  "schema": "staffordos.operator_daemon_config.v1",
+  "loop_interval_ms": 30000,
+  "safe_mode": true,
+  "auto_execute": false,
+  "task_type": "primary_action_execution",
+  "qa_profile": "operator_runtime",
+  "max_loops": 3
+}
