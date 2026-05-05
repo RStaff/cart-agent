@@ -1,7 +1,7 @@
 {
   "ok": true,
   "artifact": "revenue_truth_v1",
-  "generated_at": "2026-05-05T13:21:14.622Z",
+  "generated_at": "2026-05-05T13:24:02.097Z",
   "funnel": {
     "outreach_queue": 7,
     "approval_items": 0,
