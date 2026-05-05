@@ -27,7 +27,7 @@ const COMMANDS = {
 
   lead_registry_sync: {
     task_type: "lead_registry_sync",
-    command: "node staffordos/outreach/scripts/run_real_lead_pipeline.sh",
+    command: "bash staffordos/outreach/scripts/run_real_lead_pipeline.sh",
     approval_level: "operator_safe",
     execution_class: "lead_sync",
     system: "shopifixer",
