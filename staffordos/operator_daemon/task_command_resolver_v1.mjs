@@ -303,6 +303,16 @@ const COMMANDS = {
     system: "shopifixer",
     revenue_action: false,
     reason: "Replace placeholder recipient with operator-controlled test recipient. No send."
+  },
+
+  system_brain_inventory: {
+    task_type: "system_brain_inventory",
+    command: "node staffordos/operator_daemon/write_system_brain_inventory_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "system_brain_inventory",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Inventory existing brain/decision/router/repair assets before building Option C."
   }
 };
 

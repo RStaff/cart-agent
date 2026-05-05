@@ -1,0 +1,61 @@
+{
+  "schema": "staffordos.system_brain_inventory.v1",
+  "generated_at": "2026-05-05T14:49:44.303Z",
+  "status": "inventory_complete",
+  "total_candidates": 28,
+  "grouped": {
+    "brain_candidates": [
+      "staffordos/operator_daemon/write_system_brain_inventory_v1.mjs"
+    ],
+    "decision_candidates": [
+      "staffordos/agents/agent_selector_v1.json",
+      "staffordos/clients/next_action_engine_v1.mjs",
+      "staffordos/decision/resolve_primary_action_v1.mjs",
+      "staffordos/hygiene/output/worktree_hygiene_decision_plan_v1.json",
+      "staffordos/hygiene/output/worktree_hygiene_decision_plan_v1.md",
+      "staffordos/leads/approval_decision_agent_v1.mjs",
+      "staffordos/operator_daemon/output/router_decision_agent_binding_v1.json",
+      "staffordos/operator_daemon/write_router_decision_agent_binding_v1.mjs",
+      "staffordos/optimization/opportunityDecisionEngine.js"
+    ],
+    "router_candidates": [
+      "staffordos/leads/router.js",
+      "staffordos/operator_daemon/output/neck_router_inventory_v1.json",
+      "staffordos/operator_daemon/output/router_binding_plan_v1.json",
+      "staffordos/operator_daemon/output/router_decision_agent_binding_v1.json",
+      "staffordos/operator_daemon/output/router_to_gated_runner_binding_v1.json",
+      "staffordos/operator_daemon/task_command_resolver_v1.mjs",
+      "staffordos/operator_daemon/write_neck_router_inventory_v1.mjs",
+      "staffordos/operator_daemon/write_router_binding_plan_v1.mjs",
+      "staffordos/operator_daemon/write_router_decision_agent_binding_v1.mjs",
+      "staffordos/operator_daemon/write_router_to_gated_runner_binding_v1.mjs",
+      "staffordos/router/router_v1.js",
+      "staffordos/router/router_v1_1.js",
+      "staffordos/router/router_v1_harness.mjs",
+      "staffordos/router/router_v1_real_store_worksheet.mjs",
+      "staffordos/scorecards/runAuditResolver.js",
+      "staffordos/ux_audit/output/operator_command_center_ux_integrity_v1.json"
+    ],
+    "repair_candidates": [],
+    "learning_candidates": [
+      "staffordos/loop_d/build_loop_d_feedback_v1.mjs",
+      "staffordos/loop_d/output/loop_d_feedback_report_v1.json",
+      "staffordos/memory/memory_units_v1.json",
+      "staffordos/optimization/feedbackRecorder.js"
+    ],
+    "activation_candidates": [
+      "staffordos/agents/agent_selector_v1.json"
+    ]
+  },
+  "recommendation": {
+    "next_step": "review_existing_brain_assets_before_building_option_c",
+    "do_not_create_duplicate_brain_layer": true
+  },
+  "proof": {
+    "inventory_only": true,
+    "no_execution_changed": true,
+    "real_send": false,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}
