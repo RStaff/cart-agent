@@ -183,6 +183,46 @@ const COMMANDS = {
     system: "staffordos",
     revenue_action: false,
     reason: "Create binding plan for existing router, decision, agent, and gated runner assets."
+  },
+
+  validator_map_refresh: {
+    task_type: "validator_map_refresh",
+    command: "node staffordos/operator_daemon/write_validator_map_refresh_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "validator_map_refresh",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Refresh validator map for gated StaffordOS execution."
+  },
+
+  router_to_gated_runner_binding: {
+    task_type: "router_to_gated_runner_binding",
+    command: "node staffordos/operator_daemon/write_router_to_gated_runner_binding_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "router_binding_manifest",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Bind router decisions to gated runner contract."
+  },
+
+  console_ingestion_binding: {
+    task_type: "console_ingestion_binding",
+    command: "node staffordos/operator_daemon/write_console_ingestion_binding_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "console_binding_manifest",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Define console ingestion contract into gated runner path."
+  },
+
+  real_smtp_send_gate: {
+    task_type: "real_smtp_send_gate",
+    command: "node staffordos/operator_daemon/write_real_smtp_send_gate_v1.mjs",
+    approval_level: "operator_explicit",
+    execution_class: "smtp_send_readiness_gate",
+    system: "shopifixer",
+    revenue_action: false,
+    reason: "Evaluate real SMTP readiness without sending."
   }
 };
 

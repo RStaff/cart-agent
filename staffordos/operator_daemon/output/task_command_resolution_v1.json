@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T13:42:36.975Z",
-  "task_type": "router_binding_plan",
+  "generated_at": "2026-05-05T13:49:03.891Z",
+  "task_type": "validator_map_refresh",
   "status": "resolved",
   "resolution": {
-    "task_type": "router_binding_plan",
-    "command": "node staffordos/operator_daemon/write_router_binding_plan_v1.mjs",
+    "task_type": "validator_map_refresh",
+    "command": "node staffordos/operator_daemon/write_validator_map_refresh_v1.mjs",
     "approval_level": "operator_safe",
-    "execution_class": "router_binding_planning",
+    "execution_class": "validator_map_refresh",
     "system": "staffordos",
     "revenue_action": false,
-    "reason": "Create binding plan for existing router, decision, agent, and gated runner assets."
+    "reason": "Refresh validator map for gated StaffordOS execution."
   },
   "failures": []
 }

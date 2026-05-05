@@ -1,0 +1,34 @@
+{
+  "schema": "staffordos.validator_map_refresh.v1",
+  "generated_at": "2026-05-05T13:49:04.091Z",
+  "status": "refreshed",
+  "existing_builder_ran": true,
+  "existing_builder_error": null,
+  "task_validators": {
+    "product_boundary_validator": {
+      "expected_artifact": "staffordos/operator_daemon/output/product_boundary_validator_v1.json",
+      "validation_owner": "commercial_integrity"
+    },
+    "merchant_registry_build": {
+      "expected_artifact": "staffordos/commercial/merchant_registry_v1.json",
+      "validation_owner": "truth_registry"
+    },
+    "router_binding_plan": {
+      "expected_artifact": "staffordos/operator_daemon/output/router_binding_plan_v1.json",
+      "validation_owner": "execution_architecture"
+    },
+    "send_readiness_gate": {
+      "expected_artifact": "staffordos/operator_daemon/output/send_readiness_gate_v1.json",
+      "validation_owner": "outreach_safety"
+    },
+    "real_smtp_send_gate": {
+      "expected_artifact": "staffordos/operator_daemon/output/real_smtp_send_gate_v1.json",
+      "validation_owner": "send_safety"
+    }
+  },
+  "proof": {
+    "validator_map_refreshed": true,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}

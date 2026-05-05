@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-05-05T13:42:37.047Z",
+  "generated_at": "2026-05-05T13:49:03.955Z",
   "status": "PASSED",
-  "command": "node staffordos/operator_daemon/write_router_binding_plan_v1.mjs",
+  "command": "node staffordos/operator_daemon/write_validator_map_refresh_v1.mjs",
   "inferred_system_id": "staffordos",
   "system_name": "StaffordOS Core",
   "system_status": "PARTIAL_REAL",
