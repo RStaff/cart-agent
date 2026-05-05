@@ -3,7 +3,7 @@
   "loop_interval_ms": 10000,
   "safe_mode": true,
   "auto_execute": false,
-  "task_type": "operator_confirmed_real_send",
+  "task_type": "resolver_preflight_guard_self_check",
   "qa_profile": "operator_runtime",
   "max_loops": 1
 }

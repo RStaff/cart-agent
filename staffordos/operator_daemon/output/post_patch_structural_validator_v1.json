@@ -1,0 +1,37 @@
+{
+  "schema": "staffordos.post_patch_structural_validator.v1",
+  "generated_at": "2026-05-05T17:32:14.455Z",
+  "task_type": "resolver_preflight_guard_self_check",
+  "expected_artifact": "staffordos/operator_daemon/output/resolver_preflight_guard_v1.json",
+  "status": "passed",
+  "checks": {
+    "task_type_present": true,
+    "expected_artifact_present": true,
+    "resolver_file_exists": true,
+    "runner_file_exists": true,
+    "commit_gate_file_exists": true,
+    "resolver_maps_task": true,
+    "resolver_has_commands_map": true,
+    "resolver_outputs_command": true,
+    "runner_calls_resolver_preflight": true,
+    "runner_calls_task_resolver": true,
+    "runner_calls_agent_loop": true,
+    "commit_gate_has_forbidden_action_check": true,
+    "commit_gate_forbidden_check_count": 0,
+    "commit_gate_has_no_excess_duplicate_forbidden_blocks": true,
+    "commit_gate_has_real_send_allowlist_logic": true,
+    "expected_artifact_exists": true,
+    "expected_artifact_valid_json": true,
+    "expected_artifact_schema_present": true,
+    "expected_artifact_task_or_status_present": true
+  },
+  "failures": [],
+  "recommendation": "Task structure is valid enough for gated commit consideration.",
+  "proof": {
+    "structural_validation_only": true,
+    "command_executed": false,
+    "real_send": false,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}

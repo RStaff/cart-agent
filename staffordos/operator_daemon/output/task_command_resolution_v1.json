@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T16:27:55.345Z",
-  "task_type": "operator_confirmed_real_send",
+  "generated_at": "2026-05-05T17:32:04.122Z",
+  "task_type": "resolver_preflight_guard_self_check",
   "status": "resolved",
   "resolution": {
-    "task_type": "operator_confirmed_real_send",
-    "command": "node staffordos/operator_daemon/write_operator_confirmed_real_send_v1.mjs",
-    "approval_level": "operator_explicit",
-    "execution_class": "real_send_execution_preflight",
-    "system": "shopifixer",
-    "revenue_action": true,
-    "reason": "Operator-confirmed single-lead real send path. Requires allowlist."
+    "task_type": "resolver_preflight_guard_self_check",
+    "command": "node staffordos/operator_daemon/resolver_preflight_guard_v1.mjs resolver_preflight_guard_self_check",
+    "approval_level": "operator_safe",
+    "execution_class": "resolver_integrity_guard",
+    "system": "staffordos",
+    "revenue_action": false,
+    "reason": "Validate resolver preflight guard exists and is callable."
   },
   "failures": []
 }

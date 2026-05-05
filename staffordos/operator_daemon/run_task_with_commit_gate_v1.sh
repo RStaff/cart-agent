@@ -68,7 +68,10 @@ echo "===== RUN OPERATOR ====="
 mkdir -p staffordos/operator_daemon/output
 node staffordos/operator_daemon/persistent_operator_v1.mjs | tee staffordos/operator_daemon/output/last_daemon_run.log
 
-echo "===== HARD FAILURE CHECKS ====="
+
+echo "===== POST PATCH STRUCTURAL VALIDATOR ====="
+node staffordos/operator_daemon/post_patch_structural_validator_v1.mjs "$TASK" "$EXPECTED_ARTIFACT"
+\echo "===== HARD FAILURE CHECKS ====="
 if grep -RinE "SyntaxError|loop failure|No command provided|Command failed|❌" staffordos/operator_daemon/output/last_daemon_run.log; then
   echo "🚫 COMMIT BLOCKED: runtime failure detected"
   exit 1
@@ -122,14 +125,17 @@ NODE
 else
   echo "🔒 standard safety mode (no real send allowed)"
 
-  if grep -RinE '"sent": true|"sent_messages": true|"revenue_action": true' staffordos/operator_daemon/output; then
-    echo "🚫 COMMIT BLOCKED: forbidden action detected"
+  if grep -inE '"sent": true|"sent_messages": true|"revenue_action": true' "$EXPECTED_ARTIFACT"; then
+    echo "🚫 COMMIT BLOCKED: forbidden action detected in current task artifact"
     exit 1
   fi
 fi
 
 
 echo "===== EXISTING COMMIT GATE ====="
+export EXPECTED_ARTIFACT="$EXPECTED_ARTIFACT"
+export TASK="$TASK"
+export EXPECTED_ARTIFACT="$EXPECTED_ARTIFACT"
 bash staffordos/operator_daemon/commit_gate_v1.sh
 
 echo "===== COMMIT ONLY AFTER PASSING QA ====="
