@@ -3,7 +3,7 @@
   "loop_interval_ms": 10000,
   "safe_mode": true,
   "auto_execute": false,
-  "task_type": "spine_deep_consistency_validator",
+  "task_type": "revenue_route_validator",
   "qa_profile": "operator_runtime",
   "max_loops": 1
 }

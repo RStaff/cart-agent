@@ -5,6 +5,16 @@ const outDir = "staffordos/operator_daemon/output";
 mkdirSync(outDir, { recursive: true });
 
 const COMMANDS = {
+  revenue_route_validator: {
+    task_type: "revenue_route_validator",
+    command: "node staffordos/revenue_authority/revenue_route_validator_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "revenue_validation",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Validate StaffordMedia → ShopiFixer → Abando revenue routes and ensure real execution paths exist."
+  },
+
   spine_deep_consistency_validator: {
     task_type: "spine_deep_consistency_validator",
     command: "node staffordos/spine_authority/spine_deep_consistency_validator_v1.mjs",

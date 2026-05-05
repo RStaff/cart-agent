@@ -1,0 +1,35 @@
+{
+  "schema": "staffordos.revenue_route_validator.v1",
+  "generated_at": "2026-05-05T20:23:38.081Z",
+  "status": "passed",
+  "checked_routes": {
+    "abando": [
+      "recoveryLiveTest",
+      "recoveryExecution",
+      "recoveryLedger",
+      "abandoRecoverySender",
+      "emailSender",
+      "smsSender"
+    ],
+    "shopifixer": [
+      "runAudit",
+      "guidedAudit",
+      "pricing",
+      "shopifixerLeadRegistry",
+      "shopifixerLifecycleTracker"
+    ],
+    "truth": [
+      "truth_graph_pass_4_promoted",
+      "execution_proof_register",
+      "system_map_truth"
+    ]
+  },
+  "failures": [],
+  "warnings": [],
+  "proof": {
+    "validation_only": true,
+    "real_send": false,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}

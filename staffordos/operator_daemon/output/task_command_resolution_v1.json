@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T20:11:41.902Z",
-  "task_type": "spine_deep_consistency_validator",
+  "generated_at": "2026-05-05T20:23:37.924Z",
+  "task_type": "revenue_route_validator",
   "status": "resolved",
   "resolution": {
-    "task_type": "spine_deep_consistency_validator",
-    "command": "node staffordos/spine_authority/spine_deep_consistency_validator_v1.mjs",
+    "task_type": "revenue_route_validator",
+    "command": "node staffordos/revenue_authority/revenue_route_validator_v1.mjs",
     "approval_level": "operator_safe",
-    "execution_class": "spine_consistency_validation",
+    "execution_class": "revenue_validation",
     "system": "staffordos",
     "revenue_action": false,
-    "reason": "Validate consistency between resolver tasks, validator map, task-agent map, agent registry, and gated runner bindings."
+    "reason": "Validate StaffordMedia → ShopiFixer → Abando revenue routes and ensure real execution paths exist."
   },
   "failures": []
 }

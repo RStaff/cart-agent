@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-05T20:11:41.935Z",
-  "command": "node staffordos/spine_authority/spine_deep_consistency_validator_v1.mjs",
+  "generated_at": "2026-05-05T20:23:37.957Z",
+  "command": "node staffordos/revenue_authority/revenue_route_validator_v1.mjs",
   "operatorApproved": true,
   "qaProfile": "operator_runtime",
   "stages": [
@@ -20,6 +20,6 @@
       "Score is below the automation threshold."
     ]
   },
-  "completed_at": "2026-05-05T20:11:42.074Z",
+  "completed_at": "2026-05-05T20:23:38.087Z",
   "exit_code": 0
 }

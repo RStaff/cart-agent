@@ -144,6 +144,10 @@
     "fix_operator_test_recipient": {
       "expected_artifact": "staffordos/operator_daemon/output/fix_operator_test_recipient_v1.json",
       "validation_owner": "auto_generated"
+    },
+    "revenue_route_validator": {
+      "expected_artifact": "staffordos/operator_daemon/output/revenue_route_validator_v1.json",
+      "validation_owner": "revenue_authority"
     }
   },
   "proof": {

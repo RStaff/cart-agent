@@ -1,11 +1,11 @@
 {
   "schema": "staffordos.character_integrity_guard.v1",
-  "generated_at": "2026-05-05T20:11:41.460Z",
+  "generated_at": "2026-05-05T20:23:37.481Z",
   "mode": "normalize-task",
   "status": "passed",
   "input": {
-    "task_raw_length": 34,
-    "task_normalized": "map proven agent role aliases only",
+    "task_raw_length": 56,
+    "task_normalized": "fix revenue route validator to use real discovered paths",
     "hidden_characters_detected": false
   },
   "proof": {
