@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T13:24:26.173Z",
-  "task_type": "send_readiness_gate",
+  "generated_at": "2026-05-05T13:27:12.487Z",
+  "task_type": "security_hygiene_inventory",
   "status": "resolved",
   "resolution": {
-    "task_type": "send_readiness_gate",
-    "command": "node staffordos/operator_daemon/write_send_readiness_gate_v1.mjs",
+    "task_type": "security_hygiene_inventory",
+    "command": "node staffordos/operator_daemon/write_security_hygiene_inventory_v1.mjs",
     "approval_level": "operator_safe",
-    "execution_class": "readiness_gate",
-    "system": "shopifixer",
+    "execution_class": "security_hygiene_inventory",
+    "system": "staffordos",
     "revenue_action": false,
-    "reason": "Evaluate approved outreach queue for send readiness. No sending."
+    "reason": "Inventory security/hygiene agents and dependency vulnerability surface. No external send."
   },
   "failures": []
 }

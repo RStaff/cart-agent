@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.agent_performance.v1",
-  "generated_at": "2026-05-05T13:24:26.370Z",
+  "generated_at": "2026-05-05T13:27:16.125Z",
   "summary": {
     "total_agents_detected": 79,
     "validators_detected": 17,

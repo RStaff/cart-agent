@@ -3,7 +3,7 @@
   "loop_interval_ms": 10000,
   "safe_mode": true,
   "auto_execute": false,
-  "task_type": "send_readiness_gate",
+  "task_type": "security_hygiene_inventory",
   "qa_profile": "operator_runtime",
   "max_loops": 1
 }

@@ -133,6 +133,16 @@ const COMMANDS = {
     system: "shopifixer",
     revenue_action: false,
     reason: "Controlled simulated send execution. Real send remains false."
+  },
+
+  security_hygiene_inventory: {
+    task_type: "security_hygiene_inventory",
+    command: "node staffordos/operator_daemon/write_security_hygiene_inventory_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "security_hygiene_inventory",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Inventory security/hygiene agents and dependency vulnerability surface. No external send."
   }
 };
 
