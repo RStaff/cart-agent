@@ -34,6 +34,13 @@
         "recipient_is_operator_controlled": true,
         "sent_messages": false,
         "revenue_action": false
+      },
+      {
+        "at": "2026-05-05T14:33:56.947Z",
+        "event": "operator_test_recipient_bound",
+        "recipient_is_operator_controlled": true,
+        "sent_messages": false,
+        "revenue_action": false
       }
     ],
     "enrichment": {
