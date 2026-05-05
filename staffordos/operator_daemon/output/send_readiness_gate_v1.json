@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.send_readiness_gate.v1",
-  "generated_at": "2026-05-05T14:19:28.684Z",
+  "generated_at": "2026-05-05T14:34:34.388Z",
   "system": "shopifixer",
   "status": "partial_ready",
   "source": "staffordos/operator_daemon/output/approved_outreach_queue_v1.json",

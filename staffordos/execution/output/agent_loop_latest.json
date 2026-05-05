@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-05T14:34:21.957Z",
-  "command": "node staffordos/operator_daemon/write_approved_outreach_queue_v1.mjs",
+  "generated_at": "2026-05-05T14:34:34.257Z",
+  "command": "node staffordos/operator_daemon/write_send_readiness_gate_v1.mjs",
   "operatorApproved": true,
   "qaProfile": "operator_runtime",
   "stages": [
@@ -20,6 +20,6 @@
       "Score is below the automation threshold."
     ]
   },
-  "completed_at": "2026-05-05T14:34:22.096Z",
+  "completed_at": "2026-05-05T14:34:34.394Z",
   "exit_code": 0
 }
