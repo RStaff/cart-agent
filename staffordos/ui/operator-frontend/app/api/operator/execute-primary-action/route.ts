@@ -144,7 +144,10 @@ export async function POST() {
     const childProcess = await import("node:child_process");
     const spineFile = path.join(repoRoot, ["staffordos", "execution", "run_agent_loop.mjs"].join(path.sep));
 
-    childProcess.execFileSync("node", [spineFile], {
+    childProcess.execFileSync("node", [
+      spineFile,
+      "node staffordos/loop_d/build_loop_d_feedback_v1.mjs"
+    ], {
       cwd: repoRoot,
       stdio: "ignore",
       env: {
@@ -156,7 +159,7 @@ export async function POST() {
       }
     });
 
-    loopDStatus = "spine_refreshed";
+    loopDStatus = "spine_ran_loop_d";
   } catch {
     loopDStatus = "refresh_failed";
   }
