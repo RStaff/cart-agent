@@ -3,7 +3,7 @@
   "loop_interval_ms": 10000,
   "safe_mode": true,
   "auto_execute": false,
-  "task_type": "operator_test_recipient_binding",
+  "task_type": "shopifixer_followup_draft",
   "qa_profile": "operator_runtime",
   "max_loops": 1
 }
