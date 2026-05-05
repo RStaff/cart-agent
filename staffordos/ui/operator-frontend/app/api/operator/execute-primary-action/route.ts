@@ -124,9 +124,9 @@ export async function POST() {
     risk: action.risk || [],
     result: {
       outcome_logged: true,
-      loop_d_refresh_attempted: true,
+      canonical_spine_invoked: true,
       real_external_send_performed: false,
-      note: "CTA execution logged safely. External send/payment action still requires explicit governed workflow."
+      note: "CTA execution logged safely and routed through canonical StaffordOS spine. External send/payment action still requires explicit governed workflow."
     }
   };
 
@@ -142,14 +142,21 @@ export async function POST() {
 
   try {
     const childProcess = await import("node:child_process");
-    const loopDFile = path.join(repoRoot, ["staffordos", "loop_d", "build_loop_d_feedback_v1.mjs"].join(path.sep));
+    const spineFile = path.join(repoRoot, ["staffordos", "execution", "run_agent_loop.mjs"].join(path.sep));
 
-    childProcess.execFileSync("node", [loopDFile], {
+    childProcess.execFileSync("node", [spineFile], {
       cwd: repoRoot,
-      stdio: "ignore"
+      stdio: "ignore",
+      env: {
+        ...process.env,
+        STAFFORDOS_TASK_TYPE: "primary_action_execution",
+        STAFFORDOS_ACTION_ID: action.action_id || "",
+        STAFFORDOS_ACTION_TYPE: action.action_type || "",
+        STAFFORDOS_ACTION_LABEL: action.action_label || ""
+      }
     });
 
-    loopDStatus = "refreshed";
+    loopDStatus = "spine_refreshed";
   } catch {
     loopDStatus = "refresh_failed";
   }

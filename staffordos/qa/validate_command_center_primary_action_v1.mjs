@@ -53,6 +53,16 @@ if (!hasClearCta) {
 }
 
 
+
+if (!executeRoute.includes("run_agent_loop.mjs") || !executeRoute.includes("STAFFORDOS_TASK_TYPE")) {
+  add(
+    "high",
+    "canonical_spine",
+    "Execute route does not invoke the canonical StaffordOS agent loop.",
+    "Route primary action execution through staffordos/execution/run_agent_loop.mjs."
+  );
+}
+
 if (!executeRoute.includes("validateRequiredAgents") || !executeRoute.includes("required_agent_validation")) {
   add(
     "high",

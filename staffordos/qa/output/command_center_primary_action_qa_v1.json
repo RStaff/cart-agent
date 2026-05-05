@@ -1,12 +1,19 @@
 {
   "schema": "staffordos.command_center_qa_gate.v1",
-  "generated_at": "2026-05-04T22:25:00.537Z",
+  "generated_at": "2026-05-05T00:04:51.947Z",
   "page": "/operator/command-center",
   "version": "operator_home_v1_cta_execution",
   "verdict": "pass",
-  "score": 100,
-  "findings": [],
-  "required_next_move": "CTA execution wiring is validated. Next: connect specific action handlers such as follow-up send/payment close.",
+  "score": 94,
+  "findings": [
+    {
+      "severity": "medium",
+      "area": "loop_d",
+      "finding": "Execute route does not attempt to refresh Loop D.",
+      "recommendation": "Refresh Loop D after CTA execution."
+    }
+  ],
+  "required_next_move": "Resolve QA findings before real external execution.",
   "snapshot_primary_action": {
     "action_id": "primary_1777922106443",
     "action_label": "Follow up on real ShopiFixer offer and close payment.",
