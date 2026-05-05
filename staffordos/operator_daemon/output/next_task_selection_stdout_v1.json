@@ -1,0 +1,16 @@
+{
+  "schema": "staffordos.next_task_selection.v1",
+  "generated_at": "2026-05-05T13:21:13.918Z",
+  "selected": {
+    "task_type": "send_readiness_gate",
+    "expected_artifact": "staffordos/operator_daemon/output/send_readiness_gate_v1.json",
+    "commit_message": "auto run send readiness gate through gated StaffordOS runner",
+    "reason": "Merchant registry exists. Evaluate send readiness before any preview or send."
+  },
+  "safety": {
+    "never_auto_selects_send_confirm": true,
+    "never_auto_selects_send_execute": true,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}

@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T13:16:44.441Z",
-  "task_type": "merchant_registry_build",
+  "generated_at": "2026-05-05T13:21:14.275Z",
+  "task_type": "send_readiness_gate",
   "status": "resolved",
   "resolution": {
-    "task_type": "merchant_registry_build",
-    "command": "node staffordos/commercial/build_merchant_registry_v1.mjs",
+    "task_type": "send_readiness_gate",
+    "command": "node staffordos/operator_daemon/write_send_readiness_gate_v1.mjs",
     "approval_level": "operator_safe",
-    "execution_class": "commercial_truth_mapping",
-    "system": "staffordos",
+    "execution_class": "readiness_gate",
+    "system": "shopifixer",
     "revenue_action": false,
-    "reason": "Map canonical leads into merchant registry with offer routing and lifecycle state."
+    "reason": "Evaluate approved outreach queue for send readiness. No sending."
   },
   "failures": []
 }
