@@ -1,15 +1,34 @@
 {
-  "schema": "staffordos.followup_draft.v1",
-  "generated_at": "2026-05-05T10:56:23.613Z",
+  "schema": "staffordos.followup_draft_batch.v1",
+  "generated_at": "2026-05-05T11:23:36.079Z",
   "system": "shopifixer",
-  "status": "draft_created",
-  "message": {
-    "subject": "Quick follow-up on your Shopify store audit",
-    "body": "Hi — I took a look at your store and found a few high-impact conversion gaps. Happy to share a quick breakdown if helpful."
-  },
+  "status": "drafts_created",
+  "source": "staffordos/outreach/leads.json",
+  "lead_count": 1,
+  "draft_count": 1,
+  "drafts": [
+    {
+      "lead_id": "lead_001",
+      "company": "Example Shopify Store",
+      "website": "https://examplestore.com",
+      "contact": {
+        "name": "Unknown",
+        "email": "",
+        "phone": ""
+      },
+      "subject": "Quick follow-up on Example Shopify Store",
+      "body": "Hi there — I took a look at Example Shopify Store (https://examplestore.com) and noticed a few possible conversion gaps that may be affecting abandoned carts. I can share a quick ShopiFixer breakdown if helpful.",
+      "proof": {
+        "drafted": true,
+        "sent": false,
+        "revenue_action": false
+      }
+    }
+  ],
   "proof": {
-    "drafted": true,
-    "sent": false,
+    "read_canonical_leads": true,
+    "generated_per_lead_drafts": true,
+    "sent_messages": false,
     "revenue_action": false
   }
 }
