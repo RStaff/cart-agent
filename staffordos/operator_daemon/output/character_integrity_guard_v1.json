@@ -1,11 +1,11 @@
 {
   "schema": "staffordos.character_integrity_guard.v1",
-  "generated_at": "2026-05-05T19:47:15.445Z",
+  "generated_at": "2026-05-05T20:09:18.196Z",
   "mode": "normalize-task",
   "status": "passed",
   "input": {
-    "task_raw_length": 46,
-    "task_normalized": "auto-generate validator mappings from resolver",
+    "task_raw_length": 51,
+    "task_normalized": "auto-generate required agent mappings from resolver",
     "hidden_characters_detected": false
   },
   "proof": {

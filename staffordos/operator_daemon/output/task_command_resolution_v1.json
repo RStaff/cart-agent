@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T19:47:15.865Z",
+  "generated_at": "2026-05-05T20:09:18.611Z",
   "task_type": "spine_deep_consistency_validator",
   "status": "resolved",
   "resolution": {
