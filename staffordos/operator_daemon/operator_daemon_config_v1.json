@@ -3,7 +3,7 @@
   "loop_interval_ms": 30000,
   "safe_mode": true,
   "auto_execute": false,
-  "task_type": "shopifixer_followup_draft",
+  "task_type": "lead_registry_sync",
   "qa_profile": "operator_runtime",
   "max_loops": 1
 }

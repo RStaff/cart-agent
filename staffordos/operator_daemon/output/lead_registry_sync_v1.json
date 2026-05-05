@@ -1,0 +1,19 @@
+{
+  "schema": "staffordos.lead_registry_sync.v1",
+  "generated_at": "2026-05-05T10:59:03.824Z",
+  "system": "shopifixer",
+  "status": "synced_status_only",
+  "mode": "safe_non_revenue_sync",
+  "found_lead_sources": [],
+  "missing_lead_sources": [
+    "staffordos/outreach/leads.json",
+    "staffordos/products/shopifixer/assisted/leads.json",
+    "staffordos/truth/lead_truth_store.json"
+  ],
+  "proof": {
+    "checked_known_lead_sources": true,
+    "wrote_sync_artifact": true,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}
