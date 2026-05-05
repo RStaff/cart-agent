@@ -1,11 +1,11 @@
 {
   "schema": "staffordos.character_integrity_guard.v1",
-  "generated_at": "2026-05-05T20:09:18.196Z",
+  "generated_at": "2026-05-05T20:11:41.460Z",
   "mode": "normalize-task",
   "status": "passed",
   "input": {
-    "task_raw_length": 51,
-    "task_normalized": "auto-generate required agent mappings from resolver",
+    "task_raw_length": 34,
+    "task_normalized": "map proven agent role aliases only",
     "hidden_characters_detected": false
   },
   "proof": {

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-05T20:09:18.670Z",
+  "generated_at": "2026-05-05T20:11:41.969Z",
   "status": "PASSED",
   "command": "node staffordos/spine_authority/spine_deep_consistency_validator_v1.mjs",
   "inferred_system_id": "staffordos",

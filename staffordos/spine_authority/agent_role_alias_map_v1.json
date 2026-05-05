@@ -5,9 +5,9 @@
     "preflight_agent": null,
     "pm_agent": null,
     "architect_agent": null,
-    "shape_checker": null,
+    "shape_checker": "dev_task_integrity_agent_v1",
     "execution_agent": "run_agent_v1",
-    "qa_validator": null,
+    "qa_validator": "dev_task_integrity_agent_v1",
     "loop_d_agent": null
   },
   "rules": [
