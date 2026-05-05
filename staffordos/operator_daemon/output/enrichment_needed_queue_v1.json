@@ -1,0 +1,37 @@
+{
+  "schema": "staffordos.enrichment_needed_queue.v1",
+  "generated_at": "2026-05-05T12:37:29.903Z",
+  "system": "shopifixer",
+  "status": "enrichment_needed",
+  "source": "staffordos/operator_daemon/output/approved_outreach_queue_v1.json",
+  "total_items_checked": 1,
+  "enrichment_needed_count": 1,
+  "items": [
+    {
+      "lead_id": "lead_001",
+      "company": "Example Shopify Store",
+      "website": "https://examplestore.com",
+      "contact": {
+        "name": "Unknown",
+        "email": "",
+        "phone": ""
+      },
+      "reason": "missing_email_and_phone",
+      "next_action": "enrich_contact",
+      "proof": {
+        "has_email": false,
+        "has_phone": false,
+        "send_ready": false,
+        "sent_messages": false,
+        "revenue_action": false
+      }
+    }
+  ],
+  "proof": {
+    "approved_queue_read": true,
+    "contact_completeness_checked": true,
+    "wrote_enrichment_queue": true,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}

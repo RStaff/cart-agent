@@ -3,7 +3,7 @@
   "loop_interval_ms": 30000,
   "safe_mode": true,
   "auto_execute": false,
-  "task_type": "send_readiness_gate",
+  "task_type": "contact_completeness_gate",
   "qa_profile": "operator_runtime",
   "max_loops": 1
 }

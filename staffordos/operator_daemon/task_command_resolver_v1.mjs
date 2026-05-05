@@ -63,6 +63,16 @@ const COMMANDS = {
     system: "shopifixer",
     revenue_action: false,
     reason: "Evaluate approved outreach queue for send readiness (NO sending)."
+  },
+
+  contact_completeness_gate: {
+    task_type: "contact_completeness_gate",
+    command: "node staffordos/operator_daemon/write_contact_completeness_gate_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "contact_quality_gate",
+    system: "shopifixer",
+    revenue_action: false,
+    reason: "Route approved leads with missing contact data to enrichment_needed_queue (NO sending)."
   }
 };
 
