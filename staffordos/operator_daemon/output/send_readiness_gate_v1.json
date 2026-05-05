@@ -1,0 +1,24 @@
+{
+  "schema": "staffordos.send_readiness_gate.v1",
+  "generated_at": "2026-05-05T12:34:28.004Z",
+  "system": "shopifixer",
+  "status": "not_ready",
+  "source": "staffordos/operator_daemon/output/approved_outreach_queue_v1.json",
+  "total_items": 1,
+  "ready_items": 0,
+  "readiness": [
+    {
+      "lead_id": "lead_001",
+      "company": "Example Shopify Store",
+      "has_email": false,
+      "has_phone": false,
+      "ready_to_send": false
+    }
+  ],
+  "proof": {
+    "queue_read": true,
+    "readiness_evaluated": true,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}

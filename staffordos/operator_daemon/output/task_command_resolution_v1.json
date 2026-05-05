@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T12:31:13.250Z",
-  "task_type": "shopifixer_followup_approve",
+  "generated_at": "2026-05-05T12:34:27.843Z",
+  "task_type": "send_readiness_gate",
   "status": "resolved",
   "resolution": {
-    "task_type": "shopifixer_followup_approve",
-    "command": "node staffordos/operator_daemon/write_approved_outreach_queue_v1.mjs",
-    "approval_level": "operator_explicit",
-    "execution_class": "approval_gate",
+    "task_type": "send_readiness_gate",
+    "command": "node staffordos/operator_daemon/write_send_readiness_gate_v1.mjs",
+    "approval_level": "operator_safe",
+    "execution_class": "readiness_gate",
     "system": "shopifixer",
     "revenue_action": false,
-    "reason": "Move drafted outreach into approved queue (NO sending)."
+    "reason": "Evaluate approved outreach queue for send readiness (NO sending)."
   },
   "failures": []
 }

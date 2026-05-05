@@ -53,7 +53,7 @@ const COMMANDS = {
     system: "shopifixer",
     revenue_action: false,
     reason: "Move drafted outreach into approved queue (NO sending)."
-  }
+  },
 
   send_readiness_gate: {
     task_type: "send_readiness_gate",
@@ -62,9 +62,8 @@ const COMMANDS = {
     execution_class: "readiness_gate",
     system: "shopifixer",
     revenue_action: false,
-    reason: "Evaluate send readiness (NO sending)."
-  },
-
+    reason: "Evaluate approved outreach queue for send readiness (NO sending)."
+  }
 };
 
 const resolved = COMMANDS[taskType];
@@ -76,17 +75,6 @@ const result = {
   status: resolved ? "resolved" : "unresolved",
   resolution: resolved || null,
   failures: []
-
-  send_readiness_gate: {
-    task_type: "send_readiness_gate",
-    command: "node staffordos/operator_daemon/write_send_readiness_gate_v1.mjs",
-    approval_level: "operator_safe",
-    execution_class: "readiness_gate",
-    system: "shopifixer",
-    revenue_action: false,
-    reason: "Evaluate send readiness (NO sending)."
-  },
-
 };
 
 if (!resolved) {
