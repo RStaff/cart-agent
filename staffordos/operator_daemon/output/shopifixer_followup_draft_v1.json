@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.followup_draft_batch.v1",
-  "generated_at": "2026-05-05T13:24:01.907Z",
+  "generated_at": "2026-05-05T14:19:04.133Z",
   "system": "shopifixer",
   "status": "drafts_created",
   "source": "staffordos/outreach/leads.json",
@@ -13,7 +13,7 @@
       "website": "https://examplestore.com",
       "contact": {
         "name": "Unknown",
-        "email": "test@example.com",
+        "email": "rossstafford1@gmail.com",
         "phone": ""
       },
       "subject": "Quick follow-up on Example Shopify Store",

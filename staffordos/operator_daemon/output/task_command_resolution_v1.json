@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T14:18:51.772Z",
-  "task_type": "operator_test_recipient_binding",
+  "generated_at": "2026-05-05T14:19:03.974Z",
+  "task_type": "shopifixer_followup_draft",
   "status": "resolved",
   "resolution": {
-    "task_type": "operator_test_recipient_binding",
-    "command": "node staffordos/operator_daemon/write_operator_test_recipient_binding_v1.mjs",
-    "approval_level": "operator_explicit",
-    "execution_class": "test_recipient_binding",
+    "task_type": "shopifixer_followup_draft",
+    "command": "node staffordos/operator_daemon/write_followup_draft_v1.mjs",
+    "approval_level": "operator_review_required",
+    "execution_class": "outreach_prep",
     "system": "shopifixer",
     "revenue_action": false,
-    "reason": "Replace placeholder recipient with operator-controlled test recipient. No send."
+    "reason": "Prepare ShopiFixer follow-up message draft from canonical leads. No sending."
   },
   "failures": []
 }
