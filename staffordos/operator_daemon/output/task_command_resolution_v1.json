@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T20:38:54.894Z",
-  "task_type": "revenue_flow_logic_validator",
+  "generated_at": "2026-05-05T20:39:47.198Z",
+  "task_type": "revenue_conversion_surface_validator",
   "status": "resolved",
   "resolution": {
-    "task_type": "revenue_flow_logic_validator",
-    "command": "node staffordos/revenue_authority/revenue_flow_logic_validator_v1.mjs",
+    "task_type": "revenue_conversion_surface_validator",
+    "command": "node staffordos/revenue_authority/revenue_conversion_surface_validator_v1.mjs",
     "approval_level": "operator_safe",
-    "execution_class": "revenue_flow_logic_validation",
+    "execution_class": "revenue_conversion_surface_validation",
     "system": "staffordos",
     "revenue_action": false,
-    "reason": "Validate logical route-to-revenue flow connections without executing revenue actions."
+    "reason": "Validate user-facing revenue conversion surfaces without payment, send, or external actions."
   },
   "failures": []
 }

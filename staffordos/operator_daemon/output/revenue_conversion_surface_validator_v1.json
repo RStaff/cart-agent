@@ -1,0 +1,29 @@
+{
+  "schema": "staffordos.revenue_conversion_surface_validator.v1",
+  "generated_at": "2026-05-05T20:39:47.360Z",
+  "status": "passed_with_warnings",
+  "surfaces_checked": {
+    "shopifixer": [
+      "runAudit",
+      "auditResultPage",
+      "pricing",
+      "frontendPricing"
+    ],
+    "abando": [
+      "recoveryLiveTest",
+      "recoveryExecution"
+    ]
+  },
+  "failures": [],
+  "warnings": [
+    "missing_optional_conversion_signal:audit_result_email_handoff:email|full audit|check your email"
+  ],
+  "proof": {
+    "validation_only": true,
+    "routes_executed": false,
+    "payment_attempted": false,
+    "real_send": false,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}

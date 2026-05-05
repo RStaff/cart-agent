@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-05T20:38:54.924Z",
-  "command": "node staffordos/revenue_authority/revenue_flow_logic_validator_v1.mjs",
+  "generated_at": "2026-05-05T20:39:47.232Z",
+  "command": "node staffordos/revenue_authority/revenue_conversion_surface_validator_v1.mjs",
   "operatorApproved": true,
   "qaProfile": "operator_runtime",
   "stages": [
@@ -20,6 +20,6 @@
       "Score is below the automation threshold."
     ]
   },
-  "completed_at": "2026-05-05T20:38:55.053Z",
+  "completed_at": "2026-05-05T20:39:47.366Z",
   "exit_code": 0
 }

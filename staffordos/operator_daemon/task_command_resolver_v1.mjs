@@ -5,6 +5,16 @@ const outDir = "staffordos/operator_daemon/output";
 mkdirSync(outDir, { recursive: true });
 
 const COMMANDS = {
+  revenue_conversion_surface_validator: {
+    task_type: "revenue_conversion_surface_validator",
+    command: "node staffordos/revenue_authority/revenue_conversion_surface_validator_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "revenue_conversion_surface_validation",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Validate user-facing revenue conversion surfaces without payment, send, or external actions."
+  },
+
   revenue_flow_logic_validator: {
     task_type: "revenue_flow_logic_validator",
     command: "node staffordos/revenue_authority/revenue_flow_logic_validator_v1.mjs",
