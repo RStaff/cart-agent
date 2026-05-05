@@ -73,6 +73,16 @@ const COMMANDS = {
     system: "shopifixer",
     revenue_action: false,
     reason: "Route approved leads with missing contact data to enrichment_needed_queue (NO sending)."
+  },
+
+  enrichment_task_packet: {
+    task_type: "enrichment_task_packet",
+    command: "node staffordos/operator_daemon/write_enrichment_task_packet_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "enrichment_planning",
+    system: "shopifixer",
+    revenue_action: false,
+    reason: "Create contact enrichment task packet from enrichment_needed_queue (NO external lookup/send)."
   }
 };
 

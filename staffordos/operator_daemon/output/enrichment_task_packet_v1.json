@@ -1,0 +1,44 @@
+{
+  "schema": "staffordos.enrichment_task_packet.v1",
+  "generated_at": "2026-05-05T12:39:27.814Z",
+  "system": "shopifixer",
+  "status": "task_packet_created",
+  "source": "staffordos/operator_daemon/output/enrichment_needed_queue_v1.json",
+  "task_count": 1,
+  "tasks": [
+    {
+      "task_id": "enrich_lead_001",
+      "lead_id": "lead_001",
+      "company": "Example Shopify Store",
+      "website": "https://examplestore.com",
+      "status": "ready_for_operator_review",
+      "task_type": "contact_enrichment",
+      "instructions": [
+        "Find a valid business contact email or contact form for this Shopify store.",
+        "Do not send outreach.",
+        "Do not update approved_outreach_queue until contact data is verified.",
+        "Record source/proof before marking enrichment complete."
+      ],
+      "required_output": {
+        "email": "",
+        "phone": "",
+        "contact_form_url": "",
+        "source_url": "",
+        "confidence": 0
+      },
+      "proof": {
+        "packet_created": true,
+        "external_lookup_performed": false,
+        "sent_messages": false,
+        "revenue_action": false
+      }
+    }
+  ],
+  "proof": {
+    "enrichment_queue_read": true,
+    "task_packet_written": true,
+    "external_lookup_performed": false,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}
