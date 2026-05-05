@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.revenue_flow_logic_validator.v1",
-  "generated_at": "2026-05-05T20:34:15.299Z",
+  "generated_at": "2026-05-05T20:38:55.048Z",
   "status": "passed_with_warnings",
   "flows_checked": {
     "shopifixer": [
@@ -24,8 +24,7 @@
   "failures": [],
   "warnings": [
     "missing_optional_signal:shopifixer_runAudit_product_signal:shopifixer",
-    "missing_optional_signal:shopifixer_950_price_signal:950",
-    "missing_optional_signal:abando_sender_sms_signal:sms"
+    "missing_optional_signal:shopifixer_950_price_signal:950"
   ],
   "proof": {
     "validation_only": true,
