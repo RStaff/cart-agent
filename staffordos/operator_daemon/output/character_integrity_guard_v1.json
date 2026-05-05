@@ -1,11 +1,11 @@
 {
   "schema": "staffordos.character_integrity_guard.v1",
-  "generated_at": "2026-05-05T20:23:37.481Z",
+  "generated_at": "2026-05-05T20:34:14.694Z",
   "mode": "normalize-task",
   "status": "passed",
   "input": {
-    "task_raw_length": 56,
-    "task_normalized": "fix revenue route validator to use real discovered paths",
+    "task_raw_length": 63,
+    "task_normalized": "align revenue flow validator with actual runAudit resolver flow",
     "hidden_characters_detected": false
   },
   "proof": {

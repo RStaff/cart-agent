@@ -1,0 +1,37 @@
+{
+  "schema": "staffordos.revenue_flow_logic_validator.v1",
+  "generated_at": "2026-05-05T20:34:15.299Z",
+  "status": "passed_with_warnings",
+  "flows_checked": {
+    "shopifixer": [
+      "runAudit",
+      "runAuditResolver",
+      "scorecardOrInstallFallback",
+      "guidedAudit",
+      "pricing",
+      "shopifixerLeadRegistry",
+      "shopifixerLifecycleTracker"
+    ],
+    "abando": [
+      "recoveryLiveTest",
+      "recoveryExecution",
+      "recoveryLedger",
+      "abandoRecoverySender",
+      "emailSender",
+      "smsSender"
+    ]
+  },
+  "failures": [],
+  "warnings": [
+    "missing_optional_signal:shopifixer_runAudit_product_signal:shopifixer",
+    "missing_optional_signal:shopifixer_950_price_signal:950",
+    "missing_optional_signal:abando_sender_sms_signal:sms"
+  ],
+  "proof": {
+    "validation_only": true,
+    "routes_executed": false,
+    "real_send": false,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}

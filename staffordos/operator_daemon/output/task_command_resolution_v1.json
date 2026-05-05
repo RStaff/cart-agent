@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T20:23:37.924Z",
-  "task_type": "revenue_route_validator",
+  "generated_at": "2026-05-05T20:34:15.136Z",
+  "task_type": "revenue_flow_logic_validator",
   "status": "resolved",
   "resolution": {
-    "task_type": "revenue_route_validator",
-    "command": "node staffordos/revenue_authority/revenue_route_validator_v1.mjs",
+    "task_type": "revenue_flow_logic_validator",
+    "command": "node staffordos/revenue_authority/revenue_flow_logic_validator_v1.mjs",
     "approval_level": "operator_safe",
-    "execution_class": "revenue_validation",
+    "execution_class": "revenue_flow_logic_validation",
     "system": "staffordos",
     "revenue_action": false,
-    "reason": "Validate StaffordMedia → ShopiFixer → Abando revenue routes and ensure real execution paths exist."
+    "reason": "Validate logical route-to-revenue flow connections without executing revenue actions."
   },
   "failures": []
 }

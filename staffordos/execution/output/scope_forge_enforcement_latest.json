@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-05-05T20:23:37.985Z",
+  "generated_at": "2026-05-05T20:34:15.202Z",
   "status": "PASSED",
-  "command": "node staffordos/revenue_authority/revenue_route_validator_v1.mjs",
+  "command": "node staffordos/revenue_authority/revenue_flow_logic_validator_v1.mjs",
   "inferred_system_id": "revenue",
   "system_name": "Revenue Path System",
   "system_status": "NOT_PROVEN",
