@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.real_smtp_dry_run_actual.v1",
-  "generated_at": "2026-05-05T14:19:40.911Z",
+  "generated_at": "2026-05-05T14:34:46.543Z",
   "status": "actual_sender_path_validated_no_send",
   "checks": {
     "sender_module_path": "web/src/lib/emailSender.js",
