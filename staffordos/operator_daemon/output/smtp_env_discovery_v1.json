@@ -1,17 +1,17 @@
 {
   "schema": "staffordos.smtp_env_discovery.v1",
-  "generated_at": "2026-05-05T13:52:21.939Z",
-  "status": "smtp_env_not_visible_to_operator",
+  "generated_at": "2026-05-05T14:00:03.830Z",
+  "status": "smtp_env_visible_to_operator",
   "current_process_env_presence_without_values": {
-    "SMTP_HOST": false,
-    "SMTP_PORT": false,
-    "SMTP_USER": false,
-    "SMTP_PASS": false,
-    "FROM_EMAIL": false,
+    "SMTP_HOST": true,
+    "SMTP_PORT": true,
+    "SMTP_USER": true,
+    "SMTP_PASS": true,
+    "FROM_EMAIL": true,
     "DEFAULT_FROM": false,
     "SMTP_FROM": false
   },
-  "smtp_ready_minimum": false,
+  "smtp_ready_minimum": true,
   "config_file_candidates_without_secret_values": [
     {
       "path": ".env",
@@ -79,7 +79,46 @@
       ]
     },
     {
+      "path": "staffordos/operator_daemon/output/smtp_env_binding_patch_v1.json",
+      "mentions_smtp_keys": true,
+      "keys_mentioned": [
+        "SMTP_HOST",
+        "SMTP_PORT",
+        "SMTP_USER",
+        "SMTP_PASS",
+        "FROM_EMAIL",
+        "DEFAULT_FROM",
+        "SMTP_FROM"
+      ]
+    },
+    {
+      "path": "staffordos/operator_daemon/output/smtp_env_discovery_v1.json",
+      "mentions_smtp_keys": true,
+      "keys_mentioned": [
+        "SMTP_HOST",
+        "SMTP_PORT",
+        "SMTP_USER",
+        "SMTP_PASS",
+        "FROM_EMAIL",
+        "DEFAULT_FROM",
+        "SMTP_FROM"
+      ]
+    },
+    {
       "path": "staffordos/operator_daemon/write_real_smtp_send_gate_v1.mjs",
+      "mentions_smtp_keys": true,
+      "keys_mentioned": [
+        "SMTP_HOST",
+        "SMTP_PORT",
+        "SMTP_USER",
+        "SMTP_PASS",
+        "FROM_EMAIL",
+        "DEFAULT_FROM",
+        "SMTP_FROM"
+      ]
+    },
+    {
+      "path": "staffordos/operator_daemon/write_smtp_env_binding_patch_v1.mjs",
       "mentions_smtp_keys": true,
       "keys_mentioned": [
         "SMTP_HOST",
@@ -203,9 +242,8 @@
     }
   ],
   "binding_recommendation": {
-    "action": "bind_operator_daemon_to_existing_env_source",
-    "reason": "SMTP may be configured elsewhere, but current StaffordOS operator process cannot see required env vars.",
-    "next_task": "smtp_env_binding_patch"
+    "action": "keep_current_env_binding",
+    "reason": "The operator process can see required SMTP env vars."
   },
   "proof": {
     "did_not_print_secret_values": true,

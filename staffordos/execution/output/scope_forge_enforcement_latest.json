@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-05-05T13:59:50.363Z",
+  "generated_at": "2026-05-05T14:00:03.622Z",
   "status": "PASSED",
-  "command": "node staffordos/operator_daemon/write_smtp_env_binding_patch_v1.mjs",
+  "command": "node staffordos/operator_daemon/write_smtp_env_discovery_v1.mjs",
   "inferred_system_id": "staffordos",
   "system_name": "StaffordOS Core",
   "system_status": "PARTIAL_REAL",
