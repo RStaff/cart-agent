@@ -28,6 +28,122 @@
     "spine_deep_consistency_validator": {
       "expected_artifact": "staffordos/operator_daemon/output/spine_deep_consistency_validator_v1.json",
       "validation_owner": "spine_authority"
+    },
+    "operator_confirmed_real_send": {
+      "expected_artifact": "staffordos/operator_daemon/output/operator_confirmed_real_send_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "primary_action_execution": {
+      "expected_artifact": "staffordos/operator_daemon/output/primary_action_execution_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "system_truth_sync": {
+      "expected_artifact": "staffordos/operator_daemon/output/system_truth_sync_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "lead_registry_sync": {
+      "expected_artifact": "staffordos/operator_daemon/output/lead_registry_sync_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "shopifixer_followup_draft": {
+      "expected_artifact": "staffordos/operator_daemon/output/shopifixer_followup_draft_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "shopifixer_followup_approve": {
+      "expected_artifact": "staffordos/operator_daemon/output/shopifixer_followup_approve_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "contact_completeness_gate": {
+      "expected_artifact": "staffordos/operator_daemon/output/contact_completeness_gate_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "enrichment_task_packet": {
+      "expected_artifact": "staffordos/operator_daemon/output/enrichment_task_packet_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "operator_reviewed_enrichment_result": {
+      "expected_artifact": "staffordos/operator_daemon/output/operator_reviewed_enrichment_result_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "send_preview": {
+      "expected_artifact": "staffordos/operator_daemon/output/send_preview_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "send_confirm": {
+      "expected_artifact": "staffordos/operator_daemon/output/send_confirm_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "send_execute": {
+      "expected_artifact": "staffordos/operator_daemon/output/send_execute_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "security_hygiene_inventory": {
+      "expected_artifact": "staffordos/operator_daemon/output/security_hygiene_inventory_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "neck_router_inventory": {
+      "expected_artifact": "staffordos/operator_daemon/output/neck_router_inventory_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "router_decision_agent_binding": {
+      "expected_artifact": "staffordos/operator_daemon/output/router_decision_agent_binding_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "validator_map_refresh": {
+      "expected_artifact": "staffordos/operator_daemon/output/validator_map_refresh_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "router_to_gated_runner_binding": {
+      "expected_artifact": "staffordos/operator_daemon/output/router_to_gated_runner_binding_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "console_ingestion_binding": {
+      "expected_artifact": "staffordos/operator_daemon/output/console_ingestion_binding_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "smtp_env_discovery": {
+      "expected_artifact": "staffordos/operator_daemon/output/smtp_env_discovery_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "smtp_env_binding_patch": {
+      "expected_artifact": "staffordos/operator_daemon/output/smtp_env_binding_patch_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "real_smtp_dry_run": {
+      "expected_artifact": "staffordos/operator_daemon/output/real_smtp_dry_run_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "simulated_send_execution": {
+      "expected_artifact": "staffordos/operator_daemon/output/simulated_send_execution_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "operator_confirmed_real_send_manifest": {
+      "expected_artifact": "staffordos/operator_daemon/output/operator_confirmed_real_send_manifest_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "real_smtp_dry_run_actual": {
+      "expected_artifact": "staffordos/operator_daemon/output/real_smtp_dry_run_actual_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "real_send_allowlist_and_ledger": {
+      "expected_artifact": "staffordos/operator_daemon/output/real_send_allowlist_and_ledger_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "operator_test_recipient_binding": {
+      "expected_artifact": "staffordos/operator_daemon/output/operator_test_recipient_binding_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "system_brain_inventory": {
+      "expected_artifact": "staffordos/operator_daemon/output/system_brain_inventory_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "resolver_preflight_guard_self_check": {
+      "expected_artifact": "staffordos/operator_daemon/output/resolver_preflight_guard_self_check_v1.json",
+      "validation_owner": "auto_generated"
+    },
+    "fix_operator_test_recipient": {
+      "expected_artifact": "staffordos/operator_daemon/output/fix_operator_test_recipient_v1.json",
+      "validation_owner": "auto_generated"
     }
   },
   "proof": {

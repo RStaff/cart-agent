@@ -1,11 +1,11 @@
 {
   "schema": "staffordos.character_integrity_guard.v1",
-  "generated_at": "2026-05-05T19:39:03.814Z",
+  "generated_at": "2026-05-05T19:47:15.445Z",
   "mode": "normalize-task",
   "status": "passed",
   "input": {
-    "task_raw_length": 34,
-    "task_normalized": "fix runner arg normalization order",
+    "task_raw_length": 46,
+    "task_normalized": "auto-generate validator mappings from resolver",
     "hidden_characters_detected": false
   },
   "proof": {
