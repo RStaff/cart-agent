@@ -1,0 +1,14 @@
+{
+  "schema": "staffordos.operator_test_recipient_binding.v1",
+  "generated_at": "2026-05-05T14:18:51.936Z",
+  "status": "operator_test_recipient_bound",
+  "lead_id": "lead_001",
+  "recipient": "rossstafford1@gmail.com",
+  "proof": {
+    "operator_controlled_recipient": true,
+    "real_customer": false,
+    "real_send": false,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}

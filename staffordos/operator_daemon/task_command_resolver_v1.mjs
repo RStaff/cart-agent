@@ -293,6 +293,16 @@ const COMMANDS = {
     system: "shopifixer",
     revenue_action: false,
     reason: "Create disabled-by-default real-send allowlist and immutable ledger contract."
+  },
+
+  operator_test_recipient_binding: {
+    task_type: "operator_test_recipient_binding",
+    command: "node staffordos/operator_daemon/write_operator_test_recipient_binding_v1.mjs",
+    approval_level: "operator_explicit",
+    execution_class: "test_recipient_binding",
+    system: "shopifixer",
+    revenue_action: false,
+    reason: "Replace placeholder recipient with operator-controlled test recipient. No send."
   }
 };
 

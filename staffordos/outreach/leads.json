@@ -8,7 +8,7 @@
     "website": "https://examplestore.com",
     "contact": {
       "name": "Unknown",
-      "email": "test@example.com",
+      "email": "rossstafford1@gmail.com",
       "phone": ""
     },
     "shopify_detected": true,
@@ -27,6 +27,13 @@
         "event": "operator_reviewed_enrichment_applied",
         "sent_messages": false,
         "revenue_action": false
+      },
+      {
+        "at": "2026-05-05T14:18:51.935Z",
+        "event": "operator_test_recipient_bound",
+        "recipient_is_operator_controlled": true,
+        "sent_messages": false,
+        "revenue_action": false
       }
     ],
     "enrichment": {
@@ -34,6 +41,11 @@
       "source_url": "operator_review_manual_seed",
       "confidence": 0.75,
       "reviewed_at": "2026-05-05T12:41:56.608Z"
+    },
+    "test_control": {
+      "operator_controlled_recipient": true,
+      "purpose": "first SMTP dry-run and controlled send testing",
+      "real_customer": false
     }
   }
 ]

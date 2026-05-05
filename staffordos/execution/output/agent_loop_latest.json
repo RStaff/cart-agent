@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-05T14:16:41.922Z",
-  "command": "node staffordos/operator_daemon/write_real_send_allowlist_and_ledger_v1.mjs",
+  "generated_at": "2026-05-05T14:18:51.806Z",
+  "command": "node staffordos/operator_daemon/write_operator_test_recipient_binding_v1.mjs",
   "operatorApproved": true,
   "qaProfile": "operator_runtime",
   "stages": [
@@ -20,6 +20,6 @@
       "Score is below the automation threshold."
     ]
   },
-  "completed_at": "2026-05-05T14:16:42.059Z",
+  "completed_at": "2026-05-05T14:18:51.942Z",
   "exit_code": 0
 }
