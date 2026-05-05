@@ -1,25 +1,23 @@
 {
   "schema": "staffordos.real_smtp_send_gate.v1",
-  "generated_at": "2026-05-05T13:49:41.372Z",
-  "status": "not_ready",
+  "generated_at": "2026-05-05T14:00:16.260Z",
+  "status": "smtp_ready_but_send_not_executed",
   "checks": {
     "smtp_config_present_without_secrets": {
-      "SMTP_HOST": false,
-      "SMTP_PORT": false,
-      "SMTP_USER": false,
-      "SMTP_PASS": false,
-      "FROM_EMAIL": false,
+      "SMTP_HOST": true,
+      "SMTP_PORT": true,
+      "SMTP_USER": true,
+      "SMTP_PASS": true,
+      "FROM_EMAIL": true,
       "DEFAULT_FROM": false,
       "SMTP_FROM": false
     },
-    "smtp_ready_minimum": false,
+    "smtp_ready_minimum": true,
     "approved_queue_present": true,
     "ready_items": 1,
     "product_boundary_passed": true
   },
-  "blocking_reasons": [
-    "smtp_env_missing_or_incomplete"
-  ],
+  "blocking_reasons": [],
   "proof": {
     "readiness_gate_only": true,
     "real_send": false,
