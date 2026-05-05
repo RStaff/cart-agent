@@ -153,6 +153,16 @@ const COMMANDS = {
     system: "staffordos",
     revenue_action: false,
     reason: "Inventory existing Neck/router/decision assets before adding new activation layer."
+  },
+
+  router_decision_agent_binding: {
+    task_type: "router_decision_agent_binding",
+    command: "node staffordos/operator_daemon/write_router_decision_agent_binding_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "router_decision_agent_binding",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Bind existing router, decision, and agent assets into gated runner operating model."
   }
 };
 

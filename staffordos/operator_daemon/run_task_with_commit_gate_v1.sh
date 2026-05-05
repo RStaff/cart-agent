@@ -29,6 +29,22 @@ cat > staffordos/operator_daemon/operator_daemon_config_v1.json <<JSON
 }
 JSON
 
+echo "===== ROUTER / DECISION / AGENT BINDING CHECK ====="
+if [ -f "staffordos/operator_daemon/output/router_decision_agent_binding_v1.json" ]; then
+  node - <<'NODE'
+const fs = require("fs");
+const p = "staffordos/operator_daemon/output/router_decision_agent_binding_v1.json";
+const b = JSON.parse(fs.readFileSync(p, "utf8"));
+if (b.status !== "binding_manifest_created") {
+  console.error("🚫 COMMIT BLOCKED: router/decision/agent binding manifest invalid");
+  process.exit(1);
+}
+console.log("✅ router/decision/agent binding manifest present");
+NODE
+else
+  echo "⚠️ router/decision/agent binding manifest not present yet"
+fi
+
 echo "===== VALIDATE RESOLVER ====="
 node --check staffordos/operator_daemon/task_command_resolver_v1.mjs
 node staffordos/operator_daemon/task_command_resolver_v1.mjs "$TASK"

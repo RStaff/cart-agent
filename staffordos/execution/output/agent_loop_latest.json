@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-05T13:34:14.478Z",
-  "command": "node staffordos/operator_daemon/write_neck_router_inventory_v1.mjs",
+  "generated_at": "2026-05-05T13:37:30.618Z",
+  "command": "node staffordos/operator_daemon/write_router_decision_agent_binding_v1.mjs",
   "operatorApproved": true,
   "qaProfile": "operator_runtime",
   "stages": [
@@ -20,6 +20,6 @@
       "Score is below the automation threshold."
     ]
   },
-  "completed_at": "2026-05-05T13:34:14.632Z",
+  "completed_at": "2026-05-05T13:37:30.754Z",
   "exit_code": 0
 }

@@ -1,0 +1,120 @@
+{
+  "schema": "staffordos.router_decision_agent_binding.v1",
+  "generated_at": "2026-05-05T13:37:30.748Z",
+  "status": "binding_manifest_created",
+  "binding_model": {
+    "router_owner": "staffordos/operator_daemon/task_command_resolver_v1.mjs",
+    "decision_owner": "staffordos/decision/resolve_primary_action_v1.mjs",
+    "next_action_owner": "staffordos/clients/next_action_engine_v1.mjs",
+    "agent_selection_owner": "staffordos/agents/agent_selector_v1.json",
+    "execution_owner": "staffordos/execution/run_agent_loop.mjs",
+    "gated_commit_owner": "staffordos/operator_daemon/run_task_with_commit_gate_v1.sh"
+  },
+  "assets": {
+    "router_assets": [
+      {
+        "path": "staffordos/router/router_v1.js",
+        "exists": true,
+        "role": "router"
+      },
+      {
+        "path": "staffordos/router/router_v1_1.js",
+        "exists": true,
+        "role": "router"
+      },
+      {
+        "path": "staffordos/router/router_v1_harness.mjs",
+        "exists": true,
+        "role": "router"
+      },
+      {
+        "path": "staffordos/operator_daemon/task_command_resolver_v1.mjs",
+        "exists": true,
+        "role": "router"
+      }
+    ],
+    "decision_assets": [
+      {
+        "path": "staffordos/decision/resolve_primary_action_v1.mjs",
+        "exists": true,
+        "role": "decision"
+      },
+      {
+        "path": "staffordos/clients/next_action_engine_v1.mjs",
+        "exists": true,
+        "role": "decision"
+      },
+      {
+        "path": "staffordos/optimization/opportunityDecisionEngine.js",
+        "exists": true,
+        "role": "decision"
+      },
+      {
+        "path": "staffordos/agents/agent_selector_v1.json",
+        "exists": true,
+        "role": "decision"
+      }
+    ],
+    "agent_assets": [
+      {
+        "path": "staffordos/agents/system_truth_sync_agent_v1.mjs",
+        "exists": true,
+        "role": "agent"
+      },
+      {
+        "path": "staffordos/leads/lead_registry_sync_agent_v1.mjs",
+        "exists": true,
+        "role": "agent"
+      },
+      {
+        "path": "staffordos/leads/contact_enrichment_agent_v1.mjs",
+        "exists": true,
+        "role": "agent"
+      },
+      {
+        "path": "staffordos/leads/message_integrity_agent_v1.mjs",
+        "exists": true,
+        "role": "agent"
+      },
+      {
+        "path": "staffordos/leads/message_validation_agent_v1.mjs",
+        "exists": true,
+        "role": "agent"
+      },
+      {
+        "path": "staffordos/leads/send_execution_agent_v1.mjs",
+        "exists": true,
+        "role": "agent"
+      },
+      {
+        "path": "staffordos/leads/send_ledger_agent_v1.mjs",
+        "exists": true,
+        "role": "agent"
+      },
+      {
+        "path": "staffordos/revenue/revenue_agent_v1.mjs",
+        "exists": true,
+        "role": "agent"
+      },
+      {
+        "path": "staffordos/qa/runtime_qa_agent_v1.mjs",
+        "exists": true,
+        "role": "agent"
+      }
+    ]
+  },
+  "required_binding_rules": [
+    "All task execution must enter through run_task_with_commit_gate_v1.sh or run_auto_task_with_commit_gate_v1.sh.",
+    "Task names must resolve through task_command_resolver_v1.mjs.",
+    "Decision assets may recommend a task, but may not execute directly.",
+    "Agents may produce outputs, but commits require the gated runner.",
+    "Send execution remains blocked from auto-selection."
+  ],
+  "proof": {
+    "inventory_only": false,
+    "binding_manifest_written": true,
+    "no_direct_execution_added": true,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}

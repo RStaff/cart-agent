@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T13:34:14.444Z",
-  "task_type": "neck_router_inventory",
+  "generated_at": "2026-05-05T13:37:30.584Z",
+  "task_type": "router_decision_agent_binding",
   "status": "resolved",
   "resolution": {
-    "task_type": "neck_router_inventory",
-    "command": "node staffordos/operator_daemon/write_neck_router_inventory_v1.mjs",
+    "task_type": "router_decision_agent_binding",
+    "command": "node staffordos/operator_daemon/write_router_decision_agent_binding_v1.mjs",
     "approval_level": "operator_safe",
-    "execution_class": "inventory_audit",
+    "execution_class": "router_decision_agent_binding",
     "system": "staffordos",
     "revenue_action": false,
-    "reason": "Inventory existing Neck/router/decision assets before adding new activation layer."
+    "reason": "Bind existing router, decision, and agent assets into gated runner operating model."
   },
   "failures": []
 }

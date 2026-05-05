@@ -3,7 +3,7 @@
   "loop_interval_ms": 10000,
   "safe_mode": true,
   "auto_execute": false,
-  "task_type": "neck_router_inventory",
+  "task_type": "router_decision_agent_binding",
   "qa_profile": "operator_runtime",
   "max_loops": 1
 }
