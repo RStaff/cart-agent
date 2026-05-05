@@ -1,30 +1,27 @@
 {
-  "generated_at": "2026-05-05T13:24:01.808Z",
+  "generated_at": "2026-05-05T13:24:14.130Z",
   "status": "PASSED",
-  "command": "node staffordos/operator_daemon/write_followup_draft_v1.mjs",
-  "inferred_system_id": "staffordos",
-  "system_name": "StaffordOS Core",
-  "system_status": "PARTIAL_REAL",
-  "next_slice": "multi-system_execution_orchestration_v1",
+  "command": "node staffordos/operator_daemon/write_approved_outreach_queue_v1.mjs",
+  "inferred_system_id": "outreach",
+  "system_name": "Lead + Outreach System",
+  "system_status": "PARTIAL",
+  "next_slice": "reply_tracking_and_conversion_v1",
   "owners": [
     "pm",
     "architect",
     "executor",
     "qa",
-    "truth"
+    "revenue"
   ],
   "proof_required": [
-    "execution_gate_enforced",
-    "truth_map_verified",
-    "guardrails_enforced",
-    "proof_written",
-    "proof_tracked"
+    "lead_generated",
+    "lead_scored",
+    "message_sent",
+    "response_received",
+    "meeting_booked"
   ],
   "current_proof": [
-    "execution_gate",
-    "truth_map_preflight",
-    "guardrails",
-    "proof_register_writeback"
+    "lead_generation"
   ],
   "failures": []
 }
