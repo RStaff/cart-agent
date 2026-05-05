@@ -45,6 +45,18 @@ else
   echo "⚠️ router/decision/agent binding manifest not present yet"
 fi
 
+
+echo "===== LOAD OPERATOR LOCAL ENV IF PRESENT ====="
+OPERATOR_ENV_FILE="staffordos/dev/.env.abando.local"
+if [ -f "$OPERATOR_ENV_FILE" ]; then
+  echo "✅ Loading operator env source: $OPERATOR_ENV_FILE"
+  set -a
+  source "$OPERATOR_ENV_FILE"
+  set +a
+else
+  echo "⚠️ Operator env source not found: $OPERATOR_ENV_FILE"
+fi
+
 echo "===== VALIDATE RESOLVER ====="
 node --check staffordos/operator_daemon/task_command_resolver_v1.mjs
 node staffordos/operator_daemon/task_command_resolver_v1.mjs "$TASK"

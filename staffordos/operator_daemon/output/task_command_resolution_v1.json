@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T13:52:21.722Z",
-  "task_type": "smtp_env_discovery",
+  "generated_at": "2026-05-05T13:59:50.299Z",
+  "task_type": "smtp_env_binding_patch",
   "status": "resolved",
   "resolution": {
-    "task_type": "smtp_env_discovery",
-    "command": "node staffordos/operator_daemon/write_smtp_env_discovery_v1.mjs",
+    "task_type": "smtp_env_binding_patch",
+    "command": "node staffordos/operator_daemon/write_smtp_env_binding_patch_v1.mjs",
     "approval_level": "operator_safe",
-    "execution_class": "smtp_config_discovery",
+    "execution_class": "smtp_env_binding",
     "system": "staffordos",
     "revenue_action": false,
-    "reason": "Discover SMTP env/config binding without printing secrets or sending."
+    "reason": "Bind StaffordOS gated runner to existing local SMTP env source without printing secrets or sending."
   },
   "failures": []
 }

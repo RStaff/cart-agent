@@ -1,6 +1,18 @@
 #!/bin/bash
 set -euo pipefail
 
+
+echo "===== LOAD OPERATOR LOCAL ENV IF PRESENT ====="
+OPERATOR_ENV_FILE="staffordos/dev/.env.abando.local"
+if [ -f "$OPERATOR_ENV_FILE" ]; then
+  echo "✅ Loading operator env source: $OPERATOR_ENV_FILE"
+  set -a
+  source "$OPERATOR_ENV_FILE"
+  set +a
+else
+  echo "⚠️ Operator env source not found: $OPERATOR_ENV_FILE"
+fi
+
 echo "===== STAFFORDOS AUTO TASK SELECTION ====="
 
 node staffordos/operator_daemon/select_next_task_v1.mjs | tee staffordos/operator_daemon/output/next_task_selection_stdout_v1.json

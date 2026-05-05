@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-05T13:52:21.755Z",
-  "command": "node staffordos/operator_daemon/write_smtp_env_discovery_v1.mjs",
+  "generated_at": "2026-05-05T13:59:50.333Z",
+  "command": "node staffordos/operator_daemon/write_smtp_env_binding_patch_v1.mjs",
   "operatorApproved": true,
   "qaProfile": "operator_runtime",
   "stages": [
@@ -20,6 +20,6 @@
       "Score is below the automation threshold."
     ]
   },
-  "completed_at": "2026-05-05T13:52:21.946Z",
+  "completed_at": "2026-05-05T13:59:50.474Z",
   "exit_code": 0
 }

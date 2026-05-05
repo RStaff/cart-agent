@@ -233,6 +233,16 @@ const COMMANDS = {
     system: "staffordos",
     revenue_action: false,
     reason: "Discover SMTP env/config binding without printing secrets or sending."
+  },
+
+  smtp_env_binding_patch: {
+    task_type: "smtp_env_binding_patch",
+    command: "node staffordos/operator_daemon/write_smtp_env_binding_patch_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "smtp_env_binding",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Bind StaffordOS gated runner to existing local SMTP env source without printing secrets or sending."
   }
 };
 

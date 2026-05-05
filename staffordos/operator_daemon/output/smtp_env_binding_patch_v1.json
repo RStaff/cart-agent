@@ -1,0 +1,31 @@
+{
+  "schema": "staffordos.smtp_env_binding_patch.v1",
+  "generated_at": "2026-05-05T13:59:50.467Z",
+  "status": "operator_env_bound",
+  "env_source": "staffordos/dev/.env.abando.local",
+  "env_source_present": true,
+  "keys_detected_in_file_without_values": [
+    "SMTP_HOST",
+    "SMTP_PORT",
+    "SMTP_USER",
+    "SMTP_PASS",
+    "FROM_EMAIL"
+  ],
+  "current_process_env_presence_without_values": {
+    "SMTP_HOST": true,
+    "SMTP_PORT": true,
+    "SMTP_USER": true,
+    "SMTP_PASS": true,
+    "FROM_EMAIL": true,
+    "DEFAULT_FROM": false,
+    "SMTP_FROM": false
+  },
+  "smtp_ready_minimum": true,
+  "proof": {
+    "did_not_print_secret_values": true,
+    "binding_check_only": true,
+    "real_send": false,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}
