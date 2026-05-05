@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-05-02T20:33:01.155Z",
-  "command": "npm --prefix web run dev",
+  "generated_at": "2026-05-05T10:50:49.330Z",
+  "command": "node staffordos/operator_daemon/write_operator_observation_v1.mjs",
   "operatorApproved": true,
-  "qaProfile": "abando_return_attribution",
+  "qaProfile": "operator_runtime",
   "stages": [
     "mode_resolved",
     "operator_override_accepted",
@@ -10,14 +10,16 @@
     "truth_map_preflight_passed",
     "guardrails_passed",
     "runtime_prepared",
-    "runtime_qa_passed"
+    "execution_finished"
   ],
-  "status": "EXECUTING_WITH_QA_PASSED",
+  "status": "COMPLETED",
   "mode": {
     "decision": "IGNORE",
     "executionMode": "AUTO",
     "reasons": [
       "Score is below the automation threshold."
     ]
-  }
+  },
+  "completed_at": "2026-05-05T10:50:49.464Z",
+  "exit_code": 0
 }

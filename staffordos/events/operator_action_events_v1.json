@@ -1,11 +1,9 @@
 {
-  "schema": "staffordos.outcome_event_log.v1",
-  "purpose": "Append-only event log for actions, offers, replies, payments, fixes, verification, failures, and learning outcomes.",
-  "generated_at": "2026-05-04T15:06:21.177Z",
+  "schema": "staffordos.operator_action_events.v1",
   "events": [
     {
       "event_id": "operator_action_1777927373137",
-      "schema": "staffordos.outcome_event.v1",
+      "schema": "staffordos.operator_action_event.v1",
       "created_at": "2026-05-04T20:42:53.136Z",
       "action_id": "primary_1777922106443",
       "action_label": "Follow up on real ShopiFixer offer and close payment.",
@@ -35,12 +33,11 @@
         "loop_d_refresh_attempted": true,
         "real_external_send_performed": false,
         "note": "CTA execution logged safely. External send/payment action still requires explicit governed workflow."
-      },
-      "event_type": "primary_action_cta_clicked"
+      }
     },
     {
       "event_id": "operator_action_1777927221245",
-      "schema": "staffordos.outcome_event.v1",
+      "schema": "staffordos.operator_action_event.v1",
       "created_at": "2026-05-04T20:40:21.244Z",
       "action_id": "primary_1777922106443",
       "action_label": "Follow up on real ShopiFixer offer and close payment.",
@@ -70,12 +67,11 @@
         "loop_d_refresh_attempted": true,
         "real_external_send_performed": false,
         "note": "CTA execution logged safely. External send/payment action still requires explicit governed workflow."
-      },
-      "event_type": "primary_action_cta_clicked"
+      }
     },
     {
       "event_id": "operator_action_1777925410452",
-      "schema": "staffordos.outcome_event.v1",
+      "schema": "staffordos.operator_action_event.v1",
       "created_at": "2026-05-04T20:10:10.449Z",
       "action_id": "primary_1777922106443",
       "action_label": "Follow up on real ShopiFixer offer and close payment.",
@@ -105,12 +101,11 @@
         "loop_d_refresh_attempted": true,
         "real_external_send_performed": false,
         "note": "CTA execution logged safely. External send/payment action still requires explicit governed workflow."
-      },
-      "event_type": "primary_action_cta_clicked"
+      }
     },
     {
       "event_id": "operator_action_1777925399829",
-      "schema": "staffordos.outcome_event.v1",
+      "schema": "staffordos.operator_action_event.v1",
       "created_at": "2026-05-04T20:09:59.828Z",
       "action_id": "primary_1777922106443",
       "action_label": "Follow up on real ShopiFixer offer and close payment.",
@@ -140,12 +135,11 @@
         "loop_d_refresh_attempted": true,
         "real_external_send_performed": false,
         "note": "CTA execution logged safely. External send/payment action still requires explicit governed workflow."
-      },
-      "event_type": "primary_action_cta_clicked"
+      }
     },
     {
       "event_id": "operator_action_1777925395313",
-      "schema": "staffordos.outcome_event.v1",
+      "schema": "staffordos.operator_action_event.v1",
       "created_at": "2026-05-04T20:09:55.313Z",
       "action_id": "primary_1777922106443",
       "action_label": "Follow up on real ShopiFixer offer and close payment.",
@@ -175,20 +169,7 @@
         "loop_d_refresh_attempted": true,
         "real_external_send_performed": false,
         "note": "CTA execution logged safely. External send/payment action still requires explicit governed workflow."
-      },
-      "event_type": "primary_action_cta_clicked"
-    },
-    {
-      "event_id": "evt_schema_foundation_1777907181179",
-      "event_type": "schema_foundation_locked",
-      "domain_id": "system",
-      "linked_units": [
-        "delivery_internal_dev_schema_foundation_v1"
-      ],
-      "actor": "system",
-      "summary": "Non-destructive schema foundation created for domains, opportunities, issues, delivery, actions, memory, confidence gates, and outcomes.",
-      "outcome": "created",
-      "created_at": "2026-05-04T15:06:21.177Z"
+      }
     }
   ],
   "updated_at": "2026-05-04T20:42:53.136Z"

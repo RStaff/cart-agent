@@ -1,30 +1,30 @@
 {
-  "generated_at": "2026-05-02T20:33:01.195Z",
+  "generated_at": "2026-05-05T10:50:49.359Z",
   "status": "PASSED",
-  "command": "npm --prefix web run dev",
-  "inferred_system_id": "abando",
-  "system_name": "Abando Recovery Engine",
-  "system_status": "REAL_SEND_PROVEN",
-  "next_slice": "return_flow_and_revenue_attribution_v1",
+  "command": "node staffordos/operator_daemon/write_operator_observation_v1.mjs",
+  "inferred_system_id": "staffordos",
+  "system_name": "StaffordOS Core",
+  "system_status": "PARTIAL_REAL",
+  "next_slice": "multi-system_execution_orchestration_v1",
   "owners": [
     "pm",
     "architect",
     "executor",
     "qa",
-    "revenue",
     "truth"
   ],
   "proof_required": [
-    "checkout_event_captured",
-    "recovery_message_generated",
-    "real_email_sent",
-    "return_link_clicked",
-    "revenue_attributed"
+    "execution_gate_enforced",
+    "truth_map_verified",
+    "guardrails_enforced",
+    "proof_written",
+    "proof_tracked"
   ],
   "current_proof": [
-    "real_email_sent",
-    "proof_writeback",
-    "tracked_summary"
+    "execution_gate",
+    "truth_map_preflight",
+    "guardrails",
+    "proof_register_writeback"
   ],
   "failures": []
 }

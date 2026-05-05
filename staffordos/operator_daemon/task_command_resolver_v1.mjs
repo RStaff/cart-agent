@@ -13,6 +13,36 @@ const COMMANDS = {
     system: "staffordos",
     revenue_action: false,
     reason: "Default safe executable command for persistent operator proof loop."
+  },
+
+  system_truth_sync: {
+    task_type: "system_truth_sync",
+    command: "node staffordos/system_inventory/runners/discovery_sync_runner_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "system_sync",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Sync system discovery + truth inventory state."
+  },
+
+  lead_registry_sync: {
+    task_type: "lead_registry_sync",
+    command: "node staffordos/outreach/scripts/run_real_lead_pipeline.sh",
+    approval_level: "operator_safe",
+    execution_class: "lead_sync",
+    system: "shopifixer",
+    revenue_action: false,
+    reason: "Refresh lead pipeline and update lead registry artifacts."
+  },
+
+  shopifixer_followup_draft: {
+    task_type: "shopifixer_followup_draft",
+    command: "node staffordos/operator_daemon/write_followup_draft_v1.mjs",
+    approval_level: "operator_review_required",
+    execution_class: "outreach_prep",
+    system: "shopifixer",
+    revenue_action: false,
+    reason: "Prepare follow-up message draft (NO sending)."
   }
 };
 

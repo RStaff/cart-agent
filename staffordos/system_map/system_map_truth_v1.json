@@ -1,6 +1,6 @@
 {
   "version": "system_map_truth_v1",
-  "generated_at": "2026-04-27T11:28:42.920Z",
+  "generated_at": "2026-05-05T10:50:49.647Z",
   "sources": {
     "local_repo": "~/projects/cart-agent",
     "home_server_repo": "/home/ross/projects/cart-agent",
@@ -216,11 +216,11 @@
   "latest_revenue_truth": {
     "ok": true,
     "artifact": "revenue_truth_v1",
-    "generated_at": "2026-04-27T11:28:42.909Z",
+    "generated_at": "2026-05-05T10:50:49.638Z",
     "funnel": {
       "outreach_queue": 7,
       "approval_items": 0,
-      "send_ledger_items": 0,
+      "send_ledger_items": 2,
       "outcomes": 3
     },
     "stages": {
@@ -254,7 +254,7 @@
   "latest_capability_matrix": {
     "ok": true,
     "artifact": "capability_matrix_v1",
-    "generated_at": "2026-04-27T11:28:42.835Z",
+    "generated_at": "2026-05-05T10:50:49.582Z",
     "summary": {
       "total": 11,
       "ready": 11,

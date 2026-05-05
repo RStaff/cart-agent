@@ -2,7 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 
 function readJson(relativePath: string, fallback: any) {
-  const filePath = path.join(process.cwd(), "../../../", relativePath);
+  const repoRoot = path.join(process.cwd(), "..", "..", "..", "..");
+const filePath = path.join(repoRoot, "staffordos", relativePath);
 
   try {
     if (!fs.existsSync(filePath)) return fallback;

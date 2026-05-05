@@ -1,11 +1,16 @@
 {
   "schema": "staffordos.validator_map.v1",
-  "generated_at": "2026-05-04T19:15:06.359Z",
-  "total_validators": 16,
+  "generated_at": "2026-05-05T00:04:44.952Z",
+  "total_validators": 17,
   "validators": [
     {
       "validator_id": "staffordos_agents_validate_progress_contract_v1.mjs",
       "path": "staffordos/agents/validate_progress_contract_v1.mjs",
+      "type": "validator"
+    },
+    {
+      "validator_id": "staffordos_execution_validate_required_agents_v1.mjs",
+      "path": "staffordos/execution/validate_required_agents_v1.mjs",
       "type": "validator"
     },
     {

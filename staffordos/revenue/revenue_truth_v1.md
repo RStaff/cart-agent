@@ -1,12 +1,12 @@
 # Revenue Truth v1
 
-Generated at: 2026-04-27T09:47:22.103Z
+Generated at: 2026-05-05T10:50:49.638Z
 
 ## Funnel
 
 - Outreach queue: 7
 - Approval items: 0
-- Send ledger items: 0
+- Send ledger items: 2
 - Outcomes: 3
 
 ## Stages

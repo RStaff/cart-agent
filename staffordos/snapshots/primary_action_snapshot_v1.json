@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.primary_action_snapshot.v1",
-  "generated_at": "2026-05-04T17:49:08.309Z",
+  "generated_at": "2026-05-05T10:50:49.261Z",
   "purpose": "Single canonical answer to: What should Ross do next?",
   "decision_model": {
     "engine": "resolve_primary_action_v1",
@@ -15,7 +15,7 @@
     "rule": "UI must consume this snapshot for the top primary action. React components must not invent primary priority locally."
   },
   "primary_action": {
-    "action_id": "primary_1777916948311",
+    "action_id": "primary_1777978249263",
     "action_label": "Follow up on real ShopiFixer offer and close payment.",
     "action_type": "revenue_close",
     "domain_id": "shopifixer",
@@ -51,7 +51,7 @@
       "staffordos/gates/confidence_gate_v1.json",
       "staffordos/ux_audit/output/operator_command_center_ux_integrity_v1.json"
     ],
-    "generated_at": "2026-05-04T17:49:08.309Z"
+    "generated_at": "2026-05-05T10:50:49.261Z"
   },
   "alternatives_considered": [
     {

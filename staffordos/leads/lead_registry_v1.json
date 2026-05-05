@@ -1,8 +1,7 @@
 {
   "version": "lead_registry_v1",
-  "schema": "canonical_lead_registry_v1",
-  "normalized_at": "2026-04-29T17:50:32.996Z",
-  "source": "staffordmedia_shopifixer_inbound",
+  "updated_at": "2026-05-05T10:50:49.524Z",
+  "source": ".tmp/send_console_data.json",
   "items": [
     {
       "id": "lead_step5_test_store_myshopify_com",
@@ -463,12 +462,8 @@
       "product": "shopifixer",
       "product_surface": "staffordmedia_shopifixer",
       "source": "unknown",
-      "lifecycle_stage": "engaged",
-      "status": {
-        "current_stage": "engaged",
-        "current_bottleneck": null,
-        "next_action": "Qualify reply and prepare offer"
-      },
+      "lifecycle_stage": "send_initial_outreach",
+      "status": "new",
       "score": 0,
       "contact": {
         "email": "",
@@ -485,9 +480,8 @@
         "sent": true
       },
       "routing": {
-        "primary_offer": "shopifixer",
-        "secondary_offer": "abando_recovery",
-        "do_not_cross_sell_until": "qualified",
+        "primary": "shopifixer",
+        "secondary": "abando_recovery",
         "rule": "hold cross-sell until qualified"
       },
       "refs": {
@@ -514,7 +508,15 @@
       "problem_summary": "Shopify CLI dev workflow issue",
       "runtime_source": ".tmp/send_console_data.json",
       "created_at": "2026-04-28T14:34:49.479Z",
-      "updated_at": "2026-04-28T19:30:04.007Z"
+      "updated_at": "2026-05-05T10:50:49.523Z",
+      "send_target": "https://github.com/Shopify/cli/issues/5698",
+      "channel": "unknown",
+      "message": "Hey yxengine — saw your issue about a Shopify app dev issue.\n\nI’ve been fixing a lot of Shopify app dev problems like this lately, especially around tunnels, preview URLs, and embedded apps not loading.\n\nIf you want, I can take a quick look and help you get it stable.",
+      "follow_up_message": null,
+      "contact_confidence": "low",
+      "payment_status": null,
+      "payment_url": null,
+      "generated_at": "2026-04-28T14:34:49.479Z"
     },
     {
       "id": "lead_260c01e80ad4",
@@ -524,12 +526,8 @@
       "product": "shopifixer",
       "product_surface": "staffordmedia_shopifixer",
       "source": "unknown",
-      "lifecycle_stage": "sent",
-      "status": {
-        "current_stage": "sent",
-        "current_bottleneck": null,
-        "next_action": "Wait for reply"
-      },
+      "lifecycle_stage": "send_initial_outreach",
+      "status": "new",
       "score": 0,
       "contact": {
         "email": "",
@@ -546,9 +544,8 @@
         "sent": true
       },
       "routing": {
-        "primary_offer": "shopifixer",
-        "secondary_offer": "abando_recovery",
-        "do_not_cross_sell_until": "qualified",
+        "primary": "shopifixer",
+        "secondary": "abando_recovery",
         "rule": "hold cross-sell until qualified"
       },
       "refs": {
@@ -575,7 +572,15 @@
       "problem_summary": "Tunnel or Cloudflare issue during Shopify app development",
       "runtime_source": ".tmp/send_console_data.json",
       "created_at": "2026-04-28T14:34:49.480Z",
-      "updated_at": "2026-04-28T19:30:04.007Z"
+      "updated_at": "2026-05-05T10:50:49.523Z",
+      "send_target": "https://github.com/barrel/shopify-vite/issues/238",
+      "channel": "unknown",
+      "message": "Hey nboliver-ventureweb — saw your issue about a Shopify app dev issue.\n\nI’ve been fixing a lot of Shopify app dev problems like this lately, especially around tunnels, preview URLs, and embedded apps not loading.\n\nIf you want, I can take a quick look and help you get it stable.",
+      "follow_up_message": null,
+      "contact_confidence": "low",
+      "payment_status": null,
+      "payment_url": null,
+      "generated_at": "2026-04-28T14:34:49.480Z"
     },
     {
       "id": "lead_52c0b97afddf",
@@ -585,12 +590,8 @@
       "product": "shopifixer",
       "product_surface": "staffordmedia_shopifixer",
       "source": "unknown",
-      "lifecycle_stage": "sent",
-      "status": {
-        "current_stage": "sent",
-        "current_bottleneck": null,
-        "next_action": "Wait for reply"
-      },
+      "lifecycle_stage": "send_initial_outreach",
+      "status": "new",
       "score": 0,
       "contact": {
         "email": "",
@@ -607,9 +608,8 @@
         "sent": false
       },
       "routing": {
-        "primary_offer": "shopifixer",
-        "secondary_offer": "abando_recovery",
-        "do_not_cross_sell_until": "qualified",
+        "primary": "shopifixer",
+        "secondary": "abando_recovery",
         "rule": "hold cross-sell until qualified"
       },
       "refs": {
@@ -631,7 +631,15 @@
       "problem_summary": "Shopify CLI dev workflow issue",
       "runtime_source": ".tmp/send_console_data.json",
       "created_at": "2026-04-28T14:34:49.480Z",
-      "updated_at": "2026-04-28T17:52:39.013Z"
+      "updated_at": "2026-05-05T10:50:49.523Z",
+      "send_target": "https://github.com/microsoft/vscode/issues/311862",
+      "channel": "unknown",
+      "message": "Hey sidhs — saw your issue about a Shopify app dev issue.\n\nI’ve been fixing a lot of Shopify app dev problems like this lately, especially around tunnels, preview URLs, and embedded apps not loading.\n\nIf you want, I can take a quick look and help you get it stable.",
+      "follow_up_message": null,
+      "contact_confidence": "low",
+      "payment_status": null,
+      "payment_url": null,
+      "generated_at": "2026-04-28T14:34:49.480Z"
     },
     {
       "id": "lead_5cc9f25726db",
@@ -642,11 +650,7 @@
       "product_surface": "staffordmedia_shopifixer",
       "source": "unknown",
       "lifecycle_stage": "send_initial_outreach",
-      "status": {
-        "current_stage": "send_initial_outreach",
-        "current_bottleneck": null,
-        "next_action": "send_initial_outreach"
-      },
+      "status": "new",
       "score": 0,
       "contact": {
         "email": "",
@@ -663,9 +667,8 @@
         "sent": false
       },
       "routing": {
-        "primary_offer": "shopifixer",
-        "secondary_offer": "abando_recovery",
-        "do_not_cross_sell_until": "qualified",
+        "primary": "shopifixer",
+        "secondary": "abando_recovery",
         "rule": "hold cross-sell until qualified"
       },
       "refs": {
@@ -687,7 +690,15 @@
       "problem_summary": "Tunnel or Cloudflare issue during Shopify app development",
       "runtime_source": ".tmp/send_console_data.json",
       "created_at": "2026-04-28T14:34:49.480Z",
-      "updated_at": "2026-04-28T15:55:03.631Z"
+      "updated_at": "2026-05-05T10:50:49.523Z",
+      "send_target": "https://github.com/Shopify/cli/issues/118",
+      "channel": "unknown",
+      "message": "Hey awd — saw your issue about a Shopify app dev issue.\n\nI’ve been fixing a lot of Shopify app dev problems like this lately, especially around tunnels, preview URLs, and embedded apps not loading.\n\nIf you want, I can take a quick look and help you get it stable.",
+      "follow_up_message": null,
+      "contact_confidence": "low",
+      "payment_status": null,
+      "payment_url": null,
+      "generated_at": "2026-04-28T14:34:49.480Z"
     },
     {
       "id": "lead_74d7e42f2f9c",
@@ -698,11 +709,7 @@
       "product_surface": "staffordmedia_shopifixer",
       "source": "unknown",
       "lifecycle_stage": "send_initial_outreach",
-      "status": {
-        "current_stage": "send_initial_outreach",
-        "current_bottleneck": null,
-        "next_action": "send_initial_outreach"
-      },
+      "status": "new",
       "score": 0,
       "contact": {
         "email": "",
@@ -719,9 +726,8 @@
         "sent": false
       },
       "routing": {
-        "primary_offer": "shopifixer",
-        "secondary_offer": "abando_recovery",
-        "do_not_cross_sell_until": "qualified",
+        "primary": "shopifixer",
+        "secondary": "abando_recovery",
         "rule": "hold cross-sell until qualified"
       },
       "refs": {
@@ -743,7 +749,15 @@
       "problem_summary": "Shopify CLI dev workflow issue",
       "runtime_source": ".tmp/send_console_data.json",
       "created_at": "2026-04-28T14:34:49.480Z",
-      "updated_at": "2026-04-28T15:55:03.631Z"
+      "updated_at": "2026-05-05T10:50:49.523Z",
+      "send_target": "https://github.com/Shopify/cli/issues/3283",
+      "channel": "unknown",
+      "message": "Hey kanasagraj — saw your issue about a Shopify app dev issue.\n\nI’ve been fixing a lot of Shopify app dev problems like this lately, especially around tunnels, preview URLs, and embedded apps not loading.\n\nIf you want, I can take a quick look and help you get it stable.",
+      "follow_up_message": null,
+      "contact_confidence": "low",
+      "payment_status": null,
+      "payment_url": null,
+      "generated_at": "2026-04-28T14:34:49.480Z"
     },
     {
       "id": "lead_7ed37cb5a539",
@@ -754,11 +768,7 @@
       "product_surface": "staffordmedia_shopifixer",
       "source": "unknown",
       "lifecycle_stage": "send_initial_outreach",
-      "status": {
-        "current_stage": "send_initial_outreach",
-        "current_bottleneck": null,
-        "next_action": "send_initial_outreach"
-      },
+      "status": "new",
       "score": 0,
       "contact": {
         "email": "",
@@ -775,9 +785,8 @@
         "sent": false
       },
       "routing": {
-        "primary_offer": "shopifixer",
-        "secondary_offer": "abando_recovery",
-        "do_not_cross_sell_until": "qualified",
+        "primary": "shopifixer",
+        "secondary": "abando_recovery",
         "rule": "hold cross-sell until qualified"
       },
       "refs": {
@@ -799,7 +808,15 @@
       "problem_summary": "Shopify preview/admin URL issue",
       "runtime_source": ".tmp/send_console_data.json",
       "created_at": "2026-04-28T14:34:49.480Z",
-      "updated_at": "2026-04-28T15:55:03.631Z"
+      "updated_at": "2026-05-05T10:50:49.523Z",
+      "send_target": "https://github.com/Shopify/shopify-app-js/issues/3181",
+      "channel": "unknown",
+      "message": "Hey MigHerCas — saw your issue about a Shopify app dev issue.\n\nI’ve been fixing a lot of Shopify app dev problems like this lately, especially around tunnels, preview URLs, and embedded apps not loading.\n\nIf you want, I can take a quick look and help you get it stable.",
+      "follow_up_message": null,
+      "contact_confidence": "low",
+      "payment_status": null,
+      "payment_url": null,
+      "generated_at": "2026-04-28T14:34:49.480Z"
     },
     {
       "id": "lead_85efb2eed600",
@@ -810,11 +827,7 @@
       "product_surface": "staffordmedia_shopifixer",
       "source": "unknown",
       "lifecycle_stage": "send_initial_outreach",
-      "status": {
-        "current_stage": "send_initial_outreach",
-        "current_bottleneck": null,
-        "next_action": "send_initial_outreach"
-      },
+      "status": "new",
       "score": 0,
       "contact": {
         "email": "",
@@ -831,9 +844,8 @@
         "sent": false
       },
       "routing": {
-        "primary_offer": "shopifixer",
-        "secondary_offer": "abando_recovery",
-        "do_not_cross_sell_until": "qualified",
+        "primary": "shopifixer",
+        "secondary": "abando_recovery",
         "rule": "hold cross-sell until qualified"
       },
       "refs": {
@@ -855,7 +867,15 @@
       "problem_summary": "Shopify CLI dev workflow issue",
       "runtime_source": ".tmp/send_console_data.json",
       "created_at": "2026-04-28T14:34:49.480Z",
-      "updated_at": "2026-04-28T15:55:03.631Z"
+      "updated_at": "2026-05-05T10:50:49.523Z",
+      "send_target": "https://github.com/Shopify/cli/issues/2969",
+      "channel": "unknown",
+      "message": "Hey sergeifilippov — saw your issue about a Shopify app dev issue.\n\nI’ve been fixing a lot of Shopify app dev problems like this lately, especially around tunnels, preview URLs, and embedded apps not loading.\n\nIf you want, I can take a quick look and help you get it stable.",
+      "follow_up_message": null,
+      "contact_confidence": "low",
+      "payment_status": null,
+      "payment_url": null,
+      "generated_at": "2026-04-28T14:34:49.480Z"
     },
     {
       "id": "lead_a07a3f8ca2d9",
@@ -866,11 +886,7 @@
       "product_surface": "staffordmedia_shopifixer",
       "source": "unknown",
       "lifecycle_stage": "send_initial_outreach",
-      "status": {
-        "current_stage": "send_initial_outreach",
-        "current_bottleneck": null,
-        "next_action": "send_initial_outreach"
-      },
+      "status": "new",
       "score": 0,
       "contact": {
         "email": "",
@@ -887,9 +903,8 @@
         "sent": false
       },
       "routing": {
-        "primary_offer": "shopifixer",
-        "secondary_offer": "abando_recovery",
-        "do_not_cross_sell_until": "qualified",
+        "primary": "shopifixer",
+        "secondary": "abando_recovery",
         "rule": "hold cross-sell until qualified"
       },
       "refs": {
@@ -911,7 +926,15 @@
       "problem_summary": "Shopify CLI dev workflow issue",
       "runtime_source": ".tmp/send_console_data.json",
       "created_at": "2026-04-28T14:34:49.480Z",
-      "updated_at": "2026-04-28T15:55:03.631Z"
+      "updated_at": "2026-05-05T10:50:49.523Z",
+      "send_target": "https://github.com/Shopify/cli/issues/3938",
+      "channel": "unknown",
+      "message": "Hey leonardo-ornelas — saw your issue about a Shopify app dev issue.\n\nI’ve been fixing a lot of Shopify app dev problems like this lately, especially around tunnels, preview URLs, and embedded apps not loading.\n\nIf you want, I can take a quick look and help you get it stable.",
+      "follow_up_message": null,
+      "contact_confidence": "low",
+      "payment_status": null,
+      "payment_url": null,
+      "generated_at": "2026-04-28T14:34:49.480Z"
     },
     {
       "id": "lead_adb16ac152ad",
@@ -922,11 +945,7 @@
       "product_surface": "staffordmedia_shopifixer",
       "source": "unknown",
       "lifecycle_stage": "send_initial_outreach",
-      "status": {
-        "current_stage": "send_initial_outreach",
-        "current_bottleneck": null,
-        "next_action": "send_initial_outreach"
-      },
+      "status": "new",
       "score": 0,
       "contact": {
         "email": "",
@@ -943,9 +962,8 @@
         "sent": false
       },
       "routing": {
-        "primary_offer": "shopifixer",
-        "secondary_offer": "abando_recovery",
-        "do_not_cross_sell_until": "qualified",
+        "primary": "shopifixer",
+        "secondary": "abando_recovery",
         "rule": "hold cross-sell until qualified"
       },
       "refs": {
@@ -967,7 +985,15 @@
       "problem_summary": "Shopify CLI dev workflow issue",
       "runtime_source": ".tmp/send_console_data.json",
       "created_at": "2026-04-28T14:34:49.480Z",
-      "updated_at": "2026-04-28T15:55:03.631Z"
+      "updated_at": "2026-05-05T10:50:49.523Z",
+      "send_target": "https://github.com/Shopify/cli/issues/4549",
+      "channel": "unknown",
+      "message": "Hey RaphaelLimaDev — saw your issue about a Shopify app dev issue.\n\nI’ve been fixing a lot of Shopify app dev problems like this lately, especially around tunnels, preview URLs, and embedded apps not loading.\n\nIf you want, I can take a quick look and help you get it stable.",
+      "follow_up_message": null,
+      "contact_confidence": "low",
+      "payment_status": null,
+      "payment_url": null,
+      "generated_at": "2026-04-28T14:34:49.480Z"
     },
     {
       "id": "lead_b6ba7fddc12a",
@@ -978,11 +1004,7 @@
       "product_surface": "staffordmedia_shopifixer",
       "source": "unknown",
       "lifecycle_stage": "send_initial_outreach",
-      "status": {
-        "current_stage": "send_initial_outreach",
-        "current_bottleneck": null,
-        "next_action": "send_initial_outreach"
-      },
+      "status": "new",
       "score": 0,
       "contact": {
         "email": "",
@@ -999,9 +1021,8 @@
         "sent": false
       },
       "routing": {
-        "primary_offer": "shopifixer",
-        "secondary_offer": "abando_recovery",
-        "do_not_cross_sell_until": "qualified",
+        "primary": "shopifixer",
+        "secondary": "abando_recovery",
         "rule": "hold cross-sell until qualified"
       },
       "refs": {
@@ -1023,7 +1044,15 @@
       "problem_summary": "Shopify CLI dev workflow issue",
       "runtime_source": ".tmp/send_console_data.json",
       "created_at": "2026-04-28T14:34:49.480Z",
-      "updated_at": "2026-04-28T15:55:03.631Z"
+      "updated_at": "2026-05-05T10:50:49.524Z",
+      "send_target": "https://github.com/Shopify/cli/issues/6472",
+      "channel": "unknown",
+      "message": "Hey vfonic — saw your issue about a Shopify app dev issue.\n\nI’ve been fixing a lot of Shopify app dev problems like this lately, especially around tunnels, preview URLs, and embedded apps not loading.\n\nIf you want, I can take a quick look and help you get it stable.",
+      "follow_up_message": null,
+      "contact_confidence": "low",
+      "payment_status": null,
+      "payment_url": null,
+      "generated_at": "2026-04-28T14:34:49.480Z"
     },
     {
       "id": "lead_e1052635ec21",
@@ -1034,11 +1063,7 @@
       "product_surface": "staffordmedia_shopifixer",
       "source": "unknown",
       "lifecycle_stage": "send_initial_outreach",
-      "status": {
-        "current_stage": "send_initial_outreach",
-        "current_bottleneck": null,
-        "next_action": "send_initial_outreach"
-      },
+      "status": "new",
       "score": 0,
       "contact": {
         "email": "",
@@ -1055,9 +1080,8 @@
         "sent": false
       },
       "routing": {
-        "primary_offer": "shopifixer",
-        "secondary_offer": "abando_recovery",
-        "do_not_cross_sell_until": "qualified",
+        "primary": "shopifixer",
+        "secondary": "abando_recovery",
         "rule": "hold cross-sell until qualified"
       },
       "refs": {
@@ -1079,7 +1103,15 @@
       "problem_summary": "Shopify CLI dev workflow issue",
       "runtime_source": ".tmp/send_console_data.json",
       "created_at": "2026-04-28T14:34:49.480Z",
-      "updated_at": "2026-04-28T15:55:03.631Z"
+      "updated_at": "2026-05-05T10:50:49.524Z",
+      "send_target": "https://github.com/Shopify/cli/issues/6235",
+      "channel": "unknown",
+      "message": "Hey aaronadamsCA — saw your issue about a Shopify app dev issue.\n\nI’ve been fixing a lot of Shopify app dev problems like this lately, especially around tunnels, preview URLs, and embedded apps not loading.\n\nIf you want, I can take a quick look and help you get it stable.",
+      "follow_up_message": null,
+      "contact_confidence": "low",
+      "payment_status": null,
+      "payment_url": null,
+      "generated_at": "2026-04-28T14:34:49.480Z"
     },
     {
       "id": "lead_f7f585ccc1f2",
@@ -1090,11 +1122,7 @@
       "product_surface": "staffordmedia_shopifixer",
       "source": "unknown",
       "lifecycle_stage": "send_initial_outreach",
-      "status": {
-        "current_stage": "send_initial_outreach",
-        "current_bottleneck": null,
-        "next_action": "send_initial_outreach"
-      },
+      "status": "new",
       "score": 0,
       "contact": {
         "email": "",
@@ -1111,9 +1139,8 @@
         "sent": false
       },
       "routing": {
-        "primary_offer": "shopifixer",
-        "secondary_offer": "abando_recovery",
-        "do_not_cross_sell_until": "qualified",
+        "primary": "shopifixer",
+        "secondary": "abando_recovery",
         "rule": "hold cross-sell until qualified"
       },
       "refs": {
@@ -1135,7 +1162,15 @@
       "problem_summary": "Shopify CLI dev workflow issue",
       "runtime_source": ".tmp/send_console_data.json",
       "created_at": "2026-04-28T14:34:49.480Z",
-      "updated_at": "2026-04-28T15:55:03.631Z"
+      "updated_at": "2026-05-05T10:50:49.524Z",
+      "send_target": "https://github.com/Shopify/cli/issues/4495",
+      "channel": "unknown",
+      "message": "Hey sillycube — saw your issue about a Shopify app dev issue.\n\nI’ve been fixing a lot of Shopify app dev problems like this lately, especially around tunnels, preview URLs, and embedded apps not loading.\n\nIf you want, I can take a quick look and help you get it stable.",
+      "follow_up_message": null,
+      "contact_confidence": "low",
+      "payment_status": null,
+      "payment_url": null,
+      "generated_at": "2026-04-28T14:34:49.480Z"
     },
     {
       "id": "lead_f8c0c8b4e640",
@@ -1146,11 +1181,7 @@
       "product_surface": "staffordmedia_shopifixer",
       "source": "unknown",
       "lifecycle_stage": "send_initial_outreach",
-      "status": {
-        "current_stage": "send_initial_outreach",
-        "current_bottleneck": null,
-        "next_action": "send_initial_outreach"
-      },
+      "status": "new",
       "score": 0,
       "contact": {
         "email": "",
@@ -1167,9 +1198,8 @@
         "sent": false
       },
       "routing": {
-        "primary_offer": "shopifixer",
-        "secondary_offer": "abando_recovery",
-        "do_not_cross_sell_until": "qualified",
+        "primary": "shopifixer",
+        "secondary": "abando_recovery",
         "rule": "hold cross-sell until qualified"
       },
       "refs": {
@@ -1191,7 +1221,15 @@
       "problem_summary": "Shopify CLI dev workflow issue",
       "runtime_source": ".tmp/send_console_data.json",
       "created_at": "2026-04-28T14:34:49.480Z",
-      "updated_at": "2026-04-28T15:55:03.631Z"
+      "updated_at": "2026-05-05T10:50:49.524Z",
+      "send_target": "https://github.com/Shopify/cli/issues/7324",
+      "channel": "unknown",
+      "message": "Hey 0xtlt — saw your issue about a Shopify app dev issue.\n\nI’ve been fixing a lot of Shopify app dev problems like this lately, especially around tunnels, preview URLs, and embedded apps not loading.\n\nIf you want, I can take a quick look and help you get it stable.",
+      "follow_up_message": null,
+      "contact_confidence": "low",
+      "payment_status": null,
+      "payment_url": null,
+      "generated_at": "2026-04-28T14:34:49.480Z"
     },
     {
       "id": "lead_fb5175137c0d",
@@ -1202,11 +1240,7 @@
       "product_surface": "staffordmedia_shopifixer",
       "source": "unknown",
       "lifecycle_stage": "send_initial_outreach",
-      "status": {
-        "current_stage": "send_initial_outreach",
-        "current_bottleneck": null,
-        "next_action": "send_initial_outreach"
-      },
+      "status": "new",
       "score": 0,
       "contact": {
         "email": "",
@@ -1223,9 +1257,8 @@
         "sent": false
       },
       "routing": {
-        "primary_offer": "shopifixer",
-        "secondary_offer": "abando_recovery",
-        "do_not_cross_sell_until": "qualified",
+        "primary": "shopifixer",
+        "secondary": "abando_recovery",
         "rule": "hold cross-sell until qualified"
       },
       "refs": {
@@ -1247,7 +1280,15 @@
       "problem_summary": "General Shopify app development issue",
       "runtime_source": ".tmp/send_console_data.json",
       "created_at": "2026-04-28T14:34:49.480Z",
-      "updated_at": "2026-04-28T15:55:03.631Z"
+      "updated_at": "2026-05-05T10:50:49.524Z",
+      "send_target": "https://github.com/Weaverse/pilot/issues/338",
+      "channel": "unknown",
+      "message": "Hey hta218 — saw your issue about a Shopify app dev issue.\n\nI’ve been fixing a lot of Shopify app dev problems like this lately, especially around tunnels, preview URLs, and embedded apps not loading.\n\nIf you want, I can take a quick look and help you get it stable.",
+      "follow_up_message": null,
+      "contact_confidence": "low",
+      "payment_status": null,
+      "payment_url": null,
+      "generated_at": "2026-04-28T14:34:49.480Z"
     },
     {
       "id": "lead_fd24790d2d98",
@@ -1258,11 +1299,7 @@
       "product_surface": "staffordmedia_shopifixer",
       "source": "unknown",
       "lifecycle_stage": "send_initial_outreach",
-      "status": {
-        "current_stage": "send_initial_outreach",
-        "current_bottleneck": null,
-        "next_action": "send_initial_outreach"
-      },
+      "status": "new",
       "score": 0,
       "contact": {
         "email": "",
@@ -1279,9 +1316,8 @@
         "sent": false
       },
       "routing": {
-        "primary_offer": "shopifixer",
-        "secondary_offer": "abando_recovery",
-        "do_not_cross_sell_until": "qualified",
+        "primary": "shopifixer",
+        "secondary": "abando_recovery",
         "rule": "hold cross-sell until qualified"
       },
       "refs": {
@@ -1303,9 +1339,15 @@
       "problem_summary": "Tunnel or Cloudflare issue during Shopify app development",
       "runtime_source": ".tmp/send_console_data.json",
       "created_at": "2026-04-28T14:34:49.480Z",
-      "updated_at": "2026-04-28T15:55:03.631Z"
+      "updated_at": "2026-05-05T10:50:49.524Z",
+      "send_target": "https://github.com/Shopify/cli/issues/5791",
+      "channel": "unknown",
+      "message": "Hey vfonic — saw your issue about a Shopify app dev issue.\n\nI’ve been fixing a lot of Shopify app dev problems like this lately, especially around tunnels, preview URLs, and embedded apps not loading.\n\nIf you want, I can take a quick look and help you get it stable.",
+      "follow_up_message": null,
+      "contact_confidence": "low",
+      "payment_status": null,
+      "payment_url": null,
+      "generated_at": "2026-04-28T14:34:49.480Z"
     }
-  ],
-  "updated_at": "2026-04-29T17:11:28.609Z",
-  "send_proof_bound_at": "2026-04-28T19:30:04.007Z"
+  ]
 }
