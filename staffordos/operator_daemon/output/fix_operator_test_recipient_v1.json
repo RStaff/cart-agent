@@ -1,0 +1,18 @@
+{
+  "schema": "staffordos.fix_operator_test_recipient.v1",
+  "generated_at": "2026-05-05T15:05:14.031Z",
+  "status": "operator_test_recipient_applied",
+  "recipient": "rossstafford1@gmail.com",
+  "patched_files": [
+    "staffordos/outreach/leads.json",
+    "staffordos/operator_daemon/output/shopifixer_followup_draft_v1.json",
+    "staffordos/operator_daemon/output/approved_outreach_queue_v1.json"
+  ],
+  "proof": {
+    "operator_controlled_recipient": true,
+    "real_customer": false,
+    "real_send": false,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}

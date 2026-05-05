@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-05T14:54:33.701Z",
-  "command": "node staffordos/operator_daemon/resolver_preflight_guard_v1.mjs resolver_preflight_guard_self_check",
+  "generated_at": "2026-05-05T15:05:13.899Z",
+  "command": "node staffordos/operator_daemon/write_fix_operator_test_recipient_v1.mjs",
   "operatorApproved": true,
   "qaProfile": "operator_runtime",
   "stages": [
@@ -20,6 +20,6 @@
       "Score is below the automation threshold."
     ]
   },
-  "completed_at": "2026-05-05T14:54:33.918Z",
+  "completed_at": "2026-05-05T15:05:14.037Z",
   "exit_code": 0
 }

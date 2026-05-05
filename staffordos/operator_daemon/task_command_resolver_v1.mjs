@@ -323,7 +323,18 @@ const COMMANDS = {
     system: "staffordos",
     revenue_action: false,
     reason: "Validate resolver preflight guard exists and is callable."
-  }
+  },
+
+  fix_operator_test_recipient: {
+    task_type: "fix_operator_test_recipient",
+    command: "node staffordos/operator_daemon/write_fix_operator_test_recipient_v1.mjs",
+    approval_level: "operator_explicit",
+    execution_class: "recipient_binding",
+    system: "shopifixer",
+    revenue_action: false,
+    reason: "Replace placeholder recipient with operator-controlled test recipient. No send."
+  },
+
 };
 
 const resolved = COMMANDS[taskType];
