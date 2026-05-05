@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-05-05T13:27:12.549Z",
+  "generated_at": "2026-05-05T13:34:14.507Z",
   "status": "PASSED",
-  "command": "node staffordos/operator_daemon/write_security_hygiene_inventory_v1.mjs",
+  "command": "node staffordos/operator_daemon/write_neck_router_inventory_v1.mjs",
   "inferred_system_id": "staffordos",
   "system_name": "StaffordOS Core",
   "system_status": "PARTIAL_REAL",

@@ -143,6 +143,16 @@ const COMMANDS = {
     system: "staffordos",
     revenue_action: false,
     reason: "Inventory security/hygiene agents and dependency vulnerability surface. No external send."
+  },
+
+  neck_router_inventory: {
+    task_type: "neck_router_inventory",
+    command: "node staffordos/operator_daemon/write_neck_router_inventory_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "inventory_audit",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Inventory existing Neck/router/decision assets before adding new activation layer."
   }
 };
 

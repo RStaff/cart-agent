@@ -1,10 +1,10 @@
 {
   "schema": "staffordos.outcome_scores.v1",
-  "generated_at": "2026-05-05T13:27:16.125Z",
+  "generated_at": "2026-05-05T13:34:14.660Z",
   "scores": [
     {
-      "outcome_id": "outcome_1777987636127",
-      "source_action_id": "primary_1777987632456",
+      "outcome_id": "outcome_1777988054662",
+      "source_action_id": "primary_1777988054415",
       "action_label": "Follow up on real ShopiFixer offer and close payment.",
       "score": 96,
       "status": "strong",

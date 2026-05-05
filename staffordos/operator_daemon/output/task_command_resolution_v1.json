@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T13:27:12.487Z",
-  "task_type": "security_hygiene_inventory",
+  "generated_at": "2026-05-05T13:34:14.444Z",
+  "task_type": "neck_router_inventory",
   "status": "resolved",
   "resolution": {
-    "task_type": "security_hygiene_inventory",
-    "command": "node staffordos/operator_daemon/write_security_hygiene_inventory_v1.mjs",
+    "task_type": "neck_router_inventory",
+    "command": "node staffordos/operator_daemon/write_neck_router_inventory_v1.mjs",
     "approval_level": "operator_safe",
-    "execution_class": "security_hygiene_inventory",
+    "execution_class": "inventory_audit",
     "system": "staffordos",
     "revenue_action": false,
-    "reason": "Inventory security/hygiene agents and dependency vulnerability surface. No external send."
+    "reason": "Inventory existing Neck/router/decision assets before adding new activation layer."
   },
   "failures": []
 }
