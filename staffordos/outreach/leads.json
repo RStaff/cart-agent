@@ -1,0 +1,26 @@
+[
+  {
+    "lead_id": "lead_001",
+    "created_at": "2026-05-05T00:00:00Z",
+    "status": "new",
+    "source": "manual_seed",
+    "company": "Example Shopify Store",
+    "website": "https://examplestore.com",
+    "contact": {
+      "name": "Unknown",
+      "email": "",
+      "phone": ""
+    },
+    "shopify_detected": true,
+    "signals": {
+      "conversion_issue": true,
+      "abandoned_cart_risk": true
+    },
+    "score": {
+      "icp_score": 0.6,
+      "confidence": 0.5
+    },
+    "next_action": "draft_followup",
+    "history": []
+  }
+]
