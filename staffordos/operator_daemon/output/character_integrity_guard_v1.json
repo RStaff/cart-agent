@@ -1,11 +1,11 @@
 {
   "schema": "staffordos.character_integrity_guard.v1",
-  "generated_at": "2026-05-05T20:39:46.691Z",
+  "generated_at": "2026-05-05T20:47:46.207Z",
   "mode": "normalize-task",
   "status": "passed",
   "input": {
-    "task_raw_length": 40,
-    "task_normalized": "add revenue conversion surface validator",
+    "task_raw_length": 37,
+    "task_normalized": "add audit result email handoff signal",
     "hidden_characters_detected": false
   },
   "proof": {

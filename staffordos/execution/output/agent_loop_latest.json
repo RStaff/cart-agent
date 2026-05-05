@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-05T20:39:47.232Z",
+  "generated_at": "2026-05-05T20:47:46.690Z",
   "command": "node staffordos/revenue_authority/revenue_conversion_surface_validator_v1.mjs",
   "operatorApproved": true,
   "qaProfile": "operator_runtime",
@@ -20,6 +20,6 @@
       "Score is below the automation threshold."
     ]
   },
-  "completed_at": "2026-05-05T20:39:47.366Z",
+  "completed_at": "2026-05-05T20:47:46.824Z",
   "exit_code": 0
 }

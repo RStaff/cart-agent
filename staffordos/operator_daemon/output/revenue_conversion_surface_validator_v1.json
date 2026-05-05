@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.revenue_conversion_surface_validator.v1",
-  "generated_at": "2026-05-05T20:39:47.360Z",
+  "generated_at": "2026-05-05T20:47:46.818Z",
   "status": "passed_with_warnings",
   "surfaces_checked": {
     "shopifixer": [
