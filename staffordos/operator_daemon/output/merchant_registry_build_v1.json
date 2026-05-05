@@ -1,0 +1,13 @@
+{
+  "schema": "staffordos.merchant_registry_build.v1",
+  "generated_at": "2026-05-05T13:14:01.590Z",
+  "status": "built",
+  "merchant_count": 1,
+  "output": "staffordos/commercial/merchant_registry_v1.json",
+  "proof": {
+    "built_from_canonical_leads": true,
+    "offer_boundary_applied": true,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}

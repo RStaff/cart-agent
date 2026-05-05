@@ -1,0 +1,55 @@
+{
+  "schema": "staffordos.merchant_registry.v1",
+  "generated_at": "2026-05-05T13:14:01.590Z",
+  "merchant_count": 1,
+  "merchants": [
+    {
+      "merchant_id": "merchant_001",
+      "lead_id": "lead_001",
+      "store_url": "https://examplestore.com",
+      "company": "Example Shopify Store",
+      "source": "manual_seed",
+      "current_stage": "send_ready",
+      "recommended_offer": "shopifixer",
+      "product_boundary": "shopifixer_only_first_touch",
+      "shopifixer_status": "not_started",
+      "abando_status": "not_started",
+      "contact": {
+        "name": "Unknown",
+        "email": "test@example.com",
+        "phone": ""
+      },
+      "signals": {
+        "conversion_issue": true,
+        "abandoned_cart_risk": true
+      },
+      "score": {
+        "icp_score": 0.6,
+        "confidence": 0.5
+      },
+      "next_best_action": "send_shopifixer_intro",
+      "revenue_events": [],
+      "history": [
+        {
+          "at": "2026-05-05T12:41:56.608Z",
+          "event": "operator_reviewed_enrichment_applied",
+          "sent_messages": false,
+          "revenue_action": false
+        },
+        {
+          "at": "2026-05-05T13:14:01.590Z",
+          "event": "merchant_registry_mapped",
+          "recommended_offer": "shopifixer",
+          "sent_messages": false,
+          "revenue_action": false
+        }
+      ]
+    }
+  ],
+  "proof": {
+    "built_from_canonical_leads": true,
+    "offer_boundary_applied": true,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}

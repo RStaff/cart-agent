@@ -22,7 +22,7 @@ const COMMANDS = {
     execution_class: "system_sync",
     system: "staffordos",
     revenue_action: false,
-    reason: "Sync system discovery + truth inventory state."
+    reason: "Sync system discovery and truth inventory state."
   },
 
   lead_registry_sync: {
@@ -42,7 +42,7 @@ const COMMANDS = {
     execution_class: "outreach_prep",
     system: "shopifixer",
     revenue_action: false,
-    reason: "Prepare follow-up message draft from canonical leads (NO sending)."
+    reason: "Prepare ShopiFixer follow-up message draft from canonical leads. No sending."
   },
 
   shopifixer_followup_approve: {
@@ -52,7 +52,7 @@ const COMMANDS = {
     execution_class: "approval_gate",
     system: "shopifixer",
     revenue_action: false,
-    reason: "Move drafted outreach into approved queue (NO sending)."
+    reason: "Move drafted outreach into approved queue. No sending."
   },
 
   send_readiness_gate: {
@@ -62,7 +62,7 @@ const COMMANDS = {
     execution_class: "readiness_gate",
     system: "shopifixer",
     revenue_action: false,
-    reason: "Evaluate approved outreach queue for send readiness (NO sending)."
+    reason: "Evaluate approved outreach queue for send readiness. No sending."
   },
 
   contact_completeness_gate: {
@@ -72,7 +72,7 @@ const COMMANDS = {
     execution_class: "contact_quality_gate",
     system: "shopifixer",
     revenue_action: false,
-    reason: "Route approved leads with missing contact data to enrichment_needed_queue (NO sending)."
+    reason: "Route approved leads with missing contact data to enrichment queue. No sending."
   },
 
   enrichment_task_packet: {
@@ -82,7 +82,7 @@ const COMMANDS = {
     execution_class: "enrichment_planning",
     system: "shopifixer",
     revenue_action: false,
-    reason: "Create contact enrichment task packet from enrichment_needed_queue (NO external lookup/send)."
+    reason: "Create contact enrichment task packet. No external lookup or sending."
   },
 
   operator_reviewed_enrichment_result: {
@@ -92,8 +92,18 @@ const COMMANDS = {
     execution_class: "lead_enrichment_writeback",
     system: "shopifixer",
     revenue_action: false,
-    reason: "Apply operator-reviewed contact enrichment to canonical leads.json (NO lookup/send)."
-  }
+    reason: "Apply operator-reviewed contact enrichment to canonical leads. No lookup or sending."
+  },
+
+  merchant_registry_build: {
+    task_type: "merchant_registry_build",
+    command: "node staffordos/commercial/build_merchant_registry_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "commercial_truth_mapping",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Map canonical leads into merchant registry with offer routing and lifecycle state."
+  },
 
   send_preview: {
     task_type: "send_preview",
@@ -101,7 +111,8 @@ const COMMANDS = {
     approval_level: "operator_safe",
     execution_class: "preview",
     system: "shopifixer",
-    revenue_action: false
+    revenue_action: false,
+    reason: "Create single-lead send preview. No sending."
   },
 
   send_confirm: {
@@ -110,18 +121,19 @@ const COMMANDS = {
     approval_level: "operator_explicit",
     execution_class: "confirmation",
     system: "shopifixer",
-    revenue_action: false
+    revenue_action: false,
+    reason: "Record operator confirmation. No sending."
   },
 
   send_execute: {
     task_type: "send_execute",
     command: "node staffordos/operator_daemon/write_send_execution_v1.mjs",
     approval_level: "operator_explicit",
-    execution_class: "execution",
+    execution_class: "controlled_execution",
     system: "shopifixer",
-    revenue_action: true
-  },
-
+    revenue_action: false,
+    reason: "Controlled simulated send execution. Real send remains false."
+  }
 };
 
 const resolved = COMMANDS[taskType];
@@ -133,34 +145,6 @@ const result = {
   status: resolved ? "resolved" : "unresolved",
   resolution: resolved || null,
   failures: []
-
-  send_preview: {
-    task_type: "send_preview",
-    command: "node staffordos/operator_daemon/write_send_preview_v1.mjs",
-    approval_level: "operator_safe",
-    execution_class: "preview",
-    system: "shopifixer",
-    revenue_action: false
-  },
-
-  send_confirm: {
-    task_type: "send_confirm",
-    command: "node staffordos/operator_daemon/write_send_confirmation_v1.mjs",
-    approval_level: "operator_explicit",
-    execution_class: "confirmation",
-    system: "shopifixer",
-    revenue_action: false
-  },
-
-  send_execute: {
-    task_type: "send_execute",
-    command: "node staffordos/operator_daemon/write_send_execution_v1.mjs",
-    approval_level: "operator_explicit",
-    execution_class: "execution",
-    system: "shopifixer",
-    revenue_action: true
-  },
-
 };
 
 if (!resolved) {

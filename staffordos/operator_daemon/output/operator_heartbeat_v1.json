@@ -1,12 +1,16 @@
 {
   "schema": "staffordos.operator_heartbeat.v1",
-  "generated_at": "2026-05-05T13:07:44.475Z",
+  "generated_at": "2026-05-05T13:14:01.303Z",
   "loop": 1,
-  "status": "error",
+  "status": "ok",
   "stages": [
     "preflight",
     "agent_validation",
-    "primary_action"
+    "primary_action",
+    "agent_loop",
+    "loop_d",
+    "runtime_sync",
+    "qa"
   ],
   "safe_mode": true,
   "auto_execute": false
