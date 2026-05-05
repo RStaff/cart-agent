@@ -94,6 +94,34 @@ const COMMANDS = {
     revenue_action: false,
     reason: "Apply operator-reviewed contact enrichment to canonical leads.json (NO lookup/send)."
   }
+
+  send_preview: {
+    task_type: "send_preview",
+    command: "node staffordos/operator_daemon/write_send_preview_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "preview",
+    system: "shopifixer",
+    revenue_action: false
+  },
+
+  send_confirm: {
+    task_type: "send_confirm",
+    command: "node staffordos/operator_daemon/write_send_confirmation_v1.mjs",
+    approval_level: "operator_explicit",
+    execution_class: "confirmation",
+    system: "shopifixer",
+    revenue_action: false
+  },
+
+  send_execute: {
+    task_type: "send_execute",
+    command: "node staffordos/operator_daemon/write_send_execution_v1.mjs",
+    approval_level: "operator_explicit",
+    execution_class: "execution",
+    system: "shopifixer",
+    revenue_action: true
+  },
+
 };
 
 const resolved = COMMANDS[taskType];
@@ -105,6 +133,34 @@ const result = {
   status: resolved ? "resolved" : "unresolved",
   resolution: resolved || null,
   failures: []
+
+  send_preview: {
+    task_type: "send_preview",
+    command: "node staffordos/operator_daemon/write_send_preview_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "preview",
+    system: "shopifixer",
+    revenue_action: false
+  },
+
+  send_confirm: {
+    task_type: "send_confirm",
+    command: "node staffordos/operator_daemon/write_send_confirmation_v1.mjs",
+    approval_level: "operator_explicit",
+    execution_class: "confirmation",
+    system: "shopifixer",
+    revenue_action: false
+  },
+
+  send_execute: {
+    task_type: "send_execute",
+    command: "node staffordos/operator_daemon/write_send_execution_v1.mjs",
+    approval_level: "operator_explicit",
+    execution_class: "execution",
+    system: "shopifixer",
+    revenue_action: true
+  },
+
 };
 
 if (!resolved) {

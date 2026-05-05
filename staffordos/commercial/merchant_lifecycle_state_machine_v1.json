@@ -1,0 +1,31 @@
+{
+  "schema": "staffordos.merchant_lifecycle_state_machine.v1",
+  "states": [
+    "lead_new",
+    "qualified",
+    "drafted",
+    "approved",
+    "send_ready",
+    "contacted",
+    "replied",
+    "shopifixer_paid",
+    "shopifixer_in_delivery",
+    "shopifixer_completed",
+    "abando_upsell_ready",
+    "abando_subscribed",
+    "closed_lost"
+  ],
+  "allowed_transitions": [
+    ["lead_new", "qualified"],
+    ["qualified", "drafted"],
+    ["drafted", "approved"],
+    ["approved", "send_ready"],
+    ["send_ready", "contacted"],
+    ["contacted", "replied"],
+    ["replied", "shopifixer_paid"],
+    ["shopifixer_paid", "shopifixer_in_delivery"],
+    ["shopifixer_in_delivery", "shopifixer_completed"],
+    ["shopifixer_completed", "abando_upsell_ready"],
+    ["abando_upsell_ready", "abando_subscribed"]
+  ]
+}

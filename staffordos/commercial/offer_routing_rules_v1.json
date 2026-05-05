@@ -1,0 +1,35 @@
+{
+  "schema": "staffordos.offer_routing_rules.v1",
+  "offers": {
+    "shopifixer": {
+      "type": "service",
+      "price": 950,
+      "positioning": "Diagnose and fix Shopify conversion and development issues.",
+      "boundary": "Do not sell Abando in first-touch ShopiFixer outreach."
+    },
+    "abando": {
+      "type": "subscription_product",
+      "price_monthly": 50,
+      "positioning": "Automated revenue recovery and customer re-engagement for Shopify merchants.",
+      "initial_wedge": "Checkout/cart recovery through email and SMS.",
+      "boundary": "Do not position Abando as the ShopiFixer audit or service."
+    }
+  },
+  "routing_rules": [
+    {
+      "rule_id": "route_general_conversion_or_dev_issue_to_shopifixer",
+      "if": ["conversion_issue", "dev_issue", "audit_needed"],
+      "then_offer": "shopifixer"
+    },
+    {
+      "rule_id": "route_recovery_demo_interest_to_abando",
+      "if": ["recovery_demo_requested", "email_sms_recovery_interest"],
+      "then_offer": "abando"
+    },
+    {
+      "rule_id": "upsell_abando_after_shopifixer_completion",
+      "if": ["shopifixer_completed", "recovery_gap_present"],
+      "then_offer": "abando"
+    }
+  ]
+}
