@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-05T14:49:44.150Z",
-  "command": "node staffordos/operator_daemon/write_system_brain_inventory_v1.mjs",
+  "generated_at": "2026-05-05T14:54:33.701Z",
+  "command": "node staffordos/operator_daemon/resolver_preflight_guard_v1.mjs resolver_preflight_guard_self_check",
   "operatorApproved": true,
   "qaProfile": "operator_runtime",
   "stages": [
@@ -20,6 +20,6 @@
       "Score is below the automation threshold."
     ]
   },
-  "completed_at": "2026-05-05T14:49:44.310Z",
+  "completed_at": "2026-05-05T14:54:33.918Z",
   "exit_code": 0
 }

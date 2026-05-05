@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T14:49:44.117Z",
-  "task_type": "system_brain_inventory",
+  "generated_at": "2026-05-05T14:54:33.883Z",
+  "task_type": "resolver_preflight_guard_self_check",
   "status": "resolved",
   "resolution": {
-    "task_type": "system_brain_inventory",
-    "command": "node staffordos/operator_daemon/write_system_brain_inventory_v1.mjs",
+    "task_type": "resolver_preflight_guard_self_check",
+    "command": "node staffordos/operator_daemon/resolver_preflight_guard_v1.mjs resolver_preflight_guard_self_check",
     "approval_level": "operator_safe",
-    "execution_class": "system_brain_inventory",
+    "execution_class": "resolver_integrity_guard",
     "system": "staffordos",
     "revenue_action": false,
-    "reason": "Inventory existing brain/decision/router/repair assets before building Option C."
+    "reason": "Validate resolver preflight guard exists and is callable."
   },
   "failures": []
 }

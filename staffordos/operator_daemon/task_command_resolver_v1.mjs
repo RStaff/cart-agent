@@ -313,6 +313,16 @@ const COMMANDS = {
     system: "staffordos",
     revenue_action: false,
     reason: "Inventory existing brain/decision/router/repair assets before building Option C."
+  },
+
+  resolver_preflight_guard_self_check: {
+    task_type: "resolver_preflight_guard_self_check",
+    command: "node staffordos/operator_daemon/resolver_preflight_guard_v1.mjs resolver_preflight_guard_self_check",
+    approval_level: "operator_safe",
+    execution_class: "resolver_integrity_guard",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Validate resolver preflight guard exists and is callable."
   }
 };
 

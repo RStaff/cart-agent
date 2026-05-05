@@ -57,6 +57,9 @@ else
   echo "⚠️ Operator env source not found: $OPERATOR_ENV_FILE"
 fi
 
+echo "===== RESOLVER PREFLIGHT GUARD ====="
+node staffordos/operator_daemon/resolver_preflight_guard_v1.mjs "$TASK"
+
 echo "===== VALIDATE RESOLVER ====="
 node --check staffordos/operator_daemon/task_command_resolver_v1.mjs
 node staffordos/operator_daemon/task_command_resolver_v1.mjs "$TASK"
