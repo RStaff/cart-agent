@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.approved_outreach_queue.v1",
-  "generated_at": "2026-05-05T14:19:16.447Z",
+  "generated_at": "2026-05-05T14:34:22.090Z",
   "source": "staffordos/operator_daemon/output/shopifixer_followup_draft_v1.json",
   "approved_count": 1,
   "items": [
@@ -22,7 +22,7 @@
       },
       "approval": {
         "status": "approved",
-        "approved_at": "2026-05-05T14:19:16.447Z",
+        "approved_at": "2026-05-05T14:34:22.090Z",
         "approved_by": "operator"
       }
     }
