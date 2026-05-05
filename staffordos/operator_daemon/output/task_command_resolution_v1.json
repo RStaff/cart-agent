@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T10:59:03.665Z",
+  "generated_at": "2026-05-05T11:02:10.700Z",
   "task_type": "lead_registry_sync",
   "status": "resolved",
   "resolution": {
