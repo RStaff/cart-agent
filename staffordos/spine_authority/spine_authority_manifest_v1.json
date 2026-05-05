@@ -1,0 +1,32 @@
+{
+  "schema": "staffordos.spine_authority_manifest.v1",
+  "generated_at": null,
+
+  "sources": {
+    "task_to_agent_map": "staffordos/agents/task_to_agent_map_v1.json",
+    "agent_registry": "staffordos/agents/agent_registry_v1.json",
+    "validator_map": "staffordos/operator_daemon/output/validator_map_refresh_v1.json",
+    "router_binding": "staffordos/operator_daemon/output/router_to_gated_runner_binding_v1.json",
+    "router_decision_binding": "staffordos/operator_daemon/output/router_decision_agent_binding_v1.json",
+    "system_map": "staffordos/system_map/system_map_truth_v1.json",
+    "policy": "staffordos/system_inventory/source_runtime_policy_register_v1.md"
+  },
+
+  "rules": [
+    "All task execution must resolve through task_command_resolver_v1.mjs",
+    "All execution must pass run_task_with_commit_gate_v1.sh",
+    "All tasks must declare required agents",
+    "All tasks must have a validator mapping",
+    "All tasks must produce an expected artifact",
+    "No task may bypass commit gate",
+    "No real send unless allowlist + explicit operator confirmation"
+  ],
+
+  "enforcement": {
+    "resolver_required": true,
+    "validator_required": true,
+    "commit_gate_required": true,
+    "agent_validation_required": true,
+    "expected_artifact_required": true
+  }
+}

@@ -29,6 +29,10 @@ cat > staffordos/operator_daemon/operator_daemon_config_v1.json <<JSON
 }
 JSON
 
+
+echo "===== SPINE SYNC VALIDATOR ====="
+node staffordos/spine_authority/spine_sync_validator_v1.mjs
+
 echo "===== ROUTER / DECISION / AGENT BINDING CHECK ====="
 if [ -f "staffordos/operator_daemon/output/router_decision_agent_binding_v1.json" ]; then
   node - <<'NODE'

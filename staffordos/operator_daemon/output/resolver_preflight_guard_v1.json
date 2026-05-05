@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.resolver_preflight_guard.v1",
-  "generated_at": "2026-05-05T17:32:04.069Z",
+  "generated_at": "2026-05-05T19:04:33.185Z",
   "task_type": "resolver_preflight_guard_self_check",
   "status": "passed",
   "checks": {

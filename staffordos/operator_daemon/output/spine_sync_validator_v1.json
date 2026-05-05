@@ -1,0 +1,12 @@
+{
+  "schema": "staffordos.spine_sync_validator.v1",
+  "generated_at": "2026-05-05T19:04:32.602Z",
+  "status": "passed",
+  "failures": [],
+  "proof": {
+    "validation_only": true,
+    "real_send": false,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}
