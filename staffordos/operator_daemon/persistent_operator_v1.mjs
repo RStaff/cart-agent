@@ -74,7 +74,7 @@ async function main() {
       if (config.auto_execute) {
         run(`node staffordos/execution/run_agent_loop.mjs "echo safe execution" --qa-profile=${config.qa_profile}`);
       } else {
-        run(`node staffordos/execution/run_agent_loop.mjs "node staffordos/operator_daemon/write_operator_observation_v1.mjs" --qa-profile=${config.qa_profile} --operator-approved`);
+        run(`node staffordos/execution/run_agent_loop.mjs "$(node staffordos/operator_daemon/task_command_resolver_v1.mjs ${config.task_type})" --qa-profile=${config.qa_profile} --operator-approved`);
       }
       stages.push("agent_loop");
 
