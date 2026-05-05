@@ -1,0 +1,27 @@
+{
+  "schema": "staffordos.operator_confirmed_real_send_manifest.v1",
+  "generated_at": "2026-05-05T14:08:29.505Z",
+  "status": "manifest_created_not_enabled",
+  "task_type": "operator_confirmed_real_send",
+  "requirements_before_enablement": [
+    "real SMTP dry-run passes",
+    "product_boundary_validator passes",
+    "real_smtp_send_gate status is smtp_ready_but_send_not_executed",
+    "recipient is not placeholder/test@example.com",
+    "operator provides explicit one-time confirmation",
+    "commit gate has a narrow allowlist for this task only",
+    "send ledger writes immutable proof"
+  ],
+  "hard_limits": {
+    "max_leads": 1,
+    "batch_send": false,
+    "auto_select_allowed": false,
+    "requires_operator_explicit": true
+  },
+  "proof": {
+    "manifest_only": true,
+    "real_send": false,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}

@@ -263,6 +263,16 @@ const COMMANDS = {
     system: "shopifixer",
     revenue_action: false,
     reason: "Simulate single-lead send execution. No real SMTP send."
+  },
+
+  operator_confirmed_real_send_manifest: {
+    task_type: "operator_confirmed_real_send_manifest",
+    command: "node staffordos/operator_daemon/write_operator_confirmed_real_send_manifest_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "real_send_gate_manifest",
+    system: "shopifixer",
+    revenue_action: false,
+    reason: "Create future real-send gate manifest only. Does not enable or perform real send."
   }
 };
 
