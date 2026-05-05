@@ -1,0 +1,16 @@
+{
+  "schema": "staffordos.operator_observation.v1",
+  "generated_at": "2026-05-05T10:48:13.327Z",
+  "system": "staffordos",
+  "mode": "safe_observation",
+  "status": "observed",
+  "purpose": "Persistent operator safe execution proof",
+  "loops_observed": 3,
+  "proof": {
+    "command_was_real": true,
+    "command_was_safe": true,
+    "shell_command_exists": true,
+    "spine_execution_path": "run_agent_loop",
+    "no_revenue_action_taken": true
+  }
+}
