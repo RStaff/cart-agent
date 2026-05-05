@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T14:19:28.515Z",
-  "task_type": "send_readiness_gate",
+  "generated_at": "2026-05-05T14:19:40.713Z",
+  "task_type": "real_smtp_dry_run_actual",
   "status": "resolved",
   "resolution": {
-    "task_type": "send_readiness_gate",
-    "command": "node staffordos/operator_daemon/write_send_readiness_gate_v1.mjs",
+    "task_type": "real_smtp_dry_run_actual",
+    "command": "node staffordos/operator_daemon/write_real_smtp_dry_run_actual_v1.mjs",
     "approval_level": "operator_safe",
-    "execution_class": "readiness_gate",
+    "execution_class": "smtp_actual_sender_dry_run",
     "system": "shopifixer",
     "revenue_action": false,
-    "reason": "Evaluate approved outreach queue for send readiness. No sending."
+    "reason": "Validate actual SMTP sender module and target without sending."
   },
   "failures": []
 }
