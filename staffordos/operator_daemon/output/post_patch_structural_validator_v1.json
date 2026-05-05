@@ -1,10 +1,11 @@
 {
   "schema": "staffordos.post_patch_structural_validator.v1",
-  "generated_at": "2026-05-05T19:04:43.578Z",
+  "generated_at": "2026-05-05T19:21:14.538Z",
   "task_type": "resolver_preflight_guard_self_check",
   "expected_artifact": "staffordos/operator_daemon/output/resolver_preflight_guard_v1.json",
   "status": "passed",
   "checks": {
+    "hidden_character_check": true,
     "task_type_present": true,
     "expected_artifact_present": true,
     "resolver_file_exists": true,

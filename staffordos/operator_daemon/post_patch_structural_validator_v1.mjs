@@ -37,7 +37,20 @@ const canonicalAllowlistMatches = [
   ...commitGate.matchAll(/ALLOWLISTED_REAL_SEND_RUNNER_CHECK|NARROW REAL SEND ALLOWLIST|real-send allowlist/gi)
 ].length;
 
+const hiddenCharacterTargets = [
+  files.resolver,
+  files.runner,
+  files.commitGate,
+  "staffordos/guards/character_integrity_guard_v1.mjs"
+];
+
+const hiddenCharacterHits = hiddenCharacterTargets
+  .filter(Boolean)
+  .filter((p) => existsSync(p))
+  .filter((p) => /[\u00a0\u200b\u200c\u200d\ufeff]/.test(read(p)));
+
 const checks = {
+  hidden_character_check: hiddenCharacterHits.length === 0,
   task_type_present: Boolean(taskType),
   expected_artifact_present: Boolean(expectedArtifact),
   resolver_file_exists: existsSync(files.resolver),
@@ -76,6 +89,10 @@ const failures = [];
 for (const [key, value] of Object.entries(checks)) {
   if (key === "commit_gate_forbidden_check_count") continue;
   if (value !== true) failures.push(key);
+}
+
+if (hiddenCharacterHits.length) {
+  failures.push(`hidden_characters_detected:${hiddenCharacterHits.join(",")}`);
 }
 
 const result = {

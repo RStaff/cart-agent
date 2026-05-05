@@ -2,6 +2,10 @@
 set -euo pipefail
 
 TASK="${1:?Usage: run_task_with_commit_gate_v1.sh <task_type> <expected_artifact> <commit_message>}"
+
+echo "===== CHARACTER INTEGRITY GUARD ====="
+TASK="$(node staffordos/guards/character_integrity_guard_v1.mjs normalize-task "$TASK")"
+echo "normalized task: $TASK"
 EXPECTED_ARTIFACT="${2:?Missing expected artifact path}"
 COMMIT_MESSAGE="${3:?Missing commit message}"
 

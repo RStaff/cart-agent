@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-05T19:04:33.085Z",
+  "generated_at": "2026-05-05T19:21:04.045Z",
   "status": "PASSED",
   "command": "node staffordos/operator_daemon/resolver_preflight_guard_v1.mjs resolver_preflight_guard_self_check",
   "inferred_system_id": "staffordos",

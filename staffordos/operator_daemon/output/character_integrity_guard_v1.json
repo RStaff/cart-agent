@@ -1,0 +1,17 @@
+{
+  "schema": "staffordos.character_integrity_guard.v1",
+  "generated_at": "2026-05-05T19:21:03.502Z",
+  "mode": "normalize-task",
+  "status": "normalized_hidden_characters",
+  "input": {
+    "task_raw_length": 37,
+    "task_normalized": "resolver_preflight_guard_self_check",
+    "hidden_characters_detected": true
+  },
+  "proof": {
+    "character_integrity_checked": true,
+    "real_send": false,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}
