@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T14:04:35.364Z",
-  "task_type": "real_smtp_dry_run",
+  "generated_at": "2026-05-05T14:08:16.903Z",
+  "task_type": "simulated_send_execution",
   "status": "resolved",
   "resolution": {
-    "task_type": "real_smtp_dry_run",
-    "command": "node staffordos/operator_daemon/write_real_smtp_dry_run_v1.mjs",
-    "approval_level": "operator_safe",
-    "execution_class": "smtp_dry_run",
+    "task_type": "simulated_send_execution",
+    "command": "node staffordos/operator_daemon/write_simulated_send_execution_v1.mjs",
+    "approval_level": "operator_explicit",
+    "execution_class": "smtp_simulated_execution",
     "system": "shopifixer",
     "revenue_action": false,
-    "reason": "Validate SMTP send path without executing real send."
+    "reason": "Simulate single-lead send execution. No real SMTP send."
   },
   "failures": []
 }

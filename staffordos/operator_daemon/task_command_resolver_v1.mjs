@@ -253,6 +253,16 @@ const COMMANDS = {
     system: "shopifixer",
     revenue_action: false,
     reason: "Validate SMTP send path without executing real send."
+  },
+
+  simulated_send_execution: {
+    task_type: "simulated_send_execution",
+    command: "node staffordos/operator_daemon/write_simulated_send_execution_v1.mjs",
+    approval_level: "operator_explicit",
+    execution_class: "smtp_simulated_execution",
+    system: "shopifixer",
+    revenue_action: false,
+    reason: "Simulate single-lead send execution. No real SMTP send."
   }
 };
 

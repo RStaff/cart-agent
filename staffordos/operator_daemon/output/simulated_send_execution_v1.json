@@ -1,0 +1,22 @@
+{
+  "schema": "staffordos.simulated_send_execution.v1",
+  "generated_at": "2026-05-05T14:08:17.062Z",
+  "execution": {
+    "mode": "single_lead_only",
+    "lead_id": "lead_001",
+    "channel": "email",
+    "send_attempted": false,
+    "send_status": "simulated_success"
+  },
+  "constraints": {
+    "max_leads": 1,
+    "operator_confirmed": true,
+    "batch_send": false
+  },
+  "proof": {
+    "simulated_only": true,
+    "real_send": false,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}
