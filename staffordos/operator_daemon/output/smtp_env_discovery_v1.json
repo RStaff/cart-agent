@@ -1,0 +1,217 @@
+{
+  "schema": "staffordos.smtp_env_discovery.v1",
+  "generated_at": "2026-05-05T13:52:21.939Z",
+  "status": "smtp_env_not_visible_to_operator",
+  "current_process_env_presence_without_values": {
+    "SMTP_HOST": false,
+    "SMTP_PORT": false,
+    "SMTP_USER": false,
+    "SMTP_PASS": false,
+    "FROM_EMAIL": false,
+    "DEFAULT_FROM": false,
+    "SMTP_FROM": false
+  },
+  "smtp_ready_minimum": false,
+  "config_file_candidates_without_secret_values": [
+    {
+      "path": ".env",
+      "mentions_smtp_keys": true,
+      "keys_mentioned": [
+        "FROM_EMAIL",
+        "DEFAULT_FROM"
+      ]
+    },
+    {
+      "path": "scripts/fuse_ai_mail_and_test.sh",
+      "mentions_smtp_keys": false,
+      "keys_mentioned": []
+    },
+    {
+      "path": "scripts/leads/run_gmail_reply_sync.mjs",
+      "mentions_smtp_keys": false,
+      "keys_mentioned": []
+    },
+    {
+      "path": "staffordos/dev/.env.abando.local",
+      "mentions_smtp_keys": true,
+      "keys_mentioned": [
+        "SMTP_HOST",
+        "SMTP_PORT",
+        "SMTP_USER",
+        "SMTP_PASS",
+        "FROM_EMAIL"
+      ]
+    },
+    {
+      "path": "staffordos/integrations/gmail/fetch_github_notifications.mjs",
+      "mentions_smtp_keys": false,
+      "keys_mentioned": []
+    },
+    {
+      "path": "staffordos/integrations/gmail/parse_github_email.mjs",
+      "mentions_smtp_keys": false,
+      "keys_mentioned": []
+    },
+    {
+      "path": "staffordos/integrations/gmail/process_github_replies.mjs",
+      "mentions_smtp_keys": false,
+      "keys_mentioned": []
+    },
+    {
+      "path": "staffordos/leads/hot_followup_auto_sender_v1.mjs",
+      "mentions_smtp_keys": true,
+      "keys_mentioned": [
+        "FROM_EMAIL",
+        "DEFAULT_FROM"
+      ]
+    },
+    {
+      "path": "staffordos/operator_daemon/output/real_smtp_send_gate_v1.json",
+      "mentions_smtp_keys": true,
+      "keys_mentioned": [
+        "SMTP_HOST",
+        "SMTP_PORT",
+        "SMTP_USER",
+        "SMTP_PASS",
+        "FROM_EMAIL",
+        "DEFAULT_FROM",
+        "SMTP_FROM"
+      ]
+    },
+    {
+      "path": "staffordos/operator_daemon/write_real_smtp_send_gate_v1.mjs",
+      "mentions_smtp_keys": true,
+      "keys_mentioned": [
+        "SMTP_HOST",
+        "SMTP_PORT",
+        "SMTP_USER",
+        "SMTP_PASS",
+        "FROM_EMAIL",
+        "DEFAULT_FROM",
+        "SMTP_FROM"
+      ]
+    },
+    {
+      "path": "staffordos/operator_daemon/write_smtp_env_discovery_v1.mjs",
+      "mentions_smtp_keys": true,
+      "keys_mentioned": [
+        "SMTP_HOST",
+        "SMTP_PORT",
+        "SMTP_USER",
+        "SMTP_PASS",
+        "FROM_EMAIL",
+        "DEFAULT_FROM",
+        "SMTP_FROM"
+      ]
+    },
+    {
+      "path": "web/.env",
+      "mentions_smtp_keys": true,
+      "keys_mentioned": [
+        "FROM_EMAIL",
+        "DEFAULT_FROM"
+      ]
+    },
+    {
+      "path": "web/lib/mailer.js",
+      "mentions_smtp_keys": false,
+      "keys_mentioned": []
+    },
+    {
+      "path": "web/prisma/migrations/20250903094948_email_queue/migration.sql",
+      "mentions_smtp_keys": false,
+      "keys_mentioned": []
+    },
+    {
+      "path": "web/prisma/migrations/20250903111834_email_queue_rel_fix/migration.sql",
+      "mentions_smtp_keys": false,
+      "keys_mentioned": []
+    },
+    {
+      "path": "web/prisma/migrations/20250904110018_emailqueue_unique_cartid_status/migration.sql",
+      "mentions_smtp_keys": false,
+      "keys_mentioned": []
+    },
+    {
+      "path": "web/prisma/migrations/20250904112517_emailqueue_partial_unique/migration.sql",
+      "mentions_smtp_keys": false,
+      "keys_mentioned": []
+    },
+    {
+      "path": "web/prisma/migrations/20250904121850_emailqueue_attachments_json/migration.sql",
+      "mentions_smtp_keys": false,
+      "keys_mentioned": []
+    },
+    {
+      "path": "web/prisma/migrations/20250904234117_emailqueue_attachments_json_fix/migration.sql",
+      "mentions_smtp_keys": false,
+      "keys_mentioned": []
+    },
+    {
+      "path": "web/prisma/migrations/20250904234317_emailqueue_attachments_json_fix/migration.sql",
+      "mentions_smtp_keys": false,
+      "keys_mentioned": []
+    },
+    {
+      "path": "web/src/lib/abandoRecoverySender.js",
+      "mentions_smtp_keys": true,
+      "keys_mentioned": [
+        "SMTP_HOST",
+        "SMTP_PORT",
+        "SMTP_USER",
+        "SMTP_PASS",
+        "FROM_EMAIL"
+      ]
+    },
+    {
+      "path": "web/src/lib/email-template.js",
+      "mentions_smtp_keys": false,
+      "keys_mentioned": []
+    },
+    {
+      "path": "web/src/lib/emailSender.js",
+      "mentions_smtp_keys": true,
+      "keys_mentioned": [
+        "SMTP_HOST",
+        "SMTP_PORT",
+        "SMTP_USER",
+        "SMTP_PASS",
+        "FROM_EMAIL"
+      ]
+    },
+    {
+      "path": "web/src/lib/mailer.js",
+      "mentions_smtp_keys": true,
+      "keys_mentioned": [
+        "DEFAULT_FROM"
+      ]
+    },
+    {
+      "path": "web/src/lib/queue-email.js",
+      "mentions_smtp_keys": false,
+      "keys_mentioned": []
+    },
+    {
+      "path": "web/src/lib/renderAbandonedEmail.js",
+      "mentions_smtp_keys": false,
+      "keys_mentioned": []
+    },
+    {
+      "path": "web/src/lib/smsSender.js",
+      "mentions_smtp_keys": false,
+      "keys_mentioned": []
+    }
+  ],
+  "binding_recommendation": {
+    "action": "bind_operator_daemon_to_existing_env_source",
+    "reason": "SMTP may be configured elsewhere, but current StaffordOS operator process cannot see required env vars.",
+    "next_task": "smtp_env_binding_patch"
+  },
+  "proof": {
+    "did_not_print_secret_values": true,
+    "discovery_only": true,
+    "real_send": false,
+    "sent_messages": false,
+    "revenue_action": false
+  }
+}

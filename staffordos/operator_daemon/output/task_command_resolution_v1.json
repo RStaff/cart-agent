@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T13:49:41.205Z",
-  "task_type": "real_smtp_send_gate",
+  "generated_at": "2026-05-05T13:52:21.722Z",
+  "task_type": "smtp_env_discovery",
   "status": "resolved",
   "resolution": {
-    "task_type": "real_smtp_send_gate",
-    "command": "node staffordos/operator_daemon/write_real_smtp_send_gate_v1.mjs",
-    "approval_level": "operator_explicit",
-    "execution_class": "smtp_send_readiness_gate",
-    "system": "shopifixer",
+    "task_type": "smtp_env_discovery",
+    "command": "node staffordos/operator_daemon/write_smtp_env_discovery_v1.mjs",
+    "approval_level": "operator_safe",
+    "execution_class": "smtp_config_discovery",
+    "system": "staffordos",
     "revenue_action": false,
-    "reason": "Evaluate real SMTP readiness without sending."
+    "reason": "Discover SMTP env/config binding without printing secrets or sending."
   },
   "failures": []
 }

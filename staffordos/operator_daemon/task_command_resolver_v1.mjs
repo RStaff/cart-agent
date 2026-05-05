@@ -223,6 +223,16 @@ const COMMANDS = {
     system: "shopifixer",
     revenue_action: false,
     reason: "Evaluate real SMTP readiness without sending."
+  },
+
+  smtp_env_discovery: {
+    task_type: "smtp_env_discovery",
+    command: "node staffordos/operator_daemon/write_smtp_env_discovery_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "smtp_config_discovery",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Discover SMTP env/config binding without printing secrets or sending."
   }
 };
 
