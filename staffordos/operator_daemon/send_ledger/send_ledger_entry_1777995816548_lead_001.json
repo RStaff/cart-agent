@@ -1,0 +1,21 @@
+{
+  "schema": "staffordos.send_ledger_entry.v1",
+  "sent_at": "2026-05-05T15:43:34.870Z",
+  "mode": "operator_controlled_test_send",
+  "lead_id": "lead_001",
+  "merchant_id": null,
+  "recipient": "rossstafford1@gmail.com",
+  "subject": "[StaffordOS Test Send] Quick follow-up on Example Shopify Store",
+  "provider": "smtp",
+  "provider_message_id": "<962a5884-6be6-b43b-8d8e-8164934ff67d@staffordmedia.ai>",
+  "operator_confirmation_id": "operator_confirmed_1777995816548",
+  "product_boundary_version": "shopifixer_only_first_touch",
+  "proof": {
+    "operator_controlled_test_send": true,
+    "max_leads": 1,
+    "batch_send": false,
+    "real_send": true,
+    "sent_messages": true,
+    "revenue_action": false
+  }
+}

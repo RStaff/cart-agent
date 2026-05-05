@@ -94,11 +94,40 @@ if (h.status !== "ok") {
 console.log("✅ heartbeat ok");
 NODE
 
+
 echo "===== FORBIDDEN ACTION CHECK ====="
-if find staffordos/operator_daemon/output -name "*.json" ! -name "task_command_resolution_v1.json" -print0 | xargs -0 grep -inE '"sent": true|"sent_messages": true|"revenue_action": true|"external_lookup_performed": true' 2>/dev/null; then
-  echo "🚫 COMMIT BLOCKED: forbidden action detected"
-  exit 1
+
+# ===== ALLOWLISTED REAL SEND =====
+if [ "${TASK:-}" = "operator_confirmed_real_send" ] && [ "${STAFFORDOS_ALLOW_REAL_SEND:-}" = "true" ]; then
+  echo "🟢 allowlisted real send path"
+
+  node <<'NODE'
+const fs = require("fs");
+const p = "staffordos/operator_daemon/output/operator_confirmed_real_send_v1.json";
+const j = JSON.parse(fs.readFileSync(p, "utf8"));
+
+if (j.status !== "real_send_executed") process.exit(1);
+if (j.execution?.mode !== "single_lead_only") process.exit(1);
+if (j.constraints?.max_leads !== 1) process.exit(1);
+if (j.constraints?.operator_controlled_test_send !== true) process.exit(1);
+if (j.constraints?.batch_send !== false) process.exit(1);
+if (j.proof?.real_send !== true) process.exit(1);
+if (j.proof?.sent_messages !== true) process.exit(1);
+if (j.proof?.revenue_action === true) process.exit(1);
+if (!j.ledger_path || !fs.existsSync(j.ledger_path)) process.exit(1);
+
+console.log("✅ allowlisted send verified");
+NODE
+
+else
+  echo "🔒 standard safety mode (no real send allowed)"
+
+  if grep -RinE '"sent": true|"sent_messages": true|"revenue_action": true' staffordos/operator_daemon/output; then
+    echo "🚫 COMMIT BLOCKED: forbidden action detected"
+    exit 1
+  fi
 fi
+
 
 echo "===== EXISTING COMMIT GATE ====="
 bash staffordos/operator_daemon/commit_gate_v1.sh

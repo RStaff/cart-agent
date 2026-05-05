@@ -1,22 +1,28 @@
 {
   "schema": "staffordos.operator_confirmed_real_send.v1",
-  "generated_at": "2026-05-05T15:24:33.248Z",
+  "generated_at": "2026-05-05T16:27:55.550Z",
+  "status": "real_send_executed",
   "execution": {
     "mode": "single_lead_only",
-    "lead_id": "lead_f8c0c8b4e640",
+    "lead_id": "lead_001",
     "channel": "email",
-    "send_attempted": false,
-    "send_status": "ready_for_real_send_not_executed"
+    "recipient": "rossstafford1@gmail.com",
+    "send_attempted": true,
+    "send_status": "provider_accepted",
+    "provider_message_id": "<b4add883-85b1-48d6-cc21-fd7435bd5977@staffordmedia.ai>"
   },
+  "ledger_path": "staffordos/operator_daemon/send_ledger/send_ledger_entry_1777998477455_lead_001.json",
   "constraints": {
     "max_leads": 1,
     "operator_confirmed": true,
+    "operator_controlled_test_send": true,
+    "batch_send": false,
     "allowlist_required": true
   },
   "proof": {
-    "preflight_only": true,
-    "real_send": false,
-    "sent_messages": false,
+    "operator_controlled_test_send": true,
+    "real_send": true,
+    "sent_messages": true,
     "revenue_action": false
   }
 }

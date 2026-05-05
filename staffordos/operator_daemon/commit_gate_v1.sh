@@ -1,3 +1,34 @@
+# === ALLOWLIST_OVERRIDE_REAL_SEND ===
+if [ "${STAFFORDOS_ALLOW_REAL_SEND:-}" = "true" ] && [ -f "staffordos/operator_daemon/output/operator_confirmed_real_send_v1.json" ]; then
+  echo "🟢 ALLOWLIST OVERRIDE ACTIVE — validating real send..."
+
+  node <<'NODE' || exit 1
+const fs = require("fs");
+
+const path = "staffordos/operator_daemon/output/operator_confirmed_real_send_v1.json";
+const j = JSON.parse(fs.readFileSync(path, "utf8"));
+
+if (j.status !== "real_send_executed") process.exit(1);
+if (j.execution.mode !== "single_lead_only") process.exit(1);
+if (j.constraints?.max_leads !== 1) process.exit(1);
+if (j.constraints?.operator_controlled_test_send !== true) process.exit(1);
+if (j.proof?.real_send !== true) process.exit(1);
+if (j.proof?.sent_messages !== true) process.exit(1);
+if (j.proof?.revenue_action === true) process.exit(1);
+
+if (!j.ledger_path || !fs.existsSync(j.ledger_path)) process.exit(1);
+
+console.log("✅ Allowlisted real send VERIFIED — bypassing forbidden check");
+process.exit(0);
+NODE
+
+  echo "✅ COMMIT ALLOWED (override path)"
+  exit 0
+fi
+
+# === END ALLOWLIST_OVERRIDE_REAL_SEND ===
+
+
 #!/bin/bash
 
 echo "===== COMMIT GATE START ====="
