@@ -1,0 +1,46 @@
+{
+  "schema": "staffordos.surface_registry.v1",
+  "generated_at": "",
+  "surfaces": {
+    "abando_marketing": {
+      "host": "abando.ai",
+      "path": "/",
+      "type": "marketing",
+      "status": "active"
+    },
+    "abando_install": {
+      "host": "abando.ai",
+      "path": "/install/shopify",
+      "type": "conversion_entry",
+      "status": "active"
+    },
+    "abando_dashboard": {
+      "host": "app.abando.ai",
+      "path": "/dashboard",
+      "type": "merchant_surface",
+      "status": "fragmented"
+    },
+    "abando_recovery_engine": {
+      "host": "app.abando.ai",
+      "path": "/experience",
+      "type": "customer_surface",
+      "status": "missing"
+    },
+    "abando_api": {
+      "host": "api.abando.ai",
+      "routes": [
+        "/api/recovery-actions/send-live-test",
+        "/api/recovery/return",
+        "/api/experience/status"
+      ],
+      "type": "engine",
+      "status": "working"
+    },
+    "shopifixer_entry": {
+      "host": "staffordmedia.com",
+      "path": "/shopifixer",
+      "type": "lead_entry",
+      "status": "active"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "schema": "staffordos.surface_binding_runner.v1",
+  "generated_at": "2026-05-06T01:36:00.462Z",
+  "status": "passed",
+  "bindings": [
+    {
+      "surface": "abando_marketing",
+      "path": "/",
+      "status": "active"
+    },
+    {
+      "surface": "abando_install",
+      "path": "/install/shopify",
+      "status": "active"
+    },
+    {
+      "surface": "abando_dashboard",
+      "path": "/dashboard",
+      "status": "fragmented"
+    },
+    {
+      "surface": "abando_recovery_engine",
+      "path": "/experience",
+      "status": "missing"
+    },
+    {
+      "surface": "abando_api",
+      "path": [
+        "/api/recovery-actions/send-live-test",
+        "/api/recovery/return",
+        "/api/experience/status"
+      ],
+      "status": "working"
+    },
+    {
+      "surface": "shopifixer_entry",
+      "path": "/shopifixer",
+      "status": "active"
+    }
+  ],
+  "failures": []
+}

@@ -5,7 +5,27 @@ const outDir = "staffordos/operator_daemon/output";
 mkdirSync(outDir, { recursive: true });
 
 const COMMANDS = {
-  revenue_conversion_surface_validator: {
+  
+  surface_validator: {
+    task_type: "surface_validator",
+    command: "node staffordos/system_map/surface_validator_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "system_validation",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Validate surface registry alignment"
+  },
+
+  surface_binding_runner: {
+    task_type: "surface_binding_runner",
+    command: "node staffordos/system_map/surface_binding_runner_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "system_binding",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Bind surface registry to runtime layer"
+  },
+revenue_conversion_surface_validator: {
     task_type: "revenue_conversion_surface_validator",
     command: "node staffordos/revenue_authority/revenue_conversion_surface_validator_v1.mjs",
     approval_level: "operator_safe",

@@ -1,24 +1,30 @@
 {
-  "generated_at": "2026-05-05T20:50:02.875Z",
+  "generated_at": "2026-05-06T01:36:00.366Z",
   "status": "PASSED",
-  "command": "node staffordos/revenue_authority/revenue_conversion_surface_validator_v1.mjs",
-  "inferred_system_id": "revenue",
-  "system_name": "Revenue Path System",
-  "system_status": "NOT_PROVEN",
-  "next_slice": "first_paid_customer_proof_v1",
+  "command": "node staffordos/system_map/surface_binding_runner_v1.mjs",
+  "inferred_system_id": "staffordos",
+  "system_name": "StaffordOS Core",
+  "system_status": "PARTIAL_REAL",
+  "next_slice": "multi-system_execution_orchestration_v1",
   "owners": [
     "pm",
     "architect",
     "executor",
     "qa",
-    "revenue"
+    "truth"
   ],
   "proof_required": [
-    "user_pays",
-    "payment_recorded",
-    "service_triggered",
-    "delivery_completed"
+    "execution_gate_enforced",
+    "truth_map_verified",
+    "guardrails_enforced",
+    "proof_written",
+    "proof_tracked"
   ],
-  "current_proof": [],
+  "current_proof": [
+    "execution_gate",
+    "truth_map_preflight",
+    "guardrails",
+    "proof_register_writeback"
+  ],
   "failures": []
 }

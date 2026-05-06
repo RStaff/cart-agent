@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-05T20:50:02.805Z",
-  "task_type": "revenue_conversion_surface_validator",
+  "generated_at": "2026-05-06T01:36:00.308Z",
+  "task_type": "surface_binding_runner",
   "status": "resolved",
   "resolution": {
-    "task_type": "revenue_conversion_surface_validator",
-    "command": "node staffordos/revenue_authority/revenue_conversion_surface_validator_v1.mjs",
+    "task_type": "surface_binding_runner",
+    "command": "node staffordos/system_map/surface_binding_runner_v1.mjs",
     "approval_level": "operator_safe",
-    "execution_class": "revenue_conversion_surface_validation",
+    "execution_class": "system_binding",
     "system": "staffordos",
     "revenue_action": false,
-    "reason": "Validate user-facing revenue conversion surfaces without payment, send, or external actions."
+    "reason": "Bind surface registry to runtime layer"
   },
   "failures": []
 }

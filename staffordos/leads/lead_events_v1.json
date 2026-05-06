@@ -9283,6 +9283,426 @@
       "type": "lead_registry_updated",
       "source": ".tmp/send_console_data.json",
       "created_at": "2026-05-05T20:50:03.081Z"
+    },
+    {
+      "id": "event_1778016909214_0",
+      "lead_id": "lead_04826b2d41a8",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-05T21:35:09.214Z"
+    },
+    {
+      "id": "event_1778016909214_1",
+      "lead_id": "lead_260c01e80ad4",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-05T21:35:09.214Z"
+    },
+    {
+      "id": "event_1778016909214_2",
+      "lead_id": "lead_52c0b97afddf",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-05T21:35:09.214Z"
+    },
+    {
+      "id": "event_1778016909214_3",
+      "lead_id": "lead_5cc9f25726db",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-05T21:35:09.214Z"
+    },
+    {
+      "id": "event_1778016909214_4",
+      "lead_id": "lead_74d7e42f2f9c",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-05T21:35:09.214Z"
+    },
+    {
+      "id": "event_1778016909214_5",
+      "lead_id": "lead_7ed37cb5a539",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-05T21:35:09.214Z"
+    },
+    {
+      "id": "event_1778016909214_6",
+      "lead_id": "lead_85efb2eed600",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-05T21:35:09.214Z"
+    },
+    {
+      "id": "event_1778016909214_7",
+      "lead_id": "lead_a07a3f8ca2d9",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-05T21:35:09.214Z"
+    },
+    {
+      "id": "event_1778016909214_8",
+      "lead_id": "lead_adb16ac152ad",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-05T21:35:09.214Z"
+    },
+    {
+      "id": "event_1778016909214_9",
+      "lead_id": "lead_b6ba7fddc12a",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-05T21:35:09.214Z"
+    },
+    {
+      "id": "event_1778016909214_10",
+      "lead_id": "lead_e1052635ec21",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-05T21:35:09.214Z"
+    },
+    {
+      "id": "event_1778016909214_11",
+      "lead_id": "lead_f7f585ccc1f2",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-05T21:35:09.214Z"
+    },
+    {
+      "id": "event_1778016909214_12",
+      "lead_id": "lead_f8c0c8b4e640",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-05T21:35:09.214Z"
+    },
+    {
+      "id": "event_1778016909214_13",
+      "lead_id": "lead_fb5175137c0d",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-05T21:35:09.214Z"
+    },
+    {
+      "id": "event_1778016909214_14",
+      "lead_id": "lead_fd24790d2d98",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-05T21:35:09.214Z"
+    },
+    {
+      "id": "event_1778029994641_0",
+      "lead_id": "lead_04826b2d41a8",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:13:14.641Z"
+    },
+    {
+      "id": "event_1778029994641_1",
+      "lead_id": "lead_260c01e80ad4",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:13:14.641Z"
+    },
+    {
+      "id": "event_1778029994641_2",
+      "lead_id": "lead_52c0b97afddf",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:13:14.641Z"
+    },
+    {
+      "id": "event_1778029994641_3",
+      "lead_id": "lead_5cc9f25726db",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:13:14.641Z"
+    },
+    {
+      "id": "event_1778029994641_4",
+      "lead_id": "lead_74d7e42f2f9c",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:13:14.641Z"
+    },
+    {
+      "id": "event_1778029994641_5",
+      "lead_id": "lead_7ed37cb5a539",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:13:14.641Z"
+    },
+    {
+      "id": "event_1778029994641_6",
+      "lead_id": "lead_85efb2eed600",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:13:14.641Z"
+    },
+    {
+      "id": "event_1778029994641_7",
+      "lead_id": "lead_a07a3f8ca2d9",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:13:14.641Z"
+    },
+    {
+      "id": "event_1778029994641_8",
+      "lead_id": "lead_adb16ac152ad",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:13:14.641Z"
+    },
+    {
+      "id": "event_1778029994641_9",
+      "lead_id": "lead_b6ba7fddc12a",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:13:14.641Z"
+    },
+    {
+      "id": "event_1778029994641_10",
+      "lead_id": "lead_e1052635ec21",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:13:14.641Z"
+    },
+    {
+      "id": "event_1778029994641_11",
+      "lead_id": "lead_f7f585ccc1f2",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:13:14.641Z"
+    },
+    {
+      "id": "event_1778029994641_12",
+      "lead_id": "lead_f8c0c8b4e640",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:13:14.641Z"
+    },
+    {
+      "id": "event_1778029994641_13",
+      "lead_id": "lead_fb5175137c0d",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:13:14.641Z"
+    },
+    {
+      "id": "event_1778029994641_14",
+      "lead_id": "lead_fd24790d2d98",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:13:14.641Z"
+    },
+    {
+      "id": "event_1778031228531_0",
+      "lead_id": "lead_04826b2d41a8",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:33:48.530Z"
+    },
+    {
+      "id": "event_1778031228531_1",
+      "lead_id": "lead_260c01e80ad4",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:33:48.531Z"
+    },
+    {
+      "id": "event_1778031228531_2",
+      "lead_id": "lead_52c0b97afddf",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:33:48.531Z"
+    },
+    {
+      "id": "event_1778031228531_3",
+      "lead_id": "lead_5cc9f25726db",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:33:48.531Z"
+    },
+    {
+      "id": "event_1778031228531_4",
+      "lead_id": "lead_74d7e42f2f9c",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:33:48.531Z"
+    },
+    {
+      "id": "event_1778031228531_5",
+      "lead_id": "lead_7ed37cb5a539",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:33:48.531Z"
+    },
+    {
+      "id": "event_1778031228531_6",
+      "lead_id": "lead_85efb2eed600",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:33:48.531Z"
+    },
+    {
+      "id": "event_1778031228531_7",
+      "lead_id": "lead_a07a3f8ca2d9",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:33:48.531Z"
+    },
+    {
+      "id": "event_1778031228531_8",
+      "lead_id": "lead_adb16ac152ad",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:33:48.531Z"
+    },
+    {
+      "id": "event_1778031228531_9",
+      "lead_id": "lead_b6ba7fddc12a",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:33:48.531Z"
+    },
+    {
+      "id": "event_1778031228531_10",
+      "lead_id": "lead_e1052635ec21",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:33:48.531Z"
+    },
+    {
+      "id": "event_1778031228531_11",
+      "lead_id": "lead_f7f585ccc1f2",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:33:48.531Z"
+    },
+    {
+      "id": "event_1778031228531_12",
+      "lead_id": "lead_f8c0c8b4e640",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:33:48.531Z"
+    },
+    {
+      "id": "event_1778031228531_13",
+      "lead_id": "lead_fb5175137c0d",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:33:48.531Z"
+    },
+    {
+      "id": "event_1778031228531_14",
+      "lead_id": "lead_fd24790d2d98",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:33:48.531Z"
+    },
+    {
+      "id": "event_1778031360530_0",
+      "lead_id": "lead_04826b2d41a8",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:36:00.529Z"
+    },
+    {
+      "id": "event_1778031360530_1",
+      "lead_id": "lead_260c01e80ad4",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:36:00.530Z"
+    },
+    {
+      "id": "event_1778031360530_2",
+      "lead_id": "lead_52c0b97afddf",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:36:00.530Z"
+    },
+    {
+      "id": "event_1778031360530_3",
+      "lead_id": "lead_5cc9f25726db",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:36:00.530Z"
+    },
+    {
+      "id": "event_1778031360530_4",
+      "lead_id": "lead_74d7e42f2f9c",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:36:00.530Z"
+    },
+    {
+      "id": "event_1778031360530_5",
+      "lead_id": "lead_7ed37cb5a539",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:36:00.530Z"
+    },
+    {
+      "id": "event_1778031360530_6",
+      "lead_id": "lead_85efb2eed600",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:36:00.530Z"
+    },
+    {
+      "id": "event_1778031360530_7",
+      "lead_id": "lead_a07a3f8ca2d9",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:36:00.530Z"
+    },
+    {
+      "id": "event_1778031360530_8",
+      "lead_id": "lead_adb16ac152ad",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:36:00.530Z"
+    },
+    {
+      "id": "event_1778031360530_9",
+      "lead_id": "lead_b6ba7fddc12a",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:36:00.530Z"
+    },
+    {
+      "id": "event_1778031360530_10",
+      "lead_id": "lead_e1052635ec21",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:36:00.530Z"
+    },
+    {
+      "id": "event_1778031360530_11",
+      "lead_id": "lead_f7f585ccc1f2",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:36:00.530Z"
+    },
+    {
+      "id": "event_1778031360530_12",
+      "lead_id": "lead_f8c0c8b4e640",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:36:00.530Z"
+    },
+    {
+      "id": "event_1778031360530_13",
+      "lead_id": "lead_fb5175137c0d",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:36:00.530Z"
+    },
+    {
+      "id": "event_1778031360530_14",
+      "lead_id": "lead_fd24790d2d98",
+      "type": "lead_registry_updated",
+      "source": ".tmp/send_console_data.json",
+      "created_at": "2026-05-06T01:36:00.530Z"
     }
   ]
 }

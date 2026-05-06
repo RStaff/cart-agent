@@ -156,6 +156,10 @@
     "revenue_conversion_surface_validator": {
       "expected_artifact": "staffordos/operator_daemon/output/revenue_conversion_surface_validator_v1.json",
       "validation_owner": "revenue_authority"
+    },
+    "revenue_proof_validator": {
+      "expected_artifact": "staffordos/operator_daemon/output/revenue_proof_validator_v1.json",
+      "validation_owner": "revenue_authority"
     }
   },
   "proof": {
