@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-06T01:45:03.860Z",
-  "command": "node staffordos/system_map/execution_readiness_runner_v1.mjs",
+  "generated_at": "2026-05-06T01:46:03.209Z",
+  "command": "node staffordos/execution/revenue_loop_runner_v1.mjs",
   "operatorApproved": true,
   "qaProfile": "operator_runtime",
   "stages": [
@@ -20,6 +20,6 @@
       "Score is below the automation threshold."
     ]
   },
-  "completed_at": "2026-05-06T01:45:03.987Z",
+  "completed_at": "2026-05-06T01:46:03.346Z",
   "exit_code": 0
 }

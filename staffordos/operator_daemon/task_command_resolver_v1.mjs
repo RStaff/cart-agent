@@ -55,6 +55,16 @@ const COMMANDS = {
     revenue_action: false,
     reason: "Validate readiness for execution layer"
   },
+
+  revenue_loop_runner: {
+    task_type: "revenue_loop_runner",
+    command: "node staffordos/execution/revenue_loop_runner_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "revenue_execution",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Simulate full revenue loop"
+  },
 revenue_conversion_surface_validator: {
     task_type: "revenue_conversion_surface_validator",
     command: "node staffordos/revenue_authority/revenue_conversion_surface_validator_v1.mjs",

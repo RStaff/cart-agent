@@ -1,0 +1,13 @@
+{
+  "schema": "staffordos.revenue_loop_runner.v1",
+  "generated_at": "2026-05-06T01:46:03.340Z",
+  "status": "simulated_success",
+  "flow": [
+    "lead_detected",
+    "shopifixer_audit_sent",
+    "user_clicks_email",
+    "redirect_to_experience",
+    "recovery_triggered",
+    "return_attributed"
+  ]
+}
