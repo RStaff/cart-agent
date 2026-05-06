@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-05-06T01:36:56.694Z",
+  "generated_at": "2026-05-06T01:44:41.870Z",
   "status": "PASSED",
-  "command": "node staffordos/system_map/routing_authority_runner_v1.mjs",
+  "command": "node staffordos/system_map/experience_binding_runner_v1.mjs",
   "inferred_system_id": "staffordos",
   "system_name": "StaffordOS Core",
   "system_status": "PARTIAL_REAL",

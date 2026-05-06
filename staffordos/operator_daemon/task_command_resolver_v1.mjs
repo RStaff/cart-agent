@@ -35,6 +35,16 @@ const COMMANDS = {
     revenue_action: false,
     reason: "Centralize routing authority"
   },
+
+  experience_binding_runner: {
+    task_type: "experience_binding_runner",
+    command: "node staffordos/system_map/experience_binding_runner_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "binding",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Bind ShopiFixer to Abando experience"
+  },
 revenue_conversion_surface_validator: {
     task_type: "revenue_conversion_surface_validator",
     command: "node staffordos/revenue_authority/revenue_conversion_surface_validator_v1.mjs",

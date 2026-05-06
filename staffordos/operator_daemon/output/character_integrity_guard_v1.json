@@ -1,11 +1,11 @@
 {
   "schema": "staffordos.character_integrity_guard.v1",
-  "generated_at": "2026-05-06T01:36:56.180Z",
+  "generated_at": "2026-05-06T01:44:41.360Z",
   "mode": "normalize-task",
   "status": "passed",
   "input": {
-    "task_raw_length": 27,
-    "task_normalized": "phase 2.6 routing authority",
+    "task_raw_length": 28,
+    "task_normalized": "phase 2.8 experience binding",
     "hidden_characters_detected": false
   },
   "proof": {

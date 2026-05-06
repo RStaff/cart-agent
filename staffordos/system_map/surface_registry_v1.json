@@ -21,13 +21,13 @@
       "status": "fragmented"
     },
     "abando_recovery_engine": {
-      "host": "app.abando.ai",
+      "host": "localhost:8081",
       "path": "/experience",
       "type": "customer_surface",
-      "status": "missing"
+      "status": "active_local_unbound"
     },
     "abando_api": {
-      "host": "api.abando.ai",
+      "host": "localhost:8081",
       "routes": [
         "/api/recovery-actions/send-live-test",
         "/api/recovery/return",

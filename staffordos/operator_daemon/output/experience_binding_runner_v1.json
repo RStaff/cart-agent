@@ -1,0 +1,13 @@
+{
+  "schema": "staffordos.experience_binding_runner.v1",
+  "generated_at": "2026-05-06T01:44:41.973Z",
+  "status": "passed",
+  "bindings": [
+    {
+      "source": "shopifixer_entry",
+      "target": "abando_recovery_engine",
+      "route": "/experience",
+      "method": "redirect_with_params"
+    }
+  ]
+}

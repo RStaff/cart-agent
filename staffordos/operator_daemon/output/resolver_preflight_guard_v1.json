@@ -1,7 +1,7 @@
 {
   "schema": "staffordos.resolver_preflight_guard.v1",
-  "generated_at": "2026-05-06T01:36:56.302Z",
-  "task_type": "routing_authority_runner",
+  "generated_at": "2026-05-06T01:44:41.481Z",
+  "task_type": "experience_binding_runner",
   "status": "passed",
   "checks": {
     "task_type_present": true,
@@ -11,7 +11,7 @@
     "command_target_exists": true,
     "command_target_syntax_valid": true
   },
-  "command": "node staffordos/system_map/routing_authority_runner_v1.mjs",
+  "command": "node staffordos/system_map/experience_binding_runner_v1.mjs",
   "failures": [],
   "proof": {
     "resolver_preflight_only": true,
