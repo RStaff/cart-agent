@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-06T01:36:00.339Z",
-  "command": "node staffordos/system_map/surface_binding_runner_v1.mjs",
+  "generated_at": "2026-05-06T01:36:56.665Z",
+  "command": "node staffordos/system_map/routing_authority_runner_v1.mjs",
   "operatorApproved": true,
   "qaProfile": "operator_runtime",
   "stages": [
@@ -20,6 +20,6 @@
       "Score is below the automation threshold."
     ]
   },
-  "completed_at": "2026-05-06T01:36:00.468Z",
+  "completed_at": "2026-05-06T01:36:56.803Z",
   "exit_code": 0
 }

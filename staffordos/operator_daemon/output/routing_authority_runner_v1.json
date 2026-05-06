@@ -1,0 +1,33 @@
+{
+  "schema": "staffordos.routing_authority_runner.v1",
+  "generated_at": "2026-05-06T01:36:56.796Z",
+  "status": "passed",
+  "routes": [
+    {
+      "route": "/",
+      "surface": "abando_marketing",
+      "status": "active"
+    },
+    {
+      "route": "/install/shopify",
+      "surface": "abando_install",
+      "status": "active"
+    },
+    {
+      "route": "/dashboard",
+      "surface": "abando_dashboard",
+      "status": "fragmented"
+    },
+    {
+      "route": "/experience",
+      "surface": "abando_recovery_engine",
+      "status": "missing"
+    },
+    {
+      "route": "/shopifixer",
+      "surface": "shopifixer_entry",
+      "status": "active"
+    }
+  ],
+  "failures": []
+}

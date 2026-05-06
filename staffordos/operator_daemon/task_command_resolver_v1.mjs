@@ -25,6 +25,16 @@ const COMMANDS = {
     revenue_action: false,
     reason: "Bind surface registry to runtime layer"
   },
+
+  routing_authority_runner: {
+    task_type: "routing_authority_runner",
+    command: "node staffordos/system_map/routing_authority_runner_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "routing_control",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Centralize routing authority"
+  },
 revenue_conversion_surface_validator: {
     task_type: "revenue_conversion_surface_validator",
     command: "node staffordos/revenue_authority/revenue_conversion_surface_validator_v1.mjs",
