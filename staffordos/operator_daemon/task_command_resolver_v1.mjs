@@ -45,6 +45,16 @@ const COMMANDS = {
     revenue_action: false,
     reason: "Bind ShopiFixer to Abando experience"
   },
+
+  execution_readiness_runner: {
+    task_type: "execution_readiness_runner",
+    command: "node staffordos/system_map/execution_readiness_runner_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "readiness",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Validate readiness for execution layer"
+  },
 revenue_conversion_surface_validator: {
     task_type: "revenue_conversion_surface_validator",
     command: "node staffordos/revenue_authority/revenue_conversion_surface_validator_v1.mjs",

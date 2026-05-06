@@ -1,8 +1,8 @@
 {
   "schema": "staffordos.post_patch_structural_validator.v1",
-  "generated_at": "2026-05-06T01:44:52.291Z",
-  "task_type": "experience_binding_runner",
-  "expected_artifact": "staffordos/operator_daemon/output/experience_binding_runner_v1.json",
+  "generated_at": "2026-05-06T01:45:14.287Z",
+  "task_type": "execution_readiness_runner",
+  "expected_artifact": "staffordos/operator_daemon/output/execution_readiness_runner_v1.json",
   "status": "passed",
   "checks": {
     "hidden_character_check": true,
