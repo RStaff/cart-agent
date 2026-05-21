@@ -66,6 +66,21 @@ function normalizeEmail(value = "") {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : "";
 }
 
+function isTruthyFlag(value) {
+  if (value === true) return true;
+  return ["true", "1", "yes"].includes(String(value || "").trim().toLowerCase());
+}
+
+function shouldSuppressFixAuditEmail(req) {
+  return (
+    isTruthyFlag(req.get("X-ShopiFixer-Validation-Mode")) ||
+    isTruthyFlag(req.body?.suppress_email) ||
+    isTruthyFlag(req.body?.suppressEmail) ||
+    isTruthyFlag(req.body?.validation_mode) ||
+    isTruthyFlag(req.body?.validationMode)
+  );
+}
+
 async function readFixAuditLeads() {
   try {
     const raw = await readFile(fixAuditLeadsPath, "utf8");
@@ -402,6 +417,7 @@ app.post("/api/fix-audit", async (req, res) => {
   try {
     const storeUrl = normalizeStoreInput(req.body?.storeUrl);
     const email = normalizeEmail(req.body?.email);
+    const emailSuppressed = shouldSuppressFixAuditEmail(req);
 
     if (!storeUrl || !email) {
       return res.status(400).json({ ok: false, error: "invalid_fix_audit_input" });
@@ -418,27 +434,36 @@ app.post("/api/fix-audit", async (req, res) => {
     const payload = buildCanonicalPayload({ storeUrl, analysis });
     await saveCanonicalPayload(payload);
 
-    const emailReadiness = getEmailReadiness();
-    console.log("[SHOPIFIXER EMAIL] attempt", {
-      storeUrl,
-      email,
-      smtpReady: emailReadiness.ready,
-      smtpEnvPresent: emailReadiness.missing.length === 0,
-    });
+    let emailResult = null;
 
-    const emailResult = await sendRecoveryEmail({
-      to: email,
-      payload,
-    });
-
-    if (emailResult?.success) {
-      console.log("[SHOPIFIXER EMAIL] sent", {
-        messageId: emailResult?.messageId || null,
+    if (emailSuppressed) {
+      console.info("[SHOPIFIXER EMAIL] suppressed by validation mode", {
+        storeUrl,
+        source: req.body?.source || "unknown",
       });
     } else {
-      console.error("[SHOPIFIXER EMAIL ERROR]", {
-        error: String(emailResult?.error || "unknown_email_error"),
+      const emailReadiness = getEmailReadiness();
+      console.log("[SHOPIFIXER EMAIL] attempt", {
+        storeUrl,
+        email,
+        smtpReady: emailReadiness.ready,
+        smtpEnvPresent: emailReadiness.missing.length === 0,
       });
+
+      emailResult = await sendRecoveryEmail({
+        to: email,
+        payload,
+      });
+
+      if (emailResult?.success) {
+        console.log("[SHOPIFIXER EMAIL] sent", {
+          messageId: emailResult?.messageId || null,
+        });
+      } else {
+        console.error("[SHOPIFIXER EMAIL ERROR]", {
+          error: String(emailResult?.error || "unknown_email_error"),
+        });
+      }
     }
 
     return res.status(200).json({
@@ -447,9 +472,10 @@ app.post("/api/fix-audit", async (req, res) => {
       registryLeadId: registryResult.leadId,
       analysis,
       payload,
-      emailAttempted: true,
-      emailSent: Boolean(emailResult?.success),
-      emailError: emailResult?.success ? "" : String(emailResult?.error || ""),
+      emailAttempted: !emailSuppressed,
+      emailSent: emailSuppressed ? false : Boolean(emailResult?.success),
+      emailSuppressed,
+      emailError: emailSuppressed ? "" : emailResult?.success ? "" : String(emailResult?.error || ""),
     });
   } catch (error) {
     console.error("[fix-audit] error:", error);
