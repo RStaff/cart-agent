@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
-import { PrismaClient } from "@prisma/client";
+import pkg from "@prisma/client";
 
+const { PrismaClient } = pkg;
 const prisma = new PrismaClient();
 
 const SHOPIFY_SCOPES =

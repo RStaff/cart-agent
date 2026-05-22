@@ -1,5 +1,7 @@
-import { EventVisibility } from "@prisma/client";
+import pkg from "@prisma/client";
 import { prisma } from "./clients/prisma.js";
+
+const { EventVisibility } = pkg;
 
 export async function appendSystemEvent(input) {
   return prisma.systemEvent.create({

@@ -1,5 +1,7 @@
-import { JobStatus, Prisma } from "@prisma/client";
+import pkg from "@prisma/client";
 import { prisma } from "../clients/prisma.js";
+
+const { JobStatus, Prisma } = pkg;
 
 export async function createJob(input) {
   return prisma.job.create({

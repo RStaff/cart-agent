@@ -1,7 +1,9 @@
 import fs from "fs";
 import path from "path";
 import dotenv from "dotenv";
-import { PrismaClient } from "@prisma/client";
+import pkg from "@prisma/client";
+
+const { PrismaClient } = pkg;
 
 // load .env from ./web/.env or ../.env (repo root) – first one that exists wins
 const candidates = [

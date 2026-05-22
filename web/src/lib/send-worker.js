@@ -1,6 +1,7 @@
-import { PrismaClient } from "@prisma/client";
+import pkg from "@prisma/client";
 import { sendEmail } from "./mailer.js";
 
+const { PrismaClient } = pkg;
 const prisma = new PrismaClient();
 const MAX_ATTEMPTS = 5;
 
