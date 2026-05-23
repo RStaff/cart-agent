@@ -105,13 +105,25 @@ function normalizeStoreDomain(store) {
 }
 
 function deriveBenchmarkFlagsFromSignals(signals) {
+  const hasShippingEvidence =
+    signals.shipping_context_detected === true ||
+    signals.free_shipping_threshold_visible === true ||
+    signals.shipping_price_shown_before_checkout === true;
+  const hasCheckoutEvidence = signals.checkout_context_detected === true;
+
   return {
     shipping_cost_surprise:
-      signals.free_shipping_threshold_visible === false ||
-      signals.shipping_cost_hidden === true ||
-      signals.shipping_price_shown_before_checkout === false,
+      hasShippingEvidence &&
+      hasCheckoutEvidence &&
+      (
+        signals.shipping_cost_hidden === true ||
+        (
+          signals.free_shipping_threshold_visible === false &&
+          signals.shipping_price_shown_before_checkout === false
+        )
+      ),
     missing_express_checkout:
-      signals.guest_checkout_required === true,
+      hasCheckoutEvidence && signals.guest_checkout_required === true,
     discount_timing_friction: false,
   };
 }
