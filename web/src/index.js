@@ -20,6 +20,8 @@ import { installSmcAlign } from "./smc-align.js";
 import { upsertShopifixerLead } from "./lib/shopifixerLeadRegistry.js";
 import { trackShopifixerLifecycle } from "./lib/shopifixerLifecycleTracker.js";
 import checkoutPublic from "./checkout-public.js";
+import { installPacketAuthority } from "./routes/packetAuthority.esm.js";
+import { installStripeWebhook } from "./routes/stripeWebhook.esm.js";
 import { installPlayground } from "./routes/playground.esm.js";
 import { installAskAbandoRoute } from "./routes/askAbando.esm.js";
 import { installRecoveryLedgerRoute } from './routes/recoveryLedger.esm.js';
@@ -276,6 +278,8 @@ app.use(express.json({ limit: "1mb" }));
 
 // Execute public checkout installer (source-of-truth)
 checkoutPublic(app);
+installPacketAuthority(app);
+installStripeWebhook(app);
 
 
 // Public checkout money path — mounted only after source-of-truth audit.

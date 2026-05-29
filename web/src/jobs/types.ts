@@ -9,6 +9,7 @@ export type JobResult = Record<string, unknown>;
 export interface CreateJobInput<TPayload extends JobPayload = JobPayload> {
   type: string;
   shopDomain: string;
+  packetId?: string | null;
   idempotencyKey: string;
   payload: TPayload;
   runAt?: Date;
@@ -34,5 +35,6 @@ export interface AppendSystemEventInput<TPayload extends JobPayload = JobPayload
   eventType: string;
   visibility?: EventVisibility;
   relatedJobId?: string;
+  packetId?: string | null;
   payload?: TPayload;
 }

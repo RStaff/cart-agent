@@ -8,6 +8,7 @@ export async function createJob(input) {
     data: {
       type: input.type,
       shopDomain: input.shopDomain,
+      packetId: input.packetId ?? input.packet_id ?? null,
       idempotencyKey: input.idempotencyKey,
       payload: input.payload,
       runAt: input.runAt ?? new Date(),

@@ -89,6 +89,7 @@ model Job {
   id             String    @id @default(cuid())
   type           String
   shopDomain     String
+  packetId       String?
   idempotencyKey String    @unique
   status         JobStatus @default(queued)
   payload        Json
@@ -107,11 +108,13 @@ model Job {
   @@index([status, runAt])
   @@index([type, status, runAt])
   @@index([shopDomain, createdAt])
+  @@index([packetId, createdAt])
 }
 
 model SystemEvent {
   id           String          @id @default(cuid())
   shopDomain   String
+  packetId     String?
   eventType    String
   visibility   EventVisibility @default(system)
   relatedJobId String?
@@ -119,6 +122,7 @@ model SystemEvent {
   createdAt    DateTime        @default(now())
 
   @@index([shopDomain, createdAt])
+  @@index([packetId, createdAt])
   @@index([eventType, createdAt])
   @@index([relatedJobId, createdAt])
 }
@@ -126,6 +130,7 @@ model SystemEvent {
 model DecisionLog {
   id                String   @id @default(cuid())
   shopDomain        String
+  packetId          String?
   cartToken         String?
   trigger           String
   decision          String
@@ -142,8 +147,25 @@ model DecisionLog {
   updatedAt         DateTime @updatedAt
 
   @@index([shopDomain, decisionTimestamp])
+  @@index([packetId, decisionTimestamp])
   @@index([cartToken, decisionTimestamp])
   @@index([relatedEventId])
+}
+
+model Packet {
+  packetId         String   @id @map("packet_id")
+  storeDomain      String   @map("store_domain")
+  paymentReference String?  @map("payment_reference")
+  status           String   @default("prepared")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+  executionStatus  String   @default("not_started") @map("execution_status")
+  proofStatus      String   @default("not_started") @map("proof_status")
+  completionStatus String   @default("not_started") @map("completion_status")
+
+  @@index([storeDomain, createdAt])
+  @@index([paymentReference])
+  @@map("packets")
 }
 
 model Invite {

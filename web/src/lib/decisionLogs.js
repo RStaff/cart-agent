@@ -35,6 +35,7 @@ export async function createDecisionLog(input) {
   return prisma.decisionLog.create({
     data: {
       shopDomain: input.shopDomain,
+      packetId: input.packetId ?? input.packet_id ?? null,
       cartToken: input.cartToken ?? null,
       trigger: normalizeDecisionTrigger(input.trigger),
       decision: input.decision,

@@ -1,3 +1,18 @@
+import express from "express";
+import { bindPacketPayment, createPacket, normalizeStoreDomain } from "./lib/packetRepository.js";
+
+const defaultCanonicalReturnUrl =
+  "https://cart-agent-api.onrender.com/payment-return?packet_id={PACKET_ID}&session_id={CHECKOUT_SESSION_ID}";
+
+function pickCanonicalSuccessUrl() {
+  const canonical = process.env.CANONICAL_PAYMENT_RETURN_URL || "";
+  const legacy = process.env.CHECKOUT_SUCCESS_URL || "";
+
+  if (canonical) return canonical;
+  if (legacy.includes("/payment-return")) return legacy;
+  return defaultCanonicalReturnUrl;
+}
+
 /**
  * Public checkout endpoints used by /pricing and curl tests.
  * - GET  /__public-checkout/_status : shows env wiring
@@ -24,9 +39,8 @@ export default function installPublicCheckout(app) {
     return map[String(plan || "").toLowerCase()] || null;
   }
 
-  const successUrl =
-    process.env.CHECKOUT_SUCCESS_URL
-    || "https://cart-agent-backend.onrender.com/success?session_id={CHECKOUT_SESSION_ID}";
+  const canonicalReturnUrl = pickCanonicalSuccessUrl();
+  const successUrl = canonicalReturnUrl;
   const cancelUrl =
     process.env.CHECKOUT_CANCEL_URL
     || "https://cart-agent-backend.onrender.com/cancel";
@@ -41,26 +55,53 @@ export default function installPublicCheckout(app) {
         scale: Boolean(pickPrice("scale")),
       },
       successUrl,
+      canonicalReturnUrl,
       cancelUrl,
+      legacyCheckoutSuccessUrlIgnored: Boolean(
+        process.env.CHECKOUT_SUCCESS_URL
+        && !process.env.CHECKOUT_SUCCESS_URL.includes("/payment-return"),
+      ),
     });
   });
 
   app.post("/__public-checkout", express.json(), async (req, res) => {
     try {
       const plan = (req.body && req.body.plan) || "starter";
+      const storeDomain = normalizeStoreDomain(
+        req.body?.store_domain || req.body?.storeDomain || req.body?.store,
+      );
       const price = pickPrice(plan);
       if (!price) return res.status(400).json({ ok:false, code:"missing_price", plan });
+      if (!storeDomain) return res.status(400).json({ ok:false, code:"missing_store_domain" });
+
+      const packet = await createPacket({
+        store_domain: storeDomain,
+        status: "payment_pending",
+      });
 
       const stripe = await getStripe();
+      const boundSuccessUrl = successUrl.replace("{PACKET_ID}", encodeURIComponent(packet.packet_id));
       const session = await stripe.checkout.sessions.create({
         mode: "subscription",
         line_items: [{ price, quantity: 1 }],
         allow_promotion_codes: true,
-        success_url: successUrl,
+        client_reference_id: packet.packet_id,
+        metadata: {
+          packet_id: packet.packet_id,
+          store_domain: storeDomain,
+        },
+        success_url: boundSuccessUrl,
         cancel_url: cancelUrl,
       });
 
-      return res.json({ ok: true, plan, sessionId: session.id, url: session.url });
+      await bindPacketPayment({
+        packet_id: packet.packet_id,
+        store_domain: storeDomain,
+        payment_reference: session.id,
+        status: "payment_pending",
+      });
+
+      return res.json({ ok: true, plan, packetId: packet.packet_id, sessionId: session.id, url: session.url });
     } catch (e) {
       console.error("[public-checkout] error:", e?.message || e);
       return res.status(500).json({ ok:false, code:"server_error", message:String(e?.message||e) });
@@ -69,4 +110,3 @@ export default function installPublicCheckout(app) {
 }
 
 // NOTE: this file is imported dynamically from index.js; no side effects here.
-import express from "express";

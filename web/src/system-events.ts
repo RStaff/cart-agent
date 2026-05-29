@@ -8,6 +8,7 @@ export async function appendSystemEvent<TPayload extends Record<string, unknown>
   return prisma.systemEvent.create({
     data: {
       shopDomain: input.shopDomain,
+      packetId: input.packetId ?? null,
       eventType: input.eventType,
       visibility: input.visibility ?? EventVisibility.system,
       relatedJobId: input.relatedJobId ?? null,

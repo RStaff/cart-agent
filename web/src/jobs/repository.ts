@@ -11,6 +11,7 @@ export async function createJob<TPayload extends Record<string, unknown>>(input:
     data: {
       type: input.type,
       shopDomain: input.shopDomain,
+      packetId: input.packetId ?? null,
       idempotencyKey: input.idempotencyKey,
       payload: input.payload,
       runAt: input.runAt ?? new Date(),

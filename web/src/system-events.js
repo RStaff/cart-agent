@@ -7,6 +7,7 @@ export async function appendSystemEvent(input) {
   return prisma.systemEvent.create({
     data: {
       shopDomain: input.shopDomain,
+      packetId: input.packetId ?? input.packet_id ?? null,
       eventType: input.eventType,
       visibility: input.visibility ?? EventVisibility.system,
       relatedJobId: input.relatedJobId ?? null,
