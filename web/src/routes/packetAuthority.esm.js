@@ -78,6 +78,7 @@ export function installPacketAuthority(app) {
         packet_id: packetId,
         store_domain: effectiveStore,
         payment_reference: paymentReference,
+        status: "payment_pending",
       });
 
       return res.status(200).json({

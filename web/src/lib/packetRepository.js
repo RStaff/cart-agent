@@ -145,7 +145,7 @@ export async function bindPacketPayment(input = {}) {
   const packetId = String(input.packet_id || input.packetId || "").trim();
   const storeDomain = normalizeStoreDomain(input.store_domain || input.storeDomain || input.store);
   const paymentReference = String(input.payment_reference || input.paymentReference || "").trim();
-  const status = input.status || "payment_received";
+  const status = input.status || "payment_pending";
 
   if (!packetId) throw new Error("missing_packet_id");
   if (!storeDomain) throw new Error("missing_store_domain");
