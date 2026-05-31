@@ -1,32 +1,48 @@
+import express from "express";
+import Stripe from "stripe";
 import { bindPacketPayment, getPacket, normalizeStoreDomain } from "../lib/packetRepository.js";
 
+function getStripeClient() {
+  const key = process.env.STRIPE_LIVE_SECRET_KEY || process.env.STRIPE_SECRET_KEY || "";
+  if (!key) throw new Error("missing_stripe_secret_key");
+  return new Stripe(key, { apiVersion: "2024-09-30.acacia" });
+}
+
 /**
- * Minimal Stripe webhook receiver at POST /stripe/webhook.
- * Packet lifecycle updates require a pre-existing canonical packet.
+ * Canonical Stripe webhook receiver at POST /stripe/webhook.
+ * Packet lifecycle updates require:
+ * - raw request body
+ * - valid Stripe signature
+ * - STRIPE_WEBHOOK_SECRET
+ * - pre-existing canonical packet
  */
 export function installStripeWebhook(app) {
-  // Route-specific raw parser would be ideal, but we keep it simple here.
-  app.post("/stripe/webhook", async (req, res) => {
+  app.post("/stripe/webhook", express.raw({ type: "application/json" }), async (req, res) => {
+    const sig = req.headers["stripe-signature"] || "";
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
+
+    if (!webhookSecret) {
+      console.error("[stripe:webhook] missing STRIPE_WEBHOOK_SECRET; refusing lifecycle mutation");
+      return res.status(500).json({ ok: false, error: "missing_stripe_webhook_secret" });
+    }
+
+    let event;
     try {
-      // Best-effort read body whether pre-parsed or not
-      let payload;
-      if (typeof req.body === "string") payload = req.body;
-      else if (Buffer.isBuffer(req.body)) payload = req.body.toString("utf8");
-      else payload = JSON.stringify(req.body || {});
+      const stripe = getStripeClient();
+      event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+    } catch (error) {
+      console.error("[stripe:webhook] signature verification failed", error?.message || error);
+      return res.status(400).send(`Webhook Error: ${error?.message || String(error)}`);
+    }
 
-      const sig = req.headers["stripe-signature"] || "";
-      let evtType = "unknown", evtId = "unknown", parsed = {};
-      try {
-        parsed = JSON.parse(payload || "{}");
-        evtType = parsed?.type || parsed?.data?.object?.type || "unknown";
-        evtId = parsed?.id || "unknown";
-      } catch {}
+    try {
+      const evtType = event?.type || "unknown";
+      const evtId = event?.id || "unknown";
 
-      console.log("[stripe:webhook] got event",
-        { id: evtId, type: evtType, sig: String(sig).slice(0,32) + "…" });
+      console.log("[stripe:webhook] verified event", { id: evtId, type: evtType });
 
       if (evtType === "checkout.session.completed") {
-        const session = parsed?.data?.object || {};
+        const session = event.data?.object || {};
         const packetId = String(session?.metadata?.packet_id || session?.client_reference_id || "");
         const metadataStoreDomain = normalizeStoreDomain(session?.metadata?.store_domain || "");
         const paymentReference = String(session?.id || evtId || "");
@@ -62,10 +78,10 @@ export function installStripeWebhook(app) {
         }
       }
 
-      return res.status(200).json({ ok:true });
-    } catch (e) {
-      console.error("[stripe:webhook] error:", e?.message || e);
-      return res.status(200).json({ ok:true }); // still 200 to avoid retries while we iterate
+      return res.status(200).json({ ok: true, received: true });
+    } catch (error) {
+      console.error("[stripe:webhook] verified event handling error", error?.message || error);
+      return res.status(500).json({ ok: false, error: "stripe_webhook_handling_failed" });
     }
   });
 }
