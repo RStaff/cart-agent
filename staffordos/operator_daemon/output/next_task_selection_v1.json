@@ -1,11 +1,11 @@
 {
   "schema": "staffordos.next_task_selection.v1",
-  "generated_at": "2026-05-05T13:21:13.918Z",
+  "generated_at": "2026-05-31T02:37:24.228Z",
   "selected": {
-    "task_type": "send_readiness_gate",
-    "expected_artifact": "staffordos/operator_daemon/output/send_readiness_gate_v1.json",
-    "commit_message": "auto run send readiness gate through gated StaffordOS runner",
-    "reason": "Merchant registry exists. Evaluate send readiness before any preview or send."
+    "task_type": "send_preview",
+    "expected_artifact": "staffordos/operator_daemon/output/send_preview_v1.json",
+    "commit_message": "auto create send preview through gated StaffordOS runner",
+    "reason": "At least one merchant is send-ready. Create preview only. No send."
   },
   "safety": {
     "never_auto_selects_send_confirm": true,

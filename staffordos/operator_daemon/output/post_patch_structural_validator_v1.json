@@ -1,8 +1,8 @@
 {
   "schema": "staffordos.post_patch_structural_validator.v1",
-  "generated_at": "2026-05-06T01:46:13.649Z",
-  "task_type": "revenue_loop_runner",
-  "expected_artifact": "staffordos/operator_daemon/output/revenue_loop_runner_v1.json",
+  "generated_at": "2026-05-31T02:37:35.554Z",
+  "task_type": "send_preview",
+  "expected_artifact": "staffordos/operator_daemon/output/send_preview_v1.json",
   "status": "passed",
   "checks": {
     "hidden_character_check": true,
