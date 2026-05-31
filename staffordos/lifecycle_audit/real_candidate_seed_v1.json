@@ -1,0 +1,37 @@
+[
+  {
+    "lead_id": "lead_no_kings_athletics_dryrun_v1",
+    "created_at": "2026-05-31T00:00:00Z",
+    "status": "candidate",
+    "source": "manual_dry_run_inspection",
+    "company": "No Kings Athletics",
+    "website": "https://no-kings-athletics.myshopify.com",
+    "contact": {
+      "name": "Unknown",
+      "email": "",
+      "phone": ""
+    },
+    "shopify_detected": true,
+    "signals": {
+      "conversion_issue": true,
+      "observed_issue": "Homepage product section does not clearly show product image, price, or buy action in visible area.",
+      "shopifixer_candidate": true
+    },
+    "score": {
+      "icp_score": 0.7,
+      "confidence": 0.65
+    },
+    "next_action": "research_contact",
+    "fulfillment_scope_candidate": {
+      "issue": "Homepage product discovery friction",
+      "affected_url": "https://no-kings-athletics.myshopify.com",
+      "proposed_fix": "Improve homepage product card visibility with image, price, and clear CTA.",
+      "proof_needed": "Before/after homepage screenshot showing product card clarity."
+    },
+    "test_control": {
+      "operator_controlled_recipient": false,
+      "real_customer": false,
+      "purpose": "realistic dry-run candidate without send authorization"
+    }
+  }
+]
