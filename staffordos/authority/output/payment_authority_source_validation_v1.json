@@ -1,11 +1,7 @@
 {
   "schema": "staffordos.payment_authority_source_validation.v1",
-  "status": "failed",
-  "failures": [
-    "stripe_webhook_missing_signature_verification",
-    "stripe_webhook_missing_webhook_secret_requirement",
-    "stripe_webhook_mounted_after_express_json"
-  ],
+  "status": "passed",
+  "failures": [],
   "warnings": [],
-  "current_blocker": "S2F_STRIPE_AUTHORITY_UNIFICATION"
+  "current_blocker": null
 }
