@@ -1,0 +1,20 @@
+c372404e correct roadmap toward fulfillment readiness
+a28a62f5 record current bottleneck analysis
+dad11a9e add ShopiFixer daily sales checklist
+c14887e9 lock ShopiFixer first sales motion
+71dbcd03 lock ShopiFixer sales execution pivot
+98c3d9f2 record S2H paused before payment
+0df56215 record S2H checkout visual confirmation
+6aadd1ca record S2H active checkout session
+478f5d5c prepare S2H controlled payment packet
+c43a0248 lock current north star
+8c79d108 lock ShopiFixer revenue capacity target
+c431f06c record S2H real payment readiness
+4b1e552a lock survival execution focus
+61d424c1 lock updated success roadmap
+58ed3355 record S2G live payment gate decision
+d80361b6 record S2G packet binding readiness
+add8e3bf record S2G waiting for signed Stripe delivery
+d4deafe0 record S2G gate ready for signed event validation
+12396726 record S2G current packet state
+ae90b7da lock current truth checkpoint
