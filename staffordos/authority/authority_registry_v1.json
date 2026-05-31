@@ -1,0 +1,67 @@
+{
+  "schema": "staffordos.authority_registry.v1",
+  "status": "SEED_V1",
+  "current_blocker": "S2F_STRIPE_AUTHORITY_UNIFICATION",
+  "authorities": [
+    {
+      "name": "Checkout Authority",
+      "owner": "web/src/checkout-public.js",
+      "responsibilities": [
+        "Create Stripe checkout session",
+        "Create canonical packet",
+        "Bind packet to Stripe session"
+      ],
+      "not_allowed": [
+        "Mark payment_received"
+      ],
+      "status": "active"
+    },
+    {
+      "name": "Packet Authority",
+      "owner": "web/src/routes/packetAuthority.esm.js",
+      "responsibilities": [
+        "Bind Stripe session to packet",
+        "Preserve payment lifecycle boundaries"
+      ],
+      "not_allowed": [
+        "Grant payment_received without Stripe verification"
+      ],
+      "status": "active"
+    },
+    {
+      "name": "Stripe Webhook Authority",
+      "owner": "web/src/routes/stripeWebhook.esm.js",
+      "responsibilities": [
+        "Receive Stripe events",
+        "Verify Stripe signatures",
+        "Transition payment lifecycle"
+      ],
+      "required": [
+        "STRIPE_WEBHOOK_SECRET",
+        "stripe.webhooks.constructEvent()",
+        "express.raw()"
+      ],
+      "allowed_state_transitions": [
+        "payment_pending -> payment_received"
+      ],
+      "status": "active_but_unverified",
+      "risk": "canonical webhook can currently mark payment_received without Stripe signature verification"
+    },
+    {
+      "name": "Billing Authority",
+      "owner": "web/src/routes/billing.js",
+      "responsibilities": [
+        "Legacy/subscription billing",
+        "Contains Stripe webhook verification example"
+      ],
+      "status": "non_canonical_for_shopifixer_packet_payments",
+      "required_action": "Merge verification authority into canonical Stripe webhook authority"
+    }
+  ],
+  "blocked_actions": [
+    "real_payment_validation",
+    "paid_packet_execution",
+    "merchant_execution_workflow"
+  ],
+  "next_required_phase": "S2F_STRIPE_AUTHORITY_UNIFICATION"
+}
