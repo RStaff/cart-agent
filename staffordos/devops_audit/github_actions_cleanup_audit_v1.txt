@@ -1,0 +1,220 @@
+ M staffordos/leads/candidate_stores.json
+ M staffordos/leads/contact_targets.json
+ M staffordos/leads/qualified_targets.json
+ M staffordos/leads/real_store_candidates.json
+ M staffordos/leads/scored_stores.json
+ M staffordos/leads/top_targets.json
+?? staffordos/devops_audit/
+?? staffordos/lifecycle_audit/backups/
+=== WORKFLOWS ===
+total 88
+drwxr-xr-x  12 rossstafford  staff   384 Apr 26 17:05 .
+drwxr-xr-x   3 rossstafford  staff    96 Oct  6  2025 ..
+-rw-r--r--   1 rossstafford  staff   801 Apr 26 17:05 abando-align-validate.yml
+-rw-r--r--   1 rossstafford  staff  6704 Feb 27 12:21 ci.yml
+-rw-r--r--   1 rossstafford  staff   655 Apr 15 10:35 docker-build.yml
+-rw-r--r--   1 rossstafford  staff  2326 Jan  9 13:53 frontend-preview.yml
+-rw-r--r--@  1 rossstafford  staff  1792 Nov  8  2025 frontend-preview.yml.bak
+-rw-r--r--@  1 rossstafford  staff  1446 Nov  8  2025 pages.yml
+-rw-r--r--@  1 rossstafford  staff  1138 Nov  8  2025 render-preview.yml
+-rw-r--r--   1 rossstafford  staff  1202 Apr 23 06:19 security-ci.yml
+-rw-r--r--@  1 rossstafford  staff  1279 Nov  8  2025 smoke.yml
+-rw-r--r--   1 rossstafford  staff  1535 Oct  6  2025 sync-prices-to-render.yml
+=== WORKFLOW FILE CONTENT SUMMARY ===
+----- .github/workflows/abando-align-validate.yml -----
+1:name: abando-align-validate
+2:on:
+3:  pull_request: { branches: [ main ] }
+4:  push: { branches: [ chore/**, feat/** ] }
+7:    runs-on: ubuntu-latest
+15:            test -f "$d/smc-align.js" || { echo "missing $d/smc-align.js"; exit 1; }
+19:          test "$found" = "1" || { echo "no real entries found"; exit 1; }
+----- .github/workflows/ci.yml -----
+1:name: Verify deps, E2E smoke, and Next preview with live curl
+3:on:
+4:  push:
+5:    branches: ["**"]
+6:  pull_request:
+7:    branches: ["**"]
+18:    runs-on: ubuntu-latest
+28:          node-version: "20"
+29:          cache: "npm"
+30:      - name: Dependency / lockfile check (self-contained)
+43:              npm --prefix "$r" ci --ignore-scripts --dry-run || fail=1
+55:    runs-on: ubuntu-latest
+63:          node-version: "20"
+64:          cache: "npm"
+65:      - name: Locate Playwright projects
+82:      - name: Install deps + browsers & run smoke
+89:            npm --prefix "$R" ci
+91:            if jq -e '.scripts["test:e2e:ci"]' "$R/package.json" >/dev/null 2>&1; then
+92:              (cd "$R" && npm run -s test:e2e:ci)
+94:              (cd "$R" && npx playwright test --reporter=list)
+97:      - name: Upload Playwright artifacts
+101:          name: playwright-artifacts
+104:            **/test-results/**
+107:  build-preview:
+109:    runs-on: ubuntu-latest
+117:          node-version: "20"
+118:          cache: "npm"
+120:      - name: Locate Next.js app roots
+140:      - name: Build Next apps (standalone) + pack preview
+161:            npm --prefix "$R" ci
+162:            (cd "$R" && npx next build)
+167:      - name: Upload preview artifacts
+171:          name: next-standalone-preview
+175:      - name: Tiny smoke-serve check (curl) with logs
+207:      - name: Upload smoke-serve logs on failure
+211:          name: preview-smoke-logs
+----- .github/workflows/docker-build.yml -----
+1:name: Build and Push to GHCR
+3:on:
+4:  push:
+5:    branches: [main]
+8:  build:
+9:    runs-on: ubuntu-latest
+16:      - name: Log in to GHCR
+17:        uses: docker/login-action@v3
+19:          registry: ghcr.io
+20:          username: ${{ github.actor }}
+23:      - name: Build and push
+24:        uses: docker/build-push-action@v5
+27:          push: true
+29:            ghcr.io/rstaff/cart-agent:latest
+30:            ghcr.io/rstaff/cart-agent:${{ github.sha }}
+----- .github/workflows/frontend-preview.yml -----
+1:name: Frontend preview smoke
+3:on:
+4:  push:
+5:    branches: ["**"]
+6:  pull_request:
+7:    branches: ["**"]
+12:    runs-on: ubuntu-latest
+15:      npm_config_ignore_scripts: "true"
+23:          node-version: '20'
+24:          cache: 'npm'
+27:      - name: Install (web/frontend)
+30:            npm --prefix web/frontend ci
+32:            echo "⚠️ No lockfile; using npm install"
+33:            npm --prefix web/frontend install
+36:      - name: Guardrails (PostCSS config)
+38:          test ! -f web/frontend/postcss.config.js || (echo "❌ legacy postcss.config.js present" && exit 1)
+39:          test -f web/frontend/postcss.config.cjs || (echo "❌ missing postcss.config.cjs" && exit 1)
+40:      - name: Build (web/frontend)
+44:        run: npm --prefix web/frontend run build
+46:      - name: Serve preview in background and curl it
+64:      - name: Upload preview logs on failure
+68:          name: vite-preview-logs
+72:      - name: Upload built site (dist)
+75:          name: frontend-dist
+----- .github/workflows/pages.yml -----
+1:name: Deploy frontend to GitHub Pages
+2:on:
+3:  push:
+4:    branches: [main]
+14:  build:
+15:    runs-on: ubuntu-latest
+18:      npm_config_ignore_scripts: "true"
+25:          node-version: 20
+26:          cache: npm
+28:      - name: Install deps
+31:            npm --prefix web/frontend ci
+33:            npm --prefix web/frontend install
+35:      - name: Build (Vite) with repo base
+38:          npm --prefix web/frontend run build -- --base="/$REPO/"
+39:      - name: Add SPA 404 fallback
+41:      - name: Upload Pages artifact
+46:    needs: build
+48:      name: github-pages
+50:    runs-on: ubuntu-latest
+----- .github/workflows/render-preview.yml -----
+1:name: Host build smoke (Render parity)
+2:on:
+4:  push:
+5:    branches: [main]
+11:    runs-on: ubuntu-latest
+14:      npm_config_ignore_scripts: "true"
+18:        with: { node-version: 20, cache: npm, cache-dependency-path: web/frontend/package-lock.json }
+19:      - name: Install
+21:          if [ -f web/frontend/package-lock.json ]; then npm --prefix web/frontend ci; else npm --prefix web/frontend install; fi
+22:      - name: Build (base=/)
+23:        run: npm --prefix web/frontend run build -- --base="/"
+24:      - name: Add SPA 404
+26:      - name: Preview & curl
+----- .github/workflows/security-ci.yml -----
+1:name: security-ci
+3:on:
+4:  push:
+5:    branches:
+10:  pull_request:
+18:    name: Secret scan
+19:    runs-on: ubuntu-latest
+21:      - name: Checkout
+24:      - name: Gitleaks scan
+30:    name: Root install + audit
+31:    runs-on: ubuntu-latest
+33:      - name: Checkout
+36:      - name: Setup Node
+39:          node-version: 20
+40:          cache: npm
+42:      - name: Install root deps
+43:        run: npm install
+45:      - name: Root audit
+46:        run: npm audit --audit-level=high || true
+48:      - name: Merge marker guard
+52:    name: CodeQL
+----- .github/workflows/smoke.yml -----
+1:name: Smoke (Vite build + preview)
+2:on:
+3:  push:
+4:    branches: [ main ]
+8:    runs-on: ubuntu-24.04
+13:      npm_config_ignore_scripts: true
+18:          node-version: 20
+19:          cache: npm
+21:      - name: Install
+24:            npm --prefix web/frontend ci
+26:            npm --prefix web/frontend install
+28:      - name: Build (Pages base)
+31:          npm --prefix web/frontend run build -- --base="/$REPO/"
+33:      - name: Preview & curl
+----- .github/workflows/sync-prices-to-render.yml -----
+1:name: Sync Stripe Prices to Render
+2:on:
+6:        description: "apply or dry-run"
+11:        description: "Optional: custom domain to match"
+14:      service_name:
+15:        description: "Render service name (recommended)"
+18:  schedule:
+19:    - cron: "17 6 * * *"   # nightly dry-run
+24:  group: sync-prices-to-render-${{ github.ref }}
+29:    runs-on: ubuntu-latest
+33:      - run: chmod +x scripts/sync-prices-to-render.sh
+34:      - name: Run sync (dry-run by default)
+49:          echo "scripts/sync-prices-to-render.sh ${ARGS[*]}"
+50:          scripts/sync-prices-to-render.sh "${ARGS[@]}"
+=== RECENT GITHUB ACTION FAILURES IF GH CLI IS AUTHED ===
+completed	success	define StaffordOS cockpit requirements	Deploy frontend to GitHub Pages	main	push	26725894720	30s	2026-05-31T22:09:12Z
+completed	failure	define StaffordOS cockpit requirements	Build and Push to GHCR	main	push	26725894704	18s	2026-05-31T22:09:12Z
+completed	success	define StaffordOS cockpit requirements	Frontend preview smoke	main	push	26725894694	25s	2026-05-31T22:09:12Z
+completed	success	define StaffordOS cockpit requirements	Smoke (Vite build + preview)	main	push	26725894691	20s	2026-05-31T22:09:12Z
+completed	failure	define StaffordOS cockpit requirements	.github/workflows/security-ci.yml	main	push	26725894400	0s	2026-05-31T22:09:11Z
+completed	failure	define StaffordOS cockpit requirements	.github/workflows/ci.yml	main	push	26725894234	0s	2026-05-31T22:09:11Z
+completed	success	Push on main	CodeQL	main	dynamic	26725894123	1m59s	2026-05-31T22:09:10Z
+completed	failure	define capacity authority	Build and Push to GHCR	main	push	26725807026	15s	2026-05-31T22:05:14Z
+completed	success	define capacity authority	Frontend preview smoke	main	push	26725807024	21s	2026-05-31T22:05:14Z
+completed	success	define capacity authority	Smoke (Vite build + preview)	main	push	26725807018	22s	2026-05-31T22:05:14Z
+completed	success	define capacity authority	Deploy frontend to GitHub Pages	main	push	26725807017	36s	2026-05-31T22:05:14Z
+completed	failure	define capacity authority	.github/workflows/ci.yml	main	push	26725806736	0s	2026-05-31T22:05:13Z
+completed	failure	define capacity authority	.github/workflows/security-ci.yml	main	push	26725806570	0s	2026-05-31T22:05:13Z
+completed	success	Push on main	CodeQL	main	dynamic	26725806369	1m53s	2026-05-31T22:05:12Z
+completed	success	define product routing authority	Smoke (Vite build + preview)	main	push	26725723297	20s	2026-05-31T22:01:36Z
+completed	success	define product routing authority	Frontend preview smoke	main	push	26725723247	18s	2026-05-31T22:01:36Z
+completed	success	define product routing authority	Deploy frontend to GitHub Pages	main	push	26725723238	38s	2026-05-31T22:01:36Z
+completed	failure	define product routing authority	Build and Push to GHCR	main	push	26725723229	18s	2026-05-31T22:01:36Z
+completed	failure	define product routing authority	.github/workflows/ci.yml	main	push	26725722935	0s	2026-05-31T22:01:35Z
+completed	failure	define product routing authority	.github/workflows/security-ci.yml	main	push	26725722758	0s	2026-05-31T22:01:35Z
+=== OPEN DEPENDABOT PRS ===
+105	Bump the npm_and_yarn group across 8 directories with 16 updates	dependabot/npm_and_yarn/npm_and_yarn-7877ebdd94	OPEN	2026-05-22T19:37:41Z
+104	Bump the npm_and_yarn group across 8 directories with 19 updates	dependabot/npm_and_yarn/npm_and_yarn-599052e141	OPEN	2026-05-22T19:32:01Z
+103	Bump the npm_and_yarn group across 6 directories with 19 updates	dependabot/npm_and_yarn/npm_and_yarn-61f7827327	OPEN	2026-05-22T19:32:00Z
