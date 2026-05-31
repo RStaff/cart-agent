@@ -82,7 +82,7 @@ export default function installPublicCheckout(app) {
       const stripe = await getStripe();
       const boundSuccessUrl = successUrl.replace("{PACKET_ID}", encodeURIComponent(packet.packet_id));
       const session = await stripe.checkout.sessions.create({
-        mode: "subscription",
+        mode: "payment",
         line_items: [{ price, quantity: 1 }],
         allow_promotion_codes: true,
         client_reference_id: packet.packet_id,
