@@ -1,0 +1,459 @@
+
+==============================
+staffordos/ui/operator-frontend/app/operator/page.tsx
+==============================
+import { OperatorConsole } from "../../components/operator/OperatorConsole";
+
+export default function OperatorPage() {
+  return <OperatorConsole />;
+}
+
+==============================
+staffordos/ui/operator-frontend/app/operator/leads/page.tsx
+==============================
+import LeadActions from "./LeadActions";
+
+type Lead = {
+  id: string;
+  name: string;
+  domain: string;
+  email: string | null;
+  source: string;
+  lifecycle_stage: string;
+  next_action: string;
+  score: number | null;
+  temperature?: string;
+  conversion_score?: number;
+  outreach_ready: boolean;
+  queued: boolean;
+  sent: boolean;
+  replied: boolean;
+  last_event_at: string | null;
+};
+
+async function loadLeads() {
+  const res = await fetch("http://localhost:3000/api/operator/lead-registry", {
+    cache: "no-store"
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to load operator leads");
+  }
+
+  return res.json();
+}
+
+export default async function OperatorLeadsPage() {
+  const data = await loadLeads();
+  const summary = data.summary || {};
+  const leads: Lead[] = Array.isArray(data.leads) ? data.leads : [];
+
+  return (
+    <main style={{ padding: "32px", fontFamily: "system-ui, sans-serif" }}>
+      <p style={{ color: "#666", marginBottom: 8 }}>StaffordOS / Operator Leads</p>
+      <h1 style={{ fontSize: 32, marginBottom: 8 }}>Lead Command</h1>
+      <p style={{ color: "#555", marginBottom: 24 }}>
+        Real lead registry, queue, readiness, send ledger, and event counts. No placeholder lead data.
+      </p>
+
+      <section
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+          gap: 12,
+          marginBottom: 28
+        }}
+      >
+        {[
+          ["Total Leads", summary.total_leads],
+          ["Contact Ready", summary.contact_ready],
+          ["Outreach Ready", summary.outreach_ready],
+          ["Queued", summary.queued],
+          ["Sent", summary.sent],
+          ["Engaged", summary.engaged],
+          ["Blocked", summary.blocked],
+          ["Events", summary.event_count]
+        ].map(([label, value]) => (
+          <div
+            key={String(label)}
+            style={{
+              border: "1px solid #ddd",
+              borderRadius: 12,
+              padding: 16,
+              background: "#fff"
+            }}
+          >
+            <div style={{ color: "#666", fontSize: 13 }}>{label}</div>
+            <div style={{ fontSize: 28, fontWeight: 700 }}>{String(value ?? 0)}</div>
+          </div>
+        ))}
+      </section>
+
+      <section style={{ border: "1px solid #ddd", borderRadius: 12, overflow: "hidden" }}>
+        <div style={{ padding: 16, borderBottom: "1px solid #ddd", background: "#fafafa" }}>
+          <strong>Real Lead Pipeline</strong>
+          <div style={{ color: "#666", fontSize: 13 }}>
+            Source policy: {data.source_policy} · Registry + send queue + send ready + send console.
+          </div>
+        </div>
+
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+          <thead>
+            <tr style={{ background: "#f5f5f5", textAlign: "left" }}>
+              {["Lead", "Domain", "Email", "Stage", "Next Action", "Score", "Temp", "Status", "Actions"].map((h) => (
+                <th key={h} style={{ padding: 12, borderBottom: "1px solid #ddd" }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {leads.map((lead) => (
+              <tr key={lead.id}>
+                <td style={{ padding: 12, borderBottom: "1px solid #eee", fontWeight: 600 }}>
+                  {lead.name}
+                </td>
+                <td style={{ padding: 12, borderBottom: "1px solid #eee" }}>
+                  {lead.domain || "—"}
+                </td>
+                <td style={{ padding: 12, borderBottom: "1px solid #eee" }}>
+                  {lead.email || "Needs contact"}
+                </td>
+                <td style={{ padding: 12, borderBottom: "1px solid #eee" }}>
+                  {lead.lifecycle_stage}
+                </td>
+                <td style={{ padding: 12, borderBottom: "1px solid #eee", maxWidth: 280 }}>
+                  {lead.next_action}
+                </td>
+                <td style={{ padding: 12, borderBottom: "1px solid #eee" }}>
+                  {lead.conversion_score ?? lead.score ?? "—"}
+                </td>
+                <td style={{ padding: 12, borderBottom: "1px solid #eee", fontWeight: 700 }}>
+                  {(lead.temperature || "cold").toUpperCase()}
+                </td>
+                <td style={{ padding: 12, borderBottom: "1px solid #eee" }}>
+                  {lead.sent ? "Sent" : lead.queued ? "Queued" : lead.outreach_ready ? "Ready" : "Blocked"}
+                </td>
+                <td style={{ padding: 12, borderBottom: "1px solid #eee" }}>
+                  <LeadActions leadId={lead.id} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {leads.length === 0 && (
+          <div style={{ padding: 24, color: "#666" }}>
+            No real leads found in the current registry or queue files.
+          </div>
+        )}
+      </section>
+    </main>
+  );
+}
+
+==============================
+staffordos/ui/operator-frontend/app/operator/revenue-command/page.tsx
+==============================
+import { OperatorNav } from "../../../components/operator/OperatorNav";
+
+type ApiResponse = {
+  ok?: boolean;
+  source?: string;
+  registry?: any;
+  lifecycle_counts?: any;
+  product_routing?: Record<string, number>;
+  priority_leads?: any[];
+  bottleneck?: any;
+};
+
+type SendProofResponse = {
+  ok?: boolean;
+  source?: string;
+  proof_count?: number;
+  dry_run_proof_count?: number;
+  live_send_attempted_count?: number;
+  latest_proofs?: any[];
+};
+
+async function loadRevenueCommand() {
+  const registryResponse = await fetch("http://localhost:3000/api/operator/lead-registry", {
+    cache: "no-store",
+  });
+
+  const proofResponse = await fetch("http://localhost:3000/api/operator/send-proof", {
+    cache: "no-store",
+  });
+
+  const data = (await registryResponse.json()) as ApiResponse;
+  const sendProof = (await proofResponse.json()) as SendProofResponse;
+
+  return { data, sendProof };
+}
+
+export default async function RevenueCommandPage() {
+  const { data, sendProof } = await loadRevenueCommand();
+
+  const registry = data.registry || {};
+  const lifecycle = data.lifecycle_counts || {};
+  const routing = data.product_routing || {};
+  const priorityLeads = data.priority_leads || [];
+  const bottleneck = data.bottleneck || {
+    stage: "unknown",
+    next_action: "Run lead registry sync and inspect lifecycle state.",
+  };
+
+  return (
+    <main className="shell">
+      <div className="container">
+        <section className="panel">
+          <div className="panelInner">
+            <p className="eyebrow">StaffordOS Revenue</p>
+            <h1 className="title">Lead Registry Command</h1>
+            <p className="subtitle">
+              Real operator dashboard powered by the canonical lead registry.
+            </p>
+            <OperatorNav activeHref="/operator/revenue-command" />
+          </div>
+        </section>
+
+        <section className="panel">
+          <div className="panelInner">
+            <h2 className="sectionTitle">Current Bottleneck</h2>
+            <p className="subtitle" style={{ marginTop: 0 }}>{bottleneck.stage}</p>
+            <div className="kv">
+              <div><strong>Next action:</strong> {bottleneck.next_action}</div>
+              <div><strong>Total leads:</strong> {registry.items?.length || 0}</div>
+              <div><strong>Registry version:</strong> {registry.version}</div>
+              <div><strong>Schema:</strong> {registry.schema}</div>
+              <div><strong>Read source:</strong> staffordos/leads/lead_registry_v1.json</div>
+            </div>
+          </div>
+        </section>
+
+        <div className="grid gridTwo">
+          <section className="panel">
+            <div className="panelInner">
+              <h2 className="sectionTitle">Lifecycle Counts</h2>
+              <div className="kv">
+                <div><strong>Contact needed:</strong> {lifecycle.contact_needed || 0}</div>
+                <div><strong>Send initial outreach:</strong> {lifecycle.send_initial_outreach || 0}</div>
+                <div><strong>Approved:</strong> {lifecycle.approved || 0}</div>
+                <div><strong>Dry-run ready:</strong> {lifecycle.dry_run_ready || 0}</div>
+                <div><strong>Sent:</strong> {lifecycle.sent || 0}</div>
+                <div><strong>Engaged:</strong> {lifecycle.engaged || 0}</div>
+                <div><strong>Recovered revenue:</strong> ${lifecycle.recovered_revenue || 0}</div>
+              </div>
+            </div>
+          </section>
+
+          <section className="panel">
+            <div className="panelInner">
+              <h2 className="sectionTitle">Product Routing</h2>
+              <div className="kv">
+                {Object.entries(routing).map(([product, count]) => (
+                  <div key={product}>
+                    <strong>{product}:</strong> {String(count)}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <section className="panel">
+          <div className="panelInner">
+            <h2 className="sectionTitle">Send Proof</h2>
+            <div className="kv">
+              <div><strong>Total proof records:</strong> {sendProof.proof_count || 0}</div>
+              <div><strong>Dry-run proofs:</strong> {sendProof.dry_run_proof_count || 0}</div>
+              <div><strong>Live sends attempted:</strong> {sendProof.live_send_attempted_count || 0}</div>
+              <div><strong>Read source:</strong> {sendProof.source}</div>
+            </div>
+
+            <div className="kv" style={{ marginTop: 16 }}>
+              {(sendProof.latest_proofs || []).map((proof: any) => (
+                <details key={proof.id} style={{ marginBottom: 10 }}>
+                  <summary>
+                    <strong>{proof.lead_name || proof.lead_id}</strong>
+                    {" — "}
+                    {proof.status}
+                    {" / "}
+                    {proof.proof_type}
+                    {" / "}
+                    {proof.id}
+                    {" — View Proof"}
+                  </summary>
+
+                  <div style={{ marginTop: 8, padding: 8, border: "1px solid #333", borderRadius: 6, fontSize: 12, lineHeight: 1.4 }}>
+                    <div><strong>Target:</strong> {proof.send_target || "n/a"}</div>
+                    <div style={{ marginTop: 6 }}>
+                      <strong>Message:</strong>
+                      <pre style={{ whiteSpace: "pre-wrap", marginTop: 4 }}>
+                        {proof.message || "No message recorded."}
+                      </pre>
+                    </div>
+                  </div>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="panel">
+          <div className="panelInner">
+            <h2 className="sectionTitle">Priority Leads</h2>
+            <div className="kv">
+              {priorityLeads.map((lead: any) => (
+                <div key={lead.id || lead.name || lead.domain}>
+                  <strong>{lead.name || lead.domain || lead.id}</strong> —{" "}
+                  {lead.product || "unknown"} / {lead.stage || "unknown"} /{" "}
+                  {lead.next_action || "Review lead"}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  );
+}
+
+==============================
+staffordos/ui/operator-frontend/app/operator/command-center/page.tsx
+==============================
+import { OperatorHomeV1 } from "../../../components/operator/OperatorHomeV1";
+import { loadPrimaryActionSnapshot } from "../../../lib/operator/loadPrimaryActionSnapshot";
+import { loadPreflightReport } from "../../../lib/operator/loadPreflightReport";
+import { loadCommandCenterQaReport } from "../../../lib/operator/loadCommandCenterQaReport";
+import { loadUnitWorkSnapshot } from "../../../lib/operator/loadUnitWorkSnapshot";
+
+export default function RossCommandCenterPage() {
+  const primaryActionSnapshot = loadPrimaryActionSnapshot();
+  const preflightReport = loadPreflightReport();
+  const qaReport = loadCommandCenterQaReport();
+  const unitWorkSnapshot = loadUnitWorkSnapshot();
+
+  return (
+    <OperatorHomeV1
+      primaryActionSnapshot={primaryActionSnapshot}
+      preflightReport={preflightReport}
+      qaReport={qaReport}
+      unitWorkSnapshot={unitWorkSnapshot}
+    />
+  );
+}
+
+==============================
+staffordos/ui/operator-frontend/app/operator/products/page.tsx
+==============================
+import { AbandoProductSummaryCard } from "../../../components/operator/AbandoProductSummaryCard";
+import { OperatorNav } from "../../../components/operator/OperatorNav";
+import { ProductSummaryPlaceholderCard } from "../../../components/operator/ProductSummaryPlaceholderCard";
+
+type AbandoMerchantSummary = {
+  ok: true;
+  product: "abando";
+  status: "not_connected" | "listening" | "recovery_ready";
+  recoveryStatus: "none" | "created" | "sent" | "failed";
+  eventCount: number;
+  lastEventSeen: "none" | "checkout_started" | "checkout_risk" | "test_event";
+  lastEventAt: string | null;
+  lastRecoveryActionAt: string | null;
+  lastRecoveryActionType: string | null;
+  notes: string[];
+};
+
+function getAbandoBaseUrl() {
+  const raw =
+    process.env.ABANDO_API_BASE ||
+    process.env.NEXT_PUBLIC_ABANDO_API_BASE ||
+    "http://localhost:3000";
+
+  return raw.replace(/\/$/, "");
+}
+
+async function getAbandoSummary() {
+  const shop =
+    process.env.ABANDO_SUMMARY_SHOP ||
+    process.env.NEXT_PUBLIC_ABANDO_SUMMARY_SHOP ||
+    "";
+  const endpoint = shop
+    ? `${getAbandoBaseUrl()}/api/abando/merchant-summary?shop=${encodeURIComponent(shop)}`
+    : `${getAbandoBaseUrl()}/api/abando/merchant-summary`;
+
+  try {
+    const response = await fetch(endpoint, { cache: "no-store" });
+
+    if (!response.ok) {
+      throw new Error(`Abando summary request failed with status ${response.status}.`);
+    }
+
+    const payload = (await response.json()) as AbandoMerchantSummary;
+    const hasObservableState =
+      payload.status !== "not_connected" ||
+      payload.eventCount > 0 ||
+      payload.lastEventAt !== null ||
+      payload.lastRecoveryActionAt !== null ||
+      payload.lastRecoveryActionType !== null;
+
+    return {
+      summary: hasObservableState ? payload : null,
+      placeholderNote: payload.notes[0] || "Waiting for merchant state.",
+    };
+  } catch (error) {
+    return {
+      summary: null,
+      placeholderNote:
+        error instanceof Error
+          ? `Abando summary endpoint could not be reached: ${error.message}`
+          : "Abando summary endpoint could not be reached.",
+    };
+  }
+}
+
+export default async function OperatorProductsPage() {
+  const { summary, placeholderNote } = await getAbandoSummary();
+
+  return (
+    <main className="shell">
+      <div className="container">
+        <section className="panel">
+          <div className="panelInner">
+            <p className="eyebrow">StaffordOS Products</p>
+            <h1 className="title">Product Overview</h1>
+            <p className="subtitle">
+              This control-plane view aggregates product summaries by API. Product workflows and merchant dashboards stay inside the product engines.
+            </p>
+            <OperatorNav activeHref="/operator/products" />
+          </div>
+        </section>
+
+        <section className="panel">
+          <div className="panelInner">
+            <h2 className="sectionTitle">Summary Status</h2>
+            <div className="kv">
+              <div><strong>Audience:</strong> StaffordOS operators</div>
+              <div><strong>Embedded product workflows:</strong> None</div>
+              <div><strong>Metric policy:</strong> No fake metrics or synthetic product dashboards</div>
+            </div>
+          </div>
+        </section>
+
+        <div className="grid gridTwo">
+          <AbandoProductSummaryCard summary={summary} placeholderNote={placeholderNote} />
+
+          <ProductSummaryPlaceholderCard
+            title="Shopifixer"
+            description="Shopifixer should appear here only as a control-plane summary once a product summary endpoint exists."
+            placeholderNote="No Shopifixer product summary endpoint is connected yet."
+          />
+
+          <ProductSummaryPlaceholderCard
+            title="Actinventory"
+            description="Actinventory should appear here only as a control-plane summary once a product summary endpoint exists."
+            placeholderNote="No Actinventory product summary endpoint is connected yet."
+          />
+        </div>
+      </div>
+    </main>
+  );
+}
