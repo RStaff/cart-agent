@@ -1,0 +1,440 @@
+--- staffordos/cockpit_audit/recovery/cockpit_previous_clean_version.tsx	2026-06-01 11:54:08
++++ staffordos/cockpit_audit/recovery/cockpit_current_after_ceo_binding.tsx	2026-06-01 11:54:08
+@@ -0,0 +1,437 @@
++"use client";
++
++import { useEffect, useMemo, useState } from "react";
++
++type Result = {
++  ok?: boolean;
++  action?: string;
++  stdout?: string;
++  stderr?: string;
++  latest?: string;
++  status?: any;
++  error?: string;
++};
++
++type CeoSnapshot = {
++  ok?: boolean;
++  generated_at?: string;
++  source_policy?: string;
++  revenue?: any;
++  acquisition?: any;
++  conversion?: any;
++  fulfillment?: any;
++  merchant_success?: any;
++  executive_control?: any;
++  next_best_action?: any;
++};
++
++function money(value: unknown) {
++  return `$${Number(value || 0).toLocaleString()}`;
++}
++
++function valueOrDash(value: unknown) {
++  const text = String(value ?? "").trim();
++  return text || "-";
++}
++
++function statusStyle(status?: string) {
++  const normalized = String(status || "").toLowerCase();
++  if (normalized.includes("complete") || normalized === "loaded") {
++    return { borderColor: "#15803d", color: "#166534", background: "#dcfce7" };
++  }
++  if (normalized.includes("missing") || normalized.includes("blocked")) {
++    return { borderColor: "#b91c1c", color: "#991b1b", background: "#fee2e2" };
++  }
++  return { borderColor: "#c2410c", color: "#9a3412", background: "#ffedd5" };
++}
++
++function StatusPill({ status }: { status?: string }) {
++  return (
++    <span
++      style={{
++        display: "inline-flex",
++        alignItems: "center",
++        minHeight: 24,
++        padding: "0 8px",
++        border: "1px solid",
++        borderRadius: 999,
++        fontSize: 12,
++        fontWeight: 700,
++        ...statusStyle(status)
++      }}
++    >
++      {valueOrDash(status)}
++    </span>
++  );
++}
++
++function AnswerCard({
++  title,
++  status,
++  primary,
++  details
++}: {
++  title: string;
++  status?: string;
++  primary: string;
++  details?: string[];
++}) {
++  return (
++    <section
++      style={{
++        border: "1px solid #d4d4d8",
++        borderRadius: 8,
++        padding: 16,
++        background: "#fff",
++        minHeight: 180
++      }}
++    >
++      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start" }}>
++        <h2 style={{ fontSize: 16, margin: 0 }}>{title}</h2>
++        {status ? <StatusPill status={status} /> : null}
++      </div>
++      <p style={{ fontSize: 20, fontWeight: 750, lineHeight: 1.25, margin: "16px 0 0" }}>
++        {primary}
++      </p>
++      {details?.length ? (
++        <ul style={{ margin: "14px 0 0", paddingLeft: 18, color: "#52525b", lineHeight: 1.5 }}>
++          {details.map((detail) => (
++            <li key={detail}>{detail}</li>
++          ))}
++        </ul>
++      ) : null}
++    </section>
++  );
++}
++
++function MetricStrip({ snapshot }: { snapshot: CeoSnapshot }) {
++  const metrics = [
++    ["Stafford Revenue", money(snapshot.revenue?.stafford_revenue)],
++    ["Merchant Recovered", money(snapshot.revenue?.merchant_revenue_recovered)],
++    ["Leads", snapshot.acquisition?.total_leads ?? 0],
++    ["Clients", snapshot.revenue?.total_clients ?? 0],
++    ["Blocked", snapshot.executive_control?.blockers?.length ?? 0],
++    ["Proof Gaps", snapshot.merchant_success?.proof_or_revenue_gaps ?? 0]
++  ];
++
++  return (
++    <section
++      style={{
++        display: "grid",
++        gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
++        gap: 10,
++        marginTop: 18
++      }}
++    >
++      {metrics.map(([label, value]) => (
++        <div
++          key={String(label)}
++          style={{
++            border: "1px solid #d4d4d8",
++            borderRadius: 8,
++            padding: 12,
++            background: "#fafafa"
++          }}
++        >
++          <div style={{ color: "#71717a", fontSize: 12, fontWeight: 700 }}>{label}</div>
++          <div style={{ fontSize: 22, fontWeight: 800, marginTop: 4 }}>{String(value)}</div>
++        </div>
++      ))}
++    </section>
++  );
++}
++
++export default function OperatorCockpitPage() {
++  const [result, setResult] = useState<Result | null>(null);
++  const [loading, setLoading] = useState<string | null>(null);
++  const [snapshot, setSnapshot] = useState<CeoSnapshot | null>(null);
++  const [snapshotError, setSnapshotError] = useState("");
++  const [snapshotLoading, setSnapshotLoading] = useState(true);
++
++  useEffect(() => {
++    let active = true;
++
++    async function loadSnapshot() {
++      setSnapshotLoading(true);
++      setSnapshotError("");
++
++      try {
++        const res = await fetch("/api/operator/ceo-snapshot", { cache: "no-store" });
++        const json = await res.json();
++
++        if (!active) return;
++
++        if (!res.ok || json?.ok === false) {
++          setSnapshotError(json?.error || "CEO snapshot failed to load.");
++          setSnapshot(null);
++          return;
++        }
++
++        setSnapshot(json);
++      } catch (error: any) {
++        if (active) {
++          setSnapshotError(error.message || "CEO snapshot failed to load.");
++          setSnapshot(null);
++        }
++      } finally {
++        if (active) setSnapshotLoading(false);
++      }
++    }
++
++    void loadSnapshot();
++
++    return () => {
++      active = false;
++    };
++  }, []);
++
++  const answers = useMemo(() => {
++    if (!snapshot) return null;
++
++    const closestClient = snapshot.conversion?.closest_to_payment?.[0];
++    const revenueGap = snapshot.revenue?.revenue_gaps?.[0];
++    const blockers = Array.isArray(snapshot.executive_control?.blockers)
++      ? snapshot.executive_control.blockers
++      : [];
++
++    return {
++      next: {
++        area: valueOrDash(snapshot.next_best_action?.area),
++        action: valueOrDash(snapshot.next_best_action?.action),
++        reason: valueOrDash(snapshot.next_best_action?.reason),
++        source: valueOrDash(snapshot.next_best_action?.source)
++      },
++      revenueClosest: closestClient
++        ? {
++            primary: `${valueOrDash(closestClient.merchant_shop)} - ${valueOrDash(closestClient.lifecycle_stage)}`,
++            details: [
++              `Payment: ${valueOrDash(closestClient.payment_status)}`,
++              `Priority: ${closestClient.priority_score ?? 0}`,
++              `Next: ${valueOrDash(closestClient.next_action?.instructions)}`
++            ]
++          }
++        : revenueGap
++          ? {
++              primary: `${valueOrDash(revenueGap.merchant_shop)} - ${money(revenueGap.gap)} gap`,
++              details: [valueOrDash(revenueGap.action)]
++            }
++          : {
++              primary: "No close-ready revenue signal.",
++              details: ["CEO snapshot has no closest-to-payment client."]
++            },
++      blocked: blockers.length
++        ? {
++            primary: `${blockers.length} blocker${blockers.length === 1 ? "" : "s"} need attention`,
++            details: blockers.slice(0, 4).map((blocker: any) => `${valueOrDash(blocker.area)}: ${valueOrDash(blocker.message)}`)
++          }
++        : {
++            primary: "No blockers reported.",
++            details: ["Source health and business blockers are clear in the snapshot."]
++          },
++      audit: {
++        primary: `${snapshot.conversion?.audits_needed ?? 0} client audit${snapshot.conversion?.audits_needed === 1 ? "" : "s"} needed`,
++        details: [
++          `Proposal sent clients: ${snapshot.conversion?.proposal_sent_clients ?? 0}`,
++          `Engaged leads: ${snapshot.conversion?.engaged_leads ?? 0}`
++        ]
++      },
++      fulfillment: {
++        primary: `${snapshot.fulfillment?.fixes_in_progress ?? 0} fix${snapshot.fulfillment?.fixes_in_progress === 1 ? "" : "es"} in progress`,
++        details: [
++          `Not started: ${snapshot.fulfillment?.fix_not_started ?? 0}`,
++          `QA queue: ${snapshot.fulfillment?.qa_queue ?? 0}`,
++          valueOrDash(snapshot.fulfillment?.note)
++        ]
++      },
++      proof: {
++        primary: `${snapshot.fulfillment?.proof_queue ?? 0} in proof queue`,
++        details: [
++          `Proof or revenue gaps: ${snapshot.merchant_success?.proof_or_revenue_gaps ?? 0}`,
++          `Outreach proof records: ${snapshot.merchant_success?.outreach_proof?.total_proofs ?? 0}`,
++          valueOrDash(snapshot.merchant_success?.note)
++        ]
++      },
++      reviewReferral: {
++        primary: `${snapshot.merchant_success?.reviews_requested ?? 0} reviews requested`,
++        details: [
++          `Reviews received: ${snapshot.merchant_success?.reviews_received ?? 0}`,
++          `Referral opportunities: ${snapshot.merchant_success?.referral_opportunities ?? 0}`
++        ]
++      }
++    };
++  }, [snapshot]);
++
++  async function run(label: string, url: string, method: "GET" | "POST") {
++    setLoading(label);
++    setResult(null);
++
++    try {
++      const res = await fetch(url, { method, cache: "no-store" });
++      const json = await res.json();
++      setResult(json);
++    } catch (error: any) {
++      setResult({ ok: false, error: error.message });
++    } finally {
++      setLoading(null);
++    }
++  }
++
++  return (
++    <main style={{ padding: 24, maxWidth: 1240, margin: "0 auto", fontFamily: "system-ui, sans-serif" }}>
++      <header>
++        <p style={{ color: "#71717a", fontSize: 13, fontWeight: 700, margin: "0 0 8px" }}>
++          StaffordOS / CEO Cockpit
++        </p>
++        <h1 style={{ fontSize: 36, margin: 0 }}>What should Ross do next?</h1>
++        <p style={{ color: "#52525b", margin: "10px 0 0", maxWidth: 780, lineHeight: 1.5 }}>
++          Bound to <strong>/api/operator/ceo-snapshot</strong>. Existing workday and discovery controls remain below the CEO view.
++        </p>
++      </header>
++
++      {snapshotLoading ? (
++        <section style={{ marginTop: 24, border: "1px solid #d4d4d8", borderRadius: 8, padding: 18 }}>
++          Loading CEO snapshot...
++        </section>
++      ) : snapshotError ? (
++        <section style={{ marginTop: 24, border: "1px solid #b91c1c", borderRadius: 8, padding: 18, background: "#fee2e2" }}>
++          <strong>CEO snapshot unavailable.</strong>
++          <div style={{ marginTop: 8 }}>{snapshotError}</div>
++        </section>
++      ) : snapshot && answers ? (
++        <>
++          <section
++            style={{
++              marginTop: 24,
++              border: "1px solid #18181b",
++              borderRadius: 8,
++              padding: 22,
++              background: "#18181b",
++              color: "#fafafa"
++            }}
++          >
++            <div style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "flex-start" }}>
++              <div>
++                <div style={{ color: "#a1a1aa", fontSize: 13, fontWeight: 700 }}>Next Best Action</div>
++                <h2 style={{ fontSize: 28, margin: "8px 0 0", lineHeight: 1.2 }}>{answers.next.action}</h2>
++                <p style={{ color: "#d4d4d8", margin: "12px 0 0", lineHeight: 1.5 }}>
++                  {answers.next.area} - {answers.next.reason}
++                </p>
++              </div>
++              <div style={{ textAlign: "right", minWidth: 190 }}>
++                <div style={{ color: "#a1a1aa", fontSize: 12, fontWeight: 700 }}>Generated</div>
++                <div style={{ fontWeight: 700, marginTop: 4 }}>{valueOrDash(snapshot.generated_at)}</div>
++                <div style={{ color: "#a1a1aa", fontSize: 12, fontWeight: 700, marginTop: 12 }}>Source</div>
++                <div style={{ fontSize: 13, marginTop: 4 }}>{answers.next.source}</div>
++              </div>
++            </div>
++          </section>
++
++          <MetricStrip snapshot={snapshot} />
++
++          <section
++            style={{
++              display: "grid",
++              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
++              gap: 14,
++              marginTop: 18
++            }}
++          >
++            <AnswerCard
++              title="What revenue is closest?"
++              status={snapshot.revenue?.status}
++              primary={answers.revenueClosest.primary}
++              details={answers.revenueClosest.details}
++            />
++            <AnswerCard
++              title="What is blocked?"
++              status={snapshot.executive_control?.status}
++              primary={answers.blocked.primary}
++              details={answers.blocked.details}
++            />
++            <AnswerCard
++              title="What needs audit?"
++              status={snapshot.conversion?.status}
++              primary={answers.audit.primary}
++              details={answers.audit.details}
++            />
++            <AnswerCard
++              title="What needs fulfillment?"
++              status={snapshot.fulfillment?.status}
++              primary={answers.fulfillment.primary}
++              details={answers.fulfillment.details}
++            />
++            <AnswerCard
++              title="What needs proof?"
++              status={snapshot.merchant_success?.status}
++              primary={answers.proof.primary}
++              details={answers.proof.details}
++            />
++            <AnswerCard
++              title="What needs review/referral?"
++              status={snapshot.merchant_success?.status}
++              primary={answers.reviewReferral.primary}
++              details={answers.reviewReferral.details}
++            />
++          </section>
++
++          <section style={{ marginTop: 18, border: "1px solid #d4d4d8", borderRadius: 8, padding: 16, background: "#fafafa" }}>
++            <h2 style={{ fontSize: 18, margin: 0 }}>Executive Control</h2>
++            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 12 }}>
++              {Object.entries(snapshot.executive_control?.source_health || {}).map(([key, source]: [string, any]) => (
++                <div key={key} style={{ display: "flex", alignItems: "center", gap: 8 }}>
++                  <strong style={{ fontSize: 13 }}>{key}</strong>
++                  <StatusPill status={source?.status} />
++                </div>
++              ))}
++            </div>
++            <p style={{ color: "#71717a", margin: "12px 0 0", lineHeight: 1.5 }}>
++              {valueOrDash(snapshot.source_policy)}
++            </p>
++          </section>
++        </>
++      ) : null}
++
++      <section style={{ marginTop: 32, paddingTop: 24, borderTop: "1px solid #d4d4d8" }}>
++        <h2 style={{ fontSize: 22, margin: 0 }}>Control Plane</h2>
++        <p style={{ color: "#52525b", margin: "8px 0 0" }}>
++          Start/stop gates, cron visibility, and discovery sync status.
++        </p>
++
++        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 16 }}>
++          <button onClick={() => run("Start Workday", "/api/operator/workday/start", "POST")}>
++            Start Workday
++          </button>
++
++          <button onClick={() => run("Stop Workday", "/api/operator/workday/stop", "POST")}>
++            Stop Workday
++          </button>
++
++          <button onClick={() => run("Cron Status", "/api/operator/cron-status", "GET")}>
++            Cron Status
++          </button>
++
++          <button onClick={() => run("Discovery Status", "/api/operator/discovery-status", "GET")}>
++            Discovery Status
++          </button>
++        </div>
++      </section>
++
++      <section style={{ marginTop: 24 }}>
++        <h2>{loading ? `Running: ${loading}` : "Output"}</h2>
++        <pre
++          style={{
++            background: "#0b0b0c",
++            color: "#f2f2f2",
++            padding: 16,
++            borderRadius: 12,
++            overflowX: "auto",
++            minHeight: 300,
++            whiteSpace: "pre-wrap"
++          }}
++        >
++          {result ? JSON.stringify(result, null, 2) : "No action run yet."}
++        </pre>
++      </section>
++    </main>
++  );
++}
