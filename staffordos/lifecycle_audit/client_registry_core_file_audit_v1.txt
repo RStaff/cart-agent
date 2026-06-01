@@ -1,0 +1,1182 @@
+
+===============================
+staffordos/clients/client_registry_v1.mjs
+===============================
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { dirname } from "node:path";
+
+const REGISTRY_PATH = "staffordos/clients/client_registry_v1.json";
+
+function now() {
+  return new Date().toISOString();
+}
+
+function ensureRegistry() {
+  mkdirSync(dirname(REGISTRY_PATH), { recursive: true });
+
+  if (!existsSync(REGISTRY_PATH)) {
+    writeFileSync(
+      REGISTRY_PATH,
+      JSON.stringify({
+        schema: "staffordos.client_registry.v1",
+        purpose:
+          "Canonical registry for StaffordOS clients, separating Stafford Media business revenue from ShopiFixer audit/fix data and Abando merchant performance data.",
+        generated_at: now(),
+        clients: []
+      }, null, 2)
+    );
+  }
+}
+
+export function readClientRegistry() {
+  ensureRegistry();
+  return JSON.parse(readFileSync(REGISTRY_PATH, "utf8"));
+}
+
+export function writeClientRegistry(registry) {
+  registry.generated_at = now();
+  writeFileSync(REGISTRY_PATH, JSON.stringify(registry, null, 2) + "\n");
+}
+
+export function upsertClient({
+  client_id,
+  merchant_shop,
+  source = "unknown",
+  status = "prospect",
+  contact = {},
+  deal = {},
+  shopifixer = {},
+  abando = {},
+  business = {},
+  notes = []
+}) {
+  if (!client_id && !merchant_shop) {
+    throw new Error("client_id_or_merchant_shop_required");
+  }
+
+  const id = client_id || merchant_shop;
+  const registry = readClientRegistry();
+
+  const existingIndex = registry.clients.findIndex(
+    (client) => client.client_id === id || client.merchant_shop === merchant_shop
+  );
+
+  const existing = existingIndex >= 0 ? registry.clients[existingIndex] : {};
+
+  const merged = {
+    client_id: id,
+    merchant_shop: merchant_shop || existing.merchant_shop || null,
+    source: source || existing.source || "unknown",
+    status: status || existing.status || "prospect",
+    created_at: existing.created_at || now(),
+    updated_at: now(),
+
+    contact: {
+      ...(existing.contact || {}),
+      ...contact
+    },
+
+    deal: {
+      type: null,
+      value: 0,
+      currency: "USD",
+      closed_at: null,
+      payment_status: "unpaid",
+      ...(existing.deal || {}),
+      ...deal
+    },
+
+    shopifixer: {
+      audit_status: "not_started",
+      audit_score: null,
+      primary_problem: null,
+      fix_status: "not_started",
+      latest_audit_at: null,
+      ...(existing.shopifixer || {}),
+      ...shopifixer
+    },
+
+    abando: {
+      installed: false,
+      install_status: "unknown",
+      checkout_events: 0,
+      recovery_actions: 0,
+      merchant_revenue_recovered: 0,
+      currency: "USD",
+      last_recovery_at: null,
+      ...(existing.abando || {}),
+      ...abando
+    },
+
+    business: {
+      stafford_revenue_earned: 0,
+      stafford_recurring_revenue: 0,
+      lifetime_value: 0,
+      next_action: null,
+      ...(existing.business || {}),
+      ...business
+    },
+
+    notes: [
+      ...(existing.notes || []),
+      ...notes
+    ]
+  };
+
+  if (existingIndex >= 0) {
+    registry.clients[existingIndex] = merged;
+  } else {
+    registry.clients.push(merged);
+  }
+
+  writeClientRegistry(registry);
+  return merged;
+}
+
+===============================
+staffordos/clients/generate_shopifixer_offer_v1.mjs
+===============================
+import { readFileSync, writeFileSync } from "fs";
+
+const REGISTRY_PATH = "staffordos/clients/client_registry_v1.json";
+const OUTPUT_PATH = "staffordos/clients/shopifixer_offer_latest.json";
+
+function formatMoney(n) {
+  return Number(n || 0).toFixed(0);
+}
+
+function buildOffer(client) {
+  const recovered = client.abando?.merchant_revenue_recovered || 0;
+  const email = client.contact?.email || "";
+  const shop = client.merchant_shop;
+
+  // SIMPLE PRICING (you can change later)
+  const fixPrice = recovered > 0 ? Math.max(99, Math.floor(recovered * 1.5)) : 149;
+  const abandoPrice = 49;
+
+  return {
+    client_id: client.client_id,
+    merchant_shop: shop,
+    email,
+
+    offer: {
+      subject: `We found a revenue leak in your store (${shop})`,
+
+      body: `
+Hi,
+
+I took a look at your store and found a revenue leak in your checkout flow.
+
+We actually recovered $${formatMoney(recovered)} in lost revenue already.
+
+Right now, that recovery is not running consistently — it's just a one-time proof.
+
+Here’s what I can do for you:
+
+1. Fix the underlying issue causing the drop-off
+2. Implement the correction directly in your store
+3. Activate continuous recovery so this runs automatically
+
+→ One-time fix: $${fixPrice}
+
+Optional:
+→ Ongoing recovery system (Abando): $${abandoPrice}/month
+
+This turns what we already proved into something that runs every day.
+
+Want me to set this up for you?
+
+– Ross
+Stafford Media Consulting
+`,
+
+      pricing: {
+        shopifixer_one_time: fixPrice,
+        abando_mrr: abandoPrice
+      },
+
+      context: {
+        recovered_revenue: recovered,
+        proof_present: recovered > 0
+      }
+    }
+  };
+}
+
+function run() {
+  const registry = JSON.parse(readFileSync(REGISTRY_PATH, "utf8"));
+
+  if (!registry.clients || registry.clients.length === 0) {
+    console.error("No clients found.");
+    process.exit(1);
+  }
+
+  const client = registry.clients[0]; // first client for now
+  const offer = buildOffer(client);
+
+  writeFileSync(OUTPUT_PATH, JSON.stringify(offer, null, 2) + "\n");
+
+  console.log("\n===== OFFER GENERATED =====\n");
+  console.log(offer.offer.body);
+
+  console.log("\n===== STRUCTURED OUTPUT SAVED =====");
+  console.log(OUTPUT_PATH);
+}
+
+run();
+
+===============================
+staffordos/clients/send_shopifixer_offer_v1.mjs
+===============================
+import { readFileSync, writeFileSync } from "fs";
+import https from "https";
+
+const OFFER_PATH = "staffordos/clients/shopifixer_offer_latest.json";
+const REGISTRY_PATH = "staffordos/clients/client_registry_v1.json";
+
+function sendEmail(shop, email) {
+  return new Promise((resolve, reject) => {
+    const data = JSON.stringify({
+      shop,
+      email
+    });
+
+    const req = https.request(
+      "https://pay.abando.ai/api/recovery-actions/send-live-test",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Content-Length": data.length
+        }
+      },
+      (res) => {
+        let body = "";
+        res.on("data", (chunk) => (body += chunk));
+        res.on("end", () => {
+          resolve({
+            status: res.statusCode,
+            body
+          });
+        });
+      }
+    );
+
+    req.on("error", reject);
+    req.write(data);
+    req.end();
+  });
+}
+
+function run() {
+  const offer = JSON.parse(readFileSync(OFFER_PATH, "utf8"));
+  const registry = JSON.parse(readFileSync(REGISTRY_PATH, "utf8"));
+
+  const client = registry.clients.find(
+    (c) => c.client_id === offer.client_id
+  );
+
+  if (!client) {
+    console.error("Client not found.");
+    process.exit(1);
+  }
+
+  console.log("\n===== SENDING OFFER =====\n");
+
+  sendEmail(client.merchant_shop, offer.email)
+    .then((result) => {
+      console.log("Email send result:", result.status);
+
+      const now = new Date().toISOString();
+
+      // LOG EVENT
+      client.notes = client.notes || [];
+      client.notes.push({
+        at: now,
+        type: "offer_sent",
+        text: `ShopiFixer offer sent ($${offer.offer.pricing.shopifixer_one_time})`
+      });
+
+      // UPDATE LIFECYCLE
+      client.lifecycle = client.lifecycle || {};
+      client.lifecycle.stage = "proposal_sent";
+      client.lifecycle.stage_updated_at = now;
+
+      // UPDATE NEXT ACTION
+      client.next_action = {
+        type: "followup",
+        owner: "ross",
+        instructions: "Follow up on ShopiFixer offer.",
+        auto_executable: false,
+        updated_at: now
+      };
+
+      writeFileSync(REGISTRY_PATH, JSON.stringify(registry, null, 2) + "\n");
+
+      console.log("\n===== SYSTEM UPDATED =====\n");
+      console.log({
+        lifecycle: client.lifecycle.stage,
+        next_action: client.next_action.type
+      });
+    })
+    .catch((err) => {
+      console.error("Send failed:", err);
+    });
+}
+
+run();
+
+===============================
+staffordos/clients/close_engine_v1.mjs
+===============================
+import { readFileSync, writeFileSync } from "fs";
+
+const REGISTRY_PATH = "staffordos/clients/client_registry_v1.json";
+
+function hoursSince(ts) {
+  if (!ts) return 999;
+  return (Date.now() - new Date(ts).getTime()) / (1000 * 60 * 60);
+}
+
+function buildFollowupMessage(client, stageHours) {
+  const recovered = client.abando?.merchant_revenue_recovered || 0;
+
+  if (stageHours < 24) {
+    return `Quick follow-up — we already recovered $${recovered} from your store.
+
+Want me to lock this in so it runs consistently?`;
+  }
+
+  if (stageHours < 72) {
+    return `Just checking back — the $${recovered} we recovered was only a one-time event.
+
+Right now nothing is running to capture that consistently.
+
+Want me to set this up for you?`;
+  }
+
+  return `Last note on this — we proved there's revenue being left on the table ($${recovered}).
+
+If you want, I can fix it and set it up so it runs daily.
+
+Let me know.`;
+}
+
+function run() {
+  const registry = JSON.parse(readFileSync(REGISTRY_PATH, "utf8"));
+  const now = new Date().toISOString();
+
+  const results = [];
+
+  registry.clients = registry.clients.map(client => {
+    if (client.lifecycle?.stage !== "proposal_sent") return client;
+
+    const lastUpdate = client.lifecycle.stage_updated_at;
+    const hours = hoursSince(lastUpdate);
+
+    const message = buildFollowupMessage(client, hours);
+
+    const followup = {
+      type: "followup_ready",
+      owner: "system",
+      message,
+      urgency:
+        hours > 72 ? "high" :
+        hours > 24 ? "medium" :
+        "low",
+      generated_at: now
+    };
+
+    client.close_engine = {
+      last_evaluated_at: now,
+      hours_since_proposal: Math.round(hours),
+      followup_ready: true,
+      suggested_message: message,
+      urgency: followup.urgency
+    };
+
+    results.push({
+      client_id: client.client_id,
+      hours_since: Math.round(hours),
+      urgency: followup.urgency
+    });
+
+    return client;
+  });
+
+  writeFileSync(REGISTRY_PATH, JSON.stringify(registry, null, 2) + "\n");
+
+  console.log(JSON.stringify({
+    ok: true,
+    engine: "close_engine_v1",
+    evaluated_at: now,
+    results
+  }, null, 2));
+}
+
+run();
+
+===============================
+staffordos/clients/next_action_engine_v1.mjs
+===============================
+import { readFileSync, writeFileSync } from "node:fs";
+
+const REGISTRY_PATH = "staffordos/clients/client_registry_v1.json";
+
+function now() {
+  return new Date().toISOString();
+}
+
+
+function computePriorityScore(client) {
+  const revenue = client.revenue || {};
+  const abando = client.abando || {};
+  const lifecycle = client.lifecycle || {};
+  const nextAction = client.next_action || {};
+
+  const revenuePotential =
+    Number(revenue.shopifixer_one_time || 0) +
+    Number(revenue.abando_recurring_mrr || 0) * 12 +
+    Number(abando.merchant_revenue_recovered || 0);
+
+  const easeOfClose =
+    lifecycle.stage === "revenue_active" ? 95 :
+    lifecycle.stage === "deal_won" ? 90 :
+    lifecycle.stage === "proposal_sent" ? 75 :
+    lifecycle.stage === "audit_completed" ? 65 :
+    lifecycle.stage === "lead" ? 40 :
+    50;
+
+  const timeToCash =
+    nextAction.type === "collect_payment" ? 95 :
+    nextAction.type === "close" ? 85 :
+    nextAction.type === "proposal" ? 70 :
+    nextAction.type === "outreach" ? 45 :
+    nextAction.type === "monitor" ? 35 :
+    50;
+
+  const health = client.system_health || {};
+  const greenCount = Object.entries(health)
+    .filter(([key, value]) => key !== "last_verified_at" && value === "green")
+    .length;
+
+  const systemConfidence = Math.min(100, greenCount * 20);
+
+  const total =
+    Math.round(
+      (Math.min(100, revenuePotential) * 0.35) +
+      (easeOfClose * 0.25) +
+      (timeToCash * 0.25) +
+      (systemConfidence * 0.15)
+    );
+
+  return {
+    revenue_potential: Math.min(100, revenuePotential),
+    ease_of_close: easeOfClose,
+    time_to_cash: timeToCash,
+    system_confidence: systemConfidence,
+    total
+  };
+}
+
+function detectBlockers(client) {
+  const blockers = [];
+
+  const health = client.system_health || {};
+  for (const [key, value] of Object.entries(health)) {
+    if (key !== "last_verified_at" && value === "red") {
+      blockers.push({
+        type: "system_health",
+        severity: "high",
+        source: key,
+        message: `${key} is red`
+      });
+    }
+  }
+
+  if (client.lifecycle?.stage === "proposal_sent" && client.deal?.payment_status !== "paid") {
+    blockers.push({
+      type: "payment",
+      severity: "medium",
+      source: "deal.payment_status",
+      message: "Proposal sent but payment is not collected"
+    });
+  }
+
+  if (client.lifecycle?.stage === "fix_in_progress" && client.shopifixer?.fix_status !== "completed") {
+    blockers.push({
+      type: "execution",
+      severity: "medium",
+      source: "shopifixer.fix_status",
+      message: "Fix is in progress and not yet completed"
+    });
+  }
+
+  if (client.abando?.installed === true && Number(client.abando?.checkout_events || 0) > 0 && Number(client.abando?.recovery_actions || 0) === 0) {
+    blockers.push({
+      type: "recovery",
+      severity: "high",
+      source: "abando.recovery_actions",
+      message: "Checkout events exist but no recovery action has fired"
+    });
+  }
+
+  return {
+    blocked: blockers.length > 0,
+    blocker_count: blockers.length,
+    highest_severity:
+      blockers.some((b) => b.severity === "high") ? "high" :
+      blockers.some((b) => b.severity === "medium") ? "medium" :
+      blockers.length ? "low" : null,
+    blockers
+  };
+}
+
+
+function computeNextAction(client) {
+  const stage = client.lifecycle?.stage || "lead";
+  const auditStatus = client.shopifixer?.audit_status || "not_started";
+  const fixStatus = client.shopifixer?.fix_status || "not_started";
+  const paymentStatus = client.deal?.payment_status || "unpaid";
+
+  const abandoInstalled = client.abando?.installed === true;
+  const checkoutEvents = Number(client.abando?.checkout_events || 0);
+  const recoveryActions = Number(client.abando?.recovery_actions || 0);
+  const merchantRevenueRecovered = Number(client.abando?.merchant_revenue_recovered || 0);
+
+  const health = client.system_health || {};
+  const redHealth = Object.entries(health)
+    .filter(([key, value]) => key !== "last_verified_at" && value === "red")
+    .map(([key]) => key);
+
+  if (redHealth.length > 0) {
+    return {
+      lifecycle_stage: stage,
+      blocked: true,
+      block_reason: `System health issue: ${redHealth.join(", ")}`,
+      next_action: {
+        type: "monitor",
+        owner: "ross",
+        due_at: null,
+        instructions: `Investigate failed system health checks: ${redHealth.join(", ")}.`,
+        auto_executable: false
+      }
+    };
+  }
+
+  if (merchantRevenueRecovered > 0) {
+    return {
+      lifecycle_stage: "revenue_active",
+      blocked: false,
+      block_reason: null,
+      next_action: {
+        type: "monitor",
+        owner: "system",
+        due_at: null,
+        instructions: "Monitor recovered revenue and prepare upsell or case study.",
+        auto_executable: true
+      }
+    };
+  }
+
+  if (stage === "lead") {
+    return {
+      lifecycle_stage: "lead",
+      blocked: false,
+      block_reason: null,
+      next_action: {
+        type: "outreach",
+        owner: "system",
+        due_at: null,
+        instructions: "Send first ShopiFixer audit outreach message.",
+        auto_executable: true
+      }
+    };
+  }
+
+  if (auditStatus === "not_started" && stage !== "proof_client") {
+    return {
+      lifecycle_stage: "audit_requested",
+      blocked: false,
+      block_reason: null,
+      next_action: {
+        type: "audit",
+        owner: "system",
+        due_at: null,
+        instructions: "Run ShopiFixer audit and write findings to client record.",
+        auto_executable: true
+      }
+    };
+  }
+
+  if (auditStatus === "completed" && paymentStatus !== "paid") {
+    return {
+      lifecycle_stage: "proposal_sent",
+      blocked: false,
+      block_reason: null,
+      next_action: {
+        type: "close",
+        owner: "ross",
+        due_at: null,
+        instructions: "Review audit findings and close paid fix or Abando install.",
+        auto_executable: false
+      }
+    };
+  }
+
+  if (paymentStatus === "paid" && fixStatus === "not_started") {
+    return {
+      lifecycle_stage: "deal_won",
+      blocked: false,
+      block_reason: null,
+      next_action: {
+        type: "fix",
+        owner: "system",
+        due_at: null,
+        instructions: "Start paid ShopiFixer fix execution packet.",
+        auto_executable: true
+      }
+    };
+  }
+
+
+===============================
+staffordos/clients/build_operator_dashboard_snapshot_v1.mjs
+===============================
+import { readFileSync, writeFileSync } from "node:fs";
+
+const registry = JSON.parse(readFileSync("staffordos/clients/client_registry_v1.json", "utf8"));
+const clients = registry.clients || [];
+const now = new Date().toISOString();
+
+const money = (n) => Number(n || 0);
+
+const revenueGaps = clients
+  .map(c => {
+    const merchantRevenue = money(c.abando?.merchant_revenue_recovered);
+    const staffordRevenue = money(c.revenue?.total_lifetime_value);
+    return {
+      client_id: c.client_id,
+      merchant_shop: c.merchant_shop,
+      merchant_revenue: merchantRevenue,
+      stafford_revenue: staffordRevenue,
+      gap: Math.max(0, merchantRevenue - staffordRevenue),
+      action:
+        merchantRevenue > 0 && staffordRevenue === 0
+          ? "Convert proof/recovery value into paid ShopiFixer or Abando plan."
+          : "Monitor."
+    };
+  })
+  .filter(g => g.gap > 0)
+  .sort((a, b) => b.gap - a.gap);
+
+const actionableClients = clients
+  .map(c => ({
+    client_id: c.client_id,
+    merchant_shop: c.merchant_shop,
+    lifecycle_stage: c.lifecycle?.stage,
+    priority_total: money(c.priority_score?.total),
+    blocked: c.blocker_detection?.blocked || false,
+    blocker_count: c.blocker_detection?.blocker_count || 0,
+    next_action: c.next_action,
+    merchant_revenue_recovered: money(c.abando?.merchant_revenue_recovered),
+    stafford_ltv: money(c.revenue?.total_lifetime_value)
+  }))
+  .sort((a, b) => {
+    if (a.blocked !== b.blocked) return a.blocked ? -1 : 1;
+    const aGap = Math.max(0, a.merchant_revenue_recovered - a.stafford_ltv);
+    const bGap = Math.max(0, b.merchant_revenue_recovered - b.stafford_ltv);
+    if (aGap !== bGap) return bGap - aGap;
+    return b.priority_total - a.priority_total;
+  });
+
+const primaryFocusClient = actionableClients[0] || null;
+
+const primaryFocus = primaryFocusClient
+  ? {
+      client_id: primaryFocusClient.client_id,
+      merchant_shop: primaryFocusClient.merchant_shop,
+      reason: primaryFocusClient.blocked
+        ? "Client has active blocker(s) preventing revenue progress."
+        : primaryFocusClient.merchant_revenue_recovered > primaryFocusClient.stafford_ltv
+          ? "Merchant value has been proven but Stafford revenue has not been captured."
+          : "Highest-priority client by current operating model.",
+      action: primaryFocusClient.blocked
+        ? "Resolve blocker before continuing."
+        : primaryFocusClient.merchant_revenue_recovered > primaryFocusClient.stafford_ltv
+          ? "Convert recovered merchant value into paid plan or case-study close."
+          : primaryFocusClient.next_action?.instructions || "Review client.",
+      priority_total: primaryFocusClient.priority_total,
+      blocked: primaryFocusClient.blocked,
+      next_action: primaryFocusClient.next_action
+    }
+  : {
+      client_id: null,
+      merchant_shop: null,
+      reason: "No clients available.",
+      action: "Add or discover clients.",
+      priority_total: 0,
+      blocked: false,
+      next_action: null
+    };
+
+const snapshot = {
+  schema: "staffordos.operator_dashboard_snapshot.v1",
+  generated_at: now,
+  source: "staffordos/clients/client_registry_v1.json",
+
+  primary_focus: primaryFocus,
+  revenue_gaps: revenueGaps,
+
+  top_metrics: {
+    total_clients: clients.length,
+    active_revenue_clients: clients.filter(c => c.lifecycle?.stage === "revenue_active").length,
+    blocked_clients: clients.filter(c => c.blocker_detection?.blocked).length,
+    total_stafford_revenue: clients.reduce((sum, c) => sum + money(c.revenue?.total_lifetime_value), 0),
+    total_merchant_revenue_recovered: clients.reduce((sum, c) => sum + money(c.abando?.merchant_revenue_recovered), 0)
+  },
+
+  revenue_summary: {
+    stafford_revenue: clients.reduce((sum, c) => sum + money(c.revenue?.total_lifetime_value), 0),
+    merchant_revenue_recovered: clients.reduce((sum, c) => sum + money(c.abando?.merchant_revenue_recovered), 0),
+    recurring_mrr: clients.reduce((sum, c) => sum + money(c.revenue?.abando_recurring_mrr), 0),
+    currency: "USD"
+  },
+
+  system_health_summary: {
+    green: clients.filter(c =>
+      Object.entries(c.system_health || {})
+        .filter(([k]) => k !== "last_verified_at")
+        .every(([, v]) => v === "green")
+    ).length,
+    red: clients.filter(c =>
+      Object.entries(c.system_health || {})
+        .some(([k, v]) => k !== "last_verified_at" && v === "red")
+    ).length,
+    unknown: clients.filter(c =>
+      Object.entries(c.system_health || {})
+        .some(([k, v]) => k !== "last_verified_at" && v === "unknown")
+    ).length
+  },
+
+  priority_clients: clients
+    .slice()
+    .sort((a, b) => money(b.priority_score?.total) - money(a.priority_score?.total))
+    .map(c => ({
+      client_id: c.client_id,
+      merchant_shop: c.merchant_shop,
+      lifecycle_stage: c.lifecycle?.stage,
+      priority_total: c.priority_score?.total || 0,
+      next_action: c.next_action,
+      blocked: c.blocker_detection?.blocked || false,
+      merchant_revenue_recovered: c.abando?.merchant_revenue_recovered || 0,
+      stafford_ltv: c.revenue?.total_lifetime_value || 0,
+      close_engine: c.close_engine || null
+    })),
+
+  blocked_clients: clients
+    .filter(c => c.blocker_detection?.blocked)
+    .map(c => ({
+      client_id: c.client_id,
+      merchant_shop: c.merchant_shop,
+      blockers: c.blocker_detection?.blockers || [],
+      next_action: c.next_action
+    })),
+
+  next_actions: clients
+    .map(c => ({
+      client_id: c.client_id,
+      owner: c.next_action?.owner,
+      type: c.next_action?.type,
+      instructions: c.next_action?.instructions,
+      auto_executable: c.next_action?.auto_executable,
+      priority_total: c.priority_score?.total || 0,
+      close_engine: c.close_engine || null
+    }))
+    .sort((a, b) => money(b.priority_total) - money(a.priority_total))
+};
+
+writeFileSync(
+  "staffordos/clients/operator_dashboard_snapshot_v1.json",
+  JSON.stringify(snapshot, null, 2) + "\n"
+);
+
+console.log(JSON.stringify(snapshot, null, 2));
+
+===============================
+staffordos/clients/upgrade_client_registry_operating_model_v1.mjs
+===============================
+import { readFileSync, writeFileSync, existsSync } from "node:fs";
+
+const path = "staffordos/clients/client_registry_v1.json";
+
+if (!existsSync(path)) {
+  throw new Error("client_registry_v1.json not found");
+}
+
+const now = new Date().toISOString();
+const registry = JSON.parse(readFileSync(path, "utf8"));
+
+registry.schema = "staffordos.client_registry.v1";
+registry.operating_model = {
+  version: "operating_model_v1",
+  purpose: "Separate StaffordOS business truth from ShopiFixer service truth and Abando merchant performance truth.",
+  rules: [
+    "Abando revenue is merchant revenue, not Stafford revenue.",
+    "ShopiFixer tracks diagnosis and fix lifecycle.",
+    "StaffordOS tracks client lifecycle, deal state, next actions, business revenue, and system health.",
+    "Every client must have one lifecycle stage and one primary next action."
+  ],
+  lifecycle_stages: [
+    "lead",
+    "audit_requested",
+    "audit_completed",
+    "proposal_sent",
+    "deal_won",
+    "fix_in_progress",
+    "fix_completed",
+    "abando_installed",
+    "revenue_active",
+    "paused",
+    "lost"
+  ],
+  next_action_types: [
+    "discover",
+    "outreach",
+    "audit",
+    "proposal",
+    "close",
+    "collect_payment",
+    "fix",
+    "install_abando",
+    "trigger_recovery",
+    "followup",
+    "monitor",
+    "none"
+  ]
+};
+
+registry.generated_at = now;
+registry.clients = (registry.clients || []).map((client) => {
+  const previousNextAction =
+    typeof client.business?.next_action === "string"
+      ? client.business.next_action
+      : client.business?.next_action?.instructions || null;
+
+  const lifecycleStage =
+    client.status === "proof_client"
+      ? "revenue_active"
+      : client.deal?.payment_status === "paid"
+        ? "deal_won"
+        : client.shopifixer?.audit_status === "completed"
+          ? "audit_completed"
+          : "lead";
+
+  const upgraded = {
+    ...client,
+    updated_at: now,
+
+    lifecycle: {
+      stage: client.lifecycle?.stage || lifecycleStage,
+      stage_updated_at: client.lifecycle?.stage_updated_at || now,
+      blocked: client.lifecycle?.blocked ?? false,
+      block_reason: client.lifecycle?.block_reason ?? null
+    },
+
+    next_action: {
+      type: client.next_action?.type || "followup",
+      owner: client.next_action?.owner || "ross",
+      due_at: client.next_action?.due_at || null,
+      instructions:
+        client.next_action?.instructions ||
+        previousNextAction ||
+        "Review client and choose next revenue action.",
+      auto_executable: client.next_action?.auto_executable ?? false,
+      created_at: client.next_action?.created_at || now,
+      updated_at: now
+    },
+
+    revenue: {
+      shopifixer_one_time: client.revenue?.shopifixer_one_time ?? client.deal?.value ?? 0,
+      shopifixer_collected: client.revenue?.shopifixer_collected ?? client.deal?.payment_status === "paid",
+      abando_recurring_mrr: client.revenue?.abando_recurring_mrr ?? 0,
+      abando_percentage: client.revenue?.abando_percentage ?? 0,
+      total_lifetime_value:
+        client.revenue?.total_lifetime_value ??
+        client.business?.lifetime_value ??
+        client.deal?.value ??
+        0,
+      currency: client.revenue?.currency || client.deal?.currency || "USD"
+    },
+
+    problem_profile: {
+      type: client.problem_profile?.type || null,
+      severity: client.problem_profile?.severity ?? null,
+      detected_by: client.problem_profile?.detected_by || null,
+      recommended_fix: client.problem_profile?.recommended_fix || null,
+      fix_template_id: client.problem_profile?.fix_template_id || null
+    },
+
+    system_health: {
+      abando_install:
+        client.system_health?.abando_install ||
+        (client.abando?.installed ? "green" : "unknown"),
+      event_ingestion:
+        client.system_health?.event_ingestion ||
+        (client.abando?.checkout_events > 0 ? "green" : "unknown"),
+      recovery_trigger:
+        client.system_health?.recovery_trigger ||
+        (client.abando?.recovery_actions > 0 ? "green" : "unknown"),
+      email_send: client.system_health?.email_send || "green",
+      return_tracking:
+        client.system_health?.return_tracking ||
+        (client.abando?.merchant_revenue_recovered > 0 ? "green" : "unknown"),
+      last_verified_at: client.system_health?.last_verified_at || now
+    }
+  };
+
+  if (upgraded.business) {
+    delete upgraded.business.next_action;
+  }
+
+  return upgraded;
+});
+
+writeFileSync(path, JSON.stringify(registry, null, 2) + "\n");
+
+console.log(JSON.stringify({
+  ok: true,
+  upgraded_at: now,
+  clients: registry.clients.length,
+  required_layers: [
+    "lifecycle",
+    "next_action",
+    "revenue",
+    "problem_profile",
+    "system_health"
+  ]
+}, null, 2));
+
+===============================
+staffordos/decision/resolve_primary_action_v1.mjs
+===============================
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
+
+const now = new Date().toISOString();
+
+function readJson(path, fallback = null) {
+  if (!existsSync(path)) return fallback;
+  try {
+    return JSON.parse(readFileSync(path, "utf8"));
+  } catch {
+    return fallback;
+  }
+}
+
+function money(value) {
+  return Number(value || 0);
+}
+
+const unitSnapshot = readJson("staffordos/snapshots/unit_work_snapshot_v1.json", { open_work: [], summary: {} });
+const dashboardSnapshot = readJson("staffordos/clients/operator_dashboard_snapshot_v1.json", {});
+const clientRegistry = readJson("staffordos/clients/client_registry_v1.json", { clients: [] });
+const confidenceGate = readJson("staffordos/gates/confidence_gate_v1.json", {});
+const uxReport = readJson("staffordos/ux_audit/output/operator_command_center_ux_integrity_v1.json", { score: {} });
+
+const clients = Array.isArray(clientRegistry.clients) ? clientRegistry.clients : [];
+const openUnits = Array.isArray(unitSnapshot.open_work) ? unitSnapshot.open_work : [];
+const primaryFocus = dashboardSnapshot.primary_focus || null;
+
+function classifyAction(unit) {
+  if (unit.type === "opportunity" && String(unit.stage || "").includes("proposal")) {
+    return "revenue_close";
+  }
+
+  if (unit.type === "action" && String(unit.next_action || "").toLowerCase().includes("follow up")) {
+    return "revenue_followup";
+  }
+
+  if (unit.type === "delivery" && unit.status === "waiting_for_payment") {
+    return "payment_waiting";
+  }
+
+  if (unit.domain_id === "internal_dev") {
+    return "internal_dev";
+  }
+
+  return unit.type || "unknown";
+}
+
+function scoreUnit(unit) {
+  const actionType = classifyAction(unit);
+  let score = 0;
+  const reasons = [];
+
+  if (actionType === "revenue_close") {
+    score += 45;
+    reasons.push("Active proposal has direct revenue capture potential.");
+  }
+
+  if (actionType === "revenue_followup") {
+    score += 35;
+    reasons.push("Follow-up action can move an active opportunity toward payment.");
+  }
+
+  if (actionType === "payment_waiting") {
+    score += 25;
+    reasons.push("Delivery is blocked until payment is captured.");
+  }
+
+  if (unit.domain_id === "shopifixer") {
+    score += 18;
+    reasons.push("ShopiFixer is the current immediate one-time revenue path.");
+  }
+
+  if (unit.domain_id === "abando") {
+    score += 14;
+    reasons.push("Abando supports recurring revenue.");
+  }
+
+  if (unit.domain_id === "internal_dev") {
+    score += 6;
+    reasons.push("Internal dev improves system capability but is not immediate cash capture.");
+  }
+
+  if (unit.owner === "ross") {
+    score += 10;
+    reasons.push("Ross-owned action can be advanced immediately.");
+  }
+
+  if (String(unit.next_action || "").toLowerCase().includes("close payment")) {
+    score += 20;
+    reasons.push("Next action explicitly targets payment close.");
+  }
+
+  if (String(unit.next_action || "").toLowerCase().includes("follow up")) {
+    score += 12;
+    reasons.push("Follow-up is the active bottleneck after offer send.");
+  }
+
+  if (unit.status === "open") score += 5;
+  if (unit.status === "waiting_for_payment") score += 8;
+
+  return {
+    unit,
+    action_type: actionType,
+    priority_score: Math.min(score, 100),
+    reasons
+  };
+}
+
+const scored = openUnits
+  .map(scoreUnit)
+  .sort((a, b) => b.priority_score - a.priority_score);
+
+const winner = scored[0] || null;
+const alternatives = scored.slice(1, 5).map((item) => ({
+  unit_id: item.unit.unit_id,
+  action_type: item.action_type,
+  domain_id: item.unit.domain_id,
+  priority_score: item.priority_score,
+  next_action: item.unit.next_action,
+  why_not_primary: item.priority_score < (winner?.priority_score || 0)
+    ? "Lower combined revenue/urgency score than primary action."
+    : "Comparable priority but not selected."
+}));
+
+const matchingClient =
+  clients.find((client) =>
+    winner?.unit?.unit_id?.includes(client.client_id) ||
+    winner?.unit?.next_action === client.next_action?.instructions
+  ) || null;
+
+const merchantRevenue = money(matchingClient?.abando?.merchant_revenue_recovered);
+const staffordRevenue = money(matchingClient?.revenue?.total_lifetime_value);
+const revenueGap = Math.max(merchantRevenue - staffordRevenue, 0);
+
+const confidence =
+  winner?.action_type === "revenue_close" ? 0.82 :
+  winner?.action_type === "revenue_followup" ? 0.76 :
+  winner?.action_type === "payment_waiting" ? 0.72 :
+  0.62;
+
+const urgency =
+  winner?.action_type === "revenue_close" ? "high" :
+  winner?.action_type === "revenue_followup" ? "high" :
+  winner?.action_type === "payment_waiting" ? "medium" :
+  "medium";
+
+const primaryAction = winner ? {
+  action_id: `primary_${Date.now()}`,
+  action_label: winner.unit.next_action || primaryFocus?.action || "Review active work.",
+  action_type: winner.action_type,
+  domain_id: winner.unit.domain_id,
+  product_id: winner.unit.domain_id === "shopifixer" ? "shopifixer" : winner.unit.domain_id,
+  linked_units: [winner.unit.unit_id],
+  owner: winner.unit.owner || "ross",
+  priority_score: winner.priority_score,
+  urgency,
+  confidence,
+  confidence_band:
+    confidence >= 0.9 ? "high_auto_allowed" :
+    confidence >= 0.75 ? "medium_high_human_validated" :
+    confidence >= 0.55 ? "medium_requires_review" :
+    "low_blocked",
+  evidence: [
+    ...winner.reasons,
+    revenueGap > 0 ? `Merchant value proven: $${revenueGap} gap between recovered value and Stafford revenue captured.` : null,
+    uxReport?.score?.ux ? `Current UX integrity score is ${uxReport.score.ux}; decision layer needed before further UI polish.` : null
+  ].filter(Boolean),
+  risk: [
+    "Do not start delivery work before payment is captured.",
+    "Do not treat merchant recovered value as Stafford revenue.",
+    confidence < (confidenceGate?.thresholds?.auto_fix_allowed_min_confidence || 0.9)
+      ? "Human judgment required before executing irreversible actions."
+      : null
+  ].filter(Boolean),
+  next_step: winner.unit.next_action,
+  expected_outcome:
+    winner.action_type === "revenue_close" || winner.action_type === "revenue_followup"
+      ? "Move active ShopiFixer proposal toward paid client status."
+      : "Advance highest-priority unit of work.",
+  source_snapshots: [
+    "staffordos/snapshots/unit_work_snapshot_v1.json",
+    "staffordos/clients/operator_dashboard_snapshot_v1.json",
+    "staffordos/clients/client_registry_v1.json",
+    "staffordos/gates/confidence_gate_v1.json",
+    "staffordos/ux_audit/output/operator_command_center_ux_integrity_v1.json"
+  ],
+  generated_at: now
+} : {
+  action_id: `primary_${Date.now()}`,
+  action_label: "No active unit of work found.",
+  action_type: "none",
+  domain_id: "system",
+  product_id: null,
+  linked_units: [],
+  owner: "system",
+  priority_score: 0,
+  urgency: "low",
+  confidence: 0,
+  confidence_band: "none",
+  evidence: [],
+  risk: ["No open work was found in unit_work_snapshot_v1."],
+  next_step: "Create or sync work units.",
+  expected_outcome: "Restore actionable operating state.",
+  source_snapshots: ["staffordos/snapshots/unit_work_snapshot_v1.json"],
+  generated_at: now
+};
+
+const snapshot = {
+  schema: "staffordos.primary_action_snapshot.v1",
+  generated_at: now,
+  purpose: "Single canonical answer to: What should Ross do next?",
+  decision_model: {
+    engine: "resolve_primary_action_v1",
+    scoring_inputs: [
+      "revenue_capture_potential",
+      "domain_priority",
+      "owner_executability",
+      "payment_closure_language",
+      "followup_bottleneck",
+      "system_risk"

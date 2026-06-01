@@ -1,0 +1,14 @@
+staffordos/clients/close_engine_v1.mjs:3:const REGISTRY_PATH = "staffordos/clients/client_registry_v1.json";
+staffordos/clients/generate_shopifixer_offer_v1.mjs:3:const REGISTRY_PATH = "staffordos/clients/client_registry_v1.json";
+staffordos/clients/client_registry_v1.mjs:4:const REGISTRY_PATH = "staffordos/clients/client_registry_v1.json";
+staffordos/clients/send_shopifixer_offer_v1.mjs:5:const REGISTRY_PATH = "staffordos/clients/client_registry_v1.json";
+staffordos/clients/build_operator_dashboard_snapshot_v1.mjs:3:const registry = JSON.parse(readFileSync("staffordos/clients/client_registry_v1.json", "utf8"));
+staffordos/clients/build_operator_dashboard_snapshot_v1.mjs:81:  source: "staffordos/clients/client_registry_v1.json",
+staffordos/clients/next_action_engine_v1.mjs:3:const REGISTRY_PATH = "staffordos/clients/client_registry_v1.json";
+staffordos/clients/upgrade_client_registry_operating_model_v1.mjs:3:const path = "staffordos/clients/client_registry_v1.json";
+staffordos/clients/upgrade_client_registry_operating_model_v1.mjs:6:  throw new Error("client_registry_v1.json not found");
+staffordos/units/lock_schema_foundation_v1.mjs:26:const clients = readJson("staffordos/clients/client_registry_v1.json", { clients: [] }).clients || [];
+staffordos/units/lock_schema_foundation_v1.mjs:70:    source_refs: ["staffordos/clients/client_registry_v1.json"],
+staffordos/ux_audit/validate_operator_ux_v1.mjs:25:  clientRegistry: "staffordos/clients/client_registry_v1.json"
+staffordos/decision/resolve_primary_action_v1.mjs:20:const clientRegistry = readJson("staffordos/clients/client_registry_v1.json", { clients: [] });
+staffordos/decision/resolve_primary_action_v1.mjs:183:    "staffordos/clients/client_registry_v1.json",
