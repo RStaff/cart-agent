@@ -1,0 +1,8 @@
+╭─ error ──────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│  A path was explicitly provided but doesn't exist.                           │
+│                                                                              │
+│  Please check the path and try again: /tmp/no_kings_pull_test                │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
