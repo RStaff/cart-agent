@@ -1,0 +1,9 @@
+Auth operations.
+
+USAGE
+  $ shopify auth COMMAND
+
+COMMANDS
+  auth login   Logs you in to your Shopify account.
+  auth logout  Logs you out of the Shopify account or Partner account and store.
+

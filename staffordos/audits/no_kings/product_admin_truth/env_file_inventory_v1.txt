@@ -1,0 +1,12 @@
+./.env
+./.env.local
+./.env.shopify.local
+./abando-frontend/.env.local
+./abando-frontend/.vercel/.env.production.local
+./frontend/.env.local
+./staffordos/dev/.env.abando.local
+./staffordos/ui/operator-frontend/.env.local
+./web/.env
+./web/.env.example
+./web/.env.local
+./web/shopify/.env
