@@ -1,0 +1,4 @@
+./.abando-dev/shopify.app.dev.toml
+./.abando-dev/shopify.app.r12b-dev.toml
+./shopify.app.r12b-dev.toml
+./shopify.app.toml
