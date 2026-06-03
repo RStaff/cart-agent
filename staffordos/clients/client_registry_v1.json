@@ -1,7 +1,7 @@
 {
   "schema": "staffordos.client_registry.v1",
   "purpose": "Canonical registry for StaffordOS clients, separating Stafford Media business revenue from ShopiFixer audit/fix data and Abando merchant performance data.",
-  "generated_at": "2026-05-03T23:09:47.062Z",
+  "generated_at": "2026-06-03T22:46:57.292Z",
   "clients": [
     {
       "client_id": "cart-agent-dev.myshopify.com",
@@ -127,6 +127,399 @@
         "suggested_message": "Quick follow-up — we already recovered $100 from your store.\n\nWant me to lock this in so it runs consistently?",
         "urgency": "low"
       }
+    },
+    {
+      "client_id": "step5-test-store.myshopify.com",
+      "merchant_shop": "step5-test-store.myshopify.com",
+      "source": "staffordmedia",
+      "status": "qualified",
+      "created_at": "2026-06-03T22:46:15.216Z",
+      "updated_at": "2026-06-03T22:46:57.290Z",
+      "selected_product": "shopifixer",
+      "routing_reason": "Shopify conversion, checkout, audit, or dev issue",
+      "qualification_status": "qualified",
+      "lifecycle": {
+        "stage": "lead",
+        "stage_updated_at": "2026-06-03T22:46:57.290Z",
+        "blocked": false,
+        "block_reason": null
+      },
+      "next_action": {
+        "type": "audit",
+        "owner": "system",
+        "due_at": null,
+        "instructions": "Prepare the ShopiFixer audit path and next merchant follow-up.",
+        "auto_executable": true,
+        "created_at": "2026-06-03T22:46:15.216Z",
+        "updated_at": "2026-06-03T22:46:57.290Z"
+      },
+      "contact": {
+        "email": "rossstafford1@gmail.com",
+        "name": "",
+        "role": "",
+        "confidence": "submitted_by_visitor"
+      },
+      "deal": {
+        "type": null,
+        "value": 0,
+        "currency": "USD",
+        "closed_at": null,
+        "payment_status": "unpaid"
+      },
+      "shopifixer": {
+        "audit_status": "not_started",
+        "audit_score": null,
+        "primary_problem": null,
+        "fix_status": "not_started",
+        "latest_audit_at": null
+      },
+      "abando": {
+        "installed": false,
+        "install_status": "unknown",
+        "checkout_events": 0,
+        "recovery_actions": 0,
+        "merchant_revenue_recovered": 0,
+        "currency": "USD",
+        "last_recovery_at": null
+      },
+      "business": {
+        "stafford_revenue_earned": 0,
+        "stafford_recurring_revenue": 0,
+        "lifetime_value": 0,
+        "next_action": "Prepare the ShopiFixer audit path and next merchant follow-up."
+      },
+      "notes": [
+        {
+          "at": "2026-06-03T22:46:15.215Z",
+          "type": "lead_promotion",
+          "text": "Promoted from lead registry with selected_product=staffordmedia.",
+          "lead_id": "lead_step5_test_store_myshopify_com",
+          "selected_product": "staffordmedia",
+          "routing_reason": "consulting, automation, transformation, or strategy signal",
+          "qualification_reasons": [
+            "score>=80",
+            "status.current_stage=followup_sent",
+            "valid_contact_email"
+          ]
+        },
+        {
+          "at": "2026-06-03T22:46:30.724Z",
+          "type": "lead_promotion",
+          "text": "Promoted from lead registry with selected_product=abando.",
+          "lead_id": "lead_step5_test_store_myshopify_com",
+          "selected_product": "abando",
+          "routing_reason": "recovery or abandoned-cart signal",
+          "qualification_reasons": [
+            "score>=80",
+            "status.current_stage=followup_sent",
+            "valid_contact_email"
+          ]
+        },
+        {
+          "at": "2026-06-03T22:46:57.290Z",
+          "type": "lead_promotion",
+          "text": "Promoted from lead registry with selected_product=shopifixer.",
+          "lead_id": "lead_step5_test_store_myshopify_com",
+          "selected_product": "shopifixer",
+          "routing_reason": "Shopify conversion, checkout, audit, or dev issue",
+          "qualification_reasons": [
+            "score>=80",
+            "status.current_stage=followup_sent",
+            "valid_contact_email"
+          ]
+        }
+      ]
+    },
+    {
+      "client_id": "fitgearpro.myshopify.com",
+      "merchant_shop": "fitgearpro.myshopify.com",
+      "source": "staffordos",
+      "status": "qualified",
+      "created_at": "2026-06-03T22:46:15.217Z",
+      "updated_at": "2026-06-03T22:46:57.291Z",
+      "selected_product": "shopifixer",
+      "routing_reason": "Shopify conversion, checkout, audit, or dev issue",
+      "qualification_status": "qualified",
+      "lifecycle": {
+        "stage": "lead",
+        "stage_updated_at": "2026-06-03T22:46:57.291Z",
+        "blocked": false,
+        "block_reason": null
+      },
+      "next_action": {
+        "type": "audit",
+        "owner": "system",
+        "due_at": null,
+        "instructions": "Prepare the ShopiFixer audit path and next merchant follow-up.",
+        "auto_executable": true,
+        "created_at": "2026-06-03T22:46:15.217Z",
+        "updated_at": "2026-06-03T22:46:57.291Z"
+      },
+      "contact": {
+        "email": "",
+        "name": "",
+        "role": "",
+        "confidence": "no_contact_found"
+      },
+      "deal": {
+        "type": null,
+        "value": 0,
+        "currency": "USD",
+        "closed_at": null,
+        "payment_status": "unpaid"
+      },
+      "shopifixer": {
+        "audit_status": "not_started",
+        "audit_score": null,
+        "primary_problem": null,
+        "fix_status": "not_started",
+        "latest_audit_at": null
+      },
+      "abando": {
+        "installed": false,
+        "install_status": "unknown",
+        "checkout_events": 0,
+        "recovery_actions": 0,
+        "merchant_revenue_recovered": 0,
+        "currency": "USD",
+        "last_recovery_at": null
+      },
+      "business": {
+        "stafford_revenue_earned": 0,
+        "stafford_recurring_revenue": 0,
+        "lifetime_value": 0,
+        "next_action": "Prepare the ShopiFixer audit path and next merchant follow-up."
+      },
+      "notes": [
+        {
+          "at": "2026-06-03T22:46:15.217Z",
+          "type": "lead_promotion",
+          "text": "Promoted from lead registry with selected_product=staffordmedia.",
+          "lead_id": "lead_fitgearpro_myshopify_com",
+          "selected_product": "staffordmedia",
+          "routing_reason": "consulting, automation, transformation, or strategy signal",
+          "qualification_reasons": [
+            "status.current_stage=engaged"
+          ]
+        },
+        {
+          "at": "2026-06-03T22:46:30.724Z",
+          "type": "lead_promotion",
+          "text": "Promoted from lead registry with selected_product=abando.",
+          "lead_id": "lead_fitgearpro_myshopify_com",
+          "selected_product": "abando",
+          "routing_reason": "recovery or abandoned-cart signal",
+          "qualification_reasons": [
+            "status.current_stage=engaged"
+          ]
+        },
+        {
+          "at": "2026-06-03T22:46:57.291Z",
+          "type": "lead_promotion",
+          "text": "Promoted from lead registry with selected_product=shopifixer.",
+          "lead_id": "lead_fitgearpro_myshopify_com",
+          "selected_product": "shopifixer",
+          "routing_reason": "Shopify conversion, checkout, audit, or dev issue",
+          "qualification_reasons": [
+            "status.current_stage=engaged"
+          ]
+        }
+      ]
+    },
+    {
+      "client_id": "homegoodsco.myshopify.com",
+      "merchant_shop": "homegoodsco.myshopify.com",
+      "source": "staffordos",
+      "status": "qualified",
+      "created_at": "2026-06-03T22:46:15.217Z",
+      "updated_at": "2026-06-03T22:46:57.292Z",
+      "selected_product": "shopifixer",
+      "routing_reason": "Shopify conversion, checkout, audit, or dev issue",
+      "qualification_status": "qualified",
+      "lifecycle": {
+        "stage": "lead",
+        "stage_updated_at": "2026-06-03T22:46:57.292Z",
+        "blocked": false,
+        "block_reason": null
+      },
+      "next_action": {
+        "type": "audit",
+        "owner": "system",
+        "due_at": null,
+        "instructions": "Prepare the ShopiFixer audit path and next merchant follow-up.",
+        "auto_executable": true,
+        "created_at": "2026-06-03T22:46:15.217Z",
+        "updated_at": "2026-06-03T22:46:57.292Z"
+      },
+      "contact": {
+        "email": "",
+        "name": "",
+        "role": "",
+        "confidence": "no_contact_found"
+      },
+      "deal": {
+        "type": null,
+        "value": 0,
+        "currency": "USD",
+        "closed_at": null,
+        "payment_status": "unpaid"
+      },
+      "shopifixer": {
+        "audit_status": "not_started",
+        "audit_score": null,
+        "primary_problem": null,
+        "fix_status": "not_started",
+        "latest_audit_at": null
+      },
+      "abando": {
+        "installed": false,
+        "install_status": "unknown",
+        "checkout_events": 0,
+        "recovery_actions": 0,
+        "merchant_revenue_recovered": 0,
+        "currency": "USD",
+        "last_recovery_at": null
+      },
+      "business": {
+        "stafford_revenue_earned": 0,
+        "stafford_recurring_revenue": 0,
+        "lifetime_value": 0,
+        "next_action": "Prepare the ShopiFixer audit path and next merchant follow-up."
+      },
+      "notes": [
+        {
+          "at": "2026-06-03T22:46:15.217Z",
+          "type": "lead_promotion",
+          "text": "Promoted from lead registry with selected_product=staffordmedia.",
+          "lead_id": "lead_homegoodsco_myshopify_com",
+          "selected_product": "staffordmedia",
+          "routing_reason": "consulting, automation, transformation, or strategy signal",
+          "qualification_reasons": [
+            "status.current_stage=engaged"
+          ]
+        },
+        {
+          "at": "2026-06-03T22:46:30.725Z",
+          "type": "lead_promotion",
+          "text": "Promoted from lead registry with selected_product=abando.",
+          "lead_id": "lead_homegoodsco_myshopify_com",
+          "selected_product": "abando",
+          "routing_reason": "recovery or abandoned-cart signal",
+          "qualification_reasons": [
+            "status.current_stage=engaged"
+          ]
+        },
+        {
+          "at": "2026-06-03T22:46:57.292Z",
+          "type": "lead_promotion",
+          "text": "Promoted from lead registry with selected_product=shopifixer.",
+          "lead_id": "lead_homegoodsco_myshopify_com",
+          "selected_product": "shopifixer",
+          "routing_reason": "Shopify conversion, checkout, audit, or dev issue",
+          "qualification_reasons": [
+            "status.current_stage=engaged"
+          ]
+        }
+      ]
+    },
+    {
+      "client_id": "store1.myshopify.com",
+      "merchant_shop": "store1.myshopify.com",
+      "source": "staffordos",
+      "status": "qualified",
+      "created_at": "2026-06-03T22:46:15.218Z",
+      "updated_at": "2026-06-03T22:46:57.292Z",
+      "selected_product": "shopifixer",
+      "routing_reason": "Shopify conversion, checkout, audit, or dev issue",
+      "qualification_status": "qualified",
+      "lifecycle": {
+        "stage": "lead",
+        "stage_updated_at": "2026-06-03T22:46:57.292Z",
+        "blocked": false,
+        "block_reason": null
+      },
+      "next_action": {
+        "type": "audit",
+        "owner": "system",
+        "due_at": null,
+        "instructions": "Prepare the ShopiFixer audit path and next merchant follow-up.",
+        "auto_executable": true,
+        "created_at": "2026-06-03T22:46:15.218Z",
+        "updated_at": "2026-06-03T22:46:57.292Z"
+      },
+      "contact": {
+        "email": "owner@store1.com",
+        "name": "Jane Smith",
+        "role": "Founder",
+        "confidence": "contact_page_ready"
+      },
+      "deal": {
+        "type": null,
+        "value": 0,
+        "currency": "USD",
+        "closed_at": null,
+        "payment_status": "unpaid"
+      },
+      "shopifixer": {
+        "audit_status": "not_started",
+        "audit_score": null,
+        "primary_problem": null,
+        "fix_status": "not_started",
+        "latest_audit_at": null
+      },
+      "abando": {
+        "installed": false,
+        "install_status": "unknown",
+        "checkout_events": 0,
+        "recovery_actions": 0,
+        "merchant_revenue_recovered": 0,
+        "currency": "USD",
+        "last_recovery_at": null
+      },
+      "business": {
+        "stafford_revenue_earned": 0,
+        "stafford_recurring_revenue": 0,
+        "lifetime_value": 0,
+        "next_action": "Prepare the ShopiFixer audit path and next merchant follow-up."
+      },
+      "notes": [
+        {
+          "at": "2026-06-03T22:46:15.217Z",
+          "type": "lead_promotion",
+          "text": "Promoted from lead registry with selected_product=staffordmedia.",
+          "lead_id": "lead_store1_myshopify_com",
+          "selected_product": "staffordmedia",
+          "routing_reason": "consulting, automation, transformation, or strategy signal",
+          "qualification_reasons": [
+            "status.current_stage=engaged",
+            "valid_contact_email"
+          ]
+        },
+        {
+          "at": "2026-06-03T22:46:30.725Z",
+          "type": "lead_promotion",
+          "text": "Promoted from lead registry with selected_product=abando.",
+          "lead_id": "lead_store1_myshopify_com",
+          "selected_product": "abando",
+          "routing_reason": "recovery or abandoned-cart signal",
+          "qualification_reasons": [
+            "status.current_stage=engaged",
+            "valid_contact_email"
+          ]
+        },
+        {
+          "at": "2026-06-03T22:46:57.292Z",
+          "type": "lead_promotion",
+          "text": "Promoted from lead registry with selected_product=shopifixer.",
+          "lead_id": "lead_store1_myshopify_com",
+          "selected_product": "shopifixer",
+          "routing_reason": "Shopify conversion, checkout, audit, or dev issue",
+          "qualification_reasons": [
+            "status.current_stage=engaged",
+            "valid_contact_email"
+          ]
+        }
+      ]
     }
   ],
   "operating_model": {

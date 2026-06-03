@@ -44,7 +44,12 @@ export function upsertClient({
   shopifixer = {},
   abando = {},
   business = {},
-  notes = []
+  notes = [],
+  selected_product = null,
+  routing_reason = null,
+  qualification_status = null,
+  lifecycle = {},
+  next_action = {}
 }) {
   if (!client_id && !merchant_shop) {
     throw new Error("client_id_or_merchant_shop_required");
@@ -58,6 +63,10 @@ export function upsertClient({
   );
 
   const existing = existingIndex >= 0 ? registry.clients[existingIndex] : {};
+  const businessNextAction =
+    typeof business?.next_action === "string"
+      ? business.next_action
+      : business?.next_action?.instructions || existing.business?.next_action || null;
 
   const merged = {
     client_id: id,
@@ -66,6 +75,30 @@ export function upsertClient({
     status: status || existing.status || "prospect",
     created_at: existing.created_at || now(),
     updated_at: now(),
+    selected_product: selected_product || existing.selected_product || null,
+    routing_reason: routing_reason || existing.routing_reason || null,
+    qualification_status: qualification_status || existing.qualification_status || null,
+
+    lifecycle: {
+      stage: lifecycle.stage || existing.lifecycle?.stage || null,
+      stage_updated_at: lifecycle.stage_updated_at || existing.lifecycle?.stage_updated_at || now(),
+      blocked: lifecycle.blocked ?? existing.lifecycle?.blocked ?? false,
+      block_reason: lifecycle.block_reason ?? existing.lifecycle?.block_reason ?? null
+    },
+
+    next_action: {
+      type: next_action.type || existing.next_action?.type || null,
+      owner: next_action.owner || existing.next_action?.owner || null,
+      due_at: next_action.due_at || existing.next_action?.due_at || null,
+      instructions:
+        next_action.instructions ||
+        existing.next_action?.instructions ||
+        businessNextAction ||
+        null,
+      auto_executable: next_action.auto_executable ?? existing.next_action?.auto_executable ?? false,
+      created_at: existing.next_action?.created_at || now(),
+      updated_at: now()
+    },
 
     contact: {
       ...(existing.contact || {}),
