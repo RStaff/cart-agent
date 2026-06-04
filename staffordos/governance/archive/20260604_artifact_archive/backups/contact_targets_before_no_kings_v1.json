@@ -1,0 +1,142 @@
+[
+  {
+    "domain": "store1.myshopify.com",
+    "score": 1100,
+    "quality": "high",
+    "audit_link": "https://pay.abando.ai/audit?shop=store1.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=store1.myshopify.com&eid=auto-1774472993360",
+    "contact": {
+      "email": "",
+      "source": "contact_page_only",
+      "confidence": "low",
+      "contact_page_found": true,
+      "social_links": {
+        "instagram": "",
+        "linkedin": "",
+        "facebook": ""
+      }
+    },
+    "notes": "",
+    "updated_at": "2026-03-25T21:10:31.256Z"
+  },
+  {
+    "domain": "store2.com",
+    "score": 1040,
+    "quality": "high",
+    "audit_link": "https://pay.abando.ai/audit?shop=store2.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=store2.com&eid=auto-1774472993360",
+    "contact": {
+      "email": "",
+      "source": "",
+      "confidence": "none",
+      "contact_page_found": false,
+      "social_links": {
+        "instagram": "",
+        "linkedin": "",
+        "facebook": ""
+      }
+    },
+    "notes": "",
+    "updated_at": "2026-03-25T21:11:11.266Z"
+  },
+  {
+    "domain": "fitgearpro.myshopify.com",
+    "score": 100,
+    "quality": "high",
+    "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro.myshopify.com&eid=auto-1774472993360",
+    "contact": {
+      "email": "",
+      "source": "",
+      "confidence": "none",
+      "contact_page_found": false,
+      "social_links": {
+        "instagram": "",
+        "linkedin": "",
+        "facebook": ""
+      }
+    },
+    "notes": "",
+    "updated_at": "2026-03-25T21:11:11.804Z"
+  },
+  {
+    "domain": "homegoodsco.myshopify.com",
+    "score": 100,
+    "quality": "high",
+    "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco.myshopify.com&eid=auto-1774472993360",
+    "contact": {
+      "email": "",
+      "source": "",
+      "confidence": "none",
+      "contact_page_found": false,
+      "social_links": {
+        "instagram": "",
+        "linkedin": "",
+        "facebook": ""
+      }
+    },
+    "notes": "",
+    "updated_at": "2026-03-25T21:11:12.346Z"
+  },
+  {
+    "domain": "luxbath.myshopify.com",
+    "score": 100,
+    "quality": "high",
+    "audit_link": "https://pay.abando.ai/audit?shop=luxbath.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=luxbath.myshopify.com&eid=auto-1774472993360",
+    "contact": {
+      "email": "",
+      "source": "",
+      "confidence": "none",
+      "contact_page_found": false,
+      "social_links": {
+        "instagram": "",
+        "linkedin": "",
+        "facebook": ""
+      }
+    },
+    "notes": "",
+    "updated_at": "2026-03-25T21:11:12.911Z"
+  },
+  {
+    "domain": "modernpets.myshopify.com",
+    "score": 100,
+    "quality": "high",
+    "audit_link": "https://pay.abando.ai/audit?shop=modernpets.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=modernpets.myshopify.com&eid=auto-1774472993360",
+    "contact": {
+      "email": "",
+      "source": "",
+      "confidence": "none",
+      "contact_page_found": false,
+      "social_links": {
+        "instagram": "",
+        "linkedin": "",
+        "facebook": ""
+      }
+    },
+    "notes": "",
+    "updated_at": "2026-03-25T21:11:13.510Z"
+  },
+  {
+    "domain": "urbankitchen.myshopify.com",
+    "score": 100,
+    "quality": "high",
+    "audit_link": "https://pay.abando.ai/audit?shop=urbankitchen.myshopify.com",
+    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen.myshopify.com&eid=auto-1774472993360",
+    "contact": {
+      "email": "",
+      "source": "",
+      "confidence": "none",
+      "contact_page_found": false,
+      "social_links": {
+        "instagram": "",
+        "linkedin": "",
+        "facebook": ""
+      }
+    },
+    "notes": "",
+    "updated_at": "2026-03-25T21:11:14.067Z"
+  }
+]

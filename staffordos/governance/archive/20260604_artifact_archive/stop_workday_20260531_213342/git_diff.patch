@@ -1,0 +1,866 @@
+diff --git a/staffordos/leads/candidate_stores.json b/staffordos/leads/candidate_stores.json
+index a489df07..978a74ff 100644
+--- a/staffordos/leads/candidate_stores.json
++++ b/staffordos/leads/candidate_stores.json
+@@ -9,6 +9,13 @@
+     "source": "manual",
+     "notes": "mid"
+   },
++  {
++    "domain": "no-kings-athletics.myshopify.com",
++    "source": "real_store",
++    "priority": "real",
++    "notes": "real_store",
++    "status": "new"
++  },
+   {
+     "domain": "store1.myshopify.com",
+     "source": "real_store",
+diff --git a/staffordos/leads/contact_targets.json b/staffordos/leads/contact_targets.json
+index 4b813217..15985fb4 100644
+--- a/staffordos/leads/contact_targets.json
++++ b/staffordos/leads/contact_targets.json
+@@ -1,10 +1,30 @@
+ [
++  {
++    "domain": "no-kings-athletics.myshopify.com",
++    "score": 1100,
++    "quality": "high",
++    "audit_link": "https://pay.abando.ai/audit?shop=no-kings-athletics.myshopify.com",
++    "experience_link": "https://pay.abando.ai/experience?shop=no-kings-athletics.myshopify.com&eid=auto-1780262170514",
++    "contact": {
++      "email": "support@nokingsathletics.com",
++      "source": "homepage",
++      "confidence": "medium",
++      "contact_page_found": true,
++      "social_links": {
++        "instagram": "",
++        "linkedin": "",
++        "facebook": ""
++      }
++    },
++    "notes": "",
++    "updated_at": "2026-05-31T21:55:26.841Z"
++  },
+   {
+     "domain": "store1.myshopify.com",
+     "score": 1100,
+     "quality": "high",
+     "audit_link": "https://pay.abando.ai/audit?shop=store1.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=store1.myshopify.com&eid=auto-1774472993360",
++    "experience_link": "https://pay.abando.ai/experience?shop=store1.myshopify.com&eid=auto-1780262170514",
+     "contact": {
+       "email": "",
+       "source": "contact_page_only",
+@@ -17,19 +37,19 @@
+       }
+     },
+     "notes": "",
+-    "updated_at": "2026-03-25T21:10:31.256Z"
++    "updated_at": "2026-05-31T21:55:28.715Z"
+   },
+   {
+     "domain": "store2.com",
+     "score": 1040,
+     "quality": "high",
+     "audit_link": "https://pay.abando.ai/audit?shop=store2.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=store2.com&eid=auto-1774472993360",
++    "experience_link": "https://pay.abando.ai/experience?shop=store2.com&eid=auto-1780262170514",
+     "contact": {
+       "email": "",
+-      "source": "",
+-      "confidence": "none",
+-      "contact_page_found": false,
++      "source": "contact_page_only",
++      "confidence": "low",
++      "contact_page_found": true,
+       "social_links": {
+         "instagram": "",
+         "linkedin": "",
+@@ -37,14 +57,14 @@
+       }
+     },
+     "notes": "",
+-    "updated_at": "2026-03-25T21:11:11.266Z"
++    "updated_at": "2026-05-31T21:55:29.038Z"
+   },
+   {
+     "domain": "fitgearpro.myshopify.com",
+     "score": 100,
+     "quality": "high",
+     "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro.myshopify.com&eid=auto-1774472993360",
++    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro.myshopify.com&eid=auto-1780262170514",
+     "contact": {
+       "email": "",
+       "source": "",
+@@ -57,14 +77,14 @@
+       }
+     },
+     "notes": "",
+-    "updated_at": "2026-03-25T21:11:11.804Z"
++    "updated_at": "2026-05-31T21:55:29.662Z"
+   },
+   {
+     "domain": "homegoodsco.myshopify.com",
+     "score": 100,
+     "quality": "high",
+     "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco.myshopify.com&eid=auto-1774472993360",
++    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco.myshopify.com&eid=auto-1780262170514",
+     "contact": {
+       "email": "",
+       "source": "",
+@@ -77,14 +97,14 @@
+       }
+     },
+     "notes": "",
+-    "updated_at": "2026-03-25T21:11:12.346Z"
++    "updated_at": "2026-05-31T21:55:30.194Z"
+   },
+   {
+     "domain": "luxbath.myshopify.com",
+     "score": 100,
+     "quality": "high",
+     "audit_link": "https://pay.abando.ai/audit?shop=luxbath.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=luxbath.myshopify.com&eid=auto-1774472993360",
++    "experience_link": "https://pay.abando.ai/experience?shop=luxbath.myshopify.com&eid=auto-1780262170514",
+     "contact": {
+       "email": "",
+       "source": "",
+@@ -97,14 +117,14 @@
+       }
+     },
+     "notes": "",
+-    "updated_at": "2026-03-25T21:11:12.911Z"
++    "updated_at": "2026-05-31T21:55:30.779Z"
+   },
+   {
+     "domain": "modernpets.myshopify.com",
+     "score": 100,
+     "quality": "high",
+     "audit_link": "https://pay.abando.ai/audit?shop=modernpets.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=modernpets.myshopify.com&eid=auto-1774472993360",
++    "experience_link": "https://pay.abando.ai/experience?shop=modernpets.myshopify.com&eid=auto-1780262170514",
+     "contact": {
+       "email": "",
+       "source": "",
+@@ -117,14 +137,14 @@
+       }
+     },
+     "notes": "",
+-    "updated_at": "2026-03-25T21:11:13.510Z"
++    "updated_at": "2026-05-31T21:55:31.395Z"
+   },
+   {
+     "domain": "urbankitchen.myshopify.com",
+     "score": 100,
+     "quality": "high",
+     "audit_link": "https://pay.abando.ai/audit?shop=urbankitchen.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen.myshopify.com&eid=auto-1774472993360",
++    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen.myshopify.com&eid=auto-1780262170514",
+     "contact": {
+       "email": "",
+       "source": "",
+@@ -137,6 +157,6 @@
+       }
+     },
+     "notes": "",
+-    "updated_at": "2026-03-25T21:11:14.067Z"
++    "updated_at": "2026-05-31T21:55:32.006Z"
+   }
+ ]
+diff --git a/staffordos/leads/qualified_targets.json b/staffordos/leads/qualified_targets.json
+index 2943d5c6..e9d2e8c6 100644
+--- a/staffordos/leads/qualified_targets.json
++++ b/staffordos/leads/qualified_targets.json
+@@ -1,4 +1,13 @@
+ [
++  {
++    "domain": "no-kings-athletics.myshopify.com",
++    "source": "real_store",
++    "priority": "real",
++    "score": 1100,
++    "quality": "high",
++    "audit_link": "https://pay.abando.ai/audit?shop=no-kings-athletics.myshopify.com",
++    "experience_link": "https://pay.abando.ai/experience?shop=no-kings-athletics.myshopify.com&eid=auto-1780262170514"
++  },
+   {
+     "domain": "store1.myshopify.com",
+     "source": "real_store",
+@@ -6,7 +15,7 @@
+     "score": 1100,
+     "quality": "high",
+     "audit_link": "https://pay.abando.ai/audit?shop=store1.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=store1.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=store1.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "store2.com",
+@@ -15,7 +24,7 @@
+     "score": 1040,
+     "quality": "high",
+     "audit_link": "https://pay.abando.ai/audit?shop=store2.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=store2.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=store2.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "fitgearpro.myshopify.com",
+@@ -24,7 +33,7 @@
+     "score": 100,
+     "quality": "high",
+     "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "homegoodsco.myshopify.com",
+@@ -33,7 +42,7 @@
+     "score": 100,
+     "quality": "high",
+     "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "luxbath.myshopify.com",
+@@ -42,7 +51,7 @@
+     "score": 100,
+     "quality": "high",
+     "audit_link": "https://pay.abando.ai/audit?shop=luxbath.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=luxbath.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=luxbath.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "modernpets.myshopify.com",
+@@ -51,7 +60,7 @@
+     "score": 100,
+     "quality": "high",
+     "audit_link": "https://pay.abando.ai/audit?shop=modernpets.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=modernpets.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=modernpets.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "urbankitchen.myshopify.com",
+@@ -60,6 +69,6 @@
+     "score": 100,
+     "quality": "high",
+     "audit_link": "https://pay.abando.ai/audit?shop=urbankitchen.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen.myshopify.com&eid=auto-1780262170514"
+   }
+ ]
+diff --git a/staffordos/leads/real_store_candidates.json b/staffordos/leads/real_store_candidates.json
+index feabfd4d..6251a2cf 100644
+--- a/staffordos/leads/real_store_candidates.json
++++ b/staffordos/leads/real_store_candidates.json
+@@ -1,4 +1,9 @@
+ [
++  {
++    "domain": "no-kings-athletics.myshopify.com",
++    "source": "real_store",
++    "priority": "real"
++  },
+   {
+     "domain": "store1.myshopify.com",
+     "source": "real_store",
+diff --git a/staffordos/leads/scored_stores.json b/staffordos/leads/scored_stores.json
+index 5f158ba1..4abab72b 100644
+--- a/staffordos/leads/scored_stores.json
++++ b/staffordos/leads/scored_stores.json
+@@ -1,4 +1,20 @@
+ [
++  {
++    "domain": "no-kings-athletics.myshopify.com",
++    "source": "real_store",
++    "priority": "real",
++    "notes": "real_store",
++    "score": 1100,
++    "quality_rank": 3,
++    "signals": {
++      "has_products": true,
++      "has_cart": true,
++      "recovery_visible": false,
++      "site_quality": "mid"
++    },
++    "audit_link": "https://pay.abando.ai/audit?shop=no-kings-athletics.myshopify.com",
++    "experience_link": "https://pay.abando.ai/experience?shop=no-kings-athletics.myshopify.com&eid=auto-1780262170514"
++  },
+   {
+     "domain": "store1.myshopify.com",
+     "source": "real_store",
+@@ -13,7 +29,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=store1.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=store1.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=store1.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "store2.com",
+@@ -29,7 +45,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=store2.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=store2.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=store2.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "example-store.myshopify.com",
+@@ -45,7 +61,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=example-store.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=example-store.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=example-store.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "midmarket-home.myshopify.com",
+@@ -61,7 +77,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=midmarket-home.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "fitgearpro-co.myshopify.com",
+@@ -77,7 +93,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-co.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-co.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-co.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "fitgearpro-goods.myshopify.com",
+@@ -93,7 +109,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-goods.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-goods.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-goods.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "fitgearpro-home.myshopify.com",
+@@ -109,7 +125,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-home.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-home.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-home.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "fitgearpro-shop.myshopify.com",
+@@ -125,7 +141,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-shop.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-shop.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-shop.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "fitgearpro-store.myshopify.com",
+@@ -141,7 +157,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-store.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-store.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-store.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "fitgearpro.myshopify.com",
+@@ -157,7 +173,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "homegoodsco-co.myshopify.com",
+@@ -173,7 +189,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco-co.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-co.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-co.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "homegoodsco-goods.myshopify.com",
+@@ -189,7 +205,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco-goods.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-goods.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-goods.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "homegoodsco-home.myshopify.com",
+@@ -205,7 +221,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco-home.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-home.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-home.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "homegoodsco-shop.myshopify.com",
+@@ -221,7 +237,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco-shop.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-shop.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-shop.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "homegoodsco-store.myshopify.com",
+@@ -237,7 +253,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco-store.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-store.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco-store.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "homegoodsco.myshopify.com",
+@@ -253,7 +269,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=homegoodsco.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=homegoodsco.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "luxbath-co.myshopify.com",
+@@ -269,7 +285,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=luxbath-co.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=luxbath-co.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=luxbath-co.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "luxbath-goods.myshopify.com",
+@@ -285,7 +301,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=luxbath-goods.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=luxbath-goods.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=luxbath-goods.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "luxbath-home.myshopify.com",
+@@ -301,7 +317,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=luxbath-home.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=luxbath-home.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=luxbath-home.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "luxbath-shop.myshopify.com",
+@@ -317,7 +333,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=luxbath-shop.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=luxbath-shop.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=luxbath-shop.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "luxbath-store.myshopify.com",
+@@ -333,7 +349,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=luxbath-store.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=luxbath-store.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=luxbath-store.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "luxbath.myshopify.com",
+@@ -349,7 +365,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=luxbath.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=luxbath.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=luxbath.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "midmarket-home-co.myshopify.com",
+@@ -365,7 +381,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=midmarket-home-co.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home-co.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home-co.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "midmarket-home-goods.myshopify.com",
+@@ -381,7 +397,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=midmarket-home-goods.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home-goods.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home-goods.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "midmarket-home-shop.myshopify.com",
+@@ -397,7 +413,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=midmarket-home-shop.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home-shop.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home-shop.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "midmarket-home-store.myshopify.com",
+@@ -413,7 +429,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=midmarket-home-store.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home-store.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home-store.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "midmarket-home-usa.myshopify.com",
+@@ -429,7 +445,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=midmarket-home-usa.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home-usa.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home-usa.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "modernpets-co.myshopify.com",
+@@ -445,7 +461,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=modernpets-co.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=modernpets-co.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=modernpets-co.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "modernpets-goods.myshopify.com",
+@@ -461,7 +477,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=modernpets-goods.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=modernpets-goods.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=modernpets-goods.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "modernpets-home.myshopify.com",
+@@ -477,7 +493,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=modernpets-home.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=modernpets-home.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=modernpets-home.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "modernpets-shop.myshopify.com",
+@@ -493,7 +509,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=modernpets-shop.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=modernpets-shop.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=modernpets-shop.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "modernpets-store.myshopify.com",
+@@ -509,7 +525,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=modernpets-store.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=modernpets-store.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=modernpets-store.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "modernpets.myshopify.com",
+@@ -525,7 +541,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=modernpets.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=modernpets.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=modernpets.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "urbankitchen-co.myshopify.com",
+@@ -541,7 +557,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=urbankitchen-co.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen-co.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen-co.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "urbankitchen-goods.myshopify.com",
+@@ -557,7 +573,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=urbankitchen-goods.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen-goods.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen-goods.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "urbankitchen-home.myshopify.com",
+@@ -573,7 +589,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=urbankitchen-home.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen-home.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen-home.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "urbankitchen-shop.myshopify.com",
+@@ -589,7 +605,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=urbankitchen-shop.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen-shop.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen-shop.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "urbankitchen-store.myshopify.com",
+@@ -605,7 +621,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=urbankitchen-store.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen-store.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen-store.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "urbankitchen.myshopify.com",
+@@ -621,7 +637,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=urbankitchen.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=urbankitchen.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "visible-recovery-store.myshopify.com",
+@@ -637,6 +653,6 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=visible-recovery-store.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=visible-recovery-store.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=visible-recovery-store.myshopify.com&eid=auto-1780262170514"
+   }
+ ]
+diff --git a/staffordos/leads/top_targets.json b/staffordos/leads/top_targets.json
+index f89e394a..cd8a9017 100644
+--- a/staffordos/leads/top_targets.json
++++ b/staffordos/leads/top_targets.json
+@@ -1,4 +1,20 @@
+ [
++  {
++    "domain": "no-kings-athletics.myshopify.com",
++    "source": "real_store",
++    "priority": "real",
++    "notes": "real_store",
++    "score": 1100,
++    "quality_rank": 3,
++    "signals": {
++      "has_products": true,
++      "has_cart": true,
++      "recovery_visible": false,
++      "site_quality": "mid"
++    },
++    "audit_link": "https://pay.abando.ai/audit?shop=no-kings-athletics.myshopify.com",
++    "experience_link": "https://pay.abando.ai/experience?shop=no-kings-athletics.myshopify.com&eid=auto-1780262170514"
++  },
+   {
+     "domain": "store1.myshopify.com",
+     "source": "real_store",
+@@ -13,7 +29,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=store1.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=store1.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=store1.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "store2.com",
+@@ -29,7 +45,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=store2.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=store2.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=store2.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "example-store.myshopify.com",
+@@ -45,7 +61,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=example-store.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=example-store.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=example-store.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "midmarket-home.myshopify.com",
+@@ -61,7 +77,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=midmarket-home.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=midmarket-home.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "fitgearpro-co.myshopify.com",
+@@ -77,7 +93,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-co.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-co.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-co.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "fitgearpro-goods.myshopify.com",
+@@ -93,7 +109,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-goods.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-goods.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-goods.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "fitgearpro-home.myshopify.com",
+@@ -109,7 +125,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-home.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-home.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-home.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "fitgearpro-shop.myshopify.com",
+@@ -125,7 +141,7 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-shop.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-shop.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-shop.myshopify.com&eid=auto-1780262170514"
+   },
+   {
+     "domain": "fitgearpro-store.myshopify.com",
+@@ -141,22 +157,6 @@
+       "site_quality": "mid"
+     },
+     "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro-store.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-store.myshopify.com&eid=auto-1774472993360"
+-  },
+-  {
+-    "domain": "fitgearpro.myshopify.com",
+-    "source": "seed",
+-    "priority": "synthetic",
+-    "notes": "auto_discovered",
+-    "score": 100,
+-    "quality_rank": 1,
+-    "signals": {
+-      "has_products": true,
+-      "has_cart": true,
+-      "recovery_visible": false,
+-      "site_quality": "mid"
+-    },
+-    "audit_link": "https://pay.abando.ai/audit?shop=fitgearpro.myshopify.com",
+-    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro.myshopify.com&eid=auto-1774472993360"
++    "experience_link": "https://pay.abando.ai/experience?shop=fitgearpro-store.myshopify.com&eid=auto-1780262170514"
+   }
+ ]
+diff --git a/staffordos/operating_loop/output/start_workday_latest.txt b/staffordos/operating_loop/output/start_workday_latest.txt
+index 74c106cc..0b1b4d56 100644
+--- a/staffordos/operating_loop/output/start_workday_latest.txt
++++ b/staffordos/operating_loop/output/start_workday_latest.txt
+@@ -1,50 +1,41 @@
+ === DATE ===
+-Thu Apr 30 18:16:31 EDT 2026
++Sun May 31 21:33:41 EDT 2026
+ 
+ === GIT STATUS ===
+- M scripts/create_events_table.sh
+- M scripts/migrations_make.sh
+- M scripts/test_unified_events.sh
+- M staffordos/leads/hot_followup_auto_sender_v1.mjs
+- M staffordos/ui/operator-frontend/app/api/proof/abando-recovery/run/route.ts
+- M web/scripts/prisma-wait-and-migrate.sh
+- M web/src/index.js
+- M web/src/jobs/worker.js
+-?? staffordos/operating_loop/
+-?? staffordos/system_inventory/abando_canonical_proof_path_map_v1.mjs
+-?? staffordos/system_inventory/scheduler/
+-?? staffordos/ui/operator-frontend/app/api/operator/cron-status/
+-?? staffordos/ui/operator-frontend/app/api/operator/discovery-status/
+-?? staffordos/ui/operator-frontend/app/api/operator/workday/
+-?? staffordos/ui/operator-frontend/app/operator/cockpit/
+-?? web/src/lib/recoveryLedger.js
+-?? web/src/routes/recoveryLedger.esm.js
++ M staffordos/leads/candidate_stores.json
++ M staffordos/leads/contact_targets.json
++ M staffordos/leads/qualified_targets.json
++ M staffordos/leads/real_store_candidates.json
++ M staffordos/leads/scored_stores.json
++ M staffordos/leads/top_targets.json
++ M staffordos/operating_loop/output/start_workday_latest.txt
++?? merchant_audit.sh
++?? merchant_audit_output.txt
++?? staffordos/audits/no_kings/capture_before_evidence_v1.mjs
++?? staffordos/lifecycle_audit/backups/
++?? staffordos/lifecycle_audit/client_promotion_path_v1.txt
++?? staffordos/lifecycle_audit/merchant_lifecycle_artifact_inventory_v1.txt
+ 
+ === CURRENT BRANCH ===
+ main
+ 
+ === RUNTIME CHECK ===
+-200
+-{"ok":true,"service":"cart-agent-api"}
++000
++
+ === PLAYGROUND CHECK ===
+-200
++000
+ === EXISTING GOVERNANCE ARTIFACTS ===
+--rw-r--r--   1 rossstafford  staff   2.3K Apr 28 19:07 data_ownership_matrix_v1.md
+--rw-r--r--   1 rossstafford  staff   939B Apr 28 21:41 discovery_sync_manifest_v1.json
+--rw-r--r--   1 rossstafford  staff   510B Apr 28 21:41 discovery_sync_manifest_v1.md
+--rw-r--r--   1 rossstafford  staff   1.2K Apr 30 18:15 discovery_sync_runner_status_v1.json
+--rw-r--r--   1 rossstafford  staff   869B Apr 30 18:15 discovery_sync_runner_status_v1.md
+ -rw-r--r--   1 rossstafford  staff   5.5M Apr 30 16:19 execution_governance_audit_v1.txt
+ -rw-r--r--   1 rossstafford  staff    18K Apr 29 15:12 execution_proof_register_pass_5_rebound_v1.json
+--rw-r--r--   1 rossstafford  staff    16K Apr 28 21:59 execution_proof_register_v1.json
++-rw-r--r--   1 rossstafford  staff    19K May  6 12:01 execution_proof_register_v1.json
+ -rw-r--r--   1 rossstafford  staff   1.9K Apr 28 21:59 execution_proof_register_v1.md
+-drwxr-xr-x   5 rossstafford  staff   160B Apr 30 17:02 local_discovery_v2
++drwxr-xr-x   6 rossstafford  staff   192B May  4 19:21 execution_support_agent_search_v1
++-rw-r--r--   1 rossstafford  staff   301B May 31 18:59 lifecycle_surface_inventory_v1.md
+ -rw-r--r--   1 rossstafford  staff   6.8K Apr 28 19:46 missed_systems_discovery_pass_v1.md
+ -rw-r--r--   1 rossstafford  staff   9.6K Apr 28 21:33 pass_4_binding_v1.json
+ -rw-r--r--   1 rossstafford  staff   2.1K Apr 28 21:33 pass_4_binding_v1.md
+ -rw-r--r--   1 rossstafford  staff   7.3K Apr 28 21:33 pass_4_classification_v1.json
+ -rw-r--r--   1 rossstafford  staff   1.2K Apr 28 21:33 pass_4_classification_v1.md
+-drwxr-xr-x   6 rossstafford  staff   192B Apr 30 17:18 project_tree_audit_v2
+ -rw-r--r--   1 rossstafford  staff   210K Apr 28 21:55 proof_evidence_scan_v1.json
+ -rw-r--r--   1 rossstafford  staff   1.6K Apr 28 21:55 proof_evidence_scan_v1.md
+ -rw-r--r--   1 rossstafford  staff    14K Apr 28 21:57 proof_review_artifact_v1.json
+@@ -55,13 +46,18 @@ drwxr-xr-x  25 rossstafford  staff   800B Apr 30 14:59 proof_runs
+ -rw-r--r--   1 rossstafford  staff    42B Apr 30 15:52 recovery_ledger_v1.json
+ -rw-r--r--   1 rossstafford  staff   5.3K Apr 29 08:43 runtime_proof_wiring_plan_v1.json
+ -rw-r--r--   1 rossstafford  staff   3.7K Apr 29 08:43 runtime_proof_wiring_plan_v1.md
++-rw-r--r--   1 rossstafford  staff   362M May  5 14:43 spine_inventory_20260505_144227.zip
++-rw-r--r--   1 rossstafford  staff    82K May  5 14:47 spine_manifest_v1.json
++-rw-r--r--   1 rossstafford  staff    29K May 31 18:57 staffordmedia_local_flow_grep_v1.txt
++-rw-r--r--   1 rossstafford  staff   758K May 31 18:57 staffordmedia_local_flow_inventory_v1.md
+ -rw-r--r--   1 rossstafford  staff   5.0K Apr 28 18:43 system_map_expansion_pass_1.md
+ -rw-r--r--   1 rossstafford  staff   8.5K Apr 28 19:39 system_map_expansion_pass_2_truth_graph.md
+ -rw-r--r--   1 rossstafford  staff    11K Apr 28 20:10 system_map_expansion_pass_3_missed_systems.json
+ -rw-r--r--   1 rossstafford  staff   6.8K Apr 28 20:10 system_map_expansion_pass_3_missed_systems.md
+ -rw-r--r--   1 rossstafford  staff   4.1K Apr 28 18:31 system_map_expansion_plan_v1.md
++-rw-r--r--   1 rossstafford  staff   1.6K Apr 30 21:30 system_map_slice_truth_v1.json
+ -rw-r--r--   1 rossstafford  staff    39K Apr 28 21:09 system_map_truth_graph_v1.json
+--rw-r--r--   1 rossstafford  staff   3.5K Apr 28 21:59 system_map_ui_input_manifest_v1.json
++-rw-r--r--   1 rossstafford  staff   3.8K Apr 30 21:30 system_map_ui_input_manifest_v1.json
+ -rw-r--r--   1 rossstafford  staff   1.3K Apr 28 21:45 system_map_ui_input_manifest_v1.md
+ -rw-r--r--   1 rossstafford  staff   5.2K Apr 28 21:09 truth_graph_merge_pass_4_p1_p2.json
+ -rw-r--r--   1 rossstafford  staff   5.0K Apr 28 21:09 truth_graph_merge_pass_4_p1_p2.md
