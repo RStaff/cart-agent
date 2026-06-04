@@ -1,6 +1,7 @@
 import express from "express";
 import Stripe from "stripe";
 import { bindPacketPayment, getPacket, normalizeStoreDomain } from "../lib/packetRepository.js";
+import { recordStripePaymentPropagation } from "../../../staffordos/revenue/revenue_agent_v1.mjs";
 
 function getStripeClient() {
   const key = process.env.STRIPE_LIVE_SECRET_KEY || process.env.STRIPE_SECRET_KEY || "";
@@ -74,6 +75,25 @@ export function installStripeWebhook(app) {
               payment_reference: paymentReference,
               status: "payment_received",
             });
+
+            try {
+              const propagation = recordStripePaymentPropagation({
+                packet,
+                session,
+                eventId: evtId,
+                eventType: evtType,
+              });
+
+              if (!propagation?.updated_client) {
+                console.warn("[stripe:webhook] verified payment recorded on packet, but no matching client registry entry was found", {
+                  eventId: evtId,
+                  packetId,
+                  merchantShop: packet.store_domain,
+                });
+              }
+            } catch (propagationError) {
+              console.error("[stripe:webhook] verified payment propagation failed after packet update", propagationError?.message || propagationError);
+            }
           }
         }
       }
