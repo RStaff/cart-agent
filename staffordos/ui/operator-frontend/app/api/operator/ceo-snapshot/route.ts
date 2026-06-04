@@ -1,6 +1,13 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { NextResponse } from "next/server";
+import {
+  canonicalClientLifecycleStage,
+  canonicalLifecyclePhase,
+  canonicalLeadLifecycleStage,
+  canonicalLifecycleRecord,
+  canonicalNextActionLabel,
+} from "../../../../lib/operator/lifecycleTerminology";
 
 type AnyRecord = Record<string, any>;
 
@@ -70,7 +77,7 @@ function lifecycleStage(record: AnyRecord) {
 }
 
 function leadNextAction(lead: AnyRecord) {
-  return text(lead.status?.next_action || lead.next_action || lead.nextAction) || "Review lead";
+  return canonicalNextActionLabel(lead.status?.next_action || lead.next_action || lead.nextAction);
 }
 
 function leadScore(lead: AnyRecord) {
@@ -161,11 +168,14 @@ function clientBlockers(client: AnyRecord) {
 }
 
 function normalizeClient(client: AnyRecord) {
+  const canonical = canonicalLifecycleRecord(client, "client");
   return {
     client_id: text(client.client_id),
     merchant_shop: text(client.merchant_shop || client.shop || client.domain),
     status: text(client.status),
     lifecycle_stage: lifecycleStage(client),
+    canonical_lifecycle_stage: canonicalClientLifecycleStage(client),
+    canonical_phase: canonicalLifecyclePhase(client, "client"),
     payment_status: paymentStatus(client),
     shopifixer_audit_status: text(client.shopifixer?.audit_status),
     shopifixer_fix_status: text(client.shopifixer?.fix_status),
@@ -174,6 +184,7 @@ function normalizeClient(client: AnyRecord) {
     next_action: clientNextAction(client),
     blockers: clientBlockers(client),
     priority_score: clientPriority(client),
+    lifecycle_display: canonical,
   };
 }
 
@@ -301,6 +312,7 @@ export async function GET() {
   const normalizedProof = proofSummary(proofs);
 
   const leadStages = countBy(leads, lifecycleStage);
+  const canonicalLeadStages = countBy(leads, (lead) => canonicalLeadLifecycleStage(lead));
   const productRouting = countBy(leads, (lead) => text(lead.product || lead.routing?.primary_offer || lead.product_surface));
   const paidClients = clients.filter(isPaidClient).length;
   const unpaidClients = clients.filter(isUnpaidClient).length;
@@ -351,6 +363,12 @@ export async function GET() {
     proofOrRevenueGaps,
     auditsNeeded,
   });
+  const canonicalNextBestAction = {
+    ...nextBestAction,
+    canonical_area: nextBestAction.area,
+    canonical_action: nextBestAction.action,
+    canonical_reason: nextBestAction.reason,
+  };
 
   return NextResponse.json({
     ok: true,
@@ -378,11 +396,14 @@ export async function GET() {
       engaged: leads.filter((lead) => lifecycleStage(lead) === "engaged" || lead.engagement?.replied === true).length,
       blocked: acquisitionBlocked,
       lifecycle_counts: leadStages,
+      canonical_lifecycle_counts: canonicalLeadStages,
       product_routing: productRouting,
       priority_leads: [...leads].sort((a, b) => leadScore(b) - leadScore(a)).slice(0, 5).map((lead) => ({
         lead_id: text(lead.id || lead.lead_id),
         merchant_shop: text(lead.name || lead.domain),
         lifecycle_stage: lifecycleStage(lead),
+        canonical_lifecycle_stage: canonicalLeadLifecycleStage(lead),
+        canonical_phase: canonicalLifecyclePhase(lead, "lead"),
         next_action: leadNextAction(lead),
         score: leadScore(lead),
       })),
@@ -390,6 +411,7 @@ export async function GET() {
     conversion: {
       status: clientRegistry.status === "loaded" || leadRegistry.status === "loaded" ? "partial" : "missing",
       proposal_sent_clients: normalizedClients.filter((client) => client.lifecycle_stage === "proposal_sent").length,
+      canonical_proposal_sent_clients: normalizedClients.filter((client) => client.canonical_lifecycle_stage === "Proposed Fix").length,
       engaged_leads: leads.filter((lead) => lifecycleStage(lead) === "engaged" || lead.engagement?.replied === true).length,
       followup_sent_leads: leads.filter((lead) => lifecycleStage(lead) === "followup_sent").length,
       audits_needed: auditsNeeded,
@@ -399,6 +421,10 @@ export async function GET() {
         .filter((client) => ["proposal_sent", "deal_won", "payment_pending"].includes(String(client.lifecycle_stage || "").toLowerCase()))
         .sort((a, b) => b.priority_score - a.priority_score)
         .slice(0, 5),
+      canonical_closest_to_payment: normalizedClients
+        .filter((client) => ["Proposed Fix", "Payment"].includes(String(client.canonical_lifecycle_stage || "")))
+        .sort((a, b) => b.priority_score - a.priority_score)
+        .slice(0, 5),
     },
     fulfillment: {
       status: clientRegistry.status === "loaded" ? "partial_missing_packet_adapter" : "missing",
@@ -406,6 +432,7 @@ export async function GET() {
       fix_not_started: normalizedClients.filter((client) => client.shopifixer_fix_status === "not_started").length,
       qa_queue: normalizedClients.filter((client) => client.shopifixer_fix_status === "qa").length,
       proof_queue: normalizedClients.filter((client) => client.shopifixer_fix_status === "proof_ready").length,
+      canonical_stage_counts: countBy(normalizedClients, (client) => client.canonical_lifecycle_stage || "Unknown"),
       note: "Packet truth is not included yet because this route is limited to Lead Registry, Client Registry, Dashboard Snapshot, and Proof Status.",
     },
     merchant_success: {
@@ -461,6 +488,6 @@ export async function GET() {
         proof_queue: normalizedClients.filter((client) => client.shopifixer_fix_status === "proof_ready").length,
       },
     },
-    next_best_action: nextBestAction,
+    next_best_action: canonicalNextBestAction,
   });
 }

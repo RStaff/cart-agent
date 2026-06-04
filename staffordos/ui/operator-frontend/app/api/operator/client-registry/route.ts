@@ -1,6 +1,12 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { NextResponse } from "next/server";
+import {
+  canonicalClientLifecycleStage,
+  canonicalLifecyclePhase,
+  canonicalLifecycleRecord,
+  canonicalNextActionLabel,
+} from "../../../../lib/operator/lifecycleTerminology";
 
 type AnyRecord = Record<string, any>;
 
@@ -104,7 +110,7 @@ function nextActionFor(client: AnyRecord) {
     type: normalizeText(action.type),
     owner: normalizeText(action.owner),
     due_at: normalizeText(action.due_at),
-    instructions: normalizeText(action.instructions || action.next_action || client.status?.next_action),
+    instructions: canonicalNextActionLabel(action.instructions || action.next_action || client.status?.next_action),
     auto_executable: action.auto_executable === true,
     updated_at: normalizeText(action.updated_at),
   };
@@ -116,11 +122,14 @@ function priorityScoreFor(client: AnyRecord) {
 }
 
 function normalizeClient(client: AnyRecord) {
+  const canonical = canonicalLifecycleRecord(client, "client");
   return {
     client_id: normalizeText(client.client_id),
     merchant_shop: normalizeText(client.merchant_shop || client.shop || client.domain),
     status: normalizeText(client.status),
     lifecycle_stage: normalizeText(client.lifecycle?.stage || client.lifecycle_stage || client.decision_trace?.lifecycle_stage),
+    canonical_lifecycle_stage: canonicalClientLifecycleStage(client),
+    canonical_phase: canonicalLifecyclePhase(client, "client"),
     contact: normalizeContact(client.contact || {}),
     payment_status: paymentStatusFor(client),
     shopifixer_audit_status: normalizeText(client.shopifixer?.audit_status),
@@ -131,6 +140,7 @@ function normalizeClient(client: AnyRecord) {
     next_action: nextActionFor(client),
     blockers: blockersFor(client),
     priority_score: priorityScoreFor(client),
+    lifecycle_display: canonical,
   };
 }
 

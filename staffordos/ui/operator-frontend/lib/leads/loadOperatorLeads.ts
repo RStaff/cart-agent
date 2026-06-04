@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { canonicalLeadLifecycleStage, canonicalLifecyclePhase } from "../operator/lifecycleTerminology";
 
 const ROOT = path.resolve(process.cwd(), "../../..");
 
@@ -26,6 +27,8 @@ function normalizeLead(input: any) {
     email: contact.email || input.email || input.send_target || null,
     source: String(input.source || "unknown"),
     lifecycle_stage: String(input.lifecycle_stage || status.current_stage || input.status || "new"),
+    canonical_lifecycle_stage: canonicalLeadLifecycleStage(input),
+    canonical_phase: canonicalLifecyclePhase(input, "lead"),
     next_action: String(status.next_action || input.nextAction || input.next_action || "Review lead"),
     score: typeof input.score === "number" ? input.score : null,
     temperature: input.temperature || input.status?.temperature || "cold",
@@ -81,7 +84,12 @@ export async function loadOperatorLeads() {
     engaged: leads.filter((l) => l.lifecycle_stage === "engaged" || l.replied).length,
     blocked: leads.filter((l) => !l.email && !l.outreach_ready).length,
     send_ledger_items: Array.isArray(sendLedger.items) ? sendLedger.items.length : 0,
-    event_count: Array.isArray(events.events) ? events.events.length : 0
+    event_count: Array.isArray(events.events) ? events.events.length : 0,
+    canonical_phase_counts: leads.reduce((counts: Record<string, number>, lead) => {
+      const key = lead.canonical_phase || "Operator Control";
+      counts[key] = (counts[key] || 0) + 1;
+      return counts;
+    }, {})
   };
 
   return {
