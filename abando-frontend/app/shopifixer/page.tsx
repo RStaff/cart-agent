@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type ShopiFixerResult = {
   leak: string;
@@ -11,7 +11,22 @@ type ShopiFixerResult = {
 export default function ShopiFixerPage() {
 
   const [loading, setLoading] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [storeDomain, setStoreDomain] = useState("");
   const [result, setResult] = useState<ShopiFixerResult | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const seeded =
+      params.get("store_domain") ||
+      params.get("storeDomain") ||
+      params.get("store") ||
+      params.get("shop") ||
+      "";
+    if (seeded) setStoreDomain(seeded);
+  }, []);
 
   const trackEvent = (eventName: string, payload: Record<string, unknown> = {}) => {
     const event = {
@@ -28,6 +43,68 @@ export default function ShopiFixerPage() {
       const existing = JSON.parse(window.localStorage.getItem(key) || "[]");
       existing.push(event);
       window.localStorage.setItem(key, JSON.stringify(existing.slice(-50)));
+    }
+  };
+
+  const normalizeStoreDomain = (value: string) => value.trim().toLowerCase();
+
+  const startCheckout = async () => {
+    const normalizedStoreDomain = normalizeStoreDomain(storeDomain);
+    if (!normalizedStoreDomain) {
+      setCheckoutError("Enter a Shopify store domain to continue.");
+      return;
+    }
+
+    setCheckoutError(null);
+    setCheckoutLoading(true);
+    trackEvent("purchase_started", { store_domain: normalizedStoreDomain, product: "ShopiFixer Fix Sprint" });
+
+    try {
+      const checkoutBase = (
+        process.env.NEXT_PUBLIC_ABANDO_API_BASE ||
+        process.env.NEXT_PUBLIC_ABANDO_BACKEND_ORIGIN ||
+        ""
+      ).replace(/\/$/, "");
+
+      const checkoutUrl = checkoutBase ? `${checkoutBase}/__public-checkout` : "/__public-checkout";
+      const response = await fetch(checkoutUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          plan: "scale",
+          store_domain: normalizedStoreDomain,
+        }),
+      });
+
+      const payload = await response.json().catch(() => ({} as Record<string, unknown>));
+
+      if (!response.ok) {
+        const message =
+          (payload && typeof payload.message === "string" && payload.message) ||
+          (payload && typeof payload.code === "string" && payload.code) ||
+          `Checkout failed with status ${response.status}`;
+        throw new Error(message);
+      }
+
+      const url = payload && typeof payload.url === "string" ? payload.url : "";
+      if (!url) throw new Error("Checkout did not return a payment link.");
+
+      trackEvent("purchase_redirected", {
+        store_domain: normalizedStoreDomain,
+        plan: "scale",
+        session_id: typeof payload.sessionId === "string" ? payload.sessionId : undefined,
+      });
+
+      window.location.href = url;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Checkout unavailable.";
+      setCheckoutError(message);
+      trackEvent("purchase_failed", { store_domain: normalizedStoreDomain, message });
+    } finally {
+      setCheckoutLoading(false);
     }
   };
 
@@ -56,24 +133,63 @@ export default function ShopiFixerPage() {
         {/* HERO */}
         <section className="space-y-6 text-center">
           <p className="text-xs tracking-[0.3em] uppercase text-zinc-500">
-            A Stafford Media Consulting System
+            ShopiFixer Fix Sprint · $950 flat fee
           </p>
 
           <h1 className="text-5xl font-bold leading-tight">
-            Your Shopify store is leaking revenue. ShopiFixer shows you exactly where.
+            ShopiFixer fixes one visible Shopify conversion problem.
           </h1>
 
           <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
-            Get a focused conversion audit that identifies the single highest-impact issue costing you sales — then gives you the first fix to test.
+            Get a focused conversion audit that identifies the single highest-impact issue costing you sales, then gives you the first fix and the proof package.
           </p>
 
-          <div className="pt-4">
-            <button onClick={runAudit} className="bg-yellow-400 text-black px-8 py-4 rounded-xl font-bold text-lg hover:opacity-90">
-              Find My Biggest Revenue Leak
-            </button>
+          <div className="pt-4 space-y-4">
+            <div className="mx-auto max-w-xl text-left">
+              <label className="mb-2 block text-xs uppercase tracking-[0.24em] text-zinc-500" htmlFor="store-domain">
+                Shopify store domain
+              </label>
+              <input
+                id="store-domain"
+                type="text"
+                value={storeDomain}
+                onChange={(event) => setStoreDomain(event.target.value)}
+                placeholder="example.myshopify.com"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-yellow-400/60 focus:bg-white/8"
+              />
+              <p className="mt-2 text-xs text-zinc-500">
+                We use this to keep the checkout, fix sprint, and follow-up proof tied to the right store.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-3">
+              <button
+                type="button"
+                onClick={startCheckout}
+                disabled={checkoutLoading}
+                className="bg-yellow-400 text-black px-8 py-4 rounded-xl font-bold text-lg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {checkoutLoading ? "Opening secure checkout..." : "Get the $950 Fix Sprint"}
+              </button>
+              <button
+                type="button"
+                onClick={runAudit}
+                className="bg-yellow-400 text-black px-8 py-4 rounded-xl font-bold text-lg hover:opacity-90"
+              >
+                Run ShopiFixer Audit
+              </button>
+              <a href="/pricing" className="inline-flex items-center justify-center border border-white/10 bg-white/5 px-8 py-4 rounded-xl font-bold text-lg hover:bg-white/10">
+                View pricing
+              </a>
+            </div>
             <p className="text-xs text-zinc-500 mt-3">
-              30-second scan • No login required • Clear first fix
+              30-second scan • No login required • Clear first fix • Secure Stripe checkout
             </p>
+            {checkoutError && (
+              <p className="mx-auto max-w-xl text-sm text-red-300">
+                {checkoutError}
+              </p>
+            )}
           </div>
 
           <div className="mx-auto mt-6 grid max-w-2xl gap-3 text-left text-sm text-zinc-300 sm:grid-cols-3">
@@ -82,8 +198,8 @@ export default function ShopiFixerPage() {
               <p className="mt-1 text-zinc-400">Checkout, trust, UX, and recovery leaks.</p>
             </div>
             <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-              <strong className="text-white">Prioritize</strong>
-              <p className="mt-1 text-zinc-400">One issue first. No bloated audit report.</p>
+              <strong className="text-white">Proof</strong>
+              <p className="mt-1 text-zinc-400">Before/after evidence and a clear fix summary.</p>
             </div>
             <div className="rounded-xl border border-white/10 bg-white/5 p-4">
               <strong className="text-white">Act</strong>
@@ -93,16 +209,16 @@ export default function ShopiFixerPage() {
         </section>
 
         {/* PROOF BLOCK (CRITICAL) */}
-        <section className="bg-white/5 border border-white/10 rounded-2xl p-8">
+        <section className="bg-white/5 border border-white/10 rounded-2xl p-8" id="proof">
           <p className="text-xs uppercase tracking-widest text-zinc-500 mb-4">
-            Example Audit Output
+            Proof package
           </p>
 
           <div className="space-y-3 text-sm text-zinc-300">
             <p><strong>Store:</strong> example-store.com</p>
-            <p><strong>Leak:</strong> Checkout hesitation (mobile UX friction)</p>
-            <p><strong>Estimated 30-day loss:</strong> $12,400</p>
-            <p><strong>First Fix:</strong> Remove forced account creation + simplify payment step</p>
+            <p><strong>Visible issue:</strong> Checkout hesitation (mobile UX friction)</p>
+            <p><strong>Before/after evidence:</strong> Included with the sprint</p>
+            <p><strong>First fix:</strong> Remove forced account creation + simplify payment step</p>
           </div>
         </section>
 
@@ -128,7 +244,7 @@ export default function ShopiFixerPage() {
             <div className="p-6 border border-white/10 rounded-xl bg-white/5">
               <h3 className="font-semibold mb-2">Recover</h3>
               <p className="text-zinc-400 text-sm">
-                Abando captures lost revenue automatically after the fix.
+                Abando captures lost revenue automatically after the merchant chooses the install path.
               </p>
             </div>
           </div>
@@ -148,9 +264,20 @@ export default function ShopiFixerPage() {
 
         {/* FINAL CTA */}
         <section className="text-center pt-6">
-          <button onClick={runAudit} className="bg-yellow-400 text-black px-10 py-5 rounded-xl font-bold text-xl hover:opacity-90">
+          <button
+            type="button"
+            onClick={startCheckout}
+            disabled={checkoutLoading}
+            className="bg-yellow-400 text-black px-10 py-5 rounded-xl font-bold text-xl hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {checkoutLoading ? "Opening secure checkout..." : "Get the $950 Fix Sprint"}
+          </button>
+          <button type="button" onClick={runAudit} className="ml-3 bg-white/5 text-white px-10 py-5 rounded-xl font-bold text-xl hover:bg-white/10">
             Run ShopiFixer Audit
           </button>
+          <a href="/install/shopify" className="ml-3 inline-flex items-center justify-center border border-white/10 bg-white/5 px-10 py-5 rounded-xl font-bold text-xl hover:bg-white/10">
+            Install Abando
+          </a>
 
           {loading && (
             <div className="mx-auto mt-6 max-w-xl rounded-xl border border-white/10 bg-white/5 p-5 text-sm text-zinc-300">
