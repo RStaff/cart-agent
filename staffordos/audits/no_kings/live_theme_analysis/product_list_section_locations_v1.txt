@@ -1,0 +1,12 @@
+/tmp/no_kings_pull_test/sections/product-list.liquid:9:  data-testid="product-list"
+/tmp/no_kings_pull_test/sections/product-list.liquid:24:    {%- content_for 'block', type: '_product-list-content', id: 'static-header' -%}
+/tmp/no_kings_pull_test/sections/product-list.liquid:86:  "class": "ui-test-product-list",
+/tmp/no_kings_pull_test/sections/product-list.liquid:368:          "type": "_product-list-content",
+/tmp/no_kings_pull_test/sections/product-list.liquid:402:              "type": "_product-list-text",
+/tmp/no_kings_pull_test/sections/product-list.liquid:423:              "type": "_product-list-button",
+/tmp/no_kings_pull_test/sections/product-list.liquid:545:          "type": "_product-list-content",
+/tmp/no_kings_pull_test/sections/product-list.liquid:579:              "type": "_product-list-text",
+/tmp/no_kings_pull_test/sections/product-list.liquid:600:              "type": "_product-list-button",
+/tmp/no_kings_pull_test/sections/product-list.liquid:723:          "type": "_product-list-content",
+/tmp/no_kings_pull_test/sections/product-list.liquid:757:              "type": "_product-list-text",
+/tmp/no_kings_pull_test/sections/product-list.liquid:782:              "type": "_product-list-button",

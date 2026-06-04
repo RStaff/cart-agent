@@ -1,0 +1,200 @@
+/tmp/no_kings_pull_test/sections/predictive-search.liquid:20:          | plus: predictive_search.resources.collections.size
+/tmp/no_kings_pull_test/sections/predictive-search.liquid:73:          {% if predictive_search.resources.collections.size > 0 %}
+/tmp/no_kings_pull_test/sections/predictive-search.liquid:74:            {% assign resource_title = 'content.search_results_resource_collections' | t %}
+/tmp/no_kings_pull_test/sections/predictive-search.liquid:78:              resource_type: 'collection',
+/tmp/no_kings_pull_test/sections/predictive-search.liquid:79:              resources: predictive_search.resources.collections
+/tmp/no_kings_pull_test/sections/predictive-search.liquid:126:            | plus: predictive_search.resources.collections.size
+/tmp/no_kings_pull_test/sections/predictive-search.liquid:134:            {% elsif predictive_search.resources.collections.size == 1 %}
+/tmp/no_kings_pull_test/sections/predictive-search.liquid:135:              {% assign single_result_url = predictive_search.resources.collections.first.url %}
+/tmp/no_kings_pull_test/sections/slideshow.liquid:444:                "link": "shopify://collections/all"
+/tmp/no_kings_pull_test/sections/slideshow.liquid:480:                "link": "shopify://collections/all"
+/tmp/no_kings_pull_test/sections/slideshow.liquid:522:                "link": "shopify://collections/all"
+/tmp/no_kings_pull_test/sections/slideshow.liquid:557:                "link": "shopify://collections/all"
+/tmp/no_kings_pull_test/sections/main-collection-list.liquid:4:  assign section_collections = collections
+/tmp/no_kings_pull_test/sections/main-collection-list.liquid:28:  {% if section_collections == null %}
+/tmp/no_kings_pull_test/sections/main-collection-list.liquid:30:      {% assign section_collections = section_collections | append: ', ' %}
+/tmp/no_kings_pull_test/sections/main-collection-list.liquid:33:    {% assign section_collections = section_collections | split: ',' %}
+/tmp/no_kings_pull_test/sections/main-collection-list.liquid:37:    {% for collection in section_collections limit: max_items %}
+/tmp/no_kings_pull_test/sections/main-collection-list.liquid:39:        {% content_for 'block', type: '_collection-card', id: 'static-collection-card', closest.collection: collection %}
+/tmp/no_kings_pull_test/sections/main-collection-list.liquid:56:    carousel_ref: 'mainCollectionList',
+/tmp/no_kings_pull_test/sections/main-collection-list.liquid:58:    content_type: 'collections',
+/tmp/no_kings_pull_test/sections/main-collection-list.liquid:59:    test_id: 'collections-list-grid'
+/tmp/no_kings_pull_test/sections/main-collection-list.liquid:65:  "name": "t:names.collection_list",
+/tmp/no_kings_pull_test/sections/main-collection-list.liquid:66:  "class": "ui-test-collection-list",
+/tmp/no_kings_pull_test/sections/main-collection-list.liquid:200:      "id": "max_collections",
+/tmp/no_kings_pull_test/sections/main-collection-list.liquid:201:      "label": "t:settings.collection_count",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:4:  if section.settings.collection_list != blank
+/tmp/no_kings_pull_test/sections/collection-list.liquid:5:    assign section_collections = section.settings.collection_list
+/tmp/no_kings_pull_test/sections/collection-list.liquid:6:    assign max_items = section.settings.collection_list.count
+/tmp/no_kings_pull_test/sections/collection-list.liquid:8:    assign max_items = section.settings.max_collections
+/tmp/no_kings_pull_test/sections/collection-list.liquid:33:  data-testid="collection-list"
+/tmp/no_kings_pull_test/sections/collection-list.liquid:39:  {% if section_collections == null %}
+/tmp/no_kings_pull_test/sections/collection-list.liquid:41:      {% assign section_collections = section_collections | append: ', ' %}
+/tmp/no_kings_pull_test/sections/collection-list.liquid:44:    {% assign section_collections = section_collections | split: ',' %}
+/tmp/no_kings_pull_test/sections/collection-list.liquid:48:    {% for collection in section_collections limit: max_items %}
+/tmp/no_kings_pull_test/sections/collection-list.liquid:50:        {% content_for 'block', type: '_collection-card', id: 'static-collection-card', closest.collection: collection %}
+/tmp/no_kings_pull_test/sections/collection-list.liquid:67:    carousel_ref: 'collectionList',
+/tmp/no_kings_pull_test/sections/collection-list.liquid:69:    content_type: 'collections',
+/tmp/no_kings_pull_test/sections/collection-list.liquid:70:    test_id: 'collections-list-grid'
+/tmp/no_kings_pull_test/sections/collection-list.liquid:76:  "name": "t:names.collection_list",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:77:  "class": "ui-test-collection-list",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:115:      "type": "collection_list",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:116:      "id": "collection_list",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:117:      "label": "t:settings.collection_list"
+/tmp/no_kings_pull_test/sections/collection-list.liquid:233:      "id": "max_collections",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:234:      "label": "t:settings.collection_count",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:359:      "name": "t:names.collections_bento",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:360:      "category": "t:categories.collections",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:406:                "text": "t:html_defaults.shop_by_collection",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:426:        "static-collection-card": {
+/tmp/no_kings_pull_test/sections/collection-list.liquid:427:          "type": "_collection-card",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:428:          "name": "t:names.collection_card",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:442:            "collection-card-image": {
+/tmp/no_kings_pull_test/sections/collection-list.liquid:443:              "type": "_collection-card-image",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:444:              "name": "t:names.collection_card_image",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:450:            "collection-title": {
+/tmp/no_kings_pull_test/sections/collection-list.liquid:451:              "type": "collection-title",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:452:              "name": "t:names.collection_title",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:473:          "block_order": ["collection-title"]
+/tmp/no_kings_pull_test/sections/collection-list.liquid:479:      "name": "t:names.collections_grid",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:480:      "category": "t:categories.collections",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:518:                "text": "t:html_defaults.shop_by_collection",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:538:        "static-collection-card": {
+/tmp/no_kings_pull_test/sections/collection-list.liquid:539:          "type": "_collection-card",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:540:          "name": "t:names.collection_card",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:554:            "collection-card-image": {
+/tmp/no_kings_pull_test/sections/collection-list.liquid:555:              "type": "_collection-card-image",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:556:              "name": "t:names.collection_card_image",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:562:            "collection-title": {
+/tmp/no_kings_pull_test/sections/collection-list.liquid:563:              "type": "collection-title",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:564:              "name": "t:names.collection_title",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:585:          "block_order": ["collection-title"]
+/tmp/no_kings_pull_test/sections/collection-list.liquid:590:        "collection_list": [],
+/tmp/no_kings_pull_test/sections/collection-list.liquid:607:      "name": "t:names.collections_carousel",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:608:      "category": "t:categories.collections",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:646:                "text": "t:html_defaults.shop_by_collection",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:666:        "static-collection-card": {
+/tmp/no_kings_pull_test/sections/collection-list.liquid:667:          "type": "_collection-card",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:668:          "name": "t:names.collection_card",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:682:            "collection-card-image": {
+/tmp/no_kings_pull_test/sections/collection-list.liquid:683:              "type": "_collection-card-image",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:684:              "name": "t:names.collection_card_image",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:690:            "collection-title": {
+/tmp/no_kings_pull_test/sections/collection-list.liquid:691:              "type": "collection-title",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:692:              "name": "t:names.collection_title",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:711:          "block_order": ["collection-title"]
+/tmp/no_kings_pull_test/sections/collection-list.liquid:716:        "collection_list": [],
+/tmp/no_kings_pull_test/sections/collection-list.liquid:733:      "name": "t:names.collections_editorial",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:734:      "category": "t:categories.collections",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:779:                "text": "t:html_defaults.shop_by_collection",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:804:        "static-collection-card": {
+/tmp/no_kings_pull_test/sections/collection-list.liquid:805:          "type": "_collection-card",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:806:          "name": "t:names.collection_card",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:812:            "collection_card_gap": 8,
+/tmp/no_kings_pull_test/sections/collection-list.liquid:821:            "collection-title": {
+/tmp/no_kings_pull_test/sections/collection-list.liquid:822:              "type": "collection-title",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:823:              "name": "t:names.collection_title",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:846:            "collection-card-image": {
+/tmp/no_kings_pull_test/sections/collection-list.liquid:847:              "type": "_collection-card-image",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:848:              "name": "t:names.collection_card_image",
+/tmp/no_kings_pull_test/sections/collection-list.liquid:864:          "block_order": ["collection-title"]
+/tmp/no_kings_pull_test/sections/collection-list.liquid:869:        "collection_list": [],
+/tmp/no_kings_pull_test/sections/collection-list.liquid:877:        "max_collections": 4,
+/tmp/no_kings_pull_test/sections/collection-links.liquid:4:  assign collection_list = section.settings.collection_list
+/tmp/no_kings_pull_test/sections/collection-links.liquid:6:  if collection_list == blank
+/tmp/no_kings_pull_test/sections/collection-links.liquid:10:      assign collection_list = collection_list | append: ', '
+/tmp/no_kings_pull_test/sections/collection-links.liquid:13:    assign collection_list = collection_list | split: ','
+/tmp/no_kings_pull_test/sections/collection-links.liquid:16:  assign active_collection = collection_list | find: 'id', collection.id | default: collection_list.first
+/tmp/no_kings_pull_test/sections/collection-links.liquid:20:  src="{{ 'collection-links.js' | asset_url }}"
+/tmp/no_kings_pull_test/sections/collection-links.liquid:29:  data-testid="collection-links-{{ section.id }}"
+/tmp/no_kings_pull_test/sections/collection-links.liquid:31:  <collection-links-component
+/tmp/no_kings_pull_test/sections/collection-links.liquid:39:      class="collection-links__container"
+/tmp/no_kings_pull_test/sections/collection-links.liquid:42:      {% for collection in collection_list limit: limit %}
+/tmp/no_kings_pull_test/sections/collection-links.liquid:46:          if collection.id == active_collection.id
+/tmp/no_kings_pull_test/sections/collection-links.liquid:51:          type: '_collection-link',
+/tmp/no_kings_pull_test/sections/collection-links.liquid:53:          closest.collection: collection,
+/tmp/no_kings_pull_test/sections/collection-links.liquid:63:          {% for collection in collection_list limit: limit %}
+/tmp/no_kings_pull_test/sections/collection-links.liquid:67:            if collection.id == active_collection.id
+/tmp/no_kings_pull_test/sections/collection-links.liquid:75:              type: '_collection-link',
+/tmp/no_kings_pull_test/sections/collection-links.liquid:77:              closest.collection: collection,
+/tmp/no_kings_pull_test/sections/collection-links.liquid:91:          slide_count: collection_list.size,
+/tmp/no_kings_pull_test/sections/collection-links.liquid:92:          class: 'collection-links__images',
+/tmp/no_kings_pull_test/sections/collection-links.liquid:96:  </collection-links-component>
+/tmp/no_kings_pull_test/sections/collection-links.liquid:101:  collection-links-component {
+/tmp/no_kings_pull_test/sections/collection-links.liquid:148:      .collection-links__container {
+/tmp/no_kings_pull_test/sections/collection-links.liquid:157:        .collection-links__container {
+/tmp/no_kings_pull_test/sections/collection-links.liquid:168:      .collection-links__container {
+/tmp/no_kings_pull_test/sections/collection-links.liquid:177:  .collection-links__container {
+/tmp/no_kings_pull_test/sections/collection-links.liquid:183:  .collection-links__images {
+/tmp/no_kings_pull_test/sections/collection-links.liquid:197:  "name": "t:names.collection_links",
+/tmp/no_kings_pull_test/sections/collection-links.liquid:203:      "type": "collection_list",
+/tmp/no_kings_pull_test/sections/collection-links.liquid:204:      "id": "collection_list",
+/tmp/no_kings_pull_test/sections/collection-links.liquid:205:      "label": "t:settings.collection_list"
+/tmp/no_kings_pull_test/sections/collection-links.liquid:313:      "name": "t:names.collection_links_spotlight",
+/tmp/no_kings_pull_test/sections/collection-links.liquid:314:      "category": "t:categories.collections",
+/tmp/no_kings_pull_test/sections/collection-links.liquid:317:          "type": "_collection-link",
+/tmp/no_kings_pull_test/sections/collection-links.liquid:321:              "type": "_inline-collection-title",
+/tmp/no_kings_pull_test/sections/collection-links.liquid:341:      "name": "t:names.collection_links_text",
+/tmp/no_kings_pull_test/sections/collection-links.liquid:342:      "category": "t:categories.collections",
+/tmp/no_kings_pull_test/sections/collection-links.liquid:349:          "type": "_collection-link",
+/tmp/no_kings_pull_test/sections/collection-links.liquid:353:              "type": "_inline-collection-title",
+/tmp/no_kings_pull_test/sections/layered-slideshow.liquid:478:                "link": "shopify://collections/all"
+/tmp/no_kings_pull_test/sections/layered-slideshow.liquid:505:                "link": "shopify://collections/all"
+/tmp/no_kings_pull_test/sections/layered-slideshow.liquid:518:                "text": "t:html_defaults.featured_collection_h3",
+/tmp/no_kings_pull_test/sections/layered-slideshow.liquid:525:                "text": "t:html_defaults.shop_collection"
+/tmp/no_kings_pull_test/sections/layered-slideshow.liquid:532:                "link": "shopify://collections/all"
+/tmp/no_kings_pull_test/sections/search-results.liquid:20:    class="collection-wrapper grid gap-style"
+/tmp/no_kings_pull_test/sections/search-results.liquid:33:        {% assign collection = settings.empty_state_collection | default: collections.all %}
+/tmp/no_kings_pull_test/sections/search-results.liquid:35:        {% assign title = settings.empty_state_collection.title | default: default_title %}
+/tmp/no_kings_pull_test/sections/search-results.liquid:36:        {% assign products = collection.products %}
+/tmp/no_kings_pull_test/sections/search-results.liquid:71:      "content": "t:content.edit_empty_state_collection_in_theme_settings"
+/tmp/no_kings_pull_test/sections/header-group.json:71:            "featured_collections_aspect_ratio": "16 / 9",
+/tmp/no_kings_pull_test/sections/header-group.json:109:        "enable_transparent_header_collection": false,
+/tmp/no_kings_pull_test/sections/header-group.json:110:        "collection_color_scheme": "default"
+/tmp/no_kings_pull_test/sections/header.liquid:28:  elsif section.settings.enable_transparent_header_collection and template.name == 'collection'
+/tmp/no_kings_pull_test/sections/header.liquid:30:    assign transparent_color_scheme = section.settings.collection_color_scheme
+/tmp/no_kings_pull_test/sections/header.liquid:1569:      "visible_if": "{{ section.settings.enable_transparent_header_home or section.settings.enable_transparent_header_product or section.settings.enable_transparent_header_collection }}"
+/tmp/no_kings_pull_test/sections/header.liquid:1627:      "content": "t:content.collection_page"
+/tmp/no_kings_pull_test/sections/header.liquid:1631:      "id": "enable_transparent_header_collection",
+/tmp/no_kings_pull_test/sections/header.liquid:1637:      "id": "collection_color_scheme",
+/tmp/no_kings_pull_test/sections/header.liquid:1650:      "visible_if": "{{ section.settings.enable_transparent_header_collection }}"
+/tmp/no_kings_pull_test/sections/product-list.liquid:9:  data-testid="product-list"
+/tmp/no_kings_pull_test/sections/product-list.liquid:24:    {%- content_for 'block', type: '_product-list-content', id: 'static-header' -%}
+/tmp/no_kings_pull_test/sections/product-list.liquid:28:    {% if section.settings.collection != blank and shop.products_count != 0 %}
+/tmp/no_kings_pull_test/sections/product-list.liquid:29:      {% paginate section.settings.collection.products by max_items %}
+/tmp/no_kings_pull_test/sections/product-list.liquid:30:        {% for product in section.settings.collection.products limit: max_items %}
+/tmp/no_kings_pull_test/sections/product-list.liquid:86:  "class": "ui-test-product-list",
+/tmp/no_kings_pull_test/sections/product-list.liquid:103:      "type": "collection",
+/tmp/no_kings_pull_test/sections/product-list.liquid:104:      "id": "collection",
+/tmp/no_kings_pull_test/sections/product-list.liquid:105:      "label": "t:settings.collection"
+/tmp/no_kings_pull_test/sections/product-list.liquid:350:        "collection": "",
+/tmp/no_kings_pull_test/sections/product-list.liquid:368:          "type": "_product-list-content",
+/tmp/no_kings_pull_test/sections/product-list.liquid:402:              "type": "_product-list-text",
+/tmp/no_kings_pull_test/sections/product-list.liquid:403:              "name": "t:names.collection_title",
+/tmp/no_kings_pull_test/sections/product-list.liquid:405:                "text": "<h3>{{ closest.collection.title }}</h3>",
+/tmp/no_kings_pull_test/sections/product-list.liquid:423:              "type": "_product-list-button",
+/tmp/no_kings_pull_test/sections/product-list.liquid:527:        "collection": "",
+/tmp/no_kings_pull_test/sections/product-list.liquid:545:          "type": "_product-list-content",
+/tmp/no_kings_pull_test/sections/product-list.liquid:579:              "type": "_product-list-text",
+/tmp/no_kings_pull_test/sections/product-list.liquid:580:              "name": "t:names.collection_title",
+/tmp/no_kings_pull_test/sections/product-list.liquid:582:                "text": "<h2>{{ closest.collection.title }}</h2>",
+/tmp/no_kings_pull_test/sections/product-list.liquid:600:              "type": "_product-list-button",
+/tmp/no_kings_pull_test/sections/product-list.liquid:704:        "collection": "",
+/tmp/no_kings_pull_test/sections/product-list.liquid:723:          "type": "_product-list-content",
+/tmp/no_kings_pull_test/sections/product-list.liquid:757:              "type": "_product-list-text",
+/tmp/no_kings_pull_test/sections/product-list.liquid:758:              "name": "t:names.collection_title",
+/tmp/no_kings_pull_test/sections/product-list.liquid:760:                "text": "<h3>{{ closest.collection.title }}</h3>",
+/tmp/no_kings_pull_test/sections/product-list.liquid:782:              "type": "_product-list-button",
+/tmp/no_kings_pull_test/sections/featured-product.liquid:19:    featured-product-section
+/tmp/no_kings_pull_test/sections/featured-product.liquid:25:  data-testid="featured-product-{{ section.id }}"
+/tmp/no_kings_pull_test/sections/featured-product.liquid:43:      {% content_for 'block', type: '_featured-product', id: 'featured-product', closest.product: section.settings.product %}
+/tmp/no_kings_pull_test/sections/featured-product.liquid:57:  .featured-product-section .section-content-wrapper {
+/tmp/no_kings_pull_test/sections/featured-product.liquid:67:  .featured-product-section {
+/tmp/no_kings_pull_test/sections/featured-product.liquid:77:  .featured-product-section .product-grid__card {
+/tmp/no_kings_pull_test/sections/featured-product.liquid:88:    .featured-product-section .media-block {
+/tmp/no_kings_pull_test/sections/featured-product.liquid:94:    .featured-product-section .product-card__content {
+/tmp/no_kings_pull_test/sections/featured-product.liquid:175:        "featured-product": {
+/tmp/no_kings_pull_test/sections/featured-product.liquid:176:          "type": "_featured-product",
+/tmp/no_kings_pull_test/sections/featured-product.liquid:180:            "featured-product-title": {
+/tmp/no_kings_pull_test/sections/featured-product.liquid:189:            "featured-product-price": {
+/tmp/no_kings_pull_test/sections/featured-product.liquid:190:              "type": "_featured-product-price",

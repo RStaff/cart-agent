@@ -1,0 +1,9 @@
+/tmp/no_kings_pull_test
+/tmp/no_kings_pull_test/assets
+/tmp/no_kings_pull_test/blocks
+/tmp/no_kings_pull_test/config
+/tmp/no_kings_pull_test/layout
+/tmp/no_kings_pull_test/locales
+/tmp/no_kings_pull_test/sections
+/tmp/no_kings_pull_test/snippets
+/tmp/no_kings_pull_test/templates

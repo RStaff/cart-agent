@@ -1,0 +1,11 @@
+SHOPIFY EXECUTION READINESS AUDIT
+Mon Jun  1 19:21:19 EDT 2026
+
+.shopify/.gitignore
+.shopify/deploy-bundle/manifest.json
+.shopify/dev-bundle.br
+.shopify/dev-bundle/manifest.json
+.shopify/localhost-key.pem
+.shopify/localhost.pem
+.shopify/mkcert-LICENSE
+.shopify/project.json

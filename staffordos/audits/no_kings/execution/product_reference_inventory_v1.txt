@@ -1,0 +1,731 @@
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:30:          "type": "_cart-products",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:66:    "product_list_NNFgcy": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:67:      "type": "product-list",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:70:          "type": "_product-list-content",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:103:            "product_list_text_fifeh4": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:104:              "type": "_product-list-text",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:105:              "name": "t:names.collection_title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:129:            "product_list_button_eibbma": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:130:              "type": "_product-list-button",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:131:              "name": "t:names.product_list_button",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:145:            "product_list_text_fifeh4",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:146:            "product_list_button_eibbma"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:149:        "static-product-card": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:150:          "type": "_product-card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:151:          "name": "t:names.product_card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:154:            "product_card_gap": 4,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:167:            "product_card_gallery_PEPpfq": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:168:              "type": "_product-card-gallery",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:169:              "name": "t:names.product_card_media",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:183:            "product_title_WNMpHe": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:184:              "type": "product-title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:185:              "name": "t:names.product_title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:210:              "name": "t:names.product_price",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:233:            "product_card_gallery_PEPpfq",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:234:            "product_title_WNMpHe",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:239:      "name": "Featured collection",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:241:        "collection": "all",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:244:        "max_products": 4,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/cart.json:263:    "product_list_NNFgcy"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/search.json:82:        "product-card": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/search.json:83:          "type": "_product-card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/search.json:86:            "product_card_gap": 4,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/search.json:99:            "product_card_gallery_cFExAi": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/search.json:100:              "type": "_product-card-gallery",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/search.json:101:              "name": "t:names.product_card_media",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/search.json:115:            "product_title_j7qXTx": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/search.json:116:              "type": "product-title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/search.json:117:              "name": "t:names.product_title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/search.json:142:              "name": "t:names.product_price",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/search.json:165:            "product_card_gallery_cFExAi",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/search.json:166:            "product_title_j7qXTx",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/search.json:173:        "product_card_size": "medium",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/search.json:174:        "mobile_product_card_size": "small",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/search.json:175:        "product_grid_width": "centered",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/404.json:71:            "link": "shopify://collections/all",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/404.json:99:    "product_list_iA96Tq": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/404.json:100:      "type": "product-list",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/404.json:103:          "type": "_product-list-content",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/404.json:166:        "static-product-card": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/404.json:167:          "type": "_product-card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/404.json:168:          "name": "t:names.product_card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/404.json:171:            "product_card_gap": 4,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/404.json:184:            "product_card_gallery_wxYqE3": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/404.json:185:              "type": "_product-card-gallery",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/404.json:186:              "name": "t:names.product_card_media",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/404.json:200:            "product_title_83YMDL": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/404.json:201:              "type": "product-title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/404.json:202:              "name": "t:names.product_title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/404.json:227:              "name": "t:names.product_price",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/404.json:250:            "product_card_gallery_wxYqE3",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/404.json:251:            "product_title_83YMDL",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/404.json:256:      "name": "Featured collection",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/404.json:258:        "collection": "all",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/404.json:261:        "max_products": 4,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/404.json:280:    "product_list_iA96Tq"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/collection.json:18:            "text": "<h1>{{ closest.collection.title }}</h1>",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/collection.json:44:            "text": "{{ closest.collection.description }}",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/collection.json:71:      "name": "Collection heading",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/collection.json:101:      "type": "main-collection",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/collection.json:126:        "product-card": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/collection.json:127:          "type": "_product-card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/collection.json:130:            "product_card_gap": 4,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/collection.json:144:              "type": "_product-card-gallery",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/collection.json:158:            "product_title_4nY4eT": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/collection.json:159:              "type": "product-title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/collection.json:160:              "name": "t:names.product_title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/collection.json:208:            "product_title_4nY4eT",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/collection.json:215:        "product_card_size": "medium",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/collection.json:216:        "mobile_product_card_size": "small",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/collection.json:217:        "product_grid_width": "centered",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:12:      "type": "product-information",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:15:          "type": "_product-media-gallery",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:42:        "product-details": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:43:          "type": "_product-details",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:109:                  "name": "Product title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:111:                    "text": "<h1>{{ closest.product.title }}</h1>",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:222:              "name": "Product description",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:224:                "text": "{{ closest.product.description }}",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:267:    "product_recommendations_qggXJq": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:268:      "type": "product-recommendations",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:296:        "static-product-card": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:297:          "type": "_product-card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:298:          "name": "t:names.product_card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:301:            "product_card_gap": 8,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:314:            "product_card_gallery_DNizbJ": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:315:              "type": "_product-card-gallery",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:316:              "name": "t:names.product_card_media",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:330:            "product_title_M7MJkb": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:331:              "type": "product-title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:332:              "name": "t:names.product_title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:379:            "product_card_gallery_DNizbJ",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:380:            "product_title_M7MJkb",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:388:      "name": "t:names.product_recommendations",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:390:        "product": "{{ closest.product }}",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:394:        "max_products": 4,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/product.json:411:    "product_recommendations_qggXJq"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:18:            "text": "<p>Browse our latest products</p>",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:45:            "link": "shopify://collections/all",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:91:    "product_list_fa6P9H": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:92:      "type": "product-list",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:95:          "type": "_product-list-content",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:128:            "product_list_text_YFtzcL": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:129:              "type": "_product-list-text",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:130:              "name": "t:names.collection_title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:132:                "text": "<h3>{{ closest.collection.title }}</h3>",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:154:            "product_list_button_MWeP9V": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:155:              "type": "_product-list-button",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:156:              "name": "t:names.product_list_button",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:170:            "product_list_text_YFtzcL",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:171:            "product_list_button_MWeP9V"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:174:        "static-product-card": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:175:          "type": "_product-card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:176:          "name": "t:names.product_card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:179:            "product_card_gap": 4,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:192:            "product_card_gallery_677WP3": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:193:              "type": "_product-card-gallery",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:194:              "name": "t:names.product_card_media",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:208:            "product_title_YXxMTj": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:209:              "type": "product-title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:210:              "name": "t:names.product_title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:235:              "name": "t:names.product_price",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:258:            "product_card_gallery_677WP3",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:259:            "product_title_YXxMTj",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:264:      "name": "Featured collection",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:266:        "collection": "all",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:269:        "max_products": 8,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/index.json:288:    "product_list_fa6P9H"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/list-collections.json:11:    "collection_list_Wfgh3m": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/list-collections.json:12:      "type": "main-collection-list",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/list-collections.json:56:                "text": "<h1>Collections</h1>",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/list-collections.json:83:        "static-collection-card": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/list-collections.json:84:          "type": "_collection-card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/list-collections.json:85:          "name": "t:names.collection_card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/list-collections.json:91:            "collection_card_gap": 8,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/list-collections.json:100:            "collection_title_7YgBPU": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/list-collections.json:101:              "type": "collection-title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/list-collections.json:102:              "name": "t:names.collection_title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/list-collections.json:125:            "collection-card-image": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/list-collections.json:126:              "type": "_collection-card-image",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/list-collections.json:127:              "name": "t:names.collection_card_image",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/list-collections.json:144:            "collection_title_7YgBPU"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/list-collections.json:151:      "name": "Collection list",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/list-collections.json:160:        "max_collections": 4,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/templates/list-collections.json:172:    "collection_list_Wfgh3m"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search.liquid:17:        {% assign search_results_count = predictive_search.resources.products.size
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search.liquid:20:          | plus: predictive_search.resources.collections.size
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search.liquid:65:          {% if predictive_search.resources.products.size > 0 %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search.liquid:67:              assign title = 'content.search_results_resource_products' | t
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search.liquid:68:              assign products = predictive_search.resources.products
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search.liquid:69:              render 'predictive-search-products-list', title: title, products: products
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search.liquid:73:          {% if predictive_search.resources.collections.size > 0 %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search.liquid:74:            {% assign resource_title = 'content.search_results_resource_collections' | t %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search.liquid:78:              resource_type: 'collection',
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search.liquid:79:              resources: predictive_search.resources.collections
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search.liquid:109:          assign title = 'content.recently_viewed_products' | t
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search.liquid:110:          assign products = search.results
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search.liquid:113:            Searching for recently viewed products by id doesn't preserve the order of the products.
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search.liquid:114:            To work around this, we get the product ids into an array then use that to reorder them.
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search.liquid:117:            assign new_products_ids = search.terms | replace: 'id:', '' | split: ' OR '
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search.liquid:119:          render 'predictive-search-products-list', title: title, products: products, order_ids: new_products_ids, limit: 4
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search.liquid:125:          {% assign total_results = predictive_search.resources.products.size
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search.liquid:126:            | plus: predictive_search.resources.collections.size
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search.liquid:132:            {% if predictive_search.resources.products.size == 1 %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search.liquid:133:              {% assign single_result_url = predictive_search.resources.products.first.url %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search.liquid:134:            {% elsif predictive_search.resources.collections.size == 1 %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search.liquid:135:              {% assign single_result_url = predictive_search.resources.collections.first.url %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/slideshow.liquid:436:                "text": "t:html_defaults.latest_products",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/slideshow.liquid:444:                "link": "shopify://collections/all"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/slideshow.liquid:480:                "link": "shopify://collections/all"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/slideshow.liquid:514:                "text": "t:html_defaults.latest_products",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/slideshow.liquid:522:                "link": "shopify://collections/all"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/slideshow.liquid:557:                "link": "shopify://collections/all"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:4:  This section is only to be called by the Section Rendering API. Faster to render a single card than the entire product grid.
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:7:  same HTML structure as the final rendered product card. The variant-picker.js script will morph specific elements as needed.
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:11:  if product == blank
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:12:    assign product = closest.product
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:15:  if settings.transition_to_main_product
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:16:    assign featured_media_url = product.selected_or_first_available_variant.featured_image | image_url: width: 500
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:18:      assign featured_media_url = product.featured_media.preview_image | image_url: width: 500
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:22:  assign url = product.selected_or_first_available_variant.url
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:24:    assign url = product.first_available_variant.url
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:27:    assign url = product.url
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:30:  assign sku = product.selected_or_first_available_variant.sku
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:33:<product-card
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:34:  data-product-id="{{ product.id }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:35:  {% if settings.transition_to_main_product %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:36:    data-product-transition="true"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:45:    ref="productCardLink"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:49:        {{ product.selected_or_first_available_variant | json }}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:52:    {% render 'variant-swatches', product_resource: product, has_option_selected: true %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:54:    <product-price>
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:55:      {% render 'price', product_resource: product, show_unit_price: true %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:56:    </product-price>
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:58:    <product-sku-component
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:59:      data-product-id="{{ product.id }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:62:      {% render 'sku', product_resource: product %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:63:    </product-sku-component>
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:65:</product-card>
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:69:  "name": "t:names.product_card_rendering",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:75:      "type": "product",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:76:      "id": "product",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section-rendering-product-card.liquid:77:      "label": "t:settings.product"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:4:  src="{{ 'product-hotspot.js' | asset_url }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:12:{% render 'product-badges-styles' %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:20:    section-product-hotspots
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:25:  data-testid="product-hotspots"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:34:    --product-title-gap: {{ section.settings.product_title_gap }}px;
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:38:    --width-product-image-dialog: 110px;
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:41:  <div class="section-product-hotspots__wrapper">
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:42:    <div class="section-product-hotspots__header">
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:46:    <div class="section-product-hotspots__content">
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:66:  .section-product-hotspots {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:70:  .section-product-hotspots__wrapper {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:79:  .section-product-hotspots__content {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:85:  /* Hide hotspots without products on touch devices (tablets included) */
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:128:  .hotspot-dialog__product-content {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:262:  .hotspot-dialog__product {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:267:  .hotspot-dialog__product-image,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:268:  .hotspot-dialog svg.hotspot-dialog__placeholder-product-image {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:269:    width: var(--width-product-image-dialog);
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:270:    height: var(--width-product-image-dialog);
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:272:    padding: var(--padding-product-image-popover, var(--padding-xs));
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:283:  .hotspot-dialog__product-title {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:284:    margin-block-end: var(--product-title-gap);
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:466:  "name": "t:names.product_hotspots",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:472:      "type": "_hotspot-product"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:602:      "id": "product_title_gap",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:612:      "id": "product_title_preset",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:613:      "label": "t:settings.product_title_typography",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:641:      "id": "product_price_preset",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:642:      "label": "t:settings.product_price_typography",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:695:      "name": "t:names.product_hotspots",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:696:      "category": "t:categories.products",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:700:        "product_title_gap": 8,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:715:          "type": "_hotspot-product",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-hotspots.liquid:722:          "type": "_hotspot-product",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection-list.liquid:4:  assign section_collections = collections
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection-list.liquid:28:  {% if section_collections == null %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection-list.liquid:30:      {% assign section_collections = section_collections | append: ', ' %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection-list.liquid:33:    {% assign section_collections = section_collections | split: ',' %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection-list.liquid:37:    {% for collection in section_collections limit: max_items %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection-list.liquid:39:        {% content_for 'block', type: '_collection-card', id: 'static-collection-card', closest.collection: collection %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection-list.liquid:56:    carousel_ref: 'mainCollectionList',
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection-list.liquid:58:    content_type: 'collections',
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection-list.liquid:59:    test_id: 'collections-list-grid'
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection-list.liquid:65:  "name": "t:names.collection_list",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection-list.liquid:66:  "class": "ui-test-collection-list",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection-list.liquid:200:      "id": "max_collections",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection-list.liquid:201:      "label": "t:settings.collection_count",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-cart.liquid:23:          {%- content_for 'block', id: 'cart-page-items', type: '_cart-products', force_empty: true %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-cart.liquid:44:        {%- content_for 'block', id: 'cart-page-items', type: '_cart-products' %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:4:  if section.settings.collection_list != blank
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:5:    assign section_collections = section.settings.collection_list
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:6:    assign max_items = section.settings.collection_list.count
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:8:    assign max_items = section.settings.max_collections
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:33:  data-testid="collection-list"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:39:  {% if section_collections == null %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:41:      {% assign section_collections = section_collections | append: ', ' %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:44:    {% assign section_collections = section_collections | split: ',' %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:48:    {% for collection in section_collections limit: max_items %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:50:        {% content_for 'block', type: '_collection-card', id: 'static-collection-card', closest.collection: collection %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:67:    carousel_ref: 'collectionList',
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:69:    content_type: 'collections',
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:70:    test_id: 'collections-list-grid'
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:76:  "name": "t:names.collection_list",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:77:  "class": "ui-test-collection-list",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:115:      "type": "collection_list",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:116:      "id": "collection_list",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:117:      "label": "t:settings.collection_list"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:233:      "id": "max_collections",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:234:      "label": "t:settings.collection_count",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:359:      "name": "t:names.collections_bento",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:360:      "category": "t:categories.collections",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:406:                "text": "t:html_defaults.shop_by_collection",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:426:        "static-collection-card": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:427:          "type": "_collection-card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:428:          "name": "t:names.collection_card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:442:            "collection-card-image": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:443:              "type": "_collection-card-image",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:444:              "name": "t:names.collection_card_image",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:450:            "collection-title": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:451:              "type": "collection-title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:452:              "name": "t:names.collection_title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:473:          "block_order": ["collection-title"]
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:479:      "name": "t:names.collections_grid",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:480:      "category": "t:categories.collections",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:518:                "text": "t:html_defaults.shop_by_collection",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:538:        "static-collection-card": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:539:          "type": "_collection-card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:540:          "name": "t:names.collection_card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:554:            "collection-card-image": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:555:              "type": "_collection-card-image",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:556:              "name": "t:names.collection_card_image",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:562:            "collection-title": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:563:              "type": "collection-title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:564:              "name": "t:names.collection_title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:585:          "block_order": ["collection-title"]
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:590:        "collection_list": [],
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:607:      "name": "t:names.collections_carousel",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:608:      "category": "t:categories.collections",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:646:                "text": "t:html_defaults.shop_by_collection",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:666:        "static-collection-card": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:667:          "type": "_collection-card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:668:          "name": "t:names.collection_card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:682:            "collection-card-image": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:683:              "type": "_collection-card-image",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:684:              "name": "t:names.collection_card_image",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:690:            "collection-title": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:691:              "type": "collection-title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:692:              "name": "t:names.collection_title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:711:          "block_order": ["collection-title"]
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:716:        "collection_list": [],
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:733:      "name": "t:names.collections_editorial",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:734:      "category": "t:categories.collections",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:779:                "text": "t:html_defaults.shop_by_collection",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:804:        "static-collection-card": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:805:          "type": "_collection-card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:806:          "name": "t:names.collection_card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:812:            "collection_card_gap": 8,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:821:            "collection-title": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:822:              "type": "collection-title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:823:              "name": "t:names.collection_title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:846:            "collection-card-image": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:847:              "type": "_collection-card-image",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:848:              "name": "t:names.collection_card_image",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:864:          "block_order": ["collection-title"]
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:869:        "collection_list": [],
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-list.liquid:877:        "max_collections": 4,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:4:  assign collection_list = section.settings.collection_list
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:6:  if collection_list == blank
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:10:      assign collection_list = collection_list | append: ', '
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:13:    assign collection_list = collection_list | split: ','
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:16:  assign active_collection = collection_list | find: 'id', collection.id | default: collection_list.first
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:20:  src="{{ 'collection-links.js' | asset_url }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:29:  data-testid="collection-links-{{ section.id }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:31:  <collection-links-component
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:39:      class="collection-links__container"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:42:      {% for collection in collection_list limit: limit %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:46:          if collection.id == active_collection.id
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:51:          type: '_collection-link',
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:53:          closest.collection: collection,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:63:          {% for collection in collection_list limit: limit %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:67:            if collection.id == active_collection.id
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:75:              type: '_collection-link',
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:77:              closest.collection: collection,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:91:          slide_count: collection_list.size,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:92:          class: 'collection-links__images',
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:96:  </collection-links-component>
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:101:  collection-links-component {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:148:      .collection-links__container {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:157:        .collection-links__container {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:168:      .collection-links__container {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:177:  .collection-links__container {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:183:  .collection-links__images {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:197:  "name": "t:names.collection_links",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:203:      "type": "collection_list",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:204:      "id": "collection_list",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:205:      "label": "t:settings.collection_list"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:313:      "name": "t:names.collection_links_spotlight",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:314:      "category": "t:categories.collections",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:317:          "type": "_collection-link",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:321:              "type": "_inline-collection-title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:341:      "name": "t:names.collection_links_text",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:342:      "category": "t:categories.collections",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:349:          "type": "_collection-link",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/collection-links.liquid:353:              "type": "_inline-collection-title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/layered-slideshow.liquid:471:                "text": "t:html_defaults.latest_products"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/layered-slideshow.liquid:478:                "link": "shopify://collections/all"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/layered-slideshow.liquid:505:                "link": "shopify://collections/all"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/layered-slideshow.liquid:518:                "text": "t:html_defaults.featured_collection_h3",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/layered-slideshow.liquid:525:                "text": "t:html_defaults.shop_collection"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/layered-slideshow.liquid:532:                "link": "shopify://collections/all"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:12:  class="section product-grid-container spacing-style color-{{ section.settings.color_scheme }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:20:    class="collection-wrapper grid gap-style"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:22:    {% assign products_per_page = 24 %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:25:      {% assign products_per_page = section.settings.products_per_page %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:28:    {% paginate search.results by products_per_page %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:31:        {% assign products = search.results | where: 'object_type', 'product' %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:33:        {% assign collection = settings.empty_state_collection | default: collections.all %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:34:        {% assign default_title = 'content.search_results_resource_products' | t %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:35:        {% assign title = settings.empty_state_collection.title | default: default_title %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:36:        {% assign products = collection.products %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:40:        {% for product in products %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:42:            id="{{ section.id }}-{{ product.id }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:43:            class="product-grid__item product-grid__item--{{ forloop.index0 }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:45:            data-product-id="{{ product.id }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:48:            {% content_for 'block', type: '_product-card', id: 'product-card', closest.product: product %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:53:      {% render 'product-grid',
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:56:        products: products,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:71:      "content": "t:content.edit_empty_state_collection_in_theme_settings"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:91:      "id": "product_card_size",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:116:      "id": "mobile_product_card_size",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:133:      "label": "t:settings.auto_load_products",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:138:      "id": "products_per_page",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:139:      "label": "t:settings.products_per_page",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:152:      "id": "product_grid_width",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/search-results.liquid:171:      "visible_if": "{{ section.settings.product_grid_width != 'full-width' }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/header-group.json:69:            "menu_style": "featured_products",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/header-group.json:70:            "featured_products_aspect_ratio": "4 / 5",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/header-group.json:71:            "featured_collections_aspect_ratio": "16 / 9",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/header-group.json:107:        "enable_transparent_header_product": false,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/header-group.json:108:        "product_color_scheme": "default",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/header-group.json:109:        "enable_transparent_header_collection": false,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/header-group.json:110:        "collection_color_scheme": "default"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/header.liquid:25:  elsif section.settings.enable_transparent_header_product and template.name == 'product'
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/header.liquid:27:    assign transparent_color_scheme = section.settings.product_color_scheme
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/header.liquid:28:  elsif section.settings.enable_transparent_header_collection and template.name == 'collection'
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/header.liquid:30:    assign transparent_color_scheme = section.settings.collection_color_scheme
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/header.liquid:1569:      "visible_if": "{{ section.settings.enable_transparent_header_home or section.settings.enable_transparent_header_product or section.settings.enable_transparent_header_collection }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/header.liquid:1600:      "content": "t:content.product_page"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/header.liquid:1604:      "id": "enable_transparent_header_product",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/header.liquid:1610:      "id": "product_color_scheme",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/header.liquid:1623:      "visible_if": "{{ section.settings.enable_transparent_header_product }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/header.liquid:1627:      "content": "t:content.collection_page"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/header.liquid:1631:      "id": "enable_transparent_header_collection",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/header.liquid:1637:      "id": "collection_color_scheme",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/header.liquid:1650:      "visible_if": "{{ section.settings.enable_transparent_header_collection }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/footer-group.json:84:                "text": "<p>Get exclusive deals and early access to new products.</p>",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:4:  assign max_items = section.settings.max_products
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:9:  data-testid="product-list"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:24:    {%- content_for 'block', type: '_product-list-content', id: 'static-header' -%}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:28:    {% if section.settings.collection != blank and shop.products_count != 0 %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:29:      {% paginate section.settings.collection.products by max_items %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:30:        {% for product in section.settings.collection.products limit: max_items %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:35:              {% content_for 'block', type: '_product-card', id: 'static-product-card', closest.product: product %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:50:            {% content_for 'block', type: '_product-card', id: 'static-product-card', closest.product: null %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:71:    content_type: 'products',
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:85:  "name": "t:names.product_list",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:86:  "class": "ui-test-product-list",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:103:      "type": "collection",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:104:      "id": "collection",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:105:      "label": "t:settings.collection"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:136:      "id": "max_products",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:137:      "label": "t:settings.product_count",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:347:      "name": "t:names.products_grid",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:348:      "category": "t:categories.products",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:350:        "collection": "",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:351:        "max_products": 8,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:368:          "type": "_product-list-content",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:401:            "product_list_text": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:402:              "type": "_product-list-text",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:403:              "name": "t:names.collection_title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:405:                "text": "<h3>{{ closest.collection.title }}</h3>",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:422:            "product_list_button": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:423:              "type": "_product-list-button",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:424:              "name": "t:names.product_list_button",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:436:          "block_order": ["product_list_text", "product_list_button"]
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:438:        "static-product-card": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:439:          "type": "_product-card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:440:          "name": "t:names.product_card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:443:            "product_card_gap": 4,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:456:            "product-card-gallery": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:457:              "type": "_product-card-gallery",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:458:              "name": "t:names.product_card_media",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:471:            "product_title": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:472:              "type": "product-title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:473:              "name": "t:names.product_title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:497:              "name": "t:names.product_price",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:518:          "block_order": ["product-card-gallery", "product_title", "price"]
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:524:      "name": "t:names.products_carousel",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:525:      "category": "t:categories.products",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:527:        "collection": "",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:528:        "max_products": 6,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:545:          "type": "_product-list-content",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:578:            "product_list_text": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:579:              "type": "_product-list-text",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:580:              "name": "t:names.collection_title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:582:                "text": "<h2>{{ closest.collection.title }}</h2>",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:599:            "product_list_button": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:600:              "type": "_product-list-button",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:601:              "name": "t:names.product_list_button",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:613:          "block_order": ["product_list_text", "product_list_button"]
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:615:        "static-product-card": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:616:          "type": "_product-card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:617:          "name": "t:names.product_card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:620:            "product_card_gap": 4,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:633:            "product-card-gallery": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:634:              "type": "_product-card-gallery",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:635:              "name": "t:names.product_card_media",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:648:            "product_title": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:649:              "type": "product-title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:650:              "name": "t:names.product_title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:674:              "name": "t:names.product_price",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:695:          "block_order": ["product-card-gallery", "product_title", "price"]
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:701:      "name": "t:names.products_editorial",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:702:      "category": "t:categories.products",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:704:        "collection": "",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:707:        "max_products": 4,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:723:          "type": "_product-list-content",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:756:            "product_list_text": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:757:              "type": "_product-list-text",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:758:              "name": "t:names.collection_title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:760:                "text": "<h3>{{ closest.collection.title }}</h3>",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:781:            "product_list_button": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:782:              "type": "_product-list-button",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:783:              "name": "t:names.product_list_button",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:795:          "block_order": ["product_list_text", "product_list_button"]
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:797:        "static-product-card": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:798:          "type": "_product-card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:799:          "name": "t:names.product_card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:802:            "product_card_gap": 4,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:815:            "product-card-gallery": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:816:              "type": "_product-card-gallery",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:817:              "name": "t:names.product_card_media",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:830:            "product_title": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:831:              "type": "product-title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:832:              "name": "t:names.product_title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:856:              "name": "t:names.product_price",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-list.liquid:877:          "block_order": ["product-card-gallery", "product_title", "price"]
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/quick-order-list.liquid:4:  assign items_in_cart = cart | line_items_for: product
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/quick-order-list.liquid:5:  assign quick_order_form_id = 'QuickOrder-ProductForm-' | append: product.id | append: '-' | append: section.id
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/quick-order-list.liquid:33:    data-product-id="{{ product.id }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/quick-order-list.liquid:35:    data-url="{{ product.url }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/quick-order-list.liquid:38:    {%- form 'product', product, id: quick_order_form_id, data-type: 'add-to-cart-form' -%}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/quick-order-list.liquid:39:      {% paginate product.variants by section.settings.variants_per_page %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/quick-order-list.liquid:86:              {%- for variant in product.variants -%}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/quick-order-list.liquid:131:                  if product.variants_count == 1
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/quick-order-list.liquid:132:                    assign variant_display_name = product.title
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/quick-order-list.liquid:136:                  assign sold_out_message = 'products.product.sold_out' | t
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/quick-order-list.liquid:139:                    render 'quantity-selector', product: product, variant: variant, in_cart_quantity: variant_cart_quantity, line_index: forloop.index, min: 0
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/quick-order-list.liquid:350:      assign total_price_value = cart | line_items_for: product | sum: 'original_line_price'
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/quick-order-list.liquid:413:            <div class="quick-order-list-total__product-total">
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/quick-order-list.liquid:421:              <p class="quick-order-list-total__subtotal h5">{{ 'content.product_subtotal' | t }}</p>
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/quick-order-list.liquid:1078:    .quick-order-list-total__product-total {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/quick-order-list.liquid:1085:    .quick-order-list-total__product-total .quick-order-list-total__subtotal-value {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/quick-order-list.liquid:1090:    .quick-order-list-total__product-total .quick-order-list-total__subtotal {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/quick-order-list.liquid:1115:    "templates": ["product"]
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/quick-order-list.liquid:1174:      "category": "t:categories.products",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:4:  {{ section.settings.product | structured_data }}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:8:  assign product = section.settings.product
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:9:  assign gallery_aspect_ratio = product.featured_media.preview_image.aspect_ratio | default: 1
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:14:{% render 'product-badges-styles' %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:19:    featured-product-section
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:25:  data-testid="featured-product-{{ section.id }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:27:  <h2 class="visually-hidden">{{ 'accessibility.featured_product' | t }}</h2>
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:38:    {% capture featured_product_media %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:39:      {% content_for 'block', type: '_media-without-appearance', id: 'media', closest.product: section.settings.product %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:42:    {% capture featured_product_content %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:43:      {% content_for 'block', type: '_featured-product', id: 'featured-product', closest.product: section.settings.product %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:47:      {{ featured_product_media }}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:48:      {{ featured_product_content }}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:50:      {{ featured_product_content }}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:51:      {{ featured_product_media }}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:57:  .featured-product-section .section-content-wrapper {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:67:  .featured-product-section {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:77:  .featured-product-section .product-grid__card {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:88:    .featured-product-section .media-block {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:94:    .featured-product-section .product-card__content {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:105:  "name": "t:names.featured_product",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:111:      "type": "product",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:112:      "id": "product",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:113:      "label": "t:settings.product"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:164:      "name": "t:names.featured_product",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:165:      "category": "t:categories.products",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:173:          "name": "t:names.product_media"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:175:        "featured-product": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:176:          "type": "_featured-product",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:178:          "name": "t:names.product",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:180:            "featured-product-title": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:181:              "type": "product-title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:189:            "featured-product-price": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:190:              "type": "_featured-product-price",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:194:            "featured-product-gallery": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:195:              "type": "_featured-product-gallery",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product.liquid:199:            "featured-product-swatches": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:4:  {{ section.settings.product | structured_data }}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:9:    type: '_featured-product-information-carousel',
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:14:{% capture product_details %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:16:    type: '_product-details',
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:17:    id: 'product-details'
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:25:<featured-product-information id="{{ section.id }}">
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:26:  <h2 class="visually-hidden">{{ 'accessibility.featured_product' | t }}</h2>
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:27:  {% render 'product-information-content',
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:28:    product_media_size: section.settings.product.media.size,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:32:    product_details: product_details,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:35:</featured-product-information>
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:39:  "name": "t:names.featured_product_information",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:50:      "type": "product",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:51:      "id": "product",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:52:      "label": "t:settings.product"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:99:      "label": "t:settings.limit_product_details_width",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:146:      "name": "t:names.featured_product_information",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:147:      "category": "t:categories.products",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:156:          "type": "_featured-product-information-carousel",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:170:        "product-details": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:171:          "type": "_product-details",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:188:                  "type": "product-title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:196:                  "name": "t:names.product_price",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:207:              "name": "t:names.product_review_stars"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:211:              "name": "t:names.product_variant_picker"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/featured-product-information.liquid:215:              "name": "t:names.product_buy_buttons",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/predictive-search-empty.liquid:6:  products_test_id: 'products-list-default--reset'
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:4:  {{ closest.product | structured_data }}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:9:    type: '_product-media-gallery',
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:11:    closest.product: closest.product
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:15:{% capture product_details %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:17:    type: '_product-details',
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:18:    id: 'product-details',
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:19:    closest.product: closest.product
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:29:    assign current_variant = product.selected_or_first_available_variant
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:37:    data-product-id="{{ product.id }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:40:    data-default-variant-title="{{ 'products.product.default_title' | t }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:47:      aria-label="{{ 'products.product.sticky_add_to_cart' | t }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:50:        assign image_to_show = current_variant.featured_image | default: product.featured_image
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:56:          {% assign image_alt = image_to_show.alt | default: product.title | escape %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:64:              data-testid: 'sticky-product-image',
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:67:              ref: 'productImage'
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:74:        if product.has_only_default_variant != true and product.options.size == 1
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:87:        data-singleton="{{ product.has_only_default_variant }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:92:          data-testid="sticky-product-title"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:94:          {{ product.title | escape }}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:99:          {% if product.has_only_default_variant %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:103:          {% unless product.has_only_default_variant %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:116:        {% render 'price', product_resource: product, show_sale_price_first: true %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:139:                {{- 'products.product.add_to_cart' | t -}}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:141:                {{- 'products.product.unavailable' | t -}}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:143:                {{- 'products.product.sold_out' | t -}}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:170:{% render 'product-information-content',
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:171:  product_media_size: closest.product.media.size,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:175:  product_details: product_details,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:345:    /* For product with only default variant show title */
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:366:  "name": "t:names.product_information",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-information.liquid:421:      "label": "t:settings.limit_product_details_width",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/media-with-content.liquid:365:                    "text": "t:html_defaults.signature_products",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/media-with-content.liquid:384:                "link": "shopify://collections/all",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/footer.liquid:238:                "text": "t:html_defaults.get_exclusive_deals_and_early_access_to_new_products",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/carousel.liquid:21:  {% content_for 'block', type: '_carousel-content', id: 'static-carousel-content', closest.product: null %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:28:  class="section product-grid-container color-{{ section.settings.color_scheme }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:36:    class="collection-wrapper grid gap-style{% if section.settings.product_grid_width == 'full-width' %} collection-wrapper--grid-full-width{% endif %}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:41:      results: collection,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:42:      results_size: collection.products_count
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:45:    {% assign products_per_page = 24 %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:48:      {% assign products_per_page = section.settings.products_per_page %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:51:    {% paginate collection.products by products_per_page %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:53:        {% for product in collection.products %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:55:            id="{{ section.id }}-{{ product.id }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:56:            class="product-grid__item product-grid__item--{{ forloop.index0 }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:58:            data-product-id="{{ product.id }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:62:            {% content_for 'block', type: '_product-card', id: 'product-card', closest.product: product %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:68:      {% render 'product-grid',
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:71:        products: collection.products,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:81:  "name": "t:names.collection_container",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:83:    "templates": ["collection"]
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:104:      "id": "product_card_size",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:129:      "id": "mobile_product_card_size",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:146:      "label": "t:settings.auto_load_products",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:151:      "id": "products_per_page",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:152:      "label": "t:settings.products_per_page",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:165:      "id": "product_grid_width",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/main-collection.liquid:184:      "visible_if": "{{ section.settings.product_grid_width != 'full-width' }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/hero.liquid:1269:            "link": "shopify://collections/all"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/hero.liquid:1302:                "text": "t:html_defaults.explore_latest_products",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/hero.liquid:1313:            "link": "shopify://collections/all"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:3:  src="{{ 'product-recommendations.js' | asset_url }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:30:{% render 'product-badges-styles' %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:31:<product-recommendations
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:32:  id="product-recommendations-{{ section.id }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:33:  class="product-recommendations"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:34:  data-url="{{ routes.product_recommendations_url }}?limit={{ section.settings.max_products }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:36:  data-product-id="{{ section.settings.product.id | default: product.id }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:38:  data-testid="product-recommendations-section"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:40:  data-hydration-key="product-recommendations-{{ section.id }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:63:    {%- if recommendations.performed or section.settings.product == blank -%}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:65:        if section.settings.product == blank
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:66:          assign products = null
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:67:          # Onboarding mode: Show placeholder products
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:68:          for i in (1..section.settings.max_products)
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:69:            assign products = products | append: ', '
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:70:            assign products = products | split: ','
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:72:        elsif recommendations.performed and recommendations.products_count == 0
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:75:            assign products = collections.all.products | reject: 'id', section.settings.product.id
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:77:            # Do not recommend the All collection as complementary products
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:78:            assign products = null
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:82:          assign products = recommendations.products
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:86:        {% for product in products limit: section.settings.max_products %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:88:            {% content_for 'block', type: '_product-card', id: 'static-product-card', closest.product: product %}
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:101:        if products != blank and products.size > 0
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:131:              slide_count: recommendations.products.size,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:155:            slide_count: recommendations.products.size,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:166:            class="product-recommendations__skeleton-item"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:167:            aria-label="{{ 'accessibility.loading_product_recommendations' | t }}"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:173:</product-recommendations>
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:177:  "name": "t:names.product_recommendations",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:215:      "type": "product",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:216:      "id": "product",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:217:      "label": "t:settings.product"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:237:      "content": "t:content.complementary_products"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:268:      "id": "max_products",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:269:      "label": "t:settings.product_count",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:441:      "name": "t:names.product_recommendations",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:442:      "category": "t:categories.products",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:444:        "product": "{{ closest.product }}",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:448:        "max_products": 4,
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:466:            "text": "t:html_defaults.related_product",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:470:        "static-product-card": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:471:          "type": "_product-card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:472:          "name": "t:names.product_card",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:475:            "product_card_gap": 4
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:478:            "product-card-gallery": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:479:              "type": "_product-card-gallery",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:480:              "name": "t:names.product_card_media",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:493:            "product_title": {
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:494:              "type": "product-title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:495:              "name": "t:names.product_title",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:519:              "name": "t:names.product_price",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/product-recommendations.liquid:540:          "block_order": ["product-card-gallery", "product_title", "price"]
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section.liquid:484:            "link": "shopify://collections/all",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section.liquid:654:                "heading": "t:text_defaults.where_are_products_made"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section.liquid:815:                "text": "t:html_defaults.product_launch",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section.liquid:836:                "label": "t:text_defaults.discover_collection",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section.liquid:837:                "link": "shopify://collections/all",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section.liquid:859:            "text": "t:html_defaults.product_story",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section.liquid:870:            "link": "shopify://collections/all",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section.liquid:1268:                "link": "shopify://collections/all",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section.liquid:1312:                "link": "shopify://collections/all",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section.liquid:1357:                "text": "t:html_defaults.signature_products",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section.liquid:1372:                "link": "shopify://collections/all"
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section.liquid:1442:                "text": "<p>We create with intention. Our products solve real problems with clean design and honest materials.</p>",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section.liquid:1519:                "text": "<p>We obsess over the details and strive to deliver the best products at the best prices, every time.</p>",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section.liquid:1691:                    "link": "shopify://collections/all",
+staffordos/audits/no_kings/theme_backup/dev_horizon_150895657158/sections/section.liquid:1702:                    "link": "shopify://collections/all",
