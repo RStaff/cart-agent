@@ -1,0 +1,157 @@
+{
+  "repository": "/Users/rossstafford/projects/cart-agent",
+  "generated_at": "2026-06-04T00:00:00-04:00",
+  "executive_summary": {
+    "verified_path": [
+      "ShopiFixer page",
+      "/__public-checkout",
+      "Stripe Checkout Session",
+      "verified Stripe webhook",
+      "packet.payment_received"
+    ],
+    "does_payment_propagate_fully": false,
+    "payment_truth_stops_at": "packet layer / packets table via bindPacketPayment()",
+    "stripeWebhook_mutates_client_registry": false
+  },
+  "hop_counts": {
+    "total": 11,
+    "PROVEN": 8,
+    "PARTIALLY_PROVEN": 1,
+    "UNPROVEN": 0,
+    "BROKEN": 2
+  },
+  "hops": [
+    {
+      "hop": 1,
+      "name": "ShopiFixer page -> /__public-checkout",
+      "file": "abando-frontend/app/shopifixer/page.tsx",
+      "function": "startCheckout()",
+      "trigger": "user clicks purchase CTA",
+      "reads": ["store domain input", "checkout base env vars"],
+      "writes": ["localStorage event log", "POST request to /__public-checkout"],
+      "link_identifiers": ["store_domain", "plan"],
+      "status": "PROVEN",
+      "gap": "Only starts checkout; not payment proof."
+    },
+    {
+      "hop": 2,
+      "name": "/__public-checkout -> Stripe Checkout Session",
+      "file": "web/src/checkout-public.js",
+      "function": "POST /__public-checkout",
+      "trigger": "checkout POST",
+      "reads": ["request body", "price env vars", "Stripe secret env"],
+      "writes": ["packet row", "Stripe checkout session", "packet payment_pending bind"],
+      "link_identifiers": ["packet_id", "store_domain", "session.id"],
+      "status": "PROVEN",
+      "gap": "None at this hop."
+    },
+    {
+      "hop": 3,
+      "name": "Stripe Checkout Session -> client_reference_id / metadata.packet_id",
+      "file": "web/src/checkout-public.js",
+      "function": "stripe.checkout.sessions.create()",
+      "trigger": "session creation",
+      "reads": ["packet object"],
+      "writes": ["client_reference_id", "metadata.packet_id", "metadata.store_domain"],
+      "link_identifiers": ["client_reference_id", "metadata.packet_id", "metadata.store_domain"],
+      "status": "PROVEN",
+      "gap": "None at this hop."
+    },
+    {
+      "hop": 4,
+      "name": "Stripe checkout.session.completed webhook received",
+      "file": "web/src/routes/stripeWebhook.esm.js",
+      "function": "installStripeWebhook()",
+      "trigger": "Stripe webhook delivery",
+      "reads": ["raw body", "stripe-signature", "webhook secret"],
+      "writes": [],
+      "link_identifiers": ["event id", "signature"],
+      "status": "PROVEN",
+      "gap": "No downstream propagation proven."
+    },
+    {
+      "hop": 5,
+      "name": "Webhook signature verification",
+      "file": "web/src/routes/stripeWebhook.esm.js",
+      "function": "stripe.webhooks.constructEvent()",
+      "trigger": "webhook receipt",
+      "reads": ["raw body", "signature", "webhook secret"],
+      "writes": [],
+      "link_identifiers": ["event id"],
+      "status": "PROVEN",
+      "gap": "None at this hop."
+    },
+    {
+      "hop": 6,
+      "name": "Webhook -> packet payment_received",
+      "file": "web/src/routes/stripeWebhook.esm.js", 
+      "function": "bindPacketPayment()",
+      "trigger": "verified checkout.session.completed",
+      "reads": ["packet_id", "store_domain", "session.id", "existing packet"],
+      "writes": ["packets table row with status payment_received"],
+      "link_identifiers": ["packet_id", "store_domain", "payment_reference"],
+      "status": "PROVEN",
+      "gap": "Does not update client or revenue truth."
+    },
+    {
+      "hop": 7,
+      "name": "Webhook -> Client Registry payment status",
+      "file": "none",
+      "function": "no write path found",
+      "trigger": "verified payment event",
+      "reads": ["packet data only"],
+      "writes": [],
+      "link_identifiers": [],
+      "status": "BROKEN",
+      "gap": "No runtime client registry mutation from webhook."
+    },
+    {
+      "hop": 8,
+      "name": "Webhook -> Revenue Truth",
+      "file": "none",
+      "function": "no write path found",
+      "trigger": "verified payment event",
+      "reads": ["packet data only"],
+      "writes": [],
+      "link_identifiers": [],
+      "status": "BROKEN",
+      "gap": "No Stripe-to-revenue_truth write path."
+    },
+    {
+      "hop": 9,
+      "name": "Webhook or registry change -> Operator Dashboard Snapshot",
+      "file": "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs",
+      "function": "snapshot builder",
+      "trigger": "manual rebuild after registry change",
+      "reads": ["client_registry_v1.json"],
+      "writes": ["operator_dashboard_snapshot_v1.json"],
+      "link_identifiers": ["client_id", "merchant_shop"],
+      "status": "PARTIALLY_PROVEN",
+      "gap": "No automatic runtime propagation from payment event."
+    },
+    {
+      "hop": 10,
+      "name": "Dashboard Snapshot / Registry -> CEO Cockpit API",
+      "file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+      "function": "GET /api/operator/ceo-snapshot",
+      "trigger": "HTTP GET",
+      "reads": ["lead registry", "client registry", "dashboard snapshot", "send ledger"],
+      "writes": ["JSON response only"],
+      "link_identifiers": ["client_id", "merchant_shop"],
+      "status": "PROVEN",
+      "gap": "Packet truth is not directly read."
+    },
+    {
+      "hop": 11,
+      "name": "CEO Cockpit API -> Command Center display",
+      "file": "staffordos/ui/operator-frontend/lib/operator/loadPrimaryActionSnapshot.ts",
+      "function": "loadPrimaryActionSnapshot()",
+      "trigger": "page render",
+      "reads": ["CEO snapshot response"],
+      "writes": ["UI render only"],
+      "link_identifiers": ["client_id", "merchant_shop"],
+      "status": "PROVEN",
+      "gap": "Display is downstream of summaries, not packet truth."
+    }
+  ]
+}

@@ -1,0 +1,221 @@
+{
+  "repository": "/Users/rossstafford/projects/cart-agent",
+  "generated_at": "2026-06-04T00:00:00-04:00",
+  "end_to_end_payment_propagation_graph": [
+    "ShopiFixer page",
+    "/__public-checkout",
+    "Stripe Checkout Session",
+    "Stripe webhook",
+    "packet.payment_received"
+  ],
+  "terminal_truth_boundary": "packet table via bindPacketPayment()",
+  "existing_propagation_mechanism": {
+    "lead_to_ceo_path": [
+      "lead_registry_v1.json",
+      "promote_leads_to_clients_v1.mjs",
+      "client_registry_v1.json",
+      "build_operator_dashboard_snapshot_v1.mjs",
+      "operator_dashboard_snapshot_v1.json",
+      "ceo-snapshot API",
+      "Command Center"
+    ],
+    "packet_payment_path": [
+      "checkout-public.js",
+      "stripeWebhook.esm.js",
+      "packet table"
+    ]
+  },
+  "writers": [
+    {
+      "file": "staffordos/clients/client_registry_v1.mjs",
+      "function": "upsertClient()",
+      "input_source": "caller-provided client fields",
+      "output_target": "staffordos/clients/client_registry_v1.json",
+      "runtime_trigger": "direct client promotion / seed / registry update",
+      "currently_active": true,
+      "proof_of_existence": "reads and writes registry file directly"
+    },
+    {
+      "file": "staffordos/clients/promote_leads_to_clients_v1.mjs",
+      "function": "main promotion runner",
+      "input_source": "lead registry, routing policy, offer rules",
+      "output_target": "staffordos/clients/client_registry_v1.json",
+      "runtime_trigger": "promotion run",
+      "currently_active": true,
+      "proof_of_existence": "calls upsertClient() for qualified leads"
+    },
+    {
+      "file": "staffordos/clients/seed_client_from_abando_proof_v1.mjs",
+      "function": "script body",
+      "input_source": "hardcoded proof context",
+      "output_target": "staffordos/clients/client_registry_v1.json",
+      "runtime_trigger": "seed execution",
+      "currently_active": true,
+      "proof_of_existence": "imports upsertClient()"
+    },
+    {
+      "file": "staffordos/clients/next_action_engine_v1.mjs",
+      "function": "run()",
+      "input_source": "client_registry_v1.json",
+      "output_target": "client_registry_v1.json",
+      "runtime_trigger": "engine execution",
+      "currently_active": true,
+      "proof_of_existence": "rewrites lifecycle, next action, priority, blockers, decision trace"
+    },
+    {
+      "file": "staffordos/clients/close_engine_v1.mjs",
+      "function": "run()",
+      "input_source": "client_registry_v1.json",
+      "output_target": "client_registry_v1.json",
+      "runtime_trigger": "engine execution",
+      "currently_active": true,
+      "proof_of_existence": "mutates client.close_engine for proposal_sent clients"
+    },
+    {
+      "file": "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs",
+      "function": "top-level snapshot builder",
+      "input_source": "client_registry_v1.json",
+      "output_target": "operator_dashboard_snapshot_v1.json",
+      "runtime_trigger": "promotion runner import or manual execution",
+      "currently_active": true,
+      "proof_of_existence": "reads client registry and writes snapshot"
+    },
+    {
+      "file": "staffordos/revenue/revenue_agent_v1.mjs",
+      "function": "top-level script body",
+      "input_source": "outreach queue, approval queue, send ledger, outcomes",
+      "output_target": "revenue_truth_v1.json and .md",
+      "runtime_trigger": "revenue agent run",
+      "currently_active": true,
+      "proof_of_existence": "writes computed funnel counts and bottleneck"
+    },
+    {
+      "file": "web/src/lib/abandoRevenueRegister.js",
+      "function": "recordRevenueProof()",
+      "input_source": "Abando return attribution",
+      "output_target": "execution_proof_register_v1.json",
+      "runtime_trigger": "recovery return request",
+      "currently_active": true,
+      "proof_of_existence": "writes latest_abando_revenue_proof"
+    },
+    {
+      "file": "web/src/index.js",
+      "function": "/api/recovery/return route",
+      "input_source": "shop, experienceId, revenue",
+      "output_target": "execution proof register via recordRevenueProof()",
+      "runtime_trigger": "recovery return request",
+      "currently_active": true,
+      "proof_of_existence": "calls recordRevenueProof({ repoRoot, attribution })"
+    },
+    {
+      "file": "web/src/checkout-public.js",
+      "function": "POST /__public-checkout",
+      "input_source": "request body and env price/secret",
+      "output_target": "packets table and Stripe Checkout Session",
+      "runtime_trigger": "public checkout POST",
+      "currently_active": true,
+      "proof_of_existence": "creates packet and binds payment_pending"
+    },
+    {
+      "file": "web/src/routes/stripeWebhook.esm.js",
+      "function": "installStripeWebhook()",
+      "input_source": "Stripe webhook request",
+      "output_target": "packets table payment_received",
+      "runtime_trigger": "verified checkout.session.completed",
+      "currently_active": true,
+      "proof_of_existence": "signature verified and bindPacketPayment() called"
+    },
+    {
+      "file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+      "function": "GET",
+      "input_source": "lead registry, client registry, dashboard snapshot, send ledger",
+      "output_target": "HTTP JSON response",
+      "runtime_trigger": "CEO snapshot request",
+      "currently_active": true,
+      "proof_of_existence": "aggregates read-only truth files"
+    }
+  ],
+  "readers": [
+    {
+      "file": "web/src/routes/stripeWebhook.esm.js",
+      "function": "installStripeWebhook()",
+      "source_read": "packet rows via getPacket()",
+      "output_generated": "packet payment_received bind",
+      "runtime_trigger": "verified webhook",
+      "status": "PROVEN"
+    },
+    {
+      "file": "web/src/lib/packetRepository.js",
+      "function": "getPacket / listPackets",
+      "source_read": "packets table",
+      "output_generated": "packet objects",
+      "runtime_trigger": "packet API or checkout/webhook flow",
+      "status": "PROVEN"
+    },
+    {
+      "file": "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs",
+      "function": "top-level snapshot builder",
+      "source_read": "client_registry_v1.json",
+      "output_generated": "operator_dashboard_snapshot_v1.json",
+      "runtime_trigger": "promotion run or manual execution",
+      "status": "PROVEN"
+    },
+    {
+      "file": "staffordos/ui/operator-frontend/app/api/operator/client-registry/route.ts",
+      "function": "GET",
+      "source_read": "client_registry_v1.json",
+      "output_generated": "normalized client registry response",
+      "runtime_trigger": "client registry request",
+      "status": "PROVEN"
+    },
+    {
+      "file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+      "function": "GET",
+      "source_read": "lead registry, client registry, dashboard snapshot, send ledger",
+      "output_generated": "CEO snapshot JSON",
+      "runtime_trigger": "CEO snapshot request",
+      "status": "PROVEN"
+    },
+    {
+      "file": "staffordos/ui/operator-frontend/lib/operator/loadPrimaryActionSnapshot.ts",
+      "function": "loadPrimaryActionSnapshot()",
+      "source_read": "CEO snapshot API and local fallback files",
+      "output_generated": "Ross-facing primary action object",
+      "runtime_trigger": "command center render",
+      "status": "PROVEN"
+    },
+    {
+      "file": "staffordos/ui/operator-frontend/lib/operator/loadDashboardSnapshot.ts",
+      "function": "loadDashboardSnapshot()",
+      "source_read": "operator_dashboard_snapshot_v1.json",
+      "output_generated": "dashboard snapshot object",
+      "runtime_trigger": "operator UI render",
+      "status": "PROVEN"
+    },
+    {
+      "file": "staffordos/clients/next_action_engine_v1.mjs",
+      "function": "run()",
+      "source_read": "client_registry_v1.json",
+      "output_generated": "rewritten client registry with lifecycle/next_action",
+      "runtime_trigger": "engine execution",
+      "status": "PROVEN"
+    },
+    {
+      "file": "staffordos/clients/close_engine_v1.mjs",
+      "function": "run()",
+      "source_read": "client_registry_v1.json",
+      "output_generated": "updated close_engine inside client registry",
+      "runtime_trigger": "engine execution",
+      "status": "PROVEN"
+    }
+  ],
+  "connection_classification": {
+    "lead_to_client": "PROVEN",
+    "client_to_dashboard": "PROVEN",
+    "dashboard_to_ceo": "PROVEN",
+    "packet_to_client": "BROKEN",
+    "packet_to_revenue_truth": "BROKEN",
+    "packet_to_dashboard": "BROKEN",
+    "packet_to_ceo": "BROKEN"
+  }
+}

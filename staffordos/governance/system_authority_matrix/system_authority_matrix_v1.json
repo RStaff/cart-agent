@@ -1,0 +1,790 @@
+{
+  "generated_at": "2026-06-04T00:00:00-04:00",
+  "repository": "/Users/rossstafford/projects/cart-agent",
+  "summary": {
+    "counts": {
+      "PROVEN": 7,
+      "PARTIALLY_PROVEN": 12,
+      "UNPROVEN": 5,
+      "BROKEN": 1,
+      "UNKNOWN": 0
+    },
+    "current_north_star_alignment": "Lead -> Audit -> Product Route -> Proposal -> Checkout -> Verified Payment -> Packet -> Fulfillment -> Proof -> Review -> Referral -> Revenue -> Next Sale",
+    "current_bottleneck": "Payment -> Execution -> Proof",
+    "sufficient_existing_equivalent_found": false
+  },
+  "components": [
+    {
+      "component_name": "Lead Registry",
+      "business_lifecycle_step": "Lead -> Audit entry",
+      "authority_source": [
+        "staffordos/authority/output/current_north_star_v1.md",
+        "staffordos/authority/output/current_roadmap_lock_v1.md",
+        "staffordos/authority/output/client_promotion_authority_v1.md"
+      ],
+      "runtime_source": [
+        "staffordos/leads/lead_registry_v1.json",
+        "staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts"
+      ],
+      "write_path": "not located in inspected repo",
+      "mutation_path": "not located in inspected repo",
+      "read_path": [
+        "staffordos/leads/lead_registry_v1.json",
+        "staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts",
+        "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts"
+      ],
+      "display_path": [
+        "staffordos/ui/operator-frontend/app/operator/leads/page.tsx",
+        "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts"
+      ],
+      "event_that_changes_state": "lead capture or lead ingestion",
+      "downstream_dependency": "Lead Qualification and Product Routing",
+      "proof_artifact": "lead_registry_v1.json entries and client promotion report",
+      "status": "PARTIALLY_PROVEN",
+      "integration_gap": "Lead truth exists, but write origin and downstream propagation are not fully traced.",
+      "risk_if_ignored": "Misrouted merchants and stale lead state.",
+      "risk_if_deleted": "Loss of top-of-funnel truth and routing history.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "What code path writes lead_registry_v1.json, and does it preserve lifecycle stage and routing metadata?"
+    },
+    {
+      "component_name": "Lead Qualification",
+      "business_lifecycle_step": "Lead -> Qualified target",
+      "authority_source": [
+        "staffordos/authority/output/client_promotion_authority_v1.md",
+        "staffordos/authority/output/staffordos_canonical_lifecycle_v1.md"
+      ],
+      "runtime_source": [
+        "staffordos/clients/promote_leads_to_clients_v1.mjs"
+      ],
+      "write_path": "staffordos/clients/client_registry_v1.json via promote_leads_to_clients_v1.mjs",
+      "mutation_path": "qualification logic in promote_leads_to_clients_v1.mjs",
+      "read_path": [
+        "staffordos/leads/lead_registry_v1.json",
+        "staffordos/clients/promote_leads_to_clients_v1.mjs"
+      ],
+      "display_path": [
+        "staffordos/ui/operator-frontend/app/operator/leads/page.tsx",
+        "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts"
+      ],
+      "event_that_changes_state": "score/status/email qualification evaluation",
+      "downstream_dependency": "Product Routing",
+      "proof_artifact": "promotion report and qualified client entries",
+      "status": "PARTIALLY_PROVEN",
+      "integration_gap": "Qualification exists, but the primary merchant loop still shows routing gaps.",
+      "risk_if_ignored": "Qualified leads remain uncaptured or misrouted.",
+      "risk_if_deleted": "Lead-to-client promotion loses its decision basis.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "Does the qualification runner produce the same stage/result for the primary merchant as the runtime client record?"
+    },
+    {
+      "component_name": "Product Routing",
+      "business_lifecycle_step": "Qualified lead -> route",
+      "authority_source": [
+        "staffordos/authority/output/product_routing_authority_v1.md",
+        "staffordos/authority/output/client_promotion_authority_v1.md"
+      ],
+      "runtime_source": [
+        "staffordos/clients/promote_leads_to_clients_v1.mjs",
+        "staffordos/commercial/offer_routing_rules_v1.json",
+        "staffordos/leads/lead_routing_policy_v1.json"
+      ],
+      "write_path": "staffordos/clients/client_registry_v1.json via promotion runner",
+      "mutation_path": "route selection logic in promote_leads_to_clients_v1.mjs",
+      "read_path": [
+        "staffordos/commercial/offer_routing_rules_v1.json",
+        "staffordos/leads/lead_routing_policy_v1.json",
+        "staffordos/clients/client_registry_v1.json"
+      ],
+      "display_path": [
+        "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "staffordos/clients/operator_dashboard_snapshot_v1.json"
+      ],
+      "event_that_changes_state": "route selection after qualification",
+      "downstream_dependency": "Client Promotion and offer generation",
+      "proof_artifact": "client record selected_product and routing_reason",
+      "status": "PARTIALLY_PROVEN",
+      "integration_gap": "Routing exists, but selected product can still be absent on the primary client record.",
+      "risk_if_ignored": "Commercial motion defaults to the wrong route.",
+      "risk_if_deleted": "Loss of route selection truth.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "Where is selected_product persisted for cart-agent-dev.myshopify.com?"
+    },
+    {
+      "component_name": "Client Promotion",
+      "business_lifecycle_step": "Lead -> Client Registry",
+      "authority_source": [
+        "staffordos/authority/output/client_promotion_authority_v1.md",
+        "staffordos/authority/output/staffordos_canonical_lifecycle_v1.md"
+      ],
+      "runtime_source": [
+        "staffordos/clients/promote_leads_to_clients_v1.mjs",
+        "staffordos/clients/client_registry_v1.json"
+      ],
+      "write_path": "staffordos/clients/client_registry_v1.json",
+      "mutation_path": "promote_leads_to_clients_v1.mjs upsertClient() path",
+      "read_path": [
+        "staffordos/clients/client_registry_v1.json"
+      ],
+      "display_path": [
+        "staffordos/ui/operator-frontend/app/api/operator/client-registry/route.ts",
+        "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts"
+      ],
+      "event_that_changes_state": "qualified lead promotion",
+      "downstream_dependency": "Client Registry and follow-up actioning",
+      "proof_artifact": "client promotion report and registry record",
+      "status": "PARTIALLY_PROVEN",
+      "integration_gap": "Promotion writes clients, but the primary merchant still lacks a complete promoted product record.",
+      "risk_if_ignored": "Qualified merchants remain outside operator truth.",
+      "risk_if_deleted": "Loss of promotion history and client identity continuity.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "Does the promotion runner write all required client fields for the primary merchant, including selected product and next action?"
+    },
+    {
+      "component_name": "Client Registry",
+      "business_lifecycle_step": "Client -> active operator truth",
+      "authority_source": [
+        "staffordos/authority/output/client_promotion_authority_v1.md",
+        "staffordos/authority/output/staffordos_canonical_lifecycle_v1.md"
+      ],
+      "runtime_source": [
+        "staffordos/clients/client_registry_v1.json",
+        "staffordos/clients/client_registry_v1.mjs"
+      ],
+      "write_path": "staffordos/clients/client_registry_v1.json via upsertClient()",
+      "mutation_path": "upsertClient() in client_registry_v1.mjs",
+      "read_path": [
+        "staffordos/clients/client_registry_v1.json"
+      ],
+      "display_path": [
+        "staffordos/ui/operator-frontend/app/api/operator/client-registry/route.ts",
+        "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "staffordos/clients/operator_dashboard_snapshot_v1.json"
+      ],
+      "event_that_changes_state": "client promotion, payment, proof, or follow-up updates",
+      "downstream_dependency": "Operator dashboard and CEO cockpit",
+      "proof_artifact": "client registry record",
+      "status": "PARTIALLY_PROVEN",
+      "integration_gap": "Payment, packet, proof, and revenue fields are not fully synchronized.",
+      "risk_if_ignored": "Operator truth diverges from actual business state.",
+      "risk_if_deleted": "Loss of client continuity, route history, and next action context.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "Which runtime writer updates client payment and proof fields after verified Stripe payment?"
+    },
+    {
+      "component_name": "ShopiFixer Audit",
+      "business_lifecycle_step": "Conversation -> audit",
+      "authority_source": [
+        "staffordos/authority/output/shopifixer_audit_authority_v1.md",
+        "staffordos/authority/output/staffordos_canonical_lifecycle_v1.md"
+      ],
+      "runtime_source": [
+        "web/src/routes/runAudit.esm.js",
+        "web/src/routes/scorecard.esm.js",
+        "abando-frontend/app/shopifixer/page.tsx"
+      ],
+      "write_path": "audit output and scorecard artifacts",
+      "mutation_path": "audit route and scorecard route",
+      "read_path": [
+        "web/src/routes/runAudit.esm.js",
+        "web/src/routes/scorecard.esm.js"
+      ],
+      "display_path": [
+        "abando-frontend/app/shopifixer/page.tsx",
+        "web/src/routes/scorecard.esm.js"
+      ],
+      "event_that_changes_state": "merchant audit request or scorecard generation",
+      "downstream_dependency": "Proposal and ShopiFixer positioning",
+      "proof_artifact": "audit authority fields and scorecard result",
+      "status": "PARTIALLY_PROVEN",
+      "integration_gap": "Public audit flow exists, but merchant-grade proof is still incomplete.",
+      "risk_if_ignored": "Audit becomes a generic content surface instead of a conversion instrument.",
+      "risk_if_deleted": "Loss of structured conversion evidence.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "Does the audit output include the authoritative friction, fix, and proof fields required by the audit authority?"
+    },
+    {
+      "component_name": "ShopiFixer Proposal",
+      "business_lifecycle_step": "Audit -> proposed fix",
+      "authority_source": [
+        "staffordos/authority/output/shopifixer_audit_authority_v1.md",
+        "staffordos/authority/output/product_routing_authority_v1.md",
+        "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md"
+      ],
+      "runtime_source": [
+        "abando-frontend/app/shopifixer/page.tsx",
+        "operator generated offer artifacts"
+      ],
+      "write_path": "proposal output artifacts",
+      "mutation_path": "offer generation paths",
+      "read_path": [
+        "offer routing rules and proposal artifacts"
+      ],
+      "display_path": [
+        "abando-frontend/app/shopifixer/page.tsx",
+        "operator frontend offer surfaces"
+      ],
+      "event_that_changes_state": "audit completion and offer generation",
+      "downstream_dependency": "Checkout Link and payment",
+      "proof_artifact": "proposal artifact and offer summary",
+      "status": "PARTIALLY_PROVEN",
+      "integration_gap": "Offer exists, but proposal-to-payment is not yet a proven merchant loop.",
+      "risk_if_ignored": "Proposals remain disconnected from revenue capture.",
+      "risk_if_deleted": "Loss of commercial offer context.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "Is the canonical $950 Fix Sprint proposal emitted from the same authority used by the public page?"
+    },
+    {
+      "component_name": "Public ShopiFixer Page",
+      "business_lifecycle_step": "Visitor -> conversion entry",
+      "authority_source": [
+        "staffordos/authority/output/shopifixer_commercial_truth_authority_v1.md",
+        "staffordos/authority/output/staffordos_canonical_lifecycle_v1.md"
+      ],
+      "runtime_source": [
+        "abando-frontend/app/shopifixer/page.tsx"
+      ],
+      "write_path": "public UI and checkout handoff",
+      "mutation_path": "public page CTA submission",
+      "read_path": [
+        "abando-frontend/app/shopifixer/page.tsx"
+      ],
+      "display_path": [
+        "public ShopiFixer page"
+      ],
+      "event_that_changes_state": "merchant CTA click",
+      "downstream_dependency": "Public Checkout",
+      "proof_artifact": "canonical $950 offer visible on the page",
+      "status": "PROVEN",
+      "integration_gap": "Page exists and surfaces the canonical offer, but it is still only the front door.",
+      "risk_if_ignored": "Visitor intent can drift to the wrong offer or route.",
+      "risk_if_deleted": "Loss of merchant acquisition front door.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "Does the public ShopiFixer page route every purchase intent into the packet-aware checkout flow?"
+    },
+    {
+      "component_name": "Public Checkout",
+      "business_lifecycle_step": "Offer -> checkout request",
+      "authority_source": [
+        "staffordos/authority/output/s2g_packet_binding_readiness_v1.md",
+        "staffordos/authority/output/s2h_real_payment_readiness_snapshot_v1.md"
+      ],
+      "runtime_source": [
+        "web/src/checkout-public.js"
+      ],
+      "write_path": "packet JSON creation and Stripe checkout session creation",
+      "mutation_path": "POST /__public-checkout handler",
+      "read_path": [
+        "web/src/checkout-public.js"
+      ],
+      "display_path": [
+        "public ShopiFixer page",
+        "checkout redirect"
+      ],
+      "event_that_changes_state": "checkout form submission",
+      "downstream_dependency": "Stripe Checkout Session and Packet Binding",
+      "proof_artifact": "checkout code and packet metadata binding",
+      "status": "PROVEN",
+      "integration_gap": "Checkout exists and binds packet metadata, but end-to-end paid proof is still pending.",
+      "risk_if_ignored": "Payments can be detached from merchant identity.",
+      "risk_if_deleted": "No controlled way to start the payment loop.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "Does the public checkout create a packet with the same id that the webhook later resolves?"
+    },
+    {
+      "component_name": "Stripe Checkout Session",
+      "business_lifecycle_step": "Checkout -> Stripe session",
+      "authority_source": [
+        "Stripe checkout authority as embedded in runtime code"
+      ],
+      "runtime_source": [
+        "web/src/checkout-public.js"
+      ],
+      "write_path": "Stripe-hosted session",
+      "mutation_path": "stripe.checkout.sessions.create",
+      "read_path": [
+        "web/src/checkout-public.js"
+      ],
+      "display_path": [
+        "checkout redirect only"
+      ],
+      "event_that_changes_state": "Stripe session creation",
+      "downstream_dependency": "Stripe Webhook",
+      "proof_artifact": "session payload with client_reference_id and packet metadata",
+      "status": "PROVEN",
+      "integration_gap": "Session creation exists, but the session is not itself the business truth.",
+      "risk_if_ignored": "Session identity can be mistaken for commercial completion.",
+      "risk_if_deleted": "No payable handoff to Stripe.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "Does the created Stripe session always carry client_reference_id and metadata.packet_id?"
+    },
+    {
+      "component_name": "Stripe Webhook",
+      "business_lifecycle_step": "Verified payment event -> packet mutation",
+      "authority_source": [
+        "staffordos/authority/output/s2g_packet_binding_readiness_v1.md",
+        "staffordos/authority/output/s2h_real_payment_readiness_snapshot_v1.md"
+      ],
+      "runtime_source": [
+        "web/src/routes/stripeWebhook.esm.js"
+      ],
+      "write_path": "packet JSON state",
+      "mutation_path": "verified webhook handler",
+      "read_path": [
+        "web/src/routes/stripeWebhook.esm.js",
+        "staffordos/packets/*.json"
+      ],
+      "display_path": [
+        "packet state summaries",
+        "CEO cockpit summaries"
+      ],
+      "event_that_changes_state": "checkout.session.completed with verified Stripe signature",
+      "downstream_dependency": "Payment Received Transition",
+      "proof_artifact": "signature-verified webhook code and packet state mutation",
+      "status": "PROVEN",
+      "integration_gap": "Webhook verifies signature and can mark the packet received, but it stops at packet mutation.",
+      "risk_if_ignored": "Unverified or partial payment handling can drift into production truth.",
+      "risk_if_deleted": "Loss of the payment verification gate.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "Does the webhook mutate packet state only, or does it also update client and revenue truth?"
+    },
+    {
+      "component_name": "Payment Received Transition",
+      "business_lifecycle_step": "payment_pending -> payment_received",
+      "authority_source": [
+        "staffordos/authority/output/staffordos_canonical_lifecycle_v1.md",
+        "staffordos/authority/output/s2g_packet_binding_readiness_v1.md",
+        "staffordos/authority/output/s2h_real_payment_readiness_snapshot_v1.md"
+      ],
+      "runtime_source": [
+        "web/src/routes/stripeWebhook.esm.js",
+        "staffordos/packets/*.json"
+      ],
+      "write_path": "packet JSON state only",
+      "mutation_path": "stripeWebhook.esm.js packet status update",
+      "read_path": [
+        "packet JSON files"
+      ],
+      "display_path": [
+        "packet summaries only"
+      ],
+      "event_that_changes_state": "verified Stripe checkout.session.completed",
+      "downstream_dependency": "Fulfillment Scope and client/revenue propagation",
+      "proof_artifact": "payment_received packet state",
+      "status": "BROKEN",
+      "integration_gap": "The transition exists, but downstream propagation to client registry, revenue truth, dashboard, and CEO cockpit is missing.",
+      "risk_if_ignored": "Payment can be recorded without becoming operator truth.",
+      "risk_if_deleted": "The only payment state transition is lost.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "After a verified Stripe event, which runtime files change besides the packet JSON?"
+    },
+    {
+      "component_name": "Packet Creation",
+      "business_lifecycle_step": "Offer accepted -> packet created",
+      "authority_source": [
+        "staffordos/authority/output/s2g_packet_binding_readiness_v1.md"
+      ],
+      "runtime_source": [
+        "web/src/checkout-public.js"
+      ],
+      "write_path": "packet JSON creation",
+      "mutation_path": "packet factory in checkout-public.js",
+      "read_path": [
+        "web/src/checkout-public.js",
+        "staffordos/packets/*.json"
+      ],
+      "display_path": [
+        "packet summaries",
+        "operator dashboard summaries"
+      ],
+      "event_that_changes_state": "checkout submission",
+      "downstream_dependency": "Packet Binding and webhook resolution",
+      "proof_artifact": "packet object with packet_id and store_domain metadata",
+      "status": "PROVEN",
+      "integration_gap": "Packet creation exists and is bound to checkout metadata.",
+      "risk_if_ignored": "Payment cannot be associated with the merchant loop.",
+      "risk_if_deleted": "Breaks the packet-aware checkout path.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "Is the packet created with the same merchant and packet identifiers used by the webhook?"
+    },
+    {
+      "component_name": "Packet Binding",
+      "business_lifecycle_step": "Checkout/session -> packet id",
+      "authority_source": [
+        "staffordos/authority/output/s2g_packet_binding_readiness_v1.md",
+        "staffordos/authority/output/s2h_real_payment_readiness_snapshot_v1.md"
+      ],
+      "runtime_source": [
+        "web/src/checkout-public.js",
+        "web/src/routes/stripeWebhook.esm.js"
+      ],
+      "write_path": "packet JSON and Stripe session metadata",
+      "mutation_path": "client_reference_id and metadata.packet_id",
+      "read_path": [
+        "checkout-public.js",
+        "stripeWebhook.esm.js",
+        "packet JSON files"
+      ],
+      "display_path": [
+        "packet summaries",
+        "operator summaries"
+      ],
+      "event_that_changes_state": "checkout and webhook round trip",
+      "downstream_dependency": "Payment Received Transition",
+      "proof_artifact": "packet id persisted through checkout and webhook",
+      "status": "PROVEN",
+      "integration_gap": "Binding exists, but paid packet completion has not been proven end-to-end.",
+      "risk_if_ignored": "Merchant identity can detach from payment state.",
+      "risk_if_deleted": "Payment loop loses durable correlation.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "Does the packet survive the full checkout/webhook round trip without identity loss?"
+    },
+    {
+      "component_name": "Fulfillment Scope",
+      "business_lifecycle_step": "payment_received -> scope",
+      "authority_source": [
+        "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+        "staffordos/authority/output/staffordos_canonical_lifecycle_v1.md"
+      ],
+      "runtime_source": [
+        "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+        "staffordos/packets/*.json"
+      ],
+      "write_path": "packet fulfillment fields",
+      "mutation_path": "fulfillment packet state fields",
+      "read_path": [
+        "fulfillment authority docs",
+        "packet JSON files"
+      ],
+      "display_path": [
+        "operator summaries"
+      ],
+      "event_that_changes_state": "payment_received packet entering fulfillment",
+      "downstream_dependency": "Fulfillment Execution",
+      "proof_artifact": "intake summary and fix scope",
+      "status": "PARTIALLY_PROVEN",
+      "integration_gap": "Scope authority exists, but a paid merchant packet has not been proven to enter execution cleanly.",
+      "risk_if_ignored": "Paid work can start without a governed scope record.",
+      "risk_if_deleted": "No authoritative scope for the sprint.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "Is fulfillment scope instantiated from a paid packet or only described in authority?"
+    },
+    {
+      "component_name": "Fulfillment Execution",
+      "business_lifecycle_step": "Scope -> implementation",
+      "authority_source": [
+        "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md"
+      ],
+      "runtime_source": [
+        "no verified paid execution path found in runtime sources"
+      ],
+      "write_path": "not located in inspected repo",
+      "mutation_path": "not located in inspected repo",
+      "read_path": [
+        "fulfillment authority docs"
+      ],
+      "display_path": [
+        "not yet surfaced as runtime truth"
+      ],
+      "event_that_changes_state": "real paid sprint execution",
+      "downstream_dependency": "QA and proof package",
+      "proof_artifact": "none yet",
+      "status": "UNPROVEN",
+      "integration_gap": "No verified merchant-paid execution path observed.",
+      "risk_if_ignored": "Payment never turns into merchant value.",
+      "risk_if_deleted": "Eliminates the fulfillment layer entirely.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "What runtime file records the first real paid fulfillment execution?"
+    },
+    {
+      "component_name": "QA",
+      "business_lifecycle_step": "Implementation -> verified after-state",
+      "authority_source": [
+        "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md"
+      ],
+      "runtime_source": [
+        "no verified paid QA artifact found"
+      ],
+      "write_path": "not located in inspected repo",
+      "mutation_path": "not located in inspected repo",
+      "read_path": [
+        "fulfillment authority docs"
+      ],
+      "display_path": [
+        "not yet surfaced as runtime truth"
+      ],
+      "event_that_changes_state": "post-implementation verification",
+      "downstream_dependency": "Proof Package",
+      "proof_artifact": "none yet",
+      "status": "UNPROVEN",
+      "integration_gap": "QA authority exists, but not as a proven merchant-paid runtime step.",
+      "risk_if_ignored": "Merchant work can be marked done without validation.",
+      "risk_if_deleted": "No after-state verification layer.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "Which file stores the QA result for a real paid ShopiFixer packet?"
+    },
+    {
+      "component_name": "Proof Package",
+      "business_lifecycle_step": "QA -> merchant proof",
+      "authority_source": [
+        "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+        "staffordos/authority/output/staffordos_business_core_definition_of_done_v1.md"
+      ],
+      "runtime_source": [
+        "no verified paid proof package tied to a packet found"
+      ],
+      "write_path": "not located in inspected repo",
+      "mutation_path": "not located in inspected repo",
+      "read_path": [
+        "fulfillment authority docs"
+      ],
+      "display_path": [
+        "merchant-facing proof surface not yet verified"
+      ],
+      "event_that_changes_state": "QA complete and after-state evidence produced",
+      "downstream_dependency": "Review Request and referral",
+      "proof_artifact": "none yet",
+      "status": "UNPROVEN",
+      "integration_gap": "Proof package is defined, but not yet proven as a live merchant artifact.",
+      "risk_if_ignored": "No defensible commercial proof moat accumulates.",
+      "risk_if_deleted": "No merchant-facing evidence artifact remains.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "Which runtime artifact is the merchant-facing proof package for a paid sprint?"
+    },
+    {
+      "component_name": "Review Request",
+      "business_lifecycle_step": "Proof package -> merchant review",
+      "authority_source": [
+        "staffordos/authority/output/staffordos_canonical_lifecycle_v1.md",
+        "staffordos/authority/output/staffordos_business_core_definition_of_done_v1.md"
+      ],
+      "runtime_source": [
+        "no verified runtime review request found"
+      ],
+      "write_path": "not located in inspected repo",
+      "mutation_path": "not located in inspected repo",
+      "read_path": [
+        "merchant success authority docs"
+      ],
+      "display_path": [
+        "not yet surfaced as runtime truth"
+      ],
+      "event_that_changes_state": "proof package delivery",
+      "downstream_dependency": "Referral Motion",
+      "proof_artifact": "none yet",
+      "status": "UNPROVEN",
+      "integration_gap": "Review/referral motion not yet proven in the live paid loop.",
+      "risk_if_ignored": "No customer testimony or social proof motion.",
+      "risk_if_deleted": "No review intake pathway.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "Where is the first verified merchant review request recorded after proof delivery?"
+    },
+    {
+      "component_name": "Referral Motion",
+      "business_lifecycle_step": "Review -> referral / next sprint",
+      "authority_source": [
+        "staffordos/authority/output/staffordos_canonical_lifecycle_v1.md",
+        "staffordos/authority/output/staffordos_business_core_definition_of_done_v1.md"
+      ],
+      "runtime_source": [
+        "no verified runtime referral state found"
+      ],
+      "write_path": "not located in inspected repo",
+      "mutation_path": "not located in inspected repo",
+      "read_path": [
+        "merchant success authority docs"
+      ],
+      "display_path": [
+        "not yet surfaced as runtime truth"
+      ],
+      "event_that_changes_state": "merchant review or testimonial",
+      "downstream_dependency": "Next Sale",
+      "proof_artifact": "none yet",
+      "status": "UNPROVEN",
+      "integration_gap": "Referral logic exists on paper, not yet in a proven paid loop.",
+      "risk_if_ignored": "No compounding commercial flywheel.",
+      "risk_if_deleted": "No next-sale motion.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "What runtime evidence shows a merchant referral or next-sprint motion?"
+    },
+    {
+      "component_name": "Revenue Truth",
+      "business_lifecycle_step": "Payment -> revenue captured",
+      "authority_source": [
+        "staffordos/authority/output/revenue_success_gate_v1.md",
+        "staffordos/authority/output/current_launch_readiness_score_v1.md"
+      ],
+      "runtime_source": [
+        "staffordos/revenue/revenue_truth_v1.json",
+        "staffordos/revenue/paymentAgreements.json",
+        "client registry revenue fields"
+      ],
+      "write_path": "revenue truth JSON and client revenue fields",
+      "mutation_path": "revenue tracking and agreement records",
+      "read_path": [
+        "staffordos/revenue/revenue_truth_v1.json",
+        "staffordos/revenue/paymentAgreements.json",
+        "staffordos/clients/client_registry_v1.json"
+      ],
+      "display_path": [
+        "operator dashboard snapshot",
+        "CEO cockpit"
+      ],
+      "event_that_changes_state": "verified payment or revenue capture",
+      "downstream_dependency": "Operator dashboard and CEO cockpit",
+      "proof_artifact": "revenue truth record",
+      "status": "PARTIALLY_PROVEN",
+      "integration_gap": "Revenue truth exists, but Stafford revenue is still zero and not tied to the verified packet loop.",
+      "risk_if_ignored": "Commercial claims cannot be defended.",
+      "risk_if_deleted": "Historical revenue context is lost.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "Which runtime source is the authoritative post-payment revenue record?"
+    },
+    {
+      "component_name": "Operator Dashboard Snapshot",
+      "business_lifecycle_step": "Client/revenue summary -> operator view",
+      "authority_source": [
+        "staffordos/authority/output/current_launch_readiness_score_v1.md",
+        "staffordos/authority/output/staffordos_canonical_lifecycle_v1.md"
+      ],
+      "runtime_source": [
+        "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs",
+        "staffordos/clients/operator_dashboard_snapshot_v1.json"
+      ],
+      "write_path": "staffordos/clients/operator_dashboard_snapshot_v1.json",
+      "mutation_path": "build_operator_dashboard_snapshot_v1.mjs",
+      "read_path": [
+        "staffordos/clients/client_registry_v1.json"
+      ],
+      "display_path": [
+        "operator dashboard surface"
+      ],
+      "event_that_changes_state": "snapshot rebuild after client registry update",
+      "downstream_dependency": "CEO cockpit",
+      "proof_artifact": "snapshot JSON with primary focus and summary counts",
+      "status": "PARTIALLY_PROVEN",
+      "integration_gap": "Dashboard exists, but it does not fully surface packet/payment/proof state.",
+      "risk_if_ignored": "Operator view can remain detached from the live payment loop.",
+      "risk_if_deleted": "No operator summary of client state.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "Does the dashboard read packet/payment truth or only client and revenue summary fields?"
+    },
+    {
+      "component_name": "CEO Cockpit",
+      "business_lifecycle_step": "Executive decisioning -> next action",
+      "authority_source": [
+        "staffordos/authority/output/current_north_star_v1.md",
+        "staffordos/authority/output/current_roadmap_lock_v1.md",
+        "staffordos/authority/output/staffordos_business_core_definition_of_done_v1.md"
+      ],
+      "runtime_source": [
+        "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx"
+      ],
+      "write_path": "CEO snapshot route JSON response",
+      "mutation_path": "route aggregation logic",
+      "read_path": [
+        "client registry",
+        "lead registry",
+        "operator dashboard snapshot",
+        "send ledger proof status"
+      ],
+      "display_path": [
+        "operator command center",
+        "CEO cockpit"
+      ],
+      "event_that_changes_state": "source truth updates in underlying systems",
+      "downstream_dependency": "operator action selection",
+      "proof_artifact": "CEO snapshot response",
+      "status": "PARTIALLY_PROVEN",
+      "integration_gap": "Reads real sources, but proof and packet truth are still incomplete or indirect.",
+      "risk_if_ignored": "Executive actions can be based on summaries rather than live truth.",
+      "risk_if_deleted": "Loss of the business control plane.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "Does the CEO snapshot read packet truth directly, or only client and dashboard summaries?"
+    },
+    {
+      "component_name": "Abando Secondary Route",
+      "business_lifecycle_step": "Secondary recovery motion",
+      "authority_source": [
+        "staffordos/authority/output/product_routing_authority_v1.md"
+      ],
+      "runtime_source": [
+        "abando-frontend",
+        "operator surfaces"
+      ],
+      "write_path": "Abando public and operator surfaces",
+      "mutation_path": "Abando route selection and public pages",
+      "read_path": [
+        "routing rules",
+        "client registry route metadata"
+      ],
+      "display_path": [
+        "public and operator-facing Abando surfaces"
+      ],
+      "event_that_changes_state": "merchant abandonment or recovery trigger",
+      "downstream_dependency": "recovery motion or secondary offer path",
+      "proof_artifact": "route selection and recovery evidence",
+      "status": "PARTIALLY_PROVEN",
+      "integration_gap": "Secondary route exists, but it should stay subordinate to ShopiFixer when conversion is the issue.",
+      "risk_if_ignored": "Primary conversion motion can drift into the wrong offer.",
+      "risk_if_deleted": "Loss of the secondary recovery option.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": true,
+      "next_verifiable_question": "When the merchant has a conversion issue, does routing prefer ShopiFixer over Abando?"
+    },
+    {
+      "component_name": "Governance / Drift Containment",
+      "business_lifecycle_step": "Prevent invented claims and mixed-scope work",
+      "authority_source": [
+        "staffordos/governance/*",
+        "staffordos/governance/ai_drift_incidents/*"
+      ],
+      "runtime_source": [
+        "governance incident records and artifact containment outputs"
+      ],
+      "write_path": "governance records",
+      "mutation_path": "artifact containment and review artifacts",
+      "read_path": [
+        "governance records",
+        "incident archives"
+      ],
+      "display_path": [
+        "governance review surfaces"
+      ],
+      "event_that_changes_state": "artifact review or drift incident classification",
+      "downstream_dependency": "all governance decisions",
+      "proof_artifact": "governance incident and containment artifacts",
+      "status": "PROVEN",
+      "integration_gap": "Governance exists, but it is not yet fully absorbing runtime truth across every surface.",
+      "risk_if_ignored": "Vibe code and invented claims can re-enter the tree.",
+      "risk_if_deleted": "Loss of drift containment and audit trail.",
+      "should_appear_in_ceo_cockpit": true,
+      "should_block_new_product_work": false,
+      "next_verifiable_question": "Which governance artifact is the canonical inventory of runtime truth and integration gaps?"
+    }
+  ]
+}
