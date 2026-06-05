@@ -1,0 +1,118 @@
+{
+  "artifact": "next_action_engine_runtime_trace_v1",
+  "generated_at": "2026-06-04T00:00:00.000Z",
+  "classification": "DISCONNECTED",
+  "primary_question": "Does any active runtime entrypoint invoke staffordos/clients/next_action_engine_v1.mjs?",
+  "answer": {
+    "invoked": false,
+    "runtime_entrypoint": null,
+    "trigger": null,
+    "execution_frequency": null,
+    "persists_lifecycle_changes": false,
+    "where_lifecycle_stops": "There is no proven live runtime call into next_action_engine_v1.mjs; runtime stops at reference-only manifests and inventories."
+  },
+  "runtime_entrypoints": [
+    {
+      "file": "package.json",
+      "entrypoint": "start",
+      "classification": "PROVEN",
+      "detail": "Boots web/src/index.js"
+    },
+    {
+      "file": "staffordos/operator_daemon/persistent_operator_v1.mjs",
+      "entrypoint": "main loop",
+      "classification": "PROVEN",
+      "detail": "Calls task resolver and run_agent_loop"
+    },
+    {
+      "file": "staffordos/operator_daemon/task_command_resolver_v1.mjs",
+      "entrypoint": "task command resolution",
+      "classification": "PROVEN",
+      "detail": "Resolves task types to commands; does not map next_action_engine_v1.mjs"
+    },
+    {
+      "file": "staffordos/execution/run_agent_loop.mjs",
+      "entrypoint": "execution runner",
+      "classification": "PROVEN",
+      "detail": "Executes resolved commands only"
+    }
+  ],
+  "occurrences": [
+    {
+      "file": "staffordos/clients/next_action_engine_v1.mjs",
+      "type": "runtime executed",
+      "classification": "BROKEN",
+      "detail": "The file is executable as a standalone script, but no active runtime caller was found."
+    },
+    {
+      "file": "staffordos/operator_daemon/write_router_decision_agent_binding_v1.mjs",
+      "type": "direct invocation reference",
+      "classification": "UNPROVEN",
+      "detail": "Reference only; writes binding metadata, does not execute the engine."
+    },
+    {
+      "file": "staffordos/operator_daemon/write_router_binding_plan_v1.mjs",
+      "type": "direct invocation reference",
+      "classification": "UNPROVEN",
+      "detail": "Reference only; recommends evaluation, does not execute the engine."
+    },
+    {
+      "file": "staffordos/operator_daemon/output/router_decision_agent_binding_v1.json",
+      "type": "documentation/reference",
+      "classification": "UNPROVEN",
+      "detail": "Binding manifest references the engine as an ownership candidate."
+    },
+    {
+      "file": "staffordos/operator_daemon/output/router_binding_plan_v1.json",
+      "type": "documentation/reference",
+      "classification": "UNPROVEN",
+      "detail": "Plan references the engine as a candidate input."
+    },
+    {
+      "file": "staffordos/operator_daemon/output/neck_router_inventory_v1.json",
+      "type": "documentation/reference",
+      "classification": "UNPROVEN",
+      "detail": "Inventory lists the engine."
+    },
+    {
+      "file": "staffordos/operator_daemon/output/system_brain_inventory_v1.json",
+      "type": "documentation/reference",
+      "classification": "UNPROVEN",
+      "detail": "Inventory lists the engine."
+    }
+  ],
+  "call_chain": {
+    "direct_callers": [],
+    "indirect_callers": [],
+    "dead_references": [
+      "staffordos/operator_daemon/write_router_decision_agent_binding_v1.mjs",
+      "staffordos/operator_daemon/write_router_binding_plan_v1.mjs",
+      "staffordos/operator_daemon/output/router_decision_agent_binding_v1.json",
+      "staffordos/operator_daemon/output/router_binding_plan_v1.json",
+      "staffordos/operator_daemon/output/neck_router_inventory_v1.json",
+      "staffordos/operator_daemon/output/system_brain_inventory_v1.json"
+    ]
+  },
+  "lifecycle_transition_ownership": {
+    "proposal_sent_to_deal_won": "staffordos/clients/client_registry_v1.mjs",
+    "deal_won_to_fix_in_progress": "staffordos/clients/next_action_engine_v1.mjs (code only, not runtime proven)",
+    "fix_in_progress_to_fix_completed": "staffordos/clients/next_action_engine_v1.mjs (code only, not runtime proven)"
+  },
+  "questions": {
+    "is_invoked": false,
+    "by_what_entrypoint": null,
+    "what_triggers_execution": null,
+    "how_often": null,
+    "does_it_persist_lifecycle_changes": true,
+    "if_no_where_does_lifecycle_stop": "At the boundary between reference-only router manifests and live runtime execution."
+  },
+  "classification_summary": {
+    "active_runtime_path": "DISCONNECTED",
+    "proof": [
+      "task resolver has no mapping to next_action_engine_v1.mjs",
+      "persistent operator routes through task resolver and run_agent_loop",
+      "no direct runtime invocation was found",
+      "references exist only in inventories/manifests and the standalone file itself"
+    ]
+  }
+}

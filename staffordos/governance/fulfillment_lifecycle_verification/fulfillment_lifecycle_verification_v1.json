@@ -1,0 +1,176 @@
+{
+  "artifact": "fulfillment_lifecycle_verification_v1",
+  "generated_at": "2026-06-04T00:00:00.000Z",
+  "verdict": "PARTIALLY_PROVEN",
+  "can_complete_paid_shopifixer_sprint_without_manual_registry_edits": false,
+  "direct_answers": {
+    "writes_fix_in_progress": {
+      "file": "staffordos/clients/next_action_engine_v1.mjs",
+      "classification": "UNPROVEN",
+      "detail": "Code exists, but no live runtime caller was found."
+    },
+    "writes_fix_completed": {
+      "file": "staffordos/clients/next_action_engine_v1.mjs",
+      "classification": "UNPROVEN",
+      "detail": "Code exists, but no live runtime caller was found."
+    },
+    "writes_shopifixer_fix_status_in_progress": {
+      "file": null,
+      "classification": "UNPROVEN",
+      "detail": "No runtime writer found."
+    },
+    "writes_shopifixer_fix_status_completed": {
+      "file": null,
+      "classification": "UNPROVEN",
+      "detail": "No runtime writer found."
+    },
+    "fulfillment_packet_after_deal_won": {
+      "file": "web/src/routes/packetAuthority.esm.js",
+      "classification": "PARTIALLY_PROVEN",
+      "detail": "Manual packet creation/binding exists, but no automated deal_won bridge was found."
+    },
+    "proof_artifact_required_before_fix_completed": {
+      "file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+      "classification": "PROVEN",
+      "detail": "Before evidence, execution notes, after evidence, merchant-facing proof package, completion decision."
+    },
+    "auto_move_paid_client_into_fulfillment": {
+      "classification": "NO",
+      "detail": "No runtime path proven."
+    },
+    "auto_mark_fulfillment_complete": {
+      "classification": "NO",
+      "detail": "No runtime path proven."
+    }
+  },
+  "hops": [
+    {
+      "hop": 1,
+      "name": "deal_won client exists or can exist after payment",
+      "source_file": "staffordos/clients/client_registry_v1.mjs",
+      "function_or_process": "recordVerifiedStripePayment(...)",
+      "input_state": "verified Stripe payment",
+      "output_state": "client.lifecycle.stage = deal_won",
+      "write_target": "staffordos/clients/client_registry_v1.json",
+      "proof_artifact": "payment_propagation_verification_v1",
+      "classification": "PROVEN"
+    },
+    {
+      "hop": 2,
+      "name": "deal_won → fulfillment packet created",
+      "source_file": "web/src/routes/packetAuthority.esm.js",
+      "function_or_process": "POST /api/packets/prepare, bindPacketPayment(...)",
+      "input_state": "deal_won client",
+      "output_state": "packet created/bound manually",
+      "write_target": "packets table",
+      "proof_artifact": "shopifixer_fulfillment_authority_v1.md",
+      "classification": "PARTIALLY_PROVEN"
+    },
+    {
+      "hop": 3,
+      "name": "fulfillment packet → assigned scope",
+      "source_file": "web/src/routes/packetAuthority.esm.js",
+      "function_or_process": "packet execution update route",
+      "input_state": "packet exists",
+      "output_state": "packet execution/proof/completion fields can be updated",
+      "write_target": "packets table",
+      "proof_artifact": "shopifixer_fulfillment_packet_template_v1.md",
+      "classification": "UNPROVEN"
+    },
+    {
+      "hop": 4,
+      "name": "assigned scope → fix_in_progress",
+      "source_file": "staffordos/clients/next_action_engine_v1.mjs",
+      "function_or_process": "computeNextAction(...) / run()",
+      "input_state": "paid client with fix scope",
+      "output_state": "would write lifecycle.stage = fix_in_progress",
+      "write_target": "client_registry_v1.json",
+      "proof_artifact": "next_action_engine_v1.mjs",
+      "classification": "UNPROVEN"
+    },
+    {
+      "hop": 5,
+      "name": "fix_in_progress → QA",
+      "source_file": "web/src/routes/packetAuthority.esm.js",
+      "function_or_process": "updatePacketLifecycle(...)",
+      "input_state": "packet in progress",
+      "output_state": "packet execution/proof status can be changed manually",
+      "write_target": "packets table",
+      "proof_artifact": "shopifixer_fulfillment_authority_v1.md",
+      "classification": "PARTIALLY_PROVEN"
+    },
+    {
+      "hop": 6,
+      "name": "QA → proof package",
+      "source_file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+      "function_or_process": "proof package template and authority",
+      "input_state": "QA complete",
+      "output_state": "merchant-facing proof package required",
+      "write_target": "not proven at runtime",
+      "proof_artifact": "proof package authority/template",
+      "classification": "UNPROVEN"
+    },
+    {
+      "hop": 7,
+      "name": "proof package → fix_completed",
+      "source_file": "staffordos/clients/next_action_engine_v1.mjs",
+      "function_or_process": "computeNextAction(...) / run()",
+      "input_state": "proof complete",
+      "output_state": "would write lifecycle.stage = fix_completed",
+      "write_target": "client_registry_v1.json",
+      "proof_artifact": "next_action_engine_v1.mjs",
+      "classification": "UNPROVEN"
+    },
+    {
+      "hop": 8,
+      "name": "fix_completed → dashboard snapshot",
+      "source_file": "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs",
+      "function_or_process": "buildOperatorDashboardSnapshot()",
+      "input_state": "client registry contains fix_completed",
+      "output_state": "dashboard snapshot reflects the state",
+      "write_target": "operator_dashboard_snapshot_v1.json",
+      "proof_artifact": "dashboard builder",
+      "classification": "PARTIALLY_PROVEN"
+    },
+    {
+      "hop": 9,
+      "name": "fix_completed → CEO Cockpit",
+      "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+      "function_or_process": "GET /api/operator/ceo-snapshot",
+      "input_state": "registry/dashboard has fix_completed",
+      "output_state": "cockpit can display it",
+      "write_target": "API response only",
+      "proof_artifact": "CEO snapshot route",
+      "classification": "PARTIALLY_PROVEN"
+    },
+    {
+      "hop": 10,
+      "name": "fix_completed → review/referral readiness",
+      "source_file": "staffordos/authority/output/revenue_success_gate_v1.md",
+      "function_or_process": "review/referral authority only",
+      "input_state": "proof package delivered",
+      "output_state": "review/referral readiness should be recorded",
+      "write_target": "not proven at runtime",
+      "proof_artifact": "revenue success gate",
+      "classification": "UNPROVEN"
+    }
+  ],
+  "writer_chain": [
+    "web/src/routes/packetAuthority.esm.js",
+    "web/src/lib/packetRepository.js",
+    "staffordos/clients/next_action_engine_v1.mjs",
+    "staffordos/clients/client_registry_v1.mjs",
+    "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs"
+  ],
+  "reader_chain": [
+    "staffordos/ui/operator-frontend/app/api/operator/client-registry/route.ts",
+    "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts"
+  ],
+  "overall_fulfillment_status": "PARTIALLY_PROVEN",
+  "highest_risk_gap": "No proven runtime bridge from paid deal_won client into fix_in_progress / QA / proof package / fix_completed.",
+  "next_verifiable_question": "Does any active runtime entrypoint invoke staffordos/clients/next_action_engine_v1.mjs?",
+  "manual_only_hops": [
+    "POST /api/packets/prepare",
+    "POST /api/packets/:packetId/execution"
+  ]
+}

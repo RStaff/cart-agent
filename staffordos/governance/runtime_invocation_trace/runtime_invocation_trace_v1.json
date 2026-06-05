@@ -1,0 +1,144 @@
+{
+  "schema": "staffordos.runtime_invocation_trace.v1",
+  "generated_at": "2026-06-04T00:00:00.000Z",
+  "primary_question": "Does any active runtime entrypoint invoke staffordos/clients/next_action_engine_v1.mjs?",
+  "summary": {
+    "lifecycle_automation_active": true,
+    "fulfillment_automation_active": false,
+    "where_lifecycle_stops": "There is no proven live runtime call into next_action_engine_v1.mjs; runtime stops at revenue propagation and reference-only fulfillment engines."
+  },
+  "runtime_entrypoints": [
+    {
+      "file": "web/src/index.js",
+      "role": "server_bootstrap",
+      "status": "ACTIVE",
+      "evidence": "mounts installStripeWebhook(app)"
+    },
+    {
+      "file": "staffordos/operator_daemon/persistent_operator_v1.mjs",
+      "role": "daemon_loop",
+      "status": "ACTIVE",
+      "evidence": "calls system_truth_sync_agent_v1.mjs each loop"
+    },
+    {
+      "file": "staffordos/agents/system_truth_sync_agent_v1.mjs",
+      "role": "runtime_sync_agent",
+      "status": "ACTIVE",
+      "evidence": "executes node staffordos/agents/run_agent_v1.mjs revenue_agent_v1"
+    },
+    {
+      "file": "web/src/routes/stripeWebhook.esm.js",
+      "role": "webhook",
+      "status": "ACTIVE",
+      "evidence": "verified checkout.session.completed path calls recordStripePaymentPropagation()"
+    }
+  ],
+  "targets": {
+    "next_action_engine_v1": {
+      "file": "staffordos/clients/next_action_engine_v1.mjs",
+      "invoked_by": [],
+      "status": "DEAD_CODE",
+      "proof": "repo-wide search found no live runtime caller; only manifests, audits, and inventories reference it",
+      "business_dependency": "deal_won -> fix_in_progress -> fix_completed"
+    },
+    "close_engine_v1": {
+      "file": "staffordos/clients/close_engine_v1.mjs",
+      "invoked_by": [],
+      "status": "DEAD_CODE",
+      "proof": "repo-wide search found no live runtime caller; only self-contained script and audits reference it",
+      "business_dependency": "proposal_sent follow-up automation"
+    },
+    "promote_leads_to_clients_v1": {
+      "file": "staffordos/clients/promote_leads_to_clients_v1.mjs",
+      "invoked_by": [],
+      "status": "UNPROVEN",
+      "proof": "standalone script exists and can write the registry, but no active runtime entrypoint was proven to call it",
+      "business_dependency": "lead -> client promotion"
+    },
+    "build_operator_dashboard_snapshot_v1": {
+      "file": "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs",
+      "invoked_by": [
+        "staffordos/revenue/revenue_agent_v1.mjs",
+        "staffordos/clients/promote_leads_to_clients_v1.mjs"
+      ],
+      "status": "PROVEN",
+      "proof": "revenue_agent_v1 calls buildOperatorDashboardSnapshot() during live payment propagation",
+      "business_dependency": "dashboard truth"
+    },
+    "revenue_agent_v1": {
+      "file": "staffordos/revenue/revenue_agent_v1.mjs",
+      "invoked_by": [
+        "web/src/routes/stripeWebhook.esm.js",
+        "staffordos/agents/system_truth_sync_agent_v1.mjs"
+      ],
+      "status": "PROVEN",
+      "proof": "live webhook path and runtime sync path both invoke revenue_agent_v1",
+      "business_dependency": "payment propagation to client registry, revenue truth, dashboard"
+    }
+  },
+  "invocation_paths": [
+    {
+      "from": "web/src/index.js",
+      "to": "web/src/routes/stripeWebhook.esm.js",
+      "type": "direct_mount",
+      "classification": "PROVEN"
+    },
+    {
+      "from": "web/src/routes/stripeWebhook.esm.js",
+      "to": "staffordos/revenue/revenue_agent_v1.mjs",
+      "type": "direct_import_and_call",
+      "classification": "PROVEN"
+    },
+    {
+      "from": "staffordos/revenue/revenue_agent_v1.mjs",
+      "to": "staffordos/clients/client_registry_v1.mjs",
+      "type": "direct_function_call",
+      "classification": "PROVEN"
+    },
+    {
+      "from": "staffordos/revenue/revenue_agent_v1.mjs",
+      "to": "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs",
+      "type": "direct_function_call",
+      "classification": "PROVEN"
+    },
+    {
+      "from": "staffordos/operator_daemon/persistent_operator_v1.mjs",
+      "to": "staffordos/agents/system_truth_sync_agent_v1.mjs",
+      "type": "loop_safeRun",
+      "classification": "PROVEN"
+    },
+    {
+      "from": "staffordos/agents/system_truth_sync_agent_v1.mjs",
+      "to": "staffordos/agents/run_agent_v1.mjs revenue_agent_v1",
+      "type": "shell_exec",
+      "classification": "PROVEN"
+    },
+    {
+      "from": "staffordos/agents/run_agent_v1.mjs",
+      "to": "staffordos/revenue/revenue_agent_v1.mjs",
+      "type": "agent_registry_spawn",
+      "classification": "PROVEN"
+    },
+    {
+      "from": "any_active_runtime_entrypoint",
+      "to": "staffordos/clients/next_action_engine_v1.mjs",
+      "type": "runtime_call",
+      "classification": "BROKEN"
+    },
+    {
+      "from": "any_active_runtime_entrypoint",
+      "to": "staffordos/clients/close_engine_v1.mjs",
+      "type": "runtime_call",
+      "classification": "BROKEN"
+    }
+  ],
+  "counts": {
+    "invocation_paths_total": 9,
+    "active_entrypoints": 4,
+    "dead_code_candidates": 2,
+    "proven_paths": 7,
+    "partially_proven_paths": 0,
+    "unproven_paths": 0,
+    "broken_paths": 2
+  }
+}

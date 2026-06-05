@@ -1,0 +1,63 @@
+{
+  "artifact": "lifecycle_transition_verification_v1",
+  "generated_at": "2026-06-04T00:00:00.000Z",
+  "verdict": "YES",
+  "lifecycle_transition": {
+    "from": "proposal_sent",
+    "to": "deal_won"
+  },
+  "answers": {
+    "deal_payment_status_writer": {
+      "file": "staffordos/clients/client_registry_v1.mjs",
+      "function": "recordVerifiedStripePayment",
+      "classification": "PROVEN"
+    },
+    "next_action_engine_runtime_process": {
+      "file": "staffordos/clients/next_action_engine_v1.mjs",
+      "classification": "BROKEN",
+      "detail": "No live runtime caller found in current repository execution chain"
+    },
+    "next_action_engine_mutation": {
+      "file": "staffordos/clients/next_action_engine_v1.mjs",
+      "classification": "PROVEN",
+      "detail": "Reads and rewrites client_registry_v1.json"
+    },
+    "persisted_deal_won_writer": {
+      "file": "staffordos/clients/client_registry_v1.mjs",
+      "classification": "PROVEN",
+      "detail": "upsertClient writes lifecycle.stage = deal_won and deal.payment_status = paid"
+    },
+    "real_stripe_payment_to_persisted_deal_won": {
+      "classification": "PROVEN",
+      "detail": "Verified Stripe webhook path can persist deal_won without manual registry editing"
+    }
+  },
+  "exact_writer_chain": [
+    "web/src/routes/stripeWebhook.esm.js",
+    "web/src/lib/packetRepository.js",
+    "staffordos/revenue/revenue_agent_v1.mjs",
+    "staffordos/clients/client_registry_v1.mjs",
+    "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs"
+  ],
+  "exact_reader_chain": [
+    "web/src/routes/stripeWebhook.esm.js",
+    "staffordos/revenue/revenue_agent_v1.mjs",
+    "staffordos/ui/operator-frontend/app/api/operator/client-registry/route.ts",
+    "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts"
+  ],
+  "authority_owner": [
+    "staffordos/clients/client_registry_v1.mjs",
+    "staffordos/revenue/revenue_agent_v1.mjs"
+  ],
+  "first_runtime_location_proposal_to_deal_won": "staffordos/clients/client_registry_v1.mjs",
+  "first_runtime_location_truth_stops": "No stop proven in the verified Stripe payment propagation chain; the alternate next_action_engine path is not proven live",
+  "highest_risk_remaining_gap": "next_action_engine_v1.mjs mutates client_registry_v1.json but has no proven live runtime caller",
+  "next_verifiable_question": "Does any active runtime entrypoint invoke staffordos/clients/next_action_engine_v1.mjs?",
+  "classification": {
+    "deal.payment_status_paid_writer": "PROVEN",
+    "next_action_engine_runtime_process": "BROKEN",
+    "next_action_engine_mutates_registry": "PROVEN",
+    "writer_persists_deal_won": "PROVEN",
+    "verified_stripe_payment_to_deal_won_without_manual_intervention": "PROVEN"
+  }
+}

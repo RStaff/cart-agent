@@ -1,0 +1,171 @@
+{
+  "schema": "staffordos.fulfillment_engine_authority_review.v1",
+  "generated_at": "2026-06-04T00:00:00.000Z",
+  "direct_answers": {
+    "is_next_action_engine_the_fulfillment_engine": false,
+    "owner_for_deal_won_to_fix_in_progress": "none_proven_live",
+    "owner_for_fix_in_progress_to_fix_completed": "none_proven_live",
+    "owner_for_proof_package_creation": "none_proven_live",
+    "existing_fulfillment_orchestrator": false,
+    "should_fulfillment_be_packet_driven": true
+  },
+  "authority_basis": [
+    "current_north_star_v1",
+    "current_roadmap_lock_v1",
+    "staffordos_business_core_definition_of_done_v1",
+    "staffordos_canonical_lifecycle_v1",
+    "shopifixer_fulfillment_authority_v1",
+    "shopifixer_fulfillment_packet_template_v1"
+  ],
+  "candidate_matrix": [
+    {
+      "component": "staffordos/clients/next_action_engine_v1.mjs",
+      "primary_role": "registry_writer",
+      "classifications": [
+        "REGISTRY_WRITER",
+        "DEAD_CODE_CANDIDATE",
+        "NOT_FULFILLMENT_ENGINE"
+      ],
+      "evidence": [
+        "contains lifecycle transition code",
+        "writes client_registry_v1.json",
+        "no proven active runtime caller"
+      ]
+    },
+    {
+      "component": "staffordos/clients/close_engine_v1.mjs",
+      "primary_role": "registry_writer",
+      "classifications": [
+        "REGISTRY_WRITER",
+        "DEAD_CODE_CANDIDATE",
+        "NOT_FULFILLMENT_ENGINE"
+      ],
+      "evidence": [
+        "writes follow-up metadata to client_registry_v1.json",
+        "no proven active runtime caller"
+      ]
+    },
+    {
+      "component": "staffordos/clients/client_registry_v1.mjs",
+      "primary_role": "canonical_client_truth_writer",
+      "classifications": [
+        "REGISTRY_WRITER",
+        "SUPPORTING_UTILITY",
+        "NOT_FULFILLMENT_ENGINE"
+      ],
+      "evidence": [
+        "owns registry persistence",
+        "records verified Stripe payment truth",
+        "does not own end-to-end fulfillment execution"
+      ]
+    },
+    {
+      "component": "staffordos/optimization/executionPacketGenerator.js",
+      "primary_role": "packet_builder",
+      "classifications": [
+        "PACKET_BUILDER",
+        "SUPPORTING_UTILITY",
+        "NOT_FULFILLMENT_ENGINE"
+      ],
+      "evidence": [
+        "builds execution packet objects from templates"
+      ]
+    },
+    {
+      "component": "staffordos/optimization/executionPacketRepository.js",
+      "primary_role": "execution_packet_registry",
+      "classifications": [
+        "REGISTRY_WRITER",
+        "SUPPORTING_UTILITY",
+        "NOT_FULFILLMENT_ENGINE"
+      ],
+      "evidence": [
+        "creates and updates execution packet records"
+      ]
+    },
+    {
+      "component": "staffordos/optimization/persistExecutionPacket.js",
+      "primary_role": "packet_persistence_wrapper",
+      "classifications": [
+        "PACKET_BUILDER",
+        "SUPPORTING_UTILITY"
+      ],
+      "evidence": [
+        "wraps createExecutionPacket"
+      ]
+    },
+    {
+      "component": "staffordos/optimization/packetTemplates.js",
+      "primary_role": "template_library",
+      "classifications": [
+        "SUPPORTING_UTILITY",
+        "NOT_FULFILLMENT_ENGINE"
+      ],
+      "evidence": [
+        "static templates only"
+      ]
+    },
+    {
+      "component": "staffordos/operator_daemon/*.mjs",
+      "primary_role": "runtime_orchestrator",
+      "classifications": [
+        "RUNTIME_ORCHESTRATOR",
+        "SUPPORTING_UTILITY"
+      ],
+      "evidence": [
+        "persistent operator and task resolver are active runtime helpers",
+        "no proven fulfillment engine invocation"
+      ]
+    },
+    {
+      "component": "staffordos/agents/*.mjs",
+      "primary_role": "runtime_orchestrator",
+      "classifications": [
+        "RUNTIME_ORCHESTRATOR",
+        "SUPPORTING_UTILITY"
+      ],
+      "evidence": [
+        "system_truth_sync_agent_v1 and run_agent_v1 are active runtime helpers",
+        "no proven fulfillment engine invocation"
+      ]
+    },
+    {
+      "component": "staffordos/units/lock_schema_foundation_v1.mjs",
+      "primary_role": "delivery_unit_model",
+      "classifications": [
+        "SUPPORTING_UTILITY",
+        "NOT_FULFILLMENT_ENGINE"
+      ],
+      "evidence": [
+        "creates opportunity / issue / delivery / action / confidence gate artifacts",
+        "models proof gating but is not a live fulfillment runner"
+      ]
+    },
+    {
+      "component": "staffordos/packets/*.json",
+      "primary_role": "runtime_data",
+      "classifications": [
+        "SUPPORTING_UTILITY"
+      ],
+      "evidence": [
+        "data artifacts only"
+      ]
+    },
+    {
+      "component": "CEO Cockpit / dashboard readers",
+      "primary_role": "dashboard_reader",
+      "classifications": [
+        "DASHBOARD_READER",
+        "NOT_FULFILLMENT_ENGINE"
+      ],
+      "evidence": [
+        "read client registry and dashboard snapshot",
+        "do not mutate fulfillment state"
+      ]
+    }
+  ],
+  "runtime_ownership_gap": "No proven live runtime component owns the paid ShopiFixer fulfillment chain from deal_won through review/referral readiness.",
+  "narrowest_safe_runtime_repair_candidate": "Connect a proven active runtime entrypoint to the existing fulfillment transition logic rather than inventing a new lifecycle system.",
+  "safe_to_claim_fulfillment_automation": false
+}
+
