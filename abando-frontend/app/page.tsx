@@ -27,5 +27,5 @@ export default async function RootPage({ searchParams }: Props) {
     redirect(`/embedded${toQuery(params)}`);
   }
 
-  return <MarketingLandingPage shop={shop} />;
+  return <MarketingLandingPage shop={shop} parentBrand="StaffordMedia" />;
 }

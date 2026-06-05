@@ -7,87 +7,57 @@ import CenteredContainer from "@/components/layout/CenteredContainer";
 
 type MarketingLandingPageProps = {
   shop?: string;
+  parentBrand?: string;
 };
 
-export function MarketingLandingPage({ shop = "" }: MarketingLandingPageProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const normalizedShop = String(shop || "").trim().toLowerCase();
-
-  async function handlePrimaryCta() {
-    if (!normalizedShop || isSubmitting) {
-      window.alert("Add ?shop=your-store.myshopify.com to test recovery");
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const response = await fetch("/api/abando/activation/trigger-test-recovery", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ shop: normalizedShop }),
-      });
-
-      if (!response.ok) {
-        throw new Error("recovery_trigger_failed");
-      }
-
-      window.location.href = `/merchant?shop=${encodeURIComponent(normalizedShop)}`;
-    } catch {
-      window.alert("Recovery test could not start right now.");
-      setIsSubmitting(false);
-    }
-  }
-
+export function MarketingLandingPage({ shop = "", parentBrand = "StaffordMedia" }: MarketingLandingPageProps) {
   return (
     <CenteredContainer>
       <PublicHeader shop={shop} />
 
       <section className="rounded-2xl border border-cyan-400/15 bg-[radial-gradient(circle_at_top_right,_rgba(34,211,238,0.16),_transparent_28%),linear-gradient(135deg,_#0f172a_0%,_#0b1f2d_55%,_#10283a_100%)] p-6">
         <div className="inline-flex items-center rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-100">
-          Recovery loop for Shopify
+          {parentBrand} presents ShopiFixer
         </div>
         <h1 className="mt-5 text-4xl font-semibold tracking-tight text-white">
-          Trigger a recovery test and watch the loop complete.
+          ShopiFixer Fix Sprint · $950 flat fee
         </h1>
         <p className="mt-4 text-base leading-7 text-slate-300">
-          Start with a real recovery, bring a shopper back through the live path, and land on your merchant page with visible activity.
+          Start with one visible Shopify conversion issue, get the before/after proof package, and move into a scoped fix sprint with the existing secure checkout path.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={handlePrimaryCta}
-            disabled={!normalizedShop || isSubmitting}
-            className="inline-flex h-12 items-center justify-center rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 px-5 font-semibold text-white transition-transform duration-150 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
+          <Link
+            href="/shopifixer"
+            className="inline-flex h-12 items-center justify-center rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 px-5 font-semibold text-white transition-transform duration-150 active:scale-[0.98]"
           >
-            {isSubmitting ? "Starting recovery..." : "Make your first recovery"}
-          </button>
+            Start the ShopiFixer Fix Sprint
+          </Link>
           <Link
             href="/install/shopify"
             className="inline-flex h-12 items-center justify-center rounded-lg border border-white/10 bg-[#020617] px-5 font-semibold text-slate-200 transition hover:border-cyan-300 hover:text-cyan-200"
           >
-            Install on Shopify
+            Use Abando recovery later
           </Link>
         </div>
-        <p className="mt-4 text-sm text-slate-400">No audit step. No scorecard step. Go straight into the live recovery loop.</p>
+        <p className="mt-4 text-sm text-slate-400">ShopiFixer is the first commercial answer. Abando remains available as the secondary recovery product.</p>
       </section>
 
       <section className="rounded-xl bg-[#0f172a] p-5">
-        <h2 className="text-2xl font-semibold tracking-tight text-white">How Abando works</h2>
+        <h2 className="text-2xl font-semibold tracking-tight text-white">How ShopiFixer works</h2>
         <div className="mt-4 space-y-3 text-sm leading-7 text-slate-300">
-          <div>1. Start a recovery test for your store.</div>
-          <div>2. Abando sends the recovery through the live path and tracks the return.</div>
-          <div>3. Land on your merchant page and see the recovery activity.</div>
+          <div>1. Start with the ShopiFixer offer and the single issue to fix.</div>
+          <div>2. Review the audit result and before/after proof.</div>
+          <div>3. Continue to pricing, checkout, and the existing payment path.</div>
         </div>
       </section>
 
       <section className="rounded-xl bg-[#0f172a] p-5">
-        <h2 className="text-2xl font-semibold tracking-tight text-white">Why merchants use it</h2>
+        <h2 className="text-2xl font-semibold tracking-tight text-white">Why merchants start here</h2>
         <p className="mt-3 text-sm leading-7 text-slate-300">
-          The value moment is simple: recovery goes out, a shopper comes back, and the merchant page shows what changed.
+          The value moment is simple: one visible conversion issue, a scoped fix sprint, and proof of what changed before you choose the next step.
         </p>
         <p className="mt-3 text-sm leading-7 text-slate-400">
-          Abando is strongest when the first action is the real loop, not an audit detour.
+          Abando stays available for merchants who want the recovery product after the ShopiFixer path.
         </p>
       </section>
     </CenteredContainer>
