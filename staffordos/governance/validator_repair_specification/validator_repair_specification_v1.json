@@ -1,0 +1,44 @@
+{
+  "schema": "staffordos.validator_repair_specification.v1",
+  "determination": "READY_FOR_GOVERNED_REPAIR",
+  "repair_scope": "SINGLE_FILE",
+  "repair_risk": "LOW",
+  "exact_file": "staffordos/operator_daemon/post_patch_structural_validator_v1.mjs",
+  "exact_rule": "expected_artifact_task_or_status_present",
+  "artifact_distinction": {
+    "registry_artifacts": [
+      "staffordos/clients/client_registry_v1.json"
+    ],
+    "task_status_execution_artifacts": [
+      "status",
+      "task_type",
+      "execution"
+    ]
+  },
+  "registry_validation_criteria": {
+    "required_top_level_fields": [
+      "schema",
+      "clients",
+      "generated_at",
+      "purpose",
+      "decision_engine"
+    ],
+    "required_client_fields": [
+      "client_id",
+      "lifecycle",
+      "next_action"
+    ]
+  },
+  "task_status_validation_criteria": {
+    "required_any_of": [
+      "status",
+      "task_type",
+      "execution"
+    ]
+  },
+  "safety_assessment": {
+    "can_be_done_without_weakening_governance": true,
+    "allows_next_action_execution": true,
+    "still_rejects_malformed_task_artifacts": true
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "schema": "staffordos.fulfillment_authority_discovery.v2",
+  "generated_at": "2026-06-04T00:00:00.000Z",
+  "summary": {
+    "intended_fulfillment_transition_engine": "staffordos/clients/next_action_engine_v1.mjs",
+    "runtime_proven_full_fulfillment_owner": null,
+    "single_next_implementation_justified_by_governance": "Missing fulfillment handoff that carries a paid client into fix_in_progress and binds the fulfillment packet / proof chain on the existing next_action_execution path."
+  },
+  "answers": {
+    "fulfillment_execution_owner": {
+      "component": "staffordos/clients/next_action_engine_v1.mjs",
+      "classification": "DORMANT_OWNER",
+      "evidence": [
+        "introduced as StaffordOS next action engine v1",
+        "router binding manifest names it next_action_owner",
+        "task resolver binds next_action_execution to node staffordos/clients/next_action_engine_v1.mjs"
+      ]
+    },
+    "writes_fix_in_progress": {
+      "component": "staffordos/clients/next_action_engine_v1.mjs",
+      "classification": "DORMANT_OWNER"
+    },
+    "writes_fix_completed": {
+      "component": "staffordos/clients/next_action_engine_v1.mjs",
+      "classification": "DORMANT_OWNER"
+    },
+    "generates_proof_packages": {
+      "component": "staffordos/proof_loop/merchant_proof_loop_completion_pack_v1.js",
+      "classification": "UNKNOWN",
+      "note": "Concrete proof-loop generator exists, but it is Abando-oriented and not proven as the ShopiFixer paid-sprint proof generator."
+    },
+    "triggers_review_requests": {
+      "component": null,
+      "classification": "UNKNOWN"
+    },
+    "triggers_referral_requests": {
+      "component": null,
+      "classification": "UNKNOWN"
+    },
+    "runtime_proven_components": [
+      "staffordos/operator_daemon/task_command_resolver_v1.mjs",
+      "staffordos/operator_daemon/run_task_with_commit_gate_v1.sh",
+      "staffordos/execution/run_agent_loop.mjs",
+      "staffordos/revenue/revenue_agent_v1.mjs",
+      "staffordos/clients/next_action_engine_v1.mjs"
+    ],
+    "dormant_components": [
+      "staffordos/clients/next_action_engine_v1.mjs",
+      "staffordos/proof_loop/merchant_proof_loop_completion_pack_v1.js"
+    ],
+    "dead_components": [
+      "staffordos/clients/close_engine_v1.mjs"
+    ]
+  },
+  "final_answers": {
+    "who_owns_fulfillment": "Intended: staffordos/clients/next_action_engine_v1.mjs; runtime-proven full owner: none yet",
+    "what_writes_fix_in_progress": "staffordos/clients/next_action_engine_v1.mjs",
+    "what_writes_fix_completed": "staffordos/clients/next_action_engine_v1.mjs",
+    "what_generates_proof": "No proven ShopiFixer runtime owner; closest proof-loop generator is staffordos/proof_loop/merchant_proof_loop_completion_pack_v1.js",
+    "what_triggers_review_referral": null,
+    "is_there_an_intended_orchestrator": true
+  }
+}

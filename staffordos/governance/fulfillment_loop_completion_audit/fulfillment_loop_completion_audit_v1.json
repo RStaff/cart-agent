@@ -1,0 +1,106 @@
+{
+  "schema": "staffordos.fulfillment_loop_completion_audit.v1",
+  "generated_at": "2026-06-04T00:00:00.000Z",
+  "assumptions": {
+    "validator_repair_succeeds": true,
+    "no_source_files_modified": true,
+    "no_repair_applied": true
+  },
+  "overall_conclusion": {
+    "validator_repair_is_final_blocker": false,
+    "end_to_end_fulfillment_is_proven": false,
+    "implementation_authorized_after_validator_repair": false
+  },
+  "direct_answers": {
+    "deal_won_to_fix_in_progress_after_validator_repair": {
+      "answer": false,
+      "classification": "BROKEN",
+      "evidence": [
+        "next_action_engine_v1.mjs contains no branch that writes fix_in_progress",
+        "no runtime writer for shopifixer.fix_status = in_progress was proven"
+      ]
+    },
+    "fix_in_progress_to_fix_completed_after_validator_repair": {
+      "answer": "partially",
+      "classification": "PARTIALLY_PROVEN",
+      "evidence": [
+        "next_action_engine_v1.mjs has a fix_completed branch in code",
+        "no runtime writer proved the prerequisite fulfillment state"
+      ]
+    },
+    "proof_package_generation_runtime_proven": {
+      "answer": false,
+      "classification": "UNPROVEN"
+    },
+    "qa_approval_runtime_proven": {
+      "answer": false,
+      "classification": "UNPROVEN"
+    },
+    "review_request_generation_runtime_proven": {
+      "answer": false,
+      "classification": "UNPROVEN"
+    },
+    "referral_request_generation_runtime_proven": {
+      "answer": false,
+      "classification": "UNPROVEN"
+    },
+    "fulfillment_completion_artifact": {
+      "answer": "ShopiFixer fulfillment packet JSON with execution_status=complete, proof_status=complete, completion_status=complete",
+      "classification": "UNPROVEN"
+    },
+    "proof_completion_artifact": {
+      "answer": "ShopiFixer fulfillment packet JSON with proof_status=complete and merchant-facing proof package populated",
+      "classification": "UNPROVEN"
+    },
+    "review_completion_artifact": {
+      "answer": null,
+      "classification": "UNPROVEN"
+    },
+    "referral_completion_artifact": {
+      "answer": null,
+      "classification": "UNPROVEN"
+    },
+    "entire_lifecycle_end_to_end_after_validator_repair": {
+      "answer": false,
+      "classification": "BROKEN"
+    }
+  },
+  "hop_matrix": [
+    {
+      "hop": "payment -> deal_won",
+      "classification": "PROVEN"
+    },
+    {
+      "hop": "deal_won -> fix_in_progress",
+      "classification": "BROKEN"
+    },
+    {
+      "hop": "fix_in_progress -> fix_completed",
+      "classification": "PARTIALLY_PROVEN"
+    },
+    {
+      "hop": "proof-package generation",
+      "classification": "UNPROVEN"
+    },
+    {
+      "hop": "QA approval",
+      "classification": "UNPROVEN"
+    },
+    {
+      "hop": "review-request generation",
+      "classification": "UNPROVEN"
+    },
+    {
+      "hop": "referral-request generation",
+      "classification": "UNPROVEN"
+    }
+  ],
+  "blocked_by": [
+    "no runtime writer for deal_won -> fix_in_progress",
+    "no proven runtime owner for proof-package generation",
+    "no proven runtime owner for QA approval",
+    "no proven runtime owner for review-request generation",
+    "no proven runtime owner for referral-request generation"
+  ],
+  "recommended_next_verifiable_question": "Which runtime file, if any, writes shopifixer.fix_status = in_progress for a paid client after next_action_engine_v1.mjs runs?"
+}

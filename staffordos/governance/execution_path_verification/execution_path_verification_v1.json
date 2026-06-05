@@ -1,0 +1,55 @@
+{
+  "schema": "staffordos.execution_path_verification.v1",
+  "final_determination": "SECONDARY_BLOCKER_EXISTS",
+  "execution_classification": "PROVEN_READY",
+  "resolver_binding": "next_action_execution -> node staffordos/clients/next_action_engine_v1.mjs",
+  "runtime_entrypoint": "staffordos/operator_daemon/run_task_with_commit_gate_v1.sh",
+  "exact_runtime_artifact": "staffordos/clients/client_registry_v1.json",
+  "execution_result": {
+    "reached_engine": true,
+    "engine_read_client_registry": true,
+    "engine_mutated_lifecycle_state": true,
+    "gate_completed_successfully": false
+  },
+  "stages": [
+    {
+      "stage": "resolver_binding",
+      "classification": "PROVEN_READY"
+    },
+    {
+      "stage": "approval_layer",
+      "classification": "PROVEN_READY"
+    },
+    {
+      "stage": "packet_requirement",
+      "classification": "PROVEN_READY"
+    },
+    {
+      "stage": "schema_requirement",
+      "classification": "PROVEN_BLOCKED"
+    },
+    {
+      "stage": "execution_launch",
+      "classification": "PROVEN_READY"
+    },
+    {
+      "stage": "engine_input_contract",
+      "classification": "PROVEN_READY"
+    },
+    {
+      "stage": "registry_mutation",
+      "classification": "PROVEN_READY"
+    }
+  ],
+  "exact_remaining_blocker": {
+    "file": "staffordos/operator_daemon/post_patch_structural_validator_v1.mjs",
+    "runtime_boundary": "expected_artifact_task_or_status_present",
+    "reason": "The expected artifact is client_registry_v1.json, which is not a task/status-shaped artifact."
+  },
+  "final_answers": {
+    "resolver_binding_fixed": true,
+    "fulfillment_execution_runnable": true,
+    "single_next_blocker": "post_patch_structural_validator_v1.mjs expected_artifact_task_or_status_present",
+    "implementation_authorized": false
+  }
+}

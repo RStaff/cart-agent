@@ -1,0 +1,34 @@
+{
+  "schema": "staffordos.validator_rule_audit.v1",
+  "classification": "PARTIALLY_VALID_RULE",
+  "validator_file": "staffordos/operator_daemon/post_patch_structural_validator_v1.mjs",
+  "failing_rule": "expected_artifact_task_or_status_present",
+  "evaluated_condition": "Boolean(artifact?.status || artifact?.task_type || artifact?.execution)",
+  "expected_artifact": "staffordos/clients/client_registry_v1.json",
+  "actual_runtime_keys": [
+    "clients",
+    "decision_engine",
+    "generated_at",
+    "operating_model",
+    "purpose",
+    "schema"
+  ],
+  "runtime_evaluation": {
+    "status": "false",
+    "status_field_present": false,
+    "task_type_field_present": false,
+    "execution_field_present": false
+  },
+  "governance_assessment": {
+    "currently_governed_requirement": true,
+    "no_longer_exists_for_this_path": true,
+    "protects_real_risk": true,
+    "written_before_next_action_engine": false
+  },
+  "final_answers": {
+    "validator_correct": "partially",
+    "validator_stale": "partially",
+    "protecting_real_risk": true,
+    "recommended_action": "repair"
+  }
+}
