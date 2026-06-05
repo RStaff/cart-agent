@@ -1,0 +1,26 @@
+{
+  "schema": "staffordos.execution_capability_verification.v1",
+  "final_determination": "NOT_READY_FOR_REPAIR",
+  "execution_classification": "EXECUTION_UNBOUND",
+  "exact_runtime_entrypoint": "staffordos/operator_daemon/run_task_with_commit_gate_v1.sh",
+  "exact_task_mapping": null,
+  "exact_execution_artifact": "staffordos/clients/client_registry_v1.json",
+  "exact_remaining_blocker": {
+    "file": "staffordos/operator_daemon/task_command_resolver_v1.mjs",
+    "function": "taskType -> COMMANDS mapping resolution",
+    "reason": "No approved command mapping exists for next_action_engine_v1.mjs"
+  },
+  "answers": {
+    "can_execute_today": false,
+    "required_input": [
+      "task_type mapping in task_command_resolver_v1.mjs to node staffordos/clients/next_action_engine_v1.mjs",
+      "expected_artifact",
+      "commit_message"
+    ],
+    "task_identifier_exists": false,
+    "packet_type_exists": false,
+    "runner_binding_exists": false,
+    "would_succeed_if_called_today": false,
+    "next_breakpoint": "staffordos/operator_daemon/task_command_resolver_v1.mjs unresolved mapping"
+  }
+}

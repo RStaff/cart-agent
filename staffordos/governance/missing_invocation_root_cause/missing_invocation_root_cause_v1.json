@@ -1,0 +1,62 @@
+{
+  "schema": "staffordos.missing_invocation_root_cause.v1",
+  "target_file": "staffordos/clients/next_action_engine_v1.mjs",
+  "final_determination": "INVOCATION_DISCONNECTED",
+  "intended_invoker": {
+    "component": "staffordos/operator_daemon/select_next_task_v1.mjs",
+    "runtime_entrypoint": "staffordos/operator_daemon/run_auto_task_with_commit_gate_v1.sh",
+    "supporting_binding_artifacts": [
+      "staffordos/operator_daemon/write_router_binding_plan_v1.mjs",
+      "staffordos/operator_daemon/write_router_decision_agent_binding_v1.mjs",
+      "staffordos/operator_daemon/output/router_binding_plan_v1.json",
+      "staffordos/operator_daemon/output/router_decision_agent_binding_v1.json"
+    ]
+  },
+  "root_cause": {
+    "exact_breakpoint_file": "staffordos/operator_daemon/select_next_task_v1.mjs",
+    "exact_breakpoint_function": "module top-level task selection logic",
+    "exact_runtime_boundary": "automatic task selection ends before any call into next_action_engine_v1.mjs",
+    "why_it_breaks": "The active selector chooses merchant_registry_build / send_readiness_gate / send_preview and never invokes or reads next_action_engine_v1.mjs."
+  },
+  "status_findings": [
+    {
+      "finding": "next_action_owner binding exists",
+      "classification": "HISTORICAL_INTENT",
+      "evidence": "router_decision_agent_binding_v1.mjs and its JSON output name next_action_engine_v1.mjs as next_action_owner"
+    },
+    {
+      "finding": "active runtime selector exists",
+      "classification": "PROVEN_RUNTIME_PATH",
+      "evidence": "run_auto_task_with_commit_gate_v1.sh invokes select_next_task_v1.mjs"
+    },
+    {
+      "finding": "next_action_engine invocation missing",
+      "classification": "DISCONNECTED_RUNTIME_PATH",
+      "evidence": "No active runtime entrypoint imports, shells, or otherwise executes next_action_engine_v1.mjs"
+    },
+    {
+      "finding": "binding plan references next_action_engine as candidate upstream input",
+      "classification": "PARTIAL_INTEGRATION",
+      "evidence": "write_router_binding_plan_v1.mjs lists next_action_engine_v1.mjs among task selection candidates"
+    },
+    {
+      "finding": "no live worker found for the binding",
+      "classification": "DEAD_REFERENCE",
+      "evidence": "Runtime traces found no live caller for next_action_engine_v1.mjs"
+    }
+  ],
+  "answers": {
+    "supposed_invoker": "staffordos/operator_daemon/select_next_task_v1.mjs",
+    "invocation_implemented": false,
+    "invocation_removed": false,
+    "invocation_renamed": false,
+    "invocation_replaced": false,
+    "partially_completed_integration": true,
+    "abandoned_implementation": true,
+    "runtime_registration_without_execution": true,
+    "scheduler_without_worker": true,
+    "first_breakpoint_file": "staffordos/operator_daemon/select_next_task_v1.mjs",
+    "first_breakpoint_function": "module top-level task selection logic",
+    "implementation_blocked": true
+  }
+}

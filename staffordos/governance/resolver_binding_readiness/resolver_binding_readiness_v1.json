@@ -1,0 +1,69 @@
+{
+  "schema": "staffordos.resolver_binding_readiness.v1",
+  "final_determination": "RESOLVER_IS_FINAL_BLOCKER",
+  "execution_prediction": {
+    "resolver_mapping_exists": false,
+    "gate_can_run_mapped_command": true,
+    "engine_self_input_contract_ok": true,
+    "registry_mutation_possible": true,
+    "secondary_blocker_exists": false
+  },
+  "exact_commands_pattern_required": {
+    "shape": [
+      "task_type",
+      "command",
+      "approval_level",
+      "execution_class",
+      "system",
+      "revenue_action",
+      "reason"
+    ],
+    "recommended_entry": {
+      "task_type": "next_action_execution",
+      "command": "node staffordos/clients/next_action_engine_v1.mjs",
+      "approval_level": "operator_safe",
+      "execution_class": "fulfillment_transition",
+      "system": "staffordos",
+      "revenue_action": false,
+      "reason": "Execute lifecycle transitions for paid clients through next_action_engine_v1.mjs."
+    }
+  },
+  "exact_task_payload": {
+    "task_type": "next_action_execution",
+    "expected_artifact": "staffordos/clients/client_registry_v1.json",
+    "commit_message": "run next action engine through gated StaffordOS runner"
+  },
+  "exact_runtime_artifact": "staffordos/clients/client_registry_v1.json",
+  "stages": [
+    {
+      "stage": "resolver_mapping",
+      "classification": "PROVEN_BLOCKED"
+    },
+    {
+      "stage": "gate_validation",
+      "classification": "CONDITIONAL_READY"
+    },
+    {
+      "stage": "execution_launch",
+      "classification": "CONDITIONAL_READY"
+    },
+    {
+      "stage": "engine_input_contract",
+      "classification": "PROVEN_READY"
+    },
+    {
+      "stage": "registry_mutation",
+      "classification": "PROVEN_READY"
+    }
+  ],
+  "answers": {
+    "command_resolution_would_succeed_if_binding_added": true,
+    "gate_validation_would_succeed": true,
+    "execution_would_launch": true,
+    "engine_would_receive_valid_input": true,
+    "registry_mutation_would_succeed": true,
+    "next_runtime_failure_after_resolution": null,
+    "implementation_authorized": false,
+    "exact_secondary_blocker": null
+  }
+}

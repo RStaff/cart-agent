@@ -1,0 +1,132 @@
+{
+  "schema": "staffordos.fulfillment_execution_authority_discovery.v1",
+  "generated_at": "2026-06-04T00:00:00.000Z",
+  "active_runtime_entrypoints": [
+    {
+      "file": "web/src/index.js",
+      "classification": "ACTIVE_RUNTIME_OWNER",
+      "evidence": "mounts installStripeWebhook(app)"
+    },
+    {
+      "file": "web/src/routes/stripeWebhook.esm.js",
+      "classification": "PACKET_ORCHESTRATOR",
+      "evidence": "verified Stripe webhook route calls recordStripePaymentPropagation(...)"
+    },
+    {
+      "file": "staffordos/operator_daemon/persistent_operator_v1.mjs",
+      "classification": "DAEMON",
+      "evidence": "recent heartbeat artifact and loop stages"
+    },
+    {
+      "file": "staffordos/operator_daemon/task_command_resolver_v1.mjs",
+      "classification": "SCHEDULER",
+      "evidence": "resolved command used by daemon loop"
+    },
+    {
+      "file": "staffordos/agents/system_truth_sync_agent_v1.mjs",
+      "classification": "ACTIVE_RUNTIME_WORKER",
+      "evidence": "called by persistent operator; invokes revenue_agent_v1"
+    },
+    {
+      "file": "staffordos/agents/run_agent_v1.mjs",
+      "classification": "QUEUE_PROCESSOR",
+      "evidence": "spawns registered agents and logs execution"
+    },
+    {
+      "file": "staffordos/revenue/revenue_agent_v1.mjs",
+      "classification": "ACTIVE_RUNTIME_OWNER",
+      "evidence": "invoked by webhook and runtime sync; writes client registry, revenue truth, and dashboard snapshot"
+    },
+    {
+      "file": "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs",
+      "classification": "REGISTRY_WRITER",
+      "evidence": "called by revenue propagation"
+    },
+    {
+      "file": "staffordos/clients/client_registry_v1.mjs",
+      "classification": "REGISTRY_WRITER",
+      "evidence": "owns registry persistence and verified payment writeback"
+    },
+    {
+      "file": "staffordos/clients/next_action_engine_v1.mjs",
+      "classification": "DEAD_CODE",
+      "evidence": "standalone executable, no proven active caller"
+    },
+    {
+      "file": "staffordos/clients/close_engine_v1.mjs",
+      "classification": "DEAD_CODE",
+      "evidence": "standalone executable, no proven active caller"
+    }
+  ],
+  "runtime_ownership_candidates": [
+    {
+      "rank": 1,
+      "candidate": "staffordos/revenue/revenue_agent_v1.mjs",
+      "authority_support": "strongest active commercial authority; already owns payment propagation and truth writeback",
+      "runtime_evidence": "live webhook path and system truth sync path invoke it",
+      "ownership_fit": "best existing runtime fit for initiating fulfillment handoff",
+      "governance_risk": "medium",
+      "implementation_risk": "medium"
+    },
+    {
+      "rank": 2,
+      "candidate": "staffordos/operator_daemon/persistent_operator_v1.mjs",
+      "authority_support": "strong operator-control authority",
+      "runtime_evidence": "recent heartbeat proves execution",
+      "ownership_fit": "good top-level orchestrator, but too generic for fulfillment ownership",
+      "governance_risk": "medium_high",
+      "implementation_risk": "medium"
+    },
+    {
+      "rank": 3,
+      "candidate": "staffordos/agents/system_truth_sync_agent_v1.mjs",
+      "authority_support": "runtime truth maintenance",
+      "runtime_evidence": "persistent operator invokes it; it invokes revenue_agent_v1",
+      "ownership_fit": "indirect bridge, not fulfillment authority",
+      "governance_risk": "medium",
+      "implementation_risk": "medium"
+    }
+  ],
+  "answers": {
+    "runtime_processes_execute_today": [
+      "web/src/index.js",
+      "web/src/routes/stripeWebhook.esm.js",
+      "staffordos/operator_daemon/persistent_operator_v1.mjs",
+      "staffordos/operator_daemon/task_command_resolver_v1.mjs",
+      "staffordos/agents/system_truth_sync_agent_v1.mjs",
+      "staffordos/agents/run_agent_v1.mjs",
+      "staffordos/revenue/revenue_agent_v1.mjs",
+      "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs"
+    ],
+    "runtime_processes_execute_automatically": [
+      "web/src/routes/stripeWebhook.esm.js on Stripe event delivery",
+      "staffordos/operator_daemon/persistent_operator_v1.mjs loop",
+      "staffordos/agents/system_truth_sync_agent_v1.mjs via daemon sync path",
+      "staffordos/agents/run_agent_v1.mjs as agent launcher"
+    ],
+    "runtime_processes_mutate_registries": [
+      "staffordos/clients/client_registry_v1.mjs",
+      "staffordos/revenue/revenue_agent_v1.mjs",
+      "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs"
+    ],
+    "runtime_processes_mutate_packets": [
+      "web/src/routes/stripeWebhook.esm.js",
+      "web/src/lib/packetRepository.js",
+      "staffordos/optimization/executionPacketRepository.js"
+    ],
+    "commercial_event_triggered_processes": [
+      "web/src/routes/stripeWebhook.esm.js",
+      "staffordos/revenue/revenue_agent_v1.mjs"
+    ]
+  },
+  "direct_answers": {
+    "closest_runtime_process_to_fulfillment_ownership": "staffordos/revenue/revenue_agent_v1.mjs",
+    "existing_packet_orchestrator_that_should_own_fulfillment": false,
+    "existing_operator_daemon_that_should_own_fulfillment": "staffordos/operator_daemon/persistent_operator_v1.mjs",
+    "existing_queue_processor_that_should_own_fulfillment": false,
+    "canonical_fulfillment_authority_candidate": "staffordos/revenue/revenue_agent_v1.mjs",
+    "smallest_governed_repair_candidate": "Attach fulfillment initiation to the already-active commercial propagation path rooted at staffordos/revenue/revenue_agent_v1.mjs.",
+    "implementation_safe": false
+  }
+}
+

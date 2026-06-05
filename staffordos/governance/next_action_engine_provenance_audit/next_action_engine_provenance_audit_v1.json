@@ -1,0 +1,71 @@
+{
+  "schema": "staffordos.next_action_engine_provenance_audit.v1",
+  "file": "staffordos/clients/next_action_engine_v1.mjs",
+  "provenance_classification": "DORMANT_INTENDED_AUTHORITY",
+  "first_appeared_commit": {
+    "sha": "95438db81c21b8b24daac781dad344eee9302e26",
+    "message": "add StaffordOS next action engine v1",
+    "date": "2026-05-03T18:58:23-04:00"
+  },
+  "later_relevant_commits": [
+    {
+      "sha": "ca4e0e9e4ac85d27967679ec52ea69ec7a574671",
+      "message": "fix next action engine revenue proof precedence",
+      "date": null,
+      "effect": "reordered revenue-proof precedence in the lifecycle decision chain"
+    },
+    {
+      "sha": "7dd25287",
+      "message": "add client priority scoring and blocker detection",
+      "date": null,
+      "effect": "added scoring, blockers, and richer decision trace metadata"
+    }
+  ],
+  "intended_role": {
+    "owns_fulfillment": true,
+    "owns_lifecycle_transitions": true,
+    "owns_registry_writeback": true,
+    "evidence": [
+      "initial commit created deterministic lifecycle and next-action derivation",
+      "code contains deal_won and fix_completed transition logic",
+      "later commit refined revenue proof precedence",
+      "later commit added scoring/blocker metadata"
+    ]
+  },
+  "runtime_status": {
+    "ever_active": false,
+    "proven_live_invocation": false,
+    "active_runtime_caller_found": false,
+    "current_runtime_chain_includes_file": false
+  },
+  "reference_classes": [
+    {
+      "reference": "staffordos/operator_daemon/write_router_decision_agent_binding_v1.mjs",
+      "classification": "ARCHITECTURAL_REFERENCE"
+    },
+    {
+      "reference": "staffordos/operator_daemon/output/router_decision_agent_binding_v1.json",
+      "classification": "ARCHITECTURAL_REFERENCE"
+    },
+    {
+      "reference": "staffordos/governance/runtime_invocation_trace/runtime_invocation_trace_v1.md",
+      "classification": "HISTORICAL_REFERENCE"
+    },
+    {
+      "reference": "staffordos/governance/lifecycle_transition_verification/lifecycle_transition_verification_v1.md",
+      "classification": "HISTORICAL_REFERENCE"
+    },
+    {
+      "reference": "staffordos/governance/fulfillment_lifecycle_verification/fulfillment_lifecycle_verification_v1.md",
+      "classification": "HISTORICAL_REFERENCE"
+    }
+  ],
+  "final_determination": "DORMANT_INTENDED_AUTHORITY",
+  "answers": {
+    "intended_to_own_fulfillment": true,
+    "ever_runtime_invoked": false,
+    "original_invocation_owner": null,
+    "appears": "dormant_and_disconnected",
+    "implementation_blocked": true
+  }
+}
