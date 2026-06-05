@@ -1,0 +1,138 @@
+{
+  "schema": "staffordos.lifecycle_promotion_authority_audit.v1",
+  "generated_at": "2026-06-04T00:00:00.000Z",
+  "canonical_lifecycle_authority": "staffordos/authority/output/staffordos_canonical_lifecycle_v1.md",
+  "implemented_lifecycle_authority": [
+    "staffordos/clients/next_action_engine_v1.mjs",
+    "staffordos/clients/upgrade_client_registry_operating_model_v1.mjs",
+    "staffordos/clients/client_registry_v1.mjs",
+    "staffordos/ui/operator-frontend/lib/operator/lifecycleTerminology.ts"
+  ],
+  "questions": {
+    "canonical_lifecycle_artifact": "staffordos/authority/output/staffordos_canonical_lifecycle_v1.md",
+    "stage_meanings_artifact": "staffordos/ui/operator-frontend/lib/operator/lifecycleTerminology.ts",
+    "promotion_criteria_artifacts": [
+      "staffordos/authority/output/client_promotion_authority_v1.md",
+      "staffordos/authority/output/product_routing_authority_v1.md",
+      "staffordos/authority/output/shopifixer_audit_authority_v1.md",
+      "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+      "staffordos/authority/output/revenue_success_gate_v1.md"
+    ],
+    "revenue_active_definition_artifact": [
+      "staffordos/clients/next_action_engine_v1.mjs",
+      "staffordos/clients/upgrade_client_registry_operating_model_v1.mjs",
+      "staffordos/ui/operator-frontend/lib/operator/lifecycleTerminology.ts"
+    ],
+    "deal_won_definition_artifacts": [
+      "staffordos/authority/output/s2g_packet_binding_readiness_v1.md",
+      "staffordos/authority/output/s2h_real_payment_readiness_snapshot_v1.md",
+      "staffordos/governance/lifecycle_transition_verification/lifecycle_transition_verification_v1.md"
+    ],
+    "fix_in_progress_definition_artifacts": [
+      "staffordos/authority/output/staffordos_canonical_lifecycle_v1.md",
+      "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md"
+    ],
+    "fix_completed_definition_artifacts": [
+      "staffordos/authority/output/staffordos_canonical_lifecycle_v1.md",
+      "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md"
+    ],
+    "abando_installed_definition_artifacts": [
+      "staffordos/clients/next_action_engine_v1.mjs",
+      "staffordos/clients/upgrade_client_registry_operating_model_v1.mjs",
+      "staffordos/authority/output/product_routing_authority_v1.md"
+    ],
+    "proposal_sent_definition_artifacts": [
+      "staffordos/authority/output/staffordos_canonical_lifecycle_v1.md",
+      "staffordos/authority/output/client_promotion_authority_v1.md",
+      "staffordos/clients/next_action_engine_v1.mjs"
+    ],
+    "audit_completed_definition_artifacts": [
+      "staffordos/authority/output/client_registry_canonical_lifecycle_gap_v1.md",
+      "staffordos/clients/upgrade_client_registry_operating_model_v1.mjs"
+    ]
+  },
+  "implemented_conditions_in_next_action_engine": [
+    "red system health -> blocked monitor",
+    "merchantRevenueRecovered > 0 -> revenue_active",
+    "stage === lead -> lead",
+    "auditStatus === not_started -> audit_requested",
+    "auditStatus === completed && paymentStatus !== paid -> proposal_sent",
+    "paymentStatus === paid && fixStatus === not_started -> deal_won",
+    "fixStatus === completed && !abandoInstalled -> fix_completed",
+    "abandoInstalled && checkoutEvents === 0 -> abando_installed",
+    "abandoInstalled && checkoutEvents > 0 && recoveryActions === 0 -> abando_installed",
+    "otherwise -> followup"
+  ],
+  "transition_classification": [
+    {
+      "transition": "audit_requested",
+      "classification": "PARTIALLY_DEFINED",
+      "authority_support": true,
+      "runtime_support": true
+    },
+    {
+      "transition": "proposal_sent",
+      "classification": "PROVEN_AUTHORIZED",
+      "authority_support": true,
+      "runtime_support": true
+    },
+    {
+      "transition": "deal_won",
+      "classification": "PROVEN_AUTHORIZED",
+      "authority_support": true,
+      "runtime_support": true
+    },
+    {
+      "transition": "fix_in_progress",
+      "classification": "BROKEN",
+      "authority_support": true,
+      "runtime_support": false
+    },
+    {
+      "transition": "fix_completed",
+      "classification": "PARTIALLY_DEFINED",
+      "authority_support": true,
+      "runtime_support": true
+    },
+    {
+      "transition": "abando_installed",
+      "classification": "PARTIALLY_DEFINED",
+      "authority_support": true,
+      "runtime_support": true
+    },
+    {
+      "transition": "revenue_active",
+      "classification": "PROVEN_UNAUTHORIZED",
+      "authority_support": false,
+      "runtime_support": true
+    }
+  ],
+  "cart_agent_dev_truth": {
+    "merchant": "cart-agent-dev.myshopify.com",
+    "current_registry_stage": "revenue_active",
+    "current_deal_payment_status": "not_billable",
+    "current_stafford_revenue_earned": 0,
+    "current_shopifixer_fix_status": "not_started",
+    "abando_merchant_revenue_recovered": 100,
+    "governed_stage_should_be": "proposal_sent",
+    "why": [
+      "not paid",
+      "no ShopiFixer fulfillment started",
+      "no proof package",
+      "revenue_active is being driven by recovered merchant revenue, not ShopiFixer completion"
+    ]
+  },
+  "final_answers": {
+    "canonical_lifecycle_authority": "staffordos/authority/output/staffordos_canonical_lifecycle_v1.md",
+    "implemented_lifecycle_authority": [
+      "staffordos/clients/next_action_engine_v1.mjs",
+      "staffordos/clients/upgrade_client_registry_operating_model_v1.mjs",
+      "staffordos/clients/client_registry_v1.mjs",
+      "staffordos/ui/operator-frontend/lib/operator/lifecycleTerminology.ts"
+    ],
+    "highest_risk_promotion_mismatch": "revenue_active promotion from merchantRevenueRecovered > 0",
+    "revenue_active_authorized": false,
+    "cart_agent_dev_governed_stage": "proposal_sent",
+    "single_next_governance_repair": "Constrain or remove the merchantRevenueRecovered > 0 -> revenue_active promotion so Abando recovery truth cannot override the governed ShopiFixer lifecycle."
+  }
+}

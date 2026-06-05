@@ -1,0 +1,47 @@
+{
+  "audit_name": "final_lifecycle_repair_readiness_v1",
+  "repair_safe": true,
+  "smallest_repair": {
+    "file": "staffordos/clients/next_action_engine_v1.mjs",
+    "line_range": "146-158",
+    "change_type": "remove_or_constrain_branch",
+    "branch": "merchantRevenueRecovered > 0 -> revenue_active"
+  },
+  "downstream_readers": [
+    "staffordos/clients/next_action_engine_v1.mjs",
+    "staffordos/clients/upgrade_client_registry_operating_model_v1.mjs",
+    "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs",
+    "staffordos/ui/operator-frontend/lib/operator/lifecycleTerminology.ts",
+    "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+    "staffordos/ui/operator-frontend/app/api/operator/client-registry/route.ts",
+    "staffordos/clients/client_registry_v1.json",
+    "staffordos/authority/output/current_launch_readiness_score_v1.md",
+    "staffordos/governance/lifecycle_promotion_authority_audit/lifecycle_promotion_authority_audit_v1.md",
+    "staffordos/governance/next_action_engine_conformance_audit/next_action_engine_conformance_audit_v1.md"
+  ],
+  "apis": [
+    "/api/operator/ceo-snapshot",
+    "/api/operator/client-registry"
+  ],
+  "dashboards": [
+    "staffordos/clients/operator_dashboard_snapshot_v1.json",
+    "staffordos/ui/operator-frontend/components/operator/ActionFirstDashboard.tsx",
+    "staffordos/ui/operator-frontend/components/operator/OperatorHomeV1.tsx"
+  ],
+  "reports": [
+    "staffordos/authority/output/current_launch_readiness_score_v1.md",
+    "staffordos/governance/lifecycle_promotion_authority_audit/lifecycle_promotion_authority_audit_v1.md",
+    "staffordos/governance/next_action_engine_conformance_audit/next_action_engine_conformance_audit_v1.md",
+    "staffordos/governance/next_action_engine_provenance_audit/next_action_engine_provenance_audit_v1.md"
+  ],
+  "packet_logic": [],
+  "expected_runtime_outcome": {
+    "revenue_active_removed_as_promotion": true,
+    "current_record_falls_through_to": "audit_requested",
+    "remaining_blockers": [
+      "deal_won_to_fix_in_progress_writer_missing",
+      "proof_generation_unproven",
+      "review_referral_unproven"
+    ]
+  }
+}

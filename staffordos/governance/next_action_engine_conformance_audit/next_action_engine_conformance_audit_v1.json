@@ -1,0 +1,114 @@
+{
+  "audit_name": "next_action_engine_lifecycle_conformance_audit_v1",
+  "source_file": "staffordos/clients/next_action_engine_v1.mjs",
+  "summary": {
+    "total_branches": 10,
+    "stage_setting_branches": 8,
+    "stage_preserving_or_fallback_branches": 2,
+    "authorized_transitions": 3,
+    "unauthorized_transitions": 1,
+    "partially_defined_transitions": 4,
+    "missing_authority_transitions": 1,
+    "broken_paths": 2
+  },
+  "highest_risk_transition": {
+    "condition": "merchantRevenueRecovered > 0",
+    "resulting_lifecycle_stage": "revenue_active",
+    "classification": "PROVEN_UNAUTHORIZED",
+    "reason": "Not present in canonical ShopiFixer lifecycle; Abando merchant revenue is not ShopiFixer lifecycle authority."
+  },
+  "transitions": [
+    {
+      "id": "red_health_preserve",
+      "condition": "redHealth.length > 0",
+      "source_location": "staffordos/clients/next_action_engine_v1.mjs:131-143",
+      "resulting_lifecycle_stage": "preserve current stage",
+      "authority_source": "operational health guard only",
+      "classification": "BROKEN",
+      "notes": "This is not a lifecycle advance."
+    },
+    {
+      "id": "merchant_revenue_to_revenue_active",
+      "condition": "merchantRevenueRecovered > 0",
+      "source_location": "staffordos/clients/next_action_engine_v1.mjs:146-158",
+      "resulting_lifecycle_stage": "revenue_active",
+      "authority_source": "upgrade_client_registry_operating_model_v1.mjs; lifecycle terminology mapping only",
+      "classification": "PROVEN_UNAUTHORIZED"
+    },
+    {
+      "id": "lead_initialization",
+      "condition": "stage === \"lead\"",
+      "source_location": "staffordos/clients/next_action_engine_v1.mjs:161-173",
+      "resulting_lifecycle_stage": "lead",
+      "authority_source": "staffordos_canonical_lifecycle_v1.md; client_promotion_authority_v1.md",
+      "classification": "PROVEN_AUTHORIZED"
+    },
+    {
+      "id": "audit_requested",
+      "condition": "auditStatus === \"not_started\" && stage !== \"proof_client\"",
+      "source_location": "staffordos/clients/next_action_engine_v1.mjs:176-188",
+      "resulting_lifecycle_stage": "audit_requested",
+      "authority_source": "client_promotion_authority_v1.md; product_routing_authority_v1.md; shopifixer_audit_authority_v1.md",
+      "classification": "PARTIALLY_DEFINED"
+    },
+    {
+      "id": "proposal_sent",
+      "condition": "auditStatus === \"completed\" && paymentStatus !== \"paid\"",
+      "source_location": "staffordos/clients/next_action_engine_v1.mjs:191-203",
+      "resulting_lifecycle_stage": "proposal_sent",
+      "authority_source": "client_promotion_authority_v1.md; product_routing_authority_v1.md; shopifixer_audit_authority_v1.md",
+      "classification": "PROVEN_AUTHORIZED"
+    },
+    {
+      "id": "deal_won",
+      "condition": "paymentStatus === \"paid\" && fixStatus === \"not_started\"",
+      "source_location": "staffordos/clients/next_action_engine_v1.mjs:206-218",
+      "resulting_lifecycle_stage": "deal_won",
+      "authority_source": "payment_lifecycle_registry_v1.md; staffordos_business_core_definition_of_done_v1.md; upgrade_client_registry_operating_model_v1.mjs",
+      "classification": "PROVEN_AUTHORIZED"
+    },
+    {
+      "id": "fix_completed",
+      "condition": "fixStatus === \"completed\" && !abandoInstalled",
+      "source_location": "staffordos/clients/next_action_engine_v1.mjs:221-234",
+      "resulting_lifecycle_stage": "fix_completed",
+      "authority_source": "shopifixer_fulfillment_authority_v1.md; staffordos_business_core_definition_of_done_v1.md; upgrade_client_registry_operating_model_v1.mjs",
+      "classification": "PARTIALLY_DEFINED"
+    },
+    {
+      "id": "abando_installed_no_events",
+      "condition": "abandoInstalled && checkoutEvents === 0",
+      "source_location": "staffordos/clients/next_action_engine_v1.mjs:236-249",
+      "resulting_lifecycle_stage": "abando_installed",
+      "authority_source": "product_routing_authority_v1.md; upgrade_client_registry_operating_model_v1.mjs",
+      "classification": "PARTIALLY_DEFINED"
+    },
+    {
+      "id": "abando_installed_checkout_events",
+      "condition": "abandoInstalled && checkoutEvents > 0 && recoveryActions === 0",
+      "source_location": "staffordos/clients/next_action_engine_v1.mjs:251-264",
+      "resulting_lifecycle_stage": "abando_installed",
+      "authority_source": "product_routing_authority_v1.md; upgrade_client_registry_operating_model_v1.mjs",
+      "classification": "PARTIALLY_DEFINED"
+    },
+    {
+      "id": "fallback_followup",
+      "condition": "default branch",
+      "source_location": "staffordos/clients/next_action_engine_v1.mjs:266-277",
+      "resulting_lifecycle_stage": "preserve current stage",
+      "authority_source": "none",
+      "classification": "BROKEN",
+      "notes": "This is a fallback action only."
+    }
+  ],
+  "missing_authority": [
+    "fix_in_progress",
+    "QA",
+    "proof package",
+    "review/referral progression"
+  ],
+  "verdict": {
+    "lifecycle_authoritative_today": false,
+    "reason": "The engine contains an unauthorized revenue_active override and lacks authority-backed fulfillment progression."
+  }
+}

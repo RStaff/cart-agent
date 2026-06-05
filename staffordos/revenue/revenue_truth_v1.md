@@ -1,6 +1,6 @@
 # Revenue Truth v1
 
-Generated at: 2026-06-05T03:16:13.445Z
+Generated at: 2026-06-05T04:17:27.560Z
 
 ## Funnel
 

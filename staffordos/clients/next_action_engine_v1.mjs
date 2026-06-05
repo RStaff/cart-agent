@@ -143,20 +143,8 @@ function computeNextAction(client) {
     };
   }
 
-  if (merchantRevenueRecovered > 0) {
-    return {
-      lifecycle_stage: "revenue_active",
-      blocked: false,
-      block_reason: null,
-      next_action: {
-        type: "monitor",
-        owner: "system",
-        due_at: null,
-        instructions: "Monitor recovered revenue and prepare upsell or case study.",
-        auto_executable: true
-      }
-    };
-  }
+  // Merchant revenue recovered remains a metric/evidence signal, but it does not
+  // advance ShopiFixer lifecycle state on its own.
 
   if (stage === "lead") {
     return {

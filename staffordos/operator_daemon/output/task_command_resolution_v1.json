@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-06-05T03:16:13.058Z",
+  "generated_at": "2026-06-05T04:17:27.216Z",
   "task_type": "next_action_execution",
   "status": "resolved",
   "resolution": {

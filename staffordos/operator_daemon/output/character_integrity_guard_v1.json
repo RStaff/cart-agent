@@ -1,11 +1,11 @@
 {
   "schema": "staffordos.character_integrity_guard.v1",
-  "generated_at": "2026-06-05T03:16:12.563Z",
+  "generated_at": "2026-06-05T04:17:26.834Z",
   "mode": "normalize-task",
   "status": "passed",
   "input": {
-    "task_raw_length": 54,
-    "task_normalized": "run next action engine through gated StaffordOS runner",
+    "task_raw_length": 44,
+    "task_normalized": "repair unauthorized revenue active promotion",
     "hidden_characters_detected": false
   },
   "proof": {
