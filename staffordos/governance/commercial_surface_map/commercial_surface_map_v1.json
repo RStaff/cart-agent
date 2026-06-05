@@ -1,0 +1,379 @@
+{
+  "canonical_merchant_path": [
+    "/shopifixer",
+    "/__public-checkout",
+    "Stripe Checkout",
+    "/stripe/webhook",
+    "packet/client/revenue/dashboard/CEO truth"
+  ],
+  "canonical_audit_intake": [
+    "POST /api/fix-audit",
+    "lead registry",
+    "saved audit payload",
+    "email follow-up"
+  ],
+  "surface_inventory": [
+    {
+      "route": "/",
+      "file_owner": "abando-frontend/app/page.tsx -> src/components/MarketingLandingPage.tsx",
+      "offer_presented": "Abando recovery loop and install flow",
+      "cta_destination": [
+        "/install/shopify",
+        "/marketing/demo/playground",
+        "/merchant?shop=..."
+      ],
+      "conversion_destination": "merchant recovery page / install flow",
+      "status": "CONFLICTING",
+      "notes": "Root page is Abando-first and bypasses ShopiFixer."
+    },
+    {
+      "route": "/marketing",
+      "file_owner": "abando-frontend/app/marketing/page.tsx",
+      "offer_presented": "Abando AI Shopping Copilot",
+      "cta_destination": [
+        "/pricing",
+        "/marketing/demo/playground"
+      ],
+      "conversion_destination": "pricing / demo",
+      "status": "CONFLICTING",
+      "notes": "Strong Abando-first marketing surface."
+    },
+    {
+      "route": "/run-audit",
+      "file_owner": "abando-frontend/app/run-audit/page.tsx",
+      "offer_presented": "free Abando checkout audit",
+      "cta_destination": [
+        "/run-audit?store=...",
+        "/scorecard/[domain]",
+        "/install/shopify"
+      ],
+      "conversion_destination": "scorecard or install flow",
+      "status": "CONFLICTING",
+      "notes": "Audit entry exists, but it is Abando-framed."
+    },
+    {
+      "route": "/scorecard/[domain]",
+      "file_owner": "abando-frontend/app/scorecard/[domain]/page.tsx",
+      "offer_presented": "benchmark scorecard estimate",
+      "cta_destination": [
+        "/dashboard",
+        "/shopify/install",
+        "/pricing"
+      ],
+      "conversion_destination": "install / dashboard / pricing",
+      "status": "CONFLICTING",
+      "notes": "Scorecard remains pre-install estimate copy."
+    },
+    {
+      "route": "/audit-result",
+      "file_owner": "abando-frontend/app/audit-result/page.tsx",
+      "offer_presented": "Abando audit result",
+      "cta_destination": [
+        "/dashboard",
+        "/shopify/install",
+        "/pricing"
+      ],
+      "conversion_destination": "install / dashboard / pricing",
+      "status": "CONFLICTING",
+      "notes": "Result page is still Abando-first."
+    },
+    {
+      "route": "/install/shopify",
+      "file_owner": "abando-frontend/app/install/shopify/page.tsx",
+      "offer_presented": "Abando install / connect-your-store flow",
+      "cta_destination": [
+        "Shopify approval",
+        "merchant dashboard"
+      ],
+      "conversion_destination": "installed Abando merchant dashboard",
+      "status": "CONFLICTING",
+      "notes": "Install-first, not ShopiFixer purchase-first."
+    },
+    {
+      "route": "/merchant",
+      "file_owner": "abando-frontend/app/merchant/page.tsx",
+      "offer_presented": "Abando recovery dashboard",
+      "cta_destination": [
+        "/embedded/dashboard?shop=...",
+        "recovery test"
+      ],
+      "conversion_destination": "merchant dashboard / recovery loop",
+      "status": "LEGACY",
+      "notes": "Revenue-recovery oriented, not the ShopiFixer commercial flow."
+    },
+    {
+      "route": "/dashboard",
+      "file_owner": "abando-frontend/app/dashboard/page.tsx",
+      "offer_presented": "Abando merchant dashboard",
+      "cta_destination": [
+        "/run-audit",
+        "/pricing",
+        "open Shopify"
+      ],
+      "conversion_destination": "embedded dashboard / run-audit",
+      "status": "CONFLICTING",
+      "notes": "Dashboard nav still loops back to Abando audit/pricing."
+    },
+    {
+      "route": "/shopifixer",
+      "file_owner": "abando-frontend/app/shopifixer/page.tsx",
+      "offer_presented": "ShopiFixer Fix Sprint · $950 flat fee",
+      "cta_destination": [
+        "/__public-checkout",
+        "/pricing",
+        "in-page demo audit"
+      ],
+      "conversion_destination": "Stripe Checkout",
+      "status": "CANONICAL",
+      "notes": "Direct canonical ShopiFixer offer surface."
+    },
+    {
+      "route": "POST /api/fix-audit",
+      "file_owner": "web/src/index.js",
+      "offer_presented": "ShopiFixer audit intake / lead capture",
+      "cta_destination": [
+        "lead registry",
+        "saved audit payload",
+        "email follow-up"
+      ],
+      "conversion_destination": "audit payload + lead registry",
+      "status": "CANONICAL",
+      "notes": "Canonical acquisition API for the ShopiFixer audit side."
+    },
+    {
+      "route": "GET /api/fix-audit",
+      "file_owner": "web/src/index.js",
+      "offer_presented": "saved ShopiFixer audit payload",
+      "cta_destination": [],
+      "conversion_destination": "audit payload reader",
+      "status": "CANONICAL",
+      "notes": "Retrieval path for the canonical audit payload."
+    },
+    {
+      "route": "/api/audit/status",
+      "file_owner": "abando-frontend/app/api/audit/status/route.ts",
+      "offer_presented": "audit state polling",
+      "cta_destination": [
+        "/audit-result"
+      ],
+      "conversion_destination": "audit-result page",
+      "status": "LEGACY",
+      "notes": "Supports the Abando audit flow, not the canonical ShopiFixer offer."
+    },
+    {
+      "route": "/buy",
+      "file_owner": "web/src/routes/publicPages.esm.js",
+      "offer_presented": "Abando Starter / Pro pricing",
+      "cta_destination": [
+        "/__public-checkout"
+      ],
+      "conversion_destination": "Stripe Checkout",
+      "status": "LEGACY",
+      "notes": "Legacy Abando purchase page; not ShopiFixer-first."
+    },
+    {
+      "route": "/success, /cancel",
+      "file_owner": "web/src/routes/publicPages.esm.js",
+      "offer_presented": "post-checkout result pages",
+      "cta_destination": [
+        "back to site",
+        "back to plans"
+      ],
+      "conversion_destination": "post-payment landing",
+      "status": "LEGACY",
+      "notes": "Legacy Abando checkout wrappers."
+    },
+    {
+      "route": "/pricing",
+      "file_owner": "web/src/routes/pricing.esm.js and abando-frontend/src/app_legacy/pricing/page.tsx",
+      "offer_presented": "Abando pricing / plan selection",
+      "cta_destination": [
+        "/run-audit",
+        "/install/shopify"
+      ],
+      "conversion_destination": "install / trial / quote",
+      "status": "CONFLICTING",
+      "notes": "Conflicts directly with the canonical $950 Fix Sprint."
+    },
+    {
+      "route": "legacy root landing files",
+      "file_owner": "web/src/public/index.html and web/src/routes/landing.esm.js",
+      "offer_presented": "Abando recovery revenue landing",
+      "cta_destination": [
+        "/fix",
+        "/install/shopify",
+        "/demo/playground"
+      ],
+      "conversion_destination": "install / demo",
+      "status": "BROKEN",
+      "notes": "Legacy root landing uses a broken /fix CTA and Abando-first copy."
+    }
+  ],
+  "navigation_inventory": [
+    {
+      "surface": "abando-frontend/src/components/brand/PublicHeader.tsx",
+      "nav_items": [
+        "Recovery test",
+        "Pricing"
+      ],
+      "destinations": [
+        "/merchant?shop=...",
+        "/install/shopify",
+        "/pricing"
+      ],
+      "assessment": "Abando-first navigation."
+    },
+    {
+      "surface": "abando-frontend/src/components/Navbar.tsx",
+      "nav_items": [
+        "Pricing",
+        "Onboarding",
+        "Support",
+        "Open demo",
+        "Start free trial"
+      ],
+      "destinations": [
+        "/pricing",
+        "/onboarding",
+        "/support",
+        "/marketing/demo/playground",
+        "/trial"
+      ],
+      "assessment": "Abando-first navigation."
+    },
+    {
+      "surface": "abando-frontend/src/components/NavbarV2.tsx",
+      "nav_items": [
+        "Pricing",
+        "Start free trial",
+        "Open demo"
+      ],
+      "destinations": [
+        "/pricing",
+        "/trial",
+        "/marketing/demo/playground"
+      ],
+      "assessment": "Abando-first navigation."
+    },
+    {
+      "surface": "abando-frontend/src/components/dashboard/DashboardHeader.tsx",
+      "nav_items": [
+        "Run audit",
+        "Pricing",
+        "Open Shopify"
+      ],
+      "destinations": [
+        "/run-audit",
+        "/pricing",
+        "external Shopify admin"
+      ],
+      "assessment": "Keeps the dashboard in the Abando loop."
+    },
+    {
+      "surface": "abando-frontend/app/marketing/layout.tsx",
+      "nav_items": [
+        "Marketing",
+        "Pricing",
+        "Onboarding",
+        "Support",
+        "Demo",
+        "Open app"
+      ],
+      "destinations": [
+        "/marketing",
+        "/pricing",
+        "/onboarding",
+        "/support",
+        "/marketing/demo/playground",
+        "/embedded"
+      ],
+      "assessment": "Abando marketing navigation, not ShopiFixer."
+    },
+    {
+      "surface": "web/src/public/index.html legacy nav",
+      "nav_items": [
+        "Try audit",
+        "Install Abando",
+        "Open demo"
+      ],
+      "destinations": [
+        "/fix",
+        "/install/shopify",
+        "/demo/playground"
+      ],
+      "assessment": "Broken + Abando-first."
+    },
+    {
+      "surface": "abando-frontend/app/shopifixer/page.tsx buttons",
+      "nav_items": [
+        "Get the $950 Fix Sprint",
+        "Run ShopiFixer Audit",
+        "View pricing"
+      ],
+      "destinations": [
+        "/__public-checkout",
+        "(in-page demo)",
+        "/pricing"
+      ],
+      "assessment": "Canonical offer button is aligned; pricing link still conflicts."
+    }
+  ],
+  "answers": {
+    "canonical_merchant_path_today": "/shopifixer -> /__public-checkout -> Stripe -> /stripe/webhook -> packet/client/revenue/dashboard/CEO truth",
+    "pages_still_present_abando_first_messaging": [
+      "/",
+      "/marketing",
+      "/run-audit",
+      "/scorecard/[domain]",
+      "/audit-result",
+      "/install/shopify",
+      "/merchant",
+      "/dashboard",
+      "/pricing",
+      "/buy",
+      "/success",
+      "/cancel"
+    ],
+    "pages_conflicting_with_950_shopifixer_offer": [
+      "/",
+      "/marketing",
+      "/run-audit",
+      "/scorecard/[domain]",
+      "/audit-result",
+      "/install/shopify",
+      "/dashboard",
+      "/merchant",
+      "/pricing",
+      "/buy"
+    ],
+    "smallest_set_of_files_for_one_canonical_journey": [
+      "abando-frontend/app/page.tsx",
+      "abando-frontend/src/components/MarketingLandingPage.tsx",
+      "abando-frontend/src/components/brand/PublicHeader.tsx",
+      "abando-frontend/src/components/Navbar.tsx",
+      "abando-frontend/src/components/NavbarV2.tsx",
+      "abando-frontend/src/components/dashboard/DashboardHeader.tsx",
+      "abando-frontend/app/marketing/page.tsx",
+      "abando-frontend/app/run-audit/page.tsx",
+      "abando-frontend/app/scorecard/[domain]/page.tsx",
+      "abando-frontend/app/audit-result/page.tsx",
+      "abando-frontend/app/install/shopify/page.tsx",
+      "abando-frontend/app/dashboard/page.tsx",
+      "abando-frontend/app/merchant/page.tsx"
+    ],
+    "files_to_modify_first": [
+      "abando-frontend/app/page.tsx",
+      "abando-frontend/src/components/MarketingLandingPage.tsx",
+      "abando-frontend/src/components/brand/PublicHeader.tsx",
+      "abando-frontend/src/components/Navbar.tsx",
+      "abando-frontend/src/components/NavbarV2.tsx",
+      "abando-frontend/src/components/dashboard/DashboardHeader.tsx",
+      "abando-frontend/app/run-audit/page.tsx",
+      "abando-frontend/app/scorecard/[domain]/page.tsx",
+      "abando-frontend/app/install/shopify/page.tsx",
+      "abando-frontend/app/audit-result/page.tsx",
+      "abando-frontend/app/dashboard/page.tsx",
+      "abando-frontend/app/merchant/page.tsx"
+    ]
+  }
+}
