@@ -202,99 +202,72 @@ function page({ title, body }) {
 export function installPricingRoute(app) {
   app.get("/pricing", (_req, res) => {
     const body = `
-      <div class="brand"><span class="brand-dot"></span>Abando</div>
+      <div class="brand"><span class="brand-dot"></span>StaffordMedia presents ShopiFixer</div>
       <section class="hero">
         <div class="panel">
-          <h1>Pricing for Shopify stores looking to recover lost revenue</h1>
-          <p class="subtitle">Start with a free audit. Upgrade to track real checkout behavior and recovery opportunities.</p>
+          <h1>ShopiFixer Fix Sprint pricing</h1>
+          <p class="subtitle">A scoped Shopify conversion fix with proof-driven delivery. Start with a free audit, then decide whether the $950 Fix Sprint is the right next step for your store.</p>
           <div class="cta-row">
-            <a class="cta" href="/run-audit">Run your audit</a>
-            <a class="ghost" href="/install/shopify">Install Abando</a>
+            <a class="cta" href="/shopifixer">Get the $950 Fix Sprint</a>
+            <a class="ghost" href="/run-audit">Run the free audit first</a>
           </div>
         </div>
 
         <div class="plans">
-          <section class="plan">
-            <div class="eyebrow">Starter</div>
-            <div class="plan-title">STARTER</div>
-            <div class="price">$49<span style="font-size:18px; color:#94a3b8;">/month</span></div>
-            <ul class="feature-list">
-              <li>Checkout audit + scorecard</li>
-              <li>Guided advisor insights</li>
-              <li>Basic recovery tracking (after install)</li>
-              <li>Email support</li>
-            </ul>
-            <a class="cta" href="/install/shopify?plan=starter">Start free trial</a>
-            <div class="helper">No commitment required to run the audit.</div>
-          </section>
-
-          <section class="plan recommended">
+          <section class="plan recommended" style="grid-column:1 / -1;">
             <div style="display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap;">
-              <div class="eyebrow">Growth</div>
-              <div class="recommended-badge">Recommended</div>
+              <div class="eyebrow">ShopiFixer Fix Sprint</div>
+              <div class="recommended-badge">Canonical</div>
             </div>
-            <div class="plan-title">GROWTH</div>
-            <div class="price">$149<span style="font-size:18px; color:#94a3b8;">/month</span></div>
+            <div class="plan-title">Scoped Shopify conversion fix</div>
+            <div class="price">$950<span style="font-size:18px; color:#94a3b8;"> flat fee</span></div>
             <ul class="feature-list">
-              <li>Everything in Starter</li>
-              <li>Advanced checkout tracking</li>
-              <li>Recovery opportunity insights</li>
-              <li>Priority support</li>
+              <li>Focused on one visible conversion issue</li>
+              <li>Proof-driven delivery with before/after evidence</li>
+              <li>Scoped recommendation tied to the audit result</li>
+              <li>Checkout happens through the existing ShopiFixer path</li>
             </ul>
-            <a class="cta" href="/install/shopify?plan=growth">Start free trial</a>
-            <div class="helper">No commitment required to run the audit.</div>
-          </section>
-
-          <section class="plan">
-            <div class="eyebrow">Custom</div>
-            <div class="plan-title">CUSTOM</div>
-            <div class="price">Custom<span style="font-size:18px; color:#94a3b8;"> pricing</span></div>
-            <ul class="feature-list">
-              <li>High-volume stores</li>
-              <li>Custom integrations</li>
-              <li>Dedicated support</li>
-            </ul>
-            <a class="ghost" href="mailto:support@abando.ai?subject=Abando%20Custom%20Pricing">Contact us</a>
-            <div class="helper">We’ll scope the right fit before any billing setup.</div>
+            <a class="cta" href="/shopifixer">Get the $950 Fix Sprint</a>
+            <div class="helper">The checkout path is unchanged. This page now frames the canonical offer before you move into the existing purchase flow.</div>
           </section>
         </div>
 
         <div class="panel">
-          <h2>How this works</h2>
+          <h2>How the Fix Sprint works</h2>
           <div class="steps">
             <div class="step">
               <div class="step-title">1. Run a free audit (no signup)</div>
-              <div>Start with a benchmark-based scorecard to see estimated revenue opportunity and the likely checkout issue.</div>
+              <div>Start with a benchmark-based scorecard to see the likely checkout issue and whether a scoped fix is worth pursuing.</div>
             </div>
             <div class="step">
-              <div class="step-title">2. Connect your Shopify store</div>
-              <div>Install Abando so it can move from public estimate into real storefront and checkout behavior tracking.</div>
+              <div class="step-title">2. Review the ShopiFixer Fix Sprint</div>
+              <div>Compare the audit result against the $950 flat-fee offer, scoped to a single Shopify conversion problem.</div>
             </div>
             <div class="step">
-              <div class="step-title">3. Abando tracks real checkout behavior</div>
-              <div>After install, Abando can observe checkout decision activity and recovery opportunities in your merchant workspace.</div>
+              <div class="step-title">3. Purchase through the existing checkout path</div>
+              <div>The current purchase flow remains in place and continues to handle payment and Stripe propagation exactly as before.</div>
             </div>
             <div class="step">
-              <div class="step-title">4. See where revenue is actually being lost and recovered</div>
-              <div>That is when tracked results begin and the product can move beyond benchmark guidance.</div>
+              <div class="step-title">4. Receive proof-driven delivery</div>
+              <div>The sprint is delivered with before/after evidence around the problem that was surfaced in the audit.</div>
             </div>
           </div>
-          <div class="trust">The audit you see before install is a benchmark-based estimate — real tracking begins after connecting your store.</div>
+          <div class="trust">This pricing page is now the canonical ShopiFixer offer. Abando remains available elsewhere as a secondary product, but it is not the primary commercial decision here.</div>
         </div>
 
         <div class="panel">
-          <h2>Ready to see where your checkout may be losing conversions?</h2>
-          <p class="subtitle">Run the public audit first, then choose the plan that fits once you’re ready to connect your store.</p>
+          <h2>Ready to review the canonical offer?</h2>
+          <p class="subtitle">If you already know you want the fix sprint, jump into the existing ShopiFixer flow. If you want the diagnosis first, run the free audit.</p>
           <div class="cta-row">
-            <a class="cta" href="/run-audit">Run your audit</a>
-            <a class="ghost" href="/install/shopify">Go to install</a>
+            <a class="cta" href="/shopifixer">Get the $950 Fix Sprint</a>
+            <a class="ghost" href="/run-audit">Run your audit</a>
           </div>
         </div>
       </section>
     `;
 
     res.status(200).type("html").send(page({
-      title: "Abando Pricing",
+      title: "ShopiFixer Pricing",
       body,
     }));
   });
