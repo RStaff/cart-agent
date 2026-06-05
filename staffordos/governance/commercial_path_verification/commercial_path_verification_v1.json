@@ -1,0 +1,169 @@
+{
+  "audit_name": "commercial_path_verification_v1",
+  "overall_status": "PARTIALLY_PROVEN",
+  "steps": [
+    {
+      "step": "StaffordMedia landing pages",
+      "route": "/ and /fix",
+      "owner": "Public StaffordMedia / Abando marketing surface",
+      "authority": "Abando public marketing; not canonical ShopiFixer authority",
+      "runtime_writer": null,
+      "runtime_reader": "Browser / merchant",
+      "status": "PARTIALLY_PROVEN",
+      "evidence": [
+        "web/src/public/index.html",
+        "Abando-branded landing copy",
+        "/fix CTA"
+      ]
+    },
+    {
+      "step": "ShopiFixer entry points",
+      "route": "/shopifixer",
+      "owner": "ShopiFixer",
+      "authority": "ShopiFixer commercial authority / product routing authority",
+      "runtime_writer": "Client-side checkout handoff to /__public-checkout; local audit event tracking only",
+      "runtime_reader": "Browser / merchant",
+      "status": "PROVEN",
+      "evidence": [
+        "abando-frontend/app/shopifixer/page.tsx",
+        "$950 Fix Sprint CTA",
+        "calls /__public-checkout"
+      ]
+    },
+    {
+      "step": "Audit request flow",
+      "route": "POST /api/fix-audit",
+      "owner": "ShopiFixer audit intake / lead acquisition",
+      "authority": "ShopiFixer audit authority; client promotion authority",
+      "runtime_writer": "upsertShopifixerLead, saved canonical payload, email send when configured",
+      "runtime_reader": "Lead registry, audit payload readers, email sender",
+      "status": "PROVEN",
+      "evidence": [
+        "web/src/index.js",
+        "web/src/lib/shopifixerLeadRegistry.js",
+        "web/src/lib/emailSender.js"
+      ]
+    },
+    {
+      "step": "Audit result flow",
+      "route": "GET /api/audit/status and /audit-result?store=...",
+      "owner": "ShopiFixer audit result surface",
+      "authority": "ShopiFixer audit authority; public audit status route",
+      "runtime_writer": "read-only redirect and status reader",
+      "runtime_reader": "Browser, audit result page, email deep links",
+      "status": "PARTIALLY_PROVEN",
+      "evidence": [
+        "abando-frontend/app/api/audit/status/route.ts",
+        "abando-frontend/app/audit-result/page.tsx"
+      ]
+    },
+    {
+      "step": "Pricing flow",
+      "route": "/pricing",
+      "owner": "Public pricing / Abando surface",
+      "authority": "Abando pricing authority; not canonical ShopiFixer pricing authority",
+      "runtime_writer": null,
+      "runtime_reader": "Browser / merchant",
+      "status": "BROKEN",
+      "evidence": [
+        "web/src/routes/pricing.esm.js",
+        "Abando monthly-plan framing",
+        "not the canonical $950 ShopiFixer offer"
+      ]
+    },
+    {
+      "step": "Checkout flow",
+      "route": "POST /__public-checkout",
+      "owner": "Payment checkout authority",
+      "authority": "Payment lifecycle authority / packet binding readiness",
+      "runtime_writer": "createPacket, Stripe Checkout session creation, bindPacketPayment(..., payment_pending)",
+      "runtime_reader": "Merchant, Stripe checkout, webhook",
+      "status": "PROVEN",
+      "evidence": [
+        "web/src/checkout-public.js",
+        "web/src/lib/packetRepository.js"
+      ]
+    },
+    {
+      "step": "Stripe flow",
+      "route": "stripeWebhook.esm.js / POST /api/billing/webhook",
+      "owner": "Stripe webhook authority",
+      "authority": "Payment lifecycle authority",
+      "runtime_writer": "bindPacketPayment(..., payment_received), recordStripePaymentPropagation(...)",
+      "runtime_reader": "Packet repo, client registry, revenue agent",
+      "status": "PROVEN",
+      "evidence": [
+        "web/src/routes/stripeWebhook.esm.js",
+        "web/src/lib/packetRepository.js",
+        "staffordos/revenue/revenue_agent_v1.mjs"
+      ]
+    },
+    {
+      "step": "Packet creation",
+      "route": "createPacket / bindPacketPayment",
+      "owner": "Packet authority",
+      "authority": "Packet binding authority / payment lifecycle registry",
+      "runtime_writer": "packets table",
+      "runtime_reader": "Stripe webhook and packet readers",
+      "status": "PROVEN",
+      "evidence": [
+        "web/src/lib/packetRepository.js"
+      ]
+    },
+    {
+      "step": "Client registry creation/update",
+      "route": "recordVerifiedStripePayment / upsertClient",
+      "owner": "Client Registry",
+      "authority": "Client promotion authority / lifecycle authority",
+      "runtime_writer": "staffordos/clients/client_registry_v1.json",
+      "runtime_reader": "Dashboard, CEO cockpit, next-action engine",
+      "status": "PROVEN",
+      "evidence": [
+        "staffordos/clients/client_registry_v1.mjs"
+      ]
+    },
+    {
+      "step": "Revenue truth update",
+      "route": "recordStripePaymentPropagation / revenue_agent_v1.mjs",
+      "owner": "Revenue authority",
+      "authority": "Revenue success gate / payment propagation authority",
+      "runtime_writer": "staffordos/revenue/revenue_truth_v1.json and .md",
+      "runtime_reader": "CEO snapshot, system truth readers",
+      "status": "PROVEN",
+      "evidence": [
+        "staffordos/revenue/revenue_agent_v1.mjs"
+      ]
+    },
+    {
+      "step": "Dashboard update",
+      "route": "buildOperatorDashboardSnapshot",
+      "owner": "Operator dashboard truth",
+      "authority": "Derived truth from Client Registry / Revenue Truth",
+      "runtime_writer": "staffordos/clients/operator_dashboard_snapshot_v1.json",
+      "runtime_reader": "CEO cockpit route, operator dashboard UI",
+      "status": "PROVEN",
+      "evidence": [
+        "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs"
+      ]
+    },
+    {
+      "step": "CEO cockpit visibility",
+      "route": "/api/operator/ceo-snapshot",
+      "owner": "Operator cockpit",
+      "authority": "CEO cockpit requirements / canonical lifecycle mapping",
+      "runtime_writer": null,
+      "runtime_reader": "Operator UI / Command Center",
+      "status": "PROVEN",
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts"
+      ]
+    }
+  ],
+  "answers": {
+    "can_real_merchant_complete_full_journey_today": "PARTIALLY_PROVEN",
+    "first_broken_link": "The public landing/pricing path is still Abando-first and not a clean canonical ShopiFixer-first answer.",
+    "highest_value_repair": "Make the public entry and pricing surfaces consistently ShopiFixer-first so the canonical $950 Fix Sprint is the first clear commercial answer.",
+    "smallest_repair": "Change the first public CTA / pricing handoff that still routes merchants into the Abando-first flow so it lands on the canonical ShopiFixer path.",
+    "first_revenue_ready_repair": "Align the public landing/pricing path to the canonical ShopiFixer purchase flow."
+  }
+}
