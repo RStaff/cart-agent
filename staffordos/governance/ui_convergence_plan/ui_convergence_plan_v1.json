@@ -1,0 +1,249 @@
+{
+  "smallest_implementation_slice": {
+    "name": "ShopiFixer-first public front door",
+    "routes": [
+      "/",
+      "/run-audit",
+      "/scorecard/[domain]",
+      "/audit-result",
+      "/pricing",
+      "/shopifixer"
+    ],
+    "principle": "Make ShopiFixer the first commercial answer while preserving Abando as the secondary product."
+  },
+  "exact_files_to_change_first": [
+    "abando-frontend/app/page.tsx",
+    "abando-frontend/src/components/MarketingLandingPage.tsx",
+    "abando-frontend/src/components/brand/PublicHeader.tsx",
+    "abando-frontend/app/run-audit/page.tsx",
+    "abando-frontend/app/scorecard/[domain]/page.tsx",
+    "abando-frontend/app/audit-result/page.tsx",
+    "web/src/routes/pricing.esm.js"
+  ],
+  "files_not_to_touch_in_first_slice": [
+    "web/src/checkout-public.js",
+    "web/src/routes/stripeWebhook.esm.js",
+    "web/src/lib/packetRepository.js",
+    "staffordos/revenue/revenue_agent_v1.mjs",
+    "staffordos/clients/client_registry_v1.mjs",
+    "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs",
+    "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+    "abando-frontend/app/install/shopify/page.tsx",
+    "abando-frontend/app/dashboard/page.tsx",
+    "abando-frontend/app/merchant/page.tsx"
+  ],
+  "routes_becoming_shopifixer_first": [
+    "/",
+    "/run-audit",
+    "/scorecard/[domain]",
+    "/audit-result",
+    "/pricing",
+    "/shopifixer"
+  ],
+  "abando_preservation_strategy": "Keep Abando visible as a secondary recovery product in marketing, install, dashboard, and merchant surfaces while removing it from the primary hero and the first commercial decision points.",
+  "implementation_order": [
+    {
+      "phase": "Phase 1",
+      "goal": "Make the public front door ShopiFixer-first.",
+      "files": [
+        "abando-frontend/app/page.tsx",
+        "abando-frontend/src/components/MarketingLandingPage.tsx",
+        "abando-frontend/src/components/brand/PublicHeader.tsx"
+      ]
+    },
+    {
+      "phase": "Phase 2",
+      "goal": "Make the audit/result path ShopiFixer-first.",
+      "files": [
+        "abando-frontend/app/run-audit/page.tsx",
+        "abando-frontend/app/scorecard/[domain]/page.tsx",
+        "abando-frontend/app/audit-result/page.tsx"
+      ]
+    },
+    {
+      "phase": "Phase 3",
+      "goal": "Make pricing align with the $950 Fix Sprint.",
+      "files": [
+        "web/src/routes/pricing.esm.js"
+      ]
+    },
+    {
+      "phase": "Phase 4",
+      "goal": "Preserve Abando as a secondary product after the primary experience is stable.",
+      "files": [
+        "abando-frontend/app/marketing/page.tsx",
+        "abando-frontend/src/components/Navbar.tsx",
+        "abando-frontend/src/components/NavbarV2.tsx",
+        "abando-frontend/src/components/dashboard/DashboardHeader.tsx",
+        "abando-frontend/app/install/shopify/page.tsx",
+        "abando-frontend/app/dashboard/page.tsx",
+        "abando-frontend/app/merchant/page.tsx"
+      ]
+    }
+  ],
+  "first_revenue_producing_ui_release": "The first revenue-producing UI release is the ShopiFixer-first landing flow that routes merchants from the StaffordMedia parent page into ShopiFixer audit/result/pricing and then into the existing checkout.",
+  "file_matrix": [
+    {
+      "file": "abando-frontend/app/page.tsx",
+      "purpose": "Root route wrapper.",
+      "route": "/",
+      "current_cta": "redirects to embedded when Shopify context exists.",
+      "current_offer": "Abando marketing landing.",
+      "destination": "MarketingLandingPage.",
+      "become": "STAFFORDMEDIA_PARENT"
+    },
+    {
+      "file": "abando-frontend/src/components/MarketingLandingPage.tsx",
+      "purpose": "Public landing page.",
+      "route": "/",
+      "current_cta": "Make your first recovery / Install on Shopify.",
+      "current_offer": "Abando recovery loop.",
+      "destination": "/api/abando/activation/trigger-test-recovery, /install/shopify.",
+      "become": "STAFFORDMEDIA_PARENT"
+    },
+    {
+      "file": "abando-frontend/src/components/brand/PublicHeader.tsx",
+      "purpose": "Shared public header.",
+      "route": "shared",
+      "current_cta": "Recovery test, Pricing.",
+      "current_offer": "Abando brand nav.",
+      "destination": "/merchant?shop=..., /install/shopify, /pricing.",
+      "become": "STAFFORDMEDIA_PARENT"
+    },
+    {
+      "file": "abando-frontend/app/run-audit/page.tsx",
+      "purpose": "Audit entry point.",
+      "route": "/run-audit",
+      "current_cta": "Run audit.",
+      "current_offer": "free Abando checkout audit.",
+      "destination": "/scorecard/[domain] or /install/shopify.",
+      "become": "PRIMARY_SHOPIFIXER"
+    },
+    {
+      "file": "abando-frontend/app/scorecard/[domain]/page.tsx",
+      "purpose": "Audit result / scorecard.",
+      "route": "/scorecard/[domain]",
+      "current_cta": "View Dashboard, Install Abando, See Pricing.",
+      "current_offer": "Abando scorecard estimate.",
+      "destination": "/dashboard, /shopify/install, /pricing.",
+      "become": "PRIMARY_SHOPIFIXER"
+    },
+    {
+      "file": "abando-frontend/app/audit-result/page.tsx",
+      "purpose": "Audit result landing.",
+      "route": "/audit-result",
+      "current_cta": "View Dashboard, Install Abando, See Pricing.",
+      "current_offer": "Abando audit result.",
+      "destination": "/dashboard, /shopify/install, /pricing.",
+      "become": "PRIMARY_SHOPIFIXER"
+    },
+    {
+      "file": "web/src/routes/pricing.esm.js",
+      "purpose": "Pricing surface.",
+      "route": "/pricing",
+      "current_cta": "Run your audit, Install Abando, plan CTAs.",
+      "current_offer": "Abando pricing.",
+      "destination": "/run-audit, /install/shopify, /__public-checkout.",
+      "become": "PRIMARY_SHOPIFIXER"
+    },
+    {
+      "file": "abando-frontend/app/marketing/page.tsx",
+      "purpose": "Marketing landing.",
+      "route": "/marketing",
+      "current_cta": "Start free trial, Try the demo.",
+      "current_offer": "Abando AI Shopping Copilot.",
+      "destination": "/pricing, /marketing/demo/playground.",
+      "become": "SECONDARY_ABANDO"
+    },
+    {
+      "file": "abando-frontend/src/components/Navbar.tsx",
+      "purpose": "Global Abando nav.",
+      "route": "shared",
+      "current_cta": "Pricing, Onboarding, Support, Open demo, Start free trial.",
+      "current_offer": "Abando navigation.",
+      "destination": "Abando pages.",
+      "become": "SECONDARY_ABANDO"
+    },
+    {
+      "file": "abando-frontend/src/components/NavbarV2.tsx",
+      "purpose": "V2 Abando nav.",
+      "route": "shared",
+      "current_cta": "Pricing, Start free trial, Open demo.",
+      "current_offer": "Abando navigation.",
+      "destination": "Abando pages.",
+      "become": "SECONDARY_ABANDO"
+    },
+    {
+      "file": "abando-frontend/src/components/dashboard/DashboardHeader.tsx",
+      "purpose": "Dashboard nav.",
+      "route": "/dashboard",
+      "current_cta": "Run audit, Pricing, Open Shopify.",
+      "current_offer": "Abando dashboard.",
+      "destination": "/run-audit, /pricing, Shopify admin.",
+      "become": "SECONDARY_ABANDO"
+    },
+    {
+      "file": "abando-frontend/app/install/shopify/page.tsx",
+      "purpose": "Install flow.",
+      "route": "/install/shopify",
+      "current_cta": "Connect your store, install prompts.",
+      "current_offer": "Abando install path.",
+      "destination": "Shopify approval / merchant dashboard.",
+      "become": "SECONDARY_ABANDO"
+    },
+    {
+      "file": "abando-frontend/app/dashboard/page.tsx",
+      "purpose": "Dashboard.",
+      "route": "/dashboard",
+      "current_cta": "Run another audit, View connection status.",
+      "current_offer": "Abando dashboard.",
+      "destination": "dashboard / audit loop.",
+      "become": "SECONDARY_ABANDO"
+    },
+    {
+      "file": "abando-frontend/app/merchant/page.tsx",
+      "purpose": "Merchant recovery page.",
+      "route": "/merchant",
+      "current_cta": "Send test recovery to myself / recovered shoppers.",
+      "current_offer": "Abando recovery dashboard.",
+      "destination": "merchant recovery loop.",
+      "become": "SECONDARY_ABANDO"
+    },
+    {
+      "file": "web/src/public/index.html",
+      "purpose": "Legacy public root HTML.",
+      "route": "/ (legacy host)",
+      "current_cta": "Try audit, Install Abando, Open demo.",
+      "current_offer": "Abando recovery landing.",
+      "destination": "/fix, /install/shopify, /demo/playground.",
+      "become": "LEAVE_UNCHANGED"
+    },
+    {
+      "file": "web/src/routes/landing.esm.js",
+      "purpose": "Legacy landing route.",
+      "route": "/ (legacy host)",
+      "current_cta": "Start Free Trial, Try the demo, Install on Shopify.",
+      "current_offer": "Abando checkout co-pilot.",
+      "destination": "/pricing, /demo/playground, /install/shopify.",
+      "become": "LEAVE_UNCHANGED"
+    },
+    {
+      "file": "web/src/routes/runAudit.esm.js",
+      "purpose": "Legacy audit route.",
+      "route": "/run-audit (legacy host)",
+      "current_cta": "Run audit, Connect Shopify to Abando.",
+      "current_offer": "Abando free audit.",
+      "destination": "/scorecard/... or /install/shopify.",
+      "become": "LEAVE_UNCHANGED"
+    },
+    {
+      "file": "web/src/routes/publicPages.esm.js",
+      "purpose": "Legacy buy/success/cancel wrappers.",
+      "route": "/buy, /success, /cancel",
+      "current_cta": "plan buttons / checkout.",
+      "current_offer": "Abando Starter / Pro.",
+      "destination": "/__public-checkout.",
+      "become": "LEAVE_UNCHANGED"
+    }
+  ]
+}
