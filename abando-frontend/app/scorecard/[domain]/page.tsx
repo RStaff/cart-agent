@@ -1,18 +1,8 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import AdvisorRail from "@/components/advisor/AdvisorRail";
 import PublicHeader from "@/components/brand/PublicHeader";
 import CenteredContainer from "@/components/layout/CenteredContainer";
 import { findPublicScorecard } from "@/lib/scorecards";
-import BaselineExplainer from "@/components/scorecard/BaselineExplainer";
-import CheckoutFlowDiagram from "@/components/scorecard/CheckoutFlowDiagram";
-import GuidedScorecardMode from "@/components/scorecard/GuidedScorecardMode";
-import ScorecardNarrative from "@/components/scorecard/ScorecardNarrative";
-import ScorecardSlideOver from "@/components/scorecard/ScorecardSlideOver";
-import {
-  merchantIssueFraming,
-  revenueRiskTieIn,
-  topScorecardIssue,
-} from "@/lib/scorecardPresentation";
 
 type PageProps = {
   params: Promise<{ domain: string }>;
@@ -24,12 +14,12 @@ export async function generateMetadata({ params }: PageProps) {
 
   if (!scorecard) {
     return {
-      title: "Abando Scorecard",
+      title: "ShopiFixer audit result",
     };
   }
 
   return {
-    title: `${scorecard.domain} checkout scorecard | Abando`,
+    title: `${scorecard.domain} audit result | ShopiFixer`,
   };
 }
 
@@ -41,8 +31,9 @@ export default async function ScorecardPage({ params }: PageProps) {
     notFound();
   }
 
-  const topIssue = topScorecardIssue(scorecard);
-  const issueFraming = merchantIssueFraming(scorecard);
+  const primaryIssue = scorecard.topFindings?.[0] || scorecard.benchmarkSummary || "checkout friction";
+  const confidence = scorecard.confidence || "Benchmark-based estimate";
+  const convertedScore = typeof scorecard.checkoutScore === "number" ? `${scorecard.checkoutScore}/100` : "Benchmark-only";
 
   return (
     <>
@@ -51,47 +42,69 @@ export default async function ScorecardPage({ params }: PageProps) {
 
         <section className="space-y-3">
           <p className="text-sm font-medium text-cyan-300">{scorecard.domain}</p>
-          <h1 className="text-4xl font-semibold tracking-tight text-white">Your checkout may be losing revenue</h1>
+          <h1 className="text-4xl font-semibold tracking-tight text-white">Your audit points to a ShopiFixer Fix Sprint</h1>
           <p className="max-w-2xl text-sm leading-7 text-slate-300">
-            This free audit uses Shopify benchmark patterns to show where your store may be losing customers before purchase.
+            This scorecard shows where your Shopify checkout may be leaking revenue and what a scoped fix sprint would focus on next.
           </p>
-        </section>
-
-        <section className="rounded-xl bg-[#0f172a] p-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-400">Revenue card</p>
-          <div className="mt-3 text-4xl font-semibold tracking-tight text-white">{scorecard.revenueOpportunityDisplay}</div>
-          <p className="mt-3 text-sm leading-7 text-slate-300">
-            This estimate comes from how similar Shopify stores perform and the strongest issue surfaced on this scorecard. It is not tracked revenue yet. Connect Shopify to confirm it with real checkout data after successful approval.
-          </p>
-          <p className="mt-3 text-sm leading-7 text-cyan-100">{revenueRiskTieIn(scorecard)}</p>
-          <p className="mt-3 text-sm leading-7 text-cyan-100">You are still viewing a free audit — nothing has been installed yet.</p>
         </section>
 
         <section className="rounded-xl border border-cyan-400/20 bg-[linear-gradient(135deg,rgba(15,23,42,1)_0%,rgba(11,31,45,1)_100%)] p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">Primary finding</p>
-          <h2 className="mt-3 text-2xl font-semibold tracking-tight text-white">{issueFraming}</h2>
+          <div className="mt-3 text-4xl font-semibold tracking-tight text-white">{scorecard.revenueOpportunityDisplay}</div>
           <p className="mt-3 text-sm leading-7 text-slate-300">
-            Surfaced issue: <span className="font-medium text-slate-100">{topIssue}</span>
-          </p>
-          <p className="mt-3 text-sm leading-7 text-slate-400">
-            This is the clearest problem on the scorecard, which is why Abando is treating it as the strongest place to confirm first.
+            This is a benchmark-based estimate of likely opportunity, not tracked live revenue. The audit helps decide whether the ShopiFixer Fix Sprint is the right next step for the issue surfaced here.
           </p>
         </section>
 
-        <GuidedScorecardMode scorecard={scorecard} />
-
         <div className="grid gap-6 md:grid-cols-[1.05fr_0.95fr]">
-          <div className="space-y-6">
-            <BaselineExplainer scorecard={scorecard} />
-            <CheckoutFlowDiagram scorecard={scorecard} />
-          </div>
-          <div className="space-y-6">
-            <AdvisorRail scorecard={scorecard} />
-          </div>
+          <section className="space-y-4 rounded-xl bg-[#0f172a] p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-400">What the audit found</p>
+            <h2 className="text-2xl font-semibold tracking-tight text-white">{primaryIssue}</h2>
+            <p className="text-sm leading-7 text-slate-300">
+              Confidence: <span className="font-medium text-slate-100">{confidence}</span>
+            </p>
+            <p className="text-sm leading-7 text-slate-400">
+              Scorecard snapshot: <span className="text-slate-200">{convertedScore}</span>
+            </p>
+            <p className="text-sm leading-7 text-slate-300">
+              The next decision is whether this problem is worth fixing with a scoped sprint. That is what the ShopiFixer offer is built for.
+            </p>
+          </section>
+
+          <section className="space-y-4 rounded-xl border border-slate-800 bg-slate-900/90 p-5 shadow-2xl shadow-black/20">
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">Why this matters</p>
+            <p className="text-sm leading-7 text-slate-300">
+              Small checkout issues compound quickly. The audit exists to show which issue should be fixed first and whether the scoped ShopiFixer sprint is a fit.
+            </p>
+            <p className="text-sm leading-7 text-slate-400">
+              This is still an estimate, not a guarantee. The recommendation becomes more concrete when you compare the result against the $950 Fix Sprint.
+            </p>
+          </section>
         </div>
-        <ScorecardNarrative scorecard={scorecard} />
+
+        <section className="rounded-xl border border-slate-800 bg-slate-900/90 p-5 shadow-2xl shadow-black/20">
+          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">Recommended next move</p>
+          <h2 className="mt-3 text-2xl font-semibold text-white">{scorecard.benchmarkSummary || "Review the ShopiFixer Fix Sprint"}</h2>
+          <p className="mt-3 text-sm leading-7 text-slate-300">
+            If the audit surfaces a real fix candidate, the next step is to review the ShopiFixer offer and decide whether to proceed with the scoped sprint.
+          </p>
+        </section>
+
+        <section className="rounded-xl border border-slate-800 bg-[#07111f] p-5 shadow-2xl shadow-black/20">
+          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">Next step</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link href="/pricing" className="rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300">
+              See the $950 Fix Sprint
+            </Link>
+            <Link href="/shopifixer" className="rounded-full border border-slate-600 px-5 py-3 text-sm font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-200">
+              Review the ShopiFixer offer
+            </Link>
+            <Link href="/install/shopify" className="rounded-full border border-slate-700 px-5 py-3 text-sm font-semibold text-slate-300 transition hover:border-cyan-300 hover:text-cyan-100">
+              Explore Abando later
+            </Link>
+          </div>
+        </section>
       </CenteredContainer>
-      <ScorecardSlideOver scorecard={scorecard} />
     </>
   );
 }
