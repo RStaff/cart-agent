@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-05-31T02:37:25.026Z",
-  "task_type": "send_preview",
+  "generated_at": "2026-06-05T03:16:13.058Z",
+  "task_type": "next_action_execution",
   "status": "resolved",
   "resolution": {
-    "task_type": "send_preview",
-    "command": "node staffordos/operator_daemon/write_send_preview_v1.mjs",
+    "task_type": "next_action_execution",
+    "command": "node staffordos/clients/next_action_engine_v1.mjs",
     "approval_level": "operator_safe",
-    "execution_class": "preview",
-    "system": "shopifixer",
+    "execution_class": "fulfillment_transition",
+    "system": "staffordos",
     "revenue_action": false,
-    "reason": "Create single-lead send preview. No sending."
+    "reason": "Execute lifecycle transitions for paid clients through next_action_engine_v1.mjs."
   },
   "failures": []
 }

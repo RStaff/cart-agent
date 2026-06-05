@@ -1,7 +1,7 @@
 {
   "schema": "staffordos.client_registry.v1",
   "purpose": "Canonical registry for StaffordOS clients, separating Stafford Media business revenue from ShopiFixer audit/fix data and Abando merchant performance data.",
-  "generated_at": "2026-06-03T22:46:57.292Z",
+  "generated_at": "2026-06-05T03:16:13.233Z",
   "clients": [
     {
       "client_id": "cart-agent-dev.myshopify.com",
@@ -9,7 +9,7 @@
       "source": "abando_proof_loop",
       "status": "proof_client",
       "created_at": "2026-05-03T22:38:50.701Z",
-      "updated_at": "2026-05-03T23:09:47.062Z",
+      "updated_at": "2026-06-05T03:16:13.233Z",
       "contact": {
         "email": "rossstafford1@gmail.com"
       },
@@ -63,18 +63,18 @@
         }
       ],
       "lifecycle": {
-        "stage": "proposal_sent",
-        "stage_updated_at": "2026-05-04T12:26:57.688Z",
+        "stage": "revenue_active",
+        "stage_updated_at": "2026-06-05T03:16:13.233Z",
         "blocked": false,
         "block_reason": null
       },
       "next_action": {
-        "type": "followup",
-        "owner": "ross",
+        "type": "monitor",
+        "owner": "system",
         "due_at": null,
-        "instructions": "Follow up on real ShopiFixer offer and close payment.",
-        "auto_executable": false,
-        "updated_at": "2026-05-04T12:26:57.688Z"
+        "instructions": "Monitor recovered revenue and prepare upsell or case study.",
+        "auto_executable": true,
+        "updated_at": "2026-06-05T03:16:13.233Z"
       },
       "revenue": {
         "shopifixer_one_time": 0,
@@ -101,7 +101,7 @@
       },
       "decision_trace": {
         "engine": "next_action_engine_v1",
-        "evaluated_at": "2026-05-03T23:09:47.062Z",
+        "evaluated_at": "2026-06-05T03:16:13.233Z",
         "lifecycle_stage": "revenue_active",
         "next_action_type": "monitor",
         "blocked": false,
@@ -134,7 +134,7 @@
       "source": "staffordmedia",
       "status": "qualified",
       "created_at": "2026-06-03T22:46:15.216Z",
-      "updated_at": "2026-06-03T22:46:57.290Z",
+      "updated_at": "2026-06-05T03:16:13.233Z",
       "selected_product": "shopifixer",
       "routing_reason": "Shopify conversion, checkout, audit, or dev issue",
       "qualification_status": "qualified",
@@ -145,13 +145,13 @@
         "block_reason": null
       },
       "next_action": {
-        "type": "audit",
+        "type": "outreach",
         "owner": "system",
         "due_at": null,
-        "instructions": "Prepare the ShopiFixer audit path and next merchant follow-up.",
+        "instructions": "Send first ShopiFixer audit outreach message.",
         "auto_executable": true,
         "created_at": "2026-06-03T22:46:15.216Z",
-        "updated_at": "2026-06-03T22:46:57.290Z"
+        "updated_at": "2026-06-05T03:16:13.233Z"
       },
       "contact": {
         "email": "rossstafford1@gmail.com",
@@ -228,7 +228,28 @@
             "valid_contact_email"
           ]
         }
-      ]
+      ],
+      "priority_score": {
+        "revenue_potential": 0,
+        "ease_of_close": 40,
+        "time_to_cash": 45,
+        "system_confidence": 0,
+        "total": 21
+      },
+      "blocker_detection": {
+        "blocked": false,
+        "blocker_count": 0,
+        "highest_severity": null,
+        "blockers": []
+      },
+      "decision_trace": {
+        "engine": "next_action_engine_v1",
+        "evaluated_at": "2026-06-05T03:16:13.233Z",
+        "lifecycle_stage": "lead",
+        "next_action_type": "outreach",
+        "blocked": false,
+        "block_reason": null
+      }
     },
     {
       "client_id": "fitgearpro.myshopify.com",
@@ -236,7 +257,7 @@
       "source": "staffordos",
       "status": "qualified",
       "created_at": "2026-06-03T22:46:15.217Z",
-      "updated_at": "2026-06-03T22:46:57.291Z",
+      "updated_at": "2026-06-05T03:16:13.233Z",
       "selected_product": "shopifixer",
       "routing_reason": "Shopify conversion, checkout, audit, or dev issue",
       "qualification_status": "qualified",
@@ -247,13 +268,13 @@
         "block_reason": null
       },
       "next_action": {
-        "type": "audit",
+        "type": "outreach",
         "owner": "system",
         "due_at": null,
-        "instructions": "Prepare the ShopiFixer audit path and next merchant follow-up.",
+        "instructions": "Send first ShopiFixer audit outreach message.",
         "auto_executable": true,
         "created_at": "2026-06-03T22:46:15.217Z",
-        "updated_at": "2026-06-03T22:46:57.291Z"
+        "updated_at": "2026-06-05T03:16:13.233Z"
       },
       "contact": {
         "email": "",
@@ -324,7 +345,28 @@
             "status.current_stage=engaged"
           ]
         }
-      ]
+      ],
+      "priority_score": {
+        "revenue_potential": 0,
+        "ease_of_close": 40,
+        "time_to_cash": 45,
+        "system_confidence": 0,
+        "total": 21
+      },
+      "blocker_detection": {
+        "blocked": false,
+        "blocker_count": 0,
+        "highest_severity": null,
+        "blockers": []
+      },
+      "decision_trace": {
+        "engine": "next_action_engine_v1",
+        "evaluated_at": "2026-06-05T03:16:13.233Z",
+        "lifecycle_stage": "lead",
+        "next_action_type": "outreach",
+        "blocked": false,
+        "block_reason": null
+      }
     },
     {
       "client_id": "homegoodsco.myshopify.com",
@@ -332,7 +374,7 @@
       "source": "staffordos",
       "status": "qualified",
       "created_at": "2026-06-03T22:46:15.217Z",
-      "updated_at": "2026-06-03T22:46:57.292Z",
+      "updated_at": "2026-06-05T03:16:13.233Z",
       "selected_product": "shopifixer",
       "routing_reason": "Shopify conversion, checkout, audit, or dev issue",
       "qualification_status": "qualified",
@@ -343,13 +385,13 @@
         "block_reason": null
       },
       "next_action": {
-        "type": "audit",
+        "type": "outreach",
         "owner": "system",
         "due_at": null,
-        "instructions": "Prepare the ShopiFixer audit path and next merchant follow-up.",
+        "instructions": "Send first ShopiFixer audit outreach message.",
         "auto_executable": true,
         "created_at": "2026-06-03T22:46:15.217Z",
-        "updated_at": "2026-06-03T22:46:57.292Z"
+        "updated_at": "2026-06-05T03:16:13.233Z"
       },
       "contact": {
         "email": "",
@@ -420,7 +462,28 @@
             "status.current_stage=engaged"
           ]
         }
-      ]
+      ],
+      "priority_score": {
+        "revenue_potential": 0,
+        "ease_of_close": 40,
+        "time_to_cash": 45,
+        "system_confidence": 0,
+        "total": 21
+      },
+      "blocker_detection": {
+        "blocked": false,
+        "blocker_count": 0,
+        "highest_severity": null,
+        "blockers": []
+      },
+      "decision_trace": {
+        "engine": "next_action_engine_v1",
+        "evaluated_at": "2026-06-05T03:16:13.233Z",
+        "lifecycle_stage": "lead",
+        "next_action_type": "outreach",
+        "blocked": false,
+        "block_reason": null
+      }
     },
     {
       "client_id": "store1.myshopify.com",
@@ -428,7 +491,7 @@
       "source": "staffordos",
       "status": "qualified",
       "created_at": "2026-06-03T22:46:15.218Z",
-      "updated_at": "2026-06-03T22:46:57.292Z",
+      "updated_at": "2026-06-05T03:16:13.233Z",
       "selected_product": "shopifixer",
       "routing_reason": "Shopify conversion, checkout, audit, or dev issue",
       "qualification_status": "qualified",
@@ -439,13 +502,13 @@
         "block_reason": null
       },
       "next_action": {
-        "type": "audit",
+        "type": "outreach",
         "owner": "system",
         "due_at": null,
-        "instructions": "Prepare the ShopiFixer audit path and next merchant follow-up.",
+        "instructions": "Send first ShopiFixer audit outreach message.",
         "auto_executable": true,
         "created_at": "2026-06-03T22:46:15.218Z",
-        "updated_at": "2026-06-03T22:46:57.292Z"
+        "updated_at": "2026-06-05T03:16:13.233Z"
       },
       "contact": {
         "email": "owner@store1.com",
@@ -519,7 +582,28 @@
             "valid_contact_email"
           ]
         }
-      ]
+      ],
+      "priority_score": {
+        "revenue_potential": 0,
+        "ease_of_close": 40,
+        "time_to_cash": 45,
+        "system_confidence": 0,
+        "total": 21
+      },
+      "blocker_detection": {
+        "blocked": false,
+        "blocker_count": 0,
+        "highest_severity": null,
+        "blockers": []
+      },
+      "decision_trace": {
+        "engine": "next_action_engine_v1",
+        "evaluated_at": "2026-06-05T03:16:13.233Z",
+        "lifecycle_stage": "lead",
+        "next_action_type": "outreach",
+        "blocked": false,
+        "block_reason": null
+      }
     }
   ],
   "operating_model": {
@@ -561,7 +645,7 @@
   },
   "decision_engine": {
     "name": "staffordos.next_action_engine_v1",
-    "generated_at": "2026-05-03T23:09:47.062Z",
+    "generated_at": "2026-06-05T03:16:13.233Z",
     "rule": "Deterministically derive lifecycle, blocker state, and next action from client truth."
   }
 }

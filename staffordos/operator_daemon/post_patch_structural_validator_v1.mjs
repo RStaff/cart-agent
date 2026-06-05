@@ -28,6 +28,9 @@ const resolver = read(files.resolver);
 const runner = read(files.runner);
 const commitGate = read(files.commitGate);
 const artifact = expectedArtifact ? safeJson(expectedArtifact) : null;
+const isClientRegistryArtifact =
+  expectedArtifact === "staffordos/clients/client_registry_v1.json" ||
+  expectedArtifact.endsWith("/staffordos/clients/client_registry_v1.json");
 
 const forbiddenBlockMatches = [
   ...commitGate.matchAll(/FORBIDDEN ACTION CHECK/g)
@@ -81,7 +84,22 @@ const checks = {
   expected_artifact_exists: expectedArtifact ? existsSync(expectedArtifact) : false,
   expected_artifact_valid_json: Boolean(artifact),
   expected_artifact_schema_present: Boolean(artifact?.schema),
-  expected_artifact_task_or_status_present: Boolean(artifact?.status || artifact?.task_type || artifact?.execution)
+  expected_artifact_task_or_status_present: isClientRegistryArtifact
+    ? Boolean(
+        artifact?.schema &&
+        Array.isArray(artifact?.clients) &&
+        artifact?.generated_at &&
+        artifact?.purpose &&
+        artifact?.decision_engine &&
+        artifact.clients.every((client) =>
+          Boolean(
+            client?.client_id &&
+            client?.lifecycle &&
+            client?.next_action
+          )
+        )
+      )
+    : Boolean(artifact?.status || artifact?.task_type || artifact?.execution)
 };
 
 const failures = [];

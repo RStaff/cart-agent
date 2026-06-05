@@ -125,6 +125,16 @@ revenue_conversion_surface_validator: {
     reason: "Default safe executable command for persistent operator proof loop."
   },
 
+  next_action_execution: {
+    task_type: "next_action_execution",
+    command: "node staffordos/clients/next_action_engine_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "fulfillment_transition",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Execute lifecycle transitions for paid clients through next_action_engine_v1.mjs."
+  },
+
   system_truth_sync: {
     task_type: "system_truth_sync",
     command: "node staffordos/system_inventory/runners/discovery_sync_runner_v1.mjs",
