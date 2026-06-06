@@ -1,0 +1,160 @@
+{
+  "schema": "staffordos.ceo_snapshot_discovery.v1",
+  "generated_at": "2026-06-05T04:17:27.000Z",
+  "summary": {
+    "lead_truth": true,
+    "client_truth": true,
+    "revenue_truth": true,
+    "fulfillment_truth": true,
+    "proof_truth": true,
+    "operator_truth": true,
+    "dashboard_truth": true,
+    "cockpit_convergence": "partial"
+  },
+  "truth_sources": [
+    {
+      "domain": "lead_truth",
+      "file": "staffordos/leads/lead_registry_v1.json",
+      "owner": "staffordos/leads/lead_registry_sync_agent_v1.mjs",
+      "runtime_writer": [
+        "staffordos/leads/lead_registry_sync_agent_v1.mjs",
+        "staffordos/leads/followup_agent_v1.mjs",
+        "staffordos/leads/reply_detection_agent_v1.mjs",
+        "staffordos/leads/contact_enrichment_agent_v1.mjs",
+        "staffordos/leads/promote_leads_to_clients_v1.mjs"
+      ],
+      "authority_level": "authoritative",
+      "update_frequency": "event-driven / sync-driven",
+      "used_by_cockpit": "direct"
+    },
+    {
+      "domain": "lead_event_truth",
+      "file": "staffordos/leads/lead_events_v1.json",
+      "owner": "staffordos/leads/lead_registry_sync_agent_v1.mjs",
+      "runtime_writer": [
+        "staffordos/leads/lead_registry_sync_agent_v1.mjs"
+      ],
+      "authority_level": "supporting",
+      "update_frequency": "append-only event-driven",
+      "used_by_cockpit": "indirect"
+    },
+    {
+      "domain": "send_proof_truth",
+      "file": "staffordos/leads/send_ledger_v1.json",
+      "owner": "staffordos/leads/send_ledger_agent_v1.mjs",
+      "runtime_writer": [
+        "staffordos/leads/send_ledger_agent_v1.mjs",
+        "staffordos/leads/send_execution_agent_v1.mjs",
+        "staffordos/leads/reply_detection_agent_v1.mjs"
+      ],
+      "authority_level": "supporting",
+      "update_frequency": "event-driven",
+      "used_by_cockpit": "direct"
+    },
+    {
+      "domain": "client_truth",
+      "file": "staffordos/clients/client_registry_v1.json",
+      "owner": "staffordos/clients/next_action_engine_v1.mjs",
+      "runtime_writer": [
+        "staffordos/clients/next_action_engine_v1.mjs",
+        "staffordos/revenue/revenue_agent_v1.mjs (recordVerifiedStripePayment path)",
+        "staffordos/clients/promote_leads_to_clients_v1.mjs",
+        "staffordos/clients/upgrade_client_registry_operating_model_v1.mjs"
+      ],
+      "authority_level": "authoritative",
+      "update_frequency": "gated execution / webhook / normalization runs",
+      "used_by_cockpit": "direct"
+    },
+    {
+      "domain": "revenue_truth",
+      "file": "staffordos/revenue/revenue_truth_v1.json",
+      "owner": "staffordos/revenue/revenue_agent_v1.mjs",
+      "runtime_writer": [
+        "staffordos/revenue/revenue_agent_v1.mjs"
+      ],
+      "authority_level": "authoritative",
+      "update_frequency": "payment webhook / revenue sync",
+      "used_by_cockpit": "direct"
+    },
+    {
+      "domain": "fulfillment_work_truth",
+      "file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+      "owner": "staffordos/units/lock_schema_foundation_v1.mjs",
+      "runtime_writer": [
+        "staffordos/units/lock_schema_foundation_v1.mjs"
+      ],
+      "authority_level": "supporting",
+      "update_frequency": "schema/unit refresh runs",
+      "used_by_cockpit": "direct"
+    },
+    {
+      "domain": "fulfillment_unit_truth",
+      "file": "staffordos/units/delivery_units_v1.json",
+      "owner": "staffordos/units/lock_schema_foundation_v1.mjs",
+      "runtime_writer": [
+        "staffordos/units/lock_schema_foundation_v1.mjs"
+      ],
+      "authority_level": "supporting",
+      "update_frequency": "schema/unit refresh runs",
+      "used_by_cockpit": "indirect"
+    },
+    {
+      "domain": "operator_action_truth",
+      "file": "staffordos/snapshots/primary_action_snapshot_v1.json",
+      "owner": "staffordos/decision/resolve_primary_action_v1.mjs",
+      "runtime_writer": [
+        "staffordos/decision/resolve_primary_action_v1.mjs",
+        "staffordos/operator_daemon/persistent_operator_v1.mjs"
+      ],
+      "authority_level": "authoritative for primary action",
+      "update_frequency": "operator loop / on-demand resolve",
+      "used_by_cockpit": "direct"
+    },
+    {
+      "domain": "operator_action_log",
+      "file": "staffordos/events/operator_action_events_v1.json",
+      "owner": "staffordos/ui/operator-frontend/app/api/operator/execute-primary-action/route.ts",
+      "runtime_writer": [
+        "staffordos/ui/operator-frontend/app/api/operator/execute-primary-action/route.ts"
+      ],
+      "authority_level": "supporting",
+      "update_frequency": "CTA click / operator action",
+      "used_by_cockpit": "indirect"
+    },
+    {
+      "domain": "outcome_truth",
+      "file": "staffordos/events/outcome_event_log_v1.json",
+      "owner": "staffordos/ui/operator-frontend/app/api/operator/execute-primary-action/route.ts",
+      "runtime_writer": [
+        "staffordos/ui/operator-frontend/app/api/operator/execute-primary-action/route.ts",
+        "staffordos/units/lock_schema_foundation_v1.mjs"
+      ],
+      "authority_level": "supporting",
+      "update_frequency": "CTA click / event log",
+      "used_by_cockpit": "indirect"
+    },
+    {
+      "domain": "dashboard_truth",
+      "file": "staffordos/clients/operator_dashboard_snapshot_v1.json",
+      "owner": "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs",
+      "runtime_writer": [
+        "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs",
+        "staffordos/revenue/revenue_agent_v1.mjs"
+      ],
+      "authority_level": "derived authoritative summary",
+      "update_frequency": "payment propagation / dashboard rebuild",
+      "used_by_cockpit": "direct"
+    },
+    {
+      "domain": "system_truth_summary",
+      "file": "staffordos/system_map/system_map_truth_v1.json",
+      "owner": "staffordos/agents/system_truth_sync_agent_v1.mjs",
+      "runtime_writer": [
+        "staffordos/agents/system_truth_sync_agent_v1.mjs"
+      ],
+      "authority_level": "derived system summary",
+      "update_frequency": "system truth sync loop",
+      "used_by_cockpit": "indirect"
+    }
+  ]
+}

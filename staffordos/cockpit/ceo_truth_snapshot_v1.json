@@ -1,0 +1,323 @@
+{
+  "metadata": {
+    "schema": "staffordos.ceo_truth_snapshot.v1",
+    "generated_at": "2026-06-06T03:13:50.778Z",
+    "source_files": [
+      {
+        "file": "staffordos/leads/lead_registry_v1.json",
+        "exists": true,
+        "status": "loaded",
+        "updated_at": "2026-06-05T04:17:27.440Z"
+      },
+      {
+        "file": "staffordos/leads/lead_events_v1.json",
+        "exists": true,
+        "status": "loaded",
+        "updated_at": "2026-06-05T04:17:27.441Z"
+      },
+      {
+        "file": "staffordos/leads/send_ledger_v1.json",
+        "exists": true,
+        "status": "loaded",
+        "updated_at": "2026-04-28T19:41:34.711Z"
+      },
+      {
+        "file": "staffordos/clients/client_registry_v1.json",
+        "exists": true,
+        "status": "loaded",
+        "updated_at": "2026-06-05T04:17:27.372Z"
+      },
+      {
+        "file": "staffordos/revenue/revenue_truth_v1.json",
+        "exists": true,
+        "status": "loaded",
+        "updated_at": "2026-06-05T04:17:27.561Z"
+      },
+      {
+        "file": "staffordos/clients/operator_dashboard_snapshot_v1.json",
+        "exists": true,
+        "status": "loaded",
+        "updated_at": "2026-06-04T22:47:25.080Z"
+      },
+      {
+        "file": "staffordos/snapshots/primary_action_snapshot_v1.json",
+        "exists": true,
+        "status": "loaded",
+        "updated_at": "2026-06-05T04:17:27.187Z"
+      },
+      {
+        "file": "staffordos/system_map/system_map_truth_v1.json",
+        "exists": true,
+        "status": "loaded",
+        "updated_at": "2026-06-05T04:17:27.570Z"
+      },
+      {
+        "file": "staffordos/operator_daemon/operator_daemon_state_v1.json",
+        "exists": true,
+        "status": "loaded",
+        "updated_at": "2026-06-05T04:17:37.609Z"
+      },
+      {
+        "file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+        "exists": true,
+        "status": "loaded",
+        "updated_at": "2026-05-04T15:06:21.181Z"
+      }
+    ],
+    "confidence": "partial"
+  },
+  "revenue": {
+    "stafford_revenue": 0,
+    "recurring_revenue": 0,
+    "merchant_revenue_recovered": 100,
+    "active_revenue_clients": 0
+  },
+  "shopifixer_pipeline": {
+    "leads": 23,
+    "audits_requested": 1,
+    "proposals_sent": 0,
+    "paid_clients": 0,
+    "clients_waiting_for_fulfillment": 0
+  },
+  "fulfillment": {
+    "fix_in_progress": 0,
+    "fix_completed": 0,
+    "proof_needed": null,
+    "review_needed": null,
+    "referral_needed": null
+  },
+  "abando": {
+    "installs": 1,
+    "recovery_revenue": 100,
+    "active_recovery_clients": 1
+  },
+  "system_health": {
+    "blockers": [
+      "Revenue truth bottleneck: lead_supply_or_contact_quality",
+      "1 client(s) are waiting on audit completion before payment close.",
+      "No paid ShopiFixer clients are currently represented in client truth.",
+      "Proof/review/referral completion metrics are not directly represented in current runtime truth."
+    ],
+    "stale_truth": {
+      "status": "unknown",
+      "reason": "No governed staleness threshold defined for CEO snapshot inputs; only source timestamps are available.",
+      "inspected_sources": [
+        {
+          "file": "staffordos/leads/lead_registry_v1.json",
+          "status": "loaded",
+          "updated_at": "2026-06-05T04:17:27.440Z"
+        },
+        {
+          "file": "staffordos/leads/lead_events_v1.json",
+          "status": "loaded",
+          "updated_at": "2026-06-05T04:17:27.441Z"
+        },
+        {
+          "file": "staffordos/leads/send_ledger_v1.json",
+          "status": "loaded",
+          "updated_at": "2026-04-28T19:41:34.711Z"
+        },
+        {
+          "file": "staffordos/clients/client_registry_v1.json",
+          "status": "loaded",
+          "updated_at": "2026-06-05T04:17:27.372Z"
+        },
+        {
+          "file": "staffordos/revenue/revenue_truth_v1.json",
+          "status": "loaded",
+          "updated_at": "2026-06-05T04:17:27.561Z"
+        },
+        {
+          "file": "staffordos/clients/operator_dashboard_snapshot_v1.json",
+          "status": "loaded",
+          "updated_at": "2026-06-04T22:47:25.080Z"
+        },
+        {
+          "file": "staffordos/snapshots/primary_action_snapshot_v1.json",
+          "status": "loaded",
+          "updated_at": "2026-06-05T04:17:27.187Z"
+        },
+        {
+          "file": "staffordos/system_map/system_map_truth_v1.json",
+          "status": "loaded",
+          "updated_at": "2026-06-05T04:17:27.570Z"
+        },
+        {
+          "file": "staffordos/operator_daemon/operator_daemon_state_v1.json",
+          "status": "loaded",
+          "updated_at": "2026-06-05T04:17:37.609Z"
+        },
+        {
+          "file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+          "status": "loaded",
+          "updated_at": "2026-05-04T15:06:21.181Z"
+        }
+      ],
+      "daemon": {
+        "status": "completed",
+        "last_run": "2026-06-05T04:17:27.092Z",
+        "loops_run": 1
+      }
+    },
+    "missing_sources": [],
+    "warnings": [
+      "Top 5 actions are synthesized from existing runtime truth and remain partial until a single governed top-5 action artifact exists.",
+      "Lead registry contains 23 record(s); current lead truth is real but still lead-heavy.",
+      "Primary dashboard focus: Convert recovered merchant value into paid plan or case-study close."
+    ]
+  },
+  "operator_actions": {
+    "primary_action": {
+      "action_label": "Follow up on real ShopiFixer offer and close payment.",
+      "action_type": "revenue_close",
+      "domain_id": "shopifixer",
+      "product_id": "shopifixer",
+      "owner": "ross",
+      "priority_score": 100,
+      "urgency": "high",
+      "confidence": 0.82,
+      "confidence_band": "medium_high_human_validated",
+      "next_step": "Follow up on real ShopiFixer offer and close payment.",
+      "expected_outcome": "Move active ShopiFixer proposal toward paid client status.",
+      "evidence": [
+        "Active proposal has direct revenue capture potential.",
+        "ShopiFixer is the current immediate one-time revenue path.",
+        "Ross-owned action can be advanced immediately.",
+        "Next action explicitly targets payment close.",
+        "Follow-up is the active bottleneck after offer send.",
+        "Merchant value proven: $100 gap between recovered value and Stafford revenue captured.",
+        "Current UX integrity score is 37; decision layer needed before further UI polish."
+      ],
+      "risk": [
+        "Do not start delivery work before payment is captured.",
+        "Do not treat merchant recovered value as Stafford revenue.",
+        "Human judgment required before executing irreversible actions."
+      ],
+      "source_file": "staffordos/snapshots/primary_action_snapshot_v1.json",
+      "supporting_context": [],
+      "context": {
+        "revenue_gap": 100,
+        "primary_focus": "Convert recovered merchant value into paid plan or case-study close.",
+        "open_work_items": 4,
+        "client_count": 5
+      }
+    },
+    "top_5_actions": {
+      "status": "partial",
+      "items": [
+        {
+          "rank": 1,
+          "action_label": "Follow up on real ShopiFixer offer and close payment.",
+          "source_file": "staffordos/snapshots/primary_action_snapshot_v1.json",
+          "source_field": "primary_action.next_step",
+          "owner": "ross",
+          "authority": "authoritative primary action",
+          "evidence": [
+            "Active proposal has direct revenue capture potential.",
+            "ShopiFixer is the current immediate one-time revenue path.",
+            "Ross-owned action can be advanced immediately.",
+            "Next action explicitly targets payment close.",
+            "Follow-up is the active bottleneck after offer send.",
+            "Merchant value proven: $100 gap between recovered value and Stafford revenue captured.",
+            "Current UX integrity score is 37; decision layer needed before further UI polish."
+          ],
+          "confidence": 0.82
+        },
+        {
+          "rank": 2,
+          "action_label": "Wait for reply or track next click",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "items[].status.next_action / next_action",
+          "owner": "system",
+          "authority": "lead registry truth",
+          "evidence": [
+            "Lead: step5-test-store.myshopify.com",
+            "Stage: followup_sent",
+            "Primary offer: shopifixer_audit"
+          ],
+          "confidence": 0.55
+        },
+        {
+          "rank": 3,
+          "action_label": "Follow up on real ShopiFixer offer and close payment.",
+          "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+          "source_field": "open_work[].next_action",
+          "owner": "ross",
+          "authority": "unit work truth",
+          "evidence": [
+            "Unit: opp_cart-agent-dev.myshopify.com",
+            "Type: opportunity",
+            "Stage: proposal_sent",
+            "Domain: shopifixer"
+          ],
+          "confidence": 0.65
+        },
+        {
+          "rank": 4,
+          "action_label": "Convert recovered merchant value into paid plan or case-study close.",
+          "source_file": "staffordos/clients/operator_dashboard_snapshot_v1.json",
+          "source_field": "primary_focus.action",
+          "owner": "ross",
+          "authority": "dashboard derived truth",
+          "evidence": [
+            "Merchant value has been proven but Stafford revenue has not been captured.",
+            "Follow up on real ShopiFixer offer and close payment."
+          ],
+          "confidence": 0.75
+        },
+        {
+          "rank": 5,
+          "action_label": "Run ShopiFixer audit and write findings to client record.",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "clients[].next_action.instructions",
+          "owner": "system",
+          "authority": "client registry truth",
+          "evidence": [
+            "Client: cart-agent-dev.myshopify.com",
+            "Lifecycle: audit_requested",
+            "Payment: not_billable"
+          ],
+          "confidence": 0.7
+        }
+      ],
+      "evidence": [
+        "Active proposal has direct revenue capture potential.",
+        "ShopiFixer is the current immediate one-time revenue path.",
+        "Ross-owned action can be advanced immediately.",
+        "Next action explicitly targets payment close.",
+        "Follow-up is the active bottleneck after offer send.",
+        "Merchant value proven: $100 gap between recovered value and Stafford revenue captured.",
+        "Current UX integrity score is 37; decision layer needed before further UI polish.",
+        "Lead: step5-test-store.myshopify.com",
+        "Stage: followup_sent",
+        "Primary offer: shopifixer_audit",
+        "Unit: opp_cart-agent-dev.myshopify.com",
+        "Type: opportunity",
+        "Stage: proposal_sent",
+        "Domain: shopifixer",
+        "Merchant value has been proven but Stafford revenue has not been captured.",
+        "Follow up on real ShopiFixer offer and close payment.",
+        "Client: cart-agent-dev.myshopify.com",
+        "Lifecycle: audit_requested",
+        "Payment: not_billable"
+      ],
+      "note": "Five actions were synthesized from existing runtime truth."
+    },
+    "action_source": {
+      "primary": "staffordos/snapshots/primary_action_snapshot_v1.json",
+      "supporting": [
+        "staffordos/clients/operator_dashboard_snapshot_v1.json",
+        "staffordos/clients/client_registry_v1.json",
+        "staffordos/leads/lead_registry_v1.json",
+        "staffordos/snapshots/unit_work_snapshot_v1.json"
+      ],
+      "status": "partial"
+    },
+    "confidence": {
+      "level": "partial",
+      "primary_action": "high",
+      "top_5_actions": "partial",
+      "note": "Primary action is authoritative; the top-5 list is synthesized from runtime truth and remains partial until a single governed top-5 artifact exists."
+    }
+  }
+}

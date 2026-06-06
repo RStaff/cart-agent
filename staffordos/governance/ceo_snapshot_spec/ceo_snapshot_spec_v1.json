@@ -1,0 +1,257 @@
+{
+  "schema": "staffordos.ceo_snapshot_spec.v1",
+  "generated_at": "2026-06-05T04:17:27.000Z",
+  "sections": {
+    "revenue": [
+      {
+        "metric": "stafford_revenue",
+        "source_file": "staffordos/clients/operator_dashboard_snapshot_v1.json",
+        "source_field": "revenue_summary.stafford_revenue",
+        "authority_owner": "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs",
+        "refresh_source": "dashboard rebuild / payment propagation",
+        "confidence_level": "high"
+      },
+      {
+        "metric": "merchant_revenue_recovered",
+        "source_file": "staffordos/clients/operator_dashboard_snapshot_v1.json",
+        "source_field": "revenue_summary.merchant_revenue_recovered",
+        "authority_owner": "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs",
+        "refresh_source": "dashboard rebuild / payment propagation",
+        "confidence_level": "high"
+      },
+      {
+        "metric": "recurring_mrr",
+        "source_file": "staffordos/clients/operator_dashboard_snapshot_v1.json",
+        "source_field": "revenue_summary.recurring_mrr",
+        "authority_owner": "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs",
+        "refresh_source": "dashboard rebuild",
+        "confidence_level": "medium"
+      },
+      {
+        "metric": "active_revenue_clients",
+        "source_file": "staffordos/clients/operator_dashboard_snapshot_v1.json",
+        "source_field": "top_metrics.active_revenue_clients",
+        "authority_owner": "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs",
+        "refresh_source": "dashboard rebuild",
+        "confidence_level": "high"
+      },
+      {
+        "metric": "paid_clients",
+        "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "source_field": "revenue.paid_clients",
+        "authority_owner": "staffordos/clients/client_registry_v1.json",
+        "refresh_source": "CEO snapshot aggregation",
+        "confidence_level": "high"
+      },
+      {
+        "metric": "unpaid_clients",
+        "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "source_field": "revenue.unpaid_clients",
+        "authority_owner": "staffordos/clients/client_registry_v1.json",
+        "refresh_source": "CEO snapshot aggregation",
+        "confidence_level": "high"
+      }
+    ],
+    "shopifixer_pipeline": [
+      {
+        "metric": "proposal_sent_clients",
+        "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "source_field": "conversion.proposal_sent_clients",
+        "authority_owner": "staffordos/clients/client_registry_v1.json",
+        "refresh_source": "CEO snapshot aggregation",
+        "confidence_level": "high"
+      },
+      {
+        "metric": "payment_pending_clients",
+        "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "source_field": "conversion.payment_pending_clients",
+        "authority_owner": "staffordos/clients/client_registry_v1.json",
+        "refresh_source": "CEO snapshot aggregation",
+        "confidence_level": "high"
+      },
+      {
+        "metric": "audits_needed",
+        "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "source_field": "conversion.audits_needed",
+        "authority_owner": "staffordos/clients/client_registry_v1.json",
+        "refresh_source": "CEO snapshot aggregation",
+        "confidence_level": "high"
+      },
+      {
+        "metric": "closest_to_payment",
+        "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "source_field": "conversion.closest_to_payment",
+        "authority_owner": "staffordos/clients/client_registry_v1.json",
+        "refresh_source": "CEO snapshot aggregation",
+        "confidence_level": "medium"
+      }
+    ],
+    "shopifixer_fulfillment": [
+      {
+        "metric": "fixes_in_progress",
+        "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "source_field": "fulfillment.fixes_in_progress",
+        "authority_owner": "staffordos/clients/client_registry_v1.json",
+        "refresh_source": "CEO snapshot aggregation",
+        "confidence_level": "high"
+      },
+      {
+        "metric": "fix_not_started",
+        "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "source_field": "fulfillment.fix_not_started",
+        "authority_owner": "staffordos/clients/client_registry_v1.json",
+        "refresh_source": "CEO snapshot aggregation",
+        "confidence_level": "high"
+      },
+      {
+        "metric": "qa_queue",
+        "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "source_field": "fulfillment.qa_queue",
+        "authority_owner": "staffordos/clients/client_registry_v1.json",
+        "refresh_source": "CEO snapshot aggregation",
+        "confidence_level": "medium"
+      },
+      {
+        "metric": "proof_queue",
+        "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "source_field": "fulfillment.proof_queue",
+        "authority_owner": "staffordos/clients/client_registry_v1.json",
+        "refresh_source": "CEO snapshot aggregation",
+        "confidence_level": "medium"
+      }
+    ],
+    "proof_pipeline": [
+      {
+        "metric": "total_proofs",
+        "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "source_field": "merchant_success.outreach_proof.total_proofs",
+        "authority_owner": "staffordos/leads/send_ledger_v1.json",
+        "refresh_source": "CEO snapshot aggregation",
+        "confidence_level": "medium"
+      },
+      {
+        "metric": "dry_run_proofs",
+        "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "source_field": "merchant_success.outreach_proof.dry_run_proofs",
+        "authority_owner": "staffordos/leads/send_ledger_v1.json",
+        "refresh_source": "CEO snapshot aggregation",
+        "confidence_level": "medium"
+      },
+      {
+        "metric": "live_send_attempted",
+        "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "source_field": "merchant_success.outreach_proof.live_send_attempted",
+        "authority_owner": "staffordos/leads/send_ledger_v1.json",
+        "refresh_source": "CEO snapshot aggregation",
+        "confidence_level": "medium"
+      },
+      {
+        "metric": "proof_or_revenue_gaps",
+        "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "source_field": "merchant_success.proof_or_revenue_gaps",
+        "authority_owner": "staffordos/clients/client_registry_v1.json",
+        "refresh_source": "CEO snapshot aggregation",
+        "confidence_level": "medium"
+      }
+    ],
+    "abando": [
+      {
+        "metric": "merchant_revenue_recovered",
+        "source_file": "staffordos/clients/operator_dashboard_snapshot_v1.json",
+        "source_field": "revenue_summary.merchant_revenue_recovered",
+        "authority_owner": "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs",
+        "refresh_source": "dashboard rebuild",
+        "confidence_level": "high"
+      },
+      {
+        "metric": "abando_installed_clients",
+        "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "source_field": "clients[].abando.installed",
+        "authority_owner": "staffordos/clients/client_registry_v1.json",
+        "refresh_source": "CEO snapshot aggregation",
+        "confidence_level": "high"
+      },
+      {
+        "metric": "abando_mrr",
+        "source_file": "staffordos/clients/operator_dashboard_snapshot_v1.json",
+        "source_field": "revenue_summary.recurring_mrr",
+        "authority_owner": "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs",
+        "refresh_source": "dashboard rebuild",
+        "confidence_level": "high"
+      }
+    ],
+    "system_health": [
+      {
+        "metric": "lead_registry_health",
+        "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "source_field": "executive_control.source_health.lead_registry",
+        "authority_owner": "lead_registry_v1.json",
+        "refresh_source": "CEO snapshot aggregation",
+        "confidence_level": "high"
+      },
+      {
+        "metric": "client_registry_health",
+        "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "source_field": "executive_control.source_health.client_registry",
+        "authority_owner": "client_registry_v1.json",
+        "refresh_source": "CEO snapshot aggregation",
+        "confidence_level": "high"
+      },
+      {
+        "metric": "dashboard_snapshot_health",
+        "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "source_field": "executive_control.source_health.dashboard_snapshot",
+        "authority_owner": "operator_dashboard_snapshot_v1.json",
+        "refresh_source": "CEO snapshot aggregation",
+        "confidence_level": "high"
+      },
+      {
+        "metric": "proof_status_health",
+        "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "source_field": "executive_control.source_health.proof_status",
+        "authority_owner": "send_ledger_v1.json",
+        "refresh_source": "CEO snapshot aggregation",
+        "confidence_level": "medium"
+      }
+    ],
+    "top_operator_actions": [
+      {
+        "metric": "primary_action",
+        "source_file": "staffordos/snapshots/primary_action_snapshot_v1.json",
+        "source_field": "primary_action",
+        "authority_owner": "staffordos/decision/resolve_primary_action_v1.mjs",
+        "refresh_source": "operator loop",
+        "confidence_level": "high"
+      },
+      {
+        "metric": "next_best_action",
+        "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "source_field": "next_best_action",
+        "authority_owner": "CEO snapshot aggregation",
+        "refresh_source": "CEO snapshot aggregation",
+        "confidence_level": "high"
+      },
+      {
+        "metric": "priority_leads",
+        "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "source_field": "acquisition.priority_leads",
+        "authority_owner": "lead_registry_v1.json",
+        "refresh_source": "CEO snapshot aggregation",
+        "confidence_level": "medium"
+      },
+      {
+        "metric": "closest_to_payment",
+        "source_file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "source_field": "conversion.closest_to_payment",
+        "authority_owner": "client_registry_v1.json",
+        "refresh_source": "CEO snapshot aggregation",
+        "confidence_level": "medium"
+      }
+    ]
+  },
+  "notes": [
+    "Only existing runtime truth fields are included.",
+    "The snapshot spec should not invent extra KPIs.",
+    "Fulfillment and proof are currently only partially converged in the cockpit."
+  ]
+}
