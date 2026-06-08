@@ -4,8 +4,8 @@ import { loadPreflightReport } from "../../../lib/operator/loadPreflightReport";
 import { loadCommandCenterQaReport } from "../../../lib/operator/loadCommandCenterQaReport";
 import { loadUnitWorkSnapshot } from "../../../lib/operator/loadUnitWorkSnapshot";
 
-export default function RossCommandCenterPage() {
-  const primaryActionSnapshot = loadPrimaryActionSnapshot();
+export default async function RossCommandCenterPage() {
+  const primaryActionSnapshot = await loadPrimaryActionSnapshot();
   const preflightReport = loadPreflightReport();
   const qaReport = loadCommandCenterQaReport();
   const unitWorkSnapshot = loadUnitWorkSnapshot();

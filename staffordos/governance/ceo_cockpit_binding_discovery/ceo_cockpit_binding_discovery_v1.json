@@ -1,0 +1,74 @@
+{
+  "schema": "staffordos.ceo_cockpit_binding_discovery.v1",
+  "generated_at": "2026-06-06T03:13:50.778Z",
+  "objective": "Bind the authoritative CEO Truth Snapshot to the operator cockpit as a read-only view.",
+  "ui_routes": [
+    {
+      "route": "/operator/cockpit",
+      "file": "staffordos/ui/operator-frontend/app/operator/cockpit/page.tsx",
+      "owner": "operator frontend",
+      "current_behavior": "control-plane buttons and status output",
+      "current_data_source": "control endpoints only",
+      "status": "stale",
+      "recommended_role": "CEO Truth Snapshot cockpit"
+    },
+    {
+      "route": "/operator/command-center",
+      "file": "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx",
+      "owner": "operator frontend",
+      "current_behavior": "Ross operator action surface",
+      "current_data_source": [
+        "primary action snapshot",
+        "preflight report",
+        "QA report",
+        "unit work snapshot"
+      ],
+      "status": "leave_unchanged",
+      "recommended_role": "operator control surface"
+    }
+  ],
+  "api_routes": [
+    {
+      "route": "/api/operator/ceo-snapshot",
+      "file": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+      "behavior": "aggregates lead registry, client registry, dashboard snapshot, and proof status",
+      "status": "stale_for_ceo_truth_snapshot"
+    },
+    {
+      "route": "/api/operator/dashboard-snapshot",
+      "file": "staffordos/ui/operator-frontend/app/api/operator/dashboard-snapshot/route.ts",
+      "behavior": "exposes dashboard snapshot read model",
+      "status": "supporting_read_model"
+    },
+    {
+      "route": "/api/operator/ross-command-center",
+      "file": "staffordos/ui/operator-frontend/app/api/operator/ross-command-center/route.ts",
+      "behavior": "exposes Ross operator artifacts",
+      "status": "unrelated"
+    }
+  ],
+  "data_sources": [
+    "staffordos/leads/lead_registry_v1.json",
+    "staffordos/leads/lead_events_v1.json",
+    "staffordos/leads/send_ledger_v1.json",
+    "staffordos/clients/client_registry_v1.json",
+    "staffordos/revenue/revenue_truth_v1.json",
+    "staffordos/clients/operator_dashboard_snapshot_v1.json",
+    "staffordos/snapshots/primary_action_snapshot_v1.json",
+    "staffordos/system_map/system_map_truth_v1.json",
+    "staffordos/operator_daemon/operator_daemon_state_v1.json",
+    "staffordos/snapshots/unit_work_snapshot_v1.json"
+  ],
+  "binding_recommendation": {
+    "ui_route": "/operator/cockpit",
+    "api_endpoint": "/api/operator/ceo-truth-snapshot",
+    "stale_route": "/operator/cockpit",
+    "stale_api": "/api/operator/ceo-snapshot",
+    "mode": "read_only",
+    "notes": [
+      "No new business logic.",
+      "No duplicate truth source.",
+      "No change to command-center."
+    ]
+  }
+}
