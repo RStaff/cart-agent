@@ -1,0 +1,126 @@
+{
+  "schema": "staffordos.shopifixer_before_after_conversion_model.v1",
+  "generated_at": "2026-06-08T00:00:00Z",
+  "verdict": "partial_support_not_authoritative",
+  "supports_true_before_after_ux": false,
+  "before_state": {
+    "supported": [
+      {
+        "file": "abando-frontend/app/scorecard/[domain]/page.tsx",
+        "route": "/scorecard/[domain]",
+        "proof": [
+          "revenue opportunity estimate",
+          "top issue",
+          "benchmark summary",
+          "confidence"
+        ]
+      },
+      {
+        "file": "abando-frontend/app/audit-result/page.tsx",
+        "route": "/audit-result",
+        "proof": [
+          "audit score",
+          "estimated revenue leak",
+          "top issue",
+          "benchmark summary",
+          "recommended action"
+        ]
+      },
+      {
+        "file": "staffordos/clients/client_registry_v1.json",
+        "proof": [
+          "shopifixer.audit_status = not_started",
+          "shopifixer.fix_status = not_started",
+          "deal.payment_status = not_billable"
+        ]
+      },
+      {
+        "file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+        "proof": [
+          "stage = proposal_sent",
+          "stage = waiting_for_payment"
+        ]
+      },
+      {
+        "file": "staffordos/cockpit/ceo_truth_snapshot_v1.json",
+        "proof": [
+          "merchant_revenue_recovered = 100",
+          "stafford_revenue = 0"
+        ]
+      }
+    ]
+  },
+  "after_state": {
+    "supported": [
+      {
+        "file": "staffordos/clients/shopifixer_offer_latest.json",
+        "proof": [
+          "recovered_revenue = 100",
+          "proof_present = true",
+          "one_time_fix = 150",
+          "abando_mrr = 49"
+        ]
+      },
+      {
+        "file": "staffordos/clients/client_registry_v1.json",
+        "proof": [
+          "offer_sent note proof exists"
+        ]
+      },
+      {
+        "file": "staffordos/cockpit/ceo_truth_snapshot_v1.json",
+        "proof": [
+          "merchant_revenue_recovered = 100",
+          "stafford_revenue = 0",
+          "proof_needed = null",
+          "review_needed = null",
+          "referral_needed = null"
+        ]
+      }
+    ]
+  },
+  "proof_artifacts": {
+    "existing": [
+      "staffordos/leads/send_ledger_v1.json",
+      "staffordos/leads/send_execution_log_v1.json",
+      "staffordos/clients/shopifixer_offer_latest.json",
+      "staffordos/clients/client_registry_v1.json",
+      "staffordos/cockpit/ceo_truth_snapshot_v1.json"
+    ],
+    "missing": [
+      "staffordos/audit/audit_result_surface.json",
+      "shopifixer before-state screenshot artifact",
+      "shopifixer after-state screenshot artifact",
+      "shopifixer proof package artifact"
+    ]
+  },
+  "route_dependencies": {
+    "audit_result_page": "/audit-result",
+    "audit_status_api": "/api/audit/status",
+    "missing_source": "staffordos/audit/audit_result_surface.json",
+    "missing_source_exists": false
+  },
+  "missing_proof_gaps": [
+    "No governed audit-result surface file exists in this checkout.",
+    "No ShopiFixer before/after proof package artifact exists as runtime truth.",
+    "No completed after-state merchant proof is represented yet."
+  ],
+  "smallest_next_slice": {
+    "route_or_file": "abando-frontend/app/api/audit/status/route.ts",
+    "supporting_missing_artifact": "staffordos/audit/audit_result_surface.json",
+    "reason": "The current merchant-facing audit-result flow is wired to a missing result surface; filling that gap is the smallest step toward a real before/after proof-backed conversion experience."
+  },
+  "do_not_touch": [
+    "staffordos/clients/client_registry_v1.json",
+    "staffordos/revenue/revenue_truth_v1.json",
+    "staffordos/snapshots/unit_work_snapshot_v1.json",
+    "web/src/routes/stripeWebhook.esm.js",
+    "web/src/routes/pricing.esm.js",
+    "web/src/checkout-public.js",
+    "lifecycle authority files",
+    "Abando install/dashboard/merchant flows",
+    "Stripe/payment truth logic",
+    "new lifecycle models",
+    "new metrics"
+  ]
+}
