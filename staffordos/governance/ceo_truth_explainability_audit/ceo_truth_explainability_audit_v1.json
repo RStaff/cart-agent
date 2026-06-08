@@ -1,0 +1,393 @@
+{
+  "schema": "staffordos.governance.ceo_truth_explainability_audit.v1",
+  "generated_at": "2026-06-08T22:17:11Z",
+  "verdict": "partially_explainable_partially_authoritative",
+  "summary": {
+    "primary_action_authority": "staffordos/snapshots/primary_action_snapshot_v1.json",
+    "primary_action_owner": "staffordos/decision/resolve_primary_action_v1.mjs",
+    "ceo_snapshot_builder": "staffordos/cockpit/build_ceo_truth_snapshot_v1.mjs",
+    "cockpit_surface": "staffordos/ui/operator-frontend/app/operator/cockpit/page.tsx",
+    "status": "The primary action can be traced to an authoritative resolver snapshot, but the CEO snapshot does not yet include field-level provenance or a structured scoring trace for every displayed action."
+  },
+  "files_inspected": [
+    "staffordos/cockpit/build_ceo_truth_snapshot_v1.mjs",
+    "staffordos/cockpit/ceo_truth_snapshot_v1.json",
+    "staffordos/snapshots/primary_action_snapshot_v1.json",
+    "staffordos/leads/lead_registry_v1.json",
+    "staffordos/clients/client_registry_v1.json",
+    "staffordos/revenue/revenue_truth_v1.json",
+    "staffordos/system_map/system_map_truth_v1.json",
+    "staffordos/ui/operator-frontend/app/operator/cockpit/page.tsx",
+    "staffordos/decision/resolve_primary_action_v1.mjs",
+    "staffordos/clients/operator_dashboard_snapshot_v1.json",
+    "staffordos/snapshots/unit_work_snapshot_v1.json",
+    "staffordos/gates/confidence_gate_v1.json",
+    "staffordos/ux_audit/output/operator_command_center_ux_integrity_v1.json"
+  ],
+  "directly_sourced_fields": [
+    {
+      "field": "metadata.source_files[]",
+      "source": "filesystem stat/read status for build_ceo_truth_snapshot_v1.mjs SOURCE_FILES",
+      "status": "direct_file_metadata"
+    },
+    {
+      "field": "revenue.stafford_revenue",
+      "source": "staffordos/clients/operator_dashboard_snapshot_v1.json: revenue_summary.stafford_revenue",
+      "status": "direct_current_source_with_client_registry_fallback"
+    },
+    {
+      "field": "revenue.recurring_revenue",
+      "source": "staffordos/clients/operator_dashboard_snapshot_v1.json: revenue_summary.recurring_mrr",
+      "status": "direct_current_source_with_client_registry_fallback"
+    },
+    {
+      "field": "revenue.merchant_revenue_recovered",
+      "source": "staffordos/clients/operator_dashboard_snapshot_v1.json: revenue_summary.merchant_revenue_recovered",
+      "status": "direct_current_source_with_client_registry_fallback"
+    },
+    {
+      "field": "revenue.active_revenue_clients",
+      "source": "staffordos/clients/operator_dashboard_snapshot_v1.json: top_metrics.active_revenue_clients",
+      "status": "direct_current_source_with_client_registry_fallback"
+    },
+    {
+      "field": "operator_actions.primary_action.action_label",
+      "source": "staffordos/snapshots/primary_action_snapshot_v1.json: primary_action.action_label",
+      "status": "direct"
+    },
+    {
+      "field": "operator_actions.primary_action.action_type",
+      "source": "staffordos/snapshots/primary_action_snapshot_v1.json: primary_action.action_type",
+      "status": "direct"
+    },
+    {
+      "field": "operator_actions.primary_action.domain_id",
+      "source": "staffordos/snapshots/primary_action_snapshot_v1.json: primary_action.domain_id",
+      "status": "direct"
+    },
+    {
+      "field": "operator_actions.primary_action.product_id",
+      "source": "staffordos/snapshots/primary_action_snapshot_v1.json: primary_action.product_id",
+      "status": "direct"
+    },
+    {
+      "field": "operator_actions.primary_action.owner",
+      "source": "staffordos/snapshots/primary_action_snapshot_v1.json: primary_action.owner",
+      "status": "direct"
+    },
+    {
+      "field": "operator_actions.primary_action.priority_score",
+      "source": "staffordos/snapshots/primary_action_snapshot_v1.json: primary_action.priority_score",
+      "status": "direct"
+    },
+    {
+      "field": "operator_actions.primary_action.urgency",
+      "source": "staffordos/snapshots/primary_action_snapshot_v1.json: primary_action.urgency",
+      "status": "direct"
+    },
+    {
+      "field": "operator_actions.primary_action.confidence",
+      "source": "staffordos/snapshots/primary_action_snapshot_v1.json: primary_action.confidence",
+      "status": "direct"
+    },
+    {
+      "field": "operator_actions.primary_action.confidence_band",
+      "source": "staffordos/snapshots/primary_action_snapshot_v1.json: primary_action.confidence_band",
+      "status": "direct"
+    },
+    {
+      "field": "operator_actions.primary_action.next_step",
+      "source": "staffordos/snapshots/primary_action_snapshot_v1.json: primary_action.next_step",
+      "status": "direct"
+    },
+    {
+      "field": "operator_actions.primary_action.expected_outcome",
+      "source": "staffordos/snapshots/primary_action_snapshot_v1.json: primary_action.expected_outcome",
+      "status": "direct"
+    },
+    {
+      "field": "operator_actions.primary_action.evidence[]",
+      "source": "staffordos/snapshots/primary_action_snapshot_v1.json: primary_action.evidence[]",
+      "status": "direct"
+    },
+    {
+      "field": "operator_actions.primary_action.risk[]",
+      "source": "staffordos/snapshots/primary_action_snapshot_v1.json: primary_action.risk[]",
+      "status": "direct"
+    },
+    {
+      "field": "operator_actions.primary_action.execution_*",
+      "source": "staffordos/snapshots/primary_action_snapshot_v1.json: primary_action.execution_*",
+      "status": "direct_in_current_json_but_not_preserved_by_inspected_builder"
+    },
+    {
+      "field": "system_health.stale_truth.daemon",
+      "source": "staffordos/operator_daemon/operator_daemon_state_v1.json",
+      "status": "direct"
+    }
+  ],
+  "synthesized_or_inferred_fields": [
+    {
+      "field": "metadata.generated_at",
+      "logic": "builder execution timestamp"
+    },
+    {
+      "field": "metadata.confidence",
+      "logic": "partial unless top_5_actions.status is authoritative"
+    },
+    {
+      "field": "shopifixer_pipeline.leads",
+      "logic": "count lead_registry_v1.json items[]"
+    },
+    {
+      "field": "shopifixer_pipeline.audits_requested",
+      "logic": "count normalized client records where lifecycle_stage equals audit_requested"
+    },
+    {
+      "field": "shopifixer_pipeline.proposals_sent",
+      "logic": "count normalized client records where lifecycle_stage equals proposal_sent"
+    },
+    {
+      "field": "shopifixer_pipeline.paid_clients",
+      "logic": "count clients with paid-like payment status or positive business.stafford_revenue_earned"
+    },
+    {
+      "field": "shopifixer_pipeline.clients_waiting_for_fulfillment",
+      "logic": "count paid-like clients whose shopifixer.fix_status equals not_started"
+    },
+    {
+      "field": "fulfillment.fix_in_progress",
+      "logic": "count clients with lifecycle/fix status in progress, active, qa, or proof_ready"
+    },
+    {
+      "field": "fulfillment.fix_completed",
+      "logic": "count clients with lifecycle/fix status completed"
+    },
+    {
+      "field": "abando.installs",
+      "logic": "count clients where abando.installed is true"
+    },
+    {
+      "field": "abando.recovery_revenue",
+      "logic": "sum client abando.merchant_revenue_recovered"
+    },
+    {
+      "field": "abando.active_recovery_clients",
+      "logic": "count installed clients with merchant revenue recovered over 0"
+    },
+    {
+      "field": "system_health.blockers[]",
+      "logic": "builder assembles strings from revenue bottleneck, pipeline counts, paid client count, and unavailable proof/review/referral metrics"
+    },
+    {
+      "field": "system_health.warnings[]",
+      "logic": "builder-written warnings from top-5 partial status, lead count, and dashboard primary focus"
+    },
+    {
+      "field": "operator_actions.primary_action.context",
+      "logic": "builder derives revenue_gap, primary_focus, open_work_items, and client_count from supporting files"
+    },
+    {
+      "field": "operator_actions.top_5_actions.items[]",
+      "logic": "builder synthesizes and ranks candidates from primary action, dashboard primary focus, current client next action, unit work next actions, and lead next actions"
+    },
+    {
+      "field": "operator_actions.action_source",
+      "logic": "static declaration in build_ceo_truth_snapshot_v1.mjs"
+    },
+    {
+      "field": "operator_actions.confidence",
+      "logic": "static wording based on top-5 status"
+    }
+  ],
+  "fields_not_traceable_to_single_authority": [
+    {
+      "field": "operator_actions.top_5_actions",
+      "reason": "Synthesized locally in the CEO snapshot builder; no governed top-5 action artifact exists."
+    },
+    {
+      "field": "fulfillment.proof_needed",
+      "reason": "Hard-coded null; snapshot warns proof metrics are not directly represented in current runtime truth."
+    },
+    {
+      "field": "fulfillment.review_needed",
+      "reason": "Hard-coded null; snapshot warns review metrics are not directly represented in current runtime truth."
+    },
+    {
+      "field": "fulfillment.referral_needed",
+      "reason": "Hard-coded null; snapshot warns referral metrics are not directly represented in current runtime truth."
+    },
+    {
+      "field": "system_health.stale_truth.status",
+      "reason": "Set to unknown because no governed staleness threshold exists."
+    },
+    {
+      "field": "system_health.blockers[]",
+      "reason": "Human-readable synthesized strings without structured field-level trace objects."
+    },
+    {
+      "field": "system_health.warnings[]",
+      "reason": "Builder-authored messages, not direct business truth."
+    },
+    {
+      "field": "operator_actions.primary_action.context.revenue_gap",
+      "reason": "Uses dashboard revenue_gaps[0].gap, which assumes the first gap is the relevant primary-action gap."
+    },
+    {
+      "field": "operator_actions.primary_action.execution_*",
+      "reason": "Present in current CEO JSON and traceable to primary_action_snapshot_v1.json, but not emitted by the inspected builder source."
+    }
+  ],
+  "primary_action_logic": {
+    "ceo_snapshot_behavior": "build_ceo_truth_snapshot_v1.mjs imports the primary action from primary_action_snapshot_v1.json; it does not select the winner itself.",
+    "resolver": "staffordos/decision/resolve_primary_action_v1.mjs",
+    "candidate_source": "staffordos/snapshots/unit_work_snapshot_v1.json: open_work[]",
+    "candidate_sort": "descending priority_score after scoreUnit; first candidate wins",
+    "score_cap": 100,
+    "score_components": [
+      {
+        "condition": "unit.type == opportunity and unit.stage includes proposal",
+        "points": 45
+      },
+      {
+        "condition": "unit.type == action and unit.next_action includes follow up",
+        "points": 35
+      },
+      {
+        "condition": "unit.type == delivery and unit.status == waiting_for_payment",
+        "points": 25
+      },
+      {
+        "condition": "unit.domain_id == shopifixer",
+        "points": 18
+      },
+      {
+        "condition": "unit.domain_id == abando",
+        "points": 14
+      },
+      {
+        "condition": "unit.domain_id == internal_dev",
+        "points": 6
+      },
+      {
+        "condition": "unit.owner == ross",
+        "points": 10
+      },
+      {
+        "condition": "unit.next_action includes close payment",
+        "points": 20
+      },
+      {
+        "condition": "unit.next_action includes follow up",
+        "points": 12
+      },
+      {
+        "condition": "unit.status == open",
+        "points": 5
+      },
+      {
+        "condition": "unit.status == waiting_for_payment",
+        "points": 8
+      }
+    ],
+    "current_winner": {
+      "unit_id": "opp_cart-agent-dev.myshopify.com",
+      "reason": "Open ShopiFixer opportunity in proposal stage, owned by Ross, with next action to follow up and close payment.",
+      "raw_score": 110,
+      "capped_score": 100
+    },
+    "non_selection_inputs": [
+      {
+        "file": "staffordos/clients/client_registry_v1.json",
+        "effect": "Adds matching client context, revenue gap evidence, and Stafford/merchant revenue context; does not select winner."
+      },
+      {
+        "file": "staffordos/clients/operator_dashboard_snapshot_v1.json",
+        "effect": "Provides primary focus fallback/context; does not select winner."
+      },
+      {
+        "file": "staffordos/gates/confidence_gate_v1.json",
+        "effect": "Controls risk wording and confidence interpretation; does not select winner."
+      },
+      {
+        "file": "staffordos/ux_audit/output/operator_command_center_ux_integrity_v1.json",
+        "effect": "Adds UX evidence; does not select winner."
+      }
+    ]
+  },
+  "truth_changes_that_select_different_primary_action": [
+    "Remove opp_cart-agent-dev.myshopify.com from unit_work_snapshot_v1.json open_work[].",
+    "Change that unit type away from opportunity.",
+    "Change that unit stage so it no longer includes proposal.",
+    "Change that unit domain_id away from shopifixer.",
+    "Change that unit owner away from ross.",
+    "Change that unit next_action so it no longer includes follow up or close payment.",
+    "Change that unit status away from open.",
+    "Add a higher-scoring open_work candidate.",
+    "Add an equal 100-point candidate that appears before the current winner in candidate order.",
+    "Remove all open_work items, which causes the resolver to emit No active unit of work found."
+  ],
+  "cockpit_can_explain_why": {
+    "answer": "partial",
+    "data_has_explanation": [
+      "operator_actions.primary_action.evidence[]",
+      "operator_actions.primary_action.risk[]",
+      "operator_actions.primary_action.source_file",
+      "operator_actions.top_5_actions.items[0].evidence[]",
+      "operator_actions.action_source"
+    ],
+    "ui_explanation": "The cockpit page displays primary action source/confidence/next step and top-5 cards with evidence, but it does not display a structured resolver score trace or field-source map.",
+    "missing": [
+      "primary action score breakdown",
+      "all candidates considered",
+      "why alternatives lost",
+      "field-level source map",
+      "structured blocker provenance"
+    ]
+  },
+  "smallest_repair": {
+    "description": "Add decision trace and field source maps to the resolver and CEO snapshot builder, then regenerate snapshots. Add cockpit rendering only if visible explainability is required.",
+    "steps": [
+      "Update resolve_primary_action_v1.mjs to emit decision_trace with scored candidates, score components, winner, alternatives, tie behavior, and source fields.",
+      "Update build_ceo_truth_snapshot_v1.mjs to copy primary_action.decision_trace and emit ceo_snapshot.field_sources for every displayed CEO field.",
+      "Mark proof_needed, review_needed, and referral_needed as unavailable with source notes instead of unexplained nulls.",
+      "Preserve primary action execution fields from primary_action_snapshot_v1.json when building the CEO snapshot.",
+      "Replace blocker-only strings or supplement them with structured blocker_trace entries.",
+      "Regenerate primary_action_snapshot_v1.json and ceo_truth_snapshot_v1.json/md.",
+      "Optionally update cockpit page to render decision trace and source map."
+    ]
+  },
+  "files_to_change_for_repair": [
+    "staffordos/decision/resolve_primary_action_v1.mjs",
+    "staffordos/cockpit/build_ceo_truth_snapshot_v1.mjs",
+    "staffordos/snapshots/primary_action_snapshot_v1.json",
+    "staffordos/cockpit/ceo_truth_snapshot_v1.json",
+    "staffordos/cockpit/ceo_truth_snapshot_v1.md",
+    "staffordos/ui/operator-frontend/app/operator/cockpit/page.tsx"
+  ],
+  "files_that_should_not_change": [
+    "commercial/pricing flows",
+    "ShopiFixer UI",
+    "Abando app flows",
+    "checkout code",
+    "Stripe code",
+    "lifecycle authority files",
+    "lead state machines",
+    "revenue logic",
+    "staffordos/leads/lead_registry_v1.json",
+    "staffordos/clients/client_registry_v1.json",
+    "staffordos/revenue/revenue_truth_v1.json",
+    "staffordos/system_map/system_map_truth_v1.json"
+  ],
+  "answers": {
+    "1_direct_authoritative_fields": "Revenue summary fields from operator dashboard snapshot, primary action fields from primary_action_snapshot_v1.json, source metadata, daemon state, and current execution fields in the JSON.",
+    "2_synthesized_fields": "Pipeline counts, fulfillment counts, Abando counts, blockers, warnings, top-5 actions, confidence wording, and primary-action context.",
+    "3_untraceable_fields": "Top-5 actions, proof/review/referral needed metrics, stale truth status, blocker strings, warning strings, first revenue gap selection, and builder/snapshot-drifted execution fields.",
+    "4_primary_action_logic": "The resolver scores unit_work_snapshot_v1.json open_work[] items, caps scores at 100, sorts by descending score, and selects the first candidate.",
+    "5_truth_changes_for_different_primary_action": "Change unit_work_snapshot_v1.json open_work[] so the current ShopiFixer proposal follow-up no longer scores highest, add an equal/higher candidate before it, or remove all open work.",
+    "6_can_cockpit_explain_why": "Partially. Evidence exists and some is displayed, but no structured score trace or field-source map is visible.",
+    "7_smallest_implementation_slice": "Add decision_trace to primary_action_snapshot and field_sources/structured blocker traces to CEO snapshot builder; regenerate snapshots; optionally render the trace in cockpit.",
+    "8_files_to_change": "resolve_primary_action_v1.mjs, build_ceo_truth_snapshot_v1.mjs, generated primary action snapshot, generated CEO snapshot JSON/MD, optionally cockpit page.",
+    "9_files_not_to_change": "Commercial flows, ShopiFixer UI, Abando, checkout, Stripe, lifecycle authority, lead state machines, revenue logic, and runtime truth registries."
+  }
+}
