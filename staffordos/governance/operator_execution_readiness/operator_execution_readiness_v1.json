@@ -1,0 +1,85 @@
+{
+  "schema": "staffordos.operator_execution_readiness.v1",
+  "generated_at": "2026-06-08T12:00:00.000Z",
+  "source_files": [
+    "staffordos/cockpit/ceo_truth_snapshot_v1.json",
+    "staffordos/snapshots/primary_action_snapshot_v1.json",
+    "staffordos/leads/lead_registry_v1.json",
+    "staffordos/clients/client_registry_v1.json",
+    "staffordos/ui/operator-frontend/app/operator/cockpit/page.tsx",
+    "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx",
+    "staffordos/ui/operator-frontend/app/api/operator/execute-primary-action/route.ts",
+    "staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts",
+    "staffordos/ui/operator-frontend/app/api/operator/client-registry/route.ts",
+    "staffordos/ui/operator-frontend/app/api/operator/followups/route.ts",
+    "staffordos/ui/operator-frontend/components/operator/ExecutePrimaryActionButton.tsx"
+  ],
+  "actions": [
+    {
+      "rank": 1,
+      "action_label": "Follow up on real ShopiFixer offer and close payment.",
+      "target": "opp_cart-agent-dev.myshopify.com",
+      "artifact": "staffordos/snapshots/primary_action_snapshot_v1.json",
+      "execution_path": "/api/operator/execute-primary-action -> run_agent_loop.mjs",
+      "can_launch": true,
+      "blocker": "Cockpit lacks an execution control; launch is currently exposed through the operator command-center flow.",
+      "classification": "EXECUTABLE"
+    },
+    {
+      "rank": 2,
+      "action_label": "Wait for reply or track next click",
+      "target": "step5-test-store.myshopify.com",
+      "artifact": "staffordos/leads/lead_registry_v1.json",
+      "execution_path": null,
+      "can_launch": false,
+      "blocker": "The displayed action is a passive state label and there is no dedicated launch route for it.",
+      "classification": "VIEW_ONLY"
+    },
+    {
+      "rank": 3,
+      "action_label": "Follow up on real ShopiFixer offer and close payment.",
+      "target": "opp_cart-agent-dev.myshopify.com",
+      "artifact": "staffordos/snapshots/unit_work_snapshot_v1.json",
+      "execution_path": "/api/operator/execute-primary-action -> run_agent_loop.mjs",
+      "can_launch": true,
+      "blocker": "Same execution-gap as rank 1; the cockpit has no direct launch control yet.",
+      "classification": "EXECUTABLE"
+    },
+    {
+      "rank": 4,
+      "action_label": "Convert recovered merchant value into paid plan or case-study close.",
+      "target": "cart-agent-dev.myshopify.com",
+      "artifact": "staffordos/clients/operator_dashboard_snapshot_v1.json",
+      "execution_path": null,
+      "can_launch": false,
+      "blocker": "This is a derived recommendation without a direct executor.",
+      "classification": "ACTIONABLE"
+    },
+    {
+      "rank": 5,
+      "action_label": "Run ShopiFixer audit and write findings to client record.",
+      "target": "cart-agent-dev.myshopify.com",
+      "artifact": "staffordos/clients/client_registry_v1.json",
+      "execution_path": null,
+      "can_launch": false,
+      "blocker": "Client registry truth exists, but there is no runtime path that executes this exact audit action from the cockpit.",
+      "classification": "ACTIONABLE"
+    }
+  ],
+  "summary": {
+    "informational_actions": 3,
+    "executable_actions": 2,
+    "fully_automatable_actions": 0,
+    "informational_percentage": 60,
+    "executable_percentage": 40,
+    "highest_value_action": "Follow up on real ShopiFixer offer and close payment.",
+    "minimum_implementation_slice": [
+      "staffordos/ui/operator-frontend/app/operator/cockpit/page.tsx"
+    ],
+    "notes": [
+      "No new metrics were introduced.",
+      "No lifecycle logic was modified.",
+      "No commercial flow was modified."
+    ]
+  }
+}
