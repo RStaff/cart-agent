@@ -8,6 +8,17 @@ const REPO_ROOT = path.resolve(__dirname, "..", "..");
 const OUT_DIR = path.join(REPO_ROOT, "staffordos", "cockpit");
 const OUT_JSON = path.join(OUT_DIR, "ceo_truth_snapshot_v1.json");
 const OUT_MD = path.join(OUT_DIR, "ceo_truth_snapshot_v1.md");
+const EXECUTION_STATE_FIELDS = [
+  "execution_status",
+  "last_execution_result",
+  "last_execution_reason",
+  "last_execution_recommendation",
+  "last_launched_at",
+  "last_completed_at",
+  "last_failed_at",
+  "last_execution_event_id",
+  "last_execution_artifacts",
+];
 
 const SOURCE_FILES = [
   "staffordos/leads/lead_registry_v1.json",
@@ -82,6 +93,25 @@ function uniqueBy(items, keyFn) {
     seen.add(key);
     return true;
   });
+}
+
+function sourceNote(status, source_file, source_field, note = null) {
+  return {
+    status,
+    source_file,
+    source_field,
+    note,
+  };
+}
+
+function unavailableMarker(field, reason, source_file = null, source_field = null) {
+  return {
+    field,
+    status: "unavailable",
+    reason,
+    source_file,
+    source_field,
+  };
 }
 
 function readSnapshotInputs() {
@@ -220,26 +250,59 @@ function deriveSystemHealth(inputs, metrics) {
   const leads = Array.isArray(inputs.leadRegistry.value.items) ? inputs.leadRegistry.value.items.map(normalizeLead) : [];
 
   const blockers = [];
+  const blockerTrace = [];
+
+  function addBlocker(message, sources, note = null) {
+    blockers.push(message);
+    blockerTrace.push({
+      message,
+      status: "synthesized",
+      sources,
+      note,
+    });
+  }
 
   const bottleneck = text(revenueTruth.current_bottleneck) || text(systemMap.system_status?.current_bottleneck);
   if (bottleneck) {
-    blockers.push(`Revenue truth bottleneck: ${bottleneck}`);
+    addBlocker(
+      `Revenue truth bottleneck: ${bottleneck}`,
+      [
+        "staffordos/revenue/revenue_truth_v1.json: current_bottleneck",
+        "staffordos/system_map/system_map_truth_v1.json: system_status.current_bottleneck",
+      ],
+      "Revenue truth is preferred; system map is fallback.",
+    );
   }
 
   const auditRequested = metrics.shopifixer_pipeline.audits_requested || 0;
   const paidClients = metrics.shopifixer_pipeline.paid_clients || 0;
   if (auditRequested > 0) {
-    blockers.push(`${auditRequested} client(s) are waiting on audit completion before payment close.`);
+    addBlocker(
+      `${auditRequested} client(s) are waiting on audit completion before payment close.`,
+      ["staffordos/clients/client_registry_v1.json: clients[].lifecycle.stage"],
+      "Synthesized from audit_requested client count.",
+    );
   }
   if (paidClients === 0) {
-    blockers.push("No paid ShopiFixer clients are currently represented in client truth.");
+    addBlocker(
+      "No paid ShopiFixer clients are currently represented in client truth.",
+      [
+        "staffordos/clients/client_registry_v1.json: clients[].deal.payment_status",
+        "staffordos/clients/client_registry_v1.json: clients[].business.stafford_revenue_earned",
+      ],
+      "Synthesized from paid-like payment status and Stafford revenue earned.",
+    );
   }
 
   const proofNeeded = metrics.fulfillment.proof_needed;
   const reviewNeeded = metrics.fulfillment.review_needed;
   const referralNeeded = metrics.fulfillment.referral_needed;
   if (proofNeeded === null || reviewNeeded === null || referralNeeded === null) {
-    blockers.push("Proof/review/referral completion metrics are not directly represented in current runtime truth.");
+    addBlocker(
+      "Proof/review/referral completion metrics are not directly represented in current runtime truth.",
+      ["staffordos/clients/client_registry_v1.json: no governed proof/review/referral needed fields"],
+      "Unavailable metrics are carried as null with explicit unavailable markers.",
+    );
   }
 
   const missingSources = [];
@@ -249,6 +312,7 @@ function deriveSystemHealth(inputs, metrics) {
 
   return {
     blockers,
+    blocker_trace: blockerTrace,
     stale_truth: {
       status: "unknown",
       reason: "No governed staleness threshold defined for CEO snapshot inputs; only source timestamps are available.",
@@ -273,7 +337,16 @@ function deriveSystemHealth(inputs, metrics) {
 }
 
 function derivePrimaryAction(inputs) {
-  const primary = inputs.primaryActionSnapshot.value?.primary_action || {};
+  const primaryActionSnapshot = inputs.primaryActionSnapshot.value || {};
+  const primary = primaryActionSnapshot.primary_action || {};
+  const executionState = {};
+  for (const field of EXECUTION_STATE_FIELDS) {
+    if (Object.prototype.hasOwnProperty.call(primary, field)) {
+      executionState[field] = primary[field];
+    } else if (Object.prototype.hasOwnProperty.call(primaryActionSnapshot, field)) {
+      executionState[field] = primaryActionSnapshot[field];
+    }
+  }
   const dashboard = inputs.dashboardSnapshot.value || {};
   const clients = Array.isArray(inputs.clientRegistry.value.clients) ? inputs.clientRegistry.value.clients.map(normalizeClient) : [];
   const unitWork = inputs.unitWorkSnapshot.value || {};
@@ -292,6 +365,7 @@ function derivePrimaryAction(inputs) {
     expected_outcome: text(primary.expected_outcome),
     evidence: Array.isArray(primary.evidence) ? primary.evidence : [],
     risk: Array.isArray(primary.risk) ? primary.risk : [],
+    decision_trace: primary.decision_trace || primaryActionSnapshot.decision_trace || null,
     source_file: "staffordos/snapshots/primary_action_snapshot_v1.json",
     supporting_context: Array.isArray(primary.supporting_context) ? primary.supporting_context : [],
     context: {
@@ -299,7 +373,8 @@ function derivePrimaryAction(inputs) {
       primary_focus: text(dashboard.primary_focus?.action),
       open_work_items: Array.isArray(unitWork.open_work) ? unitWork.open_work.length : 0,
       client_count: clients.length,
-    }
+    },
+    ...executionState,
   };
 }
 
@@ -436,6 +511,69 @@ function deriveActionSource(inputs) {
   };
 }
 
+function buildUnavailableFields() {
+  return [
+    unavailableMarker(
+      "fulfillment.proof_needed",
+      "No governed runtime truth field currently represents proof-needed count.",
+      "staffordos/clients/client_registry_v1.json",
+      "not_available",
+    ),
+    unavailableMarker(
+      "fulfillment.review_needed",
+      "No governed runtime truth field currently represents review-needed count.",
+      "staffordos/clients/client_registry_v1.json",
+      "not_available",
+    ),
+    unavailableMarker(
+      "fulfillment.referral_needed",
+      "No governed runtime truth field currently represents referral-needed count.",
+      "staffordos/clients/client_registry_v1.json",
+      "not_available",
+    ),
+    unavailableMarker(
+      "system_health.stale_truth.status",
+      "No governed staleness threshold is defined for CEO snapshot inputs.",
+      "staffordos/cockpit/build_ceo_truth_snapshot_v1.mjs",
+      "deriveSystemHealth",
+    ),
+  ];
+}
+
+function buildFieldSources() {
+  return {
+    "metadata.generated_at": sourceNote("generated", "staffordos/cockpit/build_ceo_truth_snapshot_v1.mjs", "buildSnapshot"),
+    "metadata.source_files": sourceNote("file_metadata", "staffordos/cockpit/build_ceo_truth_snapshot_v1.mjs", "SOURCE_FILES"),
+    "metadata.confidence": sourceNote("synthesized", "staffordos/cockpit/build_ceo_truth_snapshot_v1.mjs", "top_5_actions.status"),
+    "revenue.stafford_revenue": sourceNote("direct_with_fallback", "staffordos/clients/operator_dashboard_snapshot_v1.json", "revenue_summary.stafford_revenue", "Falls back to client registry revenue totals if dashboard summary is absent."),
+    "revenue.recurring_revenue": sourceNote("direct_with_fallback", "staffordos/clients/operator_dashboard_snapshot_v1.json", "revenue_summary.recurring_mrr", "Falls back to client registry recurring MRR if dashboard summary is absent."),
+    "revenue.merchant_revenue_recovered": sourceNote("direct_with_fallback", "staffordos/clients/operator_dashboard_snapshot_v1.json", "revenue_summary.merchant_revenue_recovered", "Falls back to client registry recovered merchant revenue if dashboard summary is absent."),
+    "revenue.active_revenue_clients": sourceNote("direct_with_fallback", "staffordos/clients/operator_dashboard_snapshot_v1.json", "top_metrics.active_revenue_clients", "Falls back to client registry revenue_active count if dashboard summary is absent."),
+    "shopifixer_pipeline.leads": sourceNote("synthesized", "staffordos/leads/lead_registry_v1.json", "items[].length"),
+    "shopifixer_pipeline.audits_requested": sourceNote("synthesized", "staffordos/clients/client_registry_v1.json", "clients[].lifecycle.stage == audit_requested"),
+    "shopifixer_pipeline.proposals_sent": sourceNote("synthesized", "staffordos/clients/client_registry_v1.json", "clients[].lifecycle.stage == proposal_sent"),
+    "shopifixer_pipeline.paid_clients": sourceNote("synthesized", "staffordos/clients/client_registry_v1.json", "clients[].deal.payment_status + clients[].business.stafford_revenue_earned"),
+    "shopifixer_pipeline.clients_waiting_for_fulfillment": sourceNote("synthesized", "staffordos/clients/client_registry_v1.json", "paid-like clients with shopifixer.fix_status == not_started"),
+    "fulfillment.fix_in_progress": sourceNote("synthesized", "staffordos/clients/client_registry_v1.json", "clients[].lifecycle.stage + clients[].shopifixer.fix_status"),
+    "fulfillment.fix_completed": sourceNote("synthesized", "staffordos/clients/client_registry_v1.json", "clients[].lifecycle.stage + clients[].shopifixer.fix_status"),
+    "fulfillment.proof_needed": sourceNote("unavailable", "staffordos/clients/client_registry_v1.json", "not_available", "No governed runtime truth field currently represents this metric."),
+    "fulfillment.review_needed": sourceNote("unavailable", "staffordos/clients/client_registry_v1.json", "not_available", "No governed runtime truth field currently represents this metric."),
+    "fulfillment.referral_needed": sourceNote("unavailable", "staffordos/clients/client_registry_v1.json", "not_available", "No governed runtime truth field currently represents this metric."),
+    "abando.installs": sourceNote("synthesized", "staffordos/clients/client_registry_v1.json", "clients[].abando.installed"),
+    "abando.recovery_revenue": sourceNote("synthesized", "staffordos/clients/client_registry_v1.json", "clients[].abando.merchant_revenue_recovered"),
+    "abando.active_recovery_clients": sourceNote("synthesized", "staffordos/clients/client_registry_v1.json", "clients[].abando.installed + clients[].abando.merchant_revenue_recovered"),
+    "system_health.blockers": sourceNote("synthesized", "staffordos/cockpit/build_ceo_truth_snapshot_v1.mjs", "deriveSystemHealth"),
+    "system_health.blocker_trace": sourceNote("synthesized", "staffordos/cockpit/build_ceo_truth_snapshot_v1.mjs", "deriveSystemHealth"),
+    "system_health.stale_truth": sourceNote("synthesized_unavailable", "staffordos/cockpit/build_ceo_truth_snapshot_v1.mjs", "deriveSystemHealth", "Source timestamps exist, but no governed staleness threshold exists."),
+    "operator_actions.primary_action": sourceNote("direct", "staffordos/snapshots/primary_action_snapshot_v1.json", "primary_action"),
+    "operator_actions.primary_action.decision_trace": sourceNote("direct", "staffordos/snapshots/primary_action_snapshot_v1.json", "primary_action.decision_trace"),
+    "operator_actions.primary_action.execution_state": sourceNote("direct", "staffordos/snapshots/primary_action_snapshot_v1.json", EXECUTION_STATE_FIELDS.map((field) => `primary_action.${field}`).join(", ")),
+    "operator_actions.top_5_actions": sourceNote("synthesized", "staffordos/cockpit/build_ceo_truth_snapshot_v1.mjs", "deriveTopFiveActions", "No governed top-5 action authority artifact exists yet."),
+    "operator_actions.action_source": sourceNote("synthesized", "staffordos/cockpit/build_ceo_truth_snapshot_v1.mjs", "deriveActionSource"),
+    "operator_actions.confidence": sourceNote("synthesized", "staffordos/cockpit/build_ceo_truth_snapshot_v1.mjs", "top_5_actions.status"),
+  };
+}
+
 function buildSnapshot() {
   const sourceFileInfo = SOURCE_FILES.map((file) => {
     const filePath = abs(file);
@@ -478,6 +616,8 @@ function buildSnapshot() {
   const primaryAction = derivePrimaryAction(inputs);
   const topFiveActions = deriveTopFiveActions(inputs, primaryAction);
   const actionSource = deriveActionSource(inputs);
+  const fieldSources = buildFieldSources();
+  const unavailableFields = buildUnavailableFields();
 
   const snapshot = {
     metadata: {
@@ -491,6 +631,8 @@ function buildSnapshot() {
     fulfillment,
     abando,
     system_health: systemHealth,
+    field_sources: fieldSources,
+    unavailable_fields: unavailableFields,
     operator_actions: {
       primary_action: primaryAction,
       top_5_actions: topFiveActions,

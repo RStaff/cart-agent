@@ -1,6 +1,18 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 
 const now = new Date().toISOString();
+const PRIMARY_ACTION_SNAPSHOT_PATH = "staffordos/snapshots/primary_action_snapshot_v1.json";
+const EXECUTION_STATE_FIELDS = [
+  "execution_status",
+  "last_execution_result",
+  "last_execution_reason",
+  "last_execution_recommendation",
+  "last_launched_at",
+  "last_completed_at",
+  "last_failed_at",
+  "last_execution_event_id",
+  "last_execution_artifacts",
+];
 
 function readJson(path, fallback = null) {
   if (!existsSync(path)) return fallback;
@@ -20,6 +32,7 @@ const dashboardSnapshot = readJson("staffordos/clients/operator_dashboard_snapsh
 const clientRegistry = readJson("staffordos/clients/client_registry_v1.json", { clients: [] });
 const confidenceGate = readJson("staffordos/gates/confidence_gate_v1.json", {});
 const uxReport = readJson("staffordos/ux_audit/output/operator_command_center_ux_integrity_v1.json", { score: {} });
+const existingSnapshot = readJson(PRIMARY_ACTION_SNAPSHOT_PATH, {});
 
 const clients = Array.isArray(clientRegistry.clients) ? clientRegistry.clients : [];
 const openUnits = Array.isArray(unitSnapshot.open_work) ? unitSnapshot.open_work : [];
@@ -49,60 +62,70 @@ function scoreUnit(unit) {
   const actionType = classifyAction(unit);
   let score = 0;
   const reasons = [];
+  const score_components = [];
+
+  function add(points, component, reason, source_field) {
+    score += points;
+    reasons.push(reason);
+    score_components.push({
+      component,
+      points,
+      reason,
+      source_file: "staffordos/snapshots/unit_work_snapshot_v1.json",
+      source_field,
+    });
+  }
 
   if (actionType === "revenue_close") {
-    score += 45;
-    reasons.push("Active proposal has direct revenue capture potential.");
+    add(45, "revenue_capture_potential", "Active proposal has direct revenue capture potential.", "open_work[].type + open_work[].stage");
   }
 
   if (actionType === "revenue_followup") {
-    score += 35;
-    reasons.push("Follow-up action can move an active opportunity toward payment.");
+    add(35, "revenue_followup", "Follow-up action can move an active opportunity toward payment.", "open_work[].type + open_work[].next_action");
   }
 
   if (actionType === "payment_waiting") {
-    score += 25;
-    reasons.push("Delivery is blocked until payment is captured.");
+    add(25, "payment_waiting", "Delivery is blocked until payment is captured.", "open_work[].type + open_work[].status");
   }
 
   if (unit.domain_id === "shopifixer") {
-    score += 18;
-    reasons.push("ShopiFixer is the current immediate one-time revenue path.");
+    add(18, "domain_priority", "ShopiFixer is the current immediate one-time revenue path.", "open_work[].domain_id");
   }
 
   if (unit.domain_id === "abando") {
-    score += 14;
-    reasons.push("Abando supports recurring revenue.");
+    add(14, "domain_priority", "Abando supports recurring revenue.", "open_work[].domain_id");
   }
 
   if (unit.domain_id === "internal_dev") {
-    score += 6;
-    reasons.push("Internal dev improves system capability but is not immediate cash capture.");
+    add(6, "domain_priority", "Internal dev improves system capability but is not immediate cash capture.", "open_work[].domain_id");
   }
 
   if (unit.owner === "ross") {
-    score += 10;
-    reasons.push("Ross-owned action can be advanced immediately.");
+    add(10, "owner_executability", "Ross-owned action can be advanced immediately.", "open_work[].owner");
   }
 
   if (String(unit.next_action || "").toLowerCase().includes("close payment")) {
-    score += 20;
-    reasons.push("Next action explicitly targets payment close.");
+    add(20, "payment_closure_language", "Next action explicitly targets payment close.", "open_work[].next_action");
   }
 
   if (String(unit.next_action || "").toLowerCase().includes("follow up")) {
-    score += 12;
-    reasons.push("Follow-up is the active bottleneck after offer send.");
+    add(12, "followup_bottleneck", "Follow-up is the active bottleneck after offer send.", "open_work[].next_action");
   }
 
-  if (unit.status === "open") score += 5;
-  if (unit.status === "waiting_for_payment") score += 8;
+  if (unit.status === "open") {
+    add(5, "open_work_status", "Open work is actionable.", "open_work[].status");
+  }
+  if (unit.status === "waiting_for_payment") {
+    add(8, "payment_waiting_status", "Work is waiting for payment.", "open_work[].status");
+  }
 
   return {
     unit,
     action_type: actionType,
+    raw_score: score,
     priority_score: Math.min(score, 100),
-    reasons
+    score_components,
+    reasons,
   };
 }
 
@@ -115,6 +138,7 @@ const alternatives = scored.slice(1, 5).map((item) => ({
   unit_id: item.unit.unit_id,
   action_type: item.action_type,
   domain_id: item.unit.domain_id,
+  raw_score: item.raw_score,
   priority_score: item.priority_score,
   next_action: item.unit.next_action,
   why_not_primary: item.priority_score < (winner?.priority_score || 0)
@@ -144,7 +168,81 @@ const urgency =
   winner?.action_type === "payment_waiting" ? "medium" :
   "medium";
 
-const primaryAction = winner ? {
+function actionIdentity(action) {
+  return [
+    action?.action_label,
+    action?.action_type,
+    action?.domain_id,
+    action?.next_step,
+  ].map((value) => String(value || "")).join("::");
+}
+
+function preservedExecutionState(nextAction) {
+  const previous = existingSnapshot?.primary_action || {};
+  if (actionIdentity(previous) !== actionIdentity(nextAction)) {
+    return {};
+  }
+
+  const preserved = {};
+  if (previous.action_id) {
+    preserved.action_id = previous.action_id;
+  }
+
+  for (const field of EXECUTION_STATE_FIELDS) {
+    if (Object.prototype.hasOwnProperty.call(previous, field)) {
+      preserved[field] = previous[field];
+    }
+  }
+
+  return preserved;
+}
+
+function decisionCandidate(item, rank) {
+  return {
+    rank,
+    selected: item === winner,
+    unit_id: item.unit.unit_id || null,
+    action_type: item.action_type,
+    domain_id: item.unit.domain_id || null,
+    owner: item.unit.owner || null,
+    status: item.unit.status || null,
+    stage: item.unit.stage || null,
+    next_action: item.unit.next_action || null,
+    raw_score: item.raw_score,
+    priority_score: item.priority_score,
+    score_components: item.score_components,
+  };
+}
+
+const decisionTrace = {
+  engine: "resolve_primary_action_v1",
+  generated_at: now,
+  candidate_source: "staffordos/snapshots/unit_work_snapshot_v1.json: open_work[]",
+  source_fields_read: [
+    "staffordos/snapshots/unit_work_snapshot_v1.json: open_work[].unit_id",
+    "staffordos/snapshots/unit_work_snapshot_v1.json: open_work[].type",
+    "staffordos/snapshots/unit_work_snapshot_v1.json: open_work[].stage",
+    "staffordos/snapshots/unit_work_snapshot_v1.json: open_work[].status",
+    "staffordos/snapshots/unit_work_snapshot_v1.json: open_work[].domain_id",
+    "staffordos/snapshots/unit_work_snapshot_v1.json: open_work[].owner",
+    "staffordos/snapshots/unit_work_snapshot_v1.json: open_work[].next_action",
+    "staffordos/clients/client_registry_v1.json: clients[] for matching client context",
+    "staffordos/clients/operator_dashboard_snapshot_v1.json: primary_focus and revenue_gaps[] for context",
+    "staffordos/gates/confidence_gate_v1.json: thresholds.auto_fix_allowed_min_confidence for risk wording",
+    "staffordos/ux_audit/output/operator_command_center_ux_integrity_v1.json: score.ux for evidence",
+  ],
+  score_cap: 100,
+  sort_order: "descending priority_score; first candidate wins",
+  tie_behavior: "Equal capped scores keep the earlier candidate order produced by Array.sort in this runtime.",
+  candidates: scored.map((item, index) => decisionCandidate(item, index + 1)),
+  selected_unit_id: winner?.unit?.unit_id || null,
+  selected_reason: winner
+    ? "Highest scored open work candidate after resolver scoring."
+    : "No open work candidates were available.",
+  alternatives_considered: alternatives,
+};
+
+const basePrimaryAction = winner ? {
   action_id: `primary_${Date.now()}`,
   action_label: winner.unit.next_action || primaryFocus?.action || "Review active work.",
   action_type: winner.action_type,
@@ -184,6 +282,7 @@ const primaryAction = winner ? {
     "staffordos/gates/confidence_gate_v1.json",
     "staffordos/ux_audit/output/operator_command_center_ux_integrity_v1.json"
   ],
+  decision_trace: decisionTrace,
   generated_at: now
 } : {
   action_id: `primary_${Date.now()}`,
@@ -202,8 +301,21 @@ const primaryAction = winner ? {
   next_step: "Create or sync work units.",
   expected_outcome: "Restore actionable operating state.",
   source_snapshots: ["staffordos/snapshots/unit_work_snapshot_v1.json"],
+  decision_trace: decisionTrace,
   generated_at: now
 };
+
+const primaryAction = {
+  ...basePrimaryAction,
+  ...preservedExecutionState(basePrimaryAction),
+};
+
+const rootExecutionState = {};
+for (const field of EXECUTION_STATE_FIELDS) {
+  if (Object.prototype.hasOwnProperty.call(primaryAction, field)) {
+    rootExecutionState[field] = primaryAction[field];
+  }
+}
 
 const snapshot = {
   schema: "staffordos.primary_action_snapshot.v1",
@@ -223,16 +335,18 @@ const snapshot = {
   },
   primary_action: primaryAction,
   alternatives_considered: alternatives,
+  decision_trace: decisionTrace,
   context: {
     revenue_gap: revenueGap,
     merchant_revenue_recovered: merchantRevenue,
     stafford_revenue_captured: staffordRevenue,
     ux_integrity_score: uxReport?.score?.ux ?? null,
     architecture_score: uxReport?.score?.architecture ?? null
-  }
+  },
+  ...rootExecutionState
 };
 
-writeFileSync("staffordos/snapshots/primary_action_snapshot_v1.json", JSON.stringify(snapshot, null, 2) + "\n");
+writeFileSync(PRIMARY_ACTION_SNAPSHOT_PATH, JSON.stringify(snapshot, null, 2) + "\n");
 
 console.log(JSON.stringify({
   ok: true,

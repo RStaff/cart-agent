@@ -1,6 +1,6 @@
 # CEO Truth Snapshot v1
 
-Generated at: 2026-06-06T03:13:50.778Z
+Generated at: 2026-06-08T22:31:56.105Z
 Confidence: partial
 
 ## Revenue
