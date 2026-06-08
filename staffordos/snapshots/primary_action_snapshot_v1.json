@@ -51,7 +51,26 @@
       "staffordos/gates/confidence_gate_v1.json",
       "staffordos/ux_audit/output/operator_command_center_ux_integrity_v1.json"
     ],
-    "generated_at": "2026-06-05T04:17:27.184Z"
+    "generated_at": "2026-06-05T04:17:27.184Z",
+    "execution_status": "blocked",
+    "last_launched_at": "2026-06-08T20:31:06.728Z",
+    "last_completed_at": null,
+    "last_failed_at": "2026-06-08T20:31:06.761Z",
+    "last_execution_event_id": "operator_action_1780950666730",
+    "last_execution_result": "blocked_by_execution_mode",
+    "last_execution_artifacts": [
+      "staffordos/events/operator_action_events_v1.json",
+      "staffordos/events/outcome_event_log_v1.json",
+      "staffordos/execution/output/agent_loop_latest.json",
+      "staffordos/events/outcome_scores_v1.json",
+      "staffordos/agents/agent_performance_v1.json",
+      "staffordos/rules/rule_suggestions_v1.json",
+      "staffordos/loop_d/output/loop_d_feedback_report_v1.json"
+    ],
+    "last_execution_reason": [
+      "Score is below the automation threshold."
+    ],
+    "last_execution_recommendation": "rerun_with_operator_approved"
   },
   "alternatives_considered": [
     {
@@ -85,5 +104,24 @@
     "stafford_revenue_captured": 0,
     "ux_integrity_score": 37,
     "architecture_score": 78
-  }
+  },
+  "execution_status": "blocked",
+  "last_launched_at": "2026-06-08T20:31:06.728Z",
+  "last_completed_at": null,
+  "last_failed_at": "2026-06-08T20:31:06.761Z",
+  "last_execution_event_id": "operator_action_1780950666730",
+  "last_execution_result": "blocked_by_execution_mode",
+  "last_execution_artifacts": [
+    "staffordos/events/operator_action_events_v1.json",
+    "staffordos/events/outcome_event_log_v1.json",
+    "staffordos/execution/output/agent_loop_latest.json",
+    "staffordos/events/outcome_scores_v1.json",
+    "staffordos/agents/agent_performance_v1.json",
+    "staffordos/rules/rule_suggestions_v1.json",
+    "staffordos/loop_d/output/loop_d_feedback_report_v1.json"
+  ],
+  "last_execution_reason": [
+    "Score is below the automation threshold."
+  ],
+  "last_execution_recommendation": "rerun_with_operator_approved"
 }

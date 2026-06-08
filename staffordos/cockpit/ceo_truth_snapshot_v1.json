@@ -200,7 +200,26 @@
         "primary_focus": "Convert recovered merchant value into paid plan or case-study close.",
         "open_work_items": 4,
         "client_count": 5
-      }
+      },
+      "execution_status": "blocked",
+      "last_launched_at": "2026-06-08T20:31:06.728Z",
+      "last_completed_at": null,
+      "last_failed_at": "2026-06-08T20:31:06.761Z",
+      "last_execution_event_id": "operator_action_1780950666730",
+      "last_execution_result": "blocked_by_execution_mode",
+      "last_execution_artifacts": [
+        "staffordos/events/operator_action_events_v1.json",
+        "staffordos/events/outcome_event_log_v1.json",
+        "staffordos/execution/output/agent_loop_latest.json",
+        "staffordos/events/outcome_scores_v1.json",
+        "staffordos/agents/agent_performance_v1.json",
+        "staffordos/rules/rule_suggestions_v1.json",
+        "staffordos/loop_d/output/loop_d_feedback_report_v1.json"
+      ],
+      "last_execution_reason": [
+        "Score is below the automation threshold."
+      ],
+      "last_execution_recommendation": "rerun_with_operator_approved"
     },
     "top_5_actions": {
       "status": "partial",

@@ -4,6 +4,111 @@
   "generated_at": "2026-05-04T15:06:21.177Z",
   "events": [
     {
+      "event_id": "operator_action_1780950666730",
+      "schema": "staffordos.outcome_event.v1",
+      "created_at": "2026-06-08T20:31:06.728Z",
+      "action_id": "primary_1780633047186",
+      "action_label": "Follow up on real ShopiFixer offer and close payment.",
+      "action_type": "revenue_close",
+      "domain_id": "shopifixer",
+      "product_id": "shopifixer",
+      "owner": "ross",
+      "execution_mode": "human_prepare_required",
+      "status": "prepared_for_human_execution",
+      "next_step": "Follow up on real ShopiFixer offer and close payment.",
+      "evidence": [
+        "Active proposal has direct revenue capture potential.",
+        "ShopiFixer is the current immediate one-time revenue path.",
+        "Ross-owned action can be advanced immediately.",
+        "Next action explicitly targets payment close.",
+        "Follow-up is the active bottleneck after offer send.",
+        "Merchant value proven: $100 gap between recovered value and Stafford revenue captured.",
+        "Current UX integrity score is 37; decision layer needed before further UI polish."
+      ],
+      "risk": [
+        "Do not start delivery work before payment is captured.",
+        "Do not treat merchant recovered value as Stafford revenue.",
+        "Human judgment required before executing irreversible actions."
+      ],
+      "result": {
+        "outcome_logged": true,
+        "canonical_spine_invoked": true,
+        "real_external_send_performed": false,
+        "note": "CTA execution logged safely and routed through canonical StaffordOS spine. External send/payment action still requires explicit governed workflow."
+      },
+      "event_type": "primary_action_cta_clicked"
+    },
+    {
+      "event_id": "operator_action_1780948231614",
+      "schema": "staffordos.outcome_event.v1",
+      "created_at": "2026-06-08T19:50:31.612Z",
+      "action_id": "primary_1780633047186",
+      "action_label": "Follow up on real ShopiFixer offer and close payment.",
+      "action_type": "revenue_close",
+      "domain_id": "shopifixer",
+      "product_id": "shopifixer",
+      "owner": "ross",
+      "execution_mode": "human_prepare_required",
+      "status": "prepared_for_human_execution",
+      "next_step": "Follow up on real ShopiFixer offer and close payment.",
+      "evidence": [
+        "Active proposal has direct revenue capture potential.",
+        "ShopiFixer is the current immediate one-time revenue path.",
+        "Ross-owned action can be advanced immediately.",
+        "Next action explicitly targets payment close.",
+        "Follow-up is the active bottleneck after offer send.",
+        "Merchant value proven: $100 gap between recovered value and Stafford revenue captured.",
+        "Current UX integrity score is 37; decision layer needed before further UI polish."
+      ],
+      "risk": [
+        "Do not start delivery work before payment is captured.",
+        "Do not treat merchant recovered value as Stafford revenue.",
+        "Human judgment required before executing irreversible actions."
+      ],
+      "result": {
+        "outcome_logged": true,
+        "canonical_spine_invoked": true,
+        "real_external_send_performed": false,
+        "note": "CTA execution logged safely and routed through canonical StaffordOS spine. External send/payment action still requires explicit governed workflow."
+      },
+      "event_type": "primary_action_cta_clicked"
+    },
+    {
+      "event_id": "operator_action_1780948190894",
+      "schema": "staffordos.outcome_event.v1",
+      "created_at": "2026-06-08T19:49:50.882Z",
+      "action_id": "primary_1780633047186",
+      "action_label": "Follow up on real ShopiFixer offer and close payment.",
+      "action_type": "revenue_close",
+      "domain_id": "shopifixer",
+      "product_id": "shopifixer",
+      "owner": "ross",
+      "execution_mode": "human_prepare_required",
+      "status": "prepared_for_human_execution",
+      "next_step": "Follow up on real ShopiFixer offer and close payment.",
+      "evidence": [
+        "Active proposal has direct revenue capture potential.",
+        "ShopiFixer is the current immediate one-time revenue path.",
+        "Ross-owned action can be advanced immediately.",
+        "Next action explicitly targets payment close.",
+        "Follow-up is the active bottleneck after offer send.",
+        "Merchant value proven: $100 gap between recovered value and Stafford revenue captured.",
+        "Current UX integrity score is 37; decision layer needed before further UI polish."
+      ],
+      "risk": [
+        "Do not start delivery work before payment is captured.",
+        "Do not treat merchant recovered value as Stafford revenue.",
+        "Human judgment required before executing irreversible actions."
+      ],
+      "result": {
+        "outcome_logged": true,
+        "canonical_spine_invoked": true,
+        "real_external_send_performed": false,
+        "note": "CTA execution logged safely and routed through canonical StaffordOS spine. External send/payment action still requires explicit governed workflow."
+      },
+      "event_type": "primary_action_cta_clicked"
+    },
+    {
       "event_id": "operator_action_1777927373137",
       "schema": "staffordos.outcome_event.v1",
       "created_at": "2026-05-04T20:42:53.136Z",
@@ -191,5 +296,5 @@
       "created_at": "2026-05-04T15:06:21.177Z"
     }
   ],
-  "updated_at": "2026-05-04T20:42:53.136Z"
+  "updated_at": "2026-06-08T20:31:06.728Z"
 }

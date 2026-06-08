@@ -1,18 +1,12 @@
 {
-  "generated_at": "2026-06-05T04:17:27.247Z",
-  "command": "node staffordos/clients/next_action_engine_v1.mjs",
-  "operatorApproved": true,
-  "qaProfile": "operator_runtime",
+  "generated_at": "2026-06-08T20:31:06.759Z",
+  "command": "node staffordos/loop_d/build_loop_d_feedback_v1.mjs",
+  "operatorApproved": false,
+  "qaProfile": null,
   "stages": [
-    "mode_resolved",
-    "operator_override_accepted",
-    "scope_forge_enforced",
-    "truth_map_preflight_passed",
-    "guardrails_passed",
-    "runtime_prepared",
-    "execution_finished"
+    "mode_resolved"
   ],
-  "status": "COMPLETED",
+  "status": "BLOCKED_BY_EXECUTION_MODE",
   "mode": {
     "decision": "IGNORE",
     "executionMode": "AUTO",
@@ -20,6 +14,5 @@
       "Score is below the automation threshold."
     ]
   },
-  "completed_at": "2026-06-05T04:17:27.376Z",
-  "exit_code": 0
+  "completed_at": "2026-06-08T20:31:06.759Z"
 }
