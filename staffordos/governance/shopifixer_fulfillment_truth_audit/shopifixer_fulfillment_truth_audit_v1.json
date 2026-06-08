@@ -1,0 +1,362 @@
+{
+  "schema": "staffordos.shopifixer_fulfillment_truth_audit.v1",
+  "generated_at": "2026-06-08T22:47:29Z",
+  "mission": "Create the authoritative ShopiFixer Fulfillment Truth Model audit.",
+  "constraints_observed": {
+    "ui_modified": false,
+    "commercial_pages_modified": false,
+    "checkout_modified": false,
+    "stripe_modified": false,
+    "abando_modified": false,
+    "lifecycle_authority_modified": false,
+    "runtime_truth_modified": false
+  },
+  "overall_verdict": {
+    "can_track_lead_to_audit": "partial",
+    "can_track_audit_to_purchase": "partial",
+    "can_track_purchase_to_fulfillment": false,
+    "can_track_fulfillment_to_proof_package": false,
+    "can_track_proof_package_to_case_study": false,
+    "can_track_case_study_to_referral_opportunity": false,
+    "single_authoritative_fulfillment_object_exists": false,
+    "safe_to_claim_paid_shopifixer_fulfillment_ready": false
+  },
+  "source_files_inspected": [
+    {
+      "file": "staffordos/clients/client_registry_v1.json",
+      "classification": "client_audit_payment_mirror_truth",
+      "runtime_backed": true,
+      "notes": "Contains client lifecycle, deal payment status, ShopiFixer audit/fix status, business revenue, and next action."
+    },
+    {
+      "file": "staffordos/clients/client_registry_v1.mjs",
+      "classification": "client_registry_writer",
+      "runtime_backed": true,
+      "notes": "recordVerifiedStripePayment records verified payment as paid/deal_won and sets next_action.type to fix."
+    },
+    {
+      "file": "staffordos/revenue/revenue_truth_v1.json",
+      "classification": "revenue_funnel_truth",
+      "runtime_backed": true,
+      "notes": "Tracks revenue/outreach funnel truth, not ShopiFixer fulfillment delivery state."
+    },
+    {
+      "file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+      "classification": "derived_unit_work_snapshot",
+      "runtime_backed": false,
+      "notes": "Shows one ShopiFixer delivery-like open unit waiting for payment, but is stale relative to current client truth."
+    },
+    {
+      "file": "staffordos/clients/operator_dashboard_snapshot_v1.json",
+      "classification": "operator_dashboard_snapshot",
+      "runtime_backed": false,
+      "notes": "Reads client truth and revenue gaps; not a fulfillment authority."
+    },
+    {
+      "file": "staffordos/cockpit/ceo_truth_snapshot_v1.json",
+      "classification": "cockpit_reader_snapshot",
+      "runtime_backed": false,
+      "notes": "Synthesizes fulfillment counts from client registry and marks proof/review/referral fields unavailable."
+    },
+    {
+      "file": "staffordos/leads/lead_registry_v1.json",
+      "classification": "lead_truth",
+      "runtime_backed": true,
+      "notes": "Contains 23 ShopiFixer-routed lead records."
+    },
+    {
+      "file": "staffordos/leads/lead_events_v1.json",
+      "classification": "lead_event_truth",
+      "runtime_backed": true,
+      "notes": "Contains 1494 lead events; supports lead history, not fulfillment."
+    },
+    {
+      "file": "staffordos/units/delivery_units_v1.json",
+      "classification": "closest_fulfillment_shaped_object",
+      "runtime_backed": false,
+      "notes": "Contains a ShopiFixer delivery unit waiting_for_payment with proof_required true and proof_status not_started."
+    },
+    {
+      "file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+      "classification": "fulfillment_authority",
+      "runtime_backed": false,
+      "notes": "Defines required paid sprint artifacts and completion rules."
+    },
+    {
+      "file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+      "classification": "fulfillment_packet_template",
+      "runtime_backed": false,
+      "notes": "Defines intended packet fields for intake, scope, proof, execution, and completion."
+    },
+    {
+      "file": "staffordos/system_inventory/output/execution_proof_register_v1.json",
+      "classification": "proof_register",
+      "runtime_backed": false,
+      "notes": "Contains proof governance mostly for send/Abando proof, not a completed paid ShopiFixer proof package."
+    },
+    {
+      "file": "staffordos/system_inventory/output/proof_evidence_scan_v1.json",
+      "classification": "proof_evidence_scan",
+      "runtime_backed": false,
+      "notes": "Scans for proof evidence; does not establish a completed paid ShopiFixer fulfillment proof package."
+    },
+    {
+      "file": "staffordos/proof_loop/merchant_proof_loop_completion_pack.md",
+      "classification": "abando_proof_runbook",
+      "runtime_backed": false,
+      "notes": "Abando-oriented proof loop; not a ShopiFixer paid sprint proof package."
+    },
+    {
+      "file": "staffordos/optimization/executionPacketRegistry.json",
+      "classification": "execution_packet_registry",
+      "runtime_backed": false,
+      "notes": "Contains checkout optimization packets, but no live paid ShopiFixer fulfillment packet with execution/proof/completion complete."
+    },
+    {
+      "file": "staffordos/audit/audit_result_surface.json",
+      "classification": "audit_surface",
+      "runtime_backed": false,
+      "notes": "Contains a rendered audit surface from scorecards; useful for audit presentation, not fulfillment."
+    }
+  ],
+  "current_truth_counts": {
+    "lead_registry_shopifixer_items": 23,
+    "lead_events": 1494,
+    "client_registry_clients": 5,
+    "client_registry_audit_requested": 1,
+    "client_registry_paid_shopifixer_clients": 0,
+    "client_registry_fix_in_progress": 0,
+    "client_registry_fix_completed": 0,
+    "delivery_units_shopifixer_client_fix": 1,
+    "ceo_snapshot_clients_waiting_for_fulfillment": 0,
+    "ceo_snapshot_proof_needed": null,
+    "ceo_snapshot_review_needed": null,
+    "ceo_snapshot_referral_needed": null
+  },
+  "direct_answers": {
+    "1_fulfillment_truth_already_exists": [
+      {
+        "source": "staffordos/leads/lead_registry_v1.json",
+        "truth": "ShopiFixer lead identity, routing, engagement, and lead lifecycle state.",
+        "limits": "Lead truth only; does not track paid fulfillment."
+      },
+      {
+        "source": "staffordos/clients/client_registry_v1.json",
+        "truth": "Coarse client lifecycle, audit status, payment status, and ShopiFixer fix status.",
+        "limits": "No scoped fix, delivery execution, QA, proof package, approval, case study, or referral state."
+      },
+      {
+        "source": "staffordos/clients/client_registry_v1.mjs",
+        "truth": "Verified Stripe payment can be written into client truth as paid/deal_won.",
+        "limits": "Payment propagation is not fulfillment execution."
+      },
+      {
+        "source": "staffordos/units/delivery_units_v1.json",
+        "truth": "A delivery-shaped ShopiFixer unit exists with waiting_for_payment and proof_required.",
+        "limits": "Not tied to a verified paid engagement and not authoritative."
+      }
+    ],
+    "2_proof_truth_already_exists": [
+      {
+        "source": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+        "truth": "Defines required sprint artifacts: intake summary, fix scope, before evidence, execution notes, after evidence, proof package, completion decision.",
+        "limits": "Authority only; no live paid proof package instance."
+      },
+      {
+        "source": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+        "truth": "Defines intended fields for payment, execution, proof, completion, and merchant-facing proof summary.",
+        "limits": "Template only."
+      },
+      {
+        "source": "staffordos/system_inventory/output/execution_proof_register_v1.json",
+        "truth": "Proof governance exists for runtime proof categories.",
+        "limits": "Does not prove a completed paid ShopiFixer sprint."
+      },
+      {
+        "source": "staffordos/proof_loop/merchant_proof_loop_completion_pack.md",
+        "truth": "Abando proof-loop runbook exists.",
+        "limits": "Not a ShopiFixer paid sprint proof package."
+      }
+    ],
+    "3_paid_shopifixer_customer_trackable_from_payment_through_delivery": {
+      "answer": false,
+      "reason": "Payment can be mirrored into client truth, but there is no authoritative paid fulfillment object carrying delivery, proof, approval, case study, and referral state."
+    },
+    "4_state_determination": {
+      "work_not_started": {
+        "answer": "partial",
+        "sources": [
+          "staffordos/clients/client_registry_v1.json: clients[].shopifixer.fix_status",
+          "staffordos/units/delivery_units_v1.json: units[].status and units[].proof_status"
+        ],
+        "notes": "Current values show not_started/waiting_for_payment, but not through a single fulfillment authority."
+      },
+      "work_in_progress": {
+        "answer": "partial",
+        "sources": [
+          "staffordos/clients/client_registry_v1.json: clients[].lifecycle.stage or clients[].shopifixer.fix_status",
+          "staffordos/cockpit/ceo_truth_snapshot_v1.json: fulfillment.fix_in_progress"
+        ],
+        "notes": "Modeled and counted, current observed count is 0, but no live proof-backed fulfillment object owns the state."
+      },
+      "awaiting_proof": {
+        "answer": false,
+        "sources": [
+          "staffordos/units/delivery_units_v1.json: proof_required/proof_status"
+        ],
+        "notes": "Proof requirement exists, but no governed awaiting_proof state exists for paid ShopiFixer fulfillment."
+      },
+      "awaiting_client_approval": {
+        "answer": false,
+        "sources": [],
+        "notes": "No canonical client approval or acceptance field found."
+      },
+      "completed": {
+        "answer": "partial",
+        "sources": [
+          "staffordos/clients/client_registry_v1.json: lifecycle.stage fix_completed or shopifixer.fix_status completed",
+          "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md: completion criteria"
+        ],
+        "notes": "Completion is modeled, but no live paid completed fulfillment packet was found."
+      }
+    },
+    "5_missing": [
+      "verified paid engagement identity inside a fulfillment object",
+      "fulfillment packet identity tied to payment and client",
+      "scoped fix",
+      "execution status",
+      "delivery status",
+      "before evidence status",
+      "after evidence status",
+      "QA status",
+      "proof package status",
+      "merchant proof package artifact path",
+      "awaiting client approval state",
+      "client approval or acceptance result",
+      "completion decision",
+      "case study eligibility/status",
+      "review request status",
+      "referral opportunity/status",
+      "field source notes for synthesized and unavailable values"
+    ],
+    "6_single_authoritative_fulfillment_object": {
+      "exists": false,
+      "closest_current_source": "staffordos/units/delivery_units_v1.json",
+      "why_closest_source_is_not_authoritative": [
+        "snapshot/model artifact",
+        "stale relative to current client registry",
+        "not bound to verified payment",
+        "no fulfillment packet identity",
+        "no before/after proof package artifact",
+        "no QA state",
+        "no client approval state",
+        "no case study or referral state"
+      ],
+      "authority_defined_object": "ShopiFixer fulfillment packet JSON with payment, execution, proof, and completion states",
+      "live_authority_instance_found": false
+    },
+    "7_smallest_repair": {
+      "summary": "Add a canonical ShopiFixer fulfillment truth object and materializer that reads existing truth without overwriting commercial or lifecycle truth.",
+      "first_slice": [
+        "Create staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json.",
+        "Create staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs.",
+        "Materialize records from client registry, delivery units, fulfillment authority/template, and packet registry when bindable.",
+        "Mark missing proof, QA, approval, case study, and referral fields unavailable until runtime writers prove them.",
+        "Do not invent revenue claims."
+      ]
+    },
+    "8_exact_files_would_need_to_change": {
+      "smallest_materialization_slice": [
+        "staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs",
+        "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json"
+      ],
+      "reader_alignment_after_materialization": [
+        "staffordos/cockpit/build_ceo_truth_snapshot_v1.mjs"
+      ],
+      "optional_derived_mirror_alignment": [
+        "staffordos/units/lock_schema_foundation_v1.mjs",
+        "staffordos/units/delivery_units_v1.json",
+        "staffordos/snapshots/unit_work_snapshot_v1.json"
+      ],
+      "requires_separate_authority_before_runtime_execution_changes": true
+    },
+    "9_should_not_be_changed": [
+      "UI files",
+      "commercial pages",
+      "checkout files",
+      "Stripe files",
+      "Abando runtime files",
+      "lifecycle authority artifacts",
+      "lead state machines",
+      "revenue logic",
+      "staffordos/leads/lead_registry_v1.json",
+      "staffordos/leads/lead_events_v1.json",
+      "staffordos/clients/client_registry_v1.json",
+      "staffordos/revenue/revenue_truth_v1.json"
+    ]
+  },
+  "engagement_trace": [
+    {
+      "hop": "Lead",
+      "status": "partial",
+      "source_files": [
+        "staffordos/leads/lead_registry_v1.json",
+        "staffordos/leads/lead_events_v1.json"
+      ],
+      "notes": "Lead capture/routing exists for ShopiFixer."
+    },
+    {
+      "hop": "Audit",
+      "status": "partial",
+      "source_files": [
+        "staffordos/clients/client_registry_v1.json",
+        "staffordos/audit/audit_result_surface.json",
+        "staffordos/audits/shopifixer_audit_standard_v1.md"
+      ],
+      "notes": "Audit fields and audit surface exist, but not every lead/client has a completed audit."
+    },
+    {
+      "hop": "Purchase",
+      "status": "partial",
+      "source_files": [
+        "staffordos/clients/client_registry_v1.mjs",
+        "staffordos/clients/client_registry_v1.json"
+      ],
+      "notes": "Verified payment writeback exists, but current client truth shows 0 paid ShopiFixer clients."
+    },
+    {
+      "hop": "Fulfillment",
+      "status": "unproven",
+      "source_files": [
+        "staffordos/units/delivery_units_v1.json",
+        "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md"
+      ],
+      "notes": "Delivery model and authority exist, but no authoritative paid fulfillment object exists."
+    },
+    {
+      "hop": "Proof Package",
+      "status": "unproven",
+      "source_files": [
+        "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+        "staffordos/system_inventory/output/execution_proof_register_v1.json"
+      ],
+      "notes": "Proof requirements exist; no completed paid ShopiFixer proof package was found."
+    },
+    {
+      "hop": "Case Study",
+      "status": "missing",
+      "source_files": [],
+      "notes": "No canonical case study eligibility/status object was found."
+    },
+    {
+      "hop": "Referral Opportunity",
+      "status": "missing",
+      "source_files": [
+        "staffordos/authority/output/revenue_success_gate_v1.md"
+      ],
+      "notes": "Referral authority exists after proof and satisfaction, but no runtime writer or state object was found."
+    }
+  ],
+  "no_revenue_claims_invented": true,
+  "business_truth_overwritten": false
+}
