@@ -1,0 +1,70 @@
+{
+  "schema": "staffordos.audit.audit_result_surface.v1",
+  "generated_at": "2026-06-08T21:50:23.146Z",
+  "store_domain": "northstar-outdoors.myshopify.com",
+  "audit_score": 64,
+  "estimated_revenue_leak": "$22,280.00",
+  "revenue_claim_scope": "benchmark_estimate_not_live_revenue",
+  "top_issue": "Slow mobile checkout handoff",
+  "benchmark_summary": "This store is performing below roughly 56% of similar Shopify stores on checkout completion and recovery readiness.",
+  "fix_recommendation": "Tighten the mobile checkout path and remove unnecessary handoff friction.",
+  "recommended_action": "Tighten the mobile checkout path and remove unnecessary handoff friction.",
+  "proof_plan": [
+    "Treat this scorecard-backed audit result as the before-state summary.",
+    "Capture before evidence for the top issue before any scoped fix begins.",
+    "Attach after-state evidence and completion notes before claiming a completed ShopiFixer outcome."
+  ],
+  "confidence": "Early confidence",
+  "updated_at": "2026-06-08T21:50:23.146Z",
+  "source": {
+    "primary": "staffordos/scorecards/scorecards_output.json",
+    "source_generated_at": "2026-03-18T12:39:22.529Z",
+    "source_audit_updated_at": "2026-03-16T12:23:22.605Z",
+    "source_store_scores_updated_at": "2026-03-16T12:23:22.584Z",
+    "scorecard_created_at": "2026-03-16T12:23:22.605Z",
+    "audit_id": "audit-015",
+    "score_band": "high"
+  },
+  "field_sources": {
+    "store_domain": {
+      "status": "source",
+      "source": "staffordos/scorecards/scorecards_output.json: scorecards[].domain",
+      "note": null
+    },
+    "audit_score": {
+      "status": "source",
+      "source": "staffordos/scorecards/scorecards_output.json: scorecards[].checkoutScore",
+      "note": null
+    },
+    "estimated_revenue_leak": {
+      "status": "source_estimate",
+      "source": "staffordos/scorecards/scorecards_output.json: scorecards[].revenueOpportunityDisplay",
+      "note": "Existing benchmark estimate only; not tracked live recovered revenue."
+    },
+    "top_issue": {
+      "status": "source",
+      "source": "staffordos/scorecards/scorecards_output.json: scorecards[].topFindings[0]",
+      "note": null
+    },
+    "benchmark_summary": {
+      "status": "source",
+      "source": "staffordos/scorecards/scorecards_output.json: scorecards[].benchmarkSummary",
+      "note": null
+    },
+    "fix_recommendation": {
+      "status": "source",
+      "source": "staffordos/scorecards/scorecards_output.json: scorecards[].topFindings[2]",
+      "note": null
+    },
+    "proof_plan": {
+      "status": "derived",
+      "source": "staffordos/governance/shopifixer_before_after_conversion_model/shopifixer_before_after_conversion_model_v1.md",
+      "note": "Plan only; the governance model says the ShopiFixer before/after proof package is still missing."
+    },
+    "updated_at": {
+      "status": "generated",
+      "source": "staffordos/audit/audit_result_surface.json",
+      "note": null
+    }
+  }
+}

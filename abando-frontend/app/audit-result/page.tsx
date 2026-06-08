@@ -4,6 +4,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import PublicHeader from "@/components/brand/PublicHeader";
 
+export const dynamic = "force-dynamic";
+
 type AuditResultSnapshot = {
   store_domain: string;
   audit_score: number;
@@ -11,7 +13,9 @@ type AuditResultSnapshot = {
   confidence: string;
   top_issue: string;
   benchmark_summary: string;
-  recommended_action: string;
+  fix_recommendation?: string;
+  recommended_action?: string;
+  proof_plan?: string[] | string;
   updated_at: string;
 };
 
@@ -40,6 +44,13 @@ export default function AuditResultRoute() {
   }
 
   const snapshot = readSnapshot(snapshotPath);
+  const fixRecommendation =
+    snapshot.fix_recommendation || snapshot.recommended_action || "Fix recommendation unavailable";
+  const proofPlan = Array.isArray(snapshot.proof_plan)
+    ? snapshot.proof_plan
+    : snapshot.proof_plan
+      ? [snapshot.proof_plan]
+      : [];
 
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-10 text-slate-100">
@@ -84,10 +95,19 @@ export default function AuditResultRoute() {
 
         <section className="rounded-3xl border border-slate-800 bg-slate-900/90 p-8 shadow-2xl shadow-black/20">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300">Recommended next move</p>
-          <h2 className="mt-3 text-2xl font-semibold text-white">{snapshot.recommended_action}</h2>
+          <h2 className="mt-3 text-2xl font-semibold text-white">{fixRecommendation}</h2>
           <p className="mt-4 text-sm leading-7 text-slate-300">
             The audit result is the bridge into the ShopiFixer decision. Use it to decide whether a scoped fix sprint is the right next step for this store.
           </p>
+          {proofPlan.length > 0 ? (
+            <div className="mt-5 grid gap-3 md:grid-cols-3">
+              {proofPlan.map((item) => (
+                <div key={item} className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4 text-sm leading-6 text-slate-300">
+                  {item}
+                </div>
+              ))}
+            </div>
+          ) : null}
         </section>
 
         <section className="rounded-3xl border border-slate-800 bg-slate-900/90 p-8 shadow-2xl shadow-black/20">
