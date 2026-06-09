@@ -1,0 +1,1012 @@
+{
+  "schema": "staffordos.shopifixer_fulfillment_truth.v1",
+  "generated_at": "2026-06-09T12:48:59.688Z",
+  "source_files": [
+    {
+      "file": "SHOPIFIXER_FULFILLMENT_SCHEMA_DRAFT.md",
+      "role": "schema_draft",
+      "exists": true,
+      "status": "loaded",
+      "updated_at": "2026-06-09T00:11:43.684Z"
+    },
+    {
+      "file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+      "role": "fulfillment_authority",
+      "exists": true,
+      "status": "loaded",
+      "updated_at": "2026-05-31T18:45:03.639Z"
+    },
+    {
+      "file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+      "role": "fulfillment_packet_template",
+      "exists": true,
+      "status": "loaded",
+      "updated_at": "2026-05-31T18:46:55.556Z"
+    },
+    {
+      "file": "staffordos/governance/shopifixer_fulfillment_truth_audit/shopifixer_fulfillment_truth_audit_v1.md",
+      "role": "truth_audit",
+      "exists": true,
+      "status": "loaded",
+      "updated_at": "2026-06-08T22:49:11.864Z"
+    },
+    {
+      "file": "staffordos/units/delivery_units_v1.json",
+      "role": "delivery_units_source",
+      "exists": true,
+      "status": "loaded",
+      "updated_at": "2026-05-04T15:06:21.180Z"
+    },
+    {
+      "file": "staffordos/clients/client_registry_v1.json",
+      "role": "client_registry_source",
+      "exists": true,
+      "status": "loaded",
+      "updated_at": "2026-06-05T04:17:27.372Z"
+    },
+    {
+      "file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+      "role": "unit_work_snapshot_source",
+      "exists": true,
+      "status": "loaded",
+      "updated_at": "2026-05-04T15:06:21.181Z"
+    }
+  ],
+  "summary_counts": {
+    "waiting_for_payment": 1,
+    "paid": 0,
+    "in_progress": 0,
+    "awaiting_proof": 0,
+    "awaiting_client_approval": 0,
+    "completed": 0,
+    "case_study_candidate": 0,
+    "referral_candidate": 0
+  },
+  "items": [
+    {
+      "fulfillment_id": "delivery_cart-agent-dev.myshopify.com_shopifixer",
+      "packet_id": null,
+      "client_id": "cart-agent-dev.myshopify.com",
+      "store_domain": "cart-agent-dev.myshopify.com",
+      "merchant_name": null,
+      "opportunity_ref": "opp_cart-agent-dev.myshopify.com",
+      "delivery_unit_ref": "delivery_cart-agent-dev.myshopify.com_shopifixer",
+      "payment_status": "waiting_for_payment",
+      "payment_verified_source": null,
+      "paid_at": null,
+      "amount": null,
+      "currency": "USD",
+      "fulfillment_status": "waiting_for_payment",
+      "execution_status": "not_started",
+      "proof_status": "not_started",
+      "completion_status": "not_started",
+      "client_approval_status": null,
+      "review_status": null,
+      "referral_status": null,
+      "case_study_status": null,
+      "store_url": "https://cart-agent-dev.myshopify.com",
+      "affected_page_url": null,
+      "observed_friction": null,
+      "why_it_matters": null,
+      "expected_improvement_category": null,
+      "scoped_fix": null,
+      "in_scope": [],
+      "out_of_scope": [],
+      "merchant_approval_needed": null,
+      "before_evidence_status": "not_started",
+      "before_screenshot": null,
+      "before_notes": null,
+      "risk_or_limitation": "Wait for payment or follow up before starting fix delivery.",
+      "fix_started_at": null,
+      "change_made": null,
+      "location_changed": null,
+      "implementation_notes": null,
+      "fix_completed_at": null,
+      "after_evidence_status": "not_started",
+      "after_screenshot": null,
+      "after_notes": null,
+      "remaining_limitations": "Wait for payment or follow up before starting fix delivery.",
+      "proof_package_status": "not_started",
+      "proof_package_location": null,
+      "merchant_facing_summary": null,
+      "recommended_next_watch_item": "Wait for payment or follow up before starting fix delivery.",
+      "scoped_issue_addressed": false,
+      "before_evidence_captured": false,
+      "after_evidence_captured": false,
+      "merchant_proof_package_ready": false,
+      "execution_complete": false,
+      "proof_complete": false,
+      "completion_complete": false,
+      "completed_at": null,
+      "review_requested": false,
+      "review_received": false,
+      "referral_requested": false,
+      "referral_received": false,
+      "case_study_authorized": false,
+      "source_files": [
+        {
+          "file": "SHOPIFIXER_FULFILLMENT_SCHEMA_DRAFT.md",
+          "role": "schema_draft",
+          "exists": true,
+          "status": "loaded",
+          "updated_at": "2026-06-09T00:11:43.684Z"
+        },
+        {
+          "file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+          "role": "fulfillment_authority",
+          "exists": true,
+          "status": "loaded",
+          "updated_at": "2026-05-31T18:45:03.639Z"
+        },
+        {
+          "file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+          "role": "fulfillment_packet_template",
+          "exists": true,
+          "status": "loaded",
+          "updated_at": "2026-05-31T18:46:55.556Z"
+        },
+        {
+          "file": "staffordos/governance/shopifixer_fulfillment_truth_audit/shopifixer_fulfillment_truth_audit_v1.md",
+          "role": "truth_audit",
+          "exists": true,
+          "status": "loaded",
+          "updated_at": "2026-06-08T22:49:11.864Z"
+        },
+        {
+          "file": "staffordos/units/delivery_units_v1.json",
+          "role": "delivery_units_source",
+          "exists": true,
+          "status": "loaded",
+          "updated_at": "2026-05-04T15:06:21.180Z"
+        },
+        {
+          "file": "staffordos/clients/client_registry_v1.json",
+          "role": "client_registry_source",
+          "exists": true,
+          "status": "loaded",
+          "updated_at": "2026-06-05T04:17:27.372Z"
+        },
+        {
+          "file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+          "role": "unit_work_snapshot_source",
+          "exists": true,
+          "status": "loaded",
+          "updated_at": "2026-05-04T15:06:21.181Z"
+        }
+      ],
+      "field_sources": {
+        "fulfillment_id": {
+          "status": "source",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "units[].unit_id",
+          "note": "Canonical fulfillment items are built from ShopiFixer client_fix delivery units."
+        },
+        "packet_id": {
+          "status": "unavailable",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "packet_id",
+          "note": "No canonical fulfillment packet is bound yet."
+        },
+        "client_id": {
+          "status": "source",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "units[].client_id",
+          "note": "Delivery unit client binding is the canonical client key."
+        },
+        "store_domain": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "merchant_shop",
+          "note": "Merchant shop is the best available store-domain truth."
+        },
+        "merchant_name": {
+          "status": "unavailable",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "merchant_name",
+          "note": "No merchant name is represented in current truth."
+        },
+        "opportunity_ref": {
+          "status": "source",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "units[].opportunity_ref",
+          "note": "Delivery unit opportunity binding is preserved."
+        },
+        "delivery_unit_ref": {
+          "status": "source",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "units[].unit_id",
+          "note": "Delivery unit id is the fulfillment unit key."
+        },
+        "payment_status": {
+          "status": "derived",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "units[].status + staffordos/clients/client_registry_v1.json: deal.payment_status",
+          "note": "Delivery unit status is the source truth; client registry payment values are used to upgrade to paid when verified."
+        },
+        "payment_verified_source": {
+          "status": "unavailable",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "deal.payment_status",
+          "note": "No verified payment exists yet."
+        },
+        "paid_at": {
+          "status": "unavailable",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "deal.closed_at",
+          "note": "No verified payment timestamp exists yet."
+        },
+        "amount": {
+          "status": "unavailable",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "deal.value",
+          "note": "No verified paid amount exists yet."
+        },
+        "currency": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "deal.currency",
+          "note": "Client registry currency is the best available monetary currency."
+        },
+        "fulfillment_status": {
+          "status": "source",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "units[].status",
+          "note": "Delivery unit status is treated as source truth."
+        },
+        "execution_status": {
+          "status": "derived",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "units[].status + units[].stage",
+          "note": "Execution is derived from the delivery unit current state."
+        },
+        "proof_status": {
+          "status": "source",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "units[].proof_status",
+          "note": "Proof status comes directly from delivery unit truth."
+        },
+        "completion_status": {
+          "status": "derived",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "units[].status + units[].proof_status",
+          "note": "Completion is derived from execution and proof state."
+        },
+        "client_approval_status": {
+          "status": "unavailable",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "not_available",
+          "note": "No client approval field exists in current truth."
+        },
+        "review_status": {
+          "status": "unavailable",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "not_available",
+          "note": "No review state exists in current truth."
+        },
+        "referral_status": {
+          "status": "unavailable",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "not_available",
+          "note": "No referral state exists in current truth."
+        },
+        "case_study_status": {
+          "status": "unavailable",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "not_available",
+          "note": "No case study state exists in current truth."
+        },
+        "store_url": {
+          "status": "derived",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "merchant_shop",
+          "note": "Store URL is derived from the merchant shop domain."
+        },
+        "affected_page_url": {
+          "status": "unavailable",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "shopifixer.primary_problem",
+          "note": "No affected page URL is proven yet."
+        },
+        "observed_friction": {
+          "status": "unavailable",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "shopifixer.primary_problem",
+          "note": "No observed friction is proven yet."
+        },
+        "why_it_matters": {
+          "status": "unavailable",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "shopifixer.primary_problem",
+          "note": "No business rationale is proven yet."
+        },
+        "expected_improvement_category": {
+          "status": "unavailable",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "shopifixer.primary_problem",
+          "note": "No improvement category is proven yet."
+        },
+        "scoped_fix": {
+          "status": "unavailable",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "shopifixer.primary_problem",
+          "note": "No scoped fix is proven yet."
+        },
+        "in_scope": {
+          "status": "unavailable",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+          "source_field": "Fix Scope",
+          "note": "No scoped fix items are proven yet."
+        },
+        "out_of_scope": {
+          "status": "unavailable",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+          "source_field": "Fix Scope",
+          "note": "No scoped out-of-scope items are proven yet."
+        },
+        "merchant_approval_needed": {
+          "status": "unavailable",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+          "source_field": "Merchant Approval Needed?",
+          "note": "No merchant approval requirement is proven yet."
+        },
+        "before_evidence_status": {
+          "status": "derived",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "units[].proof_status",
+          "note": "Before evidence is not started until proof work begins."
+        },
+        "before_screenshot": {
+          "status": "unavailable",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+          "source_field": "Before-State Evidence",
+          "note": "No before screenshot exists yet."
+        },
+        "before_notes": {
+          "status": "unavailable",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+          "source_field": "Before-State Evidence",
+          "note": "No before notes exist yet."
+        },
+        "risk_or_limitation": {
+          "status": "derived",
+          "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+          "source_field": "open_work[].next_action",
+          "note": "Next action text is the best current limitation statement."
+        },
+        "fix_started_at": {
+          "status": "unavailable",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "units[].status",
+          "note": "No fix has started yet."
+        },
+        "change_made": {
+          "status": "unavailable",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+          "source_field": "Execution Notes",
+          "note": "No execution change exists yet."
+        },
+        "location_changed": {
+          "status": "unavailable",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+          "source_field": "Execution Notes",
+          "note": "No execution location exists yet."
+        },
+        "implementation_notes": {
+          "status": "unavailable",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+          "source_field": "Execution Notes",
+          "note": "No implementation notes exist yet."
+        },
+        "fix_completed_at": {
+          "status": "unavailable",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "shopifixer.fix_status",
+          "note": "No fix completion timestamp exists yet."
+        },
+        "after_evidence_status": {
+          "status": "derived",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "units[].proof_status",
+          "note": "After evidence is unavailable until proof is complete."
+        },
+        "after_screenshot": {
+          "status": "unavailable",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+          "source_field": "After-State Evidence",
+          "note": "No after screenshot exists yet."
+        },
+        "after_notes": {
+          "status": "unavailable",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+          "source_field": "After-State Evidence",
+          "note": "No after notes exist yet."
+        },
+        "remaining_limitations": {
+          "status": "derived",
+          "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+          "source_field": "open_work[].next_action",
+          "note": "Open work next action describes the current limitation."
+        },
+        "proof_package_status": {
+          "status": "derived",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "units[].proof_status",
+          "note": "Proof package remains not started until proof work exists."
+        },
+        "proof_package_location": {
+          "status": "unavailable",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+          "source_field": "Merchant-Facing Proof Summary",
+          "note": "No proof package artifact exists yet."
+        },
+        "merchant_facing_summary": {
+          "status": "unavailable",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+          "source_field": "Merchant-Facing Proof Package",
+          "note": "No merchant-facing proof summary exists yet."
+        },
+        "recommended_next_watch_item": {
+          "status": "source",
+          "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+          "source_field": "open_work[].next_action",
+          "note": "Open work next action is the best current watch item."
+        },
+        "scoped_issue_addressed": {
+          "status": "derived",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "units[].status",
+          "note": "No issue has been addressed while waiting_for_payment."
+        },
+        "before_evidence_captured": {
+          "status": "derived",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "units[].proof_status",
+          "note": "Before evidence has not been captured yet."
+        },
+        "after_evidence_captured": {
+          "status": "derived",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "units[].proof_status",
+          "note": "After evidence has not been captured yet."
+        },
+        "merchant_proof_package_ready": {
+          "status": "derived",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+          "source_field": "Completion Criteria",
+          "note": "Proof package is not ready until proof is complete."
+        },
+        "execution_complete": {
+          "status": "derived",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "units[].status",
+          "note": "Execution is not complete while waiting_for_payment."
+        },
+        "proof_complete": {
+          "status": "derived",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "units[].proof_status",
+          "note": "Proof is not complete."
+        },
+        "completion_complete": {
+          "status": "derived",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+          "source_field": "Completion Criteria",
+          "note": "Completion requires execution, proof, and completion statuses to be complete."
+        },
+        "completed_at": {
+          "status": "unavailable",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "shopifixer.fix_status",
+          "note": "No completion timestamp exists yet."
+        },
+        "review_requested": {
+          "status": "derived",
+          "source_file": "staffordos/authority/output/revenue_success_gate_v1.md",
+          "source_field": "Gate 5",
+          "note": "Review request is not yet proven."
+        },
+        "review_received": {
+          "status": "derived",
+          "source_file": "staffordos/authority/output/revenue_success_gate_v1.md",
+          "source_field": "Gate 5",
+          "note": "Review received is not yet proven."
+        },
+        "referral_requested": {
+          "status": "derived",
+          "source_file": "staffordos/authority/output/revenue_success_gate_v1.md",
+          "source_field": "Gate 5",
+          "note": "Referral request is not yet proven."
+        },
+        "referral_received": {
+          "status": "derived",
+          "source_file": "staffordos/authority/output/revenue_success_gate_v1.md",
+          "source_field": "Gate 5",
+          "note": "Referral received is not yet proven."
+        },
+        "case_study_authorized": {
+          "status": "derived",
+          "source_file": "staffordos/governance/shopifixer_fulfillment_truth_audit/shopifixer_fulfillment_truth_audit_v1.md",
+          "source_field": "Smallest Repair",
+          "note": "Case study authorization is not yet proven."
+        }
+      },
+      "unavailable_fields": [
+        {
+          "field": "merchant_name",
+          "status": "unavailable",
+          "reason": "No merchant name is represented in the source truth.",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "merchant_name"
+        },
+        {
+          "field": "packet_id",
+          "status": "unavailable",
+          "reason": "No canonical fulfillment packet has been bound to this fulfillment record yet.",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "packet_id"
+        },
+        {
+          "field": "paid_at",
+          "status": "unavailable",
+          "reason": "No verified paid fulfillment exists yet.",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "deal.closed_at"
+        },
+        {
+          "field": "amount",
+          "status": "unavailable",
+          "reason": "No verified paid amount exists yet.",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "deal.value"
+        },
+        {
+          "field": "payment_verified_source",
+          "status": "unavailable",
+          "reason": "No verified payment source exists because the fulfillment has not been paid.",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "deal.payment_status"
+        },
+        {
+          "field": "client_approval_status",
+          "status": "unavailable",
+          "reason": "No client approval state is represented in the current source truth.",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "not_available"
+        },
+        {
+          "field": "review_status",
+          "status": "unavailable",
+          "reason": "No review status is represented in the current source truth.",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "not_available"
+        },
+        {
+          "field": "referral_status",
+          "status": "unavailable",
+          "reason": "No referral status is represented in the current source truth.",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "not_available"
+        },
+        {
+          "field": "case_study_status",
+          "status": "unavailable",
+          "reason": "No case study status is represented in the current source truth.",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "not_available"
+        },
+        {
+          "field": "affected_page_url",
+          "status": "unavailable",
+          "reason": "No affected page URL is proven in the current source truth.",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "shopifixer.primary_problem"
+        },
+        {
+          "field": "observed_friction",
+          "status": "unavailable",
+          "reason": "No observed friction statement is proven in the current source truth.",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "shopifixer.primary_problem"
+        },
+        {
+          "field": "why_it_matters",
+          "status": "unavailable",
+          "reason": "No merchant-facing business rationale is proven in the current source truth.",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "shopifixer.primary_problem"
+        },
+        {
+          "field": "expected_improvement_category",
+          "status": "unavailable",
+          "reason": "No improvement category is proven in the current source truth.",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "shopifixer.primary_problem"
+        },
+        {
+          "field": "scoped_fix",
+          "status": "unavailable",
+          "reason": "No scoped fix is proven in the current source truth.",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "shopifixer.primary_problem"
+        },
+        {
+          "field": "merchant_approval_needed",
+          "status": "unavailable",
+          "reason": "No merchant approval requirement is proven in the current source truth.",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+          "source_field": "Merchant Approval Needed?"
+        },
+        {
+          "field": "before_screenshot",
+          "status": "unavailable",
+          "reason": "No before screenshot is represented in the current source truth.",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+          "source_field": "Before-State Evidence"
+        },
+        {
+          "field": "before_notes",
+          "status": "unavailable",
+          "reason": "No before notes are represented in the current source truth.",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+          "source_field": "Before-State Evidence"
+        },
+        {
+          "field": "fix_started_at",
+          "status": "unavailable",
+          "reason": "No fulfillment execution has started yet.",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "status"
+        },
+        {
+          "field": "change_made",
+          "status": "unavailable",
+          "reason": "No execution change is represented in the current source truth.",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+          "source_field": "Execution Notes"
+        },
+        {
+          "field": "location_changed",
+          "status": "unavailable",
+          "reason": "No execution location is represented in the current source truth.",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+          "source_field": "Execution Notes"
+        },
+        {
+          "field": "implementation_notes",
+          "status": "unavailable",
+          "reason": "No implementation notes are represented in the current source truth.",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+          "source_field": "Execution Notes"
+        },
+        {
+          "field": "fix_completed_at",
+          "status": "unavailable",
+          "reason": "No fulfillment completion timestamp exists yet.",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "shopifixer.fix_status"
+        },
+        {
+          "field": "after_screenshot",
+          "status": "unavailable",
+          "reason": "No after screenshot is represented in the current source truth.",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+          "source_field": "After-State Evidence"
+        },
+        {
+          "field": "after_notes",
+          "status": "unavailable",
+          "reason": "No after notes are represented in the current source truth.",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+          "source_field": "After-State Evidence"
+        },
+        {
+          "field": "proof_package_location",
+          "status": "unavailable",
+          "reason": "No proof package artifact exists yet.",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+          "source_field": "Merchant-Facing Proof Summary"
+        },
+        {
+          "field": "merchant_facing_summary",
+          "status": "unavailable",
+          "reason": "No merchant-facing proof summary exists yet.",
+          "source_file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+          "source_field": "Merchant-Facing Proof Package"
+        },
+        {
+          "field": "completed_at",
+          "status": "unavailable",
+          "reason": "No completion timestamp exists yet.",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "shopifixer.fix_status"
+        }
+      ]
+    }
+  ],
+  "unavailable_fields": [
+    {
+      "field": "merchant_name",
+      "status": "unavailable",
+      "reason": "No merchant name is represented in the source truth.",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "merchant_name",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "packet_id",
+      "status": "unavailable",
+      "reason": "No canonical fulfillment packet has been bound to this fulfillment record yet.",
+      "source_file": "staffordos/units/delivery_units_v1.json",
+      "source_field": "packet_id",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "paid_at",
+      "status": "unavailable",
+      "reason": "No verified paid fulfillment exists yet.",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "deal.closed_at",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "amount",
+      "status": "unavailable",
+      "reason": "No verified paid amount exists yet.",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "deal.value",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "payment_verified_source",
+      "status": "unavailable",
+      "reason": "No verified payment source exists because the fulfillment has not been paid.",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "deal.payment_status",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "client_approval_status",
+      "status": "unavailable",
+      "reason": "No client approval state is represented in the current source truth.",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "not_available",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "review_status",
+      "status": "unavailable",
+      "reason": "No review status is represented in the current source truth.",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "not_available",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "referral_status",
+      "status": "unavailable",
+      "reason": "No referral status is represented in the current source truth.",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "not_available",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "case_study_status",
+      "status": "unavailable",
+      "reason": "No case study status is represented in the current source truth.",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "not_available",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "affected_page_url",
+      "status": "unavailable",
+      "reason": "No affected page URL is proven in the current source truth.",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "shopifixer.primary_problem",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "observed_friction",
+      "status": "unavailable",
+      "reason": "No observed friction statement is proven in the current source truth.",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "shopifixer.primary_problem",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "why_it_matters",
+      "status": "unavailable",
+      "reason": "No merchant-facing business rationale is proven in the current source truth.",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "shopifixer.primary_problem",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "expected_improvement_category",
+      "status": "unavailable",
+      "reason": "No improvement category is proven in the current source truth.",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "shopifixer.primary_problem",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "scoped_fix",
+      "status": "unavailable",
+      "reason": "No scoped fix is proven in the current source truth.",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "shopifixer.primary_problem",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "merchant_approval_needed",
+      "status": "unavailable",
+      "reason": "No merchant approval requirement is proven in the current source truth.",
+      "source_file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+      "source_field": "Merchant Approval Needed?",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "before_screenshot",
+      "status": "unavailable",
+      "reason": "No before screenshot is represented in the current source truth.",
+      "source_file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+      "source_field": "Before-State Evidence",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "before_notes",
+      "status": "unavailable",
+      "reason": "No before notes are represented in the current source truth.",
+      "source_file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+      "source_field": "Before-State Evidence",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "fix_started_at",
+      "status": "unavailable",
+      "reason": "No fulfillment execution has started yet.",
+      "source_file": "staffordos/units/delivery_units_v1.json",
+      "source_field": "status",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "change_made",
+      "status": "unavailable",
+      "reason": "No execution change is represented in the current source truth.",
+      "source_file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+      "source_field": "Execution Notes",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "location_changed",
+      "status": "unavailable",
+      "reason": "No execution location is represented in the current source truth.",
+      "source_file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+      "source_field": "Execution Notes",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "implementation_notes",
+      "status": "unavailable",
+      "reason": "No implementation notes are represented in the current source truth.",
+      "source_file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+      "source_field": "Execution Notes",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "fix_completed_at",
+      "status": "unavailable",
+      "reason": "No fulfillment completion timestamp exists yet.",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "shopifixer.fix_status",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "after_screenshot",
+      "status": "unavailable",
+      "reason": "No after screenshot is represented in the current source truth.",
+      "source_file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+      "source_field": "After-State Evidence",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "after_notes",
+      "status": "unavailable",
+      "reason": "No after notes are represented in the current source truth.",
+      "source_file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+      "source_field": "After-State Evidence",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "proof_package_location",
+      "status": "unavailable",
+      "reason": "No proof package artifact exists yet.",
+      "source_file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+      "source_field": "Merchant-Facing Proof Summary",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "merchant_facing_summary",
+      "status": "unavailable",
+      "reason": "No merchant-facing proof summary exists yet.",
+      "source_file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+      "source_field": "Merchant-Facing Proof Package",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    },
+    {
+      "field": "completed_at",
+      "status": "unavailable",
+      "reason": "No completion timestamp exists yet.",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "shopifixer.fix_status",
+      "item_id": "delivery_cart-agent-dev.myshopify.com_shopifixer"
+    }
+  ],
+  "field_sources": {
+    "summary_counts.waiting_for_payment": {
+      "status": "derived",
+      "source_file": "staffordos/units/delivery_units_v1.json",
+      "source_field": "units[].status === waiting_for_payment",
+      "note": "Counted from canonical ShopiFixer client_fix delivery units."
+    },
+    "summary_counts.paid": {
+      "status": "derived",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "clients[].deal.payment_status",
+      "note": "Counted from paid-like client registry payment states."
+    },
+    "summary_counts.in_progress": {
+      "status": "derived",
+      "source_file": "staffordos/units/delivery_units_v1.json",
+      "source_field": "units[].status === active / in_progress",
+      "note": "Counted from delivery unit execution states."
+    },
+    "summary_counts.awaiting_proof": {
+      "status": "derived",
+      "source_file": "staffordos/units/delivery_units_v1.json",
+      "source_field": "units[].proof_status",
+      "note": "Counted from delivery unit proof states."
+    },
+    "summary_counts.awaiting_client_approval": {
+      "status": "derived",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "clients[].client_approval_status",
+      "note": "No source field exists yet; count remains zero."
+    },
+    "summary_counts.completed": {
+      "status": "derived",
+      "source_file": "staffordos/units/delivery_units_v1.json",
+      "source_field": "units[].status + units[].proof_status",
+      "note": "Counted from completion-ready delivery states."
+    },
+    "summary_counts.case_study_candidate": {
+      "status": "derived",
+      "source_file": "staffordos/governance/shopifixer_fulfillment_truth_audit/shopifixer_fulfillment_truth_audit_v1.md",
+      "source_field": "smallest repair",
+      "note": "Requires completion, proof, and case study authorization."
+    },
+    "summary_counts.referral_candidate": {
+      "status": "derived",
+      "source_file": "staffordos/authority/output/revenue_success_gate_v1.md",
+      "source_field": "Gate 5",
+      "note": "Requires proof and merchant satisfaction / review before referral."
+    },
+    "items": {
+      "status": "derived",
+      "source_file": "staffordos/units/delivery_units_v1.json",
+      "source_field": "units[]",
+      "note": "Canonical fulfillment items are derived from delivery units and reconciled against client registry and open work."
+    },
+    "source_files": {
+      "status": "file_metadata",
+      "source_file": "SHOPIFIXER_FULFILLMENT_SCHEMA_DRAFT.md",
+      "source_field": "authority docs + runtime truth inputs",
+      "note": "Preserves the canonical source list used to build the fulfillment truth read model."
+    },
+    "updated_at": {
+      "status": "generated",
+      "source_file": "staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs",
+      "source_field": "now()",
+      "note": null
+    }
+  }
+}
