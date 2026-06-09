@@ -1,0 +1,130 @@
+{
+  "schema": "staffordos.shopifixer_conversion_brief.v1",
+  "generated_at": "2026-06-09T12:58:00.000Z",
+  "store_domain": "northstar-outdoors.myshopify.com",
+  "audit_score": 64,
+  "benchmark_summary": "This store is performing below roughly 56% of similar Shopify stores on checkout completion and recovery readiness.",
+  "top_issue": "Slow mobile checkout handoff",
+  "why_it_matters": "The audit surface identifies a benchmark-backed checkout friction issue. If the mobile checkout handoff stays slow, the store remains below a meaningful portion of similar Shopify stores on checkout completion and recovery readiness.",
+  "fix_recommendation": "Tighten the mobile checkout path and remove unnecessary handoff friction.",
+  "sprint_price": 950,
+  "sprint_deliverables": [
+    "Diagnosis",
+    "Scoped fix",
+    "Before evidence",
+    "After evidence",
+    "Merchant-facing proof package",
+    "Completion decision",
+    "Intake summary",
+    "Fix scope",
+    "Execution notes"
+  ],
+  "proof_package_deliverables": [
+    "Before-state evidence",
+    "After-state evidence",
+    "Merchant-facing proof summary",
+    "Completion decision"
+  ],
+  "call_to_action": "Get the $950 Fix Sprint",
+  "source_files": [
+    {
+      "file": "staffordos/audit/audit_result_surface.json",
+      "role": "audit_result_surface",
+      "status": "source"
+    },
+    {
+      "file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+      "role": "fulfillment_authority",
+      "status": "source"
+    },
+    {
+      "file": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md",
+      "role": "merchant_proof_package",
+      "status": "source"
+    },
+    {
+      "file": "web/src/routes/pricing.esm.js",
+      "role": "pricing_route",
+      "status": "source"
+    },
+    {
+      "file": "abando-frontend/app/shopifixer/page.tsx",
+      "role": "shopifixer_page",
+      "status": "source"
+    }
+  ],
+  "field_sources": {
+    "store_domain": {
+      "status": "source",
+      "source_file": "staffordos/audit/audit_result_surface.json",
+      "source_field": "store_domain",
+      "note": null
+    },
+    "audit_score": {
+      "status": "source",
+      "source_file": "staffordos/audit/audit_result_surface.json",
+      "source_field": "audit_score",
+      "note": null
+    },
+    "benchmark_summary": {
+      "status": "source",
+      "source_file": "staffordos/audit/audit_result_surface.json",
+      "source_field": "benchmark_summary",
+      "note": null
+    },
+    "top_issue": {
+      "status": "source",
+      "source_file": "staffordos/audit/audit_result_surface.json",
+      "source_field": "top_issue",
+      "note": null
+    },
+    "why_it_matters": {
+      "status": "derived",
+      "source_file": "staffordos/audit/audit_result_surface.json",
+      "source_field": "benchmark_summary + top_issue + audit_score",
+      "note": "Explains the audit result without inventing a live revenue claim."
+    },
+    "fix_recommendation": {
+      "status": "source",
+      "source_file": "staffordos/audit/audit_result_surface.json",
+      "source_field": "fix_recommendation",
+      "note": null
+    },
+    "sprint_price": {
+      "status": "source",
+      "source_file": "web/src/routes/pricing.esm.js",
+      "source_field": "$950 Fix Sprint",
+      "note": "ShopiFixer pricing authority."
+    },
+    "sprint_deliverables": {
+      "status": "source",
+      "source_file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+      "source_field": "Required Fulfillment Artifacts + Completion Criteria",
+      "note": "Proof-backed fulfillment deliverables for the sprint."
+    },
+    "proof_package_deliverables": {
+      "status": "source",
+      "source_file": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md",
+      "source_field": "Problem Found / Why It Mattered / What Was Changed / Before Evidence / After Evidence / Proof Summary",
+      "note": "Merchant proof package wording from the dry-run artifact."
+    },
+    "call_to_action": {
+      "status": "source",
+      "source_file": "web/src/routes/pricing.esm.js",
+      "source_field": "Get the $950 Fix Sprint",
+      "note": "Matches the canonical pricing page CTA."
+    }
+  },
+  "unavailable_fields": [
+    {
+      "field": "estimated_revenue_leak",
+      "status": "unavailable",
+      "reason": "The audit surface labels this as a benchmark estimate, not a live recovered revenue claim."
+    },
+    {
+      "field": "live_revenue_claim",
+      "status": "unavailable",
+      "reason": "No live revenue recovery claim is supported by the authority files used for this brief."
+    }
+  ]
+}
