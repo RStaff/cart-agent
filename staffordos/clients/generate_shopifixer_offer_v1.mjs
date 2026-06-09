@@ -2,6 +2,8 @@ import { readFileSync, writeFileSync } from "fs";
 
 const REGISTRY_PATH = "staffordos/clients/client_registry_v1.json";
 const OUTPUT_PATH = "staffordos/clients/shopifixer_offer_latest.json";
+const SHOPIFIXER_FIX_SPRINT_PRICE = 950;
+const ABANDO_OPTIONAL_MRR = 50;
 
 function formatMoney(n) {
   return Number(n || 0).toFixed(0);
@@ -12,39 +14,34 @@ function buildOffer(client) {
   const email = client.contact?.email || "";
   const shop = client.merchant_shop;
 
-  // SIMPLE PRICING (you can change later)
-  const fixPrice = recovered > 0 ? Math.max(99, Math.floor(recovered * 1.5)) : 149;
-  const abandoPrice = 49;
-
   return {
     client_id: client.client_id,
     merchant_shop: shop,
     email,
 
     offer: {
-      subject: `We found a revenue leak in your store (${shop})`,
+      subject: `ShopiFixer Fix Sprint for ${shop}`,
 
       body: `
 Hi,
 
-I took a look at your store and found a revenue leak in your checkout flow.
+I took a look at your store and put together a ShopiFixer Fix Sprint offer.
 
-We actually recovered $${formatMoney(recovered)} in lost revenue already.
+This is a proof-backed Fix Sprint for one visible Shopify problem:
 
-Right now, that recovery is not running consistently — it's just a one-time proof.
+1. Diagnosis
+2. Scoped fix
+3. Before evidence
+4. After evidence
+5. Merchant-facing proof package
 
-Here’s what I can do for you:
+We have already seen $${formatMoney(recovered)} in recovered revenue as supporting context, but the price for the sprint does not change with that number.
 
-1. Fix the underlying issue causing the drop-off
-2. Implement the correction directly in your store
-3. Activate continuous recovery so this runs automatically
+ShopiFixer Fix Sprint: $${SHOPIFIXER_FIX_SPRINT_PRICE}
 
-→ One-time fix: $${fixPrice}
+Abando remains a separate optional SaaS product for ongoing recovery after the ShopiFixer work is complete.
 
-Optional:
-→ Ongoing recovery system (Abando): $${abandoPrice}/month
-
-This turns what we already proved into something that runs every day.
+This offer is for the fix sprint only.
 
 Want me to set this up for you?
 
@@ -53,8 +50,8 @@ Stafford Media Consulting
 `,
 
       pricing: {
-        shopifixer_one_time: fixPrice,
-        abando_mrr: abandoPrice
+        shopifixer_one_time: SHOPIFIXER_FIX_SPRINT_PRICE,
+        abando_mrr: ABANDO_OPTIONAL_MRR
       },
 
       context: {

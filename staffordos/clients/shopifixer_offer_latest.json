@@ -3,11 +3,11 @@
   "merchant_shop": "cart-agent-dev.myshopify.com",
   "email": "rossstafford1@gmail.com",
   "offer": {
-    "subject": "We found a revenue leak in your store (cart-agent-dev.myshopify.com)",
-    "body": "\nHi,\n\nI took a look at your store and found a revenue leak in your checkout flow.\n\nWe actually recovered $100 in lost revenue already.\n\nRight now, that recovery is not running consistently — it's just a one-time proof.\n\nHere’s what I can do for you:\n\n1. Fix the underlying issue causing the drop-off\n2. Implement the correction directly in your store\n3. Activate continuous recovery so this runs automatically\n\n→ One-time fix: $150\n\nOptional:\n→ Ongoing recovery system (Abando): $49/month\n\nThis turns what we already proved into something that runs every day.\n\nWant me to set this up for you?\n\n– Ross\nStafford Media Consulting\n",
+    "subject": "ShopiFixer Fix Sprint for cart-agent-dev.myshopify.com",
+    "body": "\nHi,\n\nI took a look at your store and put together a ShopiFixer Fix Sprint offer.\n\nThis is a proof-backed Fix Sprint for one visible Shopify problem:\n\n1. Diagnosis\n2. Scoped fix\n3. Before evidence\n4. After evidence\n5. Merchant-facing proof package\n\nWe have already seen $100 in recovered revenue as supporting context, but the price for the sprint does not change with that number.\n\nShopiFixer Fix Sprint: $950\n\nAbando remains a separate optional SaaS product for ongoing recovery after the ShopiFixer work is complete.\n\nThis offer is for the fix sprint only.\n\nWant me to set this up for you?\n\n– Ross\nStafford Media Consulting\n",
     "pricing": {
-      "shopifixer_one_time": 150,
-      "abando_mrr": 49
+      "shopifixer_one_time": 950,
+      "abando_mrr": 50
     },
     "context": {
       "recovered_revenue": 100,
