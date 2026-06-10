@@ -1,0 +1,125 @@
+{
+  "schema": "staffordos.shopifixer_before_evidence_action_design.v1",
+  "generated_at": "2026-06-10T17:10:00Z",
+  "action": "Capture Before Evidence",
+  "belongs_in": "ShopiFixer fulfillment workbench",
+  "recommended_artifact_path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md",
+  "active_merchant_proof_run_path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/",
+  "operator_goal": "Capture the pre-fix state and document the problem before any scoped fix is applied.",
+  "what_operator_must_capture": [
+    "merchant identity",
+    "affected page or artifact",
+    "before screenshot or equivalent visual evidence",
+    "observed friction",
+    "why it matters",
+    "date of capture"
+  ],
+  "required_fields": [
+    "store",
+    "date",
+    "affected_page_or_artifact",
+    "issue",
+    "why_it_matters",
+    "screenshot",
+    "notes"
+  ],
+  "optional_fields": [
+    "merchant_name",
+    "store_url",
+    "observed_friction",
+    "expected_improvement_category",
+    "supporting_links",
+    "captured_by"
+  ],
+  "where_to_write": {
+    "primary": "dedicated proof-run evidence artifact",
+    "file_path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md",
+    "write_scope": "append or replace the proof-run evidence artifact only"
+  },
+  "safety_boundaries": {
+    "must_not_touch": [
+      "staffordos/clients/client_registry_v1.json",
+      "staffordos/revenue/revenue_truth_v1.json",
+      "payment truth",
+      "fulfillment truth",
+      "merchant_lifecycle_registry_v1.json",
+      "shopifixer_command_center_v1.json",
+      "checkout",
+      "Stripe"
+    ],
+    "must_not_simulate": [
+      "payment",
+      "fulfillment completion",
+      "merchant approval",
+      "merchant reply"
+    ]
+  },
+  "source_truth_used": [
+    "staffordos/fulfillment/shopifixer_fulfillment_workspace_design_v1.json",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md",
+    "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+    "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json"
+  ],
+  "data_requirements": {
+    "merchant_identity_source": "merchant_lifecycle_registry_v1.json active record",
+    "fulfillment_context_source": "shopifixer_fulfillment_truth_v1.json active fulfillment item",
+    "proof_context_source": "internal_shopifixer_dry_run_v1/before_evidence.md"
+  },
+  "ui_future_display": [
+    "before screenshot preview",
+    "affected page URL",
+    "observed friction",
+    "why it matters",
+    "capture timestamp",
+    "merchant identity",
+    "proof-run path"
+  ],
+  "answer": {
+    "data_must_capture": [
+      "merchant identity",
+      "affected page or artifact",
+      "before screenshot or equivalent visual evidence",
+      "observed friction",
+      "why it matters",
+      "date of capture"
+    ],
+    "write_location": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md",
+    "active_merchant_proof_run_path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/",
+    "required_fields_list": [
+      "store",
+      "date",
+      "affected_page_or_artifact",
+      "issue",
+      "why_it_matters",
+      "screenshot",
+      "notes"
+    ],
+    "optional_fields_list": [
+      "merchant_name",
+      "store_url",
+      "observed_friction",
+      "expected_improvement_category",
+      "supporting_links",
+      "captured_by"
+    ],
+    "ui_eventual_display": [
+      "before screenshot preview",
+      "affected page URL",
+      "observed friction",
+      "why it matters",
+      "capture timestamp",
+      "merchant identity",
+      "proof-run path"
+    ],
+    "do_not_touch": [
+      "client_registry_v1.json",
+      "revenue_truth_v1.json",
+      "payment truth",
+      "fulfillment truth",
+      "merchant_lifecycle_registry_v1.json",
+      "shopifixer_command_center_v1.json",
+      "checkout",
+      "Stripe"
+    ]
+  }
+}
