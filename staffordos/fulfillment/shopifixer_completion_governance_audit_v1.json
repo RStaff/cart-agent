@@ -1,0 +1,63 @@
+{
+  "schema": "staffordos.shopifixer_completion_governance_audit.v1",
+  "generated_at": "2026-06-10T15:45:00Z",
+  "exact_authority": {
+    "governing_truth": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+    "proof_gate": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md",
+    "derived_read_model": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json"
+  },
+  "answers": {
+    "files_may_be_updated": [
+      "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json"
+    ],
+    "files_must_never_be_updated": [
+      "staffordos/clients/client_registry_v1.json",
+      "staffordos/revenue/revenue_truth_v1.json",
+      "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+      "staffordos/shopifixer/shopifixer_command_center_v1.json",
+      "checkout",
+      "Stripe"
+    ],
+    "lifecycle_state_changes_allowed": [
+      "proof_package_status: not_started -> ready -> complete",
+      "execution_status: not_started -> in_progress -> complete",
+      "completion_status: not_started -> complete",
+      "proof_status: not_started -> complete",
+      "completed_at: null -> timestamp",
+      "review_status / referral_status / case_study_status may be marked only after completion evidence exists"
+    ],
+    "proof_required_before_completion": [
+      "before_evidence.md exists and is populated",
+      "fix_scope.md exists and is populated",
+      "after_evidence.md exists and is populated",
+      "merchant_proof_package.md exists and is populated",
+      "merchant proof package reflects the same merchant and the same fulfillment item",
+      "proof_package_status is complete or equivalent"
+    ],
+    "completion_evidence_to_record": [
+      "completion timestamp",
+      "proof package location",
+      "completion status",
+      "execution complete marker",
+      "proof complete marker",
+      "optional review/referral/case-study state only when independently proven"
+    ],
+    "completion_reversible": "not automatically; only by explicit administrative correction with audit trail",
+    "smallest_safe_completion_writeback": [
+      "set fulfillment_truth.items[0].proof_package_status = 'complete'",
+      "set fulfillment_truth.items[0].proof_status = 'complete'",
+      "set fulfillment_truth.items[0].execution_status = 'complete'",
+      "set fulfillment_truth.items[0].completion_status = 'complete'",
+      "set fulfillment_truth.items[0].proof_complete = true",
+      "set fulfillment_truth.items[0].execution_complete = true",
+      "set fulfillment_truth.items[0].completion_complete = true",
+      "set fulfillment_truth.items[0].completed_at = <timestamp>",
+      "set fulfillment_truth.items[0].proof_package_location = staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md"
+    ],
+    "readiness_score_after_implementation": 91
+  },
+  "notes": [
+    "Completion should be a governed writeback on fulfillment truth, not a direct client registry or revenue truth mutation.",
+    "The merchant lifecycle registry should be regenerated from fulfillment truth after completion if the operator UI needs the updated read model."
+  ]
+}
