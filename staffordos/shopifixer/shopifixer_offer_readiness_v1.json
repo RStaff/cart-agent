@@ -1,0 +1,47 @@
+{
+  "schema": "staffordos.shopifixer_offer_readiness.v1",
+  "generated_at": "2026-06-09T13:20:00.000Z",
+  "overall_status": "READY",
+  "ready_to_send": true,
+  "blocking_issues": [],
+  "source_validation": [
+    {
+      "source_file": "staffordos/audit/audit_result_surface.json",
+      "merchant_identity": "cart-agent-dev.myshopify.com",
+      "status": "aligned",
+      "mismatch_reason": ""
+    },
+    {
+      "source_file": "staffordos/shopifixer/shopifixer_conversion_brief_v1.json",
+      "merchant_identity": "cart-agent-dev.myshopify.com",
+      "status": "aligned",
+      "mismatch_reason": ""
+    },
+    {
+      "source_file": "staffordos/clients/shopifixer_offer_latest.json",
+      "merchant_identity": "cart-agent-dev.myshopify.com",
+      "status": "aligned",
+      "mismatch_reason": ""
+    },
+    {
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "merchant_identity": "cart-agent-dev.myshopify.com",
+      "status": "source_truth",
+      "mismatch_reason": ""
+    }
+  ],
+  "alignment_checks": {
+    "store_domain_alignment": "aligned",
+    "client_id_alignment": "aligned",
+    "merchant_shop_alignment": "aligned",
+    "offer_source_alignment": "aligned",
+    "pricing_alignment": "aligned",
+    "proof_package_alignment": "aligned",
+    "readiness_status": "ready"
+  },
+  "smallest_repair": "No further repair required for merchant identity alignment.",
+  "exact_files_to_change": [
+    "none"
+  ],
+  "business_truth_untouched": true
+}

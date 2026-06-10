@@ -2,7 +2,7 @@
 
 ## Store
 
-- Store domain: `northstar-outdoors.myshopify.com`
+- Store domain: `cart-agent-dev.myshopify.com`
 - Audit score: `64`
 - Benchmark position: below roughly `56%` of similar Shopify stores on checkout completion and recovery readiness
 

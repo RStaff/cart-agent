@@ -1,7 +1,7 @@
 {
   "schema": "staffordos.audit.audit_result_surface.v1",
   "generated_at": "2026-06-08T21:50:23.146Z",
-  "store_domain": "northstar-outdoors.myshopify.com",
+  "store_domain": "cart-agent-dev.myshopify.com",
   "audit_score": 64,
   "estimated_revenue_leak": "$22,280.00",
   "revenue_claim_scope": "benchmark_estimate_not_live_revenue",
@@ -27,9 +27,9 @@
   },
   "field_sources": {
     "store_domain": {
-      "status": "source",
-      "source": "staffordos/scorecards/scorecards_output.json: scorecards[].domain",
-      "note": null
+      "status": "derived",
+      "source": "staffordos/clients/client_registry_v1.json: merchant_shop",
+      "note": "Merchant identity is bound to the active client record so downstream offer artifacts stay aligned."
     },
     "audit_score": {
       "status": "source",

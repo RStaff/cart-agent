@@ -1,7 +1,7 @@
 {
   "schema": "staffordos.shopifixer_conversion_brief.v1",
   "generated_at": "2026-06-09T12:58:00.000Z",
-  "store_domain": "northstar-outdoors.myshopify.com",
+  "store_domain": "cart-agent-dev.myshopify.com",
   "audit_score": 64,
   "benchmark_summary": "This store is performing below roughly 56% of similar Shopify stores on checkout completion and recovery readiness.",
   "top_issue": "Slow mobile checkout handoff",

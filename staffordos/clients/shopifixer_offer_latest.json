@@ -3,7 +3,7 @@
   "merchant_shop": "cart-agent-dev.myshopify.com",
   "email": "rossstafford1@gmail.com",
   "offer": {
-    "subject": "ShopiFixer Fix Sprint for northstar-outdoors.myshopify.com",
+    "subject": "ShopiFixer Fix Sprint for cart-agent-dev.myshopify.com",
     "brief_source": "staffordos/shopifixer/shopifixer_conversion_brief_v1.json",
     "sections": {
       "problem_found": "Slow mobile checkout handoff",
@@ -30,7 +30,7 @@
       ],
       "call_to_action": "Get the $950 Fix Sprint"
     },
-    "body": "\nHi,\n\nHere is the ShopiFixer Conversion Brief for northstar-outdoors.myshopify.com.\n\nProblem Found:\nSlow mobile checkout handoff\n\nBenchmark Position:\nThis store is performing below roughly 56% of similar Shopify stores on checkout completion and recovery readiness.\n\nWhy It Matters:\nThe audit surface identifies a benchmark-backed checkout friction issue. If the mobile checkout handoff stays slow, the store remains below a meaningful portion of similar Shopify stores on checkout completion and recovery readiness.\n\nFix Recommendation:\nTighten the mobile checkout path and remove unnecessary handoff friction.\n\nWhat The $950 Fix Sprint Includes:\n1. Diagnosis\n2. Scoped fix\n3. Before evidence\n4. After evidence\n5. Merchant-facing proof package\n6. Completion decision\n7. Intake summary\n8. Fix scope\n9. Execution notes\n\nWhat Proof They Will Receive:\n1. Before-state evidence\n2. After-state evidence\n3. Merchant-facing proof summary\n4. Completion decision\n\nShopiFixer Fix Sprint: $950\n\nAbando remains a separate optional SaaS product and is not part of this offer.\n\nCall To Action:\nGet the $950 Fix Sprint\n\nThis offer is for the fix sprint only.\n\n– Ross\nStafford Media Consulting\n",
+    "body": "\nHi,\n\nHere is the ShopiFixer Conversion Brief for cart-agent-dev.myshopify.com.\n\nProblem Found:\nSlow mobile checkout handoff\n\nBenchmark Position:\nThis store is performing below roughly 56% of similar Shopify stores on checkout completion and recovery readiness.\n\nWhy It Matters:\nThe audit surface identifies a benchmark-backed checkout friction issue. If the mobile checkout handoff stays slow, the store remains below a meaningful portion of similar Shopify stores on checkout completion and recovery readiness.\n\nFix Recommendation:\nTighten the mobile checkout path and remove unnecessary handoff friction.\n\nWhat The $950 Fix Sprint Includes:\n1. Diagnosis\n2. Scoped fix\n3. Before evidence\n4. After evidence\n5. Merchant-facing proof package\n6. Completion decision\n7. Intake summary\n8. Fix scope\n9. Execution notes\n\nWhat Proof They Will Receive:\n1. Before-state evidence\n2. After-state evidence\n3. Merchant-facing proof summary\n4. Completion decision\n\nShopiFixer Fix Sprint: $950\n\nAbando remains a separate optional SaaS product and is not part of this offer.\n\nCall To Action:\nGet the $950 Fix Sprint\n\nThis offer is for the fix sprint only.\n\n– Ross\nStafford Media Consulting\n",
     "pricing": {
       "shopifixer_one_time": 950,
       "abando_mrr": 50
