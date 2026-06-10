@@ -1,0 +1,109 @@
+{
+  "schema": "staffordos.shopifixer_proof_package_generator_design.v1",
+  "generated_at": "2026-06-10T17:40:00Z",
+  "generator": "merchant-facing proof package",
+  "recommended_output_path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md",
+  "required_input_artifacts": [
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md"
+  ],
+  "required_sections": [
+    "Problem Found",
+    "Why It Mattered",
+    "What Was Changed",
+    "Before Evidence",
+    "After Evidence",
+    "Proof Summary",
+    "Recommended Next Watch Item",
+    "Completion Status"
+  ],
+  "safety_boundaries": {
+    "must_not_touch": [
+      "staffordos/clients/client_registry_v1.json",
+      "staffordos/revenue/revenue_truth_v1.json",
+      "payment truth",
+      "fulfillment truth",
+      "merchant_lifecycle_registry_v1.json",
+      "checkout",
+      "Stripe"
+    ],
+    "must_not_simulate": [
+      "payment",
+      "fulfillment completion",
+      "merchant reply",
+      "merchant approval"
+    ]
+  },
+  "completion_limits": [
+    "The generator may only summarize real proof-run evidence that already exists.",
+    "The generator must not claim payment, fulfillment completion, or revenue capture unless those states are independently proven in truth files.",
+    "The generator must not claim a full merchant proof package if before evidence, fix scope, and after evidence are not all present.",
+    "The generator must not invent merchant-facing outcomes beyond the evidence provided."
+  ],
+  "must_not_claim": [
+    "a real merchant paid",
+    "fulfillment is complete",
+    "review or referral has occurred",
+    "case study authorization exists",
+    "payment truth changed",
+    "client registry changed",
+    "revenue truth changed"
+  ],
+  "source_truth_used": [
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md",
+    "staffordos/fulfillment/shopifixer_fulfillment_workspace_design_v1.json"
+  ],
+  "data_requirements": {
+    "before_evidence_source": "before_evidence.md",
+    "fix_scope_source": "fix_scope.md",
+    "after_evidence_source": "after_evidence.md",
+    "fulfillment_context_source": "shopifixer_fulfillment_workspace_design_v1.json"
+  },
+  "answer": {
+    "recommended_output_path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md",
+    "required_input_artifacts": [
+      "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md",
+      "staffordos/proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md",
+      "staffordos/proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md"
+    ],
+    "required_sections": [
+      "Problem Found",
+      "Why It Mattered",
+      "What Was Changed",
+      "Before Evidence",
+      "After Evidence",
+      "Proof Summary",
+      "Recommended Next Watch Item",
+      "Completion Status"
+    ],
+    "safety_boundaries": [
+      "Do not touch client registry",
+      "Do not touch revenue truth",
+      "Do not touch payment truth",
+      "Do not touch fulfillment truth",
+      "Do not touch merchant lifecycle registry",
+      "Do not touch checkout",
+      "Do not touch Stripe"
+    ],
+    "completion_limits": [
+      "Only summarize evidence that already exists",
+      "Do not claim payment or completion unless independently proven",
+      "Do not claim a full merchant proof package without all three evidence artifacts",
+      "Do not invent merchant-facing outcomes"
+    ],
+    "must_not_claim": [
+      "a real merchant paid",
+      "fulfillment is complete",
+      "review or referral has occurred",
+      "case study authorization exists",
+      "payment truth changed",
+      "client registry changed",
+      "revenue truth changed"
+    ],
+    "next_implementation_step": "Build a small proof-package writer that composes the existing before, scope, and after evidence into merchant_proof_package.md without touching governed truth."
+  }
+}
