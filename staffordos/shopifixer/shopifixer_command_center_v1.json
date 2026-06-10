@@ -1,0 +1,211 @@
+{
+  "schema": "staffordos.shopifixer_command_center.v1",
+  "generated_at": "2026-06-10T02:34:39.051Z",
+  "merchant": {
+    "store": "cart-agent-dev.myshopify.com",
+    "client_id": "cart-agent-dev.myshopify.com"
+  },
+  "audit": {
+    "score": 64,
+    "top_issue": "Slow mobile checkout handoff",
+    "recommendation": "Tighten the mobile checkout path and remove unnecessary handoff friction."
+  },
+  "offer": {
+    "offer_status": "offer_sent",
+    "offer_price": 950,
+    "send_allowed": true
+  },
+  "payment": {
+    "payment_status": "waiting_for_payment",
+    "readiness": "READY_FOR_REAL_PAYMENT"
+  },
+  "fulfillment": {
+    "fulfillment_status": "waiting_for_payment",
+    "execution_status": "not_started",
+    "proof_status": "not_started"
+  },
+  "lifecycle": {
+    "offer_generated": true,
+    "offer_sent": true,
+    "payment_received": false,
+    "fulfillment_started": false,
+    "proof_complete": false,
+    "completed": false
+  },
+  "overall": {
+    "current_stage": "offer_sent",
+    "next_required_action": "Collect a verified Stripe payment for the authorized $950 Fix Sprint.",
+    "readiness_score": 93
+  },
+  "source_files": [
+    {
+      "file": "staffordos/audit/audit_result_surface.json",
+      "role": "audit_surface",
+      "status": "source"
+    },
+    {
+      "file": "staffordos/shopifixer/shopifixer_conversion_brief_v1.json",
+      "role": "conversion_brief",
+      "status": "source"
+    },
+    {
+      "file": "staffordos/clients/shopifixer_offer_latest.json",
+      "role": "generated_offer",
+      "status": "source"
+    },
+    {
+      "file": "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+      "role": "send_authority",
+      "status": "source"
+    },
+    {
+      "file": "staffordos/shopifixer/shopifixer_offer_outcome_authority_v1.json",
+      "role": "offer_outcome_authority",
+      "status": "source"
+    },
+    {
+      "file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "role": "fulfillment_truth",
+      "status": "source"
+    },
+    {
+      "file": "staffordos/shopifixer/shopifixer_runtime_payment_verification_v1.json",
+      "role": "runtime_payment_verification",
+      "status": "source"
+    }
+  ],
+  "field_sources": {
+    "merchant.store": {
+      "status": "source",
+      "source_file": "staffordos/clients/shopifixer_offer_latest.json",
+      "source_field": "merchant_shop",
+      "note": "The merchant identity is aligned across the active offer and client record."
+    },
+    "merchant.client_id": {
+      "status": "source",
+      "source_file": "staffordos/clients/shopifixer_offer_latest.json",
+      "source_field": "client_id",
+      "note": "The active client id is the same merchant key used throughout the ShopiFixer flow."
+    },
+    "audit.score": {
+      "status": "source",
+      "source_file": "staffordos/audit/audit_result_surface.json",
+      "source_field": "audit_score",
+      "note": "Audit score is copied directly from the truth surface."
+    },
+    "audit.top_issue": {
+      "status": "source",
+      "source_file": "staffordos/audit/audit_result_surface.json",
+      "source_field": "top_issue",
+      "note": "Current problem statement from the audit surface."
+    },
+    "audit.recommendation": {
+      "status": "source",
+      "source_file": "staffordos/audit/audit_result_surface.json",
+      "source_field": "fix_recommendation",
+      "note": "Recommended fix from the audit surface."
+    },
+    "offer.offer_status": {
+      "status": "derived",
+      "source_file": "staffordos/shopifixer/shopifixer_offer_outcome_authority_v1.json",
+      "source_field": "current_outcome_state",
+      "note": "The offer is sent, but not yet paid or converted."
+    },
+    "offer.offer_price": {
+      "status": "source",
+      "source_file": "staffordos/clients/shopifixer_offer_latest.json",
+      "source_field": "offer.pricing.shopifixer_one_time",
+      "note": "Canonical ShopiFixer price is $950."
+    },
+    "offer.send_allowed": {
+      "status": "source",
+      "source_file": "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+      "source_field": "send_allowed",
+      "note": "Offer is eligible to be sent."
+    },
+    "payment.payment_status": {
+      "status": "source",
+      "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "source_field": "items[0].payment_status",
+      "note": "Current fulfillment truth still shows waiting for payment."
+    },
+    "payment.readiness": {
+      "status": "source",
+      "source_file": "staffordos/shopifixer/shopifixer_runtime_payment_verification_v1.json",
+      "source_field": "final_verdict",
+      "note": "Runtime path is ready for a real payment event."
+    },
+    "fulfillment.fulfillment_status": {
+      "status": "source",
+      "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "source_field": "items[0].fulfillment_status",
+      "note": "Fulfillment has not started yet."
+    },
+    "fulfillment.execution_status": {
+      "status": "source",
+      "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "source_field": "items[0].execution_status",
+      "note": "Execution remains not started."
+    },
+    "fulfillment.proof_status": {
+      "status": "source",
+      "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "source_field": "items[0].proof_status",
+      "note": "No proof package has been produced yet."
+    },
+    "lifecycle.offer_generated": {
+      "status": "source",
+      "source_file": "staffordos/clients/shopifixer_offer_latest.json",
+      "source_field": "offer.subject",
+      "note": "Generated offer exists."
+    },
+    "lifecycle.offer_sent": {
+      "status": "source",
+      "source_file": "staffordos/shopifixer/shopifixer_offer_outcome_authority_v1.json",
+      "source_field": "current_outcome_state",
+      "note": "Offer has been sent."
+    },
+    "lifecycle.payment_received": {
+      "status": "derived",
+      "source_file": "staffordos/shopifixer/shopifixer_runtime_payment_verification_v1.json",
+      "source_field": "payment_status_propagation.fulfillment_result",
+      "note": "Not yet observed in the current fulfillment truth."
+    },
+    "lifecycle.fulfillment_started": {
+      "status": "derived",
+      "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "source_field": "items[0].execution_status",
+      "note": "Execution has not started."
+    },
+    "lifecycle.proof_complete": {
+      "status": "derived",
+      "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "source_field": "items[0].proof_complete",
+      "note": "No proof completion has been recorded."
+    },
+    "lifecycle.completed": {
+      "status": "derived",
+      "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "source_field": "items[0].completion_complete",
+      "note": "The engagement is not completed."
+    },
+    "overall.current_stage": {
+      "status": "derived",
+      "source_file": "staffordos/shopifixer/shopifixer_offer_outcome_authority_v1.json",
+      "source_field": "current_outcome_state + fulfillment_status",
+      "note": "The lifecycle is commercially sent but not yet paid."
+    },
+    "overall.next_required_action": {
+      "status": "derived",
+      "source_file": "staffordos/shopifixer/shopifixer_runtime_payment_verification_v1.json",
+      "source_field": "remaining_blockers + smallest_remaining_repair",
+      "note": "Collect a verified Stripe payment to move fulfillment truth forward."
+    },
+    "overall.readiness_score": {
+      "status": "source",
+      "source_file": "staffordos/shopifixer/shopifixer_runtime_payment_verification_v1.json",
+      "source_field": "readiness_score",
+      "note": "Runtime path readiness, not completion."
+    }
+  }
+}

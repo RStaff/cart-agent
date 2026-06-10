@@ -1,0 +1,80 @@
+{
+  "schema": "staffordos.shopifixer_ui_binding_audit.v1",
+  "generated_at": "2026-06-10T02:34:39.051Z",
+  "exact_route": "/operator/command-center",
+  "navigation_component": {
+    "component": "OperatorNav",
+    "source_file": "staffordos/ui/operator-frontend/components/operator/OperatorNav.tsx",
+    "active_href": "/operator/command-center",
+    "pill_label": "Command Center"
+  },
+  "current_command_center_component": {
+    "component": "OperatorHomeV1",
+    "source_file": "staffordos/ui/operator-frontend/components/operator/OperatorHomeV1.tsx",
+    "page_file": "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx",
+    "current_data_sources": [
+      {
+        "name": "primary_action_snapshot",
+        "source_file": "staffordos/ui/operator-frontend/lib/operator/loadPrimaryActionSnapshot.ts -> staffordos/snapshots/primary_action_snapshot_v1.json",
+        "loader": "loadPrimaryActionSnapshot",
+        "status": "existing"
+      },
+      {
+        "name": "preflight_report",
+        "source_file": "staffordos/ui/operator-frontend/lib/operator/loadPreflightReport.ts -> preflight/output/preflight_report_v1.json",
+        "loader": "loadPreflightReport",
+        "status": "existing"
+      },
+      {
+        "name": "qa_report",
+        "source_file": "staffordos/ui/operator-frontend/lib/operator/loadCommandCenterQaReport.ts -> qa/output/command_center_primary_action_qa_v1.json",
+        "loader": "loadCommandCenterQaReport",
+        "status": "existing"
+      },
+      {
+        "name": "unit_work_snapshot",
+        "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+        "loader": "loadUnitWorkSnapshot",
+        "status": "existing"
+      }
+    ]
+  },
+  "shopifixer_read_model": {
+    "source_file": "staffordos/shopifixer/shopifixer_command_center_v1.json",
+    "can_be_read_model": true,
+    "reason": "It already contains merchant, audit, offer, payment, fulfillment, lifecycle, and overall state in one read-only truth object."
+  },
+  "requested_display_fields": [
+    "merchant.store",
+    "merchant.client_id",
+    "audit.score",
+    "audit.top_issue",
+    "audit.recommendation",
+    "offer.offer_status",
+    "offer.offer_price",
+    "offer.send_allowed",
+    "payment.payment_status",
+    "payment.readiness",
+    "fulfillment.fulfillment_status",
+    "fulfillment.execution_status",
+    "fulfillment.proof_status",
+    "overall.current_stage",
+    "overall.next_required_action",
+    "overall.readiness_score"
+  ],
+  "smallest_ui_change_required": {
+    "status": "add_read_model_to_existing_page",
+    "description": "Load staffordos/shopifixer/shopifixer_command_center_v1.json in the existing /operator/command-center page and render a ShopiFixer summary panel or card inside OperatorHomeV1, reusing the current OperatorNav and page shell.",
+    "files_likely_to_change": [
+      "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx",
+      "staffordos/ui/operator-frontend/components/operator/OperatorHomeV1.tsx",
+      "staffordos/ui/operator-frontend/lib/shopifixerCommandCenter.ts"
+    ]
+  },
+  "can_render_without_additional_truth_artifacts": true,
+  "notes": [
+    "No new authority file is required.",
+    "The UI currently renders operator truth from primary-action and CEO snapshot sources; ShopiFixer can be added as a read-only companion surface.",
+    "The existing route already presents a command-center shell, so the cleanest binding is to extend that page rather than introduce a separate operator section."
+  ]
+}

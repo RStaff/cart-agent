@@ -55,11 +55,43 @@ type UnitWorkSnapshot = {
   }>;
 };
 
+type ShopifixerCommandCenter = {
+  merchant?: {
+    store?: string;
+    client_id?: string;
+  };
+  audit?: {
+    score?: number;
+    top_issue?: string;
+    recommendation?: string;
+  };
+  offer?: {
+    offer_status?: string;
+    offer_price?: number;
+    send_allowed?: boolean;
+  };
+  payment?: {
+    payment_status?: string;
+    readiness?: string;
+  };
+  fulfillment?: {
+    fulfillment_status?: string;
+    execution_status?: string;
+    proof_status?: string;
+  };
+  overall?: {
+    current_stage?: string;
+    next_required_action?: string;
+    readiness_score?: number;
+  };
+};
+
 type OperatorHomeV1Props = {
   primaryActionSnapshot: PrimaryActionSnapshot;
   preflightReport: PreflightReport;
   qaReport: QaReport;
   unitWorkSnapshot: UnitWorkSnapshot;
+  shopifixerCommandCenter?: ShopifixerCommandCenter;
 };
 
 function percent(value?: number) {
@@ -83,13 +115,21 @@ export function OperatorHomeV1({
   primaryActionSnapshot,
   preflightReport,
   qaReport,
-  unitWorkSnapshot
+  unitWorkSnapshot,
+  shopifixerCommandCenter
 }: OperatorHomeV1Props) {
   const action = primaryActionSnapshot.primary_action || {};
   const evidence = Array.isArray(action.evidence) ? action.evidence : [];
   const risk = Array.isArray(action.risk) ? action.risk : [];
   const supportingWork = Array.isArray(unitWorkSnapshot.open_work) ? unitWorkSnapshot.open_work : [];
   const summary = unitWorkSnapshot.summary || {};
+  const shopifixer = shopifixerCommandCenter || {};
+  const shopifixerMerchant = shopifixer.merchant || {};
+  const shopifixerAudit = shopifixer.audit || {};
+  const shopifixerOffer = shopifixer.offer || {};
+  const shopifixerPayment = shopifixer.payment || {};
+  const shopifixerFulfillment = shopifixer.fulfillment || {};
+  const shopifixerOverall = shopifixer.overall || {};
 
   return (
     <main className="shell">
@@ -183,7 +223,7 @@ Expected outcome: {action.expected_outcome || "Outcome not yet defined."}
           </details>
 
           <details className="panel operatorHomeDetails">
-            <summary>Guardrails / risks (hidden)</summary>
+              <summary>Guardrails / risks (hidden)</summary>
             <div className="panelInner">
               {risk.length ? (
                 <ul>
@@ -196,6 +236,58 @@ Expected outcome: {action.expected_outcome || "Outcome not yet defined."}
               )}
             </div>
           </details>
+        </section>
+
+        <section className="panel operatorHomeDetails" style={{ marginTop: 18 }}>
+          <div className="panelInner">
+            <p className="eyebrow">ShopiFixer Command Center</p>
+            <h2 className="sectionTitle" style={{ marginTop: 0 }}>Lifecycle status for the active merchant</h2>
+            <div className="operatorHomeSummaryPills" style={{ marginBottom: 16 }}>
+              <span>Merchant: {shopifixerMerchant.store || "unavailable"}</span>
+              <span>Client ID: {shopifixerMerchant.client_id || "unavailable"}</span>
+              <span>Audit: {shopifixerAudit.score ?? 0}</span>
+              <span>Offer: {shopifixerOffer.offer_status || "unavailable"}</span>
+              <span>Payment: {shopifixerPayment.payment_status || "unavailable"}</span>
+              <span>Fulfillment: {shopifixerFulfillment.fulfillment_status || "unavailable"}</span>
+            </div>
+            <div className="operatorHomeActionCard" style={{ marginTop: 0 }}>
+              <div className="operatorHomeActionFooter">
+                <div>
+                  <small>Top issue</small>
+                  <strong>{shopifixerAudit.top_issue || "unavailable"}</strong>
+                </div>
+                <div>
+                  <small>Send allowed</small>
+                  <strong>{String(Boolean(shopifixerOffer.send_allowed))}</strong>
+                </div>
+                <div>
+                  <small>Readiness</small>
+                  <strong>{shopifixerOverall.readiness_score ?? 0}</strong>
+                </div>
+              </div>
+              <div className="operatorHomeNextStep" style={{ marginTop: 16 }}>
+                <span>Next required action</span>
+                <strong>{shopifixerOverall.next_required_action || "unavailable"}</strong>
+              </div>
+              <div className="operatorHomeActionFooter" style={{ marginTop: 16 }}>
+                <div>
+                  <small>Current stage</small>
+                  <strong>{shopifixerOverall.current_stage || "unavailable"}</strong>
+                </div>
+                <div>
+                  <small>Execution</small>
+                  <strong>{shopifixerFulfillment.execution_status || "unavailable"}</strong>
+                </div>
+                <div>
+                  <small>Proof</small>
+                  <strong>{shopifixerFulfillment.proof_status || "unavailable"}</strong>
+                </div>
+              </div>
+              <p className="hint" style={{ marginTop: 14 }}>
+                {shopifixerAudit.recommendation || "unavailable"}
+              </p>
+            </div>
+          </div>
         </section>
 
         <details className="panel operatorHomeDetails">
