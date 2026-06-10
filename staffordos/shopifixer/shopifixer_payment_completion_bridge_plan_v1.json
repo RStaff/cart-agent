@@ -1,0 +1,118 @@
+{
+  "schema": "staffordos.shopifixer_payment_completion_bridge_plan.v1",
+  "generated_at": "2026-06-09T14:50:00.000Z",
+  "readiness_score": 40,
+  "in_repo_webhook_exists": true,
+  "in_repo_public_checkout_exists": true,
+  "checkout_path": {
+    "file": "abando-frontend/app/shopifixer/page.tsx",
+    "path": "/__public-checkout",
+    "status": "mounted_in_web_entrypoint",
+    "notes": [
+      "The ShopiFixer page posts to /__public-checkout or an env-based base URL plus /__public-checkout.",
+      "The route creates a Stripe Checkout session and binds packet payment_pending state."
+    ]
+  },
+  "webhook_path": {
+    "file": "web/src/routes/stripeWebhook.esm.js",
+    "path": "/stripe/webhook",
+    "status": "mounted_in_web_entrypoint",
+    "can_call_payment_writer": true,
+    "calls": "recordStripePaymentPropagation",
+    "notes": [
+      "The webhook already verifies Stripe signatures with STRIPE_WEBHOOK_SECRET.",
+      "The webhook already extracts packet_id and store_domain from checkout.session.completed metadata.",
+      "The webhook already calls recordStripePaymentPropagation after bindPacketPayment."
+    ]
+  },
+  "successful_payment_event": "checkout.session.completed",
+  "payment_provider": "Stripe",
+  "payment_truth_writer": "staffordos/clients/client_registry_v1.mjs:recordVerifiedStripePayment",
+  "payment_propagation_writer": "staffordos/revenue/revenue_agent_v1.mjs:recordStripePaymentPropagation",
+  "fulfillment_truth_builder": "staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs",
+  "smallest_repair": "Add a runtime-safe fulfillment update helper, then invoke it from web/src/routes/stripeWebhook.esm.js after payment propagation succeeds so the paid client record produces payment_received in shopifixer_fulfillment_truth_v1.json.",
+  "merchant_identity_fields_available_at_payment": [
+    "packet_id",
+    "store_domain",
+    "client_reference_id",
+    "session.id",
+    "amount_total",
+    "currency",
+    "customer_details.email (when present)"
+  ],
+  "payment_completion_bridge": {
+    "current_gap": "Payment truth is written, but fulfillment truth is still rebuilt offline rather than updated by the runtime payment path.",
+    "smallest_safe_repair": "After recordStripePaymentPropagation succeeds in the Stripe webhook, call the fulfillment truth builder or extract its core fulfillment update logic into a runtime-safe helper so the paid client record produces payment_received in shopifixer_fulfillment_truth_v1.json.",
+    "preferred_implementation_path": [
+      "Keep the existing Stripe webhook and payment writers.",
+      "Add a small runtime helper that maps paid client truth to fulfillment truth.",
+      "Invoke that helper from web/src/routes/stripeWebhook.esm.js after successful payment propagation."
+    ]
+  },
+  "exact_files_to_change": [
+    "web/src/routes/stripeWebhook.esm.js",
+    "staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs"
+  ],
+  "runtime_flow": [
+    {
+      "step": "authorized_offer",
+      "source": "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+      "destination": "staffordos/shopifixer/shopifixer_offer_outcome_authority_v1.json",
+      "status": "observed"
+    },
+    {
+      "step": "checkout_start",
+      "source": "abando-frontend/app/shopifixer/page.tsx",
+      "destination": "web/src/checkout-public.js",
+      "status": "observed"
+    },
+    {
+      "step": "payment_event",
+      "source": "web/src/routes/stripeWebhook.esm.js",
+      "destination": "staffordos/clients/client_registry_v1.json",
+      "status": "observed"
+    },
+    {
+      "step": "verified_payment_truth",
+      "source": "staffordos/clients/client_registry_v1.mjs",
+      "destination": "staffordos/clients/client_registry_v1.json",
+      "status": "observed"
+    },
+    {
+      "step": "fulfillment_payment_received",
+      "source": "staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs",
+      "destination": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "status": "planned"
+    }
+  ],
+  "authority_files_used": [
+    "staffordos/shopifixer/shopifixer_payment_path_audit_v1.json",
+    "staffordos/clients/client_registry_v1.mjs",
+    "staffordos/revenue/revenue_agent_v1.mjs",
+    "staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs",
+    "web/src/routes/stripeWebhook.esm.js",
+    "web/src/checkout-public.js",
+    "abando-frontend/app/shopifixer/page.tsx"
+  ],
+  "business_truth_untouched": true,
+  "payment_simulated": false,
+  "implementation_allowed_next": [
+    "Add a runtime-safe fulfillment update helper.",
+    "Invoke the helper from web/src/routes/stripeWebhook.esm.js after payment propagation succeeds.",
+    "Keep checkout, Stripe, client registry, revenue truth, and fulfillment truth semantics unchanged."
+  ],
+  "blockers": [
+    "Fulfillment truth is still updated by an offline builder rather than a runtime bridge.",
+    "The smallest safe repair needs a runtime-safe helper or bridge before payment can advance to fulfillment truth."
+  ],
+  "do_not_touch": [
+    "web/src/checkout-public.js",
+    "staffordos/clients/client_registry_v1.mjs payment semantics",
+    "staffordos/revenue/revenue_agent_v1.mjs payment semantics",
+    "client_registry_v1.json",
+    "revenue_truth_v1.json",
+    "Stripe checkout semantics",
+    "CEO cockpit",
+    "lifecycle authority"
+  ]
+}
