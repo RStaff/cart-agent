@@ -1,0 +1,159 @@
+{
+  "schema": "staffordos.shopifixer_payment_path_audit.v1",
+  "generated_at": "2026-06-09T14:40:00.000Z",
+  "current_state": "offer_sent",
+  "target_state": "payment_received",
+  "readiness_score": 40,
+  "checkout_path": {
+    "exact_checkout_url": "POST to /__public-checkout, or to `${NEXT_PUBLIC_ABANDO_API_BASE || NEXT_PUBLIC_ABANDO_BACKEND_ORIGIN}/__public-checkout` when an API base is configured",
+    "status": "partial",
+    "evidence": [
+      "abando-frontend/app/shopifixer/page.tsx posts to /__public-checkout",
+      "The code falls back to a relative /__public-checkout endpoint when no base URL is configured",
+      "No in-repo handler for /__public-checkout was found"
+    ]
+  },
+  "payment_authority_location": {
+    "provider": "Stripe",
+    "code_files": [
+      "abando-frontend/src/lib/stripe.ts",
+      "abando-frontend/src/app_legacy/api/trial/link/route.ts",
+      "abando-frontend/src/app_legacy/api/stripe/webhook/route.ts",
+      "staffordos/clients/client_registry_v1.mjs",
+      "staffordos/revenue/revenue_agent_v1.mjs"
+    ],
+    "success_event": "checkout.session.completed",
+    "payment_writer": "staffordos/clients/client_registry_v1.mjs:recordVerifiedStripePayment",
+    "payment_propagation_writer": "staffordos/revenue/revenue_agent_v1.mjs:recordStripePaymentPropagation"
+  },
+  "fulfillment_trigger_location": {
+    "code_file": "staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs",
+    "status": "offline_builder_only",
+    "what_it_does": "Rebuilds shopifixer_fulfillment_truth_v1.json from client registry and delivery units",
+    "missing_runtime_bridge": "No runtime handler was found that calls the fulfillment builder or mutates fulfillment truth after a verified payment"
+  },
+  "runtime_flow_map": [
+    {
+      "step": "authorized_offer",
+      "source": "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+      "destination": "staffordos/shopifixer/shopifixer_offer_outcome_authority_v1.json",
+      "status": "observed",
+      "evidence_available": [
+        "send_allowed is true",
+        "current_outcome_state is offer_sent",
+        "client_registry contains an offer_sent note"
+      ],
+      "missing_links": []
+    },
+    {
+      "step": "checkout_start",
+      "source": "abando-frontend/app/shopifixer/page.tsx",
+      "destination": "checkout endpoint",
+      "status": "partial",
+      "evidence_available": [
+        "The page POSTs to /__public-checkout",
+        "The checkout request body includes plan=scale and store_domain"
+      ],
+      "missing_links": [
+        "No in-repo /__public-checkout handler was found",
+        "No proof that this endpoint returns a real payment link in the checked-in codebase"
+      ]
+    },
+    {
+      "step": "payment_event",
+      "source": "Stripe",
+      "destination": "client_registry_v1.json",
+      "status": "partial",
+      "evidence_available": [
+        "Stripe webhook code handles checkout.session.completed in a legacy route",
+        "recordVerifiedStripePayment exists and can set deal.payment_status to paid"
+      ],
+      "missing_links": [
+        "The current ShopiFixer checkout path does not call recordStripePaymentPropagation",
+        "The legacy webhook route only sends a magic link and does not update ShopiFixer payment truth"
+      ]
+    },
+    {
+      "step": "verified_payment_truth",
+      "source": "staffordos/clients/client_registry_v1.mjs",
+      "destination": "staffordos/clients/client_registry_v1.json",
+      "status": "not_wired_from_shopifixer_flow",
+      "evidence_available": [
+        "recordVerifiedStripePayment updates deal.payment_status to paid",
+        "It also writes the offer_sent -> deal_won style payment note"
+      ],
+      "missing_links": [
+        "No live ShopiFixer runtime call into this function was found from the current checkout flow"
+      ]
+    },
+    {
+      "step": "fulfillment_payment_received",
+      "source": "staffordos/clients/client_registry_v1.json",
+      "destination": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "status": "not_wired_from_shopifixer_flow",
+      "evidence_available": [
+        "The fulfillment builder knows how to mark an item as payment_received when client truth is paid"
+      ],
+      "missing_links": [
+        "No runtime bridge rebuilds or updates fulfillment truth after payment"
+      ]
+    }
+  ],
+  "blockers": [
+    "The ShopiFixer page posts to /__public-checkout, but no in-repo handler for that endpoint was found.",
+    "The only verified-payment writer is client_registry_v1.mjs, but the ShopiFixer checkout path does not call it.",
+    "The only fulfillment truth writer is an offline builder, not a runtime post-payment handler.",
+    "The app_legacy Stripe webhook path handles checkout.session.completed for magic-link issuance, not ShopiFixer payment truth.",
+    "Fulfillment truth remains waiting_for_payment and cannot advance automatically from the current ShopiFixer flow."
+  ],
+  "runtime_gaps": [
+    "missing_shopifixer_checkout_handler_in_repo",
+    "missing_shopifixer_payment_to_client_registry_bridge",
+    "missing_shopifixer_payment_to_fulfillment_truth_bridge",
+    "missing_post_payment_fulfillment_rebuild"
+  ],
+  "smallest_repair": "Wire the ShopiFixer checkout success/webhook path to call staffordos/revenue/revenue_agent_v1.mjs:recordStripePaymentPropagation (or recordVerifiedStripePayment) for the same merchant, then rebuild staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json from the paid client record so the fulfillment item can move to payment_received.",
+  "exact_next_repair": [
+    "Add the missing runtime bridge from the ShopiFixer payment completion event to recordStripePaymentPropagation.",
+    "Ensure the same merchant identity is passed through the payment event payload.",
+    "Rebuild shopifixer_fulfillment_truth_v1.json from the now-paid client registry truth."
+  ],
+  "what_becomes_provable_after_payment": [
+    "The offer became a paid ShopiFixer Fix Sprint.",
+    "The client registry records paid revenue truth.",
+    "The fulfillment item is eligible to start and can move to payment_received.",
+    "The downstream proof package can be materialized from the fulfillment authority."
+  ],
+  "field_sources": {
+    "checkout_path": {
+      "status": "source",
+      "source_file": "abando-frontend/app/shopifixer/page.tsx",
+      "source_field": "fetch to /__public-checkout",
+      "note": "The checkout URL is environment-dependent and no in-repo handler was found."
+    },
+    "payment_authority_location": {
+      "status": "source",
+      "source_file": "abando-frontend/src/lib/stripe.ts + abando-frontend/src/app_legacy/api/stripe/webhook/route.ts + staffordos/clients/client_registry_v1.mjs + staffordos/revenue/revenue_agent_v1.mjs",
+      "source_field": "Stripe checkout.session.completed + recordVerifiedStripePayment + recordStripePaymentPropagation",
+      "note": "Payment authority exists, but it is not wired into the current ShopiFixer checkout flow."
+    },
+    "fulfillment_trigger_location": {
+      "status": "source",
+      "source_file": "staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs",
+      "source_field": "offline builder",
+      "note": "The fulfillment truth is generated offline; no runtime trigger was found."
+    },
+    "readiness_score": {
+      "status": "derived",
+      "source_file": "staffordos/shopifixer/shopifixer_send_authority_v1.json + staffordos/shopifixer/shopifixer_offer_outcome_authority_v1.json + abando-frontend/app/shopifixer/page.tsx + staffordos/clients/client_registry_v1.mjs + staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs",
+      "source_field": "offer + checkout + payment + fulfillment bridge completeness",
+      "note": "The path is partially wired but not end-to-end."
+    },
+    "smallest_repair": {
+      "status": "derived",
+      "source_file": "staffordos/clients/client_registry_v1.mjs + staffordos/revenue/revenue_agent_v1.mjs + staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs",
+      "source_field": "payment bridge + fulfillment rebuild",
+      "note": "Bridge the payment event into existing truth writers, then rebuild fulfillment truth."
+    }
+  }
+}

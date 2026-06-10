@@ -1,0 +1,55 @@
+{
+  "schema": "staffordos.shopifixer_merchant_outreach_packet.v1",
+  "generated_at": "2026-06-09T14:30:00.000Z",
+  "identity": {
+    "merchant_shop": "cart-agent-dev.myshopify.com",
+    "client_id": "cart-agent-dev.myshopify.com",
+    "readiness_status": "READY"
+  },
+  "subject": "ShopiFixer Fix Sprint for cart-agent-dev.myshopify.com",
+  "body": "Hi,\n\nHere is the ShopiFixer Conversion Brief for cart-agent-dev.myshopify.com.\n\nProblem Found:\nSlow mobile checkout handoff\n\nBenchmark Position:\nThis store is performing below roughly 56% of similar Shopify stores on checkout completion and recovery readiness.\n\nWhy It Matters:\nThe audit surface identifies a benchmark-backed checkout friction issue. If the mobile checkout handoff stays slow, the store remains below a meaningful portion of similar Shopify stores on checkout completion and recovery readiness.\n\nFix Recommendation:\nTighten the mobile checkout path and remove unnecessary handoff friction.\n\nWhat The $950 Fix Sprint Includes:\n1. Diagnosis\n2. Scoped fix\n3. Before evidence\n4. After evidence\n5. Merchant-facing proof package\n6. Completion decision\n7. Intake summary\n8. Fix scope\n9. Execution notes\n\nWhat Proof They Will Receive:\n1. Before-state evidence\n2. After-state evidence\n3. Merchant-facing proof summary\n4. Completion decision\n\nShopiFixer Fix Sprint: $950\n\nAbando remains a separate optional SaaS product and is not part of this offer.\n\nCall To Action:\nGet the $950 Fix Sprint\n\nThis offer is for the fix sprint only.\n\n– Ross\nStafford Media Consulting\n",
+  "conversion_summary": {
+    "problem_found": "Slow mobile checkout handoff",
+    "benchmark_position": "This store is performing below roughly 56% of similar Shopify stores on checkout completion and recovery readiness.",
+    "why_it_matters": "The audit surface identifies a benchmark-backed checkout friction issue. If the mobile checkout handoff stays slow, the store remains below a meaningful portion of similar Shopify stores on checkout completion and recovery readiness.",
+    "fix_recommendation": "Tighten the mobile checkout path and remove unnecessary handoff friction."
+  },
+  "offer_summary": {
+    "sprint_price": 950,
+    "sprint_deliverables": [
+      "Diagnosis",
+      "Scoped fix",
+      "Before evidence",
+      "After evidence",
+      "Merchant-facing proof package",
+      "Completion decision",
+      "Intake summary",
+      "Fix scope",
+      "Execution notes"
+    ],
+    "proof_package_deliverables": [
+      "Before-state evidence",
+      "After-state evidence",
+      "Merchant-facing proof summary",
+      "Completion decision"
+    ]
+  },
+  "cta": {
+    "call_to_action": "Get the $950 Fix Sprint",
+    "offer_type": "ShopiFixer Fix Sprint",
+    "offer_status": "authorized_and_send_ready"
+  },
+  "send_readiness_proof": {
+    "send_allowed": true,
+    "readiness_status": "READY",
+    "blocking_issues": [],
+    "authority_files_used": [
+      "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+      "staffordos/shopifixer/shopifixer_offer_outcome_authority_v1.json",
+      "staffordos/shopifixer/shopifixer_conversion_brief_v1.json",
+      "staffordos/clients/shopifixer_offer_latest.json",
+      "staffordos/shopifixer/shopifixer_offer_readiness_v1.json",
+      "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md"
+    ]
+  }
+}
