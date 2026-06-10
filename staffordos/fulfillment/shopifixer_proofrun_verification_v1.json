@@ -1,0 +1,56 @@
+{
+  "schema": "staffordos.shopifixer_proofrun_verification.v1",
+  "generated_at": "2026-06-10T18:40:00Z",
+  "architecture_grade": "B",
+  "reusable_component_effective": true,
+  "duplication_eliminated": [
+    "workbench shell layout",
+    "merchant/store provenance display",
+    "save/success banner pattern",
+    "form submit pattern",
+    "artifact path handling",
+    "stage selection mechanics"
+  ],
+  "duplication_remaining": [
+    "stage-specific field definitions",
+    "stage-specific writer helpers",
+    "server action wiring in the page component",
+    "per-stage saved-state redirects"
+  ],
+  "shared_shell_status": {
+    "before_evidence": "shared shell in ProofRunWorkbench",
+    "scoped_fix": "shared shell in ProofRunWorkbench",
+    "after_evidence": "not yet implemented",
+    "proof_package": "not yet implemented",
+    "completion": "not yet implemented"
+  },
+  "answers": {
+    "eliminates_duplication": "Yes, at the shell and provenance layer; not yet at the stage implementation layer.",
+    "same_workbench_shell": "Yes. before_evidence and scoped_fix use the same ProofRunWorkbench component and differ only by stage config and action.",
+    "add_after_evidence": [
+      "extend proofRunStageConfigs.ts with after_evidence stage config",
+      "add writeShopifixerAfterEvidence helper",
+      "add a server action in page.tsx",
+      "render a second ProofRunWorkbench instance with stage='after_evidence'"
+    ],
+    "add_proof_package": [
+      "extend proofRunStageConfigs.ts with proof_package stage config",
+      "add a proof-package writer/helper",
+      "add a server action in page.tsx",
+      "render a ProofRunWorkbench instance for proof_package or a composition-only action"
+    ],
+    "add_completion": [
+      "extend proofRunStageConfigs.ts with completion stage config",
+      "add completion summary handling",
+      "add a server action in page.tsx",
+      "add governed writeback only if future truth policy allows it"
+    ]
+  },
+  "effort_estimates": {
+    "after_evidence": "small",
+    "proof_package": "small_to_medium",
+    "completion": "medium"
+  },
+  "recommendation": "Continue, not refactor.",
+  "next_implementation": "Add the after_evidence stage to the same ProofRunWorkbench shell, then add proof_package and completion sequentially."
+}
