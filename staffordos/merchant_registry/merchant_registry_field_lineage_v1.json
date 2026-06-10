@@ -1,0 +1,88 @@
+{
+  "schema": "staffordos.merchant_registry_field_lineage.v1",
+  "generated_at": "2026-06-10T14:10:00Z",
+  "verdict": "YES",
+  "answer": "The missing ShopiFixer panel fields can be sourced from existing truth and materialized into merchant_lifecycle_registry_v1.json. From a field-lineage standpoint, the merchant lifecycle registry can fully replace shopifixer_command_center_v1.json once these fields are materialized.",
+  "investigated_fields": [
+    {
+      "field": "audit.score",
+      "classification": "source_available",
+      "source_file": "staffordos/audit/audit_result_surface.json",
+      "source_field": "audit_score",
+      "materialization_note": "Copy directly into the merchant lifecycle record as the ShopiFixer audit score."
+    },
+    {
+      "field": "audit.top_issue",
+      "classification": "source_available",
+      "source_file": "staffordos/audit/audit_result_surface.json",
+      "source_field": "top_issue",
+      "materialization_note": "Copy directly into the merchant lifecycle record as the audit problem statement."
+    },
+    {
+      "field": "audit.recommendation",
+      "classification": "source_available",
+      "source_file": "staffordos/audit/audit_result_surface.json",
+      "source_field": "fix_recommendation",
+      "materialization_note": "Copy directly into the merchant lifecycle record as the recommended fix."
+    },
+    {
+      "field": "offer.send_allowed",
+      "classification": "source_available",
+      "source_file": "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+      "source_field": "send_allowed",
+      "materialization_note": "Copy directly into the merchant lifecycle record as the ShopiFixer send eligibility flag."
+    },
+    {
+      "field": "payment.readiness",
+      "classification": "derivable",
+      "source_file": "staffordos/shopifixer/shopifixer_runtime_payment_verification_v1.json",
+      "source_field": "final_verdict",
+      "materialization_note": "Derive directly from final_verdict, which is READY_FOR_REAL_PAYMENT for the verified runtime path."
+    },
+    {
+      "field": "fulfillment.execution_status",
+      "classification": "source_available",
+      "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "source_field": "items[0].execution_status",
+      "materialization_note": "Copy directly into the merchant lifecycle record as the fulfillment execution state."
+    }
+  ],
+  "lineage_summary": {
+    "source_available": [
+      "audit.score",
+      "audit.top_issue",
+      "audit.recommendation",
+      "offer.send_allowed",
+      "fulfillment.execution_status"
+    ],
+    "derivable": [
+      "payment.readiness"
+    ],
+    "unavailable": []
+  },
+  "replacement_assessment": {
+    "can_fully_replace_shopifixer_command_center": true,
+    "basis": [
+      "Every missing ShopiFixer panel field has a verified source or a verified derivation path.",
+      "The merchant lifecycle registry already carries the merchant identity, lifecycle stage, offer status, payment status, fulfillment status, and readiness score needed by the panel.",
+      "The remaining ShopiFixer panel fields are now lineage-complete and can be materialized into the registry without inventing new truth."
+    ]
+  },
+  "exact_materialization_paths": {
+    "audit.score": "staffordos/audit/audit_result_surface.json#audit_score",
+    "audit.top_issue": "staffordos/audit/audit_result_surface.json#top_issue",
+    "audit.recommendation": "staffordos/audit/audit_result_surface.json#fix_recommendation",
+    "offer.send_allowed": "staffordos/shopifixer/shopifixer_send_authority_v1.json#send_allowed",
+    "payment.readiness": "staffordos/shopifixer/shopifixer_runtime_payment_verification_v1.json#final_verdict",
+    "fulfillment.execution_status": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json#items[0].execution_status"
+  },
+  "source_files": [
+    "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+    "staffordos/shopifixer/shopifixer_command_center_v1.json",
+    "staffordos/audit/audit_result_surface.json",
+    "staffordos/shopifixer/shopifixer_conversion_brief_v1.json",
+    "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+    "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+    "staffordos/shopifixer/shopifixer_runtime_payment_verification_v1.json"
+  ]
+}

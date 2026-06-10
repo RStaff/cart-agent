@@ -1,0 +1,1724 @@
+{
+  "schema": "staffordos.merchant_lifecycle_registry.v1",
+  "generated_at": "2026-06-10T13:36:35.662Z",
+  "source_files": [
+    "staffordos/clients/client_registry_v1.json",
+    "staffordos/leads/lead_registry_v1.json",
+    "staffordos/units/opportunity_units_v1.json",
+    "staffordos/units/delivery_units_v1.json",
+    "staffordos/units/action_units_v1.json",
+    "staffordos/revenue/revenue_truth_v1.json",
+    "staffordos/audit/audit_result_surface.json",
+    "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+    "staffordos/shopifixer/shopifixer_runtime_payment_verification_v1.json",
+    "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+    "staffordos/shopifixer/shopifixer_command_center_v1.json"
+  ],
+  "summary": {
+    "records": 5,
+    "current_stage_counts": {
+      "offer_sent": 1,
+      "engaged": 3,
+      "followup_sent": 1
+    },
+    "payment_status_counts": {
+      "waiting_for_payment": 1,
+      "unpaid": 4
+    },
+    "records_with_payment_amount": 0,
+    "records_with_lead_truth": 4,
+    "records_with_opportunity_truth": 1,
+    "records_with_delivery_truth": 1
+  },
+  "records": [
+    {
+      "merchant_id": "cart-agent-dev.myshopify.com",
+      "client_id": "cart-agent-dev.myshopify.com",
+      "merchant_shop": "cart-agent-dev.myshopify.com",
+      "store_domain": "cart-agent-dev.myshopify.com",
+      "lead_id": null,
+      "opportunity_id": "opp_cart-agent-dev.myshopify.com",
+      "delivery_id": "delivery_cart-agent-dev.myshopify.com_shopifixer",
+      "action_id": "action_cart-agent-dev.myshopify.com_followup_offer",
+      "current_stage": "offer_sent",
+      "next_required_action": "Collect a verified Stripe payment for the authorized $950 Fix Sprint.",
+      "readiness_score": 93,
+      "lead_status": null,
+      "audit_status": "complete",
+      "offer_status": "offer_sent",
+      "payment_status": "waiting_for_payment",
+      "fulfillment_status": "waiting_for_payment",
+      "proof_package_status": "not_started",
+      "revenue_status": "abando_recovered_only",
+      "case_study_status": "not_started",
+      "before_evidence_status": "not_started",
+      "after_evidence_status": "not_started",
+      "review_status": "not_started",
+      "referral_status": "not_started",
+      "offer_price": 950,
+      "payment_amount": null,
+      "payment_currency": "USD",
+      "lifetime_value": 0,
+      "audit": {
+        "score": 64,
+        "top_issue": "Slow mobile checkout handoff",
+        "recommendation": "Tighten the mobile checkout path and remove unnecessary handoff friction."
+      },
+      "offer": {
+        "send_allowed": true
+      },
+      "payment": {
+        "readiness": "READY_FOR_REAL_PAYMENT"
+      },
+      "fulfillment": {
+        "execution_status": "not_started",
+        "proof_status": "not_started"
+      },
+      "source_files": [
+        "staffordos/clients/client_registry_v1.json",
+        "staffordos/leads/lead_registry_v1.json",
+        "staffordos/units/opportunity_units_v1.json",
+        "staffordos/units/delivery_units_v1.json",
+        "staffordos/units/action_units_v1.json",
+        "staffordos/revenue/revenue_truth_v1.json",
+        "staffordos/audit/audit_result_surface.json",
+        "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+        "staffordos/shopifixer/shopifixer_runtime_payment_verification_v1.json",
+        "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+        "staffordos/shopifixer/shopifixer_command_center_v1.json"
+      ],
+      "field_sources": {
+        "merchant_id": {
+          "status": "derived",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "client_id",
+          "note": "Client ID is the stable merchant identifier in the current merchant lifecycle read model."
+        },
+        "client_id": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "client_id",
+          "note": null
+        },
+        "merchant_shop": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "merchant_shop",
+          "note": null
+        },
+        "store_domain": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "merchant_shop",
+          "note": "Store domain is derived from the canonical client merchant shop."
+        },
+        "lead_id": {
+          "status": "unavailable",
+          "source_file": "No lead matched by client_id / merchant_shop / store_domain.",
+          "source_field": null,
+          "note": null
+        },
+        "opportunity_id": {
+          "status": "source",
+          "source_file": "staffordos/units/opportunity_units_v1.json",
+          "source_field": "unit_id",
+          "note": null
+        },
+        "delivery_id": {
+          "status": "source",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "unit_id",
+          "note": null
+        },
+        "action_id": {
+          "status": "source",
+          "source_file": "staffordos/units/action_units_v1.json",
+          "source_field": "unit_id",
+          "note": null
+        },
+        "current_stage": {
+          "status": "source",
+          "source_file": "staffordos/shopifixer/shopifixer_command_center_v1.json",
+          "source_field": "overall.current_stage",
+          "note": "Active ShopiFixer command-center stage takes precedence for the current merchant."
+        },
+        "next_required_action": {
+          "status": "source",
+          "source_file": "staffordos/shopifixer/shopifixer_command_center_v1.json",
+          "source_field": "overall.next_required_action",
+          "note": "Active ShopiFixer command-center next action takes precedence."
+        },
+        "readiness_score": {
+          "status": "source",
+          "source_file": "staffordos/shopifixer/shopifixer_command_center_v1.json",
+          "source_field": "overall.readiness_score",
+          "note": "Runtime readiness from the active ShopiFixer command center."
+        },
+        "lead_status": {
+          "status": "unavailable",
+          "source_file": "No lead truth exists for this merchant.",
+          "source_field": null,
+          "note": null
+        },
+        "audit_status": {
+          "status": "source",
+          "source_file": "staffordos/shopifixer/shopifixer_command_center_v1.json",
+          "source_field": "audit.score",
+          "note": "Active ShopiFixer command center implies audit completion."
+        },
+        "offer_status": {
+          "status": "source",
+          "source_file": "staffordos/shopifixer/shopifixer_command_center_v1.json",
+          "source_field": "offer.offer_status",
+          "note": "Active ShopiFixer command center carries the current offer state for the current merchant."
+        },
+        "payment_status": {
+          "status": "source",
+          "source_file": "staffordos/shopifixer/shopifixer_command_center_v1.json",
+          "source_field": "payment.payment_status",
+          "note": "Active ShopiFixer command center carries the current payment state for the current merchant."
+        },
+        "fulfillment_status": {
+          "status": "source",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "status / stage",
+          "note": null
+        },
+        "proof_package_status": {
+          "status": "source",
+          "source_file": "staffordos/units/delivery_units_v1.json",
+          "source_field": "proof_status",
+          "note": null
+        },
+        "revenue_status": {
+          "status": "derived",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "revenue + deal.payment_status + abando.merchant_revenue_recovered",
+          "note": "Revenue state is derived from client revenue and payment truth."
+        },
+        "case_study_status": {
+          "status": "derived",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].case_study_status / review_status / referral_status",
+          "note": "Case-study readiness is not yet proven."
+        },
+        "before_evidence_status": {
+          "status": "source",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].before_evidence_status",
+          "note": null
+        },
+        "after_evidence_status": {
+          "status": "source",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].after_evidence_status",
+          "note": null
+        },
+        "review_status": {
+          "status": "source",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].review_status",
+          "note": null
+        },
+        "referral_status": {
+          "status": "source",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].referral_status",
+          "note": null
+        },
+        "offer_price": {
+          "status": "source",
+          "source_file": "staffordos/units/opportunity_units_v1.json",
+          "source_field": "value.one_time",
+          "note": "ShopiFixer canonical price is $950 for the current product path."
+        },
+        "payment_amount": {
+          "status": "unavailable",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].amount",
+          "note": "No verified payment amount exists yet for the active merchant."
+        },
+        "payment_currency": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "deal.currency",
+          "note": null
+        },
+        "lifetime_value": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "business.lifetime_value",
+          "note": null
+        },
+        "audit.score": {
+          "status": "source",
+          "source_file": "staffordos/audit/audit_result_surface.json",
+          "source_field": "audit_score",
+          "note": "ShopiFixer audit score is materialized from the audit result surface."
+        },
+        "audit.top_issue": {
+          "status": "source",
+          "source_file": "staffordos/audit/audit_result_surface.json",
+          "source_field": "top_issue",
+          "note": "ShopiFixer top issue is materialized from the audit result surface."
+        },
+        "audit.recommendation": {
+          "status": "source",
+          "source_file": "staffordos/audit/audit_result_surface.json",
+          "source_field": "fix_recommendation",
+          "note": "ShopiFixer fix recommendation is materialized from the audit result surface."
+        },
+        "offer.send_allowed": {
+          "status": "source",
+          "source_file": "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+          "source_field": "send_allowed",
+          "note": "ShopiFixer send eligibility is materialized from the send authority."
+        },
+        "payment.readiness": {
+          "status": "derivable",
+          "source_file": "staffordos/shopifixer/shopifixer_runtime_payment_verification_v1.json",
+          "source_field": "final_verdict",
+          "note": "Runtime payment readiness is derived from the verified payment path verdict."
+        },
+        "fulfillment.execution_status": {
+          "status": "source",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].execution_status",
+          "note": "Fulfillment execution status is materialized from the fulfillment truth."
+        },
+        "fulfillment.proof_status": {
+          "status": "source",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].proof_status",
+          "note": "Proof status is materialized from the fulfillment truth."
+        }
+      },
+      "unavailable_fields": [
+        {
+          "field": "lead_id",
+          "status": "unavailable",
+          "reason": "No matching lead could be proven for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "lead_status",
+          "status": "unavailable",
+          "reason": "No lead row exists for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "payment_amount",
+          "status": "unavailable",
+          "reason": "No payment is verified yet.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "payment_received_at",
+          "status": "unavailable",
+          "reason": "No verified payment receipt timestamp exists yet.",
+          "source_file": null,
+          "source_field": null
+        }
+      ]
+    },
+    {
+      "merchant_id": "fitgearpro.myshopify.com",
+      "client_id": "fitgearpro.myshopify.com",
+      "merchant_shop": "fitgearpro.myshopify.com",
+      "store_domain": "fitgearpro.myshopify.com",
+      "lead_id": "lead_fitgearpro_myshopify_com",
+      "opportunity_id": null,
+      "delivery_id": null,
+      "action_id": null,
+      "current_stage": "engaged",
+      "next_required_action": "Qualify reply and prepare offer",
+      "readiness_score": 25,
+      "lead_status": "engaged",
+      "audit_status": "not_started",
+      "offer_status": "not_started",
+      "payment_status": "unpaid",
+      "fulfillment_status": "not_started",
+      "proof_package_status": "not_started",
+      "revenue_status": "not_captured",
+      "case_study_status": "not_started",
+      "before_evidence_status": "not_started",
+      "after_evidence_status": "not_started",
+      "review_status": "not_started",
+      "referral_status": "not_started",
+      "offer_price": 950,
+      "payment_amount": null,
+      "payment_currency": "USD",
+      "lifetime_value": 0,
+      "audit": {
+        "score": null,
+        "top_issue": null,
+        "recommendation": null
+      },
+      "offer": {
+        "send_allowed": null
+      },
+      "payment": {
+        "readiness": null
+      },
+      "fulfillment": {
+        "execution_status": null,
+        "proof_status": null
+      },
+      "source_files": [
+        "staffordos/clients/client_registry_v1.json",
+        "staffordos/leads/lead_registry_v1.json",
+        "staffordos/units/opportunity_units_v1.json",
+        "staffordos/units/delivery_units_v1.json",
+        "staffordos/units/action_units_v1.json",
+        "staffordos/revenue/revenue_truth_v1.json",
+        "staffordos/audit/audit_result_surface.json",
+        "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+        "staffordos/shopifixer/shopifixer_runtime_payment_verification_v1.json",
+        "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+        "staffordos/shopifixer/shopifixer_command_center_v1.json"
+      ],
+      "field_sources": {
+        "merchant_id": {
+          "status": "derived",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "client_id",
+          "note": "Client ID is the stable merchant identifier in the current merchant lifecycle read model."
+        },
+        "client_id": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "client_id",
+          "note": null
+        },
+        "merchant_shop": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "merchant_shop",
+          "note": null
+        },
+        "store_domain": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "merchant_shop",
+          "note": "Store domain is derived from the canonical client merchant shop."
+        },
+        "lead_id": {
+          "status": "source",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "lead_id",
+          "note": null
+        },
+        "opportunity_id": {
+          "status": "unavailable",
+          "source_file": "No matching opportunity unit found for this merchant.",
+          "source_field": null,
+          "note": null
+        },
+        "delivery_id": {
+          "status": "unavailable",
+          "source_file": "No matching delivery unit found for this merchant.",
+          "source_field": null,
+          "note": null
+        },
+        "action_id": {
+          "status": "unavailable",
+          "source_file": "No matching action unit found for this merchant.",
+          "source_field": null,
+          "note": null
+        },
+        "current_stage": {
+          "status": "derived",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "status.current_stage + lifecycle_stage",
+          "note": "Current stage is derived from the most specific available lifecycle source."
+        },
+        "next_required_action": {
+          "status": "derived",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "status.next_action / next_action.instructions",
+          "note": "Next action is derived from the best available lifecycle source."
+        },
+        "readiness_score": {
+          "status": "derived",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "score + lifecycle stage",
+          "note": "Readiness is derived from existing priority and stage truth."
+        },
+        "lead_status": {
+          "status": "source",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "status.current_stage / lifecycle_stage",
+          "note": null
+        },
+        "audit_status": {
+          "status": "derived",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "engagement.audit_viewed / engagement.experience_viewed",
+          "note": "Audit state is derived from lead engagement flags when present."
+        },
+        "offer_status": {
+          "status": "derived",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "engagement.sent / notes[].type",
+          "note": "Offer state is derived from lead engagement and proof notes."
+        },
+        "payment_status": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "deal.payment_status",
+          "note": null
+        },
+        "fulfillment_status": {
+          "status": "derived",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "shopifixer.fix_status",
+          "note": "No delivery unit exists, so fulfillment is not started."
+        },
+        "proof_package_status": {
+          "status": "derived",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "shopifixer.fix_status",
+          "note": "No proof package has been produced yet."
+        },
+        "revenue_status": {
+          "status": "derived",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "revenue + deal.payment_status + abando.merchant_revenue_recovered",
+          "note": "Revenue state is derived from client revenue and payment truth."
+        },
+        "case_study_status": {
+          "status": "derived",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].case_study_status / review_status / referral_status",
+          "note": "Case-study readiness is not yet proven."
+        },
+        "before_evidence_status": {
+          "status": "derived",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].before_evidence_status",
+          "note": "No delivery has started, so before evidence is not started."
+        },
+        "after_evidence_status": {
+          "status": "derived",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].after_evidence_status",
+          "note": "No delivery has started, so after evidence is not started."
+        },
+        "review_status": {
+          "status": "derived",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].review_status",
+          "note": "No review request is currently proven."
+        },
+        "referral_status": {
+          "status": "derived",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].referral_status",
+          "note": "No referral request is currently proven."
+        },
+        "offer_price": {
+          "status": "source",
+          "source_file": "staffordos/units/opportunity_units_v1.json",
+          "source_field": "value.one_time",
+          "note": "ShopiFixer canonical price is $950 for the current product path."
+        },
+        "payment_amount": {
+          "status": "unavailable",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "deal.value",
+          "note": "No verified paid amount exists yet for this merchant."
+        },
+        "payment_currency": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "deal.currency",
+          "note": null
+        },
+        "lifetime_value": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "business.lifetime_value",
+          "note": null
+        },
+        "audit.score": {
+          "status": "unavailable",
+          "source_file": "staffordos/audit/audit_result_surface.json",
+          "source_field": "audit_score",
+          "note": "No ShopiFixer audit surface is available for this merchant."
+        },
+        "audit.top_issue": {
+          "status": "unavailable",
+          "source_file": "staffordos/audit/audit_result_surface.json",
+          "source_field": "top_issue",
+          "note": "No ShopiFixer audit surface is available for this merchant."
+        },
+        "audit.recommendation": {
+          "status": "unavailable",
+          "source_file": "staffordos/audit/audit_result_surface.json",
+          "source_field": "fix_recommendation",
+          "note": "No ShopiFixer audit surface is available for this merchant."
+        },
+        "offer.send_allowed": {
+          "status": "unavailable",
+          "source_file": "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+          "source_field": "send_allowed",
+          "note": "No send authority applies to this merchant."
+        },
+        "payment.readiness": {
+          "status": "unavailable",
+          "source_file": "staffordos/shopifixer/shopifixer_runtime_payment_verification_v1.json",
+          "source_field": "final_verdict",
+          "note": "No runtime payment readiness verdict applies to this merchant."
+        },
+        "fulfillment.execution_status": {
+          "status": "unavailable",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].execution_status",
+          "note": "No fulfillment truth applies to this merchant."
+        },
+        "fulfillment.proof_status": {
+          "status": "unavailable",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].proof_status",
+          "note": "No fulfillment proof status applies to this merchant."
+        }
+      },
+      "unavailable_fields": [
+        {
+          "field": "opportunity_id",
+          "status": "unavailable",
+          "reason": "No matching opportunity unit could be proven for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "delivery_id",
+          "status": "unavailable",
+          "reason": "No matching delivery unit could be proven for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "action_id",
+          "status": "unavailable",
+          "reason": "No matching action unit could be proven for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "audit.score",
+          "status": "unavailable",
+          "reason": "No ShopiFixer audit score is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "audit.top_issue",
+          "status": "unavailable",
+          "reason": "No ShopiFixer audit issue statement is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "audit.recommendation",
+          "status": "unavailable",
+          "reason": "No ShopiFixer audit recommendation is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "offer.send_allowed",
+          "status": "unavailable",
+          "reason": "No ShopiFixer send authority is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "payment.readiness",
+          "status": "unavailable",
+          "reason": "No runtime payment readiness verdict is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "fulfillment.execution_status",
+          "status": "unavailable",
+          "reason": "No fulfillment execution status is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "fulfillment.proof_status",
+          "status": "unavailable",
+          "reason": "No fulfillment proof status is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "payment_amount",
+          "status": "unavailable",
+          "reason": "No payment is verified yet.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "payment_received_at",
+          "status": "unavailable",
+          "reason": "No verified payment receipt timestamp exists yet.",
+          "source_file": null,
+          "source_field": null
+        }
+      ]
+    },
+    {
+      "merchant_id": "homegoodsco.myshopify.com",
+      "client_id": "homegoodsco.myshopify.com",
+      "merchant_shop": "homegoodsco.myshopify.com",
+      "store_domain": "homegoodsco.myshopify.com",
+      "lead_id": "lead_homegoodsco_myshopify_com",
+      "opportunity_id": null,
+      "delivery_id": null,
+      "action_id": null,
+      "current_stage": "engaged",
+      "next_required_action": "Qualify reply and prepare offer",
+      "readiness_score": 25,
+      "lead_status": "engaged",
+      "audit_status": "not_started",
+      "offer_status": "not_started",
+      "payment_status": "unpaid",
+      "fulfillment_status": "not_started",
+      "proof_package_status": "not_started",
+      "revenue_status": "not_captured",
+      "case_study_status": "not_started",
+      "before_evidence_status": "not_started",
+      "after_evidence_status": "not_started",
+      "review_status": "not_started",
+      "referral_status": "not_started",
+      "offer_price": 950,
+      "payment_amount": null,
+      "payment_currency": "USD",
+      "lifetime_value": 0,
+      "audit": {
+        "score": null,
+        "top_issue": null,
+        "recommendation": null
+      },
+      "offer": {
+        "send_allowed": null
+      },
+      "payment": {
+        "readiness": null
+      },
+      "fulfillment": {
+        "execution_status": null,
+        "proof_status": null
+      },
+      "source_files": [
+        "staffordos/clients/client_registry_v1.json",
+        "staffordos/leads/lead_registry_v1.json",
+        "staffordos/units/opportunity_units_v1.json",
+        "staffordos/units/delivery_units_v1.json",
+        "staffordos/units/action_units_v1.json",
+        "staffordos/revenue/revenue_truth_v1.json",
+        "staffordos/audit/audit_result_surface.json",
+        "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+        "staffordos/shopifixer/shopifixer_runtime_payment_verification_v1.json",
+        "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+        "staffordos/shopifixer/shopifixer_command_center_v1.json"
+      ],
+      "field_sources": {
+        "merchant_id": {
+          "status": "derived",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "client_id",
+          "note": "Client ID is the stable merchant identifier in the current merchant lifecycle read model."
+        },
+        "client_id": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "client_id",
+          "note": null
+        },
+        "merchant_shop": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "merchant_shop",
+          "note": null
+        },
+        "store_domain": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "merchant_shop",
+          "note": "Store domain is derived from the canonical client merchant shop."
+        },
+        "lead_id": {
+          "status": "source",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "lead_id",
+          "note": null
+        },
+        "opportunity_id": {
+          "status": "unavailable",
+          "source_file": "No matching opportunity unit found for this merchant.",
+          "source_field": null,
+          "note": null
+        },
+        "delivery_id": {
+          "status": "unavailable",
+          "source_file": "No matching delivery unit found for this merchant.",
+          "source_field": null,
+          "note": null
+        },
+        "action_id": {
+          "status": "unavailable",
+          "source_file": "No matching action unit found for this merchant.",
+          "source_field": null,
+          "note": null
+        },
+        "current_stage": {
+          "status": "derived",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "status.current_stage + lifecycle_stage",
+          "note": "Current stage is derived from the most specific available lifecycle source."
+        },
+        "next_required_action": {
+          "status": "derived",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "status.next_action / next_action.instructions",
+          "note": "Next action is derived from the best available lifecycle source."
+        },
+        "readiness_score": {
+          "status": "derived",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "score + lifecycle stage",
+          "note": "Readiness is derived from existing priority and stage truth."
+        },
+        "lead_status": {
+          "status": "source",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "status.current_stage / lifecycle_stage",
+          "note": null
+        },
+        "audit_status": {
+          "status": "derived",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "engagement.audit_viewed / engagement.experience_viewed",
+          "note": "Audit state is derived from lead engagement flags when present."
+        },
+        "offer_status": {
+          "status": "derived",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "engagement.sent / notes[].type",
+          "note": "Offer state is derived from lead engagement and proof notes."
+        },
+        "payment_status": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "deal.payment_status",
+          "note": null
+        },
+        "fulfillment_status": {
+          "status": "derived",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "shopifixer.fix_status",
+          "note": "No delivery unit exists, so fulfillment is not started."
+        },
+        "proof_package_status": {
+          "status": "derived",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "shopifixer.fix_status",
+          "note": "No proof package has been produced yet."
+        },
+        "revenue_status": {
+          "status": "derived",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "revenue + deal.payment_status + abando.merchant_revenue_recovered",
+          "note": "Revenue state is derived from client revenue and payment truth."
+        },
+        "case_study_status": {
+          "status": "derived",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].case_study_status / review_status / referral_status",
+          "note": "Case-study readiness is not yet proven."
+        },
+        "before_evidence_status": {
+          "status": "derived",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].before_evidence_status",
+          "note": "No delivery has started, so before evidence is not started."
+        },
+        "after_evidence_status": {
+          "status": "derived",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].after_evidence_status",
+          "note": "No delivery has started, so after evidence is not started."
+        },
+        "review_status": {
+          "status": "derived",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].review_status",
+          "note": "No review request is currently proven."
+        },
+        "referral_status": {
+          "status": "derived",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].referral_status",
+          "note": "No referral request is currently proven."
+        },
+        "offer_price": {
+          "status": "source",
+          "source_file": "staffordos/units/opportunity_units_v1.json",
+          "source_field": "value.one_time",
+          "note": "ShopiFixer canonical price is $950 for the current product path."
+        },
+        "payment_amount": {
+          "status": "unavailable",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "deal.value",
+          "note": "No verified paid amount exists yet for this merchant."
+        },
+        "payment_currency": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "deal.currency",
+          "note": null
+        },
+        "lifetime_value": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "business.lifetime_value",
+          "note": null
+        },
+        "audit.score": {
+          "status": "unavailable",
+          "source_file": "staffordos/audit/audit_result_surface.json",
+          "source_field": "audit_score",
+          "note": "No ShopiFixer audit surface is available for this merchant."
+        },
+        "audit.top_issue": {
+          "status": "unavailable",
+          "source_file": "staffordos/audit/audit_result_surface.json",
+          "source_field": "top_issue",
+          "note": "No ShopiFixer audit surface is available for this merchant."
+        },
+        "audit.recommendation": {
+          "status": "unavailable",
+          "source_file": "staffordos/audit/audit_result_surface.json",
+          "source_field": "fix_recommendation",
+          "note": "No ShopiFixer audit surface is available for this merchant."
+        },
+        "offer.send_allowed": {
+          "status": "unavailable",
+          "source_file": "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+          "source_field": "send_allowed",
+          "note": "No send authority applies to this merchant."
+        },
+        "payment.readiness": {
+          "status": "unavailable",
+          "source_file": "staffordos/shopifixer/shopifixer_runtime_payment_verification_v1.json",
+          "source_field": "final_verdict",
+          "note": "No runtime payment readiness verdict applies to this merchant."
+        },
+        "fulfillment.execution_status": {
+          "status": "unavailable",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].execution_status",
+          "note": "No fulfillment truth applies to this merchant."
+        },
+        "fulfillment.proof_status": {
+          "status": "unavailable",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].proof_status",
+          "note": "No fulfillment proof status applies to this merchant."
+        }
+      },
+      "unavailable_fields": [
+        {
+          "field": "opportunity_id",
+          "status": "unavailable",
+          "reason": "No matching opportunity unit could be proven for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "delivery_id",
+          "status": "unavailable",
+          "reason": "No matching delivery unit could be proven for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "action_id",
+          "status": "unavailable",
+          "reason": "No matching action unit could be proven for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "audit.score",
+          "status": "unavailable",
+          "reason": "No ShopiFixer audit score is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "audit.top_issue",
+          "status": "unavailable",
+          "reason": "No ShopiFixer audit issue statement is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "audit.recommendation",
+          "status": "unavailable",
+          "reason": "No ShopiFixer audit recommendation is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "offer.send_allowed",
+          "status": "unavailable",
+          "reason": "No ShopiFixer send authority is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "payment.readiness",
+          "status": "unavailable",
+          "reason": "No runtime payment readiness verdict is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "fulfillment.execution_status",
+          "status": "unavailable",
+          "reason": "No fulfillment execution status is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "fulfillment.proof_status",
+          "status": "unavailable",
+          "reason": "No fulfillment proof status is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "payment_amount",
+          "status": "unavailable",
+          "reason": "No payment is verified yet.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "payment_received_at",
+          "status": "unavailable",
+          "reason": "No verified payment receipt timestamp exists yet.",
+          "source_file": null,
+          "source_field": null
+        }
+      ]
+    },
+    {
+      "merchant_id": "step5-test-store.myshopify.com",
+      "client_id": "step5-test-store.myshopify.com",
+      "merchant_shop": "step5-test-store.myshopify.com",
+      "store_domain": "step5-test-store.myshopify.com",
+      "lead_id": "lead_step5_test_store_myshopify_com",
+      "opportunity_id": null,
+      "delivery_id": null,
+      "action_id": null,
+      "current_stage": "followup_sent",
+      "next_required_action": "Wait for reply or track next click",
+      "readiness_score": 35,
+      "lead_status": "followup_sent",
+      "audit_status": "viewed",
+      "offer_status": "offer_sent",
+      "payment_status": "unpaid",
+      "fulfillment_status": "not_started",
+      "proof_package_status": "not_started",
+      "revenue_status": "not_captured",
+      "case_study_status": "not_started",
+      "before_evidence_status": "not_started",
+      "after_evidence_status": "not_started",
+      "review_status": "not_started",
+      "referral_status": "not_started",
+      "offer_price": 950,
+      "payment_amount": null,
+      "payment_currency": "USD",
+      "lifetime_value": 0,
+      "audit": {
+        "score": null,
+        "top_issue": null,
+        "recommendation": null
+      },
+      "offer": {
+        "send_allowed": null
+      },
+      "payment": {
+        "readiness": null
+      },
+      "fulfillment": {
+        "execution_status": null,
+        "proof_status": null
+      },
+      "source_files": [
+        "staffordos/clients/client_registry_v1.json",
+        "staffordos/leads/lead_registry_v1.json",
+        "staffordos/units/opportunity_units_v1.json",
+        "staffordos/units/delivery_units_v1.json",
+        "staffordos/units/action_units_v1.json",
+        "staffordos/revenue/revenue_truth_v1.json",
+        "staffordos/audit/audit_result_surface.json",
+        "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+        "staffordos/shopifixer/shopifixer_runtime_payment_verification_v1.json",
+        "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+        "staffordos/shopifixer/shopifixer_command_center_v1.json"
+      ],
+      "field_sources": {
+        "merchant_id": {
+          "status": "derived",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "client_id",
+          "note": "Client ID is the stable merchant identifier in the current merchant lifecycle read model."
+        },
+        "client_id": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "client_id",
+          "note": null
+        },
+        "merchant_shop": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "merchant_shop",
+          "note": null
+        },
+        "store_domain": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "merchant_shop",
+          "note": "Store domain is derived from the canonical client merchant shop."
+        },
+        "lead_id": {
+          "status": "source",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "lead_id",
+          "note": null
+        },
+        "opportunity_id": {
+          "status": "unavailable",
+          "source_file": "No matching opportunity unit found for this merchant.",
+          "source_field": null,
+          "note": null
+        },
+        "delivery_id": {
+          "status": "unavailable",
+          "source_file": "No matching delivery unit found for this merchant.",
+          "source_field": null,
+          "note": null
+        },
+        "action_id": {
+          "status": "unavailable",
+          "source_file": "No matching action unit found for this merchant.",
+          "source_field": null,
+          "note": null
+        },
+        "current_stage": {
+          "status": "derived",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "status.current_stage + lifecycle_stage",
+          "note": "Current stage is derived from the most specific available lifecycle source."
+        },
+        "next_required_action": {
+          "status": "derived",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "status.next_action / next_action.instructions",
+          "note": "Next action is derived from the best available lifecycle source."
+        },
+        "readiness_score": {
+          "status": "derived",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "score + lifecycle stage",
+          "note": "Readiness is derived from existing priority and stage truth."
+        },
+        "lead_status": {
+          "status": "source",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "status.current_stage / lifecycle_stage",
+          "note": null
+        },
+        "audit_status": {
+          "status": "derived",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "engagement.audit_viewed / engagement.experience_viewed",
+          "note": "Audit state is derived from lead engagement flags when present."
+        },
+        "offer_status": {
+          "status": "derived",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "engagement.sent / notes[].type",
+          "note": "Offer state is derived from lead engagement and proof notes."
+        },
+        "payment_status": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "deal.payment_status",
+          "note": null
+        },
+        "fulfillment_status": {
+          "status": "derived",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "shopifixer.fix_status",
+          "note": "No delivery unit exists, so fulfillment is not started."
+        },
+        "proof_package_status": {
+          "status": "derived",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "shopifixer.fix_status",
+          "note": "No proof package has been produced yet."
+        },
+        "revenue_status": {
+          "status": "derived",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "revenue + deal.payment_status + abando.merchant_revenue_recovered",
+          "note": "Revenue state is derived from client revenue and payment truth."
+        },
+        "case_study_status": {
+          "status": "derived",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].case_study_status / review_status / referral_status",
+          "note": "Case-study readiness is not yet proven."
+        },
+        "before_evidence_status": {
+          "status": "derived",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].before_evidence_status",
+          "note": "No delivery has started, so before evidence is not started."
+        },
+        "after_evidence_status": {
+          "status": "derived",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].after_evidence_status",
+          "note": "No delivery has started, so after evidence is not started."
+        },
+        "review_status": {
+          "status": "derived",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].review_status",
+          "note": "No review request is currently proven."
+        },
+        "referral_status": {
+          "status": "derived",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].referral_status",
+          "note": "No referral request is currently proven."
+        },
+        "offer_price": {
+          "status": "source",
+          "source_file": "staffordos/units/opportunity_units_v1.json",
+          "source_field": "value.one_time",
+          "note": "ShopiFixer canonical price is $950 for the current product path."
+        },
+        "payment_amount": {
+          "status": "unavailable",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "deal.value",
+          "note": "No verified paid amount exists yet for this merchant."
+        },
+        "payment_currency": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "deal.currency",
+          "note": null
+        },
+        "lifetime_value": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "business.lifetime_value",
+          "note": null
+        },
+        "audit.score": {
+          "status": "unavailable",
+          "source_file": "staffordos/audit/audit_result_surface.json",
+          "source_field": "audit_score",
+          "note": "No ShopiFixer audit surface is available for this merchant."
+        },
+        "audit.top_issue": {
+          "status": "unavailable",
+          "source_file": "staffordos/audit/audit_result_surface.json",
+          "source_field": "top_issue",
+          "note": "No ShopiFixer audit surface is available for this merchant."
+        },
+        "audit.recommendation": {
+          "status": "unavailable",
+          "source_file": "staffordos/audit/audit_result_surface.json",
+          "source_field": "fix_recommendation",
+          "note": "No ShopiFixer audit surface is available for this merchant."
+        },
+        "offer.send_allowed": {
+          "status": "unavailable",
+          "source_file": "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+          "source_field": "send_allowed",
+          "note": "No send authority applies to this merchant."
+        },
+        "payment.readiness": {
+          "status": "unavailable",
+          "source_file": "staffordos/shopifixer/shopifixer_runtime_payment_verification_v1.json",
+          "source_field": "final_verdict",
+          "note": "No runtime payment readiness verdict applies to this merchant."
+        },
+        "fulfillment.execution_status": {
+          "status": "unavailable",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].execution_status",
+          "note": "No fulfillment truth applies to this merchant."
+        },
+        "fulfillment.proof_status": {
+          "status": "unavailable",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].proof_status",
+          "note": "No fulfillment proof status applies to this merchant."
+        }
+      },
+      "unavailable_fields": [
+        {
+          "field": "opportunity_id",
+          "status": "unavailable",
+          "reason": "No matching opportunity unit could be proven for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "delivery_id",
+          "status": "unavailable",
+          "reason": "No matching delivery unit could be proven for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "action_id",
+          "status": "unavailable",
+          "reason": "No matching action unit could be proven for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "audit.score",
+          "status": "unavailable",
+          "reason": "No ShopiFixer audit score is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "audit.top_issue",
+          "status": "unavailable",
+          "reason": "No ShopiFixer audit issue statement is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "audit.recommendation",
+          "status": "unavailable",
+          "reason": "No ShopiFixer audit recommendation is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "offer.send_allowed",
+          "status": "unavailable",
+          "reason": "No ShopiFixer send authority is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "payment.readiness",
+          "status": "unavailable",
+          "reason": "No runtime payment readiness verdict is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "fulfillment.execution_status",
+          "status": "unavailable",
+          "reason": "No fulfillment execution status is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "fulfillment.proof_status",
+          "status": "unavailable",
+          "reason": "No fulfillment proof status is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "payment_amount",
+          "status": "unavailable",
+          "reason": "No payment is verified yet.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "payment_received_at",
+          "status": "unavailable",
+          "reason": "No verified payment receipt timestamp exists yet.",
+          "source_file": null,
+          "source_field": null
+        }
+      ]
+    },
+    {
+      "merchant_id": "store1.myshopify.com",
+      "client_id": "store1.myshopify.com",
+      "merchant_shop": "store1.myshopify.com",
+      "store_domain": "store1.myshopify.com",
+      "lead_id": "lead_store1_myshopify_com",
+      "opportunity_id": null,
+      "delivery_id": null,
+      "action_id": null,
+      "current_stage": "engaged",
+      "next_required_action": "Qualify reply and prepare offer",
+      "readiness_score": 25,
+      "lead_status": "engaged",
+      "audit_status": "not_started",
+      "offer_status": "not_started",
+      "payment_status": "unpaid",
+      "fulfillment_status": "not_started",
+      "proof_package_status": "not_started",
+      "revenue_status": "not_captured",
+      "case_study_status": "not_started",
+      "before_evidence_status": "not_started",
+      "after_evidence_status": "not_started",
+      "review_status": "not_started",
+      "referral_status": "not_started",
+      "offer_price": 950,
+      "payment_amount": null,
+      "payment_currency": "USD",
+      "lifetime_value": 0,
+      "audit": {
+        "score": null,
+        "top_issue": null,
+        "recommendation": null
+      },
+      "offer": {
+        "send_allowed": null
+      },
+      "payment": {
+        "readiness": null
+      },
+      "fulfillment": {
+        "execution_status": null,
+        "proof_status": null
+      },
+      "source_files": [
+        "staffordos/clients/client_registry_v1.json",
+        "staffordos/leads/lead_registry_v1.json",
+        "staffordos/units/opportunity_units_v1.json",
+        "staffordos/units/delivery_units_v1.json",
+        "staffordos/units/action_units_v1.json",
+        "staffordos/revenue/revenue_truth_v1.json",
+        "staffordos/audit/audit_result_surface.json",
+        "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+        "staffordos/shopifixer/shopifixer_runtime_payment_verification_v1.json",
+        "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+        "staffordos/shopifixer/shopifixer_command_center_v1.json"
+      ],
+      "field_sources": {
+        "merchant_id": {
+          "status": "derived",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "client_id",
+          "note": "Client ID is the stable merchant identifier in the current merchant lifecycle read model."
+        },
+        "client_id": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "client_id",
+          "note": null
+        },
+        "merchant_shop": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "merchant_shop",
+          "note": null
+        },
+        "store_domain": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "merchant_shop",
+          "note": "Store domain is derived from the canonical client merchant shop."
+        },
+        "lead_id": {
+          "status": "source",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "lead_id",
+          "note": null
+        },
+        "opportunity_id": {
+          "status": "unavailable",
+          "source_file": "No matching opportunity unit found for this merchant.",
+          "source_field": null,
+          "note": null
+        },
+        "delivery_id": {
+          "status": "unavailable",
+          "source_file": "No matching delivery unit found for this merchant.",
+          "source_field": null,
+          "note": null
+        },
+        "action_id": {
+          "status": "unavailable",
+          "source_file": "No matching action unit found for this merchant.",
+          "source_field": null,
+          "note": null
+        },
+        "current_stage": {
+          "status": "derived",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "status.current_stage + lifecycle_stage",
+          "note": "Current stage is derived from the most specific available lifecycle source."
+        },
+        "next_required_action": {
+          "status": "derived",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "status.next_action / next_action.instructions",
+          "note": "Next action is derived from the best available lifecycle source."
+        },
+        "readiness_score": {
+          "status": "derived",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "score + lifecycle stage",
+          "note": "Readiness is derived from existing priority and stage truth."
+        },
+        "lead_status": {
+          "status": "source",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "status.current_stage / lifecycle_stage",
+          "note": null
+        },
+        "audit_status": {
+          "status": "derived",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "engagement.audit_viewed / engagement.experience_viewed",
+          "note": "Audit state is derived from lead engagement flags when present."
+        },
+        "offer_status": {
+          "status": "derived",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "engagement.sent / notes[].type",
+          "note": "Offer state is derived from lead engagement and proof notes."
+        },
+        "payment_status": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "deal.payment_status",
+          "note": null
+        },
+        "fulfillment_status": {
+          "status": "derived",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "shopifixer.fix_status",
+          "note": "No delivery unit exists, so fulfillment is not started."
+        },
+        "proof_package_status": {
+          "status": "derived",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "shopifixer.fix_status",
+          "note": "No proof package has been produced yet."
+        },
+        "revenue_status": {
+          "status": "derived",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "revenue + deal.payment_status + abando.merchant_revenue_recovered",
+          "note": "Revenue state is derived from client revenue and payment truth."
+        },
+        "case_study_status": {
+          "status": "derived",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].case_study_status / review_status / referral_status",
+          "note": "Case-study readiness is not yet proven."
+        },
+        "before_evidence_status": {
+          "status": "derived",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].before_evidence_status",
+          "note": "No delivery has started, so before evidence is not started."
+        },
+        "after_evidence_status": {
+          "status": "derived",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].after_evidence_status",
+          "note": "No delivery has started, so after evidence is not started."
+        },
+        "review_status": {
+          "status": "derived",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].review_status",
+          "note": "No review request is currently proven."
+        },
+        "referral_status": {
+          "status": "derived",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].referral_status",
+          "note": "No referral request is currently proven."
+        },
+        "offer_price": {
+          "status": "source",
+          "source_file": "staffordos/units/opportunity_units_v1.json",
+          "source_field": "value.one_time",
+          "note": "ShopiFixer canonical price is $950 for the current product path."
+        },
+        "payment_amount": {
+          "status": "unavailable",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "deal.value",
+          "note": "No verified paid amount exists yet for this merchant."
+        },
+        "payment_currency": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "deal.currency",
+          "note": null
+        },
+        "lifetime_value": {
+          "status": "source",
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "business.lifetime_value",
+          "note": null
+        },
+        "audit.score": {
+          "status": "unavailable",
+          "source_file": "staffordos/audit/audit_result_surface.json",
+          "source_field": "audit_score",
+          "note": "No ShopiFixer audit surface is available for this merchant."
+        },
+        "audit.top_issue": {
+          "status": "unavailable",
+          "source_file": "staffordos/audit/audit_result_surface.json",
+          "source_field": "top_issue",
+          "note": "No ShopiFixer audit surface is available for this merchant."
+        },
+        "audit.recommendation": {
+          "status": "unavailable",
+          "source_file": "staffordos/audit/audit_result_surface.json",
+          "source_field": "fix_recommendation",
+          "note": "No ShopiFixer audit surface is available for this merchant."
+        },
+        "offer.send_allowed": {
+          "status": "unavailable",
+          "source_file": "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+          "source_field": "send_allowed",
+          "note": "No send authority applies to this merchant."
+        },
+        "payment.readiness": {
+          "status": "unavailable",
+          "source_file": "staffordos/shopifixer/shopifixer_runtime_payment_verification_v1.json",
+          "source_field": "final_verdict",
+          "note": "No runtime payment readiness verdict applies to this merchant."
+        },
+        "fulfillment.execution_status": {
+          "status": "unavailable",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].execution_status",
+          "note": "No fulfillment truth applies to this merchant."
+        },
+        "fulfillment.proof_status": {
+          "status": "unavailable",
+          "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "source_field": "items[0].proof_status",
+          "note": "No fulfillment proof status applies to this merchant."
+        }
+      },
+      "unavailable_fields": [
+        {
+          "field": "opportunity_id",
+          "status": "unavailable",
+          "reason": "No matching opportunity unit could be proven for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "delivery_id",
+          "status": "unavailable",
+          "reason": "No matching delivery unit could be proven for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "action_id",
+          "status": "unavailable",
+          "reason": "No matching action unit could be proven for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "audit.score",
+          "status": "unavailable",
+          "reason": "No ShopiFixer audit score is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "audit.top_issue",
+          "status": "unavailable",
+          "reason": "No ShopiFixer audit issue statement is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "audit.recommendation",
+          "status": "unavailable",
+          "reason": "No ShopiFixer audit recommendation is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "offer.send_allowed",
+          "status": "unavailable",
+          "reason": "No ShopiFixer send authority is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "payment.readiness",
+          "status": "unavailable",
+          "reason": "No runtime payment readiness verdict is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "fulfillment.execution_status",
+          "status": "unavailable",
+          "reason": "No fulfillment execution status is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "fulfillment.proof_status",
+          "status": "unavailable",
+          "reason": "No fulfillment proof status is available for this merchant.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "payment_amount",
+          "status": "unavailable",
+          "reason": "No payment is verified yet.",
+          "source_file": null,
+          "source_field": null
+        },
+        {
+          "field": "payment_received_at",
+          "status": "unavailable",
+          "reason": "No verified payment receipt timestamp exists yet.",
+          "source_file": null,
+          "source_field": null
+        }
+      ]
+    }
+  ]
+}

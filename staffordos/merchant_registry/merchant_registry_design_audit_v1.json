@@ -1,0 +1,205 @@
+{
+  "schema": "staffordos.merchant_registry_design_audit.v1",
+  "generated_at": "2026-06-10T04:00:00.000Z",
+  "current_maturity_score": 41,
+  "canonical_merchant_object_exists": false,
+  "missing_business_object": "canonical_merchant_registry",
+  "exact_blocker_to_operational_revenue": "StaffordOS does not have one live merchant object that can be traced from lead to audit to offer to payment to fulfillment to proof package to revenue to case study; merchant identity and lifecycle are split across lead_registry_v1.json, client_registry_v1.json, opportunity_units_v1.json, delivery_units_v1.json, action_units_v1.json, revenue_truth_v1.json, and ShopiFixer-specific authorities, while merchant_registry_v1.json is a stale seeded commercial mapping artifact rather than a runtime canonical source.",
+  "canonical_merchant_object_assessment": {
+    "closest_existing_object": "staffordos/clients/client_registry_v1.json",
+    "why_it_is_not_yet_canonical": [
+      "It is canonical for clients, not for the full merchant lifecycle.",
+      "It does not yet hold a unified proof package, review/referral, and case-study state for every merchant.",
+      "It does not own lead acquisition truth or opportunity/delivery truth.",
+      "Payment and fulfillment are split into separate truth layers."
+    ],
+    "stale_competing_object": "staffordos/commercial/merchant_registry_v1.json",
+    "why_it_is_not_canonical": [
+      "It is a manual seeded merchant mapping artifact with examplestore.com as its sample merchant.",
+      "It is referenced by operator-daemon selection/validation flows, but not by the live revenue or command-center runtime path.",
+      "Governance inventory marks it stale / seed and non-canonical."
+    ]
+  },
+  "inventory": {
+    "leads": {
+      "canonical": [
+        "staffordos/leads/lead_registry_v1.json",
+        "staffordos/leads/lead_state_machine_v1.json",
+        "staffordos/leads/lead_events_v1.json"
+      ],
+      "supporting_runtime": [
+        "web/src/lib/shopifixerLeadRegistry.js",
+        "web/src/lib/shopifixerLifecycleTracker.js",
+        "web/src/index.js:/api/fix-audit"
+      ]
+    },
+    "opportunities": {
+      "canonical": [
+        "staffordos/units/opportunity_units_v1.json"
+      ]
+    },
+    "deliveries": {
+      "canonical": [
+        "staffordos/units/delivery_units_v1.json",
+        "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json"
+      ]
+    },
+    "actions": {
+      "canonical": [
+        "staffordos/units/action_units_v1.json"
+      ]
+    },
+    "outcomes": {
+      "canonical": [
+        "staffordos/events/outcome_event_log_v1.json",
+        "staffordos/events/outcome_scores_v1.json",
+        "staffordos/events/operator_action_events_v1.json",
+        "staffordos/leads/outcomes.json"
+      ]
+    },
+    "revenue": {
+      "canonical_or_primary": [
+        "staffordos/revenue/revenue_truth_v1.json",
+        "staffordos/revenue/revenue_agent_v1.mjs",
+        "web/src/routes/stripeWebhook.esm.js",
+        "web/src/checkout-public.js",
+        "web/src/routes/packetAuthority.esm.js",
+        "web/src/lib/packetRepository.js"
+      ],
+      "supporting_or_legacy": [
+        "staffordos/revenue/paymentAgreements.json",
+        "staffordos/revenue/paymentAgreementRepository.js",
+        "staffordos/revenue/verifyPaymentAgreementLayer.js",
+        "staffordos/revenue/gate.js",
+        "staffordos/revenue/verify_revenue_gate.js"
+      ]
+    },
+    "shopifixer": {
+      "canonical_and_governed": [
+        "staffordos/audit/audit_result_surface.json",
+        "staffordos/shopifixer/shopifixer_conversion_brief_v1.json",
+        "staffordos/clients/shopifixer_offer_latest.json",
+        "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+        "staffordos/shopifixer/shopifixer_offer_outcome_authority_v1.json",
+        "staffordos/shopifixer/shopifixer_runtime_payment_verification_v1.json",
+        "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+        "staffordos/shopifixer/shopifixer_command_center_v1.json",
+        "staffordos/shopifixer/shopifixer_operator_experience_audit_v1.json",
+        "staffordos/shopifixer/shopifixer_lifecycle_lane_design_v1.json"
+      ]
+    }
+  },
+  "canonical_merchant_schema_recommendation": {
+    "identity": [
+      "merchant_id",
+      "client_id",
+      "merchant_shop",
+      "store_domain",
+      "lead_id",
+      "opportunity_id"
+    ],
+    "lead_audit_offer_payment_fulfillment": [
+      "lead_status",
+      "audit_status",
+      "audit_score",
+      "top_issue",
+      "benchmark_summary",
+      "fix_recommendation",
+      "offer_status",
+      "offer_price",
+      "send_allowed",
+      "payment_status",
+      "payment_amount",
+      "payment_currency",
+      "payment_received_at",
+      "fulfillment_status",
+      "execution_status",
+      "proof_status",
+      "completion_status"
+    ],
+    "proof_revenue_case_study": [
+      "proof_package_status",
+      "before_evidence_status",
+      "after_evidence_status",
+      "review_status",
+      "referral_status",
+      "case_study_status",
+      "revenue_status",
+      "lifetime_value",
+      "last_updated_at"
+    ],
+    "operational_fields": [
+      "current_stage",
+      "next_required_action",
+      "readiness_score",
+      "owner",
+      "source_files",
+      "field_sources"
+    ]
+  },
+  "duplicate_or_competing_truth_sources": [
+    {
+      "file": "staffordos/commercial/merchant_registry_v1.json",
+      "status": "stale_seed_noncanonical",
+      "reason": "Seeded commercial mapping artifact with examplestore.com; not part of the live ShopiFixer revenue loop."
+    },
+    {
+      "file": "staffordos/revenue/revenue_truth_v1.json",
+      "status": "partial_legacy_support",
+      "reason": "Outreach-funnel revenue truth, not a live merchant lifecycle object."
+    },
+    {
+      "file": "staffordos/clients/operator_dashboard_snapshot_v1.json",
+      "status": "derived_summary",
+      "reason": "Useful dashboard summary, but not the canonical merchant object."
+    }
+  ],
+  "consumers_and_usage": {
+    "merchant_registry_v1_json": {
+      "verified_operational_consumers": [
+        "staffordos/operator_daemon/select_next_task_v1.mjs",
+        "staffordos/operator_daemon/write_product_boundary_validator_v1.mjs",
+        "staffordos/operator_daemon/task_command_resolver_v1.mjs",
+        "staffordos/operator_daemon/write_validator_map_refresh_v1.mjs"
+      ],
+      "live_runtime_consumers_found": [],
+      "governance_or_doc_consumers": [
+        "staffordos/governance/archive/20260604_artifact_archive/canonical_artifact_inventory_v1.md",
+        "staffordos/governance/archive/20260604_artifact_archive/canonical_systems_v1.md",
+        "staffordos/governance/quarantine/20260604_untracked_artifacts/shopifixer_commercial_truth_authority_v1.md"
+      ]
+    },
+    "client_registry_v1_json": {
+      "verified_consumers": [
+        "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+        "staffordos/ui/operator-frontend/app/api/operator/client-registry/route.ts",
+        "staffordos/ui/operator-frontend/app/api/operator/dashboard-snapshot/route.ts",
+        "staffordos/ui/operator-frontend/app/api/operator/execute-primary-action/route.ts",
+        "staffordos/clients/build_operator_dashboard_snapshot_v1.mjs",
+        "staffordos/clients/client_registry_v1.mjs",
+        "staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs",
+        "staffordos/revenue/revenue_agent_v1.mjs",
+        "staffordos/shopifixer/shopifixer_command_center_v1.json"
+      ]
+    },
+    "lead_registry_v1_json": {
+      "verified_consumers": [
+        "web/src/lib/shopifixerLeadRegistry.js",
+        "web/src/lib/shopifixerLifecycleTracker.js",
+        "staffordos/ui/operator-frontend/app/api/operator/lead-registry/route.ts",
+        "staffordos/ui/operator-frontend/app/api/leads/queue/route.ts",
+        "staffordos/cockpit/build_ceo_truth_snapshot_v1.mjs"
+      ]
+    }
+  },
+  "recommended_next_implementation": {
+    "title": "Promote client_registry into the canonical merchant lifecycle object",
+    "minimum_viable_scope": [
+      "Use client_registry_v1.json as the merchant identity anchor.",
+      "Add explicit merchant lifecycle fields for lead, audit, offer, payment, fulfillment, proof package, revenue, case study, and referral states.",
+      "Materialize a single merchant registry builder/read model from existing lead, opportunity, delivery, action, revenue, and ShopiFixer truth sources.",
+      "Keep merchant_registry_v1.json only if it is rebuilt from live merchant truth and no longer acts as a seeded standalone mapping.",
+      "Make the Command Center, Revenue Command, Capacity Board, Lead Command, and Execution Log read from the canonical merchant lifecycle object rather than separately stitching stage fragments."
+    ]
+  }
+}

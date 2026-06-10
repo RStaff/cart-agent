@@ -1,0 +1,169 @@
+{
+  "schema": "staffordos.shopifixer_authority_binding_audit.v1",
+  "generated_at": "2026-06-10T14:00:00Z",
+  "verdict": "NO",
+  "answer": "ShopiFixer Command Center cannot yet read directly from merchant_lifecycle_registry_v1.json instead of shopifixer_command_center_v1.json without losing fields that the current panel renders.",
+  "current_read_authority": {
+    "file": "staffordos/shopifixer/shopifixer_command_center_v1.json",
+    "role": "primary_shopifixer_command_center_read_model"
+  },
+  "candidate_read_authority": {
+    "file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+    "role": "merchant_lifecycle_read_model"
+  },
+  "ui_binding_sources": {
+    "route": "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx",
+    "loader": "staffordos/ui/operator-frontend/lib/operator/loadShopifixerCommandCenter.ts",
+    "component": "staffordos/ui/operator-frontend/components/operator/OperatorHomeV1.tsx"
+  },
+  "rendered_fields": [
+    {
+      "field": "merchant.store",
+      "present_in_candidate": false,
+      "closest_candidate_fields": [
+        "merchant_shop",
+        "store_domain"
+      ],
+      "status": "mappable_only"
+    },
+    {
+      "field": "merchant.client_id",
+      "present_in_candidate": true,
+      "candidate_field": "client_id",
+      "status": "present"
+    },
+    {
+      "field": "audit.score",
+      "present_in_candidate": false,
+      "status": "missing"
+    },
+    {
+      "field": "audit.top_issue",
+      "present_in_candidate": false,
+      "status": "missing"
+    },
+    {
+      "field": "audit.recommendation",
+      "present_in_candidate": false,
+      "status": "missing"
+    },
+    {
+      "field": "offer.offer_status",
+      "present_in_candidate": true,
+      "candidate_field": "offer_status",
+      "status": "present"
+    },
+    {
+      "field": "offer.offer_price",
+      "present_in_candidate": true,
+      "candidate_field": "offer_price",
+      "status": "present"
+    },
+    {
+      "field": "offer.send_allowed",
+      "present_in_candidate": false,
+      "status": "missing"
+    },
+    {
+      "field": "payment.payment_status",
+      "present_in_candidate": true,
+      "candidate_field": "payment_status",
+      "status": "present"
+    },
+    {
+      "field": "payment.readiness",
+      "present_in_candidate": false,
+      "status": "missing"
+    },
+    {
+      "field": "fulfillment.fulfillment_status",
+      "present_in_candidate": true,
+      "candidate_field": "fulfillment_status",
+      "status": "present"
+    },
+    {
+      "field": "fulfillment.execution_status",
+      "present_in_candidate": false,
+      "status": "missing"
+    },
+    {
+      "field": "fulfillment.proof_status",
+      "present_in_candidate": false,
+      "closest_candidate_fields": [
+        "proof_package_status"
+      ],
+      "status": "mappable_only"
+    },
+    {
+      "field": "overall.current_stage",
+      "present_in_candidate": true,
+      "candidate_field": "current_stage",
+      "status": "present"
+    },
+    {
+      "field": "overall.next_required_action",
+      "present_in_candidate": true,
+      "candidate_field": "next_required_action",
+      "status": "present"
+    },
+    {
+      "field": "overall.readiness_score",
+      "present_in_candidate": true,
+      "candidate_field": "readiness_score",
+      "status": "present"
+    }
+  ],
+  "candidate_fields_that_are_present": [
+    "merchant.client_id",
+    "offer.offer_status",
+    "offer.offer_price",
+    "payment.payment_status",
+    "fulfillment.fulfillment_status",
+    "overall.current_stage",
+    "overall.next_required_action",
+    "overall.readiness_score"
+  ],
+  "candidate_fields_that_are_missing": [
+    "audit.score",
+    "audit.top_issue",
+    "audit.recommendation",
+    "offer.send_allowed",
+    "payment.readiness",
+    "fulfillment.execution_status"
+  ],
+  "candidate_fields_that_are_mappable_only": [
+    "merchant.store",
+    "fulfillment.proof_status"
+  ],
+  "remaining_missing_fields": [
+    "audit.score",
+    "audit.top_issue",
+    "audit.recommendation",
+    "offer.send_allowed",
+    "payment.readiness",
+    "fulfillment.execution_status"
+  ],
+  "exact_verdict_reason": [
+    "The candidate registry has the merchant identity and most lifecycle state fields needed for the panel.",
+    "It does not carry the audit score, top issue, recommendation, offer sendability, payment readiness, or fulfillment execution status that the current panel renders.",
+    "Two rendered fields are only mappable, not present with the same field name or shape: merchant.store and fulfillment.proof_status."
+  ],
+  "field_mapping_if_replaced": {
+    "merchant.client_id": "client_id",
+    "merchant.store": "merchant_shop or store_domain",
+    "offer.offer_status": "offer_status",
+    "offer.offer_price": "offer_price",
+    "payment.payment_status": "payment_status",
+    "fulfillment.fulfillment_status": "fulfillment_status",
+    "overall.current_stage": "current_stage",
+    "overall.next_required_action": "next_required_action",
+    "overall.readiness_score": "readiness_score"
+  },
+  "source_files": [
+    "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+    "staffordos/shopifixer/shopifixer_command_center_v1.json",
+    "staffordos/ui/operator-frontend/lib/operator/loadShopifixerCommandCenter.ts",
+    "staffordos/ui/operator-frontend/components/operator/OperatorHomeV1.tsx",
+    "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx"
+  ]
+}

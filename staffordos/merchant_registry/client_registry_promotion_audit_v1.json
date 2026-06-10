@@ -1,0 +1,200 @@
+{
+  "schema": "staffordos.client_registry_promotion_audit.v1",
+  "generated_at": "2026-06-10T04:00:00.000Z",
+  "question": "Can client_registry_v1.json safely become the canonical merchant lifecycle authority?",
+  "answer": "NO",
+  "current_maturity_score": 44,
+  "exact_blocker_to_operational_revenue": "client_registry_v1.json does not yet contain the full merchant lifecycle fields or linked lead/opportunity/delivery/action identifiers needed to unify lead through case-study truth; payment and fulfillment also remain split into separate runtime authorities.",
+  "read_scope": {
+    "client_registry": "staffordos/clients/client_registry_v1.json",
+    "comparison_sources": [
+      "staffordos/leads/lead_registry_v1.json",
+      "staffordos/units/opportunity_units_v1.json",
+      "staffordos/units/delivery_units_v1.json",
+      "staffordos/units/action_units_v1.json",
+      "staffordos/revenue/revenue_truth_v1.json",
+      "staffordos/shopifixer/shopifixer_command_center_v1.json"
+    ]
+  },
+  "findings": {
+    "fields_already_present": [
+      "client_id",
+      "merchant_shop",
+      "source",
+      "status",
+      "created_at",
+      "updated_at",
+      "contact.email",
+      "deal.type",
+      "deal.value",
+      "deal.currency",
+      "deal.closed_at",
+      "deal.payment_status",
+      "shopifixer.audit_status",
+      "shopifixer.audit_score",
+      "shopifixer.primary_problem",
+      "shopifixer.fix_status",
+      "shopifixer.latest_audit_at",
+      "abando.installed",
+      "abando.install_status",
+      "abando.checkout_events",
+      "abando.recovery_actions",
+      "abando.merchant_revenue_recovered",
+      "business.stafford_revenue_earned",
+      "business.stafford_recurring_revenue",
+      "business.lifetime_value",
+      "lifecycle.stage",
+      "lifecycle.stage_updated_at",
+      "lifecycle.blocked",
+      "lifecycle.block_reason",
+      "next_action.type",
+      "next_action.owner",
+      "next_action.instructions",
+      "next_action.auto_executable",
+      "notes[]",
+      "decision_trace",
+      "priority_score",
+      "blocker_detection",
+      "close_engine"
+    ],
+    "fields_missing_for_canonical_merchant_authority": [
+      "lead_id",
+      "opportunity_id",
+      "delivery_id",
+      "action_id",
+      "offer_status",
+      "offer_price",
+      "send_allowed",
+      "payment_amount",
+      "payment_currency",
+      "payment_received_at",
+      "fulfillment_status",
+      "execution_status",
+      "proof_status",
+      "proof_package_status",
+      "completion_status",
+      "review_status",
+      "referral_status",
+      "case_study_status",
+      "revenue_status",
+      "lifetime_value_attributable",
+      "current_stage",
+      "next_required_action",
+      "readiness_score",
+      "source_files",
+      "field_sources"
+    ],
+    "conflicting_identifiers": [
+      {
+        "field": "merchant_shop",
+        "source_files": [
+          "staffordos/clients/client_registry_v1.json",
+          "staffordos/leads/lead_registry_v1.json",
+          "staffordos/units/opportunity_units_v1.json",
+          "staffordos/units/delivery_units_v1.json",
+          "staffordos/shopifixer/shopifixer_command_center_v1.json"
+        ],
+        "finding": "The same merchant identity is represented through different lifecycle layers, but client_registry does not own the lead and opportunity identifiers needed to unify them."
+      },
+      {
+        "field": "client_id",
+        "source_files": [
+          "staffordos/clients/client_registry_v1.json",
+          "staffordos/units/opportunity_units_v1.json",
+          "staffordos/units/delivery_units_v1.json",
+          "staffordos/shopifixer/shopifixer_command_center_v1.json"
+        ],
+        "finding": "client_id is shared across delivery and opportunity truth, but the client registry does not yet encode those linked object ids as first-class merchant lifecycle references."
+      },
+      {
+        "field": "status / stage",
+        "source_files": [
+          "staffordos/clients/client_registry_v1.json",
+          "staffordos/leads/lead_registry_v1.json",
+          "staffordos/units/opportunity_units_v1.json",
+          "staffordos/units/delivery_units_v1.json"
+        ],
+        "finding": "multiple lifecycle vocabularies exist (lead lifecycle, opportunity stage, delivery status, client lifecycle), so client_registry alone cannot currently be the canonical lifecycle authority."
+      }
+    ],
+    "duplicate_ownership": [
+      {
+        "domain": "merchant identity",
+        "owners": [
+          "staffordos/leads/lead_registry_v1.json",
+          "staffordos/clients/client_registry_v1.json",
+          "staffordos/units/opportunity_units_v1.json",
+          "staffordos/units/delivery_units_v1.json",
+          "staffordos/commercial/merchant_registry_v1.json"
+        ],
+        "finding": "Merchant identity is split across acquisition, client, opportunity, delivery, and commercial mapping layers."
+      },
+      {
+        "domain": "ShopiFixer lifecycle",
+        "owners": [
+          "staffordos/clients/client_registry_v1.json",
+          "staffordos/shopifixer/shopifixer_command_center_v1.json",
+          "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+          "staffordos/shopifixer/shopifixer_offer_outcome_authority_v1.json"
+        ],
+        "finding": "ShopiFixer lifecycle is already modeled in multiple read layers, so client_registry cannot safely absorb it without schema expansion and a consolidation plan."
+      },
+      {
+        "domain": "revenue truth",
+        "owners": [
+          "staffordos/clients/client_registry_v1.json",
+          "staffordos/revenue/revenue_truth_v1.json",
+          "web/src/routes/stripeWebhook.esm.js",
+          "web/src/checkout-public.js",
+          "staffordos/revenue/revenue_agent_v1.mjs"
+        ],
+        "finding": "Client registry records merchant-level payment, but revenue truth still holds separate funnel-level revenue state."
+      }
+    ]
+  },
+  "why_no": [
+    "client_registry_v1.json is canonical for clients, but it is not yet a full merchant lifecycle object.",
+    "It does not own acquisition truth, opportunity truth, or delivery truth.",
+    "It does not encode proof package, review, referral, or case-study readiness as first-class lifecycle state.",
+    "Payment and fulfillment are still split across runtime/fulfillment authorities.",
+    "A stale seeded commercial merchant registry still exists and competes conceptually with the client registry."
+  ],
+  "smallest_viable_authority_object": {
+    "name": "canonical merchant lifecycle object",
+    "recommended_anchor": "staffordos/clients/client_registry_v1.json",
+    "required_shape": [
+      "merchant identity: merchant_id, client_id, merchant_shop, store_domain, lead_id, opportunity_id",
+      "lifecycle: lead_status, audit_status, offer_status, payment_status, fulfillment_status, proof_package_status, revenue_status, case_study_status",
+      "proof/review/referral: before_evidence_status, after_evidence_status, review_status, referral_status",
+      "commercial summary: offer_price, payment_amount, payment_currency, lifetime_value, current_stage, next_required_action, readiness_score",
+      "traceability: source_files, field_sources"
+    ],
+    "reason": "That is the smallest object that can unify the merchant across lead, audit, offer, payment, fulfillment, proof, revenue, and case-study paths without creating another competing registry."
+  },
+  "exact_schema_additions_if_promoted_later": [
+    "lead_id",
+    "opportunity_id",
+    "delivery_id",
+    "action_id",
+    "offer_status",
+    "offer_price",
+    "send_allowed",
+    "payment_amount",
+    "payment_currency",
+    "payment_received_at",
+    "fulfillment_status",
+    "execution_status",
+    "proof_status",
+    "proof_package_status",
+    "completion_status",
+    "review_status",
+    "referral_status",
+    "case_study_status",
+    "revenue_status",
+    "current_stage",
+    "next_required_action",
+    "readiness_score",
+    "source_files",
+    "field_sources"
+  ]
+}
