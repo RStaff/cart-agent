@@ -1,0 +1,110 @@
+{
+  "schema": "staffordos.shopifixer_operational_proof_audit.v1",
+  "generated_at": "2026-06-10T15:00:00Z",
+  "assumption": "A real merchant pays the authorized $950 Fix Sprint today.",
+  "verdict": "PARTIAL",
+  "can_successfully_execute_and_prove_complete_engagement_today": false,
+  "operational_readiness_score": 56,
+  "lifecycle_trace": [
+    {
+      "stage": "Lead",
+      "status": "partially_proven",
+      "evidence": [
+        "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+        "staffordos/clients/client_registry_v1.json",
+        "staffordos/revenue/revenue_truth_v1.json"
+      ],
+      "why": "Lead truth exists for several merchants and lifecycle stage data is present, but the active ShopiFixer merchant has no provable lead row."
+    },
+    {
+      "stage": "Audit",
+      "status": "proven",
+      "evidence": [
+        "staffordos/audit/audit_result_surface.json",
+        "staffordos/shopifixer/shopifixer_conversion_brief_v1.json",
+        "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json"
+      ],
+      "why": "The audit surface has a score, top issue, and recommendation, and the registry materializes that audit state for the active merchant."
+    },
+    {
+      "stage": "Offer",
+      "status": "proven",
+      "evidence": [
+        "staffordos/clients/shopifixer_offer_latest.json",
+        "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+        "staffordos/shopifixer/shopifixer_offer_outcome_authority_v1.json",
+        "staffordos/shopifixer/shopifixer_command_center_v1.json",
+        "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json"
+      ],
+      "why": "The $950 Fix Sprint offer is generated, send-authorized, and tracked as sent for the active merchant."
+    },
+    {
+      "stage": "Payment",
+      "status": "proven",
+      "evidence": [
+        "staffordos/shopifixer/shopifixer_runtime_payment_verification_v1.json",
+        "staffordos/shopifixer/shopifixer_payment_path_audit_v1.json",
+        "staffordos/shopifixer/shopifixer_payment_completion_bridge_plan_v1.json",
+        "staffordos/shopifixer/shopifixer_send_authority_v1.json"
+      ],
+      "why": "The runtime payment path is in place and ready for a real Stripe checkout.session.completed event; the bridge can propagate payment into fulfillment truth."
+    },
+    {
+      "stage": "Fulfillment",
+      "status": "partially_proven",
+      "evidence": [
+        "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+        "staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs",
+        "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md"
+      ],
+      "why": "The fulfillment truth object exists and can move to payment_received, but no real delivery execution, before/after evidence, or started work is present yet."
+    },
+    {
+      "stage": "Proof Package",
+      "status": "partially_proven",
+      "evidence": [
+        "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+        "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md",
+        "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md",
+        "staffordos/proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md"
+      ],
+      "why": "The proof package structure and dry-run proof content exist, but no real merchant-facing proof package has been produced from a paid delivery."
+    },
+    {
+      "stage": "Revenue",
+      "status": "unproven",
+      "evidence": [
+        "staffordos/revenue/revenue_truth_v1.json",
+        "staffordos/clients/client_registry_v1.json"
+      ],
+      "why": "Revenue truth does not yet contain a realized ShopiFixer paid record for this engagement."
+    },
+    {
+      "stage": "Completion",
+      "status": "unproven",
+      "evidence": [
+        "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+        "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json"
+      ],
+      "why": "Completion requires fulfillment execution, proof completion, and closure evidence that are not yet present."
+    }
+  ],
+  "first_break_stage": {
+    "stage": "Fulfillment",
+    "reason": "Payment can be captured and propagated, but there is still no real execution evidence, before/after proof package, or completed fulfillment record."
+  },
+  "proof_break_summary": {
+    "breaks_at": "Fulfillment",
+    "reason": "The chain stops being fully provable once it reaches real delivery work and proof packaging."
+  },
+  "source_files": [
+    "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+    "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+    "staffordos/shopifixer/shopifixer_offer_outcome_authority_v1.json",
+    "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md",
+    "staffordos/revenue/revenue_truth_v1.json"
+  ]
+}
