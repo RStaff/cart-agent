@@ -1,0 +1,145 @@
+{
+  "schema": "staffordos.shopifixer_scoped_fix_action_design.v1",
+  "generated_at": "2026-06-10T17:20:00Z",
+  "action": "Scoped Fix Record",
+  "belongs_in": "ShopiFixer fulfillment workbench",
+  "recommended_artifact_path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md",
+  "active_merchant_proof_run_path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/",
+  "operator_goal": "Record the exact fix performed after before evidence is captured and before after evidence is captured.",
+  "required_fields": [
+    "store",
+    "scoped_fix",
+    "in_scope",
+    "out_of_scope",
+    "merchant_approval_needed",
+    "change_made",
+    "location_changed",
+    "implementation_notes",
+    "success_criteria"
+  ],
+  "optional_fields": [
+    "packet_id",
+    "affected_page_or_artifact",
+    "before_reference",
+    "after_reference",
+    "supporting_links",
+    "captured_by",
+    "fix_started_at",
+    "fix_completed_at"
+  ],
+  "relationship_to_before_evidence": {
+    "depends_on": "Before evidence must exist first and identify the problem being fixed.",
+    "uses": [
+      "store",
+      "affected page or artifact",
+      "issue",
+      "why it matters",
+      "observed friction"
+    ]
+  },
+  "relationship_to_after_evidence": {
+    "precedes": "After evidence",
+    "enables": [
+      "after screenshot",
+      "after notes",
+      "remaining limitations"
+    ]
+  },
+  "operator_workflow_sequence": [
+    "Capture Before Evidence",
+    "Record Scoped Fix",
+    "Capture After Evidence",
+    "Assemble Proof Package",
+    "Mark Completion"
+  ],
+  "proof_requirements": [
+    "before evidence exists",
+    "fix scope describes the exact change",
+    "in-scope and out-of-scope boundaries are explicit",
+    "implementation notes name the changed location",
+    "after evidence can reference the scoped fix record"
+  ],
+  "source_truth_used": [
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md",
+    "staffordos/fulfillment/shopifixer_before_evidence_action_design_v1.json",
+    "staffordos/fulfillment/shopifixer_fulfillment_workspace_design_v1.json"
+  ],
+  "data_requirements": {
+    "merchant_identity_source": "merchant_lifecycle_registry_v1.json active record",
+    "fix_context_source": "before_evidence.md",
+    "fulfillment_context_source": "shopifixer_fulfillment_truth_v1.json active fulfillment item"
+  },
+  "ui_future_display": [
+    "scoped fix summary",
+    "in scope list",
+    "out of scope list",
+    "changed location",
+    "implementation notes",
+    "success criteria"
+  ],
+  "safety_boundaries": {
+    "must_not_touch": [
+      "staffordos/clients/client_registry_v1.json",
+      "staffordos/revenue/revenue_truth_v1.json",
+      "payment truth",
+      "fulfillment truth",
+      "merchant_lifecycle_registry_v1.json",
+      "checkout",
+      "Stripe"
+    ],
+    "must_not_simulate": [
+      "payment",
+      "merchant approval",
+      "fulfillment completion"
+    ]
+  },
+  "answer": {
+    "recommended_artifact_path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md",
+    "required_fields": [
+      "store",
+      "scoped_fix",
+      "in_scope",
+      "out_of_scope",
+      "merchant_approval_needed",
+      "change_made",
+      "location_changed",
+      "implementation_notes",
+      "success_criteria"
+    ],
+    "optional_fields": [
+      "packet_id",
+      "affected_page_or_artifact",
+      "before_reference",
+      "after_reference",
+      "supporting_links",
+      "captured_by",
+      "fix_started_at",
+      "fix_completed_at"
+    ],
+    "relationship_to_before_evidence": "Depends on before evidence and uses the captured problem statement as the fix input.",
+    "relationship_to_after_evidence": "Precedes after evidence and gives after evidence something concrete to prove.",
+    "operator_workflow_sequence": [
+      "Capture Before Evidence",
+      "Record Scoped Fix",
+      "Capture After Evidence",
+      "Assemble Proof Package",
+      "Mark Completion"
+    ],
+    "proof_requirements": [
+      "before evidence exists",
+      "fix scope describes the exact change",
+      "in-scope and out-of-scope boundaries are explicit",
+      "implementation notes name the changed location",
+      "after evidence can reference the scoped fix record"
+    ],
+    "do_not_touch": [
+      "client registry",
+      "revenue truth",
+      "payment truth",
+      "fulfillment truth",
+      "merchant lifecycle registry",
+      "checkout",
+      "Stripe"
+    ]
+  }
+}
