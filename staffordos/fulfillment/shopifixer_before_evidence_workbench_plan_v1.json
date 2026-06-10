@@ -1,0 +1,83 @@
+{
+  "schema": "staffordos.shopifixer_before_evidence_workbench_plan.v1",
+  "generated_at": "2026-06-10T18:10:00Z",
+  "goal": "Capture Before Evidence",
+  "placement": "inside /operator/command-center within the existing ShopiFixer fulfillment workbench panel",
+  "smallest_ui_control": {
+    "type": "single compact inline form with one submit control",
+    "label": "Capture Before Evidence",
+    "behavior": "expands or reveals a short evidence form inside the existing workbench card; no new route, modal can be used only if the inline form cannot fit"
+  },
+  "operator_enters": [
+    "affected_page_or_artifact",
+    "issue",
+    "why_it_matters",
+    "screenshot_path_or_link",
+    "notes"
+  ],
+  "system_prefills": [
+    "store from active merchant lifecycle record",
+    "date from current date",
+    "merchant identity from merchant_lifecycle_registry_v1.json"
+  ],
+  "invoke_path": {
+    "ui": "OperatorHomeV1.tsx renders the control and submits the form",
+    "server_side": "page.tsx or a small operator helper invokes write_before_evidence_v1.mjs",
+    "writer_command": "node staffordos/proof_runs/internal_shopifixer_dry_run_v1/write_before_evidence_v1.mjs --store <store> --date <date> --affected <affected_page_or_artifact> --issue <issue> --why <why_it_matters> --screenshot <screenshot_path_or_link> --notes <notes>",
+    "output": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md"
+  },
+  "success_state": {
+    "display": "Before evidence saved",
+    "proof": "the proof-run markdown exists and shows the submitted evidence",
+    "local_progress": "mark the Before Evidence step complete in the fulfillment workbench UI only"
+  },
+  "lifecycle_progression_without_truth_writeback": {
+    "representation": "local workbench progress indicator only",
+    "rule": "do not update merchant_lifecycle_registry_v1.json or shopifixer_fulfillment_truth_v1.json yet",
+    "status_source": "presence of the updated before_evidence.md artifact and the writer success response"
+  },
+  "files_to_change": [
+    "staffordos/ui/operator-frontend/components/operator/OperatorHomeV1.tsx",
+    "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx",
+    "staffordos/ui/operator-frontend/lib/operator/writeShopifixerBeforeEvidence.ts"
+  ],
+  "safety_boundaries": {
+    "must_not_touch": [
+      "staffordos/clients/client_registry_v1.json",
+      "staffordos/revenue/revenue_truth_v1.json",
+      "payment truth",
+      "fulfillment truth",
+      "merchant_lifecycle_registry_v1.json",
+      "checkout",
+      "Stripe"
+    ],
+    "must_not_create": [
+      "new routes",
+      "new truth files",
+      "payment logic",
+      "fulfillment logic"
+    ]
+  },
+  "readiness_impact": {
+    "current_state": "design-only proof-run support",
+    "after_implementation": "first operator-triggered fulfillment step becomes executable from /operator/command-center",
+    "governance_effect": "improves execution readiness without changing governed truth"
+  },
+  "answer": {
+    "exact_ui_control": "A single compact inline form with one submit control labeled Capture Before Evidence, embedded in the existing fulfillment workbench card.",
+    "exact_files_to_modify": [
+      "staffordos/ui/operator-frontend/components/operator/OperatorHomeV1.tsx",
+      "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx",
+      "staffordos/ui/operator-frontend/lib/operator/writeShopifixerBeforeEvidence.ts"
+    ],
+    "expected_operator_flow": [
+      "Open /operator/command-center",
+      "Expand the ShopiFixer fulfillment workbench",
+      "Click Capture Before Evidence",
+      "Fill affected page or artifact, issue, why it matters, screenshot path/link, and notes",
+      "Submit",
+      "Confirm the before_evidence.md artifact was rewritten and the local workbench step is marked complete"
+    ],
+    "readiness_impact": "Improves ShopiFixer execution readiness by turning the first proof-run step into an operator-triggered workflow while leaving lifecycle truth unchanged."
+  }
+}
