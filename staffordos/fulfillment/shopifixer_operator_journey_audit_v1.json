@@ -1,0 +1,85 @@
+{
+  "schema": "staffordos.shopifixer_operator_journey_audit.v1",
+  "generated_at": "2026-06-10T16:00:00Z",
+  "journey_start": "/operator/command-center",
+  "steps": [
+    {
+      "step": "View merchant",
+      "available_in_ui": true,
+      "requires_file_editing": false,
+      "requires_terminal_access": false,
+      "requires_manual_artifact_creation": false,
+      "requires_missing_action": false,
+      "notes": "Merchant identity is visible in the ShopiFixer command-center panel and the fulfillment workbench header."
+    },
+    {
+      "step": "View lifecycle",
+      "available_in_ui": true,
+      "requires_file_editing": false,
+      "requires_terminal_access": false,
+      "requires_manual_artifact_creation": false,
+      "requires_missing_action": false,
+      "notes": "The lifecycle lane is already rendered in the command center."
+    },
+    {
+      "step": "Capture before evidence",
+      "available_in_ui": true,
+      "requires_file_editing": false,
+      "requires_terminal_access": false,
+      "requires_manual_artifact_creation": false,
+      "requires_missing_action": false,
+      "notes": "A dedicated ProofRunWorkbench stage writes only to before_evidence.md."
+    },
+    {
+      "step": "Record scoped fix",
+      "available_in_ui": true,
+      "requires_file_editing": false,
+      "requires_terminal_access": false,
+      "requires_manual_artifact_creation": false,
+      "requires_missing_action": false,
+      "notes": "A dedicated ProofRunWorkbench stage writes only to fix_scope.md."
+    },
+    {
+      "step": "Capture after evidence",
+      "available_in_ui": true,
+      "requires_file_editing": false,
+      "requires_terminal_access": false,
+      "requires_manual_artifact_creation": false,
+      "requires_missing_action": false,
+      "notes": "A dedicated ProofRunWorkbench stage writes only to after_evidence.md."
+    },
+    {
+      "step": "Generate proof package",
+      "available_in_ui": true,
+      "requires_file_editing": false,
+      "requires_terminal_access": false,
+      "requires_manual_artifact_creation": false,
+      "requires_missing_action": false,
+      "notes": "A dedicated ProofRunWorkbench stage composes merchant_proof_package.md from the existing evidence files."
+    },
+    {
+      "step": "Complete engagement",
+      "available_in_ui": false,
+      "requires_file_editing": true,
+      "requires_terminal_access": false,
+      "requires_manual_artifact_creation": false,
+      "requires_missing_action": true,
+      "notes": "There is no operator-facing completion action yet. Completion still needs a governed fulfillment-truth writeback and an operator control to trigger it."
+    }
+  ],
+  "journey_score": 85,
+  "first_missing_step": "Complete engagement",
+  "first_missing_action": "Governed completion writeback from the proof-package state into fulfillment truth",
+  "exact_blocker": "The UI can produce the evidence chain and proof package, but it cannot yet mark the active fulfillment item complete in governed truth.",
+  "can_non_technical_operator_complete_dry_run": false,
+  "completion_implementation_should_proceed_now": true,
+  "source_files": [
+    "staffordos/ui/operator-frontend/components/operator/OperatorHomeV1.tsx",
+    "staffordos/ui/operator-frontend/components/operator/ProofRunWorkbench.tsx",
+    "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx",
+    "staffordos/ui/operator-frontend/lib/operator/proofRunStageConfigs.ts",
+    "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md",
+    "staffordos/fulfillment/shopifixer_completion_governance_audit_v1.json"
+  ]
+}
