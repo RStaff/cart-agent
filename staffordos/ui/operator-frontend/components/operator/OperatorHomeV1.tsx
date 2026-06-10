@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { OperatorNav } from "./OperatorNav";
 import { ExecutePrimaryActionButton } from "./ExecutePrimaryActionButton";
+import { ProofRunWorkbench } from "./ProofRunWorkbench";
 
 type PrimaryActionSnapshot = {
   schema?: string;
@@ -390,95 +391,14 @@ Expected outcome: {action.expected_outcome || "Outcome not yet defined."}
                 </div>
               </div>
 
-              <div style={{ marginTop: 18, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-                <div className="operatorHomeActionFooter" style={{ marginBottom: 12 }}>
-                  <div>
-                    <small>Before Evidence</small>
-                    <strong>{beforeEvidenceSaved ? "saved" : "ready"}</strong>
-                  </div>
-                  <div>
-                    <small>Store</small>
-                    <strong>{shopifixerMerchant.store || "unavailable"}</strong>
-                  </div>
-                  <div>
-                    <small>Date</small>
-                    <strong>{beforeEvidenceDate || "—"}</strong>
-                  </div>
-                </div>
-
-                {beforeEvidenceSaved ? (
-                  <div className="badge success" style={{ marginBottom: 12 }}>
-                    Before evidence saved
-                  </div>
-                ) : null}
-
-                <form action={beforeEvidenceAction} style={{ display: "grid", gap: 12 }}>
-                  <input type="hidden" name="store" value={shopifixerMerchant.store || "unavailable"} />
-                  <input type="hidden" name="date" value={beforeEvidenceDate || ""} />
-
-                  <div
-                    style={{
-                      display: "grid",
-                      gap: 12,
-                      gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))"
-                    }}
-                  >
-                    <label style={{ display: "grid", gap: 6 }}>
-                      <span className="eyebrow">Affected Page / Artifact</span>
-                      <input
-                        name="affected_page_or_artifact"
-                        type="text"
-                        defaultValue=""
-                        placeholder="staffordos/clients/generate_shopifixer_offer_v1.mjs"
-                      />
-                    </label>
-
-                    <label style={{ display: "grid", gap: 6 }}>
-                      <span className="eyebrow">Screenshot</span>
-                      <input
-                        name="screenshot"
-                        type="text"
-                        defaultValue=""
-                        placeholder="proof_runs/internal_shopifixer_dry_run_v1/screenshots/before.png"
-                      />
-                    </label>
-                  </div>
-
-                  <label style={{ display: "grid", gap: 6 }}>
-                    <span className="eyebrow">Issue</span>
-                    <textarea
-                      name="issue"
-                      rows={3}
-                      defaultValue=""
-                      placeholder="Describe the problem visible before the fix."
-                    />
-                  </label>
-
-                  <label style={{ display: "grid", gap: 6 }}>
-                    <span className="eyebrow">Why It Matters</span>
-                    <textarea
-                      name="why_it_matters"
-                      rows={3}
-                      defaultValue=""
-                      placeholder="Explain the merchant or business risk."
-                    />
-                  </label>
-
-                  <label style={{ display: "grid", gap: 6 }}>
-                    <span className="eyebrow">Notes</span>
-                    <textarea
-                      name="notes"
-                      rows={3}
-                      defaultValue=""
-                      placeholder="Any supporting notes for the proof run."
-                    />
-                  </label>
-
-                  <button type="submit" className="button" style={{ width: "fit-content" }}>
-                    Capture Before Evidence
-                  </button>
-                </form>
-              </div>
+              <ProofRunWorkbench
+                stage="before_evidence"
+                merchant={shopifixerMerchant}
+                proofRunPath="staffordos/proof_runs/internal_shopifixer_dry_run_v1/"
+                date={beforeEvidenceDate || ""}
+                saved={beforeEvidenceSaved}
+                onSubmit={beforeEvidenceAction}
+              />
             </div>
           </div>
         </section>
