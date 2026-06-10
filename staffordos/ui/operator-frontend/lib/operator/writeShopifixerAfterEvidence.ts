@@ -1,0 +1,57 @@
+import fs from "node:fs";
+import path from "node:path";
+
+export type ShopifixerAfterEvidenceInput = {
+  store: string;
+  date: string;
+  affected_page_or_artifact: string;
+  after_screenshot: string;
+  after_notes: string;
+  remaining_limitations: string;
+  observed_improvement: string;
+  merchant_facing_summary: string;
+};
+
+export function writeShopifixerAfterEvidence(input: ShopifixerAfterEvidenceInput) {
+  const outputPath = path.resolve(
+    process.cwd(),
+    "../../proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md"
+  );
+
+  const content = [
+    "# AFTER EVIDENCE",
+    "",
+    "Store:",
+    input.store,
+    "",
+    "Date:",
+    input.date,
+    "",
+    "Affected Page / Artifact:",
+    input.affected_page_or_artifact,
+    "",
+    "Screenshot:",
+    input.after_screenshot,
+    "",
+    "After Notes:",
+    input.after_notes,
+    "",
+    "Observed Improvement:",
+    input.observed_improvement,
+    "",
+    "Remaining Limitations:",
+    input.remaining_limitations,
+    "",
+    "Merchant-Facing Summary:",
+    input.merchant_facing_summary,
+    ""
+  ].join("\n");
+
+  fs.writeFileSync(outputPath, content, "utf8");
+
+  return {
+    outputPath,
+    stdout: "",
+    stderr: ""
+  };
+}

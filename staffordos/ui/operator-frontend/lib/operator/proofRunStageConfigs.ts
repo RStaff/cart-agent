@@ -1,4 +1,4 @@
-export type ProofRunStageKey = "before_evidence" | "scoped_fix";
+export type ProofRunStageKey = "before_evidence" | "scoped_fix" | "after_evidence";
 
 export type ProofRunStageConfig = {
   stage: ProofRunStageKey;
@@ -119,6 +119,56 @@ export const PROOF_RUN_STAGE_CONFIGS: Record<ProofRunStageKey, ProofRunStageConf
         name: "success_criteria",
         label: "Success Criteria",
         placeholder: "How the fix will be judged complete.",
+        type: "textarea",
+        rows: 3
+      }
+    ]
+  },
+  after_evidence: {
+    stage: "after_evidence",
+    title: "Capture After Evidence",
+    description: "Record the post-fix state and the improvement observed for the active ShopiFixer merchant.",
+    outputPath: "staffordos/proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md",
+    submitLabel: "Capture After Evidence",
+    savedLabel: "After evidence saved",
+    fields: [
+      {
+        name: "affected_page_or_artifact",
+        label: "Affected Page / Artifact",
+        placeholder: "staffordos/clients/shopifixer_offer_latest.json",
+        type: "text"
+      },
+      {
+        name: "after_screenshot",
+        label: "After Screenshot",
+        placeholder: "proof_runs/internal_shopifixer_dry_run_v1/screenshots/after.png",
+        type: "text"
+      },
+      {
+        name: "after_notes",
+        label: "After Notes",
+        placeholder: "Describe the post-fix state.",
+        type: "textarea",
+        rows: 3
+      },
+      {
+        name: "remaining_limitations",
+        label: "Remaining Limitations",
+        placeholder: "Any limits still present after the fix.",
+        type: "textarea",
+        rows: 3
+      },
+      {
+        name: "observed_improvement",
+        label: "Observed Improvement",
+        placeholder: "What improved after the scoped fix.",
+        type: "textarea",
+        rows: 3
+      },
+      {
+        name: "merchant_facing_summary",
+        label: "Merchant-Facing Summary",
+        placeholder: "Short summary the merchant could understand.",
         type: "textarea",
         rows: 3
       }

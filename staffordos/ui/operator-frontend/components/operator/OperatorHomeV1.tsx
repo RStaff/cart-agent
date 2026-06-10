@@ -97,6 +97,7 @@ type ShopifixerCommandCenter = {
 };
 
 type BeforeEvidenceAction = (formData: FormData) => Promise<void>;
+type AfterEvidenceAction = (formData: FormData) => Promise<void>;
 type ScopedFixAction = (formData: FormData) => Promise<void>;
 
 type OperatorHomeV1Props = {
@@ -108,6 +109,9 @@ type OperatorHomeV1Props = {
   beforeEvidenceAction: BeforeEvidenceAction;
   beforeEvidenceSaved?: boolean;
   beforeEvidenceDate?: string;
+  afterEvidenceAction: AfterEvidenceAction;
+  afterEvidenceSaved?: boolean;
+  afterEvidenceDate?: string;
   scopedFixAction: ScopedFixAction;
   scopedFixSaved?: boolean;
   scopedFixDate?: string;
@@ -139,6 +143,9 @@ export function OperatorHomeV1({
   beforeEvidenceAction,
   beforeEvidenceSaved,
   beforeEvidenceDate,
+  afterEvidenceAction,
+  afterEvidenceSaved,
+  afterEvidenceDate,
   scopedFixAction,
   scopedFixSaved,
   scopedFixDate
@@ -414,6 +421,15 @@ Expected outcome: {action.expected_outcome || "Outcome not yet defined."}
                 date={scopedFixDate || beforeEvidenceDate || ""}
                 saved={scopedFixSaved}
                 onSubmit={scopedFixAction}
+              />
+
+              <ProofRunWorkbench
+                stage="after_evidence"
+                merchant={shopifixerMerchant}
+                proofRunPath="staffordos/proof_runs/internal_shopifixer_dry_run_v1/"
+                date={afterEvidenceDate || scopedFixDate || beforeEvidenceDate || ""}
+                saved={afterEvidenceSaved}
+                onSubmit={afterEvidenceAction}
               />
             </div>
           </div>

@@ -6,11 +6,13 @@ import { loadCommandCenterQaReport } from "../../../lib/operator/loadCommandCent
 import { loadUnitWorkSnapshot } from "../../../lib/operator/loadUnitWorkSnapshot";
 import { loadShopifixerCommandCenter } from "../../../lib/operator/loadShopifixerCommandCenter";
 import { writeShopifixerBeforeEvidence } from "../../../lib/operator/writeShopifixerBeforeEvidence";
+import { writeShopifixerAfterEvidence } from "../../../lib/operator/writeShopifixerAfterEvidence";
 import { writeShopifixerScopedFix } from "../../../lib/operator/writeShopifixerScopedFix";
 
 type RossCommandCenterPageProps = {
   searchParams?: {
     shopifixer_before_saved?: string;
+    shopifixer_after_saved?: string;
     shopifixer_scoped_fix_saved?: string;
   };
 };
@@ -22,6 +24,7 @@ export default async function RossCommandCenterPage({ searchParams }: RossComman
   const unitWorkSnapshot = loadUnitWorkSnapshot();
   const shopifixerCommandCenter = loadShopifixerCommandCenter();
   const beforeEvidenceSaved = searchParams?.shopifixer_before_saved === "1";
+  const afterEvidenceSaved = searchParams?.shopifixer_after_saved === "1";
   const scopedFixSaved = searchParams?.shopifixer_scoped_fix_saved === "1";
   const beforeEvidenceDate = new Date().toISOString().slice(0, 10);
 
@@ -47,6 +50,32 @@ export default async function RossCommandCenterPage({ searchParams }: RossComman
     });
 
     redirect("/operator/command-center?shopifixer_before_saved=1");
+  }
+
+  async function captureAfterEvidence(formData: FormData) {
+    "use server";
+
+    const store = String(formData.get("store") || shopifixerCommandCenter.merchant?.store || "unavailable");
+    const date = String(formData.get("date") || beforeEvidenceDate);
+    const affected_page_or_artifact = String(formData.get("affected_page_or_artifact") || "");
+    const after_screenshot = String(formData.get("after_screenshot") || "");
+    const after_notes = String(formData.get("after_notes") || "");
+    const remaining_limitations = String(formData.get("remaining_limitations") || "");
+    const observed_improvement = String(formData.get("observed_improvement") || "");
+    const merchant_facing_summary = String(formData.get("merchant_facing_summary") || "");
+
+    writeShopifixerAfterEvidence({
+      store,
+      date,
+      affected_page_or_artifact,
+      after_screenshot,
+      after_notes,
+      remaining_limitations,
+      observed_improvement,
+      merchant_facing_summary
+    });
+
+    redirect("/operator/command-center?shopifixer_after_saved=1");
   }
 
   async function captureScopedFix(formData: FormData) {
@@ -88,6 +117,9 @@ export default async function RossCommandCenterPage({ searchParams }: RossComman
       beforeEvidenceAction={captureBeforeEvidence}
       beforeEvidenceSaved={beforeEvidenceSaved}
       beforeEvidenceDate={beforeEvidenceDate}
+      afterEvidenceAction={captureAfterEvidence}
+      afterEvidenceSaved={afterEvidenceSaved}
+      afterEvidenceDate={beforeEvidenceDate}
       scopedFixAction={captureScopedFix}
       scopedFixSaved={scopedFixSaved}
       scopedFixDate={beforeEvidenceDate}
