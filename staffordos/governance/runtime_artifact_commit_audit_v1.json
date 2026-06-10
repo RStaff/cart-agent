@@ -1,0 +1,80 @@
+{
+  "schema": "staffordos.runtime_artifact_commit_audit.v1",
+  "generated_at": "2026-06-10T17:00:00Z",
+  "final_verdict": "DO_NOT_COMMIT",
+  "overall_assessment": {
+    "modified_files_are_runtime_outputs": true,
+    "normal_command_center_execution_caused_changes": true,
+    "expected_runtime_churn": true,
+    "commit_would_improve_governance": false,
+    "commit_would_reduce_governance": true
+  },
+  "files": [
+    {
+      "file": "staffordos/cockpit/ceo_truth_snapshot_v1.json",
+      "source_of_truth": false,
+      "generated_read_model": true,
+      "runtime_artifact": false,
+      "event_log": false,
+      "snapshot": true,
+      "should_commit": false,
+      "classification_reason": "Generated CEO read model snapshot synthesized from runtime truth sources and supporting snapshots; it is not a source-of-truth file."
+    },
+    {
+      "file": "staffordos/events/operator_action_events_v1.json",
+      "source_of_truth": false,
+      "generated_read_model": false,
+      "runtime_artifact": true,
+      "event_log": true,
+      "snapshot": false,
+      "should_commit": false,
+      "classification_reason": "Append-style operator action event log capturing runtime execution outcomes; committing it as source would blur live history with governed truth."
+    },
+    {
+      "file": "staffordos/events/outcome_event_log_v1.json",
+      "source_of_truth": false,
+      "generated_read_model": false,
+      "runtime_artifact": true,
+      "event_log": true,
+      "snapshot": false,
+      "should_commit": false,
+      "classification_reason": "Append-only outcome log of execution and learning events; expected to churn during runtime and should remain out of source commits unless explicitly governed."
+    },
+    {
+      "file": "staffordos/execution/output/agent_loop_latest.json",
+      "source_of_truth": false,
+      "generated_read_model": false,
+      "runtime_artifact": true,
+      "event_log": false,
+      "snapshot": true,
+      "should_commit": false,
+      "classification_reason": "Latest agent loop runtime output; this is execution telemetry, not governed truth."
+    },
+    {
+      "file": "staffordos/snapshots/primary_action_snapshot_v1.json",
+      "source_of_truth": false,
+      "generated_read_model": true,
+      "runtime_artifact": false,
+      "event_log": false,
+      "snapshot": true,
+      "should_commit": false,
+      "classification_reason": "Canonical primary-action read snapshot generated from runtime truth; it is designed to be rebuilt, not hand-governed."
+    }
+  ],
+  "commit_guidance": {
+    "normal_execution_updates": [
+      "operator_action_events_v1.json",
+      "outcome_event_log_v1.json",
+      "agent_loop_latest.json",
+      "primary_action_snapshot_v1.json",
+      "ceo_truth_snapshot_v1.json"
+    ],
+    "expected_churn": [
+      "primary_action snapshot refreshes after command-center execution",
+      "CEO truth snapshot refreshes after source snapshots change",
+      "event logs append during operator actions and outcome logging",
+      "agent loop output refreshes after each execution cycle"
+    ],
+    "governance_effect": "Committing these runtime artifacts would preserve transient execution state in version control and reduce the clarity of the source-of-truth boundary."
+  }
+}
