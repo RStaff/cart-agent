@@ -9,6 +9,7 @@ import { writeShopifixerBeforeEvidence } from "../../../lib/operator/writeShopif
 import { writeShopifixerAfterEvidence } from "../../../lib/operator/writeShopifixerAfterEvidence";
 import { writeShopifixerScopedFix } from "../../../lib/operator/writeShopifixerScopedFix";
 import { writeShopifixerProofPackage } from "../../../lib/operator/writeShopifixerProofPackage";
+import { writeShopifixerCompletion } from "../../../lib/operator/writeShopifixerCompletion";
 
 type RossCommandCenterPageProps = {
   searchParams?: {
@@ -16,6 +17,7 @@ type RossCommandCenterPageProps = {
     shopifixer_after_saved?: string;
     shopifixer_scoped_fix_saved?: string;
     shopifixer_proof_package_saved?: string;
+    shopifixer_completion_saved?: string;
   };
 };
 
@@ -29,7 +31,9 @@ export default async function RossCommandCenterPage({ searchParams }: RossComman
   const afterEvidenceSaved = searchParams?.shopifixer_after_saved === "1";
   const scopedFixSaved = searchParams?.shopifixer_scoped_fix_saved === "1";
   const proofPackageSaved = searchParams?.shopifixer_proof_package_saved === "1";
+  const completionSaved = searchParams?.shopifixer_completion_saved === "1";
   const beforeEvidenceDate = new Date().toISOString().slice(0, 10);
+  const completionDate = beforeEvidenceDate;
 
   async function captureBeforeEvidence(formData: FormData) {
     "use server";
@@ -121,6 +125,20 @@ export default async function RossCommandCenterPage({ searchParams }: RossComman
     redirect("/operator/command-center?shopifixer_proof_package_saved=1");
   }
 
+  async function captureCompletion(formData: FormData) {
+    "use server";
+
+    const store = String(formData.get("store") || shopifixerCommandCenter.merchant?.store || "unavailable");
+    const date = String(formData.get("date") || completionDate);
+
+    writeShopifixerCompletion({
+      store,
+      date
+    });
+
+    redirect("/operator/command-center?shopifixer_completion_saved=1");
+  }
+
   return (
     <OperatorHomeV1
       primaryActionSnapshot={primaryActionSnapshot}
@@ -140,6 +158,9 @@ export default async function RossCommandCenterPage({ searchParams }: RossComman
       proofPackageAction={captureProofPackage}
       proofPackageSaved={proofPackageSaved}
       proofPackageDate={beforeEvidenceDate}
+      completionAction={captureCompletion}
+      completionSaved={completionSaved}
+      completionDate={completionDate}
     />
   );
 }

@@ -1,4 +1,4 @@
-export type ProofRunStageKey = "before_evidence" | "scoped_fix" | "after_evidence" | "proof_package";
+export type ProofRunStageKey = "before_evidence" | "scoped_fix" | "after_evidence" | "proof_package" | "completion";
 
 export type ProofRunStageConfig = {
   stage: ProofRunStageKey;
@@ -181,6 +181,15 @@ export const PROOF_RUN_STAGE_CONFIGS: Record<ProofRunStageKey, ProofRunStageConf
     outputPath: "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md",
     submitLabel: "Generate Proof Package",
     savedLabel: "Proof package saved",
+    fields: []
+  },
+  completion: {
+    stage: "completion",
+    title: "Mark Completion",
+    description: "Close the ShopiFixer fulfillment item after the proof package exists and is populated.",
+    outputPath: "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+    submitLabel: "Mark Completion",
+    savedLabel: "Completion saved",
     fields: []
   }
 };
