@@ -1,0 +1,126 @@
+{
+  "schema": "staffordos.shopifixer_proofrun_workbench_component_plan.v1",
+  "generated_at": "2026-06-10T18:30:00Z",
+  "verdict": "REUSABLE_COMPONENT",
+  "recommendation": "Create one shared ProofRunWorkbench component and parameterize it for each proof-run stage.",
+  "reusable_component_location": "staffordos/ui/operator-frontend/components/operator/ProofRunWorkbench.tsx",
+  "stage_order": [
+    "before_evidence",
+    "scoped_fix",
+    "after_evidence",
+    "proof_package",
+    "completion"
+  ],
+  "exact_props": {
+    "stage": "before_evidence | scoped_fix | after_evidence | proof_package | completion",
+    "merchant": {
+      "store": "string",
+      "client_id": "string"
+    },
+    "proofRunPath": "string",
+    "defaultDate": "string",
+    "saved": "boolean",
+    "onSubmit": "server action or operator-safe helper",
+    "onSuccessRedirect": "string",
+    "stageConfig": "stage-specific labels, fields, and writer target"
+  },
+  "shared_form_structure": [
+    "workbench card shell",
+    "merchant/store header",
+    "stage title and description",
+    "compact inline field grid",
+    "shared provenance banner",
+    "shared save/success banner",
+    "single submit button",
+    "local progress indicator"
+  ],
+  "stage_specific_field_definitions": {
+    "before_evidence": [
+      "affected_page_or_artifact",
+      "issue",
+      "why_it_matters",
+      "screenshot",
+      "notes"
+    ],
+    "scoped_fix": [
+      "scoped_fix",
+      "in_scope",
+      "out_of_scope",
+      "merchant_approval_needed",
+      "change_made",
+      "location_changed",
+      "implementation_notes",
+      "success_criteria"
+    ],
+    "after_evidence": [
+      "affected_page_or_artifact",
+      "after_screenshot",
+      "after_notes",
+      "remaining_limitations",
+      "observed_improvement",
+      "merchant_facing_summary"
+    ],
+    "proof_package": [
+      "compose from before_evidence.md, fix_scope.md, after_evidence.md"
+    ],
+    "completion": [
+      "completion_summary",
+      "proof_package_location",
+      "remaining_limitations"
+    ]
+  },
+  "shared_success_state": [
+    "artifact saved",
+    "writer returned success",
+    "local stage marked complete",
+    "return to /operator/command-center with saved state"
+  ],
+  "shared_provenance_display": [
+    "active merchant store",
+    "active merchant client id",
+    "proof-run directory",
+    "current stage",
+    "output artifact path"
+  ],
+  "migration_path_from_existing_before_evidence_form": [
+    "Extract the inline before-evidence fields from OperatorHomeV1 into ProofRunWorkbench",
+    "Keep the existing proof-run writer and artifact path unchanged",
+    "Swap the one-off form in OperatorHomeV1 for a stage config that renders the before_evidence stage",
+    "Point the same shared component at scoped_fix, after_evidence, proof_package, and completion stages next"
+  ],
+  "files_that_will_change": [
+    "staffordos/ui/operator-frontend/components/operator/ProofRunWorkbench.tsx",
+    "staffordos/ui/operator-frontend/components/operator/OperatorHomeV1.tsx",
+    "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx",
+    "staffordos/ui/operator-frontend/lib/operator/writeShopifixerBeforeEvidence.ts",
+    "staffordos/ui/operator-frontend/lib/operator/proofRunStageConfigs.ts"
+  ],
+  "expected_code_reduction_percent": 68,
+  "source_files": [
+    "staffordos/ui/operator-frontend/components/operator/OperatorHomeV1.tsx",
+    "staffordos/ui/operator-frontend/lib/operator/writeShopifixerBeforeEvidence.ts",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/write_fix_scope_v1.mjs",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/write_after_evidence_v1.mjs",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/write_merchant_proof_package_v1.mjs",
+    "staffordos/fulfillment/shopifixer_fulfillment_workspace_design_v1.json"
+  ],
+  "shared_validation": [
+    "store present",
+    "required stage fields non-empty",
+    "writer target fixed to a proof-run artifact",
+    "no governed truth files touched",
+    "success state derived from writer success"
+  ],
+  "migration_strategy": "Move proof-run stage UI into one reusable component, keep the proof-run markdown writers as the persistence layer, and introduce a small stage-config map for each action.",
+  "answer": {
+    "reusable_component_location": "staffordos/ui/operator-frontend/components/operator/ProofRunWorkbench.tsx",
+    "migration_strategy": [
+      "Extract the existing before-evidence inline form into ProofRunWorkbench",
+      "Use a stage config map to swap fields and labels",
+      "Keep the proof-run writer path unchanged",
+      "Add the next stages after the first component lands"
+    ],
+    "estimated_code_reduction": "68%",
+    "exact_next_implementation_step": "Create ProofRunWorkbench and wire the existing before-evidence UI to it, then add stage configs for scoped fix, after evidence, proof package, and completion."
+  }
+}
