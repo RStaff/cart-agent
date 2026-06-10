@@ -1,0 +1,142 @@
+{
+  "schema": "staffordos.shopifixer_send_authority.v1",
+  "generated_at": "2026-06-09T14:00:00.000Z",
+  "send_status": "ready_to_send",
+  "send_allowed": true,
+  "blocking_issues": [],
+  "required_repairs": [],
+  "merchant_identity": {
+    "client_id": "cart-agent-dev.myshopify.com",
+    "merchant_shop": "cart-agent-dev.myshopify.com",
+    "store_domain": "cart-agent-dev.myshopify.com",
+    "email": "rossstafford1@gmail.com",
+    "status": "aligned"
+  },
+  "validation_checks": {
+    "readiness_status": "READY",
+    "merchant_identity_alignment": "aligned",
+    "pricing_authority_alignment": "aligned",
+    "fulfillment_authority_exists": true,
+    "proof_package_authority_exists": true,
+    "active_client_exists": true,
+    "email_exists": true,
+    "governance_issues": "none"
+  },
+  "authority_sources": [
+    {
+      "file": "staffordos/shopifixer/shopifixer_offer_readiness_v1.json",
+      "role": "readiness_authority",
+      "status": "source"
+    },
+    {
+      "file": "staffordos/clients/shopifixer_offer_latest.json",
+      "role": "generated_offer",
+      "status": "source"
+    },
+    {
+      "file": "staffordos/clients/client_registry_v1.json",
+      "role": "client_registry",
+      "status": "source"
+    },
+    {
+      "file": "staffordos/shopifixer/shopifixer_conversion_brief_v1.json",
+      "role": "conversion_brief",
+      "status": "source"
+    },
+    {
+      "file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "role": "fulfillment_truth",
+      "status": "source"
+    },
+    {
+      "file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+      "role": "fulfillment_authority",
+      "status": "source"
+    },
+    {
+      "file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+      "role": "proof_package_authority",
+      "status": "source"
+    }
+  ],
+  "field_sources": {
+    "send_status": {
+      "status": "derived",
+      "source_file": "staffordos/shopifixer/shopifixer_offer_readiness_v1.json",
+      "source_field": "overall_status + ready_to_send",
+      "note": "Offer is eligible because readiness is READY and all required alignments are aligned."
+    },
+    "send_allowed": {
+      "status": "derived",
+      "source_file": "staffordos/shopifixer/shopifixer_offer_readiness_v1.json",
+      "source_field": "ready_to_send",
+      "note": "True when readiness validator reports READY and no blocking issues exist."
+    },
+    "blocking_issues": {
+      "status": "source",
+      "source_file": "staffordos/shopifixer/shopifixer_offer_readiness_v1.json",
+      "source_field": "blocking_issues",
+      "note": "Empty in the current readiness output."
+    },
+    "required_repairs": {
+      "status": "source",
+      "source_file": "staffordos/shopifixer/shopifixer_offer_readiness_v1.json",
+      "source_field": "exact_files_to_change",
+      "note": "No repairs required after merchant identity alignment."
+    },
+    "merchant_identity": {
+      "status": "derived",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "client_id + merchant_shop + contact.email",
+      "note": "The active client record is the canonical merchant identity source."
+    },
+    "readiness_status": {
+      "status": "source",
+      "source_file": "staffordos/shopifixer/shopifixer_offer_readiness_v1.json",
+      "source_field": "overall_status",
+      "note": "Current readiness authority."
+    },
+    "merchant_identity_alignment": {
+      "status": "source",
+      "source_file": "staffordos/shopifixer/shopifixer_offer_readiness_v1.json",
+      "source_field": "alignment_checks.merchant_shop_alignment",
+      "note": "Offer, brief, audit surface, and client record are aligned."
+    },
+    "pricing_authority_alignment": {
+      "status": "source",
+      "source_file": "staffordos/shopifixer/shopifixer_conversion_brief_v1.json",
+      "source_field": "sprint_price",
+      "note": "$950 Fix Sprint is the canonical ShopiFixer price."
+    },
+    "fulfillment_authority_exists": {
+      "status": "source",
+      "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "source_field": "source_files + items[0].proof_package_status",
+      "note": "Canonical fulfillment truth exists even though fulfillment is not started."
+    },
+    "proof_package_authority_exists": {
+      "status": "source",
+      "source_file": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+      "source_field": "Merchant-Facing Proof Summary + Completion Decision",
+      "note": "Proof package structure is defined in the fulfillment packet template and authority."
+    },
+    "active_client_exists": {
+      "status": "source",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "clients[].status",
+      "note": "cart-agent-dev.myshopify.com is present as a proof client."
+    },
+    "email_exists": {
+      "status": "source",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "clients[].contact.email",
+      "note": "rossstafford1@gmail.com is present for the active client."
+    },
+    "governance_issues": {
+      "status": "derived",
+      "source_file": "staffordos/shopifixer/shopifixer_offer_readiness_v1.json",
+      "source_field": "blocking_issues + business_truth_untouched",
+      "note": "No blocking governance issues remain in the current readiness output."
+    }
+  }
+}

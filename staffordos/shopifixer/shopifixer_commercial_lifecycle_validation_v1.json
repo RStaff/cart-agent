@@ -1,0 +1,206 @@
+{
+  "schema": "staffordos.shopifixer_commercial_lifecycle_validation.v1",
+  "generated_at": "2026-06-09T14:20:00.000Z",
+  "lifecycle_status": "partial",
+  "lifecycle_completeness_percentage": 55.6,
+  "validated_links": [
+    {
+      "transition": "Audit -> Conversion Brief",
+      "source_authority": "staffordos/audit/audit_result_surface.json",
+      "destination_authority": "staffordos/shopifixer/shopifixer_conversion_brief_v1.json",
+      "status": "validated",
+      "missing_links": [],
+      "blocking_assumptions": [],
+      "evidence_available": [
+        "Audit surface exists with store_domain, audit_score, benchmark_summary, top_issue, fix_recommendation",
+        "Conversion brief exists and imports audit_surface fields",
+        "Conversion brief field_sources point back to audit_result_surface.json"
+      ]
+    },
+    {
+      "transition": "Conversion Brief -> Offer",
+      "source_authority": "staffordos/shopifixer/shopifixer_conversion_brief_v1.json",
+      "destination_authority": "staffordos/clients/shopifixer_offer_latest.json",
+      "status": "validated",
+      "missing_links": [],
+      "blocking_assumptions": [],
+      "evidence_available": [
+        "Generated offer exists",
+        "Offer sections import problem_found, benchmark_position, why_it_matters, fix_recommendation, sprint_price, sprint_deliverables, proof_package_deliverables",
+        "Offer body references the conversion brief source"
+      ]
+    },
+    {
+      "transition": "Offer -> Ready To Send",
+      "source_authority": "staffordos/clients/shopifixer_offer_latest.json",
+      "destination_authority": "staffordos/shopifixer/shopifixer_offer_readiness_v1.json",
+      "status": "validated",
+      "missing_links": [],
+      "blocking_assumptions": [],
+      "evidence_available": [
+        "Readiness authority reports READY",
+        "merchant identity alignment is aligned",
+        "pricing, proof package, and source validation are aligned"
+      ]
+    },
+    {
+      "transition": "Ready To Send -> Send Authority",
+      "source_authority": "staffordos/shopifixer/shopifixer_offer_readiness_v1.json",
+      "destination_authority": "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+      "status": "validated",
+      "missing_links": [],
+      "blocking_assumptions": [],
+      "evidence_available": [
+        "Send authority reports send_allowed true",
+        "No blocking issues are present",
+        "Active client and email exist"
+      ]
+    },
+    {
+      "transition": "Send Authority -> Offer Outcome",
+      "source_authority": "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+      "destination_authority": "staffordos/shopifixer/shopifixer_offer_outcome_authority_v1.json",
+      "status": "validated",
+      "missing_links": [],
+      "blocking_assumptions": [],
+      "evidence_available": [
+        "Offer outcome authority exists",
+        "Current outcome state is offer_sent",
+        "Client registry note and action unit proof status record the sent offer"
+      ]
+    }
+  ],
+  "broken_links": [
+    {
+      "transition": "Offer Outcome -> Payment",
+      "source_authority": "staffordos/shopifixer/shopifixer_offer_outcome_authority_v1.json",
+      "destination_authority": "staffordos/clients/client_registry_v1.json",
+      "status": "broken",
+      "missing_links": [
+        "verified payment event",
+        "paid deal truth",
+        "closed_at timestamp"
+      ],
+      "blocking_assumptions": [
+        "A sent offer has not yet converted into verified payment truth."
+      ],
+      "evidence_available": [
+        "Client registry still shows deal.payment_status = not_billable",
+        "Fulfillment truth still shows waiting_for_payment",
+        "No paid amount or paid timestamp exists"
+      ]
+    },
+    {
+      "transition": "Payment -> Fulfillment Start",
+      "source_authority": "staffordos/clients/client_registry_v1.json",
+      "destination_authority": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "status": "broken",
+      "missing_links": [
+        "payment_received fulfillment state",
+        "execution_status not_started on a paid sprint item",
+        "proof_status not_started on a paid sprint item"
+      ],
+      "blocking_assumptions": [
+        "Fulfillment cannot start until payment is verified."
+      ],
+      "evidence_available": [
+        "Fulfillment truth item exists",
+        "Fulfillment truth item remains waiting_for_payment",
+        "execution_status is not_started"
+      ]
+    },
+    {
+      "transition": "Fulfillment Start -> Proof Package",
+      "source_authority": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "destination_authority": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+      "status": "broken",
+      "missing_links": [
+        "before evidence",
+        "after evidence",
+        "merchant-facing proof summary",
+        "completion decision"
+      ],
+      "blocking_assumptions": [
+        "No paid fulfillment run has started."
+      ],
+      "evidence_available": [
+        "Proof package authority exists as a template",
+        "No proof package has been materialized for the active merchant"
+      ]
+    },
+    {
+      "transition": "Proof Package -> Completion",
+      "source_authority": "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md",
+      "destination_authority": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "status": "broken",
+      "missing_links": [
+        "completion_complete flag",
+        "completed_at timestamp",
+        "proof_complete flag"
+      ],
+      "blocking_assumptions": [
+        "Completion cannot be asserted before proof-backed fulfillment exists."
+      ],
+      "evidence_available": [
+        "Completion fields remain false/null in fulfillment truth",
+        "The fulfillment item is still waiting_for_payment"
+      ]
+    }
+  ],
+  "missing_runtime_events": [
+    "verified_shopifixer_payment",
+    "payment_closed_at_timestamp",
+    "fulfillment_payment_received_state",
+    "fulfillment_execution_started_state",
+    "before_evidence_captured",
+    "after_evidence_captured",
+    "merchant_facing_proof_package_created",
+    "completion_decision_recorded"
+  ],
+  "highest_risk_gap": "No verified ShopiFixer payment event exists for the active merchant, so the chain cannot progress into fulfillment, proof, or completion truth.",
+  "next_real_world_proof_needed": "A verified ShopiFixer payment event for cart-agent-dev.myshopify.com recorded in client registry truth, which would unlock fulfillment start and downstream proof package materialization.",
+  "field_sources": {
+    "lifecycle_status": {
+      "status": "derived",
+      "source_file": "staffordos/shopifixer/shopifixer_offer_readiness_v1.json + staffordos/shopifixer/shopifixer_send_authority_v1.json + staffordos/shopifixer/shopifixer_offer_outcome_authority_v1.json + staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "source_field": "validated_links vs broken_links",
+      "note": "Lifecycle is partial because the chain is coherent through send, but not yet through payment and fulfillment."
+    },
+    "lifecycle_completeness_percentage": {
+      "status": "derived",
+      "source_file": "staffordos/shopifixer/shopifixer_commercial_lifecycle_validation_v1.json",
+      "source_field": "5 validated links / 9 total links",
+      "note": "Percent reflects validated authority transitions in the commercial chain."
+    },
+    "validated_links": {
+      "status": "source",
+      "source_file": "staffordos/audit/audit_result_surface.json + staffordos/shopifixer/shopifixer_conversion_brief_v1.json + staffordos/clients/shopifixer_offer_latest.json + staffordos/shopifixer/shopifixer_offer_readiness_v1.json + staffordos/shopifixer/shopifixer_send_authority_v1.json + staffordos/shopifixer/shopifixer_offer_outcome_authority_v1.json",
+      "source_field": "authority chain through send",
+      "note": "Validated links are supported by the existing authority artifacts."
+    },
+    "broken_links": {
+      "status": "source",
+      "source_file": "staffordos/clients/client_registry_v1.json + staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "source_field": "payment and fulfillment truth",
+      "note": "Post-send runtime events are missing."
+    },
+    "missing_runtime_events": {
+      "status": "derived",
+      "source_file": "staffordos/shopifixer/shopifixer_offer_outcome_authority_v1.json + staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "source_field": "not_observed outcomes + waiting_for_payment fulfillment",
+      "note": "These events are the concrete runtime proof still absent."
+    },
+    "highest_risk_gap": {
+      "status": "derived",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "deal.payment_status + revenue + notes",
+      "note": "Payment is still not billable, so the commercial chain stops before fulfillment."
+    },
+    "next_real_world_proof_needed": {
+      "status": "derived",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "verified payment event",
+      "note": "A real merchant payment is the next proof required to advance the lifecycle."
+    }
+  }
+}

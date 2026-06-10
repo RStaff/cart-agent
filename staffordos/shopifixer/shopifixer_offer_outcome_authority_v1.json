@@ -1,0 +1,234 @@
+{
+  "schema": "staffordos.shopifixer_offer_outcome_authority.v1",
+  "generated_at": "2026-06-09T14:10:00.000Z",
+  "current_outcome_state": "offer_sent",
+  "allowed_next_states": [
+    "offer_opened",
+    "offer_replied",
+    "offer_declined",
+    "offer_expired",
+    "offer_paid",
+    "offer_converted"
+  ],
+  "outcomes": {
+    "offer_generated": {
+      "status": "observed",
+      "authority_source": [
+        "staffordos/clients/shopifixer_offer_latest.json",
+        "staffordos/shopifixer/shopifixer_send_authority_v1.json"
+      ],
+      "required_evidence": [
+        "Generated offer file exists for the same merchant",
+        "Offer sections include problem, benchmark, fix recommendation, pricing, and proof deliverables",
+        "Merchant identity matches the active client record"
+      ],
+      "downstream_action": "Authorize send and await send result.",
+      "next_owner": "staffordos/clients/send_shopifixer_offer_v1.mjs"
+    },
+    "offer_sent": {
+      "status": "observed",
+      "authority_source": [
+        "staffordos/clients/client_registry_v1.json",
+        "staffordos/units/action_units_v1.json",
+        "staffordos/shopifixer/shopifixer_send_authority_v1.json"
+      ],
+      "required_evidence": [
+        "Client registry note with type offer_sent",
+        "Client registry proof message for OFFER_SENT",
+        "Action unit proof_status equals offer_sent_logged"
+      ],
+      "downstream_action": "Wait for merchant open, reply, decline, expiry, or payment signal.",
+      "next_owner": "merchant"
+    },
+    "offer_opened": {
+      "status": "not_observed",
+      "authority_source": [
+        "email delivery/open tracking",
+        "merchant reply or engagement log"
+      ],
+      "required_evidence": [
+        "Open tracking event for the sent offer",
+        "Same merchant identity as the offer"
+      ],
+      "downstream_action": "Follow up or respond to engagement.",
+      "next_owner": "merchant"
+    },
+    "offer_replied": {
+      "status": "not_observed",
+      "authority_source": [
+        "inbound email thread",
+        "client registry note",
+        "support or inbox log"
+      ],
+      "required_evidence": [
+        "Inbound reply tied to the sent offer",
+        "Reply references the same merchant identity"
+      ],
+      "downstream_action": "Record reply intent and route toward close, decline, or payment.",
+      "next_owner": "StaffordOS operator"
+    },
+    "offer_declined": {
+      "status": "not_observed",
+      "authority_source": [
+        "merchant reply",
+        "client registry note"
+      ],
+      "required_evidence": [
+        "Explicit decline from the merchant",
+        "Reason recorded when available"
+      ],
+      "downstream_action": "Close the opportunity or retain for future follow-up.",
+      "next_owner": "StaffordOS operator"
+    },
+    "offer_expired": {
+      "status": "not_observed",
+      "authority_source": [
+        "follow-up policy",
+        "time-based offer lifecycle record"
+      ],
+      "required_evidence": [
+        "Offer reached its expiry condition without conversion",
+        "No payment or accepted reply before expiry"
+      ],
+      "downstream_action": "Send follow-up or mark the opportunity stale.",
+      "next_owner": "StaffordOS operator"
+    },
+    "offer_paid": {
+      "status": "not_observed",
+      "authority_source": [
+        "staffordos/clients/client_registry_v1.json",
+        "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json"
+      ],
+      "required_evidence": [
+        "Verified payment is recorded for the same merchant",
+        "Payment status is paid and amount is known",
+        "Payment can be tied to the ShopiFixer Fix Sprint"
+      ],
+      "downstream_action": "Activate fulfillment truth for the paid sprint.",
+      "next_owner": "StaffordOS fulfillment operator"
+    },
+    "offer_converted": {
+      "status": "not_observed",
+      "authority_source": [
+        "staffordos/clients/client_registry_v1.json",
+        "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json"
+      ],
+      "required_evidence": [
+        "Verified payment exists for the same merchant",
+        "Fulfillment truth exists for the same merchant",
+        "Offer moved from commercial intent into execution-ready delivery"
+      ],
+      "downstream_action": "Begin or continue the fulfillment loop with proof-backed delivery.",
+      "next_owner": "StaffordOS fulfillment operator"
+    }
+  },
+  "conversion_event_definition": "An offer converts when the authorized ShopiFixer offer is accepted and verified payment exists for the same merchant, with the fulfillment truth model ready to enter or already in the paid delivery loop.",
+  "payment_event_definition": "A payment event exists when the client registry records a verified paid ShopiFixer deal for the same merchant, with payment status, amount, and closure evidence available from runtime truth.",
+  "fulfillment_start_definition": "Fulfillment starts when the ShopiFixer fulfillment truth item for the same merchant becomes payment_received with execution_status not_started, proof_status not_started, and completion_status not_started.",
+  "field_sources": {
+    "current_outcome_state": {
+      "status": "derived",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "notes[].type == offer_sent",
+      "note": "The current state is inferred from the observed send proof in the active client record and the matching offer state in the action unit."
+    },
+    "allowed_next_states": {
+      "status": "derived",
+      "source_file": "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+      "source_field": "send_allowed + observed offer state",
+      "note": "Next states are the valid post-send outcomes tracked by this authority."
+    },
+    "offer_generated": {
+      "status": "source",
+      "source_file": "staffordos/clients/shopifixer_offer_latest.json",
+      "source_field": "offer",
+      "note": "The generated offer file is the source of the pre-send commercial artifact."
+    },
+    "offer_sent": {
+      "status": "source",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "notes[].type == offer_sent",
+      "note": "The active client record contains the send proof note."
+    },
+    "offer_opened": {
+      "status": "unavailable",
+      "source_file": "none",
+      "source_field": "open tracking event",
+      "note": "No open-tracking evidence is currently present in the read sources."
+    },
+    "offer_replied": {
+      "status": "unavailable",
+      "source_file": "none",
+      "source_field": "inbound reply thread",
+      "note": "No reply evidence is currently present in the read sources."
+    },
+    "offer_declined": {
+      "status": "unavailable",
+      "source_file": "none",
+      "source_field": "explicit decline record",
+      "note": "No decline evidence is currently present in the read sources."
+    },
+    "offer_expired": {
+      "status": "unavailable",
+      "source_file": "none",
+      "source_field": "offer expiry record",
+      "note": "No expiry record is currently present in the read sources."
+    },
+    "offer_paid": {
+      "status": "unavailable",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "deal.payment_status == paid",
+      "note": "The active client record is still not billable and no paid state is recorded."
+    },
+    "offer_converted": {
+      "status": "unavailable",
+      "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "source_field": "payment_status == payment_received + execution/proof/completion readiness",
+      "note": "The fulfillment truth exists, but the item remains waiting_for_payment."
+    },
+    "conversion_event_definition": {
+      "status": "derived",
+      "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "source_field": "payment_status + fulfillment authority",
+      "note": "Defined from payment verification plus fulfillment readiness."
+    },
+    "payment_event_definition": {
+      "status": "derived",
+      "source_file": "staffordos/clients/client_registry_v1.json",
+      "source_field": "deal.payment_status + deal.value + deal.closed_at",
+      "note": "Payment is only real when the client registry reflects verified paid truth."
+    },
+    "fulfillment_start_definition": {
+      "status": "source",
+      "source_file": "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md",
+      "source_field": "payment_received / not_started / not_started / not_started",
+      "note": "Fulfillment authority defines the minimum start conditions."
+    }
+  },
+  "unavailable_fields": [
+    {
+      "field": "offer_opened_at",
+      "reason": "No open-tracking source is present in the current read set."
+    },
+    {
+      "field": "offer_replied_at",
+      "reason": "No inbound reply source is present in the current read set."
+    },
+    {
+      "field": "offer_declined_at",
+      "reason": "No explicit decline record is present in the current read set."
+    },
+    {
+      "field": "offer_expired_at",
+      "reason": "No expiry record is present in the current read set."
+    },
+    {
+      "field": "offer_paid_at",
+      "reason": "The active client record is not paid."
+    },
+    {
+      "field": "offer_converted_at",
+      "reason": "The fulfillment truth item is still waiting_for_payment."
+    }
+  ]
+}
