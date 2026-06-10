@@ -1,4 +1,4 @@
-export type ProofRunStageKey = "before_evidence" | "scoped_fix" | "after_evidence";
+export type ProofRunStageKey = "before_evidence" | "scoped_fix" | "after_evidence" | "proof_package";
 
 export type ProofRunStageConfig = {
   stage: ProofRunStageKey;
@@ -173,5 +173,14 @@ export const PROOF_RUN_STAGE_CONFIGS: Record<ProofRunStageKey, ProofRunStageConf
         rows: 3
       }
     ]
+  },
+  proof_package: {
+    stage: "proof_package",
+    title: "Generate Proof Package",
+    description: "Compose the merchant-facing proof package from the before, fix, and after evidence artifacts.",
+    outputPath: "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md",
+    submitLabel: "Generate Proof Package",
+    savedLabel: "Proof package saved",
+    fields: []
   }
 };

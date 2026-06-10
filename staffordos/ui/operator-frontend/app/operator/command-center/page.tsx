@@ -8,12 +8,14 @@ import { loadShopifixerCommandCenter } from "../../../lib/operator/loadShopifixe
 import { writeShopifixerBeforeEvidence } from "../../../lib/operator/writeShopifixerBeforeEvidence";
 import { writeShopifixerAfterEvidence } from "../../../lib/operator/writeShopifixerAfterEvidence";
 import { writeShopifixerScopedFix } from "../../../lib/operator/writeShopifixerScopedFix";
+import { writeShopifixerProofPackage } from "../../../lib/operator/writeShopifixerProofPackage";
 
 type RossCommandCenterPageProps = {
   searchParams?: {
     shopifixer_before_saved?: string;
     shopifixer_after_saved?: string;
     shopifixer_scoped_fix_saved?: string;
+    shopifixer_proof_package_saved?: string;
   };
 };
 
@@ -26,6 +28,7 @@ export default async function RossCommandCenterPage({ searchParams }: RossComman
   const beforeEvidenceSaved = searchParams?.shopifixer_before_saved === "1";
   const afterEvidenceSaved = searchParams?.shopifixer_after_saved === "1";
   const scopedFixSaved = searchParams?.shopifixer_scoped_fix_saved === "1";
+  const proofPackageSaved = searchParams?.shopifixer_proof_package_saved === "1";
   const beforeEvidenceDate = new Date().toISOString().slice(0, 10);
 
   async function captureBeforeEvidence(formData: FormData) {
@@ -107,6 +110,17 @@ export default async function RossCommandCenterPage({ searchParams }: RossComman
     redirect("/operator/command-center?shopifixer_scoped_fix_saved=1");
   }
 
+  async function captureProofPackage(formData: FormData) {
+    "use server";
+
+    const _store = String(formData.get("store") || shopifixerCommandCenter.merchant?.store || "unavailable");
+    const _date = String(formData.get("date") || beforeEvidenceDate);
+
+    writeShopifixerProofPackage();
+
+    redirect("/operator/command-center?shopifixer_proof_package_saved=1");
+  }
+
   return (
     <OperatorHomeV1
       primaryActionSnapshot={primaryActionSnapshot}
@@ -123,6 +137,9 @@ export default async function RossCommandCenterPage({ searchParams }: RossComman
       scopedFixAction={captureScopedFix}
       scopedFixSaved={scopedFixSaved}
       scopedFixDate={beforeEvidenceDate}
+      proofPackageAction={captureProofPackage}
+      proofPackageSaved={proofPackageSaved}
+      proofPackageDate={beforeEvidenceDate}
     />
   );
 }
