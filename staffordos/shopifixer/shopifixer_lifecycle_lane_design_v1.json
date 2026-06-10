@@ -1,0 +1,91 @@
+{
+  "schema": "staffordos.shopifixer_lifecycle_lane_design.v1",
+  "generated_at": "2026-06-10T02:34:39.051Z",
+  "current_stage": "offer_sent",
+  "active_stage": "Offer Sent",
+  "blocked_stage": "Payment Received",
+  "readiness_score_source": "staffordos/shopifixer/shopifixer_runtime_payment_verification_v1.json.readiness_score",
+  "next_action": "Collect verified payment for the authorized $950 Fix Sprint.",
+  "operator_action_recommendations": [
+    "Confirm the merchant is still aligned to the active ShopiFixer offer.",
+    "Monitor for Stripe checkout.session.completed on the authorized offer.",
+    "Verify the paid state lands in client registry truth.",
+    "Confirm the fulfillment truth rebuild advances to payment_received.",
+    "Do not start fulfillment until payment is verified."
+  ],
+  "stages": [
+    {
+      "name": "Audit Complete",
+      "source_file": "staffordos/audit/audit_result_surface.json",
+      "source_field": "audit_score, top_issue, fix_recommendation",
+      "completion_condition": "Audit surface exists and contains a scored merchant problem statement plus recommendation.",
+      "visual_state": "complete"
+    },
+    {
+      "name": "Conversion Brief Generated",
+      "source_file": "staffordos/shopifixer/shopifixer_conversion_brief_v1.json",
+      "source_field": "store_domain, audit_score, benchmark_summary, top_issue, fix_recommendation, sprint_price",
+      "completion_condition": "Conversion brief exists for the same merchant and carries the $950 Fix Sprint authority.",
+      "visual_state": "complete"
+    },
+    {
+      "name": "Offer Sent",
+      "source_file": "staffordos/shopifixer/shopifixer_offer_outcome_authority_v1.json",
+      "source_field": "current_outcome_state, allowed_next_states, offer_sent status",
+      "completion_condition": "Offer outcome authority records offer_sent for the active merchant.",
+      "visual_state": "active"
+    },
+    {
+      "name": "Payment Received",
+      "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "source_field": "items[0].payment_status, items[0].paid_at, items[0].amount",
+      "completion_condition": "Client registry and fulfillment truth both reflect verified paid ShopiFixer truth for the same merchant.",
+      "visual_state": "blocked"
+    },
+    {
+      "name": "Fulfillment Started",
+      "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "source_field": "items[0].execution_status, items[0].fix_started_at",
+      "completion_condition": "Fulfillment truth changes execution_status from not_started to in_progress or equivalent paid-delivery state.",
+      "visual_state": "pending"
+    },
+    {
+      "name": "Proof Package Complete",
+      "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "source_field": "items[0].proof_status, items[0].proof_package_status, items[0].merchant_proof_package_ready",
+      "completion_condition": "Before evidence, after evidence, and merchant-facing proof package are present in fulfillment truth.",
+      "visual_state": "pending"
+    },
+    {
+      "name": "Completed",
+      "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "source_field": "items[0].completion_status, items[0].completed_at, items[0].completion_complete",
+      "completion_condition": "Fulfillment truth records completed delivery and no further proof/work is required.",
+      "visual_state": "pending"
+    }
+  ],
+  "rendering_notes": {
+    "recommended_order": [
+      "Audit Complete",
+      "Conversion Brief Generated",
+      "Offer Sent",
+      "Payment Received",
+      "Fulfillment Started",
+      "Proof Package Complete",
+      "Completed"
+    ],
+    "lane_behavior": [
+      "Complete stages render as filled/confirmed.",
+      "Active stage renders as highlighted.",
+      "Blocked stage renders as visually blocked until payment truth arrives.",
+      "Pending stages render as muted future steps."
+    ]
+  },
+  "exact_files_required_to_render_lane": [
+    "staffordos/shopifixer/shopifixer_command_center_v1.json",
+    "staffordos/shopifixer/shopifixer_operator_experience_audit_v1.json",
+    "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx",
+    "staffordos/ui/operator-frontend/components/operator/OperatorHomeV1.tsx",
+    "staffordos/ui/operator-frontend/lib/operator/loadShopifixerCommandCenter.ts"
+  ]
+}

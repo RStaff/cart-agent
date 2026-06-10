@@ -1,0 +1,38 @@
+{
+  "schema": "staffordos.shopifixer_operator_experience_audit.v1",
+  "generated_at": "2026-06-10T02:34:39.051Z",
+  "operator_surface": {
+    "route": "/operator/command-center",
+    "component": "OperatorHomeV1",
+    "data_source": "staffordos/shopifixer/shopifixer_command_center_v1.json"
+  },
+  "answers": {
+    "what_does_operator_currently_see": "A read-only StaffordOS Command Center with the standard CEO primary-action card plus a ShopiFixer panel showing merchant identity, audit score, top issue, offer status, send allowance, payment status, fulfillment status, current stage, next required action, and readiness score.",
+    "what_decision_can_operator_make": "Ross can decide whether the ShopiFixer opportunity is ready to remain in a paid-pursuit state, whether payment collection is the next step, and whether the current offer should be treated as send-ready versus conversion-ready.",
+    "what_action_can_operator_take": "From this screen the operator can review the next required action and then move to collect a verified Stripe payment or inspect supporting revenue context; the screen itself is read-only and does not initiate payment or fulfillment.",
+    "what_information_is_still_missing": [
+      "Proof that the merchant has actually paid",
+      "A live fulfillment-start signal",
+      "Before/after evidence for the active merchant",
+      "Proof package readiness and completion details",
+      "A merchant-facing approval/review signal",
+      "A direct ShopiFixer action button on the command center"
+    ],
+    "single_highest_value_ui_improvement": "Add a dedicated ShopiFixer lifecycle card with explicit state transitions and a visible payment/fulfillment proof timeline instead of only summary pills.",
+    "single_highest_value_operational_improvement": "Close the loop from verified Stripe payment into fulfillment proof-package readiness so the command center can move from status-only to execution-aware.",
+    "single_highest_value_revenue_improvement": "Convert the send-ready offer into a verified paid Fix Sprint and make the paid state visible immediately in the command center."
+  },
+  "assessments": {
+    "current_operator_maturity": 74,
+    "biggest_visibility_gap": "The command center shows the lifecycle summary, but it does not yet expose a merchant-level proof timeline with payment verification, execution start, proof completion, and completion evidence in one place.",
+    "biggest_revenue_gap": "The screen makes it clear that the offer is sent and ready, but it does not yet surface a paid state or make payment conversion friction obvious enough to drive immediate follow-through.",
+    "biggest_operational_gap": "There is no operator-facing ShopiFixer workflow control on the screen; it is read-only, so the operator must leave the page to act on payment or fulfillment.",
+    "next_implementation_after_the_audit": "Add a compact ShopiFixer lifecycle lane to /operator/command-center that shows payment verification, fulfillment start, proof package status, and a single next-action affordance tied to the current stage."
+  },
+  "source_files": [
+    "staffordos/shopifixer/shopifixer_command_center_v1.json",
+    "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx",
+    "staffordos/ui/operator-frontend/components/operator/OperatorHomeV1.tsx",
+    "staffordos/ui/operator-frontend/lib/operator/loadShopifixerCommandCenter.ts"
+  ]
+}
