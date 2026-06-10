@@ -39,6 +39,16 @@ type MerchantLifecycleRecord = {
     proof_complete?: boolean;
     completed?: boolean;
   };
+  lifecycle?: {
+    offer_generated?: boolean;
+    audit_complete?: boolean;
+    conversion_brief_generated?: boolean;
+    offer_sent?: boolean;
+    payment_received?: boolean;
+    fulfillment_started?: boolean;
+    proof_complete?: boolean;
+    completed?: boolean;
+  };
   field_sources?: Record<string, unknown>;
   source_files?: string[];
 };
@@ -79,6 +89,16 @@ function fallbackCommandCenter() {
       fulfillment_status: "unavailable",
       execution_status: "unavailable",
       proof_status: "unavailable",
+    },
+    lifecycle_lane: {
+      offer_generated: false,
+      audit_complete: false,
+      conversion_brief_generated: false,
+      offer_sent: false,
+      payment_received: false,
+      fulfillment_started: false,
+      proof_complete: false,
+      completed: false,
     },
     lifecycle: {
       offer_generated: false,
@@ -158,6 +178,16 @@ function buildCommandCenterFromRecord(registry: MerchantLifecycleRegistry, recor
       fulfillment_status: record.fulfillment_status || "unavailable",
       execution_status: fulfillment.execution_status || "unavailable",
       proof_status: fulfillment.proof_status || record.proof_package_status || "unavailable",
+    },
+    lifecycle_lane: {
+      offer_generated: Boolean(lifecycleLane.offer_generated),
+      audit_complete: Boolean(lifecycleLane.audit_complete),
+      conversion_brief_generated: Boolean(lifecycleLane.conversion_brief_generated),
+      offer_sent: Boolean(lifecycleLane.offer_sent),
+      payment_received: Boolean(lifecycleLane.payment_received),
+      fulfillment_started: Boolean(lifecycleLane.fulfillment_started),
+      proof_complete: Boolean(lifecycleLane.proof_complete),
+      completed: Boolean(lifecycleLane.completed),
     },
     lifecycle: {
       offer_generated: Boolean(lifecycleLane.offer_generated),

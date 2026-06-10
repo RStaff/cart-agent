@@ -79,6 +79,15 @@ type ShopifixerCommandCenter = {
     execution_status?: string;
     proof_status?: string;
   };
+  lifecycle_lane?: {
+    audit_complete?: boolean;
+    conversion_brief_generated?: boolean;
+    offer_sent?: boolean;
+    payment_received?: boolean;
+    fulfillment_started?: boolean;
+    proof_complete?: boolean;
+    completed?: boolean;
+  };
   overall?: {
     current_stage?: string;
     next_required_action?: string;
@@ -129,7 +138,27 @@ export function OperatorHomeV1({
   const shopifixerOffer = shopifixer.offer || {};
   const shopifixerPayment = shopifixer.payment || {};
   const shopifixerFulfillment = shopifixer.fulfillment || {};
+  const shopifixerLifecycleLane = shopifixer.lifecycle_lane || {};
   const shopifixerOverall = shopifixer.overall || {};
+  const lifecycleLaneStages = [
+    { key: "audit_complete", label: "Audit Complete" },
+    { key: "conversion_brief_generated", label: "Conversion Brief Generated" },
+    { key: "offer_sent", label: "Offer Sent" },
+    { key: "payment_received", label: "Payment Received" },
+    { key: "fulfillment_started", label: "Fulfillment Started" },
+    { key: "proof_complete", label: "Proof Package Complete" },
+    { key: "completed", label: "Completed" }
+  ] as const;
+  const activeLifecycleStage = String(shopifixerOverall.current_stage || "").toLowerCase();
+  const activeLifecycleIndex = lifecycleLaneStages.findIndex((stage) => stage.key === activeLifecycleStage);
+
+  function lifecycleStageState(stageKey: string, index: number) {
+    if (activeLifecycleIndex === index) return "active";
+    const isComplete = Boolean((shopifixerLifecycleLane as Record<string, boolean | undefined>)[stageKey]);
+    if (isComplete) return "complete";
+    if (activeLifecycleIndex >= 0 && index < activeLifecycleIndex) return "blocked";
+    return "pending";
+  }
 
   return (
     <main className="shell">
@@ -286,6 +315,72 @@ Expected outcome: {action.expected_outcome || "Outcome not yet defined."}
               <p className="hint" style={{ marginTop: 14 }}>
                 {shopifixerAudit.recommendation || "unavailable"}
               </p>
+            </div>
+
+            <div className="operatorHomeActionCard" style={{ marginTop: 16 }}>
+              <div className="operatorHomeActionFooter">
+                <div>
+                  <small>Merchant</small>
+                  <strong>{shopifixerMerchant.store || "unavailable"}</strong>
+                </div>
+                <div>
+                  <small>Current stage</small>
+                  <strong>{shopifixerOverall.current_stage || "unavailable"}</strong>
+                </div>
+                <div>
+                  <small>Readiness score</small>
+                  <strong>{shopifixerOverall.readiness_score ?? "—"}</strong>
+                </div>
+                <div>
+                  <small>Payment status</small>
+                  <strong>{shopifixerPayment.payment_status || "unavailable"}</strong>
+                </div>
+                <div>
+                  <small>Fulfillment status</small>
+                  <strong>{shopifixerFulfillment.fulfillment_status || "unavailable"}</strong>
+                </div>
+                <div>
+                  <small>Execution status</small>
+                  <strong>{shopifixerFulfillment.execution_status || "unavailable"}</strong>
+                </div>
+                <div>
+                  <small>Proof status</small>
+                  <strong>{shopifixerFulfillment.proof_status || "unavailable"}</strong>
+                </div>
+                <div>
+                  <small>Next required action</small>
+                  <strong>{shopifixerOverall.next_required_action || "unavailable"}</strong>
+                </div>
+              </div>
+
+              <div style={{ marginTop: 16 }}>
+                <small className="eyebrow">Lifecycle Lane</small>
+                <div
+                  style={{
+                    display: "grid",
+                    gap: 10,
+                    marginTop: 10,
+                    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))"
+                  }}
+                >
+                  {lifecycleLaneStages.map((stage, index) => {
+                    const state = lifecycleStageState(stage.key, index);
+                    return (
+                      <div
+                        key={stage.key}
+                        className={`operatorHomeProofBadge ${state === "complete" ? "operatorHomeProofGood" : state === "active" ? "operatorHomeProofWarn" : ""}`}
+                        style={{
+                          alignItems: "flex-start",
+                          minHeight: 72
+                        }}
+                      >
+                        <span>{stage.label}</span>
+                        <strong style={{ textTransform: "capitalize" }}>{state}</strong>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
         </section>
