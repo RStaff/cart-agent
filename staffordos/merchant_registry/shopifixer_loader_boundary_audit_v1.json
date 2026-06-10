@@ -1,0 +1,197 @@
+{
+  "schema": "staffordos.shopifixer_loader_boundary_audit.v1",
+  "generated_at": "2026-06-10T14:30:00Z",
+  "verdict": "REFACTOR_BEFORE_COMMIT",
+  "answer": "loadShopifixerCommandCenter.ts is no longer a pure UI adapter. It contains read-model selection and lifecycle-state derivation logic that should live in the merchant lifecycle read-model layer, not the UI loader.",
+  "derived_logic": [
+    {
+      "symbol": "normalizeStage",
+      "category": "read-model transformation",
+      "description": "Normalizes stage strings for comparison and ranking.",
+      "should_live_in": "build_merchant_lifecycle_registry_v1.mjs"
+    },
+    {
+      "symbol": "scoreRecord",
+      "category": "business logic",
+      "description": "Assigns a stage bonus and readiness score to select the active merchant record.",
+      "should_live_in": "build_merchant_lifecycle_registry_v1.mjs"
+    },
+    {
+      "symbol": "selectActiveRecord",
+      "category": "business logic",
+      "description": "Ranks lifecycle records and chooses the active merchant for the panel.",
+      "should_live_in": "build_merchant_lifecycle_registry_v1.mjs"
+    },
+    {
+      "symbol": "merchant.store",
+      "category": "pure presentation mapping",
+      "description": "Maps the selected registry record into the command-center merchant store field.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    },
+    {
+      "symbol": "merchant.client_id",
+      "category": "pure presentation mapping",
+      "description": "Maps the selected registry record into the command-center merchant client_id field.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    },
+    {
+      "symbol": "audit.score",
+      "category": "pure presentation mapping",
+      "description": "Maps registry audit.score into the command-center audit section.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    },
+    {
+      "symbol": "audit.top_issue",
+      "category": "pure presentation mapping",
+      "description": "Maps registry audit.top_issue into the command-center audit section.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    },
+    {
+      "symbol": "audit.recommendation",
+      "category": "pure presentation mapping",
+      "description": "Maps registry audit.recommendation into the command-center audit section.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    },
+    {
+      "symbol": "offer.offer_status",
+      "category": "pure presentation mapping",
+      "description": "Maps registry offer_status into the command-center offer section.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    },
+    {
+      "symbol": "offer.offer_price",
+      "category": "pure presentation mapping",
+      "description": "Maps registry offer_price into the command-center offer section.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    },
+    {
+      "symbol": "offer.send_allowed",
+      "category": "pure presentation mapping",
+      "description": "Maps registry offer.send_allowed into the command-center offer section.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    },
+    {
+      "symbol": "payment.payment_status",
+      "category": "pure presentation mapping",
+      "description": "Maps registry payment_status into the command-center payment section.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    },
+    {
+      "symbol": "payment.readiness",
+      "category": "pure presentation mapping",
+      "description": "Maps registry payment.readiness into the command-center payment section.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    },
+    {
+      "symbol": "fulfillment.fulfillment_status",
+      "category": "pure presentation mapping",
+      "description": "Maps registry fulfillment_status into the command-center fulfillment section.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    },
+    {
+      "symbol": "fulfillment.execution_status",
+      "category": "pure presentation mapping",
+      "description": "Maps registry fulfillment.execution_status into the command-center fulfillment section.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    },
+    {
+      "symbol": "fulfillment.proof_status",
+      "category": "pure presentation mapping",
+      "description": "Maps registry fulfillment.proof_status into the command-center fulfillment section.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    },
+    {
+      "symbol": "lifecycle.offer_generated",
+      "category": "lifecycle logic",
+      "description": "Derives whether the offer exists from offer_status.",
+      "should_live_in": "build_merchant_lifecycle_registry_v1.mjs"
+    },
+    {
+      "symbol": "lifecycle.offer_sent",
+      "category": "lifecycle logic",
+      "description": "Derives the sent state from current_stage / offer_status.",
+      "should_live_in": "build_merchant_lifecycle_registry_v1.mjs"
+    },
+    {
+      "symbol": "lifecycle.payment_received",
+      "category": "lifecycle logic",
+      "description": "Derives payment receipt state from payment_status.",
+      "should_live_in": "build_merchant_lifecycle_registry_v1.mjs"
+    },
+    {
+      "symbol": "lifecycle.fulfillment_started",
+      "category": "lifecycle logic",
+      "description": "Derives fulfillment start from fulfillment status.",
+      "should_live_in": "build_merchant_lifecycle_registry_v1.mjs"
+    },
+    {
+      "symbol": "lifecycle.proof_complete",
+      "category": "lifecycle logic",
+      "description": "Derives proof completion from proof status.",
+      "should_live_in": "build_merchant_lifecycle_registry_v1.mjs"
+    },
+    {
+      "symbol": "lifecycle.completed",
+      "category": "lifecycle logic",
+      "description": "Derives completion from current_stage / case_study_status.",
+      "should_live_in": "build_merchant_lifecycle_registry_v1.mjs"
+    },
+    {
+      "symbol": "overall.current_stage",
+      "category": "read-model transformation",
+      "description": "Copies the selected registry current_stage into the UI-shaped command center.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    },
+    {
+      "symbol": "overall.next_required_action",
+      "category": "read-model transformation",
+      "description": "Copies the selected registry next_required_action into the UI-shaped command center.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    },
+    {
+      "symbol": "overall.readiness_score",
+      "category": "read-model transformation",
+      "description": "Copies the selected registry readiness_score into the UI-shaped command center.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    },
+    {
+      "symbol": "fallbackCommandCenter",
+      "category": "presentation fallback",
+      "description": "Provides a blank UI-safe object if the registry cannot be read.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    },
+    {
+      "symbol": "source_files / field_sources / registry_source",
+      "category": "read-model transformation",
+      "description": "Provenance wrapper around the selected record, not business logic.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    }
+  ],
+  "logic_that_should_move_to_builder": [
+    "normalizeStage",
+    "scoreRecord",
+    "selectActiveRecord",
+    "lifecycle.offer_generated",
+    "lifecycle.offer_sent",
+    "lifecycle.payment_received",
+    "lifecycle.fulfillment_started",
+    "lifecycle.proof_complete",
+    "lifecycle.completed"
+  ],
+  "logic_that_can_remain_in_loader": [
+    "pure field mapping into the existing UI shape",
+    "fallbackCommandCenter",
+    "provenance wrapper fields"
+  ],
+  "findings": {
+    "loader_purity": "impaired",
+    "business_logic_leak": true,
+    "lifecycle_logic_leak": true,
+    "read_model_boundary_violation": true
+  },
+  "source_files": [
+    "staffordos/ui/operator-frontend/lib/operator/loadShopifixerCommandCenter.ts",
+    "staffordos/merchant_registry/build_merchant_lifecycle_registry_v1.mjs",
+    "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json"
+  ]
+}

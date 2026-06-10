@@ -1,0 +1,72 @@
+{
+  "schema": "staffordos.shopifixer_loader_boundary_audit.v2",
+  "generated_at": "2026-06-10T14:45:00Z",
+  "verdict": "SAFE_TO_COMMIT",
+  "answer": "loadShopifixerCommandCenter.ts is now a UI adapter over precomputed registry data. The business and lifecycle logic have been moved into the merchant lifecycle registry builder and registry output.",
+  "remaining_derived_logic": [
+    {
+      "symbol": "normalizeKey",
+      "category": "read-model transformation",
+      "description": "Normalizes merchant identifiers so the loader can look up the precomputed active record.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    },
+    {
+      "symbol": "selectPrecomputedRecord",
+      "category": "read-model transformation",
+      "description": "Selects the active record using registry metadata only; no scoring or lifecycle logic remains.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    },
+    {
+      "symbol": "buildCommandCenterFromRecord",
+      "category": "pure presentation mapping",
+      "description": "Maps the selected registry record into the existing ShopiFixer UI shape.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    },
+    {
+      "symbol": "fallbackCommandCenter",
+      "category": "presentation fallback",
+      "description": "Provides a UI-safe fallback object when the registry cannot be loaded.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    },
+    {
+      "symbol": "registry_source / source_files / field_sources",
+      "category": "read-model transformation",
+      "description": "Provenance wrapper around the selected record and registry source.",
+      "should_live_in": "loadShopifixerCommandCenter.ts"
+    }
+  ],
+  "logic_confirmed_upstream": {
+    "active_record_selection": {
+      "location": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json#active_record_selection",
+      "source_of_truth": "staffordos/merchant_registry/build_merchant_lifecycle_registry_v1.mjs"
+    },
+    "lifecycle_lane_status": {
+      "location": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json#records[].lifecycle_lane",
+      "source_of_truth": "staffordos/merchant_registry/build_merchant_lifecycle_registry_v1.mjs"
+    },
+    "current_stage": {
+      "location": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json#records[].current_stage",
+      "source_of_truth": "staffordos/merchant_registry/build_merchant_lifecycle_registry_v1.mjs"
+    },
+    "next_required_action": {
+      "location": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json#records[].next_required_action",
+      "source_of_truth": "staffordos/merchant_registry/build_merchant_lifecycle_registry_v1.mjs"
+    },
+    "readiness_score": {
+      "location": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json#records[].readiness_score",
+      "source_of_truth": "staffordos/merchant_registry/build_merchant_lifecycle_registry_v1.mjs"
+    }
+  },
+  "loader_boundary": {
+    "business_logic_leak": false,
+    "lifecycle_logic_leak": false,
+    "read_model_selection_leak": true,
+    "presentation_only": true
+  },
+  "source_files": [
+    "staffordos/ui/operator-frontend/lib/operator/loadShopifixerCommandCenter.ts",
+    "staffordos/merchant_registry/build_merchant_lifecycle_registry_v1.mjs",
+    "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+    "staffordos/merchant_registry/shopifixer_loader_boundary_audit_v1.json"
+  ]
+}

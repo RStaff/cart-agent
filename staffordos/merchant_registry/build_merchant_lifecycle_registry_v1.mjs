@@ -176,6 +176,30 @@ function normalizePaymentStatus(value) {
   return normalized.toLowerCase();
 }
 
+function normalizeStage(stage) {
+  return String(stage || "").trim().toLowerCase();
+}
+
+function scoreRecord(record) {
+  const readiness = num(record?.readiness_score) ?? 0;
+  const stage = normalizeStage(record?.current_stage);
+  const stageBonus =
+    stage === "offer_sent" ? 1000 :
+    stage === "payment_received" ? 900 :
+    stage === "completed" ? 800 :
+    stage === "followup_sent" ? 700 :
+    stage === "engaged" ? 600 :
+    0;
+
+  return stageBonus + readiness;
+}
+
+function selectActiveRecord(records) {
+  if (!Array.isArray(records) || !records.length) return null;
+  const ranked = records.slice().sort((a, b) => scoreRecord(b) - scoreRecord(a));
+  return ranked[0] || null;
+}
+
 function deriveAuditStatus(client, lead, auditSurfaceMatch, commandCenterMatch) {
   if (auditSurfaceMatch || commandCenterMatch) return "complete";
   if (lead?.engagement?.audit_viewed || lead?.engagement?.experience_viewed) return "viewed";
@@ -266,6 +290,28 @@ function deriveReadinessScore(client, lead, commandCenterMatch, currentStage) {
   const stageScore = stageReadinessScore(currentStage);
   const clientPriority = num(client?.priority_score?.total) ?? 0;
   return Math.max(stageScore, clientPriority);
+}
+
+function deriveLifecycleLane(record) {
+  const auditComplete = text(record.audit_status) === "complete" || num(record?.audit?.score) !== null;
+  const offerGenerated = auditComplete || ["offer_sent", "payment_received", "fulfillment_started", "proof_complete", "completed"].includes(normalizeStage(record.current_stage)) || text(record.offer_status) === "offer_sent";
+  const conversionBriefGenerated = auditComplete || offerGenerated;
+  const offerSent = text(record.offer_status) === "offer_sent" || ["offer_sent", "followup_sent", "payment_received", "fulfillment_started", "proof_complete", "completed"].includes(normalizeStage(record.current_stage));
+  const paymentReceived = ["paid", "payment_received"].includes(normalizePaymentStatus(record.payment_status));
+  const fulfillmentStarted = !["unavailable", "not_started", "waiting_for_payment", "unpaid"].includes(normalizeStage(record.fulfillment_status));
+  const proofComplete = !["unavailable", "not_started", "pending"].includes(normalizeStage(record.proof_package_status));
+  const completed = normalizeStage(record.current_stage) === "completed" || normalizeStage(record.case_study_status) === "completed";
+
+  return {
+    offer_generated: offerGenerated,
+    audit_complete: auditComplete,
+    conversion_brief_generated: conversionBriefGenerated,
+    offer_sent: offerSent,
+    payment_received: paymentReceived,
+    fulfillment_started: fulfillmentStarted,
+    proof_complete: proofComplete,
+    completed,
+  };
 }
 
 function buildFieldSources(client, lead, opportunity, delivery, action, commandCenterMatch, activeShopifixerMatch, currentStage) {
@@ -359,6 +405,14 @@ function buildFieldSources(client, lead, opportunity, delivery, action, commandC
   sources["fulfillment.proof_status"] = activeShopifixerMatch
     ? sourceNote("source", "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json", "items[0].proof_status", "Proof status is materialized from the fulfillment truth.")
     : sourceNote("unavailable", "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json", "items[0].proof_status", "No fulfillment proof status applies to this merchant.");
+  sources["lifecycle_lane.offer_generated"] = sourceNote("derived", "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json", "audit_status + offer_status + current_stage", "Offer generation is derived in the registry materialization.");
+  sources["lifecycle_lane.audit_complete"] = sourceNote("derived", "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json", "audit_status + audit.score", "Audit lane state is derived in the registry materialization.");
+  sources["lifecycle_lane.conversion_brief_generated"] = sourceNote("derived", "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json", "audit_status + audit.score", "Conversion brief lane state is derived in the registry materialization.");
+  sources["lifecycle_lane.offer_sent"] = sourceNote("derived", "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json", "offer_status + current_stage", "Offer lane state is derived in the registry materialization.");
+  sources["lifecycle_lane.payment_received"] = sourceNote("derived", "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json", "payment_status", "Payment lane state is derived in the registry materialization.");
+  sources["lifecycle_lane.fulfillment_started"] = sourceNote("derived", "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json", "fulfillment_status", "Fulfillment lane state is derived in the registry materialization.");
+  sources["lifecycle_lane.proof_complete"] = sourceNote("derived", "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json", "proof_package_status", "Proof lane state is derived in the registry materialization.");
+  sources["lifecycle_lane.completed"] = sourceNote("derived", "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json", "current_stage + case_study_status", "Completion lane state is derived in the registry materialization.");
 
   return sources;
 }
@@ -415,6 +469,18 @@ function buildMerchantRecord(client, leadRegistry, opportunities, deliveries, ac
   const paymentReadiness = activeShopifixerMatch ? text(runtimePaymentVerification?.final_verdict) || null : null;
   const fulfillmentExecutionStatus = activeShopifixerMatch ? text(fulfillmentTruth?.items?.[0]?.execution_status) || null : null;
   const fulfillmentProofStatus = activeShopifixerMatch ? text(fulfillmentTruth?.items?.[0]?.proof_status) || null : null;
+  const lifecycleLane = deriveLifecycleLane({
+    audit_status: auditStatus,
+    audit: {
+      score: auditScore,
+    },
+    offer_status: offerStatus,
+    payment_status: paymentStatus,
+    fulfillment_status: fulfillmentStatus,
+    proof_package_status: proofPackageStatus,
+    current_stage: currentStage,
+    case_study_status: caseStudyStatus,
+  });
 
   const record = {
     merchant_id: merchantId,
@@ -459,6 +525,7 @@ function buildMerchantRecord(client, leadRegistry, opportunities, deliveries, ac
       execution_status: fulfillmentExecutionStatus,
       proof_status: fulfillmentProofStatus,
     },
+    lifecycle_lane: lifecycleLane,
     source_files: INPUT_FILES.slice(),
     field_sources: {},
     unavailable_fields: [],
@@ -522,6 +589,7 @@ function buildRegistry() {
     .slice()
     .sort((a, b) => String(a.client_id || "").localeCompare(String(b.client_id || "")))
     .map((client) => buildMerchantRecord(client, leadItems, opportunities, deliveries, actions, revenueTruth, commandCenter));
+  const activeRecord = selectActiveRecord(records);
 
   const summary = {
     records: records.length,
@@ -544,6 +612,25 @@ function buildRegistry() {
   return {
     schema: "staffordos.merchant_lifecycle_registry.v1",
     generated_at: new Date().toISOString(),
+    active_record_selection: activeRecord
+      ? {
+          merchant_id: activeRecord.merchant_id,
+          client_id: activeRecord.client_id,
+          merchant_shop: activeRecord.merchant_shop,
+          store_domain: activeRecord.store_domain,
+          current_stage: activeRecord.current_stage,
+          readiness_score: activeRecord.readiness_score,
+          selection_source: "precomputed_in_builder",
+        }
+      : {
+          merchant_id: null,
+          client_id: null,
+          merchant_shop: null,
+          store_domain: null,
+          current_stage: null,
+          readiness_score: 0,
+          selection_source: "none",
+        },
     source_files: INPUT_FILES.slice(),
     summary,
     records,
@@ -562,6 +649,7 @@ function renderMarkdown(registry) {
   lines.push(`- Lead-linked records: ${registry.summary.records_with_lead_truth}`);
   lines.push(`- Opportunity-linked records: ${registry.summary.records_with_opportunity_truth}`);
   lines.push(`- Delivery-linked records: ${registry.summary.records_with_delivery_truth}`);
+  lines.push(`- Active merchant: ${registry.active_record_selection?.merchant_id || "unavailable"}`);
   lines.push("");
   lines.push("## ShopiFixer Panel Fields");
   lines.push("");
@@ -572,6 +660,13 @@ function renderMarkdown(registry) {
   lines.push("- payment.readiness");
   lines.push("- fulfillment.execution_status");
   lines.push("- fulfillment.proof_status");
+  lines.push("- lifecycle_lane.audit_complete");
+  lines.push("- lifecycle_lane.conversion_brief_generated");
+  lines.push("- lifecycle_lane.offer_sent");
+  lines.push("- lifecycle_lane.payment_received");
+  lines.push("- lifecycle_lane.fulfillment_started");
+  lines.push("- lifecycle_lane.proof_complete");
+  lines.push("- lifecycle_lane.completed");
   lines.push("");
   lines.push("## Records");
   lines.push("");

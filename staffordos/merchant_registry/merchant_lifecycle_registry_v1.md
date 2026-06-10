@@ -1,6 +1,6 @@
 # Merchant Lifecycle Registry
 
-Generated: 2026-06-10T13:36:35.662Z
+Generated: 2026-06-10T14:08:47.331Z
 
 ## Summary
 
@@ -8,6 +8,7 @@ Generated: 2026-06-10T13:36:35.662Z
 - Lead-linked records: 4
 - Opportunity-linked records: 1
 - Delivery-linked records: 1
+- Active merchant: cart-agent-dev.myshopify.com
 
 ## ShopiFixer Panel Fields
 
@@ -18,6 +19,13 @@ Generated: 2026-06-10T13:36:35.662Z
 - payment.readiness
 - fulfillment.execution_status
 - fulfillment.proof_status
+- lifecycle_lane.audit_complete
+- lifecycle_lane.conversion_brief_generated
+- lifecycle_lane.offer_sent
+- lifecycle_lane.payment_received
+- lifecycle_lane.fulfillment_started
+- lifecycle_lane.proof_complete
+- lifecycle_lane.completed
 
 ## Records
 

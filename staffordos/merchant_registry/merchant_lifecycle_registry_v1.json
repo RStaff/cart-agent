@@ -1,6 +1,15 @@
 {
   "schema": "staffordos.merchant_lifecycle_registry.v1",
-  "generated_at": "2026-06-10T13:36:35.662Z",
+  "generated_at": "2026-06-10T14:08:47.331Z",
+  "active_record_selection": {
+    "merchant_id": "cart-agent-dev.myshopify.com",
+    "client_id": "cart-agent-dev.myshopify.com",
+    "merchant_shop": "cart-agent-dev.myshopify.com",
+    "store_domain": "cart-agent-dev.myshopify.com",
+    "current_stage": "offer_sent",
+    "readiness_score": 93,
+    "selection_source": "precomputed_in_builder"
+  },
   "source_files": [
     "staffordos/clients/client_registry_v1.json",
     "staffordos/leads/lead_registry_v1.json",
@@ -73,6 +82,16 @@
       "fulfillment": {
         "execution_status": "not_started",
         "proof_status": "not_started"
+      },
+      "lifecycle_lane": {
+        "offer_generated": true,
+        "audit_complete": true,
+        "conversion_brief_generated": true,
+        "offer_sent": true,
+        "payment_received": false,
+        "fulfillment_started": false,
+        "proof_complete": false,
+        "completed": false
       },
       "source_files": [
         "staffordos/clients/client_registry_v1.json",
@@ -291,6 +310,54 @@
           "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
           "source_field": "items[0].proof_status",
           "note": "Proof status is materialized from the fulfillment truth."
+        },
+        "lifecycle_lane.offer_generated": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "audit_status + offer_status + current_stage",
+          "note": "Offer generation is derived in the registry materialization."
+        },
+        "lifecycle_lane.audit_complete": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "audit_status + audit.score",
+          "note": "Audit lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.conversion_brief_generated": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "audit_status + audit.score",
+          "note": "Conversion brief lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.offer_sent": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "offer_status + current_stage",
+          "note": "Offer lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.payment_received": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "payment_status",
+          "note": "Payment lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.fulfillment_started": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "fulfillment_status",
+          "note": "Fulfillment lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.proof_complete": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "proof_package_status",
+          "note": "Proof lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.completed": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "current_stage + case_study_status",
+          "note": "Completion lane state is derived in the registry materialization."
         }
       },
       "unavailable_fields": [
@@ -366,6 +433,16 @@
       "fulfillment": {
         "execution_status": null,
         "proof_status": null
+      },
+      "lifecycle_lane": {
+        "offer_generated": true,
+        "audit_complete": true,
+        "conversion_brief_generated": true,
+        "offer_sent": false,
+        "payment_received": false,
+        "fulfillment_started": false,
+        "proof_complete": false,
+        "completed": false
       },
       "source_files": [
         "staffordos/clients/client_registry_v1.json",
@@ -584,6 +661,54 @@
           "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
           "source_field": "items[0].proof_status",
           "note": "No fulfillment proof status applies to this merchant."
+        },
+        "lifecycle_lane.offer_generated": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "audit_status + offer_status + current_stage",
+          "note": "Offer generation is derived in the registry materialization."
+        },
+        "lifecycle_lane.audit_complete": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "audit_status + audit.score",
+          "note": "Audit lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.conversion_brief_generated": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "audit_status + audit.score",
+          "note": "Conversion brief lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.offer_sent": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "offer_status + current_stage",
+          "note": "Offer lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.payment_received": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "payment_status",
+          "note": "Payment lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.fulfillment_started": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "fulfillment_status",
+          "note": "Fulfillment lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.proof_complete": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "proof_package_status",
+          "note": "Proof lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.completed": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "current_stage + case_study_status",
+          "note": "Completion lane state is derived in the registry materialization."
         }
       },
       "unavailable_fields": [
@@ -716,6 +841,16 @@
         "execution_status": null,
         "proof_status": null
       },
+      "lifecycle_lane": {
+        "offer_generated": true,
+        "audit_complete": true,
+        "conversion_brief_generated": true,
+        "offer_sent": false,
+        "payment_received": false,
+        "fulfillment_started": false,
+        "proof_complete": false,
+        "completed": false
+      },
       "source_files": [
         "staffordos/clients/client_registry_v1.json",
         "staffordos/leads/lead_registry_v1.json",
@@ -933,6 +1068,54 @@
           "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
           "source_field": "items[0].proof_status",
           "note": "No fulfillment proof status applies to this merchant."
+        },
+        "lifecycle_lane.offer_generated": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "audit_status + offer_status + current_stage",
+          "note": "Offer generation is derived in the registry materialization."
+        },
+        "lifecycle_lane.audit_complete": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "audit_status + audit.score",
+          "note": "Audit lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.conversion_brief_generated": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "audit_status + audit.score",
+          "note": "Conversion brief lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.offer_sent": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "offer_status + current_stage",
+          "note": "Offer lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.payment_received": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "payment_status",
+          "note": "Payment lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.fulfillment_started": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "fulfillment_status",
+          "note": "Fulfillment lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.proof_complete": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "proof_package_status",
+          "note": "Proof lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.completed": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "current_stage + case_study_status",
+          "note": "Completion lane state is derived in the registry materialization."
         }
       },
       "unavailable_fields": [
@@ -1065,6 +1248,16 @@
         "execution_status": null,
         "proof_status": null
       },
+      "lifecycle_lane": {
+        "offer_generated": true,
+        "audit_complete": true,
+        "conversion_brief_generated": true,
+        "offer_sent": true,
+        "payment_received": false,
+        "fulfillment_started": false,
+        "proof_complete": false,
+        "completed": false
+      },
       "source_files": [
         "staffordos/clients/client_registry_v1.json",
         "staffordos/leads/lead_registry_v1.json",
@@ -1282,6 +1475,54 @@
           "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
           "source_field": "items[0].proof_status",
           "note": "No fulfillment proof status applies to this merchant."
+        },
+        "lifecycle_lane.offer_generated": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "audit_status + offer_status + current_stage",
+          "note": "Offer generation is derived in the registry materialization."
+        },
+        "lifecycle_lane.audit_complete": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "audit_status + audit.score",
+          "note": "Audit lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.conversion_brief_generated": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "audit_status + audit.score",
+          "note": "Conversion brief lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.offer_sent": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "offer_status + current_stage",
+          "note": "Offer lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.payment_received": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "payment_status",
+          "note": "Payment lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.fulfillment_started": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "fulfillment_status",
+          "note": "Fulfillment lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.proof_complete": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "proof_package_status",
+          "note": "Proof lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.completed": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "current_stage + case_study_status",
+          "note": "Completion lane state is derived in the registry materialization."
         }
       },
       "unavailable_fields": [
@@ -1414,6 +1655,16 @@
         "execution_status": null,
         "proof_status": null
       },
+      "lifecycle_lane": {
+        "offer_generated": true,
+        "audit_complete": true,
+        "conversion_brief_generated": true,
+        "offer_sent": false,
+        "payment_received": false,
+        "fulfillment_started": false,
+        "proof_complete": false,
+        "completed": false
+      },
       "source_files": [
         "staffordos/clients/client_registry_v1.json",
         "staffordos/leads/lead_registry_v1.json",
@@ -1631,6 +1882,54 @@
           "source_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
           "source_field": "items[0].proof_status",
           "note": "No fulfillment proof status applies to this merchant."
+        },
+        "lifecycle_lane.offer_generated": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "audit_status + offer_status + current_stage",
+          "note": "Offer generation is derived in the registry materialization."
+        },
+        "lifecycle_lane.audit_complete": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "audit_status + audit.score",
+          "note": "Audit lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.conversion_brief_generated": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "audit_status + audit.score",
+          "note": "Conversion brief lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.offer_sent": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "offer_status + current_stage",
+          "note": "Offer lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.payment_received": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "payment_status",
+          "note": "Payment lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.fulfillment_started": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "fulfillment_status",
+          "note": "Fulfillment lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.proof_complete": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "proof_package_status",
+          "note": "Proof lane state is derived in the registry materialization."
+        },
+        "lifecycle_lane.completed": {
+          "status": "derived",
+          "source_file": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+          "source_field": "current_stage + case_study_status",
+          "note": "Completion lane state is derived in the registry materialization."
         }
       },
       "unavailable_fields": [
