@@ -1,0 +1,145 @@
+{
+  "schema": "staffordos.shopifixer_runtime_payment_verification.v1",
+  "generated_at": "2026-06-09T15:10:00.000Z",
+  "readiness_score": 93,
+  "final_verdict": "READY_FOR_REAL_PAYMENT",
+  "runtime_flow": [
+    {
+      "step": "offer_sent",
+      "source": "staffordos/shopifixer/shopifixer_offer_outcome_authority_v1.json",
+      "destination": "staffordos/shopifixer/shopifixer_send_authority_v1.json",
+      "status": "verified",
+      "evidence": [
+        "send_allowed is true",
+        "current_outcome_state is offer_sent",
+        "client registry contains an offer_sent note"
+      ]
+    },
+    {
+      "step": "checkout_creation",
+      "source": "abando-frontend/app/shopifixer/page.tsx",
+      "destination": "web/src/checkout-public.js",
+      "status": "verified",
+      "evidence": [
+        "ShopiFixer page POSTs to /__public-checkout or env-based base URL + /__public-checkout",
+        "Public checkout route creates a Stripe Checkout session",
+        "Packet is created with status payment_pending and bound to the session"
+      ]
+    },
+    {
+      "step": "checkout_session_completed",
+      "source": "web/src/checkout-public.js",
+      "destination": "web/src/routes/stripeWebhook.esm.js",
+      "status": "verified",
+      "evidence": [
+        "Stripe Checkout session uses metadata.packet_id and metadata.store_domain",
+        "Webhook verifies checkout.session.completed with STRIPE_WEBHOOK_SECRET",
+        "Webhook resolves packet by packet_id and checks store domain alignment"
+      ]
+    },
+    {
+      "step": "payment_verified",
+      "source": "web/src/routes/stripeWebhook.esm.js",
+      "destination": "staffordos/clients/client_registry_v1.mjs",
+      "status": "verified",
+      "evidence": [
+        "Webhook calls recordStripePaymentPropagation after bindPacketPayment",
+        "recordStripePaymentPropagation calls recordVerifiedStripePayment",
+        "recordVerifiedStripePayment writes deal.payment_status = paid and closed_at"
+      ]
+    },
+    {
+      "step": "payment_received",
+      "source": "web/src/routes/stripeWebhook.esm.js",
+      "destination": "staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs",
+      "status": "verified",
+      "evidence": [
+        "Webhook imports rebuildShopifixerFulfillmentTruth",
+        "Fulfillment rebuild is invoked after successful payment propagation",
+        "Builder maps paid client truth into payment_received fulfillment state"
+      ]
+    },
+    {
+      "step": "fulfillment_ready",
+      "source": "staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs",
+      "destination": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "status": "verified",
+      "evidence": [
+        "Fulfillment truth row is rebuilt from client registry truth",
+        "payment_status becomes payment_received when deal.payment_status is paid",
+        "fulfillment_status becomes payment_received and execution_status remains not_started"
+      ]
+    }
+  ],
+  "verified_links": [
+    {
+      "from": "offer_sent",
+      "to": "checkout_creation",
+      "status": "verified"
+    },
+    {
+      "from": "checkout_creation",
+      "to": "checkout_session_completed",
+      "status": "verified"
+    },
+    {
+      "from": "checkout_session_completed",
+      "to": "payment_verified",
+      "status": "verified"
+    },
+    {
+      "from": "payment_verified",
+      "to": "payment_received",
+      "status": "verified"
+    },
+    {
+      "from": "payment_received",
+      "to": "fulfillment_ready",
+      "status": "verified"
+    }
+  ],
+  "broken_links": [],
+  "remaining_blockers": [
+    "No code blocker remains in the inspected runtime path.",
+    "A real Stripe payment event is still required to exercise the path in production."
+  ],
+  "smallest_remaining_repair": "None required in code for the verified path; the only remaining step is an actual Stripe checkout.session.completed event for the target merchant.",
+  "merchant_identity_propagation": {
+    "checkout_packet_fields": [
+      "packet_id",
+      "store_domain"
+    ],
+    "stripe_event_fields": [
+      "session.metadata.packet_id",
+      "session.metadata.store_domain",
+      "session.client_reference_id",
+      "session.id",
+      "session.amount_total",
+      "session.currency",
+      "session.customer_details.email (when present)"
+    ],
+    "client_registry_match": "merchant_shop and client_id are matched against packet.store_domain / client_id before payment propagation"
+  },
+  "amount_propagation": {
+    "source_field": "session.amount_total",
+    "client_registry_value": "deal.value = amount_total / 100",
+    "revenue_truth_value": "latest_stripe_payment.amount_total = session.amount_total"
+  },
+  "payment_status_propagation": {
+    "stripe_event": "checkout.session.completed",
+    "client_registry_result": "deal.payment_status = paid",
+    "fulfillment_result": "payment_status = payment_received"
+  },
+  "fulfillment_rebuild_invocation": {
+    "called_from": "web/src/routes/stripeWebhook.esm.js",
+    "helper": "rebuildShopifixerFulfillmentTruth",
+    "effect": "writes staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json"
+  },
+  "validation": {
+    "jq": "not_run_for_write_only_artifact"
+  },
+  "notes": [
+    "The chain is code-complete for the inspected merchant identity.",
+    "No manual intervention is required after a successful Stripe checkout.session.completed event beyond the normal Stripe and webhook transport."
+  ]
+}
