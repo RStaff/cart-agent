@@ -1,0 +1,143 @@
+{
+  "schema": "staffordos.shopifixer_workbench_architecture_audit.v1",
+  "generated_at": "2026-06-10T18:20:00Z",
+  "verdict": "REUSABLE_COMPONENT",
+  "recommendation": "Implement one reusable proof-run workbench component with stage-specific field sets and a shared writer contract.",
+  "shared_fields": {
+    "store": true,
+    "date": true,
+    "artifact_path": true,
+    "text_notes": true,
+    "merchant_identity": true,
+    "proof_run_path": true
+  },
+  "shared_validation": [
+    "store is present",
+    "artifact path is fixed to the internal ShopiFixer proof-run directory",
+    "stage-specific required fields are non-empty",
+    "writer output is confined to a single markdown artifact",
+    "governed truth files are untouched"
+  ],
+  "shared_lifecycle_behavior": [
+    "each action captures one stage of the same proof-run",
+    "each action advances local workbench progress only",
+    "none of the actions should update merchant lifecycle truth yet",
+    "each action feeds the next proof artifact in the chain"
+  ],
+  "shared_ui_structure": [
+    "same workbench card",
+    "same compact inline form shell",
+    "same submit pattern",
+    "same success banner pattern",
+    "same merchant/store prefill",
+    "same proof-run provenance display"
+  ],
+  "shared_success_states": [
+    "artifact saved",
+    "local step marked complete",
+    "proof-run file updated",
+    "return to the same command-center panel with saved state"
+  ],
+  "field_matrices": {
+    "Capture Before Evidence": {
+      "required": [
+        "affected_page_or_artifact",
+        "issue",
+        "why_it_matters",
+        "screenshot",
+        "notes"
+      ],
+      "optional": [
+        "merchant_name",
+        "store_url",
+        "observed_friction",
+        "expected_improvement_category",
+        "supporting_links",
+        "captured_by"
+      ]
+    },
+    "Record Scoped Fix": {
+      "required": [
+        "scoped_fix",
+        "in_scope",
+        "out_of_scope",
+        "merchant_approval_needed",
+        "change_made",
+        "location_changed",
+        "implementation_notes",
+        "success_criteria"
+      ],
+      "optional": [
+        "packet_id",
+        "affected_page_or_artifact",
+        "before_reference",
+        "after_reference",
+        "supporting_links",
+        "captured_by",
+        "fix_started_at",
+        "fix_completed_at"
+      ]
+    },
+    "Capture After Evidence": {
+      "required": [
+        "affected_page_or_artifact",
+        "after_screenshot",
+        "after_notes",
+        "remaining_limitations",
+        "observed_improvement",
+        "merchant_facing_summary"
+      ],
+      "optional": [
+        "merchant_name",
+        "store_url",
+        "before_reference",
+        "fix_scope_reference",
+        "supporting_links",
+        "captured_by",
+        "proof_package_location"
+      ]
+    },
+    "Generate Proof Package": {
+      "required": [
+        "before_evidence",
+        "fix_scope",
+        "after_evidence"
+      ],
+      "optional": [
+        "proof_package_location",
+        "merchant_context_notes"
+      ]
+    },
+    "Mark Completion": {
+      "required": [
+        "completion_summary",
+        "proof_package_location",
+        "remaining_limitations"
+      ],
+      "optional": [
+        "review_status",
+        "referral_status",
+        "case_study_status"
+      ]
+    }
+  },
+  "lifecycle_behavior": {
+    "same_chain": [
+      "before evidence",
+      "scoped fix",
+      "after evidence",
+      "proof package",
+      "completion"
+    ],
+    "truth_update_policy": "local proof-run state only until a separate governed writeback exists",
+    "manual_transitions_remaining": [
+      "proof package to fulfillment completion",
+      "completion proof to governed truth"
+    ]
+  },
+  "expected_code_duplication_reduction": {
+    "estimate_percent": 68,
+    "why": "The form shell, proof-run provenance, submission pattern, save banner, and path handling can all be shared; only stage-specific fields and markdown composition vary."
+  },
+  "next_implementation_after_audit": "Build one reusable proof-run workbench component in OperatorHomeV1 and parameterize it for before evidence, scoped fix, after evidence, proof package, and completion."
+}
