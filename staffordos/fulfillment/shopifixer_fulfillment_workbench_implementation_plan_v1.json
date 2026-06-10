@@ -1,0 +1,77 @@
+{
+  "schema": "staffordos.shopifixer_fulfillment_workbench_implementation_plan.v1",
+  "generated_at": "2026-06-10T15:45:00Z",
+  "verdict": "YES",
+  "placement": {
+    "exact_location": "staffordos/ui/operator-frontend/components/operator/OperatorHomeV1.tsx",
+    "existing_section": "the ShopiFixer Command Center panel rendered inside <section className=\"panel operatorHomeDetails\" style={{ marginTop: 18 }}>",
+    "rendering_strategy": "extend the existing read-only ShopiFixer panel in place; do not add a route, modal, drawer, or separate workbench page"
+  },
+  "reusable_components": [
+    "OperatorHomeV1",
+    "OperatorNav",
+    "existing ShopiFixer summary pills",
+    "existing ShopiFixer action-card layout",
+    "existing operatorHomeActionFooter and operatorHomeNextStep blocks"
+  ],
+  "extendable_cards": [
+    {
+      "card": "ShopiFixer Command Center summary card",
+      "extension": "add a read-only fulfillment workbench subsection beneath the existing audit/offer/payment summary"
+    },
+    {
+      "card": "operatorHomeActionCard",
+      "extension": "reuse the existing card structure for the fulfillment lane and status stack, without adding controls"
+    }
+  ],
+  "available_data_fields": [
+    "merchant",
+    "client_id",
+    "current_stage",
+    "next_required_action",
+    "payment_status",
+    "fulfillment_status",
+    "execution_status",
+    "proof_status",
+    "lifecycle_lane",
+    "readiness_score",
+    "audit.score",
+    "audit.top_issue",
+    "audit.recommendation",
+    "offer.send_allowed"
+  ],
+  "panel_spec": {
+    "title": "ShopiFixer Fulfillment Workbench",
+    "mode": "read-only",
+    "fields": [
+      "Merchant",
+      "Current Stage",
+      "Next Required Action",
+      "Payment Status",
+      "Fulfillment Status",
+      "Execution Status",
+      "Proof Status",
+      "Lifecycle Lane",
+      "Readiness Score"
+    ],
+    "lane_source": "merchant_lifecycle_registry_v1.json.lifecycle_lane",
+    "truth_sources": [
+      "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+      "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "staffordos/clients/client_registry_v1.json"
+    ]
+  },
+  "implementation_constraints": {
+    "buttons": false,
+    "write_actions": false,
+    "new_routes": false,
+    "new_truth_files": false
+  },
+  "smallest_implementation": "Render a dedicated read-only fulfillment workbench subsection inside the existing ShopiFixer Command Center panel, backed only by merchant_lifecycle_registry_v1.json and fulfillment truth.",
+  "final_verdict": "YES",
+  "notes": [
+    "The existing command-center structure already contains the active merchant summary area needed for this panel.",
+    "No new navigation or route is required.",
+    "The lifecycle lane is already precomputed in merchant_lifecycle_registry_v1.json."
+  ]
+}
