@@ -1,4 +1,4 @@
-export type ProofRunStageKey = "before_evidence";
+export type ProofRunStageKey = "before_evidence" | "scoped_fix";
 
 export type ProofRunStageConfig = {
   stage: ProofRunStageKey;
@@ -55,6 +55,70 @@ export const PROOF_RUN_STAGE_CONFIGS: Record<ProofRunStageKey, ProofRunStageConf
         name: "notes",
         label: "Notes",
         placeholder: "Any supporting notes for the proof run.",
+        type: "textarea",
+        rows: 3
+      }
+    ]
+  },
+  scoped_fix: {
+    stage: "scoped_fix",
+    title: "Record Scoped Fix",
+    description: "Record the exact fix performed for the active ShopiFixer merchant.",
+    outputPath: "staffordos/proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md",
+    submitLabel: "Record Scoped Fix",
+    savedLabel: "Scoped fix saved",
+    fields: [
+      {
+        name: "scoped_fix",
+        label: "Scoped Fix",
+        placeholder: "Describe the smallest fix that was made.",
+        type: "textarea",
+        rows: 3
+      },
+      {
+        name: "in_scope",
+        label: "In Scope",
+        placeholder: "One item per line",
+        type: "textarea",
+        rows: 4
+      },
+      {
+        name: "out_of_scope",
+        label: "Out of Scope",
+        placeholder: "One item per line",
+        type: "textarea",
+        rows: 4
+      },
+      {
+        name: "merchant_approval_needed",
+        label: "Merchant Approval Needed",
+        placeholder: "no",
+        type: "text"
+      },
+      {
+        name: "change_made",
+        label: "Change Made",
+        placeholder: "Explain what changed.",
+        type: "textarea",
+        rows: 3
+      },
+      {
+        name: "location_changed",
+        label: "Location Changed",
+        placeholder: "Where the fix was applied.",
+        type: "text"
+      },
+      {
+        name: "implementation_notes",
+        label: "Implementation Notes",
+        placeholder: "Any notes needed for the proof run.",
+        type: "textarea",
+        rows: 3
+      },
+      {
+        name: "success_criteria",
+        label: "Success Criteria",
+        placeholder: "How the fix will be judged complete.",
         type: "textarea",
         rows: 3
       }

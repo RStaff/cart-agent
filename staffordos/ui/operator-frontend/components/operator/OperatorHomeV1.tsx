@@ -97,6 +97,7 @@ type ShopifixerCommandCenter = {
 };
 
 type BeforeEvidenceAction = (formData: FormData) => Promise<void>;
+type ScopedFixAction = (formData: FormData) => Promise<void>;
 
 type OperatorHomeV1Props = {
   primaryActionSnapshot: PrimaryActionSnapshot;
@@ -107,6 +108,9 @@ type OperatorHomeV1Props = {
   beforeEvidenceAction: BeforeEvidenceAction;
   beforeEvidenceSaved?: boolean;
   beforeEvidenceDate?: string;
+  scopedFixAction: ScopedFixAction;
+  scopedFixSaved?: boolean;
+  scopedFixDate?: string;
 };
 
 function percent(value?: number) {
@@ -134,7 +138,10 @@ export function OperatorHomeV1({
   shopifixerCommandCenter,
   beforeEvidenceAction,
   beforeEvidenceSaved,
-  beforeEvidenceDate
+  beforeEvidenceDate,
+  scopedFixAction,
+  scopedFixSaved,
+  scopedFixDate
 }: OperatorHomeV1Props) {
   const action = primaryActionSnapshot.primary_action || {};
   const evidence = Array.isArray(action.evidence) ? action.evidence : [];
@@ -398,6 +405,15 @@ Expected outcome: {action.expected_outcome || "Outcome not yet defined."}
                 date={beforeEvidenceDate || ""}
                 saved={beforeEvidenceSaved}
                 onSubmit={beforeEvidenceAction}
+              />
+
+              <ProofRunWorkbench
+                stage="scoped_fix"
+                merchant={shopifixerMerchant}
+                proofRunPath="staffordos/proof_runs/internal_shopifixer_dry_run_v1/"
+                date={scopedFixDate || beforeEvidenceDate || ""}
+                saved={scopedFixSaved}
+                onSubmit={scopedFixAction}
               />
             </div>
           </div>
