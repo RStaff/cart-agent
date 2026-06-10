@@ -1,0 +1,197 @@
+{
+  "schema": "staffordos.shopifixer_fulfillment_workspace_design.v1",
+  "generated_at": "2026-06-10T15:30:00Z",
+  "verdict": "FULFILLMENT_WORKBENCH",
+  "belongs_in": "fulfillment workbench",
+  "recommended_shell": "inside /operator/command-center as a dedicated fulfillment workbench panel or slide-over anchored to the active merchant",
+  "minimum_viable_workflow": [
+    "Payment Received",
+    "Before Evidence",
+    "Scoped Fix",
+    "After Evidence",
+    "Proof Package",
+    "Completion"
+  ],
+  "workflow_details": [
+    {
+      "stage": "Payment Received",
+      "operator_goal": "Confirm the verified payment and open the fulfillment item.",
+      "required_inputs": [
+        "verified payment status",
+        "merchant identity",
+        "fulfillment item selection"
+      ],
+      "required_actions": [
+        "set fulfillment payment status to payment_received",
+        "select the active delivery item"
+      ],
+      "required_proof_artifacts": [
+        "client_registry payment truth",
+        "merchant_lifecycle_registry active record",
+        "fulfillment truth payment_received state"
+      ],
+      "truth_sources": [
+        "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+        "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+        "staffordos/clients/client_registry_v1.json"
+      ]
+    },
+    {
+      "stage": "Before Evidence",
+      "operator_goal": "Capture the pre-fix state and document the problem.",
+      "required_inputs": [
+        "before screenshot",
+        "affected page URL",
+        "observed friction",
+        "why it matters"
+      ],
+      "required_actions": [
+        "capture screenshot or screen recording",
+        "write before notes",
+        "bind issue to the fulfillment record"
+      ],
+      "required_proof_artifacts": [
+        "before screenshot",
+        "before notes",
+        "affected page URL"
+      ],
+      "truth_sources": [
+        "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+        "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md",
+        "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md"
+      ]
+    },
+    {
+      "stage": "Scoped Fix",
+      "operator_goal": "Implement the smallest scoped fix that addresses the problem.",
+      "required_inputs": [
+        "scoped fix description",
+        "in scope items",
+        "out of scope items",
+        "implementation notes"
+      ],
+      "required_actions": [
+        "make the fix",
+        "record the change made",
+        "record the changed location"
+      ],
+      "required_proof_artifacts": [
+        "implementation notes",
+        "change made",
+        "location changed"
+      ],
+      "truth_sources": [
+        "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+        "staffordos/proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md",
+        "staffordos/proof_runs/internal_shopifixer_dry_run_v1/execution_notes.md"
+      ]
+    },
+    {
+      "stage": "After Evidence",
+      "operator_goal": "Capture the post-fix state and prove the change.",
+      "required_inputs": [
+        "after screenshot",
+        "after notes",
+        "remaining limitations"
+      ],
+      "required_actions": [
+        "capture after screenshot",
+        "write after notes",
+        "confirm observed improvement"
+      ],
+      "required_proof_artifacts": [
+        "after screenshot",
+        "after notes",
+        "merchant-facing summary"
+      ],
+      "truth_sources": [
+        "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+        "staffordos/proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md",
+        "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md"
+      ]
+    },
+    {
+      "stage": "Proof Package",
+      "operator_goal": "Assemble the merchant-facing proof package.",
+      "required_inputs": [
+        "before evidence",
+        "after evidence",
+        "merchant-facing summary",
+        "proof package location"
+      ],
+      "required_actions": [
+        "assemble proof package",
+        "mark proof package ready",
+        "attach proof artifacts to fulfillment item"
+      ],
+      "required_proof_artifacts": [
+        "merchant proof package",
+        "proof package location",
+        "merchant-facing summary"
+      ],
+      "truth_sources": [
+        "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+        "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md",
+        "staffordos/authority/output/shopifixer_fulfillment_packet_template_v1.md"
+      ]
+    },
+    {
+      "stage": "Completion",
+      "operator_goal": "Close the fulfillment and mark review/referral/case-study readiness.",
+      "required_inputs": [
+        "completion status",
+        "review status",
+        "referral status",
+        "case study status"
+      ],
+      "required_actions": [
+        "mark execution complete",
+        "mark proof complete",
+        "mark completion complete"
+      ],
+      "required_proof_artifacts": [
+        "completion timestamp",
+        "review/referral state",
+        "case study authorization"
+      ],
+      "truth_sources": [
+        "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+        "staffordos/revenue/revenue_truth_v1.json",
+        "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json"
+      ]
+    }
+  ],
+  "minimum_ui_needed": [
+    "merchant selector bound to the active paid merchant",
+    "vertical fulfillment lane with stage states",
+    "current stage and next action banner",
+    "evidence upload/read-only preview cards",
+    "fulfillment truth detail panel",
+    "proof package summary card",
+    "completion status card"
+  ],
+  "placement_recommendation": {
+    "primary": "inside /operator/command-center",
+    "form_factor": "dedicated fulfillment workbench section",
+    "why": "The operator already starts in the command center, and the paid-merchant fulfillment flow should be reachable without changing routes or opening a separate app."
+  },
+  "required_truth_sources": [
+    "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+    "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+    "staffordos/clients/client_registry_v1.json",
+    "staffordos/units/delivery_units_v1.json",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md"
+  ],
+  "single_highest_roi_implementation": "Add a paid-merchant fulfillment workbench panel inside /operator/command-center that binds the active fulfillment truth item to evidence capture, scoped-fix status, proof packaging, and completion controls.",
+  "source_files": [
+    "staffordos/fulfillment/shopifixer_operator_execution_audit_v1.json",
+    "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+    "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/execution_notes.md",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md",
+    "staffordos/ui/operator-frontend"
+  ]
+}

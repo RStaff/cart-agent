@@ -1,0 +1,65 @@
+{
+  "schema": "staffordos.shopifixer_operator_execution_audit.v1",
+  "generated_at": "2026-06-10T15:15:00Z",
+  "assumption": "A merchant payment is verified.",
+  "verdict": "PARTIAL",
+  "can_execute_entirely_from_staffordos": false,
+  "next_place_to_go": "Operator Command Center / Merchant Lifecycle Registry / Fulfillment truth surfaces",
+  "operator_path_after_payment": [
+    "Confirm payment verification in merchant lifecycle registry",
+    "Open the fulfillment truth item for the paid merchant",
+    "Advance fulfillment status from waiting_for_payment to payment_received",
+    "Capture before evidence, implement the scoped fix, capture after evidence",
+    "Assemble the merchant-facing proof package",
+    "Mark completion and then review/referral/case-study readiness"
+  ],
+  "workspaces": [
+    {
+      "name": "fulfillment_queue",
+      "status": "exists_and_usable",
+      "location": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "reason": "The canonical fulfillment truth item exists for the active merchant and can represent payment_received, execution_status, proof_status, and completion_status."
+    },
+    {
+      "name": "active_work_queue",
+      "status": "exists_but_disconnected",
+      "location": "staffordos/units/delivery_units_v1.json",
+      "reason": "Delivery units exist and show the active merchant in waiting_for_payment, but they are not yet a full execution workspace with task controls or evidence capture flow."
+    },
+    {
+      "name": "execution_workspace",
+      "status": "exists_but_disconnected",
+      "location": "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json + staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "reason": "Execution state is visible in truth, but there is no operator control surface for starting and tracking the scoped fix from the same workspace."
+    },
+    {
+      "name": "proof_package_workspace",
+      "status": "exists_but_disconnected",
+      "location": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md and fulfillment authority/template files",
+      "reason": "The proof package structure exists, but only as dry-run documentation and authority text rather than an operator workspace bound to a paid merchant."
+    },
+    {
+      "name": "completion_workflow",
+      "status": "exists_but_disconnected",
+      "location": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "reason": "Completion fields exist, but there is no integrated operator workflow that advances the item through execution, proof, review, and completion from StaffordOS alone."
+    }
+  ],
+  "stage_classification": {
+    "fulfillment_queue": "exists_and_usable",
+    "active_work_queue": "exists_but_disconnected",
+    "execution_workspace": "exists_but_disconnected",
+    "proof_package_workspace": "exists_but_disconnected",
+    "completion_workflow": "exists_but_disconnected"
+  },
+  "single_highest_roi_implementation": "Build a paid-merchant ShopiFixer fulfillment workspace in StaffordOS that binds the active fulfillment truth item to operator actions for before evidence, scoped fix execution, after evidence, and proof package completion.",
+  "source_files": [
+    "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+    "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md",
+    "staffordos/units/delivery_units_v1.json",
+    "staffordos/ui/operator-frontend"
+  ]
+}
