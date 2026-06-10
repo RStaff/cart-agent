@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.shopifixer_fulfillment_truth.v1",
-  "generated_at": "2026-06-09T12:48:59.688Z",
+  "generated_at": "2026-06-10T02:34:39.051Z",
   "source_files": [
     {
       "file": "SHOPIFIXER_FULFILLMENT_SCHEMA_DRAFT.md",
@@ -221,7 +221,7 @@
           "status": "derived",
           "source_file": "staffordos/units/delivery_units_v1.json",
           "source_field": "units[].status + staffordos/clients/client_registry_v1.json: deal.payment_status",
-          "note": "Delivery unit status is the source truth; client registry payment values are used to upgrade to paid when verified."
+          "note": "Delivery unit status is the source truth; client registry payment values are used to upgrade to payment_received when verified."
         },
         "payment_verified_source": {
           "status": "unavailable",
@@ -248,10 +248,10 @@
           "note": "Client registry currency is the best available monetary currency."
         },
         "fulfillment_status": {
-          "status": "source",
+          "status": "derived",
           "source_file": "staffordos/units/delivery_units_v1.json",
-          "source_field": "units[].status",
-          "note": "Delivery unit status is treated as source truth."
+          "source_field": "units[].status + client_registry_v1.json: deal.payment_status",
+          "note": "Delivery unit status is upgraded to payment_received when verified payment exists."
         },
         "execution_status": {
           "status": "derived",

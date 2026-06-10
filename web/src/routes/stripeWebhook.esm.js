@@ -2,6 +2,7 @@ import express from "express";
 import Stripe from "stripe";
 import { bindPacketPayment, getPacket, normalizeStoreDomain } from "../lib/packetRepository.js";
 import { recordStripePaymentPropagation } from "../../../staffordos/revenue/revenue_agent_v1.mjs";
+import { rebuildShopifixerFulfillmentTruth } from "../../../staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs";
 
 function getStripeClient() {
   const key = process.env.STRIPE_LIVE_SECRET_KEY || process.env.STRIPE_SECRET_KEY || "";
@@ -90,6 +91,21 @@ export function installStripeWebhook(app) {
                   packetId,
                   merchantShop: packet.store_domain,
                 });
+              } else {
+                try {
+                  const fulfillmentTruth = rebuildShopifixerFulfillmentTruth();
+                  const fulfillmentCount = Array.isArray(fulfillmentTruth?.items) ? fulfillmentTruth.items.length : 0;
+
+                  if (!fulfillmentCount) {
+                    console.warn("[stripe:webhook] payment propagated but fulfillment truth rebuild returned no items", {
+                      eventId: evtId,
+                      packetId,
+                      merchantShop: packet.store_domain,
+                    });
+                  }
+                } catch (fulfillmentError) {
+                  console.error("[stripe:webhook] fulfillment truth rebuild failed after payment propagation", fulfillmentError?.message || fulfillmentError);
+                }
               }
             } catch (propagationError) {
               console.error("[stripe:webhook] verified payment propagation failed after packet update", propagationError?.message || propagationError);

@@ -115,6 +115,10 @@ function isPaidLike(status) {
   ].includes(String(status || "").toLowerCase());
 }
 
+function isDirectRun() {
+  return Boolean(process.argv[1]) && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+}
+
 function sourceNote(status, source_file, source_field, note = null) {
   return {
     status,
@@ -135,15 +139,18 @@ function unavailableField(field, reason, source_file, source_field) {
 }
 
 function buildItem({ unit, client, openWork, sourceFiles }) {
-  const paymentStatus = isPaidLike(client?.deal?.payment_status)
-    ? "paid"
-    : text(unit.status) || "unavailable";
-  const executionStatus =
-    paymentStatus === "paid"
+  const paymentReceived = isPaidLike(client?.deal?.payment_status);
+  const paymentStatus = paymentReceived
+    ? "payment_received"
+    : text(unit.status) || "waiting_for_payment";
+  const fulfillmentStatus = paymentReceived
+    ? "payment_received"
+    : text(unit.status) || "waiting_for_payment";
+  const executionStatus = paymentReceived
+    ? "not_started"
+    : text(unit.status) === "active"
       ? "in_progress"
-      : text(unit.status) === "active"
-        ? "in_progress"
-        : "not_started";
+      : "not_started";
   const proofStatus = text(unit.proof_status) || "unavailable";
   const completionStatus =
     executionStatus === "in_progress" && proofStatus === "complete"
@@ -339,7 +346,7 @@ function buildItem({ unit, client, openWork, sourceFiles }) {
     paid_at: null,
     amount: null,
     currency: text(client?.deal?.currency || client?.revenue?.currency || "USD") || "USD",
-    fulfillment_status: text(unit.status) || "unavailable",
+    fulfillment_status: fulfillmentStatus,
     execution_status: executionStatus,
     proof_status: proofStatus,
     completion_status: completionStatus,
@@ -395,12 +402,12 @@ function buildItem({ unit, client, openWork, sourceFiles }) {
       merchant_name: sourceNote("unavailable", "staffordos/clients/client_registry_v1.json", "merchant_name", "No merchant name is represented in current truth."),
       opportunity_ref: sourceNote("source", "staffordos/units/delivery_units_v1.json", "units[].opportunity_ref", "Delivery unit opportunity binding is preserved."),
       delivery_unit_ref: sourceNote("source", "staffordos/units/delivery_units_v1.json", "units[].unit_id", "Delivery unit id is the fulfillment unit key."),
-      payment_status: sourceNote("derived", "staffordos/units/delivery_units_v1.json", "units[].status + staffordos/clients/client_registry_v1.json: deal.payment_status", "Delivery unit status is the source truth; client registry payment values are used to upgrade to paid when verified."),
+      payment_status: sourceNote("derived", "staffordos/units/delivery_units_v1.json", "units[].status + staffordos/clients/client_registry_v1.json: deal.payment_status", "Delivery unit status is the source truth; client registry payment values are used to upgrade to payment_received when verified."),
       payment_verified_source: sourceNote("unavailable", "staffordos/clients/client_registry_v1.json", "deal.payment_status", "No verified payment exists yet."),
       paid_at: sourceNote("unavailable", "staffordos/clients/client_registry_v1.json", "deal.closed_at", "No verified payment timestamp exists yet."),
       amount: sourceNote("unavailable", "staffordos/clients/client_registry_v1.json", "deal.value", "No verified paid amount exists yet."),
       currency: sourceNote("source", "staffordos/clients/client_registry_v1.json", "deal.currency", "Client registry currency is the best available monetary currency."),
-      fulfillment_status: sourceNote("source", "staffordos/units/delivery_units_v1.json", "units[].status", "Delivery unit status is treated as source truth."),
+      fulfillment_status: sourceNote("derived", "staffordos/units/delivery_units_v1.json", "units[].status + client_registry_v1.json: deal.payment_status", "Delivery unit status is upgraded to payment_received when verified payment exists."),
       execution_status: sourceNote("derived", "staffordos/units/delivery_units_v1.json", "units[].status + units[].stage", "Execution is derived from the delivery unit current state."),
       proof_status: sourceNote("source", "staffordos/units/delivery_units_v1.json", "units[].proof_status", "Proof status comes directly from delivery unit truth."),
       completion_status: sourceNote("derived", "staffordos/units/delivery_units_v1.json", "units[].status + units[].proof_status", "Completion is derived from execution and proof state."),
@@ -457,7 +464,7 @@ function buildItem({ unit, client, openWork, sourceFiles }) {
 function buildCounts(items) {
   return {
     waiting_for_payment: items.filter((item) => item.payment_status === "waiting_for_payment").length,
-    paid: items.filter((item) => item.payment_status === "paid").length,
+    paid: items.filter((item) => item.payment_status === "payment_received").length,
     in_progress: items.filter((item) => item.execution_status === "in_progress").length,
     awaiting_proof: items.filter((item) => item.proof_status === "awaiting_proof").length,
     awaiting_client_approval: items.filter((item) => item.client_approval_status === "awaiting_client_approval").length,
@@ -540,17 +547,18 @@ function buildSnapshot() {
   };
 }
 
-function itemIdFromField(entry, items) {
-  if (!entry || !Array.isArray(items)) return null;
-  if (items.length !== 1) return null;
-  return items[0]?.fulfillment_id || null;
-}
-
-function main() {
+export function rebuildShopifixerFulfillmentTruth() {
   const snapshot = buildSnapshot();
   mkdirSync(dirname(OUTPUT_PATH), { recursive: true });
   writeFileSync(OUTPUT_PATH, `${JSON.stringify(snapshot, null, 2)}\n`, "utf8");
+  return snapshot;
+}
+
+function main() {
+  const snapshot = rebuildShopifixerFulfillmentTruth();
   console.log(JSON.stringify(snapshot, null, 2));
 }
 
-main();
+if (isDirectRun()) {
+  main();
+}
