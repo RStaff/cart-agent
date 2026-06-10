@@ -1,0 +1,105 @@
+{
+  "schema": "staffordos.shopifixer_operational_gap_analysis.v1",
+  "generated_at": "2026-06-10T18:00:00Z",
+  "operational_readiness_score": 64,
+  "verdict": "PARTIAL",
+  "can_execute_complete_engagement_today": false,
+  "first_missing_operator_action": {
+    "name": "Capture Before Evidence",
+    "reason": "The fulfillment workbench design defines the action, and proof-run evidence files exist, but there is no integrated operator-facing execution surface that binds the action into the Command Center workflow."
+  },
+  "first_missing_lifecycle_transition": {
+    "from": "payment_received",
+    "to": "before_evidence_captured",
+    "reason": "Payment-to-fulfillment bridging exists, but the next evidence stage remains a manual proof-run step rather than an integrated lifecycle transition."
+  },
+  "first_missing_completion_proof": {
+    "name": "merchant_proof_package_bound_to_active_fulfillment_item",
+    "reason": "A composed proof package can be generated from the proof-run artifacts, but StaffordOS still lacks an integrated completion proof that binds the package back to the active fulfillment item as governed completion evidence."
+  },
+  "operator_actions_status": [
+    {
+      "action": "Payment Received",
+      "status": "partially_proven",
+      "gap": "Verified payment truth and bridge exist, but the operator workflow is not yet surfaced as a first-class fulfillment action."
+    },
+    {
+      "action": "Capture Before Evidence",
+      "status": "manual",
+      "gap": "Writer/design exist, but action is not yet integrated into the workbench."
+    },
+    {
+      "action": "Record Scoped Fix",
+      "status": "manual",
+      "gap": "Writer/design exist, but action is not yet integrated into the workbench."
+    },
+    {
+      "action": "Capture After Evidence",
+      "status": "manual",
+      "gap": "Writer/design exist, but action is not yet integrated into the workbench."
+    },
+    {
+      "action": "Assemble Proof Package",
+      "status": "manual",
+      "gap": "Generator/design exist, but action is not yet integrated into the workbench."
+    },
+    {
+      "action": "Mark Completion",
+      "status": "manual",
+      "gap": "No governed completion writeback exists from the proof package into fulfillment truth."
+    }
+  ],
+  "lifecycle_transitions": [
+    {
+      "transition": "offer_sent -> payment_received",
+      "status": "supported",
+      "manual": false,
+      "note": "Payment-to-fulfillment bridge exists."
+    },
+    {
+      "transition": "payment_received -> before_evidence_captured",
+      "status": "manual",
+      "manual": true,
+      "note": "Requires operator-driven fulfillment workbench action."
+    },
+    {
+      "transition": "before_evidence_captured -> scoped_fix_recorded",
+      "status": "manual",
+      "manual": true,
+      "note": "Requires operator-driven fix scope recording."
+    },
+    {
+      "transition": "scoped_fix_recorded -> after_evidence_captured",
+      "status": "manual",
+      "manual": true,
+      "note": "Requires operator-driven after-evidence capture."
+    },
+    {
+      "transition": "after_evidence_captured -> proof_package_generated",
+      "status": "manual",
+      "manual": true,
+      "note": "Requires proof-package composition from three evidence artifacts."
+    },
+    {
+      "transition": "proof_package_generated -> fulfillment_completed",
+      "status": "missing_governed_writeback",
+      "manual": true,
+      "note": "No governed completion proof currently writes back into fulfillment truth."
+    }
+  ],
+  "completion_proof_missing": [
+    "A fulfillment-truth-backed completion marker tied to the active merchant proof package",
+    "A governed completion state that records proof-package completion for the same fulfillment item",
+    "An operator-visible completion proof that links before evidence, scoped fix, after evidence, and merchant-facing summary"
+  ],
+  "highest_roi_remaining_implementation": "Bind the fulfillment workbench panel in /operator/command-center to the proof-run evidence and proof-package writers, then add a governed completion writeback for the active fulfillment item.",
+  "source_files": [
+    "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+    "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+    "staffordos/fulfillment/shopifixer_fulfillment_workspace_design_v1.json",
+    "staffordos/fulfillment/shopifixer_before_evidence_action_design_v1.json",
+    "staffordos/fulfillment/shopifixer_scoped_fix_action_design_v1.json",
+    "staffordos/fulfillment/shopifixer_after_evidence_action_design_v1.json",
+    "staffordos/fulfillment/shopifixer_proof_package_generator_design_v1.json"
+  ]
+}
