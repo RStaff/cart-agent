@@ -1,0 +1,155 @@
+{
+  "schema": "staffordos.shopifixer_after_evidence_action_design.v1",
+  "generated_at": "2026-06-10T17:30:00Z",
+  "action": "Capture After Evidence",
+  "belongs_in": "ShopiFixer fulfillment workbench",
+  "recommended_artifact_path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md",
+  "active_merchant_proof_run_path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/",
+  "operator_goal": "Capture the post-fix state and prove the effect of the scoped fix.",
+  "required_fields": [
+    "store",
+    "date",
+    "affected_page_or_artifact",
+    "after_screenshot",
+    "after_notes",
+    "remaining_limitations",
+    "observed_improvement",
+    "merchant-facing_summary"
+  ],
+  "optional_fields": [
+    "merchant_name",
+    "store_url",
+    "before_reference",
+    "fix_scope_reference",
+    "supporting_links",
+    "captured_by",
+    "proof_package_location"
+  ],
+  "relationship_to_before_evidence": {
+    "depends_on": "Before evidence must exist first and define the original problem state.",
+    "uses": [
+      "store",
+      "affected page or artifact",
+      "issue",
+      "why it matters",
+      "screenshot"
+    ]
+  },
+  "relationship_to_fix_scope": {
+    "depends_on": "The scoped fix record must already define what changed.",
+    "uses": [
+      "scoped fix",
+      "in scope",
+      "out of scope",
+      "change made",
+      "location changed"
+    ]
+  },
+  "relationship_to_proof_package_generation": {
+    "precedes": "Proof package generation",
+    "enables": [
+      "merchant-facing summary",
+      "proof package location",
+      "before and after evidence comparison"
+    ]
+  },
+  "operator_workflow_sequence": [
+    "Capture Before Evidence",
+    "Record Scoped Fix",
+    "Capture After Evidence",
+    "Assemble Proof Package",
+    "Mark Completion"
+  ],
+  "proof_requirements": [
+    "before evidence exists",
+    "scoped fix exists",
+    "after screenshot or equivalent evidence exists",
+    "after notes explain the observed improvement",
+    "remaining limitations are explicit",
+    "merchant-facing summary is written in proof-ready form"
+  ],
+  "source_truth_used": [
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md",
+    "staffordos/fulfillment/shopifixer_fulfillment_workspace_design_v1.json"
+  ],
+  "data_requirements": {
+    "merchant_identity_source": "merchant_lifecycle_registry_v1.json active record",
+    "fix_context_source": "fix_scope.md",
+    "before_context_source": "before_evidence.md"
+  },
+  "ui_future_display": [
+    "after screenshot preview",
+    "after notes",
+    "remaining limitations",
+    "merchant-facing summary",
+    "before/after comparison",
+    "capture timestamp"
+  ],
+  "safety_boundaries": {
+    "must_not_touch": [
+      "staffordos/clients/client_registry_v1.json",
+      "staffordos/revenue/revenue_truth_v1.json",
+      "payment truth",
+      "fulfillment truth",
+      "merchant_lifecycle_registry_v1.json",
+      "checkout",
+      "Stripe"
+    ],
+    "must_not_simulate": [
+      "payment",
+      "merchant reply",
+      "merchant approval",
+      "fulfillment completion"
+    ]
+  },
+  "answer": {
+    "recommended_artifact_path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md",
+    "required_fields": [
+      "store",
+      "date",
+      "affected_page_or_artifact",
+      "after_screenshot",
+      "after_notes",
+      "remaining_limitations",
+      "observed_improvement",
+      "merchant-facing_summary"
+    ],
+    "optional_fields": [
+      "merchant_name",
+      "store_url",
+      "before_reference",
+      "fix_scope_reference",
+      "supporting_links",
+      "captured_by",
+      "proof_package_location"
+    ],
+    "relationship_to_before_evidence": "Depends on before evidence and uses it as the comparison baseline.",
+    "relationship_to_fix_scope": "Depends on the fix scope record and proves the scoped change had an effect.",
+    "relationship_to_proof_package_generation": "Precedes proof package generation and feeds the merchant-facing summary.",
+    "operator_workflow_sequence": [
+      "Capture Before Evidence",
+      "Record Scoped Fix",
+      "Capture After Evidence",
+      "Assemble Proof Package",
+      "Mark Completion"
+    ],
+    "proof_requirements": [
+      "before evidence exists",
+      "scoped fix exists",
+      "after screenshot or equivalent evidence exists",
+      "after notes explain the observed improvement",
+      "remaining limitations are explicit",
+      "merchant-facing summary is written in proof-ready form"
+    ],
+    "do_not_touch": [
+      "client registry",
+      "revenue truth",
+      "payment truth",
+      "fulfillment truth",
+      "merchant lifecycle registry",
+      "checkout",
+      "Stripe"
+    ]
+  }
+}
