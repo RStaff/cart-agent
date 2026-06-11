@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 
 type ShopifixerCompletionInput = {
   store: string;
@@ -9,6 +10,33 @@ type ShopifixerCompletionInput = {
 function readJson(filePath: string) {
   return JSON.parse(fs.readFileSync(filePath, "utf8")) as {
     items?: Array<Record<string, unknown>>;
+  };
+}
+
+function rebuildMerchantLifecycleRegistry() {
+  const buildScriptPath = path.resolve(
+    process.cwd(),
+    "../../merchant_registry/build_merchant_lifecycle_registry_v1.mjs"
+  );
+
+  const result = spawnSync(process.execPath, [buildScriptPath], {
+    cwd: process.cwd(),
+    encoding: "utf8"
+  });
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  if (result.status !== 0) {
+    throw new Error(
+      `Merchant lifecycle registry rebuild failed: ${result.stderr || result.stdout || "unknown error"}`
+    );
+  }
+
+  return {
+    stdout: result.stdout || "",
+    stderr: result.stderr || ""
   };
 }
 
@@ -72,12 +100,13 @@ export function writeShopifixerCompletion(input: ShopifixerCompletionInput) {
   };
 
   fs.writeFileSync(fulfillmentTruthPath, `${JSON.stringify(updatedTruth, null, 2)}\n`, "utf8");
+  const rebuildResult = rebuildMerchantLifecycleRegistry();
 
   return {
     outputPath: fulfillmentTruthPath,
     proofPackagePath,
     completedAt,
-    stdout: "",
-    stderr: ""
+    stdout: rebuildResult.stdout,
+    stderr: rebuildResult.stderr
   };
 }

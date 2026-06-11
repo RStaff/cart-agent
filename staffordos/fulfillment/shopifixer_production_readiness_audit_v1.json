@@ -1,0 +1,45 @@
+{
+  "schema": "staffordos.shopifixer_production_readiness_audit.v1",
+  "generated_at": "2026-06-10T16:15:00Z",
+  "can_real_merchant_be_processed_end_to_end": "partially",
+  "scores": {
+    "production_readiness_score": 68,
+    "operator_readiness_score": 85
+  },
+  "operator_ready_steps": [
+    "View merchant",
+    "View lifecycle",
+    "Capture before evidence",
+    "Record scoped fix",
+    "Capture after evidence",
+    "Generate proof package"
+  ],
+  "steps_requiring_developer_intervention": [
+    "Completion governance writeback wiring and enforcement",
+    "Any change to fulfillment-truth schema if completion flags need expansion"
+  ],
+  "steps_requiring_manual_file_edits": [],
+  "steps_requiring_terminal_access": [
+    "Building and running the operator frontend in development",
+    "Any backfill or repair of fulfillment truth outside the UI"
+  ],
+  "steps_requiring_missing_action": [
+    "Complete engagement from the command center with governed fulfillment-truth writeback"
+  ],
+  "what_prevents_non_technical_employee": [
+    "Completion is still governed by a direct truth writeback path and not yet a polished operator workflow",
+    "A real paid merchant must already exist in fulfillment truth for the journey to be meaningful",
+    "There is no fully self-service payment-to-completion automation across all stages"
+  ],
+  "first_real_world_blocker": "Completion still depends on governed fulfillment-truth state change and a verified paid item; the operator cannot fully finish the journey without that final writeback path being accepted as production-ready.",
+  "highest_roi_improvement": "Turn completion into a first-class operator action that updates fulfillment truth and returns the refreshed lifecycle registry automatically.",
+  "can_support_paying_customer_today": "yes_partially",
+  "source_files": [
+    "staffordos/fulfillment/shopifixer_operator_journey_audit_v1.json",
+    "staffordos/fulfillment/shopifixer_completion_governance_audit_v1.json",
+    "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+    "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+    "staffordos/ui/operator-frontend/components/operator/OperatorHomeV1.tsx",
+    "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx"
+  ]
+}

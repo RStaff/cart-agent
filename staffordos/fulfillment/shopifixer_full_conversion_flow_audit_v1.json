@@ -1,0 +1,121 @@
+{
+  "schema": "staffordos.shopifixer_full_conversion_flow_audit.v1",
+  "generated_at": "2026-06-10T16:30:00Z",
+  "full_conversion_flow_complete": "implemented_but_not_runtime_proven",
+  "steps": [
+    {
+      "step": "public ShopiFixer offer/CTA",
+      "status": "proven",
+      "evidence": [
+        "abando-frontend/app/shopifixer/page.tsx",
+        "CTA: Get the $950 Fix Sprint",
+        "CTA: Run ShopiFixer Audit"
+      ]
+    },
+    {
+      "step": "checkout path",
+      "status": "proven",
+      "evidence": [
+        "abando-frontend/app/shopifixer/page.tsx",
+        "web/src/checkout-public.js"
+      ]
+    },
+    {
+      "step": "Stripe webhook",
+      "status": "proven",
+      "evidence": [
+        "web/src/routes/stripeWebhook.esm.js"
+      ]
+    },
+    {
+      "step": "payment truth write",
+      "status": "proven",
+      "evidence": [
+        "staffordos/clients/client_registry_v1.mjs",
+        "staffordos/revenue/revenue_agent_v1.mjs"
+      ]
+    },
+    {
+      "step": "fulfillment truth payment_received transition",
+      "status": "proven",
+      "evidence": [
+        "staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs"
+      ]
+    },
+    {
+      "step": "merchant lifecycle registry rebuild",
+      "status": "proven",
+      "evidence": [
+        "staffordos/merchant_registry/build_merchant_lifecycle_registry_v1.mjs",
+        "staffordos/ui/operator-frontend/lib/operator/writeShopifixerCompletion.ts"
+      ]
+    },
+    {
+      "step": "command-center paid state",
+      "status": "proven",
+      "evidence": [
+        "staffordos/ui/operator-frontend/lib/operator/loadShopifixerCommandCenter.ts",
+        "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json"
+      ]
+    },
+    {
+      "step": "proof workbench actions",
+      "status": "proven",
+      "evidence": [
+        "staffordos/ui/operator-frontend/components/operator/ProofRunWorkbench.tsx",
+        "staffordos/ui/operator-frontend/lib/operator/proofRunStageConfigs.ts",
+        "staffordos/ui/operator-frontend/lib/operator/writeShopifixerBeforeEvidence.ts",
+        "staffordos/ui/operator-frontend/lib/operator/writeShopifixerScopedFix.ts",
+        "staffordos/ui/operator-frontend/lib/operator/writeShopifixerAfterEvidence.ts",
+        "staffordos/ui/operator-frontend/lib/operator/writeShopifixerProofPackage.ts"
+      ]
+    },
+    {
+      "step": "completion writeback",
+      "status": "proven",
+      "evidence": [
+        "staffordos/ui/operator-frontend/lib/operator/writeShopifixerCompletion.ts",
+        "staffordos/fulfillment/shopifixer_completion_governance_audit_v1.json"
+      ]
+    },
+    {
+      "step": "lifecycle registry refresh after completion",
+      "status": "proven",
+      "evidence": [
+        "staffordos/ui/operator-frontend/lib/operator/writeShopifixerCompletion.ts",
+        "staffordos/merchant_registry/build_merchant_lifecycle_registry_v1.mjs"
+      ]
+    }
+  ],
+  "first_unproven_link": "A live merchant runtime has not yet been exercised end-to-end through Stripe checkout.session.completed into completion writeback and post-completion registry refresh.",
+  "what_is_proven": [
+    "The public CTA and pricing surface exist.",
+    "The checkout path exists and returns a Stripe Checkout session.",
+    "The Stripe webhook records verified payment and updates client and revenue truth.",
+    "The fulfillment truth builder derives payment_received from verified payment.",
+    "The merchant lifecycle registry builder can rebuild derived read models.",
+    "The command center reads the merchant lifecycle registry.",
+    "The proof-run workbench stages exist for before evidence, scoped fix, after evidence, proof package, and completion.",
+    "Completion is guarded by proof package existence, payment verification, and matching fulfillment item.",
+    "Completion triggers merchant lifecycle registry rebuild."
+  ],
+  "what_is_partially_proven": [
+    "The end-to-end path is implemented and build-verified.",
+    "The live merchant execution path has not yet been exercised with a real payment and a real completion event in production runtime.",
+    "The operator journey is UI-ready, but the live business journey still depends on actual merchant activity."
+  ],
+  "next_safest_implementation": "Keep the current completion path and add a post-completion command-center refresh or notification hook only after a live paid merchant run confirms the full runtime chain.",
+  "source_files": [
+    "abando-frontend/app/shopifixer/page.tsx",
+    "web/src/checkout-public.js",
+    "web/src/routes/stripeWebhook.esm.js",
+    "staffordos/clients/client_registry_v1.mjs",
+    "staffordos/revenue/revenue_agent_v1.mjs",
+    "staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs",
+    "staffordos/merchant_registry/build_merchant_lifecycle_registry_v1.mjs",
+    "staffordos/ui/operator-frontend/lib/operator/writeShopifixerCompletion.ts",
+    "staffordos/ui/operator-frontend/lib/operator/loadShopifixerCommandCenter.ts",
+    "staffordos/ui/operator-frontend/components/operator/ProofRunWorkbench.tsx",
+    "staffordos/ui/operator-frontend/lib/operator/proofRunStageConfigs.ts"
+  ]
+}
