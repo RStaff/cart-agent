@@ -1,0 +1,112 @@
+{
+  "schema": "staffordos.shopifixer_live_path_verification_checklist.v1",
+  "generated_at": "2026-06-11T00:00:00Z",
+  "goal": "Verify the full ShopiFixer live path from public offer/checkout through Stripe webhook, payment truth, fulfillment truth, merchant lifecycle registry refresh, command center workbench actions, proof package, completion, and final command-center completed state.",
+  "preflight_checks": [
+    "Confirm the operator frontend builds successfully locally.",
+    "Confirm the public ShopiFixer page renders the $950 Fix Sprint CTA.",
+    "Confirm the fulfillment workbench stages are present in /operator/command-center.",
+    "Confirm the proof package and completion helpers are present in the operator frontend.",
+    "Confirm the target merchant exists in client truth and fulfillment truth is available for the merchant."
+  ],
+  "required_environment_variables": [
+    "NEXT_PUBLIC_ABANDO_API_BASE or NEXT_PUBLIC_ABANDO_BACKEND_ORIGIN",
+    "STRIPE_LIVE_SECRET_KEY or STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET",
+    "CANONICAL_PAYMENT_RETURN_URL or CHECKOUT_SUCCESS_URL",
+    "CHECKOUT_CANCEL_URL",
+    "PRICE_SCALE or STRIPE_PRICE_SCALE or STRIPE_PRICE_SCALE_LIVE"
+  ],
+  "required_local_dev_servers": [
+    "abando-frontend or the service that serves /__public-checkout",
+    "web app / checkout backend that receives Stripe webhook traffic",
+    "staffordos/ui/operator-frontend"
+  ],
+  "stripe_webhook_verification": [
+    "Trigger a real checkout.session.completed event from Stripe.",
+    "Verify the webhook signature is accepted.",
+    "Verify packet payment binding is updated to payment_received.",
+    "Verify client_registry_v1.json receives the paid deal truth.",
+    "Verify revenue_truth_v1.json records the propagated payment truth."
+  ],
+  "checkout_trigger": [
+    "Open the public ShopiFixer page.",
+    "Enter the target Shopify store domain.",
+    "Click the $950 Fix Sprint CTA.",
+    "Confirm the checkout session URL is returned.",
+    "Confirm the Stripe Checkout page opens."
+  ],
+  "expected_files_changed": [
+    "staffordos/clients/client_registry_v1.json",
+    "staffordos/revenue/revenue_truth_v1.json",
+    "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+    "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+    "staffordos/merchant_registry/merchant_lifecycle_registry_v1.md"
+  ],
+  "files_that_must_not_change": [
+    "checkout route definitions",
+    "Stripe account configuration",
+    "public pricing copy",
+    "merchant registry source inputs other than the generated read model",
+    "manual business truth outside the live payment and fulfillment flow"
+  ],
+  "command_center_checks": [
+    "Verify the ShopiFixer panel shows the correct merchant.",
+    "Verify the lifecycle lane shows payment_received after verified payment.",
+    "Verify the current stage updates from offer_sent to payment_received or later.",
+    "Verify the next required action updates after payment.",
+    "Verify the proof workbench remains visible and bound to the active merchant."
+  ],
+  "workbench_action_checks": [
+    "Capture Before Evidence writes only to before_evidence.md.",
+    "Record Scoped Fix writes only to fix_scope.md.",
+    "Capture After Evidence writes only to after_evidence.md.",
+    "Generate Proof Package writes only to merchant_proof_package.md.",
+    "Mark Completion updates only the active fulfillment item in fulfillment truth and then triggers the registry rebuild."
+  ],
+  "completion_checks": [
+    "Merchant proof package exists and is non-empty.",
+    "Completion helper verifies matching fulfillment item.",
+    "Completion helper verifies payment status is payment_received or paid.",
+    "Completion helper updates only the matched fulfillment item.",
+    "Merchant lifecycle registry rebuild runs successfully after completion.",
+    "Command center reflects the completed state on reload."
+  ],
+  "rollback_recovery_notes": [
+    "If completion fails, do not edit client registry or revenue truth manually.",
+    "If a proof artifact is malformed, regenerate it from the prior stage artifact rather than patching governed truth.",
+    "If the webhook fails, rerun the Stripe event replay only after signature and packet binding are confirmed.",
+    "If the lifecycle registry is stale, rerun the merchant lifecycle builder from fulfillment truth."
+  ],
+  "final_pass_fail_criteria": {
+    "pass": [
+      "Public offer and checkout work end to end.",
+      "Stripe webhook records payment and updates truth.",
+      "Fulfillment truth reaches payment_received.",
+      "Merchant lifecycle registry refreshes successfully.",
+      "Command center shows the paid and active fulfillment state.",
+      "All proof workbench stages complete successfully.",
+      "Completion writes back governed fulfillment truth and refreshes the registry.",
+      "Command center shows the completed state after refresh."
+    ],
+    "fail": [
+      "Any step requires manual file editing.",
+      "Any step requires direct mutation of client registry or revenue truth outside the live flow.",
+      "Completion cannot update fulfillment truth and refresh the registry.",
+      "Command center does not reflect the completed state after completion."
+    ]
+  },
+  "source_files": [
+    "abando-frontend/app/shopifixer/page.tsx",
+    "web/src/checkout-public.js",
+    "web/src/routes/stripeWebhook.esm.js",
+    "staffordos/clients/client_registry_v1.mjs",
+    "staffordos/revenue/revenue_agent_v1.mjs",
+    "staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs",
+    "staffordos/merchant_registry/build_merchant_lifecycle_registry_v1.mjs",
+    "staffordos/ui/operator-frontend/components/operator/ProofRunWorkbench.tsx",
+    "staffordos/ui/operator-frontend/lib/operator/writeShopifixerCompletion.ts",
+    "staffordos/ui/operator-frontend/lib/operator/proofRunStageConfigs.ts",
+    "staffordos/ui/operator-frontend/lib/operator/loadShopifixerCommandCenter.ts"
+  ]
+}
