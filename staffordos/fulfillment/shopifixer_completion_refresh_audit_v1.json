@@ -1,0 +1,32 @@
+{
+  "schema": "staffordos.shopifixer_completion_refresh_audit.v1",
+  "generated_at": "2026-06-10T16:20:00Z",
+  "after_completion_stale_artifacts": [
+    "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+    "staffordos/merchant_registry/merchant_lifecycle_registry_v1.md",
+    "staffordos/ui/operator-frontend/lib/operator/loadShopifixerCommandCenter.ts runtime output",
+    "staffordos/ui/operator-frontend/components/operator/OperatorHomeV1.tsx ShopiFixer panel",
+    "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx ShopiFixer workbench readout"
+  ],
+  "registries_requiring_regeneration": [
+    "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json"
+  ],
+  "command_center_surfaces_requiring_refresh": [
+    "staffordos/ui/operator-frontend/lib/operator/loadShopifixerCommandCenter.ts",
+    "staffordos/ui/operator-frontend/components/operator/OperatorHomeV1.tsx",
+    "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx"
+  ],
+  "smallest_automatic_refresh_chain": [
+    "write completion to staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+    "regenerate staffordos/merchant_registry/merchant_lifecycle_registry_v1.json from fulfillment truth",
+    "reload /operator/command-center so loadShopifixerCommandCenter.ts reads the refreshed registry"
+  ],
+  "completion_can_trigger_registry_rebuild_safely": true,
+  "source_of_truth_trigger_file": "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+  "implementation_complexity": "small_to_medium",
+  "readiness_score_after_refresh_automation": 94,
+  "notes": [
+    "The completion writeback itself should stay limited to fulfillment truth.",
+    "The merchant lifecycle registry and command-center panel are derived read models and should refresh from that truth change rather than being edited directly."
+  ]
+}
