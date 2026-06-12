@@ -1,11 +1,14 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { OperatorNav } from "../../components/operator/OperatorNav";
+import { deriveCustomerOutcome } from "../../lib/operator/loadShopifixerCommandCenter";
 
 const PATHS = {
   primaryAction: "staffordos/snapshots/primary_action_snapshot_v1.json",
   revenueTruth: "staffordos/revenue/revenue_truth_v1.json",
   dashboardSnapshot: "staffordos/clients/operator_dashboard_snapshot_v1.json",
+  clientRegistry: "staffordos/clients/client_registry_v1.json",
+  merchantLifecycle: "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
   unitWorkSnapshot: "staffordos/snapshots/unit_work_snapshot_v1.json",
   fulfillmentTruth: "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
   ceoTruth: "staffordos/cockpit/ceo_truth_snapshot_v1.json",
@@ -51,6 +54,11 @@ function list(values: unknown[], fallback = "None") {
     .map((value) => String(value ?? "").trim())
     .filter(Boolean);
   return items.length ? items : [fallback];
+}
+
+function toStringValue(value: unknown, fallback = "") {
+  const normalized = String(value ?? "").trim();
+  return normalized || fallback;
 }
 
 function translateBottleneck(value: unknown) {
@@ -124,6 +132,8 @@ function loadExecutiveHome() {
   const primaryAction = readJson<any>(repoRoot, PATHS.primaryAction, {});
   const revenueTruth = readJson<any>(repoRoot, PATHS.revenueTruth, {});
   const dashboardSnapshot = readJson<any>(repoRoot, PATHS.dashboardSnapshot, {});
+  const clientRegistry = readJson<any>(repoRoot, PATHS.clientRegistry, {});
+  const merchantLifecycle = readJson<any>(repoRoot, PATHS.merchantLifecycle, {});
   const unitWorkSnapshot = readJson<any>(repoRoot, PATHS.unitWorkSnapshot, {});
   const fulfillmentTruth = readJson<any>(repoRoot, PATHS.fulfillmentTruth, {});
   const ceoTruth = readJson<any>(repoRoot, PATHS.ceoTruth, {});
@@ -143,6 +153,51 @@ function loadExecutiveHome() {
     : [];
   const priorityClient = Array.isArray(dashboardSnapshot.priority_clients) ? dashboardSnapshot.priority_clients[0] : null;
   const revenueGap = Array.isArray(dashboardSnapshot.revenue_gaps) ? dashboardSnapshot.revenue_gaps[0] : null;
+  const activeMerchantRecord = Array.isArray(merchantLifecycle.records)
+    ? merchantLifecycle.records.find((record: any) => {
+        const selected = merchantLifecycle.active_record_selection?.merchant_id;
+        return selected && toStringValue(record.merchant_id).toLowerCase() === toStringValue(selected).toLowerCase();
+      }) || merchantLifecycle.records[0] || null
+    : null;
+  const clientRecord = Array.isArray(clientRegistry.clients)
+    ? clientRegistry.clients.find((client: any) => {
+        const keys = [
+          activeMerchantRecord?.client_id,
+          activeMerchantRecord?.merchant_id,
+          activeMerchantRecord?.merchant_shop,
+          activeMerchantRecord?.store_domain,
+          priorityClient?.client_id,
+          priorityClient?.merchant_shop
+        ]
+          .map((value) => toStringValue(value).toLowerCase())
+          .filter(Boolean);
+        return keys.includes(toStringValue(client.client_id).toLowerCase()) || keys.includes(toStringValue(client.merchant_shop).toLowerCase());
+      }) || clientRegistry.clients[0] || null
+    : null;
+  const fulfillmentItem = Array.isArray(fulfillmentTruth.items)
+    ? fulfillmentTruth.items.find((item: any) => {
+        const keys = [
+          activeMerchantRecord?.client_id,
+          activeMerchantRecord?.merchant_id,
+          activeMerchantRecord?.merchant_shop,
+          activeMerchantRecord?.store_domain,
+          priorityClient?.client_id,
+          priorityClient?.merchant_shop
+        ]
+          .map((value) => toStringValue(value).toLowerCase())
+          .filter(Boolean);
+        return keys.includes(toStringValue(item.client_id).toLowerCase()) || keys.includes(toStringValue(item.store_domain).toLowerCase());
+      }) || fulfillmentTruth.items[0] || null
+    : null;
+  const outcomeRow = deriveCustomerOutcome({
+    customer:
+      toStringValue(priorityClient?.merchant_shop) ||
+      toStringValue(activeMerchantRecord?.merchant_shop) ||
+      "No completed customer yet",
+    lifecycle: activeMerchantRecord,
+    client: clientRecord,
+    fulfillment: fulfillmentItem,
+  });
   const blockers = [
     ...(Array.isArray(ceoTruth?.system_health?.blockers) ? ceoTruth.system_health.blockers : []),
     ...(Array.isArray(primary.risk) ? primary.risk : []),
@@ -161,6 +216,7 @@ function loadExecutiveHome() {
     waitingFulfillment,
     priorityClient,
     revenueGap,
+    outcomeRow,
     blockers,
   };
 }
@@ -194,6 +250,7 @@ export default function OperatorPage() {
         ? "Current"
         : "Partially current"
       : "Unavailable";
+  const outcomeVisible = data.outcomeRow.outcome_state !== "Awaiting Outcome Review" || Boolean(data.outcomeRow.completed);
 
   return (
     <main className="shell">
@@ -311,11 +368,11 @@ export default function OperatorPage() {
             </div>
           </section>
 
-          <section className="panel">
-            <div className="panelInner">
-              <p className="eyebrow">What can be ignored?</p>
-              <h2 className="sectionTitle" style={{ marginBottom: 10 }}>
-                Low-priority or non-revenue work
+        <section className="panel">
+          <div className="panelInner">
+            <p className="eyebrow">What can be ignored?</p>
+            <h2 className="sectionTitle" style={{ marginBottom: 10 }}>
+              Low-priority or non-revenue work
               </h2>
               <div className="kv">
                 <div><strong>Internal system work:</strong> {data.internalWork.length > 0 ? "Present" : "None"}</div>
@@ -326,6 +383,25 @@ export default function OperatorPage() {
             </div>
           </section>
         </div>
+
+        <section className="panel">
+          <div className="panelInner">
+            <p className="eyebrow">Outcome</p>
+            <h2 className="sectionTitle" style={{ marginBottom: 10 }}>What happened after completion?</h2>
+            <div className="kv">
+              <div><strong>Customer:</strong> {data.outcomeRow.customer}</div>
+              <div><strong>Outcome state:</strong> {data.outcomeRow.outcome_state}</div>
+              <div><strong>Why:</strong> {data.outcomeRow.why}</div>
+              <div><strong>Suggested next action:</strong> {data.outcomeRow.suggested_next_action}</div>
+              <div><strong>Revenue impact:</strong> {data.outcomeRow.revenue_impact}</div>
+            </div>
+            {!outcomeVisible ? (
+              <p className="hint" style={{ marginTop: 12 }}>
+                This customer has not completed fulfillment yet, so the post-completion outcome is still awaiting review.
+              </p>
+            ) : null}
+          </div>
+        </section>
 
         <section className="panel">
           <div className="panelInner">

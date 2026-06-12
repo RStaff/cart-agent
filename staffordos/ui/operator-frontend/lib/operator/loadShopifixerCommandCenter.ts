@@ -14,6 +14,10 @@ type MerchantLifecycleRecord = {
   payment_status?: string;
   fulfillment_status?: string;
   proof_package_status?: string;
+  case_study_status?: string;
+  review_status?: string;
+  referral_status?: string;
+  revenue_status?: string;
   audit?: {
     score?: number;
     top_issue?: string;
@@ -61,6 +65,26 @@ type MerchantLifecycleRegistry = {
   };
   records?: MerchantLifecycleRecord[];
   source_files?: string[];
+};
+
+type ClientRegistry = {
+  clients?: Array<Record<string, any>>;
+};
+
+type FulfillmentTruth = {
+  items?: Array<Record<string, any>>;
+  summary_counts?: Record<string, number>;
+};
+
+export type CustomerOutcomeRow = {
+  customer: string;
+  outcome_state: string;
+  why: string;
+  suggested_next_action: string;
+  revenue_impact: string;
+  visible_on_fulfillment: boolean;
+  completed: boolean;
+  completed_at: string | null;
 };
 
 function fallbackCommandCenter() {
@@ -214,8 +238,195 @@ function buildCommandCenterFromRecord(registry: MerchantLifecycleRegistry, recor
   };
 }
 
+function readJsonFile<T>(filePath: string, fallback: T): T {
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf8")) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+function selectClientRecord(registry: ClientRegistry, record: MerchantLifecycleRecord) {
+  const clients = Array.isArray(registry.clients) ? registry.clients : [];
+  const merchantKeys = [record.client_id, record.merchant_id, record.merchant_shop, record.store_domain]
+    .map(normalizeKey)
+    .filter(Boolean);
+
+  return (
+    clients.find((client) => merchantKeys.includes(normalizeKey(client.client_id))) ||
+    clients.find((client) => merchantKeys.includes(normalizeKey(client.merchant_shop))) ||
+    clients[0] ||
+    null
+  );
+}
+
+function selectFulfillmentItem(truth: FulfillmentTruth, record: MerchantLifecycleRecord) {
+  const items = Array.isArray(truth.items) ? truth.items : [];
+  const merchantKeys = [record.client_id, record.merchant_id, record.merchant_shop, record.store_domain]
+    .map(normalizeKey)
+    .filter(Boolean);
+
+  return (
+    items.find((item) => merchantKeys.includes(normalizeKey(item.client_id))) ||
+    items.find((item) => merchantKeys.includes(normalizeKey(item.store_domain))) ||
+    items[0] ||
+    null
+  );
+}
+
+function toBoolean(value: unknown) {
+  if (typeof value === "boolean") return value;
+  const normalized = String(value ?? "").trim().toLowerCase();
+  return ["true", "1", "yes", "yes."].includes(normalized);
+}
+
+function toNumber(value: unknown) {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : 0;
+}
+
+function hasSignal(value: unknown) {
+  const normalized = String(value ?? "").trim().toLowerCase();
+  if (!normalized) return false;
+  return !["not_started", "unknown", "unavailable", "none", "false", "0", "null"].includes(normalized);
+}
+
+function daysSince(isoDate?: string | null) {
+  const value = String(isoDate ?? "").trim();
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return Math.max(0, Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24)));
+}
+
+export function deriveCustomerOutcome(input: {
+  customer: string;
+  lifecycle?: MerchantLifecycleRecord | null;
+  client?: Record<string, any> | null;
+  fulfillment?: Record<string, any> | null;
+}): CustomerOutcomeRow {
+  const lifecycle = input.lifecycle || {};
+  const client = input.client || {};
+  const fulfillment = input.fulfillment || {};
+
+  const completed = Boolean(
+    toBoolean(fulfillment.completion_complete) ||
+    toBoolean(lifecycle.lifecycle_lane?.completed) ||
+    toBoolean(lifecycle.lifecycle?.completed)
+  );
+  const proofComplete = Boolean(
+    toBoolean(fulfillment.proof_complete) ||
+    toBoolean(lifecycle.lifecycle_lane?.proof_complete) ||
+    toBoolean(lifecycle.lifecycle?.proof_complete)
+  );
+  const completionDate = String(fulfillment.completed_at || "").trim() || null;
+  const riskNotes = [
+    String(fulfillment.risk_or_limitation || "").trim(),
+    String(fulfillment.remaining_limitations || "").trim(),
+    String(client?.blocker_detection?.highest_severity || "").trim(),
+    String(client?.blocker_detection?.blockers?.[0] || "").trim()
+  ].filter(Boolean);
+  const referralSignals = [
+    fulfillment.referral_requested,
+    fulfillment.referral_received,
+    fulfillment.review_requested,
+    fulfillment.review_received,
+    lifecycle.referral_status,
+    fulfillment.case_study_authorized,
+    lifecycle.case_study_status
+  ].some(hasSignal);
+  const expansionSignals = [
+    client?.close_engine?.followup_ready,
+    client?.business?.stafford_revenue_earned,
+    client?.business?.stafford_recurring_revenue,
+    client?.abando?.merchant_revenue_recovered,
+    client?.business?.next_action,
+    lifecycle.revenue_status
+  ].some((value) => toBoolean(value) || toNumber(value) > 0 || hasSignal(value));
+  const completedAge = daysSince(completionDate);
+  const dormant = Boolean(completed && completedAge !== null && completedAge >= 14 && !referralSignals && !expansionSignals);
+
+  if (!completed) {
+    return {
+      customer: input.customer,
+      outcome_state: "Awaiting Outcome Review",
+      why: "Fulfillment is not complete yet.",
+      suggested_next_action: "Complete fulfillment before deciding the customer outcome.",
+      revenue_impact: "Low",
+      visible_on_fulfillment: false,
+      completed: false,
+      completed_at: null,
+    };
+  }
+
+  if (!proofComplete || riskNotes.length > 0) {
+    return {
+      customer: input.customer,
+      outcome_state: "At Risk",
+      why: riskNotes.length > 0 ? `Open risk or limitation: ${riskNotes[0]}` : "Completion is not backed by proof yet.",
+      suggested_next_action: "Repair trust or finish proof before moving on.",
+      revenue_impact: "High",
+      visible_on_fulfillment: true,
+      completed: true,
+      completed_at: completionDate,
+    };
+  }
+
+  if (referralSignals) {
+    return {
+      customer: input.customer,
+      outcome_state: "Referral Candidate",
+      why: "The customer is complete and has referral or review signals.",
+      suggested_next_action: "Ask for a referral, testimonial, or case-study permission.",
+      revenue_impact: "High",
+      visible_on_fulfillment: true,
+      completed: true,
+      completed_at: completionDate,
+    };
+  }
+
+  if (expansionSignals) {
+    return {
+      customer: input.customer,
+      outcome_state: "Expansion Candidate",
+      why: "The customer is complete and shows follow-on revenue potential.",
+      suggested_next_action: "Offer the next relevant product or follow-up plan.",
+      revenue_impact: "High",
+      visible_on_fulfillment: true,
+      completed: true,
+      completed_at: completionDate,
+    };
+  }
+
+  if (dormant) {
+    return {
+      customer: input.customer,
+      outcome_state: "Dormant",
+      why: "The customer is complete, quiet, and has no immediate follow-on motion.",
+      suggested_next_action: "Archive for now and revisit later only if a new signal appears.",
+      revenue_impact: "Low",
+      visible_on_fulfillment: true,
+      completed: true,
+      completed_at: completionDate,
+    };
+  }
+
+  return {
+    customer: input.customer,
+    outcome_state: "Satisfied",
+    why: "Fulfillment is complete and there are no risk, referral, or expansion signals yet.",
+    suggested_next_action: "Keep the customer warm and look for a future referral or expansion signal.",
+    revenue_impact: "Medium",
+    visible_on_fulfillment: true,
+    completed: true,
+    completed_at: completionDate,
+  };
+}
+
 export function loadShopifixerCommandCenter() {
   const filePath = path.join(process.cwd(), "../../../merchant_registry/merchant_lifecycle_registry_v1.json");
+  const clientRegistryPath = path.join(process.cwd(), "../../../clients/client_registry_v1.json");
+  const fulfillmentTruthPath = path.join(process.cwd(), "../../../fulfillment/shopifixer_fulfillment_truth_v1.json");
 
   try {
     const registry = JSON.parse(fs.readFileSync(filePath, "utf8")) as MerchantLifecycleRegistry;
@@ -225,7 +436,21 @@ export function loadShopifixerCommandCenter() {
       return fallbackCommandCenter();
     }
 
-    return buildCommandCenterFromRecord(registry, activeRecord);
+    const clientRegistry = readJsonFile<ClientRegistry>(clientRegistryPath, {});
+    const fulfillmentTruth = readJsonFile<FulfillmentTruth>(fulfillmentTruthPath, {});
+    const clientRecord = selectClientRecord(clientRegistry, activeRecord);
+    const fulfillmentItem = selectFulfillmentItem(fulfillmentTruth, activeRecord);
+    const customerOutcome = deriveCustomerOutcome({
+      customer: activeRecord.merchant_shop || activeRecord.store_domain || activeRecord.client_id || activeRecord.merchant_id || "unavailable",
+      lifecycle: activeRecord,
+      client: clientRecord,
+      fulfillment: fulfillmentItem,
+    });
+
+    return {
+      ...buildCommandCenterFromRecord(registry, activeRecord),
+      customer_outcomes: [customerOutcome],
+    };
   } catch {
     return fallbackCommandCenter();
   }

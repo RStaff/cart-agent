@@ -94,6 +94,16 @@ type ShopifixerCommandCenter = {
     next_required_action?: string;
     readiness_score?: number;
   };
+  customer_outcomes?: Array<{
+    customer?: string;
+    outcome_state?: string;
+    why?: string;
+    suggested_next_action?: string;
+    revenue_impact?: string;
+    visible_on_fulfillment?: boolean;
+    completed?: boolean;
+    completed_at?: string | null;
+  }>;
 };
 
 type BeforeEvidenceAction = (formData: FormData) => Promise<void>;
@@ -177,13 +187,15 @@ export function OperatorHomeV1({
   const shopifixerFulfillment = shopifixer.fulfillment || {};
   const shopifixerLifecycleLane = shopifixer.lifecycle_lane || {};
   const shopifixerOverall = shopifixer.overall || {};
+  const customerOutcomes = Array.isArray(shopifixer.customer_outcomes) ? shopifixer.customer_outcomes : [];
+  const visibleCustomerOutcomes = customerOutcomes.filter((outcome) => outcome.visible_on_fulfillment);
   const lifecycleLaneStages = [
-    { key: "audit_complete", label: "Audit Complete" },
-    { key: "conversion_brief_generated", label: "Conversion Brief Generated" },
-    { key: "offer_sent", label: "Offer Sent" },
-    { key: "payment_received", label: "Payment Received" },
-    { key: "fulfillment_started", label: "Fulfillment Started" },
-    { key: "proof_complete", label: "Proof Package Complete" },
+    { key: "audit_complete", label: "Work ready" },
+    { key: "conversion_brief_generated", label: "Scope written" },
+    { key: "offer_sent", label: "Offer sent" },
+    { key: "payment_received", label: "Payment received" },
+    { key: "fulfillment_started", label: "Work started" },
+    { key: "proof_complete", label: "Proof ready" },
     { key: "completed", label: "Completed" }
   ] as const;
   const activeLifecycleStage = String(shopifixerOverall.current_stage || "").toLowerCase();
@@ -202,13 +214,13 @@ export function OperatorHomeV1({
       <div className="container operatorHomeContainer">
         <section className="panel operatorHomeHero">
           <div className="panelInner">
-            <p className="eyebrow">StaffordOS Operator Home v1</p>
+            <p className="eyebrow">StaffordOS Fulfillment</p>
 
             <div className="operatorHomeTitleRow">
               <div>
-                <h1 className="title">What should Ross do next?</h1>
+                <h1 className="title">What paid work needs attention?</h1>
                 <p className="subtitle">
-                  One canonical action, one next move, three proof checks. Everything else is supporting context.
+                  One paid work item, the proof that is still missing, and the next fulfillment step.
                 </p>
               </div>
             </div>
@@ -216,9 +228,9 @@ export function OperatorHomeV1({
             <OperatorNav activeHref="/operator/command-center" />
 
             <div className="operatorHomeProofRow">
-              {proofStatus("Preflight", preflightReport.status, ["go"])}
-              {proofStatus("QA Gate", qaReport.verdict, ["pass"])}
-              {proofStatus("Confidence", percent(action.confidence), ["90%", "91%", "92%", "93%", "94%", "95%", "96%", "97%", "98%", "99%", "100%"])}
+              {proofStatus("Work check", preflightReport.status, ["go"])}
+              {proofStatus("Proof gate", qaReport.verdict, ["pass"])}
+              {proofStatus("Readiness", percent(action.confidence), ["90%", "91%", "92%", "93%", "94%", "95%", "96%", "97%", "98%", "99%", "100%"])}
             </div>
 
             <article className="operatorHomeActionCard">
@@ -238,10 +250,10 @@ export function OperatorHomeV1({
 
               <div className="operatorHomeActionFooter">
                 <div>
-                  <small>Owner</small>
-                  <strong>{action.owner || "unknown"}</strong>
-                </div>
-                <div>
+                <small>Owner</small>
+                <strong>{action.owner || "unknown"}</strong>
+              </div>
+              <div>
                   <small>Priority</small>
                   <strong>{action.priority_score ?? "—"}</strong>
                 </div>
@@ -254,14 +266,14 @@ export function OperatorHomeV1({
               <div className="operatorHomeCTAGroup">
                 <ExecutePrimaryActionButton />
                 <Link className="button" href="/operator/revenue-command">
-                  View revenue context
+                  View payment context
                 </Link>
               </div>
 
               <div className="hint">
                 
       <div className="operatorMicroProof">
-        <span className="badge success">Revenue path</span>
+        <span className="badge success">Paid work path</span>
         <span className="badge success">Not blocked</span>
         <span className="badge warn">Human judgment</span>
       </div>
@@ -274,7 +286,7 @@ Expected outcome: {action.expected_outcome || "Outcome not yet defined."}
 
         <section className="grid gridTwo">
           <details className="panel operatorHomeDetails">
-            <summary>Why this action? (hidden)</summary>
+            <summary>Why this fulfillment step? (hidden)</summary>
             <div className="panelInner">
               {evidence.length ? (
                 <ul>
@@ -289,7 +301,7 @@ Expected outcome: {action.expected_outcome || "Outcome not yet defined."}
           </details>
 
           <details className="panel operatorHomeDetails">
-              <summary>Guardrails / risks (hidden)</summary>
+              <summary>Completion blockers (hidden)</summary>
             <div className="panelInner">
               {risk.length ? (
                 <ul>
@@ -306,8 +318,8 @@ Expected outcome: {action.expected_outcome || "Outcome not yet defined."}
 
         <section className="panel operatorHomeDetails" style={{ marginTop: 18 }}>
           <div className="panelInner">
-            <p className="eyebrow">ShopiFixer Command Center</p>
-            <h2 className="sectionTitle" style={{ marginTop: 0 }}>Lifecycle status for the active merchant</h2>
+            <p className="eyebrow">Fulfillment</p>
+            <h2 className="sectionTitle" style={{ marginTop: 0 }}>Status for the active customer</h2>
             <div className="operatorHomeSummaryPills" style={{ marginBottom: 16 }}>
               <span>Merchant: {shopifixerMerchant.store || "unavailable"}</span>
               <span>Client ID: {shopifixerMerchant.client_id || "unavailable"}</span>
@@ -319,11 +331,11 @@ Expected outcome: {action.expected_outcome || "Outcome not yet defined."}
             <div className="operatorHomeActionCard" style={{ marginTop: 0 }}>
               <div className="operatorHomeActionFooter">
                 <div>
-                  <small>Top issue</small>
+                  <small>What is blocked</small>
                   <strong>{shopifixerAudit.top_issue || "unavailable"}</strong>
                 </div>
                 <div>
-                  <small>Send allowed</small>
+                  <small>Can proceed</small>
                   <strong>{String(Boolean(shopifixerOffer.send_allowed))}</strong>
                 </div>
                 <div>
@@ -332,16 +344,16 @@ Expected outcome: {action.expected_outcome || "Outcome not yet defined."}
                 </div>
               </div>
               <div className="operatorHomeNextStep" style={{ marginTop: 16 }}>
-                <span>Next required action</span>
+                <span>Next fulfillment action</span>
                 <strong>{shopifixerOverall.next_required_action || "unavailable"}</strong>
               </div>
               <div className="operatorHomeActionFooter" style={{ marginTop: 16 }}>
                 <div>
-                  <small>Current stage</small>
+                  <small>Fulfillment stage</small>
                   <strong>{shopifixerOverall.current_stage || "unavailable"}</strong>
                 </div>
                 <div>
-                  <small>Execution</small>
+                  <small>Work status</small>
                   <strong>{shopifixerFulfillment.execution_status || "unavailable"}</strong>
                 </div>
                 <div>
@@ -361,7 +373,7 @@ Expected outcome: {action.expected_outcome || "Outcome not yet defined."}
                   <strong>{shopifixerMerchant.store || "unavailable"}</strong>
                 </div>
                 <div>
-                  <small>Current stage</small>
+                  <small>Fulfillment stage</small>
                   <strong>{shopifixerOverall.current_stage || "unavailable"}</strong>
                 </div>
                 <div>
@@ -377,7 +389,7 @@ Expected outcome: {action.expected_outcome || "Outcome not yet defined."}
                   <strong>{shopifixerFulfillment.fulfillment_status || "unavailable"}</strong>
                 </div>
                 <div>
-                  <small>Execution status</small>
+                  <small>Work status</small>
                   <strong>{shopifixerFulfillment.execution_status || "unavailable"}</strong>
                 </div>
                 <div>
@@ -385,13 +397,13 @@ Expected outcome: {action.expected_outcome || "Outcome not yet defined."}
                   <strong>{shopifixerFulfillment.proof_status || "unavailable"}</strong>
                 </div>
                 <div>
-                  <small>Next required action</small>
+                  <small>Next fulfillment action</small>
                   <strong>{shopifixerOverall.next_required_action || "unavailable"}</strong>
                 </div>
               </div>
 
               <div style={{ marginTop: 16 }}>
-                <small className="eyebrow">Lifecycle Lane</small>
+                <small className="eyebrow">Work path</small>
                 <div
                   style={{
                     display: "grid",
@@ -463,12 +475,34 @@ Expected outcome: {action.expected_outcome || "Outcome not yet defined."}
                 saved={completionSaved}
                 onSubmit={completionAction}
               />
+
+              {visibleCustomerOutcomes.length > 0 ? (
+                <div className="operatorHomeActionCard" style={{ marginTop: 16 }}>
+                    <p className="eyebrow">Outcome</p>
+                    <h3 className="sectionTitle" style={{ marginTop: 0, marginBottom: 10 }}>
+                      What happened after completion?
+                    </h3>
+                    <div className="operatorHomeSupportGrid">
+                      {visibleCustomerOutcomes.map((outcome) => (
+                        <article key={`${outcome.customer || "customer"}-${outcome.outcome_state || "outcome"}`} className="operatorHomeSupportCard">
+                          <div>
+                            <strong>{outcome.customer || "unavailable"}</strong>
+                            <p>{outcome.outcome_state || "Awaiting Outcome Review"}</p>
+                          </div>
+                          <p>{outcome.why || "No outcome reason recorded."}</p>
+                          <p>{outcome.suggested_next_action || "No next action recorded."}</p>
+                          <p className="hint">Revenue impact: {outcome.revenue_impact || "unknown"}</p>
+                        </article>
+                      ))}
+                    </div>
+                </div>
+              ) : null}
             </div>
           </div>
         </section>
 
         <details className="panel operatorHomeDetails">
-          <summary>Supporting system context (hidden)</summary>
+          <summary>Additional fulfillment context (hidden)</summary>
           <div className="panelInner">
             <div className="operatorHomeSummaryPills">
               <span>Domains: {summary.domains ?? 0}</span>
@@ -495,7 +529,7 @@ Expected outcome: {action.expected_outcome || "Outcome not yet defined."}
         </details>
 
         <p className="hint operatorHomeGenerated">
-          Primary action snapshot generated: {primaryActionSnapshot.generated_at || "unknown"}
+          Work snapshot refreshed: {primaryActionSnapshot.generated_at || "unknown"}
         </p>
       </div>
     </main>
