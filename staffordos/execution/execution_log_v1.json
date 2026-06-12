@@ -1,0 +1,31 @@
+{
+  "schema": "staffordos.execution_log.v1",
+  "purpose": "Append-only execution log for operator actions, customer outcome impact, and revenue impact.",
+  "generated_at": "2026-06-12T00:00:00.000Z",
+  "events": [
+    {
+      "execution_id": "execution_1780948231614",
+      "timestamp": "2026-06-08T19:50:31.612Z",
+      "operator": "ross",
+      "action_type": "follow_up_action_selected",
+      "customer": "cart-agent-dev.myshopify.com",
+      "product": "ShopiFixer",
+      "stage": "offer_sent",
+      "outcome": "payment_pending",
+      "revenue_impact": "$950 pending",
+      "notes": "Current evidence supports a payment follow-up being selected, not a confirmed sent follow-up. No send success record, message ID, or explicit sent confirmation is available."
+    },
+    {
+      "execution_id": "execution_1777922106443",
+      "timestamp": "2026-05-04T12:26:57.688Z",
+      "operator": "ross",
+      "action_type": "offer_sent",
+      "customer": "cart-agent-dev.myshopify.com",
+      "product": "ShopiFixer",
+      "stage": "proposal_sent",
+      "outcome": "offer_outstanding",
+      "revenue_impact": "$950 offer open",
+      "notes": "Real ShopiFixer offer sent successfully via /api/shopifixer/send-offer."
+    }
+  ]
+}

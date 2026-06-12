@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { OperatorNav } from "../../components/operator/OperatorNav";
 import { deriveCustomerOutcome } from "../../lib/operator/loadShopifixerCommandCenter";
+import { loadExecutionLog } from "../../lib/operator/loadExecutionLog";
 
 const PATHS = {
   primaryAction: "staffordos/snapshots/primary_action_snapshot_v1.json",
@@ -198,6 +199,7 @@ function loadExecutiveHome() {
     client: clientRecord,
     fulfillment: fulfillmentItem,
   });
+  const executionLog = loadExecutionLog();
   const blockers = [
     ...(Array.isArray(ceoTruth?.system_health?.blockers) ? ceoTruth.system_health.blockers : []),
     ...(Array.isArray(primary.risk) ? primary.risk : []),
@@ -210,6 +212,7 @@ function loadExecutiveHome() {
     unitWorkSnapshot,
     fulfillmentTruth,
     ceoTruth,
+    executionLog,
     deliveryWork,
     internalWork,
     paidFulfillment,
@@ -251,6 +254,9 @@ export default function OperatorPage() {
         : "Partially current"
       : "Unavailable";
   const outcomeVisible = data.outcomeRow.outcome_state !== "Awaiting Outcome Review" || Boolean(data.outcomeRow.completed);
+  const lastExecution = data.executionLog?.lastExecution as any;
+  const lastOutcomeEvent = data.executionLog?.lastOutcomeEvent as any;
+  const outcomeStateChangesToday = data.executionLog?.outcomeStateChangesToday ?? 0;
 
   return (
     <main className="shell">
@@ -400,6 +406,21 @@ export default function OperatorPage() {
                 This customer has not completed fulfillment yet, so the post-completion outcome is still awaiting review.
               </p>
             ) : null}
+          </div>
+        </section>
+
+        <section className="panel">
+          <div className="panelInner">
+            <p className="eyebrow">Execution</p>
+            <h2 className="sectionTitle" style={{ marginBottom: 10 }}>Last action, last outcome, and today</h2>
+            <div className="kv">
+              <div><strong>Last Execution:</strong> {lastExecution ? `${lastExecution.action_type} · ${lastExecution.customer}` : "No execution logged yet."}</div>
+              <div><strong>Last Outcome Event:</strong> {lastOutcomeEvent ? `${lastOutcomeEvent.previous_state} → ${lastOutcomeEvent.new_state}` : "No outcome event logged yet."}</div>
+              <div><strong>Outcome State Changes Today:</strong> {outcomeStateChangesToday}</div>
+              <div><strong>Did it create revenue?</strong> {data.executionLog?.executionSummary?.didCreateRevenue || "Unknown"}</div>
+              <div><strong>Did it improve the customer relationship?</strong> {data.executionLog?.executionSummary?.didImproveCustomerRelationship || "Unknown"}</div>
+              <div><strong>Should StaffordOS recommend doing that again?</strong> {data.executionLog?.executionSummary?.shouldRecommendAgain || "Unknown"}</div>
+            </div>
           </div>
         </section>
 

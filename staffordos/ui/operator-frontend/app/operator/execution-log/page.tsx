@@ -16,9 +16,11 @@ function getEvents(data: any) {
 
 export default function ExecutionLogPage() {
   const data = loadExecutionLog();
+  const lastExecution = data.lastExecution as any;
+  const lastOutcomeEvent = data.lastOutcomeEvent as any;
 
-  const executions = getEvents(data.operatorActions).slice(0, 10);
-  const outcomeEvents = getEvents(data.outcomeLog).slice(0, 10);
+  const executions = getEvents(data.executionEvents || data.operatorActions).slice(0, 10);
+  const outcomeEvents = getEvents(data.outcomeEvents || data.outcomeLog).slice(0, 10);
   const scores = data.outcomeScores.slice(-10).reverse();
   const agents = Array.isArray(data.agentPerformance?.agents)
     ? data.agentPerformance.agents
@@ -42,20 +44,20 @@ export default function ExecutionLogPage() {
 
             <div className="executionMetricGrid">
               <div className="executionMetric">
-                <span>Last outcome score</span>
-                <strong>{data.loopDReport?.outcome_score ?? "—"}</strong>
+                <span>Last execution</span>
+                <strong>{lastExecution?.action_type || "—"}</strong>
               </div>
               <div className="executionMetric">
-                <span>QA verdict</span>
-                <strong>{data.loopDReport?.qa_verdict ?? "—"}</strong>
+                <span>Last outcome event</span>
+                <strong>{lastOutcomeEvent?.new_state || "—"}</strong>
               </div>
               <div className="executionMetric">
-                <span>Required loop agents</span>
-                <strong>{data.agentPerformance?.summary?.active_agents_in_this_loop ?? "—"}</strong>
+                <span>Outcome state changes today</span>
+                <strong>{data.outcomeStateChangesToday ?? 0}</strong>
               </div>
               <div className="executionMetric">
-                <span>All detected agents</span>
-                <strong>{data.agentPerformance?.summary?.total_agents_detected ?? "—"}</strong>
+                <span>Revenue impact</span>
+                <strong>{data.executionSummary?.didCreateRevenue ?? "—"}</strong>
               </div>
             </div>
           </div>
@@ -68,10 +70,12 @@ export default function ExecutionLogPage() {
               {executions.length ? (
                 <div className="executionList">
                   {executions.map((event: any) => (
-                    <div key={event.event_id || event.created_at} className="executionItem">
-                      <strong>{event.action_label || "Unknown action"}</strong>
-                      <p>{event.status || "unknown"} · {event.execution_mode || "unknown"}</p>
-                      <small>{formatDate(event.created_at)}</small>
+                    <div key={event.execution_id || event.event_id || event.created_at} className="executionItem">
+                      <strong>{event.action_type || event.action_label || "Unknown action"}</strong>
+                      <p>{event.customer || "unknown customer"} · {event.product || "unknown product"}</p>
+                      <small>{formatDate(event.timestamp || event.created_at)}</small>
+                      <p>{event.outcome || event.status || "unknown"}</p>
+                      <small>{event.revenue_impact || "unknown revenue impact"}</small>
                     </div>
                   ))}
                 </div>
@@ -87,10 +91,12 @@ export default function ExecutionLogPage() {
               {outcomeEvents.length ? (
                 <div className="executionList">
                   {outcomeEvents.map((event: any) => (
-                    <div key={event.event_id || event.created_at} className="executionItem">
-                      <strong>{event.event_type || event.action_type || "Outcome event"}</strong>
-                      <p>{event.action_label || event.next_step || "No action label"}</p>
-                      <small>{formatDate(event.created_at)}</small>
+                    <div key={event.event_id || event.execution_id || event.created_at} className="executionItem">
+                      <strong>{event.new_state || event.event_type || "Outcome event"}</strong>
+                      <p>{event.customer || "unknown customer"}</p>
+                      <small>{formatDate(event.timestamp || event.created_at)}</small>
+                      <p>{event.previous_state ? `${event.previous_state} → ${event.new_state}` : event.action_label || event.next_step || "No transition recorded"}</p>
+                      <small>{event.trigger || event.event_type || "unknown trigger"} · confidence {event.confidence ?? "—"}</small>
                     </div>
                   ))}
                 </div>

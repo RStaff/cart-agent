@@ -1,0 +1,25 @@
+{
+  "schema": "staffordos.outcome_events.v1",
+  "purpose": "Append-only customer outcome transition log derived from execution, lifecycle, client, and dashboard truth.",
+  "generated_at": "2026-06-12T00:00:00.000Z",
+  "events": [
+    {
+      "event_id": "outcome_1780948231614",
+      "timestamp": "2026-06-08T19:50:31.612Z",
+      "customer": "cart-agent-dev.myshopify.com",
+      "previous_state": "offer_sent",
+      "new_state": "payment_followup_pending",
+      "trigger": "follow_up_action_selected",
+      "confidence": 0.82
+    },
+    {
+      "event_id": "outcome_1777922106443",
+      "timestamp": "2026-05-04T12:26:57.688Z",
+      "customer": "cart-agent-dev.myshopify.com",
+      "previous_state": "proposal_ready",
+      "new_state": "offer_sent",
+      "trigger": "offer_sent",
+      "confidence": 0.98
+    }
+  ]
+}
