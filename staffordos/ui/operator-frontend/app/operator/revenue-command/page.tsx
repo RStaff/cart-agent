@@ -1,162 +1,463 @@
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
+
 import { OperatorNav } from "../../../components/operator/OperatorNav";
 
-type ApiResponse = {
-  ok?: boolean;
-  source?: string;
-  registry?: any;
-  lifecycle_counts?: any;
-  product_routing?: Record<string, number>;
-  priority_leads?: any[];
-  bottleneck?: any;
+const PATHS = {
+  leadRegistry: "staffordos/leads/lead_registry_v1.json",
+  revenueTruth: "staffordos/revenue/revenue_truth_v1.json",
+  dashboardSnapshot: "staffordos/clients/operator_dashboard_snapshot_v1.json"
+} as const;
+
+type LeadRecord = {
+  id?: string;
+  lead_id?: string;
+  name?: string;
+  domain?: string | null;
+  product?: string;
+  lifecycle_stage?: string;
+  status?: {
+    current_stage?: string;
+    current_bottleneck?: string;
+    next_action?: string;
+  };
+  score?: number;
+  contact?: {
+    email?: string;
+  };
+  engagement?: {
+    sent?: boolean;
+    replied?: boolean;
+    dry_run_ready?: boolean;
+  };
+  updated_at?: string;
+  created_at?: string;
+  close_engine?: {
+    last_evaluated_at?: string;
+    hours_since_proposal?: number;
+    suggested_message?: string;
+    urgency?: string;
+  };
 };
 
-type SendProofResponse = {
-  ok?: boolean;
-  source?: string;
-  proof_count?: number;
-  dry_run_proof_count?: number;
-  live_send_attempted_count?: number;
-  latest_proofs?: any[];
+type QueueRow = {
+  item: string;
+  type: string;
+  why: string;
+  revenueImpact: string;
+  nextAction: string;
+  age: string;
+  blocker: string;
+  status: string;
 };
 
-async function loadRevenueCommand() {
-  const registryResponse = await fetch("http://localhost:3000/api/operator/lead-registry", {
-    cache: "no-store",
-  });
+function resolveRepoRoot() {
+  const cwd = process.cwd();
+  if (existsSync(path.join(cwd, PATHS.leadRegistry))) return cwd;
 
-  const proofResponse = await fetch("http://localhost:3000/api/operator/send-proof", {
-    cache: "no-store",
-  });
+  const fromFrontend = path.resolve(cwd, "../../..");
+  if (existsSync(path.join(fromFrontend, PATHS.leadRegistry))) return fromFrontend;
 
-  const data = (await registryResponse.json()) as ApiResponse;
-  const sendProof = (await proofResponse.json()) as SendProofResponse;
-
-  return { data, sendProof };
+  return fromFrontend;
 }
 
-export default async function RevenueCommandPage() {
-  const { data, sendProof } = await loadRevenueCommand();
+function readJson<T>(repoRoot: string, relativePath: string, fallback: T): T {
+  const filePath = path.join(repoRoot, relativePath);
 
-  const registry = data.registry || {};
-  const lifecycle = data.lifecycle_counts || {};
-  const routing = data.product_routing || {};
-  const priorityLeads = data.priority_leads || [];
-  const bottleneck = data.bottleneck || {
-    stage: "unknown",
-    next_action: "Run lead registry sync and inspect lifecycle state.",
+  if (!existsSync(filePath)) {
+    return fallback;
+  }
+
+  try {
+    return JSON.parse(readFileSync(filePath, "utf8")) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+function money(value: unknown) {
+  const numberValue = Number(value);
+  if (!Number.isFinite(numberValue)) return "$0";
+  return `$${numberValue.toLocaleString()}`;
+}
+
+function text(value: unknown, fallback = "—") {
+  const normalized = String(value ?? "").trim();
+  return normalized || fallback;
+}
+
+function translateBottleneck(value: unknown) {
+  const normalized = String(value ?? "").trim();
+  if (normalized === "lead_supply_or_contact_quality") {
+    return "Not enough good leads or reachable contacts";
+  }
+  return normalized || "No revenue blocker recorded";
+}
+
+function translateStatus(value: unknown) {
+  const normalized = String(value ?? "").trim().toLowerCase();
+  const map: Record<string, string> = {
+    proposal_sent: "Offer sent, waiting on payment",
+    waiting_for_payment: "Waiting on payment",
+    contact_needed: "Needs contact info",
+    dry_run_ready: "Ready to send",
+    engaged: "Engaged",
+    send_initial_outreach: "Ready to send",
+    followup_sent: "Waiting for reply",
+    replied: "Replied",
+    queued: "Queued",
+    sent: "Sent",
+    active: "Active",
+    blocked: "Blocked"
   };
+
+  return map[normalized] || (String(value ?? "").trim() || "Unknown");
+}
+
+function formatAge(value: unknown) {
+  if (!value) return "Unknown";
+  const timestamp = Date.parse(String(value));
+  if (Number.isNaN(timestamp)) return "Unknown";
+
+  const diffHours = Math.max(0, Math.floor((Date.now() - timestamp) / (1000 * 60 * 60)));
+  if (diffHours < 24) {
+    return diffHours <= 0 ? "Today" : `${diffHours} hour${diffHours === 1 ? "" : "s"}`;
+  }
+
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays < 30) {
+    return `${diffDays} day${diffDays === 1 ? "" : "s"}`;
+  }
+
+  const diffMonths = Math.floor(diffDays / 30);
+  return `${diffMonths} month${diffMonths === 1 ? "" : "s"}`;
+}
+
+function formatHours(value: unknown) {
+  const numberValue = Number(value);
+  if (!Number.isFinite(numberValue) || numberValue < 0) return "Unknown";
+  if (numberValue < 1) return "Today";
+  if (numberValue < 24) return `${Math.round(numberValue)} hour${Math.round(numberValue) === 1 ? "" : "s"}`;
+  const days = Math.floor(numberValue / 24);
+  return `${days} day${days === 1 ? "" : "s"}`;
+}
+
+function stage(lead: LeadRecord) {
+  return String(lead.lifecycle_stage || lead.status?.current_stage || "").trim().toLowerCase();
+}
+
+function leadName(lead: LeadRecord) {
+  return lead.name || lead.domain || lead.lead_id || lead.id || "Unknown lead";
+}
+
+function leadNextAction(lead: LeadRecord) {
+  const currentStage = stage(lead);
+  const fallback =
+    currentStage === "engaged"
+      ? "Qualify the reply and prepare the offer."
+      : currentStage === "followup_sent"
+        ? "Wait for the reply or track the next click."
+        : currentStage === "send_initial_outreach"
+          ? "Send the next outreach touch."
+          : currentStage === "contact_needed"
+            ? "Find or add a valid contact email."
+            : currentStage === "proposal_sent"
+              ? "Follow up and close payment."
+              : "Review the next revenue step.";
+
+  return text(lead.status?.next_action, fallback);
+}
+
+function leadBlocker(lead: LeadRecord) {
+  const currentStage = stage(lead);
+  if (currentStage === "contact_needed") return "Needs contact info";
+  if (currentStage === "engaged") return "Waiting for an offer";
+  if (currentStage === "followup_sent") return "Waiting on a reply";
+  if (currentStage === "send_initial_outreach") return "Waiting to send or gather a better contact";
+  if (currentStage === "proposal_sent") return "Waiting on payment";
+  return text(lead.status?.current_bottleneck, "No blocker recorded");
+}
+
+function oldestAge(items: LeadRecord[]) {
+  const timestamps = items
+    .map((item) => item.updated_at || item.created_at || item.close_engine?.last_evaluated_at)
+    .filter(Boolean);
+  if (!timestamps.length) return "Unknown";
+
+  let oldest = Date.now();
+  for (const value of timestamps) {
+    const time = Date.parse(String(value));
+    if (!Number.isNaN(time) && time < oldest) {
+      oldest = time;
+    }
+  }
+
+  return formatAge(new Date(oldest).toISOString());
+}
+
+function buildLeadRow(lead: LeadRecord, overrides: Partial<QueueRow> = {}): QueueRow {
+  const currentStage = stage(lead);
+  const translatedStatus = translateStatus(currentStage);
+  const status =
+    overrides.status ||
+    translatedStatus ||
+    "Unknown";
+
+  return {
+    item: leadName(lead),
+    type: overrides.type || `ShopiFixer ${status.toLowerCase()}`,
+    why:
+      overrides.why ||
+      (currentStage === "engaged"
+        ? "Ross should care because this merchant replied and is close to a real offer."
+        : currentStage === "followup_sent"
+          ? "Ross should care because the conversation is warm and needs one more touch."
+          : currentStage === "send_initial_outreach"
+            ? "Ross should care because outreach is active and can create the next sale."
+            : currentStage === "contact_needed"
+              ? "Ross should care because nothing moves until a valid contact exists."
+              : "Ross should care because this item can still move revenue forward."),
+    revenueImpact:
+      overrides.revenueImpact ||
+      (currentStage === "engaged"
+        ? "High — a qualified reply can become a paid ShopiFixer close."
+        : currentStage === "followup_sent"
+          ? "Medium — a follow-up can reopen the path to revenue."
+          : currentStage === "send_initial_outreach"
+            ? "Medium — this outreach can create new opportunities."
+            : currentStage === "contact_needed"
+              ? "Low until contact info is fixed."
+              : "Potential revenue if the next step is handled."),
+    nextAction: overrides.nextAction || leadNextAction(lead),
+    age: overrides.age || formatAge(lead.updated_at || lead.created_at || lead.close_engine?.last_evaluated_at),
+    blocker: overrides.blocker || leadBlocker(lead),
+    status
+  };
+}
+
+function sectionCountLabel(count: number) {
+  return `${count} item${count === 1 ? "" : "s"}`;
+}
+
+function QueueSection({ title, rows, note }: { title: string; rows: QueueRow[]; note: string }) {
+  return (
+    <section className="panel">
+      <div className="panelInner">
+        <div className="row" style={{ justifyContent: "space-between", alignItems: "baseline", gap: 16, flexWrap: "wrap" }}>
+          <div>
+            <p className="eyebrow">{title}</p>
+            <h2 className="sectionTitle" style={{ marginBottom: 8 }}>
+              {sectionCountLabel(rows.length)}
+            </h2>
+          </div>
+          <p className="subtitle" style={{ margin: 0, maxWidth: 720 }}>
+            {note}
+          </p>
+        </div>
+
+        <div className="tableWrap" style={{ marginTop: 16 }}>
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Type</th>
+                <th>Why Ross should care</th>
+                <th>Revenue impact</th>
+                <th>Next action</th>
+                <th>Age</th>
+                <th>Blocker</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr key={`${title}-${row.item}-${row.type}`}>
+                  <td>{row.item}</td>
+                  <td>{row.type}</td>
+                  <td>{row.why}</td>
+                  <td>{row.revenueImpact}</td>
+                  <td>{row.nextAction}</td>
+                  <td>{row.age}</td>
+                  <td>{row.blocker}</td>
+                  <td>{row.status}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function loadRevenueQueue() {
+  const repoRoot = resolveRepoRoot();
+  const leadRegistry = readJson<{ items?: LeadRecord[] }>(repoRoot, PATHS.leadRegistry, { items: [] });
+  const revenueTruth = readJson<any>(repoRoot, PATHS.revenueTruth, {});
+  const dashboardSnapshot = readJson<any>(repoRoot, PATHS.dashboardSnapshot, {});
+
+  const leads = Array.isArray(leadRegistry.items) ? leadRegistry.items : [];
+  const priorityFocus = dashboardSnapshot?.primary_focus || null;
+  const priorityClient = Array.isArray(dashboardSnapshot?.priority_clients) ? dashboardSnapshot.priority_clients[0] : null;
+  const revenueGap = Array.isArray(dashboardSnapshot?.revenue_gaps) ? dashboardSnapshot.revenue_gaps[0] : null;
+
+  const paymentWaitingRows: QueueRow[] = priorityFocus
+    ? [
+        {
+          item: text(priorityFocus.merchant_shop || priorityFocus.client_id, "Current payment close"),
+          type: "Payments waiting",
+          why: "Merchant value has already been proven. This is the closest cash close in the queue.",
+          revenueImpact: `${money(revenueGap?.gap ?? priorityFocus.merchant_revenue ?? 0)} of value is ready to become Stafford revenue.`,
+          nextAction: text(priorityFocus.next_action?.instructions || priorityFocus.action, "Follow up and close payment."),
+          age: formatHours(priorityClient?.close_engine?.hours_since_proposal),
+          blocker: "Waiting on payment",
+          status: translateStatus("proposal_sent")
+        }
+      ]
+    : leads
+        .filter((lead) => stage(lead) === "proposal_sent" || String(lead.status?.current_stage || "").toLowerCase() === "waiting_for_payment")
+        .slice(0, 3)
+        .map((lead) =>
+          buildLeadRow(lead, {
+            type: "Payments waiting",
+            why: "Ross should care because this offer is already out and money is waiting to be captured.",
+            revenueImpact: "High — this is direct revenue that can close quickly.",
+            blocker: "Waiting on payment",
+            status: translateStatus(stage(lead)),
+            nextAction: leadNextAction(lead)
+          })
+        );
+
+  const offersWaitingRows = leads
+    .filter((lead) => stage(lead) === "engaged" || lead.engagement?.replied)
+    .sort((a, b) => (Number(b.score || 0) - Number(a.score || 0)) || Date.parse(String(b.updated_at || 0)) - Date.parse(String(a.updated_at || 0)))
+    .slice(0, 5)
+    .map((lead) =>
+      buildLeadRow(lead, {
+        type: "Offers waiting",
+        why: "Ross should care because this merchant replied and is ready for a real offer.",
+        revenueImpact: "High — a qualified reply can become a paid ShopiFixer close.",
+        blocker: "Offer not sent yet",
+        status: "Engaged"
+      })
+    );
+
+  const warmOpportunitiesRows = leads
+    .filter((lead) => stage(lead) === "followup_sent")
+    .sort((a, b) => (Number(b.score || 0) - Number(a.score || 0)) || Date.parse(String(b.updated_at || 0)) - Date.parse(String(a.updated_at || 0)))
+    .slice(0, 5)
+    .map((lead) =>
+      buildLeadRow(lead, {
+        type: "Warm opportunities",
+        why: "Ross should care because outreach landed and one good follow-up can reopen the conversation.",
+        revenueImpact: "Medium — this follow-up could move the lead toward an offer or payment.",
+        blocker: "Waiting on a reply",
+        status: "Waiting for reply"
+      })
+    );
+
+  const activeCampaignLeads = leads.filter((lead) => stage(lead) === "send_initial_outreach");
+  const activeCampaignRows: QueueRow[] = activeCampaignLeads.length
+    ? [
+        {
+          item: `ShopiFixer outreach campaign (${activeCampaignLeads.length} prospects)`,
+          type: "Active campaigns",
+          why: "Ross should care because this is the current source of new opportunities.",
+          revenueImpact: `${activeCampaignLeads.length} prospects are still in play for future revenue.`,
+          nextAction: "Review the warmest replies and keep outreach moving.",
+          age: oldestAge(activeCampaignLeads),
+          blocker: activeCampaignLeads.some((lead) => !lead.contact?.email && !lead.domain)
+            ? "Some prospects still need contact info"
+            : "Waiting on responses",
+          status: "Active"
+        }
+      ]
+    : [];
+
+  const staleOpportunitiesRows = leads
+    .filter((lead) => stage(lead) === "contact_needed")
+    .sort((a, b) => (Number(b.score || 0) - Number(a.score || 0)) || Date.parse(String(b.updated_at || 0)) - Date.parse(String(a.updated_at || 0)))
+    .slice(0, 5)
+    .map((lead) =>
+      buildLeadRow(lead, {
+        type: "Stale opportunities",
+        why: "Ross should care because this opportunity cannot move without a usable contact.",
+        revenueImpact: "Low until contact info is fixed; then it can become a real sales lead.",
+        blocker: "Needs contact info",
+        status: "Needs contact info"
+      })
+    );
+
+  return {
+    currentBottleneck: translateBottleneck(revenueTruth?.current_bottleneck),
+    topRevenueAction: text(priorityFocus?.next_action?.instructions || revenueTruth?.next_actions?.[0]?.action, "Review the highest-priority revenue motion."),
+    moneyAtStake: money(revenueGap?.gap ?? 0),
+    revenueGap,
+    paymentWaitingRows,
+    offersWaitingRows,
+    warmOpportunitiesRows,
+    activeCampaignRows,
+    staleOpportunitiesRows
+  };
+}
+
+export default function RevenueCommandPage() {
+  const data = loadRevenueQueue();
 
   return (
     <main className="shell">
       <div className="container">
         <section className="panel">
           <div className="panelInner">
-            <p className="eyebrow">StaffordOS Revenue</p>
-            <h1 className="title">Lead Registry Command</h1>
+            <p className="eyebrow">StaffordOS</p>
+            <h1 className="title">Revenue Queue</h1>
             <p className="subtitle">
-              Real operator dashboard powered by the canonical lead registry.
+              One business queue for the next money, the next follow-up, and the work that is still stalled.
             </p>
+
             <OperatorNav activeHref="/operator/revenue-command" />
-          </div>
-        </section>
 
-        <section className="panel">
-          <div className="panelInner">
-            <h2 className="sectionTitle">Current Bottleneck</h2>
-            <p className="subtitle" style={{ marginTop: 0 }}>{bottleneck.stage}</p>
-            <div className="kv">
-              <div><strong>Next action:</strong> {bottleneck.next_action}</div>
-              <div><strong>Total leads:</strong> {registry.items?.length || 0}</div>
-              <div><strong>Registry version:</strong> {registry.version}</div>
-              <div><strong>Schema:</strong> {registry.schema}</div>
-              <div><strong>Read source:</strong> staffordos/leads/lead_registry_v1.json</div>
+            <div className="row" style={{ marginTop: 16, flexWrap: "wrap" }}>
+              <span className="chip">Revenue block: {data.currentBottleneck}</span>
+              <span className="chip">Money at stake: {data.moneyAtStake}</span>
+              <span className="chip">Payments waiting: {data.paymentWaitingRows.length}</span>
+              <span className="chip">Offers waiting: {data.offersWaitingRows.length}</span>
+              <span className="chip">Warm opportunities: {data.warmOpportunitiesRows.length}</span>
+              <span className="chip">Active campaigns: {data.activeCampaignRows.length}</span>
+              <span className="chip">Stale opportunities: {data.staleOpportunitiesRows.length}</span>
             </div>
           </div>
         </section>
 
-        <div className="grid gridTwo">
-          <section className="panel">
-            <div className="panelInner">
-              <h2 className="sectionTitle">Lifecycle Counts</h2>
-              <div className="kv">
-                <div><strong>Contact needed:</strong> {lifecycle.contact_needed || 0}</div>
-                <div><strong>Send initial outreach:</strong> {lifecycle.send_initial_outreach || 0}</div>
-                <div><strong>Approved:</strong> {lifecycle.approved || 0}</div>
-                <div><strong>Dry-run ready:</strong> {lifecycle.dry_run_ready || 0}</div>
-                <div><strong>Sent:</strong> {lifecycle.sent || 0}</div>
-                <div><strong>Engaged:</strong> {lifecycle.engaged || 0}</div>
-                <div><strong>Recovered revenue:</strong> ${lifecycle.recovered_revenue || 0}</div>
-              </div>
-            </div>
-          </section>
+        <QueueSection
+          title="Payments waiting"
+          note="These are the closest cash closes. Ross should follow up here first."
+          rows={data.paymentWaitingRows}
+        />
 
-          <section className="panel">
-            <div className="panelInner">
-              <h2 className="sectionTitle">Product Routing</h2>
-              <div className="kv">
-                {Object.entries(routing).map(([product, count]) => (
-                  <div key={product}>
-                    <strong>{product}:</strong> {String(count)}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        </div>
+        <QueueSection
+          title="Offers waiting"
+          note="These are qualified replies that need a clear offer before the money can move."
+          rows={data.offersWaitingRows}
+        />
 
-        <section className="panel">
-          <div className="panelInner">
-            <h2 className="sectionTitle">Send Proof</h2>
-            <div className="kv">
-              <div><strong>Total proof records:</strong> {sendProof.proof_count || 0}</div>
-              <div><strong>Dry-run proofs:</strong> {sendProof.dry_run_proof_count || 0}</div>
-              <div><strong>Live sends attempted:</strong> {sendProof.live_send_attempted_count || 0}</div>
-              <div><strong>Read source:</strong> {sendProof.source}</div>
-            </div>
+        <QueueSection
+          title="Warm opportunities"
+          note="These conversations are warm enough to keep nudging without starting from scratch."
+          rows={data.warmOpportunitiesRows}
+        />
 
-            <div className="kv" style={{ marginTop: 16 }}>
-              {(sendProof.latest_proofs || []).map((proof: any) => (
-                <details key={proof.id} style={{ marginBottom: 10 }}>
-                  <summary>
-                    <strong>{proof.lead_name || proof.lead_id}</strong>
-                    {" — "}
-                    {proof.status}
-                    {" / "}
-                    {proof.proof_type}
-                    {" / "}
-                    {proof.id}
-                    {" — View Proof"}
-                  </summary>
+        <QueueSection
+          title="Active campaigns"
+          note="These are the live outreach motions creating the next batch of opportunities."
+          rows={data.activeCampaignRows}
+        />
 
-                  <div style={{ marginTop: 8, padding: 8, border: "1px solid #333", borderRadius: 6, fontSize: 12, lineHeight: 1.4 }}>
-                    <div><strong>Target:</strong> {proof.send_target || "n/a"}</div>
-                    <div style={{ marginTop: 6 }}>
-                      <strong>Message:</strong>
-                      <pre style={{ whiteSpace: "pre-wrap", marginTop: 4 }}>
-                        {proof.message || "No message recorded."}
-                      </pre>
-                    </div>
-                  </div>
-                </details>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="panel">
-          <div className="panelInner">
-            <h2 className="sectionTitle">Priority Leads</h2>
-            <div className="kv">
-              {priorityLeads.map((lead: any) => (
-                <div key={lead.id || lead.name || lead.domain}>
-                  <strong>{lead.name || lead.domain || lead.id}</strong> —{" "}
-                  {lead.product || "unknown"} / {lead.stage || "unknown"} /{" "}
-                  {lead.next_action || "Review lead"}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <QueueSection
+          title="Stale opportunities"
+          note="These items need contact cleanup before they can produce revenue again."
+          rows={data.staleOpportunitiesRows}
+        />
       </div>
     </main>
   );
