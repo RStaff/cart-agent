@@ -3,6 +3,7 @@ import path from "node:path";
 import { OperatorNav } from "../../components/operator/OperatorNav";
 import { deriveCustomerOutcome } from "../../lib/operator/loadShopifixerCommandCenter";
 import { loadExecutionLog } from "../../lib/operator/loadExecutionLog";
+import { getDecisionEngineReport } from "../../lib/operator/decisionEngineResolver";
 
 const PATHS = {
   primaryAction: "staffordos/snapshots/primary_action_snapshot_v1.json",
@@ -127,6 +128,61 @@ function translateRisk(value: string) {
   return normalized;
 }
 
+function summarizeDecisionAction(action: any) {
+  if (!action) return "Unavailable";
+  const label = text(action.title || action.action_type || action.action_label, "Unavailable");
+  const relationship = text(action.relationship_id, "unknown relationship");
+  const status = text(action.status, "unknown");
+  const blocker = action.blocker ? ` · blocker: ${text(action.blocker)}` : "";
+  return `${label} (${relationship}) · ${status}${blocker}`;
+}
+
+function comparePrimaryActionWithDecisionEngine(primary: any, decisionTopAction: any, decisionTopBlocker: any) {
+  const reasons: string[] = [];
+  const primaryLabel = text(primary?.action_label || primary?.action_type, "");
+  const primaryStep = text(primary?.next_step, "");
+  const decisionLabel = text(decisionTopAction?.title || decisionTopAction?.action_type, "");
+  const decisionRelationship = text(decisionTopAction?.relationship_id, "");
+
+  if (!decisionTopAction) {
+    reasons.push("Decision Engine did not resolve a top action.");
+    return reasons;
+  }
+
+  if (decisionTopAction.status && decisionTopAction.status !== "ready") {
+    reasons.push(`Decision Engine top action is ${decisionTopAction.status}, not ready.`);
+  }
+
+  if (primaryLabel && decisionLabel && normalizeComparison(primaryLabel) !== normalizeComparison(decisionLabel)) {
+    reasons.push(`Title mismatch: current action is "${primaryLabel}" but Decision Engine selected "${decisionLabel}".`);
+  }
+
+  if (primaryStep && decisionLabel && normalizeComparison(primaryStep) !== normalizeComparison(decisionLabel)) {
+    reasons.push(`Step mismatch: current next step is "${primaryStep}" while Decision Engine selected "${decisionLabel}".`);
+  }
+
+  if (primary?.domain_id && decisionRelationship && normalizeComparison(primary.domain_id) !== normalizeComparison(decisionRelationship)) {
+    reasons.push(`Relationship mismatch: current domain is "${text(primary.domain_id)}" but Decision Engine selected "${decisionRelationship}".`);
+  }
+
+  if (decisionTopBlocker?.action_id && decisionTopAction.action_id === decisionTopBlocker.action_id) {
+    reasons.push("Decision Engine top action is also the top blocker, which means the selection is blocked.");
+  }
+
+  if (!reasons.length) {
+    reasons.push("Current Executive Home action and Decision Engine top action are aligned.");
+  }
+
+  return reasons;
+}
+
+function normalizeComparison(value: unknown) {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ");
+}
+
 function loadExecutiveHome() {
   const repoRoot = resolveRepoRoot();
 
@@ -138,6 +194,7 @@ function loadExecutiveHome() {
   const unitWorkSnapshot = readJson<any>(repoRoot, PATHS.unitWorkSnapshot, {});
   const fulfillmentTruth = readJson<any>(repoRoot, PATHS.fulfillmentTruth, {});
   const ceoTruth = readJson<any>(repoRoot, PATHS.ceoTruth, {});
+  const decisionEngine = getDecisionEngineReport();
 
   const primary = primaryAction.primary_action || {};
   const openWork = Array.isArray(unitWorkSnapshot.open_work) ? unitWorkSnapshot.open_work : [];
@@ -204,6 +261,11 @@ function loadExecutiveHome() {
     ...(Array.isArray(ceoTruth?.system_health?.blockers) ? ceoTruth.system_health.blockers : []),
     ...(Array.isArray(primary.risk) ? primary.risk : []),
   ];
+  const decisionMismatchReasons = comparePrimaryActionWithDecisionEngine(
+    primary,
+    decisionEngine?.top_action || null,
+    decisionEngine?.top_blocker || null
+  );
 
   return {
     primaryAction: primary,
@@ -221,6 +283,8 @@ function loadExecutiveHome() {
     revenueGap,
     outcomeRow,
     blockers,
+    decisionEngine,
+    decisionMismatchReasons,
   };
 }
 
@@ -257,6 +321,18 @@ export default function OperatorPage() {
   const lastExecution = data.executionLog?.lastExecution as any;
   const lastOutcomeEvent = data.executionLog?.lastOutcomeEvent as any;
   const outcomeStateChangesToday = data.executionLog?.outcomeStateChangesToday ?? 0;
+  const decisionTopAction = data.decisionEngine?.top_action || null;
+  const decisionTopRevenueAction = data.decisionEngine?.top_revenue_action || null;
+  const decisionTopRelationshipAction = data.decisionEngine?.top_relationship_action || null;
+  const decisionTopBlocker = data.decisionEngine?.top_blocker || null;
+  const decisionValidation = data.decisionEngine?.validation || { ok: false, errors: [] };
+  const decisionMismatchReasons = Array.isArray(data.decisionMismatchReasons) ? data.decisionMismatchReasons : [];
+  const currentPrimaryActionLabel = text(primary.action_label || primary.action_type, "Unavailable");
+  const currentPrimaryActionStep = text(primary.next_step, "Unavailable");
+  const decisionTopActionLabel = text(decisionTopAction?.title || decisionTopAction?.action_type, "Unavailable");
+  const currentActionMatchesDecision =
+    normalizeComparison(currentPrimaryActionLabel) === normalizeComparison(decisionTopActionLabel) &&
+    normalizeComparison(currentPrimaryActionStep) === normalizeComparison(text(decisionTopAction?.title || decisionTopAction?.action_type, ""));
 
   return (
     <main className="shell">
@@ -294,6 +370,37 @@ export default function OperatorPage() {
               <div><strong>Product:</strong> {translateDomain(primary.domain_id)}</div>
               <div><strong>Signal strength:</strong> {translateConfidence(primary.confidence)}</div>
             </div>
+          </div>
+        </section>
+
+        <section className="panel">
+          <div className="panelInner">
+            <p className="eyebrow">Decision Engine Audit</p>
+            <h2 className="sectionTitle" style={{ marginBottom: 10 }}>
+              Shadow comparison against the current Executive Home action
+            </h2>
+            <div className="kv">
+              <div><strong>Top Action:</strong> {summarizeDecisionAction(decisionTopAction)}</div>
+              <div><strong>Top Revenue Action:</strong> {summarizeDecisionAction(decisionTopRevenueAction)}</div>
+              <div><strong>Top Relationship Action:</strong> {summarizeDecisionAction(decisionTopRelationshipAction)}</div>
+              <div><strong>Top Blocker:</strong> {summarizeDecisionAction(decisionTopBlocker)}</div>
+              <div><strong>Validation Status:</strong> {decisionValidation.ok ? "Pass" : "Fail"}</div>
+              <div><strong>Current Executive Home action:</strong> {currentPrimaryActionLabel}</div>
+              <div><strong>Decision Engine top_action:</strong> {decisionTopActionLabel}</div>
+              <div><strong>Current action matches Decision Engine:</strong> {currentActionMatchesDecision ? "Yes" : "No"}</div>
+            </div>
+            {decisionMismatchReasons.length > 0 ? (
+              <div className="kv" style={{ marginTop: 12 }}>
+                <div><strong>Mismatch reasons:</strong></div>
+                {decisionMismatchReasons.map((reason: string) => (
+                  <div key={reason}>• {reason}</div>
+                ))}
+              </div>
+            ) : (
+              <p className="hint" style={{ marginTop: 12 }}>
+                No mismatch reasons recorded.
+              </p>
+            )}
           </div>
         </section>
 
