@@ -1,15 +1,22 @@
-import { existsSync, readFileSync } from "node:fs";
+import fs from "node:fs";
 import path from "node:path";
-import { canonicalNextActionLabel } from "./lifecycleTerminology";
 
-type AnyRecord = Record<string, any>;
+type ResolverState = "resolved" | "lead_only" | "contact_unknown" | "operational_conflict" | "unresolved_identity";
+type ConflictType = "stage_conflict" | "payment_conflict" | "identity_conflict" | "contact_conflict";
+type FacetName = "lead" | "client" | "merchant" | "fulfillment" | "execution" | "outcome";
 
-export type RelationshipFacet = AnyRecord;
+type SourceMatchReasons = Record<FacetName, string[]>;
 
-export type RelationshipObject = {
+type RelationshipFacet = {
+  source_match_reasons: string[];
+  source_records: string[];
+};
+
+type RelationshipObject = {
   relationship_id: string;
   display_name: string;
-  relationship_type: string;
+  relationship_type: "lead" | "client" | "merchant" | "referral_source" | "partner";
+  resolver_state: ResolverState;
   identity: {
     lead_id: string | null;
     client_id: string | null;
@@ -18,28 +25,99 @@ export type RelationshipObject = {
     store_domain: string | null;
     domain: string | null;
     email: string | null;
-    customer: string | null;
+    aliases: string[];
   };
   relationship_core: {
     owner: string;
-    status: string;
-    current_stage: string;
-    next_action: string;
-    contactability: string;
-    relationship_health: string;
-    risk_level: string;
-    priority_score: number;
-    last_touch_at: string | null;
+    status: "resolved" | "lead_only" | "contact_unknown" | "operational_conflict" | "unresolved_identity";
+    current_stage: string | null;
+    current_stage_source: string | null;
+    next_action: string | null;
+    next_action_source: string | null;
     next_touch_at: string | null;
+    contactability: "reachable" | "unknown";
+    relationship_health: "healthy" | "warm" | "dormant" | "at_risk" | "unknown";
+    risk_level: "low" | "medium" | "high" | "unknown";
+    priority_score: number;
     confidence: number;
+    conflict_types: ConflictType[];
     conflict_notes: string[];
   };
   facets: {
-    lead: RelationshipFacet | null;
-    merchant: RelationshipFacet | null;
-    client: RelationshipFacet | null;
-    fulfillment: RelationshipFacet | null;
-    outcome: RelationshipFacet | null;
+    lead: RelationshipFacet & {
+      lead_id: string | null;
+      name: string | null;
+      domain: string | null;
+      email: string | null;
+      current_stage: string | null;
+      next_action: string | null;
+      status: string | null;
+      score: number | null;
+      temperature: string | null;
+      sent: boolean;
+      replied: boolean;
+      blocked: boolean;
+    };
+    client: RelationshipFacet & {
+      client_id: string | null;
+      contact_email: string | null;
+      current_stage: string | null;
+      next_action: string | null;
+      payment_status: string | null;
+      closed_at: string | null;
+      lifetime_value: number | null;
+      followup_ready: boolean;
+    };
+    merchant: RelationshipFacet & {
+      merchant_id: string | null;
+      merchant_shop: string | null;
+      store_domain: string | null;
+      current_stage: string | null;
+      next_required_action: string | null;
+      readiness_score: number | null;
+      offer_status: string | null;
+      payment_status: string | null;
+      fulfillment_status: string | null;
+      proof_package_status: string | null;
+      case_study_status: string | null;
+      referral_status: string | null;
+      revenue_status: string | null;
+    };
+    fulfillment: RelationshipFacet & {
+      fulfillment_id: string | null;
+      client_id: string | null;
+      store_domain: string | null;
+      payment_status: string | null;
+      fulfillment_status: string | null;
+      proof_status: string | null;
+      completion_status: string | null;
+      before_evidence_status: string | null;
+      after_evidence_status: string | null;
+      proof_package_status: string | null;
+      completed_at: string | null;
+      merchant_proof_package_ready: boolean;
+      remaining_limitations: string | null;
+      risk_or_limitation: string | null;
+    };
+    execution: RelationshipFacet & {
+      execution_id: string | null;
+      timestamp: string | null;
+      operator: string | null;
+      action_type: string | null;
+      stage: string | null;
+      outcome: string | null;
+      revenue_impact: string | null;
+      customer: string | null;
+    };
+    outcome: RelationshipFacet & {
+      event_id: string | null;
+      timestamp: string | null;
+      customer: string | null;
+      previous_state: string | null;
+      new_state: string | null;
+      trigger: string | null;
+      confidence: number | null;
+    };
   };
   links: {
     lead_registry_ids: string[];
@@ -52,108 +130,76 @@ export type RelationshipObject = {
   provenance: {
     primary_source: string;
     secondary_sources: string[];
-    source_keys: string[];
-    confidence: number;
+    source_match_reasons: SourceMatchReasons;
+    conflict_types: ConflictType[];
     conflict_notes: string[];
+    confidence: number;
   };
   timeline: {
-    created_at: string;
-    updated_at: string;
+    created_at: string | null;
+    updated_at: string | null;
+    last_execution_at: string | null;
+    last_outcome_at: string | null;
   };
 };
 
-type LeadRegistry = {
-  items?: AnyRecord[];
+type LeadRecord = Record<string, any>;
+type ClientRecord = Record<string, any>;
+type MerchantLifecycleRecord = Record<string, any>;
+type FulfillmentRecord = Record<string, any>;
+type ExecutionRecord = Record<string, any>;
+type OutcomeRecord = Record<string, any>;
+
+type RawGroupRecord = {
+  source: "lead" | "client" | "merchant" | "fulfillment" | "execution" | "outcome";
+  id: string;
+  raw: Record<string, any>;
+  keys: string[];
+  created_at: string | null;
+  updated_at: string | null;
 };
 
-type ClientRegistry = {
-  clients?: AnyRecord[];
+type RelationshipGroup = {
+  key: string;
+  records: RawGroupRecord[];
 };
 
-type MerchantLifecycleRegistry = {
-  generated_at?: string;
-  records?: AnyRecord[];
-  active_record_selection?: {
-    merchant_id?: string | null;
-  };
+type ResolverValidation = {
+  ok: boolean;
+  errors: string[];
 };
 
-type FulfillmentTruth = {
-  items?: AnyRecord[];
-};
+const VALID_RESOLVER_STATES: ResolverState[] = [
+  "resolved",
+  "lead_only",
+  "contact_unknown",
+  "operational_conflict",
+  "unresolved_identity",
+];
 
-type ExecutionTruth = {
-  events?: AnyRecord[];
-};
-
-type OutcomeTruth = {
-  events?: AnyRecord[];
-};
-
-type RelationshipAccumulator = {
-  relationship_id: string;
-  display_name: string;
-  relationship_type: string;
-  identity: RelationshipObject["identity"];
-  relationship_core: RelationshipObject["relationship_core"];
-  facets: RelationshipObject["facets"];
-  links: RelationshipObject["links"];
-  provenance: RelationshipObject["provenance"];
-  timeline: RelationshipObject["timeline"];
-  aliases: Set<string>;
-  source_keys: Set<string>;
-  has_client: boolean;
-  has_lead: boolean;
-  has_merchant: boolean;
-  has_fulfillment: boolean;
-  has_execution: boolean;
-  has_outcome: boolean;
-  latest_at: string | null;
-};
-
-const SOURCES = {
-  leadRegistry: "staffordos/leads/lead_registry_v1.json",
-  clientRegistry: "staffordos/clients/client_registry_v1.json",
-  merchantLifecycle: "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
-  fulfillmentTruth: "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
-  executionLog: "staffordos/execution/execution_log_v1.json",
-  outcomeEvents: "staffordos/execution/outcome_events_v1.json",
-} as const;
+const VALID_CONFLICT_TYPES: ConflictType[] = [
+  "stage_conflict",
+  "payment_conflict",
+  "identity_conflict",
+  "contact_conflict",
+];
 
 function resolveRepoRoot() {
   const cwd = process.cwd();
-  const candidates = [cwd, path.resolve(cwd, "../../..")];
-
+  const candidates = [cwd, path.resolve(cwd, "../../.."), path.resolve(cwd, "../..")];
   for (const candidate of candidates) {
-    if (existsSync(path.join(candidate, SOURCES.clientRegistry))) return candidate;
+    if (fs.existsSync(path.join(candidate, "staffordos/clients/client_registry_v1.json"))) return candidate;
   }
-
   return path.resolve(cwd, "../../..");
 }
 
 function readJson<T>(filePath: string, fallback: T): T {
   try {
-    if (!existsSync(filePath)) return fallback;
-    return JSON.parse(readFileSync(filePath, "utf8")) as T;
+    if (!fs.existsSync(filePath)) return fallback;
+    return JSON.parse(fs.readFileSync(filePath, "utf8")) as T;
   } catch {
     return fallback;
   }
-}
-
-export function normalizeRelationshipKey(value?: string | null) {
-  const normalized = String(value ?? "")
-    .trim()
-    .toLowerCase()
-    .replace(/^https?:\/\//, "")
-    .replace(/^www\./, "")
-    .split("/")[0]
-    .split("?")[0]
-    .split("#")[0]
-    .replace(/[^a-z0-9.-]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^[.-]+|[.-]+$/g, "");
-
-  return normalized;
 }
 
 function text(value: unknown, fallback = "") {
@@ -161,900 +207,1083 @@ function text(value: unknown, fallback = "") {
   return normalized || fallback;
 }
 
-function toNumber(value: unknown) {
-  const numberValue = Number(value);
-  return Number.isFinite(numberValue) ? numberValue : 0;
+function lowerText(value: unknown, fallback = "") {
+  return text(value, fallback).toLowerCase();
 }
 
-function toBoolean(value: unknown) {
-  if (typeof value === "boolean") return value;
-  const normalized = String(value ?? "").trim().toLowerCase();
-  return ["true", "1", "yes", "paid", "payment_received", "complete", "completed"].includes(normalized);
+function normalizeTimestamp(value: unknown): string | null {
+  const raw = text(value);
+  if (!raw) return null;
+  const parsed = new Date(raw);
+  return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+}
+
+function normalizeRelationshipKey(value?: string | null) {
+  const normalized = text(value)
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .split(/[/?#]/)[0]
+    .replace(/[^a-z0-9.@_-]+/g, "-")
+    .replace(/[_\s]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+  return normalized;
+}
+
+function toRelationshipId(value?: string | null) {
+  const normalized = normalizeRelationshipKey(value);
+  return normalized ? `rel_${normalized}` : "";
 }
 
 function unique(values: Array<string | null | undefined>) {
-  return [...new Set(values.map((value) => text(value)).filter(Boolean))];
+  return Array.from(new Set(values.map((value) => text(value)).filter(Boolean)));
 }
 
-function firstNonEmpty(values: Array<string | null | undefined>) {
+function firstDefined(values: Array<string | null | undefined>) {
   for (const value of values) {
-    const normalized = text(value);
-    if (normalized) return normalized;
+    if (text(value)) return text(value);
   }
   return null;
 }
 
-function latestTimestamp(...values: Array<string | null | undefined>) {
-  const timestamps = values
-    .map((value) => text(value))
-    .filter(Boolean)
-    .map((value) => new Date(value).getTime())
-    .filter((time) => Number.isFinite(time));
-
-  if (!timestamps.length) return null;
-  return new Date(Math.max(...timestamps)).toISOString();
+function isLikelyTimestamp(value: unknown) {
+  return normalizeTimestamp(value) !== null;
 }
 
-function shortestNonEmpty(values: Array<string | null | undefined>) {
-  const items = values.map((value) => text(value)).filter(Boolean);
-  if (!items.length) return null;
-  return items.sort((a, b) => a.length - b.length)[0];
+function collectBaseKeys(record: Record<string, any>, source: RawGroupRecord["source"]) {
+  const keys = new Set<string>();
+  const add = (...values: Array<string | null | undefined>) => {
+    for (const value of values) {
+      const normalized = normalizeRelationshipKey(value);
+      if (normalized) keys.add(normalized);
+    }
+  };
+
+  if (source === "lead") {
+    add(record.lead_id, record.id, record.domain, record.name, record.execution?.send_target);
+  }
+
+  if (source === "client") {
+    add(record.client_id, record.merchant_shop, record.store_domain, record.notes?.[0]?.lead_id);
+  }
+
+  if (source === "merchant") {
+    add(
+      record.merchant_id,
+      record.client_id,
+      record.merchant_shop,
+      record.store_domain,
+      record.lead_id,
+      record.opportunity_id,
+      record.delivery_id,
+      record.action_id
+    );
+  }
+
+  if (source === "fulfillment") {
+    add(record.fulfillment_id, record.client_id, record.store_domain, record.opportunity_ref, record.delivery_unit_ref, record.packet_id);
+  }
+
+  if (source === "execution") {
+    add(record.customer, record.product, record.execution_id);
+  }
+
+  if (source === "outcome") {
+    add(record.customer, record.event_id);
+  }
+
+  return Array.from(keys);
 }
 
-function recordAliases(record: AnyRecord) {
-  return unique([
-    record.relationship_id,
-    record.client_id,
-    record.merchant_id,
-    record.merchant_shop,
-    record.store_domain,
-    record.domain,
-    record.email,
-    record.customer,
-    record.lead_id,
-    record.id,
-    record.name,
-    record.merchant_name,
-    record.lead_name,
-    record.fulfillment_id,
-    record.packet_id,
-    record.opportunity_ref,
-    record.delivery_unit_ref,
-    record.action_id,
-    record.send_target,
-    record.execution?.send_target,
-    record.contact?.email,
-    record.contact?.name,
-    record.contact?.role,
+class UnionFind {
+  private parent = new Map<string, string>();
+
+  make(value: string) {
+    if (!this.parent.has(value)) this.parent.set(value, value);
+  }
+
+  find(value: string): string {
+    this.make(value);
+    const parent = this.parent.get(value);
+    if (!parent || parent === value) return value;
+    const root = this.find(parent);
+    this.parent.set(value, root);
+    return root;
+  }
+
+  union(a: string, b: string) {
+    const rootA = this.find(a);
+    const rootB = this.find(b);
+    if (rootA !== rootB) this.parent.set(rootB, rootA);
+  }
+}
+
+function readSourceTruths(repoRoot: string) {
+  const leadRegistry = readJson<{ items?: LeadRecord[] }>(path.join(repoRoot, "staffordos/leads/lead_registry_v1.json"), { items: [] });
+  const clientRegistry = readJson<{ clients?: ClientRecord[] }>(path.join(repoRoot, "staffordos/clients/client_registry_v1.json"), { clients: [] });
+  const merchantLifecycle = readJson<{ generated_at?: string; records?: MerchantLifecycleRecord[] }>(
+    path.join(repoRoot, "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json"),
+    { records: [] }
+  );
+  const revenueTruth = readJson<Record<string, any>>(path.join(repoRoot, "staffordos/revenue/revenue_truth_v1.json"), {});
+  const fulfillmentTruth = readJson<{ generated_at?: string; items?: FulfillmentRecord[] }>(
+    path.join(repoRoot, "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json"),
+    { items: [] }
+  );
+  const executionTruth = readJson<{ generated_at?: string; events?: ExecutionRecord[] }>(
+    path.join(repoRoot, "staffordos/execution/execution_log_v1.json"),
+    { events: [] }
+  );
+  const outcomeTruth = readJson<{ generated_at?: string; events?: OutcomeRecord[] }>(
+    path.join(repoRoot, "staffordos/execution/outcome_events_v1.json"),
+    { events: [] }
+  );
+
+  return { leadRegistry, clientRegistry, merchantLifecycle, revenueTruth, fulfillmentTruth, executionTruth, outcomeTruth };
+}
+
+function stageFromLead(record: LeadRecord) {
+  return firstDefined([
+    record.status?.current_stage,
+    record.lifecycle_stage,
+    record.status?.lifecycle_stage,
   ]);
 }
 
-function noteAliases(record: AnyRecord) {
-  const notes = Array.isArray(record.notes) ? record.notes : [];
-  return unique(
-    notes.flatMap((note) => [
-      note?.lead_id,
-      note?.client_id,
-      note?.merchant_id,
-      note?.merchant_shop,
-      note?.store_domain,
-      note?.email,
-      note?.customer,
+function nextActionFromLead(record: LeadRecord) {
+  return firstDefined([
+    record.status?.next_action,
+    record.next_action?.instructions,
+    record.next_action,
+  ]);
+}
+
+function timestampFromLead(record: LeadRecord) {
+  return normalizeTimestamp(
+    firstDefined([
+      record.next_action?.due_at,
+      record.next_action?.updated_at,
+      record.updated_at,
+      record.created_at,
     ])
   );
 }
 
-function outcomeState(record: AnyRecord) {
-  return text(record.outcome_state || record.new_state || record.status);
+function stageFromClient(record: ClientRecord) {
+  return firstDefined([
+    record.decision_trace?.lifecycle_stage,
+    record.lifecycle?.stage,
+    record.status?.current_stage,
+    record.lifecycle_stage,
+  ]);
 }
 
-function relationshipTypeFor(accumulator: RelationshipAccumulator) {
-  const outcome = accumulator.facets.outcome || {};
-  const client = accumulator.facets.client || {};
-  const merchant = accumulator.facets.merchant || {};
-  const lead = accumulator.facets.lead || {};
-  const outcomeLabel = text(outcome.outcome_state || outcome.new_state).toLowerCase();
-
-  if (outcomeLabel.includes("at risk")) return "at_risk";
-  if (outcomeLabel.includes("dormant")) return "dormant";
-  if (outcomeLabel.includes("referral")) return "client";
-  if (outcomeLabel.includes("expansion")) return "client";
-  if (client.client_id || client.deal || toBoolean(client.revenue?.shopifixer_collected)) return "client";
-  if (merchant.merchant_id || merchant.payment_status || merchant.offer_status) return "merchant";
-  if (lead.lead_id) return "lead";
-  return "relationship";
+function nextActionFromClient(record: ClientRecord) {
+  return firstDefined([
+    record.next_action?.instructions,
+    record.business?.next_action,
+    record.decision_trace?.next_action_type,
+    record.next_action,
+  ]);
 }
 
-function relationshipHealthFor(accumulator: RelationshipAccumulator) {
-  const outcome = accumulator.facets.outcome || {};
-  const client = accumulator.facets.client || {};
-  const merchant = accumulator.facets.merchant || {};
-  const lead = accumulator.facets.lead || {};
-  const label = text(outcome.outcome_state || outcome.new_state).toLowerCase();
-
-  if (label.includes("at risk")) return "at_risk";
-  if (label.includes("dormant")) return "dormant";
-  if (label.includes("referral")) return "healthy";
-  if (label.includes("expansion")) return "healthy";
-  if (merchant.payment_status === "waiting_for_payment" || client.deal?.payment_status === "unpaid") return "warm";
-  if (lead.lead_id && !client.client_id) return "warm";
-  if (toBoolean(client.blocker_detection?.blocked) || toBoolean(client.lifecycle?.blocked)) return "at_risk";
-  return "healthy";
+function timestampFromClient(record: ClientRecord) {
+  return normalizeTimestamp(
+    firstDefined([
+      record.next_action?.due_at,
+      record.next_action?.updated_at,
+      record.decision_trace?.evaluated_at,
+      record.updated_at,
+      record.created_at,
+    ])
+  );
 }
 
-function relationshipStatusFor(accumulator: RelationshipAccumulator) {
-  const outcome = accumulator.facets.outcome || {};
-  const label = text(outcome.outcome_state || outcome.new_state).toLowerCase();
-  if (label.includes("at risk")) return "at_risk";
-  if (label.includes("dormant")) return "dormant";
-  if (label.includes("satisfied")) return "active";
-  if (label.includes("referral")) return "active";
-  if (label.includes("expansion")) return "active";
-  if (accumulator.has_fulfillment && !accumulator.relationship_core.next_action) return "blocked";
-  return accumulator.has_client ? "active" : accumulator.has_lead ? "open" : "unknown";
+function stageFromMerchant(record: MerchantLifecycleRecord) {
+  return firstDefined([record.current_stage, record.overall?.current_stage, record.lifecycle?.stage]);
 }
 
-function riskLevelFor(accumulator: RelationshipAccumulator) {
-  const notes = accumulator.relationship_core.conflict_notes;
-  const outcome = accumulator.facets.outcome || {};
-  const fulfillment = accumulator.facets.fulfillment || {};
-  const client = accumulator.facets.client || {};
-  const label = text(outcome.outcome_state || outcome.new_state).toLowerCase();
+function nextActionFromMerchant(record: MerchantLifecycleRecord) {
+  return firstDefined([record.next_required_action, record.next_action?.instructions, record.overall?.next_required_action]);
+}
 
-  if (label.includes("at risk")) return "high";
-  if (notes.length > 2 || toBoolean(client.blocker_detection?.blocked) || toBoolean(fulfillment.risk_or_limitation) || toBoolean(fulfillment.remaining_limitations)) {
-    return "high";
+function timestampFromMerchant(record: MerchantLifecycleRecord) {
+  return normalizeTimestamp(firstDefined([record.updated_at, record.generated_at, record.created_at]));
+}
+
+function stageFromFulfillment(record: FulfillmentRecord) {
+  return firstDefined([record.completion_status, record.fulfillment_status, record.payment_status, record.proof_status]);
+}
+
+function timestampFromFulfillment(record: FulfillmentRecord) {
+  return normalizeTimestamp(firstDefined([record.completed_at, record.fix_completed_at, record.fix_started_at]));
+}
+
+function stageFromExecution(record: ExecutionRecord) {
+  return firstDefined([record.stage, record.outcome, record.action_type]);
+}
+
+function nextActionFromExecution(record: ExecutionRecord) {
+  return firstDefined([record.notes, record.action_type]);
+}
+
+function timestampFromExecution(record: ExecutionRecord) {
+  return normalizeTimestamp(record.timestamp);
+}
+
+function stageFromOutcome(record: OutcomeRecord) {
+  return firstDefined([record.new_state, record.previous_state, record.trigger]);
+}
+
+function nextActionFromOutcome(record: OutcomeRecord) {
+  return firstDefined([record.trigger, record.new_state]);
+}
+
+function timestampFromOutcome(record: OutcomeRecord) {
+  return normalizeTimestamp(record.timestamp);
+}
+
+function buildRecords(repoRoot: string) {
+  const truths = readSourceTruths(repoRoot);
+  const records: RawGroupRecord[] = [];
+
+  const leadItems = Array.isArray(truths.leadRegistry.items) ? truths.leadRegistry.items : [];
+  for (const [index, item] of leadItems.entries()) {
+    records.push({
+      source: "lead",
+      id: text(item.id || item.lead_id || `lead-${index}`),
+      raw: item,
+      keys: collectBaseKeys(item, "lead"),
+      created_at: normalizeTimestamp(item.created_at),
+      updated_at: normalizeTimestamp(item.updated_at),
+    });
   }
-  if (notes.length > 0 || accumulator.relationship_core.status === "blocked") return "medium";
-  return "low";
-}
 
-function contactabilityFor(accumulator: RelationshipAccumulator) {
-  const lead = accumulator.facets.lead || {};
-  const client = accumulator.facets.client || {};
-  const email = text(lead.contact?.email || client.contact?.email || accumulator.identity.email);
-  if (email) return "reachable";
-  return accumulator.has_lead || accumulator.has_client ? "unknown" : "unreachable";
-}
-
-function confidenceFor(accumulator: RelationshipAccumulator) {
-  let confidence = 0.25;
-  if (accumulator.has_lead) confidence += 0.15;
-  if (accumulator.has_client) confidence += 0.25;
-  if (accumulator.has_merchant) confidence += 0.15;
-  if (accumulator.has_fulfillment) confidence += 0.1;
-  if (accumulator.has_execution) confidence += 0.05;
-  if (accumulator.has_outcome) confidence += 0.1;
-  confidence -= Math.min(0.3, accumulator.relationship_core.conflict_notes.length * 0.08);
-  return Math.max(0.15, Math.min(1, Number(confidence.toFixed(2))));
-}
-
-function addConflict(accumulator: RelationshipAccumulator, note: string) {
-  if (!accumulator.relationship_core.conflict_notes.includes(note)) {
-    accumulator.relationship_core.conflict_notes.push(note);
+  const clientItems = Array.isArray(truths.clientRegistry.clients) ? truths.clientRegistry.clients : [];
+  for (const [index, item] of clientItems.entries()) {
+    records.push({
+      source: "client",
+      id: text(item.client_id || `client-${index}`),
+      raw: item,
+      keys: collectBaseKeys(item, "client"),
+      created_at: normalizeTimestamp(item.created_at),
+      updated_at: normalizeTimestamp(item.updated_at),
+    });
   }
+
+  const lifecycleItems = Array.isArray(truths.merchantLifecycle.records) ? truths.merchantLifecycle.records : [];
+  for (const [index, item] of lifecycleItems.entries()) {
+    records.push({
+      source: "merchant",
+      id: text(item.merchant_id || item.client_id || `merchant-${index}`),
+      raw: item,
+      keys: collectBaseKeys(item, "merchant"),
+      created_at: normalizeTimestamp(item.created_at),
+      updated_at: normalizeTimestamp(item.updated_at || truths.merchantLifecycle.generated_at),
+    });
+  }
+
+  const fulfillmentItems = Array.isArray(truths.fulfillmentTruth.items) ? truths.fulfillmentTruth.items : [];
+  for (const [index, item] of fulfillmentItems.entries()) {
+    records.push({
+      source: "fulfillment",
+      id: text(item.fulfillment_id || item.delivery_unit_ref || `fulfillment-${index}`),
+      raw: item,
+      keys: collectBaseKeys(item, "fulfillment"),
+      created_at: normalizeTimestamp(item.created_at),
+      updated_at: normalizeTimestamp(item.updated_at || truths.fulfillmentTruth.generated_at),
+    });
+  }
+
+  const executionItems = Array.isArray(truths.executionTruth.events) ? truths.executionTruth.events : [];
+  for (const [index, item] of executionItems.entries()) {
+    records.push({
+      source: "execution",
+      id: text(item.execution_id || `execution-${index}`),
+      raw: item,
+      keys: collectBaseKeys(item, "execution"),
+      created_at: normalizeTimestamp(item.timestamp),
+      updated_at: normalizeTimestamp(item.timestamp),
+    });
+  }
+
+  const outcomeItems = Array.isArray(truths.outcomeTruth.events) ? truths.outcomeTruth.events : [];
+  for (const [index, item] of outcomeItems.entries()) {
+    records.push({
+      source: "outcome",
+      id: text(item.event_id || `outcome-${index}`),
+      raw: item,
+      keys: collectBaseKeys(item, "outcome"),
+      created_at: normalizeTimestamp(item.timestamp),
+      updated_at: normalizeTimestamp(item.timestamp),
+    });
+  }
+
+  return { truths, records };
 }
 
-function touchAccumulator(accumulator: RelationshipAccumulator, at?: string | null) {
-  const latest = latestTimestamp(accumulator.latest_at, at);
-  accumulator.latest_at = latest;
-  accumulator.timeline.updated_at = latest || accumulator.timeline.updated_at;
+function buildGroups(records: RawGroupRecord[]) {
+  const uf = new UnionFind();
+  for (const record of records) {
+    if (!record.keys.length) {
+      record.keys = [normalizeRelationshipKey(`${record.source}-${record.id}`)];
+    }
+    const [head, ...tail] = record.keys;
+    uf.make(head);
+    for (const key of tail) {
+      uf.make(key);
+      uf.union(head, key);
+    }
+  }
+
+  const groups = new Map<string, RelationshipGroup>();
+  for (const record of records) {
+    const root = uf.find(record.keys[0]);
+    const existing = groups.get(root);
+    if (existing) {
+      existing.records.push(record);
+    } else {
+      groups.set(root, { key: root, records: [record] });
+    }
+  }
+
+  return groups;
 }
 
-function createAccumulator(canonicalKey: string, displayName: string): RelationshipAccumulator {
+function sourceIds(records: RawGroupRecord[], source: RawGroupRecord["source"]) {
+  return records.filter((record) => record.source === source).map((record) => record.id);
+}
+
+function recordsBySource(records: RawGroupRecord[], source: RawGroupRecord["source"]) {
+  return records.filter((record) => record.source === source);
+}
+
+function pickPrimaryRecord(group: RelationshipGroup) {
+  const client = group.records.find((record) => record.source === "client");
+  const merchant = group.records.find((record) => record.source === "merchant");
+  const fulfillment = group.records.find((record) => record.source === "fulfillment");
+  const lead = group.records.find((record) => record.source === "lead");
+  const execution = group.records.find((record) => record.source === "execution");
+  const outcome = group.records.find((record) => record.source === "outcome");
+  return client || merchant || fulfillment || lead || execution || outcome || group.records[0];
+}
+
+function collectLeadFacet(group: RelationshipGroup): RelationshipObject["facets"]["lead"] {
+  const leads = recordsBySource(group.records, "lead");
+  const record = leads[0]?.raw || {};
+  const contactEmail = firstDefined([record.contact?.email, record.email, record.send_target]);
   return {
-    relationship_id: `rel_${canonicalKey}`,
-    display_name: displayName || canonicalKey,
-    relationship_type: "relationship",
-    identity: {
-      lead_id: null,
-      client_id: null,
-      merchant_id: null,
-      merchant_shop: null,
-      store_domain: null,
-      domain: null,
-      email: null,
-      customer: null,
-    },
-    relationship_core: {
-      owner: "Ross",
-      status: "unknown",
-      current_stage: "unknown",
-      next_action: "Review relationship",
-      contactability: "unknown",
-      relationship_health: "healthy",
-      risk_level: "low",
-      priority_score: 0,
-      last_touch_at: null,
-      next_touch_at: null,
-      confidence: 0.25,
-      conflict_notes: [],
-    },
-    facets: {
-      lead: null,
-      merchant: null,
-      client: null,
-      fulfillment: null,
-      outcome: null,
-    },
-    links: {
-      lead_registry_ids: [],
-      client_registry_ids: [],
-      merchant_lifecycle_ids: [],
-      fulfillment_ids: [],
-      execution_ids: [],
-      outcome_event_ids: [],
-    },
-    provenance: {
-      primary_source: "unknown",
-      secondary_sources: [],
-      source_keys: [],
-      confidence: 0.25,
-      conflict_notes: [],
-    },
-    timeline: {
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    },
-    aliases: new Set<string>(),
-    source_keys: new Set<string>(),
-    has_client: false,
-    has_lead: false,
-    has_merchant: false,
-    has_fulfillment: false,
-    has_execution: false,
-    has_outcome: false,
-    latest_at: null,
+    lead_id: firstDefined([record.lead_id, record.id]),
+    name: firstDefined([record.name, record.domain]),
+    domain: firstDefined([record.domain]),
+    email: contactEmail || null,
+    current_stage: firstDefined([stageFromLead(record)]),
+    next_action: firstDefined([nextActionFromLead(record)]),
+    status: firstDefined([record.status?.current_stage, record.lifecycle_stage, record.status]) || null,
+    score: Number.isFinite(Number(record.score)) ? Number(record.score) : null,
+    temperature: firstDefined([record.status?.temperature, record.temperature]) || null,
+    sent: Boolean(record.engagement?.sent || record.sent),
+    replied: Boolean(record.engagement?.replied || record.replied),
+    blocked: Boolean(record.blocked || record.status?.blocked),
+    source_match_reasons: leads.length
+      ? unique(
+          leads.flatMap((lead) => [
+            lead.raw.lead_id ? `lead_id=${lead.raw.lead_id}` : null,
+            lead.raw.id ? `id=${lead.raw.id}` : null,
+            lead.raw.domain ? `domain=${lead.raw.domain}` : null,
+            lead.raw.contact?.email ? `contact.email=${lead.raw.contact.email}` : null,
+          ])
+        )
+      : [],
+    source_records: leads.map((lead) => lead.id),
   };
 }
 
-function chooseRelationship(accumulator: RelationshipAccumulator, record: AnyRecord, candidateKey: string, sourceKey: string) {
-  accumulator.aliases.add(candidateKey);
-  accumulator.source_keys.add(sourceKey);
-  touchAccumulator(accumulator, record.updated_at || record.created_at || record.generated_at || record.completed_at || record.timestamp);
-
-  if (!accumulator.provenance.secondary_sources.includes(sourceKey)) {
-    accumulator.provenance.secondary_sources.push(sourceKey);
-  }
-}
-
-function resolveOrCreate(
-  buckets: Map<string, RelationshipAccumulator>,
-  aliases: Map<string, string>,
-  candidateKeys: string[],
-  displayName: string
-) {
-  for (const key of candidateKeys) {
-    const normalized = normalizeRelationshipKey(key);
-    const existingKey = aliases.get(normalized);
-    if (existingKey) {
-      return buckets.get(existingKey) || null;
-    }
-  }
-
-  const canonical = normalizeRelationshipKey(candidateKeys.find(Boolean) || displayName || "unknown");
-  if (!canonical) return null;
-
-  const existing = buckets.get(canonical);
-  if (existing) return existing;
-
-  const accumulator = createAccumulator(canonical, displayName || canonical);
-  buckets.set(canonical, accumulator);
-  aliases.set(canonical, canonical);
-  return accumulator;
-}
-
-function registerAliases(aliases: Map<string, string>, canonicalKey: string, values: string[]) {
-  for (const value of values) {
-    const normalized = normalizeRelationshipKey(value);
-    if (normalized) {
-      aliases.set(normalized, canonicalKey);
-    }
-  }
-}
-
-function mergeLead(record: AnyRecord, bucket: RelationshipAccumulator, sourceKey: string, aliases: Map<string, string>) {
-  bucket.has_lead = true;
-  bucket.facets.lead = {
-    lead_id: text(record.lead_id || record.id),
-    name: text(record.name),
-    domain: text(record.domain),
-    product: text(record.product),
-    lifecycle_stage: text(record.lifecycle_stage || record.status?.current_stage),
-    status: record.status || {},
-    score: toNumber(record.score ?? record.conversion_score ?? record.status?.conversion_score),
-    contact: record.contact || {},
-    engagement: record.engagement || {},
-    routing: record.routing || {},
-    refs: record.refs || {},
-    execution: record.execution || {},
-    payment: record.payment || {},
-    next_action: record.next_action || null,
-    updated_at: text(record.updated_at),
-    created_at: text(record.created_at),
+function collectClientFacet(group: RelationshipGroup): RelationshipObject["facets"]["client"] {
+  const clients = recordsBySource(group.records, "client");
+  const record = clients[0]?.raw || {};
+  return {
+    client_id: firstDefined([record.client_id]),
+    contact_email: firstDefined([record.contact?.email, record.email, record.next_action?.contact_email]) || null,
+    current_stage: firstDefined([stageFromClient(record)]),
+    next_action: firstDefined([nextActionFromClient(record)]),
+    payment_status: firstDefined([record.deal?.payment_status, record.payment_status]) || null,
+    closed_at: firstDefined([record.deal?.closed_at]) || null,
+    lifetime_value: Number.isFinite(Number(record.business?.lifetime_value ?? record.revenue?.total_lifetime_value))
+      ? Number(record.business?.lifetime_value ?? record.revenue?.total_lifetime_value)
+      : null,
+    followup_ready: Boolean(record.close_engine?.followup_ready),
+    source_match_reasons: clients.length
+      ? unique(
+          clients.flatMap((client) => [
+            client.raw.client_id ? `client_id=${client.raw.client_id}` : null,
+            client.raw.merchant_shop ? `merchant_shop=${client.raw.merchant_shop}` : null,
+            client.raw.contact?.email ? `contact.email=${client.raw.contact.email}` : null,
+            client.raw.next_action?.instructions ? `next_action.instructions=${client.raw.next_action.instructions}` : null,
+          ])
+        )
+      : [],
+    source_records: clients.map((client) => client.id),
   };
-
-  const aliasesToAdd = recordAliases(record).concat(noteAliases(record));
-  if (bucket.facets.lead.lead_id) bucket.identity.lead_id = bucket.identity.lead_id || bucket.facets.lead.lead_id;
-  if (record.contact?.email || record.email) bucket.identity.email = bucket.identity.email || text(record.contact?.email || record.email);
-  if (record.domain) bucket.identity.domain = bucket.identity.domain || text(record.domain);
-
-  if (!bucket.display_name || bucket.display_name === bucket.relationship_id.replace(/^rel_/, "")) {
-    bucket.display_name = text(record.name || record.domain || record.lead_id || bucket.display_name);
-  }
-
-  registerAliases(aliases, bucket.relationship_id, aliasesToAdd);
-  chooseRelationship(bucket, record, bucket.relationship_id, sourceKey);
 }
 
-function mergeClient(record: AnyRecord, bucket: RelationshipAccumulator, sourceKey: string, aliases: Map<string, string>) {
-  bucket.has_client = true;
-  bucket.facets.client = {
-    client_id: text(record.client_id),
-    merchant_shop: text(record.merchant_shop),
-    status: text(record.status),
-    lifecycle: record.lifecycle || {},
-    lifecycle_stage: text(record.lifecycle?.stage || record.lifecycle_stage || record.decision_trace?.lifecycle_stage),
-    payment_status: text(record.deal?.payment_status || record.payment_status),
-    deal: record.deal || {},
-    business: record.business || {},
-    shopifixer: record.shopifixer || {},
-    abando: record.abando || {},
-    priority_score: record.priority_score || {},
-    blocker_detection: record.blocker_detection || {},
-    decision_trace: record.decision_trace || {},
-    close_engine: record.close_engine || {},
-    next_action: record.next_action || {},
-    notes: record.notes || [],
-    contact: record.contact || {},
+function collectMerchantFacet(group: RelationshipGroup): RelationshipObject["facets"]["merchant"] {
+  const merchants = recordsBySource(group.records, "merchant");
+  const record = merchants[0]?.raw || {};
+  return {
+    merchant_id: firstDefined([record.merchant_id, record.client_id]),
+    merchant_shop: firstDefined([record.merchant_shop]),
+    store_domain: firstDefined([record.store_domain, record.merchant_shop]),
+    current_stage: firstDefined([stageFromMerchant(record)]),
+    next_required_action: firstDefined([nextActionFromMerchant(record)]),
+    readiness_score: Number.isFinite(Number(record.readiness_score)) ? Number(record.readiness_score) : null,
+    offer_status: firstDefined([record.offer_status]) || null,
+    payment_status: firstDefined([record.payment_status]) || null,
+    fulfillment_status: firstDefined([record.fulfillment_status]) || null,
+    proof_package_status: firstDefined([record.proof_package_status]) || null,
+    case_study_status: firstDefined([record.case_study_status]) || null,
+    referral_status: firstDefined([record.referral_status]) || null,
+    revenue_status: firstDefined([record.revenue_status]) || null,
+    source_match_reasons: merchants.length
+      ? unique(
+          merchants.flatMap((merchant) => [
+            merchant.raw.merchant_id ? `merchant_id=${merchant.raw.merchant_id}` : null,
+            merchant.raw.client_id ? `client_id=${merchant.raw.client_id}` : null,
+            merchant.raw.merchant_shop ? `merchant_shop=${merchant.raw.merchant_shop}` : null,
+            merchant.raw.store_domain ? `store_domain=${merchant.raw.store_domain}` : null,
+            merchant.raw.current_stage ? `current_stage=${merchant.raw.current_stage}` : null,
+            merchant.raw.next_required_action ? `next_required_action=${merchant.raw.next_required_action}` : null,
+          ])
+        )
+      : [],
+    source_records: merchants.map((merchant) => merchant.id),
   };
-
-  const aliasesToAdd = recordAliases(record).concat(noteAliases(record));
-  if (record.client_id) bucket.identity.client_id = bucket.identity.client_id || text(record.client_id);
-  if (record.merchant_shop) bucket.identity.merchant_shop = bucket.identity.merchant_shop || text(record.merchant_shop);
-  if (record.contact?.email) bucket.identity.email = bucket.identity.email || text(record.contact.email);
-  if (record.contact?.name) bucket.identity.customer = bucket.identity.customer || text(record.contact.name);
-
-  const leadIdsFromNotes = Array.isArray(record.notes)
-    ? record.notes.map((note) => text(note?.lead_id)).filter(Boolean)
-    : [];
-  if (leadIdsFromNotes.length) {
-    bucket.identity.lead_id = bucket.identity.lead_id || leadIdsFromNotes[0];
-  }
-
-  if (!bucket.display_name || bucket.display_name === bucket.relationship_id.replace(/^rel_/, "")) {
-    bucket.display_name = text(record.merchant_shop || record.client_id || bucket.display_name);
-  }
-
-  registerAliases(aliases, bucket.relationship_id, aliasesToAdd);
-  chooseRelationship(bucket, record, bucket.relationship_id, sourceKey);
-
-  for (const leadId of leadIdsFromNotes) {
-    registerAliases(aliases, bucket.relationship_id, [leadId]);
-    bucket.links.lead_registry_ids.push(leadId);
-  }
 }
 
-function mergeMerchantLifecycle(record: AnyRecord, bucket: RelationshipAccumulator, sourceKey: string, aliases: Map<string, string>) {
-  bucket.has_merchant = true;
-  bucket.facets.merchant = {
-    merchant_id: text(record.merchant_id),
-    client_id: text(record.client_id),
-    merchant_shop: text(record.merchant_shop),
-    store_domain: text(record.store_domain),
-    current_stage: text(record.current_stage),
-    next_required_action: text(record.next_required_action),
-    readiness_score: toNumber(record.readiness_score),
-    offer_status: text(record.offer_status),
-    offer_price: toNumber(record.offer_price),
-    payment_status: text(record.payment_status),
-    fulfillment_status: text(record.fulfillment_status),
-    proof_package_status: text(record.proof_package_status),
-    case_study_status: text(record.case_study_status),
-    review_status: text(record.review_status),
-    referral_status: text(record.referral_status),
-    revenue_status: text(record.revenue_status),
-    audit: record.audit || {},
-    offer: record.offer || {},
-    payment: record.payment || {},
-    fulfillment: record.fulfillment || {},
-    lifecycle_lane: record.lifecycle_lane || {},
-    field_sources: record.field_sources || {},
-    source_files: record.source_files || [],
+function collectFulfillmentFacet(group: RelationshipGroup): RelationshipObject["facets"]["fulfillment"] {
+  const fulfillments = recordsBySource(group.records, "fulfillment");
+  const record = fulfillments[0]?.raw || {};
+  return {
+    fulfillment_id: firstDefined([record.fulfillment_id, record.delivery_unit_ref]) || null,
+    client_id: firstDefined([record.client_id]) || null,
+    store_domain: firstDefined([record.store_domain]) || null,
+    payment_status: firstDefined([record.payment_status]) || null,
+    fulfillment_status: firstDefined([record.fulfillment_status]) || null,
+    proof_status: firstDefined([record.proof_status]) || null,
+    completion_status: firstDefined([record.completion_status]) || null,
+    before_evidence_status: firstDefined([record.before_evidence_status]) || null,
+    after_evidence_status: firstDefined([record.after_evidence_status]) || null,
+    proof_package_status: firstDefined([record.proof_package_status]) || null,
+    completed_at: normalizeTimestamp(record.completed_at),
+    merchant_proof_package_ready: Boolean(record.merchant_proof_package_ready),
+    remaining_limitations: firstDefined([record.remaining_limitations]) || null,
+    risk_or_limitation: firstDefined([record.risk_or_limitation]) || null,
+    source_match_reasons: fulfillments.length
+      ? unique(
+          fulfillments.flatMap((fulfillment) => [
+            fulfillment.raw.fulfillment_id ? `fulfillment_id=${fulfillment.raw.fulfillment_id}` : null,
+            fulfillment.raw.client_id ? `client_id=${fulfillment.raw.client_id}` : null,
+            fulfillment.raw.store_domain ? `store_domain=${fulfillment.raw.store_domain}` : null,
+            fulfillment.raw.payment_status ? `payment_status=${fulfillment.raw.payment_status}` : null,
+            fulfillment.raw.fulfillment_status ? `fulfillment_status=${fulfillment.raw.fulfillment_status}` : null,
+          ])
+        )
+      : [],
+    source_records: fulfillments.map((fulfillment) => fulfillment.id),
   };
-
-  const aliasesToAdd = recordAliases(record);
-  if (record.merchant_id) bucket.identity.merchant_id = bucket.identity.merchant_id || text(record.merchant_id);
-  if (record.client_id) bucket.identity.client_id = bucket.identity.client_id || text(record.client_id);
-  if (record.merchant_shop) bucket.identity.merchant_shop = bucket.identity.merchant_shop || text(record.merchant_shop);
-  if (record.store_domain) bucket.identity.store_domain = bucket.identity.store_domain || text(record.store_domain);
-
-  if (!bucket.display_name || bucket.display_name === bucket.relationship_id.replace(/^rel_/, "")) {
-    bucket.display_name = text(record.merchant_shop || record.store_domain || record.client_id || record.merchant_id || bucket.display_name);
-  }
-
-  registerAliases(aliases, bucket.relationship_id, aliasesToAdd);
-  chooseRelationship(bucket, record, bucket.relationship_id, sourceKey);
 }
 
-function mergeFulfillment(record: AnyRecord, bucket: RelationshipAccumulator, sourceKey: string, aliases: Map<string, string>) {
-  bucket.has_fulfillment = true;
-  bucket.facets.fulfillment = {
-    fulfillment_id: text(record.fulfillment_id),
-    packet_id: text(record.packet_id),
-    client_id: text(record.client_id),
-    store_domain: text(record.store_domain),
-    opportunity_ref: text(record.opportunity_ref),
-    delivery_unit_ref: text(record.delivery_unit_ref),
-    payment_status: text(record.payment_status),
-    fulfillment_status: text(record.fulfillment_status),
-    execution_status: text(record.execution_status),
-    proof_status: text(record.proof_status),
-    completion_status: text(record.completion_status),
-    before_evidence_status: text(record.before_evidence_status),
-    after_evidence_status: text(record.after_evidence_status),
-    proof_package_status: text(record.proof_package_status),
-    review_status: text(record.review_status),
-    referral_status: text(record.referral_status),
-    case_study_status: text(record.case_study_status),
-    risk_or_limitation: text(record.risk_or_limitation),
-    remaining_limitations: text(record.remaining_limitations),
-    merchant_proof_package_ready: toBoolean(record.merchant_proof_package_ready),
-    completed_at: text(record.completed_at),
-    source_files: record.source_files || [],
+function collectExecutionFacet(group: RelationshipGroup): RelationshipObject["facets"]["execution"] {
+  const executions = recordsBySource(group.records, "execution");
+  const record = executions[0]?.raw || {};
+  return {
+    execution_id: firstDefined([record.execution_id]) || null,
+    timestamp: timestampFromExecution(record),
+    operator: firstDefined([record.operator]) || null,
+    action_type: firstDefined([record.action_type]) || null,
+    stage: firstDefined([stageFromExecution(record)]),
+    outcome: firstDefined([record.outcome]) || null,
+    revenue_impact: firstDefined([record.revenue_impact]) || null,
+    customer: firstDefined([record.customer]) || null,
+    source_match_reasons: executions.length
+      ? unique(
+          executions.flatMap((execution) => [
+            execution.raw.execution_id ? `execution_id=${execution.raw.execution_id}` : null,
+            execution.raw.customer ? `customer=${execution.raw.customer}` : null,
+            execution.raw.action_type ? `action_type=${execution.raw.action_type}` : null,
+          ])
+        )
+      : [],
+    source_records: executions.map((execution) => execution.id),
   };
-
-  const aliasesToAdd = recordAliases(record);
-  if (record.fulfillment_id) bucket.links.fulfillment_ids.push(text(record.fulfillment_id));
-  if (record.client_id) bucket.identity.client_id = bucket.identity.client_id || text(record.client_id);
-  if (record.store_domain) bucket.identity.store_domain = bucket.identity.store_domain || text(record.store_domain);
-
-  if (!bucket.display_name || bucket.display_name === bucket.relationship_id.replace(/^rel_/, "")) {
-    bucket.display_name = text(record.merchant_name || record.client_id || record.store_domain || bucket.display_name);
-  }
-
-  registerAliases(aliases, bucket.relationship_id, aliasesToAdd);
-  chooseRelationship(bucket, record, bucket.relationship_id, sourceKey);
 }
 
-function mergeExecution(record: AnyRecord, bucket: RelationshipAccumulator, sourceKey: string, aliases: Map<string, string>) {
-  bucket.has_execution = true;
-  bucket.facets.outcome = bucket.facets.outcome || {};
-  bucket.facets.outcome = {
-    ...(bucket.facets.outcome || {}),
-    execution_id: text(record.execution_id),
-    timestamp: text(record.timestamp),
-    customer: text(record.customer),
-    action_type: text(record.action_type),
-    stage: text(record.stage),
-    outcome: text(record.outcome),
-    revenue_impact: text(record.revenue_impact),
-    notes: text(record.notes),
+function collectOutcomeFacet(group: RelationshipGroup): RelationshipObject["facets"]["outcome"] {
+  const outcomes = recordsBySource(group.records, "outcome");
+  const record = outcomes[0]?.raw || {};
+  return {
+    event_id: firstDefined([record.event_id]) || null,
+    timestamp: timestampFromOutcome(record),
+    customer: firstDefined([record.customer]) || null,
+    previous_state: firstDefined([record.previous_state]) || null,
+    new_state: firstDefined([record.new_state]) || null,
+    trigger: firstDefined([record.trigger]) || null,
+    confidence: Number.isFinite(Number(record.confidence)) ? Number(record.confidence) : null,
+    source_match_reasons: outcomes.length
+      ? unique(
+          outcomes.flatMap((outcome) => [
+            outcome.raw.event_id ? `event_id=${outcome.raw.event_id}` : null,
+            outcome.raw.customer ? `customer=${outcome.raw.customer}` : null,
+            outcome.raw.new_state ? `new_state=${outcome.raw.new_state}` : null,
+            outcome.raw.trigger ? `trigger=${outcome.raw.trigger}` : null,
+          ])
+        )
+      : [],
+    source_records: outcomes.map((outcome) => outcome.id),
   };
-
-  const aliasValues = unique([record.customer, record.customer_name, record.domain, record.email]);
-  registerAliases(aliases, bucket.relationship_id, aliasValues);
-  if (record.execution_id) bucket.links.execution_ids.push(text(record.execution_id));
-  if (!bucket.identity.customer) bucket.identity.customer = text(record.customer);
-  if (!bucket.display_name || bucket.display_name === bucket.relationship_id.replace(/^rel_/, "")) {
-    bucket.display_name = text(record.customer || bucket.display_name);
-  }
-
-  chooseRelationship(bucket, record, bucket.relationship_id, sourceKey);
 }
 
-function mergeOutcome(record: AnyRecord, bucket: RelationshipAccumulator, sourceKey: string, aliases: Map<string, string>) {
-  bucket.has_outcome = true;
-  bucket.facets.outcome = {
-    ...(bucket.facets.outcome || {}),
-    event_id: text(record.event_id),
-    timestamp: text(record.timestamp),
-    customer: text(record.customer),
-    previous_state: text(record.previous_state),
-    new_state: text(record.new_state),
-    trigger: text(record.trigger),
-    confidence: Number.isFinite(Number(record.confidence)) ? Number(record.confidence) : 0,
+function determinePrimaryKey(group: RelationshipGroup) {
+  const byPriority = [
+    group.records.find((record) => record.source === "client" && text(record.raw.client_id)),
+    group.records.find((record) => record.source === "merchant" && text(record.raw.client_id || record.raw.merchant_shop)),
+    group.records.find((record) => record.source === "fulfillment" && text(record.raw.client_id || record.raw.store_domain)),
+    group.records.find((record) => record.source === "lead" && text(record.raw.lead_id || record.raw.domain)),
+    group.records.find((record) => record.source === "execution" && text(record.raw.customer)),
+    group.records.find((record) => record.source === "outcome" && text(record.raw.customer)),
+  ].filter(Boolean) as RawGroupRecord[];
+
+  const chosen = byPriority[0] || group.records[0];
+  const primary =
+    chosen.source === "client"
+      ? chosen.raw.client_id || chosen.raw.merchant_shop || chosen.raw.store_domain
+      : chosen.source === "merchant"
+        ? chosen.raw.client_id || chosen.raw.merchant_shop || chosen.raw.store_domain || chosen.raw.merchant_id
+        : chosen.source === "fulfillment"
+          ? chosen.raw.client_id || chosen.raw.store_domain || chosen.raw.fulfillment_id
+          : chosen.source === "lead"
+            ? chosen.raw.lead_id || chosen.raw.domain || chosen.raw.name
+            : chosen.source === "execution"
+              ? chosen.raw.customer || chosen.raw.execution_id
+              : chosen.raw.customer || chosen.raw.event_id;
+
+  return text(primary || chosen.id || group.key);
+}
+
+function determineDisplayName(group: RelationshipGroup) {
+  const client = group.records.find((record) => record.source === "client")?.raw || {};
+  const merchant = group.records.find((record) => record.source === "merchant")?.raw || {};
+  const fulfillment = group.records.find((record) => record.source === "fulfillment")?.raw || {};
+  const lead = group.records.find((record) => record.source === "lead")?.raw || {};
+  const outcome = group.records.find((record) => record.source === "outcome")?.raw || {};
+  const execution = group.records.find((record) => record.source === "execution")?.raw || {};
+
+  return firstDefined([
+    client.merchant_shop,
+    client.client_id,
+    merchant.merchant_shop,
+    merchant.client_id,
+    fulfillment.store_domain,
+    lead.name,
+    lead.domain,
+    outcome.customer,
+    execution.customer,
+    group.key,
+  ]) || "unknown";
+}
+
+function determineCurrentStage(group: RelationshipGroup) {
+  const client = group.records.find((record) => record.source === "client")?.raw || {};
+  const merchant = group.records.find((record) => record.source === "merchant")?.raw || {};
+  const fulfillment = group.records.find((record) => record.source === "fulfillment")?.raw || {};
+  const lead = group.records.find((record) => record.source === "lead")?.raw || {};
+  const outcome = group.records.find((record) => record.source === "outcome")?.raw || {};
+
+  const sourceValues = [
+    { source: "client_registry_v1.json", value: stageFromClient(client), precedence: 1 },
+    { source: "merchant_lifecycle_registry_v1.json", value: stageFromMerchant(merchant), precedence: 2 },
+    { source: "shopifixer_fulfillment_truth_v1.json", value: stageFromFulfillment(fulfillment), precedence: 3 },
+    { source: "lead_registry_v1.json", value: stageFromLead(lead), precedence: 4 },
+    { source: "execution/outcome history", value: stageFromOutcome(outcome), precedence: 5 },
+  ].filter((item) => text(item.value));
+
+  const selected = [...sourceValues].sort((a, b) => a.precedence - b.precedence)[0] || null;
+  const distinctValues = unique(sourceValues.map((item) => item.value));
+  const conflict = distinctValues.length > 1 ? true : false;
+
+  return {
+    stage: selected ? selected.value : null,
+    source: selected ? selected.source : null,
+    conflict,
+    allValues: distinctValues,
   };
-
-  const aliasValues = unique([record.customer, record.customer_name, record.domain, record.email]);
-  registerAliases(aliases, bucket.relationship_id, aliasValues);
-  if (record.event_id) bucket.links.outcome_event_ids.push(text(record.event_id));
-  if (!bucket.identity.customer) bucket.identity.customer = text(record.customer);
-  if (!bucket.display_name || bucket.display_name === bucket.relationship_id.replace(/^rel_/, "")) {
-    bucket.display_name = text(record.customer || bucket.display_name);
-  }
-
-  chooseRelationship(bucket, record, bucket.relationship_id, sourceKey);
 }
 
-function addConflictNotes(bucket: RelationshipAccumulator) {
-  const lead = bucket.facets.lead || {};
-  const client = bucket.facets.client || {};
-  const merchant = bucket.facets.merchant || {};
-  const fulfillment = bucket.facets.fulfillment || {};
-  const outcome = bucket.facets.outcome || {};
+function determineNextAction(group: RelationshipGroup, revenueTruth: Record<string, any>) {
+  const client = group.records.find((record) => record.source === "client")?.raw || {};
+  const merchant = group.records.find((record) => record.source === "merchant")?.raw || {};
+  const lead = group.records.find((record) => record.source === "lead")?.raw || {};
+
+  const clientAction = firstDefined([nextActionFromClient(client)]);
+  const merchantAction = firstDefined([nextActionFromMerchant(merchant)]);
+  const leadAction = firstDefined([nextActionFromLead(lead)]);
+  const revenueAction = firstDefined([
+    revenueTruth?.next_actions?.[0]?.action,
+    revenueTruth?.next_actions?.[0]?.expected_outcome,
+    revenueTruth?.current_bottleneck,
+  ]);
+
+  const selected = firstDefined([clientAction, merchantAction, revenueAction, leadAction]);
+  const selectedSource = clientAction
+    ? "client_registry_v1.json"
+    : merchantAction
+      ? "merchant_lifecycle_registry_v1.json"
+      : revenueAction
+        ? "revenue_truth_v1.json"
+          : leadAction
+            ? "lead_registry_v1.json"
+            : null;
+  const selectedOwner = firstDefined([
+    client.next_action?.owner,
+    merchant.next_action?.owner,
+    lead.next_action?.owner,
+  ]) || (selectedSource ? "system" : null);
+
+  return {
+    nextAction: selected,
+    source: selectedSource,
+    owner: selectedOwner,
+    values: unique([clientAction, merchantAction, revenueAction, leadAction]),
+  };
+}
+
+function determineNextTouchAt(group: RelationshipGroup) {
+  const client = group.records.find((record) => record.source === "client")?.raw || {};
+  const merchant = group.records.find((record) => record.source === "merchant")?.raw || {};
+  const lead = group.records.find((record) => record.source === "lead")?.raw || {};
+  const fulfillment = group.records.find((record) => record.source === "fulfillment")?.raw || {};
+
+  return (
+    normalizeTimestamp(firstDefined([
+      client.next_action?.due_at,
+      client.next_action?.updated_at,
+      client.decision_trace?.evaluated_at,
+      merchant.updated_at,
+      merchant.generated_at,
+      lead.next_action?.due_at,
+      lead.next_action?.updated_at,
+      lead.updated_at,
+      fulfillment.updated_at,
+      fulfillment.completed_at,
+    ])) || null
+  );
+}
+
+function detectConflicts(group: RelationshipGroup) {
+  const client = group.records.find((record) => record.source === "client")?.raw || {};
+  const merchant = group.records.find((record) => record.source === "merchant")?.raw || {};
+  const fulfillment = group.records.find((record) => record.source === "fulfillment")?.raw || {};
+  const lead = group.records.find((record) => record.source === "lead")?.raw || {};
+  const execution = group.records.find((record) => record.source === "execution")?.raw || {};
+  const outcome = group.records.find((record) => record.source === "outcome")?.raw || {};
+
+  const conflictTypes: ConflictType[] = [];
+  const conflictNotes: string[] = [];
 
   const stageValues = unique([
-    lead.lifecycle_stage,
-    lead.status?.current_stage,
-    client.lifecycle_stage,
-    client.decision_trace?.lifecycle_stage,
-    merchant.current_stage,
-    merchant.offer_status,
-    merchant.payment_status,
-    fulfillment.fulfillment_status,
-    fulfillment.execution_status,
-    fulfillment.proof_status,
-    fulfillment.completion_status,
-    outcome.previous_state,
-    outcome.new_state,
+    stageFromClient(client),
+    stageFromMerchant(merchant),
+    stageFromFulfillment(fulfillment),
+    stageFromLead(lead),
+    stageFromExecution(execution),
+    stageFromOutcome(outcome),
   ]);
   if (stageValues.length > 1) {
-    addConflict(bucket, `Stage mismatch: ${stageValues.join(" | ")}`);
+    conflictTypes.push("stage_conflict");
+    conflictNotes.push(`stage conflict: ${stageValues.join(" | ")}`);
   }
 
   const paymentValues = unique([
+    client.deal?.payment_status,
     client.payment_status,
     merchant.payment_status,
     fulfillment.payment_status,
-  ]);
+  ].filter((value) => lowerText(value) !== "not_billable" && lowerText(value) !== "unknown"));
   if (paymentValues.length > 1) {
-    addConflict(bucket, `Payment mismatch: ${paymentValues.join(" | ")}`);
+    conflictTypes.push("payment_conflict");
+    conflictNotes.push(`payment conflict: ${paymentValues.join(" | ")}`);
   }
 
-  const emailValues = unique([
+  const clientIds = unique([client.client_id, merchant.client_id, fulfillment.client_id]);
+  const merchantShops = unique([client.merchant_shop, merchant.merchant_shop, fulfillment.store_domain]);
+  const leadIds = unique([lead.lead_id, merchant.lead_id]);
+  const customerNames = unique([execution.customer, outcome.customer]);
+  const identitySignals = unique([...clientIds, ...merchantShops, ...leadIds, ...customerNames]);
+  const meaningfulIdentitySignals = identitySignals.filter((value) => Boolean(value));
+  if (meaningfulIdentitySignals.length > 1 && clientIds.length > 1) {
+    conflictTypes.push("identity_conflict");
+    conflictNotes.push(`identity conflict: ${meaningfulIdentitySignals.join(" | ")}`);
+  }
+
+  const contactValues = unique([
     lead.contact?.email,
     client.contact?.email,
-    bucket.identity.email,
   ]);
-  if (emailValues.length > 1) {
-    addConflict(bucket, `Email mismatch: ${emailValues.join(" | ")}`);
-  }
-
-  const leadIds = unique(bucket.links.lead_registry_ids);
-  const clientIds = unique(bucket.links.client_registry_ids);
-  const merchantIds = unique(bucket.links.merchant_lifecycle_ids);
-  if (leadIds.length > 1) {
-    addConflict(bucket, `Multiple lead IDs mapped: ${leadIds.join(" | ")}`);
-  }
-  if (clientIds.length > 1) {
-    addConflict(bucket, `Multiple client IDs mapped: ${clientIds.join(" | ")}`);
-  }
-  if (merchantIds.length > 1) {
-    addConflict(bucket, `Multiple merchant lifecycle IDs mapped: ${merchantIds.join(" | ")}`);
-  }
-}
-
-function finalizeAccumulator(bucket: RelationshipAccumulator): RelationshipObject {
-  addConflictNotes(bucket);
-
-  const lead = bucket.facets.lead || {};
-  const client = bucket.facets.client || {};
-  const merchant = bucket.facets.merchant || {};
-  const fulfillment = bucket.facets.fulfillment || {};
-  const outcome = bucket.facets.outcome || {};
-
-  const displayName = firstNonEmpty([
-    bucket.identity.client_id,
-    bucket.identity.merchant_shop,
-    bucket.identity.store_domain,
-    bucket.identity.lead_id,
-    bucket.identity.customer,
-    lead.name,
-    client.merchant_shop,
-    merchant.merchant_shop,
-    fulfillment.store_domain,
-  ]) || bucket.display_name;
-
-  const currentStage = firstNonEmpty([
-    text(merchant.current_stage),
-    text(client.lifecycle_stage),
-    text(lead.lifecycle_stage),
-    text(fulfillment.fulfillment_status),
-    text(outcome.new_state || outcome.previous_state),
-  ]) || "unknown";
-
-  const nextAction = firstNonEmpty([
-    merchant.next_required_action,
-    client.next_action?.instructions,
-    lead.next_action?.instructions,
-    fulfillment.risk_or_limitation,
-    fulfillment.remaining_limitations,
-  ]) || canonicalNextActionLabel("Review relationship");
-
-  const lastTouchAt = latestTimestamp(
-    lead.updated_at,
-    client.next_action?.updated_at,
-    merchant.field_sources?.updated_at,
-    fulfillment.completed_at,
-    executionTimestamp(outcome),
-    outcome.timestamp,
-    bucket.timeline.updated_at
-  );
-  const nextTouchAt = firstNonEmpty([
-    client.next_action?.due_at,
-    lead.next_action?.due_at,
-    merchant.next_required_action,
-  ]);
-
-  const confidence = confidenceFor(bucket);
-  const relationshipHealth = relationshipHealthFor(bucket);
-  const status = relationshipStatusFor(bucket);
-  const riskLevel = riskLevelFor(bucket);
-  const relationshipType = relationshipTypeFor(bucket);
-
-  const sourceKeys = unique([
-    ...Array.from(bucket.source_keys),
-    ...bucket.links.lead_registry_ids,
-    ...bucket.links.client_registry_ids,
-    ...bucket.links.merchant_lifecycle_ids,
-    ...bucket.links.fulfillment_ids,
-    ...bucket.links.execution_ids,
-    ...bucket.links.outcome_event_ids,
-  ]);
-
-  const primarySource = bucket.has_client
-    ? "client_registry_v1.json"
-    : bucket.has_merchant
-      ? "merchant_lifecycle_registry_v1.json"
-      : bucket.has_fulfillment
-        ? "shopifixer_fulfillment_truth_v1.json"
-        : bucket.has_lead
-          ? "lead_registry_v1.json"
-          : bucket.has_outcome
-            ? "outcome_events_v1.json"
-            : bucket.has_execution
-              ? "execution_log_v1.json"
-              : "unknown";
-
-  const secondarySources = unique([
-    bucket.has_lead ? "lead_registry_v1.json" : null,
-    bucket.has_client ? "client_registry_v1.json" : null,
-    bucket.has_merchant ? "merchant_lifecycle_registry_v1.json" : null,
-    bucket.has_fulfillment ? "shopifixer_fulfillment_truth_v1.json" : null,
-    bucket.has_execution ? "execution_log_v1.json" : null,
-    bucket.has_outcome ? "outcome_events_v1.json" : null,
-  ]).filter((value) => value !== primarySource);
-
-  const conflictNotes = unique([
-    ...bucket.relationship_core.conflict_notes,
-    ...(bucket.identity.lead_id && bucket.identity.client_id && bucket.identity.lead_id === bucket.identity.client_id ? [] : []),
-  ]);
-
-  const timelineCreated = bucket.timeline.created_at || new Date().toISOString();
-  const timelineUpdated = bucket.latest_at || bucket.timeline.updated_at || timelineCreated;
-
-  const merchantId = bucket.identity.merchant_id || bucket.identity.client_id || bucket.identity.merchant_shop || bucket.identity.store_domain || null;
-
-  const resolvedRelationship: RelationshipObject = {
-    relationship_id: bucket.relationship_id,
-    display_name: displayName,
-    relationship_type: relationshipType,
-    identity: {
-      lead_id: bucket.identity.lead_id,
-      client_id: bucket.identity.client_id,
-      merchant_id: merchantId,
-      merchant_shop: bucket.identity.merchant_shop,
-      store_domain: bucket.identity.store_domain,
-      domain: bucket.identity.domain,
-      email: bucket.identity.email,
-      customer: bucket.identity.customer,
-    },
-    relationship_core: {
-      owner: bucket.relationship_core.owner,
-      status,
-      current_stage: currentStage,
-      next_action: nextAction,
-      contactability: contactabilityFor(bucket),
-      relationship_health: relationshipHealth,
-      risk_level: riskLevel,
-      priority_score: toNumber(client.priority_score?.total || client.priority_score || merchant.readiness_score || lead.score),
-      last_touch_at: lastTouchAt,
-      next_touch_at: nextTouchAt,
-      confidence,
-      conflict_notes: conflictNotes,
-    },
-    facets: {
-      lead: bucket.facets.lead,
-      merchant: bucket.facets.merchant,
-      client: bucket.facets.client,
-      fulfillment: bucket.facets.fulfillment,
-      outcome: bucket.facets.outcome,
-    },
-    links: {
-      lead_registry_ids: unique(bucket.links.lead_registry_ids),
-      client_registry_ids: unique(bucket.links.client_registry_ids),
-      merchant_lifecycle_ids: unique(bucket.links.merchant_lifecycle_ids),
-      fulfillment_ids: unique(bucket.links.fulfillment_ids),
-      execution_ids: unique(bucket.links.execution_ids),
-      outcome_event_ids: unique(bucket.links.outcome_event_ids),
-    },
-    provenance: {
-      primary_source: primarySource,
-      secondary_sources: secondarySources,
-      source_keys: sourceKeys,
-      confidence,
-      conflict_notes: conflictNotes,
-    },
-    timeline: {
-      created_at: timelineCreated,
-      updated_at: timelineUpdated,
-    },
-  };
-
-  return resolvedRelationship;
-}
-
-function executionTimestamp(outcome: AnyRecord) {
-  return text(outcome.timestamp);
-}
-
-function buildRelationshipBuckets() {
-  const repoRoot = resolveRepoRoot();
-  const leadRegistry = readJson<LeadRegistry>(path.join(repoRoot, SOURCES.leadRegistry), { items: [] });
-  const clientRegistry = readJson<ClientRegistry>(path.join(repoRoot, SOURCES.clientRegistry), { clients: [] });
-  const merchantLifecycle = readJson<MerchantLifecycleRegistry>(path.join(repoRoot, SOURCES.merchantLifecycle), { records: [] });
-  const fulfillmentTruth = readJson<FulfillmentTruth>(path.join(repoRoot, SOURCES.fulfillmentTruth), { items: [] });
-  const executionTruth = readJson<ExecutionTruth>(path.join(repoRoot, SOURCES.executionLog), { events: [] });
-  const outcomeTruth = readJson<OutcomeTruth>(path.join(repoRoot, SOURCES.outcomeEvents), { events: [] });
-
-  const buckets = new Map<string, RelationshipAccumulator>();
-  const aliases = new Map<string, string>();
-
-  function getBucket(candidateKeys: string[], displayName: string) {
-    return resolveOrCreate(buckets, aliases, candidateKeys, displayName);
-  }
-
-  for (const client of Array.isArray(clientRegistry.clients) ? clientRegistry.clients : []) {
-    const candidateKeys = unique([
-      client.client_id,
-      client.merchant_shop,
-      client.shop,
-      client.domain,
-      client.contact?.email,
-      ...noteAliases(client),
-    ]);
-    const displayName = text(client.merchant_shop || client.client_id || client.contact?.email || "Unknown client");
-    const bucket = getBucket(candidateKeys, displayName);
-    if (!bucket) continue;
-
-    mergeClient(client, bucket, SOURCES.clientRegistry, aliases);
-    registerAliases(aliases, bucket.relationship_id, candidateKeys);
-    if (client.client_id) bucket.links.client_registry_ids.push(text(client.client_id));
-  }
-
-  for (const record of Array.isArray(merchantLifecycle.records) ? merchantLifecycle.records : []) {
-    const candidateKeys = unique([
-      record.client_id,
-      record.merchant_id,
-      record.merchant_shop,
-      record.store_domain,
-      ...recordAliases(record),
-    ]);
-    const displayName = text(record.merchant_shop || record.store_domain || record.client_id || record.merchant_id || "Unknown merchant");
-    const bucket = getBucket(candidateKeys, displayName);
-    if (!bucket) continue;
-
-    mergeMerchantLifecycle(record, bucket, SOURCES.merchantLifecycle, aliases);
-    registerAliases(aliases, bucket.relationship_id, candidateKeys);
-    if (record.merchant_id) bucket.links.merchant_lifecycle_ids.push(text(record.merchant_id));
-    if (record.client_id) bucket.links.client_registry_ids.push(text(record.client_id));
-  }
-
-  for (const item of Array.isArray(fulfillmentTruth.items) ? fulfillmentTruth.items : []) {
-    const candidateKeys = unique([
-      item.client_id,
-      item.merchant_name,
-      item.store_domain,
-      item.fulfillment_id,
-      item.delivery_unit_ref,
-      item.opportunity_ref,
-      item.packet_id,
-      ...recordAliases(item),
-    ]);
-    const displayName = text(item.merchant_name || item.store_domain || item.client_id || item.fulfillment_id || "Unknown fulfillment");
-    const bucket = getBucket(candidateKeys, displayName);
-    if (!bucket) continue;
-
-    mergeFulfillment(item, bucket, SOURCES.fulfillmentTruth, aliases);
-    registerAliases(aliases, bucket.relationship_id, candidateKeys);
-    if (item.client_id) bucket.links.client_registry_ids.push(text(item.client_id));
-    if (item.fulfillment_id) bucket.links.fulfillment_ids.push(text(item.fulfillment_id));
-  }
-
-  for (const lead of Array.isArray(leadRegistry.items) ? leadRegistry.items : []) {
-    const candidateKeys = unique([
-      lead.lead_id,
-      lead.id,
-      lead.domain,
-      lead.name,
-      lead.contact?.email,
-      lead.execution?.send_target,
-      ...recordAliases(lead),
-    ]);
-    const displayName = text(lead.name || lead.domain || lead.lead_id || lead.id || "Unknown lead");
-    const bucket = getBucket(candidateKeys, displayName);
-    if (!bucket) continue;
-
-    mergeLead(lead, bucket, SOURCES.leadRegistry, aliases);
-    registerAliases(aliases, bucket.relationship_id, candidateKeys);
-    if (lead.lead_id || lead.id) bucket.links.lead_registry_ids.push(text(lead.lead_id || lead.id));
-  }
-
-  for (const event of Array.isArray(executionTruth.events) ? executionTruth.events : []) {
-    const candidateKeys = unique([event.customer, event.domain, event.email, ...recordAliases(event)]);
-    const displayName = text(event.customer || "Unknown execution customer");
-    const bucket = getBucket(candidateKeys, displayName);
-    if (!bucket) continue;
-
-    mergeExecution(event, bucket, SOURCES.executionLog, aliases);
-    registerAliases(aliases, bucket.relationship_id, candidateKeys);
-    if (event.execution_id) bucket.links.execution_ids.push(text(event.execution_id));
-  }
-
-  for (const event of Array.isArray(outcomeTruth.events) ? outcomeTruth.events : []) {
-    const candidateKeys = unique([event.customer, event.domain, event.email, ...recordAliases(event)]);
-    const displayName = text(event.customer || "Unknown outcome customer");
-    const bucket = getBucket(candidateKeys, displayName);
-    if (!bucket) continue;
-
-    mergeOutcome(event, bucket, SOURCES.outcomeEvents, aliases);
-    registerAliases(aliases, bucket.relationship_id, candidateKeys);
-    if (event.event_id) bucket.links.outcome_event_ids.push(text(event.event_id));
-  }
-
-  return { repoRoot, buckets, aliases };
-}
-
-export function resolveRelationships() {
-  const { buckets } = buildRelationshipBuckets();
-  const relationships = [...buckets.values()].map(finalizeAccumulator);
-
-  return relationships.sort((a, b) => {
-    const priorityDelta = (b.relationship_core.priority_score || 0) - (a.relationship_core.priority_score || 0);
-    if (priorityDelta !== 0) return priorityDelta;
-    return a.relationship_id.localeCompare(b.relationship_id);
-  });
-}
-
-export function resolveRelationshipById(id: string) {
-  const normalized = normalizeRelationshipKey(id);
-  if (!normalized) return null;
-
-  return resolveRelationships().find((relationship) => {
-    const keys = unique([
-      relationship.relationship_id,
-      relationship.identity.client_id,
-      relationship.identity.merchant_id,
-      relationship.identity.merchant_shop,
-      relationship.identity.store_domain,
-      relationship.identity.lead_id,
-      relationship.identity.domain,
-      relationship.identity.email,
-      relationship.identity.customer,
-    ]);
-
-    return keys.some((value) => normalizeRelationshipKey(value) === normalized);
-  }) || null;
-}
-
-export function validateResolvedRelationships(relationships: RelationshipObject[]) {
-  const issues: string[] = [];
-
-  for (const relationship of relationships) {
-    if (!relationship.relationship_id) issues.push("Missing relationship_id");
-    if (!relationship.identity.client_id && !relationship.identity.lead_id && !relationship.identity.customer) {
-      issues.push(`Relationship ${relationship.relationship_id} is missing identity anchors.`);
-    }
-    if (!relationship.display_name) issues.push(`Relationship ${relationship.relationship_id} is missing display_name.`);
-    if (!relationship.provenance.primary_source) issues.push(`Relationship ${relationship.relationship_id} is missing primary_source.`);
-    if (relationship.provenance.confidence < 0.25 || relationship.provenance.confidence > 1) {
-      issues.push(`Relationship ${relationship.relationship_id} has invalid confidence ${relationship.provenance.confidence}.`);
-    }
+  if (contactValues.length > 1) {
+    conflictTypes.push("contact_conflict");
+    conflictNotes.push(`contact conflict: ${contactValues.join(" | ")}`);
   }
 
   return {
-    ok: issues.length === 0,
-    issues,
+    conflictTypes,
+    conflictNotes,
+  };
+}
+
+function buildSourceMatchReasons(group: RelationshipGroup): SourceMatchReasons {
+  const lead = recordsBySource(group.records, "lead");
+  const client = recordsBySource(group.records, "client");
+  const merchant = recordsBySource(group.records, "merchant");
+  const fulfillment = recordsBySource(group.records, "fulfillment");
+  const execution = recordsBySource(group.records, "execution");
+  const outcome = recordsBySource(group.records, "outcome");
+
+  return {
+    lead: unique(
+      lead.flatMap((record) => [
+        record.raw.lead_id ? `lead_id=${record.raw.lead_id}` : null,
+        record.raw.id ? `id=${record.raw.id}` : null,
+        record.raw.domain ? `domain=${record.raw.domain}` : null,
+        record.raw.contact?.email ? `contact.email=${record.raw.contact.email}` : null,
+      ])
+    ),
+    client: unique(
+      client.flatMap((record) => [
+        record.raw.client_id ? `client_id=${record.raw.client_id}` : null,
+        record.raw.merchant_shop ? `merchant_shop=${record.raw.merchant_shop}` : null,
+        record.raw.contact?.email ? `contact.email=${record.raw.contact.email}` : null,
+      ])
+    ),
+    merchant: unique(
+      merchant.flatMap((record) => [
+        record.raw.merchant_id ? `merchant_id=${record.raw.merchant_id}` : null,
+        record.raw.client_id ? `client_id=${record.raw.client_id}` : null,
+        record.raw.merchant_shop ? `merchant_shop=${record.raw.merchant_shop}` : null,
+        record.raw.store_domain ? `store_domain=${record.raw.store_domain}` : null,
+      ])
+    ),
+    fulfillment: unique(
+      fulfillment.flatMap((record) => [
+        record.raw.fulfillment_id ? `fulfillment_id=${record.raw.fulfillment_id}` : null,
+        record.raw.client_id ? `client_id=${record.raw.client_id}` : null,
+        record.raw.store_domain ? `store_domain=${record.raw.store_domain}` : null,
+      ])
+    ),
+    execution: unique(
+      execution.flatMap((record) => [
+        record.raw.execution_id ? `execution_id=${record.raw.execution_id}` : null,
+        record.raw.customer ? `customer=${record.raw.customer}` : null,
+        record.raw.action_type ? `action_type=${record.raw.action_type}` : null,
+      ])
+    ),
+    outcome: unique(
+      outcome.flatMap((record) => [
+        record.raw.event_id ? `event_id=${record.raw.event_id}` : null,
+        record.raw.customer ? `customer=${record.raw.customer}` : null,
+        record.raw.new_state ? `new_state=${record.raw.new_state}` : null,
+      ])
+    ),
+  };
+}
+
+function selectResolverState(group: RelationshipGroup, conflictTypes: ConflictType[], identity: RelationshipObject["identity"], contactability: "reachable" | "unknown"): ResolverState {
+  const leadRecords = recordsBySource(group.records, "lead");
+  const clientRecords = recordsBySource(group.records, "client");
+  const merchantRecords = recordsBySource(group.records, "merchant");
+  const fulfillmentRecords = recordsBySource(group.records, "fulfillment");
+  const executionRecords = recordsBySource(group.records, "execution");
+  const outcomeRecords = recordsBySource(group.records, "outcome");
+
+  const hasLeadOnly =
+    leadRecords.length > 0 &&
+    clientRecords.length === 0 &&
+    merchantRecords.length === 0 &&
+    fulfillmentRecords.length === 0 &&
+    executionRecords.length === 0 &&
+    outcomeRecords.length === 0;
+
+  const hasIdentityAnchors = Boolean(
+    identity.client_id || identity.merchant_shop || identity.store_domain || identity.lead_id || identity.email || identity.domain
+  );
+
+  if (!hasIdentityAnchors) return "unresolved_identity";
+  if (hasLeadOnly) return "lead_only";
+  const severeConflict =
+    conflictTypes.length > 1 || conflictTypes.some((type) => type !== "stage_conflict");
+  if (severeConflict) return "operational_conflict";
+  if (contactability === "unknown") return "contact_unknown";
+  return "resolved";
+}
+
+function determineRelationshipType(group: RelationshipGroup, resolverState: ResolverState): RelationshipObject["relationship_type"] {
+  if (resolverState === "lead_only") return "lead";
+  if (group.records.some((record) => record.source === "fulfillment" || record.source === "merchant")) return "merchant";
+  if (group.records.some((record) => record.source === "client")) return "client";
+  return "lead";
+}
+
+function determineHealth(resolverState: ResolverState, conflictTypes: ConflictType[]) {
+  if (resolverState === "operational_conflict") return "at_risk" as const;
+  if (resolverState === "contact_unknown" || resolverState === "lead_only") return "unknown" as const;
+  if (resolverState === "unresolved_identity") return "unknown" as const;
+  if (conflictTypes.length > 0) return "at_risk" as const;
+  return "healthy" as const;
+}
+
+function determineRiskLevel(resolverState: ResolverState, conflictTypes: ConflictType[], contactability: "reachable" | "unknown") {
+  if (resolverState === "operational_conflict") return "high" as const;
+  if (resolverState === "unresolved_identity") return "high" as const;
+  if (resolverState === "lead_only") return contactability === "reachable" ? "medium" as const : "high" as const;
+  if (resolverState === "contact_unknown") return "medium" as const;
+  if (conflictTypes.length > 0) return "high" as const;
+  return "low" as const;
+}
+
+function determineContactability(identity: RelationshipObject["identity"]) {
+  return identity.email ? ("reachable" as const) : ("unknown" as const);
+}
+
+function computePriorityScore(group: RelationshipGroup, relationshipCore: RelationshipObject["relationship_core"]) {
+  const client = group.records.find((record) => record.source === "client")?.raw || {};
+  const merchant = group.records.find((record) => record.source === "merchant")?.raw || {};
+  const lead = group.records.find((record) => record.source === "lead")?.raw || {};
+  const fulfillment = group.records.find((record) => record.source === "fulfillment")?.raw || {};
+
+  const base =
+    Number(client.priority_score?.total) ||
+    Number(client.priority_score?.revenue_potential) * 0.5 ||
+    Number(merchant.readiness_score) ||
+    Number(lead.score) ||
+    Number(fulfillment.merchant_proof_package_ready ? 90 : 0) ||
+    0;
+  const riskPenalty = relationshipCore.conflict_types.length > 0 ? 20 : 0;
+  const statePenalty = relationshipCore.status === "lead_only" ? 10 : relationshipCore.status === "contact_unknown" ? 5 : 0;
+  return Math.max(0, Math.min(100, Math.round(base - riskPenalty - statePenalty)));
+}
+
+function computeConfidence(group: RelationshipGroup, conflictTypes: ConflictType[], identity: RelationshipObject["identity"]) {
+  const hasClient = group.records.some((record) => record.source === "client");
+  const hasMerchant = group.records.some((record) => record.source === "merchant");
+  const hasFulfillment = group.records.some((record) => record.source === "fulfillment");
+  const hasExecution = group.records.some((record) => record.source === "execution");
+  const hasOutcome = group.records.some((record) => record.source === "outcome");
+  const hasLead = group.records.some((record) => record.source === "lead");
+
+  let confidence = 0.3;
+  if (hasLead) confidence += 0.1;
+  if (identity.client_id) confidence += 0.25;
+  if (identity.merchant_shop) confidence += 0.1;
+  if (hasMerchant) confidence += 0.1;
+  if (hasFulfillment) confidence += 0.1;
+  if (hasExecution) confidence += 0.05;
+  if (hasOutcome) confidence += 0.05;
+  if (conflictTypes.length > 0) confidence -= 0.15 * conflictTypes.length;
+  return Math.max(0, Math.min(1, Number(confidence.toFixed(2))));
+}
+
+function buildRelationship(group: RelationshipGroup, revenueTruth: Record<string, any>): RelationshipObject {
+  const leadFacet = collectLeadFacet(group);
+  const clientFacet = collectClientFacet(group);
+  const merchantFacet = collectMerchantFacet(group);
+  const fulfillmentFacet = collectFulfillmentFacet(group);
+  const executionFacet = collectExecutionFacet(group);
+  const outcomeFacet = collectOutcomeFacet(group);
+  const sourceMatchReasons = buildSourceMatchReasons(group);
+  const identity = {
+    lead_id: firstDefined([leadFacet.lead_id, merchantFacet.current_stage ? leadFacet.lead_id : null]) || null,
+    client_id: firstDefined([clientFacet.client_id, fulfillmentFacet.client_id, merchantFacet.merchant_id]) || null,
+    merchant_id: firstDefined([merchantFacet.merchant_id, clientFacet.client_id, fulfillmentFacet.client_id]) || null,
+    merchant_shop: firstDefined([merchantFacet.merchant_shop, clientFacet.client_id, fulfillmentFacet.store_domain, leadFacet.domain]) || null,
+    store_domain: firstDefined([merchantFacet.store_domain, fulfillmentFacet.store_domain, clientFacet.contact_email ? merchantFacet.merchant_shop : null, leadFacet.domain]) || null,
+    domain: firstDefined([leadFacet.domain, merchantFacet.store_domain, clientFacet.client_id, outcomeFacet.customer, executionFacet.customer]) || null,
+    email: firstDefined([clientFacet.contact_email, leadFacet.email]) || null,
+    aliases: unique([
+      leadFacet.lead_id,
+      leadFacet.domain,
+      clientFacet.client_id,
+      merchantFacet.merchant_id,
+      merchantFacet.merchant_shop,
+      merchantFacet.store_domain,
+      fulfillmentFacet.client_id,
+      fulfillmentFacet.store_domain,
+      executionFacet.customer,
+      outcomeFacet.customer,
+    ]),
+  };
+
+  const currentStageInfo = determineCurrentStage(group);
+  const nextActionInfo = determineNextAction(group, revenueTruth);
+  const nextTouchAt = determineNextTouchAt(group);
+  const conflictInfo = detectConflicts(group);
+  const contactability = determineContactability(identity);
+  const resolverState = selectResolverState(group, conflictInfo.conflictTypes, identity, contactability);
+  const relationshipType = determineRelationshipType(group, resolverState);
+  const relationshipCore = {
+    owner: nextActionInfo.owner || "system",
+    status: resolverState,
+    current_stage: currentStageInfo.stage,
+    current_stage_source: currentStageInfo.source,
+    next_action: nextActionInfo.nextAction,
+    next_action_source: nextActionInfo.source,
+    next_touch_at: nextTouchAt,
+    contactability,
+    relationship_health: determineHealth(resolverState, conflictInfo.conflictTypes),
+    risk_level: determineRiskLevel(resolverState, conflictInfo.conflictTypes, contactability),
+    priority_score: 0,
+    confidence: 0,
+    conflict_types: conflictInfo.conflictTypes,
+    conflict_notes: conflictInfo.conflictNotes,
+  } as RelationshipObject["relationship_core"];
+
+  relationshipCore.priority_score = computePriorityScore(group, relationshipCore);
+  relationshipCore.confidence = computeConfidence(group, conflictInfo.conflictTypes, identity);
+
+  const recordsByType = {
+    lead: recordsBySource(group.records, "lead"),
+    client: recordsBySource(group.records, "client"),
+    merchant: recordsBySource(group.records, "merchant"),
+    fulfillment: recordsBySource(group.records, "fulfillment"),
+    execution: recordsBySource(group.records, "execution"),
+    outcome: recordsBySource(group.records, "outcome"),
+  };
+
+  const createdAt = firstDefined([
+    ...group.records.map((record) => record.created_at),
+  ]);
+  const updatedAt = firstDefined([
+    ...group.records.map((record) => record.updated_at),
+    executionFacet.timestamp,
+    outcomeFacet.timestamp,
+  ]);
+
+  const lastExecutionAt = executionFacet.timestamp || null;
+  const lastOutcomeAt = outcomeFacet.timestamp || null;
+
+  const primaryKey = determinePrimaryKey(group);
+  const relationshipId = toRelationshipId(primaryKey || group.key);
+
+  const provenanceSources = unique([
+    ...recordsByType.lead.map((record) => record.source),
+    ...recordsByType.client.map((record) => record.source),
+    ...recordsByType.merchant.map((record) => record.source),
+    ...recordsByType.fulfillment.map((record) => record.source),
+    ...recordsByType.execution.map((record) => record.source),
+    ...recordsByType.outcome.map((record) => record.source),
+  ]);
+
+  const primarySource =
+    relationshipCore.status === "lead_only"
+      ? "lead_registry_v1.json"
+      : relationshipCore.status === "contact_unknown" || relationshipCore.status === "resolved" || relationshipCore.status === "operational_conflict"
+        ? "client_registry_v1.json"
+        : "lead_registry_v1.json";
+
+  return {
+    relationship_id: relationshipId,
+    display_name: determineDisplayName(group),
+    relationship_type: relationshipType,
+    resolver_state: resolverState,
+    identity,
+    relationship_core: relationshipCore,
+    facets: {
+      lead: leadFacet,
+      client: clientFacet,
+      merchant: merchantFacet,
+      fulfillment: fulfillmentFacet,
+      execution: executionFacet,
+      outcome: outcomeFacet,
+    },
+    links: {
+      lead_registry_ids: sourceIds(group.records, "lead"),
+      client_registry_ids: sourceIds(group.records, "client"),
+      merchant_lifecycle_ids: sourceIds(group.records, "merchant"),
+      fulfillment_ids: sourceIds(group.records, "fulfillment"),
+      execution_ids: sourceIds(group.records, "execution"),
+      outcome_event_ids: sourceIds(group.records, "outcome"),
+    },
+    provenance: {
+      primary_source: primarySource,
+      secondary_sources: provenanceSources.filter((source) => source !== primarySource),
+      source_match_reasons: sourceMatchReasons,
+      conflict_types: conflictInfo.conflictTypes,
+      conflict_notes: conflictInfo.conflictNotes,
+      confidence: relationshipCore.confidence,
+    },
+    timeline: {
+      created_at: normalizeTimestamp(createdAt) || group.records.map((record) => record.created_at).find(Boolean) || null,
+      updated_at: normalizeTimestamp(updatedAt) || group.records.map((record) => record.updated_at).find(Boolean) || null,
+      last_execution_at: lastExecutionAt,
+      last_outcome_at: lastOutcomeAt,
+    },
+  };
+}
+
+function buildRelationshipIndex() {
+  const repoRoot = resolveRepoRoot();
+  const { truths, records } = buildRecords(repoRoot);
+  const groups = buildGroups(records);
+  const relationships = Array.from(groups.values()).map((group) => buildRelationship(group, truths.revenueTruth || {}));
+  relationships.sort((a, b) => a.relationship_id.localeCompare(b.relationship_id));
+  return { repoRoot, relationships };
+}
+
+export function resolveRelationships() {
+  return buildRelationshipIndex().relationships;
+}
+
+export function resolveRelationshipById(id: string) {
+  const normalized = toRelationshipId(id) || normalizeRelationshipKey(id);
+  return resolveRelationships().find((relationship) => {
+    if (relationship.relationship_id === normalized) return true;
+    return relationship.identity.aliases.some((alias) => normalizeRelationshipKey(alias) === normalizeRelationshipKey(id));
+  }) || null;
+}
+
+export function validateResolvedRelationships(relationships: RelationshipObject[]): ResolverValidation {
+  const errors: string[] = [];
+  const seen = new Set<string>();
+
+  for (const relationship of relationships) {
+    if (!relationship.relationship_id) errors.push("Missing relationship_id");
+    if (seen.has(relationship.relationship_id)) errors.push(`Duplicate relationship_id: ${relationship.relationship_id}`);
+    seen.add(relationship.relationship_id);
+
+    if (!VALID_RESOLVER_STATES.includes(relationship.resolver_state)) {
+      errors.push(`Invalid resolver_state: ${relationship.relationship_id}`);
+    }
+
+    const conflictTypes = relationship.relationship_core.conflict_types || [];
+    for (const conflictType of conflictTypes) {
+      if (!VALID_CONFLICT_TYPES.includes(conflictType)) {
+        errors.push(`Invalid conflict type on ${relationship.relationship_id}: ${conflictType}`);
+      }
+    }
+
+    if (relationship.relationship_core.next_touch_at !== null && !isLikelyTimestamp(relationship.relationship_core.next_touch_at)) {
+      errors.push(`next_touch_at must be timestamp or null: ${relationship.relationship_id}`);
+    }
+  }
+
+  return { ok: errors.length === 0, errors };
+}
+
+export function getRelationshipResolverReport() {
+  const relationships = resolveRelationships();
+  const validation = validateResolvedRelationships(relationships);
+  return {
+    total_relationships: relationships.length,
+    relationships,
+    validation,
   };
 }
