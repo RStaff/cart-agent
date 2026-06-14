@@ -1,0 +1,879 @@
+{
+  "schema": "staffordos.execution_authority_map.v1",
+  "generated_at": "2026-06-13T00:00:00.000Z",
+  "scope": "Read-only authority audit of executable StaffordOS paths that can send, mutate, or trigger state.",
+  "entries": [
+    {
+      "authority_id": "email.shopifixer.send_offer",
+      "file": "web/src/routes/sendOffer.esm.js",
+      "function": "installSendOffer",
+      "route": "/api/shopifixer/send-offer",
+      "execution_type": "send_email",
+      "writes_to": [],
+      "proof_written_to": [],
+      "external_side_effect": "SMTP email send",
+      "source_of_authority": "SMTP env readiness plus caller-provided email, subject, and body",
+      "governance_status": "PARTIALLY_GOVERNED",
+      "risks": [
+        "No persisted canonical execution truth",
+        "No preview/confirm reservation binding",
+        "Caller controls target and content"
+      ],
+      "dependencies": [
+        "web/src/lib/emailSender.js",
+        "nodemailer",
+        "SMTP_HOST",
+        "SMTP_PORT",
+        "SMTP_USER",
+        "SMTP_PASS"
+      ],
+      "evidence": [
+        "web/src/routes/sendOffer.esm.js:4-43",
+        "web/src/index.js:36,302"
+      ]
+    },
+    {
+      "authority_id": "email.abando.recovery_send",
+      "file": "web/src/lib/abandoRecoverySender.js",
+      "function": "sendAbandoRecoveryEmail",
+      "route": "/api/recovery-actions/send-live-test",
+      "execution_type": "send_email",
+      "writes_to": [],
+      "proof_written_to": [
+        "staffordos/system_inventory/output/proof_runs/latest_abando_live_test_proof.json",
+        "staffordos/system_inventory/output/abando_real_send_proof_log_v1.json",
+        "staffordos/system_inventory/output/execution_proof_register_v1.json"
+      ],
+      "external_side_effect": "SMTP email send",
+      "source_of_authority": "SMTP env readiness plus live-test caller payload",
+      "governance_status": "PARTIALLY_GOVERNED",
+      "risks": [
+        "Live-test proof is outside canonical StaffordOS execution truth",
+        "No idempotency key or reservation binding",
+        "Can be misused outside the playground context"
+      ],
+      "dependencies": [
+        "web/src/lib/emailSender.js",
+        "nodemailer",
+        "SMTP_HOST",
+        "SMTP_PORT",
+        "SMTP_USER",
+        "SMTP_PASS"
+      ],
+      "evidence": [
+        "web/src/lib/abandoRecoverySender.js:1-55",
+        "web/src/routes/recoveryLiveTest.esm.js:1-135",
+        "web/src/lib/staffordosProofRegister.js:14-65"
+      ]
+    },
+    {
+      "authority_id": "sms.abando.recovery_send",
+      "file": "web/src/lib/smsSender.js",
+      "function": "sendRecoverySMS",
+      "route": "/api/recovery-actions/send-live-test",
+      "execution_type": "send_sms",
+      "writes_to": [],
+      "proof_written_to": [
+        "staffordos/system_inventory/output/proof_runs/latest_abando_live_test_proof.json",
+        "staffordos/system_inventory/output/abando_real_send_proof_log_v1.json",
+        "staffordos/system_inventory/output/execution_proof_register_v1.json"
+      ],
+      "external_side_effect": "Twilio SMS send",
+      "source_of_authority": "TWILIO env readiness plus live-test caller payload",
+      "governance_status": "PARTIALLY_GOVERNED",
+      "risks": [
+        "No canonical StaffordOS execution proof",
+        "No reservation binding",
+        "Direct provider call can be duplicated"
+      ],
+      "dependencies": [
+        "TWILIO_ACCOUNT_SID",
+        "TWILIO_AUTH_TOKEN",
+        "TWILIO_FROM",
+        "fetch"
+      ],
+      "evidence": [
+        "web/src/lib/smsSender.js:13-72",
+        "web/src/routes/recoveryLiveTest.esm.js:87-107"
+      ]
+    },
+    {
+      "authority_id": "email.recovery.audit_send",
+      "file": "web/src/lib/emailSender.js",
+      "function": "sendRecoveryEmail",
+      "route": "/api/recovery-actions/send-live-test",
+      "execution_type": "send_email",
+      "writes_to": [],
+      "proof_written_to": [
+        "staffordos/system_inventory/output/proof_runs/latest_abando_live_test_proof.json",
+        "staffordos/system_inventory/output/abando_real_send_proof_log_v1.json",
+        "staffordos/system_inventory/output/execution_proof_register_v1.json"
+      ],
+      "external_side_effect": "SMTP email send",
+      "source_of_authority": "SMTP env readiness plus validated audit payload",
+      "governance_status": "PARTIALLY_GOVERNED",
+      "risks": [
+        "Audit payload validation is local only",
+        "No StaffordOS canonical proof append",
+        "No preview/confirm reservation"
+      ],
+      "dependencies": [
+        "nodemailer",
+        "SMTP_HOST",
+        "SMTP_PORT",
+        "SMTP_USER",
+        "SMTP_PASS"
+      ],
+      "evidence": [
+        "web/src/lib/emailSender.js:216-275",
+        "web/src/routes/recoveryExecution.esm.js:1-69"
+      ]
+    },
+    {
+      "authority_id": "recovery.live_test_route",
+      "file": "web/src/routes/recoveryLiveTest.esm.js",
+      "function": "installRecoveryLiveTestRoute",
+      "route": "/api/recovery-actions/send-live-test",
+      "execution_type": "recovery_live_test",
+      "writes_to": [
+        "staffordos/system_inventory/output/proof_runs/latest_abando_live_test_proof.json"
+      ],
+      "proof_written_to": [
+        "staffordos/system_inventory/output/proof_runs/latest_abando_live_test_proof.json",
+        "staffordos/system_inventory/output/abando_real_send_proof_log_v1.json",
+        "staffordos/system_inventory/output/execution_proof_register_v1.json"
+      ],
+      "external_side_effect": "SMTP email send or Twilio SMS send",
+      "source_of_authority": "playground caller payload plus SMTP/Twilio readiness",
+      "governance_status": "PARTIALLY_GOVERNED",
+      "risks": [
+        "Proof lives in system_inventory, not canonical StaffordOS execution truth",
+        "Can send email or SMS depending on channel",
+        "No reservation or idempotency"
+      ],
+      "dependencies": [
+        "web/src/lib/abandoRecoverySender.js",
+        "web/src/lib/emailSender.js",
+        "web/src/lib/smsSender.js",
+        "web/src/lib/recoveryMessageEngine.js",
+        "web/src/lib/staffordosProofRegister.js"
+      ],
+      "evidence": [
+        "web/src/routes/recoveryLiveTest.esm.js:9-135"
+      ]
+    },
+    {
+      "authority_id": "payment.public_checkout_session",
+      "file": "web/src/checkout-public.js",
+      "function": "installPublicCheckout",
+      "route": "/__public-checkout",
+      "execution_type": "create_stripe_checkout_session",
+      "writes_to": [
+        "staffordos/packets/*",
+        "packetRepository persistence"
+      ],
+      "proof_written_to": [
+        "packetRepository payment binding",
+        "Stripe Checkout session"
+      ],
+      "external_side_effect": "Stripe checkout session creation",
+      "source_of_authority": "Stripe secret plus packet repository and request payload",
+      "governance_status": "PARTIALLY_GOVERNED",
+      "risks": [
+        "Checkout creation is not coupled to a reservation proof",
+        "Payment_pending state is not canonical StaffordOS execution proof",
+        "Caller can create sessions without operator preview/confirm"
+      ],
+      "dependencies": [
+        "stripe",
+        "packetRepository.js",
+        "STRIPE_LIVE_SECRET_KEY",
+        "STRIPE_SECRET_KEY",
+        "price env vars"
+      ],
+      "evidence": [
+        "web/src/checkout-public.js:21-109"
+      ]
+    },
+    {
+      "authority_id": "payment.stripe_webhook_receipt",
+      "file": "web/src/routes/stripeWebhook.esm.js",
+      "function": "installStripeWebhook",
+      "route": "/stripe/webhook",
+      "execution_type": "process_stripe_webhook",
+      "writes_to": [
+        "packetRepository payment state",
+        "staffordos/clients/client_registry_v1.json",
+        "staffordos/revenue/revenue_truth_v1.json",
+        "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json"
+      ],
+      "proof_written_to": [
+        "Stripe verified webhook event",
+        "client_registry_v1.json",
+        "revenue_truth_v1.json",
+        "shopifixer_fulfillment_truth_v1.json"
+      ],
+      "external_side_effect": "Inbound Stripe webhook processing",
+      "source_of_authority": "Stripe webhook signature and verified checkout.session.completed event",
+      "governance_status": "GOVERNED",
+      "risks": [
+        "If packet binding is missing the payment update is skipped",
+        "Fan-out mutates multiple truth layers from one event",
+        "Webhook secret failure blocks lifecycle mutation"
+      ],
+      "dependencies": [
+        "stripe",
+        "STRIPE_WEBHOOK_SECRET",
+        "packetRepository.js",
+        "revenue_agent_v1.mjs",
+        "build_shopifixer_fulfillment_truth_v1.mjs"
+      ],
+      "evidence": [
+        "web/src/routes/stripeWebhook.esm.js:13-123"
+      ]
+    },
+    {
+      "authority_id": "revenue.record_stripe_payment_propagation",
+      "file": "staffordos/revenue/revenue_agent_v1.mjs",
+      "function": "recordStripePaymentPropagation",
+      "route": "/stripe/webhook",
+      "execution_type": "mutate_revenue_truth",
+      "writes_to": [
+        "staffordos/revenue/revenue_truth_v1.json",
+        "staffordos/revenue/revenue_truth_v1.md"
+      ],
+      "proof_written_to": [
+        "staffordos/revenue/revenue_truth_v1.json",
+        "staffordos/revenue/revenue_truth_v1.md"
+      ],
+      "external_side_effect": "Filesystem mutation",
+      "source_of_authority": "verified Stripe payment propagated from webhook caller",
+      "governance_status": "GOVERNED",
+      "risks": [
+        "Trusts caller packet/session binding",
+        "Writes derived truth from upstream state",
+        "Can drift if the caller bypasses Stripe receipt validation"
+      ],
+      "dependencies": [
+        "recordVerifiedStripePayment",
+        "buildOperatorDashboardSnapshot",
+        "outreach_queue.json",
+        "approval_queue_v1.json",
+        "send_ledger_v1.json"
+      ],
+      "evidence": [
+        "staffordos/revenue/revenue_agent_v1.mjs:192-225"
+      ]
+    },
+    {
+      "authority_id": "client.record_verified_stripe_payment",
+      "file": "staffordos/clients/client_registry_v1.mjs",
+      "function": "recordVerifiedStripePayment",
+      "route": "/stripe/webhook",
+      "execution_type": "mutate_client_state",
+      "writes_to": [
+        "staffordos/clients/client_registry_v1.json"
+      ],
+      "proof_written_to": [
+        "staffordos/clients/client_registry_v1.json"
+      ],
+      "external_side_effect": "Filesystem mutation",
+      "source_of_authority": "verified Stripe checkout.session.completed payment",
+      "governance_status": "GOVERNED",
+      "risks": [
+        "Depends on packet or merchant key alignment",
+        "No separate reservation or replay protection",
+        "Mutates client lifecycle and revenue state together"
+      ],
+      "dependencies": [
+        "stripe webhook caller",
+        "client registry",
+        "packet_id",
+        "payment_reference"
+      ],
+      "evidence": [
+        "staffordos/clients/client_registry_v1.mjs:188-286"
+      ]
+    },
+    {
+      "authority_id": "revenue.rebuild_truth",
+      "file": "staffordos/revenue/revenue_agent_v1.mjs",
+      "function": "rebuildRevenueTruth",
+      "route": "direct or webhook fan-out",
+      "execution_type": "rebuild_revenue_truth",
+      "writes_to": [
+        "staffordos/revenue/revenue_truth_v1.json",
+        "staffordos/revenue/revenue_truth_v1.md"
+      ],
+      "proof_written_to": [
+        "staffordos/revenue/revenue_truth_v1.json",
+        "staffordos/revenue/revenue_truth_v1.md"
+      ],
+      "external_side_effect": "Filesystem mutation",
+      "source_of_authority": "lead queue, approval queue, send ledger, outcomes files",
+      "governance_status": "GOVERNED",
+      "risks": [
+        "Derived truth can drift if source queues are stale",
+        "No protection against repeated rebuilds",
+        "Not a live execution proof boundary"
+      ],
+      "dependencies": [
+        "outreach_queue.json",
+        "approval_queue_v1.json",
+        "send_ledger_v1.json",
+        "outcomes.json"
+      ],
+      "evidence": [
+        "staffordos/revenue/revenue_agent_v1.mjs:30-151,192-194"
+      ]
+    },
+    {
+      "authority_id": "fulfillment.rebuild_truth",
+      "file": "staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs",
+      "function": "rebuildShopifixerFulfillmentTruth",
+      "route": "/stripe/webhook",
+      "execution_type": "mutate_fulfillment_truth",
+      "writes_to": [
+        "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json"
+      ],
+      "proof_written_to": [
+        "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json"
+      ],
+      "external_side_effect": "Filesystem mutation",
+      "source_of_authority": "delivery units, client registry, unit work snapshot",
+      "governance_status": "GOVERNED",
+      "risks": [
+        "Derived state depends on multiple source files staying in sync",
+        "No direct live send or payment action here",
+        "Proof is read-model output, not an execution receipt"
+      ],
+      "dependencies": [
+        "staffordos/units/delivery_units_v1.json",
+        "staffordos/clients/client_registry_v1.json",
+        "staffordos/snapshots/unit_work_snapshot_v1.json"
+      ],
+      "evidence": [
+        "staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs:550-555"
+      ]
+    },
+    {
+      "authority_id": "lead.operator_action",
+      "file": "staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts",
+      "function": "POST",
+      "route": "/api/operator/lead-registry/action",
+      "execution_type": "mutate_lead_state_with_dry_run_proof",
+      "writes_to": [
+        "staffordos/leads/lead_registry_v1.json",
+        "staffordos/leads/lead_events_v1.json",
+        "staffordos/leads/send_ledger_v1.json",
+        "staffordos/leads/send_execution_log_v1.json"
+      ],
+      "proof_written_to": [
+        "staffordos/leads/send_ledger_v1.json",
+        "staffordos/leads/send_execution_log_v1.json",
+        "staffordos/leads/lead_events_v1.json"
+      ],
+      "external_side_effect": "None live; dry-run proof only",
+      "source_of_authority": "operator choice plus lead lifecycle/contact state",
+      "governance_status": "GOVERNED",
+      "risks": [
+        "mark_sent is proof-only, not a real send",
+        "If UI semantics drift, dry-run proof can be mistaken for live outreach",
+        "Lead registry and send ledger mutate together"
+      ],
+      "dependencies": [
+        "lead_registry_v1.json",
+        "lead_events_v1.json",
+        "send_ledger_v1.json",
+        "send_execution_log_v1.json"
+      ],
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts:1-218"
+      ]
+    },
+    {
+      "authority_id": "recovery.trigger_action",
+      "file": "web/src/routes/recoveryTrigger.esm.js",
+      "function": "installRecoveryTrigger",
+      "route": "/api/recovery/trigger",
+      "execution_type": "create_recovery_action",
+      "writes_to": [
+        "PostgreSQL recovery_actions"
+      ],
+      "proof_written_to": [
+        "recovery_actions row"
+      ],
+      "external_side_effect": "PostgreSQL mutation",
+      "source_of_authority": "latest checkout event in database plus shop identifier",
+      "governance_status": "PARTIALLY_GOVERNED",
+      "risks": [
+        "Not persisted in canonical StaffordOS truth files",
+        "Depends on a latest checkout event query",
+        "No execution reservation or idempotency at StaffordOS layer"
+      ],
+      "dependencies": [
+        "pg Pool",
+        "DATABASE_URL",
+        "checkout_events / checkout_event_proofs tables"
+      ],
+      "evidence": [
+        "web/src/routes/recoveryTrigger.esm.js:18-87"
+      ]
+    },
+    {
+      "authority_id": "order.webhook_paid",
+      "file": "web/src/routes/orderWebhook.esm.js",
+      "function": "installOrderWebhook / processOrdersPaidPayload",
+      "route": "/api/webhooks/orders/paid",
+      "execution_type": "process_order_webhook_and_trigger_recovery",
+      "writes_to": [
+        "Prisma cart table",
+        "external StaffordOS recovery post"
+      ],
+      "proof_written_to": [
+        "cart attribution fields",
+        "remote recovery response"
+      ],
+      "external_side_effect": "Database mutation plus HTTP POST to StaffordOS recovery endpoint",
+      "source_of_authority": "verified Shopify orders/paid HMAC plus cart matching",
+      "governance_status": "PARTIALLY_GOVERNED",
+      "risks": [
+        "Cross-system side effect chain",
+        "Remote recovery post can fail independently of local cart mutation",
+        "Attribution depends on matching heuristics"
+      ],
+      "dependencies": [
+        "prisma",
+        "getStaffordosUrl",
+        "verifyShopifyWebhookHmac",
+        "checkout_event_proofs",
+        "email_queue"
+      ],
+      "evidence": [
+        "web/src/routes/orderWebhook.esm.js:107-145",
+        "web/src/routes/orderWebhook.esm.js:220-397",
+        "web/src/routes/orderWebhook.esm.js:416-471"
+      ]
+    },
+    {
+      "authority_id": "order.webhook_create",
+      "file": "web/src/routes/orderWebhook.esm.js",
+      "function": "installOrderWebhook / processOrdersCreatePayload",
+      "route": "/api/webhooks/orders/create",
+      "execution_type": "process_order_webhook_and_trigger_recovery",
+      "writes_to": [
+        "Prisma cart table",
+        "external StaffordOS recovery post"
+      ],
+      "proof_written_to": [
+        "cart attribution fields",
+        "remote recovery response"
+      ],
+      "external_side_effect": "Database mutation plus HTTP POST to StaffordOS recovery endpoint",
+      "source_of_authority": "verified Shopify orders/create HMAC plus cart matching",
+      "governance_status": "PARTIALLY_GOVERNED",
+      "risks": [
+        "Cross-system side effect chain",
+        "Remote recovery post can fail independently of local cart mutation",
+        "Attribution depends on matching heuristics"
+      ],
+      "dependencies": [
+        "prisma",
+        "getStaffordosUrl",
+        "verifyShopifyWebhookHmac",
+        "checkout_event_proofs",
+        "email_queue"
+      ],
+      "evidence": [
+        "web/src/routes/orderWebhook.esm.js:408-471"
+      ]
+    },
+    {
+      "authority_id": "checkout.signal.start",
+      "file": "web/src/routes/checkoutSignals.esm.js",
+      "function": "installCheckoutSignals / POST /signal/checkout-start",
+      "route": "/signal/checkout-start",
+      "execution_type": "capture_checkout_start_and_persist_event",
+      "writes_to": [
+        "checkout signal capture file",
+        "PostgreSQL systemEvent"
+      ],
+      "proof_written_to": [
+        "checkout signal capture file",
+        "systemEvent row"
+      ],
+      "external_side_effect": "Database mutation",
+      "source_of_authority": "store existence plus checkout-start signal payload",
+      "governance_status": "PARTIALLY_GOVERNED",
+      "risks": [
+        "Read-model and DB event can diverge",
+        "Event is persisted outside canonical execution truth",
+        "No reservation or replay control"
+      ],
+      "dependencies": [
+        "prisma",
+        "shop record",
+        "validateBasePayload",
+        "persistCheckoutStartSystemEvent"
+      ],
+      "evidence": [
+        "web/src/routes/checkoutSignals.esm.js:383-417",
+        "web/src/routes/checkoutSignals.esm.js:531-602"
+      ]
+    },
+    {
+      "authority_id": "checkout.signal.risk",
+      "file": "web/src/routes/checkoutSignals.esm.js",
+      "function": "processCheckoutRiskPayload / POST /signal/checkout-risk",
+      "route": "/signal/checkout-risk",
+      "execution_type": "capture_risk_signal_enqueue_audit_and_recovery_job",
+      "writes_to": [
+        "checkout signal capture file",
+        "signal audit job queue",
+        "decision log"
+      ],
+      "proof_written_to": [
+        "checkout signal capture file",
+        "decision log",
+        "recovery job queue"
+      ],
+      "external_side_effect": "Job queue and decision engine side effects",
+      "source_of_authority": "checkout-risk payload plus decision context",
+      "governance_status": "PARTIALLY_GOVERNED",
+      "risks": [
+        "Can enqueue recovery work without canonical execution reservation",
+        "Decision and recovery job are coupled but separately persisted",
+        "No live-send proof boundary"
+      ],
+      "dependencies": [
+        "appendCheckoutSignal",
+        "enqueueSignalAuditJob",
+        "requestDecision",
+        "enqueueRecoveryEmailJob",
+        "createDecisionLog"
+      ],
+      "evidence": [
+        "web/src/routes/checkoutSignals.esm.js:419-529",
+        "web/src/routes/checkoutSignals.esm.js:604-629"
+      ]
+    },
+    {
+      "authority_id": "checkout.signal.decision_log",
+      "file": "web/src/routes/checkoutSignals.esm.js",
+      "function": "POST /signal/decision-log",
+      "route": "/signal/decision-log",
+      "execution_type": "log_manual_decision",
+      "writes_to": [
+        "decision log"
+      ],
+      "proof_written_to": [
+        "decision log"
+      ],
+      "external_side_effect": "Database mutation",
+      "source_of_authority": "manual operator decision payload",
+      "governance_status": "PARTIALLY_GOVERNED",
+      "risks": [
+        "Manual override can diverge from actual execution",
+        "No execution reservation",
+        "No proof of live send or payment"
+      ],
+      "dependencies": [
+        "createDecisionLog",
+        "normalizeDecisionTrigger",
+        "deriveInterventionType"
+      ],
+      "evidence": [
+        "web/src/routes/checkoutSignals.esm.js:631-669"
+      ]
+    },
+    {
+      "authority_id": "checkout.signal.decision_outcome",
+      "file": "web/src/routes/checkoutSignals.esm.js",
+      "function": "POST /signal/decision-outcome",
+      "route": "/signal/decision-outcome",
+      "execution_type": "update_decision_outcome",
+      "writes_to": [
+        "decision log"
+      ],
+      "proof_written_to": [
+        "decision log"
+      ],
+      "external_side_effect": "Database mutation",
+      "source_of_authority": "decisionId plus outcome payload",
+      "governance_status": "PARTIALLY_GOVERNED",
+      "risks": [
+        "Outcome can be updated independently of actual execution",
+        "No canonical StaffordOS proof append",
+        "No reservation or idempotency"
+      ],
+      "dependencies": [
+        "updateDecisionOutcome"
+      ],
+      "evidence": [
+        "web/src/routes/checkoutSignals.esm.js:671-702"
+      ]
+    },
+    {
+      "authority_id": "packet.prepare",
+      "file": "web/src/routes/packetAuthority.esm.js",
+      "function": "installPacketAuthority / POST /api/packets/prepare",
+      "route": "/api/packets/prepare",
+      "execution_type": "create_packet",
+      "writes_to": [
+        "packet table"
+      ],
+      "proof_written_to": [
+        "packet row"
+      ],
+      "external_side_effect": "Database mutation",
+      "source_of_authority": "packet authority plus request payload",
+      "governance_status": "PARTIALLY_GOVERNED",
+      "risks": [
+        "Packet creation is not tied to a reservation token",
+        "Can be called without downstream execution binding",
+        "Proof remains in packet store only"
+      ],
+      "dependencies": [
+        "createPacket"
+      ],
+      "evidence": [
+        "web/src/routes/packetAuthority.esm.js:14-29"
+      ]
+    },
+    {
+      "authority_id": "packet.execution_update",
+      "file": "web/src/routes/packetAuthority.esm.js",
+      "function": "installPacketAuthority / POST /api/packets/:packetId/execution",
+      "route": "/api/packets/:packetId/execution",
+      "execution_type": "mutate_packet_lifecycle",
+      "writes_to": [
+        "packet table"
+      ],
+      "proof_written_to": [
+        "packet row"
+      ],
+      "external_side_effect": "Database mutation",
+      "source_of_authority": "packet authority plus packetId and lifecycle payload",
+      "governance_status": "PARTIALLY_GOVERNED",
+      "risks": [
+        "Lifecycle mutation can occur independently of verified payment",
+        "No canonical StaffordOS execution proof",
+        "No reservation or idempotency"
+      ],
+      "dependencies": [
+        "updatePacketLifecycle"
+      ],
+      "evidence": [
+        "web/src/routes/packetAuthority.esm.js:48-58"
+      ]
+    },
+    {
+      "authority_id": "packet.payment_return",
+      "file": "web/src/routes/packetAuthority.esm.js",
+      "function": "GET /payment-return",
+      "route": "/payment-return",
+      "execution_type": "bind_payment_to_packet",
+      "writes_to": [
+        "packet table"
+      ],
+      "proof_written_to": [
+        "packet row"
+      ],
+      "external_side_effect": "Database mutation",
+      "source_of_authority": "packet_id, session_id, and store domain",
+      "governance_status": "GOVERNED",
+      "risks": [
+        "Binds payment_pending before Stripe webhook receipt",
+        "Depends on packet presence",
+        "Proof is packet state, not canonical execution truth"
+      ],
+      "dependencies": [
+        "bindPacketPayment",
+        "getPacket",
+        "normalizeStoreDomain"
+      ],
+      "evidence": [
+        "web/src/routes/packetAuthority.esm.js:60-96"
+      ]
+    },
+    {
+      "authority_id": "operator.execute_primary_action",
+      "file": "staffordos/ui/operator-frontend/app/api/operator/execute-primary-action/route.ts",
+      "function": "POST",
+      "route": "/api/operator/execute-primary-action",
+      "execution_type": "trigger_operator_actions_and_loop_d",
+      "writes_to": [
+        "staffordos/events/operator_action_events_v1.json",
+        "staffordos/events/outcome_event_log_v1.json",
+        "staffordos/snapshots/primary_action_snapshot_v1.json",
+        "staffordos/cockpit/ceo_truth_snapshot_v1.json"
+      ],
+      "proof_written_to": [
+        "operator_action_events_v1.json",
+        "outcome_event_log_v1.json",
+        "primary_action_snapshot_v1.json",
+        "ceo_truth_snapshot_v1.json"
+      ],
+      "external_side_effect": "Local subprocess execution of loop D",
+      "source_of_authority": "agent selector gate plus preflight/QA pass plus primary action snapshot",
+      "governance_status": "PARTIALLY_GOVERNED",
+      "risks": [
+        "Projection writes are mixed into proof capture",
+        "Does not provide a canonical live-send reservation",
+        "Subprocess execution can diverge from proof state"
+      ],
+      "dependencies": [
+        "agent_selector_v1.json",
+        "task_to_agent_map_v1.json",
+        "preflight/output/preflight_report_v1.json",
+        "qa/output/command_center_primary_action_qa_v1.json",
+        "run_agent_loop.mjs"
+      ],
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/api/operator/execute-primary-action/route.ts:1-220"
+      ]
+    },
+    {
+      "authority_id": "operator.read_only_proof",
+      "file": "staffordos/ui/operator-frontend/app/api/operator/send-proof/route.ts",
+      "function": "GET",
+      "route": "/api/operator/send-proof",
+      "execution_type": "read_only_proof_lookup",
+      "writes_to": [],
+      "proof_written_to": [],
+      "external_side_effect": "None",
+      "source_of_authority": "send ledger file",
+      "governance_status": "READ_ONLY",
+      "risks": [
+        "Can only inspect dry-run proof",
+        "No live-send state is mutated"
+      ],
+      "dependencies": [
+        "staffordos/leads/send_ledger_v1.json"
+      ],
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/api/operator/send-proof/route.ts:1-32"
+      ]
+    },
+    {
+      "authority_id": "operator.read_only_followups",
+      "file": "staffordos/ui/operator-frontend/app/api/operator/followups/route.ts",
+      "function": "GET",
+      "route": "/api/operator/followups",
+      "execution_type": "read_only_queue_lookup",
+      "writes_to": [],
+      "proof_written_to": [],
+      "external_side_effect": "None",
+      "source_of_authority": "follow up queue file",
+      "governance_status": "READ_ONLY",
+      "risks": [
+        "Queue can be stale relative to actual execution",
+        "No mutation path"
+      ],
+      "dependencies": [
+        "staffordos/leads/follow_up_queue_v1.json"
+      ],
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/api/operator/followups/route.ts:1-32"
+      ]
+    },
+    {
+      "authority_id": "operator.read_only_client_registry",
+      "file": "staffordos/ui/operator-frontend/app/api/operator/client-registry/route.ts",
+      "function": "GET",
+      "route": "/api/operator/client-registry",
+      "execution_type": "read_only_registry_lookup",
+      "writes_to": [],
+      "proof_written_to": [],
+      "external_side_effect": "None",
+      "source_of_authority": "client registry file",
+      "governance_status": "READ_ONLY",
+      "risks": [
+        "Read model only",
+        "No direct execution authority"
+      ],
+      "dependencies": [
+        "staffordos/clients/client_registry_v1.json"
+      ],
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/api/operator/client-registry/route.ts:1-15"
+      ]
+    },
+    {
+      "authority_id": "operator.read_only_ceo_truth",
+      "file": "staffordos/ui/operator-frontend/app/api/operator/ceo-truth-snapshot/route.ts",
+      "function": "GET",
+      "route": "/api/operator/ceo-truth-snapshot",
+      "execution_type": "read_only_snapshot_lookup",
+      "writes_to": [],
+      "proof_written_to": [],
+      "external_side_effect": "None",
+      "source_of_authority": "CEO truth snapshot file",
+      "governance_status": "READ_ONLY",
+      "risks": [
+        "Snapshot may lag canonical truth",
+        "No mutation path"
+      ],
+      "dependencies": [
+        "staffordos/cockpit/ceo_truth_snapshot_v1.json"
+      ],
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/api/operator/ceo-truth-snapshot/route.ts:1-47"
+      ]
+    },
+    {
+      "authority_id": "operator.read_only_command_center",
+      "file": "staffordos/ui/operator-frontend/app/api/operator/ross-command-center/route.ts",
+      "function": "GET",
+      "route": "/api/operator/ross-command-center",
+      "execution_type": "read_only_command_snapshot",
+      "writes_to": [],
+      "proof_written_to": [],
+      "external_side_effect": "None",
+      "source_of_authority": "command center artifacts",
+      "governance_status": "READ_ONLY",
+      "risks": [
+        "Read model only",
+        "No proof boundary"
+      ],
+      "dependencies": [
+        "loadRossOperatorArtifacts"
+      ],
+      "evidence": [
+        "staffordos/ui/operator-frontend/app/api/operator/ross-command-center/route.ts:1-53"
+      ]
+    }
+  ],
+  "canonical_authorities": {
+    "send_authority": {
+      "email_shopifixer": "web/src/routes/sendOffer.esm.js::installSendOffer",
+      "email_abando": "web/src/lib/abandoRecoverySender.js::sendAbandoRecoveryEmail",
+      "email_recovery_audit": "web/src/lib/emailSender.js::sendRecoveryEmail",
+      "sms_abando": "web/src/lib/smsSender.js::sendRecoverySMS"
+    },
+    "payment_authority": {
+      "initiation": "web/src/checkout-public.js::installPublicCheckout",
+      "receipt": "web/src/routes/stripeWebhook.esm.js::installStripeWebhook",
+      "packet_binding": "web/src/routes/packetAuthority.esm.js"
+    },
+    "fulfillment_authority": "staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs::rebuildShopifixerFulfillmentTruth",
+    "revenue_authority": "staffordos/revenue/revenue_agent_v1.mjs::recordStripePaymentPropagation and rebuildRevenueTruth",
+    "proof_authority": "staffordos/execution/execution_log_v1.json and staffordos/execution/outcome_events_v1.json"
+  },
+  "bridge_v2_guidance": {
+    "call": [
+      "canonical send authority for the specific channel",
+      "canonical execution/outcome proof appenders",
+      "reservation validation against the current decision engine and offer artifact",
+      "canonical payment authority only if the action is payment collection, not email send"
+    ],
+    "never_call": [
+      "HTTP self-calls when a direct server-side primitive exists",
+      "projection writes such as primary_action_snapshot_v1.json or ceo_truth_snapshot_v1.json inside proof capture",
+      "reward/revenue rebuilders directly from the send bridge",
+      "fulfillment rebuilders directly from the send bridge",
+      "recovery trigger paths as a substitute for preview/confirm reservation",
+      "manual decision/outcome log routes as a substitute for proof"
+    ]
+  }
+}
