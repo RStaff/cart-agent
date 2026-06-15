@@ -216,6 +216,7 @@ export function recordStripePaymentPropagation({
     client_id: packet?.store_domain || session?.metadata?.store_domain || "",
     merchant_shop: packet?.store_domain || session?.metadata?.store_domain || "",
     packet_id: packet?.packet_id || session?.metadata?.packet_id || session?.client_reference_id || "",
+    reservation_id: reservationId,
     payment_reference: session?.id || eventId || "",
     stripe_session_id: session?.id || null,
     stripe_event_id: eventId || null,

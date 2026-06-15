@@ -189,6 +189,7 @@ export function recordVerifiedStripePayment({
   client_id,
   merchant_shop,
   packet_id,
+  reservation_id = null,
   payment_reference,
   stripe_session_id,
   stripe_event_id,
@@ -232,6 +233,7 @@ export function recordVerifiedStripePayment({
     contact: existing.contact || {},
     deal: {
       ...currentDeal,
+      reservation_id: reservation_id || currentDeal.reservation_id || null,
       payment_status: "paid",
       closed_at: currentDeal.closed_at || timestamp,
       value: amountValue ?? currentDeal.value ?? 0,
