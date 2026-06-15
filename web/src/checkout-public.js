@@ -1,4 +1,5 @@
 import express from "express";
+import crypto from "node:crypto";
 import { bindPacketPayment, createPacket, normalizeStoreDomain } from "./lib/packetRepository.js";
 
 const defaultCanonicalReturnUrl =
@@ -73,8 +74,10 @@ export default function installPublicCheckout(app) {
       const price = pickPrice(plan);
       if (!price) return res.status(400).json({ ok:false, code:"missing_price", plan });
       if (!storeDomain) return res.status(400).json({ ok:false, code:"missing_store_domain" });
+      const reservation_id = `res_${crypto.randomUUID()}`;
 
       const packet = await createPacket({
+        reservation_id,
         store_domain: storeDomain,
         status: "payment_pending",
       });

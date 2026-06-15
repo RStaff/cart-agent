@@ -42,6 +42,7 @@ function mapPacket(row) {
 
   return {
     packet_id: row.packet_id,
+    reservation_id: row.reservation_id ?? null,
     store_domain: row.store_domain,
     payment_reference: row.payment_reference,
     status: row.status,
@@ -57,6 +58,7 @@ export async function ensurePacketTable() {
   await getPool().query(`
     CREATE TABLE IF NOT EXISTS packets (
       packet_id TEXT PRIMARY KEY,
+      reservation_id TEXT,
       store_domain TEXT NOT NULL,
       payment_reference TEXT,
       status TEXT NOT NULL DEFAULT 'prepared',
@@ -77,6 +79,11 @@ export async function ensurePacketTable() {
     CREATE INDEX IF NOT EXISTS packets_payment_reference_idx
     ON packets (payment_reference)
   `);
+
+  await getPool().query(`
+    ALTER TABLE packets
+    ADD COLUMN IF NOT EXISTS reservation_id TEXT
+  `);
 }
 
 export async function createPacket(input = {}) {
@@ -88,23 +95,25 @@ export async function createPacket(input = {}) {
   }
 
   const packetId = input.packet_id || input.packetId || makePacketId(storeDomain);
+  const reservationId = input.reservation_id || input.reservationId || null;
   const paymentReference = input.payment_reference || input.paymentReference || null;
   const status = input.status || (paymentReference ? "payment_pending" : "prepared");
 
   const result = await getPool().query(
     `
     INSERT INTO packets
-      (packet_id, store_domain, payment_reference, status)
+      (packet_id, reservation_id, store_domain, payment_reference, status)
     VALUES
-      ($1, $2, $3, $4)
+      ($1, $2, $3, $4, $5)
     ON CONFLICT (packet_id) DO UPDATE SET
+      reservation_id = COALESCE(EXCLUDED.reservation_id, packets.reservation_id),
       store_domain = EXCLUDED.store_domain,
       payment_reference = COALESCE(EXCLUDED.payment_reference, packets.payment_reference),
       status = EXCLUDED.status,
       updated_at = NOW()
     RETURNING *
     `,
-    [packetId, storeDomain, paymentReference, status],
+    [packetId, reservationId, storeDomain, paymentReference, status],
   );
 
   return mapPacket(result.rows[0]);
@@ -143,6 +152,7 @@ export async function bindPacketPayment(input = {}) {
   await ensurePacketTable();
 
   const packetId = String(input.packet_id || input.packetId || "").trim();
+  const reservationId = input.reservation_id || input.reservationId || null;
   const storeDomain = normalizeStoreDomain(input.store_domain || input.storeDomain || input.store);
   const paymentReference = String(input.payment_reference || input.paymentReference || "").trim();
   const status = input.status || "payment_pending";
@@ -154,17 +164,18 @@ export async function bindPacketPayment(input = {}) {
   const result = await getPool().query(
     `
     INSERT INTO packets
-      (packet_id, store_domain, payment_reference, status)
+      (packet_id, reservation_id, store_domain, payment_reference, status)
     VALUES
-      ($1, $2, $3, $4)
+      ($1, $2, $3, $4, $5)
     ON CONFLICT (packet_id) DO UPDATE SET
+      reservation_id = COALESCE(EXCLUDED.reservation_id, packets.reservation_id),
       store_domain = EXCLUDED.store_domain,
       payment_reference = EXCLUDED.payment_reference,
       status = EXCLUDED.status,
       updated_at = NOW()
     RETURNING *
     `,
-    [packetId, storeDomain, paymentReference, status],
+    [packetId, reservationId, storeDomain, paymentReference, status],
   );
 
   return mapPacket(result.rows[0]);
