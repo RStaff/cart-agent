@@ -384,6 +384,7 @@ function buildFieldSources(client, lead, opportunity, delivery, action, commandC
     : sourceNote("unavailable", "staffordos/clients/client_registry_v1.json", "deal.value", "No verified paid amount exists yet for this merchant.");
   sources.payment_currency = sourceNote("source", "staffordos/clients/client_registry_v1.json", "deal.currency");
   sources.lifetime_value = sourceNote("source", "staffordos/clients/client_registry_v1.json", "business.lifetime_value");
+  sources.reservation_id = sourceNote("source", "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json", "items[0].reservation_id", "Reservation lineage is materialized from the fulfillment truth.");
   sources["audit.score"] = activeShopifixerMatch
     ? sourceNote("source", "staffordos/audit/audit_result_surface.json", "audit_score", "ShopiFixer audit score is materialized from the audit result surface.")
     : sourceNote("unavailable", "staffordos/audit/audit_result_surface.json", "audit_score", "No ShopiFixer audit surface is available for this merchant.");
@@ -469,6 +470,7 @@ function buildMerchantRecord(client, leadRegistry, opportunities, deliveries, ac
   const paymentReadiness = activeShopifixerMatch ? text(runtimePaymentVerification?.final_verdict) || null : null;
   const fulfillmentExecutionStatus = activeShopifixerMatch ? text(fulfillmentTruth?.items?.[0]?.execution_status) || null : null;
   const fulfillmentProofStatus = activeShopifixerMatch ? text(fulfillmentTruth?.items?.[0]?.proof_status) || null : null;
+  const reservationId = text(fulfillmentTruth?.items?.[0]?.reservation_id) || null;
   const lifecycleLane = deriveLifecycleLane({
     audit_status: auditStatus,
     audit: {
@@ -494,6 +496,7 @@ function buildMerchantRecord(client, leadRegistry, opportunities, deliveries, ac
     current_stage: currentStage,
     next_required_action: nextRequiredAction,
     readiness_score: readinessScore,
+    reservation_id: reservationId,
     lead_status: leadStatus,
     audit_status: auditStatus,
     offer_status: offerStatus,
@@ -620,6 +623,7 @@ function buildRegistry() {
           store_domain: activeRecord.store_domain,
           current_stage: activeRecord.current_stage,
           readiness_score: activeRecord.readiness_score,
+          reservation_id: activeRecord.reservation_id,
           selection_source: "precomputed_in_builder",
         }
       : {
@@ -629,6 +633,7 @@ function buildRegistry() {
           store_domain: null,
           current_stage: null,
           readiness_score: 0,
+          reservation_id: null,
           selection_source: "none",
         },
     source_files: INPUT_FILES.slice(),
