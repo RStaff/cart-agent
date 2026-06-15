@@ -336,6 +336,7 @@ function buildItem({ unit, client, openWork, sourceFiles }) {
   const fulfillment = {
     fulfillment_id: unit.unit_id,
     packet_id: null,
+    reservation_id: text(client?.deal?.reservation_id) || null,
     client_id: text(unit.client_id) || text(client?.client_id) || null,
     store_domain: merchantShop,
     merchant_name: null,
@@ -397,6 +398,7 @@ function buildItem({ unit, client, openWork, sourceFiles }) {
     field_sources: {
       fulfillment_id: sourceNote("source", "staffordos/units/delivery_units_v1.json", "units[].unit_id", "Canonical fulfillment items are built from ShopiFixer client_fix delivery units."),
       packet_id: sourceNote("unavailable", "staffordos/units/delivery_units_v1.json", "packet_id", "No canonical fulfillment packet is bound yet."),
+      reservation_id: sourceNote("source", "staffordos/clients/client_registry_v1.json", "deal.reservation_id", "Reservation lineage is preserved from verified Stripe payment into client truth."),
       client_id: sourceNote("source", "staffordos/units/delivery_units_v1.json", "units[].client_id", "Delivery unit client binding is the canonical client key."),
       store_domain: sourceNote("source", "staffordos/clients/client_registry_v1.json", "merchant_shop", "Merchant shop is the best available store-domain truth."),
       merchant_name: sourceNote("unavailable", "staffordos/clients/client_registry_v1.json", "merchant_name", "No merchant name is represented in current truth."),
