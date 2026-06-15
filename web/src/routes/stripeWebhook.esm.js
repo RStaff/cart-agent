@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { bindPacketPayment, getPacket, normalizeStoreDomain } from "../lib/packetRepository.js";
 import { recordStripePaymentPropagation } from "../../../staffordos/revenue/revenue_agent_v1.mjs";
 import { rebuildShopifixerFulfillmentTruth } from "../../../staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs";
+import { appendProofEvent } from "../../../staffordos/execution/proof_authority_v1.mjs";
 
 function getStripeClient() {
   const key = process.env.STRIPE_LIVE_SECRET_KEY || process.env.STRIPE_SECRET_KEY || "";
@@ -70,11 +71,54 @@ export function installStripeWebhook(app) {
               packetStoreDomain: packet.store_domain,
             });
           } else {
+            if (!packet?.reservation_id) {
+              console.warn("[stripe:webhook] packet missing reservation_id; refusing lifecycle update", {
+                packet_id: packet.packet_id,
+                store_domain: packet.store_domain,
+                stripe_event_id: evtId,
+              });
+              return res.status(409).json({ ok: false, error: "missing_reservation_id" });
+            }
+
+            await appendProofEvent({
+              reservation_id: packet.reservation_id,
+              event_type: "reservation_confirmed",
+              authority: "payment.stripe_webhook_receipt",
+              packet_id: packet.packet_id,
+              status: "verified",
+              stripe_event_id: evtId,
+              payment_reference: paymentReference,
+              proof: {
+                stripe_signature_verified: true,
+                stripe_event_type: evtType,
+                packet_lookup: true,
+                store_domain_match: true,
+                packet_status_before: packet.status,
+              },
+            });
+
             await bindPacketPayment({
               packet_id: packet.packet_id,
               store_domain: packet.store_domain,
               payment_reference: paymentReference,
               status: "payment_received",
+            });
+
+            await appendProofEvent({
+              reservation_id: packet.reservation_id,
+              event_type: "payment_received",
+              authority: "payment.stripe_webhook_receipt",
+              packet_id: packet.packet_id,
+              status: "payment_received",
+              stripe_event_id: evtId,
+              payment_reference: paymentReference,
+              proof: {
+                stripe_signature_verified: true,
+                stripe_event_type: evtType,
+                packet_lookup: true,
+                store_domain_match: true,
+                packet_status_after: "payment_received",
+              },
             });
 
             try {
