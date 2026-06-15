@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -35,6 +36,70 @@ function getIdempotencyKey(event) {
     event.event_type,
     event.stripe_event_id,
   ].join("::");
+}
+
+export function getProofEvent(criteria = {}) {
+  const reservationId = String(criteria.reservation_id || criteria.reservationId || "").trim();
+  const eventType = String(criteria.event_type || criteria.eventType || "").trim();
+  const stripeEventId = String(criteria.stripe_event_id || criteria.stripeEventId || "").trim();
+
+  if (!reservationId || !eventType || !stripeEventId) {
+    return {
+      found: false,
+      event: null,
+      criteria: {
+        reservation_id: reservationId,
+        event_type: eventType,
+        stripe_event_id: stripeEventId,
+      },
+      path: PROOF_STORE_PATH,
+    };
+  }
+
+  if (!existsSync(PROOF_STORE_PATH)) {
+    return {
+      found: false,
+      event: null,
+      criteria: {
+        reservation_id: reservationId,
+        event_type: eventType,
+        stripe_event_id: stripeEventId,
+      },
+      path: PROOF_STORE_PATH,
+    };
+  }
+
+  const needle = [reservationId, eventType, stripeEventId].join("::");
+  const raw = readFileSync(PROOF_STORE_PATH, "utf8");
+
+  let latest = null;
+  for (const line of raw.split("\n")) {
+    if (!line.trim()) continue;
+    try {
+      const parsed = JSON.parse(line);
+      const parsedKey = [
+        parsed?.reservation_id,
+        parsed?.event_type,
+        parsed?.stripe_event_id,
+      ].join("::");
+      if (parsedKey === needle) {
+        latest = parsed;
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  return {
+    found: Boolean(latest),
+    event: latest,
+    criteria: {
+      reservation_id: reservationId,
+      event_type: eventType,
+      stripe_event_id: stripeEventId,
+    },
+    path: PROOF_STORE_PATH,
+  };
 }
 
 export async function appendProofEvent(input = {}) {

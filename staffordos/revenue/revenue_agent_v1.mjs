@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { recordVerifiedStripePayment } from "../clients/client_registry_v1.mjs";
 import { buildOperatorDashboardSnapshot } from "../clients/build_operator_dashboard_snapshot_v1.mjs";
+import { getProofEvent } from "../execution/proof_authority_v1.mjs";
 
 const OUTREACH_QUEUE = "staffordos/leads/outreach_queue.json";
 const APPROVAL_QUEUE = "staffordos/leads/approval_queue_v1.json";
@@ -199,6 +200,18 @@ export function recordStripePaymentPropagation({
   eventId,
   eventType,
 } = {}) {
+  const reservationId = String(packet?.reservation_id || "").trim();
+  const stripeEventId = String(eventId || "").trim();
+  const proofLookup = getProofEvent({
+    reservation_id: reservationId,
+    event_type: "payment_received",
+    stripe_event_id: stripeEventId,
+  });
+
+  if (!proofLookup?.found) {
+    throw new Error("missing_payment_received_proof");
+  }
+
   const updatedClient = recordVerifiedStripePayment({
     client_id: packet?.store_domain || session?.metadata?.store_domain || "",
     merchant_shop: packet?.store_domain || session?.metadata?.store_domain || "",
