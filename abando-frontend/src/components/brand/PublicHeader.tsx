@@ -24,9 +24,6 @@ export default function PublicHeader({ shop = "" }: PublicHeaderProps) {
           <Link href="/run-audit" className="transition hover:text-cyan-200">
             Audit
           </Link>
-          <Link href="/install/shopify" className="transition hover:text-cyan-200">
-            Abando
-          </Link>
         </nav>
       </div>
     </header>

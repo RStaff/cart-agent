@@ -93,14 +93,11 @@ export default async function ScorecardPage({ params }: PageProps) {
         <section className="rounded-xl border border-slate-800 bg-[#07111f] p-5 shadow-2xl shadow-black/20">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">Next step</p>
           <div className="mt-4 flex flex-wrap gap-3">
-            <Link href="/pricing" className="rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300">
+            <Link href="/shopifixer" className="rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300">
               See the $950 Fix Sprint
             </Link>
             <Link href="/shopifixer" className="rounded-full border border-slate-600 px-5 py-3 text-sm font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-200">
               Review the ShopiFixer offer
-            </Link>
-            <Link href="/install/shopify" className="rounded-full border border-slate-700 px-5 py-3 text-sm font-semibold text-slate-300 transition hover:border-cyan-300 hover:text-cyan-100">
-              Explore Abando later
             </Link>
           </div>
         </section>

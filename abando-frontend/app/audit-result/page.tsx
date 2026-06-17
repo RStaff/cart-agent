@@ -113,14 +113,11 @@ export default function AuditResultRoute() {
         <section className="rounded-3xl border border-slate-800 bg-slate-900/90 p-8 shadow-2xl shadow-black/20">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300">Next step</p>
           <div className="mt-5 flex flex-wrap gap-4">
-            <Link href="/pricing" className="rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300">
+            <Link href="/shopifixer" className="rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300">
               See the $950 Fix Sprint
             </Link>
             <Link href="/shopifixer" className="rounded-full border border-slate-600 px-5 py-3 text-sm font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-200">
               Review the ShopiFixer offer
-            </Link>
-            <Link href="/install/shopify" className="rounded-full border border-slate-600 px-5 py-3 text-sm font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-200">
-              Explore Abando later
             </Link>
           </div>
         </section>

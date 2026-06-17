@@ -23,6 +23,7 @@ import checkoutPublic from "./checkout-public.js";
 import { installPacketAuthority } from "./routes/packetAuthority.esm.js";
 import { installStripeWebhook } from "./routes/stripeWebhook.esm.js";
 import { installPlayground } from "./routes/playground.esm.js";
+import { installPricingRoute } from "./routes/pricing.esm.js";
 import { installAskAbandoRoute } from "./routes/askAbando.esm.js";
 import { installRecoveryLedgerRoute } from './routes/recoveryLedger.esm.js';
 import { installRecoveryLiveTestRoute } from "./routes/recoveryLiveTest.esm.js";
@@ -302,6 +303,7 @@ installRecoveryExecution(app);
 installSendOffer(app);
 installCheckoutSignals(app);
 installPlayground(app);
+installPricingRoute(app);
 
 // Ask Abando API route
 installAskAbandoRoute(app);
@@ -391,7 +393,7 @@ app.get("/api/shopifixer/track-redirect", async (req, res) => {
     if (eventType === "audit_result_viewed") {
       redirectPath = `/audit-result?store=${store}`;
     } else if (eventType === "pricing_viewed") {
-      redirectPath = `/pricing?store=${store}`;
+      redirectPath = `/shopifixer?store=${store}`;
     }
 
     return res.redirect(302, redirectPath);

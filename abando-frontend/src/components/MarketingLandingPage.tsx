@@ -33,13 +33,13 @@ export function MarketingLandingPage({ shop = "", parentBrand = "StaffordMedia" 
             Start the ShopiFixer Fix Sprint
           </Link>
           <Link
-            href="/install/shopify"
+            href="/run-audit"
             className="inline-flex h-12 items-center justify-center rounded-lg border border-white/10 bg-[#020617] px-5 font-semibold text-slate-200 transition hover:border-cyan-300 hover:text-cyan-200"
           >
-            Use Abando recovery later
+            Run the free audit
           </Link>
         </div>
-        <p className="mt-4 text-sm text-slate-400">ShopiFixer is the first commercial answer. Abando remains available as the secondary recovery product.</p>
+        <p className="mt-4 text-sm text-slate-400">ShopiFixer is the first commercial answer. The recovery path stays outside the canonical merchant journey.</p>
       </section>
 
       <section className="rounded-xl bg-[#0f172a] p-5">
@@ -47,7 +47,7 @@ export function MarketingLandingPage({ shop = "", parentBrand = "StaffordMedia" 
         <div className="mt-4 space-y-3 text-sm leading-7 text-slate-300">
           <div>1. Start with the ShopiFixer offer and the single issue to fix.</div>
           <div>2. Review the audit result and before/after proof.</div>
-          <div>3. Continue to pricing, checkout, and the existing payment path.</div>
+          <div>3. Continue to the ShopiFixer offer, checkout, and the existing payment path.</div>
         </div>
       </section>
 
@@ -55,9 +55,6 @@ export function MarketingLandingPage({ shop = "", parentBrand = "StaffordMedia" 
         <h2 className="text-2xl font-semibold tracking-tight text-white">Why merchants start here</h2>
         <p className="mt-3 text-sm leading-7 text-slate-300">
           The value moment is simple: one visible conversion issue, a scoped fix sprint, and proof of what changed before you choose the next step.
-        </p>
-        <p className="mt-3 text-sm leading-7 text-slate-400">
-          Abando stays available for merchants who want the recovery product after the ShopiFixer path.
         </p>
       </section>
     </CenteredContainer>

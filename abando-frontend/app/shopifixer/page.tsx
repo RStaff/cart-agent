@@ -178,8 +178,8 @@ export default function ShopiFixerPage() {
               >
                 Run ShopiFixer Audit
               </button>
-              <a href="/pricing" className="inline-flex items-center justify-center border border-white/10 bg-white/5 px-8 py-4 rounded-xl font-bold text-lg hover:bg-white/10">
-                View pricing
+              <a href="/shopifixer" className="inline-flex items-center justify-center border border-white/10 bg-white/5 px-8 py-4 rounded-xl font-bold text-lg hover:bg-white/10">
+                View the ShopiFixer offer
               </a>
             </div>
             <p className="text-xs text-zinc-500 mt-3">
@@ -244,7 +244,7 @@ export default function ShopiFixerPage() {
             <div className="p-6 border border-white/10 rounded-xl bg-white/5">
               <h3 className="font-semibold mb-2">Recover</h3>
               <p className="text-zinc-400 text-sm">
-                Abando captures lost revenue automatically after the merchant chooses the install path.
+                The ShopiFixer path captures the issue, the fix, and the proof before the merchant moves on.
               </p>
             </div>
           </div>
@@ -275,8 +275,8 @@ export default function ShopiFixerPage() {
           <button type="button" onClick={runAudit} className="ml-3 bg-white/5 text-white px-10 py-5 rounded-xl font-bold text-xl hover:bg-white/10">
             Run ShopiFixer Audit
           </button>
-          <a href="/install/shopify" className="ml-3 inline-flex items-center justify-center border border-white/10 bg-white/5 px-10 py-5 rounded-xl font-bold text-xl hover:bg-white/10">
-            Install Abando
+          <a href="/run-audit" className="ml-3 inline-flex items-center justify-center border border-white/10 bg-white/5 px-10 py-5 rounded-xl font-bold text-xl hover:bg-white/10">
+            Run the free audit
           </a>
 
           {loading && (

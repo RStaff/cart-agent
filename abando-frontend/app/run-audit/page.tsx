@@ -53,8 +53,8 @@ export default async function RunAuditPage({ searchParams }: PageProps) {
           <Link href="/shopifixer" className="rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300">
             Review the Fix Sprint
           </Link>
-          <Link href="/pricing" className="rounded-full border border-slate-600 px-5 py-3 text-sm font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-200">
-            See pricing
+          <Link href="/shopifixer" className="rounded-full border border-slate-600 px-5 py-3 text-sm font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-200">
+            See the ShopiFixer offer
           </Link>
         </div>
       </section>
