@@ -11,6 +11,20 @@ function sendPacketNotFound(res) {
   return res.status(404).json({ ok: false, error: "packet_not_found" });
 }
 
+function resolveMerchantWorkspaceOrigin() {
+  const raw =
+    process.env.ABANDO_PUBLIC_APP_ORIGIN ||
+    process.env.NEXT_PUBLIC_ABANDO_PUBLIC_APP_ORIGIN ||
+    process.env.APP_URL ||
+    "http://127.0.0.1:3001";
+
+  try {
+    return new URL(String(raw)).origin;
+  } catch {
+    return String(raw).replace(/\/+$/, "");
+  }
+}
+
 export function installPacketAuthority(app) {
   app.post("/api/packets/prepare", async (req, res) => {
     try {
@@ -81,11 +95,15 @@ export function installPacketAuthority(app) {
         status: "payment_pending",
       });
 
-      return res.status(200).json({
-        ok: true,
-        status: "PAYMENT_RETURN_BOUND_TO_PACKET",
-        packet,
-      });
+      const statusUrl = new URL("/shopifixer/status", resolveMerchantWorkspaceOrigin());
+      statusUrl.searchParams.set("packet_id", packet.packet_id);
+      statusUrl.searchParams.set("session_id", paymentReference);
+      statusUrl.searchParams.set("store", packet.store_domain);
+      if (packet.reservation_id) {
+        statusUrl.searchParams.set("reservation_id", packet.reservation_id);
+      }
+
+      return res.redirect(302, `${statusUrl.pathname}?${statusUrl.searchParams.toString()}`);
     } catch (error) {
       return res.status(500).json({
         ok: false,

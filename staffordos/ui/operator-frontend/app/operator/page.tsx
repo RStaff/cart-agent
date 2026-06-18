@@ -1,9 +1,11 @@
+import Link from "next/link";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { OperatorNav } from "../../components/operator/OperatorNav";
 import { deriveCustomerOutcome } from "../../lib/operator/loadShopifixerCommandCenter";
 import { loadExecutionLog } from "../../lib/operator/loadExecutionLog";
 import { getDecisionEngineReport } from "../../lib/operator/decisionEngineResolver";
+import { resolveRelationshipById } from "../../lib/operator/relationshipResolver";
 
 const PATHS = {
   primaryAction: "staffordos/snapshots/primary_action_snapshot_v1.json",
@@ -183,6 +185,13 @@ function normalizeComparison(value: unknown) {
     .replace(/[^a-z0-9]+/g, " ");
 }
 
+function relationshipRouteId(value: unknown) {
+  const normalized = String(value ?? "").trim();
+  if (!normalized) return null;
+  const relationship = resolveRelationshipById(normalized) || resolveRelationshipById(normalized.replace(/^rel_/, ""));
+  return relationship?.relationship_id ? relationship.relationship_id.replace(/^rel_/, "") : null;
+}
+
 function loadExecutiveHome() {
   const repoRoot = resolveRepoRoot();
 
@@ -333,6 +342,15 @@ export default function OperatorPage() {
   const currentActionMatchesDecision =
     normalizeComparison(currentPrimaryActionLabel) === normalizeComparison(decisionTopActionLabel) &&
     normalizeComparison(currentPrimaryActionStep) === normalizeComparison(text(decisionTopAction?.title || decisionTopAction?.action_type, ""));
+  const relationshipId =
+    relationshipRouteId(data.decisionEngine?.top_action?.relationship_id) ||
+    relationshipRouteId(data.decisionEngine?.top_relationship_action?.relationship_id) ||
+    relationshipRouteId(data.priorityClient?.merchant_shop) ||
+    relationshipRouteId(data.priorityClient?.client_id) ||
+    relationshipRouteId(data.revenueGap?.merchant_shop) ||
+    relationshipRouteId(data.revenueGap?.client_id) ||
+    relationshipRouteId(data.executionLog?.lastExecution?.customer) ||
+    relationshipRouteId(data.priorityClient?.merchant_shop ? `rel_${data.priorityClient.merchant_shop}` : "");
 
   return (
     <main className="shell">
@@ -370,6 +388,10 @@ export default function OperatorPage() {
               <div><strong>Product:</strong> {translateDomain(primary.domain_id)}</div>
               <div><strong>Signal strength:</strong> {translateConfidence(primary.confidence)}</div>
             </div>
+            <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+              <Link href="/operator/campaigns" className="chip">Open Campaigns</Link>
+              {relationshipId ? <Link href={`/operator/relationship/${relationshipId}`} className="chip">Open Relationship</Link> : null}
+            </div>
           </div>
         </section>
 
@@ -401,6 +423,10 @@ export default function OperatorPage() {
                 No mismatch reasons recorded.
               </p>
             )}
+            <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+              <Link href="/operator/campaigns" className="chip">Open Campaigns</Link>
+              {relationshipId ? <Link href={`/operator/relationship/${relationshipId}`} className="chip">Open Relationship</Link> : null}
+            </div>
           </div>
         </section>
 
@@ -412,12 +438,16 @@ export default function OperatorPage() {
               <p className="subtitle" style={{ marginTop: 0 }}>{revenueSummary}</p>
               <div className="kv">
                 <div><strong>Top move:</strong> {topRevenueAction}</div>
-                <div><strong>Open outreach:</strong> {text(data.revenueTruth?.funnel?.outreach_queue, "0")}</div>
-                <div><strong>Offers out:</strong> {text(data.revenueTruth?.stages?.sent, "0")}</div>
-                <div><strong>Replies waiting:</strong> {text(data.revenueTruth?.stages?.replies, "0")}</div>
-              </div>
+              <div><strong>Open outreach:</strong> {text(data.revenueTruth?.funnel?.outreach_queue, "0")}</div>
+              <div><strong>Offers out:</strong> {text(data.revenueTruth?.stages?.sent, "0")}</div>
+              <div><strong>Replies waiting:</strong> {text(data.revenueTruth?.stages?.replies, "0")}</div>
             </div>
-          </section>
+            <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+              <Link href="/operator/campaigns" className="chip">Open Campaigns</Link>
+              {relationshipId ? <Link href={`/operator/relationship/${relationshipId}`} className="chip">Open Relationship</Link> : null}
+            </div>
+          </div>
+        </section>
 
           <section className="panel">
             <div className="panelInner">
@@ -429,11 +459,15 @@ export default function OperatorPage() {
                 ) : (
                   <div><strong>None:</strong> No explicit blocker recorded.</div>
                 )}
-                <div><strong>Revenue gap:</strong> {money(data.dashboardSnapshot?.revenue_gaps?.[0]?.gap || 0)}</div>
-                <div><strong>Primary risk:</strong> {translateRisk(list(primary.risk || ["None"])[0])}</div>
-              </div>
+              <div><strong>Revenue gap:</strong> {money(data.dashboardSnapshot?.revenue_gaps?.[0]?.gap || 0)}</div>
+              <div><strong>Primary risk:</strong> {translateRisk(list(primary.risk || ["None"])[0])}</div>
             </div>
-          </section>
+            <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+              <Link href="/operator/campaigns" className="chip">Open Campaigns</Link>
+              {relationshipId ? <Link href={`/operator/relationship/${relationshipId}`} className="chip">Open Relationship</Link> : null}
+            </div>
+          </div>
+        </section>
 
           <section className="panel">
             <div className="panelInner">
@@ -442,13 +476,17 @@ export default function OperatorPage() {
                 {paidWorkCount > 0 ? `${paidWorkCount} paid work item(s)` : "No paid work active yet"}
               </h2>
               <div className="kv">
-                <div><strong>Paid fulfillment items:</strong> {paidWorkCount}</div>
-                <div><strong>Waiting for payment:</strong> {waitingForPaymentCount}</div>
-                <div><strong>ShopiFixer stage:</strong> {translateStage(data.deliveryWork[0]?.stage)}</div>
-                <div><strong>Next action:</strong> {text(data.deliveryWork[0]?.next_action, "Wait for payment or follow up before starting fix delivery.")}</div>
-              </div>
+              <div><strong>Paid fulfillment items:</strong> {paidWorkCount}</div>
+              <div><strong>Waiting for payment:</strong> {waitingForPaymentCount}</div>
+              <div><strong>ShopiFixer stage:</strong> {translateStage(data.deliveryWork[0]?.stage)}</div>
+              <div><strong>Next action:</strong> {text(data.deliveryWork[0]?.next_action, "Wait for payment or follow up before starting fix delivery.")}</div>
             </div>
-          </section>
+            <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+              <Link href="/operator/campaigns" className="chip">Open Campaigns</Link>
+              {relationshipId ? <Link href={`/operator/relationship/${relationshipId}`} className="chip">Open Relationship</Link> : null}
+            </div>
+          </div>
+        </section>
 
           <section className="panel">
             <div className="panelInner">
@@ -459,12 +497,16 @@ export default function OperatorPage() {
               </p>
               <div className="kv">
                 <div><strong>Reason:</strong> {text(data.priorityClient?.close_engine?.suggested_message, "Review the highest-priority customer relationship.")}</div>
-                <div><strong>Priority:</strong> {text(data.priorityClient?.priority_total, "0")}</div>
-                <div><strong>Stage:</strong> {translateStage(data.priorityClient?.lifecycle_stage)}</div>
-                <div><strong>Next touch:</strong> {translateStage(data.priorityClient?.next_action?.type)}</div>
-              </div>
+              <div><strong>Priority:</strong> {text(data.priorityClient?.priority_total, "0")}</div>
+              <div><strong>Stage:</strong> {translateStage(data.priorityClient?.lifecycle_stage)}</div>
+              <div><strong>Next touch:</strong> {translateStage(data.priorityClient?.next_action?.type)}</div>
             </div>
-          </section>
+            <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+              <Link href="/operator/campaigns" className="chip">Open Campaigns</Link>
+              {relationshipId ? <Link href={`/operator/relationship/${relationshipId}`} className="chip">Open Relationship</Link> : null}
+            </div>
+          </div>
+        </section>
 
           <section className="panel">
             <div className="panelInner">
@@ -473,13 +515,17 @@ export default function OperatorPage() {
                 {text(primary.next_step, topRevenueAction)}
               </h2>
               <div className="kv">
-                <div><strong>Action:</strong> {text(primary.action_label, "Follow up on revenue close.")}</div>
-                <div><strong>Outcome:</strong> {text(primary.expected_outcome, "Move active ShopiFixer proposal toward paid client status.")}</div>
-                <div><strong>Other options considered:</strong> {text(data.primaryAction?.alternatives_considered?.length, "0")}</div>
-                <div><strong>Focus:</strong> ShopiFixer payment close</div>
-              </div>
+              <div><strong>Action:</strong> {text(primary.action_label, "Follow up on revenue close.")}</div>
+              <div><strong>Outcome:</strong> {text(primary.expected_outcome, "Move active ShopiFixer proposal toward paid client status.")}</div>
+              <div><strong>Other options considered:</strong> {text(data.primaryAction?.alternatives_considered?.length, "0")}</div>
+              <div><strong>Focus:</strong> ShopiFixer payment close</div>
             </div>
-          </section>
+            <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+              <Link href="/operator/campaigns" className="chip">Open Campaigns</Link>
+              {relationshipId ? <Link href={`/operator/relationship/${relationshipId}`} className="chip">Open Relationship</Link> : null}
+            </div>
+          </div>
+        </section>
 
         <section className="panel">
           <div className="panelInner">
