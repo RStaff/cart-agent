@@ -2,12 +2,10 @@ import Link from "next/link";
 
 const CONTROL_PLANE_ROUTES = [
   { href: "/operator", label: "Console" },
+  { href: "/operator/revenue-command", label: "Revenue Command" },
+  { href: "/operator/leads", label: "Leads" },
   { href: "/operator/command-center", label: "Command Center" },
   { href: "/operator/execution-log", label: "Execution Log" },
-  { href: "/operator/capacity", label: "Capacity" },
-  { href: "/operator/revenue-command", label: "Revenue Command" },
-  { href: "/operator/analytics", label: "Analytics" },
-  { href: "/operator/products", label: "Products" },
   { href: "/operator/system-map", label: "System Map" },
 ] as const;
 
