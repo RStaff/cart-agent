@@ -36,6 +36,7 @@ export default function installPublicCheckout(app) {
       starter: P("PRICE_STARTER") || P("STRIPE_PRICE_STARTER") || P("STRIPE_PRICE_STARTER_LIVE"),
       pro:     P("PRICE_PRO")     || P("STRIPE_PRICE_PRO")     || P("STRIPE_PRICE_PRO_LIVE"),
       scale:   P("PRICE_SCALE")   || P("STRIPE_PRICE_SCALE")   || P("STRIPE_PRICE_SCALE_LIVE"),
+      verification: P("PRICE_VERIFICATION"),
     };
     return map[String(plan || "").toLowerCase()] || null;
   }
@@ -54,6 +55,7 @@ export default function installPublicCheckout(app) {
         starter: Boolean(pickPrice("starter")),
         pro: Boolean(pickPrice("pro")),
         scale: Boolean(pickPrice("scale")),
+        verification: Boolean(pickPrice("verification")),
       },
       successUrl,
       canonicalReturnUrl,
