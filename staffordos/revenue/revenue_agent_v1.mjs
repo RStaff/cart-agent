@@ -15,12 +15,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const repoRoot = join(__dirname, "..", "..");
 
+function repoPath(relPath) {
+  return join(repoRoot, relPath);
+}
+
 function readJson(path, fallback) {
   if (!existsSync(path)) return fallback;
   try { return JSON.parse(readFileSync(path, "utf8")); } catch { return fallback; }
 }
 
 function writeJson(path, value) {
+  mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, JSON.stringify(value, null, 2) + "\n");
 }
 
@@ -29,13 +34,13 @@ function countBy(items, predicate) {
 }
 
 function buildRevenueTruthFromQueues() {
-  const outreach = readJson(OUTREACH_QUEUE, []);
-  const approvalsDoc = readJson(APPROVAL_QUEUE, { version: "approval_queue_v1", items: [] });
+  const outreach = readJson(repoPath(OUTREACH_QUEUE), []);
+  const approvalsDoc = readJson(repoPath(APPROVAL_QUEUE), { version: "approval_queue_v1", items: [] });
   const approvals = Array.isArray(approvalsDoc.items) ? approvalsDoc.items : [];
-  const ledgerDoc = readJson(SEND_LEDGER, { version: "send_ledger_v1", items: [] });
+  const ledgerDoc = readJson(repoPath(SEND_LEDGER), { version: "send_ledger_v1", items: [] });
   const ledger = Array.isArray(ledgerDoc.items) ? ledgerDoc.items : [];
-  const outcomes = readJson(OUTCOMES, []);
-  const existingTruth = readJson(TRUTH_JSON, {});
+  const outcomes = readJson(repoPath(OUTCOMES), []);
+  const existingTruth = readJson(repoPath(TRUTH_JSON), {});
 
   const stages = {
     captured: countBy(outreach, x => x.status === "captured"),
@@ -114,8 +119,8 @@ function buildRevenueTruthFromQueues() {
 }
 
 function writeRevenueTruth(truth) {
-  writeJson(TRUTH_JSON, truth);
-  writeFileSync(TRUTH_MD, `# Revenue Truth v1
+  writeJson(repoPath(TRUTH_JSON), truth);
+  writeFileSync(repoPath(TRUTH_MD), `# Revenue Truth v1
 
 Generated at: ${truth.generated_at}
 
