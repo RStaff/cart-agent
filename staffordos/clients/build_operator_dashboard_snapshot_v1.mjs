@@ -1,7 +1,17 @@
 import { readFileSync, writeFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const REPO_ROOT = resolve(__dirname, "..", "..");
+
+function repoPath(relPath) {
+  return resolve(REPO_ROOT, relPath);
+}
 
 export function buildOperatorDashboardSnapshot() {
-  const registry = JSON.parse(readFileSync("staffordos/clients/client_registry_v1.json", "utf8"));
+  const registry = JSON.parse(readFileSync(repoPath("staffordos/clients/client_registry_v1.json"), "utf8"));
   const clients = registry.clients || [];
   const now = new Date().toISOString();
 
@@ -153,7 +163,7 @@ export function buildOperatorDashboardSnapshot() {
   };
 
   writeFileSync(
-    "staffordos/clients/operator_dashboard_snapshot_v1.json",
+    repoPath("staffordos/clients/operator_dashboard_snapshot_v1.json"),
     JSON.stringify(snapshot, null, 2) + "\n"
   );
 
