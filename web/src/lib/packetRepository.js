@@ -130,6 +130,17 @@ export async function getPacket(packetId) {
   return mapPacket(result.rows[0]);
 }
 
+export async function getPacketByPaymentReference(paymentReference) {
+  await ensurePacketTable();
+
+  const result = await getPool().query(
+    `SELECT * FROM packets WHERE payment_reference = $1 LIMIT 1`,
+    [String(paymentReference || "").trim()],
+  );
+
+  return mapPacket(result.rows[0]);
+}
+
 export async function listPackets(input = {}) {
   await ensurePacketTable();
 

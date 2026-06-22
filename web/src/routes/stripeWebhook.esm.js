@@ -1,6 +1,11 @@
 import express from "express";
 import Stripe from "stripe";
-import { bindPacketPayment, getPacket, normalizeStoreDomain } from "../lib/packetRepository.js";
+import {
+  bindPacketPayment,
+  getPacket,
+  getPacketByPaymentReference,
+  normalizeStoreDomain,
+} from "../lib/packetRepository.js";
 import { recordStripePaymentPropagation } from "../../../staffordos/revenue/revenue_agent_v1.mjs";
 import { rebuildShopifixerFulfillmentTruth } from "../../../staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs";
 import { appendProofEvent } from "../../../staffordos/execution/proof_authority_v1.mjs";
@@ -46,27 +51,66 @@ export function installStripeWebhook(app) {
 
       if (evtType === "checkout.session.completed") {
         const session = event.data?.object || {};
-        const packetId = String(session?.metadata?.packet_id || session?.client_reference_id || "");
-        const metadataStoreDomain = normalizeStoreDomain(session?.metadata?.store_domain || "");
+        const metadataPacketId = String(session?.metadata?.packet_id || "");
+        const clientReferenceId = String(session?.client_reference_id || "");
         const paymentReference = String(session?.id || evtId || "");
+        const metadataStoreDomain = normalizeStoreDomain(session?.metadata?.store_domain || "");
+        let packet = null;
+        let resolvedBy = "";
+
+        if (metadataPacketId) {
+          packet = await getPacket(metadataPacketId);
+          if (packet) resolvedBy = "metadata.packet_id";
+        } else if (clientReferenceId) {
+          packet = await getPacket(clientReferenceId);
+          if (packet) resolvedBy = "client_reference_id";
+        }
+
+        if (!packet && clientReferenceId && clientReferenceId !== metadataPacketId) {
+          packet = await getPacket(clientReferenceId);
+          if (packet) resolvedBy = "client_reference_id";
+        }
+
+        if (!packet && paymentReference) {
+          packet = await getPacketByPaymentReference(paymentReference);
+          if (packet) {
+            resolvedBy = "payment_reference";
+            console.info("[stripe:webhook] resolved packet by payment_reference fallback", {
+              eventId: evtId,
+              sessionId: paymentReference,
+              packetId: packet.packet_id,
+            });
+          }
+        }
+
+        const packetId = packet?.packet_id || metadataPacketId || clientReferenceId || "";
 
         if (!packetId || !paymentReference) {
           console.warn("[stripe:webhook] checkout.session.completed missing packet binding", {
             eventId: evtId,
+            sessionId: paymentReference,
+            metadataPacketId,
+            clientReferenceId,
             hasPacketId: Boolean(packetId),
             hasPaymentReference: Boolean(paymentReference),
           });
         } else {
-          const packet = await getPacket(packetId);
           if (!packet) {
             console.warn("[stripe:webhook] packet missing; skipping payment lifecycle update", {
               eventId: evtId,
-              packetId,
+              sessionId: paymentReference,
+              metadataPacketId,
+              clientReferenceId,
+              resolvedBy,
             });
           } else if (metadataStoreDomain && metadataStoreDomain !== packet.store_domain) {
             console.warn("[stripe:webhook] packet store mismatch; skipping payment lifecycle update", {
               eventId: evtId,
               packetId,
+              sessionId: paymentReference,
+              metadataPacketId,
+              clientReferenceId,
+              resolvedBy,
               metadataStoreDomain,
               packetStoreDomain: packet.store_domain,
             });
