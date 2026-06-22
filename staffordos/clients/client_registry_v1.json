@@ -604,6 +604,88 @@
         "blocked": false,
         "block_reason": null
       }
+    },
+    {
+      "client_id": "elkeyecoffee.com",
+      "merchant_shop": "elkeyecoffee.com",
+      "source": "staffordos",
+      "status": "qualified",
+      "created_at": "2026-06-22T14:46:52.000Z",
+      "updated_at": "2026-06-22T14:46:52.000Z",
+      "selected_product": "shopifixer",
+      "routing_reason": "Shopify conversion, checkout, audit, or dev issue",
+      "qualification_status": "qualified",
+      "lifecycle": {
+        "stage": "lead",
+        "stage_updated_at": "2026-06-22T14:46:52.000Z",
+        "blocked": false,
+        "block_reason": null
+      },
+      "next_action": {
+        "type": "outreach",
+        "owner": "system",
+        "due_at": null,
+        "instructions": "Send first ShopiFixer audit outreach message.",
+        "auto_executable": true,
+        "created_at": "2026-06-22T14:46:52.000Z",
+        "updated_at": "2026-06-22T14:46:52.000Z"
+      },
+      "contact": {
+        "email": "",
+        "name": "",
+        "role": "",
+        "confidence": "no_contact_found"
+      },
+      "deal": {
+        "type": null,
+        "value": 0,
+        "currency": "USD",
+        "closed_at": null,
+        "payment_status": "unpaid"
+      },
+      "shopifixer": {
+        "audit_status": "not_started",
+        "audit_score": null,
+        "primary_problem": null,
+        "fix_status": "not_started",
+        "latest_audit_at": null
+      },
+      "abando": {
+        "installed": false,
+        "install_status": "unknown",
+        "checkout_events": 0,
+        "recovery_actions": 0,
+        "merchant_revenue_recovered": 0,
+        "currency": "USD",
+        "last_recovery_at": null
+      },
+      "business": {
+        "stafford_revenue_earned": 0,
+        "stafford_recurring_revenue": 0,
+        "lifetime_value": 0,
+        "next_action": "Prepare the ShopiFixer audit path and next merchant follow-up."
+      },
+      "priority_score": {
+        "revenue_potential": 0,
+        "ease_of_close": 40,
+        "time_to_cash": 45,
+        "system_confidence": 0,
+        "total": 21
+      },
+      "blocker_detection": {
+        "blocked": false,
+        "blocker_count": 0,
+        "highest_severity": null,
+        "blockers": []
+      },
+      "decision_trace": {
+        "engine": "next_action_engine_v1",
+        "evaluated_at": "2026-06-22T14:46:52.000Z",
+        "lifecycle_stage": "lead",
+        "next_action_type": "outreach",
+        "blocked": false,
+        "block_reason": null
+      }
     }
   ],
   "operating_model": {
