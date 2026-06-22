@@ -1,7 +1,11 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
-import { dirname } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const REGISTRY_PATH = "staffordos/clients/client_registry_v1.json";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const repoRoot = join(__dirname, "..", "..");
+const REGISTRY_PATH = join(repoRoot, "staffordos/clients/client_registry_v1.json");
 
 function now() {
   return new Date().toISOString();
