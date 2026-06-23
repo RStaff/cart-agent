@@ -95,7 +95,7 @@ export function installPacketAuthority(app) {
         status: "payment_pending",
       });
 
-      const statusUrl = new URL("/shopifixer/status", resolveMerchantWorkspaceOrigin());
+      const statusUrl = new URL("/fix-status", resolveMerchantWorkspaceOrigin());
       statusUrl.searchParams.set("packet_id", packet.packet_id);
       statusUrl.searchParams.set("session_id", paymentReference);
       statusUrl.searchParams.set("store", packet.store_domain);
