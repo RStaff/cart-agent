@@ -79,6 +79,7 @@ export function installPacketAuthority(app) {
 
       const existing = packetId ? await getPacket(packetId) : null;
       const effectiveStore = storeDomain || existing?.store_domain || "";
+      const nextStatus = existing?.status === "payment_received" ? existing.status : "payment_pending";
 
       if (!packetId || !paymentReference || !effectiveStore) {
         return res.status(400).json({
@@ -92,7 +93,7 @@ export function installPacketAuthority(app) {
         packet_id: packetId,
         store_domain: effectiveStore,
         payment_reference: paymentReference,
-        status: "payment_pending",
+        status: nextStatus,
       });
 
       const statusUrl = new URL("/fix-status", resolveMerchantWorkspaceOrigin());

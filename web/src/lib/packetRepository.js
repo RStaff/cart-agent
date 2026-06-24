@@ -172,6 +172,9 @@ export async function bindPacketPayment(input = {}) {
   if (!storeDomain) throw new Error("missing_store_domain");
   if (!paymentReference) throw new Error("missing_payment_reference");
 
+  const existing = await getPacket(packetId);
+  const nextStatus = existing?.status === "payment_received" ? existing.status : status;
+
   const result = await getPool().query(
     `
     INSERT INTO packets
@@ -182,11 +185,14 @@ export async function bindPacketPayment(input = {}) {
       reservation_id = COALESCE(EXCLUDED.reservation_id, packets.reservation_id),
       store_domain = EXCLUDED.store_domain,
       payment_reference = EXCLUDED.payment_reference,
-      status = EXCLUDED.status,
+      status = CASE
+        WHEN packets.status = 'payment_received' THEN packets.status
+        ELSE EXCLUDED.status
+      END,
       updated_at = NOW()
     RETURNING *
     `,
-    [packetId, reservationId, storeDomain, paymentReference, status],
+    [packetId, reservationId, storeDomain, paymentReference, nextStatus],
   );
 
   return mapPacket(result.rows[0]);
