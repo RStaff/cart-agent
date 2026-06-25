@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-06-05T04:17:27.277Z",
+  "generated_at": "2026-06-25T21:41:03.922Z",
   "status": "PASSED",
-  "command": "node staffordos/clients/next_action_engine_v1.mjs",
+  "command": "node staffordos/operator_daemon/write_operator_observation_v1.mjs",
   "inferred_system_id": "staffordos",
   "system_name": "StaffordOS Core",
   "system_status": "PARTIAL_REAL",

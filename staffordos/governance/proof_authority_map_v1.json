@@ -1,0 +1,269 @@
+{
+  "schema": "staffordos.proof_authority_map.v1",
+  "generated_at": "2026-06-13T00:00:00.000Z",
+  "scope": "Read-only audit of current proof-writing locations and the canonical StaffordOS proof authority design.",
+  "proof_authority_v1": {
+    "store": "staffordos/execution/proof_authority_v1.jsonl",
+    "append_only": true,
+    "reservation_aware": true,
+    "idempotent": true,
+    "relationship_bound": true,
+    "action_bound": true,
+    "campaign_aware": true,
+    "no_snapshot_patching": true,
+    "no_projections": true,
+    "no_ui_writes": true,
+    "event_types": [
+      "reservation_created",
+      "reservation_confirmed",
+      "send_attempted",
+      "send_succeeded",
+      "send_failed",
+      "payment_received",
+      "fulfillment_started",
+      "fulfillment_completed"
+    ],
+    "binding_fields": [
+      "reservation_id",
+      "action_id",
+      "relationship_id",
+      "campaign_id",
+      "offer_artifact_hash",
+      "decision_engine_hash"
+    ]
+  },
+  "current_proof_writers": [
+    {
+      "proof_source": "operator.execute_primary_action",
+      "file": "staffordos/ui/operator-frontend/app/api/operator/execute-primary-action/route.ts",
+      "append_only": false,
+      "canonical": false,
+      "governance_status": "PARTIALLY_GOVERNED",
+      "written_by": "POST /api/operator/execute-primary-action",
+      "consumers": [
+        "staffordos/events/operator_action_events_v1.json",
+        "staffordos/events/outcome_event_log_v1.json",
+        "staffordos/snapshots/primary_action_snapshot_v1.json",
+        "staffordos/cockpit/ceo_truth_snapshot_v1.json"
+      ],
+      "replacement_plan": "Replace CTA logging and snapshot patching with reservation-confirmed proof events written only to proof_authority_v1."
+    },
+    {
+      "proof_source": "lead.operator_action",
+      "file": "staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts",
+      "append_only": false,
+      "canonical": false,
+      "governance_status": "GOVERNED",
+      "written_by": "POST /api/operator/lead-registry/action",
+      "consumers": [
+        "staffordos/leads/lead_registry_v1.json",
+        "staffordos/leads/lead_events_v1.json",
+        "staffordos/leads/send_ledger_v1.json",
+        "staffordos/leads/send_execution_log_v1.json",
+        "staffordos/ui/operator-frontend/app/api/operator/send-proof/route.ts",
+        "staffordos/ui/operator-frontend/lib/operator/loadExecutionLog.ts"
+      ],
+      "replacement_plan": "Move real send proof to proof_authority_v1; keep lead lifecycle mutation separate from proof capture."
+    },
+    {
+      "proof_source": "proof.execution.operator_action_events",
+      "file": "staffordos/events/operator_action_events_v1.json",
+      "append_only": false,
+      "canonical": false,
+      "governance_status": "PARTIALLY_GOVERNED",
+      "written_by": "execute-primary-action route appendEvent",
+      "consumers": [
+        "staffordos/ui/operator-frontend/lib/operator/loadExecutionLog.ts",
+        "staffordos/ui/operator-frontend/lib/operator/actionResolver.ts",
+        "staffordos/ui/operator-frontend/lib/operator/decisionEngineResolver.ts",
+        "staffordos/ui/operator-frontend/lib/operator/relationshipResolver.ts"
+      ],
+      "replacement_plan": "Replace with append-only reservation/proof events in proof_authority_v1 and stop truncating event history."
+    },
+    {
+      "proof_source": "proof.execution.outcome_event_log",
+      "file": "staffordos/events/outcome_event_log_v1.json",
+      "append_only": false,
+      "canonical": false,
+      "governance_status": "PARTIALLY_GOVERNED",
+      "written_by": "execute-primary-action route appendEvent",
+      "consumers": [
+        "staffordos/ui/operator-frontend/lib/operator/loadExecutionLog.ts",
+        "staffordos/ui/operator-frontend/lib/operator/actionResolver.ts",
+        "staffordos/ui/operator-frontend/lib/operator/decisionEngineResolver.ts",
+        "staffordos/ui/operator-frontend/lib/operator/relationshipResolver.ts"
+      ],
+      "replacement_plan": "Replace with canonical proof events in proof_authority_v1 and derive outcome truth from that store."
+    },
+    {
+      "proof_source": "proof.lead.send_ledger",
+      "file": "staffordos/leads/send_ledger_v1.json",
+      "append_only": true,
+      "canonical": false,
+      "governance_status": "PARTIALLY_GOVERNED",
+      "written_by": "lead-registry action route and send_execution_agent_v1.mjs",
+      "consumers": [
+        "staffordos/ui/operator-frontend/app/api/operator/send-proof/route.ts",
+        "staffordos/revenue/revenue_agent_v1.mjs",
+        "staffordos/ui/operator-frontend/app/api/operator/system-map/route.ts"
+      ],
+      "replacement_plan": "Treat as legacy proof ledger only. Emit reservation_created/send_attempted/send_succeeded/send_failed into proof_authority_v1 instead."
+    },
+    {
+      "proof_source": "proof.lead.send_execution_log",
+      "file": "staffordos/leads/send_execution_log_v1.json",
+      "append_only": true,
+      "canonical": false,
+      "governance_status": "PARTIALLY_GOVERNED",
+      "written_by": "lead-registry action route and send_execution_agent_v1.mjs",
+      "consumers": [
+        "staffordos/ui/operator-frontend/app/api/operator/send-proof/route.ts",
+        "staffordos/ui/operator-frontend/app/api/operator/system-map/route.ts",
+        "staffordos/cockpit_audit/ceo_cockpit_binding_plan_v1.md"
+      ],
+      "replacement_plan": "Retain as legacy history until proof_authority_v1 replaces it; do not use as a sole proof source."
+    },
+    {
+      "proof_source": "proof.shopifixer.before_evidence",
+      "file": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md",
+      "append_only": false,
+      "canonical": false,
+      "governance_status": "PARTIALLY_GOVERNED",
+      "written_by": "writeShopifixerBeforeEvidence",
+      "consumers": [
+        "staffordos/ui/operator-frontend/lib/operator/writeShopifixerProofPackage.ts",
+        "staffordos/ui/operator-frontend/components/operator/ProofRunWorkbench.tsx"
+      ],
+      "replacement_plan": "Convert the proof run artifact into an event stream backed by proof_authority_v1; preserve the rendered markdown as a derived view only."
+    },
+    {
+      "proof_source": "proof.shopifixer.scoped_fix",
+      "file": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md",
+      "append_only": false,
+      "canonical": false,
+      "governance_status": "PARTIALLY_GOVERNED",
+      "written_by": "writeShopifixerScopedFix",
+      "consumers": [
+        "staffordos/ui/operator-frontend/lib/operator/writeShopifixerProofPackage.ts",
+        "staffordos/ui/operator-frontend/components/operator/ProofRunWorkbench.tsx"
+      ],
+      "replacement_plan": "Emit proof events to proof_authority_v1 and keep this file as a generated presentation artifact only."
+    },
+    {
+      "proof_source": "proof.shopifixer.after_evidence",
+      "file": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md",
+      "append_only": false,
+      "canonical": false,
+      "governance_status": "PARTIALLY_GOVERNED",
+      "written_by": "writeShopifixerAfterEvidence",
+      "consumers": [
+        "staffordos/ui/operator-frontend/lib/operator/writeShopifixerProofPackage.ts",
+        "staffordos/ui/operator-frontend/components/operator/ProofRunWorkbench.tsx"
+      ],
+      "replacement_plan": "Derive from proof_authority_v1 events; do not treat as proof authority itself."
+    },
+    {
+      "proof_source": "proof.shopifixer.merchant_proof_package",
+      "file": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md",
+      "append_only": false,
+      "canonical": false,
+      "governance_status": "PARTIALLY_GOVERNED",
+      "written_by": "writeShopifixerProofPackage",
+      "consumers": [
+        "staffordos/ui/operator-frontend/lib/operator/writeShopifixerCompletion.ts",
+        "staffordos/ui/operator-frontend/components/operator/ProofRunWorkbench.tsx"
+      ],
+      "replacement_plan": "Keep as a generated merchant-facing artifact; proof authority should be the event stream, not the markdown package."
+    },
+    {
+      "proof_source": "proof.shopifixer.completion_writeback",
+      "file": "staffordos/ui/operator-frontend/lib/operator/writeShopifixerCompletion.ts",
+      "append_only": false,
+      "canonical": false,
+      "governance_status": "PARTIALLY_GOVERNED",
+      "written_by": "writeShopifixerCompletion",
+      "consumers": [
+        "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+        "staffordos/merchant_registry/build_merchant_lifecycle_registry_v1.mjs"
+      ],
+      "replacement_plan": "Move completion proof events into proof_authority_v1 and derive fulfillment completion truth from that store."
+    },
+    {
+      "proof_source": "proof.abando.latest_live_test_proof",
+      "file": "staffordos/system_inventory/output/proof_runs/latest_abando_live_test_proof.json",
+      "append_only": false,
+      "canonical": false,
+      "governance_status": "PARTIALLY_GOVERNED",
+      "written_by": "recoveryLiveTest route",
+      "consumers": [
+        "web/src/lib/staffordosProofRegister.js",
+        "web/src/routes/recoveryLiveTest.esm.js",
+        "staffordos/system_inventory/output/abando_real_send_proof_log_v1.json"
+      ],
+      "replacement_plan": "Replace with reservation-aware proof events in proof_authority_v1; keep this as a debugging artifact only."
+    },
+    {
+      "proof_source": "proof.abando.execution_proof_register",
+      "file": "staffordos/system_inventory/output/execution_proof_register_v1.json",
+      "append_only": true,
+      "canonical": false,
+      "governance_status": "PARTIALLY_GOVERNED",
+      "written_by": "recordAbandoRealSendProof",
+      "consumers": [
+        "web/src/lib/staffordosProofRegister.js",
+        "web/src/routes/recoveryLiveTest.esm.js",
+        "staffordos/system_inventory/output/abando_real_send_proof_log_v1.json"
+      ],
+      "replacement_plan": "Move the latest proof register into proof_authority_v1 as a reservation/proof event log and retire the separate register."
+    },
+    {
+      "proof_source": "proof.abando.proof_log",
+      "file": "staffordos/system_inventory/output/abando_real_send_proof_log_v1.json",
+      "append_only": true,
+      "canonical": false,
+      "governance_status": "PARTIALLY_GOVERNED",
+      "written_by": "recordAbandoRealSendProof",
+      "consumers": [
+        "web/src/lib/staffordosProofRegister.js",
+        "web/src/routes/recoveryLiveTest.esm.js"
+      ],
+      "replacement_plan": "Replace with proof_authority_v1 event append history."
+    }
+  ],
+  "canonical_targets": [
+    {
+      "proof_source": "proof.execution.execution_log",
+      "file": "staffordos/execution/execution_log_v1.json",
+      "append_only": true,
+      "canonical": true,
+      "governance_status": "READ_ONLY",
+      "written_by": "No active writer observed in the current repository tree",
+      "consumers": [
+        "staffordos/ui/operator-frontend/lib/operator/loadExecutionLog.ts",
+        "staffordos/ui/operator-frontend/lib/operator/actionResolver.ts",
+        "staffordos/ui/operator-frontend/lib/operator/decisionEngineResolver.ts",
+        "staffordos/ui/operator-frontend/lib/operator/relationshipResolver.ts",
+        "staffordos/ui/operator-frontend/lib/operator/campaignResolver.ts",
+        "staffordos/execution/validate_execution_truth_v1.mjs"
+      ],
+      "replacement_plan": "Promote proof_authority_v1 as the append-only source of reservation and send/payment/fulfillment events, then derive execution_log_v1.json from it as a projection."
+    },
+    {
+      "proof_source": "proof.execution.outcome_events",
+      "file": "staffordos/execution/outcome_events_v1.json",
+      "append_only": true,
+      "canonical": true,
+      "governance_status": "READ_ONLY",
+      "written_by": "No active writer observed in the current repository tree",
+      "consumers": [
+        "staffordos/ui/operator-frontend/lib/operator/loadExecutionLog.ts",
+        "staffordos/ui/operator-frontend/lib/operator/actionResolver.ts",
+        "staffordos/ui/operator-frontend/lib/operator/decisionEngineResolver.ts",
+        "staffordos/ui/operator-frontend/lib/operator/relationshipResolver.ts",
+        "staffordos/ui/operator-frontend/lib/operator/campaignResolver.ts",
+        "staffordos/execution/validate_execution_truth_v1.mjs"
+      ],
+      "replacement_plan": "Derive outcome_events_v1.json from proof_authority_v1 instead of letting UI or bridge code patch outcomes directly."
+    }
+  ]
+}

@@ -26,7 +26,7 @@ export default async function RossCommandCenterPage({ searchParams }: RossComman
   const preflightReport = loadPreflightReport();
   const qaReport = loadCommandCenterQaReport();
   const unitWorkSnapshot = loadUnitWorkSnapshot();
-  const shopifixerCommandCenter = loadShopifixerCommandCenter();
+  const shopifixerCommandCenter = await loadShopifixerCommandCenter();
   const beforeEvidenceSaved = searchParams?.shopifixer_before_saved === "1";
   const afterEvidenceSaved = searchParams?.shopifixer_after_saved === "1";
   const scopedFixSaved = searchParams?.shopifixer_scoped_fix_saved === "1";

@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-06-05T04:17:27.216Z",
-  "task_type": "next_action_execution",
+  "generated_at": "2026-06-25T21:41:03.858Z",
+  "task_type": "primary_action_execution",
   "status": "resolved",
   "resolution": {
-    "task_type": "next_action_execution",
-    "command": "node staffordos/clients/next_action_engine_v1.mjs",
+    "task_type": "primary_action_execution",
+    "command": "node staffordos/operator_daemon/write_operator_observation_v1.mjs",
     "approval_level": "operator_safe",
-    "execution_class": "fulfillment_transition",
+    "execution_class": "safe_observation",
     "system": "staffordos",
     "revenue_action": false,
-    "reason": "Execute lifecycle transitions for paid clients through next_action_engine_v1.mjs."
+    "reason": "Default safe executable command for persistent operator proof loop."
   },
   "failures": []
 }

@@ -94,6 +94,18 @@ type ShopifixerCommandCenter = {
     next_required_action?: string;
     readiness_score?: number;
   };
+  checkout_linkage?: {
+    packet_id?: string | null;
+    reservation_id?: string | null;
+    store_domain?: string | null;
+    payment_reference?: string | null;
+    status?: string | null;
+    continuity_status?: string | null;
+    shopifixer_url?: string | null;
+    pricing_url?: string | null;
+    merchant_workspace_url?: string | null;
+    packet_authority_url?: string | null;
+  };
   customer_outcomes?: Array<{
     customer?: string;
     outcome_state?: string;
@@ -187,6 +199,7 @@ export function OperatorHomeV1({
   const shopifixerFulfillment = shopifixer.fulfillment || {};
   const shopifixerLifecycleLane = shopifixer.lifecycle_lane || {};
   const shopifixerOverall = shopifixer.overall || {};
+  const shopifixerCheckoutLinkage = shopifixer.checkout_linkage || {};
   const customerOutcomes = Array.isArray(shopifixer.customer_outcomes) ? shopifixer.customer_outcomes : [];
   const visibleCustomerOutcomes = customerOutcomes.filter((outcome) => outcome.visible_on_fulfillment);
   const lifecycleLaneStages = [
@@ -364,6 +377,53 @@ Expected outcome: {action.expected_outcome || "Outcome not yet defined."}
               <p className="hint" style={{ marginTop: 14 }}>
                 {shopifixerAudit.recommendation || "unavailable"}
               </p>
+            </div>
+
+            <div className="operatorHomeActionCard" style={{ marginTop: 16 }}>
+              <div className="operatorHomeActionFooter">
+                <div>
+                  <small>Packet ID</small>
+                  <strong>{shopifixerCheckoutLinkage.packet_id || "unavailable"}</strong>
+                </div>
+                <div>
+                  <small>Reservation ID</small>
+                  <strong>{shopifixerCheckoutLinkage.reservation_id || "unavailable"}</strong>
+                </div>
+                <div>
+                  <small>Payment status</small>
+                  <strong>{shopifixerCheckoutLinkage.status || "unavailable"}</strong>
+                </div>
+                <div>
+                  <small>Continuity</small>
+                  <strong>{shopifixerCheckoutLinkage.continuity_status || "unavailable"}</strong>
+                </div>
+              </div>
+              <div className="operatorHomeNextStep" style={{ marginTop: 16 }}>
+                <span>Checkout linkage</span>
+                <strong>{shopifixerCheckoutLinkage.store_domain || shopifixerMerchant.store || "unavailable"}</strong>
+              </div>
+              <div className="operatorHomeCTAGroup" style={{ marginTop: 16, flexWrap: "wrap" }}>
+                {shopifixerCheckoutLinkage.shopifixer_url ? (
+                  <Link className="button" href={shopifixerCheckoutLinkage.shopifixer_url}>
+                    Open ShopiFixer
+                  </Link>
+                ) : null}
+                {shopifixerCheckoutLinkage.pricing_url ? (
+                  <Link className="button" href={shopifixerCheckoutLinkage.pricing_url}>
+                    Open Pricing
+                  </Link>
+                ) : null}
+                {shopifixerCheckoutLinkage.merchant_workspace_url ? (
+                  <Link className="button" href={shopifixerCheckoutLinkage.merchant_workspace_url}>
+                    Open Merchant Workspace
+                  </Link>
+                ) : null}
+                {shopifixerCheckoutLinkage.packet_authority_url ? (
+                  <Link className="button" href={shopifixerCheckoutLinkage.packet_authority_url}>
+                    Open Packet Authority
+                  </Link>
+                ) : null}
+              </div>
             </div>
 
             <div className="operatorHomeActionCard" style={{ marginTop: 16 }}>

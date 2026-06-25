@@ -1,8 +1,8 @@
 {
   "schema": "staffordos.post_patch_structural_validator.v1",
-  "generated_at": "2026-06-05T04:17:37.658Z",
-  "task_type": "next_action_execution",
-  "expected_artifact": "staffordos/clients/client_registry_v1.json",
+  "generated_at": "2026-06-25T21:41:14.279Z",
+  "task_type": "primary_action_execution",
+  "expected_artifact": "staffordos/operator_daemon/output/staffordos_sprint1_task4_execution_report_v1.json",
   "status": "passed",
   "checks": {
     "hidden_character_check": true,

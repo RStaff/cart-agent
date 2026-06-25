@@ -76,6 +76,24 @@ type FulfillmentTruth = {
   summary_counts?: Record<string, number>;
 };
 
+type PacketRecord = {
+  packet_id?: string;
+  reservation_id?: string | null;
+  store_domain?: string | null;
+  payment_reference?: string | null;
+  status?: string | null;
+  execution_status?: string | null;
+  proof_status?: string | null;
+  completion_status?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+};
+
+type PacketListResponse = {
+  ok?: boolean;
+  packets?: PacketRecord[];
+};
+
 export type CustomerOutcomeRow = {
   customer: string;
   outcome_state: string;
@@ -136,6 +154,18 @@ function fallbackCommandCenter() {
       current_stage: "unavailable",
       next_required_action: "unavailable",
       readiness_score: 0,
+    },
+    checkout_linkage: {
+      packet_id: null,
+      reservation_id: null,
+      store_domain: null,
+      payment_reference: null,
+      status: "unavailable",
+      continuity_status: "unavailable",
+      shopifixer_url: null,
+      pricing_url: null,
+      merchant_workspace_url: null,
+      packet_authority_url: null,
     },
   };
 }
@@ -260,6 +290,71 @@ function selectClientRecord(registry: ClientRegistry, record: MerchantLifecycleR
   );
 }
 
+function normalizeStore(value: unknown) {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .split("/")[0]
+    .split("?")[0]
+    .split("#")[0];
+}
+
+function resolvePacketApiBases() {
+  const rawBases = [
+    process.env.PACKET_AUTHORITY_URL,
+    process.env.NEXT_PUBLIC_PACKET_AUTHORITY_URL,
+    process.env.CART_AGENT_API_URL,
+    process.env.NEXT_PUBLIC_CART_AGENT_API_URL,
+    process.env.NEXT_PUBLIC_ABANDO_API_BASE,
+    process.env.NEXT_PUBLIC_API_BASE,
+    process.env.NEXT_PUBLIC_ABANDO_BACKEND_ORIGIN,
+    process.env.ABANDO_BACKEND_ORIGIN,
+    process.env.ABANDO_API_BASE,
+    process.env.CART_AGENT_API_BASE,
+    "https://pay.abando.ai",
+    "https://cart-agent-api.onrender.com",
+  ];
+
+  return Array.from(
+    new Set(
+      rawBases
+        .map((base) => String(base ?? "").trim().replace(/\/$/, ""))
+        .filter(Boolean),
+    ),
+  );
+}
+
+function isPaidPacket(packet: PacketRecord | null | undefined) {
+  const status = String(packet?.status ?? "").trim().toLowerCase();
+  return status === "payment_received" || status === "paid";
+}
+
+function comparePacketRecency(left: PacketRecord, right: PacketRecord) {
+  const leftTime = Date.parse(String(left.updated_at || left.created_at || ""));
+  const rightTime = Date.parse(String(right.updated_at || right.created_at || ""));
+  return (Number.isFinite(rightTime) ? rightTime : 0) - (Number.isFinite(leftTime) ? leftTime : 0);
+}
+
+async function readPackets(): Promise<PacketRecord[]> {
+  for (const base of resolvePacketApiBases()) {
+    try {
+      const response = await fetch(`${base}/api/operator/packets`, { cache: "no-store" });
+      if (!response.ok) continue;
+
+      const payload = (await response.json()) as PacketListResponse;
+      if (Array.isArray(payload?.packets)) {
+        return payload.packets;
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  return [];
+}
+
 function selectFulfillmentItem(truth: FulfillmentTruth, record: MerchantLifecycleRecord) {
   const items = Array.isArray(truth.items) ? truth.items : [];
   const merchantKeys = [record.client_id, record.merchant_id, record.merchant_shop, record.store_domain]
@@ -270,6 +365,22 @@ function selectFulfillmentItem(truth: FulfillmentTruth, record: MerchantLifecycl
     items.find((item) => merchantKeys.includes(normalizeKey(item.client_id))) ||
     items.find((item) => merchantKeys.includes(normalizeKey(item.store_domain))) ||
     items[0] ||
+    null
+  );
+}
+
+function selectPacketRecord(packets: PacketRecord[], record: MerchantLifecycleRecord) {
+  const merchantKeys = [record.client_id, record.merchant_id, record.merchant_shop, record.store_domain]
+    .map(normalizeStore)
+    .filter(Boolean);
+  const paidPackets = packets.filter(isPaidPacket);
+
+  return (
+    paidPackets.find(
+      (packet) =>
+        merchantKeys.includes(normalizeStore(packet.store_domain)) || merchantKeys.includes(normalizeStore(packet.packet_id))
+    ) ||
+    paidPackets.sort(comparePacketRecency)[0] ||
     null
   );
 }
@@ -423,10 +534,10 @@ export function deriveCustomerOutcome(input: {
   };
 }
 
-export function loadShopifixerCommandCenter() {
-  const filePath = path.join(process.cwd(), "../../../merchant_registry/merchant_lifecycle_registry_v1.json");
-  const clientRegistryPath = path.join(process.cwd(), "../../../clients/client_registry_v1.json");
-  const fulfillmentTruthPath = path.join(process.cwd(), "../../../fulfillment/shopifixer_fulfillment_truth_v1.json");
+export async function loadShopifixerCommandCenter() {
+  const filePath = path.join(process.cwd(), "../../merchant_registry/merchant_lifecycle_registry_v1.json");
+  const clientRegistryPath = path.join(process.cwd(), "../../clients/client_registry_v1.json");
+  const fulfillmentTruthPath = path.join(process.cwd(), "../../fulfillment/shopifixer_fulfillment_truth_v1.json");
 
   try {
     const registry = JSON.parse(fs.readFileSync(filePath, "utf8")) as MerchantLifecycleRegistry;
@@ -440,8 +551,19 @@ export function loadShopifixerCommandCenter() {
     const fulfillmentTruth = readJsonFile<FulfillmentTruth>(fulfillmentTruthPath, {});
     const clientRecord = selectClientRecord(clientRegistry, activeRecord);
     const fulfillmentItem = selectFulfillmentItem(fulfillmentTruth, activeRecord);
+    const packetRecords = await readPackets();
+    const livePacket = selectPacketRecord(packetRecords, activeRecord);
+    const merchantStore = activeRecord.merchant_shop || activeRecord.store_domain || activeRecord.client_id || activeRecord.merchant_id || "unavailable";
+    const packetStore = livePacket?.store_domain || merchantStore;
+    const packetId = livePacket?.packet_id || null;
+    const reservationId = livePacket?.reservation_id || null;
+    const paymentReference = livePacket?.payment_reference || null;
+    const normalizedStore = normalizeStore(packetStore);
+    const merchantWorkspaceUrl = packetId
+      ? `/fix-status?packet_id=${encodeURIComponent(packetId)}${paymentReference ? `&session_id=${encodeURIComponent(paymentReference)}` : ""}${normalizedStore ? `&store=${encodeURIComponent(normalizedStore)}` : ""}${reservationId ? `&reservation_id=${encodeURIComponent(reservationId)}` : ""}`
+      : null;
     const customerOutcome = deriveCustomerOutcome({
-      customer: activeRecord.merchant_shop || activeRecord.store_domain || activeRecord.client_id || activeRecord.merchant_id || "unavailable",
+      customer: merchantStore,
       lifecycle: activeRecord,
       client: clientRecord,
       fulfillment: fulfillmentItem,
@@ -449,6 +571,19 @@ export function loadShopifixerCommandCenter() {
 
     return {
       ...buildCommandCenterFromRecord(registry, activeRecord),
+      checkout_linkage: {
+        packet_id: packetId,
+        reservation_id: reservationId,
+        store_domain: packetStore,
+        payment_reference: paymentReference,
+        status: livePacket?.status || activeRecord.payment_status || "unavailable",
+        continuity_status:
+          livePacket?.status === "payment_received" ? "Paid packet ready" : livePacket ? "Waiting for packet" : "unavailable",
+        shopifixer_url: normalizedStore ? `/shopifixer?store=${encodeURIComponent(normalizedStore)}` : null,
+        pricing_url: normalizedStore ? `/pricing?store=${encodeURIComponent(normalizedStore)}` : null,
+        merchant_workspace_url: merchantWorkspaceUrl,
+        packet_authority_url: packetId ? `/api/packets/${encodeURIComponent(packetId)}` : null,
+      },
       customer_outcomes: [customerOutcome],
     };
   } catch {

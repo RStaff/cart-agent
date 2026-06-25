@@ -1,11 +1,11 @@
 {
   "schema": "staffordos.character_integrity_guard.v1",
-  "generated_at": "2026-06-05T04:17:26.834Z",
+  "generated_at": "2026-06-25T21:41:03.460Z",
   "mode": "normalize-task",
   "status": "passed",
   "input": {
-    "task_raw_length": 44,
-    "task_normalized": "repair unauthorized revenue active promotion",
+    "task_raw_length": 29,
+    "task_normalized": "Add operator checkout linkage",
     "hidden_characters_detected": false
   },
   "proof": {

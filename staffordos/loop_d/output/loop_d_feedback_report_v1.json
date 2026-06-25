@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.loop_d_feedback_report.v1",
-  "generated_at": "2026-06-05T04:17:27.404Z",
+  "generated_at": "2026-06-25T21:41:04.045Z",
   "outcome_score": 96,
   "agent_utilization_percent_this_loop": 6,
   "qa_verdict": "pass",
