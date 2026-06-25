@@ -130,6 +130,13 @@ function translateOwner(value: unknown) {
   return String(value ?? "").trim() || "Unknown";
 }
 
+function sameDay(value: string | undefined, reference = new Date()) {
+  if (!value) return false;
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return false;
+  return parsed.toDateString() === reference.toDateString();
+}
+
 function translateDomain(value: unknown) {
   const normalized = String(value ?? "").trim().toLowerCase();
   if (normalized === "shopifixer") return "ShopiFixer";
@@ -484,6 +491,46 @@ export default async function OperatorPage() {
     if (packetReservationId !== "unavailable") url.searchParams.set("reservation_id", packetReservationId);
     return `${url.pathname}?${url.searchParams.toString()}`;
   })();
+  const completedWorkToday = (data.executionLog?.executionEvents || [])
+    .filter((event: any) => sameDay(event.timestamp))
+    .filter((event: any) => {
+      const outcome = normalizeComparison(event.outcome);
+      const stage = normalizeComparison(event.stage);
+      return ["complete", "completed", "done", "success", "succeeded", "paid packet ready"].some((term) =>
+        outcome.includes(term) || stage.includes(term)
+      );
+    });
+  const openMerchantItems = [
+    {
+      label: "Active merchant",
+      value: relationshipName,
+      detail: relationshipNext,
+    },
+    {
+      label: "Live packet",
+      value: activePacketId,
+      detail: `${packetStatus} · ${packetContinuityStatus}`,
+    },
+    {
+      label: "Awaiting payment",
+      value: waitingForPaymentCount.toLocaleString(),
+      detail: "Open work still tied to payment close.",
+    },
+  ];
+  const nextDayPriorities = [
+    {
+      label: "Top revenue action",
+      value: topRevenueAction,
+    },
+    {
+      label: "Next relationship action",
+      value: relationshipNext,
+    },
+    {
+      label: "Decision Engine top action",
+      value: decisionTopActionLabel,
+    },
+  ];
 
   return (
     <main className="shell">
@@ -745,6 +792,85 @@ export default async function OperatorPage() {
               <div><strong>Trust status:</strong> {text(data.ceoTruth?.metadata?.confidence, "unknown")}</div>
               <div><strong>Current revenue block:</strong> {translateBottleneck(data.revenueTruth?.current_bottleneck)}</div>
               <div><strong>Core records:</strong> {coreRecordsState}</div>
+            </div>
+          </div>
+        </section>
+
+        <section className="panel">
+          <div className="panelInner">
+            <p className="eyebrow">End-of-day consolidation</p>
+            <h2 className="sectionTitle" style={{ marginBottom: 10 }}>
+              What closed, what stays open, and what to do first tomorrow
+            </h2>
+            <div className="operatorHomeSummaryPills" style={{ marginBottom: 16 }}>
+              <span>Completed today: {completedWorkToday.length}</span>
+              <span>Open merchants: {openMerchantItems.length}</span>
+              <span>Next-day priorities: {nextDayPriorities.length}</span>
+              <span>Evidence trail: {data.executionLog?.outcomeStateChangesToday || 0} changes</span>
+            </div>
+
+            <div className="grid gridTwo">
+              <section className="panel" style={{ margin: 0 }}>
+                <div className="panelInner">
+                  <h3 className="sectionTitle">Completed work</h3>
+                  {completedWorkToday.length ? (
+                    <div className="executionList">
+                      {completedWorkToday.slice(0, 4).map((event: any) => (
+                        <div key={`${event.execution_id || event.event_id || event.timestamp}`} className="executionItem">
+                          <strong>{text(event.action_type, "Completed action")}</strong>
+                          <span className="hint">
+                            {text(event.customer, "unknown customer")} · {text(event.outcome, "unknown outcome")}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="hint">No completed actions recorded today.</p>
+                  )}
+                </div>
+              </section>
+
+              <section className="panel" style={{ margin: 0 }}>
+                <div className="panelInner">
+                  <h3 className="sectionTitle">Open merchants</h3>
+                  <div className="executionList">
+                    {openMerchantItems.map((item) => (
+                      <div key={item.label} className="executionItem">
+                        <strong>{item.label}</strong>
+                        <span className="hint">
+                          {item.value}
+                          {item.detail ? ` · ${item.detail}` : ""}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              <section className="panel" style={{ margin: 0 }}>
+                <div className="panelInner">
+                  <h3 className="sectionTitle">Tomorrow’s priorities</h3>
+                  <div className="executionList">
+                    {nextDayPriorities.map((item) => (
+                      <div key={item.label} className="executionItem">
+                        <strong>{item.label}</strong>
+                        <span className="hint">{item.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+                    <Link href="/operator/command-center" className="chip">Open Command Center</Link>
+                    <Link href="/operator/revenue-command" className="chip">Open Revenue Command</Link>
+                    {relationshipId ? <Link href={`/operator/relationship/${relationshipId}`} className="chip">Open Relationship</Link> : null}
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <div className="kv" style={{ marginTop: 16 }}>
+              <div><strong>Completion indicators:</strong> Paid packet ready, execution log current, evidence trail visible</div>
+              <div><strong>Closeout state:</strong> {paidWorkCount > 0 ? "Ready for end-of-day review" : "No paid work to close"}</div>
+              <div><strong>Next checkpoint:</strong> {text(primary.next_step, "Review the next-day priority stack.")}</div>
             </div>
           </div>
         </section>
