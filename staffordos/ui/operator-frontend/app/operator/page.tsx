@@ -7,6 +7,9 @@ import { loadExecutionLog } from "../../lib/operator/loadExecutionLog";
 import { getDecisionEngineReport } from "../../lib/operator/decisionEngineResolver";
 import { resolveRelationshipById } from "../../lib/operator/relationshipResolver";
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 const PATHS = {
   primaryAction: "staffordos/snapshots/primary_action_snapshot_v1.json",
   revenueTruth: "staffordos/revenue/revenue_truth_v1.json",
@@ -17,6 +20,24 @@ const PATHS = {
   fulfillmentTruth: "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
   ceoTruth: "staffordos/cockpit/ceo_truth_snapshot_v1.json",
 } as const;
+
+type PacketRecord = {
+  packet_id?: string;
+  reservation_id?: string | null;
+  store_domain?: string | null;
+  payment_reference?: string | null;
+  status?: string | null;
+  execution_status?: string | null;
+  proof_status?: string | null;
+  completion_status?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+};
+
+type PacketListResponse = {
+  ok?: boolean;
+  packets?: PacketRecord[];
+};
 
 function resolveRepoRoot() {
   const cwd = process.cwd();
@@ -185,6 +206,90 @@ function normalizeComparison(value: unknown) {
     .replace(/[^a-z0-9]+/g, " ");
 }
 
+function normalizeStore(value: unknown) {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .split("/")[0]
+    .split("?")[0]
+    .split("#")[0];
+}
+
+function resolvePacketApiBases() {
+  const rawBases = [
+    process.env.PACKET_AUTHORITY_URL,
+    process.env.NEXT_PUBLIC_PACKET_AUTHORITY_URL,
+    process.env.CART_AGENT_API_URL,
+    process.env.NEXT_PUBLIC_CART_AGENT_API_URL,
+    process.env.NEXT_PUBLIC_ABANDO_API_BASE,
+    process.env.NEXT_PUBLIC_API_BASE,
+    process.env.NEXT_PUBLIC_ABANDO_BACKEND_ORIGIN,
+    process.env.ABANDO_BACKEND_ORIGIN,
+    process.env.ABANDO_API_BASE,
+    process.env.CART_AGENT_API_BASE,
+    "https://pay.abando.ai",
+    "https://cart-agent-api.onrender.com",
+  ];
+
+  return Array.from(
+    new Set(
+      rawBases
+        .map((base) => String(base ?? "").trim().replace(/\/$/, ""))
+        .filter(Boolean),
+    ),
+  );
+}
+
+function isPaidPacket(packet: PacketRecord | null | undefined) {
+  const status = String(packet?.status ?? "").trim().toLowerCase();
+  return status === "payment_received" || status === "paid";
+}
+
+function comparePacketRecency(left: PacketRecord, right: PacketRecord) {
+  const leftTime = Date.parse(String(left.updated_at || left.created_at || ""));
+  const rightTime = Date.parse(String(right.updated_at || right.created_at || ""));
+  return (Number.isFinite(rightTime) ? rightTime : 0) - (Number.isFinite(leftTime) ? leftTime : 0);
+}
+
+async function readPacket(packetId: string): Promise<PacketRecord | null> {
+  const normalized = String(packetId ?? "").trim();
+  if (!normalized) return null;
+
+  for (const base of resolvePacketApiBases()) {
+    try {
+      const response = await fetch(`${base}/api/packets/${encodeURIComponent(normalized)}`, { cache: "no-store" });
+      if (!response.ok) continue;
+
+      const payload = (await response.json()) as { ok?: boolean; packet?: PacketRecord };
+      return payload?.packet || null;
+    } catch {
+      continue;
+    }
+  }
+
+  return null;
+}
+
+async function readPackets(): Promise<PacketRecord[]> {
+  for (const base of resolvePacketApiBases()) {
+    try {
+      const response = await fetch(`${base}/api/operator/packets`, { cache: "no-store" });
+      if (!response.ok) continue;
+
+      const payload = (await response.json()) as PacketListResponse;
+      if (Array.isArray(payload?.packets)) {
+        return payload.packets;
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  return [];
+}
+
 function relationshipRouteId(value: unknown) {
   const normalized = String(value ?? "").trim();
   if (!normalized) return null;
@@ -192,7 +297,7 @@ function relationshipRouteId(value: unknown) {
   return relationship?.relationship_id ? relationship.relationship_id.replace(/^rel_/, "") : null;
 }
 
-function loadExecutiveHome() {
+async function loadExecutiveHome() {
   const repoRoot = resolveRepoRoot();
 
   const primaryAction = readJson<any>(repoRoot, PATHS.primaryAction, {});
@@ -215,6 +320,13 @@ function loadExecutiveHome() {
         return status === "paid" || status === "payment_received";
       })
     : [];
+  const activeWorkspaceItem = paidFulfillment[0] || (Array.isArray(fulfillmentTruth.items) ? fulfillmentTruth.items[0] || null : null);
+  const packetAuthorityPackets = await readPackets();
+  const livePacketFromAuthorityList =
+    packetAuthorityPackets
+      .filter(isPaidPacket)
+      .sort(comparePacketRecency)[0] || null;
+  const livePacket = livePacketFromAuthorityList || (activeWorkspaceItem?.packet_id ? await readPacket(activeWorkspaceItem.packet_id) : null);
   const waitingFulfillment = Array.isArray(fulfillmentTruth.items)
     ? fulfillmentTruth.items.filter((item: any) => String(item.payment_status || "").toLowerCase() === "waiting_for_payment")
     : [];
@@ -288,6 +400,8 @@ function loadExecutiveHome() {
     internalWork,
     paidFulfillment,
     waitingFulfillment,
+    activeWorkspaceItem,
+    livePacket,
     priorityClient,
     revenueGap,
     outcomeRow,
@@ -297,8 +411,8 @@ function loadExecutiveHome() {
   };
 }
 
-export default function OperatorPage() {
-  const data = loadExecutiveHome();
+export default async function OperatorPage() {
+  const data = await loadExecutiveHome();
   const primary = data.primaryAction;
   const topRevenueAction =
     data.revenueTruth?.next_actions?.[0]?.action ||
@@ -351,6 +465,25 @@ export default function OperatorPage() {
     relationshipRouteId(data.revenueGap?.client_id) ||
     relationshipRouteId(data.executionLog?.lastExecution?.customer) ||
     relationshipRouteId(data.priorityClient?.merchant_shop ? `rel_${data.priorityClient.merchant_shop}` : "");
+  const livePacket = data.livePacket;
+  const activePacketId = text(livePacket?.packet_id || data.activeWorkspaceItem?.packet_id, "No live packet selected");
+  const packetStatus = text(livePacket?.status || data.activeWorkspaceItem?.payment_status || "unavailable", "unavailable");
+  const packetReservationId = text(livePacket?.reservation_id || data.activeWorkspaceItem?.reservation_id || "unavailable", "unavailable");
+  const packetStore = text(livePacket?.store_domain || data.activeWorkspaceItem?.store_domain || data.priorityClient?.merchant_shop || "unavailable", "unavailable");
+  const packetPaymentReference = text(
+    livePacket?.payment_reference || data.activeWorkspaceItem?.payment_reference || "unavailable",
+    "unavailable"
+  );
+  const packetContinuityStatus = packetStatus === "payment_received" ? "Paid packet ready" : "Waiting for packet";
+  const packetWorkspaceUrl = (() => {
+    const url = new URL("/fix-status", "https://staffordmedia.ai");
+    const packetId = livePacket?.packet_id || data.activeWorkspaceItem?.packet_id;
+    if (packetId) url.searchParams.set("packet_id", packetId);
+    if (packetPaymentReference !== "unavailable") url.searchParams.set("session_id", packetPaymentReference);
+    if (packetStore !== "unavailable") url.searchParams.set("store", normalizeStore(packetStore));
+    if (packetReservationId !== "unavailable") url.searchParams.set("reservation_id", packetReservationId);
+    return `${url.pathname}?${url.searchParams.toString()}`;
+  })();
 
   return (
     <main className="shell">
@@ -370,6 +503,33 @@ export default function OperatorPage() {
               <span className="chip">Paid work: {paidWorkCount}</span>
               <span className="chip">Customer needing attention: {relationshipName}</span>
               <span className="chip">Open blockers: {data.blockers.length}</span>
+            </div>
+          </div>
+        </section>
+
+        <section className="panel">
+          <div className="panelInner">
+            <p className="eyebrow">Merchant Workspace</p>
+            <h2 className="sectionTitle" style={{ marginBottom: 10 }}>
+              Live paid packet
+            </h2>
+            <div className="kv">
+              <div><strong>Packet ID:</strong> {activePacketId}</div>
+              <div><strong>Reservation ID:</strong> {packetReservationId}</div>
+              <div><strong>Store:</strong> {packetStore}</div>
+              <div><strong>Packet status:</strong> {packetStatus}</div>
+              <div><strong>Payment reference:</strong> {packetPaymentReference}</div>
+              <div><strong>Continuity status:</strong> {packetContinuityStatus}</div>
+              <div>
+                <strong>Next action:</strong>{" "}
+                {packetStatus === "payment_received"
+                  ? "Open merchant workspace"
+                  : text(data.priorityClient?.next_action?.instructions, "Review the highest-priority merchant action.")}
+              </div>
+            </div>
+            <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+              <Link href={packetWorkspaceUrl} className="chip">Open Merchant Workspace</Link>
+              {livePacket?.packet_id ? <Link href={`/api/packets/${encodeURIComponent(livePacket.packet_id)}`} className="chip">Open Packet Authority</Link> : null}
             </div>
           </div>
         </section>

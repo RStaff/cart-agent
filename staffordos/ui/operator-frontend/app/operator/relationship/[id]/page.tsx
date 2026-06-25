@@ -9,8 +9,10 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 type PageProps = {
-  params: {
-    id: string;
+  params: Promise<{
+    id?: string;
+  }> | {
+    id?: string;
   };
 };
 
@@ -90,7 +92,12 @@ function normalizeId(value: string) {
 }
 
 export default async function RelationshipPage({ params }: PageProps) {
-  const { id } = params;
+  const resolvedParams = await Promise.resolve(params);
+  const id = typeof resolvedParams?.id === "string" ? resolvedParams.id.trim() : "";
+  if (!id) {
+    notFound();
+  }
+
   const relationshipId = id.startsWith("rel_") ? id : `rel_${id}`;
   const relationship = resolveRelationshipById(relationshipId) || resolveRelationshipById(normalizeId(relationshipId)) || null;
   const repoRoot = resolveRepoRoot();
