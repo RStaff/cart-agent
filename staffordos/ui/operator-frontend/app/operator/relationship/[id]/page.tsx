@@ -23,6 +23,24 @@ const PATHS = {
   fulfillmentTruth: "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
 } as const;
 
+type PacketRecord = {
+  packet_id?: string;
+  reservation_id?: string | null;
+  store_domain?: string | null;
+  payment_reference?: string | null;
+  status?: string | null;
+  execution_status?: string | null;
+  proof_status?: string | null;
+  completion_status?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+};
+
+type PacketListResponse = {
+  ok?: boolean;
+  packets?: PacketRecord[];
+};
+
 function resolveRepoRoot() {
   const cwd = process.cwd();
   if (existsSync(path.join(cwd, PATHS.revenueTruth))) return cwd;
@@ -91,6 +109,96 @@ function normalizeId(value: string) {
     .replace(/^rel_/, "");
 }
 
+function normalizeStore(value: unknown) {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .split("/")[0]
+    .split("?")[0]
+    .split("#")[0];
+}
+
+function resolvePacketApiBases() {
+  const rawBases = [
+    process.env.PACKET_AUTHORITY_URL,
+    process.env.NEXT_PUBLIC_PACKET_AUTHORITY_URL,
+    process.env.CART_AGENT_API_URL,
+    process.env.NEXT_PUBLIC_CART_AGENT_API_URL,
+    process.env.NEXT_PUBLIC_ABANDO_API_BASE,
+    process.env.NEXT_PUBLIC_API_BASE,
+    process.env.NEXT_PUBLIC_ABANDO_BACKEND_ORIGIN,
+    process.env.ABANDO_BACKEND_ORIGIN,
+    process.env.ABANDO_API_BASE,
+    process.env.CART_AGENT_API_BASE,
+    "https://pay.abando.ai",
+    "https://cart-agent-api.onrender.com",
+  ];
+
+  return Array.from(
+    new Set(
+      rawBases
+        .map((base) => String(base ?? "").trim().replace(/\/$/, ""))
+        .filter(Boolean),
+    ),
+  );
+}
+
+function isPaidPacket(packet: PacketRecord | null | undefined) {
+  const status = String(packet?.status ?? "").trim().toLowerCase();
+  return status === "payment_received" || status === "paid";
+}
+
+function comparePacketRecency(left: PacketRecord, right: PacketRecord) {
+  const leftTime = Date.parse(String(left.updated_at || left.created_at || ""));
+  const rightTime = Date.parse(String(right.updated_at || right.created_at || ""));
+  return (Number.isFinite(rightTime) ? rightTime : 0) - (Number.isFinite(leftTime) ? leftTime : 0);
+}
+
+async function readPackets(): Promise<PacketRecord[]> {
+  for (const base of resolvePacketApiBases()) {
+    try {
+      const response = await fetch(`${base}/api/operator/packets`, { cache: "no-store" });
+      if (!response.ok) continue;
+
+      const payload = (await response.json()) as PacketListResponse;
+      if (Array.isArray(payload?.packets)) {
+        return payload.packets;
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  return [];
+}
+
+function packetCandidateKeys(relationship: any) {
+  return Array.from(
+    new Set(
+      [
+        relationship?.identity?.store_domain,
+        relationship?.identity?.merchant_shop,
+        relationship?.identity?.client_id,
+        relationship?.identity?.domain,
+        relationship?.facets?.merchant?.store_domain,
+        relationship?.facets?.merchant?.merchant_shop,
+        relationship?.facets?.client?.client_id,
+        relationship?.facets?.lead?.domain,
+      ]
+        .map((value) => normalizeStore(value))
+        .filter(Boolean),
+    ),
+  );
+}
+
+function matchesPacketRelationship(packet: PacketRecord, candidateKeys: string[]) {
+  const packetStore = normalizeStore(packet.store_domain);
+  const packetId = normalizeStore(packet.packet_id);
+  return Boolean(candidateKeys.includes(packetStore) || candidateKeys.includes(packetId));
+}
+
 export default async function RelationshipPage({ params }: PageProps) {
   const resolvedParams = await Promise.resolve(params);
   const id = typeof resolvedParams?.id === "string" ? resolvedParams.id.trim() : "";
@@ -117,6 +225,14 @@ export default async function RelationshipPage({ params }: PageProps) {
   if (!relationship) {
     notFound();
   }
+
+  const packetAuthorityPackets = await readPackets();
+  const relationshipPacketCandidates = packetCandidateKeys(relationship);
+  const livePacket =
+    packetAuthorityPackets
+      .filter(isPaidPacket)
+      .filter((packet) => matchesPacketRelationship(packet, relationshipPacketCandidates))
+      .sort(comparePacketRecency)[0] || null;
 
   const relationshipLead = relationship.facets.lead || {};
   const relationshipClient = relationship.facets.client || {};
@@ -159,6 +275,11 @@ export default async function RelationshipPage({ params }: PageProps) {
     .find((candidate: any) => candidate.blocker) || null;
 
   const commercialFacts = [
+    livePacket?.packet_id ? `Packet ID: ${livePacket.packet_id}` : null,
+    livePacket?.reservation_id ? `Reservation ID: ${livePacket.reservation_id}` : null,
+    livePacket?.store_domain ? `Store: ${livePacket.store_domain}` : null,
+    livePacket?.status ? `Packet status: ${livePacket.status}` : null,
+    livePacket?.payment_reference ? `Payment reference: ${livePacket.payment_reference}` : null,
     relationshipClient.payment_status ? `Client payment: ${relationshipClient.payment_status}` : null,
     relationshipClient.closed_at ? `Client closed at: ${dateText(relationshipClient.closed_at)}` : null,
     relationshipClient.lifetime_value ? `Client LTV: ${money(relationshipClient.lifetime_value)}` : null,
@@ -178,6 +299,17 @@ export default async function RelationshipPage({ params }: PageProps) {
     relationshipFulfillment.risk_or_limitation ? `Risk: ${relationshipFulfillment.risk_or_limitation}` : null,
     relationshipFulfillment.remaining_limitations ? `Remaining limitations: ${relationshipFulfillment.remaining_limitations}` : null,
   ].filter(Boolean) as string[];
+
+  const packetWorkspaceUrl = (() => {
+    if (!livePacket?.packet_id) return null;
+    const url = new URL("/fix-status", "https://staffordmedia.ai");
+    url.searchParams.set("packet_id", livePacket.packet_id);
+    if (livePacket.payment_reference) url.searchParams.set("session_id", livePacket.payment_reference);
+    const store = normalizeStore(livePacket.store_domain || relationshipMerchant.store_domain || relationship.identity.store_domain);
+    if (store) url.searchParams.set("store", store);
+    if (livePacket.reservation_id) url.searchParams.set("reservation_id", livePacket.reservation_id);
+    return `${url.pathname}?${url.searchParams.toString()}`;
+  })();
 
   const outcomeFacts = [
     relationshipOutcome.new_state ? `Latest state: ${relationshipOutcome.new_state}` : null,
@@ -274,6 +406,33 @@ export default async function RelationshipPage({ params }: PageProps) {
               </div>
             </div>
           </article>
+        </section>
+
+        <section className="panel">
+          <div className="panelInner">
+            <p className="eyebrow">Merchant Workspace</p>
+            <h2 className="sectionTitle" style={{ marginBottom: 10 }}>
+              Live packet authority
+            </h2>
+            <div className="kv">
+              <div><strong>Packet ID:</strong> {livePacket?.packet_id || "No live packet matched yet"}</div>
+              <div><strong>Reservation ID:</strong> {livePacket?.reservation_id || "—"}</div>
+              <div><strong>Store:</strong> {livePacket?.store_domain || relationshipMerchant.store_domain || relationship.identity.store_domain || "—"}</div>
+              <div><strong>Packet status:</strong> {livePacket?.status || relationshipMerchant.payment_status || relationshipFulfillment.payment_status || "—"}</div>
+              <div><strong>Payment reference:</strong> {livePacket?.payment_reference || "—"}</div>
+              <div><strong>Continuity status:</strong> {livePacket?.status === "payment_received" ? "Paid packet ready" : "Waiting for packet"}</div>
+              <div>
+                <strong>Next action:</strong>{" "}
+                {livePacket?.status === "payment_received"
+                  ? "Open merchant workspace"
+                  : text(relationshipMerchant.next_required_action || relationshipClient.next_action || relationshipLead.next_action || "Review the next customer relationship.")}
+              </div>
+            </div>
+            <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+              {packetWorkspaceUrl ? <Link href={packetWorkspaceUrl} className="chip">Open Merchant Workspace</Link> : null}
+              {livePacket?.packet_id ? <Link href={`/api/packets/${encodeURIComponent(livePacket.packet_id)}`} className="chip">Open Packet Authority</Link> : null}
+            </div>
+          </div>
         </section>
 
         <section className="grid gridTwo">
