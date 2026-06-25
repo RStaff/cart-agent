@@ -1,0 +1,58 @@
+{
+  "schema": "staffordos.task4_commit_cleanup_report.v1",
+  "generated_at": "2026-06-25T21:41:30.000Z",
+  "task_type": "primary_action_execution",
+  "status": "go",
+  "commit_reviewed": "1323359e",
+  "cleanup_target": "remove unrelated spillover from Task 4 commit while preserving the operator checkout-linkage implementation",
+  "files_retained_as_task4": [
+    "staffordos/ui/operator-frontend/lib/operator/loadShopifixerCommandCenter.ts",
+    "staffordos/ui/operator-frontend/components/operator/OperatorHomeV1.tsx",
+    "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx"
+  ],
+  "files_removed_or_isolated": [
+    "staffordos/agents/agent_performance_v1.json",
+    "staffordos/capabilities/capability_matrix_v1.json",
+    "staffordos/clients/operator_dashboard_snapshot_v1.json",
+    "staffordos/events/outcome_scores_v1.json",
+    "staffordos/execution/output/agent_loop_latest.json",
+    "staffordos/execution/output/required_agent_validation_v1.json",
+    "staffordos/execution/output/scope_forge_enforcement_latest.json",
+    "staffordos/execution/output/truth_map_preflight_latest.json",
+    "staffordos/governance/proof_authority_map_v1.json",
+    "staffordos/governance/proof_authority_map_v1.md",
+    "staffordos/leads/lead_events_v1.json",
+    "staffordos/leads/lead_registry_v1.json",
+    "staffordos/loop_d/output/loop_d_feedback_report_v1.json",
+    "staffordos/operator_daemon/operator_daemon_config_v1.json",
+    "staffordos/operator_daemon/operator_daemon_state_v1.json",
+    "staffordos/operator_daemon/output/character_integrity_guard_v1.json",
+    "staffordos/operator_daemon/output/operator_heartbeat_v1.json",
+    "staffordos/operator_daemon/output/operator_observation_v1.json",
+    "staffordos/operator_daemon/output/post_patch_structural_validator_v1.json",
+    "staffordos/operator_daemon/output/resolver_preflight_guard_v1.json",
+    "staffordos/operator_daemon/output/spine_sync_validator_v1.json",
+    "staffordos/operator_daemon/output/task_command_resolution_v1.json",
+    "staffordos/preflight/output/preflight_report_v1.json",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md",
+    "staffordos/revenue/revenue_truth_v1.json",
+    "staffordos/revenue/revenue_truth_v1.md",
+    "staffordos/rules/rule_suggestions_v1.json",
+    "staffordos/snapshots/primary_action_snapshot_v1.json",
+    "staffordos/system_map/system_map_truth_v1.json",
+    "staffordos/ui/operator-frontend/app/operator/campaigns/page.tsx",
+    "staffordos/ui/operator-frontend/next-env.d.ts"
+  ],
+  "risks_found": [
+    "The broader commit bundled unrelated runtime truth/projection changes beyond Task 4.",
+    "A new /operator/campaigns route was introduced outside Sprint 1 Task 4 scope.",
+    "Task 4 implementation itself remains intact and build-verified."
+  ],
+  "rollback_needed": false,
+  "cleanup_needed": true,
+  "validation": {
+    "build": "passed",
+    "git_diff_check": "pending"
+  },
+  "go_no_go_for_sprint1_task5": "NO-GO"
+}

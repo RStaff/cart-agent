@@ -1,11 +1,11 @@
 {
   "schema": "staffordos.character_integrity_guard.v1",
-  "generated_at": "2026-06-25T21:41:03.460Z",
+  "generated_at": "2026-06-25T22:10:41.145Z",
   "mode": "normalize-task",
   "status": "passed",
   "input": {
-    "task_raw_length": 29,
-    "task_normalized": "Add operator checkout linkage",
+    "task_raw_length": 24,
+    "task_normalized": "Cleanup Task 4 spillover",
     "hidden_characters_detected": false
   },
   "proof": {
