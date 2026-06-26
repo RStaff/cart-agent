@@ -2,6 +2,7 @@ import Link from "next/link";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { OperatorNav } from "../../components/operator/OperatorNav";
+import { WorkdayControlPanel } from "../../components/operator/WorkdayControlPanel";
 import { deriveCustomerOutcome } from "../../lib/operator/loadShopifixerCommandCenter";
 import { loadExecutionLog } from "../../lib/operator/loadExecutionLog";
 import { getDecisionEngineReport } from "../../lib/operator/decisionEngineResolver";
@@ -553,6 +554,8 @@ export default async function OperatorPage() {
             </div>
           </div>
         </section>
+
+        <WorkdayControlPanel />
 
         <section className="panel">
           <div className="panelInner">
