@@ -4,6 +4,7 @@ import path from "node:path";
 import { OperatorNav } from "../../components/operator/OperatorNav";
 import { WorkdayControlPanel } from "../../components/operator/WorkdayControlPanel";
 import { deriveCustomerOutcome } from "../../lib/operator/loadShopifixerCommandCenter";
+import { getCampaignResolverReport } from "../../lib/operator/campaignResolver";
 import { loadExecutionLog } from "../../lib/operator/loadExecutionLog";
 import { getDecisionEngineReport } from "../../lib/operator/decisionEngineResolver";
 import { resolveRelationshipById } from "../../lib/operator/relationshipResolver";
@@ -317,6 +318,7 @@ async function loadExecutiveHome() {
   const fulfillmentTruth = readJson<any>(repoRoot, PATHS.fulfillmentTruth, {});
   const ceoTruth = readJson<any>(repoRoot, PATHS.ceoTruth, {});
   const decisionEngine = getDecisionEngineReport();
+  const campaignReport = getCampaignResolverReport();
 
   const primary = primaryAction.primary_action || {};
   const openWork = Array.isArray(unitWorkSnapshot.open_work) ? unitWorkSnapshot.open_work : [];
@@ -404,6 +406,7 @@ async function loadExecutiveHome() {
     fulfillmentTruth,
     ceoTruth,
     executionLog,
+    campaignReport,
     deliveryWork,
     internalWork,
     paidFulfillment,
@@ -421,6 +424,7 @@ async function loadExecutiveHome() {
 
 export default async function OperatorPage() {
   const data = await loadExecutiveHome();
+  const campaignReport = data.campaignReport;
   const primary = data.primaryAction;
   const topRevenueAction =
     data.revenueTruth?.next_actions?.[0]?.action ||
@@ -532,6 +536,25 @@ export default async function OperatorPage() {
       value: decisionTopActionLabel,
     },
   ];
+  const campaignInventory = Array.isArray(campaignReport?.campaigns) ? campaignReport.campaigns : [];
+  const activeCampaigns = campaignInventory.filter((campaign: any) => campaign.health === "healthy" || campaign.health === "warm");
+  const reviewCampaigns = campaignInventory.filter((campaign: any) => campaign.health === "at_risk");
+  const inactiveCampaigns = campaignInventory.filter((campaign: any) => campaign.health === "dormant");
+  const workQueueFollowUps = [
+    data.priorityClient?.next_action?.instructions || relationshipNext,
+    topRevenueAction,
+    decisionTopActionLabel,
+  ].map((value) => text(value, "")).filter((value) => Boolean(value));
+  const operatorActions = [
+    { href: "/operator/command-center", label: "Open Command Center" },
+    { href: "/operator/campaigns", label: "Open Campaigns" },
+    { href: packetWorkspaceUrl, label: "Open Merchant Workspace" },
+    ...(livePacket?.packet_id || data.activeWorkspaceItem?.packet_id
+      ? [{ href: `/api/packets/${encodeURIComponent(livePacket?.packet_id || data.activeWorkspaceItem?.packet_id || "")}`, label: "Open Packet Authority" }]
+      : []),
+    ...(relationshipId ? [{ href: `/operator/relationship/${relationshipId}`, label: "Open Relationship Workspace" }] : []),
+    { href: "/operator/revenue-command", label: "Open Revenue Command" },
+  ];
 
   return (
     <main className="shell">
@@ -547,334 +570,321 @@ export default async function OperatorPage() {
             <OperatorNav activeHref="/operator" />
 
             <div className="row" style={{ marginTop: 16, flexWrap: "wrap" }}>
-              <span className="chip">Revenue block: {translateBottleneck(data.revenueTruth?.current_bottleneck)}</span>
               <span className="chip">Paid work: {paidWorkCount}</span>
-              <span className="chip">Customer needing attention: {relationshipName}</span>
+              <span className="chip">Active merchants: {Math.max(campaignReport?.relationship_coverage?.covered_relationships || 0, openMerchantItems.length)}</span>
+              <span className="chip">Revenue at stake: {money(campaignReport?.revenue_at_stake_total || 0)}</span>
               <span className="chip">Open blockers: {data.blockers.length}</span>
             </div>
           </div>
         </section>
 
-        <WorkdayControlPanel />
-
-        <section className="panel">
-          <div className="panelInner">
-            <p className="eyebrow">Merchant Workspace</p>
-            <h2 className="sectionTitle" style={{ marginBottom: 10 }}>
-              Live paid packet
-            </h2>
-            <div className="kv">
-              <div><strong>Packet ID:</strong> {activePacketId}</div>
-              <div><strong>Reservation ID:</strong> {packetReservationId}</div>
-              <div><strong>Store:</strong> {packetStore}</div>
-              <div><strong>Packet status:</strong> {packetStatus}</div>
-              <div><strong>Payment reference:</strong> {packetPaymentReference}</div>
-              <div><strong>Continuity status:</strong> {packetContinuityStatus}</div>
-              <div>
-                <strong>Next action:</strong>{" "}
-                {packetStatus === "payment_received"
-                  ? "Open merchant workspace"
-                  : text(data.priorityClient?.next_action?.instructions, "Review the highest-priority merchant action.")}
-              </div>
-            </div>
-            <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
-              <Link href={packetWorkspaceUrl} className="chip">Open Merchant Workspace</Link>
-              {livePacket?.packet_id ? <Link href={`/api/packets/${encodeURIComponent(livePacket.packet_id)}`} className="chip">Open Packet Authority</Link> : null}
-            </div>
-          </div>
-        </section>
-
-        <section className="panel">
-          <div className="panelInner">
-            <p className="eyebrow">What should Ross do today?</p>
-            <h2 className="sectionTitle" style={{ marginBottom: 10 }}>
-              {text(primary.action_label, "Follow the highest-priority business action.")}
-            </h2>
-            <div className="kv">
-              <div><strong>Next step:</strong> {text(primary.next_step, topRevenueAction)}</div>
-              <div><strong>Expected outcome:</strong> {text(primary.expected_outcome, "Move the business forward.")}</div>
-              <div><strong>Owner:</strong> {translateOwner(primary.owner)}</div>
-              <div><strong>Priority:</strong> {Number(primary.priority_score || 0) >= 90 ? "Top priority" : text(primary.priority_score, "0")}</div>
-              <div><strong>Product:</strong> {translateDomain(primary.domain_id)}</div>
-              <div><strong>Signal strength:</strong> {translateConfidence(primary.confidence)}</div>
-            </div>
-            <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
-              <Link href="/operator/campaigns" className="chip">Open Campaigns</Link>
-              {relationshipId ? <Link href={`/operator/relationship/${relationshipId}`} className="chip">Open Relationship</Link> : null}
-            </div>
-          </div>
-        </section>
-
-        <section className="panel">
-          <div className="panelInner">
-            <p className="eyebrow">Decision Engine Audit</p>
-            <h2 className="sectionTitle" style={{ marginBottom: 10 }}>
-              Shadow comparison against the current Executive Home action
-            </h2>
-            <div className="kv">
-              <div><strong>Top Action:</strong> {summarizeDecisionAction(decisionTopAction)}</div>
-              <div><strong>Top Revenue Action:</strong> {summarizeDecisionAction(decisionTopRevenueAction)}</div>
-              <div><strong>Top Relationship Action:</strong> {summarizeDecisionAction(decisionTopRelationshipAction)}</div>
-              <div><strong>Top Blocker:</strong> {summarizeDecisionAction(decisionTopBlocker)}</div>
-              <div><strong>Validation Status:</strong> {decisionValidation.ok ? "Pass" : "Fail"}</div>
-              <div><strong>Current Executive Home action:</strong> {currentPrimaryActionLabel}</div>
-              <div><strong>Decision Engine top_action:</strong> {decisionTopActionLabel}</div>
-              <div><strong>Current action matches Decision Engine:</strong> {currentActionMatchesDecision ? "Yes" : "No"}</div>
-            </div>
-            {decisionMismatchReasons.length > 0 ? (
-              <div className="kv" style={{ marginTop: 12 }}>
-                <div><strong>Mismatch reasons:</strong></div>
-                {decisionMismatchReasons.map((reason: string) => (
-                  <div key={reason}>• {reason}</div>
-                ))}
-              </div>
-            ) : (
-              <p className="hint" style={{ marginTop: 12 }}>
-                No mismatch reasons recorded.
-              </p>
-            )}
-            <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
-              <Link href="/operator/campaigns" className="chip">Open Campaigns</Link>
-              {relationshipId ? <Link href={`/operator/relationship/${relationshipId}`} className="chip">Open Relationship</Link> : null}
-            </div>
-          </div>
-        </section>
-
-        <div className="grid gridTwo">
-          <section className="panel">
+        <section style={{ marginTop: 24 }}>
+          <div className="panel" style={{ marginBottom: 16 }}>
             <div className="panelInner">
-              <p className="eyebrow">What creates revenue today?</p>
-              <h2 className="sectionTitle" style={{ marginBottom: 10 }}>{translateBottleneck(data.revenueTruth?.current_bottleneck)}</h2>
-              <p className="subtitle" style={{ marginTop: 0 }}>{revenueSummary}</p>
-              <div className="kv">
-                <div><strong>Top move:</strong> {topRevenueAction}</div>
-              <div><strong>Open outreach:</strong> {text(data.revenueTruth?.funnel?.outreach_queue, "0")}</div>
-              <div><strong>Offers out:</strong> {text(data.revenueTruth?.stages?.sent, "0")}</div>
-              <div><strong>Replies waiting:</strong> {text(data.revenueTruth?.stages?.replies, "0")}</div>
-            </div>
-            <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
-              <Link href="/operator/campaigns" className="chip">Open Campaigns</Link>
-              {relationshipId ? <Link href={`/operator/relationship/${relationshipId}`} className="chip">Open Relationship</Link> : null}
-            </div>
-          </div>
-        </section>
-
-          <section className="panel">
-            <div className="panelInner">
-              <p className="eyebrow">What is blocked?</p>
-              <h2 className="sectionTitle" style={{ marginBottom: 10 }}>Current blockers</h2>
-              <div className="kv">
-                {data.blockers.length > 0 ? (
-                  data.blockers.map((blocker: string) => <div key={blocker}><strong>•</strong> {translateRisk(blocker)}</div>)
-                ) : (
-                  <div><strong>None:</strong> No explicit blocker recorded.</div>
-                )}
-              <div><strong>Revenue gap:</strong> {money(data.dashboardSnapshot?.revenue_gaps?.[0]?.gap || 0)}</div>
-              <div><strong>Primary risk:</strong> {translateRisk(list(primary.risk || ["None"])[0])}</div>
-            </div>
-            <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
-              <Link href="/operator/campaigns" className="chip">Open Campaigns</Link>
-              {relationshipId ? <Link href={`/operator/relationship/${relationshipId}`} className="chip">Open Relationship</Link> : null}
-            </div>
-          </div>
-        </section>
-
-          <section className="panel">
-            <div className="panelInner">
-              <p className="eyebrow">What paid work exists?</p>
-              <h2 className="sectionTitle" style={{ marginBottom: 10 }}>
-                {paidWorkCount > 0 ? `${paidWorkCount} paid work item(s)` : "No paid work active yet"}
-              </h2>
-              <div className="kv">
-              <div><strong>Paid fulfillment items:</strong> {paidWorkCount}</div>
-              <div><strong>Waiting for payment:</strong> {waitingForPaymentCount}</div>
-              <div><strong>ShopiFixer stage:</strong> {translateStage(data.deliveryWork[0]?.stage)}</div>
-              <div><strong>Next action:</strong> {text(data.deliveryWork[0]?.next_action, "Wait for payment or follow up before starting fix delivery.")}</div>
-            </div>
-            <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
-              <Link href="/operator/campaigns" className="chip">Open Campaigns</Link>
-              {relationshipId ? <Link href={`/operator/relationship/${relationshipId}`} className="chip">Open Relationship</Link> : null}
-            </div>
-          </div>
-        </section>
-
-          <section className="panel">
-            <div className="panelInner">
-              <p className="eyebrow">What relationship needs attention?</p>
-              <h2 className="sectionTitle" style={{ marginBottom: 10 }}>{relationshipName}</h2>
+              <p className="eyebrow">System Health</p>
+              <h2 className="sectionTitle" style={{ marginBottom: 8 }}>Live operating status</h2>
               <p className="subtitle" style={{ marginTop: 0 }}>
-                {text(data.priorityClient?.next_action?.instructions, relationshipNext)}
+                StaffordOS is now the working surface for packet authority, workday controls, and merchant readiness.
               </p>
-              <div className="kv">
-                <div><strong>Reason:</strong> {text(data.priorityClient?.close_engine?.suggested_message, "Review the highest-priority customer relationship.")}</div>
-              <div><strong>Priority:</strong> {text(data.priorityClient?.priority_total, "0")}</div>
-              <div><strong>Stage:</strong> {translateStage(data.priorityClient?.lifecycle_stage)}</div>
-              <div><strong>Next touch:</strong> {translateStage(data.priorityClient?.next_action?.type)}</div>
-            </div>
-            <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
-              <Link href="/operator/campaigns" className="chip">Open Campaigns</Link>
-              {relationshipId ? <Link href={`/operator/relationship/${relationshipId}`} className="chip">Open Relationship</Link> : null}
             </div>
           </div>
-        </section>
-
-          <section className="panel">
-            <div className="panelInner">
-              <p className="eyebrow">What should happen next?</p>
-              <h2 className="sectionTitle" style={{ marginBottom: 10 }}>
-                {text(primary.next_step, topRevenueAction)}
-              </h2>
-              <div className="kv">
-              <div><strong>Action:</strong> {text(primary.action_label, "Follow up on revenue close.")}</div>
-              <div><strong>Outcome:</strong> {text(primary.expected_outcome, "Move active ShopiFixer proposal toward paid client status.")}</div>
-              <div><strong>Other options considered:</strong> {text(data.primaryAction?.alternatives_considered?.length, "0")}</div>
-              <div><strong>Focus:</strong> ShopiFixer payment close</div>
-            </div>
-            <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
-              <Link href="/operator/campaigns" className="chip">Open Campaigns</Link>
-              {relationshipId ? <Link href={`/operator/relationship/${relationshipId}`} className="chip">Open Relationship</Link> : null}
-            </div>
-          </div>
-        </section>
-
-        <section className="panel">
-          <div className="panelInner">
-            <p className="eyebrow">What can be ignored?</p>
-            <h2 className="sectionTitle" style={{ marginBottom: 10 }}>
-              Low-priority or non-revenue work
-              </h2>
-              <div className="kv">
-                <div><strong>Internal system work:</strong> {data.internalWork.length > 0 ? "Present" : "None"}</div>
-                <div><strong>Ignore diagnostics unless blocked:</strong> Yes</div>
-                <div><strong>Ignore technical maps unless blocked:</strong> Yes</div>
-                <div><strong>Ignore placeholder analytics:</strong> Yes</div>
+          <div className="grid gridTwo">
+            <WorkdayControlPanel />
+            <section className="panel">
+              <div className="panelInner">
+                <p className="eyebrow">Live packet summary</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>Paid packet authority</h3>
+                <div className="kv">
+                  <div><strong>Packet ID:</strong> {activePacketId}</div>
+                  <div><strong>Reservation ID:</strong> {packetReservationId}</div>
+                  <div><strong>Store:</strong> {packetStore}</div>
+                  <div><strong>Status:</strong> {packetStatus}</div>
+                  <div><strong>Payment reference:</strong> {packetPaymentReference}</div>
+                  <div><strong>Continuity:</strong> {packetContinuityStatus}</div>
+                </div>
+                <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+                  <Link href={packetWorkspaceUrl} className="chip">Open Merchant Workspace</Link>
+                  {livePacket?.packet_id ? (
+                    <Link href={`/api/packets/${encodeURIComponent(livePacket.packet_id)}`} className="chip">
+                      Open Packet Authority
+                    </Link>
+                  ) : null}
+                </div>
               </div>
-            </div>
-          </section>
-        </div>
+            </section>
+            <section className="panel">
+              <div className="panelInner">
+                <p className="eyebrow">Active merchants</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>{relationshipName}</h3>
+                <div className="kv">
+                  <div><strong>Open merchant rows:</strong> {openMerchantItems.length}</div>
+                  <div><strong>Covered relationships:</strong> {campaignReport?.relationship_coverage?.covered_relationships || 0}</div>
+                  <div><strong>Total relationships:</strong> {campaignReport?.relationship_coverage?.total_relationships || 0}</div>
+                  <div><strong>Priority client:</strong> {text(data.priorityClient?.merchant_shop, "None")}</div>
+                </div>
+                <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+                  {relationshipId ? <Link href={`/operator/relationship/${relationshipId}`} className="chip">Open Relationship Workspace</Link> : null}
+                </div>
+              </div>
+            </section>
+            <section className="panel">
+              <div className="panelInner">
+                <p className="eyebrow">Revenue at stake</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>{money(campaignReport?.revenue_at_stake_total || 0)}</h3>
+                <div className="kv">
+                  <div><strong>Revenue block:</strong> {translateBottleneck(data.revenueTruth?.current_bottleneck)}</div>
+                  <div><strong>Merchant value proven:</strong> {money(data.revenueGap?.merchant_revenue || 0)}</div>
+                  <div><strong>Stafford revenue captured:</strong> {money(data.revenueGap?.stafford_revenue || 0)}</div>
+                  <div><strong>Open outreach queue:</strong> {text(data.revenueTruth?.funnel?.outreach_queue, "0")}</div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
 
-        <section className="panel">
-          <div className="panelInner">
-            <p className="eyebrow">Outcome</p>
-            <h2 className="sectionTitle" style={{ marginBottom: 10 }}>What happened after completion?</h2>
-            <div className="kv">
-              <div><strong>Customer:</strong> {data.outcomeRow.customer}</div>
-              <div><strong>Outcome state:</strong> {data.outcomeRow.outcome_state}</div>
-              <div><strong>Why:</strong> {data.outcomeRow.why}</div>
-              <div><strong>Suggested next action:</strong> {data.outcomeRow.suggested_next_action}</div>
-              <div><strong>Revenue impact:</strong> {data.outcomeRow.revenue_impact}</div>
-            </div>
-            {!outcomeVisible ? (
-              <p className="hint" style={{ marginTop: 12 }}>
-                This customer has not completed fulfillment yet, so the post-completion outcome is still awaiting review.
+        <section style={{ marginTop: 24 }}>
+          <div className="panel" style={{ marginBottom: 16 }}>
+            <div className="panelInner">
+              <p className="eyebrow">Today's Work Queue</p>
+              <h2 className="sectionTitle" style={{ marginBottom: 8 }}>What Ross should process next</h2>
+              <p className="subtitle" style={{ marginTop: 0 }}>
+                Intake, campaigns, follow-ups, and immediate operator actions are now surfaced together.
               </p>
-            ) : null}
-          </div>
-        </section>
-
-        <section className="panel">
-          <div className="panelInner">
-            <p className="eyebrow">Execution</p>
-            <h2 className="sectionTitle" style={{ marginBottom: 10 }}>Last action, last outcome, and today</h2>
-            <div className="kv">
-              <div><strong>Last Execution:</strong> {lastExecution ? `${lastExecution.action_type} · ${lastExecution.customer}` : "No execution logged yet."}</div>
-              <div><strong>Last Outcome Event:</strong> {lastOutcomeEvent ? `${lastOutcomeEvent.previous_state} → ${lastOutcomeEvent.new_state}` : "No outcome event logged yet."}</div>
-              <div><strong>Outcome State Changes Today:</strong> {outcomeStateChangesToday}</div>
-              <div><strong>Did it create revenue?</strong> {data.executionLog?.executionSummary?.didCreateRevenue || "Unknown"}</div>
-              <div><strong>Did it improve the customer relationship?</strong> {data.executionLog?.executionSummary?.didImproveCustomerRelationship || "Unknown"}</div>
-              <div><strong>Should StaffordOS recommend doing that again?</strong> {data.executionLog?.executionSummary?.shouldRecommendAgain || "Unknown"}</div>
             </div>
           </div>
-        </section>
-
-        <section className="panel">
-          <div className="panelInner">
-            <p className="eyebrow">Trust / freshness</p>
-            <div className="kv">
-              <div><strong>Last refreshed:</strong> {trustUpdatedAt}</div>
-              <div><strong>Trust status:</strong> {text(data.ceoTruth?.metadata?.confidence, "unknown")}</div>
-              <div><strong>Current revenue block:</strong> {translateBottleneck(data.revenueTruth?.current_bottleneck)}</div>
-              <div><strong>Core records:</strong> {coreRecordsState}</div>
-            </div>
-          </div>
-        </section>
-
-        <section className="panel">
-          <div className="panelInner">
-            <p className="eyebrow">End-of-day consolidation</p>
-            <h2 className="sectionTitle" style={{ marginBottom: 10 }}>
-              What closed, what stays open, and what to do first tomorrow
-            </h2>
-            <div className="operatorHomeSummaryPills" style={{ marginBottom: 16 }}>
-              <span>Completed today: {completedWorkToday.length}</span>
-              <span>Open merchants: {openMerchantItems.length}</span>
-              <span>Next-day priorities: {nextDayPriorities.length}</span>
-              <span>Evidence trail: {data.executionLog?.outcomeStateChangesToday || 0} changes</span>
-            </div>
-
-            <div className="grid gridTwo">
-              <section className="panel" style={{ margin: 0 }}>
-                <div className="panelInner">
-                  <h3 className="sectionTitle">Completed work</h3>
-                  {completedWorkToday.length ? (
-                    <div className="executionList">
-                      {completedWorkToday.slice(0, 4).map((event: any) => (
-                        <div key={`${event.execution_id || event.event_id || event.timestamp}`} className="executionItem">
-                          <strong>{text(event.action_type, "Completed action")}</strong>
-                          <span className="hint">
-                            {text(event.customer, "unknown customer")} · {text(event.outcome, "unknown outcome")}
-                          </span>
-                        </div>
-                      ))}
+          <div className="grid gridTwo">
+            <section className="panel">
+              <div className="panelInner">
+                <p className="eyebrow">Merchants awaiting intake</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>{waitingForPaymentCount > 0 ? `${waitingForPaymentCount} open item(s)` : "No intake waiting"}</h3>
+                <div className="executionList">
+                  {data.waitingFulfillment.slice(0, 4).map((item: any) => (
+                    <div key={`${item.packet_id || item.client_id || item.store_domain || item.id}`} className="executionItem">
+                      <strong>{text(item.store_domain || item.client_id || item.packet_id, "Unknown merchant")}</strong>
+                      <span className="hint">
+                        {text(item.payment_status || item.status, "waiting_for_payment")} · {text(item.next_action || item.stage, "Awaiting payment")}
+                      </span>
                     </div>
-                  ) : (
-                    <p className="hint">No completed actions recorded today.</p>
-                  )}
+                  ))}
+                  {!data.waitingFulfillment.length ? <p className="hint">No merchants are currently waiting on intake.</p> : null}
                 </div>
-              </section>
+              </div>
+            </section>
 
-              <section className="panel" style={{ margin: 0 }}>
-                <div className="panelInner">
-                  <h3 className="sectionTitle">Open merchants</h3>
-                  <div className="executionList">
-                    {openMerchantItems.map((item) => (
-                      <div key={item.label} className="executionItem">
-                        <strong>{item.label}</strong>
-                        <span className="hint">
-                          {item.value}
-                          {item.detail ? ` · ${item.detail}` : ""}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+            <section className="panel">
+              <div className="panelInner">
+                <p className="eyebrow">Campaigns needing review</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>{reviewCampaigns.length > 0 ? `${reviewCampaigns.length} campaign(s)` : "No at-risk campaigns"}</h3>
+                <div className="executionList">
+                  {reviewCampaigns.slice(0, 4).map((campaign: any) => (
+                    <div key={campaign.campaign_id} className="executionItem">
+                      <strong>{campaign.campaign_id}</strong>
+                      <span className="hint">
+                        {campaign.objective} · {campaign.health} · {money(campaign.revenue_at_stake || 0)}
+                      </span>
+                    </div>
+                  ))}
+                  {!reviewCampaigns.length ? <p className="hint">No campaigns currently need review.</p> : null}
                 </div>
-              </section>
+              </div>
+            </section>
 
-              <section className="panel" style={{ margin: 0 }}>
-                <div className="panelInner">
-                  <h3 className="sectionTitle">Tomorrow’s priorities</h3>
-                  <div className="executionList">
-                    {nextDayPriorities.map((item) => (
-                      <div key={item.label} className="executionItem">
-                        <strong>{item.label}</strong>
-                        <span className="hint">{item.value}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
-                    <Link href="/operator/command-center" className="chip">Open Command Center</Link>
-                    <Link href="/operator/revenue-command" className="chip">Open Revenue Command</Link>
-                    {relationshipId ? <Link href={`/operator/relationship/${relationshipId}`} className="chip">Open Relationship</Link> : null}
-                  </div>
+            <section className="panel">
+              <div className="panelInner">
+                <p className="eyebrow">Follow-ups</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>{workQueueFollowUps.length ? `${workQueueFollowUps.length} queued` : "No follow-ups queued"}</h3>
+                <div className="executionList">
+                  {workQueueFollowUps.slice(0, 4).map((item) => (
+                    <div key={item} className="executionItem">
+                      <strong>{item}</strong>
+                    </div>
+                  ))}
+                  {!workQueueFollowUps.length ? <p className="hint">No explicit follow-ups were resolved from current truth.</p> : null}
                 </div>
-              </section>
+              </div>
+            </section>
+
+            <section className="panel">
+              <div className="panelInner">
+                <p className="eyebrow">Operator actions</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>Execute work directly from StaffordOS</h3>
+                <div className="row" style={{ flexWrap: "wrap" }}>
+                  {operatorActions.map((action) => (
+                    <Link key={`${action.href}-${action.label}`} href={action.href} className="chip">
+                      {action.label}
+                    </Link>
+                  ))}
+                </div>
+                <p className="hint" style={{ marginTop: 12 }}>
+                  Command Center, Campaign Command, Relationship Workspace, Merchant Workspace, Packet Authority, and Revenue Command stay reachable from the same operator surface.
+                </p>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section style={{ marginTop: 24 }}>
+          <div className="panel" style={{ marginBottom: 16 }}>
+            <div className="panelInner">
+              <p className="eyebrow">Merchant Operations</p>
+              <h2 className="sectionTitle" style={{ marginBottom: 8 }}>Work the merchant lifecycle from one workspace</h2>
+              <p className="subtitle" style={{ marginTop: 0 }}>
+                Relationship, merchant, packet, and campaign surfaces now live together on the operator home.
+              </p>
             </div>
+          </div>
+          <div className="grid gridTwo">
+            <section className="panel">
+              <div className="panelInner">
+                <p className="eyebrow">Relationship workspace</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>{relationshipName}</h3>
+                <div className="kv">
+                  <div><strong>Reason:</strong> {text(data.priorityClient?.close_engine?.suggested_message, "Review the highest-priority customer relationship.")}</div>
+                  <div><strong>Priority:</strong> {text(data.priorityClient?.priority_total, "0")}</div>
+                  <div><strong>Stage:</strong> {translateStage(data.priorityClient?.lifecycle_stage)}</div>
+                  <div><strong>Next touch:</strong> {translateStage(data.priorityClient?.next_action?.type)}</div>
+                </div>
+                <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+                  {relationshipId ? <Link href={`/operator/relationship/${relationshipId}`} className="chip">Open Relationship Workspace</Link> : null}
+                </div>
+              </div>
+            </section>
 
-            <div className="kv" style={{ marginTop: 16 }}>
-              <div><strong>Completion indicators:</strong> Paid packet ready, execution log current, evidence trail visible</div>
-              <div><strong>Closeout state:</strong> {paidWorkCount > 0 ? "Ready for end-of-day review" : "No paid work to close"}</div>
-              <div><strong>Next checkpoint:</strong> {text(primary.next_step, "Review the next-day priority stack.")}</div>
+            <section className="panel">
+              <div className="panelInner">
+                <p className="eyebrow">Merchant workspace</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>{packetStatus === "payment_received" ? "Fix request open" : "Merchant workspace"}</h3>
+                <div className="kv">
+                  <div><strong>Next action:</strong> {packetStatus === "payment_received" ? "Open merchant workspace" : text(data.priorityClient?.next_action?.instructions, "Review the highest-priority merchant action.")}</div>
+                  <div><strong>Continuity:</strong> {packetContinuityStatus}</div>
+                  <div><strong>Merchant link:</strong> {packetWorkspaceUrl}</div>
+                </div>
+                <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+                  <Link href={packetWorkspaceUrl} className="chip">Open Merchant Workspace</Link>
+                </div>
+              </div>
+            </section>
+
+            <section className="panel">
+              <div className="panelInner">
+                <p className="eyebrow">Packet authority</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>{activePacketId}</h3>
+                <div className="kv">
+                  <div><strong>Packet status:</strong> {packetStatus}</div>
+                  <div><strong>Reservation:</strong> {packetReservationId}</div>
+                  <div><strong>Payment reference:</strong> {packetPaymentReference}</div>
+                  <div><strong>Store:</strong> {packetStore}</div>
+                </div>
+                <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+                  {livePacket?.packet_id ? <Link href={`/api/packets/${encodeURIComponent(livePacket.packet_id)}`} className="chip">Open Packet Authority</Link> : null}
+                </div>
+              </div>
+            </section>
+
+            <section className="panel">
+              <div className="panelInner">
+                <p className="eyebrow">Campaign Command</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>
+                  {campaignInventory.length > 0 ? `${campaignInventory.length} campaign(s)` : "Campaign Command"}
+                </h3>
+                <div className="kv">
+                  <div><strong>At risk:</strong> {reviewCampaigns.length}</div>
+                  <div><strong>Healthy/warm:</strong> {activeCampaigns.length}</div>
+                  <div><strong>Dormant:</strong> {inactiveCampaigns.length}</div>
+                  <div><strong>Revenue at stake:</strong> {money(campaignReport?.revenue_at_stake_total || 0)}</div>
+                </div>
+                <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+                  <Link href="/operator/campaigns" className="chip">Open Campaign Command</Link>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section style={{ marginTop: 24 }}>
+          <div className="panel" style={{ marginBottom: 16 }}>
+            <div className="panelInner">
+              <p className="eyebrow">Business Intelligence</p>
+              <h2 className="sectionTitle" style={{ marginBottom: 8 }}>Review the day and set up tomorrow</h2>
+              <p className="subtitle" style={{ marginTop: 0 }}>
+                End-of-day consolidation, evidence, revenue pipeline, and next-day priorities are now in the same home surface.
+              </p>
             </div>
+          </div>
+          <div className="grid gridTwo">
+            <section className="panel">
+              <div className="panelInner">
+                <p className="eyebrow">End-of-day summary</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>
+                  Completed today: {completedWorkToday.length}
+                </h3>
+                <div className="kv">
+                  <div><strong>Open merchants:</strong> {openMerchantItems.length}</div>
+                  <div><strong>Next-day priorities:</strong> {nextDayPriorities.length}</div>
+                  <div><strong>Evidence trail:</strong> {data.executionLog?.outcomeStateChangesToday || 0} changes</div>
+                  <div><strong>Closeout state:</strong> {paidWorkCount > 0 ? "Ready for end-of-day review" : "No paid work to close"}</div>
+                </div>
+                {!outcomeVisible ? (
+                  <p className="hint" style={{ marginTop: 12 }}>
+                    This customer has not completed fulfillment yet, so the post-completion outcome is still awaiting review.
+                  </p>
+                ) : null}
+              </div>
+            </section>
+
+            <section className="panel">
+              <div className="panelInner">
+                <p className="eyebrow">Evidence generated today</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>
+                  {completedWorkToday.length ? `${completedWorkToday.length} completed action(s)` : "No completed actions recorded"}
+                </h3>
+                <div className="executionList">
+                  {completedWorkToday.slice(0, 4).map((event: any) => (
+                    <div key={`${event.execution_id || event.event_id || event.timestamp}`} className="executionItem">
+                      <strong>{text(event.action_type, "Completed action")}</strong>
+                      <span className="hint">
+                        {text(event.customer, "unknown customer")} · {text(event.outcome, "unknown outcome")}
+                      </span>
+                    </div>
+                  ))}
+                  {!completedWorkToday.length ? <p className="hint">No execution evidence recorded today.</p> : null}
+                </div>
+              </div>
+            </section>
+
+            <section className="panel">
+              <div className="panelInner">
+                <p className="eyebrow">Revenue pipeline</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>{translateBottleneck(data.revenueTruth?.current_bottleneck)}</h3>
+                <p className="subtitle" style={{ marginTop: 0 }}>{revenueSummary}</p>
+                <div className="kv">
+                  <div><strong>Top move:</strong> {topRevenueAction}</div>
+                  <div><strong>Open outreach:</strong> {text(data.revenueTruth?.funnel?.outreach_queue, "0")}</div>
+                  <div><strong>Offers out:</strong> {text(data.revenueTruth?.stages?.sent, "0")}</div>
+                  <div><strong>Replies waiting:</strong> {text(data.revenueTruth?.stages?.replies, "0")}</div>
+                </div>
+              </div>
+            </section>
+
+            <section className="panel">
+              <div className="panelInner">
+                <p className="eyebrow">Tomorrow’s priorities</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>What Ross should do first</h3>
+                <div className="executionList">
+                  {nextDayPriorities.map((item) => (
+                    <div key={item.label} className="executionItem">
+                      <strong>{item.label}</strong>
+                      <span className="hint">{item.value}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+                  <Link href="/operator/command-center" className="chip">Open Command Center</Link>
+                  <Link href="/operator/revenue-command" className="chip">Open Revenue Command</Link>
+                  {relationshipId ? <Link href={`/operator/relationship/${relationshipId}`} className="chip">Open Relationship Workspace</Link> : null}
+                </div>
+              </div>
+            </section>
           </div>
         </section>
       </div>
