@@ -1,11 +1,11 @@
 {
   "schema": "staffordos.next_task_selection.v1",
-  "generated_at": "2026-05-31T02:37:24.228Z",
+  "generated_at": "2026-06-29T18:09:41.312Z",
   "selected": {
-    "task_type": "send_preview",
-    "expected_artifact": "staffordos/operator_daemon/output/send_preview_v1.json",
-    "commit_message": "auto create send preview through gated StaffordOS runner",
-    "reason": "At least one merchant is send-ready. Create preview only. No send."
+    "task_type": "merchant_registry_build",
+    "expected_artifact": "staffordos/commercial/merchant_registry_v1.json",
+    "commit_message": "auto refresh merchant registry through gated StaffordOS runner",
+    "reason": "No higher safe auto-task selected. Refresh merchant registry."
   },
   "safety": {
     "never_auto_selects_send_confirm": true,

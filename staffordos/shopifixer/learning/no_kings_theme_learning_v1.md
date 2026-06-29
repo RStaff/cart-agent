@@ -100,7 +100,57 @@ For future Shopify audits:
 7. Choose minimal theme change.
 8. Capture after evidence.
 
+## Exercise 002 Note
+
+Observed approved change:
+
+- hero CTA style only
+- from `button-secondary`
+- to `button-primary`
+
+Target file:
+
+`staffordos/governance/archive/20260604_no_kings_evidence_review/theme_backup/dev_horizon_150895657158/templates/index.json`
+
+Reason this is safe:
+
+- copy unchanged
+- destination unchanged
+- layout unchanged
+- spacing unchanged
+- colors unchanged
+- typography unchanged
+
+Validation focus:
+
+- desktop CTA appearance
+- mobile CTA appearance
+- same navigation target
+- no homepage section regressions
+
 ## Anti-Drift Rule
 
 Do not propose redesigns before inspecting the actual Shopify theme structure.
 
+## Exercise 003 Note
+
+Observed product-list architecture:
+
+- homepage product rails use `sections/product-list.liquid`
+- collection pages use `sections/main-collection.liquid` plus `snippets/product-grid.liquid`
+- search results use `sections/search-results.liquid` plus `snippets/product-grid.liquid`
+- product recommendations use `sections/product-recommendations.liquid`
+- cart recommendations reuse the same `product-list` section pattern
+- predictive search uses `snippets/predictive-search-products-list.liquid` with `resource-card`
+
+Key lesson:
+
+The product list surface is not one component. It is a family of surfaces that share one card primitive and several layout wrappers.
+
+Reusable pattern:
+
+When the question is product merchandising, inspect the shared card primitive first, then the layout wrapper, then the data source.
+
+Exercise recommendation:
+
+Move next to the full product detail page stack before attempting deeper styling changes on the shared card primitive.

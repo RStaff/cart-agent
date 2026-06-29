@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.merchant_registry_build.v1",
-  "generated_at": "2026-05-05T13:16:44.600Z",
+  "generated_at": "2026-06-29T18:09:42.228Z",
   "status": "built",
   "merchant_count": 1,
   "output": "staffordos/commercial/merchant_registry_v1.json",

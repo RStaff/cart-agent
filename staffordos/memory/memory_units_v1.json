@@ -18,6 +18,28 @@
       "source": "conversation_and_repo_inventory",
       "created_at": "2026-05-04T15:06:21.177Z",
       "updated_at": "2026-05-04T15:06:21.177Z"
+    },
+    {
+      "memory_id": "mem_shopifixer_no_kings_exercise_002_homepage_primary_cta_v1",
+      "memory_type": "lesson",
+      "domain_id": "shopifixer",
+      "entity_id": "no-kings-homepage",
+      "summary": "The NoKings homepage hero CTA can be safely promoted from secondary to primary style without changing copy, destination, layout, spacing, colors, or typography.",
+      "confidence": 0.92,
+      "source": "mission_001_exercise_002",
+      "created_at": "2026-06-28T00:00:00.000Z",
+      "updated_at": "2026-06-28T00:00:00.000Z"
+    },
+    {
+      "memory_id": "mem_shopifixer_no_kings_exercise_003_product_list_analysis_v1",
+      "memory_type": "lesson",
+      "domain_id": "shopifixer",
+      "entity_id": "no-kings-product-list-surfaces",
+      "summary": "NoKings uses a shared product-card primitive across homepage product rails, collection grids, search results, cart recommendations, and product recommendations, with layout wrappers handling presentation while the card primitive handles links, images, titles, prices, and badges.",
+      "confidence": 0.94,
+      "source": "mission_001_exercise_003",
+      "created_at": "2026-06-28T00:00:00.000Z",
+      "updated_at": "2026-06-28T00:00:00.000Z"
     }
   ]
 }

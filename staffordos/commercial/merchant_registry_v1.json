@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.merchant_registry.v1",
-  "generated_at": "2026-05-05T13:16:44.600Z",
+  "generated_at": "2026-06-29T18:09:42.228Z",
   "merchant_count": 1,
   "merchants": [
     {
@@ -16,7 +16,7 @@
       "abando_status": "not_started",
       "contact": {
         "name": "Unknown",
-        "email": "test@example.com",
+        "email": "rossstafford1@gmail.com",
         "phone": ""
       },
       "signals": {
@@ -37,7 +37,21 @@
           "revenue_action": false
         },
         {
-          "at": "2026-05-05T13:16:44.599Z",
+          "at": "2026-05-05T14:18:51.935Z",
+          "event": "operator_test_recipient_bound",
+          "recipient_is_operator_controlled": true,
+          "sent_messages": false,
+          "revenue_action": false
+        },
+        {
+          "at": "2026-05-05T14:33:56.947Z",
+          "event": "operator_test_recipient_bound",
+          "recipient_is_operator_controlled": true,
+          "sent_messages": false,
+          "revenue_action": false
+        },
+        {
+          "at": "2026-06-29T18:09:42.228Z",
           "event": "merchant_registry_mapped",
           "recommended_offer": "shopifixer",
           "sent_messages": false,

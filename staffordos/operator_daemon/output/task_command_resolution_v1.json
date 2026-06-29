@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-06-25T22:10:41.538Z",
-  "task_type": "primary_action_execution",
+  "generated_at": "2026-06-29T18:41:51.807Z",
+  "task_type": "competency_engine_sync",
   "status": "resolved",
   "resolution": {
-    "task_type": "primary_action_execution",
-    "command": "node staffordos/operator_daemon/write_operator_observation_v1.mjs",
+    "task_type": "competency_engine_sync",
+    "command": "node staffordos/operator_daemon/write_competency_engine_sync_v1.mjs",
     "approval_level": "operator_safe",
-    "execution_class": "safe_observation",
+    "execution_class": "documentation_sync",
     "system": "staffordos",
     "revenue_action": false,
-    "reason": "Default safe executable command for persistent operator proof loop."
+    "reason": "Synchronize ShopiFixer competency metadata and documentation only."
   },
   "failures": []
 }

@@ -154,7 +154,7 @@ bash staffordos/operator_daemon/commit_gate_v1.sh
 echo "===== COMMIT ONLY AFTER PASSING QA ====="
 export STAFFORDOS_GATED=true
 
-git add staffordos
+git add staffordos MISSION_001_CONSOLIDATION_CERTIFICATION_V1.md SHOPIFIXER_COMPETENCY_ENGINE_V1.md
 if git diff --cached --quiet; then
   echo "✅ No changes to commit"
 else

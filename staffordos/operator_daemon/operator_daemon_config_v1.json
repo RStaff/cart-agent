@@ -3,7 +3,7 @@
   "loop_interval_ms": 10000,
   "safe_mode": true,
   "auto_execute": false,
-  "task_type": "primary_action_execution",
+  "task_type": "competency_engine_sync",
   "qa_profile": "operator_runtime",
   "max_loops": 1
 }

@@ -1,7 +1,7 @@
 {
   "schema": "staffordos.resolver_preflight_guard.v1",
-  "generated_at": "2026-06-25T22:10:41.239Z",
-  "task_type": "primary_action_execution",
+  "generated_at": "2026-06-29T18:41:51.465Z",
+  "task_type": "competency_engine_sync",
   "status": "passed",
   "checks": {
     "task_type_present": true,
@@ -11,7 +11,7 @@
     "command_target_exists": true,
     "command_target_syntax_valid": true
   },
-  "command": "node staffordos/operator_daemon/write_operator_observation_v1.mjs",
+  "command": "node staffordos/operator_daemon/write_competency_engine_sync_v1.mjs",
   "failures": [],
   "proof": {
     "resolver_preflight_only": true,

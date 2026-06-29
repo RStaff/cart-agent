@@ -125,6 +125,16 @@ revenue_conversion_surface_validator: {
     reason: "Default safe executable command for persistent operator proof loop."
   },
 
+  competency_engine_sync: {
+    task_type: "competency_engine_sync",
+    command: "node staffordos/operator_daemon/write_competency_engine_sync_v1.mjs",
+    approval_level: "operator_safe",
+    execution_class: "documentation_sync",
+    system: "staffordos",
+    revenue_action: false,
+    reason: "Synchronize ShopiFixer competency metadata and documentation only."
+  },
+
   next_action_execution: {
     task_type: "next_action_execution",
     command: "node staffordos/clients/next_action_engine_v1.mjs",
