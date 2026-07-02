@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.primary_action_snapshot.v1",
-  "generated_at": "2026-07-02T02:33:42.428Z",
+  "generated_at": "2026-06-29T18:41:51.771Z",
   "purpose": "Single canonical answer to: What should Ross do next?",
   "decision_model": {
     "engine": "resolve_primary_action_v1",
@@ -54,7 +54,7 @@
     ],
     "decision_trace": {
       "engine": "resolve_primary_action_v1",
-      "generated_at": "2026-07-02T02:33:42.428Z",
+      "generated_at": "2026-06-29T18:41:51.771Z",
       "candidate_source": "staffordos/snapshots/unit_work_snapshot_v1.json: open_work[]",
       "source_fields_read": [
         "staffordos/snapshots/unit_work_snapshot_v1.json: open_work[].unit_id",
@@ -292,7 +292,7 @@
         }
       ]
     },
-    "generated_at": "2026-07-02T02:33:42.428Z",
+    "generated_at": "2026-06-29T18:41:51.771Z",
     "execution_status": "blocked",
     "last_execution_result": "blocked_by_execution_mode",
     "last_execution_reason": [
@@ -344,7 +344,7 @@
   ],
   "decision_trace": {
     "engine": "resolve_primary_action_v1",
-    "generated_at": "2026-07-02T02:33:42.428Z",
+    "generated_at": "2026-06-29T18:41:51.771Z",
     "candidate_source": "staffordos/snapshots/unit_work_snapshot_v1.json: open_work[]",
     "source_fields_read": [
       "staffordos/snapshots/unit_work_snapshot_v1.json: open_work[].unit_id",
