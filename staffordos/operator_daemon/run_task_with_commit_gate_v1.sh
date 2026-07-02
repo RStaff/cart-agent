@@ -154,7 +154,16 @@ bash staffordos/operator_daemon/commit_gate_v1.sh
 echo "===== COMMIT ONLY AFTER PASSING QA ====="
 export STAFFORDOS_GATED=true
 
-git add staffordos MISSION_001_CONSOLIDATION_CERTIFICATION_V1.md SHOPIFIXER_COMPETENCY_ENGINE_V1.md
+APPROVED_COMMIT_PATHS=("$EXPECTED_ARTIFACT")
+if [ -n "${STAFFORDOS_APPROVED_COMMIT_PATHS:-}" ]; then
+  IFS=':' read -r -a EXTRA_APPROVED_COMMIT_PATHS <<< "$STAFFORDOS_APPROVED_COMMIT_PATHS"
+  APPROVED_COMMIT_PATHS+=("${EXTRA_APPROVED_COMMIT_PATHS[@]}")
+fi
+
+for path in "${APPROVED_COMMIT_PATHS[@]}"; do
+  git add -- "$path"
+done
+
 if git diff --cached --quiet; then
   echo "✅ No changes to commit"
 else
