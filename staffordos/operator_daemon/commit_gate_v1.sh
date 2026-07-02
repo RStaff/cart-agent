@@ -5,6 +5,14 @@ echo "===== COMMIT GATE START ====="
 
 FAIL=0
 EXPECTED_ARTIFACT="${EXPECTED_ARTIFACT:-}"
+APPROVED_COMMIT_PATHS=()
+if [ -n "$EXPECTED_ARTIFACT" ]; then
+  APPROVED_COMMIT_PATHS+=("$EXPECTED_ARTIFACT")
+fi
+if [ -n "${STAFFORDOS_APPROVED_COMMIT_PATHS:-}" ]; then
+  IFS=':' read -r -a EXTRA_APPROVED_COMMIT_PATHS <<< "$STAFFORDOS_APPROVED_COMMIT_PATHS"
+  APPROVED_COMMIT_PATHS+=("${EXTRA_APPROVED_COMMIT_PATHS[@]}")
+fi
 
 echo "→ Check 1: Resolver syntax"
 node --check staffordos/operator_daemon/task_command_resolver_v1.mjs || FAIL=1
@@ -69,6 +77,27 @@ else
       echo "✅ No forbidden action in current artifact"
     fi
   fi
+fi
+
+echo "→ Check 5: Staged files must be approved task paths"
+STAGED_FILES="$(git diff --cached --name-only)"
+if [ -n "$STAGED_FILES" ]; then
+  while IFS= read -r staged_file; do
+    [ -n "$staged_file" ] || continue
+    approved=0
+    for approved_path in "${APPROVED_COMMIT_PATHS[@]}"; do
+      if [ "$staged_file" = "$approved_path" ]; then
+        approved=1
+        break
+      fi
+    done
+    if [ "$approved" -ne 1 ]; then
+      echo "❌ Unexpected staged file: $staged_file"
+      FAIL=1
+    fi
+  done <<EOF
+$STAGED_FILES
+EOF
 fi
 
 echo "===== DECISION ====="
