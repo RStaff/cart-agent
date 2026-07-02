@@ -556,6 +556,90 @@ export default async function OperatorPage() {
     { href: "/operator/revenue-command", label: "Open Revenue Command" },
   ];
 
+  const nextAction = (() => {
+    const decisionCategory = text(decisionTopAction?.category, "");
+    const decisionActionType = text(decisionTopAction?.action_type, "");
+    const selectedTitle = decisionTopActionLabel !== "Unavailable" ? decisionTopActionLabel : "Open Command Center";
+
+    if (decisionCategory === "revenue" || decisionActionType.startsWith("revenue_")) {
+      return {
+        title: selectedTitle,
+        detail: text(decisionTopAction?.candidate_reason || topRevenueAction, "Review the highest-priority revenue motion."),
+        href: "/operator/revenue-command",
+        cta: "Open Revenue Command",
+        linkable: true,
+      };
+    }
+
+    if (decisionCategory === "fulfillment" || decisionActionType === "fulfillment_waiting_payment") {
+      return {
+        title: selectedTitle,
+        detail: `${packetStore} · ${packetContinuityStatus}`,
+        href: packetWorkspaceUrl,
+        cta: "Open Merchant Workspace",
+        linkable: Boolean(packetWorkspaceUrl),
+      };
+    }
+
+    if (decisionCategory === "relationship" || decisionActionType === "payment_followup_pending") {
+      if (relationshipId) {
+        return {
+          title: selectedTitle,
+          detail: relationshipNext,
+          href: `/operator/relationship/${relationshipId}`,
+          cta: "Open Relationship Workspace",
+          linkable: true,
+        };
+      }
+
+      return {
+        title: selectedTitle,
+        detail: relationshipNext,
+        href: null,
+        cta: "Relationship workspace unavailable",
+        linkable: false,
+      };
+    }
+
+    if (decisionCategory === "outcome" || decisionActionType === "offer_sent") {
+      return {
+        title: selectedTitle,
+        detail: "Review execution history and outcome transitions.",
+        href: "/operator/execution-log",
+        cta: "Open Execution Log",
+        linkable: true,
+      };
+    }
+
+    if (livePacket?.packet_id || data.activeWorkspaceItem?.packet_id) {
+      return {
+        title: packetStatus === "payment_received" ? "Open Merchant Workspace" : "Review Merchant Continuity",
+        detail: `${packetStore} · ${packetContinuityStatus}`,
+        href: packetWorkspaceUrl,
+        cta: "Open Merchant Workspace",
+        linkable: Boolean(packetWorkspaceUrl),
+      };
+    }
+
+    if (reviewCampaigns.length > 0) {
+      return {
+        title: "Review Campaign Command",
+        detail: `${reviewCampaigns.length} campaign(s) need attention`,
+        href: "/operator/campaigns",
+        cta: "Open Campaign Command",
+        linkable: true,
+      };
+    }
+
+    return {
+      title: "Open Lead Queue",
+      detail: "Review the next lead in StaffordOS.",
+      href: "/operator/leads",
+      cta: "Open Lead Queue",
+      linkable: true,
+    };
+  })();
+
   return (
     <main className="shell">
       <div className="container">
@@ -581,15 +665,33 @@ export default async function OperatorPage() {
         <section style={{ marginTop: 24 }}>
           <div className="panel" style={{ marginBottom: 16 }}>
             <div className="panelInner">
-              <p className="eyebrow">System Health</p>
-              <h2 className="sectionTitle" style={{ marginBottom: 8 }}>Live operating status</h2>
+              <p className="eyebrow">Today</p>
+              <h2 className="sectionTitle" style={{ marginBottom: 8 }}>Founder workflow</h2>
               <p className="subtitle" style={{ marginTop: 0 }}>
-                StaffordOS is now the working surface for packet authority, workday controls, and merchant readiness.
+                StaffordOS guides Ross through one governed business day from startup to closeout.
               </p>
             </div>
           </div>
           <div className="grid gridTwo">
             <WorkdayControlPanel />
+            <section className="panel">
+              <div className="panelInner">
+                <p className="eyebrow">Next Action</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>{nextAction.title}</h3>
+                <p className="subtitle" style={{ marginTop: 0 }}>{nextAction.detail}</p>
+                <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+                  {nextAction.linkable && nextAction.href ? (
+                    <Link href={nextAction.href} className="chip">
+                      {nextAction.cta}
+                    </Link>
+                  ) : (
+                    <span className="chip" aria-disabled="true" style={{ opacity: 0.6, cursor: "not-allowed" }}>
+                      {nextAction.cta}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </section>
             <section className="panel">
               <div className="panelInner">
                 <p className="eyebrow">Live packet summary</p>
@@ -614,28 +716,20 @@ export default async function OperatorPage() {
             </section>
             <section className="panel">
               <div className="panelInner">
-                <p className="eyebrow">Active merchants</p>
-                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>{relationshipName}</h3>
-                <div className="kv">
-                  <div><strong>Open merchant rows:</strong> {openMerchantItems.length}</div>
-                  <div><strong>Covered relationships:</strong> {campaignReport?.relationship_coverage?.covered_relationships || 0}</div>
-                  <div><strong>Total relationships:</strong> {campaignReport?.relationship_coverage?.total_relationships || 0}</div>
-                  <div><strong>Priority client:</strong> {text(data.priorityClient?.merchant_shop, "None")}</div>
+                <p className="eyebrow">Open blockers</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>{data.blockers.length ? `${data.blockers.length} blocker(s)` : "No open blockers"}</h3>
+                <div className="executionList">
+                  {data.blockers.slice(0, 4).map((blocker: any, index: number) => (
+                    <div key={`${index}-${text(blocker)}`} className="executionItem">
+                      <strong>{text(blocker, "Unknown blocker")}</strong>
+                    </div>
+                  ))}
+                  {!data.blockers.length ? <p className="hint">No blockers are currently blocking the founder day.</p> : null}
                 </div>
                 <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
-                  {relationshipId ? <Link href={`/operator/relationship/${relationshipId}`} className="chip">Open Relationship Workspace</Link> : null}
-                </div>
-              </div>
-            </section>
-            <section className="panel">
-              <div className="panelInner">
-                <p className="eyebrow">Revenue at stake</p>
-                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>{money(campaignReport?.revenue_at_stake_total || 0)}</h3>
-                <div className="kv">
-                  <div><strong>Revenue block:</strong> {translateBottleneck(data.revenueTruth?.current_bottleneck)}</div>
-                  <div><strong>Merchant value proven:</strong> {money(data.revenueGap?.merchant_revenue || 0)}</div>
-                  <div><strong>Stafford revenue captured:</strong> {money(data.revenueGap?.stafford_revenue || 0)}</div>
-                  <div><strong>Open outreach queue:</strong> {text(data.revenueTruth?.funnel?.outreach_queue, "0")}</div>
+                  {operatorActions.map((action) => (
+                    <Link key={action.href} href={action.href} className="chip">{action.label}</Link>
+                  ))}
                 </div>
               </div>
             </section>
@@ -645,32 +739,61 @@ export default async function OperatorPage() {
         <section style={{ marginTop: 24 }}>
           <div className="panel" style={{ marginBottom: 16 }}>
             <div className="panelInner">
-              <p className="eyebrow">Today's Work Queue</p>
-              <h2 className="sectionTitle" style={{ marginBottom: 8 }}>What Ross should process next</h2>
+              <p className="eyebrow">Leads</p>
+              <h2 className="sectionTitle" style={{ marginBottom: 8 }}>Lead queue and qualification context</h2>
               <p className="subtitle" style={{ marginTop: 0 }}>
-                Intake, campaigns, follow-ups, and immediate operator actions are now surfaced together.
+                Prospect discovery, lead queue triage, research, and qualification are all rooted in the same registry and routing truth.
               </p>
             </div>
           </div>
           <div className="grid gridTwo">
             <section className="panel">
               <div className="panelInner">
-                <p className="eyebrow">Merchants awaiting intake</p>
-                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>{waitingForPaymentCount > 0 ? `${waitingForPaymentCount} open item(s)` : "No intake waiting"}</h3>
-                <div className="executionList">
-                  {data.waitingFulfillment.slice(0, 4).map((item: any) => (
-                    <div key={`${item.packet_id || item.client_id || item.store_domain || item.id}`} className="executionItem">
-                      <strong>{text(item.store_domain || item.client_id || item.packet_id, "Unknown merchant")}</strong>
-                      <span className="hint">
-                        {text(item.payment_status || item.status, "waiting_for_payment")} · {text(item.next_action || item.stage, "Awaiting payment")}
-                      </span>
-                    </div>
-                  ))}
-                  {!data.waitingFulfillment.length ? <p className="hint">No merchants are currently waiting on intake.</p> : null}
+                <p className="eyebrow">Lead queue</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>{relationshipName}</h3>
+                <div className="kv">
+                  <div><strong>Open merchant rows:</strong> {openMerchantItems.length}</div>
+                  <div><strong>Covered relationships:</strong> {campaignReport?.relationship_coverage?.covered_relationships || 0}</div>
+                  <div><strong>Total relationships:</strong> {campaignReport?.relationship_coverage?.total_relationships || 0}</div>
+                  <div><strong>Priority client:</strong> {text(data.priorityClient?.merchant_shop, "None")}</div>
+                </div>
+                <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+                  <Link href="/operator/leads" className="chip">Open Lead Queue</Link>
                 </div>
               </div>
             </section>
 
+            <section className="panel">
+              <div className="panelInner">
+                <p className="eyebrow">Qualification</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>
+                  {data.priorityClient?.next_action?.instructions ? "Qualification context ready" : "Qualification context unavailable"}
+                </h3>
+                <div className="kv">
+                  <div><strong>Current stage:</strong> {translateStage(data.priorityClient?.lifecycle_stage)}</div>
+                  <div><strong>Next touch:</strong> {translateStage(data.priorityClient?.next_action?.type)}</div>
+                  <div><strong>Priority:</strong> {text(data.priorityClient?.priority_total, "0")}</div>
+                  <div><strong>Decision state:</strong> {decisionTopActionLabel}</div>
+                </div>
+                <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+                  {relationshipId ? <Link href={`/operator/relationship/${relationshipId}`} className="chip">Open Relationship Workspace</Link> : null}
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section style={{ marginTop: 24 }}>
+          <div className="panel" style={{ marginBottom: 16 }}>
+            <div className="panelInner">
+              <p className="eyebrow">Outreach</p>
+              <h2 className="sectionTitle" style={{ marginBottom: 8 }}>Campaigns and active motion</h2>
+              <p className="subtitle" style={{ marginTop: 0 }}>
+                Approved outreach, review queues, and follow-up motion stay visible here without leaving the founder day.
+              </p>
+            </div>
+          </div>
+          <div className="grid gridTwo">
             <section className="panel">
               <div className="panelInner">
                 <p className="eyebrow">Campaigns needing review</p>
@@ -686,38 +809,27 @@ export default async function OperatorPage() {
                   ))}
                   {!reviewCampaigns.length ? <p className="hint">No campaigns currently need review.</p> : null}
                 </div>
-              </div>
-            </section>
-
-            <section className="panel">
-              <div className="panelInner">
-                <p className="eyebrow">Follow-ups</p>
-                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>{workQueueFollowUps.length ? `${workQueueFollowUps.length} queued` : "No follow-ups queued"}</h3>
-                <div className="executionList">
-                  {workQueueFollowUps.slice(0, 4).map((item) => (
-                    <div key={item} className="executionItem">
-                      <strong>{item}</strong>
-                    </div>
-                  ))}
-                  {!workQueueFollowUps.length ? <p className="hint">No explicit follow-ups were resolved from current truth.</p> : null}
+                <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+                  <Link href="/operator/campaigns" className="chip">Open Campaign Command</Link>
                 </div>
               </div>
             </section>
 
             <section className="panel">
               <div className="panelInner">
-                <p className="eyebrow">Operator actions</p>
-                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>Execute work directly from StaffordOS</h3>
-                <div className="row" style={{ flexWrap: "wrap" }}>
-                  {operatorActions.map((action) => (
-                    <Link key={`${action.href}-${action.label}`} href={action.href} className="chip">
-                      {action.label}
-                    </Link>
-                  ))}
+                <p className="eyebrow">Outreach motion</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>
+                  {campaignInventory.length > 0 ? `${campaignInventory.length} campaign(s)` : "Campaign Command"}
+                </h3>
+                <div className="kv">
+                  <div><strong>At risk:</strong> {reviewCampaigns.length}</div>
+                  <div><strong>Healthy/warm:</strong> {activeCampaigns.length}</div>
+                  <div><strong>Dormant:</strong> {inactiveCampaigns.length}</div>
+                  <div><strong>Revenue at stake:</strong> {money(campaignReport?.revenue_at_stake_total || 0)}</div>
                 </div>
-                <p className="hint" style={{ marginTop: 12 }}>
-                  Command Center, Campaign Command, Relationship Workspace, Merchant Workspace, Packet Authority, and Revenue Command stay reachable from the same operator surface.
-                </p>
+                <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+                  <Link href="/operator/campaigns" className="chip">Open Campaign Command</Link>
+                </div>
               </div>
             </section>
           </div>
@@ -726,10 +838,10 @@ export default async function OperatorPage() {
         <section style={{ marginTop: 24 }}>
           <div className="panel" style={{ marginBottom: 16 }}>
             <div className="panelInner">
-              <p className="eyebrow">Merchant Operations</p>
-              <h2 className="sectionTitle" style={{ marginBottom: 8 }}>Work the merchant lifecycle from one workspace</h2>
+              <p className="eyebrow">Merchants</p>
+              <h2 className="sectionTitle" style={{ marginBottom: 8 }}>Relationship and merchant workspace</h2>
               <p className="subtitle" style={{ marginTop: 0 }}>
-                Relationship, merchant, packet, and campaign surfaces now live together on the operator home.
+                Relationship, merchant, and packet surfaces stay together so the founder can stay on one record.
               </p>
             </div>
           </div>
@@ -764,7 +876,20 @@ export default async function OperatorPage() {
                 </div>
               </div>
             </section>
+          </div>
+        </section>
 
+        <section style={{ marginTop: 24 }}>
+          <div className="panel" style={{ marginBottom: 16 }}>
+            <div className="panelInner">
+              <p className="eyebrow">ShopiFixer</p>
+              <h2 className="sectionTitle" style={{ marginBottom: 8 }}>Canonical packet authority</h2>
+              <p className="subtitle" style={{ marginTop: 0 }}>
+                The governed merchant record and packet authority stay visible while the fix progresses.
+              </p>
+            </div>
+          </div>
+          <div className="grid gridTwo">
             <section className="panel">
               <div className="panelInner">
                 <p className="eyebrow">Packet authority</p>
@@ -774,6 +899,7 @@ export default async function OperatorPage() {
                   <div><strong>Reservation:</strong> {packetReservationId}</div>
                   <div><strong>Payment reference:</strong> {packetPaymentReference}</div>
                   <div><strong>Store:</strong> {packetStore}</div>
+                  <div><strong>Continuity:</strong> {packetContinuityStatus}</div>
                 </div>
                 <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
                   {livePacket?.packet_id ? <Link href={`/api/packets/${encodeURIComponent(livePacket.packet_id)}`} className="chip">Open Packet Authority</Link> : null}
@@ -783,18 +909,14 @@ export default async function OperatorPage() {
 
             <section className="panel">
               <div className="panelInner">
-                <p className="eyebrow">Campaign Command</p>
-                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>
-                  {campaignInventory.length > 0 ? `${campaignInventory.length} campaign(s)` : "Campaign Command"}
-                </h3>
+                <p className="eyebrow">Merchant access</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>Open the current merchant workspace</h3>
                 <div className="kv">
-                  <div><strong>At risk:</strong> {reviewCampaigns.length}</div>
-                  <div><strong>Healthy/warm:</strong> {activeCampaigns.length}</div>
-                  <div><strong>Dormant:</strong> {inactiveCampaigns.length}</div>
-                  <div><strong>Revenue at stake:</strong> {money(campaignReport?.revenue_at_stake_total || 0)}</div>
+                  <div><strong>Workspace:</strong> {packetWorkspaceUrl}</div>
+                  <div><strong>Route:</strong> Fix status / review / proof / completion</div>
                 </div>
                 <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
-                  <Link href="/operator/campaigns" className="chip">Open Campaign Command</Link>
+                  <Link href={packetWorkspaceUrl} className="chip">Open Merchant Workspace</Link>
                 </div>
               </div>
             </section>
@@ -804,34 +926,14 @@ export default async function OperatorPage() {
         <section style={{ marginTop: 24 }}>
           <div className="panel" style={{ marginBottom: 16 }}>
             <div className="panelInner">
-              <p className="eyebrow">Business Intelligence</p>
-              <h2 className="sectionTitle" style={{ marginBottom: 8 }}>Review the day and set up tomorrow</h2>
+              <p className="eyebrow">Evidence</p>
+              <h2 className="sectionTitle" style={{ marginBottom: 8 }}>Execution proof and review</h2>
               <p className="subtitle" style={{ marginTop: 0 }}>
-                End-of-day consolidation, evidence, revenue pipeline, and next-day priorities are now in the same home surface.
+                Evidence, proof, and runtime truth stay connected to the merchant record and can be reviewed from the same day surface.
               </p>
             </div>
           </div>
           <div className="grid gridTwo">
-            <section className="panel">
-              <div className="panelInner">
-                <p className="eyebrow">End-of-day summary</p>
-                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>
-                  Completed today: {completedWorkToday.length}
-                </h3>
-                <div className="kv">
-                  <div><strong>Open merchants:</strong> {openMerchantItems.length}</div>
-                  <div><strong>Next-day priorities:</strong> {nextDayPriorities.length}</div>
-                  <div><strong>Evidence trail:</strong> {data.executionLog?.outcomeStateChangesToday || 0} changes</div>
-                  <div><strong>Closeout state:</strong> {paidWorkCount > 0 ? "Ready for end-of-day review" : "No paid work to close"}</div>
-                </div>
-                {!outcomeVisible ? (
-                  <p className="hint" style={{ marginTop: 12 }}>
-                    This customer has not completed fulfillment yet, so the post-completion outcome is still awaiting review.
-                  </p>
-                ) : null}
-              </div>
-            </section>
-
             <section className="panel">
               <div className="panelInner">
                 <p className="eyebrow">Evidence generated today</p>
@@ -849,9 +951,83 @@ export default async function OperatorPage() {
                   ))}
                   {!completedWorkToday.length ? <p className="hint">No execution evidence recorded today.</p> : null}
                 </div>
+                <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+                </div>
               </div>
             </section>
 
+            <section className="panel">
+              <div className="panelInner">
+                <p className="eyebrow">Review surface</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>Operator proof linkage</h3>
+                <div className="kv">
+                  <div><strong>Evidence trail:</strong> {data.executionLog?.outcomeStateChangesToday || 0} changes</div>
+                </div>
+                <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+                  <Link href="/operator/execution-log" className="chip">Open Execution Log</Link>
+                  <Link href="/operator/command-center" className="chip">Open Command Center</Link>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section style={{ marginTop: 24 }}>
+          <div className="panel" style={{ marginBottom: 16 }}>
+            <div className="panelInner">
+              <p className="eyebrow">Follow-up</p>
+              <h2 className="sectionTitle" style={{ marginBottom: 8 }}>Active follow-up and reply motion</h2>
+              <p className="subtitle" style={{ marginTop: 0 }}>
+                Follow-up tasks stay visible next to the lead and campaign work they came from.
+              </p>
+            </div>
+          </div>
+          <div className="grid gridTwo">
+            <section className="panel">
+              <div className="panelInner">
+                <p className="eyebrow">Follow-up queue</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>
+                  {workQueueFollowUps.length ? `${workQueueFollowUps.length} follow-up item(s)` : "No follow-up items"}
+                </h3>
+                <div className="executionList">
+                  {workQueueFollowUps.slice(0, 4).map((item, index) => (
+                    <div key={`${index}-${item}`} className="executionItem">
+                      <strong>{text(item, "Follow-up item")}</strong>
+                    </div>
+                  ))}
+                  {!workQueueFollowUps.length ? <p className="hint">No follow-ups are queued right now.</p> : null}
+                </div>
+              </div>
+            </section>
+
+            <section className="panel">
+              <div className="panelInner">
+                <p className="eyebrow">Merchant follow-up</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>Keep the customer moving</h3>
+                <div className="kv">
+                  <div><strong>Priority client:</strong> {text(data.priorityClient?.merchant_shop, "None")}</div>
+                  <div><strong>Reply state:</strong> {translateConfidence(data.priorityClient?.reply_confidence)}</div>
+                  <div><strong>Active leads:</strong> {openMerchantItems.length}</div>
+                </div>
+                <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+                  <Link href="/operator/leads" className="chip">Open Lead Queue</Link>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section style={{ marginTop: 24 }}>
+          <div className="panel" style={{ marginBottom: 16 }}>
+            <div className="panelInner">
+              <p className="eyebrow">Revenue</p>
+              <h2 className="sectionTitle" style={{ marginBottom: 8 }}>Revenue pipeline and bottlenecks</h2>
+              <p className="subtitle" style={{ marginTop: 0 }}>
+                Revenue truth and outreach load stay visible so the founder can see what is blocking cash flow.
+              </p>
+            </div>
+          </div>
+          <div className="grid gridTwo">
             <section className="panel">
               <div className="panelInner">
                 <p className="eyebrow">Revenue pipeline</p>
@@ -863,13 +1039,48 @@ export default async function OperatorPage() {
                   <div><strong>Offers out:</strong> {text(data.revenueTruth?.stages?.sent, "0")}</div>
                   <div><strong>Replies waiting:</strong> {text(data.revenueTruth?.stages?.replies, "0")}</div>
                 </div>
+                <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+                  <Link href="/operator/revenue-command" className="chip">Open Revenue Command</Link>
+                </div>
               </div>
             </section>
 
             <section className="panel">
               <div className="panelInner">
+                <p className="eyebrow">Day closeout</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>
+                  Completed today: {completedWorkToday.length}
+                </h3>
+                <div className="kv">
+                  <div><strong>Open merchants:</strong> {openMerchantItems.length}</div>
+                  <div><strong>Next-day priorities:</strong> {nextDayPriorities.length}</div>
+                  <div><strong>Closeout state:</strong> {paidWorkCount > 0 ? "Ready for end-of-day review" : "No paid work to close"}</div>
+                  <div><strong>Open blockers:</strong> {data.blockers.length}</div>
+                </div>
+                {!outcomeVisible ? (
+                  <p className="hint" style={{ marginTop: 12 }}>
+                    This customer has not completed fulfillment yet, so the post-completion outcome is still awaiting review.
+                  </p>
+                ) : null}
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section style={{ marginTop: 24 }}>
+          <div className="panel" style={{ marginBottom: 16 }}>
+            <div className="panelInner">
+              <p className="eyebrow">Tomorrow</p>
+              <h2 className="sectionTitle" style={{ marginBottom: 8 }}>What Ross should do first</h2>
+              <p className="subtitle" style={{ marginTop: 0 }}>
+                Tomorrow planning rolls up the day and sets the first governed move for the next business cycle.
+              </p>
+            </div>
+          </div>
+          <div className="grid gridTwo">
+            <section className="panel">
+              <div className="panelInner">
                 <p className="eyebrow">Tomorrow’s priorities</p>
-                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>What Ross should do first</h3>
                 <div className="executionList">
                   {nextDayPriorities.map((item) => (
                     <div key={item.label} className="executionItem">
@@ -878,6 +1089,13 @@ export default async function OperatorPage() {
                     </div>
                   ))}
                 </div>
+              </div>
+            </section>
+
+            <section className="panel">
+              <div className="panelInner">
+                <p className="eyebrow">Closeout actions</p>
+                <h3 className="sectionTitle" style={{ marginBottom: 10 }}>Open the next control surface</h3>
                 <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
                   <Link href="/operator/command-center" className="chip">Open Command Center</Link>
                   <Link href="/operator/revenue-command" className="chip">Open Revenue Command</Link>

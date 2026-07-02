@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-06-29T18:41:51.876Z",
+  "generated_at": "2026-07-02T02:33:42.531Z",
   "status": "PASSED",
-  "command": "node staffordos/operator_daemon/write_competency_engine_sync_v1.mjs",
+  "command": "node staffordos/operator_daemon/write_send_readiness_gate_v1.mjs",
   "inferred_system_id": "staffordos",
   "system_name": "StaffordOS Core",
   "system_status": "PARTIAL_REAL",

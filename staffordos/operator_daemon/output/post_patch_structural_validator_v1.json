@@ -1,8 +1,8 @@
 {
   "schema": "staffordos.post_patch_structural_validator.v1",
-  "generated_at": "2026-06-29T18:42:02.313Z",
-  "task_type": "competency_engine_sync",
-  "expected_artifact": "staffordos/operator_daemon/output/competency_engine_sync_v1.json",
+  "generated_at": "2026-07-02T02:33:52.979Z",
+  "task_type": "send_readiness_gate",
+  "expected_artifact": "staffordos/operator_daemon/output/send_readiness_gate_v1.json",
   "status": "passed",
   "checks": {
     "hidden_character_check": true,

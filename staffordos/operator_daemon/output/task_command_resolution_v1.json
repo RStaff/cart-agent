@@ -1,16 +1,16 @@
 {
   "schema": "staffordos.task_command_resolution.v1",
-  "generated_at": "2026-06-29T18:41:51.807Z",
-  "task_type": "competency_engine_sync",
+  "generated_at": "2026-07-02T02:33:42.464Z",
+  "task_type": "send_readiness_gate",
   "status": "resolved",
   "resolution": {
-    "task_type": "competency_engine_sync",
-    "command": "node staffordos/operator_daemon/write_competency_engine_sync_v1.mjs",
+    "task_type": "send_readiness_gate",
+    "command": "node staffordos/operator_daemon/write_send_readiness_gate_v1.mjs",
     "approval_level": "operator_safe",
-    "execution_class": "documentation_sync",
-    "system": "staffordos",
+    "execution_class": "readiness_gate",
+    "system": "shopifixer",
     "revenue_action": false,
-    "reason": "Synchronize ShopiFixer competency metadata and documentation only."
+    "reason": "Evaluate approved outreach queue for send readiness. No sending."
   },
   "failures": []
 }
