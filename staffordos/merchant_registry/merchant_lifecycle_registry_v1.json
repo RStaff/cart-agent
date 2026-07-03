@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.merchant_lifecycle_registry.v1",
-  "generated_at": "2026-07-03T04:16:23.842Z",
+  "generated_at": "2026-07-03T14:15:09.003Z",
   "active_record_selection": {
     "merchant_id": "cart-agent-dev.myshopify.com",
     "client_id": "cart-agent-dev.myshopify.com",
@@ -35,7 +35,7 @@
       "unpaid": 5
     },
     "records_with_payment_amount": 0,
-    "records_with_lead_truth": 4,
+    "records_with_lead_truth": 5,
     "records_with_opportunity_truth": 1,
     "records_with_delivery_truth": 1
   },
@@ -45,7 +45,7 @@
       "client_id": "cart-agent-dev.myshopify.com",
       "merchant_shop": "cart-agent-dev.myshopify.com",
       "store_domain": "cart-agent-dev.myshopify.com",
-      "lead_id": null,
+      "lead_id": "lead_cart_agent_dev_myshopify_com",
       "opportunity_id": "opp_cart-agent-dev.myshopify.com",
       "delivery_id": "delivery_cart-agent-dev.myshopify.com_shopifixer",
       "action_id": "action_cart-agent-dev.myshopify.com_followup_offer",
@@ -53,11 +53,11 @@
       "next_required_action": "Collect a verified Stripe payment for the authorized $950 Fix Sprint.",
       "readiness_score": 93,
       "reservation_id": null,
-      "lead_status": null,
-      "qualification_status": null,
-      "qualification_reason": null,
-      "qualification_source": null,
-      "qualification_updated_at": null,
+      "lead_status": "qualified",
+      "qualification_status": "qualified",
+      "qualification_reason": "Backfilled from canonical client, lifecycle, execution, and evidence truth for cart-agent-dev.myshopify.com",
+      "qualification_source": "manual_backfill",
+      "qualification_updated_at": "2026-07-03T14:00:00.000Z",
       "audit_status": "complete",
       "offer_status": "offer_sent",
       "payment_status": "waiting_for_payment",
@@ -137,9 +137,9 @@
           "note": "Store domain is derived from the canonical client merchant shop."
         },
         "lead_id": {
-          "status": "unavailable",
-          "source_file": "No lead matched by client_id / merchant_shop / store_domain.",
-          "source_field": null,
+          "status": "source",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "lead_id",
           "note": null
         },
         "opportunity_id": {
@@ -179,34 +179,34 @@
           "note": "Runtime readiness from the active ShopiFixer command center."
         },
         "lead_status": {
-          "status": "unavailable",
-          "source_file": "No lead truth exists for this merchant.",
-          "source_field": null,
+          "status": "source",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "status.current_stage / lifecycle_stage",
           "note": null
         },
         "qualification_status": {
-          "status": "unavailable",
-          "source_file": "No qualification truth exists for this merchant.",
-          "source_field": null,
-          "note": null
+          "status": "source",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "qualification_status",
+          "note": "Qualification provenance falls back to lead truth when client provenance is absent."
         },
         "qualification_reason": {
-          "status": "unavailable",
-          "source_file": "No qualification reason exists for this merchant.",
-          "source_field": null,
-          "note": null
+          "status": "source",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "qualification_reason",
+          "note": "Qualification reason falls back to lead truth when client provenance is absent."
         },
         "qualification_source": {
-          "status": "unavailable",
-          "source_file": "No qualification source exists for this merchant.",
-          "source_field": null,
-          "note": null
+          "status": "source",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "qualification_source",
+          "note": "Qualification source falls back to lead truth when client provenance is absent."
         },
         "qualification_updated_at": {
-          "status": "unavailable",
-          "source_file": "No qualification timestamp exists for this merchant.",
-          "source_field": null,
-          "note": null
+          "status": "source",
+          "source_file": "staffordos/leads/lead_registry_v1.json",
+          "source_field": "qualification_updated_at",
+          "note": "Qualification timestamp falls back to lead truth when client provenance is absent."
         },
         "audit_status": {
           "status": "source",
@@ -396,20 +396,6 @@
         }
       },
       "unavailable_fields": [
-        {
-          "field": "lead_id",
-          "status": "unavailable",
-          "reason": "No matching lead could be proven for this merchant.",
-          "source_file": null,
-          "source_field": null
-        },
-        {
-          "field": "lead_status",
-          "status": "unavailable",
-          "reason": "No lead row exists for this merchant.",
-          "source_file": null,
-          "source_field": null
-        },
         {
           "field": "payment_amount",
           "status": "unavailable",

@@ -1,11 +1,11 @@
 # Merchant Lifecycle Registry
 
-Generated: 2026-07-03T04:16:23.842Z
+Generated: 2026-07-03T14:15:09.003Z
 
 ## Summary
 
 - Records: 6
-- Lead-linked records: 4
+- Lead-linked records: 5
 - Opportunity-linked records: 1
 - Delivery-linked records: 1
 - Active merchant: cart-agent-dev.myshopify.com
@@ -31,7 +31,7 @@ Generated: 2026-07-03T04:16:23.842Z
 
 | Merchant | Current stage | Next action | Readiness | Lead | Opportunity | Delivery | Action |
 | --- | --- | --- | ---: | --- | --- | --- | --- |
-| cart-agent-dev.myshopify.com | offer_sent | Collect a verified Stripe payment for the authorized $950 Fix Sprint. | 93 | unavailable | opp_cart-agent-dev.myshopify.com | delivery_cart-agent-dev.myshopify.com_shopifixer | action_cart-agent-dev.myshopify.com_followup_offer |
+| cart-agent-dev.myshopify.com | offer_sent | Collect a verified Stripe payment for the authorized $950 Fix Sprint. | 93 | lead_cart_agent_dev_myshopify_com | opp_cart-agent-dev.myshopify.com | delivery_cart-agent-dev.myshopify.com_shopifixer | action_cart-agent-dev.myshopify.com_followup_offer |
 | elkeyecoffee.com | lead | Send first ShopiFixer audit outreach message. | 21 | unavailable | unavailable | unavailable | unavailable |
 | fitgearpro.myshopify.com | lead | Send first ShopiFixer audit outreach message. | 21 | lead_fitgearpro_myshopify_com | unavailable | unavailable | unavailable |
 | homegoodsco.myshopify.com | lead | Send first ShopiFixer audit outreach message. | 21 | lead_homegoodsco_myshopify_com | unavailable | unavailable | unavailable |
@@ -41,8 +41,6 @@ Generated: 2026-07-03T04:16:23.842Z
 ## Unavailable Fields
 
 ### cart-agent-dev.myshopify.com
-- lead_id: No matching lead could be proven for this merchant.
-- lead_status: No lead row exists for this merchant.
 - payment_amount: No payment is verified yet.
 - payment_received_at: No verified payment receipt timestamp exists yet.
 
