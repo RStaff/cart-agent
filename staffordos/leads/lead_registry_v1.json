@@ -63,6 +63,73 @@
       "generated_at": "2026-04-28T14:34:49.480Z"
     },
     {
+      "id": "lead_cart_agent_dev_myshopify_com",
+      "lead_id": "lead_cart_agent_dev_myshopify_com",
+      "name": "cart-agent-dev.myshopify.com",
+      "domain": "cart-agent-dev.myshopify.com",
+      "product": "shopifixer",
+      "product_surface": "staffordmedia_shopifixer",
+      "source": "manual_backfill",
+      "lead_state": "qualified",
+      "lifecycle_stage": "qualified",
+      "status": {
+        "current_stage": "qualified",
+        "current_bottleneck": "close",
+        "next_action": "Promote into client registry",
+        "temperature": "hot",
+        "conversion_score": 100
+      },
+      "score": 100,
+      "temperature": "hot",
+      "conversion_score": 100,
+      "contact": {
+        "email": "",
+        "name": "",
+        "role": "",
+        "confidence": "manual_backfill"
+      },
+      "engagement": {
+        "audit_viewed": false,
+        "experience_viewed": false,
+        "replied": false,
+        "approved_for_send": false,
+        "dry_run_ready": false,
+        "sent": false,
+        "recovery_sent": false,
+        "return_tracked": false,
+        "recovered_revenue": null
+      },
+      "routing": {
+        "primary_offer": "shopifixer_audit",
+        "secondary_offer": "abando_recovery",
+        "do_not_cross_sell_until": "qualified",
+        "rule": "ShopiFixer first; Abando only after leak diagnosed"
+      },
+      "refs": {
+        "outreach_queue": false,
+        "approval_queue_ids": [],
+        "send_ledger_ids": [],
+        "reply_ids": [],
+        "outcome": false
+      },
+      "execution": {
+        "channel": "manual_backfill",
+        "send_target": null,
+        "message": null,
+        "follow_up_message": null
+      },
+      "payment": {
+        "status": null,
+        "url": null
+      },
+      "qualification_status": "qualified",
+      "qualification_reason": "Backfilled from canonical client, lifecycle, execution, and evidence truth for cart-agent-dev.myshopify.com",
+      "qualification_source": "manual_backfill",
+      "qualification_updated_at": "2026-07-03T14:00:00.000Z",
+      "created_at": "2026-07-03T14:00:00.000Z",
+      "updated_at": "2026-07-03T14:00:00.000Z"
+    },
+    {
       "lead_id": "lead_example_store_myshopify_com",
       "domain": "example-store.myshopify.com",
       "source": "staffordos",

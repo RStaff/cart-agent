@@ -11028,6 +11028,23 @@
         "outcomes": true
       },
       "created_at": "2026-07-03T03:05:54.430Z"
+    },
+    {
+      "id": "event_lead_cart_agent_dev_myshopify_com_manual_backfill",
+      "lead_id": "lead_cart_agent_dev_myshopify_com",
+      "domain": "cart-agent-dev.myshopify.com",
+      "event_type": "lead_registered",
+      "product_intent": "shopifixer",
+      "source": "manual_backfill",
+      "observed_sources": {
+        "outreach_queue": false,
+        "contact_research_queue": false,
+        "approval_queue": false,
+        "send_ledger": false,
+        "reply_interpretation": false,
+        "outcomes": false
+      },
+      "created_at": "2026-07-03T14:00:00.000Z"
     }
   ]
 }
