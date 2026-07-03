@@ -1,21 +1,21 @@
 {
   "schema": "staffordos.operator_dashboard_snapshot.v1",
-  "generated_at": "2026-06-03T22:47:01.081Z",
+  "generated_at": "2026-07-03T03:49:38.656Z",
   "source": "staffordos/clients/client_registry_v1.json",
   "primary_focus": {
     "client_id": "cart-agent-dev.myshopify.com",
     "merchant_shop": "cart-agent-dev.myshopify.com",
     "reason": "Merchant value has been proven but Stafford revenue has not been captured.",
     "action": "Convert recovered merchant value into paid plan or case-study close.",
-    "priority_total": 83,
+    "priority_total": 75,
     "blocked": false,
     "next_action": {
-      "type": "followup",
-      "owner": "ross",
+      "type": "audit",
+      "owner": "system",
       "due_at": null,
-      "instructions": "Follow up on real ShopiFixer offer and close payment.",
-      "auto_executable": false,
-      "updated_at": "2026-05-04T12:26:57.688Z"
+      "instructions": "Run ShopiFixer audit and write findings to client record.",
+      "auto_executable": true,
+      "updated_at": "2026-06-05T04:17:27.370Z"
     }
   },
   "revenue_gaps": [
@@ -29,7 +29,7 @@
     }
   ],
   "top_metrics": {
-    "total_clients": 5,
+    "total_clients": 6,
     "active_revenue_clients": 0,
     "blocked_clients": 0,
     "total_stafford_revenue": 0,
@@ -42,7 +42,7 @@
     "currency": "USD"
   },
   "system_health_summary": {
-    "green": 5,
+    "green": 6,
     "red": 0,
     "unknown": 0
   },
@@ -50,15 +50,15 @@
     {
       "client_id": "cart-agent-dev.myshopify.com",
       "merchant_shop": "cart-agent-dev.myshopify.com",
-      "lifecycle_stage": "proposal_sent",
-      "priority_total": 83,
+      "lifecycle_stage": "audit_requested",
+      "priority_total": 75,
       "next_action": {
-        "type": "followup",
-        "owner": "ross",
+        "type": "audit",
+        "owner": "system",
         "due_at": null,
-        "instructions": "Follow up on real ShopiFixer offer and close payment.",
-        "auto_executable": false,
-        "updated_at": "2026-05-04T12:26:57.688Z"
+        "instructions": "Run ShopiFixer audit and write findings to client record.",
+        "auto_executable": true,
+        "updated_at": "2026-06-05T04:17:27.370Z"
       },
       "blocked": false,
       "merchant_revenue_recovered": 100,
@@ -72,6 +72,63 @@
       }
     },
     {
+      "client_id": "fitgearpro.myshopify.com",
+      "merchant_shop": "fitgearpro.myshopify.com",
+      "lifecycle_stage": "lead",
+      "priority_total": 21,
+      "next_action": {
+        "type": "outreach",
+        "owner": "system",
+        "due_at": null,
+        "instructions": "Send first ShopiFixer audit outreach message.",
+        "auto_executable": true,
+        "created_at": "2026-06-03T22:46:15.217Z",
+        "updated_at": "2026-06-05T04:17:27.370Z"
+      },
+      "blocked": false,
+      "merchant_revenue_recovered": 0,
+      "stafford_ltv": 0,
+      "close_engine": null
+    },
+    {
+      "client_id": "homegoodsco.myshopify.com",
+      "merchant_shop": "homegoodsco.myshopify.com",
+      "lifecycle_stage": "lead",
+      "priority_total": 21,
+      "next_action": {
+        "type": "outreach",
+        "owner": "system",
+        "due_at": null,
+        "instructions": "Send first ShopiFixer audit outreach message.",
+        "auto_executable": true,
+        "created_at": "2026-06-03T22:46:15.217Z",
+        "updated_at": "2026-06-05T04:17:27.370Z"
+      },
+      "blocked": false,
+      "merchant_revenue_recovered": 0,
+      "stafford_ltv": 0,
+      "close_engine": null
+    },
+    {
+      "client_id": "elkeyecoffee.com",
+      "merchant_shop": "elkeyecoffee.com",
+      "lifecycle_stage": "lead",
+      "priority_total": 21,
+      "next_action": {
+        "type": "outreach",
+        "owner": "system",
+        "due_at": null,
+        "instructions": "Send first ShopiFixer audit outreach message.",
+        "auto_executable": true,
+        "created_at": "2026-06-22T14:46:52.000Z",
+        "updated_at": "2026-06-22T14:46:52.000Z"
+      },
+      "blocked": false,
+      "merchant_revenue_recovered": 0,
+      "stafford_ltv": 0,
+      "close_engine": null
+    },
+    {
       "client_id": "step5-test-store.myshopify.com",
       "merchant_shop": "step5-test-store.myshopify.com",
       "lifecycle_stage": "lead",
@@ -83,45 +140,7 @@
         "instructions": "Prepare the ShopiFixer audit path and next merchant follow-up.",
         "auto_executable": true,
         "created_at": "2026-06-03T22:46:15.216Z",
-        "updated_at": "2026-06-03T22:46:57.290Z"
-      },
-      "blocked": false,
-      "merchant_revenue_recovered": 0,
-      "stafford_ltv": 0,
-      "close_engine": null
-    },
-    {
-      "client_id": "fitgearpro.myshopify.com",
-      "merchant_shop": "fitgearpro.myshopify.com",
-      "lifecycle_stage": "lead",
-      "priority_total": 0,
-      "next_action": {
-        "type": "audit",
-        "owner": "system",
-        "due_at": null,
-        "instructions": "Prepare the ShopiFixer audit path and next merchant follow-up.",
-        "auto_executable": true,
-        "created_at": "2026-06-03T22:46:15.217Z",
-        "updated_at": "2026-06-03T22:46:57.291Z"
-      },
-      "blocked": false,
-      "merchant_revenue_recovered": 0,
-      "stafford_ltv": 0,
-      "close_engine": null
-    },
-    {
-      "client_id": "homegoodsco.myshopify.com",
-      "merchant_shop": "homegoodsco.myshopify.com",
-      "lifecycle_stage": "lead",
-      "priority_total": 0,
-      "next_action": {
-        "type": "audit",
-        "owner": "system",
-        "due_at": null,
-        "instructions": "Prepare the ShopiFixer audit path and next merchant follow-up.",
-        "auto_executable": true,
-        "created_at": "2026-06-03T22:46:15.217Z",
-        "updated_at": "2026-06-03T22:46:57.292Z"
+        "updated_at": "2026-07-03T03:48:19.884Z"
       },
       "blocked": false,
       "merchant_revenue_recovered": 0,
@@ -140,7 +159,7 @@
         "instructions": "Prepare the ShopiFixer audit path and next merchant follow-up.",
         "auto_executable": true,
         "created_at": "2026-06-03T22:46:15.218Z",
-        "updated_at": "2026-06-03T22:46:57.292Z"
+        "updated_at": "2026-07-03T03:48:19.885Z"
       },
       "blocked": false,
       "merchant_revenue_recovered": 0,
@@ -152,11 +171,11 @@
   "next_actions": [
     {
       "client_id": "cart-agent-dev.myshopify.com",
-      "owner": "ross",
-      "type": "followup",
-      "instructions": "Follow up on real ShopiFixer offer and close payment.",
-      "auto_executable": false,
-      "priority_total": 83,
+      "owner": "system",
+      "type": "audit",
+      "instructions": "Run ShopiFixer audit and write findings to client record.",
+      "auto_executable": true,
+      "priority_total": 75,
       "close_engine": {
         "last_evaluated_at": "2026-05-04T12:45:15.675Z",
         "hours_since_proposal": 0,
@@ -166,25 +185,34 @@
       }
     },
     {
-      "client_id": "step5-test-store.myshopify.com",
-      "owner": "system",
-      "type": "audit",
-      "instructions": "Prepare the ShopiFixer audit path and next merchant follow-up.",
-      "auto_executable": true,
-      "priority_total": 0,
-      "close_engine": null
-    },
-    {
       "client_id": "fitgearpro.myshopify.com",
       "owner": "system",
-      "type": "audit",
-      "instructions": "Prepare the ShopiFixer audit path and next merchant follow-up.",
+      "type": "outreach",
+      "instructions": "Send first ShopiFixer audit outreach message.",
       "auto_executable": true,
-      "priority_total": 0,
+      "priority_total": 21,
       "close_engine": null
     },
     {
       "client_id": "homegoodsco.myshopify.com",
+      "owner": "system",
+      "type": "outreach",
+      "instructions": "Send first ShopiFixer audit outreach message.",
+      "auto_executable": true,
+      "priority_total": 21,
+      "close_engine": null
+    },
+    {
+      "client_id": "elkeyecoffee.com",
+      "owner": "system",
+      "type": "outreach",
+      "instructions": "Send first ShopiFixer audit outreach message.",
+      "auto_executable": true,
+      "priority_total": 21,
+      "close_engine": null
+    },
+    {
+      "client_id": "step5-test-store.myshopify.com",
       "owner": "system",
       "type": "audit",
       "instructions": "Prepare the ShopiFixer audit path and next merchant follow-up.",

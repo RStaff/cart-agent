@@ -1,10 +1,10 @@
 # Merchant Lifecycle Registry
 
-Generated: 2026-06-10T14:08:47.331Z
+Generated: 2026-07-03T03:48:59.338Z
 
 ## Summary
 
-- Records: 5
+- Records: 6
 - Lead-linked records: 4
 - Opportunity-linked records: 1
 - Delivery-linked records: 1
@@ -32,15 +32,32 @@ Generated: 2026-06-10T14:08:47.331Z
 | Merchant | Current stage | Next action | Readiness | Lead | Opportunity | Delivery | Action |
 | --- | --- | --- | ---: | --- | --- | --- | --- |
 | cart-agent-dev.myshopify.com | offer_sent | Collect a verified Stripe payment for the authorized $950 Fix Sprint. | 93 | unavailable | opp_cart-agent-dev.myshopify.com | delivery_cart-agent-dev.myshopify.com_shopifixer | action_cart-agent-dev.myshopify.com_followup_offer |
-| fitgearpro.myshopify.com | engaged | Qualify reply and prepare offer | 25 | lead_fitgearpro_myshopify_com | unavailable | unavailable | unavailable |
-| homegoodsco.myshopify.com | engaged | Qualify reply and prepare offer | 25 | lead_homegoodsco_myshopify_com | unavailable | unavailable | unavailable |
+| elkeyecoffee.com | lead | Send first ShopiFixer audit outreach message. | 21 | unavailable | unavailable | unavailable | unavailable |
+| fitgearpro.myshopify.com | contact_needed | Find or add valid contact email. | 21 | lead_fitgearpro_myshopify_com | unavailable | unavailable | unavailable |
+| homegoodsco.myshopify.com | contact_needed | Find or add valid contact email. | 21 | lead_homegoodsco_myshopify_com | unavailable | unavailable | unavailable |
 | step5-test-store.myshopify.com | followup_sent | Wait for reply or track next click | 35 | lead_step5_test_store_myshopify_com | unavailable | unavailable | unavailable |
-| store1.myshopify.com | engaged | Qualify reply and prepare offer | 25 | lead_store1_myshopify_com | unavailable | unavailable | unavailable |
+| store1.myshopify.com | cold | Move lead into contact or message workflow. | 0 | lead_store1_myshopify_com | unavailable | unavailable | unavailable |
 
 ## Unavailable Fields
 
 ### cart-agent-dev.myshopify.com
 - lead_id: No matching lead could be proven for this merchant.
+- lead_status: No lead row exists for this merchant.
+- payment_amount: No payment is verified yet.
+- payment_received_at: No verified payment receipt timestamp exists yet.
+
+### elkeyecoffee.com
+- lead_id: No matching lead could be proven for this merchant.
+- opportunity_id: No matching opportunity unit could be proven for this merchant.
+- delivery_id: No matching delivery unit could be proven for this merchant.
+- action_id: No matching action unit could be proven for this merchant.
+- audit.score: No ShopiFixer audit score is available for this merchant.
+- audit.top_issue: No ShopiFixer audit issue statement is available for this merchant.
+- audit.recommendation: No ShopiFixer audit recommendation is available for this merchant.
+- offer.send_allowed: No ShopiFixer send authority is available for this merchant.
+- payment.readiness: No runtime payment readiness verdict is available for this merchant.
+- fulfillment.execution_status: No fulfillment execution status is available for this merchant.
+- fulfillment.proof_status: No fulfillment proof status is available for this merchant.
 - lead_status: No lead row exists for this merchant.
 - payment_amount: No payment is verified yet.
 - payment_received_at: No verified payment receipt timestamp exists yet.

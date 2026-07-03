@@ -345,6 +345,26 @@ function buildFieldSources(client, lead, opportunity, delivery, action, commandC
   sources.lead_status = lead
     ? sourceNote("source", "staffordos/leads/lead_registry_v1.json", "status.current_stage / lifecycle_stage")
     : sourceNote("unavailable", "No lead truth exists for this merchant.", null, null);
+  sources.qualification_status = client?.qualification_status
+    ? sourceNote("source", "staffordos/clients/client_registry_v1.json", "qualification_status")
+    : lead?.qualification_status
+      ? sourceNote("source", "staffordos/leads/lead_registry_v1.json", "qualification_status", "Qualification provenance falls back to lead truth when client provenance is absent.")
+      : sourceNote("unavailable", "No qualification truth exists for this merchant.", null, null);
+  sources.qualification_reason = client?.qualification_reason
+    ? sourceNote("source", "staffordos/clients/client_registry_v1.json", "qualification_reason")
+    : lead?.qualification_reason
+      ? sourceNote("source", "staffordos/leads/lead_registry_v1.json", "qualification_reason", "Qualification reason falls back to lead truth when client provenance is absent.")
+      : sourceNote("unavailable", "No qualification reason exists for this merchant.", null, null);
+  sources.qualification_source = client?.qualification_source
+    ? sourceNote("source", "staffordos/clients/client_registry_v1.json", "qualification_source")
+    : lead?.qualification_source
+      ? sourceNote("source", "staffordos/leads/lead_registry_v1.json", "qualification_source", "Qualification source falls back to lead truth when client provenance is absent.")
+      : sourceNote("unavailable", "No qualification source exists for this merchant.", null, null);
+  sources.qualification_updated_at = client?.qualification_updated_at
+    ? sourceNote("source", "staffordos/clients/client_registry_v1.json", "qualification_updated_at")
+    : lead?.qualification_updated_at
+      ? sourceNote("source", "staffordos/leads/lead_registry_v1.json", "qualification_updated_at", "Qualification timestamp falls back to lead truth when client provenance is absent.")
+      : sourceNote("unavailable", "No qualification timestamp exists for this merchant.", null, null);
   sources.audit_status = commandCenterMatch
     ? sourceNote("source", "staffordos/shopifixer/shopifixer_command_center_v1.json", "audit.score", "Active ShopiFixer command center implies audit completion.")
     : sourceNote("derived", "staffordos/leads/lead_registry_v1.json", "engagement.audit_viewed / engagement.experience_viewed", "Audit state is derived from lead engagement flags when present.");
@@ -444,6 +464,10 @@ function buildMerchantRecord(client, leadRegistry, opportunities, deliveries, ac
   const opportunityId = opportunity ? text(opportunity.unit_id) : null;
   const deliveryId = delivery ? text(delivery.unit_id) : null;
   const actionId = action ? text(action.unit_id) : null;
+  const qualificationStatus = text(client?.qualification_status) || text(lead?.qualification_status) || null;
+  const qualificationReason = text(client?.qualification_reason) || text(lead?.qualification_reason) || null;
+  const qualificationSource = text(client?.qualification_source) || text(lead?.qualification_source) || null;
+  const qualificationUpdatedAt = text(client?.qualification_updated_at) || text(lead?.qualification_updated_at) || null;
 
   const leadStatus = lead ? stageFromLead(lead) : null;
   const auditStatus = deriveAuditStatus(client, lead, auditSurfaceMatch, commandCenterMatch);
@@ -498,6 +522,10 @@ function buildMerchantRecord(client, leadRegistry, opportunities, deliveries, ac
     readiness_score: readinessScore,
     reservation_id: reservationId,
     lead_status: leadStatus,
+    qualification_status: qualificationStatus,
+    qualification_reason: qualificationReason,
+    qualification_source: qualificationSource,
+    qualification_updated_at: qualificationUpdatedAt,
     audit_status: auditStatus,
     offer_status: offerStatus,
     payment_status: paymentStatus,

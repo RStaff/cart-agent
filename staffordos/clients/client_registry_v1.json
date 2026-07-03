@@ -1,7 +1,7 @@
 {
   "schema": "staffordos.client_registry.v1",
   "purpose": "Canonical registry for StaffordOS clients, separating Stafford Media business revenue from ShopiFixer audit/fix data and Abando merchant performance data.",
-  "generated_at": "2026-06-05T04:17:27.370Z",
+  "generated_at": "2026-07-03T03:49:38.689Z",
   "clients": [
     {
       "client_id": "cart-agent-dev.myshopify.com",
@@ -134,24 +134,27 @@
       "source": "staffordmedia",
       "status": "qualified",
       "created_at": "2026-06-03T22:46:15.216Z",
-      "updated_at": "2026-06-05T04:17:27.370Z",
+      "updated_at": "2026-07-03T03:49:38.689Z",
       "selected_product": "shopifixer",
       "routing_reason": "Shopify conversion, checkout, audit, or dev issue",
       "qualification_status": "qualified",
+      "qualification_reason": "score>=80; status.current_stage=followup_sent; valid_contact_email",
+      "qualification_source": "lead_promotion",
+      "qualification_updated_at": "2026-07-03T03:48:19.884Z",
       "lifecycle": {
         "stage": "lead",
-        "stage_updated_at": "2026-06-03T22:46:57.290Z",
+        "stage_updated_at": "2026-07-03T03:49:38.688Z",
         "blocked": false,
         "block_reason": null
       },
       "next_action": {
-        "type": "outreach",
+        "type": "audit",
         "owner": "system",
         "due_at": null,
-        "instructions": "Send first ShopiFixer audit outreach message.",
+        "instructions": "Prepare the ShopiFixer audit path and next merchant follow-up.",
         "auto_executable": true,
         "created_at": "2026-06-03T22:46:15.216Z",
-        "updated_at": "2026-06-05T04:17:27.370Z"
+        "updated_at": "2026-07-03T03:49:38.689Z"
       },
       "contact": {
         "email": "rossstafford1@gmail.com",
@@ -165,6 +168,14 @@
         "currency": "USD",
         "closed_at": null,
         "payment_status": "unpaid"
+      },
+      "revenue": {
+        "shopifixer_one_time": 0,
+        "shopifixer_collected": false,
+        "abando_recurring_mrr": 0,
+        "abando_percentage": 0,
+        "total_lifetime_value": 0,
+        "currency": "USD"
       },
       "shopifixer": {
         "audit_status": "not_started",
@@ -227,29 +238,34 @@
             "status.current_stage=followup_sent",
             "valid_contact_email"
           ]
+        },
+        {
+          "at": "2026-07-03T03:48:19.884Z",
+          "type": "lead_promotion",
+          "text": "Promoted from lead registry with selected_product=shopifixer.",
+          "lead_id": "lead_step5_test_store_myshopify_com",
+          "selected_product": "shopifixer",
+          "routing_reason": "Shopify conversion, checkout, audit, or dev issue",
+          "qualification_reasons": [
+            "score>=80",
+            "status.current_stage=followup_sent",
+            "valid_contact_email"
+          ]
+        },
+        {
+          "at": "2026-07-03T03:49:38.688Z",
+          "type": "lead_promotion",
+          "text": "Promoted from lead registry with selected_product=shopifixer.",
+          "lead_id": "lead_step5_test_store_myshopify_com",
+          "selected_product": "shopifixer",
+          "routing_reason": "Shopify conversion, checkout, audit, or dev issue",
+          "qualification_reasons": [
+            "score>=80",
+            "status.current_stage=followup_sent",
+            "valid_contact_email"
+          ]
         }
-      ],
-      "priority_score": {
-        "revenue_potential": 0,
-        "ease_of_close": 40,
-        "time_to_cash": 45,
-        "system_confidence": 0,
-        "total": 21
-      },
-      "blocker_detection": {
-        "blocked": false,
-        "blocker_count": 0,
-        "highest_severity": null,
-        "blockers": []
-      },
-      "decision_trace": {
-        "engine": "next_action_engine_v1",
-        "evaluated_at": "2026-06-05T04:17:27.370Z",
-        "lifecycle_stage": "lead",
-        "next_action_type": "outreach",
-        "blocked": false,
-        "block_reason": null
-      }
+      ]
     },
     {
       "client_id": "fitgearpro.myshopify.com",
@@ -491,24 +507,27 @@
       "source": "staffordos",
       "status": "qualified",
       "created_at": "2026-06-03T22:46:15.218Z",
-      "updated_at": "2026-06-05T04:17:27.370Z",
+      "updated_at": "2026-07-03T03:49:38.689Z",
       "selected_product": "shopifixer",
       "routing_reason": "Shopify conversion, checkout, audit, or dev issue",
       "qualification_status": "qualified",
+      "qualification_reason": "valid_contact_email",
+      "qualification_source": "lead_promotion",
+      "qualification_updated_at": "2026-07-03T03:48:19.885Z",
       "lifecycle": {
         "stage": "lead",
-        "stage_updated_at": "2026-06-03T22:46:57.292Z",
+        "stage_updated_at": "2026-07-03T03:49:38.689Z",
         "blocked": false,
         "block_reason": null
       },
       "next_action": {
-        "type": "outreach",
+        "type": "audit",
         "owner": "system",
         "due_at": null,
-        "instructions": "Send first ShopiFixer audit outreach message.",
+        "instructions": "Prepare the ShopiFixer audit path and next merchant follow-up.",
         "auto_executable": true,
         "created_at": "2026-06-03T22:46:15.218Z",
-        "updated_at": "2026-06-05T04:17:27.370Z"
+        "updated_at": "2026-07-03T03:49:38.689Z"
       },
       "contact": {
         "email": "owner@store1.com",
@@ -522,6 +541,14 @@
         "currency": "USD",
         "closed_at": null,
         "payment_status": "unpaid"
+      },
+      "revenue": {
+        "shopifixer_one_time": 0,
+        "shopifixer_collected": false,
+        "abando_recurring_mrr": 0,
+        "abando_percentage": 0,
+        "total_lifetime_value": 0,
+        "currency": "USD"
       },
       "shopifixer": {
         "audit_status": "not_started",
@@ -581,29 +608,30 @@
             "status.current_stage=engaged",
             "valid_contact_email"
           ]
+        },
+        {
+          "at": "2026-07-03T03:48:19.885Z",
+          "type": "lead_promotion",
+          "text": "Promoted from lead registry with selected_product=shopifixer.",
+          "lead_id": "lead_store1_myshopify_com",
+          "selected_product": "shopifixer",
+          "routing_reason": "Shopify conversion, checkout, audit, or dev issue",
+          "qualification_reasons": [
+            "valid_contact_email"
+          ]
+        },
+        {
+          "at": "2026-07-03T03:49:38.689Z",
+          "type": "lead_promotion",
+          "text": "Promoted from lead registry with selected_product=shopifixer.",
+          "lead_id": "lead_store1_myshopify_com",
+          "selected_product": "shopifixer",
+          "routing_reason": "Shopify conversion, checkout, audit, or dev issue",
+          "qualification_reasons": [
+            "valid_contact_email"
+          ]
         }
-      ],
-      "priority_score": {
-        "revenue_potential": 0,
-        "ease_of_close": 40,
-        "time_to_cash": 45,
-        "system_confidence": 0,
-        "total": 21
-      },
-      "blocker_detection": {
-        "blocked": false,
-        "blocker_count": 0,
-        "highest_severity": null,
-        "blockers": []
-      },
-      "decision_trace": {
-        "engine": "next_action_engine_v1",
-        "evaluated_at": "2026-06-05T04:17:27.370Z",
-        "lifecycle_stage": "lead",
-        "next_action_type": "outreach",
-        "blocked": false,
-        "block_reason": null
-      }
+      ]
     },
     {
       "client_id": "elkeyecoffee.com",

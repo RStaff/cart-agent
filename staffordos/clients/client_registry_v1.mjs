@@ -53,6 +53,9 @@ export function upsertClient({
   selected_product = null,
   routing_reason = null,
   qualification_status = null,
+  qualification_reason = null,
+  qualification_source = null,
+  qualification_updated_at = null,
   lifecycle = {},
   next_action = {}
 }) {
@@ -72,6 +75,27 @@ export function upsertClient({
     typeof business?.next_action === "string"
       ? business.next_action
       : business?.next_action?.instructions || existing.business?.next_action || null;
+  const leadPromotionNote = Array.isArray(notes)
+    ? notes.find((note) => note?.type === "lead_promotion")
+    : null;
+  const derivedQualificationReason =
+    qualification_reason ||
+    existing.qualification_reason ||
+    (typeof leadPromotionNote?.qualification_reasons !== "undefined"
+      ? (Array.isArray(leadPromotionNote?.qualification_reasons)
+          ? leadPromotionNote.qualification_reasons.join("; ")
+          : String(leadPromotionNote?.qualification_reasons || "").trim() || null)
+      : null) ||
+    null;
+  const derivedQualificationSource =
+    qualification_source ||
+    existing.qualification_source ||
+    (leadPromotionNote ? "lead_promotion" : null);
+  const derivedQualificationUpdatedAt =
+    qualification_updated_at ||
+    existing.qualification_updated_at ||
+    leadPromotionNote?.at ||
+    (qualification_status || existing.qualification_status ? now() : null);
 
   const merged = {
     client_id: id,
@@ -83,6 +107,9 @@ export function upsertClient({
     selected_product: selected_product || existing.selected_product || null,
     routing_reason: routing_reason || existing.routing_reason || null,
     qualification_status: qualification_status || existing.qualification_status || null,
+    qualification_reason: derivedQualificationReason,
+    qualification_source: derivedQualificationSource,
+    qualification_updated_at: derivedQualificationUpdatedAt,
 
     lifecycle: {
       stage: lifecycle.stage || existing.lifecycle?.stage || null,
