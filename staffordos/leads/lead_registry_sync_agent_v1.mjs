@@ -9,7 +9,6 @@ const OUTCOMES = "staffordos/leads/outcomes.json";
 const REGISTRY = "staffordos/leads/lead_registry_v1.json";
 const EVENTS = "staffordos/leads/lead_events_v1.json";
 const ROUTING_POLICY = "staffordos/leads/lead_routing_policy_v1.json";
-const LOG = "staffordos/leads/lead_registry_sync_log_v1.json";
 
 function readJson(path, fallback) {
   if (!existsSync(path)) return fallback;
@@ -117,6 +116,70 @@ function bottleneckFor(stage) {
   return { current_bottleneck, next_action };
 }
 
+function isManualQualificationLocked(existing = {}) {
+  return Boolean(
+    existing?.qualification_lock === true ||
+    existing?.qualification_locked === true ||
+    existing?.qualification?.lock === true ||
+    existing?.qualification?.locked === true
+  );
+}
+
+function deriveQualification(existing, stage, replyItems, approvalItems, contactItem, outcomeItem) {
+  if (isManualQualificationLocked(existing)) {
+    const lockValue =
+      existing?.qualification_status ||
+      existing?.qualification?.status ||
+      existing?.status?.qualification_status ||
+      null;
+
+    return {
+      qualification_status: lockValue || "pending",
+      qualification_reason:
+        existing?.qualification_reason ||
+        existing?.qualification?.reason ||
+        "Manual qualification lock preserved existing qualification state.",
+      qualification_source: existing?.qualification_source || existing?.qualification?.source || "manual_lock",
+    };
+  }
+
+  const hasReply = replyItems.length > 0;
+  const hasContact = Boolean(contactItem?.contact_email);
+  const hasApprovalSignal = approvalItems.some((x) => x.status === "approved");
+  const hasPositiveOutcome = Boolean(outcomeItem?.recovery_sent || outcomeItem?.return_tracked);
+  const leadSignals = {
+    stage,
+    hasReply,
+    hasContact,
+    hasApprovalSignal,
+    hasPositiveOutcome,
+  };
+
+  let qualification_status = "pending";
+  let qualification_source = "lead_state_machine";
+
+  if (stage === "qualified" || hasPositiveOutcome || (hasReply && hasContact && hasApprovalSignal)) {
+    qualification_status = "qualified";
+    qualification_source = hasPositiveOutcome ? "outcome_signals" : hasApprovalSignal ? "approval_and_reply_signals" : "lead_state_machine";
+  } else if (stage === "stopped") {
+    qualification_status = "disqualified";
+    qualification_source = "lead_state_machine";
+  }
+
+  const qualification_reason =
+    qualification_status === "qualified"
+      ? `Derived from current lead truth: ${JSON.stringify(leadSignals)}`
+      : qualification_status === "disqualified"
+        ? `Derived from stopped lead truth: ${JSON.stringify(leadSignals)}`
+        : `Qualification remains pending from current lead truth: ${JSON.stringify(leadSignals)}`;
+
+  return {
+    qualification_status,
+    qualification_reason,
+    qualification_source,
+  };
+}
+
 const outreach = readJson(OUTREACH, []);
 const contactResearch = readJson(CONTACT_RESEARCH, []);
 const approvalDoc = readJson(APPROVAL_QUEUE, { version: "approval_queue_v1", items: [] });
@@ -137,9 +200,15 @@ const registry = readJson(REGISTRY, { version: "lead_registry_v1", items: [] });
 registry.version = "lead_registry_v1";
 registry.items = Array.isArray(registry.items) ? registry.items : [];
 
-const events = readJson(EVENTS, { version: "lead_events_v1", items: [] });
+const events = readJson(EVENTS, { version: "lead_events_v1", events: [] });
 events.version = "lead_events_v1";
-events.items = Array.isArray(events.items) ? events.items : [];
+events.events = Array.isArray(events.events)
+  ? events.events
+  : Array.isArray(events.items)
+    ? events.items
+    : [];
+events.events = events.events.filter((event) => !(event?.event_type === "lead_qualification_reconciled" && event?.previous_qualification_status == null));
+delete events.items;
 
 const byDomain = new Map(registry.items.map(item => [normalizeDomain(item.domain), item]));
 
@@ -172,6 +241,7 @@ for (const domain of domains) {
   }
   const stage = currentStage({ outreachItem, contactItem, approvals: approvalItems, ledgerItems, replies: replyItems });
   const status = bottleneckFor(stage);
+  const qualification = deriveQualification(existing, stage, replyItems, approvalItems, contactItem, outcomeItem);
   const now = new Date().toISOString();
 
   const next = {
@@ -203,6 +273,10 @@ for (const domain of domains) {
       current_stage: stage,
       ...status
     },
+    qualification_status: qualification.qualification_status,
+    qualification_reason: qualification.qualification_reason,
+    qualification_source: qualification.qualification_source,
+    qualification_updated_at: now,
     refs: {
       outreach_queue: Boolean(outreachItem.domain),
       approval_queue_ids: approvalItems.map(x => x.id).filter(Boolean),
@@ -217,9 +291,22 @@ for (const domain of domains) {
   byDomain.set(domain, next);
 
   if (existing) updated += 1;
+  if (existing && existing.qualification_status && existing.qualification_status !== qualification.qualification_status) {
+    events.events.push({
+      id: `event_${next.lead_id}_qualification_${Date.now()}`,
+      lead_id: next.lead_id,
+      domain,
+      event_type: "lead_qualification_reconciled",
+      previous_qualification_status: existing?.qualification_status || null,
+      qualification_status: qualification.qualification_status,
+      qualification_source: qualification.qualification_source,
+      source: "lead_registry_sync_agent_v1",
+      created_at: now
+    });
+  }
   else {
     created += 1;
-    events.items.push({
+    events.events.push({
       id: `event_${next.lead_id}_${Date.now()}`,
       lead_id: next.lead_id,
       domain,
@@ -239,19 +326,9 @@ for (const domain of domains) {
   }
 }
 
-registry.items = Array.from(byDomain.values()).sort((a, b) => a.domain.localeCompare(b.domain));
+registry.items = Array.from(byDomain.values()).sort((a, b) => String(a?.domain || "").localeCompare(String(b?.domain || "")));
 writeJson(REGISTRY, registry);
 writeJson(EVENTS, events);
-
-const log = readJson(LOG, []);
-log.push({
-  agent: "lead_registry_sync_agent_v1",
-  created,
-  updated,
-  total: registry.items.length,
-  at: new Date().toISOString()
-});
-writeJson(LOG, log);
 
 console.log(JSON.stringify({
   ok: true,

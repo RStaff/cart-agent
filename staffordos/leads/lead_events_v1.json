@@ -10858,6 +10858,176 @@
       "type": "lead_registry_updated",
       "source": ".tmp/send_console_data.json",
       "created_at": "2026-06-29T18:41:52.057Z"
+    },
+    {
+      "id": "event_lead_fitgearpro_myshopify_com_1783047954430",
+      "lead_id": "lead_fitgearpro_myshopify_com",
+      "domain": "fitgearpro.myshopify.com",
+      "event_type": "lead_registered",
+      "product_intent": "shopifixer",
+      "source": "lead_registry_sync_agent_v1",
+      "observed_sources": {
+        "outreach_queue": true,
+        "contact_research_queue": true,
+        "approval_queue": false,
+        "send_ledger": false,
+        "reply_interpretation": false,
+        "outcomes": false
+      },
+      "created_at": "2026-07-03T03:05:54.429Z"
+    },
+    {
+      "id": "event_lead_homegoodsco_myshopify_com_1783047954430",
+      "lead_id": "lead_homegoodsco_myshopify_com",
+      "domain": "homegoodsco.myshopify.com",
+      "event_type": "lead_registered",
+      "product_intent": "shopifixer",
+      "source": "lead_registry_sync_agent_v1",
+      "observed_sources": {
+        "outreach_queue": true,
+        "contact_research_queue": true,
+        "approval_queue": false,
+        "send_ledger": false,
+        "reply_interpretation": false,
+        "outcomes": false
+      },
+      "created_at": "2026-07-03T03:05:54.430Z"
+    },
+    {
+      "id": "event_lead_luxbath_myshopify_com_1783047954430",
+      "lead_id": "lead_luxbath_myshopify_com",
+      "domain": "luxbath.myshopify.com",
+      "event_type": "lead_registered",
+      "product_intent": "shopifixer",
+      "source": "lead_registry_sync_agent_v1",
+      "observed_sources": {
+        "outreach_queue": true,
+        "contact_research_queue": true,
+        "approval_queue": false,
+        "send_ledger": false,
+        "reply_interpretation": false,
+        "outcomes": false
+      },
+      "created_at": "2026-07-03T03:05:54.430Z"
+    },
+    {
+      "id": "event_lead_modernpets_myshopify_com_1783047954430",
+      "lead_id": "lead_modernpets_myshopify_com",
+      "domain": "modernpets.myshopify.com",
+      "event_type": "lead_registered",
+      "product_intent": "shopifixer",
+      "source": "lead_registry_sync_agent_v1",
+      "observed_sources": {
+        "outreach_queue": true,
+        "contact_research_queue": true,
+        "approval_queue": false,
+        "send_ledger": false,
+        "reply_interpretation": false,
+        "outcomes": false
+      },
+      "created_at": "2026-07-03T03:05:54.430Z"
+    },
+    {
+      "id": "event_lead_store1_myshopify_com_1783047954430",
+      "lead_id": "lead_store1_myshopify_com",
+      "domain": "store1.myshopify.com",
+      "event_type": "lead_registered",
+      "product_intent": "shopifixer",
+      "source": "lead_registry_sync_agent_v1",
+      "observed_sources": {
+        "outreach_queue": true,
+        "contact_research_queue": true,
+        "approval_queue": false,
+        "send_ledger": false,
+        "reply_interpretation": false,
+        "outcomes": false
+      },
+      "created_at": "2026-07-03T03:05:54.430Z"
+    },
+    {
+      "id": "event_lead_store2_com_1783047954430",
+      "lead_id": "lead_store2_com",
+      "domain": "store2.com",
+      "event_type": "lead_registered",
+      "product_intent": "shopifixer",
+      "source": "lead_registry_sync_agent_v1",
+      "observed_sources": {
+        "outreach_queue": true,
+        "contact_research_queue": true,
+        "approval_queue": false,
+        "send_ledger": false,
+        "reply_interpretation": false,
+        "outcomes": false
+      },
+      "created_at": "2026-07-03T03:05:54.430Z"
+    },
+    {
+      "id": "event_lead_urbankitchen_myshopify_com_1783047954430",
+      "lead_id": "lead_urbankitchen_myshopify_com",
+      "domain": "urbankitchen.myshopify.com",
+      "event_type": "lead_registered",
+      "product_intent": "shopifixer",
+      "source": "lead_registry_sync_agent_v1",
+      "observed_sources": {
+        "outreach_queue": true,
+        "contact_research_queue": true,
+        "approval_queue": false,
+        "send_ledger": false,
+        "reply_interpretation": false,
+        "outcomes": false
+      },
+      "created_at": "2026-07-03T03:05:54.430Z"
+    },
+    {
+      "id": "event_lead_example_store_myshopify_com_1783047954430",
+      "lead_id": "lead_example_store_myshopify_com",
+      "domain": "example-store.myshopify.com",
+      "event_type": "lead_registered",
+      "product_intent": "abando",
+      "source": "lead_registry_sync_agent_v1",
+      "observed_sources": {
+        "outreach_queue": true,
+        "contact_research_queue": true,
+        "approval_queue": false,
+        "send_ledger": false,
+        "reply_interpretation": false,
+        "outcomes": true
+      },
+      "created_at": "2026-07-03T03:05:54.430Z"
+    },
+    {
+      "id": "event_lead_midmarket_home_myshopify_com_1783047954430",
+      "lead_id": "lead_midmarket_home_myshopify_com",
+      "domain": "midmarket-home.myshopify.com",
+      "event_type": "lead_registered",
+      "product_intent": "shopifixer",
+      "source": "lead_registry_sync_agent_v1",
+      "observed_sources": {
+        "outreach_queue": true,
+        "contact_research_queue": true,
+        "approval_queue": false,
+        "send_ledger": false,
+        "reply_interpretation": false,
+        "outcomes": true
+      },
+      "created_at": "2026-07-03T03:05:54.430Z"
+    },
+    {
+      "id": "event_lead_visible_recovery_store_myshopify_com_1783047954430",
+      "lead_id": "lead_visible_recovery_store_myshopify_com",
+      "domain": "visible-recovery-store.myshopify.com",
+      "event_type": "lead_registered",
+      "product_intent": "shopifixer",
+      "source": "lead_registry_sync_agent_v1",
+      "observed_sources": {
+        "outreach_queue": true,
+        "contact_research_queue": true,
+        "approval_queue": false,
+        "send_ledger": false,
+        "reply_interpretation": false,
+        "outcomes": true
+      },
+      "created_at": "2026-07-03T03:05:54.430Z"
     }
   ]
 }
