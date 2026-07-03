@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.merchant_lifecycle_registry.v1",
-  "generated_at": "2026-07-03T03:48:59.338Z",
+  "generated_at": "2026-07-03T04:16:23.842Z",
   "active_record_selection": {
     "merchant_id": "cart-agent-dev.myshopify.com",
     "client_id": "cart-agent-dev.myshopify.com",
@@ -28,10 +28,7 @@
     "records": 6,
     "current_stage_counts": {
       "offer_sent": 1,
-      "lead": 1,
-      "contact_needed": 2,
-      "followup_sent": 1,
-      "cold": 1
+      "lead": 5
     },
     "payment_status_counts": {
       "waiting_for_payment": 1,
@@ -551,21 +548,21 @@
         },
         "current_stage": {
           "status": "derived",
-          "source_file": "staffordos/leads/lead_registry_v1.json",
-          "source_field": "status.current_stage + lifecycle_stage",
-          "note": "Current stage is derived from the most specific available lifecycle source."
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "lifecycle.stage + opportunity.stage + delivery.stage",
+          "note": "Current stage is projected from the canonical client registry with opportunity and delivery overlays."
         },
         "next_required_action": {
           "status": "derived",
-          "source_file": "staffordos/leads/lead_registry_v1.json",
-          "source_field": "status.next_action / next_action.instructions",
-          "note": "Next action is derived from the best available lifecycle source."
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "next_action.instructions + opportunity.next_action.instructions + delivery.next_action + action.instructions",
+          "note": "Next action is projected from the canonical client registry with opportunity, delivery, and action overlays."
         },
         "readiness_score": {
           "status": "derived",
-          "source_file": "staffordos/leads/lead_registry_v1.json",
-          "source_field": "score + lifecycle stage",
-          "note": "Readiness is derived from existing priority and stage truth."
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "priority_score.total + lifecycle.stage",
+          "note": "Readiness is derived from canonical client priority and lifecycle truth."
         },
         "lead_status": {
           "status": "unavailable",
@@ -894,8 +891,8 @@
       "opportunity_id": null,
       "delivery_id": null,
       "action_id": null,
-      "current_stage": "contact_needed",
-      "next_required_action": "Find or add valid contact email.",
+      "current_stage": "lead",
+      "next_required_action": "Send first ShopiFixer audit outreach message.",
       "readiness_score": 21,
       "reservation_id": null,
       "lead_status": "contact_needed",
@@ -1007,21 +1004,21 @@
         },
         "current_stage": {
           "status": "derived",
-          "source_file": "staffordos/leads/lead_registry_v1.json",
-          "source_field": "status.current_stage + lifecycle_stage",
-          "note": "Current stage is derived from the most specific available lifecycle source."
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "lifecycle.stage + opportunity.stage + delivery.stage",
+          "note": "Current stage is projected from the canonical client registry with opportunity and delivery overlays."
         },
         "next_required_action": {
           "status": "derived",
-          "source_file": "staffordos/leads/lead_registry_v1.json",
-          "source_field": "status.next_action / next_action.instructions",
-          "note": "Next action is derived from the best available lifecycle source."
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "next_action.instructions + opportunity.next_action.instructions + delivery.next_action + action.instructions",
+          "note": "Next action is projected from the canonical client registry with opportunity, delivery, and action overlays."
         },
         "readiness_score": {
           "status": "derived",
-          "source_file": "staffordos/leads/lead_registry_v1.json",
-          "source_field": "score + lifecycle stage",
-          "note": "Readiness is derived from existing priority and stage truth."
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "priority_score.total + lifecycle.stage",
+          "note": "Readiness is derived from canonical client priority and lifecycle truth."
         },
         "lead_status": {
           "status": "source",
@@ -1336,8 +1333,8 @@
       "opportunity_id": null,
       "delivery_id": null,
       "action_id": null,
-      "current_stage": "contact_needed",
-      "next_required_action": "Find or add valid contact email.",
+      "current_stage": "lead",
+      "next_required_action": "Send first ShopiFixer audit outreach message.",
       "readiness_score": 21,
       "reservation_id": null,
       "lead_status": "contact_needed",
@@ -1449,21 +1446,21 @@
         },
         "current_stage": {
           "status": "derived",
-          "source_file": "staffordos/leads/lead_registry_v1.json",
-          "source_field": "status.current_stage + lifecycle_stage",
-          "note": "Current stage is derived from the most specific available lifecycle source."
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "lifecycle.stage + opportunity.stage + delivery.stage",
+          "note": "Current stage is projected from the canonical client registry with opportunity and delivery overlays."
         },
         "next_required_action": {
           "status": "derived",
-          "source_file": "staffordos/leads/lead_registry_v1.json",
-          "source_field": "status.next_action / next_action.instructions",
-          "note": "Next action is derived from the best available lifecycle source."
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "next_action.instructions + opportunity.next_action.instructions + delivery.next_action + action.instructions",
+          "note": "Next action is projected from the canonical client registry with opportunity, delivery, and action overlays."
         },
         "readiness_score": {
           "status": "derived",
-          "source_file": "staffordos/leads/lead_registry_v1.json",
-          "source_field": "score + lifecycle stage",
-          "note": "Readiness is derived from existing priority and stage truth."
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "priority_score.total + lifecycle.stage",
+          "note": "Readiness is derived from canonical client priority and lifecycle truth."
         },
         "lead_status": {
           "status": "source",
@@ -1778,9 +1775,9 @@
       "opportunity_id": null,
       "delivery_id": null,
       "action_id": null,
-      "current_stage": "followup_sent",
-      "next_required_action": "Wait for reply or track next click",
-      "readiness_score": 35,
+      "current_stage": "lead",
+      "next_required_action": "Prepare the ShopiFixer audit path and next merchant follow-up.",
+      "readiness_score": 15,
       "reservation_id": null,
       "lead_status": "followup_sent",
       "qualification_status": "qualified",
@@ -1891,21 +1888,21 @@
         },
         "current_stage": {
           "status": "derived",
-          "source_file": "staffordos/leads/lead_registry_v1.json",
-          "source_field": "status.current_stage + lifecycle_stage",
-          "note": "Current stage is derived from the most specific available lifecycle source."
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "lifecycle.stage + opportunity.stage + delivery.stage",
+          "note": "Current stage is projected from the canonical client registry with opportunity and delivery overlays."
         },
         "next_required_action": {
           "status": "derived",
-          "source_file": "staffordos/leads/lead_registry_v1.json",
-          "source_field": "status.next_action / next_action.instructions",
-          "note": "Next action is derived from the best available lifecycle source."
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "next_action.instructions + opportunity.next_action.instructions + delivery.next_action + action.instructions",
+          "note": "Next action is projected from the canonical client registry with opportunity, delivery, and action overlays."
         },
         "readiness_score": {
           "status": "derived",
-          "source_file": "staffordos/leads/lead_registry_v1.json",
-          "source_field": "score + lifecycle stage",
-          "note": "Readiness is derived from existing priority and stage truth."
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "priority_score.total + lifecycle.stage",
+          "note": "Readiness is derived from canonical client priority and lifecycle truth."
         },
         "lead_status": {
           "status": "source",
@@ -2220,9 +2217,9 @@
       "opportunity_id": null,
       "delivery_id": null,
       "action_id": null,
-      "current_stage": "cold",
-      "next_required_action": "Move lead into contact or message workflow.",
-      "readiness_score": 0,
+      "current_stage": "lead",
+      "next_required_action": "Prepare the ShopiFixer audit path and next merchant follow-up.",
+      "readiness_score": 15,
       "reservation_id": null,
       "lead_status": "cold",
       "qualification_status": "qualified",
@@ -2333,21 +2330,21 @@
         },
         "current_stage": {
           "status": "derived",
-          "source_file": "staffordos/leads/lead_registry_v1.json",
-          "source_field": "status.current_stage + lifecycle_stage",
-          "note": "Current stage is derived from the most specific available lifecycle source."
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "lifecycle.stage + opportunity.stage + delivery.stage",
+          "note": "Current stage is projected from the canonical client registry with opportunity and delivery overlays."
         },
         "next_required_action": {
           "status": "derived",
-          "source_file": "staffordos/leads/lead_registry_v1.json",
-          "source_field": "status.next_action / next_action.instructions",
-          "note": "Next action is derived from the best available lifecycle source."
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "next_action.instructions + opportunity.next_action.instructions + delivery.next_action + action.instructions",
+          "note": "Next action is projected from the canonical client registry with opportunity, delivery, and action overlays."
         },
         "readiness_score": {
           "status": "derived",
-          "source_file": "staffordos/leads/lead_registry_v1.json",
-          "source_field": "score + lifecycle stage",
-          "note": "Readiness is derived from existing priority and stage truth."
+          "source_file": "staffordos/clients/client_registry_v1.json",
+          "source_field": "priority_score.total + lifecycle.stage",
+          "note": "Readiness is derived from canonical client priority and lifecycle truth."
         },
         "lead_status": {
           "status": "source",

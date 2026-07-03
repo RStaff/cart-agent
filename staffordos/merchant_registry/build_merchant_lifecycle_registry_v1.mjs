@@ -259,7 +259,6 @@ function deriveCurrentStage(client, lead, opportunity, delivery, commandCenterMa
   }
 
   return (
-    stageFromLead(lead) ||
     stageFromClient(client) ||
     text(opportunity?.stage) ||
     text(delivery?.stage) ||
@@ -273,7 +272,6 @@ function deriveNextAction(client, lead, opportunity, delivery, action, commandCe
   }
 
   return (
-    text(lead?.status?.next_action) ||
     text(client?.next_action?.instructions) ||
     text(opportunity?.next_action?.instructions) ||
     text(delivery?.next_action) ||
@@ -335,13 +333,13 @@ function buildFieldSources(client, lead, opportunity, delivery, action, commandC
     : sourceNote("unavailable", "No matching action unit found for this merchant.", null, null);
   sources.current_stage = commandCenterMatch
     ? sourceNote("source", "staffordos/shopifixer/shopifixer_command_center_v1.json", "overall.current_stage", "Active ShopiFixer command-center stage takes precedence for the current merchant.")
-    : sourceNote("derived", "staffordos/leads/lead_registry_v1.json", "status.current_stage + lifecycle_stage", "Current stage is derived from the most specific available lifecycle source.");
+    : sourceNote("derived", "staffordos/clients/client_registry_v1.json", "lifecycle.stage + opportunity.stage + delivery.stage", "Current stage is projected from the canonical client registry with opportunity and delivery overlays.");
   sources.next_required_action = commandCenterMatch
     ? sourceNote("source", "staffordos/shopifixer/shopifixer_command_center_v1.json", "overall.next_required_action", "Active ShopiFixer command-center next action takes precedence.")
-    : sourceNote("derived", "staffordos/leads/lead_registry_v1.json", "status.next_action / next_action.instructions", "Next action is derived from the best available lifecycle source.");
+    : sourceNote("derived", "staffordos/clients/client_registry_v1.json", "next_action.instructions + opportunity.next_action.instructions + delivery.next_action + action.instructions", "Next action is projected from the canonical client registry with opportunity, delivery, and action overlays.");
   sources.readiness_score = commandCenterMatch
     ? sourceNote("source", "staffordos/shopifixer/shopifixer_command_center_v1.json", "overall.readiness_score", "Runtime readiness from the active ShopiFixer command center.")
-    : sourceNote("derived", "staffordos/leads/lead_registry_v1.json", "score + lifecycle stage", "Readiness is derived from existing priority and stage truth.");
+    : sourceNote("derived", "staffordos/clients/client_registry_v1.json", "priority_score.total + lifecycle.stage", "Readiness is derived from canonical client priority and lifecycle truth.");
   sources.lead_status = lead
     ? sourceNote("source", "staffordos/leads/lead_registry_v1.json", "status.current_stage / lifecycle_stage")
     : sourceNote("unavailable", "No lead truth exists for this merchant.", null, null);

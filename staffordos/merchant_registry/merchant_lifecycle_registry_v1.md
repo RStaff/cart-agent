@@ -1,6 +1,6 @@
 # Merchant Lifecycle Registry
 
-Generated: 2026-07-03T03:48:59.338Z
+Generated: 2026-07-03T04:16:23.842Z
 
 ## Summary
 
@@ -33,10 +33,10 @@ Generated: 2026-07-03T03:48:59.338Z
 | --- | --- | --- | ---: | --- | --- | --- | --- |
 | cart-agent-dev.myshopify.com | offer_sent | Collect a verified Stripe payment for the authorized $950 Fix Sprint. | 93 | unavailable | opp_cart-agent-dev.myshopify.com | delivery_cart-agent-dev.myshopify.com_shopifixer | action_cart-agent-dev.myshopify.com_followup_offer |
 | elkeyecoffee.com | lead | Send first ShopiFixer audit outreach message. | 21 | unavailable | unavailable | unavailable | unavailable |
-| fitgearpro.myshopify.com | contact_needed | Find or add valid contact email. | 21 | lead_fitgearpro_myshopify_com | unavailable | unavailable | unavailable |
-| homegoodsco.myshopify.com | contact_needed | Find or add valid contact email. | 21 | lead_homegoodsco_myshopify_com | unavailable | unavailable | unavailable |
-| step5-test-store.myshopify.com | followup_sent | Wait for reply or track next click | 35 | lead_step5_test_store_myshopify_com | unavailable | unavailable | unavailable |
-| store1.myshopify.com | cold | Move lead into contact or message workflow. | 0 | lead_store1_myshopify_com | unavailable | unavailable | unavailable |
+| fitgearpro.myshopify.com | lead | Send first ShopiFixer audit outreach message. | 21 | lead_fitgearpro_myshopify_com | unavailable | unavailable | unavailable |
+| homegoodsco.myshopify.com | lead | Send first ShopiFixer audit outreach message. | 21 | lead_homegoodsco_myshopify_com | unavailable | unavailable | unavailable |
+| step5-test-store.myshopify.com | lead | Prepare the ShopiFixer audit path and next merchant follow-up. | 15 | lead_step5_test_store_myshopify_com | unavailable | unavailable | unavailable |
+| store1.myshopify.com | lead | Prepare the ShopiFixer audit path and next merchant follow-up. | 15 | lead_store1_myshopify_com | unavailable | unavailable | unavailable |
 
 ## Unavailable Fields
 
