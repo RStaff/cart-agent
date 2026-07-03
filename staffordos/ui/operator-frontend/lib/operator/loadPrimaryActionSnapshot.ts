@@ -77,12 +77,102 @@ function deriveProduct(client: AnyRecord, lead: AnyRecord, actionLabel: string) 
   );
 }
 
+function findLifecycleRecord(
+  records: AnyRecord[],
+  primaryFocus: AnyRecord,
+  focusClient: AnyRecord,
+  lead: AnyRecord
+) {
+  const merchantId = text(primaryFocus.merchant_id || primaryFocus.client_id || primaryFocus.merchant_shop);
+  const clientId = text(primaryFocus.client_id || focusClient.client_id || focusClient.merchant_shop);
+  const merchantShop = text(primaryFocus.merchant_shop || focusClient.merchant_shop || lead.domain);
+  const leadId = text(primaryFocus.lead_id || lead.lead_id || lead.id);
+  const leadDomain = text(lead.domain);
+
+  return (
+    records.find((record: AnyRecord) => {
+      const recordMerchantId = text(record.merchant_id || record.client_id || record.merchant_shop);
+      const recordClientId = text(record.client_id || record.merchant_shop);
+      const recordMerchantShop = text(record.merchant_shop || record.store_domain || record.client_id);
+      const recordLeadId = text(record.lead_id);
+
+      return Boolean(
+        (merchantId && recordMerchantId === merchantId) ||
+        (clientId && recordClientId === clientId) ||
+        (merchantShop && recordMerchantShop === merchantShop) ||
+        (leadId && recordLeadId === leadId) ||
+        (leadDomain && recordMerchantShop === leadDomain)
+      );
+    }) || null
+  );
+}
+
+function buildLifecycleSnapshot(
+  record: AnyRecord,
+  fallback: RossFacingPrimaryActionSnapshot,
+  dashboard: AnyRecord,
+  primaryFocus: AnyRecord,
+  lead: AnyRecord,
+  focusClient: AnyRecord
+): RossFacingPrimaryActionSnapshot {
+  const merchant = text(record.merchant_shop || record.client_id || focusClient.merchant_shop || lead.domain || fallback.primary_action.merchant);
+  const actionLabel = text(record.next_required_action || primaryFocus.action || fallback.primary_action.action_label || "Review merchant lifecycle");
+  const nextStep = text(record.next_required_action || primaryFocus.next_action?.instructions || primaryFocus.next_action || fallback.primary_action.next_step);
+  const confidence = toConfidence(record.readiness_score ?? primaryFocus.priority_total ?? focusClient.priority_score?.total ?? lead.score ?? fallback.primary_action.confidence);
+  const whyNowSource = text(
+    record.next_required_action ||
+    record.current_stage ||
+    primaryFocus.reason ||
+    fallback.primary_action.why_now ||
+    "Work the canonical merchant lifecycle next."
+  );
+  const support = [
+    merchant ? `Merchant Lifecycle merchant: ${merchant}` : null,
+    record.merchant_id ? `Merchant ID: ${text(record.merchant_id)}` : null,
+    record.lead_id ? `Lead ID: ${text(record.lead_id)}` : null,
+    record.current_stage ? `Lifecycle stage: ${text(record.current_stage)}` : null,
+    record.next_required_action ? `Next required action: ${text(record.next_required_action)}` : null,
+    Number.isFinite(Number(record.readiness_score)) ? `Readiness score: ${text(record.readiness_score)}` : null,
+    record.qualification_status ? `Qualification: ${text(record.qualification_status)}` : null,
+    dashboard.revenue_gaps?.length
+      ? `Revenue gap on deck: ${dashboard.revenue_gaps[0].merchant_shop} has a $${dashboard.revenue_gaps[0].gap} gap.`
+      : null,
+    primaryFocus.blocked ? "Merchant is blocked and needs attention before moving forward." : null
+  ].filter(Boolean) as string[];
+
+  return {
+    schema: "staffordos.operator_primary_action.v1",
+    generated_at: text(dashboard.generated_at || new Date().toISOString()),
+    primary_action: {
+      action_id: text(record.action_id || record.merchant_id || record.client_id || fallback.primary_action.action_id),
+      action_label: actionLabel,
+      action_type: text(primaryFocus.canonical_area || primaryFocus.area || fallback.primary_action.action_type || "merchant_followup"),
+      merchant,
+      product: text(focusClient.selected_product || lead.product || lead.routing?.primary_offer || fallback.primary_action.product || "shopifixer"),
+      why_now: humanizeOperatorReason(whyNowSource),
+      next_step: nextStep,
+      confidence,
+      confidence_band: percentToBand(confidence),
+      supporting_context: support.length ? support : fallback.primary_action.supporting_context,
+      evidence: [
+        text(record.merchant_id || record.client_id || record.lead_id),
+        text(record.current_stage || ""),
+        text(record.next_required_action || "")
+      ].filter(Boolean),
+      risk: primaryFocus.blocked ? ["Merchant is currently blocked."] : [],
+      expected_outcome: `Advance ${merchant} using the canonical merchant lifecycle projection.`
+    }
+  };
+}
+
 function synthesizeFromLocalFiles(): RossFacingPrimaryActionSnapshot {
   const repoRoot = resolveRepoRoot();
   const dashboard = readJson(path.join(repoRoot, "staffordos/clients/operator_dashboard_snapshot_v1.json"), {});
+  const merchantLifecycle = readJson(path.join(repoRoot, "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json"), { records: [] });
   const clientRegistry = readJson(path.join(repoRoot, "staffordos/clients/client_registry_v1.json"), { clients: [] });
   const leadRegistry = readJson(path.join(repoRoot, "staffordos/leads/lead_registry_v1.json"), { items: [] });
 
+  const lifecycleRecords = Array.isArray(merchantLifecycle.records) ? merchantLifecycle.records : [];
   const clients = Array.isArray(clientRegistry.clients) ? clientRegistry.clients : [];
   const leads = Array.isArray(leadRegistry.items) ? leadRegistry.items : [];
 
@@ -98,6 +188,31 @@ function synthesizeFromLocalFiles(): RossFacingPrimaryActionSnapshot {
     const domain = text(item.domain);
     return id === text(primaryFocus.client_id) || domain === text(primaryFocus.merchant_shop);
   }) || {};
+
+  const lifecycleRecord = findLifecycleRecord(lifecycleRecords, primaryFocus, focusClient, lead);
+  if (lifecycleRecord) {
+    return buildLifecycleSnapshot(lifecycleRecord, {
+      schema: "staffordos.operator_primary_action.v1",
+      generated_at: text(dashboard.generated_at || new Date().toISOString()),
+      primary_action: {
+        action_id: text(primaryFocus.client_id || focusClient.client_id || lead.lead_id || "ross_primary_action"),
+        action_label: text(primaryFocus.action || "Review merchant"),
+        action_type: text(primaryFocus.canonical_area || primaryFocus.area || "merchant_followup"),
+        merchant: text(primaryFocus.merchant_shop || focusClient.merchant_shop || lead.domain || focusClient.client_id || "unknown merchant"),
+        product: deriveProduct(focusClient, lead, text(primaryFocus.action || "Review merchant")),
+        why_now: humanizeOperatorReason(text(primaryFocus.reason || "Ross should work the highest-priority merchant action.")),
+        next_step: text(primaryFocus.next_action?.instructions || primaryFocus.next_action || focusClient.next_action?.instructions || "Review merchant and take the next step."),
+        confidence: toConfidence(primaryFocus.priority_total || focusClient.priority_score?.total || lead.score || 0),
+        confidence_band: percentToBand(toConfidence(primaryFocus.priority_total || focusClient.priority_score?.total || lead.score || 0)),
+        supporting_context: [],
+        evidence: [],
+        risk: [],
+        expected_outcome: primaryFocus.reason
+          ? `Move ${text(primaryFocus.merchant_shop || focusClient.merchant_shop || lead.domain || "the merchant")} forward on ${deriveProduct(focusClient, lead, text(primaryFocus.action || "Review merchant"))}.`
+          : "Advance the highest-priority merchant action."
+      }
+    }, dashboard, primaryFocus, lead, focusClient);
+  }
 
   const actionLabel = text(primaryFocus.action) || "Review merchant";
   const merchant = text(primaryFocus.merchant_shop || focusClient.merchant_shop || lead.domain || focusClient.client_id || "unknown merchant");
