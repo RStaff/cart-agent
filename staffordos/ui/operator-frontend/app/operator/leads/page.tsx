@@ -1,4 +1,5 @@
 import LeadActions from "./LeadActions";
+import { loadOperatorLeads } from "../../../lib/leads/loadOperatorLeads";
 
 type Lead = {
   id: string;
@@ -18,20 +19,8 @@ type Lead = {
   last_event_at: string | null;
 };
 
-async function loadLeads() {
-  const res = await fetch("http://localhost:3000/api/operator/lead-registry", {
-    cache: "no-store"
-  });
-
-  if (!res.ok) {
-    throw new Error("Failed to load operator leads");
-  }
-
-  return res.json();
-}
-
 export default async function OperatorLeadsPage() {
-  const data = await loadLeads();
+  const data = await loadOperatorLeads();
   const summary = data.summary || {};
   const leads: Lead[] = Array.isArray(data.leads) ? data.leads : [];
 
