@@ -5,6 +5,7 @@ import { OperatorNav } from "../../components/operator/OperatorNav";
 import { WorkdayControlPanel } from "../../components/operator/WorkdayControlPanel";
 import { deriveCustomerOutcome } from "../../lib/operator/loadShopifixerCommandCenter";
 import { getCampaignResolverReport } from "../../lib/operator/campaignResolver";
+import { loadFounderProfitQueue } from "../../lib/operator/loadFounderProfitQueue";
 import { loadExecutionLog } from "../../lib/operator/loadExecutionLog";
 import { getDecisionEngineReport } from "../../lib/operator/decisionEngineResolver";
 import { resolveRelationshipById } from "../../lib/operator/relationshipResolver";
@@ -319,6 +320,7 @@ async function loadExecutiveHome() {
   const ceoTruth = readJson<any>(repoRoot, PATHS.ceoTruth, {});
   const decisionEngine = getDecisionEngineReport();
   const campaignReport = getCampaignResolverReport();
+  const profitQueue = loadFounderProfitQueue();
 
   const primary = primaryAction.primary_action || {};
   const openWork = Array.isArray(unitWorkSnapshot.open_work) ? unitWorkSnapshot.open_work : [];
@@ -419,6 +421,7 @@ async function loadExecutiveHome() {
     blockers,
     decisionEngine,
     decisionMismatchReasons,
+    profitQueue,
   };
 }
 
@@ -462,6 +465,7 @@ export default async function OperatorPage() {
   const decisionTopBlocker = data.decisionEngine?.top_blocker || null;
   const decisionValidation = data.decisionEngine?.validation || { ok: false, errors: [] };
   const decisionMismatchReasons = Array.isArray(data.decisionMismatchReasons) ? data.decisionMismatchReasons : [];
+  const missionQueue = Array.isArray(data.profitQueue?.missions) ? data.profitQueue.missions.slice(0, 6) : [];
   const currentPrimaryActionLabel = text(primary.action_label || primary.action_type, "Unavailable");
   const currentPrimaryActionStep = text(primary.next_step, "Unavailable");
   const decisionTopActionLabel = text(decisionTopAction?.title || decisionTopAction?.action_type, "Unavailable");
@@ -663,6 +667,62 @@ export default async function OperatorPage() {
         </section>
 
         <section style={{ marginTop: 24 }}>
+          <div className="panel" style={{ marginBottom: 16 }}>
+            <div className="panelInner">
+              <p className="eyebrow">Profit Queue</p>
+              <h2 className="sectionTitle" style={{ marginBottom: 8 }}>Today's Profit Queue</h2>
+              <p className="subtitle" style={{ marginTop: 0 }}>
+                Ranked from canonical registry truth by expected revenue, readiness, urgency, bottleneck, payment state, and Ross requirement.
+              </p>
+              <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+                <span className="chip">Queue items: {data.profitQueue?.summary?.total ?? missionQueue.length}</span>
+                <span className="chip">Ready: {data.profitQueue?.summary?.ready ?? 0}</span>
+                <span className="chip">Ross required: {data.profitQueue?.summary?.ross_required ?? 0}</span>
+                <span className="chip">StaffordOS: {data.profitQueue?.summary?.staffordos ?? 0}</span>
+                <span className="chip">Waiting: {data.profitQueue?.summary?.waiting ?? 0}</span>
+              </div>
+              <div className="row" style={{ marginTop: 10, flexWrap: "wrap" }}>
+                <span className="hint">Ross = human decision needed</span>
+                <span className="hint">StaffordOS = agent can continue</span>
+                <span className="hint">Waiting = merchant / external dependency</span>
+              </div>
+            </div>
+          </div>
+          <div className="panel" style={{ marginBottom: 16 }}>
+            <div className="panelInner">
+              <div className="executionList">
+                {missionQueue.map((mission) => (
+                  <div key={mission.mission_id} className="executionItem" style={{ gap: 10 }}>
+                    <div className="row" style={{ justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
+                      <div style={{ minWidth: 0 }}>
+                        <strong>{mission.merchant}</strong>
+                        <div className="hint">
+                          {mission.merchant_id} · {mission.current_stage}
+                        </div>
+                      </div>
+                      <div className="row" style={{ flexWrap: "wrap", justifyContent: "flex-end" }}>
+                        <span className="chip">Expected revenue: {money(mission.expected_revenue)}</span>
+                        <span className="chip">Status: {mission.mission_status}</span>
+                        <span className="chip">Delegated to: {mission.delegated_to}</span>
+                      </div>
+                    </div>
+                    <div className="kv">
+                      <div><strong>Why now:</strong> {mission.why_now}</div>
+                      <div><strong>Recommended action:</strong> {mission.recommended_action}</div>
+                      <div><strong>Blocking dependency:</strong> {mission.blocking_dependency || "None"}</div>
+                      <div><strong>Human decision:</strong> {mission.required_human_decision || "None"}</div>
+                      <div><strong>Readiness:</strong> {mission.readiness}/100</div>
+                      <div><strong>ROI score:</strong> {mission.roi_score}</div>
+                    </div>
+                    <div className="row" style={{ marginTop: 10, flexWrap: "wrap" }}>
+                      <Link href={mission.target_route} className="chip">Open Workspace</Link>
+                    </div>
+                  </div>
+                ))}
+                {!missionQueue.length ? <p className="hint">No missions are queued right now.</p> : null}
+              </div>
+            </div>
+          </div>
           <div className="panel" style={{ marginBottom: 16 }}>
             <div className="panelInner">
               <p className="eyebrow">Today</p>
