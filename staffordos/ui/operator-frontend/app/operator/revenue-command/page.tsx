@@ -307,7 +307,7 @@ function loadRevenueQueue() {
           item: text(priorityFocus.merchant_shop || priorityFocus.client_id, "Current payment close"),
           type: "Payments waiting",
           why: "Merchant value has already been proven. This is the closest cash close in the queue.",
-          revenueImpact: `${money(revenueGap?.gap ?? priorityFocus.merchant_revenue ?? 0)} of value is ready to become Stafford revenue.`,
+          revenueImpact: `${money(revenueGap?.gap ?? priorityFocus.merchant_revenue ?? 0)} of merchant value has been recovered (proof). Stafford revenue is captured only when the merchant pays.`,
           nextAction: text(priorityFocus.next_action?.instructions || priorityFocus.action, "Follow up and close payment."),
           age: formatHours(priorityClient?.close_engine?.hours_since_proposal),
           blocker: "Waiting on payment",
@@ -388,10 +388,16 @@ function loadRevenueQueue() {
       })
     );
 
+  const staffordRevenueValue =
+    dashboardSnapshot?.revenue_summary?.stafford_revenue ??
+    dashboardSnapshot?.top_metrics?.total_stafford_revenue ??
+    0;
+
   return {
     currentBottleneck: translateBottleneck(revenueTruth?.current_bottleneck),
     topRevenueAction: text(priorityFocus?.next_action?.instructions || revenueTruth?.next_actions?.[0]?.action, "Review the highest-priority revenue motion."),
-    moneyAtStake: money(revenueGap?.gap ?? 0),
+    staffordRevenue: money(staffordRevenueValue),
+    merchantValueRecovered: money(revenueGap?.gap ?? 0),
     revenueGap,
     paymentWaitingRows,
     offersWaitingRows,
@@ -419,7 +425,8 @@ export default function RevenueCommandPage() {
 
             <div className="row" style={{ marginTop: 16, flexWrap: "wrap" }}>
               <span className="chip">Revenue block: {data.currentBottleneck}</span>
-              <span className="chip">Money at stake: {data.moneyAtStake}</span>
+              <span className="chip">Stafford revenue (captured): {data.staffordRevenue}</span>
+              <span className="chip">Merchant value recovered (proof): {data.merchantValueRecovered}</span>
               <span className="chip">Payments waiting: {data.paymentWaitingRows.length}</span>
               <span className="chip">Offers waiting: {data.offersWaitingRows.length}</span>
               <span className="chip">Warm opportunities: {data.warmOpportunitiesRows.length}</span>
