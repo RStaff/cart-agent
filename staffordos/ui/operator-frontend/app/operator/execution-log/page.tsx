@@ -10,17 +10,13 @@ function formatDate(value?: string) {
   }
 }
 
-function getEvents(data: any) {
-  return Array.isArray(data?.events) ? data.events : [];
-}
-
 export default function ExecutionLogPage() {
   const data = loadExecutionLog();
   const lastExecution = data.lastExecution as any;
   const lastOutcomeEvent = data.lastOutcomeEvent as any;
 
-  const executions = getEvents(data.executionEvents || data.operatorActions).slice(0, 10);
-  const outcomeEvents = getEvents(data.outcomeEvents || data.outcomeLog).slice(0, 10);
+  const executions = (Array.isArray(data.executionEvents) ? data.executionEvents : []).slice(0, 10);
+  const outcomeEvents = (Array.isArray(data.outcomeEvents) ? data.outcomeEvents : []).slice(0, 10);
   const scores = data.outcomeScores.slice(-10).reverse();
   const agents = Array.isArray(data.agentPerformance?.agents)
     ? data.agentPerformance.agents

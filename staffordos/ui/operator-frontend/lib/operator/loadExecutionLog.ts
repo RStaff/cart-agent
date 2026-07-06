@@ -21,7 +21,7 @@ type OutcomeEvent = {
   previous_state?: string;
   new_state?: string;
   trigger?: string;
-  confidence?: number;
+  confidence?: number | null;
 };
 
 function resolveRepoRoot() {
@@ -108,7 +108,7 @@ function normalizeOutcomeRecord(record: any): OutcomeEvent {
       previous_state: text(record.previous_state, "unknown"),
       new_state: text(record.new_state, "unknown"),
       trigger: text(record.trigger, "unknown"),
-      confidence: Number.isFinite(Number(record.confidence)) ? Number(record.confidence) : 0,
+      confidence: Number.isFinite(Number(record.confidence)) ? Number(record.confidence) : null,
     };
   }
 
@@ -119,7 +119,7 @@ function normalizeOutcomeRecord(record: any): OutcomeEvent {
     previous_state: text(record?.previous_state || "unknown"),
     new_state: text(record?.new_state || record?.status || "unknown"),
     trigger: text(record?.event_type || record?.action_type || "unknown"),
-    confidence: Number.isFinite(Number(record?.confidence)) ? Number(record.confidence) : 0,
+    confidence: Number.isFinite(Number(record?.confidence)) ? Number(record.confidence) : null,
   };
 }
 
@@ -152,13 +152,15 @@ export function loadExecutionLog() {
     { schema: "staffordos.outcome_event_log.v1", events: [] }
   );
 
+  // events/* (operator_action_events / outcome_event_log) is the live canonical execution-history
+  // write path fed by the operator execute action. execution/* is retained as fallback only.
   const executionEvents = sortByTimestampDesc(
-    (Array.isArray(executionTruth.events) && executionTruth.events.length ? executionTruth.events : legacyOperatorActions.events || []).map(
+    (Array.isArray(legacyOperatorActions.events) && legacyOperatorActions.events.length ? legacyOperatorActions.events : executionTruth.events || []).map(
       normalizeExecutionRecord
     ) as ExecutionLogEvent[]
   );
   const outcomeEvents = sortByTimestampDesc(
-    (Array.isArray(outcomeTruth.events) && outcomeTruth.events.length ? outcomeTruth.events : legacyOutcomeLog.events || []).map(
+    (Array.isArray(legacyOutcomeLog.events) && legacyOutcomeLog.events.length ? legacyOutcomeLog.events : outcomeTruth.events || []).map(
       normalizeOutcomeRecord
     ) as OutcomeEvent[]
   );
