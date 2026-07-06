@@ -147,11 +147,6 @@ type OperatorHomeV1Props = {
   completionDate?: string;
 };
 
-function percent(value?: number) {
-  if (typeof value !== "number" || Number.isNaN(value)) return "—";
-  return `${Math.round(value * 100)}%`;
-}
-
 function proofStatus(label: string, value: string | number | undefined, goodValues: string[]) {
   const text = value === undefined || value === null || value === "" ? "unknown" : String(value);
   const ok = goodValues.includes(text.toLowerCase());
@@ -199,6 +194,9 @@ export function OperatorHomeV1({
   const shopifixerFulfillment = shopifixer.fulfillment || {};
   const shopifixerLifecycleLane = shopifixer.lifecycle_lane || {};
   const shopifixerOverall = shopifixer.overall || {};
+  const readinessScore = Number(shopifixerOverall.readiness_score);
+  const readinessDisplay = Number.isFinite(readinessScore) ? `${Math.round(readinessScore)}/100` : "—";
+  const readinessGoodValues = Array.from({ length: 11 }, (_, index) => `${90 + index}/100`);
   const shopifixerCheckoutLinkage = shopifixer.checkout_linkage || {};
   const customerOutcomes = Array.isArray(shopifixer.customer_outcomes) ? shopifixer.customer_outcomes : [];
   const visibleCustomerOutcomes = customerOutcomes.filter((outcome) => outcome.visible_on_fulfillment);
@@ -243,7 +241,7 @@ export function OperatorHomeV1({
             <div className="operatorHomeProofRow">
               {proofStatus("Work check", preflightReport.status, ["go"])}
               {proofStatus("Proof gate", qaReport.verdict, ["pass"])}
-              {proofStatus("Readiness", percent(action.confidence), ["90%", "91%", "92%", "93%", "94%", "95%", "96%", "97%", "98%", "99%", "100%"])}
+              {proofStatus("Readiness", readinessDisplay, readinessGoodValues)}
             </div>
 
             <article className="operatorHomeActionCard">
@@ -251,7 +249,6 @@ export function OperatorHomeV1({
                 <span>{action.action_type || "action"}</span>
                 <span>{action.product_id || action.domain_id || "domain"}</span>
                 <span>{action.urgency || "urgency_unknown"}</span>
-                <span>{percent(action.confidence)} confidence</span>
               </div>
 
               <h2>{action.action_label || "No primary action resolved."}</h2>
