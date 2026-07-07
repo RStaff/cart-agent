@@ -124,6 +124,8 @@ Related · Deprecated · Implementation notes.
 | Shopifixer | **ShopiFixer** | Canonical spelling. |
 | Client (as the customer) | **Merchant** | "Client" is the registry-level term; "Merchant" is the canonical customer term. |
 | Operator platform / broader platform (for StaffordOS) | **StaffordOS (internal system)** | "platform" acceptable only as *internal*, never customer-facing SaaS. |
+| Revenue Department, Revenue Team | **Sales / Finance / Client Success** (per context) | "Revenue" is not a canonical department; map to Sales (qualification/routing/proposal/opportunity/pipeline), Finance (revenue/payment/gap/MRR/one-time/LTV), or Client Success (customer success/referral). |
+| Fulfillment (as a department/owner) | **Delivery** | The canonical department is Delivery; "fulfillment truth" as an artifact name is unaffected. |
 
 Do not rename implementation. These are the canonical business meanings; code/UI
 identifiers may lag and are mapped, not forced.

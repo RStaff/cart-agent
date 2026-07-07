@@ -69,7 +69,7 @@ Two hard walls run through the whole model:
 - Business meaning: The company's real, banked/earned revenue.
 - Purpose: The only figure that counts toward revenue targets, ROI, and fiscal
   actuals.
-- Owner: Revenue department; Executive (Ross) for reporting.
+- Owner: Finance; Executive (Ross) for reporting.
 - Canonical authority: `client_registry_v1.json` `revenue.stafford_revenue_earned`.
 - Storage: Stored (source of record).
 - How earned: Only after `payment_received` is granted by the Stripe webhook
@@ -92,7 +92,7 @@ Two hard walls run through the whole model:
 - Business meaning: The merchant's money/benefit — evidence that the work helps
   the merchant. It is the sales/proof asset, not Stafford's earnings.
 - Purpose: Demonstrate impact; justify offers and upsells.
-- Owner: Revenue department (proof/evidence).
+- Owner: Client Success (proof/evidence); Finance for reporting.
 - Canonical authority: `client_registry_v1.json` `abando.merchant_revenue_recovered`
   (rolled into dashboard `revenue_summary.merchant_revenue_recovered` and
   `revenue_gaps[].merchant_revenue`).
@@ -112,7 +112,7 @@ Two hard walls run through the whole model:
 - Definition: The potential value of a single scoped opportunity.
 - Business meaning: What one opportunity could be worth if it converts.
 - Purpose: Prioritize opportunities; feed pipeline estimates.
-- Owner: Revenue department.
+- Owner: Sales.
 - Canonical authority: `staffordos/units/opportunity_units_v1.json` `value`
   (with `probability` and `confidence`).
 - Storage: Stored per unit (a scoped, deterministic estimate).
@@ -130,7 +130,7 @@ Two hard walls run through the whole model:
 - Definition: The aggregated potential value of open opportunities/actions.
 - Business meaning: An estimate of possible future revenue, not money in hand.
 - Purpose: Forecasting and prioritization only.
-- Owner: Revenue department.
+- Owner: Sales.
 - Canonical authority: A DERIVED projection over Opportunity Value and action
   `expected_revenue_impact`. There is no trustworthy canonical pipeline
   calculation today: the current implementation
@@ -157,7 +157,7 @@ Two hard walls run through the whole model:
 - Business meaning: How much proven merchant value has not yet become Stafford
   earnings — a conversion opportunity, not money owed.
 - Purpose: Highlight unconverted proven value for follow-up.
-- Owner: Revenue department.
+- Owner: Finance.
 - Canonical authority: Derived in `operator_dashboard_snapshot_v1.json`
   `revenue_gaps[].gap` from client_registry values.
 - Storage: Derived (calculated).
@@ -174,7 +174,7 @@ Two hard walls run through the whole model:
 - Definition: Ongoing subscription revenue (Abando MRR).
 - Business meaning: Predictable monthly Stafford revenue from Abando subscriptions.
 - Purpose: Recurring component of Stafford revenue and LTV.
-- Owner: Revenue department; Abando product engine.
+- Owner: Finance; Abando product engine.
 - Canonical authority: `client_registry_v1.json` `revenue.abando_recurring_mrr`
   (with `abando_percentage`).
 - Storage: Stored.
@@ -192,7 +192,7 @@ Two hard walls run through the whole model:
 - Definition: Single-charge Stafford revenue — the ShopiFixer $950 Fix Sprint fee.
 - Business meaning: Non-recurring service revenue.
 - Purpose: One-time component of Stafford revenue and LTV.
-- Owner: Revenue department.
+- Owner: Finance.
 - Canonical authority: `client_registry_v1.json` `revenue.shopifixer_one_time`
   (packaging authority: `shopifixer_commercial_definition_v1.md`, $950 flat fee).
 - Storage: Stored.
@@ -210,7 +210,7 @@ Two hard walls run through the whole model:
 - Definition: Total realized Stafford revenue from a client over time.
 - Business meaning: One-time plus recurring revenue actually earned from a client.
 - Purpose: Client value reporting; prioritization.
-- Owner: Revenue department.
+- Owner: Finance.
 - Canonical authority: `client_registry_v1.json` `revenue.total_lifetime_value`
   (per-merchant echo: merchant_lifecycle `lifetime_value`).
 - Storage: Derived/aggregate over captured One-Time + Recurring Revenue.

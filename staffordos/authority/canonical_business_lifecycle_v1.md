@@ -123,7 +123,7 @@ payment handling stay attached to their stage.
 - Entry criteria: A prospect is identified from a source.
 - Exit criteria: A lead record exists with identity plus a routing hint, ready to
   qualify.
-- Owner / department: Revenue.
+- Owner / department: Marketing (hands off to Sales at qualification).
 - Required data (real): `lead_id, name, domain, product, product_surface, source,
   lifecycle_stage, status, score, contact{email, confidence}, engagement{sent,
   replied}, routing{primary, secondary}, refs, payment_status, created_at`.
@@ -142,7 +142,7 @@ payment handling stay attached to their stage.
 - Entry criteria: The lead has enough identity/contact signal to assess.
 - Exit criteria: `qualification_status = qualified` (with reason and source), or
   `closed_lost` / no action.
-- Owner / department: Revenue. Ross is the approval authority.
+- Owner / department: Sales. Ross is the approval authority.
 - Required data (real): merchant lifecycle `qualification_status,
   qualification_reason, qualification_source, qualification_updated_at`;
   `lead.score`; client `lifecycle.stage`.
@@ -159,7 +159,7 @@ payment handling stay attached to their stage.
   future offering — based on observed evidence, never defaulted.
 - Entry criteria: Lead qualified.
 - Exit criteria: A route is selected (`ShopiFixer` | `Abando` | `no action`).
-- Owner / department: Revenue (routing authority) with Ross confirmation.
+- Owner / department: Sales (routing authority) with Ross confirmation.
 - Required data (real): `lead.routing{primary, secondary}` (observed:
   `primary: shopifixer, secondary: abando_recovery`);
   `staffordos/commercial/offer_routing_rules_v1.json`.
@@ -180,7 +180,7 @@ payment handling stay attached to their stage.
   asset; the $950 Fix Sprint is the product.
 - Entry criteria: Lead routed to ShopiFixer.
 - Exit criteria: Offer accepted and payment initiated (enters the S7 gate).
-- Owner / department: Revenue. Ross approves the offer.
+- Owner / department: Sales. Ross approves the offer.
 - Required data (real): merchant `audit_status, offer_status, offer_price
   ($950), payment_amount, payment_currency`; client `deal{type, value,
   payment_status}`, `close_engine`.
@@ -201,7 +201,7 @@ payment handling stay attached to their stage.
   begin before payment is captured.
 - Exit criteria: `fulfillment_status = completed` and
   `proof_package_status = complete`.
-- Owner / department: Engineering / Fulfillment. Agents execute; Ross approves
+- Owner / department: Delivery (Engineering supports). Agents execute; Ross approves
   scope and proof.
 - Required data (real): `fulfillment_status, execution_status, proof_status,
   before_evidence_status, after_evidence_status, proof_package_status`;
@@ -226,7 +226,7 @@ payment handling stay attached to their stage.
 - Entry criteria: Offer accepted (S5).
 - Exit criteria: `payment_status = payment_received` (verified), which unlocks S6;
   or the deal is lost.
-- Owner / department: Revenue. The payment-capture authority is the Stripe webhook
+- Owner / department: Finance. The payment-capture authority is the Stripe webhook
   authority (a system authority, not a human).
 - Required data (real): `payment_status, payment_amount, payment_currency`; client
   `revenue{shopifixer_one_time, shopifixer_collected, abando_recurring_mrr,
@@ -251,7 +251,7 @@ payment handling stay attached to their stage.
 - Entry criteria: Delivery complete and proof delivered.
 - Exit criteria: An outcome is recorded (accepted / at-risk); may branch to S9 or
   S10.
-- Owner / department: Revenue / Success, with Ross.
+- Owner / department: Client Success, with Ross.
 - Required data (real): merchant `review_status, case_study_status,
   revenue_status`; `customer_outcomes[]` (outcome_state, why,
   suggested_next_action, revenue_impact).
@@ -270,7 +270,7 @@ payment handling stay attached to their stage.
 - Entry criteria: A positive customer-success outcome.
 - Exit criteria: A referral is captured as a new lead (loops back to S2 with
   referral attribution).
-- Owner / department: Revenue, with Ross.
+- Owner / department: Client Success, with Ross.
 - Required data: merchant `referral_status`.
 - Required evidence: None today.
 - Human approval gate: Ross requests the referral.
@@ -288,7 +288,7 @@ payment handling stay attached to their stage.
 - Entry criteria: `shopifixer_completed` (upsell path), or an independent Abando
   lead (direct entry).
 - Exit criteria: `abando_subscribed`, or the upsell is declined.
-- Owner / department: Revenue. Abando is a separate product engine.
+- Owner / department: Sales and Client Success. Abando is a separate product engine.
 - Required data (real): state machine `abando_upsell_ready -> abando_subscribed`;
   client `abando{...}`, `revenue.abando_recurring_mrr, abando_percentage`.
 - Required evidence: The ShopiFixer proof package (as upsell rationale); Abando

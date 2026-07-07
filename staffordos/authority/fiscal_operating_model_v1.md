@@ -172,8 +172,11 @@ does not prescribe the specific pages or layout.
 
 ## Section 8 — Business Departments
 
-Canonical departments for Stafford Media Consulting. These formalize the target
-operating structure; the runtime `department` field is informal today (Section 15).
+The canonical department authority is
+`staffordos/authority/canonical_department_architecture_v1.md`. This section is a
+fiscal-context summary that defers to that authority and does not redefine
+departments; on any difference, the Department Architecture wins. The runtime
+`department` field is informal today (Section 15).
 
 - **Executive** — Purpose: set strategy, targets, and approve gates. Owner: Ross.
   KPIs: annual/quarterly attainment, governance health. Authorities: this model;
