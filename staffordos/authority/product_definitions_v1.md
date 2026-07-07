@@ -190,8 +190,16 @@ identity, this document is authoritative; on their specific domains, they are:
 - Execution authority — `staffordos/authority/authority_registry_v1.md`
   (Checkout Authority, Packet Authority) and the governed execute action
   (`staffordos/ui/operator-frontend/app/api/operator/execute-primary-action/route.ts`).
-- Operator authority —
-  `staffordos/control_spine/contracts/ross_operator_contract_v1.json`.
+- Operator authority — the operator and agent authority role (formerly planned as
+  a `control_spine/contracts/*` layer that was never built) is satisfied by
+  existing authorities: agent governance in
+  `staffordos/agents/agent_registry_v1.json` and
+  `staffordos/spine_authority/agent_role_alias_map_v1.json`; operator action
+  authority in
+  `staffordos/governance/operator_action_authority/operator_action_authority_v1.md`;
+  and operator approval gates in `canonical_business_lifecycle_v1.md` §15,
+  `staffordos/authority/payment_lifecycle_registry_v1.md`, and
+  `staffordos/authority/authority_registry_v1.md`.
 - Routing authority —
   `staffordos/authority/output/product_routing_authority_v1.md`.
 

@@ -14,10 +14,11 @@ const SOURCES = [
   "staffordos/agents/agent_registry_v1.json",
   "staffordos/system_inventory/registry_alias_map_v1.mjs",
   "staffordos/system_inventory/registry_reality_audit_v1.mjs",
-  "staffordos/control_spine/contracts/ross_operator_contract_v1.json",
-  "staffordos/control_spine/contracts/pm_agent_contract_v1.json",
-  "staffordos/control_spine/contracts/codex_executor_contract_v1.json",
-  "staffordos/control_spine/contracts/claude_architect_contract_v1.json"
+  // The planned control_spine/contracts/* layer was never built; it was superseded
+  // by spine_authority and agent governance. Inventory the real authorities.
+  "staffordos/spine_authority/agent_role_alias_map_v1.json",
+  "staffordos/spine_authority/spine_authority_manifest_v1.json",
+  "staffordos/governance/operator_action_authority/operator_action_authority_v1.json"
 ];
 
 function resolveRepoRoot() {
