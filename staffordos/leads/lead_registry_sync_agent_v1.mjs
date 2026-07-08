@@ -1,4 +1,5 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { loadCampaignRegistry, resolveLeadCampaignId } from "./campaign_attribution_v1.mjs";
 
 const OUTREACH = "staffordos/leads/outreach_queue.json";
 const CONTACT_RESEARCH = "staffordos/leads/contact_research_queue.json";
@@ -32,11 +33,6 @@ function normalizeDomain(value = "") {
 
 function leadId(domain) {
   return `lead_${normalizeDomain(domain).replace(/[^a-z0-9]/gi, "_")}`;
-}
-
-function normalizeOptionalCampaignId(value) {
-  const normalized = String(value || "").trim();
-  return normalized || undefined;
 }
 
 function inferProductIntent(item = {}) {
@@ -204,6 +200,7 @@ const routingPolicy = readJson(ROUTING_POLICY, {
 const registry = readJson(REGISTRY, { version: "lead_registry_v1", items: [] });
 registry.version = "lead_registry_v1";
 registry.items = Array.isArray(registry.items) ? registry.items : [];
+const campaignRegistry = loadCampaignRegistry();
 
 const events = readJson(EVENTS, { version: "lead_events_v1", events: [] });
 events.version = "lead_events_v1";
@@ -253,9 +250,7 @@ for (const domain of domains) {
     lead_id: existing?.lead_id || leadId(domain),
     domain,
     source: outreachItem.source || contactItem.source || "staffordos",
-    campaign_id: normalizeOptionalCampaignId(
-      existing?.campaign_id || outreachItem.campaign_id || contactItem.campaign_id || contactItem.campaign?.campaign_id
-    ),
+    campaign_id: resolveLeadCampaignId(existing, outreachItem, contactItem, campaignRegistry),
     lead_state: stage,
     product_intent: existing?.product_intent || intent,
     product_surface: intent === "abando" ? "abando_marketing" : "staffordmedia_shopifixer",
