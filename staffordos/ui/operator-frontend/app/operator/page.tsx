@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
+import { WorkdayControlPanel } from "../../components/operator/WorkdayControlPanel";
 import { loadCommandCenterQaReport } from "../../lib/operator/loadCommandCenterQaReport";
 import { loadPreflightReport } from "../../lib/operator/loadPreflightReport";
 import { loadPrimaryActionSnapshot } from "../../lib/operator/loadPrimaryActionSnapshot";
@@ -15,6 +16,8 @@ const PATHS = {
   campaignAttributionReport: "staffordos/qa/output/campaign_attribution_report_v1.json",
   ceoTruth: "staffordos/cockpit/ceo_truth_snapshot_v1.json",
   leadRegistry: "staffordos/leads/lead_registry_v1.json",
+  operatorDaemonState: "staffordos/operator_daemon/operator_daemon_state_v1.json",
+  operatorHeartbeat: "staffordos/operator_daemon/output/operator_heartbeat_v1.json",
   operatorDashboard: "staffordos/clients/operator_dashboard_snapshot_v1.json",
 } as const;
 
@@ -97,6 +100,8 @@ export default async function OperatorPage() {
   const campaignAttributionReport = readJson<AnyRecord>(repoRoot, PATHS.campaignAttributionReport, {});
   const leadRegistry = readJson<AnyRecord>(repoRoot, PATHS.leadRegistry, {});
   const ceoTruth = readJson<AnyRecord>(repoRoot, PATHS.ceoTruth, {});
+  const operatorDaemonState = readJson<AnyRecord>(repoRoot, PATHS.operatorDaemonState, {});
+  const operatorHeartbeat = readJson<AnyRecord>(repoRoot, PATHS.operatorHeartbeat, {});
   const operatorDashboard = readJson<AnyRecord>(repoRoot, PATHS.operatorDashboard, {});
 
   const campaignRecords = asRecordList(campaignRegistry.records);
@@ -131,6 +136,12 @@ export default async function OperatorPage() {
   const revenueSummary = revenue.stafford_revenue !== undefined
     ? `Captured Stafford Revenue: ${capturedRevenue}`
     : "Not Yet Implemented";
+  const workdayStatus = text(operatorDaemonState.status, "Not Yet Implemented");
+  const workdayLoops = Number.isFinite(Number(operatorDaemonState.loops_run))
+    ? `${count(operatorDaemonState.loops_run)} loop(s)`
+    : "Not Yet Implemented";
+  const workdayHeartbeat = text(operatorHeartbeat.status, "Not Yet Implemented");
+  const workdaySafeMode = operatorHeartbeat.safe_mode === undefined ? "Not Yet Implemented" : String(Boolean(operatorHeartbeat.safe_mode));
   const activeActionTitle = text(primaryAction.action_label || primaryAction.action_type);
   const activeActionStep = text(primaryAction.next_step || primaryAction.expected_outcome);
   const activeActionWhy = text(primaryAction.why_now || primaryAction.expected_outcome);
@@ -232,6 +243,25 @@ export default async function OperatorPage() {
             ) : (
               <p className="hint">Not Yet Implemented</p>
             )}
+          </div>
+        </article>
+
+        <article className="panel operatorHomeDetails">
+          <div className="panelInner">
+            <h2 className="sectionTitle" style={{ marginTop: 0 }}>Workday control</h2>
+            <div className="operatorHomeSummaryPills">
+              <span>Status: {workdayStatus}</span>
+              <span>Loops run: {workdayLoops}</span>
+              <span>Heartbeat: {workdayHeartbeat}</span>
+              <span>Safe mode: {workdaySafeMode}</span>
+            </div>
+            <p className="subtitle" style={{ marginTop: 14 }}>
+              Start and stop the governed workday with the existing operator routes. The current daemon state is
+              surfaced from repository truth when available.
+            </p>
+            <div style={{ marginTop: 12 }}>
+              <WorkdayControlPanel />
+            </div>
           </div>
         </article>
 
