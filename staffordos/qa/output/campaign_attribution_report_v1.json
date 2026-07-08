@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.campaign_attribution_report.v1",
-  "generated_at": "2026-07-08T11:07:47.453Z",
+  "generated_at": "2026-07-08T11:53:00.616Z",
   "source_files": [
     "staffordos/leads/lead_registry_v1.json",
     "staffordos/campaigns/campaign_registry_v1.json"
@@ -63,6 +63,6 @@
     "no_lead_mutation_occurred": true,
     "attributed_plus_unattributed_equals_total": true,
     "invalid_campaign_ids_are_reported_not_corrected": true,
-    "registry_unchanged_during_report": true
+    "source_summary_campaign_ids": []
   }
 }
