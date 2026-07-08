@@ -34,6 +34,11 @@ function leadId(domain) {
   return `lead_${normalizeDomain(domain).replace(/[^a-z0-9]/gi, "_")}`;
 }
 
+function normalizeOptionalCampaignId(value) {
+  const normalized = String(value || "").trim();
+  return normalized || undefined;
+}
+
 function inferProductIntent(item = {}) {
   const haystack = [
     item.message_type,
@@ -248,6 +253,9 @@ for (const domain of domains) {
     lead_id: existing?.lead_id || leadId(domain),
     domain,
     source: outreachItem.source || contactItem.source || "staffordos",
+    campaign_id: normalizeOptionalCampaignId(
+      existing?.campaign_id || outreachItem.campaign_id || contactItem.campaign_id || contactItem.campaign?.campaign_id
+    ),
     lead_state: stage,
     product_intent: existing?.product_intent || intent,
     product_surface: intent === "abando" ? "abando_marketing" : "staffordmedia_shopifixer",

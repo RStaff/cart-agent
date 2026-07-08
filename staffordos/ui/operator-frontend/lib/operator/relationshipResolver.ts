@@ -46,6 +46,7 @@ type RelationshipObject = {
   facets: {
     lead: RelationshipFacet & {
       lead_id: string | null;
+      campaign_id: string | null;
       name: string | null;
       domain: string | null;
       email: string | null;
@@ -575,6 +576,7 @@ function collectLeadFacet(group: RelationshipGroup): RelationshipObject["facets"
   const contactEmail = firstDefined([record.contact?.email, record.email, record.send_target]);
   return {
     lead_id: firstDefined([record.lead_id, record.id]),
+    campaign_id: firstDefined([record.campaign_id]) || null,
     name: firstDefined([record.name, record.domain]),
     domain: firstDefined([record.domain]),
     email: contactEmail || null,

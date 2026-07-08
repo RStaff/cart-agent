@@ -14,6 +14,11 @@ function readJson(relativePath: string, fallback: any) {
   }
 }
 
+function normalizeOptionalCampaignId(value: any) {
+  const normalized = String(value || "").trim();
+  return normalized || null;
+}
+
 function normalizeLead(input: any) {
   const id = String(input.id || input.lead_id || input.domain || input.name || "");
   const contact = input.contact || {};
@@ -24,6 +29,7 @@ function normalizeLead(input: any) {
     id,
     name: String(input.name || input.domain || id || "unknown"),
     domain: String(input.domain || input.url || ""),
+    campaign_id: normalizeOptionalCampaignId(input.campaign_id || input.campaign?.campaign_id),
     email: contact.email || input.email || input.send_target || null,
     source: String(input.source || "unknown"),
     lifecycle_stage: String(input.lifecycle_stage || status.current_stage || input.status || "new"),
