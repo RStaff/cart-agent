@@ -22,6 +22,22 @@ type CampaignHealth = "healthy" | "warm" | "at_risk" | "dormant" | "unknown";
 
 type RawRecord = Record<string, any>;
 
+type CampaignRegistryRecord = {
+  campaign_id: string;
+  campaign_type: CampaignType;
+  status: string;
+  owner: string;
+  product: string;
+  created_at: string;
+};
+
+type CampaignRegistry = {
+  generated_at?: string;
+  source?: string;
+  version?: string;
+  records?: CampaignRegistryRecord[];
+};
+
 type RevenueTruth = {
   current_bottleneck?: string;
   next_actions?: Array<{
@@ -182,6 +198,10 @@ function normalizeCampaignId(value: string) {
   return `campaign_${normalizeKey(value)}`;
 }
 
+function isStableCampaignRegistryId(value: unknown) {
+  return typeof value === "string" && value.trim() === value && value.length > 0;
+}
+
 function toActionSummary(action: ActionCandidate | null) {
   if (!action) return null;
   return {
@@ -224,6 +244,44 @@ function resolveTruths() {
     executionTruth,
     outcomeTruth,
     merchantLifecycle,
+  };
+}
+
+function loadCampaignRegistry(repoRoot: string) {
+  const registry = readJson<CampaignRegistry>(path.join(repoRoot, "staffordos/campaigns/campaign_registry_v1.json"), {});
+  const records = Array.isArray(registry.records) ? registry.records : [];
+  const byType = new Map<CampaignType, CampaignRegistryRecord>();
+  const errors: string[] = [];
+
+  for (const record of records) {
+    if (!record || typeof record !== "object") {
+      errors.push("Invalid campaign registry record shape");
+      continue;
+    }
+    if (!VALID_CAMPAIGN_TYPES.includes(record.campaign_type)) {
+      errors.push(`Invalid campaign registry type: ${String(record.campaign_type || "")}`);
+      continue;
+    }
+    if (byType.has(record.campaign_type)) {
+      errors.push(`Duplicate campaign registry type: ${record.campaign_type}`);
+      continue;
+    }
+    if (!isStableCampaignRegistryId(record.campaign_id)) {
+      errors.push(`Invalid campaign registry id: ${String(record.campaign_id || "")}`);
+      continue;
+    }
+    if (!text(record.status) || !text(record.owner) || !text(record.product) || !text(record.created_at)) {
+      errors.push(`Incomplete campaign registry record: ${record.campaign_type}`);
+      continue;
+    }
+    byType.set(record.campaign_type, record);
+  }
+
+  return {
+    ok: errors.length === 0 && records.length > 0,
+    errors,
+    records,
+    byType,
   };
 }
 
@@ -425,6 +483,7 @@ function campaignRelationshipReasons(
 
 function buildCampaigns() {
   const truths = resolveTruths();
+  const campaignRegistry = loadCampaignRegistry(truths.repoRoot);
   const relationships = resolveRelationships();
   const actionCandidates = resolveActionCandidates();
   const decisionEngine = getDecisionEngineReport();
@@ -492,6 +551,7 @@ function buildCampaigns() {
     const campaignConflictNotes = Array.from(
       new Set(candidateRelationships.flatMap((relationship) => relationship.relationship_core.conflict_notes))
     );
+    const registryRecord = campaignRegistry.byType.get(campaignType);
 
     const campaign: Campaign = {
       campaign_id: normalizeCampaignId(campaignType),
@@ -510,6 +570,7 @@ function buildCampaigns() {
           "staffordos/ui/operator-frontend/lib/operator/relationshipResolver.ts",
           "staffordos/ui/operator-frontend/lib/operator/actionResolver.ts",
           "staffordos/ui/operator-frontend/lib/operator/decisionEngineResolver.ts",
+          ...(registryRecord ? ["staffordos/campaigns/campaign_registry_v1.json"] : []),
           "staffordos/revenue/revenue_truth_v1.json",
           "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
           "staffordos/execution/execution_log_v1.json",
