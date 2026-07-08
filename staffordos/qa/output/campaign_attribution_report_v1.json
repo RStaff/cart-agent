@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.campaign_attribution_report.v1",
-  "generated_at": "2026-07-08T10:34:37.944Z",
+  "generated_at": "2026-07-08T11:07:47.453Z",
   "source_files": [
     "staffordos/leads/lead_registry_v1.json",
     "staffordos/campaigns/campaign_registry_v1.json"

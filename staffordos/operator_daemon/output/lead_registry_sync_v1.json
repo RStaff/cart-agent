@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.lead_registry_sync.v1",
-  "generated_at": "2026-05-05T11:15:36.951Z",
+  "generated_at": "2026-07-08T10:58:47.623Z",
   "system": "shopifixer",
   "status": "synced_status_only",
   "mode": "safe_non_revenue_sync",
@@ -21,7 +21,13 @@
     {
       "path": "staffordos/outreach/leads.json",
       "type": "array",
-      "count": 1
+      "count": 1,
+      "canonical_campaign_ids": []
     }
-  ]
+  ],
+  "campaign_attribution": {
+    "registry_path": "staffordos/campaigns/campaign_registry_v1.json",
+    "registry_loaded": true,
+    "valid_campaign_id_count": 0
+  }
 }

@@ -46,3 +46,23 @@ export function resolveLeadCampaignId(existing = {}, outreachItem = {}, contactI
     registry
   );
 }
+
+export function summarizeSourceCampaignAttribution(source, registry = loadCampaignRegistry()) {
+  const records = Array.isArray(source) ? source : Array.isArray(source?.items) ? source.items : [];
+  const canonicalCampaignIds = new Set();
+  const invalidCampaignIds = new Set();
+
+  for (const record of records) {
+    const candidate = normalizeOptionalCampaignId(record?.campaign_id || record?.campaign?.campaign_id);
+    if (!candidate) continue;
+    const canonical = resolveCanonicalCampaignId(candidate, registry);
+    if (canonical) canonicalCampaignIds.add(canonical);
+    else invalidCampaignIds.add(candidate);
+  }
+
+  return {
+    record_count: records.length,
+    canonical_campaign_ids: Array.from(canonicalCampaignIds).sort(),
+    invalid_campaign_ids: Array.from(invalidCampaignIds).sort(),
+  };
+}
