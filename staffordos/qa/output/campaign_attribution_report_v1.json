@@ -1,0 +1,68 @@
+{
+  "schema": "staffordos.campaign_attribution_report.v1",
+  "generated_at": "2026-07-08T10:34:37.944Z",
+  "source_files": [
+    "staffordos/leads/lead_registry_v1.json",
+    "staffordos/campaigns/campaign_registry_v1.json"
+  ],
+  "output_path": "staffordos/qa/output/campaign_attribution_report_v1.json",
+  "totals": {
+    "leads": 13,
+    "attributed_leads": 0,
+    "unattributed_leads": 13,
+    "invalid_campaign_id_count": 0,
+    "attribution_coverage_percent": 0
+  },
+  "leads_by_campaign_id": {},
+  "invalid_campaign_ids": {},
+  "campaigns_with_zero_leads": [
+    {
+      "campaign_id": "campaign_shopifixer_outreach_001",
+      "campaign_type": "shopifixer_outreach",
+      "owner": "Marketing",
+      "status": "active",
+      "product": "ShopiFixer",
+      "lead_count": 0
+    },
+    {
+      "campaign_id": "campaign_shopifixer_close_engine_001",
+      "campaign_type": "shopifixer_close_engine",
+      "owner": "Marketing",
+      "status": "active",
+      "product": "ShopiFixer",
+      "lead_count": 0
+    },
+    {
+      "campaign_id": "campaign_fulfillment_delivery_001",
+      "campaign_type": "fulfillment_delivery",
+      "owner": "Marketing",
+      "status": "active",
+      "product": "ShopiFixer",
+      "lead_count": 0
+    },
+    {
+      "campaign_id": "campaign_referral_expansion_001",
+      "campaign_type": "referral_expansion",
+      "owner": "Marketing",
+      "status": "active",
+      "product": "ShopiFixer",
+      "lead_count": 0
+    },
+    {
+      "campaign_id": "campaign_dormant_reactivation_001",
+      "campaign_type": "dormant_reactivation",
+      "owner": "Marketing",
+      "status": "active",
+      "product": "ShopiFixer",
+      "lead_count": 0
+    }
+  ],
+  "validation": {
+    "registry_exists": true,
+    "lead_registry_exists": true,
+    "no_lead_mutation_occurred": true,
+    "attributed_plus_unattributed_equals_total": true,
+    "invalid_campaign_ids_are_reported_not_corrected": true,
+    "registry_unchanged_during_report": true
+  }
+}
