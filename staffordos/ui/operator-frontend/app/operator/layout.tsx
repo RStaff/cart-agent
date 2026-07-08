@@ -11,6 +11,11 @@ type CampaignAttributionReport = {
   attributed_leads?: number;
 };
 
+const VALIDATION_PATHS = {
+  preflight: "preflight/output/preflight_report_v1.json",
+  qa: "qa/output/command_center_primary_action_qa_v1.json",
+} as const;
+
 function resolveRepoRoot() {
   const cwd = process.cwd();
   if (fs.existsSync(path.join(cwd, "staffordos/campaigns/campaign_registry_v1.json"))) return cwd;
@@ -60,10 +65,17 @@ export default function OperatorLayout({ children }: { children: ReactNode }) {
   const campaignAttributionStatus = totalLeads > 0
     ? `Implemented · ${attributedLeads}/${totalLeads} attributed`
     : "Not Yet Implemented";
-  const validationStatus = [
-    statusValue(preflightReport?.status, ""),
-    statusValue(qaReport?.verdict, ""),
-  ].filter(Boolean).join(" / ") || "Not Yet Implemented";
+  const preflightPath = path.join(repoRoot, VALIDATION_PATHS.preflight);
+  const qaPath = path.join(repoRoot, VALIDATION_PATHS.qa);
+  const validationStatusParts = [
+    fs.existsSync(preflightPath)
+      ? `preflight: ${statusValue(preflightReport?.status, "Not Yet Implemented")}`
+      : `Missing: ${VALIDATION_PATHS.preflight}`,
+    fs.existsSync(qaPath)
+      ? `qa: ${statusValue(qaReport?.verdict, "Not Yet Implemented")}`
+      : `Missing: ${VALIDATION_PATHS.qa}`,
+  ];
+  const validationStatus = validationStatusParts.join(" / ");
   const systemHealthStatus = Array.isArray(executionLog.executionEvents) && executionLog.executionEvents.length
     ? `Live · ${executionLog.executionEvents.length} events`
     : "Not Yet Implemented";

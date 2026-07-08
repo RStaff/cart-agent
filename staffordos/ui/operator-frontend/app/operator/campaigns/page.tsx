@@ -82,6 +82,12 @@ export default function OperatorCampaignsPage() {
             <p className="subtitle" style={{ marginTop: 0 }}>
               Each campaign links the operator back to the live lead and relationship surfaces already available in StaffordOS.
             </p>
+            <div className="row" style={{ marginBottom: 12, flexWrap: "wrap" }}>
+              <span className="chip" aria-disabled="true" style={{ opacity: 0.7, cursor: "not-allowed" }}>
+                Campaign details: Planned
+              </span>
+              <span className="hint">Open campaign details is not implemented yet.</span>
+            </div>
             <div className="grid gridTwo">
               <div className="panel">
                 <div className="panelInner">

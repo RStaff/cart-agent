@@ -54,7 +54,8 @@ export function WorkdayControlPanel() {
           Start or stop the workday from StaffordOS
         </h2>
         <p className="subtitle" style={{ marginTop: 0 }}>
-          This runs the existing workday scripts through the operator UI instead of a terminal command.
+          This runs the governed StaffordOS workday loop through the operator UI instead of a terminal command.
+          Coding agents are not invoked here; they only run through governed execution routes when explicitly requested.
         </p>
         <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
           <button

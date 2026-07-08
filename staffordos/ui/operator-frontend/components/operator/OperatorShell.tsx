@@ -17,6 +17,7 @@ type NavItem = {
   label: string;
   note: string;
   planned?: boolean;
+  subtle?: boolean;
 };
 
 type OperatorShellProps = {
@@ -27,9 +28,9 @@ type OperatorShellProps = {
 const SIDEBAR_ITEMS: NavItem[] = [
   { href: "/operator", label: "Operator Home", note: "Daily operating surface" },
   { href: "/operator/command-center", label: "Executive", note: "Company command center" },
-  { href: "/operator/campaigns", label: "Marketing", note: "Campaign visibility" },
+  { href: "/operator/campaigns", label: "Marketing", note: "Campaign visibility", subtle: true },
   { href: "/operator/campaigns", label: "Campaigns", note: "Campaign registry and coverage" },
-  { href: "/operator/leads", label: "Sales", note: "Lead command center" },
+  { href: "/operator/leads", label: "Sales", note: "Lead command center", subtle: true },
   { href: "/operator/leads", label: "Leads", note: "Lead queue and readiness" },
   { label: "Relationships", note: "Planned — Coming Soon", planned: true },
   { label: "Delivery", note: "Planned — Coming Soon", planned: true },
@@ -53,8 +54,7 @@ const QUICK_ACTIONS = [
 
 function isActive(pathname: string, href?: string) {
   if (!href) return false;
-  if (href === "/operator") return pathname === "/operator";
-  return pathname === href || pathname.startsWith(`${href}/`);
+  return pathname === href;
 }
 
 function breadcrumbFromPath(pathname: string) {
@@ -116,8 +116,8 @@ export function OperatorShell({ children, status }: OperatorShellProps) {
                 <Link
                   key={item.label}
                   href={item.href}
-                  className={`operatorShellNavItem${isActive(pathname, item.href) ? " operatorShellNavItemActive" : ""}`}
-                  aria-current={isActive(pathname, item.href) ? "page" : undefined}
+                  className={`operatorShellNavItem${item.subtle ? " operatorShellNavItemMuted" : ""}${isActive(pathname, item.href) && !item.subtle ? " operatorShellNavItemActive" : ""}`}
+                  aria-current={isActive(pathname, item.href) && !item.subtle ? "page" : undefined}
                 >
                   <span className="operatorShellNavLabel">{item.label}</span>
                   <span className="operatorShellNavNote">{item.note}</span>

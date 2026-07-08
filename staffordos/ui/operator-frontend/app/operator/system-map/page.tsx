@@ -172,7 +172,8 @@ export default async function SystemMapPage() {
             <p className="eyebrow">StaffordOS System Map</p>
             <h1 className="title">True System Map</h1>
             <p className="subtitle">
-              Read-only map of current StaffordOS surfaces, business engines, agents, files, and known data flow.
+              Read-only control-plane truth for StaffordOS routes, scripts, registries, validators, agents, outputs,
+              and known missing pieces. ShopiFixer and Abando appear only where they are connected to StaffordOS.
             </p>
             <OperatorNav activeHref="/operator/system-map" />
           </div>
