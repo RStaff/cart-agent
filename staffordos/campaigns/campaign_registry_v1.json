@@ -1,0 +1,47 @@
+{
+  "generated_at": "2026-07-07T00:00:00.000Z",
+  "source": "staffordos/campaigns/campaign_registry_v1.json",
+  "version": "v1",
+  "records": [
+    {
+      "campaign_id": "campaign_shopifixer_outreach_001",
+      "campaign_type": "shopifixer_outreach",
+      "status": "active",
+      "owner": "Marketing",
+      "product": "ShopiFixer",
+      "created_at": "2026-07-07T00:00:00.000Z"
+    },
+    {
+      "campaign_id": "campaign_shopifixer_close_engine_001",
+      "campaign_type": "shopifixer_close_engine",
+      "status": "active",
+      "owner": "Marketing",
+      "product": "ShopiFixer",
+      "created_at": "2026-07-07T00:00:00.000Z"
+    },
+    {
+      "campaign_id": "campaign_fulfillment_delivery_001",
+      "campaign_type": "fulfillment_delivery",
+      "status": "active",
+      "owner": "Marketing",
+      "product": "ShopiFixer",
+      "created_at": "2026-07-07T00:00:00.000Z"
+    },
+    {
+      "campaign_id": "campaign_referral_expansion_001",
+      "campaign_type": "referral_expansion",
+      "status": "active",
+      "owner": "Marketing",
+      "product": "ShopiFixer",
+      "created_at": "2026-07-07T00:00:00.000Z"
+    },
+    {
+      "campaign_id": "campaign_dormant_reactivation_001",
+      "campaign_type": "dormant_reactivation",
+      "status": "active",
+      "owner": "Marketing",
+      "product": "ShopiFixer",
+      "created_at": "2026-07-07T00:00:00.000Z"
+    }
+  ]
+}
