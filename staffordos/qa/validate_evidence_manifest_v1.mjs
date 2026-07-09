@@ -55,8 +55,9 @@ const proofPackageBackup = backupFile(proofPackagePath, backupDir);
 const bundleDir = fs.mkdtempSync(path.join(os.tmpdir(), "staffordos-evidence-bundle-"));
 const beforeBundlePath = path.join(bundleDir, "before_writer.mjs");
 const afterBundlePath = path.join(bundleDir, "after_writer.mjs");
+const proofBundlePath = path.join(bundleDir, "proof_writer.mjs");
 const frontendCwd = path.join(repoRoot, "staffordos/ui/operator-frontend");
-const sourceArtifactDir = path.join(repoRoot, "staffordos/proof_runs/output/artifacts");
+const sourceArtifactDir = path.join(os.tmpdir(), `staffordos-evidence-artifacts-${process.pid}`);
 const tempSourceDir = fs.mkdtempSync(path.join(os.tmpdir(), "staffordos-evidence-sources-"));
 const existingScreenshot = path.join(tempSourceDir, "before.png");
 const existingAfterScreenshot = path.join(tempSourceDir, "after.png");
@@ -70,11 +71,13 @@ if (fs.existsSync(sourceArtifactDir)) {
 const failures = [];
 const originalManifestEnv = process.env.STAFFORDOS_EVIDENCE_MANIFEST_PATH;
 const originalRepoRootEnv = process.env.STAFFORDOS_REPO_ROOT;
+const originalArtifactDirEnv = process.env.STAFFORDOS_EVIDENCE_ARTIFACT_DIR;
 const originalCwd = process.cwd();
 
 try {
   process.env.STAFFORDOS_EVIDENCE_MANIFEST_PATH = manifestPath;
   process.env.STAFFORDOS_REPO_ROOT = repoRoot;
+  process.env.STAFFORDOS_EVIDENCE_ARTIFACT_DIR = sourceArtifactDir;
   process.chdir(frontendCwd);
   if (fs.existsSync(manifestPath)) {
     fs.rmSync(manifestPath, { force: true });
@@ -88,6 +91,10 @@ try {
   const afterModule = await bundleWriter(
     path.join(repoRoot, "staffordos/ui/operator-frontend/lib/operator/writeShopifixerAfterEvidence.ts"),
     afterBundlePath
+  );
+  const proofModule = await bundleWriter(
+    path.join(repoRoot, "staffordos/ui/operator-frontend/lib/operator/writeShopifixerProofPackage.ts"),
+    proofBundlePath
   );
 
   beforeModule.writeShopifixerBeforeEvidence({
@@ -109,7 +116,7 @@ try {
   assert(Array.isArray(manifest.artifacts[0].screenshot_artifacts) && manifest.artifacts[0].screenshot_artifacts.length === 1, "before screenshot artifact recorded", failures);
   assert(manifest.artifacts[0].screenshot_artifacts[0].exists === true, "before screenshot exists recorded", failures);
   assert(manifest.artifacts[0].screenshot_artifacts[0].original_reference === existingScreenshot, "before screenshot reference preserved", failures);
-  assert(fs.existsSync(path.join(repoRoot, manifest.artifacts[0].screenshot_artifacts[0].stored_path)), "before screenshot copied into artifact directory", failures);
+  assert(fs.existsSync(path.resolve(repoRoot, manifest.artifacts[0].screenshot_artifacts[0].stored_path)), "before screenshot copied into artifact directory", failures);
   assert(fs.existsSync(beforePath) && fs.readFileSync(beforePath, "utf8").trim().length > 0, "before evidence markdown still produced", failures);
 
   afterModule.writeShopifixerAfterEvidence({
@@ -130,7 +137,7 @@ try {
   assert(Array.isArray(manifest.artifacts[1].screenshot_artifacts) && manifest.artifacts[1].screenshot_artifacts.length === 1, "after screenshot artifact recorded", failures);
   assert(manifest.artifacts[1].screenshot_artifacts[0].exists === true, "after screenshot exists recorded", failures);
   assert(manifest.artifacts[1].screenshot_artifacts[0].original_reference === existingAfterScreenshot, "after screenshot reference preserved", failures);
-  assert(fs.existsSync(path.join(repoRoot, manifest.artifacts[1].screenshot_artifacts[0].stored_path)), "after screenshot copied into artifact directory", failures);
+  assert(fs.existsSync(path.resolve(repoRoot, manifest.artifacts[1].screenshot_artifacts[0].stored_path)), "after screenshot copied into artifact directory", failures);
   assert(fs.existsSync(afterPath) && fs.readFileSync(afterPath, "utf8").trim().length > 0, "after evidence markdown still produced", failures);
 
   const afterFirstSnapshot = JSON.stringify(manifest.artifacts);
@@ -168,8 +175,33 @@ try {
   assert(manifest.artifacts[2].screenshot_artifacts[0].exists === false, "missing before screenshot marked absent", failures);
   assert(manifest.artifacts[3].screenshot_artifacts[0].exists === false, "missing after screenshot marked absent", failures);
   assert(JSON.stringify(manifest.artifacts.slice(0, 3)) === JSON.stringify(readJson(manifestPath).artifacts.slice(0, 3)), "manifest content is readable after appends", failures);
-  assert((fs.existsSync(proofPackagePath) ? fs.readFileSync(proofPackagePath, "utf8") : "") === proofPackageBefore, "proof package remained unchanged", failures);
   const appendOnlyBehavior = JSON.stringify(manifest.artifacts.slice(0, 2)) === afterFirstSnapshot;
+
+  const manifestBeforePackage = fs.readFileSync(manifestPath, "utf8");
+  proofModule.writeShopifixerProofPackage();
+  const proofPackageAfter = fs.readFileSync(proofPackagePath, "utf8");
+  const manifestAfterPackage = fs.readFileSync(manifestPath, "utf8");
+
+  assert(proofPackageAfter.includes("Proof Package Version:"), "proof package includes version section", failures);
+  assert(proofPackageAfter.includes("Manifest Path:"), "proof package includes manifest path", failures);
+  assert(proofPackageAfter.includes("Proof Run ID:"), "proof package includes proof run id", failures);
+  assert(proofPackageAfter.includes("Manifest Generated At:"), "proof package includes manifest generated at", failures);
+  assert(proofPackageAfter.includes("Before Evidence Artifact IDs:"), "proof package includes before artifact IDs", failures);
+  assert(proofPackageAfter.includes("After Evidence Artifact IDs:"), "proof package includes after artifact IDs", failures);
+  assert(proofPackageAfter.includes("Screenshot Artifact References:"), "proof package includes screenshot artifact references", failures);
+  assert(proofPackageAfter.includes("Evidence Source Paths:"), "proof package includes evidence source paths", failures);
+  assert(proofPackageAfter.includes("referenced_missing"), "proof package includes missing screenshot note", failures);
+  assert(proofPackageAfter.includes(manifest.artifacts[0].screenshot_artifacts[0].stored_path), "proof package includes stored screenshot path", failures);
+  assert(manifestBeforePackage === manifestAfterPackage, "proof package generation does not mutate manifest", failures);
+  const normalizedProofPackage = (text) =>
+    text
+      .replace(/^Generated At:\s*.*$/m, "Generated At: <normalized>")
+      .replace(/^Manifest Generated At:\s*.*$/m, "Manifest Generated At: <normalized>")
+      .trim();
+  const proofPackageDeterministicCheck = normalizedProofPackage(proofPackageAfter);
+  proofModule.writeShopifixerProofPackage();
+  const proofPackageSecond = fs.readFileSync(proofPackagePath, "utf8");
+  assert(normalizedProofPackage(proofPackageSecond) === proofPackageDeterministicCheck, "proof package is deterministic except generated_at", failures);
 
   const result = {
     schema: "staffordos.evidence_manifest_validation.v1",
@@ -182,7 +214,8 @@ try {
       before_evidence_appends: true,
       after_evidence_appends: true,
       markdown_still_produced: fs.existsSync(beforePath) && fs.existsSync(afterPath),
-      no_proof_package_regression: (fs.existsSync(proofPackagePath) ? fs.readFileSync(proofPackagePath, "utf8") : "") === proofPackageBefore
+      proof_package_updated: proofPackageAfter.includes("Manifest Path:"),
+      no_proof_package_regression: manifestBeforePackage === manifestAfterPackage
     },
     failures
   };
@@ -216,8 +249,10 @@ try {
 } finally {
   process.env.STAFFORDOS_EVIDENCE_MANIFEST_PATH = originalManifestEnv;
   process.env.STAFFORDOS_REPO_ROOT = originalRepoRootEnv;
+  process.env.STAFFORDOS_EVIDENCE_ARTIFACT_DIR = originalArtifactDirEnv;
   process.chdir(originalCwd);
   restoreFile(beforePath, beforeBackup);
   restoreFile(afterPath, afterBackup);
   restoreFile(proofPackagePath, proofPackageBackup);
+  fs.rmSync(sourceArtifactDir, { recursive: true, force: true });
 }
