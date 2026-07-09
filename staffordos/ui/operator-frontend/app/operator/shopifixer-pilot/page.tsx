@@ -49,6 +49,38 @@ function text(value: unknown, fallback = "Not Yet Implemented") {
   return normalized || fallback;
 }
 
+function money(value: unknown, fallback = "Not Yet Available") {
+  const numberValue = Number(value);
+  if (!Number.isFinite(numberValue)) return fallback;
+  return `$${Math.round(numberValue).toLocaleString()}`;
+}
+
+function normalizeKey(value: unknown) {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .split("/")[0]
+    .split("?")[0]
+    .split("#")[0];
+}
+
+function findMatchingRecord<T extends Record<string, any>>(records: T[], merchantKey: string) {
+  const normalizedMerchant = normalizeKey(merchantKey);
+  return (
+    records.find((record) =>
+      [record.client_id, record.merchant_shop, record.store_domain, record.domain, record.id, record.lead_id]
+        .map(normalizeKey)
+        .includes(normalizedMerchant)
+    ) || null
+  );
+}
+
+function merchantContextFallback(value: unknown) {
+  return text(value, "Not Yet Available");
+}
+
 function phaseStatus(index: number, currentIndex: number): "ready" | "in_progress" | "blocked" | "complete" {
   if (index < currentIndex) return "complete";
   if (index === currentIndex) return "in_progress";
@@ -64,10 +96,60 @@ export default async function ShopifixerPilotPage() {
   const campaignReport = getCampaignResolverReport();
   const preflight = loadPreflightReport();
   const qa = loadCommandCenterQaReport();
+  const campaignAttributionReport = readJson<Record<string, any>>(
+    path.join(repoRoot, "staffordos/qa/output/campaign_attribution_report_v1.json"),
+    {}
+  );
+  const clientRegistry = readJson<{ clients?: Array<Record<string, any>> }>(
+    path.join(repoRoot, "staffordos/clients/client_registry_v1.json"),
+    {}
+  );
+  const leadRegistry = readJson<{ items?: Array<Record<string, any>> }>(
+    path.join(repoRoot, "staffordos/leads/lead_registry_v1.json"),
+    {}
+  );
+  const offerLatest = readJson<Record<string, any>>(
+    path.join(repoRoot, "staffordos/clients/shopifixer_offer_latest.json"),
+    {}
+  );
+  const operatorDashboard = readJson<Record<string, any>>(
+    path.join(repoRoot, "staffordos/clients/operator_dashboard_snapshot_v1.json"),
+    {}
+  );
+  const evidenceManifest = readJson<Record<string, any>>(
+    path.join(repoRoot, "staffordos/proof_runs/output/evidence_manifest_v1.json"),
+    {}
+  );
+  const proofSeal = readJson<Record<string, any>>(
+    path.join(repoRoot, "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.seal.json"),
+    {}
+  );
 
   const commandCenterMerchant = shopifixerRecord.merchant || {};
   const packet = shopifixerRecord.checkout_linkage || {};
   const customerOutcome = Array.isArray(shopifixerRecord.customer_outcomes) ? shopifixerRecord.customer_outcomes[0] : null;
+  const merchantKey = text(commandCenterMerchant.store || commandCenterMerchant.client_id);
+  const clientRecords = Array.isArray(clientRegistry.clients) ? clientRegistry.clients : [];
+  const leadRecords = Array.isArray(leadRegistry.items) ? leadRegistry.items : [];
+  const merchantClient = findMatchingRecord(clientRecords, merchantKey);
+  const merchantLead = findMatchingRecord(leadRecords, merchantKey);
+  const currentOffer = offerLatest && normalizeKey(offerLatest.merchant_shop || offerLatest.client_id) === normalizeKey(merchantKey)
+    ? offerLatest.offer || null
+    : null;
+  const attributionTotals = campaignAttributionReport.totals || {};
+  const currentRevenueGap = Array.isArray(operatorDashboard.revenue_gaps) ? operatorDashboard.revenue_gaps[0] : null;
+  const latestProofRun =
+    text(proofSeal.proof_run_id, "") && text(proofSeal.proof_run_id, "") !== "Not Yet Implemented"
+      ? `${text(proofSeal.proof_run_id)} · ${text(proofSeal.generated_at)}`
+      : "Not Yet Available";
+  const latestValidationStatus = [
+    text(preflight.status, "Not Yet Available"),
+    text(qa.verdict, "Not Yet Available"),
+    fs.existsSync(path.join(repoRoot, "staffordos/proof_runs/output/evidence_manifest_v1.json")) ? "manifest present" : "manifest missing",
+    fs.existsSync(path.join(repoRoot, "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.seal.json"))
+      ? "seal present"
+      : "seal missing"
+  ].join(" · ");
   const currentPhase = "merchant_context";
   const phases = [
     { key: "merchant_context", label: "Merchant Context" },
@@ -132,6 +214,84 @@ export default async function ShopifixerPilotPage() {
         completed: phases.filter((phase) => phase.status === "complete").length,
         total: phases.length
       }}
+      merchantContext={[
+        {
+          label: "Merchant",
+          value: merchantContextFallback(commandCenterMerchant.store),
+          note: merchantContextFallback(commandCenterMerchant.client_id),
+          href: "/operator/command-center"
+        },
+        {
+          label: "Store",
+          value: merchantContextFallback(commandCenterMerchant.store),
+          note: "Loaded from the ShopiFixer command center truth.",
+          href: "/operator/system-map"
+        },
+        {
+          label: "Lead Status",
+          value: merchantLead?.lifecycle_stage || merchantLead?.status?.current_stage || "Not Yet Available",
+          note: merchantLead?.status?.next_action || "No lead next action available.",
+          href: "/operator/leads"
+        },
+        {
+          label: "Client Status",
+          value: merchantClient?.lifecycle?.stage || merchantClient?.status?.current_stage || merchantClient?.status || "Not Yet Available",
+          note: merchantClient?.next_action?.instructions || "Loaded from client registry truth.",
+          href: "/operator/command-center"
+        },
+        {
+          label: "Campaign",
+          value: "Not Yet Available",
+          note: `${text(campaignReport.total_campaigns, "0")} campaign records are resolved, but this merchant has no attached campaign_id yet.`,
+          href: "/operator/campaigns"
+        },
+        {
+          label: "Campaign Attribution",
+          value: `${text(attributionTotals.attributed_leads, "0")}/${text(attributionTotals.leads, "0")} attributed`,
+          note: `Coverage ${text(attributionTotals.attribution_coverage_percent, "0")}% from the canonical attribution report.`,
+          href: "/operator/campaigns"
+        },
+        {
+          label: "Packet ID",
+          value: merchantContextFallback(packet.packet_id),
+          note: packet.status || "Packet state not available.",
+          href: "/operator/revenue-command"
+        },
+        {
+          label: "Current Offer",
+          value: currentOffer?.subject || "Not Yet Available",
+          note: currentOffer?.sections?.call_to_action ? `${money(currentOffer.sections.sprint_price)} · ${currentOffer.sections.call_to_action}` : "No current offer found in repository truth.",
+          href: "/operator/revenue-command"
+        },
+        {
+          label: "Current Next Action",
+          value: merchantClient?.next_action?.instructions || operatorDashboard?.primary_focus?.next_action?.instructions || merchantLead?.status?.next_action || "Not Yet Available",
+          note: operatorDashboard?.primary_focus?.action || "Current next action from dashboard truth.",
+          href: "/operator/command-center"
+        },
+        {
+          label: "Current Revenue Opportunity",
+          value: currentRevenueGap?.gap !== undefined ? money(currentRevenueGap.gap) : "Not Yet Available",
+          note: currentRevenueGap?.action || "No revenue gap recorded.",
+          href: "/operator/revenue-command"
+        },
+        {
+          label: "Latest Proof Run",
+          value: latestProofRun,
+          note: fs.existsSync(path.join(repoRoot, "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md"))
+            ? "Proof package present in the dry-run proof folder."
+            : "Not Yet Available",
+          href: "/operator/system-map"
+        },
+        {
+          label: "Latest Validation Status",
+          value: latestValidationStatus,
+          note: fs.existsSync(path.join(repoRoot, "staffordos/proof_runs/output/evidence_manifest_v1.json"))
+            ? `Manifest artifacts: ${Array.isArray(evidenceManifest.artifacts) ? evidenceManifest.artifacts.length : 0}`
+            : "Not Yet Available",
+          href: "/operator/system-map"
+        }
+      ]}
       evidenceStatus={[
         { label: "Before evidence", value: fs.existsSync(beforeEvidencePath) ? "Present" : "Missing" },
         { label: "After evidence", value: fs.existsSync(afterEvidencePath) ? "Present" : "Missing" },

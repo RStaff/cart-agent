@@ -14,6 +14,13 @@ type StatusLine = {
   value: string;
 };
 
+type ContextCard = {
+  label: string;
+  value: string;
+  note: string;
+  href?: string | null;
+};
+
 type ShopifixerPilotWorkspaceProps = {
   merchant: {
     store: string;
@@ -47,6 +54,7 @@ type ShopifixerPilotWorkspaceProps = {
     completed: number;
     total: number;
   };
+  merchantContext: ContextCard[];
   evidenceStatus: StatusLine[];
   validationStatus: StatusLine[];
   previousWork: string;
@@ -69,6 +77,7 @@ export function ShopifixerPilotWorkspace({
   currentPhase,
   phases,
   progress,
+  merchantContext,
   evidenceStatus,
   validationStatus,
   previousWork
@@ -142,13 +151,29 @@ export function ShopifixerPilotWorkspace({
         <article className="panel">
           <div className="panelInner">
             <p className="eyebrow">Center</p>
-            <h2 className="sectionTitle">Phase content placeholder</h2>
+            <h2 className="sectionTitle">Merchant context</h2>
             <div className="shopifixerPilotPlaceholder">
               <p className="subtitle" style={{ marginTop: 0 }}>
-                {activePhase.label} is the only active phase in this shell. The full P8 implementation will swap this
-                placeholder for the governed workflow card stack while keeping the same phase structure.
+                {activePhase.label} is the only active phase in this shell. The panel below uses repository truth only and
+                leaves the remaining phases as disabled placeholders.
               </p>
-              <div className="kv">
+              <div className="grid gridTwo">
+                {merchantContext.map((card) => (
+                  <article key={card.label} className="boardCard">
+                    <p className="boardCardTitle">{card.label}</p>
+                    <p className="boardCardMeta">{card.value}</p>
+                    <p className="boardCardNote">{card.note}</p>
+                    {card.href ? (
+                      <div style={{ marginTop: 10 }}>
+                        <Link href={card.href} className="inlineLink">
+                          Open related surface
+                        </Link>
+                      </div>
+                    ) : null}
+                  </article>
+                ))}
+              </div>
+              <div className="kv" style={{ marginTop: 16 }}>
                 <div><strong>Current phase:</strong> {activePhase.label}</div>
                 <div><strong>Status:</strong> {activePhase.status.replace("_", " ")}</div>
                 <div><strong>Merchant:</strong> {merchant.store}</div>
@@ -156,10 +181,6 @@ export function ShopifixerPilotWorkspace({
               </div>
 
               <div className="shopifixerPilotPhaseNotes">
-                <div className="boardCard">
-                  <p className="boardCardTitle">Merchant Context</p>
-                  <p className="boardCardNote">Identity, packet, payment, campaign, lead, and prior work live here.</p>
-                </div>
                 <div className="boardCard">
                   <p className="boardCardTitle">Scope</p>
                   <p className="boardCardNote">Issue, proposed fix, estimated impact, and approval live here.</p>
