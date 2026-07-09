@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import crypto from "node:crypto";
 import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -27,6 +28,11 @@ function assert(condition, message, failures) {
   if (!condition) failures.push(message);
 }
 
+function clean(value, fallback = "") {
+  const text = String(value ?? fallback).trim();
+  return text.length ? text : fallback;
+}
+
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
 }
@@ -49,6 +55,7 @@ const backupDir = fs.mkdtempSync(path.join(os.tmpdir(), "staffordos-evidence-bac
 const beforePath = path.join(repoRoot, "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md");
 const afterPath = path.join(repoRoot, "staffordos/proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md");
 const proofPackagePath = path.join(repoRoot, "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md");
+const sealPath = path.join(repoRoot, "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.seal.json");
 const beforeBackup = backupFile(beforePath, backupDir);
 const afterBackup = backupFile(afterPath, backupDir);
 const proofPackageBackup = backupFile(proofPackagePath, backupDir);
@@ -180,7 +187,11 @@ try {
   const manifestBeforePackage = fs.readFileSync(manifestPath, "utf8");
   proofModule.writeShopifixerProofPackage();
   const proofPackageAfter = fs.readFileSync(proofPackagePath, "utf8");
+  const seal = readJson(sealPath);
   const manifestAfterPackage = fs.readFileSync(manifestPath, "utf8");
+  const proofPackageSha256 = crypto.createHash("sha256").update(proofPackageAfter, "utf8").digest("hex");
+  const expectedManifestPath = path.relative(repoRoot, manifestPath).split(path.sep).join("/");
+  const expectedProofPackagePath = path.relative(repoRoot, proofPackagePath).split(path.sep).join("/");
 
   assert(proofPackageAfter.includes("Proof Package Version:"), "proof package includes version section", failures);
   assert(proofPackageAfter.includes("Manifest Path:"), "proof package includes manifest path", failures);
@@ -192,6 +203,11 @@ try {
   assert(proofPackageAfter.includes("Evidence Source Paths:"), "proof package includes evidence source paths", failures);
   assert(proofPackageAfter.includes("referenced_missing"), "proof package includes missing screenshot note", failures);
   assert(proofPackageAfter.includes(manifest.artifacts[0].screenshot_artifacts[0].stored_path), "proof package includes stored screenshot path", failures);
+  assert(fs.existsSync(sealPath), "seal exists after proof package write", failures);
+  assert(clean(seal.manifest_path) === expectedManifestPath, "seal manifest path present", failures);
+  assert(Number.isFinite(Number(seal.manifest_artifact_count)), "seal artifact count present", failures);
+  assert(clean(seal.proof_package_path) === expectedProofPackagePath, "seal proof package path present", failures);
+  assert(clean(seal.sha256) === proofPackageSha256, "seal sha256 matches proof package", failures);
   assert(manifestBeforePackage === manifestAfterPackage, "proof package generation does not mutate manifest", failures);
   const normalizedProofPackage = (text) =>
     text
@@ -214,6 +230,11 @@ try {
       before_evidence_appends: true,
       after_evidence_appends: true,
       markdown_still_produced: fs.existsSync(beforePath) && fs.existsSync(afterPath),
+      proof_package_exists: fs.existsSync(proofPackagePath),
+      seal_exists: fs.existsSync(sealPath),
+      sha256_matches: clean(seal.sha256) === proofPackageSha256,
+      manifest_path_present: clean(seal.manifest_path).length > 0,
+      artifact_count_present: Number.isFinite(Number(seal.manifest_artifact_count)),
       proof_package_updated: proofPackageAfter.includes("Manifest Path:"),
       no_proof_package_regression: manifestBeforePackage === manifestAfterPackage
     },

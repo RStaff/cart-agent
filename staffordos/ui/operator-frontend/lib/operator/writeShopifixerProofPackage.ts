@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import crypto from "node:crypto";
 import path from "node:path";
 import { getEvidenceManifestPath, readEvidenceManifest } from "../../../../proof_runs/evidence_manifest_v1.mjs";
 
@@ -74,12 +75,17 @@ function formatArtifactSummary(artifact: ManifestArtifact) {
   return lines;
 }
 
+function sha256(content: string) {
+  return crypto.createHash("sha256").update(content, "utf8").digest("hex");
+}
+
 export function writeShopifixerProofPackage() {
   const baseDir = path.resolve(process.cwd(), "../../proof_runs/internal_shopifixer_dry_run_v1");
   const beforePath = path.join(baseDir, "before_evidence.md");
   const fixScopePath = path.join(baseDir, "fix_scope.md");
   const afterPath = path.join(baseDir, "after_evidence.md");
   const outputPath = path.join(baseDir, "merchant_proof_package.md");
+  const sealPath = path.join(baseDir, "merchant_proof_package.seal.json");
   const manifestPath = getEvidenceManifestPath();
   const manifest = readEvidenceManifest(manifestPath);
   const manifestPathDisplay = toRepoRelative(manifestPath);
@@ -211,6 +217,19 @@ export function writeShopifixerProofPackage() {
   ].join("\n");
 
   fs.writeFileSync(outputPath, content, "utf8");
+  const proofPackageSha256 = sha256(fs.readFileSync(outputPath, "utf8"));
+  const seal = {
+    schema: "staffordos.merchant_proof_package_seal.v1",
+    generated_at: generatedAt,
+    proof_run_id: proofRunId,
+    proof_package_path: toRepoRelative(outputPath),
+    sha256: proofPackageSha256,
+    manifest_path: manifestPathDisplay,
+    manifest_artifact_count: manifestArtifacts.length,
+    evidence_source_paths: Array.from(new Set(evidenceSourcePaths)),
+    status: "sealed"
+  };
+  fs.writeFileSync(sealPath, `${JSON.stringify(seal, null, 2)}\n`, "utf8");
 
   return {
     outputPath,
