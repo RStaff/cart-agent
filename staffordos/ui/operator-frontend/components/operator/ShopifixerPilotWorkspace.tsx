@@ -34,6 +34,17 @@ type ScopeSummary = {
   sourceState: string;
 };
 
+type EvidenceArtifactSummary = {
+  artifactId: string;
+  createdAt: string;
+  outputPath: string;
+  sourceWriter: string;
+  screenshotStatus: string;
+  screenshotReference: string;
+  screenshotStoredPath: string;
+  screenshotArtifactId: string;
+};
+
 type ShopifixerPilotWorkspaceProps = {
   merchant: {
     store: string;
@@ -69,6 +80,15 @@ type ShopifixerPilotWorkspaceProps = {
   };
   merchantContext: ContextCard[];
   scopeSummary: ScopeSummary;
+  beforeEvidenceSummary: {
+    status: string;
+    path: string;
+    issue: string;
+    whyItMatters: string;
+    artifactIds: string[];
+    artifacts: EvidenceArtifactSummary[];
+    lastCapturedAt: string;
+  };
   evidenceStatus: StatusLine[];
   validationStatus: StatusLine[];
   previousWork: string;
@@ -93,6 +113,7 @@ export function ShopifixerPilotWorkspace({
   progress,
   merchantContext,
   scopeSummary,
+  beforeEvidenceSummary,
   evidenceStatus,
   validationStatus,
   previousWork
@@ -230,6 +251,54 @@ export function ShopifixerPilotWorkspace({
                 <div className="kv" style={{ marginTop: 12 }}>
                   <div><strong>Success criteria:</strong> {scopeSummary.successCriteria}</div>
                   <div><strong>Source state:</strong> {scopeSummary.sourceState}</div>
+                </div>
+              </div>
+
+              <div className="boardCard" style={{ marginTop: 16 }}>
+                <p className="boardCardTitle">Before Evidence</p>
+                <p className="boardCardMeta">{beforeEvidenceSummary.status}</p>
+                <div className="kv">
+                  <div><strong>Before evidence path:</strong> {beforeEvidenceSummary.path}</div>
+                  <div><strong>Issue:</strong> {beforeEvidenceSummary.issue}</div>
+                  <div><strong>Why it matters:</strong> {beforeEvidenceSummary.whyItMatters}</div>
+                  <div><strong>Last captured:</strong> {beforeEvidenceSummary.lastCapturedAt}</div>
+                </div>
+                <div className="grid gridTwo" style={{ marginTop: 12 }}>
+                  <div>
+                    <p className="eyebrow">Artifact IDs</p>
+                    <div className="kv">
+                      {beforeEvidenceSummary.artifactIds.length ? (
+                        beforeEvidenceSummary.artifactIds.map((item) => <div key={item}>{item}</div>)
+                      ) : (
+                        <div>Not Yet Available</div>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="eyebrow">Screenshot status</p>
+                    <div className="kv">
+                      {beforeEvidenceSummary.artifacts.length ? (
+                        beforeEvidenceSummary.artifacts.map((item) => (
+                          <div key={item.artifactId}>
+                            <strong>{item.screenshotStatus}:</strong> {item.screenshotReference}
+                          </div>
+                        ))
+                      ) : (
+                        <div>Not Yet Available</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div style={{ marginTop: 12 }} className="kv">
+                  {beforeEvidenceSummary.artifacts.length ? (
+                    beforeEvidenceSummary.artifacts.map((item) => (
+                      <div key={item.artifactId}>
+                        <strong>{item.artifactId}</strong> · {item.createdAt} · {item.sourceWriter} · {item.screenshotStoredPath}
+                      </div>
+                    ))
+                  ) : (
+                    <div>Not Yet Available</div>
+                  )}
                 </div>
               </div>
 

@@ -129,6 +129,29 @@ function parseScopeSummary(content: string) {
   };
 }
 
+function parseEvidenceFields(content: string) {
+  const lines = String(content || "").split(/\r?\n/);
+
+  function valueAfter(label: string) {
+    const index = lines.findIndex((line) => line.trim() === label);
+    if (index < 0) return "";
+    for (let i = index + 1; i < lines.length; i += 1) {
+      const candidate = lines[i].trim();
+      if (!candidate) continue;
+      if (/^[A-Za-z][A-Za-z /&-]+:$/.test(candidate)) break;
+      return candidate.replace(/^-+\s*/, "");
+    }
+    return "";
+  }
+
+  return {
+    issue: valueAfter("Issue:") || "Not Yet Available",
+    whyItMatters: valueAfter("Why It Matters:") || "Not Yet Available",
+    screenshot: valueAfter("Screenshot:") || "Not Yet Available",
+    notes: valueAfter("Notes:") || "Not Yet Available"
+  };
+}
+
 function phaseStatus(index: number, currentIndex: number): "ready" | "in_progress" | "blocked" | "complete" {
   if (index < currentIndex) return "complete";
   if (index === currentIndex) return "in_progress";
@@ -167,6 +190,9 @@ export default async function ShopifixerPilotPage() {
   const scopeFilePath = path.join(repoRoot, "staffordos/proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md");
   const scopeFileContent = readText(scopeFilePath);
   const scopeSummary = parseScopeSummary(scopeFileContent);
+  const beforeEvidencePath = path.join(repoRoot, `${PROOF_RUN_ROOT}/before_evidence.md`);
+  const beforeEvidenceContent = readText(beforeEvidencePath);
+  const beforeEvidenceFields = parseEvidenceFields(beforeEvidenceContent);
   const evidenceManifest = readJson<Record<string, any>>(
     path.join(repoRoot, "staffordos/proof_runs/output/evidence_manifest_v1.json"),
     {}
@@ -194,6 +220,24 @@ export default async function ShopifixerPilotPage() {
     : scopeSummary.inScope.length || scopeSummary.outOfScope.length || scopeSummary.successCriteria !== "Not Yet Available"
       ? (String(scopeSummary.merchantApprovalNeeded).trim().toLowerCase() === "yes" ? "Scope Ready for Approval" : "Scope Drafted")
       : "Scope Drafted";
+  const beforeEvidenceArtifacts = Array.isArray(evidenceManifest.artifacts)
+    ? evidenceManifest.artifacts.filter(
+        (artifact: any) =>
+          String(artifact?.stage || "").trim() === "before_evidence" &&
+          String(artifact?.source_writer || "").trim() === "writeShopifixerBeforeEvidence"
+      )
+    : [];
+  const beforeEvidenceLatest = beforeEvidenceArtifacts[beforeEvidenceArtifacts.length - 1] || null;
+  const beforeEvidenceArtifactIds = beforeEvidenceArtifacts.map((artifact: any) => String(artifact?.artifact_id || "").trim()).filter(Boolean);
+  const beforeEvidenceScreenshotArtifacts = Array.isArray(beforeEvidenceLatest?.screenshot_artifacts)
+    ? beforeEvidenceLatest.screenshot_artifacts
+    : [];
+  const beforeEvidenceStatus = !beforeEvidenceContent.trim()
+    ? "Before Evidence Missing"
+    : beforeEvidenceArtifacts.length
+      ? "Before Evidence Captured"
+      : "Before Evidence Drafted";
+  const beforeEvidenceLastCapturedAt = beforeEvidenceLatest?.created_at || "Not Yet Available";
   const latestProofRun =
     text(proofSeal.proof_run_id, "") && text(proofSeal.proof_run_id, "") !== "Not Yet Implemented"
       ? `${text(proofSeal.proof_run_id)} · ${text(proofSeal.generated_at)}`
@@ -227,7 +271,6 @@ export default async function ShopifixerPilotPage() {
   }));
 
   const evidenceManifestPath = path.join(repoRoot, "staffordos/proof_runs/output/evidence_manifest_v1.json");
-  const beforeEvidencePath = path.join(repoRoot, `${PROOF_RUN_ROOT}/before_evidence.md`);
   const afterEvidencePath = path.join(repoRoot, `${PROOF_RUN_ROOT}/after_evidence.md`);
   const proofPackagePath = path.join(repoRoot, `${PROOF_RUN_ROOT}/merchant_proof_package.md`);
   const sealPath = path.join(repoRoot, `${PROOF_RUN_ROOT}/merchant_proof_package.seal.json`);
@@ -363,6 +406,24 @@ export default async function ShopifixerPilotPage() {
             : "Not Yet Available",
         successCriteria: scopeSummary.successCriteria,
         sourceState: scopeSummary.sourceState
+      }}
+      beforeEvidenceSummary={{
+        status: beforeEvidenceStatus,
+        path: beforeEvidencePath.replace(repoRoot.endsWith("/") ? repoRoot : `${repoRoot}/`, ""),
+        issue: beforeEvidenceFields.issue,
+        whyItMatters: beforeEvidenceFields.whyItMatters,
+        artifactIds: beforeEvidenceArtifactIds,
+        artifacts: beforeEvidenceScreenshotArtifacts.map((artifact: any) => ({
+          artifactId: String(artifact?.artifact_id || "").trim() || "Not Yet Available",
+          createdAt: String(artifact?.created_at || "").trim() || "Not Yet Available",
+          outputPath: String(artifact?.output_path || "").trim() || "Not Yet Available",
+          sourceWriter: String(artifact?.source_writer || "").trim() || "Not Yet Available",
+          screenshotStatus: String(artifact?.screenshot_artifacts?.[0]?.status || "Not Yet Available").trim() || "Not Yet Available",
+          screenshotReference: String(artifact?.screenshot_artifacts?.[0]?.original_reference || "Not Yet Available").trim() || "Not Yet Available",
+          screenshotStoredPath: String(artifact?.screenshot_artifacts?.[0]?.stored_path || "Not Yet Available").trim() || "Not Yet Available",
+          screenshotArtifactId: String(artifact?.screenshot_artifacts?.[0]?.artifact_id || "Not Yet Available").trim() || "Not Yet Available"
+        })),
+        lastCapturedAt: beforeEvidenceLastCapturedAt || "Not Yet Available"
       }}
       evidenceStatus={[
         { label: "Before evidence", value: fs.existsSync(beforeEvidencePath) ? "Present" : "Missing" },
