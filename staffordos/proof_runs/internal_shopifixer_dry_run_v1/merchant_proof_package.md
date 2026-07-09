@@ -181,4 +181,3 @@ Manifest Artifact Details:
       stored_path: ../../../../var/folders/2_/z7ybpx8x5097zxjpfxstdrtm0000gn/T/staffordos-evidence-artifacts-14476/39814db2b6d7678f.png
       exists: false
       status: referenced_missing
-
