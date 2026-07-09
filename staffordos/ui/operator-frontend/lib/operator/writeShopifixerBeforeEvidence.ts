@@ -1,5 +1,17 @@
 import fs from "node:fs";
 import path from "node:path";
+import { appendEvidenceArtifact } from "../../../../proof_runs/evidence_manifest_v1.mjs";
+
+type EvidenceManifestAppend = (input: {
+  stage: string;
+  output_path: string;
+  source_writer: string;
+  merchant?: Record<string, unknown>;
+  references?: string[];
+  status?: string;
+}) => unknown;
+
+const appendEvidenceArtifactTyped = appendEvidenceArtifact as unknown as EvidenceManifestAppend;
 
 export type ShopifixerBeforeEvidenceInput = {
   store: string;
@@ -44,6 +56,16 @@ export function writeShopifixerBeforeEvidence(input: ShopifixerBeforeEvidenceInp
   ].join("\n");
 
   fs.writeFileSync(outputPath, content, "utf8");
+  appendEvidenceArtifactTyped({
+    stage: "before_evidence",
+    output_path: outputPath,
+    source_writer: "writeShopifixerBeforeEvidence",
+    merchant: {
+      store: input.store
+    },
+    references: [input.affected_page_or_artifact, input.screenshot, input.notes],
+    status: "written"
+  });
 
   return {
     outputPath,

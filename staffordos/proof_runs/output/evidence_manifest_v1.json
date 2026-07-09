@@ -1,0 +1,10 @@
+{
+  "schema": "staffordos.evidence_manifest.v1",
+  "generated_at": "",
+  "manifest_version": 1,
+  "proof_run_id": "internal_shopifixer_dry_run_v1",
+  "merchant": {
+    "store": "unavailable"
+  },
+  "artifacts": []
+}
