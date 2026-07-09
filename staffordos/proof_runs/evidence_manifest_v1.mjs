@@ -4,8 +4,11 @@ import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.resolve(MODULE_DIR, "..", "..");
+const REPO_ROOT = path.resolve(
+  clean(process.env.STAFFORDOS_REPO_ROOT, path.resolve(MODULE_DIR, "..", ".."))
+);
 const DEFAULT_MANIFEST_PATH = path.join(MODULE_DIR, "output", "evidence_manifest_v1.json");
+const DEFAULT_ARTIFACT_DIR = path.join(MODULE_DIR, "output", "artifacts");
 const DEFAULT_PROOF_RUN_ID = "internal_shopifixer_dry_run_v1";
 
 function clean(value, fallback = "") {
@@ -34,6 +37,12 @@ function normalizeReferences(references) {
   );
 }
 
+function resolveArtifactDir(artifactDir) {
+  const envPath = clean(process.env.STAFFORDOS_EVIDENCE_ARTIFACT_DIR);
+  const candidate = clean(artifactDir, envPath || DEFAULT_ARTIFACT_DIR);
+  return path.isAbsolute(candidate) ? candidate : path.resolve(REPO_ROOT, candidate);
+}
+
 function resolveManifestPath(manifestPath) {
   const envPath = clean(process.env.STAFFORDOS_EVIDENCE_MANIFEST_PATH);
   const candidate = clean(manifestPath, envPath || DEFAULT_MANIFEST_PATH);
@@ -42,6 +51,10 @@ function resolveManifestPath(manifestPath) {
 
 function ensureDirectory(filePath) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
+}
+
+function ensureArtifactDirectory(artifactDir) {
+  fs.mkdirSync(artifactDir, { recursive: true });
 }
 
 function readManifest(manifestPath) {
@@ -104,6 +117,66 @@ function createArtifactId({ proofRunId, stage, outputPath, sourceWriter, ordinal
   return `ev_${hash}`;
 }
 
+function isUrlReference(reference) {
+  return /^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(reference);
+}
+
+function resolveSourcePath(reference) {
+  if (!reference || isUrlReference(reference)) return null;
+  return path.isAbsolute(reference) ? reference : path.resolve(REPO_ROOT, reference);
+}
+
+function sanitizeArtifactName(reference) {
+  const base = path.basename(reference || "screenshot");
+  const cleaned = base.replace(/[^a-zA-Z0-9._-]+/g, "_");
+  return cleaned.length ? cleaned : "screenshot";
+}
+
+function inferExtension(reference) {
+  const base = sanitizeArtifactName(reference);
+  const ext = path.extname(base);
+  return ext || ".png";
+}
+
+function createScreenshotArtifact({
+  proofRunId,
+  stage,
+  originalReference,
+  createdAt,
+  artifactDir
+}) {
+  const normalizedReference = clean(originalReference);
+  const nextCreatedAt = clean(createdAt, new Date().toISOString());
+  const resolvedArtifactDir = resolveArtifactDir(artifactDir);
+  ensureArtifactDirectory(resolvedArtifactDir);
+
+  const artifactId = crypto
+    .createHash("sha256")
+    .update([proofRunId, stage, normalizedReference].join("|"))
+    .digest("hex")
+    .slice(0, 16);
+  const storedFileName = `${artifactId}${inferExtension(normalizedReference)}`;
+  const storedPath = path.join(resolvedArtifactDir, storedFileName);
+  const storedPathRelative = path.relative(REPO_ROOT, storedPath).split(path.sep).join("/");
+  const sourcePath = resolveSourcePath(normalizedReference);
+  const exists = Boolean(sourcePath && fs.existsSync(sourcePath));
+  const status = exists ? "stored" : "referenced_missing";
+
+  if (exists && sourcePath) {
+    fs.copyFileSync(sourcePath, storedPath);
+  }
+
+  return {
+    artifact_id: artifactId,
+    original_reference: normalizedReference,
+    stored_path: storedPathRelative,
+    exists,
+    stage,
+    created_at: nextCreatedAt,
+    status
+  };
+}
+
 export function getEvidenceManifestPath(manifestPath) {
   return resolveManifestPath(manifestPath);
 }
@@ -118,10 +191,12 @@ export function appendEvidenceArtifact({
   source_writer,
   merchant,
   references = [],
+  screenshot_reference,
   status = "written",
   proof_run_id,
   created_at,
-  manifestPath
+  manifestPath,
+  artifactDir
 }) {
   const resolvedManifestPath = resolveManifestPath(manifestPath);
   ensureDirectory(resolvedManifestPath);
@@ -155,6 +230,17 @@ export function appendEvidenceArtifact({
         output_path: normalizedOutputPath,
         source_writer,
         references: normalizeReferences(references),
+        screenshot_artifacts: screenshot_reference
+          ? [
+              createScreenshotArtifact({
+                proofRunId: nextProofRunId,
+                stage,
+                originalReference: screenshot_reference,
+                createdAt: nextCreatedAt,
+                artifactDir
+              })
+            ]
+          : [],
         status: clean(status, "written")
       }
     ]

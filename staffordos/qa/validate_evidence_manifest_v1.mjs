@@ -56,13 +56,25 @@ const bundleDir = fs.mkdtempSync(path.join(os.tmpdir(), "staffordos-evidence-bun
 const beforeBundlePath = path.join(bundleDir, "before_writer.mjs");
 const afterBundlePath = path.join(bundleDir, "after_writer.mjs");
 const frontendCwd = path.join(repoRoot, "staffordos/ui/operator-frontend");
+const sourceArtifactDir = path.join(repoRoot, "staffordos/proof_runs/output/artifacts");
+const tempSourceDir = fs.mkdtempSync(path.join(os.tmpdir(), "staffordos-evidence-sources-"));
+const existingScreenshot = path.join(tempSourceDir, "before.png");
+const existingAfterScreenshot = path.join(tempSourceDir, "after.png");
+const missingScreenshot = path.join(tempSourceDir, "missing.png");
+fs.writeFileSync(existingScreenshot, "before screenshot fixture", "utf8");
+fs.writeFileSync(existingAfterScreenshot, "after screenshot fixture", "utf8");
+if (fs.existsSync(sourceArtifactDir)) {
+  fs.rmSync(sourceArtifactDir, { recursive: true, force: true });
+}
 
 const failures = [];
 const originalManifestEnv = process.env.STAFFORDOS_EVIDENCE_MANIFEST_PATH;
+const originalRepoRootEnv = process.env.STAFFORDOS_REPO_ROOT;
 const originalCwd = process.cwd();
 
 try {
   process.env.STAFFORDOS_EVIDENCE_MANIFEST_PATH = manifestPath;
+  process.env.STAFFORDOS_REPO_ROOT = repoRoot;
   process.chdir(frontendCwd);
   if (fs.existsSync(manifestPath)) {
     fs.rmSync(manifestPath, { force: true });
@@ -84,7 +96,7 @@ try {
     affected_page_or_artifact: "staffordos/qa/validate_evidence_manifest_v1.mjs",
     issue: "before evidence validation fixture",
     why_it_matters: "prove append-only manifest behavior",
-    screenshot: "proof_runs/internal_shopifixer_dry_run_v1/screenshots/before.png",
+    screenshot: existingScreenshot,
     notes: "validation fixture"
   });
 
@@ -94,13 +106,17 @@ try {
   assert(manifest.artifacts[0].stage === "before_evidence", "before evidence artifact stage recorded", failures);
   assert(manifest.artifacts[0].source_writer === "writeShopifixerBeforeEvidence", "before evidence source writer recorded", failures);
   assert(Array.isArray(manifest.artifacts[0].references) && manifest.artifacts[0].references.length > 0, "before evidence references recorded", failures);
+  assert(Array.isArray(manifest.artifacts[0].screenshot_artifacts) && manifest.artifacts[0].screenshot_artifacts.length === 1, "before screenshot artifact recorded", failures);
+  assert(manifest.artifacts[0].screenshot_artifacts[0].exists === true, "before screenshot exists recorded", failures);
+  assert(manifest.artifacts[0].screenshot_artifacts[0].original_reference === existingScreenshot, "before screenshot reference preserved", failures);
+  assert(fs.existsSync(path.join(repoRoot, manifest.artifacts[0].screenshot_artifacts[0].stored_path)), "before screenshot copied into artifact directory", failures);
   assert(fs.existsSync(beforePath) && fs.readFileSync(beforePath, "utf8").trim().length > 0, "before evidence markdown still produced", failures);
 
   afterModule.writeShopifixerAfterEvidence({
     store: "validation-shop.example.com",
     date: "2026-07-08",
     affected_page_or_artifact: "staffordos/qa/validate_evidence_manifest_v1.mjs",
-    after_screenshot: "proof_runs/internal_shopifixer_dry_run_v1/screenshots/after.png",
+    after_screenshot: existingAfterScreenshot,
     after_notes: "validation fixture",
     remaining_limitations: "none",
     observed_improvement: "manifest append recorded",
@@ -111,6 +127,10 @@ try {
   assert(manifest.artifacts.length === 2, "after evidence write appended a second artifact", failures);
   assert(manifest.artifacts[1].stage === "after_evidence", "after evidence artifact stage recorded", failures);
   assert(manifest.artifacts[1].source_writer === "writeShopifixerAfterEvidence", "after evidence source writer recorded", failures);
+  assert(Array.isArray(manifest.artifacts[1].screenshot_artifacts) && manifest.artifacts[1].screenshot_artifacts.length === 1, "after screenshot artifact recorded", failures);
+  assert(manifest.artifacts[1].screenshot_artifacts[0].exists === true, "after screenshot exists recorded", failures);
+  assert(manifest.artifacts[1].screenshot_artifacts[0].original_reference === existingAfterScreenshot, "after screenshot reference preserved", failures);
+  assert(fs.existsSync(path.join(repoRoot, manifest.artifacts[1].screenshot_artifacts[0].stored_path)), "after screenshot copied into artifact directory", failures);
   assert(fs.existsSync(afterPath) && fs.readFileSync(afterPath, "utf8").trim().length > 0, "after evidence markdown still produced", failures);
 
   const afterFirstSnapshot = JSON.stringify(manifest.artifacts);
@@ -121,7 +141,7 @@ try {
     affected_page_or_artifact: "staffordos/qa/validate_evidence_manifest_v1.mjs",
     issue: "before evidence validation fixture",
     why_it_matters: "prove append-only manifest behavior",
-    screenshot: "proof_runs/internal_shopifixer_dry_run_v1/screenshots/before-2.png",
+    screenshot: missingScreenshot,
     notes: "validation fixture second append"
   });
 
@@ -133,7 +153,7 @@ try {
     store: "validation-shop.example.com",
     date: "2026-07-08",
     affected_page_or_artifact: "staffordos/qa/validate_evidence_manifest_v1.mjs",
-    after_screenshot: "proof_runs/internal_shopifixer_dry_run_v1/screenshots/after-2.png",
+    after_screenshot: missingScreenshot,
     after_notes: "validation fixture second append",
     remaining_limitations: "none",
     observed_improvement: "manifest append recorded again",
@@ -143,6 +163,10 @@ try {
   manifest = readEvidenceManifest(manifestPath);
   assert(manifest.artifacts.length === 4, "second after evidence write appended a fourth artifact", failures);
   assert(new Set(manifest.artifacts.map((artifact) => artifact.artifact_id)).size === manifest.artifacts.length, "artifact IDs are unique", failures);
+  assert(manifest.artifacts[2].screenshot_artifacts[0].status === "referenced_missing", "missing before screenshot recorded safely", failures);
+  assert(manifest.artifacts[3].screenshot_artifacts[0].status === "referenced_missing", "missing after screenshot recorded safely", failures);
+  assert(manifest.artifacts[2].screenshot_artifacts[0].exists === false, "missing before screenshot marked absent", failures);
+  assert(manifest.artifacts[3].screenshot_artifacts[0].exists === false, "missing after screenshot marked absent", failures);
   assert(JSON.stringify(manifest.artifacts.slice(0, 3)) === JSON.stringify(readJson(manifestPath).artifacts.slice(0, 3)), "manifest content is readable after appends", failures);
   assert((fs.existsSync(proofPackagePath) ? fs.readFileSync(proofPackagePath, "utf8") : "") === proofPackageBefore, "proof package remained unchanged", failures);
   const appendOnlyBehavior = JSON.stringify(manifest.artifacts.slice(0, 2)) === afterFirstSnapshot;
@@ -191,6 +215,7 @@ try {
   process.exit(1);
 } finally {
   process.env.STAFFORDOS_EVIDENCE_MANIFEST_PATH = originalManifestEnv;
+  process.env.STAFFORDOS_REPO_ROOT = originalRepoRootEnv;
   process.chdir(originalCwd);
   restoreFile(beforePath, beforeBackup);
   restoreFile(afterPath, afterBackup);

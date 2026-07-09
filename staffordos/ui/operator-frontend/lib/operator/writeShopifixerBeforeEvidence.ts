@@ -8,6 +8,7 @@ type EvidenceManifestAppend = (input: {
   source_writer: string;
   merchant?: Record<string, unknown>;
   references?: string[];
+  screenshot_reference?: string;
   status?: string;
 }) => unknown;
 
@@ -63,7 +64,8 @@ export function writeShopifixerBeforeEvidence(input: ShopifixerBeforeEvidenceInp
     merchant: {
       store: input.store
     },
-    references: [input.affected_page_or_artifact, input.screenshot, input.notes],
+    references: [input.affected_page_or_artifact, input.notes],
+    screenshot_reference: input.screenshot,
     status: "written"
   });
 
