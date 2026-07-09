@@ -45,6 +45,19 @@ type EvidenceArtifactSummary = {
   screenshotArtifactId: string;
 };
 
+type ExecuteSummary = {
+  status: string;
+  primaryAction: string;
+  preflightStatus: string;
+  qaStatus: string;
+  latestExecutionStatus: string;
+  latestExecutionEvent: string;
+  outcomeEventStatus: string;
+  rollbackAvailability: string;
+  fixScopeReadiness: string;
+  primaryActionSource: string;
+};
+
 type ShopifixerPilotWorkspaceProps = {
   merchant: {
     store: string;
@@ -89,6 +102,7 @@ type ShopifixerPilotWorkspaceProps = {
     artifacts: EvidenceArtifactSummary[];
     lastCapturedAt: string;
   };
+  executeSummary: ExecuteSummary;
   evidenceStatus: StatusLine[];
   validationStatus: StatusLine[];
   previousWork: string;
@@ -114,6 +128,7 @@ export function ShopifixerPilotWorkspace({
   merchantContext,
   scopeSummary,
   beforeEvidenceSummary,
+  executeSummary,
   evidenceStatus,
   validationStatus,
   previousWork
@@ -299,6 +314,22 @@ export function ShopifixerPilotWorkspace({
                   ) : (
                     <div>Not Yet Available</div>
                   )}
+                </div>
+              </div>
+
+              <div className="boardCard" style={{ marginTop: 16 }}>
+                <p className="boardCardTitle">Execute</p>
+                <p className="boardCardMeta">{executeSummary.status}</p>
+                <div className="kv">
+                  <div><strong>Primary action:</strong> {executeSummary.primaryAction}</div>
+                  <div><strong>Preflight status:</strong> {executeSummary.preflightStatus}</div>
+                  <div><strong>QA status:</strong> {executeSummary.qaStatus}</div>
+                  <div><strong>Latest execution status:</strong> {executeSummary.latestExecutionStatus}</div>
+                  <div><strong>Latest execution event:</strong> {executeSummary.latestExecutionEvent}</div>
+                  <div><strong>Outcome event status:</strong> {executeSummary.outcomeEventStatus}</div>
+                  <div><strong>Rollback availability:</strong> {executeSummary.rollbackAvailability}</div>
+                  <div><strong>Fix scope readiness:</strong> {executeSummary.fixScopeReadiness}</div>
+                  <div><strong>Primary action source:</strong> {executeSummary.primaryActionSource}</div>
                 </div>
               </div>
 

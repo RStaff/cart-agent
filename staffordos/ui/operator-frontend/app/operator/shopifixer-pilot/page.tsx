@@ -167,6 +167,26 @@ export default async function ShopifixerPilotPage() {
   const campaignReport = getCampaignResolverReport();
   const preflight = loadPreflightReport();
   const qa = loadCommandCenterQaReport();
+  const executionLog = readJson<Record<string, any>>(
+    path.join(repoRoot, "staffordos/execution/execution_log_v1.json"),
+    {}
+  );
+  const outcomeEventLog = readJson<Record<string, any>>(
+    path.join(repoRoot, "staffordos/events/outcome_event_log_v1.json"),
+    {}
+  );
+  const primaryActionSnapshot = readJson<Record<string, any>>(
+    path.join(repoRoot, "staffordos/snapshots/primary_action_snapshot_v1.json"),
+    {}
+  );
+  const agentLoopLatest = readJson<Record<string, any>>(
+    path.join(repoRoot, "staffordos/execution/output/agent_loop_latest.json"),
+    {}
+  );
+  const requiredAgentValidation = readJson<Record<string, any>>(
+    path.join(repoRoot, "staffordos/execution/output/required_agent_validation_v1.json"),
+    {}
+  );
   const campaignAttributionReport = readJson<Record<string, any>>(
     path.join(repoRoot, "staffordos/qa/output/campaign_attribution_report_v1.json"),
     {}
@@ -238,6 +258,30 @@ export default async function ShopifixerPilotPage() {
       ? "Before Evidence Captured"
       : "Before Evidence Drafted";
   const beforeEvidenceLastCapturedAt = beforeEvidenceLatest?.created_at || "Not Yet Available";
+  const latestExecutionEvent = Array.isArray(executionLog.events) ? executionLog.events[0] || null : null;
+  const latestOutcomeEvent = Array.isArray(outcomeEventLog.events) ? outcomeEventLog.events[0] || null : null;
+  const scopeReady = scopeStatus === "Scope Ready for Approval";
+  const preflightGo = String(preflight.status || "").trim().toUpperCase() === "GO";
+  const qaPass = String(qa.verdict || "").trim().toUpperCase() === "PASS";
+  const requiredAgentsGo = String(requiredAgentValidation.status || "").trim().toUpperCase() === "GO";
+  const executionBlocked = String(agentLoopLatest.status || "").toUpperCase().includes("BLOCKED");
+  const executionInProgress = /RUNNING|IN_PROGRESS/i.test(String(agentLoopLatest.status || ""));
+  const executionComplete = /COMPLETE/i.test(String(agentLoopLatest.status || latestExecutionEvent?.outcome || ""));
+  const executeStatus = executionComplete
+    ? "Execute Complete"
+    : executionInProgress
+      ? "Execute In Progress"
+      : executionBlocked || !scopeReady || !preflightGo || !qaPass || !requiredAgentsGo
+        ? "Execute Blocked"
+        : "Execute Ready";
+  const rollbackAvailability = executionComplete
+    ? "Not Yet Available"
+    : latestExecutionEvent
+      ? "Available"
+      : "Not Yet Available";
+  const fixScopeReadiness = !scopeFileContent.trim()
+    ? "Scope Missing"
+    : scopeStatus;
   const latestProofRun =
     text(proofSeal.proof_run_id, "") && text(proofSeal.proof_run_id, "") !== "Not Yet Implemented"
       ? `${text(proofSeal.proof_run_id)} · ${text(proofSeal.generated_at)}`
@@ -424,6 +468,24 @@ export default async function ShopifixerPilotPage() {
           screenshotArtifactId: String(artifact?.screenshot_artifacts?.[0]?.artifact_id || "Not Yet Available").trim() || "Not Yet Available"
         })),
         lastCapturedAt: beforeEvidenceLastCapturedAt || "Not Yet Available"
+      }}
+      executeSummary={{
+        status: executeStatus,
+        primaryAction: text(primaryActionSnapshot.primary_action?.action_label || qa.snapshot_primary_action?.action_label || "Not Yet Available"),
+        preflightStatus: text(preflight.status, "Not Yet Available"),
+        qaStatus: text(qa.verdict, "Not Yet Available"),
+        latestExecutionStatus: text(agentLoopLatest.status || latestExecutionEvent?.outcome || "Not Yet Available"),
+        latestExecutionEvent: latestExecutionEvent
+          ? `${text(latestExecutionEvent.execution_id || latestExecutionEvent.event_id)} · ${text(latestExecutionEvent.action_type)} · ${text(latestExecutionEvent.outcome)}`
+          : "Not Yet Available",
+        outcomeEventStatus: latestOutcomeEvent
+          ? `${text(latestOutcomeEvent.status)} · ${text(latestOutcomeEvent.event_type || latestOutcomeEvent.action_type)}`
+          : "Not Yet Available",
+        rollbackAvailability,
+        fixScopeReadiness,
+        primaryActionSource: fs.existsSync(path.join(repoRoot, "staffordos/snapshots/primary_action_snapshot_v1.json"))
+          ? "staffordos/snapshots/primary_action_snapshot_v1.json"
+          : "Not Yet Available"
       }}
       evidenceStatus={[
         { label: "Before evidence", value: fs.existsSync(beforeEvidencePath) ? "Present" : "Missing" },
