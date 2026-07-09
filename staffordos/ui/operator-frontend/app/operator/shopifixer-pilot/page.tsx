@@ -148,7 +148,10 @@ function parseEvidenceFields(content: string) {
     issue: valueAfter("Issue:") || "Not Yet Available",
     whyItMatters: valueAfter("Why It Matters:") || "Not Yet Available",
     screenshot: valueAfter("Screenshot:") || "Not Yet Available",
-    notes: valueAfter("Notes:") || "Not Yet Available"
+    notes: valueAfter("Notes:") || "Not Yet Available",
+    observedImprovement: valueAfter("Observed Improvement:") || "Not Yet Available",
+    merchantFacingSummary: valueAfter("Merchant-Facing Summary:") || "Not Yet Available",
+    remainingLimitations: valueAfter("Remaining Limitations:") || "Not Yet Available"
   };
 }
 
@@ -258,6 +261,27 @@ export default async function ShopifixerPilotPage() {
       ? "Before Evidence Captured"
       : "Before Evidence Drafted";
   const beforeEvidenceLastCapturedAt = beforeEvidenceLatest?.created_at || "Not Yet Available";
+  const afterEvidencePath = path.join(repoRoot, `${PROOF_RUN_ROOT}/after_evidence.md`);
+  const afterEvidenceContent = readText(afterEvidencePath);
+  const afterEvidenceFields = parseEvidenceFields(afterEvidenceContent);
+  const afterEvidenceArtifacts = Array.isArray(evidenceManifest.artifacts)
+    ? evidenceManifest.artifacts.filter(
+        (artifact: any) =>
+          String(artifact?.stage || "").trim() === "after_evidence" &&
+          String(artifact?.source_writer || "").trim() === "writeShopifixerAfterEvidence"
+      )
+    : [];
+  const afterEvidenceLatest = afterEvidenceArtifacts[afterEvidenceArtifacts.length - 1] || null;
+  const afterEvidenceArtifactIds = afterEvidenceArtifacts.map((artifact: any) => String(artifact?.artifact_id || "").trim()).filter(Boolean);
+  const afterEvidenceScreenshotArtifacts = Array.isArray(afterEvidenceLatest?.screenshot_artifacts)
+    ? afterEvidenceLatest.screenshot_artifacts
+    : [];
+  const afterEvidenceStatus = !afterEvidenceContent.trim()
+    ? "After Evidence Missing"
+    : afterEvidenceArtifacts.length
+      ? "After Evidence Captured"
+      : "After Evidence Drafted";
+  const afterEvidenceLastCapturedAt = afterEvidenceLatest?.created_at || "Not Yet Available";
   const latestExecutionEvent = Array.isArray(executionLog.events) ? executionLog.events[0] || null : null;
   const latestOutcomeEvent = Array.isArray(outcomeEventLog.events) ? outcomeEventLog.events[0] || null : null;
   const scopeReady = scopeStatus === "Scope Ready for Approval";
@@ -315,7 +339,6 @@ export default async function ShopifixerPilotPage() {
   }));
 
   const evidenceManifestPath = path.join(repoRoot, "staffordos/proof_runs/output/evidence_manifest_v1.json");
-  const afterEvidencePath = path.join(repoRoot, `${PROOF_RUN_ROOT}/after_evidence.md`);
   const proofPackagePath = path.join(repoRoot, `${PROOF_RUN_ROOT}/merchant_proof_package.md`);
   const sealPath = path.join(repoRoot, `${PROOF_RUN_ROOT}/merchant_proof_package.seal.json`);
 
@@ -468,6 +491,26 @@ export default async function ShopifixerPilotPage() {
           screenshotArtifactId: String(artifact?.screenshot_artifacts?.[0]?.artifact_id || "Not Yet Available").trim() || "Not Yet Available"
         })),
         lastCapturedAt: beforeEvidenceLastCapturedAt || "Not Yet Available"
+      }}
+      afterEvidenceSummary={{
+        status: afterEvidenceStatus,
+        path: afterEvidencePath.replace(repoRoot.endsWith("/") ? repoRoot : `${repoRoot}/`, ""),
+        observedImprovement: afterEvidenceFields.observedImprovement,
+        merchantFacingSummary: afterEvidenceFields.merchantFacingSummary,
+        remainingLimitations: afterEvidenceFields.remainingLimitations,
+        screenshotReference: afterEvidenceFields.screenshot,
+        artifactIds: afterEvidenceArtifactIds,
+        artifacts: afterEvidenceScreenshotArtifacts.map((artifact: any) => ({
+          artifactId: String(artifact?.artifact_id || "").trim() || "Not Yet Available",
+          createdAt: String(artifact?.created_at || "").trim() || "Not Yet Available",
+          outputPath: String(artifact?.output_path || "").trim() || "Not Yet Available",
+          sourceWriter: String(artifact?.source_writer || "").trim() || "Not Yet Available",
+          screenshotStatus: String(artifact?.screenshot_artifacts?.[0]?.status || "Not Yet Available").trim() || "Not Yet Available",
+          screenshotReference: String(artifact?.screenshot_artifacts?.[0]?.original_reference || "Not Yet Available").trim() || "Not Yet Available",
+          screenshotStoredPath: String(artifact?.screenshot_artifacts?.[0]?.stored_path || "Not Yet Available").trim() || "Not Yet Available",
+          screenshotArtifactId: String(artifact?.screenshot_artifacts?.[0]?.artifact_id || "Not Yet Available").trim() || "Not Yet Available"
+        })),
+        lastCapturedAt: afterEvidenceLastCapturedAt || "Not Yet Available"
       }}
       executeSummary={{
         status: executeStatus,

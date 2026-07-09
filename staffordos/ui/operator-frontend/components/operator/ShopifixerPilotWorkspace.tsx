@@ -58,6 +58,29 @@ type ExecuteSummary = {
   primaryActionSource: string;
 };
 
+type AfterEvidenceArtifactSummary = {
+  artifactId: string;
+  createdAt: string;
+  outputPath: string;
+  sourceWriter: string;
+  screenshotStatus: string;
+  screenshotReference: string;
+  screenshotStoredPath: string;
+  screenshotArtifactId: string;
+};
+
+type AfterEvidenceSummary = {
+  status: string;
+  path: string;
+  observedImprovement: string;
+  merchantFacingSummary: string;
+  remainingLimitations: string;
+  screenshotReference: string;
+  artifactIds: string[];
+  artifacts: AfterEvidenceArtifactSummary[];
+  lastCapturedAt: string;
+};
+
 type ShopifixerPilotWorkspaceProps = {
   merchant: {
     store: string;
@@ -103,6 +126,7 @@ type ShopifixerPilotWorkspaceProps = {
     lastCapturedAt: string;
   };
   executeSummary: ExecuteSummary;
+  afterEvidenceSummary: AfterEvidenceSummary;
   evidenceStatus: StatusLine[];
   validationStatus: StatusLine[];
   previousWork: string;
@@ -129,6 +153,7 @@ export function ShopifixerPilotWorkspace({
   scopeSummary,
   beforeEvidenceSummary,
   executeSummary,
+  afterEvidenceSummary,
   evidenceStatus,
   validationStatus,
   previousWork
@@ -330,6 +355,55 @@ export function ShopifixerPilotWorkspace({
                   <div><strong>Rollback availability:</strong> {executeSummary.rollbackAvailability}</div>
                   <div><strong>Fix scope readiness:</strong> {executeSummary.fixScopeReadiness}</div>
                   <div><strong>Primary action source:</strong> {executeSummary.primaryActionSource}</div>
+                </div>
+              </div>
+
+              <div className="boardCard" style={{ marginTop: 16 }}>
+                <p className="boardCardTitle">After Evidence</p>
+                <p className="boardCardMeta">{afterEvidenceSummary.status}</p>
+                <div className="kv">
+                  <div><strong>After evidence path:</strong> {afterEvidenceSummary.path}</div>
+                  <div><strong>Observed improvement:</strong> {afterEvidenceSummary.observedImprovement}</div>
+                  <div><strong>Merchant-facing summary:</strong> {afterEvidenceSummary.merchantFacingSummary}</div>
+                  <div><strong>Remaining limitations:</strong> {afterEvidenceSummary.remainingLimitations}</div>
+                  <div><strong>Last captured:</strong> {afterEvidenceSummary.lastCapturedAt}</div>
+                </div>
+                <div className="grid gridTwo" style={{ marginTop: 12 }}>
+                  <div>
+                    <p className="eyebrow">Artifact IDs</p>
+                    <div className="kv">
+                      {afterEvidenceSummary.artifactIds.length ? (
+                        afterEvidenceSummary.artifactIds.map((item) => <div key={item}>{item}</div>)
+                      ) : (
+                        <div>Not Yet Available</div>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="eyebrow">Screenshot status</p>
+                    <div className="kv">
+                      {afterEvidenceSummary.artifacts.length ? (
+                        afterEvidenceSummary.artifacts.map((item) => (
+                          <div key={item.artifactId}>
+                            <strong>{item.screenshotStatus}:</strong> {item.screenshotReference}
+                          </div>
+                        ))
+                      ) : (
+                        <div>Not Yet Available</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div style={{ marginTop: 12 }} className="kv">
+                  {afterEvidenceSummary.artifacts.length ? (
+                    afterEvidenceSummary.artifacts.map((item) => (
+                      <div key={item.artifactId}>
+                        <strong>{item.artifactId}</strong> · {item.createdAt} · {item.sourceWriter} · {item.screenshotStoredPath}
+                      </div>
+                    ))
+                  ) : (
+                    <div>Not Yet Available</div>
+                  )}
                 </div>
               </div>
 
