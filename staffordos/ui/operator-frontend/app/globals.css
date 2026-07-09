@@ -509,6 +509,10 @@ textarea {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.gridThree {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .fullWidth {
   grid-column: 1 / -1;
 }
@@ -788,8 +792,81 @@ textarea {
   color: #fee2e2;
 }
 
+.shopifixerPilotWorkspace {
+  gap: 20px;
+}
+
+.shopifixerPilotGrid {
+  align-items: start;
+}
+
+.shopifixerPilotRail {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.shopifixerPilotPhaseButton {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(100, 116, 139, 0.22);
+  background: rgba(2, 6, 23, 0.55);
+  color: #e2e8f0;
+  text-align: left;
+}
+
+.shopifixerPilotPhaseButton span {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.shopifixerPilotPhaseButton strong {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.shopifixerPilotPhaseButton:disabled {
+  opacity: 0.95;
+  cursor: not-allowed;
+}
+
+.shopifixerPilotPhaseButtonActive {
+  border-color: rgba(34, 211, 238, 0.55);
+  background: rgba(8, 47, 73, 0.8);
+}
+
+.shopifixerPilotPhaseButtonReady {
+  border-color: rgba(45, 212, 191, 0.35);
+}
+
+.shopifixerPilotPhaseButtonBlocked {
+  border-color: rgba(251, 113, 133, 0.35);
+}
+
+.shopifixerPilotPhaseButtonComplete {
+  border-color: rgba(45, 212, 191, 0.25);
+}
+
+.shopifixerPilotPlaceholder {
+  display: grid;
+  gap: 16px;
+}
+
+.shopifixerPilotPhaseNotes {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 @media (max-width: 860px) {
   .gridTwo,
+  .gridThree,
   .roadmapGrid,
   .capacityBoard {
     grid-template-columns: 1fr;
@@ -829,6 +906,14 @@ textarea {
     width: 100%;
     justify-content: center;
     padding: 9px 12px;
+  }
+
+  .shopifixerPilotPhaseButton {
+    width: 100%;
+  }
+
+  .shopifixerPilotPhaseNotes {
+    grid-template-columns: 1fr;
   }
 
   .commandCenterCardTitle {
