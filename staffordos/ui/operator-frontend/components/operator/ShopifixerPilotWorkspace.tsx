@@ -21,6 +21,19 @@ type ContextCard = {
   href?: string | null;
 };
 
+type ScopeSummary = {
+  status: string;
+  issue: string;
+  proposedFix: string;
+  inScope: string[];
+  outOfScope: string[];
+  merchantApprovalNeeded: string;
+  currentOffer: string;
+  currentPrice: string;
+  successCriteria: string;
+  sourceState: string;
+};
+
 type ShopifixerPilotWorkspaceProps = {
   merchant: {
     store: string;
@@ -55,6 +68,7 @@ type ShopifixerPilotWorkspaceProps = {
     total: number;
   };
   merchantContext: ContextCard[];
+  scopeSummary: ScopeSummary;
   evidenceStatus: StatusLine[];
   validationStatus: StatusLine[];
   previousWork: string;
@@ -78,6 +92,7 @@ export function ShopifixerPilotWorkspace({
   phases,
   progress,
   merchantContext,
+  scopeSummary,
   evidenceStatus,
   validationStatus,
   previousWork
@@ -180,11 +195,45 @@ export function ShopifixerPilotWorkspace({
                 <div><strong>Previous work:</strong> {previousWork}</div>
               </div>
 
-              <div className="shopifixerPilotPhaseNotes">
-                <div className="boardCard">
-                  <p className="boardCardTitle">Scope</p>
-                  <p className="boardCardNote">Issue, proposed fix, estimated impact, and approval live here.</p>
+              <div className="boardCard" style={{ marginTop: 16 }}>
+                <p className="boardCardTitle">Scope</p>
+                <p className="boardCardMeta">{scopeSummary.status}</p>
+                <div className="kv">
+                  <div><strong>Issue / problem summary:</strong> {scopeSummary.issue}</div>
+                  <div><strong>Proposed scoped fix:</strong> {scopeSummary.proposedFix}</div>
+                  <div><strong>Current offer:</strong> {scopeSummary.currentOffer}</div>
+                  <div><strong>Current price:</strong> {scopeSummary.currentPrice}</div>
+                  <div><strong>Merchant approval needed:</strong> {scopeSummary.merchantApprovalNeeded}</div>
                 </div>
+                <div className="grid gridTwo" style={{ marginTop: 12 }}>
+                  <div>
+                    <p className="eyebrow">In scope</p>
+                    <div className="kv">
+                      {scopeSummary.inScope.length ? (
+                        scopeSummary.inScope.map((item) => <div key={item}>{item}</div>)
+                      ) : (
+                        <div>Not Yet Available</div>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="eyebrow">Out of scope</p>
+                    <div className="kv">
+                      {scopeSummary.outOfScope.length ? (
+                        scopeSummary.outOfScope.map((item) => <div key={item}>{item}</div>)
+                      ) : (
+                        <div>Not Yet Available</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="kv" style={{ marginTop: 12 }}>
+                  <div><strong>Success criteria:</strong> {scopeSummary.successCriteria}</div>
+                  <div><strong>Source state:</strong> {scopeSummary.sourceState}</div>
+                </div>
+              </div>
+
+              <div className="shopifixerPilotPhaseNotes">
                 <div className="boardCard">
                   <p className="boardCardTitle">Evidence</p>
                   <p className="boardCardNote">Before and after artifacts append to the manifest here.</p>

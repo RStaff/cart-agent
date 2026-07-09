@@ -81,6 +81,54 @@ function merchantContextFallback(value: unknown) {
   return text(value, "Not Yet Available");
 }
 
+function readText(filePath: string) {
+  try {
+    if (!fs.existsSync(filePath)) return "";
+    return fs.readFileSync(filePath, "utf8");
+  } catch {
+    return "";
+  }
+}
+
+function parseScopeSummary(content: string) {
+  const lines = String(content || "").split(/\r?\n/);
+
+  function valueAfter(label: string) {
+    const index = lines.findIndex((line) => line.trim() === label);
+    if (index < 0) return "";
+    for (let i = index + 1; i < lines.length; i += 1) {
+      const candidate = lines[i].trim();
+      if (!candidate) continue;
+      if (/^[A-Za-z][A-Za-z /&-]+:$/.test(candidate)) break;
+      return candidate.replace(/^-+\s*/, "");
+    }
+    return "";
+  }
+
+  function listAfter(label: string) {
+    const index = lines.findIndex((line) => line.trim() === label);
+    if (index < 0) return [];
+    const items: string[] = [];
+    for (let i = index + 1; i < lines.length; i += 1) {
+      const candidate = lines[i].trim();
+      if (!candidate) continue;
+      if (/^[A-Za-z][A-Za-z /&-]+:$/.test(candidate)) break;
+      items.push(candidate.replace(/^-+\s*/, ""));
+    }
+    return items;
+  }
+
+  return {
+    issue: valueAfter("Scoped Fix:") || valueAfter("Issue:") || "Not Yet Available",
+    proposedFix: valueAfter("Scoped Fix:") || "Not Yet Available",
+    inScope: listAfter("In Scope:"),
+    outOfScope: listAfter("Out of Scope:"),
+    merchantApprovalNeeded: valueAfter("Merchant Approval Needed:") || "Not Yet Available",
+    successCriteria: valueAfter("Success Criteria:") || "Not Yet Available",
+    sourceState: content.trim() ? "fix_scope.md present" : "fix_scope.md missing"
+  };
+}
+
 function phaseStatus(index: number, currentIndex: number): "ready" | "in_progress" | "blocked" | "complete" {
   if (index < currentIndex) return "complete";
   if (index === currentIndex) return "in_progress";
@@ -116,6 +164,9 @@ export default async function ShopifixerPilotPage() {
     path.join(repoRoot, "staffordos/clients/operator_dashboard_snapshot_v1.json"),
     {}
   );
+  const scopeFilePath = path.join(repoRoot, "staffordos/proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md");
+  const scopeFileContent = readText(scopeFilePath);
+  const scopeSummary = parseScopeSummary(scopeFileContent);
   const evidenceManifest = readJson<Record<string, any>>(
     path.join(repoRoot, "staffordos/proof_runs/output/evidence_manifest_v1.json"),
     {}
@@ -138,6 +189,11 @@ export default async function ShopifixerPilotPage() {
     : null;
   const attributionTotals = campaignAttributionReport.totals || {};
   const currentRevenueGap = Array.isArray(operatorDashboard.revenue_gaps) ? operatorDashboard.revenue_gaps[0] : null;
+  const scopeStatus = !scopeFileContent.trim()
+    ? "Scope Missing"
+    : scopeSummary.inScope.length || scopeSummary.outOfScope.length || scopeSummary.successCriteria !== "Not Yet Available"
+      ? (String(scopeSummary.merchantApprovalNeeded).trim().toLowerCase() === "yes" ? "Scope Ready for Approval" : "Scope Drafted")
+      : "Scope Drafted";
   const latestProofRun =
     text(proofSeal.proof_run_id, "") && text(proofSeal.proof_run_id, "") !== "Not Yet Implemented"
       ? `${text(proofSeal.proof_run_id)} · ${text(proofSeal.generated_at)}`
@@ -292,6 +348,22 @@ export default async function ShopifixerPilotPage() {
           href: "/operator/system-map"
         }
       ]}
+      scopeSummary={{
+        status: scopeStatus,
+        issue: scopeSummary.issue,
+        proposedFix: scopeSummary.proposedFix,
+        inScope: scopeSummary.inScope,
+        outOfScope: scopeSummary.outOfScope,
+        merchantApprovalNeeded: scopeSummary.merchantApprovalNeeded,
+        currentOffer: currentOffer?.subject || offerLatest?.offer?.subject || "Not Yet Available",
+        currentPrice: currentOffer?.sections?.sprint_price !== undefined
+          ? money(currentOffer.sections.sprint_price)
+          : offerLatest?.offer?.sections?.sprint_price !== undefined
+            ? money(offerLatest.offer.sections.sprint_price)
+            : "Not Yet Available",
+        successCriteria: scopeSummary.successCriteria,
+        sourceState: scopeSummary.sourceState
+      }}
       evidenceStatus={[
         { label: "Before evidence", value: fs.existsSync(beforeEvidencePath) ? "Present" : "Missing" },
         { label: "After evidence", value: fs.existsSync(afterEvidencePath) ? "Present" : "Missing" },
