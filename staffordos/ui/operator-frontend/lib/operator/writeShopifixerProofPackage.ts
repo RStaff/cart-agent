@@ -89,6 +89,7 @@ export function writeShopifixerProofPackage() {
   const manifestPath = getEvidenceManifestPath();
   const manifest = readEvidenceManifest(manifestPath);
   const manifestPathDisplay = toRepoRelative(manifestPath);
+  const canonicalManifestPathDisplay = "staffordos/proof_runs/output/evidence_manifest_v1.json";
   const manifestArtifacts = Array.isArray(manifest.artifacts) ? (manifest.artifacts as ManifestArtifact[]) : [];
 
   const before = readText(beforePath);
@@ -224,7 +225,7 @@ export function writeShopifixerProofPackage() {
     proof_run_id: proofRunId,
     proof_package_path: toRepoRelative(outputPath),
     sha256: proofPackageSha256,
-    manifest_path: manifestPathDisplay,
+    manifest_path: canonicalManifestPathDisplay,
     manifest_artifact_count: manifestArtifacts.length,
     evidence_source_paths: Array.from(new Set(evidenceSourcePaths)),
     status: "sealed"

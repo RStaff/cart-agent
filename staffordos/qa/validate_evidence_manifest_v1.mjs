@@ -190,7 +190,7 @@ try {
   const seal = readJson(sealPath);
   const manifestAfterPackage = fs.readFileSync(manifestPath, "utf8");
   const proofPackageSha256 = crypto.createHash("sha256").update(proofPackageAfter, "utf8").digest("hex");
-  const expectedManifestPath = path.relative(repoRoot, manifestPath).split(path.sep).join("/");
+  const expectedManifestPath = "staffordos/proof_runs/output/evidence_manifest_v1.json";
   const expectedProofPackagePath = path.relative(repoRoot, proofPackagePath).split(path.sep).join("/");
 
   assert(proofPackageAfter.includes("Proof Package Version:"), "proof package includes version section", failures);
@@ -205,6 +205,7 @@ try {
   assert(proofPackageAfter.includes(manifest.artifacts[0].screenshot_artifacts[0].stored_path), "proof package includes stored screenshot path", failures);
   assert(fs.existsSync(sealPath), "seal exists after proof package write", failures);
   assert(clean(seal.manifest_path) === expectedManifestPath, "seal manifest path present", failures);
+  assert(!clean(seal.manifest_path).includes("/var/folders"), "seal manifest path not temp", failures);
   assert(Number.isFinite(Number(seal.manifest_artifact_count)), "seal artifact count present", failures);
   assert(clean(seal.proof_package_path) === expectedProofPackagePath, "seal proof package path present", failures);
   assert(clean(seal.sha256) === proofPackageSha256, "seal sha256 matches proof package", failures);
@@ -233,7 +234,8 @@ try {
       proof_package_exists: fs.existsSync(proofPackagePath),
       seal_exists: fs.existsSync(sealPath),
       sha256_matches: clean(seal.sha256) === proofPackageSha256,
-      manifest_path_present: clean(seal.manifest_path).length > 0,
+      seal_manifest_path_is_canonical: clean(seal.manifest_path) === expectedManifestPath,
+      seal_manifest_path_not_temp: !clean(seal.manifest_path).includes("/var/folders"),
       artifact_count_present: Number.isFinite(Number(seal.manifest_artifact_count)),
       proof_package_updated: proofPackageAfter.includes("Manifest Path:"),
       no_proof_package_regression: manifestBeforePackage === manifestAfterPackage

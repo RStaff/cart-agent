@@ -1,0 +1,19 @@
+{
+  "schema": "staffordos.merchant_proof_package_seal.v1",
+  "generated_at": "2026-07-09T04:08:21.563Z",
+  "proof_run_id": "internal_shopifixer_dry_run_v1",
+  "proof_package_path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md",
+  "sha256": "5227a809162b6f172c5ffa7be07cd53f5e0f857d5a04ba48a27dd02d8ff5e58a",
+  "manifest_path": "staffordos/proof_runs/output/evidence_manifest_v1.json",
+  "manifest_artifact_count": 4,
+  "evidence_source_paths": [
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md",
+    "staffordos/proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md",
+    "../../../../var/folders/2_/z7ybpx8x5097zxjpfxstdrtm0000gn/T/staffordos-evidence-artifacts-14476/cd74031f6068016a.png",
+    "../../../../var/folders/2_/z7ybpx8x5097zxjpfxstdrtm0000gn/T/staffordos-evidence-artifacts-14476/1da08e1acdcbfb74.png",
+    "../../../../var/folders/2_/z7ybpx8x5097zxjpfxstdrtm0000gn/T/staffordos-evidence-artifacts-14476/2b992ca724f6e79d.png",
+    "../../../../var/folders/2_/z7ybpx8x5097zxjpfxstdrtm0000gn/T/staffordos-evidence-artifacts-14476/39814db2b6d7678f.png"
+  ],
+  "status": "sealed"
+}
