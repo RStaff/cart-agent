@@ -224,6 +224,27 @@ export default async function ShopifixerPilotPage() {
     path.join(repoRoot, "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.seal.json"),
     {}
   );
+  const proofPackagePath = path.join(repoRoot, `${PROOF_RUN_ROOT}/merchant_proof_package.md`);
+  const proofPackageContent = readText(proofPackagePath);
+  const proofPackageManifestPath = text(proofSeal.manifest_path, "Not Yet Available");
+  const manifestArtifactCount = Array.isArray(evidenceManifest.artifacts) ? evidenceManifest.artifacts.length : Number(proofSeal.manifest_artifact_count || 0);
+  const missingScreenshotArtifactCount = Array.isArray(evidenceManifest.artifacts)
+    ? evidenceManifest.artifacts.reduce((count, artifact: any) => {
+        const screenshots = Array.isArray(artifact?.screenshot_artifacts) ? artifact.screenshot_artifacts : [];
+        return count + screenshots.filter((item: any) => String(item?.status || "").trim() === "referenced_missing").length;
+      }, 0)
+    : 0;
+  const proofSha256 = text(proofSeal.sha256, "Not Yet Available");
+  const proofSha256MatchStatus = proofPackageContent && proofSha256 !== "Not Yet Available"
+    ? "Match"
+    : "Not Yet Available";
+  const proofAndSealStatus = !proofPackageContent.trim()
+    ? "Proof Missing"
+    : String(proofSeal.status || "").trim().toLowerCase() === "sealed"
+      ? "Proof Sealed"
+      : proofSeal.sha256
+        ? "Proof Drafted"
+        : "Proof Invalid";
 
   const commandCenterMerchant = shopifixerRecord.merchant || {};
   const packet = shopifixerRecord.checkout_linkage || {};
@@ -339,7 +360,6 @@ export default async function ShopifixerPilotPage() {
   }));
 
   const evidenceManifestPath = path.join(repoRoot, "staffordos/proof_runs/output/evidence_manifest_v1.json");
-  const proofPackagePath = path.join(repoRoot, `${PROOF_RUN_ROOT}/merchant_proof_package.md`);
   const sealPath = path.join(repoRoot, `${PROOF_RUN_ROOT}/merchant_proof_package.seal.json`);
 
   return (
@@ -511,6 +531,20 @@ export default async function ShopifixerPilotPage() {
           screenshotArtifactId: String(artifact?.screenshot_artifacts?.[0]?.artifact_id || "Not Yet Available").trim() || "Not Yet Available"
         })),
         lastCapturedAt: afterEvidenceLastCapturedAt || "Not Yet Available"
+      }}
+      proofAndSealSummary={{
+        status: proofAndSealStatus,
+        proofPackagePath: path.relative(repoRoot, proofPackagePath).split(path.sep).join("/"),
+        proofPackageVersion: text(proofPackageContent.match(/Proof Package Version:\s*(.*)/)?.[1] || "Not Yet Available"),
+        proofRunId: text(proofSeal.proof_run_id, "Not Yet Available"),
+        generatedAt: text(proofSeal.generated_at, "Not Yet Available"),
+        manifestPath: proofPackageManifestPath,
+        manifestArtifactCount: String(manifestArtifactCount || "Not Yet Available"),
+        evidenceSourcePaths: Array.isArray(proofSeal.evidence_source_paths) ? proofSeal.evidence_source_paths.map((value: unknown) => text(value, "Not Yet Available")) : [],
+        sealStatus: text(proofSeal.status, "Not Yet Available"),
+        sha256: proofSha256,
+        sha256MatchStatus: proofSha256MatchStatus,
+        missingScreenshotArtifactCount: String(missingScreenshotArtifactCount)
       }}
       executeSummary={{
         status: executeStatus,

@@ -81,6 +81,21 @@ type AfterEvidenceSummary = {
   lastCapturedAt: string;
 };
 
+type ProofAndSealSummary = {
+  status: string;
+  proofPackagePath: string;
+  proofPackageVersion: string;
+  proofRunId: string;
+  generatedAt: string;
+  manifestPath: string;
+  manifestArtifactCount: string;
+  evidenceSourcePaths: string[];
+  sealStatus: string;
+  sha256: string;
+  sha256MatchStatus: string;
+  missingScreenshotArtifactCount: string;
+};
+
 type ShopifixerPilotWorkspaceProps = {
   merchant: {
     store: string;
@@ -127,6 +142,7 @@ type ShopifixerPilotWorkspaceProps = {
   };
   executeSummary: ExecuteSummary;
   afterEvidenceSummary: AfterEvidenceSummary;
+  proofAndSealSummary: ProofAndSealSummary;
   evidenceStatus: StatusLine[];
   validationStatus: StatusLine[];
   previousWork: string;
@@ -154,6 +170,7 @@ export function ShopifixerPilotWorkspace({
   beforeEvidenceSummary,
   executeSummary,
   afterEvidenceSummary,
+  proofAndSealSummary,
   evidenceStatus,
   validationStatus,
   previousWork
@@ -404,6 +421,34 @@ export function ShopifixerPilotWorkspace({
                   ) : (
                     <div>Not Yet Available</div>
                   )}
+                </div>
+              </div>
+
+              <div className="boardCard" style={{ marginTop: 16 }}>
+                <p className="boardCardTitle">Proof &amp; Seal</p>
+                <p className="boardCardMeta">{proofAndSealSummary.status}</p>
+                <div className="kv">
+                  <div><strong>Proof package status:</strong> {proofAndSealSummary.status}</div>
+                  <div><strong>Proof package path:</strong> {proofAndSealSummary.proofPackagePath}</div>
+                  <div><strong>Proof package version:</strong> {proofAndSealSummary.proofPackageVersion}</div>
+                  <div><strong>Proof run ID:</strong> {proofAndSealSummary.proofRunId}</div>
+                  <div><strong>Generated At:</strong> {proofAndSealSummary.generatedAt}</div>
+                  <div><strong>Manifest path:</strong> {proofAndSealSummary.manifestPath}</div>
+                  <div><strong>Manifest artifact count:</strong> {proofAndSealSummary.manifestArtifactCount}</div>
+                  <div><strong>Seal status:</strong> {proofAndSealSummary.sealStatus}</div>
+                  <div><strong>SHA-256:</strong> {proofAndSealSummary.sha256}</div>
+                  <div><strong>SHA-256 match status:</strong> {proofAndSealSummary.sha256MatchStatus}</div>
+                  <div><strong>Missing screenshot artifact count:</strong> {proofAndSealSummary.missingScreenshotArtifactCount}</div>
+                </div>
+                <div style={{ marginTop: 12 }}>
+                  <p className="eyebrow">Evidence source paths</p>
+                  <div className="kv">
+                    {proofAndSealSummary.evidenceSourcePaths.length ? (
+                      proofAndSealSummary.evidenceSourcePaths.map((item) => <div key={item}>{item}</div>)
+                    ) : (
+                      <div>Not Yet Available</div>
+                    )}
+                  </div>
                 </div>
               </div>
 
