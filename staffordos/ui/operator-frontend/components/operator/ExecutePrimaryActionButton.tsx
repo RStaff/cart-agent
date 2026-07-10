@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 type ExecuteState =
@@ -8,8 +9,22 @@ type ExecuteState =
   | { status: "success"; message: string }
   | { status: "error"; message: string };
 
-export function ExecutePrimaryActionButton() {
+type ExecutePrimaryActionButtonProps = {
+  requireConfirmation?: boolean;
+  confirmationLabel?: string;
+  submitLabel?: string;
+  refreshOnSuccess?: boolean;
+};
+
+export function ExecutePrimaryActionButton({
+  requireConfirmation = false,
+  confirmationLabel = "I confirm the displayed action only.",
+  submitLabel = "Execute now",
+  refreshOnSuccess = false
+}: ExecutePrimaryActionButtonProps) {
   const [state, setState] = useState<ExecuteState>({ status: "idle", message: "" });
+  const [confirmed, setConfirmed] = useState(!requireConfirmation);
+  const router = useRouter();
 
   async function execute() {
     setState({ status: "running", message: "Executing..." });
@@ -30,6 +45,12 @@ export function ExecutePrimaryActionButton() {
         status: "success",
         message: `${json.status}. Loop D: ${json.loop_d_status}.`
       });
+
+      if (refreshOnSuccess) {
+        setTimeout(() => {
+          router.refresh();
+        }, 1200);
+      }
     } catch (err) {
       setState({
         status: "error",
@@ -40,13 +61,25 @@ export function ExecutePrimaryActionButton() {
 
   return (
     <div className="operatorExecuteWrap">
+      {requireConfirmation ? (
+        <label style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 12 }}>
+          <input
+            type="checkbox"
+            checked={confirmed}
+            onChange={(event) => setConfirmed(event.target.checked)}
+            style={{ marginTop: 2 }}
+          />
+          <span className="hint">{confirmationLabel}</span>
+        </label>
+      ) : null}
+
       <button
         type="button"
         className="button buttonPrimary"
         onClick={execute}
-        disabled={state.status === "running"}
+        disabled={state.status === "running" || (requireConfirmation && !confirmed)}
       >
-        {state.status === "running" ? "Executing..." : "Execute now"}
+        {state.status === "running" ? "Executing..." : submitLabel}
       </button>
 
       {state.message ? (

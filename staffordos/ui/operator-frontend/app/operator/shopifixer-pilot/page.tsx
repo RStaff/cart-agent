@@ -382,9 +382,20 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
   const preflightGo = String(preflight.status || "").trim().toUpperCase() === "GO";
   const qaPass = String(qa.verdict || "").trim().toUpperCase() === "PASS";
   const requiredAgentsGo = String(requiredAgentValidation.status || "").trim().toUpperCase() === "GO";
-  const executionBlocked = String(agentLoopLatest.status || "").toUpperCase().includes("BLOCKED");
-  const executionInProgress = /RUNNING|IN_PROGRESS/i.test(String(agentLoopLatest.status || ""));
-  const executionComplete = /COMPLETE/i.test(String(agentLoopLatest.status || latestExecutionEvent?.outcome || ""));
+  const executionModeDecision = text(agentLoopLatest.mode?.decision, "Not Yet Available");
+  const executionModeExecutionMode = text(agentLoopLatest.mode?.executionMode, "Not Yet Available");
+  const executionModeBlocked = /IGNORE|BLOCK|BLOCKED|REJECT|REJECTED/i.test(executionModeDecision) || String(agentLoopLatest.status || "").toUpperCase().includes("BLOCKED");
+  const executionFailed = /FAILED/i.test(String(agentLoopLatest.status || ""));
+  const executionInProgress = /RUNNING|IN_PROGRESS|EXECUTING|STARTED/i.test(String(agentLoopLatest.status || ""));
+  const executionComplete = /COMPLETE|COMPLETED/i.test(String(agentLoopLatest.status || latestExecutionEvent?.outcome || "")) && !executionFailed;
+  const executeBlockingReasons = [
+    !scopeComplete ? "Scope incomplete" : "",
+    scopeComplete && !beforeEvidenceCaptured ? "Before Evidence Missing" : "",
+    scopeComplete && beforeEvidenceCaptured && !preflightGo ? `Preflight status: ${text(preflight.status, "Not Yet Available")}` : "",
+    scopeComplete && beforeEvidenceCaptured && preflightGo && !qaPass ? `QA verdict: ${text(qa.verdict, "Not Yet Available")}` : "",
+    scopeComplete && beforeEvidenceCaptured && preflightGo && qaPass && !requiredAgentsGo ? `Required-agent validation: ${text(requiredAgentValidation.status, "Not Yet Available")}` : "",
+    scopeComplete && beforeEvidenceCaptured && preflightGo && qaPass && requiredAgentsGo && executionModeBlocked ? `Execution mode decision: ${executionModeDecision}` : ""
+  ].filter(Boolean);
   const currentOfferReady = Boolean(currentOffer);
   const paymentCollected = merchantClient?.revenue?.shopifixer_collected === true || String(packet.status || "").toLowerCase().includes("paid");
   const deliveryProofReadyStatus = proofAndSealStatus === "Proof Sealed"
@@ -408,7 +419,11 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
     ? "Execute Complete"
     : executionInProgress
       ? "Execute In Progress"
-      : executionBlocked || !scopeReady || !preflightGo || !qaPass || !requiredAgentsGo
+      : executionFailed
+        ? "Execute Failed"
+        : executeBlockingReasons.length
+          ? "Execute Blocked"
+          : executionModeBlocked
         ? "Execute Blocked"
         : "Execute Ready";
   const rollbackAvailability = executionComplete
@@ -439,16 +454,16 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
   const evidenceManifestPath = path.join(repoRoot, "staffordos/proof_runs/output/evidence_manifest_v1.json");
   const sealPath = path.join(repoRoot, `${PROOF_RUN_ROOT}/merchant_proof_package.seal.json`);
   const selectedPhaseKey = resolvePhaseKey(Array.isArray(searchParams?.phase) ? searchParams?.phase[0] : searchParams?.phase);
+  const proofPrerequisitesComplete = scopeComplete && beforeEvidenceCaptured && executionComplete && afterEvidenceCaptured;
   const phaseTruth = {
     merchant_context: Boolean(commandCenterMerchant.store || commandCenterMerchant.client_id),
-    scope: scopeComplete,
+    scope: scopeComplete || scopeReady,
     before_evidence: beforeEvidenceCaptured,
-    execute: scopeReady && preflightGo && qaPass && requiredAgentsGo && !executionBlocked,
+    execute: executeStatus === "Execute Complete" || executeStatus === "Execute In Progress" || executeStatus === "Execute Ready",
     after_evidence: afterEvidenceCaptured,
     proof_seal: Boolean(proofPackageContent.trim()) && String(proofSeal.status || "").trim().toLowerCase() === "sealed" && proofSha256MatchStatus === "Match",
-    delivery: currentOfferReady && paymentCollected && Boolean(proofPackageContent.trim()) && String(proofSeal.status || "").trim().toLowerCase() === "sealed"
+    delivery: proofPrerequisitesComplete && currentOfferReady && paymentCollected && Boolean(proofPackageContent.trim()) && String(proofSeal.status || "").trim().toLowerCase() === "sealed"
   } as const;
-  const proofPrerequisitesComplete = scopeComplete && beforeEvidenceCaptured && executeStatus.includes("Complete") && afterEvidenceCaptured;
   const phaseDefinitions = [
     {
       key: "merchant_context",
@@ -501,21 +516,53 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
     {
       key: "execute",
       label: "Execute",
-      blockedReason: executionBlocked
-        ? "Execution Mode Blocked"
-        : !scopeReady
-          ? "Scope Missing"
-          : !preflightGo
-            ? "Preflight Not GO"
-            : !qaPass
-              ? "QA Not PASS"
-              : !requiredAgentsGo
-                ? "Required Agents Not GO"
-                : "Execution truth unavailable",
-      nextSafeAction: "Open After Evidence Workbench",
+      blockedReason: executeBlockingReasons.length
+        ? executeBlockingReasons.join(" · ")
+        : executionFailed
+          ? "Execution Failed"
+          : executionComplete
+            ? "Execution Complete"
+            : "Execution truth unavailable",
+      nextSafeAction: !scopeComplete
+        ? "Review Scope"
+        : !beforeEvidenceCaptured
+          ? "Capture Before Evidence"
+          : executeStatus === "Execute Failed"
+            ? "Review Failure Evidence"
+            : executeStatus === "Execute Complete"
+              ? "Continue to After Evidence"
+              : executeStatus === "Execute In Progress"
+                ? "Execution In Progress"
+                : executeStatus === "Execute Ready"
+                  ? "Review and Execute"
+                  : "Resolve Execution Gate",
       authority: "execution_log_v1.json / outcome_event_log_v1.json / preflight_report_v1.json / command_center_primary_action_qa_v1.json",
-      ctaLabel: "Open After Evidence Workbench",
-      ctaHref: phaseHref("after_evidence"),
+      ctaLabel: !scopeComplete
+        ? "Complete Scope"
+        : !beforeEvidenceCaptured
+          ? "Capture Before Evidence"
+          : executeStatus === "Execute Failed"
+            ? "Review Failure Evidence"
+            : executeStatus === "Execute Complete"
+              ? "Continue to After Evidence"
+              : executeStatus === "Execute In Progress"
+                ? "Execution In Progress"
+                : executeStatus === "Execute Ready"
+                  ? "Review and Execute"
+                  : "Resolve Execution Gate",
+      ctaHref: !scopeComplete
+        ? phaseHref("scope")
+        : !beforeEvidenceCaptured
+          ? phaseHref("before-evidence")
+          : executeStatus === "Execute Failed"
+            ? "/operator/execution-log"
+            : executeStatus === "Execute Complete"
+              ? phaseHref("after-evidence")
+              : executeStatus === "Execute In Progress"
+                ? phaseHref("execute")
+                : executeStatus === "Execute Ready"
+                  ? phaseHref("execute")
+                  : "/operator/command-center",
       note: executeStatus
     },
     {
@@ -525,14 +572,14 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
         ? "Scope incomplete"
         : !beforeEvidenceCaptured
           ? "Before Evidence Missing"
-          : !executeStatus.includes("Complete")
+          : !executionComplete
             ? "Execution incomplete"
             : afterEvidenceStatus,
       nextSafeAction: !scopeComplete
         ? "Review Scope"
         : !beforeEvidenceCaptured
           ? "Capture Before Evidence"
-          : !executeStatus.includes("Complete")
+          : !executionComplete
             ? "Review Execution Readiness"
             : afterEvidenceCaptured
               ? "Continue to Proof & Seal"
@@ -542,7 +589,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
         ? "Complete Scope"
         : !beforeEvidenceCaptured
           ? "Capture Before Evidence"
-          : !executeStatus.includes("Complete")
+          : !executionComplete
             ? "Review Execution Readiness"
             : afterEvidenceCaptured
               ? "Continue to Proof & Seal"
@@ -551,7 +598,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
         ? phaseHref("scope")
         : !beforeEvidenceCaptured
           ? phaseHref("before-evidence")
-          : !executeStatus.includes("Complete")
+          : !executionComplete
             ? phaseHref("execute")
             : afterEvidenceCaptured
               ? phaseHref("proof-seal")
@@ -565,7 +612,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
         ? "Scope incomplete"
         : !beforeEvidenceCaptured
           ? "Before Evidence Missing"
-          : !executeStatus.includes("Complete")
+          : !executionComplete
             ? "Execution incomplete"
             : !afterEvidenceCaptured
               ? "After Evidence Missing"
@@ -574,7 +621,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
         ? "Review Scope"
         : !beforeEvidenceCaptured
           ? "Capture Before Evidence"
-          : !executeStatus.includes("Complete")
+          : !executionComplete
             ? "Review Execution Readiness"
             : !afterEvidenceCaptured
               ? "Capture After Evidence"
@@ -586,7 +633,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
         ? "Complete Scope"
         : !beforeEvidenceCaptured
           ? "Capture Before Evidence"
-          : !executeStatus.includes("Complete")
+          : !executionComplete
             ? "Review Execution Readiness"
             : !afterEvidenceCaptured
               ? "Capture After Evidence"
@@ -597,7 +644,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
         ? phaseHref("scope")
         : !beforeEvidenceCaptured
           ? phaseHref("before-evidence")
-          : !executeStatus.includes("Complete")
+          : !executionComplete
             ? phaseHref("execute")
             : !afterEvidenceCaptured
               ? phaseHref("after-evidence")
@@ -949,6 +996,37 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
       executeSummary={{
         status: executeStatus,
         primaryAction: text(primaryActionSnapshot.primary_action?.action_label || qa.snapshot_primary_action?.action_label || "Not Yet Available"),
+        actionType: text(primaryActionSnapshot.primary_action?.action_type || "Not Yet Available"),
+        domain: text(primaryActionSnapshot.primary_action?.domain_id || "Not Yet Available"),
+        merchant: text(merchantKey || commandCenterMerchant.store || "Not Yet Available"),
+        product: text(primaryActionSnapshot.primary_action?.product_id || "Not Yet Available"),
+        owner: text(primaryActionSnapshot.primary_action?.owner || "Not Yet Available"),
+        confidence: text(primaryActionSnapshot.primary_action?.confidence !== undefined ? String(primaryActionSnapshot.primary_action.confidence) : "Not Yet Available"),
+        executionModeDecision,
+        executionModeExecutionMode,
+        lastLaunchedAt: text(primaryActionSnapshot.primary_action?.last_launched_at || "Not Yet Available"),
+        lastCompletedAt: text(primaryActionSnapshot.primary_action?.last_completed_at || "Not Yet Available"),
+        lastFailedAt: text(primaryActionSnapshot.primary_action?.last_failed_at || "Not Yet Available"),
+        executionArtifactPaths: Array.isArray(primaryActionSnapshot.primary_action?.last_execution_artifacts)
+          ? primaryActionSnapshot.primary_action.last_execution_artifacts.map((item: unknown) => text(item, "Not Yet Available"))
+          : [
+              "staffordos/events/operator_action_events_v1.json",
+              "staffordos/events/outcome_event_log_v1.json",
+              "staffordos/execution/output/agent_loop_latest.json",
+              "staffordos/events/outcome_scores_v1.json",
+              "staffordos/agents/agent_performance_v1.json",
+              "staffordos/rules/rule_suggestions_v1.json",
+              "staffordos/loop_d/output/loop_d_feedback_report_v1.json"
+            ],
+        blockingReasons: executeBlockingReasons,
+        missingTruthOrGates: [
+          !scopeComplete ? "fix_scope.md" : "",
+          scopeComplete && !beforeEvidenceCaptured ? "before_evidence.md / evidence_manifest_v1.json" : "",
+          scopeComplete && beforeEvidenceCaptured && !preflightGo ? "preflight_report_v1.json" : "",
+          scopeComplete && beforeEvidenceCaptured && preflightGo && !qaPass ? "command_center_primary_action_qa_v1.json" : "",
+          scopeComplete && beforeEvidenceCaptured && preflightGo && qaPass && !requiredAgentsGo ? "required_agent_validation_v1.json" : "",
+          scopeComplete && beforeEvidenceCaptured && preflightGo && qaPass && requiredAgentsGo && executionModeBlocked ? "agent_loop_latest.json" : ""
+        ].filter(Boolean) as string[],
         preflightStatus: text(preflight.status, "Not Yet Available"),
         qaStatus: text(qa.verdict, "Not Yet Available"),
         latestExecutionStatus: text(agentLoopLatest.status || latestExecutionEvent?.outcome || "Not Yet Available"),

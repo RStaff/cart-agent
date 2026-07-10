@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ExecutePrimaryActionButton } from "./ExecutePrimaryActionButton";
 import { ProofRunWorkbench } from "./ProofRunWorkbench";
 
 type PhaseState = "available" | "current" | "blocked" | "complete";
@@ -57,6 +58,20 @@ type EvidenceArtifactSummary = {
 type ExecuteSummary = {
   status: string;
   primaryAction: string;
+  actionType: string;
+  domain: string;
+  merchant: string;
+  product: string;
+  owner: string;
+  confidence: string;
+  executionModeDecision: string;
+  executionModeExecutionMode: string;
+  lastLaunchedAt: string;
+  lastCompletedAt: string;
+  lastFailedAt: string;
+  executionArtifactPaths: string[];
+  blockingReasons: string[];
+  missingTruthOrGates: string[];
   preflightStatus: string;
   qaStatus: string;
   latestExecutionStatus: string;
@@ -234,6 +249,12 @@ export function ShopifixerPilotWorkspace({
   previousWork
 }: ShopifixerPilotWorkspaceProps) {
   const activePhase = phases.find((phase) => phase.key === currentPhase) || phases[0];
+  const executeCanLaunch =
+    executeSummary.status === "Execute Ready" &&
+    executeSummary.blockingReasons.length === 0 &&
+    executeSummary.missingTruthOrGates.length === 0;
+  const executeConfirmation =
+    "This invokes the governed StaffordOS execution spine. It does not automatically send email or collect payment. External actions remain subject to their existing governed workflows. I am confirming the displayed action only.";
 
   return (
     <div className="container shopifixerPilotWorkspace">
@@ -452,7 +473,7 @@ export function ShopifixerPilotWorkspace({
                       </Link>
                     </div>
                   </div>
-                ) : !executeSummary.status.includes("Complete") ? (
+                ) : executeSummary.status !== "Execute Complete" ? (
                   <div className="boardCard" style={{ marginTop: 16 }}>
                     <p className="boardCardTitle">After Evidence Workbench</p>
                     <p className="boardCardMeta">Blocked</p>
@@ -514,7 +535,7 @@ export function ShopifixerPilotWorkspace({
                       </Link>
                     </div>
                   </div>
-                ) : !executeSummary.status.includes("Complete") ? (
+                ) : executeSummary.status !== "Execute Complete" ? (
                   <div className="boardCard" style={{ marginTop: 16 }}>
                     <p className="boardCardTitle">Proof &amp; Seal Workbench</p>
                     <p className="boardCardMeta">Blocked</p>
@@ -608,21 +629,125 @@ export function ShopifixerPilotWorkspace({
                 </div>
               </div>
 
-              <div className="boardCard" style={{ marginTop: 16 }}>
-                <p className="boardCardTitle">Execute</p>
-                <p className="boardCardMeta">{executeSummary.status}</p>
-                <div className="kv">
-                  <div><strong>Primary action:</strong> {executeSummary.primaryAction}</div>
-                  <div><strong>Preflight status:</strong> {executeSummary.preflightStatus}</div>
-                  <div><strong>QA status:</strong> {executeSummary.qaStatus}</div>
-                  <div><strong>Latest execution status:</strong> {executeSummary.latestExecutionStatus}</div>
-                  <div><strong>Latest execution event:</strong> {executeSummary.latestExecutionEvent}</div>
-                  <div><strong>Outcome event status:</strong> {executeSummary.outcomeEventStatus}</div>
-                  <div><strong>Rollback availability:</strong> {executeSummary.rollbackAvailability}</div>
-                  <div><strong>Fix scope readiness:</strong> {executeSummary.fixScopeReadiness}</div>
-                  <div><strong>Primary action source:</strong> {executeSummary.primaryActionSource}</div>
+              {currentPhase === "execute" ? (
+                <div className="boardCard" style={{ marginTop: 16 }}>
+                  <p className="boardCardTitle">Execute Workbench</p>
+                  <p className="boardCardMeta">{executeSummary.status}</p>
+                  <div className="grid gridTwo" style={{ marginTop: 12 }}>
+                    <div>
+                      <p className="eyebrow">Execution preview</p>
+                      <div className="kv">
+                        <div><strong>Primary action:</strong> {executeSummary.primaryAction}</div>
+                        <div><strong>Action type:</strong> {executeSummary.actionType}</div>
+                        <div><strong>Domain / merchant:</strong> {executeSummary.domain} · {executeSummary.merchant}</div>
+                        <div><strong>Product:</strong> {executeSummary.product}</div>
+                        <div><strong>Owner:</strong> {executeSummary.owner}</div>
+                        <div><strong>Confidence:</strong> {executeSummary.confidence}</div>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="eyebrow">Governance</p>
+                      <div className="kv">
+                        <div><strong>Execution mode decision:</strong> {executeSummary.executionModeDecision}</div>
+                        <div><strong>Execution mode:</strong> {executeSummary.executionModeExecutionMode}</div>
+                        <div><strong>Next step:</strong> {executeSummary.primaryAction}</div>
+                        <div><strong>Rollback availability:</strong> {executeSummary.rollbackAvailability}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid gridTwo" style={{ marginTop: 12 }}>
+                    <div>
+                      <p className="eyebrow">Evidence references</p>
+                      <div className="kv">
+                        {executeSummary.missingTruthOrGates.length ? executeSummary.missingTruthOrGates.map((item) => <div key={item}>{item}</div>) : <div>Not Yet Available</div>}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="eyebrow">Risk references</p>
+                      <div className="kv">
+                        {executeSummary.blockingReasons.length ? executeSummary.blockingReasons.map((item) => <div key={item}>{item}</div>) : <div>Not Yet Available</div>}
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ marginTop: 12 }}>
+                    <p className="eyebrow">Expected execution artifacts</p>
+                    <div className="kv">
+                      {executeSummary.executionArtifactPaths.length ? (
+                        executeSummary.executionArtifactPaths.map((item) => <div key={item}>{item}</div>)
+                      ) : (
+                        <div>Not Yet Available</div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="kv" style={{ marginTop: 12 }}>
+                    <div><strong>Last launched:</strong> {executeSummary.lastLaunchedAt}</div>
+                    <div><strong>Last completed:</strong> {executeSummary.lastCompletedAt}</div>
+                    <div><strong>Last failed:</strong> {executeSummary.lastFailedAt}</div>
+                    <div><strong>Latest execution status:</strong> {executeSummary.latestExecutionStatus}</div>
+                    <div><strong>Latest execution event:</strong> {executeSummary.latestExecutionEvent}</div>
+                    <div><strong>Outcome event status:</strong> {executeSummary.outcomeEventStatus}</div>
+                    <div><strong>Rollback availability:</strong> {executeSummary.rollbackAvailability}</div>
+                    <div><strong>Fix scope readiness:</strong> {executeSummary.fixScopeReadiness}</div>
+                    <div><strong>Primary action source:</strong> {executeSummary.primaryActionSource}</div>
+                  </div>
+                  <div style={{ marginTop: 16 }}>
+                    {executeSummary.status === "Execute Ready" && executeCanLaunch ? (
+                      <div>
+                        <p className="hint">{executeConfirmation}</p>
+                        <ExecutePrimaryActionButton
+                          requireConfirmation
+                          confirmationLabel={executeConfirmation}
+                          submitLabel="Review and Execute"
+                          refreshOnSuccess
+                        />
+                      </div>
+                    ) : (
+                      <div className="kv">
+                        <div><strong>Blocking reason:</strong> {executeSummary.blockingReasons.length ? executeSummary.blockingReasons.join(" · ") : executeSummary.status}</div>
+                        <div><strong>Missing truth or gate:</strong> {executeSummary.missingTruthOrGates.length ? executeSummary.missingTruthOrGates.join(" · ") : "Not Yet Available"}</div>
+                        <div><strong>Exact next safe action:</strong> {executeSummary.status === "Execute Complete" ? "Continue to After Evidence" : executeSummary.status === "Execute Failed" ? "Review Failure Evidence" : "Resolve Execution Gate"}</div>
+                        {executeSummary.missingTruthOrGates.some((item) => item.includes("fix_scope.md")) ? (
+                          <div style={{ marginTop: 12 }}>
+                            <Link href="/operator/shopifixer-pilot?phase=scope" className="inlineLink">
+                              Open Scope phase
+                            </Link>
+                          </div>
+                        ) : null}
+                        {executeSummary.missingTruthOrGates.some((item) => item.includes("before_evidence.md")) ? (
+                          <div style={{ marginTop: 12 }}>
+                            <Link href="/operator/shopifixer-pilot?phase=before-evidence" className="inlineLink">
+                              Open Before Evidence phase
+                            </Link>
+                          </div>
+                        ) : null}
+                        {executeSummary.missingTruthOrGates.some((item) => item.includes("preflight_report_v1.json") || item.includes("command_center_primary_action_qa_v1.json") || item.includes("required_agent_validation_v1.json") || item.includes("agent_loop_latest.json")) ? (
+                          <div style={{ marginTop: 12 }}>
+                            <Link href="/operator/command-center" className="inlineLink">
+                              Resolve Execution Gate
+                            </Link>
+                          </div>
+                        ) : null}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="boardCard" style={{ marginTop: 16 }}>
+                  <p className="boardCardTitle">Execute</p>
+                  <p className="boardCardMeta">{executeSummary.status}</p>
+                  <div className="kv">
+                    <div><strong>Primary action:</strong> {executeSummary.primaryAction}</div>
+                    <div><strong>Preflight status:</strong> {executeSummary.preflightStatus}</div>
+                    <div><strong>QA status:</strong> {executeSummary.qaStatus}</div>
+                    <div><strong>Latest execution status:</strong> {executeSummary.latestExecutionStatus}</div>
+                    <div><strong>Latest execution event:</strong> {executeSummary.latestExecutionEvent}</div>
+                    <div><strong>Outcome event status:</strong> {executeSummary.outcomeEventStatus}</div>
+                    <div><strong>Rollback availability:</strong> {executeSummary.rollbackAvailability}</div>
+                    <div><strong>Fix scope readiness:</strong> {executeSummary.fixScopeReadiness}</div>
+                    <div><strong>Primary action source:</strong> {executeSummary.primaryActionSource}</div>
+                  </div>
+                </div>
+              )}
 
               <div className="boardCard" style={{ marginTop: 16 }}>
                 <p className="boardCardTitle">After Evidence</p>
