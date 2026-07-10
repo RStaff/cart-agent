@@ -13,6 +13,8 @@ type ProofFile = {
   path: string;
 };
 
+type PhaseState = "available" | "current" | "blocked" | "complete";
+
 const PROOF_RUN_ROOT = "staffordos/proof_runs/internal_shopifixer_dry_run_v1";
 const PROOF_FILES: ProofFile[] = [
   { label: "Before evidence", path: `${PROOF_RUN_ROOT}/before_evidence.md` },
@@ -162,7 +164,42 @@ function phaseStatus(index: number, currentIndex: number): "ready" | "in_progres
   return "blocked";
 }
 
-export default async function ShopifixerPilotPage() {
+function normalizePhaseKey(value: unknown) {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "_");
+}
+
+function resolvePhaseKey(value: unknown) {
+  const key = normalizePhaseKey(value);
+  const allowed = new Set([
+    "merchant_context",
+    "scope",
+    "before_evidence",
+    "execute",
+    "after_evidence",
+    "proof_seal",
+    "delivery"
+  ]);
+  return allowed.has(key) ? key : "merchant_context";
+}
+
+function phaseHref(key: string) {
+  return `/operator/shopifixer-pilot?phase=${key}`;
+}
+
+const PHASE_KEYS = [
+  "merchant_context",
+  "scope",
+  "before_evidence",
+  "execute",
+  "after_evidence",
+  "proof_seal",
+  "delivery"
+] as const;
+
+export default async function ShopifixerPilotPage({ searchParams }: { searchParams?: { phase?: string | string[] } }) {
   const repoRoot = resolveRepoRoot();
   const shopifixer = await loadShopifixerCommandCenter();
   const shopifixerRecord = shopifixer as any;
@@ -245,11 +282,6 @@ export default async function ShopifixerPilotPage() {
       : proofSeal.sha256
         ? "Proof Drafted"
         : "Proof Invalid";
-  const deliveryProofReadyStatus = proofAndSealStatus === "Proof Sealed"
-    ? "Ready to Send"
-    : proofAndSealStatus === "Proof Drafted" || proofAndSealStatus === "Proof Missing"
-      ? "Waiting for Proof"
-      : "Not Yet Available";
 
   const commandCenterMerchant = shopifixerRecord.merchant || {};
   const packet = shopifixerRecord.checkout_linkage || {};
@@ -317,6 +349,25 @@ export default async function ShopifixerPilotPage() {
   const executionBlocked = String(agentLoopLatest.status || "").toUpperCase().includes("BLOCKED");
   const executionInProgress = /RUNNING|IN_PROGRESS/i.test(String(agentLoopLatest.status || ""));
   const executionComplete = /COMPLETE/i.test(String(agentLoopLatest.status || latestExecutionEvent?.outcome || ""));
+  const currentOfferReady = Boolean(currentOffer);
+  const paymentCollected = merchantClient?.revenue?.shopifixer_collected === true || String(packet.status || "").toLowerCase().includes("paid");
+  const deliveryProofReadyStatus = proofAndSealStatus === "Proof Sealed"
+    ? "Ready to Send"
+    : proofAndSealStatus === "Proof Drafted" || proofAndSealStatus === "Proof Missing"
+      ? "Waiting for Proof"
+      : "Not Yet Available";
+  const deliveryMerchantStatus = proofAndSealStatus === "Proof Missing"
+    ? "Waiting for Proof"
+    : paymentCollected
+      ? "Ready for Completion"
+      : "Payment Pending";
+  const deliveryOfferStatus = currentOffer ? "Waiting for Merchant" : "Not Yet Available";
+  const deliveryPaymentStatus = paymentCollected ? "Complete" : "Payment Pending";
+  const deliveryCompletionReadiness = proofAndSealStatus === "Proof Sealed"
+    ? (paymentCollected ? "Complete" : "Ready for Completion")
+    : proofAndSealStatus === "Proof Missing"
+      ? "Waiting for Proof"
+      : "Waiting for Merchant";
   const executeStatus = executionComplete
     ? "Execute Complete"
     : executionInProgress
@@ -344,21 +395,6 @@ export default async function ShopifixerPilotPage() {
       ? "seal present"
       : "seal missing"
   ].join(" · ");
-  const currentPhase = "merchant_context";
-  const phases = [
-    { key: "merchant_context", label: "Merchant Context" },
-    { key: "scope", label: "Scope" },
-    { key: "before_evidence", label: "Before Evidence" },
-    { key: "execute", label: "Execute" },
-    { key: "after_evidence", label: "After Evidence" },
-    { key: "proof_seal", label: "Proof & Seal" },
-    { key: "delivery", label: "Delivery" },
-  ].map((phase, index) => ({
-    ...phase,
-    status: phaseStatus(index, 0),
-    disabled: index !== 0
-  }));
-
   const proofFileStatuses = PROOF_FILES.map((file) => ({
     label: file.label,
     value: fs.existsSync(path.join(repoRoot, file.path)) ? "Present" : "Missing"
@@ -366,17 +402,125 @@ export default async function ShopifixerPilotPage() {
 
   const evidenceManifestPath = path.join(repoRoot, "staffordos/proof_runs/output/evidence_manifest_v1.json");
   const sealPath = path.join(repoRoot, `${PROOF_RUN_ROOT}/merchant_proof_package.seal.json`);
-  const deliveryMerchantStatus = proofAndSealStatus === "Proof Missing"
-    ? "Waiting for Proof"
-    : "Payment Pending";
-  const deliveryOfferStatus = currentOffer ? "Waiting for Merchant" : "Not Yet Available";
-  const deliveryPaymentStatus = currentRevenueGap?.gap !== undefined ? "Payment Pending" : "Not Yet Available";
-  const deliveryCompletionReadiness = deliveryPaymentStatus === "Payment Pending"
-    ? "Waiting for Merchant"
-    : merchantClient?.revenue?.shopifixer_collected
-      ? "Complete"
-      : "Ready for Completion";
+  const selectedPhaseKey = resolvePhaseKey(Array.isArray(searchParams?.phase) ? searchParams?.phase[0] : searchParams?.phase);
+  const phaseTruth = {
+    merchant_context: Boolean(commandCenterMerchant.store || commandCenterMerchant.client_id),
+    scope: Boolean(scopeFileContent.trim()),
+    before_evidence: Boolean(beforeEvidenceContent.trim()),
+    execute: scopeReady && preflightGo && qaPass && requiredAgentsGo && !executionBlocked,
+    after_evidence: Boolean(afterEvidenceContent.trim()),
+    proof_seal: Boolean(proofPackageContent.trim()) && String(proofSeal.status || "").trim().toLowerCase() === "sealed" && proofSha256MatchStatus === "Match",
+    delivery: currentOfferReady && paymentCollected && Boolean(proofPackageContent.trim()) && String(proofSeal.status || "").trim().toLowerCase() === "sealed"
+  } as const;
+  const phaseDefinitions = [
+    {
+      key: "merchant_context",
+      label: "Merchant Context",
+      blockedReason: "Merchant context truth missing",
+      nextSafeAction: "Review Scope",
+      authority: "client_registry_v1.json / lead_registry_v1.json / shopifixer command center",
+      ctaLabel: "Review Scope",
+      ctaHref: phaseHref("scope"),
+      note: "Load merchant, lead, campaign, packet, and revenue truth."
+    },
+    {
+      key: "scope",
+      label: "Scope",
+      blockedReason: scopeSummary.sourceState === "fix_scope.md missing" ? "Scope Missing" : "Scope not approved",
+      nextSafeAction: "Open Before Evidence Workbench",
+      authority: "fix_scope.md / shopifixer_offer_latest.json",
+      ctaLabel: "Open Before Evidence Workbench",
+      ctaHref: phaseHref("before_evidence"),
+      note: scopeSummary.sourceState
+    },
+    {
+      key: "before_evidence",
+      label: "Before Evidence",
+      blockedReason: beforeEvidenceStatus,
+      nextSafeAction: "Review Execution Readiness",
+      authority: "before_evidence.md / evidence_manifest_v1.json",
+      ctaLabel: "Review Execution Readiness",
+      ctaHref: phaseHref("execute"),
+      note: beforeEvidenceStatus
+    },
+    {
+      key: "execute",
+      label: "Execute",
+      blockedReason: executionBlocked
+        ? "Execution Mode Blocked"
+        : !scopeReady
+          ? "Scope Missing"
+          : !preflightGo
+            ? "Preflight Not GO"
+            : !qaPass
+              ? "QA Not PASS"
+              : !requiredAgentsGo
+                ? "Required Agents Not GO"
+                : "Execution truth unavailable",
+      nextSafeAction: "Open After Evidence Workbench",
+      authority: "execution_log_v1.json / outcome_event_log_v1.json / preflight_report_v1.json / command_center_primary_action_qa_v1.json",
+      ctaLabel: "Open After Evidence Workbench",
+      ctaHref: phaseHref("after_evidence"),
+      note: executeStatus
+    },
+    {
+      key: "after_evidence",
+      label: "After Evidence",
+      blockedReason: afterEvidenceStatus,
+      nextSafeAction: "Review Proof & Seal",
+      authority: "after_evidence.md / evidence_manifest_v1.json",
+      ctaLabel: "Review Proof & Seal",
+      ctaHref: phaseHref("proof_seal"),
+      note: afterEvidenceStatus
+    },
+    {
+      key: "proof_seal",
+      label: "Proof & Seal",
+      blockedReason: proofAndSealStatus,
+      nextSafeAction: "Review Payment Gate",
+      authority: "merchant_proof_package.md / merchant_proof_package.seal.json / evidence_manifest_v1.json",
+      ctaLabel: "Review Payment Gate",
+      ctaHref: phaseHref("delivery"),
+      note: proofAndSealStatus
+    },
+    {
+      key: "delivery",
+      label: "Delivery & Payment Gate",
+      blockedReason: deliveryCompletionReadiness === "Waiting for Merchant"
+        ? "Payment Pending"
+        : deliveryCompletionReadiness === "Ready for Completion"
+          ? "Ready for Completion"
+          : "Not Yet Available",
+      nextSafeAction: "Review Payment Gate",
+      authority: "shopifixer_offer_latest.json / operator_dashboard_snapshot_v1.json / merchant_proof_package.seal.json",
+      ctaLabel: "Review Payment Gate",
+      ctaHref: "/operator/revenue-command",
+      note: deliveryCompletionReadiness
+    }
+  ] as const;
+  const selectedPhaseIndex = PHASE_KEYS.indexOf(selectedPhaseKey as (typeof PHASE_KEYS)[number]);
+  const phaseItems = phaseDefinitions.map((phase, index) => {
+    const truthComplete = phaseTruth[phase.key as keyof typeof phaseTruth];
+    let state: PhaseState = "blocked";
 
+    if (phase.key === selectedPhaseKey) {
+      state = "current";
+    } else if (truthComplete && index < selectedPhaseIndex) {
+      state = "complete";
+    } else if (truthComplete) {
+      state = "available";
+    }
+
+    return {
+      ...phase,
+      state,
+      status: state,
+      href: phaseHref(phase.key),
+      note: state === "blocked" ? phase.blockedReason : phase.nextSafeAction
+    };
+  });
+  const activePhase = phaseItems.find((phase) => phase.key === selectedPhaseKey) || phaseItems[0];
+  const recommendedPhase = phaseItems.find((phase) => phase.state !== "complete") || activePhase;
   return (
     <ShopifixerPilotWorkspace
       merchant={{
@@ -409,11 +553,11 @@ export default async function ShopifixerPilotPage() {
         loopsRun: "Not Yet Implemented"
       }}
       proofRunId="internal_shopifixer_dry_run_v1"
-      currentPhase={currentPhase}
-      phases={phases}
+      currentPhase={selectedPhaseKey}
+      phases={phaseItems}
       progress={{
-        completed: phases.filter((phase) => phase.status === "complete").length,
-        total: phases.length
+        completed: phaseItems.filter((phase) => phase.state === "complete").length,
+        total: phaseItems.length
       }}
       merchantContext={[
         {
@@ -571,6 +715,14 @@ export default async function ShopifixerPilotPage() {
         recommendedOperatorAction: primaryActionSnapshot.primary_action?.next_step || qa.snapshot_primary_action?.next_step || "Not Yet Available",
         revenueOpportunity: currentRevenueGap?.gap !== undefined ? money(currentRevenueGap.gap) : "Not Yet Available",
         completionReadiness: deliveryCompletionReadiness
+      }}
+      recommendedNextStep={{
+        phaseLabel: recommendedPhase.label,
+        state: recommendedPhase.state,
+        blockedReason: recommendedPhase.blockedReason,
+        missingTruthOrGate: recommendedPhase.authority,
+        nextSafeAction: recommendedPhase.nextSafeAction,
+        href: recommendedPhase.href
       }}
       executeSummary={{
         status: executeStatus,

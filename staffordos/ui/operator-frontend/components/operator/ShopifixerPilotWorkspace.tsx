@@ -1,12 +1,19 @@
 import Link from "next/link";
 
-type PhaseState = "ready" | "in_progress" | "blocked" | "complete";
+type PhaseState = "available" | "current" | "blocked" | "complete";
 
 type Phase = {
   key: string;
   label: string;
+  state: PhaseState;
   status: PhaseState;
-  disabled: boolean;
+  href: string;
+  blockedReason: string;
+  nextSafeAction: string;
+  authority: string;
+  note: string;
+  ctaLabel: string;
+  ctaHref: string;
 };
 
 type StatusLine = {
@@ -108,6 +115,15 @@ type DeliverySummary = {
   completionReadiness: string;
 };
 
+type RecommendedNextStep = {
+  phaseLabel: string;
+  state: string;
+  blockedReason: string;
+  missingTruthOrGate: string;
+  nextSafeAction: string;
+  href: string;
+};
+
 type ShopifixerPilotWorkspaceProps = {
   merchant: {
     store: string;
@@ -156,6 +172,7 @@ type ShopifixerPilotWorkspaceProps = {
   afterEvidenceSummary: AfterEvidenceSummary;
   proofAndSealSummary: ProofAndSealSummary;
   deliverySummary: DeliverySummary;
+  recommendedNextStep: RecommendedNextStep;
   evidenceStatus: StatusLine[];
   validationStatus: StatusLine[];
   previousWork: string;
@@ -163,7 +180,7 @@ type ShopifixerPilotWorkspaceProps = {
 
 function badgeClass(status: PhaseState) {
   if (status === "complete") return "healthGood";
-  if (status === "in_progress") return "healthWarn";
+  if (status === "current") return "healthWarn";
   if (status === "blocked") return "healthCritical";
   return "healthBadge";
 }
@@ -185,6 +202,7 @@ export function ShopifixerPilotWorkspace({
   afterEvidenceSummary,
   proofAndSealSummary,
   deliverySummary,
+  recommendedNextStep,
   evidenceStatus,
   validationStatus,
   previousWork
@@ -227,30 +245,30 @@ export function ShopifixerPilotWorkspace({
             <h2 className="sectionTitle">Current phase</h2>
             <div className="shopifixerPilotRail">
               {phases.map((phase) => (
-                <button
+                <Link
                   key={phase.key}
-                  type="button"
-                  className={`shopifixerPilotPhaseButton ${badgeClass(phase.status)}${phase.key === activePhase.key ? " shopifixerPilotPhaseButtonActive" : ""}`}
-                  disabled={phase.disabled}
+                  href={phase.href}
+                  className={`shopifixerPilotPhaseButton ${badgeClass(phase.state)}${phase.key === activePhase.key ? " shopifixerPilotPhaseButtonActive" : ""}`}
                 >
                   <span>{phase.label}</span>
-                  <strong>{phase.status.replace("_", " ")}</strong>
-                </button>
+                  <strong>{phase.state}</strong>
+                  <span className="boardCardNote">{phase.state === "blocked" ? phase.blockedReason : phase.note}</span>
+                </Link>
               ))}
             </div>
 
             <div style={{ marginTop: 18 }}>
               <p className="eyebrow">Primary CTA</p>
-              <button type="button" className="button buttonPrimary" disabled style={{ width: "100%" }}>
-                Continue to {phases[1]?.label || "next phase"}
-              </button>
+              <Link href={activePhase.ctaHref} className="button buttonPrimary" style={{ display: "block", textAlign: "center", width: "100%" }}>
+                {activePhase.ctaLabel}
+              </Link>
             </div>
 
             <div style={{ marginTop: 12 }}>
               <p className="eyebrow">Secondary CTA</p>
-              <button type="button" className="button" disabled style={{ width: "100%" }}>
-                Review merchant context
-              </button>
+              <Link href="/operator/command-center" className="button" style={{ display: "block", textAlign: "center", width: "100%" }}>
+                Open Executive
+              </Link>
             </div>
           </div>
         </article>
@@ -280,9 +298,9 @@ export function ShopifixerPilotWorkspace({
                   </article>
                 ))}
               </div>
-              <div className="kv" style={{ marginTop: 16 }}>
+                <div className="kv" style={{ marginTop: 16 }}>
                 <div><strong>Current phase:</strong> {activePhase.label}</div>
-                <div><strong>Status:</strong> {activePhase.status.replace("_", " ")}</div>
+                <div><strong>Status:</strong> {activePhase.state.replace("_", " ")}</div>
                 <div><strong>Merchant:</strong> {merchant.store}</div>
                 <div><strong>Previous work:</strong> {previousWork}</div>
               </div>
@@ -479,6 +497,23 @@ export function ShopifixerPilotWorkspace({
                   <div><strong>Recommended operator action:</strong> {deliverySummary.recommendedOperatorAction}</div>
                   <div><strong>Revenue opportunity:</strong> {deliverySummary.revenueOpportunity}</div>
                   <div><strong>Completion readiness:</strong> {deliverySummary.completionReadiness}</div>
+                </div>
+              </div>
+
+              <div className="boardCard" style={{ marginTop: 16 }}>
+                <p className="boardCardTitle">Recommended Next Step</p>
+                <p className="boardCardMeta">{recommendedNextStep.phaseLabel}</p>
+                <div className="kv">
+                  <div><strong>Phase:</strong> {recommendedNextStep.phaseLabel}</div>
+                  <div><strong>Status:</strong> {recommendedNextStep.state}</div>
+                  <div><strong>Blocking reason:</strong> {recommendedNextStep.blockedReason}</div>
+                  <div><strong>Missing truth or gate:</strong> {recommendedNextStep.missingTruthOrGate}</div>
+                  <div><strong>Exact next safe action:</strong> {recommendedNextStep.nextSafeAction}</div>
+                </div>
+                <div style={{ marginTop: 12 }}>
+                  <Link href={recommendedNextStep.href} className="inlineLink">
+                    Open recommended phase
+                  </Link>
                 </div>
               </div>
 
