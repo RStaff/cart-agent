@@ -12,6 +12,7 @@ import { writeShopifixerBeforeEvidence } from "../../../lib/operator/writeShopif
 import { writeShopifixerAfterEvidence } from "../../../lib/operator/writeShopifixerAfterEvidence";
 import { writeShopifixerProofPackage } from "../../../lib/operator/writeShopifixerProofPackage";
 import { writeShopifixerScopedFix } from "../../../lib/operator/writeShopifixerScopedFix";
+import { writeShopifixerCompletion } from "../../../lib/operator/writeShopifixerCompletion";
 
 type ProofFile = {
   label: string;
@@ -186,7 +187,7 @@ function resolvePhaseKey(value: unknown) {
     "execute",
     "after_evidence",
     "proof_seal",
-    "delivery"
+    "delivery_payment"
   ]);
   return allowed.has(key) ? key : "merchant_context";
 }
@@ -202,7 +203,7 @@ const PHASE_KEYS = [
   "execute",
   "after_evidence",
   "proof_seal",
-  "delivery"
+  "delivery_payment"
 ] as const;
 
 type ShopifixerPilotSearchParams = {
@@ -210,6 +211,8 @@ type ShopifixerPilotSearchParams = {
   shopifixer_scoped_fix_saved?: string;
   shopifixer_before_saved?: string;
   shopifixer_after_saved?: string;
+  shopifixer_proof_package_saved?: string;
+  shopifixer_completion_saved?: string;
 };
 
 export default async function ShopifixerPilotPage({ searchParams }: { searchParams?: ShopifixerPilotSearchParams }) {
@@ -279,6 +282,8 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
   const proofPackageContent = readText(proofPackagePath);
   const proofPackageWorkbenchSaved = (searchParams as { shopifixer_proof_package_saved?: string } | undefined)?.shopifixer_proof_package_saved === "1";
   const proofPackageWorkbenchDate = new Date().toISOString().slice(0, 10);
+  const completionWorkbenchSaved = (searchParams as { shopifixer_completion_saved?: string } | undefined)?.shopifixer_completion_saved === "1";
+  const completionWorkbenchDate = new Date().toISOString().slice(0, 10);
   const evidenceManifest = readJson<Record<string, any>>(
     path.join(repoRoot, "staffordos/proof_runs/output/evidence_manifest_v1.json"),
     {}
@@ -306,7 +311,6 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
       : proofSeal.sha256
         ? "Proof Drafted"
         : "Proof Invalid";
-
   const commandCenterMerchant = shopifixerRecord.merchant || {};
   const packet = shopifixerRecord.checkout_linkage || {};
   const customerOutcome = Array.isArray(shopifixerRecord.customer_outcomes) ? shopifixerRecord.customer_outcomes[0] : null;
@@ -338,6 +342,15 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
       : String(scopeSummary.merchantApprovalNeeded).trim().toLowerCase() === "yes"
         ? "Scope Ready for Approval"
         : "Scope Drafted";
+  const fulfillmentTruth = readJson<Record<string, any>>(
+    path.join(repoRoot, "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json"),
+    {}
+  );
+  const fulfillmentItem = Array.isArray(fulfillmentTruth.items) ? fulfillmentTruth.items[0] || {} : {};
+  const fulfillmentPaymentStatus = text(fulfillmentItem.payment_status, "Not Yet Available");
+  const fulfillmentProofStatus = text(fulfillmentItem.proof_status, "Not Yet Available");
+  const fulfillmentCompletionStatus = text(fulfillmentItem.completion_status, "Not Yet Available");
+  const fulfillmentProofPackageStatus = text(fulfillmentItem.proof_package_status, "Not Yet Available");
   const beforeEvidenceArtifacts = Array.isArray(evidenceManifest.artifacts)
     ? evidenceManifest.artifacts.filter(
         (artifact: any) =>
@@ -388,6 +401,16 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
   const executionFailed = /FAILED/i.test(String(agentLoopLatest.status || ""));
   const executionInProgress = /RUNNING|IN_PROGRESS|EXECUTING|STARTED/i.test(String(agentLoopLatest.status || ""));
   const executionComplete = /COMPLETE|COMPLETED/i.test(String(agentLoopLatest.status || latestExecutionEvent?.outcome || "")) && !executionFailed;
+  const completionReady =
+    scopeComplete &&
+    beforeEvidenceCaptured &&
+    executionComplete &&
+    afterEvidenceCaptured &&
+    proofAndSealStatus === "Proof Sealed" &&
+    /paid|payment_received/i.test(fulfillmentPaymentStatus);
+  const completionComplete =
+    /complete/i.test(fulfillmentCompletionStatus) ||
+    Boolean(fulfillmentItem.completion_complete);
   const executeBlockingReasons = [
     !scopeComplete ? "Scope incomplete" : "",
     scopeComplete && !beforeEvidenceCaptured ? "Before Evidence Missing" : "",
@@ -398,23 +421,90 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
   ].filter(Boolean);
   const currentOfferReady = Boolean(currentOffer);
   const paymentCollected = merchantClient?.revenue?.shopifixer_collected === true || String(packet.status || "").toLowerCase().includes("paid");
+  const paymentReceivedTruth = /paid|payment_received/i.test(fulfillmentPaymentStatus) || paymentCollected;
   const deliveryProofReadyStatus = proofAndSealStatus === "Proof Sealed"
     ? "Ready to Send"
     : proofAndSealStatus === "Proof Drafted" || proofAndSealStatus === "Proof Missing"
       ? "Waiting for Proof"
       : "Not Yet Available";
-  const deliveryMerchantStatus = proofAndSealStatus === "Proof Missing"
-    ? "Waiting for Proof"
-    : paymentCollected
-      ? "Ready for Completion"
-      : "Payment Pending";
-  const deliveryOfferStatus = currentOffer ? "Waiting for Merchant" : "Not Yet Available";
-  const deliveryPaymentStatus = paymentCollected ? "Complete" : "Payment Pending";
-  const deliveryCompletionReadiness = proofAndSealStatus === "Proof Sealed"
-    ? (paymentCollected ? "Complete" : "Ready for Completion")
+  const deliveryCompletionReady =
+    scopeComplete &&
+    beforeEvidenceCaptured &&
+    executionComplete &&
+    afterEvidenceCaptured &&
+    proofAndSealStatus === "Proof Sealed" &&
+    paymentReceivedTruth &&
+    !completionComplete;
+  const deliveryComplete = completionComplete;
+  const deliveryMerchantStatus = deliveryComplete
+    ? "Complete"
     : proofAndSealStatus === "Proof Missing"
       ? "Waiting for Proof"
-      : "Waiting for Merchant";
+      : paymentReceivedTruth
+        ? "Ready for Completion"
+        : "Payment Pending";
+  const deliveryOfferStatus = currentOffer ? "Waiting for Merchant" : "Not Yet Available";
+  const deliveryPaymentStatus = paymentReceivedTruth ? "Ready for Completion" : "Payment Pending";
+  const deliveryCompletionReadiness = deliveryComplete
+    ? "Complete"
+    : deliveryCompletionReady
+      ? "Ready for Completion"
+      : proofAndSealStatus === "Proof Missing"
+        ? "Waiting for Proof"
+        : paymentReceivedTruth
+          ? "Waiting for Merchant"
+          : "Payment Pending";
+  const deliveryStatus = deliveryComplete
+    ? "Complete"
+    : deliveryCompletionReady
+      ? "Ready for Completion"
+      : proofAndSealStatus === "Proof Missing"
+        ? "Waiting for Proof"
+        : !paymentReceivedTruth
+          ? "Payment Pending"
+          : "Waiting for Merchant";
+  const latestOutcomeEventSummary = latestOutcomeEvent
+    ? `${text(latestOutcomeEvent.status)} · ${text(latestOutcomeEvent.event_type || latestOutcomeEvent.action_type)}`
+    : "Not Yet Available";
+  const latestSnapshotSummary = [
+    `operator_dashboard_snapshot_v1.json · ${text(operatorDashboard.generated_at, "Not Yet Available")}`,
+    `primary_action_snapshot_v1.json · ${text(primaryActionSnapshot.generated_at, "Not Yet Available")}`
+  ].join(" · ");
+  const latestRevenueStateSummary = [
+    "operator_dashboard_snapshot_v1.json",
+    `Stafford revenue: ${money(operatorDashboard?.revenue_summary?.stafford_revenue, "Not Yet Available")}`,
+    `Merchant revenue recovered: ${money(operatorDashboard?.revenue_summary?.merchant_revenue_recovered, "Not Yet Available")}`,
+    `Gap: ${currentRevenueGap?.gap !== undefined ? money(currentRevenueGap.gap) : "Not Yet Available"}`
+  ].join(" · ");
+  const deliveryBlockedReasons = [
+    !scopeComplete ? "Scope incomplete" : "",
+    scopeComplete && !beforeEvidenceCaptured ? "Before Evidence Missing" : "",
+    scopeComplete && beforeEvidenceCaptured && !executionComplete ? "Execution incomplete" : "",
+    scopeComplete && beforeEvidenceCaptured && executionComplete && !afterEvidenceCaptured ? "After Evidence Missing" : "",
+    scopeComplete && beforeEvidenceCaptured && executionComplete && afterEvidenceCaptured && proofAndSealStatus !== "Proof Sealed"
+      ? `Proof status: ${proofAndSealStatus}`
+      : "",
+    scopeComplete && beforeEvidenceCaptured && executionComplete && afterEvidenceCaptured && proofAndSealStatus === "Proof Sealed" && !paymentReceivedTruth
+      ? `Payment status: ${fulfillmentPaymentStatus}`
+      : "",
+    completionComplete ? "Complete" : ""
+  ].filter(Boolean);
+  const deliveryNextSafeAction = !scopeComplete
+    ? "Review Scope"
+    : !beforeEvidenceCaptured
+      ? "Capture Before Evidence"
+      : !executionComplete
+        ? "Review Execution Readiness"
+        : !afterEvidenceCaptured
+          ? "Capture After Evidence"
+          : proofAndSealStatus !== "Proof Sealed"
+            ? "Generate Proof Package"
+            : !paymentReceivedTruth
+              ? "Review Payment Gate"
+              : completionComplete
+                ? "Pilot Complete"
+                : "Proceed using governed delivery action";
+  const deliveryReadyToProceed = completionReady;
   const executeStatus = executionComplete
     ? "Execute Complete"
     : executionInProgress
@@ -462,7 +552,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
     execute: executeStatus === "Execute Complete" || executeStatus === "Execute In Progress" || executeStatus === "Execute Ready",
     after_evidence: afterEvidenceCaptured,
     proof_seal: Boolean(proofPackageContent.trim()) && String(proofSeal.status || "").trim().toLowerCase() === "sealed" && proofSha256MatchStatus === "Match",
-    delivery: proofPrerequisitesComplete && currentOfferReady && paymentCollected && Boolean(proofPackageContent.trim()) && String(proofSeal.status || "").trim().toLowerCase() === "sealed"
+    delivery_payment: deliveryComplete || deliveryReadyToProceed
   } as const;
   const phaseDefinitions = [
     {
@@ -649,22 +739,46 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
             : !afterEvidenceCaptured
               ? phaseHref("after-evidence")
               : proofAndSealStatus === "Proof Sealed"
-                ? phaseHref("delivery")
+                ? phaseHref("delivery-payment")
                 : phaseHref("proof-seal"),
       note: proofAndSealStatus
     },
     {
-      key: "delivery",
-      label: "Delivery & Payment Gate",
-      blockedReason: deliveryCompletionReadiness === "Waiting for Merchant"
-        ? "Payment Pending"
-        : deliveryCompletionReadiness === "Ready for Completion"
-          ? "Ready for Completion"
-          : "Not Yet Available",
-      nextSafeAction: "Review Payment Gate",
-      authority: "shopifixer_offer_latest.json / operator_dashboard_snapshot_v1.json / merchant_proof_package.seal.json",
-      ctaLabel: "Review Payment Gate",
-      ctaHref: "/operator/revenue-command",
+      key: "delivery_payment",
+      label: "Delivery & Payment",
+      blockedReason: deliveryBlockedReasons.length ? deliveryBlockedReasons.join(" · ") : "Not Yet Available",
+      nextSafeAction: deliveryNextSafeAction,
+      authority: "shopifixer_fulfillment_truth_v1.json / shopifixer_offer_latest.json / operator_dashboard_snapshot_v1.json / merchant_proof_package.seal.json",
+      ctaLabel: deliveryComplete
+        ? "Pilot Complete"
+        : !scopeComplete
+          ? "Return to Scope"
+          : !beforeEvidenceCaptured
+            ? "Return to Before Evidence"
+            : !executionComplete
+              ? "Return to Execute"
+              : !afterEvidenceCaptured
+                ? "Return to After Evidence"
+                : proofAndSealStatus !== "Proof Sealed"
+                  ? "Return to Proof & Seal"
+                  : !paymentReceivedTruth
+                    ? "Waiting for Merchant"
+                    : "Proceed using governed delivery action",
+      ctaHref: !scopeComplete
+        ? phaseHref("scope")
+        : !beforeEvidenceCaptured
+          ? phaseHref("before-evidence")
+          : !executionComplete
+            ? phaseHref("execute")
+            : !afterEvidenceCaptured
+              ? phaseHref("after-evidence")
+              : proofAndSealStatus !== "Proof Sealed"
+                ? phaseHref("proof-seal")
+                : !paymentReceivedTruth
+                  ? "/operator/command-center"
+                  : deliveryComplete
+                    ? phaseHref("delivery_payment")
+                    : phaseHref("delivery_payment"),
       note: deliveryCompletionReadiness
     }
   ] as const;
@@ -893,6 +1007,21 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
       }}
       proofPackageSaved={proofPackageWorkbenchSaved}
       proofPackageDate={proofPackageWorkbenchDate}
+      completionAction={async (formData: FormData) => {
+        "use server";
+
+        const store = String(formData.get("store") || commandCenterMerchant.store || shopifixer.merchant?.store || "unavailable");
+        const date = String(formData.get("date") || completionWorkbenchDate);
+
+        writeShopifixerCompletion({
+          store,
+          date
+        });
+
+        redirect("/operator/shopifixer-pilot?phase=delivery-payment&shopifixer_completion_saved=1");
+      }}
+      completionSaved={completionWorkbenchSaved}
+      completionDate={completionWorkbenchDate}
       scopeWorkbenchAction={async (formData: FormData) => {
         "use server";
 
@@ -975,15 +1104,21 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
         missingScreenshotArtifactCount: String(missingScreenshotArtifactCount)
       }}
       deliverySummary={{
+        deliveryStatus,
         merchantDeliveryStatus: deliveryMerchantStatus,
         proofPackageReady: deliveryProofReadyStatus,
         checksumSealStatus: text(proofSeal.status, "Not Yet Available"),
         offerStatus: deliveryOfferStatus,
         paymentStatus: deliveryPaymentStatus,
+        currentPaymentStatus: fulfillmentPaymentStatus,
+        completionStatus: fulfillmentCompletionStatus,
         currentNextAction: merchantClient?.next_action?.instructions || operatorDashboard?.primary_focus?.next_action?.instructions || merchantLead?.status?.next_action || "Not Yet Available",
         recommendedOperatorAction: primaryActionSnapshot.primary_action?.next_step || qa.snapshot_primary_action?.next_step || "Not Yet Available",
         revenueOpportunity: currentRevenueGap?.gap !== undefined ? money(currentRevenueGap.gap) : "Not Yet Available",
-        completionReadiness: deliveryCompletionReadiness
+        completionReadiness: deliveryCompletionReadiness,
+        latestOutcomeEvent: latestOutcomeEventSummary,
+        latestSnapshot: latestSnapshotSummary,
+        latestRevenueState: latestRevenueStateSummary
       }}
       recommendedNextStep={{
         phaseLabel: recommendedPhase.label,

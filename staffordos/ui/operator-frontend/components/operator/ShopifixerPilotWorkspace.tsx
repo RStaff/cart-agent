@@ -121,15 +121,21 @@ type ProofAndSealSummary = {
 };
 
 type DeliverySummary = {
+  deliveryStatus: string;
   merchantDeliveryStatus: string;
   proofPackageReady: string;
   checksumSealStatus: string;
   offerStatus: string;
   paymentStatus: string;
+  currentPaymentStatus: string;
+  completionStatus: string;
   currentNextAction: string;
   recommendedOperatorAction: string;
   revenueOpportunity: string;
   completionReadiness: string;
+  latestOutcomeEvent: string;
+  latestSnapshot: string;
+  latestRevenueState: string;
 };
 
 type RecommendedNextStep = {
@@ -188,6 +194,9 @@ type ShopifixerPilotWorkspaceProps = {
   proofPackageAction: (formData: FormData) => Promise<void>;
   proofPackageSaved: boolean;
   proofPackageDate: string;
+  completionAction: (formData: FormData) => Promise<void>;
+  completionSaved: boolean;
+  completionDate: string;
   beforeEvidenceSummary: {
     status: string;
     path: string;
@@ -238,6 +247,9 @@ export function ShopifixerPilotWorkspace({
   proofPackageAction,
   proofPackageSaved,
   proofPackageDate,
+  completionAction,
+  completionSaved,
+  completionDate,
   beforeEvidenceSummary,
   executeSummary,
   afterEvidenceSummary,
@@ -253,6 +265,9 @@ export function ShopifixerPilotWorkspace({
     executeSummary.status === "Execute Ready" &&
     executeSummary.blockingReasons.length === 0 &&
     executeSummary.missingTruthOrGates.length === 0;
+  const deliveryCanComplete =
+    deliverySummary.completionReadiness === "Ready for Completion" &&
+    deliverySummary.checksumSealStatus.toLowerCase() === "sealed";
   const executeConfirmation =
     "This invokes the governed StaffordOS execution spine. It does not automatically send email or collect payment. External actions remain subject to their existing governed workflows. I am confirming the displayed action only.";
 
@@ -830,15 +845,58 @@ export function ShopifixerPilotWorkspace({
                 <p className="boardCardTitle">Delivery &amp; Payment</p>
                 <p className="boardCardMeta">{deliverySummary.completionReadiness}</p>
                 <div className="kv">
+                  <div><strong>Delivery status:</strong> {deliverySummary.deliveryStatus}</div>
                   <div><strong>Merchant delivery status:</strong> {deliverySummary.merchantDeliveryStatus}</div>
                   <div><strong>Proof package ready:</strong> {deliverySummary.proofPackageReady}</div>
                   <div><strong>Checksum seal status:</strong> {deliverySummary.checksumSealStatus}</div>
                   <div><strong>Offer status:</strong> {deliverySummary.offerStatus}</div>
-                  <div><strong>Payment status:</strong> {deliverySummary.paymentStatus}</div>
+                  <div><strong>Current payment status:</strong> {deliverySummary.currentPaymentStatus}</div>
+                  <div><strong>Payment gate:</strong> {deliverySummary.paymentStatus}</div>
+                  <div><strong>Completion status:</strong> {deliverySummary.completionStatus}</div>
                   <div><strong>Current next action:</strong> {deliverySummary.currentNextAction}</div>
                   <div><strong>Recommended operator action:</strong> {deliverySummary.recommendedOperatorAction}</div>
                   <div><strong>Revenue opportunity:</strong> {deliverySummary.revenueOpportunity}</div>
                   <div><strong>Completion readiness:</strong> {deliverySummary.completionReadiness}</div>
+                  <div><strong>Latest outcome event:</strong> {deliverySummary.latestOutcomeEvent}</div>
+                  <div><strong>Latest snapshot:</strong> {deliverySummary.latestSnapshot}</div>
+                  <div><strong>Latest revenue state:</strong> {deliverySummary.latestRevenueState}</div>
+                </div>
+                <div style={{ marginTop: 16 }}>
+                  {currentPhase === "delivery_payment" ? (
+                    deliveryCanComplete ? (
+                      <div>
+                        <p className="hint">This invokes the governed StaffordOS delivery/completion spine. It does not change payment authority, send email, or rewrite proof state outside the existing completion writer.</p>
+                        <ProofRunWorkbench
+                          stage="completion"
+                          merchant={{ store: merchant.store, client_id: merchant.clientId }}
+                          proofRunPath="staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json"
+                          date={completionDate}
+                          saved={completionSaved}
+                          onSubmit={completionAction}
+                        />
+                      </div>
+                    ) : (
+                      <div className="kv">
+                        <div><strong>Blocking reason:</strong> {deliverySummary.completionReadiness === "Complete" ? "Complete" : deliverySummary.merchantDeliveryStatus}</div>
+                        <div><strong>Missing governed artifact:</strong> {deliverySummary.completionReadiness === "Complete" ? "Not Yet Available" : deliverySummary.proofPackageReady === "Waiting for Proof" ? "merchant_proof_package.md / merchant_proof_package.seal.json" : deliverySummary.currentPaymentStatus}</div>
+                        <div><strong>Exact next safe action:</strong> {deliverySummary.completionReadiness === "Complete" ? "Pilot Complete" : deliverySummary.completionReadiness === "Ready for Completion" ? "Proceed using governed delivery action" : deliverySummary.paymentStatus === "Payment Pending" ? "Waiting for Merchant" : "Return to blocking phase"}</div>
+                        {deliverySummary.paymentStatus === "Payment Pending" || /waiting_for_payment|payment_pending/i.test(deliverySummary.currentPaymentStatus) ? (
+                          <div style={{ marginTop: 12 }}>
+                            <Link href="/operator/command-center" className="inlineLink">
+                              Open command center
+                            </Link>
+                          </div>
+                        ) : null}
+                        {deliverySummary.completionReadiness !== "Complete" && deliverySummary.completionReadiness !== "Ready for Completion" ? (
+                          <div style={{ marginTop: 12 }}>
+                            <Link href={recommendedNextStep.href} className="inlineLink">
+                              Open blocking phase
+                            </Link>
+                          </div>
+                        ) : null}
+                      </div>
+                    )
+                  ) : null}
                 </div>
               </div>
 
