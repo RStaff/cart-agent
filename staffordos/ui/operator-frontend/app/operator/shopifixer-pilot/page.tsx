@@ -1,12 +1,14 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { redirect } from "next/navigation";
 import { ShopifixerPilotWorkspace } from "../../../components/operator/ShopifixerPilotWorkspace";
 import { loadShopifixerCommandCenter } from "../../../lib/operator/loadShopifixerCommandCenter";
 import { loadOperatorLeads } from "../../../lib/leads/loadOperatorLeads";
 import { getCampaignResolverReport } from "../../../lib/operator/campaignResolver";
 import { loadPreflightReport } from "../../../lib/operator/loadPreflightReport";
 import { loadCommandCenterQaReport } from "../../../lib/operator/loadCommandCenterQaReport";
+import { writeShopifixerScopedFix } from "../../../lib/operator/writeShopifixerScopedFix";
 
 type ProofFile = {
   label: string;
@@ -250,6 +252,8 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
   const scopeFilePath = path.join(repoRoot, "staffordos/proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md");
   const scopeFileContent = readText(scopeFilePath);
   const scopeSummary = parseScopeSummary(scopeFileContent);
+  const scopeWorkbenchSaved = (searchParams as { shopifixer_scoped_fix_saved?: string } | undefined)?.shopifixer_scoped_fix_saved === "1";
+  const scopeWorkbenchDate = new Date().toISOString().slice(0, 10);
   const beforeEvidencePath = path.join(repoRoot, `${PROOF_RUN_ROOT}/before_evidence.md`);
   const beforeEvidenceContent = readText(beforeEvidencePath);
   const beforeEvidenceFields = parseEvidenceFields(beforeEvidenceContent);
@@ -296,11 +300,24 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
     : null;
   const attributionTotals = campaignAttributionReport.totals || {};
   const currentRevenueGap = Array.isArray(operatorDashboard.revenue_gaps) ? operatorDashboard.revenue_gaps[0] : null;
+  const scopeMissingFields = !scopeFileContent.trim()
+    ? ["fix_scope.md"]
+    : [
+        scopeSummary.issue === "Not Yet Available" ? "Issue" : "",
+        scopeSummary.proposedFix === "Not Yet Available" ? "Scoped Fix" : "",
+        scopeSummary.inScope.length ? "" : "In Scope",
+        scopeSummary.outOfScope.length ? "" : "Out of Scope",
+        scopeSummary.merchantApprovalNeeded === "Not Yet Available" ? "Merchant Approval Needed" : "",
+        scopeSummary.successCriteria === "Not Yet Available" ? "Success Criteria" : ""
+      ].filter(Boolean);
+  const scopeComplete = Boolean(scopeFileContent.trim()) && scopeMissingFields.length === 0;
   const scopeStatus = !scopeFileContent.trim()
     ? "Scope Missing"
-    : scopeSummary.inScope.length || scopeSummary.outOfScope.length || scopeSummary.successCriteria !== "Not Yet Available"
-      ? (String(scopeSummary.merchantApprovalNeeded).trim().toLowerCase() === "yes" ? "Scope Ready for Approval" : "Scope Drafted")
-      : "Scope Drafted";
+    : scopeComplete
+      ? "Scope Complete"
+      : String(scopeSummary.merchantApprovalNeeded).trim().toLowerCase() === "yes"
+        ? "Scope Ready for Approval"
+        : "Scope Drafted";
   const beforeEvidenceArtifacts = Array.isArray(evidenceManifest.artifacts)
     ? evidenceManifest.artifacts.filter(
         (artifact: any) =>
@@ -405,7 +422,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
   const selectedPhaseKey = resolvePhaseKey(Array.isArray(searchParams?.phase) ? searchParams?.phase[0] : searchParams?.phase);
   const phaseTruth = {
     merchant_context: Boolean(commandCenterMerchant.store || commandCenterMerchant.client_id),
-    scope: Boolean(scopeFileContent.trim()),
+    scope: scopeComplete,
     before_evidence: Boolean(beforeEvidenceContent.trim()),
     execute: scopeReady && preflightGo && qaPass && requiredAgentsGo && !executionBlocked,
     after_evidence: Boolean(afterEvidenceContent.trim()),
@@ -426,11 +443,15 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
     {
       key: "scope",
       label: "Scope",
-      blockedReason: scopeSummary.sourceState === "fix_scope.md missing" ? "Scope Missing" : "Scope not approved",
-      nextSafeAction: "Open Before Evidence Workbench",
+      blockedReason: !scopeFileContent.trim()
+        ? "Scope Missing"
+        : scopeComplete
+          ? "Scope Complete"
+          : `Missing fields: ${scopeMissingFields.join(", ")}`,
+      nextSafeAction: scopeComplete ? "Continue to Before Evidence" : "Review Scope",
       authority: "fix_scope.md / shopifixer_offer_latest.json",
-      ctaLabel: "Open Before Evidence Workbench",
-      ctaHref: phaseHref("before_evidence"),
+      ctaLabel: scopeComplete ? "Continue to Before Evidence" : "Review Scope",
+      ctaHref: scopeComplete ? phaseHref("before_evidence") : phaseHref("scope"),
       note: scopeSummary.sourceState
     },
     {
@@ -520,7 +541,10 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
     };
   });
   const activePhase = phaseItems.find((phase) => phase.key === selectedPhaseKey) || phaseItems[0];
-  const recommendedPhase = phaseItems.find((phase) => phase.state !== "complete") || activePhase;
+  const selectedPhaseTruthComplete = phaseTruth[selectedPhaseKey as keyof typeof phaseTruth];
+  const recommendedPhase = selectedPhaseTruthComplete
+    ? phaseItems.find((phase, index) => index > selectedPhaseIndex && phase.state !== "complete") || activePhase
+    : phaseItems.find((phase) => phase.state !== "complete") || activePhase;
   return (
     <ShopifixerPilotWorkspace
       merchant={{
@@ -651,8 +675,38 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
             ? money(offerLatest.offer.sections.sprint_price)
             : "Not Yet Available",
         successCriteria: scopeSummary.successCriteria,
+        missingFields: scopeMissingFields,
         sourceState: scopeSummary.sourceState
       }}
+      scopeWorkbenchAction={async (formData: FormData) => {
+        "use server";
+
+        const store = String(formData.get("store") || commandCenterMerchant.store || shopifixer.merchant?.store || "unavailable");
+        const scoped_fix = String(formData.get("scoped_fix") || "");
+        const in_scope = String(formData.get("in_scope") || "");
+        const out_of_scope = String(formData.get("out_of_scope") || "");
+        const merchant_approval_needed = String(formData.get("merchant_approval_needed") || "no");
+        const change_made = String(formData.get("change_made") || "");
+        const location_changed = String(formData.get("location_changed") || "");
+        const implementation_notes = String(formData.get("implementation_notes") || "");
+        const success_criteria = String(formData.get("success_criteria") || "");
+
+        writeShopifixerScopedFix({
+          store,
+          scoped_fix,
+          in_scope,
+          out_of_scope,
+          merchant_approval_needed,
+          change_made,
+          location_changed,
+          implementation_notes,
+          success_criteria
+        });
+
+        redirect("/operator/shopifixer-pilot?phase=scope&shopifixer_scoped_fix_saved=1");
+      }}
+      scopeWorkbenchSaved={scopeWorkbenchSaved}
+      scopeWorkbenchDate={scopeWorkbenchDate}
       beforeEvidenceSummary={{
         status: beforeEvidenceStatus,
         path: beforeEvidencePath.replace(repoRoot.endsWith("/") ? repoRoot : `${repoRoot}/`, ""),

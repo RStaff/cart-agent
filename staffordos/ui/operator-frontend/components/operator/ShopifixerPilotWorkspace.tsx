@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ProofRunWorkbench } from "./ProofRunWorkbench";
 
 type PhaseState = "available" | "current" | "blocked" | "complete";
 
@@ -38,6 +39,7 @@ type ScopeSummary = {
   currentOffer: string;
   currentPrice: string;
   successCriteria: string;
+  missingFields: string[];
   sourceState: string;
 };
 
@@ -159,6 +161,9 @@ type ShopifixerPilotWorkspaceProps = {
   };
   merchantContext: ContextCard[];
   scopeSummary: ScopeSummary;
+  scopeWorkbenchAction: (formData: FormData) => Promise<void>;
+  scopeWorkbenchSaved: boolean;
+  scopeWorkbenchDate: string;
   beforeEvidenceSummary: {
     status: string;
     path: string;
@@ -197,6 +202,9 @@ export function ShopifixerPilotWorkspace({
   progress,
   merchantContext,
   scopeSummary,
+  scopeWorkbenchAction,
+  scopeWorkbenchSaved,
+  scopeWorkbenchDate,
   beforeEvidenceSummary,
   executeSummary,
   afterEvidenceSummary,
@@ -305,6 +313,21 @@ export function ShopifixerPilotWorkspace({
                 <div><strong>Previous work:</strong> {previousWork}</div>
               </div>
 
+              {currentPhase === "scope" ? (
+                <div className="boardCard" style={{ marginTop: 16 }}>
+                  <p className="boardCardTitle">Scope Workbench</p>
+                  <p className="boardCardMeta">{scopeSummary.status}</p>
+                  <ProofRunWorkbench
+                    stage="scoped_fix"
+                    merchant={{ store: merchant.store, client_id: merchant.clientId }}
+                    proofRunPath="staffordos/proof_runs/internal_shopifixer_dry_run_v1/"
+                    date={scopeWorkbenchDate}
+                    saved={scopeWorkbenchSaved}
+                    onSubmit={scopeWorkbenchAction}
+                  />
+                </div>
+              ) : null}
+
               <div className="boardCard" style={{ marginTop: 16 }}>
                 <p className="boardCardTitle">Scope</p>
                 <p className="boardCardMeta">{scopeSummary.status}</p>
@@ -314,6 +337,8 @@ export function ShopifixerPilotWorkspace({
                   <div><strong>Current offer:</strong> {scopeSummary.currentOffer}</div>
                   <div><strong>Current price:</strong> {scopeSummary.currentPrice}</div>
                   <div><strong>Merchant approval needed:</strong> {scopeSummary.merchantApprovalNeeded}</div>
+                  <div><strong>Blocking reason:</strong> {scopeSummary.status === "Scope Complete" ? "Not blocked" : scopeSummary.missingFields.length ? `Missing fields: ${scopeSummary.missingFields.join(", ")}` : scopeSummary.status}</div>
+                  <div><strong>Missing fields:</strong> {scopeSummary.missingFields.length ? scopeSummary.missingFields.join(", ") : "Not Yet Available"}</div>
                 </div>
                 <div className="grid gridTwo" style={{ marginTop: 12 }}>
                   <div>
@@ -340,6 +365,9 @@ export function ShopifixerPilotWorkspace({
                 <div className="kv" style={{ marginTop: 12 }}>
                   <div><strong>Success criteria:</strong> {scopeSummary.successCriteria}</div>
                   <div><strong>Source state:</strong> {scopeSummary.sourceState}</div>
+                </div>
+                <div className="kv" style={{ marginTop: 12 }}>
+                  <div><strong>Next safe action:</strong> {scopeSummary.status === "Scope Complete" ? "Continue to Before Evidence" : "Review Scope"}</div>
                 </div>
               </div>
 
