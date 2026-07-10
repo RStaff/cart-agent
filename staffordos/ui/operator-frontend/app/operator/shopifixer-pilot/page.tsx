@@ -10,6 +10,7 @@ import { loadPreflightReport } from "../../../lib/operator/loadPreflightReport";
 import { loadCommandCenterQaReport } from "../../../lib/operator/loadCommandCenterQaReport";
 import { writeShopifixerBeforeEvidence } from "../../../lib/operator/writeShopifixerBeforeEvidence";
 import { writeShopifixerAfterEvidence } from "../../../lib/operator/writeShopifixerAfterEvidence";
+import { writeShopifixerProofPackage } from "../../../lib/operator/writeShopifixerProofPackage";
 import { writeShopifixerScopedFix } from "../../../lib/operator/writeShopifixerScopedFix";
 
 type ProofFile = {
@@ -274,6 +275,10 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
   const afterEvidenceFields = parseEvidenceFields(afterEvidenceContent);
   const afterEvidenceWorkbenchSaved = (searchParams as { shopifixer_after_saved?: string } | undefined)?.shopifixer_after_saved === "1";
   const afterEvidenceWorkbenchDate = new Date().toISOString().slice(0, 10);
+  const proofPackagePath = path.join(repoRoot, `${PROOF_RUN_ROOT}/merchant_proof_package.md`);
+  const proofPackageContent = readText(proofPackagePath);
+  const proofPackageWorkbenchSaved = (searchParams as { shopifixer_proof_package_saved?: string } | undefined)?.shopifixer_proof_package_saved === "1";
+  const proofPackageWorkbenchDate = new Date().toISOString().slice(0, 10);
   const evidenceManifest = readJson<Record<string, any>>(
     path.join(repoRoot, "staffordos/proof_runs/output/evidence_manifest_v1.json"),
     {}
@@ -282,8 +287,6 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
     path.join(repoRoot, "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.seal.json"),
     {}
   );
-  const proofPackagePath = path.join(repoRoot, `${PROOF_RUN_ROOT}/merchant_proof_package.md`);
-  const proofPackageContent = readText(proofPackagePath);
   const proofPackageManifestPath = text(proofSeal.manifest_path, "Not Yet Available");
   const manifestArtifactCount = Array.isArray(evidenceManifest.artifacts) ? evidenceManifest.artifacts.length : Number(proofSeal.manifest_artifact_count || 0);
   const missingScreenshotArtifactCount = Array.isArray(evidenceManifest.artifacts)
@@ -445,6 +448,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
     proof_seal: Boolean(proofPackageContent.trim()) && String(proofSeal.status || "").trim().toLowerCase() === "sealed" && proofSha256MatchStatus === "Match",
     delivery: currentOfferReady && paymentCollected && Boolean(proofPackageContent.trim()) && String(proofSeal.status || "").trim().toLowerCase() === "sealed"
   } as const;
+  const proofPrerequisitesComplete = scopeComplete && beforeEvidenceCaptured && executeStatus.includes("Complete") && afterEvidenceCaptured;
   const phaseDefinitions = [
     {
       key: "merchant_context",
@@ -557,11 +561,49 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
     {
       key: "proof_seal",
       label: "Proof & Seal",
-      blockedReason: proofAndSealStatus,
-      nextSafeAction: "Review Payment Gate",
+      blockedReason: !scopeComplete
+        ? "Scope incomplete"
+        : !beforeEvidenceCaptured
+          ? "Before Evidence Missing"
+          : !executeStatus.includes("Complete")
+            ? "Execution incomplete"
+            : !afterEvidenceCaptured
+              ? "After Evidence Missing"
+              : proofAndSealStatus,
+      nextSafeAction: !scopeComplete
+        ? "Review Scope"
+        : !beforeEvidenceCaptured
+          ? "Capture Before Evidence"
+          : !executeStatus.includes("Complete")
+            ? "Review Execution Readiness"
+            : !afterEvidenceCaptured
+              ? "Capture After Evidence"
+              : proofAndSealStatus === "Proof Sealed"
+                ? "Continue to Delivery"
+                : "Generate Proof Package",
       authority: "merchant_proof_package.md / merchant_proof_package.seal.json / evidence_manifest_v1.json",
-      ctaLabel: "Review Payment Gate",
-      ctaHref: phaseHref("delivery"),
+      ctaLabel: !scopeComplete
+        ? "Complete Scope"
+        : !beforeEvidenceCaptured
+          ? "Capture Before Evidence"
+          : !executeStatus.includes("Complete")
+            ? "Review Execution Readiness"
+            : !afterEvidenceCaptured
+              ? "Capture After Evidence"
+              : proofAndSealStatus === "Proof Sealed"
+                ? "Continue to Delivery"
+                : "Generate Proof Package",
+      ctaHref: !scopeComplete
+        ? phaseHref("scope")
+        : !beforeEvidenceCaptured
+          ? phaseHref("before-evidence")
+          : !executeStatus.includes("Complete")
+            ? phaseHref("execute")
+            : !afterEvidenceCaptured
+              ? phaseHref("after-evidence")
+              : proofAndSealStatus === "Proof Sealed"
+                ? phaseHref("delivery")
+                : phaseHref("proof-seal"),
       note: proofAndSealStatus
     },
     {
@@ -792,6 +834,18 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
       }}
       afterEvidenceSaved={afterEvidenceWorkbenchSaved}
       afterEvidenceDate={afterEvidenceWorkbenchDate}
+      proofPackageAction={async (formData: FormData) => {
+        "use server";
+
+        const _store = String(formData.get("store") || commandCenterMerchant.store || shopifixer.merchant?.store || "unavailable");
+        const _date = String(formData.get("date") || proofPackageWorkbenchDate);
+
+        writeShopifixerProofPackage();
+
+        redirect("/operator/shopifixer-pilot?phase=proof-seal&shopifixer_proof_package_saved=1");
+      }}
+      proofPackageSaved={proofPackageWorkbenchSaved}
+      proofPackageDate={proofPackageWorkbenchDate}
       scopeWorkbenchAction={async (formData: FormData) => {
         "use server";
 

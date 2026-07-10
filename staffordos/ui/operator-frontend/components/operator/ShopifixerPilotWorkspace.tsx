@@ -170,6 +170,9 @@ type ShopifixerPilotWorkspaceProps = {
   afterEvidenceAction: (formData: FormData) => Promise<void>;
   afterEvidenceSaved: boolean;
   afterEvidenceDate: string;
+  proofPackageAction: (formData: FormData) => Promise<void>;
+  proofPackageSaved: boolean;
+  proofPackageDate: string;
   beforeEvidenceSummary: {
     status: string;
     path: string;
@@ -217,6 +220,9 @@ export function ShopifixerPilotWorkspace({
   afterEvidenceAction,
   afterEvidenceSaved,
   afterEvidenceDate,
+  proofPackageAction,
+  proofPackageSaved,
+  proofPackageDate,
   beforeEvidenceSummary,
   executeSummary,
   afterEvidenceSummary,
@@ -472,6 +478,83 @@ export function ShopifixerPilotWorkspace({
                       date={afterEvidenceDate}
                       saved={afterEvidenceSaved}
                       onSubmit={afterEvidenceAction}
+                    />
+                  </div>
+                )
+              ) : null}
+
+              {currentPhase === "proof_seal" ? (
+                scopeSummary.status !== "Scope Complete" ? (
+                  <div className="boardCard" style={{ marginTop: 16 }}>
+                    <p className="boardCardTitle">Proof &amp; Seal Workbench</p>
+                    <p className="boardCardMeta">Blocked</p>
+                    <div className="kv">
+                      <div><strong>Blocking reason:</strong> Scope incomplete</div>
+                      <div><strong>Missing truth or gate:</strong> {scopeSummary.missingFields.length ? scopeSummary.missingFields.join(", ") : "fix_scope.md"}</div>
+                      <div><strong>Exact next safe action:</strong> Review Scope</div>
+                    </div>
+                    <div style={{ marginTop: 12 }}>
+                      <Link href="/operator/shopifixer-pilot?phase=scope" className="inlineLink">
+                        Open Scope phase
+                      </Link>
+                    </div>
+                  </div>
+                ) : !beforeEvidenceSummary.artifactIds.length ? (
+                  <div className="boardCard" style={{ marginTop: 16 }}>
+                    <p className="boardCardTitle">Proof &amp; Seal Workbench</p>
+                    <p className="boardCardMeta">Blocked</p>
+                    <div className="kv">
+                      <div><strong>Blocking reason:</strong> Before Evidence Missing</div>
+                      <div><strong>Missing truth or gate:</strong> before_evidence.md / evidence_manifest_v1.json</div>
+                      <div><strong>Exact next safe action:</strong> Capture Before Evidence</div>
+                    </div>
+                    <div style={{ marginTop: 12 }}>
+                      <Link href="/operator/shopifixer-pilot?phase=before-evidence" className="inlineLink">
+                        Open Before Evidence phase
+                      </Link>
+                    </div>
+                  </div>
+                ) : !executeSummary.status.includes("Complete") ? (
+                  <div className="boardCard" style={{ marginTop: 16 }}>
+                    <p className="boardCardTitle">Proof &amp; Seal Workbench</p>
+                    <p className="boardCardMeta">Blocked</p>
+                    <div className="kv">
+                      <div><strong>Blocking reason:</strong> Execution incomplete</div>
+                      <div><strong>Missing truth or gate:</strong> {executeSummary.status}</div>
+                      <div><strong>Exact next safe action:</strong> Review Execution Readiness</div>
+                    </div>
+                    <div style={{ marginTop: 12 }}>
+                      <Link href="/operator/shopifixer-pilot?phase=execute" className="inlineLink">
+                        Open Execute phase
+                      </Link>
+                    </div>
+                  </div>
+                ) : !afterEvidenceSummary.artifactIds.length ? (
+                  <div className="boardCard" style={{ marginTop: 16 }}>
+                    <p className="boardCardTitle">Proof &amp; Seal Workbench</p>
+                    <p className="boardCardMeta">Blocked</p>
+                    <div className="kv">
+                      <div><strong>Blocking reason:</strong> After Evidence Missing</div>
+                      <div><strong>Missing truth or gate:</strong> after_evidence.md / evidence_manifest_v1.json</div>
+                      <div><strong>Exact next safe action:</strong> Capture After Evidence</div>
+                    </div>
+                    <div style={{ marginTop: 12 }}>
+                      <Link href="/operator/shopifixer-pilot?phase=after-evidence" className="inlineLink">
+                        Open After Evidence phase
+                      </Link>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="boardCard" style={{ marginTop: 16 }}>
+                    <p className="boardCardTitle">Proof &amp; Seal Workbench</p>
+                    <p className="boardCardMeta">{proofAndSealSummary.status}</p>
+                    <ProofRunWorkbench
+                      stage="proof_package"
+                      merchant={{ store: merchant.store, client_id: merchant.clientId }}
+                      proofRunPath="staffordos/proof_runs/internal_shopifixer_dry_run_v1/"
+                      date={proofPackageDate}
+                      saved={proofPackageSaved}
+                      onSubmit={proofPackageAction}
                     />
                   </div>
                 )
