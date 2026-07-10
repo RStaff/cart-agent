@@ -96,6 +96,18 @@ type ProofAndSealSummary = {
   missingScreenshotArtifactCount: string;
 };
 
+type DeliverySummary = {
+  merchantDeliveryStatus: string;
+  proofPackageReady: string;
+  checksumSealStatus: string;
+  offerStatus: string;
+  paymentStatus: string;
+  currentNextAction: string;
+  recommendedOperatorAction: string;
+  revenueOpportunity: string;
+  completionReadiness: string;
+};
+
 type ShopifixerPilotWorkspaceProps = {
   merchant: {
     store: string;
@@ -143,6 +155,7 @@ type ShopifixerPilotWorkspaceProps = {
   executeSummary: ExecuteSummary;
   afterEvidenceSummary: AfterEvidenceSummary;
   proofAndSealSummary: ProofAndSealSummary;
+  deliverySummary: DeliverySummary;
   evidenceStatus: StatusLine[];
   validationStatus: StatusLine[];
   previousWork: string;
@@ -171,6 +184,7 @@ export function ShopifixerPilotWorkspace({
   executeSummary,
   afterEvidenceSummary,
   proofAndSealSummary,
+  deliverySummary,
   evidenceStatus,
   validationStatus,
   previousWork
@@ -449,6 +463,22 @@ export function ShopifixerPilotWorkspace({
                       <div>Not Yet Available</div>
                     )}
                   </div>
+                </div>
+              </div>
+
+              <div className="boardCard" style={{ marginTop: 16 }}>
+                <p className="boardCardTitle">Delivery &amp; Payment</p>
+                <p className="boardCardMeta">{deliverySummary.completionReadiness}</p>
+                <div className="kv">
+                  <div><strong>Merchant delivery status:</strong> {deliverySummary.merchantDeliveryStatus}</div>
+                  <div><strong>Proof package ready:</strong> {deliverySummary.proofPackageReady}</div>
+                  <div><strong>Checksum seal status:</strong> {deliverySummary.checksumSealStatus}</div>
+                  <div><strong>Offer status:</strong> {deliverySummary.offerStatus}</div>
+                  <div><strong>Payment status:</strong> {deliverySummary.paymentStatus}</div>
+                  <div><strong>Current next action:</strong> {deliverySummary.currentNextAction}</div>
+                  <div><strong>Recommended operator action:</strong> {deliverySummary.recommendedOperatorAction}</div>
+                  <div><strong>Revenue opportunity:</strong> {deliverySummary.revenueOpportunity}</div>
+                  <div><strong>Completion readiness:</strong> {deliverySummary.completionReadiness}</div>
                 </div>
               </div>
 

@@ -245,6 +245,11 @@ export default async function ShopifixerPilotPage() {
       : proofSeal.sha256
         ? "Proof Drafted"
         : "Proof Invalid";
+  const deliveryProofReadyStatus = proofAndSealStatus === "Proof Sealed"
+    ? "Ready to Send"
+    : proofAndSealStatus === "Proof Drafted" || proofAndSealStatus === "Proof Missing"
+      ? "Waiting for Proof"
+      : "Not Yet Available";
 
   const commandCenterMerchant = shopifixerRecord.merchant || {};
   const packet = shopifixerRecord.checkout_linkage || {};
@@ -361,6 +366,16 @@ export default async function ShopifixerPilotPage() {
 
   const evidenceManifestPath = path.join(repoRoot, "staffordos/proof_runs/output/evidence_manifest_v1.json");
   const sealPath = path.join(repoRoot, `${PROOF_RUN_ROOT}/merchant_proof_package.seal.json`);
+  const deliveryMerchantStatus = proofAndSealStatus === "Proof Missing"
+    ? "Waiting for Proof"
+    : "Payment Pending";
+  const deliveryOfferStatus = currentOffer ? "Waiting for Merchant" : "Not Yet Available";
+  const deliveryPaymentStatus = currentRevenueGap?.gap !== undefined ? "Payment Pending" : "Not Yet Available";
+  const deliveryCompletionReadiness = deliveryPaymentStatus === "Payment Pending"
+    ? "Waiting for Merchant"
+    : merchantClient?.revenue?.shopifixer_collected
+      ? "Complete"
+      : "Ready for Completion";
 
   return (
     <ShopifixerPilotWorkspace
@@ -545,6 +560,17 @@ export default async function ShopifixerPilotPage() {
         sha256: proofSha256,
         sha256MatchStatus: proofSha256MatchStatus,
         missingScreenshotArtifactCount: String(missingScreenshotArtifactCount)
+      }}
+      deliverySummary={{
+        merchantDeliveryStatus: deliveryMerchantStatus,
+        proofPackageReady: deliveryProofReadyStatus,
+        checksumSealStatus: text(proofSeal.status, "Not Yet Available"),
+        offerStatus: deliveryOfferStatus,
+        paymentStatus: deliveryPaymentStatus,
+        currentNextAction: merchantClient?.next_action?.instructions || operatorDashboard?.primary_focus?.next_action?.instructions || merchantLead?.status?.next_action || "Not Yet Available",
+        recommendedOperatorAction: primaryActionSnapshot.primary_action?.next_step || qa.snapshot_primary_action?.next_step || "Not Yet Available",
+        revenueOpportunity: currentRevenueGap?.gap !== undefined ? money(currentRevenueGap.gap) : "Not Yet Available",
+        completionReadiness: deliveryCompletionReadiness
       }}
       executeSummary={{
         status: executeStatus,
