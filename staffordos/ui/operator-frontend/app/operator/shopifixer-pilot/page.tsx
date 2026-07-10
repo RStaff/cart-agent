@@ -9,6 +9,7 @@ import { getCampaignResolverReport } from "../../../lib/operator/campaignResolve
 import { loadPreflightReport } from "../../../lib/operator/loadPreflightReport";
 import { loadCommandCenterQaReport } from "../../../lib/operator/loadCommandCenterQaReport";
 import { writeShopifixerBeforeEvidence } from "../../../lib/operator/writeShopifixerBeforeEvidence";
+import { writeShopifixerAfterEvidence } from "../../../lib/operator/writeShopifixerAfterEvidence";
 import { writeShopifixerScopedFix } from "../../../lib/operator/writeShopifixerScopedFix";
 
 type ProofFile = {
@@ -207,6 +208,7 @@ type ShopifixerPilotSearchParams = {
   phase?: string | string[];
   shopifixer_scoped_fix_saved?: string;
   shopifixer_before_saved?: string;
+  shopifixer_after_saved?: string;
 };
 
 export default async function ShopifixerPilotPage({ searchParams }: { searchParams?: ShopifixerPilotSearchParams }) {
@@ -267,6 +269,11 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
   const beforeEvidenceFields = parseEvidenceFields(beforeEvidenceContent);
   const beforeEvidenceWorkbenchSaved = (searchParams as { shopifixer_before_saved?: string } | undefined)?.shopifixer_before_saved === "1";
   const beforeEvidenceWorkbenchDate = new Date().toISOString().slice(0, 10);
+  const afterEvidencePath = path.join(repoRoot, `${PROOF_RUN_ROOT}/after_evidence.md`);
+  const afterEvidenceContent = readText(afterEvidencePath);
+  const afterEvidenceFields = parseEvidenceFields(afterEvidenceContent);
+  const afterEvidenceWorkbenchSaved = (searchParams as { shopifixer_after_saved?: string } | undefined)?.shopifixer_after_saved === "1";
+  const afterEvidenceWorkbenchDate = new Date().toISOString().slice(0, 10);
   const evidenceManifest = readJson<Record<string, any>>(
     path.join(repoRoot, "staffordos/proof_runs/output/evidence_manifest_v1.json"),
     {}
@@ -347,9 +354,6 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
       ? "Before Evidence Captured"
       : "Before Evidence Drafted";
   const beforeEvidenceLastCapturedAt = beforeEvidenceLatest?.created_at || "Not Yet Available";
-  const afterEvidencePath = path.join(repoRoot, `${PROOF_RUN_ROOT}/after_evidence.md`);
-  const afterEvidenceContent = readText(afterEvidencePath);
-  const afterEvidenceFields = parseEvidenceFields(afterEvidenceContent);
   const afterEvidenceArtifacts = Array.isArray(evidenceManifest.artifacts)
     ? evidenceManifest.artifacts.filter(
         (artifact: any) =>
@@ -357,6 +361,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
           String(artifact?.source_writer || "").trim() === "writeShopifixerAfterEvidence"
       )
     : [];
+  const afterEvidenceCaptured = afterEvidenceArtifacts.length > 0;
   const afterEvidenceLatest = afterEvidenceArtifacts[afterEvidenceArtifacts.length - 1] || null;
   const afterEvidenceArtifactIds = afterEvidenceArtifacts.map((artifact: any) => String(artifact?.artifact_id || "").trim()).filter(Boolean);
   const afterEvidenceScreenshotArtifacts = Array.isArray(afterEvidenceLatest?.screenshot_artifacts)
@@ -364,7 +369,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
     : [];
   const afterEvidenceStatus = !afterEvidenceContent.trim()
     ? "After Evidence Missing"
-    : afterEvidenceArtifacts.length
+    : afterEvidenceCaptured
       ? "After Evidence Captured"
       : "After Evidence Drafted";
   const afterEvidenceLastCapturedAt = afterEvidenceLatest?.created_at || "Not Yet Available";
@@ -436,7 +441,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
     scope: scopeComplete,
     before_evidence: beforeEvidenceCaptured,
     execute: scopeReady && preflightGo && qaPass && requiredAgentsGo && !executionBlocked,
-    after_evidence: Boolean(afterEvidenceContent.trim()),
+    after_evidence: afterEvidenceCaptured,
     proof_seal: Boolean(proofPackageContent.trim()) && String(proofSeal.status || "").trim().toLowerCase() === "sealed" && proofSha256MatchStatus === "Match",
     delivery: currentOfferReady && paymentCollected && Boolean(proofPackageContent.trim()) && String(proofSeal.status || "").trim().toLowerCase() === "sealed"
   } as const;
@@ -512,11 +517,41 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
     {
       key: "after_evidence",
       label: "After Evidence",
-      blockedReason: afterEvidenceStatus,
-      nextSafeAction: "Review Proof & Seal",
+      blockedReason: !scopeComplete
+        ? "Scope incomplete"
+        : !beforeEvidenceCaptured
+          ? "Before Evidence Missing"
+          : !executeStatus.includes("Complete")
+            ? "Execution incomplete"
+            : afterEvidenceStatus,
+      nextSafeAction: !scopeComplete
+        ? "Review Scope"
+        : !beforeEvidenceCaptured
+          ? "Capture Before Evidence"
+          : !executeStatus.includes("Complete")
+            ? "Review Execution Readiness"
+            : afterEvidenceCaptured
+              ? "Continue to Proof & Seal"
+              : "Capture After Evidence",
       authority: "after_evidence.md / evidence_manifest_v1.json",
-      ctaLabel: "Review Proof & Seal",
-      ctaHref: phaseHref("proof_seal"),
+      ctaLabel: !scopeComplete
+        ? "Complete Scope"
+        : !beforeEvidenceCaptured
+          ? "Capture Before Evidence"
+          : !executeStatus.includes("Complete")
+            ? "Review Execution Readiness"
+            : afterEvidenceCaptured
+              ? "Continue to Proof & Seal"
+              : "Capture After Evidence",
+      ctaHref: !scopeComplete
+        ? phaseHref("scope")
+        : !beforeEvidenceCaptured
+          ? phaseHref("before-evidence")
+          : !executeStatus.includes("Complete")
+            ? phaseHref("execute")
+            : afterEvidenceCaptured
+              ? phaseHref("proof-seal")
+              : phaseHref("after-evidence"),
       note: afterEvidenceStatus
     },
     {
@@ -730,6 +765,33 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
       }}
       beforeEvidenceSaved={beforeEvidenceWorkbenchSaved}
       beforeEvidenceDate={beforeEvidenceWorkbenchDate}
+      afterEvidenceAction={async (formData: FormData) => {
+        "use server";
+
+        const store = String(formData.get("store") || commandCenterMerchant.store || shopifixer.merchant?.store || "unavailable");
+        const date = String(formData.get("date") || afterEvidenceWorkbenchDate);
+        const affected_page_or_artifact = String(formData.get("affected_page_or_artifact") || "");
+        const after_screenshot = String(formData.get("after_screenshot") || "");
+        const after_notes = String(formData.get("after_notes") || "");
+        const remaining_limitations = String(formData.get("remaining_limitations") || "");
+        const observed_improvement = String(formData.get("observed_improvement") || "");
+        const merchant_facing_summary = String(formData.get("merchant_facing_summary") || "");
+
+        writeShopifixerAfterEvidence({
+          store,
+          date,
+          affected_page_or_artifact,
+          after_screenshot,
+          after_notes,
+          remaining_limitations,
+          observed_improvement,
+          merchant_facing_summary
+        });
+
+        redirect("/operator/shopifixer-pilot?phase=after-evidence&shopifixer_after_saved=1");
+      }}
+      afterEvidenceSaved={afterEvidenceWorkbenchSaved}
+      afterEvidenceDate={afterEvidenceWorkbenchDate}
       scopeWorkbenchAction={async (formData: FormData) => {
         "use server";
 
