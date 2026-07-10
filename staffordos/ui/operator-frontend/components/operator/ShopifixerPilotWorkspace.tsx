@@ -164,6 +164,9 @@ type ShopifixerPilotWorkspaceProps = {
   scopeWorkbenchAction: (formData: FormData) => Promise<void>;
   scopeWorkbenchSaved: boolean;
   scopeWorkbenchDate: string;
+  beforeEvidenceAction: (formData: FormData) => Promise<void>;
+  beforeEvidenceSaved: boolean;
+  beforeEvidenceDate: string;
   beforeEvidenceSummary: {
     status: string;
     path: string;
@@ -205,6 +208,9 @@ export function ShopifixerPilotWorkspace({
   scopeWorkbenchAction,
   scopeWorkbenchSaved,
   scopeWorkbenchDate,
+  beforeEvidenceAction,
+  beforeEvidenceSaved,
+  beforeEvidenceDate,
   beforeEvidenceSummary,
   executeSummary,
   afterEvidenceSummary,
@@ -370,6 +376,38 @@ export function ShopifixerPilotWorkspace({
                   <div><strong>Next safe action:</strong> {scopeSummary.status === "Scope Complete" ? "Continue to Before Evidence" : "Review Scope"}</div>
                 </div>
               </div>
+
+              {currentPhase === "before_evidence" ? (
+                scopeSummary.status === "Scope Complete" ? (
+                  <div className="boardCard" style={{ marginTop: 16 }}>
+                    <p className="boardCardTitle">Before Evidence Workbench</p>
+                    <p className="boardCardMeta">{beforeEvidenceSummary.status}</p>
+                    <ProofRunWorkbench
+                      stage="before_evidence"
+                      merchant={{ store: merchant.store, client_id: merchant.clientId }}
+                      proofRunPath="staffordos/proof_runs/internal_shopifixer_dry_run_v1/"
+                      date={beforeEvidenceDate}
+                      saved={beforeEvidenceSaved}
+                      onSubmit={beforeEvidenceAction}
+                    />
+                  </div>
+                ) : (
+                  <div className="boardCard" style={{ marginTop: 16 }}>
+                    <p className="boardCardTitle">Before Evidence Workbench</p>
+                    <p className="boardCardMeta">Blocked</p>
+                    <div className="kv">
+                      <div><strong>Blocking reason:</strong> Scope incomplete</div>
+                      <div><strong>Missing truth:</strong> {scopeSummary.missingFields.length ? scopeSummary.missingFields.join(", ") : "fix_scope.md"}</div>
+                      <div><strong>Exact next safe action:</strong> Review Scope</div>
+                    </div>
+                    <div style={{ marginTop: 12 }}>
+                      <Link href="/operator/shopifixer-pilot?phase=scope" className="inlineLink">
+                        Open Scope phase
+                      </Link>
+                    </div>
+                  </div>
+                )
+              ) : null}
 
               <div className="boardCard" style={{ marginTop: 16 }}>
                 <p className="boardCardTitle">Before Evidence</p>
