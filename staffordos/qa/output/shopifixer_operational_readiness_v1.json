@@ -1,0 +1,1363 @@
+{
+  "schema": "staffordos.shopifixer_operational_readiness.v1",
+  "generated_at": "2026-07-11T13:03:59.772Z",
+  "status": "CONDITIONAL_GO",
+  "production_operation_permitted": true,
+  "completion_permitted": false,
+  "merchant": {
+    "store": "cart-agent-dev.myshopify.com",
+    "client_id": "cart-agent-dev.myshopify.com",
+    "merchant_name": "Not Yet Available",
+    "campaign_id": "Not Yet Available",
+    "lead_id": "Not Yet Available",
+    "offer_subject": "ShopiFixer Fix Sprint for cart-agent-dev.myshopify.com",
+    "payment_status": "waiting_for_payment",
+    "payment_verified_source": "Not Yet Available",
+    "paid_at": "Not Yet Available"
+  },
+  "current_phase": "before_evidence",
+  "current_blocker": "Before Evidence Missing",
+  "blocking_reasons": [
+    "Before Evidence Missing"
+  ],
+  "next_safe_action": "Capture Before Evidence",
+  "gates": {
+    "merchant_identity": {
+      "status": "pass",
+      "merchant": "cart-agent-dev.myshopify.com",
+      "reason": "Merchant identity resolved"
+    },
+    "scope": {
+      "status": "pass",
+      "reason": "Scope Complete",
+      "missing_fields": []
+    },
+    "before_evidence": {
+      "status": "blocked",
+      "reason": "Before Evidence Drafted",
+      "artifact_ids": [],
+      "merchant_matches": false,
+      "last_captured_at": "Not Yet Available"
+    },
+    "execution": {
+      "status": "blocked",
+      "reason": "Execute Blocked",
+      "blocking_reasons": [
+        "Before Evidence Missing"
+      ],
+      "preflight": "GO",
+      "qa": "pass",
+      "required_agents": "GO",
+      "execution_mode_decision": "IGNORE",
+      "latest_status": "BLOCKED_BY_EXECUTION_MODE",
+      "latest_event": "Not Yet Available"
+    },
+    "after_evidence": {
+      "status": "blocked",
+      "reason": "After Evidence Drafted",
+      "artifact_ids": [],
+      "merchant_matches": false,
+      "last_captured_at": "Not Yet Available"
+    },
+    "proof_and_checksum_seal": {
+      "status": "blocked",
+      "reason": "Proof Drafted",
+      "proof_package_path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md",
+      "seal_path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.seal.json",
+      "manifest_path": "staffordos/proof_runs/output/evidence_manifest_v1.json",
+      "sha256_match_status": "Mismatch",
+      "manifest_artifact_count": 4,
+      "evidence_source_paths": [
+        "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md",
+        "staffordos/proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md",
+        "staffordos/proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md",
+        "../../../../var/folders/2_/z7ybpx8x5097zxjpfxstdrtm0000gn/T/staffordos-evidence-artifacts-44965/770ad98912eb13d4.png",
+        "../../../../var/folders/2_/z7ybpx8x5097zxjpfxstdrtm0000gn/T/staffordos-evidence-artifacts-44965/482323cbeeb4b11e.png",
+        "../../../../var/folders/2_/z7ybpx8x5097zxjpfxstdrtm0000gn/T/staffordos-evidence-artifacts-44965/0a68d212a3f29dc4.png",
+        "../../../../var/folders/2_/z7ybpx8x5097zxjpfxstdrtm0000gn/T/staffordos-evidence-artifacts-44965/23cb997630a87ebf.png"
+      ],
+      "merchant_matches": false
+    },
+    "stripe_payment": {
+      "status": "blocked",
+      "reason": "payment_status=waiting_for_payment · paid_at missing",
+      "payment_status": "waiting_for_payment",
+      "payment_verified_source": "",
+      "paid_at": ""
+    },
+    "completion_authority": {
+      "status": "blocked",
+      "reason": "Before Evidence Missing · Payment status: waiting_for_payment",
+      "permitted": false
+    },
+    "dirty_worktree": {
+      "status": "observed",
+      "summary": {
+        "entries": [
+          {
+            "status": "M",
+            "path": "staffordos/cockpit/ceo_truth_snapshot_v1.json",
+            "category": "generated operational outputs"
+          },
+          {
+            "status": "M",
+            "path": "staffordos/events/operator_action_events_v1.json",
+            "category": "snapshots/events"
+          },
+          {
+            "status": "M",
+            "path": "staffordos/events/outcome_event_log_v1.json",
+            "category": "snapshots/events"
+          },
+          {
+            "status": "M",
+            "path": "staffordos/execution/output/agent_loop_latest.json",
+            "category": "generated operational outputs"
+          },
+          {
+            "status": "M",
+            "path": "staffordos/operating_loop/output/start_workday_latest.txt",
+            "category": "generated operational outputs"
+          },
+          {
+            "status": "M",
+            "path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md",
+            "category": "proof artifacts"
+          },
+          {
+            "status": "M",
+            "path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md",
+            "category": "proof artifacts"
+          },
+          {
+            "status": "M",
+            "path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md",
+            "category": "proof artifacts"
+          },
+          {
+            "status": "M",
+            "path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md",
+            "category": "proof artifacts"
+          },
+          {
+            "status": "M",
+            "path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.seal.json",
+            "category": "proof artifacts"
+          },
+          {
+            "status": "M",
+            "path": "staffordos/qa/output/command_center_primary_action_qa_v1.json",
+            "category": "generated operational outputs"
+          },
+          {
+            "status": "M",
+            "path": "staffordos/qa/validate_shopifixer_completion_authority_v1.mjs",
+            "category": "canonical source changes"
+          },
+          {
+            "status": "M",
+            "path": "staffordos/snapshots/primary_action_snapshot_v1.json",
+            "category": "snapshots/events"
+          },
+          {
+            "status": "??",
+            "path": "FOUNDER_EXPERIENCE_REVIEW_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "SHOPIFIXER_ENGINEERING_CURRICULUM_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "SHOPIFIXER_ENGINEERING_EXERCISE_002_REPORT.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "SHOPIFIXER_ENGINEERING_EXERCISE_003_PRODUCT_LIST_ANALYSIS_REPORT.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "SHOPIFIXER_FIRST_CUSTOMER_EVIDENCE_PACKAGE_TEMPLATE_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "SHOPIFIXER_FIRST_CUSTOMER_OPERATIONS_RUNBOOK_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "SHOPIFIXER_PATTERN_LIBRARY_0001_HOMEPAGE_ARCHITECTURE.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "SHOPIFIXER_PRODUCTION_PILOT_DECISION_RECORD_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "SHOPIFIXER_SHOPIFY_ARCHITECTURE_TRAINING_PLAN_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "SHOPIFIXER_SHOPIFY_ENGINEERING_CANON_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "STAFFORDOS_ARCHITECTURE_DECISION_RECORD_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "STAFFORDOS_CANONICAL_CONTINUITY_ROUTE_AUDIT_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "STAFFORDOS_MERCHANT_WORKSPACE_ARCHITECTURE_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "STAFFORDOS_MISSION_001_NOKINGS_TRAINING_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "STAFFORDOS_MISSION_ENGINE_ARCHITECTURE_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "STAFFORDOS_OPERATOR_DAILY_WORKFLOW_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "STAFFORDOS_OPERATOR_GAP_CLOSURE_PLAN_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "STAFFORDOS_OPERATOR_SURFACE_INVENTORY_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "STAFFORDOS_OPERATOR_TASK2_RUNTIME_FIX_REPORT_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "STAFFORDOS_POST_TASK4_COMMIT_CONTAINMENT_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "STAFFORDOS_SPRINT1_CHECKPOINT_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "STAFFORDOS_SPRINT1_TASK1_IMPLEMENTATION_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "STAFFORDOS_SPRINT1_TASK2_EXECUTION_REPORT_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "STAFFORDOS_SPRINT1_TASK2_FINAL_CLOSEOUT_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "STAFFORDOS_TASK4_COMMIT_CLEANUP_REPORT_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "STAFFORDOS_TASK5_COMMIT_CONTAINMENT_REPORT_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "STAFFORDOS_WAVE1_EXECUTION_PLAN_V1.md",
+            "category": "unknown"
+          },
+          {
+            "status": "??",
+            "path": "staffordos/implementation/p3_founder_operating_experience_v1.md",
+            "category": "documentation awaiting review"
+          },
+          {
+            "status": "??",
+            "path": "staffordos/implementation/p4_capability_certification_v1.md",
+            "category": "documentation awaiting review"
+          },
+          {
+            "status": "??",
+            "path": "staffordos/implementation/p4_implementation_backlog_v1.md",
+            "category": "documentation awaiting review"
+          },
+          {
+            "status": "??",
+            "path": "staffordos/implementation/p6_writer_function_audit_v1.md",
+            "category": "documentation awaiting review"
+          },
+          {
+            "status": "??",
+            "path": "staffordos/implementation/p7_2_shopifixer_pilot_workspace_architecture_v1.md",
+            "category": "documentation awaiting review"
+          },
+          {
+            "status": "??",
+            "path": "staffordos/implementation/p7_controlled_shopifixer_pilot_plan_v1.md",
+            "category": "documentation awaiting review"
+          },
+          {
+            "status": "??",
+            "path": "staffordos/implementation/p7_operator_pilot_walkthrough_audit_v1.md",
+            "category": "documentation awaiting review"
+          },
+          {
+            "status": "??",
+            "path": "staffordos/operating_loop/output/stop_workday_20260704_180333/",
+            "category": "generated operational outputs"
+          },
+          {
+            "status": "??",
+            "path": "staffordos/operating_loop/output/stop_workday_20260704_180926/",
+            "category": "generated operational outputs"
+          },
+          {
+            "status": "??",
+            "path": "staffordos/operations/operator_design_system_v1.md",
+            "category": "documentation awaiting review"
+          },
+          {
+            "status": "??",
+            "path": "staffordos/operations/operator_visibility_architecture_v1.md",
+            "category": "documentation awaiting review"
+          },
+          {
+            "status": "??",
+            "path": "staffordos/qa/evaluate_shopifixer_operational_readiness_v1.mjs",
+            "category": "canonical source changes"
+          },
+          {
+            "status": "??",
+            "path": "staffordos/qa/output/shopifixer_operational_readiness_v1.json",
+            "category": "generated operational outputs"
+          },
+          {
+            "status": "??",
+            "path": "staffordos/qa/validate_shopifixer_operational_readiness_v1.mjs",
+            "category": "canonical source changes"
+          },
+          {
+            "status": "??",
+            "path": "staffordos/ui/operator-frontend/tsconfig.tsbuildinfo",
+            "category": "cache/temporary files"
+          },
+          {
+            "status": "??",
+            "path": "web/.env.shopifixer.verify.example",
+            "category": "documentation awaiting review"
+          }
+        ],
+        "categories": {
+          "canonical source changes": [
+            {
+              "status": "M",
+              "path": "staffordos/qa/validate_shopifixer_completion_authority_v1.mjs",
+              "category": "canonical source changes"
+            },
+            {
+              "status": "??",
+              "path": "staffordos/qa/evaluate_shopifixer_operational_readiness_v1.mjs",
+              "category": "canonical source changes"
+            },
+            {
+              "status": "??",
+              "path": "staffordos/qa/validate_shopifixer_operational_readiness_v1.mjs",
+              "category": "canonical source changes"
+            }
+          ],
+          "generated operational outputs": [
+            {
+              "status": "M",
+              "path": "staffordos/cockpit/ceo_truth_snapshot_v1.json",
+              "category": "generated operational outputs"
+            },
+            {
+              "status": "M",
+              "path": "staffordos/execution/output/agent_loop_latest.json",
+              "category": "generated operational outputs"
+            },
+            {
+              "status": "M",
+              "path": "staffordos/operating_loop/output/start_workday_latest.txt",
+              "category": "generated operational outputs"
+            },
+            {
+              "status": "M",
+              "path": "staffordos/qa/output/command_center_primary_action_qa_v1.json",
+              "category": "generated operational outputs"
+            },
+            {
+              "status": "??",
+              "path": "staffordos/operating_loop/output/stop_workday_20260704_180333/",
+              "category": "generated operational outputs"
+            },
+            {
+              "status": "??",
+              "path": "staffordos/operating_loop/output/stop_workday_20260704_180926/",
+              "category": "generated operational outputs"
+            },
+            {
+              "status": "??",
+              "path": "staffordos/qa/output/shopifixer_operational_readiness_v1.json",
+              "category": "generated operational outputs"
+            }
+          ],
+          "proof artifacts": [
+            {
+              "status": "M",
+              "path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md",
+              "category": "proof artifacts"
+            },
+            {
+              "status": "M",
+              "path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md",
+              "category": "proof artifacts"
+            },
+            {
+              "status": "M",
+              "path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md",
+              "category": "proof artifacts"
+            },
+            {
+              "status": "M",
+              "path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md",
+              "category": "proof artifacts"
+            },
+            {
+              "status": "M",
+              "path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.seal.json",
+              "category": "proof artifacts"
+            }
+          ],
+          "snapshots/events": [
+            {
+              "status": "M",
+              "path": "staffordos/events/operator_action_events_v1.json",
+              "category": "snapshots/events"
+            },
+            {
+              "status": "M",
+              "path": "staffordos/events/outcome_event_log_v1.json",
+              "category": "snapshots/events"
+            },
+            {
+              "status": "M",
+              "path": "staffordos/snapshots/primary_action_snapshot_v1.json",
+              "category": "snapshots/events"
+            }
+          ],
+          "documentation awaiting review": [
+            {
+              "status": "??",
+              "path": "staffordos/implementation/p3_founder_operating_experience_v1.md",
+              "category": "documentation awaiting review"
+            },
+            {
+              "status": "??",
+              "path": "staffordos/implementation/p4_capability_certification_v1.md",
+              "category": "documentation awaiting review"
+            },
+            {
+              "status": "??",
+              "path": "staffordos/implementation/p4_implementation_backlog_v1.md",
+              "category": "documentation awaiting review"
+            },
+            {
+              "status": "??",
+              "path": "staffordos/implementation/p6_writer_function_audit_v1.md",
+              "category": "documentation awaiting review"
+            },
+            {
+              "status": "??",
+              "path": "staffordos/implementation/p7_2_shopifixer_pilot_workspace_architecture_v1.md",
+              "category": "documentation awaiting review"
+            },
+            {
+              "status": "??",
+              "path": "staffordos/implementation/p7_controlled_shopifixer_pilot_plan_v1.md",
+              "category": "documentation awaiting review"
+            },
+            {
+              "status": "??",
+              "path": "staffordos/implementation/p7_operator_pilot_walkthrough_audit_v1.md",
+              "category": "documentation awaiting review"
+            },
+            {
+              "status": "??",
+              "path": "staffordos/operations/operator_design_system_v1.md",
+              "category": "documentation awaiting review"
+            },
+            {
+              "status": "??",
+              "path": "staffordos/operations/operator_visibility_architecture_v1.md",
+              "category": "documentation awaiting review"
+            },
+            {
+              "status": "??",
+              "path": "web/.env.shopifixer.verify.example",
+              "category": "documentation awaiting review"
+            }
+          ],
+          "cache/temporary files": [
+            {
+              "status": "??",
+              "path": "staffordos/ui/operator-frontend/tsconfig.tsbuildinfo",
+              "category": "cache/temporary files"
+            }
+          ],
+          "unknown": [
+            {
+              "status": "??",
+              "path": "FOUNDER_EXPERIENCE_REVIEW_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "SHOPIFIXER_ENGINEERING_CURRICULUM_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "SHOPIFIXER_ENGINEERING_EXERCISE_002_REPORT.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "SHOPIFIXER_ENGINEERING_EXERCISE_003_PRODUCT_LIST_ANALYSIS_REPORT.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "SHOPIFIXER_FIRST_CUSTOMER_EVIDENCE_PACKAGE_TEMPLATE_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "SHOPIFIXER_FIRST_CUSTOMER_OPERATIONS_RUNBOOK_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "SHOPIFIXER_PATTERN_LIBRARY_0001_HOMEPAGE_ARCHITECTURE.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "SHOPIFIXER_PRODUCTION_PILOT_DECISION_RECORD_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "SHOPIFIXER_SHOPIFY_ARCHITECTURE_TRAINING_PLAN_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "SHOPIFIXER_SHOPIFY_ENGINEERING_CANON_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "STAFFORDOS_ARCHITECTURE_DECISION_RECORD_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "STAFFORDOS_CANONICAL_CONTINUITY_ROUTE_AUDIT_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "STAFFORDOS_MERCHANT_WORKSPACE_ARCHITECTURE_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "STAFFORDOS_MISSION_001_NOKINGS_TRAINING_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "STAFFORDOS_MISSION_ENGINE_ARCHITECTURE_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "STAFFORDOS_OPERATOR_DAILY_WORKFLOW_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "STAFFORDOS_OPERATOR_GAP_CLOSURE_PLAN_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "STAFFORDOS_OPERATOR_SURFACE_INVENTORY_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "STAFFORDOS_OPERATOR_TASK2_RUNTIME_FIX_REPORT_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "STAFFORDOS_POST_TASK4_COMMIT_CONTAINMENT_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "STAFFORDOS_SPRINT1_CHECKPOINT_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "STAFFORDOS_SPRINT1_TASK1_IMPLEMENTATION_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "STAFFORDOS_SPRINT1_TASK2_EXECUTION_REPORT_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "STAFFORDOS_SPRINT1_TASK2_FINAL_CLOSEOUT_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "STAFFORDOS_TASK4_COMMIT_CLEANUP_REPORT_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "STAFFORDOS_TASK5_COMMIT_CONTAINMENT_REPORT_V1.md",
+              "category": "unknown"
+            },
+            {
+              "status": "??",
+              "path": "STAFFORDOS_WAVE1_EXECUTION_PLAN_V1.md",
+              "category": "unknown"
+            }
+          ]
+        },
+        "counts": {
+          "canonical source changes": 3,
+          "generated operational outputs": 7,
+          "proof artifacts": 5,
+          "snapshots/events": 3,
+          "documentation awaiting review": 10,
+          "cache/temporary files": 1,
+          "unknown": 27
+        },
+        "dirtyCount": 56
+      }
+    }
+  },
+  "scores": {
+    "architecture": 94,
+    "governance": 95,
+    "evidence_integrity": 68,
+    "operator_ux": 83,
+    "workflow_completeness": 14,
+    "production_readiness": 7
+  },
+  "evidence_sources": [
+    {
+      "label": "Scope",
+      "path": "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md",
+      "status": "present"
+    },
+    {
+      "label": "Before Evidence",
+      "path": "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md",
+      "status": "Before Evidence Drafted"
+    },
+    {
+      "label": "After Evidence",
+      "path": "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md",
+      "status": "After Evidence Drafted"
+    },
+    {
+      "label": "Proof Package",
+      "path": "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md",
+      "status": "Proof Drafted"
+    },
+    {
+      "label": "Seal",
+      "path": "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.seal.json",
+      "status": "sealed"
+    },
+    {
+      "label": "Evidence Manifest",
+      "path": "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/evidence_manifest_v1.json",
+      "status": "artifacts:0"
+    },
+    {
+      "label": "Fulfillment Truth",
+      "path": "/Users/rossstafford/projects/cart-agent/staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+      "status": "waiting_for_payment"
+    },
+    {
+      "label": "Client Registry",
+      "path": "/Users/rossstafford/projects/cart-agent/staffordos/clients/client_registry_v1.json",
+      "status": "cart-agent-dev.myshopify.com"
+    },
+    {
+      "label": "Offer",
+      "path": "/Users/rossstafford/projects/cart-agent/staffordos/clients/shopifixer_offer_latest.json",
+      "status": "cart-agent-dev.myshopify.com"
+    },
+    {
+      "label": "Preflight",
+      "path": "/Users/rossstafford/projects/cart-agent/staffordos/preflight/output/preflight_report_v1.json",
+      "status": "GO"
+    },
+    {
+      "label": "QA",
+      "path": "/Users/rossstafford/projects/cart-agent/staffordos/qa/output/command_center_primary_action_qa_v1.json",
+      "status": "pass"
+    },
+    {
+      "label": "Required Agent Validation",
+      "path": "/Users/rossstafford/projects/cart-agent/staffordos/execution/output/required_agent_validation_v1.json",
+      "status": "GO"
+    },
+    {
+      "label": "Execution Log",
+      "path": "/Users/rossstafford/projects/cart-agent/staffordos/execution/output/agent_loop_latest.json",
+      "status": "BLOCKED_BY_EXECUTION_MODE"
+    },
+    {
+      "label": "Primary Action Snapshot",
+      "path": "/Users/rossstafford/projects/cart-agent/staffordos/snapshots/primary_action_snapshot_v1.json",
+      "status": "2026-06-29T18:41:51.771Z"
+    }
+  ],
+  "warnings": [
+    "Dirty worktree entries: 56",
+    "Proof artifacts exist but do not satisfy the current merchant gate.",
+    "Before evidence exists but does not satisfy the current merchant gate.",
+    "After evidence exists but does not satisfy the current merchant gate."
+  ],
+  "worktree_classification": {
+    "entries": [
+      {
+        "status": "M",
+        "path": "staffordos/cockpit/ceo_truth_snapshot_v1.json",
+        "category": "generated operational outputs"
+      },
+      {
+        "status": "M",
+        "path": "staffordos/events/operator_action_events_v1.json",
+        "category": "snapshots/events"
+      },
+      {
+        "status": "M",
+        "path": "staffordos/events/outcome_event_log_v1.json",
+        "category": "snapshots/events"
+      },
+      {
+        "status": "M",
+        "path": "staffordos/execution/output/agent_loop_latest.json",
+        "category": "generated operational outputs"
+      },
+      {
+        "status": "M",
+        "path": "staffordos/operating_loop/output/start_workday_latest.txt",
+        "category": "generated operational outputs"
+      },
+      {
+        "status": "M",
+        "path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md",
+        "category": "proof artifacts"
+      },
+      {
+        "status": "M",
+        "path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md",
+        "category": "proof artifacts"
+      },
+      {
+        "status": "M",
+        "path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md",
+        "category": "proof artifacts"
+      },
+      {
+        "status": "M",
+        "path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md",
+        "category": "proof artifacts"
+      },
+      {
+        "status": "M",
+        "path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.seal.json",
+        "category": "proof artifacts"
+      },
+      {
+        "status": "M",
+        "path": "staffordos/qa/output/command_center_primary_action_qa_v1.json",
+        "category": "generated operational outputs"
+      },
+      {
+        "status": "M",
+        "path": "staffordos/qa/validate_shopifixer_completion_authority_v1.mjs",
+        "category": "canonical source changes"
+      },
+      {
+        "status": "M",
+        "path": "staffordos/snapshots/primary_action_snapshot_v1.json",
+        "category": "snapshots/events"
+      },
+      {
+        "status": "??",
+        "path": "FOUNDER_EXPERIENCE_REVIEW_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "SHOPIFIXER_ENGINEERING_CURRICULUM_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "SHOPIFIXER_ENGINEERING_EXERCISE_002_REPORT.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "SHOPIFIXER_ENGINEERING_EXERCISE_003_PRODUCT_LIST_ANALYSIS_REPORT.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "SHOPIFIXER_FIRST_CUSTOMER_EVIDENCE_PACKAGE_TEMPLATE_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "SHOPIFIXER_FIRST_CUSTOMER_OPERATIONS_RUNBOOK_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "SHOPIFIXER_PATTERN_LIBRARY_0001_HOMEPAGE_ARCHITECTURE.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "SHOPIFIXER_PRODUCTION_PILOT_DECISION_RECORD_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "SHOPIFIXER_SHOPIFY_ARCHITECTURE_TRAINING_PLAN_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "SHOPIFIXER_SHOPIFY_ENGINEERING_CANON_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "STAFFORDOS_ARCHITECTURE_DECISION_RECORD_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "STAFFORDOS_CANONICAL_CONTINUITY_ROUTE_AUDIT_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "STAFFORDOS_MERCHANT_WORKSPACE_ARCHITECTURE_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "STAFFORDOS_MISSION_001_NOKINGS_TRAINING_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "STAFFORDOS_MISSION_ENGINE_ARCHITECTURE_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "STAFFORDOS_OPERATOR_DAILY_WORKFLOW_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "STAFFORDOS_OPERATOR_GAP_CLOSURE_PLAN_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "STAFFORDOS_OPERATOR_SURFACE_INVENTORY_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "STAFFORDOS_OPERATOR_TASK2_RUNTIME_FIX_REPORT_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "STAFFORDOS_POST_TASK4_COMMIT_CONTAINMENT_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "STAFFORDOS_SPRINT1_CHECKPOINT_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "STAFFORDOS_SPRINT1_TASK1_IMPLEMENTATION_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "STAFFORDOS_SPRINT1_TASK2_EXECUTION_REPORT_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "STAFFORDOS_SPRINT1_TASK2_FINAL_CLOSEOUT_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "STAFFORDOS_TASK4_COMMIT_CLEANUP_REPORT_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "STAFFORDOS_TASK5_COMMIT_CONTAINMENT_REPORT_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "STAFFORDOS_WAVE1_EXECUTION_PLAN_V1.md",
+        "category": "unknown"
+      },
+      {
+        "status": "??",
+        "path": "staffordos/implementation/p3_founder_operating_experience_v1.md",
+        "category": "documentation awaiting review"
+      },
+      {
+        "status": "??",
+        "path": "staffordos/implementation/p4_capability_certification_v1.md",
+        "category": "documentation awaiting review"
+      },
+      {
+        "status": "??",
+        "path": "staffordos/implementation/p4_implementation_backlog_v1.md",
+        "category": "documentation awaiting review"
+      },
+      {
+        "status": "??",
+        "path": "staffordos/implementation/p6_writer_function_audit_v1.md",
+        "category": "documentation awaiting review"
+      },
+      {
+        "status": "??",
+        "path": "staffordos/implementation/p7_2_shopifixer_pilot_workspace_architecture_v1.md",
+        "category": "documentation awaiting review"
+      },
+      {
+        "status": "??",
+        "path": "staffordos/implementation/p7_controlled_shopifixer_pilot_plan_v1.md",
+        "category": "documentation awaiting review"
+      },
+      {
+        "status": "??",
+        "path": "staffordos/implementation/p7_operator_pilot_walkthrough_audit_v1.md",
+        "category": "documentation awaiting review"
+      },
+      {
+        "status": "??",
+        "path": "staffordos/operating_loop/output/stop_workday_20260704_180333/",
+        "category": "generated operational outputs"
+      },
+      {
+        "status": "??",
+        "path": "staffordos/operating_loop/output/stop_workday_20260704_180926/",
+        "category": "generated operational outputs"
+      },
+      {
+        "status": "??",
+        "path": "staffordos/operations/operator_design_system_v1.md",
+        "category": "documentation awaiting review"
+      },
+      {
+        "status": "??",
+        "path": "staffordos/operations/operator_visibility_architecture_v1.md",
+        "category": "documentation awaiting review"
+      },
+      {
+        "status": "??",
+        "path": "staffordos/qa/evaluate_shopifixer_operational_readiness_v1.mjs",
+        "category": "canonical source changes"
+      },
+      {
+        "status": "??",
+        "path": "staffordos/qa/output/shopifixer_operational_readiness_v1.json",
+        "category": "generated operational outputs"
+      },
+      {
+        "status": "??",
+        "path": "staffordos/qa/validate_shopifixer_operational_readiness_v1.mjs",
+        "category": "canonical source changes"
+      },
+      {
+        "status": "??",
+        "path": "staffordos/ui/operator-frontend/tsconfig.tsbuildinfo",
+        "category": "cache/temporary files"
+      },
+      {
+        "status": "??",
+        "path": "web/.env.shopifixer.verify.example",
+        "category": "documentation awaiting review"
+      }
+    ],
+    "categories": {
+      "canonical source changes": [
+        {
+          "status": "M",
+          "path": "staffordos/qa/validate_shopifixer_completion_authority_v1.mjs",
+          "category": "canonical source changes"
+        },
+        {
+          "status": "??",
+          "path": "staffordos/qa/evaluate_shopifixer_operational_readiness_v1.mjs",
+          "category": "canonical source changes"
+        },
+        {
+          "status": "??",
+          "path": "staffordos/qa/validate_shopifixer_operational_readiness_v1.mjs",
+          "category": "canonical source changes"
+        }
+      ],
+      "generated operational outputs": [
+        {
+          "status": "M",
+          "path": "staffordos/cockpit/ceo_truth_snapshot_v1.json",
+          "category": "generated operational outputs"
+        },
+        {
+          "status": "M",
+          "path": "staffordos/execution/output/agent_loop_latest.json",
+          "category": "generated operational outputs"
+        },
+        {
+          "status": "M",
+          "path": "staffordos/operating_loop/output/start_workday_latest.txt",
+          "category": "generated operational outputs"
+        },
+        {
+          "status": "M",
+          "path": "staffordos/qa/output/command_center_primary_action_qa_v1.json",
+          "category": "generated operational outputs"
+        },
+        {
+          "status": "??",
+          "path": "staffordos/operating_loop/output/stop_workday_20260704_180333/",
+          "category": "generated operational outputs"
+        },
+        {
+          "status": "??",
+          "path": "staffordos/operating_loop/output/stop_workday_20260704_180926/",
+          "category": "generated operational outputs"
+        },
+        {
+          "status": "??",
+          "path": "staffordos/qa/output/shopifixer_operational_readiness_v1.json",
+          "category": "generated operational outputs"
+        }
+      ],
+      "proof artifacts": [
+        {
+          "status": "M",
+          "path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md",
+          "category": "proof artifacts"
+        },
+        {
+          "status": "M",
+          "path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md",
+          "category": "proof artifacts"
+        },
+        {
+          "status": "M",
+          "path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md",
+          "category": "proof artifacts"
+        },
+        {
+          "status": "M",
+          "path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md",
+          "category": "proof artifacts"
+        },
+        {
+          "status": "M",
+          "path": "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.seal.json",
+          "category": "proof artifacts"
+        }
+      ],
+      "snapshots/events": [
+        {
+          "status": "M",
+          "path": "staffordos/events/operator_action_events_v1.json",
+          "category": "snapshots/events"
+        },
+        {
+          "status": "M",
+          "path": "staffordos/events/outcome_event_log_v1.json",
+          "category": "snapshots/events"
+        },
+        {
+          "status": "M",
+          "path": "staffordos/snapshots/primary_action_snapshot_v1.json",
+          "category": "snapshots/events"
+        }
+      ],
+      "documentation awaiting review": [
+        {
+          "status": "??",
+          "path": "staffordos/implementation/p3_founder_operating_experience_v1.md",
+          "category": "documentation awaiting review"
+        },
+        {
+          "status": "??",
+          "path": "staffordos/implementation/p4_capability_certification_v1.md",
+          "category": "documentation awaiting review"
+        },
+        {
+          "status": "??",
+          "path": "staffordos/implementation/p4_implementation_backlog_v1.md",
+          "category": "documentation awaiting review"
+        },
+        {
+          "status": "??",
+          "path": "staffordos/implementation/p6_writer_function_audit_v1.md",
+          "category": "documentation awaiting review"
+        },
+        {
+          "status": "??",
+          "path": "staffordos/implementation/p7_2_shopifixer_pilot_workspace_architecture_v1.md",
+          "category": "documentation awaiting review"
+        },
+        {
+          "status": "??",
+          "path": "staffordos/implementation/p7_controlled_shopifixer_pilot_plan_v1.md",
+          "category": "documentation awaiting review"
+        },
+        {
+          "status": "??",
+          "path": "staffordos/implementation/p7_operator_pilot_walkthrough_audit_v1.md",
+          "category": "documentation awaiting review"
+        },
+        {
+          "status": "??",
+          "path": "staffordos/operations/operator_design_system_v1.md",
+          "category": "documentation awaiting review"
+        },
+        {
+          "status": "??",
+          "path": "staffordos/operations/operator_visibility_architecture_v1.md",
+          "category": "documentation awaiting review"
+        },
+        {
+          "status": "??",
+          "path": "web/.env.shopifixer.verify.example",
+          "category": "documentation awaiting review"
+        }
+      ],
+      "cache/temporary files": [
+        {
+          "status": "??",
+          "path": "staffordos/ui/operator-frontend/tsconfig.tsbuildinfo",
+          "category": "cache/temporary files"
+        }
+      ],
+      "unknown": [
+        {
+          "status": "??",
+          "path": "FOUNDER_EXPERIENCE_REVIEW_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "SHOPIFIXER_ENGINEERING_CURRICULUM_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "SHOPIFIXER_ENGINEERING_EXERCISE_002_REPORT.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "SHOPIFIXER_ENGINEERING_EXERCISE_003_PRODUCT_LIST_ANALYSIS_REPORT.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "SHOPIFIXER_FIRST_CUSTOMER_EVIDENCE_PACKAGE_TEMPLATE_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "SHOPIFIXER_FIRST_CUSTOMER_OPERATIONS_RUNBOOK_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "SHOPIFIXER_PATTERN_LIBRARY_0001_HOMEPAGE_ARCHITECTURE.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "SHOPIFIXER_PRODUCTION_PILOT_DECISION_RECORD_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "SHOPIFIXER_SHOPIFY_ARCHITECTURE_TRAINING_PLAN_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "SHOPIFIXER_SHOPIFY_ENGINEERING_CANON_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "STAFFORDOS_ARCHITECTURE_DECISION_RECORD_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "STAFFORDOS_CANONICAL_CONTINUITY_ROUTE_AUDIT_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "STAFFORDOS_MERCHANT_WORKSPACE_ARCHITECTURE_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "STAFFORDOS_MISSION_001_NOKINGS_TRAINING_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "STAFFORDOS_MISSION_ENGINE_ARCHITECTURE_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "STAFFORDOS_OPERATOR_DAILY_WORKFLOW_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "STAFFORDOS_OPERATOR_GAP_CLOSURE_PLAN_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "STAFFORDOS_OPERATOR_SURFACE_INVENTORY_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "STAFFORDOS_OPERATOR_TASK2_RUNTIME_FIX_REPORT_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "STAFFORDOS_POST_TASK4_COMMIT_CONTAINMENT_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "STAFFORDOS_SPRINT1_CHECKPOINT_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "STAFFORDOS_SPRINT1_TASK1_IMPLEMENTATION_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "STAFFORDOS_SPRINT1_TASK2_EXECUTION_REPORT_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "STAFFORDOS_SPRINT1_TASK2_FINAL_CLOSEOUT_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "STAFFORDOS_TASK4_COMMIT_CLEANUP_REPORT_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "STAFFORDOS_TASK5_COMMIT_CONTAINMENT_REPORT_V1.md",
+          "category": "unknown"
+        },
+        {
+          "status": "??",
+          "path": "STAFFORDOS_WAVE1_EXECUTION_PLAN_V1.md",
+          "category": "unknown"
+        }
+      ]
+    },
+    "counts": {
+      "canonical source changes": 3,
+      "generated operational outputs": 7,
+      "proof artifacts": 5,
+      "snapshots/events": 3,
+      "documentation awaiting review": 10,
+      "cache/temporary files": 1,
+      "unknown": 27
+    },
+    "dirtyCount": 56
+  }
+}
