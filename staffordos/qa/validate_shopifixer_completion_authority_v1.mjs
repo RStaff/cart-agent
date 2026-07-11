@@ -225,7 +225,15 @@ function snapshotProductionTruth(repoRoot) {
   const snapshot = {};
   for (const relPath of paths) {
     const abs = path.join(repoRoot, relPath);
-    snapshot[relPath] = fs.existsSync(abs) ? fs.readFileSync(abs, "utf8") : null;
+    if (!fs.existsSync(abs)) {
+      snapshot[relPath] = null;
+      continue;
+    }
+    const bytes = fs.readFileSync(abs);
+    snapshot[relPath] = {
+      sha256: crypto.createHash("sha256").update(bytes).digest("hex"),
+      size: bytes.length
+    };
   }
   return snapshot;
 }
@@ -233,8 +241,17 @@ function snapshotProductionTruth(repoRoot) {
 function assertProductionUnchanged(repoRoot, snapshot, failures) {
   for (const [relPath, before] of Object.entries(snapshot)) {
     const abs = path.join(repoRoot, relPath);
-    const after = fs.existsSync(abs) ? fs.readFileSync(abs, "utf8") : null;
-    assert(after === before, `production_truth_unchanged:${relPath}`, failures);
+    if (before === null) {
+      assert(!fs.existsSync(abs), `production_truth_unchanged:${relPath}`, failures);
+      continue;
+    }
+    assert(fs.existsSync(abs), `production_truth_unchanged:${relPath}`, failures);
+    const bytes = fs.readFileSync(abs);
+    const after = {
+      sha256: crypto.createHash("sha256").update(bytes).digest("hex"),
+      size: bytes.length
+    };
+    assert(after.sha256 === before.sha256 && after.size === before.size, `production_truth_unchanged:${relPath}`, failures);
   }
 }
 
