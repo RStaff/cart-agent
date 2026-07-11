@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.nokings_mission_001_readiness.v1",
-  "generated_at": "2026-07-11T15:14:38.677Z",
+  "generated_at": "2026-07-11T15:53:00.023Z",
   "status": "CONDITIONAL_GO",
   "production_operation_permitted": true,
   "completion_permitted": false,
@@ -15,16 +15,15 @@
     "proof_run_id": "mission_001_nokings_shopifixer_v1",
     "proof_run_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"
   },
-  "current_phase": "scope",
-  "current_blocker": "Scope Incomplete",
+  "current_phase": "before_evidence",
+  "current_blocker": "Before Evidence Missing",
   "blocking_reasons": [
-    "Scope Incomplete",
     "Before Evidence Missing",
     "Execution authority not yet available",
     "After Evidence Missing",
     "Proof Drafted"
   ],
-  "next_safe_action": "Establish governed mission scope",
+  "next_safe_action": "Capture Before Evidence",
   "payment_required": false,
   "gates": {
     "merchant_binding": {
@@ -32,8 +31,8 @@
       "reason": "NoKings binding established"
     },
     "scope": {
-      "status": "blocked",
-      "reason": "Mission scope not yet established"
+      "status": "pass",
+      "reason": "Governed mission scope established"
     },
     "before_evidence": {
       "status": "blocked",
@@ -62,14 +61,14 @@
   },
   "scores": {
     "merchant_binding": 100,
-    "scope": 25,
+    "scope": 100,
     "before_evidence": 0,
     "execution": 0,
     "after_evidence": 0,
     "proof": 0,
     "rollback": 100,
     "payment": 100,
-    "overall": 35
+    "overall": 40
   },
   "evidence_sources": [
     "STAFFORDOS_MISSION_001_NOKINGS_TRAINING_V1.md",
