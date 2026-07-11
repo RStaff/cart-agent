@@ -1,0 +1,53 @@
+{
+  "schema": "staffordos.mission_binding.nokings_shopifixer.v1",
+  "mission_id": "mission_001",
+  "mission_name": "Mission 001 - NoKings Shopify Engineering Training",
+  "product": "ShopiFixer",
+  "environment_type": "controlled_training",
+  "merchant": {
+    "merchant_name": "NoKings Athletics",
+    "client_id": "no-kings-athletics.myshopify.com",
+    "store_domain": "no-kings-athletics.myshopify.com"
+  },
+  "canonical_store_domain": "no-kings-athletics.myshopify.com",
+  "storefront_url": "https://no-kings-athletics.myshopify.com",
+  "shopify_admin_identity": "no-kings-athletics-dev.myshopify.com",
+  "proof_run_id": "mission_001_nokings_shopifixer_v1",
+  "proof_run_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1",
+  "execution_authority": [
+    "STAFFORDOS_MISSION_001_NOKINGS_TRAINING_V1.md",
+    "SHOPIFIXER_SHOPIFY_ENGINEERING_CANON_V1.md",
+    "SHOPIFIXER_ENGINEERING_CURRICULUM_V1.md",
+    "staffordos/audits/no_kings/no_kings_shopifixer_sprint_validation_v1.md",
+    "staffordos/audits/no_kings/final_audit/no_kings_shopifixer_final_audit_v1.md",
+    "staffordos/audits/no_kings/execution_truth/execution_access_result_v1.md",
+    "staffordos/audits/no_kings/execution_truth/theme_pull_test_v2.txt"
+  ],
+  "rollback_authority": [
+    "staffordos/audits/no_kings/proof_store_plan/no_kings_proof_store_correction_plan_v1.md",
+    "staffordos/audits/no_kings/evidence/before_evidence_record_v1.md",
+    "staffordos/audits/no_kings/execution_truth/theme_pull_test_v2.txt"
+  ],
+  "payment_required": false,
+  "payment_authority": "No payment required unless canonical mission doctrine explicitly requires it.",
+  "status": "scaffolded",
+  "evidence_sources": [
+    "STAFFORDOS_MISSION_001_NOKINGS_TRAINING_V1.md",
+    "SHOPIFIXER_SHOPIFY_ENGINEERING_CANON_V1.md",
+    "SHOPIFIXER_ENGINEERING_CURRICULUM_V1.md",
+    "staffordos/governance/archive/20260604_artifact_archive/canonical_systems_v1.md",
+    "staffordos/governance/archive/20260604_artifact_archive/canonical_artifact_inventory_v1.md",
+    "staffordos/governance/archive/20260604_artifact_archive/commercialization_truth_map_v1.md",
+    "staffordos/governance/archive/20260604_artifact_archive/commercialization_gaps_v1.md",
+    "staffordos/audits/no_kings/evidence/before_evidence_record_v1.md",
+    "staffordos/audits/no_kings/evidence/before/homepage_desktop_before.png",
+    "staffordos/audits/no_kings/evidence/before/homepage_mobile_before.png",
+    "staffordos/audits/no_kings/no_kings_shopifixer_sprint_validation_v1.md",
+    "staffordos/audits/no_kings/final_audit/no_kings_shopifixer_final_audit_v1.md",
+    "staffordos/audits/no_kings/execution_truth/execution_access_result_v1.md",
+    "staffordos/audits/no_kings/execution_truth/theme_pull_test_v2.txt",
+    "staffordos/implementation/p10_2_nokings_shopifixer_merchant_authority_reconciliation_v1.md"
+  ],
+  "created_at": "2026-07-11T15:09:10Z",
+  "updated_at": "2026-07-11T15:09:10Z"
+}

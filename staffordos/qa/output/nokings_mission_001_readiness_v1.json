@@ -1,0 +1,100 @@
+{
+  "schema": "staffordos.nokings_mission_001_readiness.v1",
+  "generated_at": "2026-07-11T15:14:38.677Z",
+  "status": "CONDITIONAL_GO",
+  "production_operation_permitted": true,
+  "completion_permitted": false,
+  "merchant": {
+    "merchant_name": "NoKings Athletics",
+    "store": "no-kings-athletics.myshopify.com",
+    "canonical_store_domain": "no-kings-athletics.myshopify.com",
+    "storefront_url": "https://no-kings-athletics.myshopify.com",
+    "shopify_admin_identity": "no-kings-athletics-dev.myshopify.com",
+    "product": "ShopiFixer",
+    "environment_type": "controlled_training",
+    "proof_run_id": "mission_001_nokings_shopifixer_v1",
+    "proof_run_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"
+  },
+  "current_phase": "scope",
+  "current_blocker": "Scope Incomplete",
+  "blocking_reasons": [
+    "Scope Incomplete",
+    "Before Evidence Missing",
+    "Execution authority not yet available",
+    "After Evidence Missing",
+    "Proof Drafted"
+  ],
+  "next_safe_action": "Establish governed mission scope",
+  "payment_required": false,
+  "gates": {
+    "merchant_binding": {
+      "status": "pass",
+      "reason": "NoKings binding established"
+    },
+    "scope": {
+      "status": "blocked",
+      "reason": "Mission scope not yet established"
+    },
+    "before_evidence": {
+      "status": "blocked",
+      "reason": "Before Evidence Missing"
+    },
+    "execution": {
+      "status": "blocked",
+      "reason": "Execution authority not yet available"
+    },
+    "after_evidence": {
+      "status": "blocked",
+      "reason": "After Evidence Missing"
+    },
+    "proof": {
+      "status": "blocked",
+      "reason": "Proof Drafted"
+    },
+    "rollback": {
+      "status": "pass",
+      "reason": "Separate mission proof-run path is available for rollback"
+    },
+    "payment_applicability": {
+      "status": "pass",
+      "reason": "No payment required unless canonical mission doctrine explicitly requires it"
+    }
+  },
+  "scores": {
+    "merchant_binding": 100,
+    "scope": 25,
+    "before_evidence": 0,
+    "execution": 0,
+    "after_evidence": 0,
+    "proof": 0,
+    "rollback": 100,
+    "payment": 100,
+    "overall": 35
+  },
+  "evidence_sources": [
+    "STAFFORDOS_MISSION_001_NOKINGS_TRAINING_V1.md",
+    "SHOPIFIXER_SHOPIFY_ENGINEERING_CANON_V1.md",
+    "SHOPIFIXER_ENGINEERING_CURRICULUM_V1.md",
+    "staffordos/governance/archive/20260604_artifact_archive/canonical_systems_v1.md",
+    "staffordos/governance/archive/20260604_artifact_archive/canonical_artifact_inventory_v1.md",
+    "staffordos/governance/archive/20260604_artifact_archive/commercialization_truth_map_v1.md",
+    "staffordos/governance/archive/20260604_artifact_archive/commercialization_gaps_v1.md",
+    "staffordos/audits/no_kings/evidence/before_evidence_record_v1.md",
+    "staffordos/audits/no_kings/evidence/before/homepage_desktop_before.png",
+    "staffordos/audits/no_kings/evidence/before/homepage_mobile_before.png",
+    "staffordos/audits/no_kings/execution_truth/execution_access_result_v1.md",
+    "staffordos/audits/no_kings/execution_truth/theme_pull_test_v2.txt",
+    "/Users/rossstafford/projects/cart-agent/staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json",
+    "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/fix_scope.md",
+    "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/before_evidence.md",
+    "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/after_evidence.md",
+    "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/merchant_proof_package.md",
+    "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/execution_notes.md"
+  ],
+  "warnings": [
+    "Mission 001 is a controlled training environment, not paid-commercial work.",
+    "NoKings evidence remains a separate proof target from the generic cart-agent-dev ShopiFixer pilot.",
+    "No seal or completion truth is fabricated.",
+    "No Shopify mutation is performed by this evaluator."
+  ]
+}
