@@ -2,7 +2,6 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import os from "node:os";
-import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 import { evaluateNokingsMissionReadiness } from "./evaluate_nokings_mission_001_readiness_v1.mjs";
@@ -65,18 +64,17 @@ function writeFixtureFixture(root, binding, scope, before, after, proof) {
 }
 
 function runEvaluator({ bindingPath, proofRunDir, outputPath }) {
-  const result = spawnSync("node", [path.join(MODULE_DIR, "evaluate_nokings_mission_001_readiness_v1.mjs")], {
-    cwd: REPO_ROOT,
-    encoding: "utf8",
-    env: {
-      ...process.env,
-      NOKINGS_BINDING_PATH: bindingPath,
-      NOKINGS_PROOF_RUN_DIR: proofRunDir,
-      NOKINGS_READINESS_OUTPUT_PATH: outputPath,
-      NOKINGS_REPO_ROOT: REPO_ROOT
-    }
+  const report = evaluateNokingsMissionReadiness({
+    repoRoot: REPO_ROOT,
+    bindingPath,
+    proofRunDir
   });
-  return result;
+  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+  fs.writeFileSync(outputPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  return {
+    status: report.status === "NO_GO" ? 1 : 0,
+    stdout: JSON.stringify(report, null, 2)
+  };
 }
 
 function main() {
@@ -119,17 +117,78 @@ function main() {
 
   const completedScope = `# Fix Scope\n\nStatus:\nComplete\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nStore:\nno-kings-athletics.myshopify.com\n\nIssue:\nHomepage product discovery and value clarity.\n\nSmallest Scoped Fix:\nImprove early product clarity without redesigning the store.\n\nIn Scope:\n- Governed scope establishment\n- Early product clarity\n\nOut of Scope:\n- Payment changes\n- Completion changes\n\nMerchant Approval Required:\nNo\n\nChange Location:\nHomepage product path\n\nImplementation Notes:\n- Controlled training environment only.\n- Preserve historical evidence.\n\nSuccess Criteria:\n- Scope is governed and ready for the next controlled phase.\n`;
   fs.writeFileSync(path.join(repoProofRunDir, "fix_scope.md"), completedScope, "utf8");
-  const scopeCompleteReportPath = path.join(tmpRoot, "nokings_scope_complete.json");
+  const beforeComplete = [
+    "# Before Evidence",
+    "",
+    "Status:",
+    "Complete",
+    "",
+    "Mission ID:",
+    "mission_001",
+    "",
+    "Exercise:",
+    "Exercise 004 - Product Page Analysis",
+    "",
+    "Merchant:",
+    "NoKings Athletics",
+    "",
+    "Store:",
+    "no-kings-athletics.myshopify.com",
+    "",
+    "Theme Name:",
+    "Not Yet Proven",
+    "",
+    "Theme ID:",
+    "Not Yet Proven",
+    "",
+    "Theme Version:",
+    "Not Yet Proven",
+    "",
+    "Theme Pull Reference:",
+    "- `staffordos/audits/no_kings/execution_truth/execution_access_result_v1.md`",
+    "- `staffordos/audits/no_kings/execution_truth/theme_pull_test_v2.txt`",
+    "",
+    "Target Templates:",
+    "- `templates/product.json`",
+    "- `sections/product-information.liquid`",
+    "- `snippets/product-media-gallery-content.liquid`",
+    "- `snippets/add-to-cart-button.liquid`",
+    "",
+    "Notes:",
+    "- baseline",
+    ""
+  ].join("\n");
+  fs.writeFileSync(path.join(repoProofRunDir, "before_evidence.md"), beforeComplete, "utf8");
+  const analysisBlockedReportPath = path.join(tmpRoot, "nokings_scope_complete.json");
   const scopeCompleteRun = runEvaluator({
     bindingPath: path.join(fixtureRoot, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
     proofRunDir: repoProofRunDir,
-    outputPath: scopeCompleteReportPath
+    outputPath: analysisBlockedReportPath
   });
   assert(scopeCompleteRun.status === 0, "evaluator exits 0 for scope complete fixture", failures);
-  const scopeCompleteReport = JSON.parse(fs.readFileSync(scopeCompleteReportPath, "utf8"));
-  assert(scopeCompleteReport.current_phase === "before_evidence", "completed scope advances to before_evidence", failures);
-  assert(scopeCompleteReport.current_blocker === "Before Evidence Missing", "missing before evidence becomes next blocker", failures);
-  assert(scopeCompleteReport.next_safe_action === "Capture Before Evidence", "next safe action becomes capture before evidence", failures);
+  const scopeCompleteReport = JSON.parse(fs.readFileSync(analysisBlockedReportPath, "utf8"));
+  assert(scopeCompleteReport.current_phase === "product_page_inventory", "completed scope without analysis advances to product_page_inventory", failures);
+  assert(scopeCompleteReport.current_blocker === "Product Page Inventory Not Performed", "missing analysis becomes next blocker", failures);
+  assert(scopeCompleteReport.next_safe_action === "Perform governed read-only product page inventory", "next safe action becomes governed product page inventory", failures);
+  assert(scopeCompleteReport.gates.execution.status === "blocked", "execution gate remains blocked until analysis is recorded", failures);
+
+  fs.writeFileSync(path.join(repoProofRunDir, "fix_scope.md"), completedScope, "utf8");
+  fs.writeFileSync(path.join(repoProofRunDir, "execution_notes.md"), `# Execution Notes\n\nStatus:\nComplete\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nStore:\nno-kings-athletics.myshopify.com\n\nExercise:\nExercise 004 - Product Page Analysis\n\nTarget Files:\n- templates/product.json\n- sections/product-information.liquid\n- snippets/product-media-gallery-content.liquid\n- snippets/add-to-cart-button.liquid\n\nAnalysis Result:\nNot Yet Proven\n\nNotes:\n- Repository-backed read-only analysis completed.\n- No Shopify mutation occurred.\n`);
+  fs.writeFileSync(path.join(repoProofRunDir, "after_evidence.md"), `# After Evidence\n\nStatus:\nComplete\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nStore:\nno-kings-athletics.myshopify.com\n\nAffected Page / Artifact:\nProduct page analysis record\n\nObserved Improvement:\nNot Yet Available\n\nMerchant-Facing Summary:\nNot Yet Available\n\nRemaining Limitations:\nThe exercise is analysis-only. No storefront mutation, conversion claim, or merchant outcome is established by the repository truth.\n\nScreenshot:\nNot Yet Available\n\nNotes:\n- Mission 001 Exercise 004 analysis is complete.\n- The product-page architecture inventory is captured in execution notes.\n- No Shopify mutation occurred.\n\nFiles Inventoried:\n- templates/product.json\n- sections/product-information.liquid\n- snippets/product-media-gallery-content.liquid\n- snippets/add-to-cart-button.liquid\n- snippets/quantity-selector.liquid\n`, "utf8");
+  const proofPackageMissingPath = path.join(repoProofRunDir, "merchant_proof_package.md");
+  fs.writeFileSync(proofPackageMissingPath, `# Merchant Proof Package\n\nStatus:\nNot yet executed\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nStore:\nno-kings-athletics.myshopify.com\n\nProof Run ID:\nmission_001_nokings_shopifixer_v1\n\nProof Package Version:\nv1\n\nGenerated At:\nNot Yet Available\n\nManifest Path:\nNot Yet Available\n\nEvidence Source Paths:\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/fix_scope.md\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/before_evidence.md\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/after_evidence.md\n\nSeal Status:\nNot Yet Available\n\nNotes:\n- Mission-specific proof package scaffold only.\n- No seal exists yet.\n- No payment or completion claim is made.\n`, "utf8");
+  const proofPackageMissingReportPath = path.join(tmpRoot, "nokings_proof_package_missing.json");
+  const proofPackageMissingRun = runEvaluator({
+    bindingPath: path.join(fixtureRoot, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
+    proofRunDir: repoProofRunDir,
+    outputPath: proofPackageMissingReportPath
+  });
+  assert(proofPackageMissingRun.status === 0, "evaluator exits 0 for proof package missing fixture", failures);
+  const proofPackageMissingReport = JSON.parse(proofPackageMissingRun.stdout);
+  assert(proofPackageMissingReport.current_phase === "proof_package", "analysis complete fixture advances to proof_package", failures);
+  assert(proofPackageMissingReport.current_blocker === "Proof Package Missing", "analysis complete fixture next blocker is Proof Package Missing", failures);
+  assert(proofPackageMissingReport.next_safe_action === "Generate Mission Proof Package", "analysis complete fixture next safe action is generate mission proof package", failures);
+  assert(proofPackageMissingReport.gates.proof.status === "blocked", "proof gate remains blocked until package is recorded", failures);
 
   const productionAfter = snapshot(GENERIC_FILES);
   for (const rel of GENERIC_FILES) {

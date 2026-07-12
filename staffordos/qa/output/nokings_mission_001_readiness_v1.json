@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.nokings_mission_001_readiness.v1",
-  "generated_at": "2026-07-11T23:48:06.826Z",
+  "generated_at": "2026-07-12T00:01:03.920Z",
   "status": "CONDITIONAL_GO",
   "production_operation_permitted": true,
   "completion_permitted": false,
@@ -15,13 +15,12 @@
     "proof_run_id": "mission_001_nokings_shopifixer_v1",
     "proof_run_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"
   },
-  "current_phase": "after_evidence",
-  "current_blocker": "After Evidence Missing",
+  "current_phase": "proof_package",
+  "current_blocker": "Proof Package Missing",
   "blocking_reasons": [
-    "After Evidence Missing",
-    "Proof Drafted"
+    "Proof Package Missing"
   ],
-  "next_safe_action": "Capture After Evidence",
+  "next_safe_action": "Generate Mission Proof Package",
   "payment_required": false,
   "gates": {
     "merchant_binding": {
@@ -41,12 +40,12 @@
       "reason": "Governed analysis completed and next phase may proceed"
     },
     "after_evidence": {
-      "status": "blocked",
-      "reason": "After Evidence Missing"
+      "status": "pass",
+      "reason": "After evidence scaffold present"
     },
     "proof": {
       "status": "blocked",
-      "reason": "Proof Drafted"
+      "reason": "Proof Package Missing"
     },
     "rollback": {
       "status": "pass",
@@ -62,7 +61,7 @@
     "scope": 100,
     "before_evidence": 100,
     "execution": 100,
-    "after_evidence": 0,
+    "after_evidence": 100,
     "proof": 0,
     "rollback": 100,
     "payment": 100,

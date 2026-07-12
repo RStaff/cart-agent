@@ -123,6 +123,7 @@ function evaluateNokingsMissionReadiness({
   const beforeEvidence = parseMarkdownFields(readText(beforePath));
   const afterEvidence = parseMarkdownFields(readText(afterPath));
   const proofPackage = parseMarkdownFields(readText(proofPackagePath));
+  const executionNotes = parseMarkdownFields(readText(executionNotesPath));
   const store = clean(binding?.canonical_store_domain || binding?.merchant?.store_domain || binding?.merchant?.client_id || "");
   const bindingStoreMatches = normalizeStore(binding?.canonical_store_domain) === "no-kings-athletics.myshopify.com";
   const missionIdMatches = clean(binding?.mission_id) === "mission_001";
@@ -139,7 +140,8 @@ function evaluateNokingsMissionReadiness({
   const scopeComplete = clean(missionScope.status).toLowerCase() === "complete" && normalizeStore(missionScope.store) === "no-kings-athletics.myshopify.com";
   const scopeBlocker = scopeComplete ? "" : "Mission scope not yet established";
   const beforeEvidenceCaptured = clean(beforeEvidence.status).toLowerCase() === "complete" || clean(beforeEvidence.status).toLowerCase() === "captured";
-  const executionAuthorityPass = merchantBindingPass && scopeComplete && beforeEvidenceCaptured;
+  const analysisComplete = clean(executionNotes.status).toLowerCase() === "complete" || clean(executionNotes.status).toLowerCase() === "captured";
+  const executionAuthorityPass = merchantBindingPass && scopeComplete && beforeEvidenceCaptured && analysisComplete;
   const afterEvidenceCaptured = clean(afterEvidence.status).toLowerCase() === "complete" || clean(afterEvidence.status).toLowerCase() === "captured";
   const proofReady = clean(proofPackage.status).toLowerCase() === "complete";
   const rollbackReady = Boolean(merchantBindingPass && proofRunPathExists);
@@ -148,9 +150,9 @@ function evaluateNokingsMissionReadiness({
     !merchantBindingPass ? "Merchant binding incomplete" : "",
     !scopeComplete ? "Scope Incomplete" : "",
     !beforeEvidenceCaptured ? "Before Evidence Missing" : "",
-    !executionAuthorityPass ? "Execution authority not yet available" : "",
+    !analysisComplete ? "Product Page Inventory Not Performed" : "",
     !afterEvidenceCaptured ? "After Evidence Missing" : "",
-    !proofReady ? "Proof Drafted" : "",
+    !proofReady ? "Proof Package Missing" : "",
     paymentRequired ? "Payment required by mission binding" : ""
   ].filter(Boolean);
 
@@ -160,12 +162,12 @@ function evaluateNokingsMissionReadiness({
       ? "scope"
       : !beforeEvidenceCaptured
         ? "before_evidence"
-        : !executionAuthorityPass
-          ? "execute"
+        : !analysisComplete
+          ? "product_page_inventory"
           : !afterEvidenceCaptured
             ? "after_evidence"
             : !proofReady
-              ? "proof_seal"
+              ? "proof_package"
               : paymentRequired
                 ? "delivery_payment"
                 : "scope";
@@ -177,12 +179,12 @@ function evaluateNokingsMissionReadiness({
       ? "Establish governed mission scope"
       : !beforeEvidenceCaptured
         ? "Capture Before Evidence"
-        : !executionAuthorityPass
-          ? "Establish execution authority"
-          : !afterEvidenceCaptured
-            ? "Capture After Evidence"
-            : !proofReady
-              ? "Generate proof package"
+        : !analysisComplete
+          ? "Perform governed read-only product page inventory"
+        : !afterEvidenceCaptured
+          ? "Capture After Evidence"
+          : !proofReady
+            ? "Generate Mission Proof Package"
               : paymentRequired
                 ? "Resolve payment applicability"
                 : "Mission binding established";
@@ -217,9 +219,9 @@ function evaluateNokingsMissionReadiness({
       merchant_binding: merchantBindingPass ? stageStatus("pass", "NoKings binding established") : stageStatus("blocked", "NoKings binding incomplete"),
       scope: scopeComplete ? stageStatus("pass", "Governed mission scope established") : stageStatus("blocked", scopeBlocker),
       before_evidence: beforeEvidenceCaptured ? stageStatus("pass", "Before evidence scaffold present") : stageStatus("blocked", "Before Evidence Missing"),
-      execution: executionAuthorityPass ? stageStatus("pass", "Execution authority may proceed after scope and before evidence") : stageStatus("blocked", "Execution authority not yet available"),
+      execution: executionAuthorityPass ? stageStatus("pass", "Governed analysis completed and next phase may proceed") : stageStatus("blocked", "Product Page Inventory Not Performed"),
       after_evidence: afterEvidenceCaptured ? stageStatus("pass", "After evidence scaffold present") : stageStatus("blocked", "After Evidence Missing"),
-      proof: proofReady ? stageStatus("pass", "Proof package scaffold present") : stageStatus("blocked", "Proof Drafted"),
+      proof: proofReady ? stageStatus("pass", "Proof package scaffold present") : stageStatus("blocked", "Proof Package Missing"),
       rollback: rollbackReady ? stageStatus("pass", "Separate mission proof-run path is available for rollback") : stageStatus("blocked", "Rollback path not yet established"),
       payment_applicability: paymentRequired
         ? stageStatus("blocked", paymentAuthority)
