@@ -267,6 +267,12 @@ function writeFixture({
 }) {
   const missionDir = path.join(root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1");
   const exercisesDir = path.join(missionDir, "exercises");
+  const activeExerciseSlug = /Exercise 004 - Product Page Inventory/i.test(activeExercise)
+    ? "exercise_004"
+    : /Exercise 005 - Collection Page Inventory/i.test(activeExercise)
+      ? "exercise_005"
+      : "";
+  const activeExerciseDir = activeExerciseSlug ? path.join(exercisesDir, activeExerciseSlug) : missionDir;
   fs.mkdirSync(path.join(exercisesDir, "exercise_004"), { recursive: true });
   fs.mkdirSync(path.join(exercisesDir, "exercise_005"), { recursive: true });
   writeText(path.join(root, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"), `${JSON.stringify(binding, null, 2)}\n`);
@@ -278,13 +284,13 @@ function writeFixture({
     writeText(path.join(exercisesDir, "exercise_005/fix_scope.md"), scope005);
   }
   if (includeBefore) {
-    writeText(path.join(missionDir, "before_evidence.md"), `# Before Evidence\n\nStatus:\nComplete\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise:\n${activeExercise}\n\nStore:\nno-kings-athletics.myshopify.com\n\nAffected Page / Artifact:\nNot Yet Available\n\nIssue:\nNot Yet Available\n\nWhy It Matters:\nNot Yet Available\n\nScreenshot:\nNot Yet Available\n\nNotes:\n- Controlled training baseline only.\n`);
+    writeText(path.join(activeExerciseDir, "before_evidence.md"), `# Before Evidence\n\nStatus:\nComplete\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise:\n${activeExercise}\n\nStore:\nno-kings-athletics.myshopify.com\n\nAffected Page / Artifact:\nNot Yet Available\n\nIssue:\nNot Yet Available\n\nWhy It Matters:\nNot Yet Available\n\nScreenshot:\nNot Yet Available\n\nNotes:\n- Controlled training baseline only.\n`);
   }
   if (includeExecution) {
     writeText(path.join(missionDir, "execution_notes.md"), `# Execution Notes\n\nStatus:\nComplete\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise:\n${activeExercise}\n\nStore:\nno-kings-athletics.myshopify.com\n\nTarget Files:\n- ${activeExercise === "Exercise 005 - Collection Page Inventory" ? "templates/collection.json" : "templates/product.json"}\n\nNotes:\n- Controlled training inventory only.\n- No Shopify mutation occurred.\n`);
   }
   if (includeAfter) {
-    writeText(path.join(missionDir, "after_evidence.md"), `# After Evidence\n\nStatus:\nComplete\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise:\n${activeExercise}\n\nStore:\nno-kings-athletics.myshopify.com\n\nAffected Page / Artifact:\nNot Yet Available\n\nObserved Improvement:\nNot Yet Available\n\nMerchant-Facing Summary:\nNot Yet Available\n\nRemaining Limitations:\nNot Yet Available\n\nScreenshot:\nNot Yet Available\n\nNotes:\n- Controlled training evidence only.\n`);
+    writeText(path.join(activeExerciseDir, "after_evidence.md"), `# After Evidence\n\nStatus:\nComplete\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise:\n${activeExercise}\n\nStore:\nno-kings-athletics.myshopify.com\n\nAffected Page / Artifact:\nNot Yet Available\n\nObserved Improvement:\nNot Yet Available\n\nMerchant-Facing Summary:\nNot Yet Available\n\nRemaining Limitations:\nNot Yet Available\n\nScreenshot:\nNot Yet Available\n\nNotes:\n- Controlled training evidence only.\n`);
   }
   if (includeProof) {
     writeText(path.join(missionDir, "mission_proof_package.md"), `# Mission Proof Package\n\nStatus:\nAssembled\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise:\n${activeExercise}\n\nStore:\nno-kings-athletics.myshopify.com\n\nProof Run ID:\nmission_001_nokings_shopifixer_v1\n\nProof Package Version:\nv1\n\nGenerated At:\n2026-07-11T00:00:00.000Z\n\nManifest Path:\nNot Yet Available\n\nEvidence Source Paths:\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/fix_scope.md\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/before_evidence.md\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/after_evidence.md\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/execution_notes.md\n\nSeal Status:\nNot Yet Available\n\nNotes:\n- Mission proof package scaffold only.\n`);
@@ -506,13 +512,14 @@ function run() {
   });
   assert(actualReport.status === "CONDITIONAL_GO", "current readiness status remains CONDITIONAL_GO", failures);
   assert(actualReport.active_exercise === "Exercise 005 - Collection Page Inventory", "active exercise is Exercise 005", failures);
-  assert(actualReport.current_phase === "before_evidence", "current phase is before_evidence", failures);
-  assert(actualReport.current_blocker === "Before Evidence Missing", "current blocker is Before Evidence Missing", failures);
-  assert(actualReport.next_safe_action === "Capture Before Evidence", "next safe action is Capture Before Evidence", failures);
+  assert(actualReport.current_phase === "collection_page_inventory", "current phase is collection_page_inventory", failures);
+  assert(actualReport.current_blocker === "Collection Page Inventory Not Performed", "current blocker is Collection Page Inventory Not Performed", failures);
+  assert(actualReport.next_safe_action === "Perform governed read-only collection page inventory", "next safe action is Perform governed read-only collection page inventory", failures);
   assert(actualReport.payment_required === false, "payment_required remains false", failures);
   assert(actualReport.completion_permitted === false, "completion remains prohibited", failures);
   assert(actualReport.gates.scope.status === "pass", "scope remains complete", failures);
-  assert(actualReport.gates.before_evidence.status === "blocked", "before evidence remains blocked", failures);
+  assert(actualReport.gates.before_evidence.status === "pass", "before evidence is complete", failures);
+  assert(actualReport.gates.execution.status === "blocked", "collection inventory gate is blocked until the inventory is performed", failures);
 
   if (failures.length) {
     console.error(JSON.stringify({ status: "failed", failures }, null, 2));

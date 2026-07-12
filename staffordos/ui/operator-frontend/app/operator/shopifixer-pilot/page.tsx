@@ -23,10 +23,10 @@ type PhaseState = "available" | "current" | "blocked" | "complete";
 
 const COMMERCIAL_PROOF_RUN_ROOT = "staffordos/proof_runs/internal_shopifixer_dry_run_v1";
 
-function buildProofFiles(proofRunRoot: string): ProofFile[] {
+function buildProofFiles(proofRunRoot: string, evidenceRoot = proofRunRoot): ProofFile[] {
   return [
-    { label: "Before evidence", path: `${proofRunRoot}/before_evidence.md` },
-    { label: "After evidence", path: `${proofRunRoot}/after_evidence.md` },
+    { label: "Before evidence", path: `${evidenceRoot}/before_evidence.md` },
+    { label: "After evidence", path: `${evidenceRoot}/after_evidence.md` },
     { label: "Scoped fix", path: `${proofRunRoot}/fix_scope.md` },
     { label: "Proof package", path: `${proofRunRoot}/merchant_proof_package.md` },
     { label: "Checksum seal", path: `${proofRunRoot}/merchant_proof_package.seal.json` },
@@ -182,7 +182,8 @@ function resolveProofRunContext(repoRoot: string, searchParams?: ShopifixerPilot
       beforePath: commercialBeforePath,
       afterPath: commercialAfterPath,
       proofPackagePath: commercialProofPackagePath,
-      sealPath: commercialSealPath
+      sealPath: commercialSealPath,
+      evidenceRoot: commercialRoot
     };
   }
 
@@ -194,6 +195,7 @@ function resolveProofRunContext(repoRoot: string, searchParams?: ShopifixerPilot
     : /Exercise 005 - Collection Page Inventory/i.test(scopeIndex.activeExercise)
       ? "exercise_005"
       : "";
+  const exerciseRoot = activeExerciseSlug ? path.join(missionRoot, "exercises", activeExerciseSlug) : missionRoot;
   const missionScopePath = activeExerciseSlug
     ? path.join(repoRoot, `${missionRoot}/exercises/${activeExerciseSlug}/fix_scope.md`)
     : scopeIndexPath;
@@ -203,10 +205,11 @@ function resolveProofRunContext(repoRoot: string, searchParams?: ShopifixerPilot
     proofRunRoot: missionRoot,
     scopeIndexPath,
     scopePath: missionScopePath,
-    beforePath: path.join(repoRoot, `${missionRoot}/before_evidence.md`),
-    afterPath: path.join(repoRoot, `${missionRoot}/after_evidence.md`),
+    beforePath: path.join(repoRoot, `${exerciseRoot}/before_evidence.md`),
+    afterPath: path.join(repoRoot, `${exerciseRoot}/after_evidence.md`),
     proofPackagePath: path.join(repoRoot, `${missionRoot}/merchant_proof_package.md`),
-    sealPath: path.join(repoRoot, `${missionRoot}/merchant_proof_package.seal.json`)
+    sealPath: path.join(repoRoot, `${missionRoot}/merchant_proof_package.seal.json`),
+    evidenceRoot: exerciseRoot
   };
 }
 
@@ -622,7 +625,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
       ? "seal present"
       : "seal missing"
   ].join(" · ");
-  const proofFileStatuses = buildProofFiles(proofRunContext.proofRunRoot).map((file) => ({
+  const proofFileStatuses = buildProofFiles(proofRunContext.proofRunRoot, proofRunContext.evidenceRoot).map((file) => ({
     label: file.label,
     value: fs.existsSync(path.join(repoRoot, file.path)) ? "Present" : "Missing"
   }));

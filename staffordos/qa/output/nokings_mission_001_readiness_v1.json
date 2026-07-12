@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.nokings_mission_001_readiness.v1",
-  "generated_at": "2026-07-12T04:30:14.725Z",
+  "generated_at": "2026-07-12T13:51:03.167Z",
   "status": "CONDITIONAL_GO",
   "production_operation_permitted": true,
   "completion_permitted": false,
@@ -16,15 +16,14 @@
     "proof_run_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"
   },
   "active_exercise": "Exercise 005 - Collection Page Inventory",
-  "current_phase": "before_evidence",
-  "current_blocker": "Before Evidence Missing",
+  "current_phase": "collection_page_inventory",
+  "current_blocker": "Collection Page Inventory Not Performed",
   "blocking_reasons": [
-    "Before Evidence Missing",
     "Collection Page Inventory Not Performed",
     "After Evidence Missing",
     "Proof Package Missing"
   ],
-  "next_safe_action": "Capture Before Evidence",
+  "next_safe_action": "Perform governed read-only collection page inventory",
   "payment_required": false,
   "scope_authority": {
     "index_path": "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/fix_scope.md",
@@ -41,8 +40,8 @@
       "reason": "Governed mission scope established"
     },
     "before_evidence": {
-      "status": "blocked",
-      "reason": "Before Evidence Missing"
+      "status": "pass",
+      "reason": "Before evidence scaffold present"
     },
     "execution": {
       "status": "blocked",
@@ -76,7 +75,7 @@
   "scores": {
     "merchant_binding": 100,
     "scope": 100,
-    "before_evidence": 0,
+    "before_evidence": 100,
     "execution": 0,
     "after_evidence": 0,
     "proof": 0,
@@ -84,7 +83,7 @@
     "exercise_005_planning": 0,
     "rollback": 100,
     "payment": 100,
-    "overall": 40
+    "overall": 80
   },
   "evidence_sources": [
     "STAFFORDOS_MISSION_001_NOKINGS_TRAINING_V1.md",
@@ -102,8 +101,8 @@
     "/Users/rossstafford/projects/cart-agent/staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json",
     "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/fix_scope.md",
     "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/fix_scope.md",
-    "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/before_evidence.md",
-    "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/after_evidence.md",
+    "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+    "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
     "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/mission_proof_package.md",
     "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/execution_notes.md",
     "/Users/rossstafford/projects/cart-agent/staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md"
