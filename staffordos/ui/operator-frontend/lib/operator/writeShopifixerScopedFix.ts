@@ -13,6 +13,10 @@ export type ShopifixerScopedFixInput = {
   success_criteria: string;
 };
 
+export type ShopifixerScopedFixWriteOptions = {
+  outputPath?: string;
+};
+
 function listBlock(title: string, value: string) {
   const items = String(value || "")
     .split(/\r?\n|\|/)
@@ -23,11 +27,10 @@ function listBlock(title: string, value: string) {
   return [title, ...items, ""];
 }
 
-export function writeShopifixerScopedFix(input: ShopifixerScopedFixInput) {
-  const outputPath = path.resolve(
-    process.cwd(),
-    "../../proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md"
-  );
+export function writeShopifixerScopedFix(input: ShopifixerScopedFixInput, options: ShopifixerScopedFixWriteOptions = {}) {
+  const outputPath = options.outputPath
+    ? path.resolve(options.outputPath)
+    : path.resolve(process.cwd(), "../../proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md");
 
   const content = [
     "# FIX SCOPE",
@@ -57,6 +60,7 @@ export function writeShopifixerScopedFix(input: ShopifixerScopedFixInput) {
     ""
   ].join("\n");
 
+  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
   fs.writeFileSync(outputPath, content, "utf8");
 
   return {

@@ -24,11 +24,14 @@ export type ShopifixerBeforeEvidenceInput = {
   notes: string;
 };
 
-export function writeShopifixerBeforeEvidence(input: ShopifixerBeforeEvidenceInput) {
-  const outputPath = path.resolve(
-    process.cwd(),
-    "../../proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md"
-  );
+export type ShopifixerBeforeEvidenceWriteOptions = {
+  outputPath?: string;
+};
+
+export function writeShopifixerBeforeEvidence(input: ShopifixerBeforeEvidenceInput, options: ShopifixerBeforeEvidenceWriteOptions = {}) {
+  const outputPath = options.outputPath
+    ? path.resolve(options.outputPath)
+    : path.resolve(process.cwd(), "../../proof_runs/internal_shopifixer_dry_run_v1/before_evidence.md");
 
   const content = [
     "# BEFORE EVIDENCE",

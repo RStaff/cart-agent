@@ -79,18 +79,33 @@ function sha256(content: string) {
   return crypto.createHash("sha256").update(content, "utf8").digest("hex");
 }
 
-export function writeShopifixerProofPackage() {
-  const baseDir = path.resolve(process.cwd(), "../../proof_runs/internal_shopifixer_dry_run_v1");
-  const beforePath = path.join(baseDir, "before_evidence.md");
-  const fixScopePath = path.join(baseDir, "fix_scope.md");
-  const afterPath = path.join(baseDir, "after_evidence.md");
-  const outputPath = path.join(baseDir, "merchant_proof_package.md");
-  const sealPath = path.join(baseDir, "merchant_proof_package.seal.json");
-  const manifestPath = getEvidenceManifestPath();
+export type ShopifixerProofPackageWriteOptions = {
+  proofRunDir?: string;
+  scopePath?: string;
+  beforePath?: string;
+  afterPath?: string;
+  outputPath?: string;
+  sealPath?: string;
+  manifestPath?: string;
+};
+
+export function writeShopifixerProofPackage(options: ShopifixerProofPackageWriteOptions = {}) {
+  const defaultBaseDir = path.resolve(process.cwd(), "../../proof_runs/internal_shopifixer_dry_run_v1");
+  const baseDir = options.proofRunDir ? path.resolve(options.proofRunDir) : defaultBaseDir;
+  const beforePath = options.beforePath ? path.resolve(options.beforePath) : path.join(baseDir, "before_evidence.md");
+  const fixScopePath = options.scopePath ? path.resolve(options.scopePath) : path.join(baseDir, "fix_scope.md");
+  const afterPath = options.afterPath ? path.resolve(options.afterPath) : path.join(baseDir, "after_evidence.md");
+  const outputPath = options.outputPath ? path.resolve(options.outputPath) : path.join(baseDir, "merchant_proof_package.md");
+  const sealPath = options.sealPath ? path.resolve(options.sealPath) : path.join(baseDir, "merchant_proof_package.seal.json");
+  const manifestPath = options.manifestPath ? path.resolve(options.manifestPath) : getEvidenceManifestPath();
   const manifest = readEvidenceManifest(manifestPath);
   const manifestPathDisplay = toRepoRelative(manifestPath);
   const canonicalManifestPathDisplay = "staffordos/proof_runs/output/evidence_manifest_v1.json";
   const manifestArtifacts = Array.isArray(manifest.artifacts) ? (manifest.artifacts as ManifestArtifact[]) : [];
+
+  if (options.scopePath && !fs.existsSync(fixScopePath)) {
+    throw new Error(`ShopiFixer proof package scope file missing: ${fixScopePath}`);
+  }
 
   const before = readText(beforePath);
   const fixScope = readText(fixScopePath);

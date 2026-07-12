@@ -21,15 +21,18 @@ type ProofFile = {
 
 type PhaseState = "available" | "current" | "blocked" | "complete";
 
-const PROOF_RUN_ROOT = "staffordos/proof_runs/internal_shopifixer_dry_run_v1";
-const PROOF_FILES: ProofFile[] = [
-  { label: "Before evidence", path: `${PROOF_RUN_ROOT}/before_evidence.md` },
-  { label: "After evidence", path: `${PROOF_RUN_ROOT}/after_evidence.md` },
-  { label: "Scoped fix", path: `${PROOF_RUN_ROOT}/fix_scope.md` },
-  { label: "Proof package", path: `${PROOF_RUN_ROOT}/merchant_proof_package.md` },
-  { label: "Checksum seal", path: `${PROOF_RUN_ROOT}/merchant_proof_package.seal.json` },
-  { label: "Evidence manifest", path: "staffordos/proof_runs/output/evidence_manifest_v1.json" },
-];
+const COMMERCIAL_PROOF_RUN_ROOT = "staffordos/proof_runs/internal_shopifixer_dry_run_v1";
+
+function buildProofFiles(proofRunRoot: string): ProofFile[] {
+  return [
+    { label: "Before evidence", path: `${proofRunRoot}/before_evidence.md` },
+    { label: "After evidence", path: `${proofRunRoot}/after_evidence.md` },
+    { label: "Scoped fix", path: `${proofRunRoot}/fix_scope.md` },
+    { label: "Proof package", path: `${proofRunRoot}/merchant_proof_package.md` },
+    { label: "Checksum seal", path: `${proofRunRoot}/merchant_proof_package.seal.json` },
+    { label: "Evidence manifest", path: "staffordos/proof_runs/output/evidence_manifest_v1.json" },
+  ];
+}
 
 function resolveRepoRoot() {
   const cwd = process.cwd();
@@ -137,6 +140,76 @@ function parseScopeSummary(content: string) {
   };
 }
 
+function parseMissionScopeIndex(content: string) {
+  const lines = String(content || "").split(/\r?\n/);
+
+  function valueAfter(label: string) {
+    const index = lines.findIndex((line) => line.trim() === label);
+    if (index < 0) return "";
+    for (let i = index + 1; i < lines.length; i += 1) {
+      const candidate = lines[i].trim();
+      if (!candidate) continue;
+      if (/^[A-Za-z][A-Za-z /&-]+:$/.test(candidate)) break;
+      return candidate.replace(/^-+\s*/, "");
+    }
+    return "";
+  }
+
+  return {
+    activeExercise: valueAfter("Active Exercise:"),
+    exercise004ScopePath: valueAfter("Exercise 004 Scope Path:"),
+    exercise005ScopePath: valueAfter("Exercise 005 Scope Path:"),
+    scopeAuthority: valueAfter("Scope Authority:")
+  };
+}
+
+function resolveProofRunContext(repoRoot: string, searchParams?: ShopifixerPilotSearchParams) {
+  const missionKey = normalizeMissionKey(Array.isArray(searchParams?.mission) ? searchParams?.mission[0] : searchParams?.mission);
+  const isNokingsMission = missionKey === "mission_001_nokings";
+  const commercialRoot = COMMERCIAL_PROOF_RUN_ROOT;
+  const commercialScopePath = path.join(repoRoot, `${commercialRoot}/fix_scope.md`);
+  const commercialBeforePath = path.join(repoRoot, `${commercialRoot}/before_evidence.md`);
+  const commercialAfterPath = path.join(repoRoot, `${commercialRoot}/after_evidence.md`);
+  const commercialProofPackagePath = path.join(repoRoot, `${commercialRoot}/merchant_proof_package.md`);
+  const commercialSealPath = path.join(repoRoot, `${commercialRoot}/merchant_proof_package.seal.json`);
+
+  if (!isNokingsMission) {
+    return {
+      missionKey: "",
+      proofRunRoot: commercialRoot,
+      scopeIndexPath: commercialScopePath,
+      scopePath: commercialScopePath,
+      beforePath: commercialBeforePath,
+      afterPath: commercialAfterPath,
+      proofPackagePath: commercialProofPackagePath,
+      sealPath: commercialSealPath
+    };
+  }
+
+  const missionRoot = "staffordos/proof_runs/mission_001_nokings_shopifixer_v1";
+  const scopeIndexPath = path.join(repoRoot, `${missionRoot}/fix_scope.md`);
+  const scopeIndex = parseMissionScopeIndex(readText(scopeIndexPath));
+  const activeExerciseSlug = /Exercise 004 - Product Page Inventory/i.test(scopeIndex.activeExercise)
+    ? "exercise_004"
+    : /Exercise 005 - Collection Page Inventory/i.test(scopeIndex.activeExercise)
+      ? "exercise_005"
+      : "";
+  const missionScopePath = activeExerciseSlug
+    ? path.join(repoRoot, `${missionRoot}/exercises/${activeExerciseSlug}/fix_scope.md`)
+    : scopeIndexPath;
+
+  return {
+    missionKey,
+    proofRunRoot: missionRoot,
+    scopeIndexPath,
+    scopePath: missionScopePath,
+    beforePath: path.join(repoRoot, `${missionRoot}/before_evidence.md`),
+    afterPath: path.join(repoRoot, `${missionRoot}/after_evidence.md`),
+    proofPackagePath: path.join(repoRoot, `${missionRoot}/merchant_proof_package.md`),
+    sealPath: path.join(repoRoot, `${missionRoot}/merchant_proof_package.seal.json`)
+  };
+}
+
 function parseEvidenceFields(content: string) {
   const lines = String(content || "").split(/\r?\n/);
 
@@ -192,8 +265,17 @@ function resolvePhaseKey(value: unknown) {
   return allowed.has(key) ? key : "merchant_context";
 }
 
-function phaseHref(key: string) {
-  return `/operator/shopifixer-pilot?phase=${key.replace(/_/g, "-")}`;
+function normalizeMissionKey(value: unknown) {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/-/g, "_")
+    .replace(/\s+/g, "_");
+}
+
+function phaseHref(key: string, missionKey?: string) {
+  const missionQuery = missionKey ? `&mission=${encodeURIComponent(missionKey)}` : "";
+  return `/operator/shopifixer-pilot?phase=${key.replace(/_/g, "-")}${missionQuery}`;
 }
 
 const PHASE_KEYS = [
@@ -208,6 +290,7 @@ const PHASE_KEYS = [
 
 type ShopifixerPilotSearchParams = {
   phase?: string | string[];
+  mission?: string | string[];
   shopifixer_scoped_fix_saved?: string;
   shopifixer_before_saved?: string;
   shopifixer_after_saved?: string;
@@ -219,6 +302,9 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
   const repoRoot = resolveRepoRoot();
   const shopifixer = await loadShopifixerCommandCenter();
   const shopifixerRecord = shopifixer as any;
+  const proofRunContext = resolveProofRunContext(repoRoot, searchParams);
+  const missionKey = proofRunContext.missionKey || undefined;
+  const missionPhaseHref = (key: string) => phaseHref(key, missionKey);
   const leadData = await loadOperatorLeads();
   const campaignReport = getCampaignResolverReport();
   const preflight = loadPreflightReport();
@@ -263,22 +349,22 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
     path.join(repoRoot, "staffordos/clients/operator_dashboard_snapshot_v1.json"),
     {}
   );
-  const scopeFilePath = path.join(repoRoot, "staffordos/proof_runs/internal_shopifixer_dry_run_v1/fix_scope.md");
+  const scopeFilePath = proofRunContext.scopePath;
   const scopeFileContent = readText(scopeFilePath);
   const scopeSummary = parseScopeSummary(scopeFileContent);
   const scopeWorkbenchSaved = (searchParams as { shopifixer_scoped_fix_saved?: string } | undefined)?.shopifixer_scoped_fix_saved === "1";
   const scopeWorkbenchDate = new Date().toISOString().slice(0, 10);
-  const beforeEvidencePath = path.join(repoRoot, `${PROOF_RUN_ROOT}/before_evidence.md`);
+  const beforeEvidencePath = proofRunContext.beforePath;
   const beforeEvidenceContent = readText(beforeEvidencePath);
   const beforeEvidenceFields = parseEvidenceFields(beforeEvidenceContent);
   const beforeEvidenceWorkbenchSaved = (searchParams as { shopifixer_before_saved?: string } | undefined)?.shopifixer_before_saved === "1";
   const beforeEvidenceWorkbenchDate = new Date().toISOString().slice(0, 10);
-  const afterEvidencePath = path.join(repoRoot, `${PROOF_RUN_ROOT}/after_evidence.md`);
+  const afterEvidencePath = proofRunContext.afterPath;
   const afterEvidenceContent = readText(afterEvidencePath);
   const afterEvidenceFields = parseEvidenceFields(afterEvidenceContent);
   const afterEvidenceWorkbenchSaved = (searchParams as { shopifixer_after_saved?: string } | undefined)?.shopifixer_after_saved === "1";
   const afterEvidenceWorkbenchDate = new Date().toISOString().slice(0, 10);
-  const proofPackagePath = path.join(repoRoot, `${PROOF_RUN_ROOT}/merchant_proof_package.md`);
+  const proofPackagePath = proofRunContext.proofPackagePath;
   const proofPackageContent = readText(proofPackagePath);
   const proofPackageWorkbenchSaved = (searchParams as { shopifixer_proof_package_saved?: string } | undefined)?.shopifixer_proof_package_saved === "1";
   const proofPackageWorkbenchDate = new Date().toISOString().slice(0, 10);
@@ -289,7 +375,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
     {}
   );
   const proofSeal = readJson<Record<string, any>>(
-    path.join(repoRoot, "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.seal.json"),
+    proofRunContext.sealPath,
     {}
   );
   const proofPackageManifestPath = text(proofSeal.manifest_path, "Not Yet Available");
@@ -532,17 +618,17 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
     text(preflight.status, "Not Yet Available"),
     text(qa.verdict, "Not Yet Available"),
     fs.existsSync(path.join(repoRoot, "staffordos/proof_runs/output/evidence_manifest_v1.json")) ? "manifest present" : "manifest missing",
-    fs.existsSync(path.join(repoRoot, "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.seal.json"))
+    fs.existsSync(proofRunContext.sealPath)
       ? "seal present"
       : "seal missing"
   ].join(" · ");
-  const proofFileStatuses = PROOF_FILES.map((file) => ({
+  const proofFileStatuses = buildProofFiles(proofRunContext.proofRunRoot).map((file) => ({
     label: file.label,
     value: fs.existsSync(path.join(repoRoot, file.path)) ? "Present" : "Missing"
   }));
 
   const evidenceManifestPath = path.join(repoRoot, "staffordos/proof_runs/output/evidence_manifest_v1.json");
-  const sealPath = path.join(repoRoot, `${PROOF_RUN_ROOT}/merchant_proof_package.seal.json`);
+  const sealPath = proofRunContext.sealPath;
   const selectedPhaseKey = resolvePhaseKey(Array.isArray(searchParams?.phase) ? searchParams?.phase[0] : searchParams?.phase);
   const proofPrerequisitesComplete = scopeComplete && beforeEvidenceCaptured && executionComplete && afterEvidenceCaptured;
   const phaseTruth = {
@@ -562,7 +648,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
       nextSafeAction: "Review Scope",
       authority: "client_registry_v1.json / lead_registry_v1.json / shopifixer command center",
       ctaLabel: "Review Scope",
-      ctaHref: phaseHref("scope"),
+      ctaHref: missionPhaseHref("scope"),
       note: "Load merchant, lead, campaign, packet, and revenue truth."
     },
     {
@@ -576,7 +662,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
       nextSafeAction: scopeComplete ? "Continue to Before Evidence" : "Review Scope",
       authority: "fix_scope.md / shopifixer_offer_latest.json",
       ctaLabel: scopeComplete ? "Continue to Before Evidence" : "Review Scope",
-      ctaHref: scopeComplete ? phaseHref("before_evidence") : phaseHref("scope"),
+      ctaHref: scopeComplete ? missionPhaseHref("before_evidence") : missionPhaseHref("scope"),
       note: scopeSummary.sourceState
     },
     {
@@ -597,10 +683,10 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
           ? "Continue to Execute"
           : "Capture Before Evidence",
       ctaHref: !scopeComplete
-        ? phaseHref("scope")
+        ? missionPhaseHref("scope")
         : beforeEvidenceCaptured
-          ? phaseHref("execute")
-          : phaseHref("before-evidence"),
+          ? missionPhaseHref("execute")
+          : missionPhaseHref("before-evidence"),
       note: beforeEvidenceStatus
     },
     {
@@ -641,17 +727,17 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
                   ? "Review and Execute"
                   : "Resolve Execution Gate",
       ctaHref: !scopeComplete
-        ? phaseHref("scope")
+        ? missionPhaseHref("scope")
         : !beforeEvidenceCaptured
-          ? phaseHref("before-evidence")
+          ? missionPhaseHref("before-evidence")
           : executeStatus === "Execute Failed"
             ? "/operator/execution-log"
             : executeStatus === "Execute Complete"
-              ? phaseHref("after-evidence")
+              ? missionPhaseHref("after-evidence")
               : executeStatus === "Execute In Progress"
-                ? phaseHref("execute")
+                ? missionPhaseHref("execute")
                 : executeStatus === "Execute Ready"
-                  ? phaseHref("execute")
+                  ? missionPhaseHref("execute")
                   : "/operator/command-center",
       note: executeStatus
     },
@@ -685,14 +771,14 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
               ? "Continue to Proof & Seal"
               : "Capture After Evidence",
       ctaHref: !scopeComplete
-        ? phaseHref("scope")
+        ? missionPhaseHref("scope")
         : !beforeEvidenceCaptured
-          ? phaseHref("before-evidence")
+          ? missionPhaseHref("before-evidence")
           : !executionComplete
-            ? phaseHref("execute")
+            ? missionPhaseHref("execute")
             : afterEvidenceCaptured
-              ? phaseHref("proof-seal")
-              : phaseHref("after-evidence"),
+              ? missionPhaseHref("proof-seal")
+              : missionPhaseHref("after-evidence"),
       note: afterEvidenceStatus
     },
     {
@@ -731,16 +817,16 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
                 ? "Continue to Delivery"
                 : "Generate Proof Package",
       ctaHref: !scopeComplete
-        ? phaseHref("scope")
+        ? missionPhaseHref("scope")
         : !beforeEvidenceCaptured
-          ? phaseHref("before-evidence")
+          ? missionPhaseHref("before-evidence")
           : !executionComplete
-            ? phaseHref("execute")
+            ? missionPhaseHref("execute")
             : !afterEvidenceCaptured
-              ? phaseHref("after-evidence")
+              ? missionPhaseHref("after-evidence")
               : proofAndSealStatus === "Proof Sealed"
-                ? phaseHref("delivery-payment")
-                : phaseHref("proof-seal"),
+                ? missionPhaseHref("delivery-payment")
+                : missionPhaseHref("proof-seal"),
       note: proofAndSealStatus
     },
     {
@@ -765,20 +851,20 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
                     ? "Waiting for Merchant"
                     : "Proceed using governed delivery action",
       ctaHref: !scopeComplete
-        ? phaseHref("scope")
+        ? missionPhaseHref("scope")
         : !beforeEvidenceCaptured
-          ? phaseHref("before-evidence")
+          ? missionPhaseHref("before-evidence")
           : !executionComplete
-            ? phaseHref("execute")
+            ? missionPhaseHref("execute")
             : !afterEvidenceCaptured
-              ? phaseHref("after-evidence")
+              ? missionPhaseHref("after-evidence")
               : proofAndSealStatus !== "Proof Sealed"
-                ? phaseHref("proof-seal")
+                ? missionPhaseHref("proof-seal")
                 : !paymentReceivedTruth
                   ? "/operator/command-center"
                   : deliveryComplete
-                    ? phaseHref("delivery_payment")
-                    : phaseHref("delivery_payment"),
+                    ? missionPhaseHref("delivery_payment")
+                    : missionPhaseHref("delivery_payment"),
       note: deliveryCompletionReadiness
     }
   ] as const;
@@ -801,7 +887,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
       ...phase,
       state,
       status: state,
-      href: phaseHref(phase.key),
+      href: missionPhaseHref(phase.key),
       note: state === "blocked" ? phase.blockedReason : phase.nextSafeAction
     };
   });
@@ -841,7 +927,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
         safeMode: "Not Yet Implemented",
         loopsRun: "Not Yet Implemented"
       }}
-      proofRunId="internal_shopifixer_dry_run_v1"
+      proofRunId={proofRunContext.proofRunRoot.split("/").pop() || "internal_shopifixer_dry_run_v1"}
       currentPhase={selectedPhaseKey}
       phases={phaseItems}
       progress={{
@@ -912,7 +998,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
         {
           label: "Latest Proof Run",
           value: latestProofRun,
-          note: fs.existsSync(path.join(repoRoot, "staffordos/proof_runs/internal_shopifixer_dry_run_v1/merchant_proof_package.md"))
+          note: fs.existsSync(proofPackagePath)
             ? "Proof package present in the dry-run proof folder."
             : "Not Yet Available",
           href: "/operator/system-map"
@@ -962,9 +1048,11 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
           why_it_matters,
           screenshot,
           notes
+        }, {
+          outputPath: proofRunContext.beforePath
         });
 
-        redirect("/operator/shopifixer-pilot?phase=before-evidence&shopifixer_before_saved=1");
+        redirect(`${missionPhaseHref("before_evidence")}&shopifixer_before_saved=1`);
       }}
       beforeEvidenceSaved={beforeEvidenceWorkbenchSaved}
       beforeEvidenceDate={beforeEvidenceWorkbenchDate}
@@ -989,9 +1077,11 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
           remaining_limitations,
           observed_improvement,
           merchant_facing_summary
+        }, {
+          outputPath: proofRunContext.afterPath
         });
 
-        redirect("/operator/shopifixer-pilot?phase=after-evidence&shopifixer_after_saved=1");
+        redirect(`${missionPhaseHref("after_evidence")}&shopifixer_after_saved=1`);
       }}
       afterEvidenceSaved={afterEvidenceWorkbenchSaved}
       afterEvidenceDate={afterEvidenceWorkbenchDate}
@@ -1001,9 +1091,16 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
         const _store = String(formData.get("store") || commandCenterMerchant.store || shopifixer.merchant?.store || "unavailable");
         const _date = String(formData.get("date") || proofPackageWorkbenchDate);
 
-        writeShopifixerProofPackage();
+        writeShopifixerProofPackage({
+          proofRunDir: proofRunContext.proofRunRoot,
+          scopePath: proofRunContext.scopePath,
+          beforePath: proofRunContext.beforePath,
+          afterPath: proofRunContext.afterPath,
+          outputPath: proofRunContext.proofPackagePath,
+          sealPath: proofRunContext.sealPath
+        });
 
-        redirect("/operator/shopifixer-pilot?phase=proof-seal&shopifixer_proof_package_saved=1");
+        redirect(`${missionPhaseHref("proof_seal")}&shopifixer_proof_package_saved=1`);
       }}
       proofPackageSaved={proofPackageWorkbenchSaved}
       proofPackageDate={proofPackageWorkbenchDate}
@@ -1018,7 +1115,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
           date
         });
 
-        redirect("/operator/shopifixer-pilot?phase=delivery-payment&shopifixer_completion_saved=1");
+        redirect(`${missionPhaseHref("delivery_payment")}&shopifixer_completion_saved=1`);
       }}
       completionSaved={completionWorkbenchSaved}
       completionDate={completionWorkbenchDate}
@@ -1045,9 +1142,11 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
           location_changed,
           implementation_notes,
           success_criteria
+        }, {
+          outputPath: proofRunContext.scopePath
         });
 
-        redirect("/operator/shopifixer-pilot?phase=scope&shopifixer_scoped_fix_saved=1");
+        redirect(`${missionPhaseHref("scope")}&shopifixer_scoped_fix_saved=1`);
       }}
       scopeWorkbenchSaved={scopeWorkbenchSaved}
       scopeWorkbenchDate={scopeWorkbenchDate}

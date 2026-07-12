@@ -25,11 +25,14 @@ export type ShopifixerAfterEvidenceInput = {
   merchant_facing_summary: string;
 };
 
-export function writeShopifixerAfterEvidence(input: ShopifixerAfterEvidenceInput) {
-  const outputPath = path.resolve(
-    process.cwd(),
-    "../../proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md"
-  );
+export type ShopifixerAfterEvidenceWriteOptions = {
+  outputPath?: string;
+};
+
+export function writeShopifixerAfterEvidence(input: ShopifixerAfterEvidenceInput, options: ShopifixerAfterEvidenceWriteOptions = {}) {
+  const outputPath = options.outputPath
+    ? path.resolve(options.outputPath)
+    : path.resolve(process.cwd(), "../../proof_runs/internal_shopifixer_dry_run_v1/after_evidence.md");
 
   const content = [
     "# AFTER EVIDENCE",
