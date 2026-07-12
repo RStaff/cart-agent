@@ -79,9 +79,15 @@ function parseMarkdownFields(content) {
 
   return {
     status: valueAfter("Status:"),
+    activeExercise: valueAfter("Active Exercise:"),
+    exercise004ScopePath: valueAfter("Exercise 004 Scope Path:"),
+    exercise005ScopePath: valueAfter("Exercise 005 Scope Path:"),
+    scopeAuthority: valueAfter("Scope Authority:"),
     store: valueAfter("Store:"),
+    objective: valueAfter("Exact Problem / Learning Objective:"),
     issue: valueAfter("Issue:"),
     scopedFix: valueAfter("Smallest Scoped Fix:"),
+    targetArtifact: valueAfter("Target Page / Template / Artifact:"),
     inScope: listAfter("In Scope:"),
     outOfScope: listAfter("Out of Scope:"),
     merchantApprovalRequired: valueAfter("Merchant Approval Required:"),
@@ -139,14 +145,23 @@ function evaluateNokingsMissionReadiness({
   certificationMemoPath = DEFAULT_CERTIFICATION_MEMO_PATH
 } = {}) {
   const binding = loadBinding(bindingPath);
-  const missionScopePath = path.join(proofRunDir, "fix_scope.md");
+  const scopeIndexPath = path.join(proofRunDir, "fix_scope.md");
+  const missionScopeIndex = parseMarkdownFields(readText(scopeIndexPath));
+  const activeExerciseLabel = clean(missionScopeIndex.activeExercise);
+  const activeExerciseSlug = /Exercise 004 - Product Page Inventory/i.test(activeExerciseLabel)
+    ? "exercise_004"
+    : /Exercise 005 - Collection Page Inventory/i.test(activeExerciseLabel)
+      ? "exercise_005"
+      : "";
+  const activeScopePath = activeExerciseSlug ? path.join(proofRunDir, "exercises", activeExerciseSlug, "fix_scope.md") : "";
+  const activeScopeExists = activeScopePath ? fs.existsSync(activeScopePath) : false;
+  const activeScope = parseMarkdownFields(readText(activeScopePath));
   const beforePath = path.join(proofRunDir, "before_evidence.md");
   const afterPath = path.join(proofRunDir, "after_evidence.md");
   const missionProofPackagePath = path.join(proofRunDir, "mission_proof_package.md");
   const executionNotesPath = path.join(proofRunDir, "execution_notes.md");
   const certificationMemo = parseCertificationMemo(readText(certificationMemoPath));
 
-  const missionScope = parseMarkdownFields(readText(missionScopePath));
   const beforeEvidence = parseMarkdownFields(readText(beforePath));
   const afterEvidence = parseMarkdownFields(readText(afterPath));
   const proofPackagePath = missionProofPackagePath;
@@ -165,14 +180,36 @@ function evaluateNokingsMissionReadiness({
   const paymentAuthority = clean(binding?.payment_authority);
 
   const merchantBindingPass = Boolean(bindingStoreMatches && missionIdMatches && productMatches && environmentMatches && proofRunId && proofRunPath && proofRunPathExists);
-  const scopeComplete = clean(missionScope.status).toLowerCase() === "complete" && normalizeStore(missionScope.store) === "no-kings-athletics.myshopify.com";
-  const scopeBlocker = scopeComplete ? "" : "Mission scope not yet established";
-  const beforeEvidenceCaptured = clean(beforeEvidence.status).toLowerCase() === "complete" || clean(beforeEvidence.status).toLowerCase() === "captured";
-  const analysisComplete = clean(executionNotes.status).toLowerCase() === "complete" || clean(executionNotes.status).toLowerCase() === "captured";
+  const activeScopeObjective = clean(activeScope.objective || activeScope.issue || activeScope.scopedFix);
+  const activeScopeTarget = clean(activeScope.targetArtifact);
+  const activeScopeStore = normalizeStore(activeScope.store);
+  const scopeIsExercise004 = /Exercise 004 - Product Page Inventory/i.test(activeScopeObjective) || /templates\/product\.json|product page inventory/i.test(activeScopeTarget);
+  const scopeIsExercise005 = /Exercise 005 - Collection Page Inventory/i.test(activeScopeObjective) || /templates\/collection\.json|collection page inventory/i.test(activeScopeTarget);
+  const scopeMatchesActiveExercise = activeExerciseSlug === "exercise_004" ? scopeIsExercise004 : activeExerciseSlug === "exercise_005" ? scopeIsExercise005 : false;
+  const scopeComplete = Boolean(activeExerciseSlug && activeScopeExists && clean(activeScope.status).toLowerCase() === "complete" && activeScopeStore === "no-kings-athletics.myshopify.com" && scopeMatchesActiveExercise);
+  const scopeBlocker = !activeExerciseSlug || !activeScopeExists
+    ? "Active exercise scope missing"
+    : !scopeMatchesActiveExercise
+      ? "Active exercise scope rejected"
+      : !scopeComplete
+        ? "Scope Incomplete"
+        : "";
+  const beforeEvidenceRelevant = scopeIsExercise005
+    ? /collection/i.test([beforeEvidence.objective, beforeEvidence.issue, beforeEvidence.affectedPage, beforeEvidence.notes, beforeEvidence.screenshot].join(" "))
+    : /product/i.test([beforeEvidence.objective, beforeEvidence.issue, beforeEvidence.affectedPage, beforeEvidence.notes, beforeEvidence.screenshot].join(" "));
+  const beforeEvidenceCaptured = (clean(beforeEvidence.status).toLowerCase() === "complete" || clean(beforeEvidence.status).toLowerCase() === "captured") && beforeEvidenceRelevant;
+  const analysisPhase = scopeIsExercise005
+    ? "collection_page_inventory"
+    : "product_page_inventory";
+  const analysisComplete = scopeIsExercise005
+    ? clean(executionNotes.status).toLowerCase() === "complete" && /collection/i.test([executionNotes.objective, executionNotes.issue, executionNotes.affectedPage, executionNotes.notes].join(" "))
+    : clean(executionNotes.status).toLowerCase() === "complete" || clean(executionNotes.status).toLowerCase() === "captured";
   const executionAuthorityPass = merchantBindingPass && scopeComplete && beforeEvidenceCaptured && analysisComplete;
-  const afterEvidenceCaptured = clean(afterEvidence.status).toLowerCase() === "complete" || clean(afterEvidence.status).toLowerCase() === "captured";
+  const afterEvidenceCaptured = scopeIsExercise005
+    ? (clean(afterEvidence.status).toLowerCase() === "complete" || clean(afterEvidence.status).toLowerCase() === "captured") && /collection/i.test([afterEvidence.objective, afterEvidence.issue, afterEvidence.affectedPage, afterEvidence.notes].join(" "))
+    : clean(afterEvidence.status).toLowerCase() === "complete" || clean(afterEvidence.status).toLowerCase() === "captured";
   const proofPackageStoreMatches = normalizeStore(proofPackage.store) === normalizeStore(binding?.canonical_store_domain);
-  const proofReady = ["complete", "assembled", "recognized"].includes(clean(proofPackage.status).toLowerCase()) && proofPackageStoreMatches;
+  const proofReady = ["complete", "assembled", "recognized"].includes(clean(proofPackage.status).toLowerCase()) && proofPackageStoreMatches && scopeIsExercise004;
   const certificationDecision = clean(certificationMemo.certificationDecision).toUpperCase();
   const certificationMemoReady = Boolean(
     certificationMemo.present &&
@@ -192,9 +229,9 @@ function evaluateNokingsMissionReadiness({
 
   const gatingReasons = [
     !merchantBindingPass ? "Merchant binding incomplete" : "",
-    !scopeComplete ? "Scope Incomplete" : "",
+    !scopeComplete ? scopeBlocker : "",
     !beforeEvidenceCaptured ? "Before Evidence Missing" : "",
-    !analysisComplete ? "Product Page Inventory Not Performed" : "",
+    !analysisComplete ? (scopeIsExercise005 ? "Collection Page Inventory Not Performed" : "Product Page Inventory Not Performed") : "",
     !afterEvidenceCaptured ? "After Evidence Missing" : "",
     !proofReady ? "Proof Package Missing" : !certificationMemoReady ? "Mission Certification Missing" : "Exercise 005 Planning Missing",
     paymentRequired ? "Payment required by mission binding" : ""
@@ -207,7 +244,7 @@ function evaluateNokingsMissionReadiness({
       : !beforeEvidenceCaptured
           ? "before_evidence"
           : !analysisComplete
-            ? "product_page_inventory"
+            ? analysisPhase
             : !afterEvidenceCaptured
               ? "after_evidence"
               : !proofReady
@@ -226,7 +263,7 @@ function evaluateNokingsMissionReadiness({
       : !beforeEvidenceCaptured
         ? "Capture Before Evidence"
         : !analysisComplete
-          ? "Perform governed read-only product page inventory"
+          ? (scopeIsExercise005 ? "Perform governed read-only collection page inventory" : "Perform governed read-only product page inventory")
         : !afterEvidenceCaptured
           ? "Capture After Evidence"
           : !proofReady
@@ -258,16 +295,22 @@ function evaluateNokingsMissionReadiness({
       proof_run_id: proofRunId,
       proof_run_path: proofRunPath
     },
+    active_exercise: activeExerciseLabel || "Not Yet Available",
     current_phase: currentPhase,
     current_blocker: currentBlocker,
     blocking_reasons: gatingReasons,
     next_safe_action: nextSafeAction,
     payment_required: paymentRequired,
+    scope_authority: {
+      index_path: scopeIndexPath,
+      active_scope_path: activeScopePath || "Not Yet Available",
+      active_exercise: activeExerciseLabel || "Not Yet Available"
+    },
     gates: {
       merchant_binding: merchantBindingPass ? stageStatus("pass", "NoKings binding established") : stageStatus("blocked", "NoKings binding incomplete"),
       scope: scopeComplete ? stageStatus("pass", "Governed mission scope established") : stageStatus("blocked", scopeBlocker),
       before_evidence: beforeEvidenceCaptured ? stageStatus("pass", "Before evidence scaffold present") : stageStatus("blocked", "Before Evidence Missing"),
-      execution: executionAuthorityPass ? stageStatus("pass", "Governed analysis completed and next phase may proceed") : stageStatus("blocked", "Product Page Inventory Not Performed"),
+      execution: executionAuthorityPass ? stageStatus("pass", "Governed analysis completed and next phase may proceed") : stageStatus("blocked", scopeIsExercise005 ? "Collection Page Inventory Not Performed" : "Product Page Inventory Not Performed"),
       after_evidence: afterEvidenceCaptured ? stageStatus("pass", "After evidence scaffold present") : stageStatus("blocked", "After Evidence Missing"),
       proof: proofReady ? stageStatus("pass", "Mission proof package recognized") : stageStatus("blocked", "Proof Package Missing"),
       mission_certification: proofReady
@@ -308,7 +351,8 @@ function evaluateNokingsMissionReadiness({
       "staffordos/audits/no_kings/execution_truth/execution_access_result_v1.md",
       "staffordos/audits/no_kings/execution_truth/theme_pull_test_v2.txt",
       bindingPath,
-      missionScopePath,
+      scopeIndexPath,
+      activeScopePath,
       beforePath,
       afterPath,
       proofPackagePath,

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
-import crypto from "node:crypto";
 import os from "node:os";
+import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 
 import { evaluateNokingsMissionReadiness } from "./evaluate_nokings_mission_001_readiness_v1.mjs";
@@ -10,15 +10,7 @@ const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(MODULE_DIR, "..", "..");
 const BINDING_PATH = path.join(REPO_ROOT, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json");
 const PROOF_RUN_DIR = path.join(REPO_ROOT, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1");
-const OUTPUT_PATH = path.join(MODULE_DIR, "output", "nokings_mission_001_readiness_v1.json");
-const GENERIC_FILES = [
-  "staffordos/shopifixer/shopifixer_command_center_v1.json",
-  "staffordos/clients/shopifixer_offer_latest.json",
-  "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
-  "staffordos/qa/output/shopifixer_operational_readiness_v1.json",
-  "staffordos/ui/operator-frontend/app/operator/shopifixer-pilot/page.tsx",
-  "staffordos/ui/operator-frontend/components/operator/ShopifixerPilotWorkspace.tsx"
-];
+const READINESS_OUTPUT_PATH = path.join(MODULE_DIR, "output", "nokings_mission_001_readiness_v1.json");
 
 function readText(filePath) {
   try {
@@ -28,8 +20,9 @@ function readText(filePath) {
   }
 }
 
-function sha256(text) {
-  return crypto.createHash("sha256").update(String(text ?? ""), "utf8").digest("hex");
+function writeText(filePath, text) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, text, "utf8");
 }
 
 function snapshot(paths) {
@@ -39,34 +32,128 @@ function snapshot(paths) {
     const text = readText(abs);
     out[rel] = {
       exists: fs.existsSync(abs),
-      sha256: sha256(text),
-      size: Buffer.byteLength(text, "utf8")
+      size: Buffer.byteLength(text, "utf8"),
+      sha256: crypto.createHash("sha256").update(text, "utf8").digest("hex")
     };
   }
   return out;
 }
 
-function assert(condition, label, failures) {
-  if (!condition) failures.push(label);
+function assert(condition, message, failures) {
+  if (!condition) failures.push(message);
 }
 
-function certificationMemoFixture({
-  missionId = "mission_001",
+function scopeContent({
+  exercise,
+  objective,
+  targetArtifact,
+  inScope,
+  outOfScope,
+  status = "Complete"
+}) {
+  return `# Fix Scope
+
+Status:
+${status}
+
+Mission:
+Mission 001 - NoKings Shopify Engineering Training
+
+Product:
+ShopiFixer
+
+Environment Type:
+controlled_training
+
+Store:
+no-kings-athletics.myshopify.com
+
+Exact Problem / Learning Objective:
+${exercise}
+
+${objective}
+
+Target Page / Template / Artifact:
+${targetArtifact}
+
+Smallest Governed Scope:
+Read-only training inventory for ${exercise.toLowerCase()}.
+
+In Scope:
+${inScope.map((line) => `- ${line}`).join("\n")}
+
+Out of Scope:
+${outOfScope.map((line) => `- ${line}`).join("\n")}
+
+Merchant Approval Requirement:
+No
+
+Implementation Permitted:
+No
+
+Required Before Evidence:
+- Governed scope only
+- No new evidence capture required for scope completion
+
+Success Criteria:
+- The governed scope is isolated to the active exercise
+- The root mission scope file is not treated as the canonical payload
+
+Rollback Expectation:
+- Restore the exercise-specific scope file for this exercise
+
+Knowledge Capture Requirement:
+- Record the exercise-specific scope, dependency chain, and safe-change observations
+
+Source Artifacts:
+- STAFFORDOS_MISSION_001_NOKINGS_TRAINING_V1.md
+- SHOPIFIXER_SHOPIFY_ENGINEERING_CANON_V1.md
+- SHOPIFIXER_ENGINEERING_CURRICULUM_V1.md
+`;
+}
+
+function scopeIndex(activeExercise, extraPayload = "") {
+  return `# Mission Scope Index
+
+Status:
+Deprecated
+
+Mission:
+Mission 001 - NoKings Shopify Engineering Training
+
+Active Exercise:
+${activeExercise}
+
+Exercise 004 Scope Path:
+staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_004/fix_scope.md
+
+Exercise 005 Scope Path:
+staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/fix_scope.md
+
+Scope Authority:
+Exercise-specific
+
+Notes:
+- Do not write scope content directly here.
+- Do not treat this file as authoritative scope payload.
+- ${activeExercise} is the governed active exercise.
+${extraPayload ? `\n${extraPayload}\n` : ""}
+`;
+}
+
+function certificationMemo({
   exercise = "Exercise 004 - Product Page Inventory",
-  merchant = "NoKings Athletics",
   canonicalStore = "no-kings-athletics.myshopify.com",
   decision = "CONDITIONAL GO",
-  recommendation = "Exercise 005 - Collection Page Inventory",
-  mutationLine = "- No Shopify mutation occurred.",
-  outcomeLine = "- No storefront improvements, conversion improvements, merchant results, or revenue impact are claimed."
+  recommendation = "Exercise 005 - Collection Page Inventory"
 } = {}) {
   return `# Mission 001 Exercise 004 Certification
 
 ## Mission
-- Mission ID: \`${missionId}\`
+- Mission ID: \`mission_001\`
 - Mission: \`Mission 001 - NoKings Shopify Engineering Training\`
 - Exercise: \`${exercise}\`
-- Merchant: \`${merchant}\`
+- Merchant: \`NoKings Athletics\`
 - Canonical store: \`${canonicalStore}\`
 - Product: \`ShopiFixer\`
 - Environment type: \`controlled_training\`
@@ -140,7 +227,7 @@ Repository-backed inventory confirms:
 - Payment required: \`false\`
 - Completion permitted: \`no\`
 
-## Recommendation for Exercise ${recommendation.startsWith("Exercise 005") ? "005" : recommendation}
+## Recommendation for Exercise 005
 Do not start the next exercise until the mission certification gate is intentionally resolved or the mission sequence is updated to recognize this certification artifact.
 
 ## Engineering Capability Score
@@ -158,318 +245,274 @@ Repository-backed justification:
 - However, the mission readiness evaluator still reports \`Mission Certification Missing\`, so the mission is not yet fully closed in governed readiness terms.
 
 ## Confirmation
-${mutationLine}
+- No Shopify mutation occurred.
 - The generic cart-agent-dev ShopiFixer pilot remains unchanged.
 - Abando authority remains unchanged.
 
-${outcomeLine}
 `;
 }
 
-function writeFixtureFixture(root, binding, scope, before, after, proof, certificationMemo = "", proofFileName = "mission_proof_package.md", certificationFileName = "p10_9_mission_001_exercise_004_certification_v1.md") {
+function writeFixture({
+  root,
+  binding,
+  activeExercise,
+  scope004,
+  scope005,
+  rootPayload = "",
+  includeBefore = false,
+  includeAfter = false,
+  includeExecution = false,
+  includeProof = false,
+  certification = ""
+}) {
   const missionDir = path.join(root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1");
-  const missionBindingDir = path.join(root, "staffordos/missions");
-  const missionImplementationDir = path.join(root, "staffordos/implementation");
-  fs.mkdirSync(missionDir, { recursive: true });
-  fs.mkdirSync(missionBindingDir, { recursive: true });
-  fs.mkdirSync(missionImplementationDir, { recursive: true });
-  fs.writeFileSync(path.join(root, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"), `${JSON.stringify(binding, null, 2)}\n`, "utf8");
-  fs.writeFileSync(path.join(missionDir, "fix_scope.md"), scope, "utf8");
-  fs.writeFileSync(path.join(missionDir, "before_evidence.md"), before, "utf8");
-  fs.writeFileSync(path.join(missionDir, "after_evidence.md"), after, "utf8");
-  fs.writeFileSync(path.join(missionDir, proofFileName), proof, "utf8");
-  fs.writeFileSync(path.join(missionImplementationDir, certificationFileName), certificationMemo, "utf8");
-  fs.writeFileSync(path.join(missionDir, "execution_notes.md"), "# Execution Notes\n\nStatus:\nNot yet executed\n", "utf8");
+  const exercisesDir = path.join(missionDir, "exercises");
+  fs.mkdirSync(path.join(exercisesDir, "exercise_004"), { recursive: true });
+  fs.mkdirSync(path.join(exercisesDir, "exercise_005"), { recursive: true });
+  writeText(path.join(root, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"), `${JSON.stringify(binding, null, 2)}\n`);
+  writeText(path.join(missionDir, "fix_scope.md"), scopeIndex(activeExercise, rootPayload));
+  if (scope004 !== null) {
+    writeText(path.join(exercisesDir, "exercise_004/fix_scope.md"), scope004);
+  }
+  if (scope005 !== null) {
+    writeText(path.join(exercisesDir, "exercise_005/fix_scope.md"), scope005);
+  }
+  if (includeBefore) {
+    writeText(path.join(missionDir, "before_evidence.md"), `# Before Evidence\n\nStatus:\nComplete\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise:\n${activeExercise}\n\nStore:\nno-kings-athletics.myshopify.com\n\nAffected Page / Artifact:\nNot Yet Available\n\nIssue:\nNot Yet Available\n\nWhy It Matters:\nNot Yet Available\n\nScreenshot:\nNot Yet Available\n\nNotes:\n- Controlled training baseline only.\n`);
+  }
+  if (includeExecution) {
+    writeText(path.join(missionDir, "execution_notes.md"), `# Execution Notes\n\nStatus:\nComplete\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise:\n${activeExercise}\n\nStore:\nno-kings-athletics.myshopify.com\n\nTarget Files:\n- ${activeExercise === "Exercise 005 - Collection Page Inventory" ? "templates/collection.json" : "templates/product.json"}\n\nNotes:\n- Controlled training inventory only.\n- No Shopify mutation occurred.\n`);
+  }
+  if (includeAfter) {
+    writeText(path.join(missionDir, "after_evidence.md"), `# After Evidence\n\nStatus:\nComplete\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise:\n${activeExercise}\n\nStore:\nno-kings-athletics.myshopify.com\n\nAffected Page / Artifact:\nNot Yet Available\n\nObserved Improvement:\nNot Yet Available\n\nMerchant-Facing Summary:\nNot Yet Available\n\nRemaining Limitations:\nNot Yet Available\n\nScreenshot:\nNot Yet Available\n\nNotes:\n- Controlled training evidence only.\n`);
+  }
+  if (includeProof) {
+    writeText(path.join(missionDir, "mission_proof_package.md"), `# Mission Proof Package\n\nStatus:\nAssembled\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise:\n${activeExercise}\n\nStore:\nno-kings-athletics.myshopify.com\n\nProof Run ID:\nmission_001_nokings_shopifixer_v1\n\nProof Package Version:\nv1\n\nGenerated At:\n2026-07-11T00:00:00.000Z\n\nManifest Path:\nNot Yet Available\n\nEvidence Source Paths:\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/fix_scope.md\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/before_evidence.md\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/after_evidence.md\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/execution_notes.md\n\nSeal Status:\nNot Yet Available\n\nNotes:\n- Mission proof package scaffold only.\n`);
+  }
+  if (certification) {
+    writeText(path.join(root, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md"), certification);
+  }
 }
 
-function runEvaluator({ bindingPath, proofRunDir, certificationMemoPath, outputPath }) {
-  const report = evaluateNokingsMissionReadiness({
+function runReadiness(root) {
+  const outputPath = path.join(root, "readiness.json");
+  return evaluateNokingsMissionReadiness({
     repoRoot: REPO_ROOT,
-    bindingPath,
-    proofRunDir,
-    certificationMemoPath
+    bindingPath: path.join(root, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
+    proofRunDir: path.join(root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"),
+    certificationMemoPath: path.join(root, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md")
   });
-  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-  fs.writeFileSync(outputPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
-  return {
-    status: report.status === "NO_GO" ? 1 : 0,
-    stdout: JSON.stringify(report, null, 2)
-  };
 }
 
-function main() {
+function run() {
   const failures = [];
-  const productionBefore = snapshot(GENERIC_FILES);
+  const productionBefore = snapshot([
+    "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json",
+    "staffordos/clients/shopifixer_offer_latest.json",
+    "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+    "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/fix_scope.md",
+    "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/before_evidence.md",
+    "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/after_evidence.md",
+    "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/execution_notes.md",
+    "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/mission_proof_package.md",
+    "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md",
+    "staffordos/ui/operator-frontend/app/operator/shopifixer-pilot/page.tsx",
+    "staffordos/ui/operator-frontend/components/operator/ShopifixerPilotWorkspace.tsx"
+  ]);
 
-  const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "staffordos-nokings-mission-"));
-  const fixtureRoot = path.join(tmpRoot, "repo");
-  fs.mkdirSync(fixtureRoot, { recursive: true });
-  const certificationMemoPath = path.join(fixtureRoot, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md");
-
+  const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "staffordos-nokings-binding-"));
   const repoBinding = JSON.parse(fs.readFileSync(BINDING_PATH, "utf8"));
-  const scopeIncomplete = `# Fix Scope\n\nStatus:\nNot yet executed\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nStore:\nno-kings-athletics.myshopify.com\n\nIssue:\nNot Yet Available\n\nSmallest Scoped Fix:\nNot Yet Available\n\nIn Scope:\n- Governed scope establishment\n\nOut of Scope:\n- Payment changes\n- Completion changes\n- Evidence fabrication\n- Unscoped theme changes\n\nMerchant Approval Required:\nNot Yet Available\n\nChange Location:\nNot Yet Available\n\nImplementation Notes:\n- Controlled training environment only.\n- Awaiting governed scope.\n\nSuccess Criteria:\n- Governed mission scope established without mutating production merchant truth.\n`;
-  const beforeMissing = `# Before Evidence\n\nStatus:\nNot yet executed\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nStore:\nno-kings-athletics.myshopify.com\n\nAffected Page / Artifact:\nNot Yet Available\n\nIssue:\nNot Yet Available\n\nWhy It Matters:\nNot Yet Available\n\nScreenshot:\nNot Yet Available\n\nNotes:\n- Controlled training environment.\n- No evidence captured yet.\n`;
-  const afterMissing = `# After Evidence\n\nStatus:\nNot yet executed\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nStore:\nno-kings-athletics.myshopify.com\n\nAffected Page / Artifact:\nNot Yet Available\n\nObserved Improvement:\nNot Yet Available\n\nMerchant-Facing Summary:\nNot Yet Available\n\nRemaining Limitations:\nNot Yet Available\n\nScreenshot:\nNot Yet Available\n`;
-  const proofMissing = `# Mission Proof Package\n\nStatus:\nNot yet executed\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise:\nExercise 004 - Product Page Analysis\n\nStore:\nno-kings-athletics.myshopify.com\n\nProof Run ID:\nmission_001_nokings_shopifixer_v1\n\nProof Package Version:\nv1\n\nGenerated At:\nNot Yet Available\n\nManifest Path:\nNot Yet Available\n\nNotes:\n- Mission proof package scaffold only.\n`;
-  writeFixtureFixture(fixtureRoot, repoBinding, scopeIncomplete, beforeMissing, afterMissing, proofMissing);
+  const validCertification = certificationMemo();
 
-  const tempOutput = path.join(tmpRoot, "nokings_readiness.json");
-  const repoProofRunDir = path.join(fixtureRoot, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1");
-  const baseFixture = runEvaluator({
-    bindingPath: path.join(fixtureRoot, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
-    proofRunDir: repoProofRunDir,
-    certificationMemoPath,
-    outputPath: tempOutput
+  // Root file is only an index. A stale payload in the root must not satisfy scope authority.
+  writeFixture({
+    root: tmpRoot,
+    binding: repoBinding,
+    activeExercise: "Exercise 005 - Collection Page Inventory",
+    scope004: scopeContent({
+      exercise: "Exercise 004 - Product Page Inventory",
+      objective: "The governed training objective is to inventory the NoKings product page architecture.",
+      targetArtifact: "templates/product.json\nsections/product-information.liquid\nsnippets/product-media-gallery-content.liquid\nsnippets/add-to-cart-button.liquid",
+      inScope: ["Product page file-stack inventory", "Product media dependency mapping"],
+      outOfScope: ["Shopify theme edits", "Payment changes", "Completion changes"]
+    }),
+    scope005: null,
+    rootPayload: scopeContent({
+      exercise: "Exercise 004 - Product Page Inventory",
+      objective: "The governed training objective is to inventory the NoKings product page architecture.",
+      targetArtifact: "templates/product.json\nsections/product-information.liquid\nsnippets/product-media-gallery-content.liquid\nsnippets/add-to-cart-button.liquid",
+      inScope: ["Product page file-stack inventory", "Product media dependency mapping"],
+      outOfScope: ["Shopify theme edits", "Payment changes", "Completion changes"]
+    })
   });
-  assert(baseFixture.status === 0, "evaluator exits 0 for conditional go", failures);
-  const baseReport = JSON.parse(fs.readFileSync(tempOutput, "utf8"));
-  assert(baseReport.status === "CONDITIONAL_GO", "base fixture status is CONDITIONAL_GO", failures);
-  assert(baseReport.current_phase === "scope", "base fixture current phase is scope", failures);
-  assert(baseReport.current_blocker === "Scope Incomplete", "base fixture blocker is Scope Incomplete", failures);
-  assert(baseReport.next_safe_action === "Establish governed mission scope", "base fixture next safe action is establish governed mission scope", failures);
-  assert(baseReport.payment_required === false, "payment_required is false", failures);
-  assert(baseReport.completion_permitted === false, "completion is not permitted", failures);
-  assert(baseReport.merchant.canonical_store_domain === "no-kings-athletics.myshopify.com", "canonical NoKings store is correct", failures);
-  assert(baseReport.gates.merchant_binding.status === "pass", "merchant binding passes", failures);
-  assert(baseReport.gates.scope.status === "blocked", "scope gate is blocked", failures);
-  assert(baseReport.gates.before_evidence.status === "blocked", "before evidence gate is blocked", failures);
-  assert(baseReport.gates.payment_applicability.status === "pass", "payment applicability passes as not required", failures);
-  assert(readText(BINDING_PATH).includes("no-kings-athletics.myshopify.com"), "binding file uses canonical NoKings store", failures);
-  assert(!readText(BINDING_PATH).includes("cart-agent-dev.myshopify.com"), "binding file does not reference cart-agent-dev", failures);
-
-  const completedScope = `# Fix Scope\n\nStatus:\nComplete\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nStore:\nno-kings-athletics.myshopify.com\n\nIssue:\nHomepage product discovery and value clarity.\n\nSmallest Scoped Fix:\nImprove early product clarity without redesigning the store.\n\nIn Scope:\n- Governed scope establishment\n- Early product clarity\n\nOut of Scope:\n- Payment changes\n- Completion changes\n\nMerchant Approval Required:\nNo\n\nChange Location:\nHomepage product path\n\nImplementation Notes:\n- Controlled training environment only.\n- Preserve historical evidence.\n\nSuccess Criteria:\n- Scope is governed and ready for the next controlled phase.\n`;
-  fs.writeFileSync(path.join(repoProofRunDir, "fix_scope.md"), completedScope, "utf8");
-  const beforeComplete = [
-    "# Before Evidence",
-    "",
-    "Status:",
-    "Complete",
-    "",
-    "Mission ID:",
-    "mission_001",
-    "",
-    "Exercise:",
-    "Exercise 004 - Product Page Analysis",
-    "",
-    "Merchant:",
-    "NoKings Athletics",
-    "",
-    "Store:",
-    "no-kings-athletics.myshopify.com",
-    "",
-    "Theme Name:",
-    "Not Yet Proven",
-    "",
-    "Theme ID:",
-    "Not Yet Proven",
-    "",
-    "Theme Version:",
-    "Not Yet Proven",
-    "",
-    "Theme Pull Reference:",
-    "- `staffordos/audits/no_kings/execution_truth/execution_access_result_v1.md`",
-    "- `staffordos/audits/no_kings/execution_truth/theme_pull_test_v2.txt`",
-    "",
-    "Target Templates:",
-    "- `templates/product.json`",
-    "- `sections/product-information.liquid`",
-    "- `snippets/product-media-gallery-content.liquid`",
-    "- `snippets/add-to-cart-button.liquid`",
-    "",
-    "Notes:",
-    "- baseline",
-    ""
-  ].join("\n");
-  fs.writeFileSync(path.join(repoProofRunDir, "before_evidence.md"), beforeComplete, "utf8");
-  const analysisBlockedReportPath = path.join(tmpRoot, "nokings_scope_complete.json");
-  const scopeCompleteRun = runEvaluator({
-    bindingPath: path.join(fixtureRoot, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
-    proofRunDir: repoProofRunDir,
-    certificationMemoPath,
-    outputPath: analysisBlockedReportPath
+  let report = evaluateNokingsMissionReadiness({
+    repoRoot: REPO_ROOT,
+    bindingPath: path.join(tmpRoot, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
+    proofRunDir: path.join(tmpRoot, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"),
+    certificationMemoPath: path.join(tmpRoot, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md")
   });
-  assert(scopeCompleteRun.status === 0, "evaluator exits 0 for scope complete fixture", failures);
-  const scopeCompleteReport = JSON.parse(fs.readFileSync(analysisBlockedReportPath, "utf8"));
-  assert(scopeCompleteReport.current_phase === "product_page_inventory", "completed scope without analysis advances to product_page_inventory", failures);
-  assert(scopeCompleteReport.current_blocker === "Product Page Inventory Not Performed", "missing analysis becomes next blocker", failures);
-  assert(scopeCompleteReport.next_safe_action === "Perform governed read-only product page inventory", "next safe action becomes governed product page inventory", failures);
-  assert(scopeCompleteReport.gates.execution.status === "blocked", "execution gate remains blocked until analysis is recorded", failures);
+  assert(report.current_phase === "scope", "root file is not treated as canonical scope authority", failures);
+  assert(report.current_blocker === "Active exercise scope missing", "missing active exercise scope is blocked", failures);
+  assert(report.gates.scope.status === "blocked", "scope gate blocks when active exercise scope is missing", failures);
 
-  fs.writeFileSync(path.join(repoProofRunDir, "fix_scope.md"), completedScope, "utf8");
-  fs.writeFileSync(path.join(repoProofRunDir, "execution_notes.md"), `# Execution Notes\n\nStatus:\nComplete\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nStore:\nno-kings-athletics.myshopify.com\n\nExercise:\nExercise 004 - Product Page Analysis\n\nTarget Files:\n- templates/product.json\n- sections/product-information.liquid\n- snippets/product-media-gallery-content.liquid\n- snippets/add-to-cart-button.liquid\n\nAnalysis Result:\nNot Yet Proven\n\nNotes:\n- Repository-backed read-only analysis completed.\n- No Shopify mutation occurred.\n`);
-  fs.writeFileSync(path.join(repoProofRunDir, "after_evidence.md"), `# After Evidence\n\nStatus:\nComplete\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nStore:\nno-kings-athletics.myshopify.com\n\nAffected Page / Artifact:\nProduct page analysis record\n\nObserved Improvement:\nNot Yet Available\n\nMerchant-Facing Summary:\nNot Yet Available\n\nRemaining Limitations:\nThe exercise is analysis-only. No storefront mutation, conversion claim, or merchant outcome is established by the repository truth.\n\nScreenshot:\nNot Yet Available\n\nNotes:\n- Mission 001 Exercise 004 analysis is complete.\n- The product-page architecture inventory is captured in execution notes.\n- No Shopify mutation occurred.\n\nFiles Inventoried:\n- templates/product.json\n- sections/product-information.liquid\n- snippets/product-media-gallery-content.liquid\n- snippets/add-to-cart-button.liquid\n- snippets/quantity-selector.liquid\n`, "utf8");
-  const missionPackagePath = path.join(repoProofRunDir, "mission_proof_package.md");
-  fs.rmSync(missionPackagePath, { force: true });
-  const missingMissionPackageReportPath = path.join(tmpRoot, "nokings_missing_mission_package.json");
-  const missingMissionPackageRun = runEvaluator({
-    bindingPath: path.join(fixtureRoot, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
-    proofRunDir: repoProofRunDir,
-    certificationMemoPath,
-    outputPath: missingMissionPackageReportPath
+  const exercise004Root = fs.mkdtempSync(path.join(os.tmpdir(), "staffordos-nokings-ex004-"));
+  writeFixture({
+    root: exercise004Root,
+    binding: repoBinding,
+    activeExercise: "Exercise 004 - Product Page Inventory",
+    scope004: scopeContent({
+      exercise: "Exercise 004 - Product Page Inventory",
+      objective: "The governed training objective is to map the NoKings product page file stack and media / CTA dependencies before any reversible implementation is considered.",
+      targetArtifact: "templates/product.json\nsections/product-information.liquid\nsnippets/product-media-gallery-content.liquid\nsnippets/add-to-cart-button.liquid",
+      inScope: ["Product page file-stack inventory", "Product media dependency mapping", "Product CTA dependency mapping"],
+      outOfScope: ["Shopify theme edits", "Payment changes", "Completion changes"]
+    }),
+    scope005: null,
+    certification: validCertification
   });
-  assert(missingMissionPackageRun.status === 0, "evaluator exits 0 for missing mission package fixture", failures);
-  const missingMissionPackageReport = JSON.parse(missingMissionPackageRun.stdout);
-  assert(missingMissionPackageReport.current_phase === "proof_package", "missing mission package remains on proof_package", failures);
-  assert(missingMissionPackageReport.current_blocker === "Proof Package Missing", "missing mission package remains blocked", failures);
-  assert(missingMissionPackageReport.next_safe_action === "Generate Mission Proof Package", "missing mission package next safe action is generate mission proof package", failures);
-  assert(missingMissionPackageReport.gates.proof.status === "blocked", "missing mission package blocks proof gate", failures);
-
-  fs.writeFileSync(missionPackagePath, "", "utf8");
-  const emptyMissionPackageReportPath = path.join(tmpRoot, "nokings_empty_mission_package.json");
-  const emptyMissionPackageRun = runEvaluator({
-    bindingPath: path.join(fixtureRoot, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
-    proofRunDir: repoProofRunDir,
-    certificationMemoPath,
-    outputPath: emptyMissionPackageReportPath
+  report = evaluateNokingsMissionReadiness({
+    repoRoot: REPO_ROOT,
+    bindingPath: path.join(exercise004Root, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
+    proofRunDir: path.join(exercise004Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"),
+    certificationMemoPath: path.join(exercise004Root, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md")
   });
-  assert(emptyMissionPackageRun.status === 0, "evaluator exits 0 for empty mission package fixture", failures);
-  const emptyMissionPackageReport = JSON.parse(emptyMissionPackageRun.stdout);
-  assert(emptyMissionPackageReport.current_phase === "proof_package", "empty mission package remains on proof_package", failures);
-  assert(emptyMissionPackageReport.current_blocker === "Proof Package Missing", "empty mission package remains blocked", failures);
+  assert(report.current_phase === "before_evidence", "exercise 004 resolves only to its own scope", failures);
+  assert(report.gates.scope.status === "pass", "exercise 004 scope passes from its own file", failures);
+  assert(report.current_blocker === "Before Evidence Missing", "exercise 004 next blocker is before evidence", failures);
+  assert(report.next_safe_action === "Capture Before Evidence", "exercise 004 next safe action is capture before evidence", failures);
 
-  fs.writeFileSync(missionPackagePath, `# Mission Proof Package\n\nStatus:\nAssembled\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise:\nExercise 004 - Product Page Analysis\n\nStore:\nwrong-store.myshopify.com\n\nProof Run ID:\nmission_001_nokings_shopifixer_v1\n\nProof Package Version:\nv1\n\nGenerated At:\n2026-07-11T00:00:00.000Z\n\nManifest Path:\nNot Yet Available\n\nEvidence Source Paths:\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/fix_scope.md\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/before_evidence.md\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/after_evidence.md\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/execution_notes.md\n\nSeal Status:\nNot Yet Available\n\nNotes:\n- Wrong store should not be accepted.\n`, "utf8");
-  const wrongStoreReportPath = path.join(tmpRoot, "nokings_wrong_store_mission_package.json");
-  const wrongStoreRun = runEvaluator({
-    bindingPath: path.join(fixtureRoot, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
-    proofRunDir: repoProofRunDir,
-    certificationMemoPath,
-    outputPath: wrongStoreReportPath
+  writeText(path.join(exercise004Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/fix_scope.md"), scopeContent({
+    exercise: "Exercise 005 - Collection Page Inventory",
+    objective: "The governed training objective is to inventory the NoKings collection page architecture.",
+    targetArtifact: "templates/collection.json\nsections/main-collection.liquid\nsections/collection-list.liquid\nsnippets/product-grid.liquid",
+    inScope: ["Collection page file-stack inventory", "Filter and sorting dependency mapping"],
+    outOfScope: ["Shopify theme edits", "Payment changes", "Completion changes"]
+  }));
+  const ex004AfterEx005 = evaluateNokingsMissionReadiness({
+    repoRoot: REPO_ROOT,
+    bindingPath: path.join(exercise004Root, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
+    proofRunDir: path.join(exercise004Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"),
+    certificationMemoPath: path.join(exercise004Root, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md")
   });
-  assert(wrongStoreRun.status === 0, "evaluator exits 0 for wrong store mission package fixture", failures);
-  const wrongStoreReport = JSON.parse(wrongStoreRun.stdout);
-  assert(wrongStoreReport.current_phase === "proof_package", "wrong store mission package remains on proof_package", failures);
-  assert(wrongStoreReport.current_blocker === "Proof Package Missing", "wrong store mission package blocked", failures);
+  assert(ex004AfterEx005.current_phase === "before_evidence", "exercise 005 cannot overwrite exercise 004", failures);
+  assert(ex004AfterEx005.gates.scope.status === "pass", "exercise 005 content in the other file does not disturb exercise 004", failures);
 
-  fs.writeFileSync(missionPackagePath, `# Mission Proof Package\n\nStatus:\nAssembled\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise:\nExercise 004 - Product Page Analysis\n\nStore:\ncart-agent-dev.myshopify.com\n\nProof Run ID:\nmission_001_nokings_shopifixer_v1\n\nProof Package Version:\nv1\n\nGenerated At:\n2026-07-11T00:00:00.000Z\n\nManifest Path:\nNot Yet Available\n\nEvidence Source Paths:\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/fix_scope.md\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/before_evidence.md\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/after_evidence.md\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/execution_notes.md\n\nSeal Status:\nNot Yet Available\n\nNotes:\n- cart-agent-dev must not satisfy NoKings proof recognition.\n`, "utf8");
-  const cartAgentDevPackageReportPath = path.join(tmpRoot, "nokings_cart_agent_dev_mission_package.json");
-  const cartAgentDevPackageRun = runEvaluator({
-    bindingPath: path.join(fixtureRoot, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
-    proofRunDir: repoProofRunDir,
-    certificationMemoPath,
-    outputPath: cartAgentDevPackageReportPath
+  const exercise005Root = fs.mkdtempSync(path.join(os.tmpdir(), "staffordos-nokings-ex005-"));
+  writeFixture({
+    root: exercise005Root,
+    binding: repoBinding,
+    activeExercise: "Exercise 005 - Collection Page Inventory",
+    scope004: scopeContent({
+      exercise: "Exercise 004 - Product Page Inventory",
+      objective: "The governed training objective is to map the NoKings product page file stack and media / CTA dependencies before any reversible implementation is considered.",
+      targetArtifact: "templates/product.json\nsections/product-information.liquid\nsnippets/product-media-gallery-content.liquid\nsnippets/add-to-cart-button.liquid",
+      inScope: ["Product page file-stack inventory", "Product media dependency mapping"],
+      outOfScope: ["Shopify theme edits", "Payment changes", "Completion changes"]
+    }),
+    scope005: scopeContent({
+      exercise: "Exercise 005 - Collection Page Inventory",
+      objective: "The governed training objective is to map the NoKings collection page file stack and its filtering, sorting, grid, pagination, and product-card dependencies.",
+      targetArtifact: "templates/collection.json\nsections/main-collection.liquid\nsections/collection-list.liquid\nsnippets/product-grid.liquid\nsnippets/product-card.liquid\nsnippets/collection-card.liquid\nsnippets/list-filter.liquid\nsnippets/filter-remove-buttons.liquid\nsnippets/pagination-controls.liquid",
+      inScope: ["Collection page file-stack inventory", "Filter and sorting dependency mapping", "Pagination and infinite-scroll dependency mapping"],
+      outOfScope: ["Shopify theme edits", "Payment changes", "Completion changes"]
+    }),
+    certification: validCertification
   });
-  assert(cartAgentDevPackageRun.status === 0, "evaluator exits 0 for cart-agent-dev mission package fixture", failures);
-  const cartAgentDevPackageReport = JSON.parse(cartAgentDevPackageRun.stdout);
-  assert(cartAgentDevPackageReport.current_phase === "proof_package", "cart-agent-dev package remains on proof_package", failures);
-  assert(cartAgentDevPackageReport.current_blocker === "Proof Package Missing", "cart-agent-dev package not accepted", failures);
-
-  fs.writeFileSync(missionPackagePath, `# Mission Proof Package\n\nStatus:\nAssembled\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise:\nExercise 004 - Product Page Analysis\n\nStore:\nno-kings-athletics.myshopify.com\n\nProof Run ID:\nmission_001_nokings_shopifixer_v1\n\nProof Package Version:\nv1\n\nGenerated At:\n2026-07-11T00:00:00.000Z\n\nManifest Path:\nNot Yet Available\n\nEvidence Source Paths:\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/fix_scope.md\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/before_evidence.md\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/after_evidence.md\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/execution_notes.md\n\nSeal Status:\nNot Yet Available\n\nNotes:\n- Mission proof package is ready for governed review.\n`, "utf8");
-  const validPackageReportPath = path.join(tmpRoot, "nokings_valid_mission_package.json");
-  const validPackageRun = runEvaluator({
-    bindingPath: path.join(fixtureRoot, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
-    proofRunDir: repoProofRunDir,
-    certificationMemoPath,
-    outputPath: validPackageReportPath
+  report = evaluateNokingsMissionReadiness({
+    repoRoot: REPO_ROOT,
+    bindingPath: path.join(exercise005Root, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
+    proofRunDir: path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"),
+    certificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md")
   });
-  assert(validPackageRun.status === 0, "evaluator exits 0 for valid mission package fixture", failures);
-  const validPackageReport = JSON.parse(validPackageRun.stdout);
-  assert(validPackageReport.status === "CONDITIONAL_GO", "valid mission package returns CONDITIONAL_GO", failures);
-  assert(validPackageReport.current_phase === "mission_certification", "valid package advances to mission_certification", failures);
-  assert(validPackageReport.current_blocker === "Mission Certification Missing", "valid package next blocker is Mission Certification Missing", failures);
-  assert(validPackageReport.next_safe_action === "Certify Mission 001 Exercise 004", "valid package next action is mission certification", failures);
-  assert(validPackageReport.gates.proof.status === "pass", "valid package passes proof gate", failures);
-  assert(validPackageReport.payment_required === false, "payment remains not required", failures);
+  assert(report.current_phase === "before_evidence", "exercise 005 resolves only to its own scope", failures);
+  assert(report.gates.scope.status === "pass", "exercise 005 scope passes from its own file", failures);
 
-  fs.rmSync(certificationMemoPath, { force: true });
-  const missingCertificationRunPath = path.join(tmpRoot, "nokings_missing_certification.json");
-  const missingCertificationRun = runEvaluator({
-    bindingPath: path.join(fixtureRoot, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
-    proofRunDir: repoProofRunDir,
-    certificationMemoPath,
-    outputPath: missingCertificationRunPath
+  writeText(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/fix_scope.md"), scopeContent({
+    exercise: "Exercise 004 - Product Page Inventory",
+    objective: "The governed training objective is to map the NoKings product page file stack and media / CTA dependencies before any reversible implementation is considered.",
+    targetArtifact: "templates/product.json\nsections/product-information.liquid\nsnippets/product-media-gallery-content.liquid\nsnippets/add-to-cart-button.liquid",
+    inScope: ["Product page file-stack inventory", "Product media dependency mapping"],
+    outOfScope: ["Shopify theme edits", "Payment changes", "Completion changes"]
+  }));
+  const wrongScopeFor005 = evaluateNokingsMissionReadiness({
+    repoRoot: REPO_ROOT,
+    bindingPath: path.join(exercise005Root, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
+    proofRunDir: path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"),
+    certificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md")
   });
-  assert(missingCertificationRun.status === 0, "evaluator exits 0 for missing certification memo fixture", failures);
-  const missingCertificationReport = JSON.parse(missingCertificationRun.stdout);
-  assert(missingCertificationReport.current_phase === "mission_certification", "missing certification remains on mission_certification", failures);
-  assert(missingCertificationReport.current_blocker === "Mission Certification Missing", "missing certification remains blocked", failures);
-  assert(missingCertificationReport.next_safe_action === "Certify Mission 001 Exercise 004", "missing certification next action is certify mission 001 exercise 004", failures);
-  assert(missingCertificationReport.gates.mission_certification.status === "blocked", "mission certification gate is blocked when memo is missing", failures);
+  assert(wrongScopeFor005.current_phase === "scope", "wrong exercise scope is rejected", failures);
+  assert(wrongScopeFor005.current_blocker === "Active exercise scope rejected", "wrong exercise scope rejection is explicit", failures);
 
-  fs.writeFileSync(certificationMemoPath, "", "utf8");
-  const emptyCertificationRunPath = path.join(tmpRoot, "nokings_empty_certification.json");
-  const emptyCertificationRun = runEvaluator({
-    bindingPath: path.join(fixtureRoot, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
-    proofRunDir: repoProofRunDir,
-    certificationMemoPath,
-    outputPath: emptyCertificationRunPath
+  const cartAgentDevBindingRoot = fs.mkdtempSync(path.join(os.tmpdir(), "staffordos-nokings-cart-agent-"));
+  writeFixture({
+    root: cartAgentDevBindingRoot,
+    binding: {
+      ...repoBinding,
+      canonical_store_domain: "cart-agent-dev.myshopify.com",
+      merchant: {
+        ...repoBinding.merchant,
+        client_id: "cart-agent-dev.myshopify.com",
+        store_domain: "cart-agent-dev.myshopify.com"
+      }
+    },
+    activeExercise: "Exercise 005 - Collection Page Inventory",
+    scope004: null,
+    scope005: scopeContent({
+      exercise: "Exercise 005 - Collection Page Inventory",
+      objective: "The governed training objective is to map the NoKings collection page file stack and its filtering, sorting, grid, pagination, and product-card dependencies.",
+      targetArtifact: "templates/collection.json\nsections/main-collection.liquid\nsections/collection-list.liquid\nsnippets/product-grid.liquid\nsnippets/product-card.liquid\nsnippets/collection-card.liquid\nsnippets/list-filter.liquid\nsnippets/filter-remove-buttons.liquid\nsnippets/pagination-controls.liquid",
+      inScope: ["Collection page file-stack inventory", "Filter and sorting dependency mapping"],
+      outOfScope: ["Shopify theme edits", "Payment changes", "Completion changes"]
+    }),
+    certification: validCertification
   });
-  assert(emptyCertificationRun.status === 0, "evaluator exits 0 for empty certification memo fixture", failures);
-  const emptyCertificationReport = JSON.parse(emptyCertificationRun.stdout);
-  assert(emptyCertificationReport.current_phase === "mission_certification", "empty certification remains on mission_certification", failures);
-  assert(emptyCertificationReport.current_blocker === "Mission Certification Missing", "empty certification remains blocked", failures);
-
-  fs.writeFileSync(certificationMemoPath, certificationMemoFixture({ canonicalStore: "wrong-store.myshopify.com" }), "utf8");
-  const wrongStoreCertificationRunPath = path.join(tmpRoot, "nokings_wrong_store_certification.json");
-  const wrongStoreCertificationRun = runEvaluator({
-    bindingPath: path.join(fixtureRoot, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
-    proofRunDir: repoProofRunDir,
-    certificationMemoPath,
-    outputPath: wrongStoreCertificationRunPath
+  const cartAgentDevReport = evaluateNokingsMissionReadiness({
+    repoRoot: REPO_ROOT,
+    bindingPath: path.join(cartAgentDevBindingRoot, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
+    proofRunDir: path.join(cartAgentDevBindingRoot, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"),
+    certificationMemoPath: path.join(cartAgentDevBindingRoot, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md")
   });
-  assert(wrongStoreCertificationRun.status === 0, "evaluator exits 0 for wrong-store certification fixture", failures);
-  const wrongStoreCertificationReport = JSON.parse(wrongStoreCertificationRun.stdout);
-  assert(wrongStoreCertificationReport.current_phase === "mission_certification", "wrong-store certification remains on mission_certification", failures);
-  assert(wrongStoreCertificationReport.current_blocker === "Mission Certification Missing", "wrong-store certification remains blocked", failures);
+  assert(cartAgentDevReport.current_phase === "merchant_binding", "cart-agent-dev is rejected at merchant binding", failures);
 
-  fs.writeFileSync(certificationMemoPath, certificationMemoFixture({ exercise: "Exercise 003 - Product List Analysis" }), "utf8");
-  const wrongExerciseCertificationRunPath = path.join(tmpRoot, "nokings_wrong_exercise_certification.json");
-  const wrongExerciseCertificationRun = runEvaluator({
-    bindingPath: path.join(fixtureRoot, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
-    proofRunDir: repoProofRunDir,
-    certificationMemoPath,
-    outputPath: wrongExerciseCertificationRunPath
-  });
-  assert(wrongExerciseCertificationRun.status === 0, "evaluator exits 0 for wrong-exercise certification fixture", failures);
-  const wrongExerciseCertificationReport = JSON.parse(wrongExerciseCertificationRun.stdout);
-  assert(wrongExerciseCertificationReport.current_phase === "mission_certification", "wrong-exercise certification remains on mission_certification", failures);
-  assert(wrongExerciseCertificationReport.current_blocker === "Mission Certification Missing", "wrong-exercise certification remains blocked", failures);
+  const productionAfter = snapshot([
+    "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json",
+    "staffordos/clients/shopifixer_offer_latest.json",
+    "staffordos/fulfillment/shopifixer_fulfillment_truth_v1.json",
+    "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/fix_scope.md",
+    "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/before_evidence.md",
+    "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/after_evidence.md",
+    "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/execution_notes.md",
+    "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/mission_proof_package.md",
+    "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md",
+    "staffordos/ui/operator-frontend/app/operator/shopifixer-pilot/page.tsx",
+    "staffordos/ui/operator-frontend/components/operator/ShopifixerPilotWorkspace.tsx"
+  ]);
 
-  fs.writeFileSync(certificationMemoPath, certificationMemoFixture({ canonicalStore: "cart-agent-dev.myshopify.com" }), "utf8");
-  const cartAgentDevCertificationRunPath = path.join(tmpRoot, "nokings_cart_agent_dev_certification.json");
-  const cartAgentDevCertificationRun = runEvaluator({
-    bindingPath: path.join(fixtureRoot, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
-    proofRunDir: repoProofRunDir,
-    certificationMemoPath,
-    outputPath: cartAgentDevCertificationRunPath
-  });
-  assert(cartAgentDevCertificationRun.status === 0, "evaluator exits 0 for cart-agent-dev certification fixture", failures);
-  const cartAgentDevCertificationReport = JSON.parse(cartAgentDevCertificationRun.stdout);
-  assert(cartAgentDevCertificationReport.current_phase === "mission_certification", "cart-agent-dev certification remains on mission_certification", failures);
-  assert(cartAgentDevCertificationReport.current_blocker === "Mission Certification Missing", "cart-agent-dev certification rejected", failures);
-
-  fs.writeFileSync(certificationMemoPath, certificationMemoFixture(), "utf8");
-  const validCertificationRunPath = path.join(tmpRoot, "nokings_valid_certification.json");
-  const validCertificationRun = runEvaluator({
-    bindingPath: path.join(fixtureRoot, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
-    proofRunDir: repoProofRunDir,
-    certificationMemoPath,
-    outputPath: validCertificationRunPath
-  });
-  assert(validCertificationRun.status === 0, "evaluator exits 0 for valid certification fixture", failures);
-  const validCertificationReport = JSON.parse(validCertificationRun.stdout);
-  assert(validCertificationReport.status === "CONDITIONAL_GO", "valid certification returns CONDITIONAL_GO", failures);
-  assert(validCertificationReport.current_phase === "exercise_005_planning", "valid certification advances to exercise_005_planning", failures);
-  assert(validCertificationReport.current_blocker === "Exercise 005 Planning Missing", "valid certification next blocker is Exercise 005 Planning Missing", failures);
-  assert(validCertificationReport.next_safe_action === "Plan Exercise 005 - Collection Page Inventory", "valid certification next action is Exercise 005 planning", failures);
-  assert(validCertificationReport.gates.mission_certification.status === "pass", "valid certification passes mission certification gate", failures);
-  assert(validCertificationReport.gates.exercise_005_planning.status === "blocked", "exercise 005 planning remains blocked until planned", failures);
-  assert(validCertificationReport.payment_required === false, "payment remains not required for valid certification", failures);
-
-  const productionAfter = snapshot(GENERIC_FILES);
-  for (const rel of GENERIC_FILES) {
+  for (const rel of Object.keys(productionBefore)) {
     assert(
-      productionBefore[rel].sha256 === productionAfter[rel].sha256 && productionBefore[rel].size === productionAfter[rel].size,
+      productionBefore[rel].exists === productionAfter[rel].exists &&
+      productionBefore[rel].size === productionAfter[rel].size &&
+      productionBefore[rel].sha256 === productionAfter[rel].sha256,
       `production truth unchanged for ${rel}`,
       failures
     );
   }
 
-  const currentBinding = fs.readFileSync(BINDING_PATH, "utf8");
-  assert(!currentBinding.includes("cart-agent-dev.myshopify.com") || currentBinding.includes("\"shopify_admin_identity\": \"no-kings-athletics-dev.myshopify.com\""), "NoKings binding remains separate from cart-agent-dev proof artifacts", failures);
-  assert(readText(path.join(REPO_ROOT, "staffordos/proofs/shopify_install_success_v1.md")).includes("cart-agent-dev.myshopify.com"), "Abando install proof remains intact", failures);
-  assert(readText(path.join(REPO_ROOT, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/mission_proof_package.md")).includes("Mission Proof Package"), "mission proof package exists", failures);
-  assert(!readText(path.join(REPO_ROOT, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/mission_proof_package.md")).includes("seal.json"), "No seal is fabricated in mission proof scaffold", failures);
-  assert(!readText(path.join(REPO_ROOT, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/mission_proof_package.md")).includes("payment_received"), "No payment claim is fabricated in mission proof scaffold", failures);
+  const actualReport = evaluateNokingsMissionReadiness({
+    repoRoot: REPO_ROOT,
+    bindingPath: BINDING_PATH,
+    proofRunDir: PROOF_RUN_DIR,
+    certificationMemoPath: path.join(REPO_ROOT, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md")
+  });
+  assert(actualReport.status === "CONDITIONAL_GO", "current readiness status remains CONDITIONAL_GO", failures);
+  assert(actualReport.active_exercise === "Exercise 005 - Collection Page Inventory", "active exercise is Exercise 005", failures);
+  assert(actualReport.current_phase === "before_evidence", "current phase is before_evidence", failures);
+  assert(actualReport.current_blocker === "Before Evidence Missing", "current blocker is Before Evidence Missing", failures);
+  assert(actualReport.next_safe_action === "Capture Before Evidence", "next safe action is Capture Before Evidence", failures);
+  assert(actualReport.payment_required === false, "payment_required remains false", failures);
+  assert(actualReport.completion_permitted === false, "completion remains prohibited", failures);
+  assert(actualReport.gates.scope.status === "pass", "scope remains complete", failures);
+  assert(actualReport.gates.before_evidence.status === "blocked", "before evidence remains blocked", failures);
 
   if (failures.length) {
     console.error(JSON.stringify({ status: "failed", failures }, null, 2));
@@ -480,19 +523,18 @@ function main() {
     status: "passed",
     checks: {
       evaluator_read_only: true,
-      binding_gate_passes: true,
-      scope_complete_advances: true,
-      before_evidence_next_blocker: true,
-      payment_not_required: true,
-      no_cart_agent_dev_reference_in_binding: true,
+      exercise_004_scope_isolated: true,
+      exercise_005_scope_isolated: true,
+      root_fix_scope_is_not_canonical: true,
+      missing_active_scope_blocked: true,
+      wrong_exercise_scope_rejected: true,
+      cart_agent_dev_rejected: true,
       production_truth_unchanged: true,
-      abando_authority_unchanged: true,
-      mission_proof_package_recognized: true,
-      cart_agent_dev_package_rejected: true,
-      mission_certification_requires_memo: true,
-      valid_certification_advances_to_exercise_005_planning: true
+      generic_pilot_unchanged: true,
+      abando_unchanged: true,
+      current_readiness_correct: true
     }
   }, null, 2));
 }
 
-main();
+run();
