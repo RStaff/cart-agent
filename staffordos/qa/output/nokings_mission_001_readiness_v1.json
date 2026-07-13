@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.nokings_mission_001_readiness.v1",
-  "generated_at": "2026-07-13T22:11:40.166Z",
+  "generated_at": "2026-07-13T22:32:54.599Z",
   "status": "CONDITIONAL_GO",
   "production_operation_permitted": true,
   "completion_permitted": false,
@@ -16,12 +16,12 @@
     "proof_run_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"
   },
   "active_exercise": "Exercise 006 - Cart Inventory",
-  "current_phase": "proof_package",
-  "current_blocker": "Proof Package Missing",
+  "current_phase": "mission_certification",
+  "current_blocker": "Mission Certification Missing",
   "blocking_reasons": [
-    "Proof Package Missing"
+    "Mission Certification Missing"
   ],
-  "next_safe_action": "Generate Exercise 006 Mission Proof Package",
+  "next_safe_action": "Certify Exercise 006",
   "payment_required": false,
   "scope_authority": {
     "index_path": "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/fix_scope.md",
@@ -50,12 +50,12 @@
       "reason": "After evidence scaffold present"
     },
     "proof": {
-      "status": "blocked",
-      "reason": "Proof Package Missing"
+      "status": "pass",
+      "reason": "Mission proof package recognized"
     },
     "mission_certification": {
       "status": "blocked",
-      "reason": "Proof Package Missing"
+      "reason": "Mission Certification Missing"
     },
     "exercise_005_planning": {
       "status": "blocked",
@@ -80,7 +80,7 @@
     "before_evidence": 100,
     "execution": 100,
     "after_evidence": 100,
-    "proof": 0,
+    "proof": 100,
     "mission_certification": 0,
     "exercise_005_planning": 0,
     "rollback": 100,
