@@ -635,6 +635,19 @@ function run() {
   assert(exercise006BaselineReport.next_safe_action === "Perform governed read-only cart inventory", "valid exercise 006 baseline next action is cart inventory", failures);
   assert(exercise006BaselineReport.gates.before_evidence.status === "pass", "exercise 006 before evidence gate passes when baseline is valid", failures);
   assert(exercise006BaselineReport.gates.execution.status === "blocked", "exercise 006 execution remains blocked until cart inventory is performed", failures);
+  writeText(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_006/execution_notes.md"), `# Execution Notes\n\nStatus:\nComplete\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise:\nExercise 006 - Cart Inventory\n\nStore:\nno-kings-athletics.myshopify.com\n\nObjective:\nCart inventory from repository-backed source files.\n\nAffected Page / Artifact:\nCart inventory\n\nNotes:\n- Cart template, cart summary, cart item rendering, quantity update, item removal, checkout CTA, and cart drawer source references inventoried.\n- No Shopify mutation occurred.\n`);
+  const completedCartInventoryReport = evaluateNokingsMissionReadiness({
+    repoRoot: REPO_ROOT,
+    bindingPath: path.join(exercise005Root, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
+    proofRunDir: path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"),
+    certificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md"),
+    exercise005CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_7_mission_001_exercise_005_certification_v1.md")
+  });
+  assert(completedCartInventoryReport.current_phase === "after_evidence", "completed exercise 006 cart inventory advances to after_evidence", failures);
+  assert(completedCartInventoryReport.current_blocker === "After Evidence Missing", "completed exercise 006 cart inventory exposes the after evidence blocker", failures);
+  assert(completedCartInventoryReport.next_safe_action === "Capture After Evidence", "completed exercise 006 cart inventory next action is after evidence", failures);
+  assert(completedCartInventoryReport.gates.execution.status === "pass", "completed exercise 006 cart inventory passes execution gate", failures);
+  assert(completedCartInventoryReport.gates.after_evidence.status === "blocked", "exercise 006 after evidence remains blocked after inventory", failures);
   fs.unlinkSync(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_006/fix_scope.md"));
 
   writeText(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/fix_scope.md"), scopeContent({
@@ -717,15 +730,15 @@ function run() {
   });
   assert(actualReport.status === "CONDITIONAL_GO", "current readiness status remains CONDITIONAL_GO", failures);
   assert(actualReport.active_exercise === "Exercise 006 - Cart Inventory", "active exercise is Exercise 006", failures);
-  assert(actualReport.current_phase === "cart_inventory", "current phase is cart_inventory after Exercise 006 baseline", failures);
-  assert(actualReport.current_blocker === "Cart Inventory Not Performed", "current blocker is Cart Inventory Not Performed after Exercise 006 baseline", failures);
-  assert(actualReport.next_safe_action === "Perform governed read-only cart inventory", "next safe action is Perform governed read-only cart inventory after Exercise 006 baseline", failures);
+  assert(actualReport.current_phase === "after_evidence", "current phase is after_evidence after Exercise 006 cart inventory", failures);
+  assert(actualReport.current_blocker === "After Evidence Missing", "current blocker is After Evidence Missing after Exercise 006 cart inventory", failures);
+  assert(actualReport.next_safe_action === "Capture After Evidence", "next safe action is Capture After Evidence after Exercise 006 cart inventory", failures);
   assert(actualReport.payment_required === false, "payment_required remains false", failures);
   assert(actualReport.completion_permitted === false, "completion remains prohibited", failures);
   assert(actualReport.gates.scope.status === "pass", "scope remains complete", failures);
   assert(actualReport.gates.before_evidence.status === "pass", "before evidence is complete after Exercise 006 baseline", failures);
-  assert(actualReport.gates.execution.status === "blocked", "cart inventory is blocked until performed", failures);
-  assert(actualReport.gates.after_evidence.status === "blocked", "after evidence is blocked until cart inventory completes", failures);
+  assert(actualReport.gates.execution.status === "pass", "cart inventory passes after being performed", failures);
+  assert(actualReport.gates.after_evidence.status === "blocked", "after evidence is blocked until captured", failures);
   assert(actualReport.gates.proof.status === "blocked", "proof package is blocked until Exercise 006 evidence is complete", failures);
   assert(actualReport.gates.mission_certification.status === "blocked", "mission certification is blocked until Exercise 006 proof exists", failures);
   assert(actualReport.gates.exercise_006_planning.status === "pass", "Exercise 006 planning passes after scope creation", failures);
