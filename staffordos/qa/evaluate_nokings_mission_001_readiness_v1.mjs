@@ -166,7 +166,8 @@ function evaluateNokingsMissionReadiness({
   const beforeEvidence = parseMarkdownFields(readText(beforePath));
   const afterEvidence = parseMarkdownFields(readText(afterPath));
   const proofPackagePath = missionProofPackagePath;
-  const proofPackage = parseMarkdownFields(readText(proofPackagePath));
+  const proofPackageText = readText(proofPackagePath);
+  const proofPackage = parseMarkdownFields(proofPackageText);
   const executionNotes = parseMarkdownFields(readText(executionNotesPath));
   const store = clean(binding?.canonical_store_domain || binding?.merchant?.store_domain || binding?.merchant?.client_id || "");
   const bindingStoreMatches = normalizeStore(binding?.canonical_store_domain) === "no-kings-athletics.myshopify.com";
@@ -210,10 +211,14 @@ function evaluateNokingsMissionReadiness({
     ? (clean(afterEvidence.status).toLowerCase() === "complete" || clean(afterEvidence.status).toLowerCase() === "captured") && /collection/i.test([afterEvidence.objective, afterEvidence.issue, afterEvidence.affectedPage, afterEvidence.notes].join(" "))
     : clean(afterEvidence.status).toLowerCase() === "complete" || clean(afterEvidence.status).toLowerCase() === "captured";
   const proofPackageStoreMatches = normalizeStore(proofPackage.store) === normalizeStore(binding?.canonical_store_domain);
-  const proofReady = ["complete", "assembled", "recognized"].includes(clean(proofPackage.status).toLowerCase()) && proofPackageStoreMatches && scopeIsExercise004;
+  const proofPackageMatchesActiveExercise = scopeIsExercise005
+    ? /Exercise 005 - Collection Page Inventory/i.test(proofPackageText) && /collection/i.test(proofPackageText)
+    : scopeIsExercise004
+      ? /Exercise 004 - Product Page Inventory/i.test(proofPackageText) && /product/i.test(proofPackageText)
+      : false;
+  const proofReady = ["complete", "assembled", "recognized"].includes(clean(proofPackage.status).toLowerCase()) && proofPackageStoreMatches && proofPackageMatchesActiveExercise;
   const certificationDecision = clean(certificationMemo.certificationDecision).toUpperCase();
-  const certificationMemoReady = Boolean(
-    certificationMemo.present &&
+  const exercise004CertificationReady = Boolean(certificationMemo.present &&
       certificationMemo.missionId === "mission_001" &&
       certificationMemo.exercise === "Exercise 004 - Product Page Inventory" &&
       normalizeStore(certificationMemo.canonicalStore) === "no-kings-athletics.myshopify.com" &&
@@ -224,8 +229,8 @@ function evaluateNokingsMissionReadiness({
       certificationMemo.repositoryTruthReviewed &&
       certificationMemo.readinessAssessment &&
       certificationMemo.recommendation &&
-      certificationMemo.noShopifyMutation
-  );
+      certificationMemo.noShopifyMutation);
+  const certificationMemoReady = scopeIsExercise004 ? exercise004CertificationReady : false;
   const rollbackReady = Boolean(merchantBindingPass && proofRunPathExists);
 
   const gatingReasons = [
@@ -270,7 +275,7 @@ function evaluateNokingsMissionReadiness({
         : !proofReady
             ? (scopeIsExercise005 ? "Generate Exercise 005 Mission Proof Package" : "Generate Mission Proof Package")
             : !certificationMemoReady
-              ? "Certify Mission 001 Exercise 004"
+              ? (scopeIsExercise005 ? "Certify Exercise 005" : "Certify Mission 001 Exercise 004")
               : paymentRequired
                 ? "Resolve payment applicability"
                 : "Plan Exercise 005 - Collection Page Inventory";

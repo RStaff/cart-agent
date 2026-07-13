@@ -493,6 +493,19 @@ function run() {
   assert(completedAfterEvidenceReport.gates.after_evidence.status === "pass", "after evidence gate passes when exercise 005 after evidence is valid", failures);
   assert(completedAfterEvidenceReport.gates.proof.status === "blocked", "proof gate blocks until exercise 005 proof package is generated", failures);
 
+  writeText(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/mission_proof_package.md"), `# Mission Proof Package\n\nStatus:\nComplete\n\nMission ID:\nmission_001\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise ID:\nexercise_005\n\nExercise:\nExercise 005 - Collection Page Inventory\n\nMerchant:\nNoKings Athletics\n\nStore:\nno-kings-athletics.myshopify.com\n\nObjective:\nCollection page inventory proof package from exercise-specific artifacts.\n\nNotes:\n- Collection page proof package only.\n- No Shopify mutation occurred.\n`);
+  const completedProofPackageReport = evaluateNokingsMissionReadiness({
+    repoRoot: REPO_ROOT,
+    bindingPath: path.join(exercise005Root, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
+    proofRunDir: path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"),
+    certificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md")
+  });
+  assert(completedProofPackageReport.current_phase === "mission_certification", "completed exercise 005 proof package advances to mission_certification", failures);
+  assert(completedProofPackageReport.current_blocker === "Mission Certification Missing", "completed exercise 005 proof package exposes the certification blocker", failures);
+  assert(completedProofPackageReport.next_safe_action === "Certify Exercise 005", "completed exercise 005 proof package next action is certification", failures);
+  assert(completedProofPackageReport.gates.proof.status === "pass", "proof gate passes when exercise 005 proof package is valid", failures);
+  assert(completedProofPackageReport.gates.mission_certification.status === "blocked", "mission certification remains blocked until Exercise 005 is certified", failures);
+
   writeText(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/fix_scope.md"), scopeContent({
     exercise: "Exercise 004 - Product Page Inventory",
     objective: "The governed training objective is to map the NoKings product page file stack and media / CTA dependencies before any reversible implementation is considered.",
@@ -572,16 +585,17 @@ function run() {
   });
   assert(actualReport.status === "CONDITIONAL_GO", "current readiness status remains CONDITIONAL_GO", failures);
   assert(actualReport.active_exercise === "Exercise 005 - Collection Page Inventory", "active exercise is Exercise 005", failures);
-  assert(actualReport.current_phase === "proof_package", "current phase is proof_package", failures);
-  assert(actualReport.current_blocker === "Proof Package Missing", "current blocker is Proof Package Missing", failures);
-  assert(actualReport.next_safe_action === "Generate Exercise 005 Mission Proof Package", "next safe action is Generate Exercise 005 Mission Proof Package", failures);
+  assert(actualReport.current_phase === "mission_certification", "current phase is mission_certification", failures);
+  assert(actualReport.current_blocker === "Mission Certification Missing", "current blocker is Mission Certification Missing", failures);
+  assert(actualReport.next_safe_action === "Certify Exercise 005", "next safe action is Certify Exercise 005", failures);
   assert(actualReport.payment_required === false, "payment_required remains false", failures);
   assert(actualReport.completion_permitted === false, "completion remains prohibited", failures);
   assert(actualReport.gates.scope.status === "pass", "scope remains complete", failures);
   assert(actualReport.gates.before_evidence.status === "pass", "before evidence is complete", failures);
   assert(actualReport.gates.execution.status === "pass", "collection inventory gate passes after the inventory is performed", failures);
   assert(actualReport.gates.after_evidence.status === "pass", "after evidence is complete after P11.5", failures);
-  assert(actualReport.gates.proof.status === "blocked", "proof package remains blocked until P11.6", failures);
+  assert(actualReport.gates.proof.status === "pass", "proof package is complete after P11.6", failures);
+  assert(actualReport.gates.mission_certification.status === "blocked", "mission certification remains blocked until Exercise 005 certification", failures);
 
   if (failures.length) {
     console.error(JSON.stringify({ status: "failed", failures }, null, 2));
