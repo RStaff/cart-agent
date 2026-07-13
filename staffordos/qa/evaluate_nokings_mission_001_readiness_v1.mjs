@@ -159,8 +159,8 @@ function evaluateNokingsMissionReadiness({
   const exerciseEvidenceDir = activeExerciseSlug ? path.join(proofRunDir, "exercises", activeExerciseSlug) : proofRunDir;
   const beforePath = path.join(exerciseEvidenceDir, "before_evidence.md");
   const afterPath = path.join(exerciseEvidenceDir, "after_evidence.md");
-  const missionProofPackagePath = path.join(proofRunDir, "mission_proof_package.md");
-  const executionNotesPath = path.join(proofRunDir, "execution_notes.md");
+  const missionProofPackagePath = path.join(exerciseEvidenceDir, "mission_proof_package.md");
+  const executionNotesPath = path.join(exerciseEvidenceDir, "execution_notes.md");
   const certificationMemo = parseCertificationMemo(readText(certificationMemoPath));
 
   const beforeEvidence = parseMarkdownFields(readText(beforePath));

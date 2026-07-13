@@ -23,13 +23,14 @@ type PhaseState = "available" | "current" | "blocked" | "complete";
 
 const COMMERCIAL_PROOF_RUN_ROOT = "staffordos/proof_runs/internal_shopifixer_dry_run_v1";
 
-function buildProofFiles(proofRunRoot: string, evidenceRoot = proofRunRoot): ProofFile[] {
+function buildProofFiles(proofRunRoot: string, artifactRoot = proofRunRoot): ProofFile[] {
   return [
-    { label: "Before evidence", path: `${evidenceRoot}/before_evidence.md` },
-    { label: "After evidence", path: `${evidenceRoot}/after_evidence.md` },
+    { label: "Before evidence", path: `${artifactRoot}/before_evidence.md` },
+    { label: "Execution notes", path: `${artifactRoot}/execution_notes.md` },
+    { label: "After evidence", path: `${artifactRoot}/after_evidence.md` },
     { label: "Scoped fix", path: `${proofRunRoot}/fix_scope.md` },
-    { label: "Proof package", path: `${proofRunRoot}/merchant_proof_package.md` },
-    { label: "Checksum seal", path: `${proofRunRoot}/merchant_proof_package.seal.json` },
+    { label: "Proof package", path: `${artifactRoot}/mission_proof_package.md` },
+    { label: "Checksum seal", path: `${artifactRoot}/mission_proof_package.seal.json` },
     { label: "Evidence manifest", path: "staffordos/proof_runs/output/evidence_manifest_v1.json" },
   ];
 }
@@ -177,13 +178,17 @@ function resolveProofRunContext(repoRoot: string, searchParams?: ShopifixerPilot
     return {
       missionKey: "",
       proofRunRoot: commercialRoot,
+      artifactRoot: commercialRoot,
       scopeIndexPath: commercialScopePath,
       scopePath: commercialScopePath,
       beforePath: commercialBeforePath,
       afterPath: commercialAfterPath,
+      executionNotesPath: path.join(repoRoot, `${commercialRoot}/execution_notes.md`),
       proofPackagePath: commercialProofPackagePath,
       sealPath: commercialSealPath,
-      evidenceRoot: commercialRoot
+      evidenceRoot: commercialRoot,
+      proofPackageFileName: "merchant_proof_package.md",
+      sealFileName: "merchant_proof_package.seal.json"
     };
   }
 
@@ -192,24 +197,29 @@ function resolveProofRunContext(repoRoot: string, searchParams?: ShopifixerPilot
   const scopeIndex = parseMissionScopeIndex(readText(scopeIndexPath));
   const activeExerciseSlug = /Exercise 004 - Product Page Inventory/i.test(scopeIndex.activeExercise)
     ? "exercise_004"
-    : /Exercise 005 - Collection Page Inventory/i.test(scopeIndex.activeExercise)
-      ? "exercise_005"
-      : "";
+      : /Exercise 005 - Collection Page Inventory/i.test(scopeIndex.activeExercise)
+        ? "exercise_005"
+        : "";
   const exerciseRoot = activeExerciseSlug ? path.join(missionRoot, "exercises", activeExerciseSlug) : missionRoot;
   const missionScopePath = activeExerciseSlug
     ? path.join(repoRoot, `${missionRoot}/exercises/${activeExerciseSlug}/fix_scope.md`)
     : scopeIndexPath;
+  const activeArtifactRoot = activeExerciseSlug ? path.join(missionRoot, "exercises", activeExerciseSlug) : missionRoot;
 
   return {
     missionKey,
     proofRunRoot: missionRoot,
+    artifactRoot: activeArtifactRoot,
     scopeIndexPath,
     scopePath: missionScopePath,
     beforePath: path.join(repoRoot, `${exerciseRoot}/before_evidence.md`),
     afterPath: path.join(repoRoot, `${exerciseRoot}/after_evidence.md`),
-    proofPackagePath: path.join(repoRoot, `${missionRoot}/merchant_proof_package.md`),
-    sealPath: path.join(repoRoot, `${missionRoot}/merchant_proof_package.seal.json`),
-    evidenceRoot: exerciseRoot
+    executionNotesPath: path.join(repoRoot, `${exerciseRoot}/execution_notes.md`),
+    proofPackagePath: path.join(repoRoot, `${activeArtifactRoot}/mission_proof_package.md`),
+    sealPath: path.join(repoRoot, `${activeArtifactRoot}/mission_proof_package.seal.json`),
+    evidenceRoot: exerciseRoot,
+    proofPackageFileName: "mission_proof_package.md",
+    sealFileName: "mission_proof_package.seal.json"
   };
 }
 
@@ -625,7 +635,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
       ? "seal present"
       : "seal missing"
   ].join(" · ");
-  const proofFileStatuses = buildProofFiles(proofRunContext.proofRunRoot, proofRunContext.evidenceRoot).map((file) => ({
+  const proofFileStatuses = buildProofFiles(proofRunContext.proofRunRoot, proofRunContext.artifactRoot).map((file) => ({
     label: file.label,
     value: fs.existsSync(path.join(repoRoot, file.path)) ? "Present" : "Missing"
   }));
@@ -1095,7 +1105,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
         const _date = String(formData.get("date") || proofPackageWorkbenchDate);
 
         writeShopifixerProofPackage({
-          proofRunDir: proofRunContext.proofRunRoot,
+          proofRunDir: proofRunContext.artifactRoot,
           scopePath: proofRunContext.scopePath,
           beforePath: proofRunContext.beforePath,
           afterPath: proofRunContext.afterPath,

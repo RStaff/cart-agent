@@ -21,6 +21,14 @@ function clean(value: unknown, fallback = "") {
   return text.length ? text : fallback;
 }
 
+function firstNonEmpty(...values: unknown[]) {
+  for (const value of values) {
+    const text = String(value ?? "").trim();
+    if (text.length) return text;
+  }
+  return "";
+}
+
 function toRepoRelative(filePath: string) {
   const repoRoot = path.resolve(process.cwd(), "../../../");
   return path.relative(repoRoot, filePath).split(path.sep).join("/");
@@ -111,10 +119,19 @@ export function writeShopifixerProofPackage(options: ShopifixerProofPackageWrite
   const fixScope = readText(fixScopePath);
   const after = readText(afterPath);
 
-  const store = clean(extractSection(before, "Store"), extractSection(fixScope, "Store"));
+  const store = firstNonEmpty(extractSection(before, "Store"), extractSection(fixScope, "Store")) || "Not Yet Available";
+  const exerciseLabel = firstNonEmpty(
+    extractSection(fixScope, "Exercise"),
+    extractSection(fixScope, "Exact Problem / Learning Objective"),
+    extractSection(before, "Exercise"),
+    extractSection(after, "Exercise")
+  ) || "Not Yet Available";
   const beforeIssue = clean(extractSection(before, "Issue"), "unavailable");
   const whyItMattered = clean(extractSection(before, "Why It Matters"), "unavailable");
-  const scopedFix = clean(extractSection(fixScope, "Scoped Fix"), "unavailable");
+  const scopedFix = firstNonEmpty(
+    extractSection(fixScope, "Scoped Fix"),
+    extractSection(fixScope, "Exact Problem / Learning Objective")
+  ) || "unavailable";
   const whatWasChanged = [
     scopedFix,
     clean(extractSection(after, "What Changed"), "")
@@ -169,6 +186,9 @@ export function writeShopifixerProofPackage(options: ShopifixerProofPackageWrite
     "",
     "Merchant / Store:",
     merchantStore,
+    "",
+    "Exercise:",
+    exerciseLabel,
     "",
     "Before Evidence Artifact IDs:",
     ...formatList(beforeArtifacts.map((artifact) => clean(artifact.artifact_id, "unavailable")).filter(Boolean)),

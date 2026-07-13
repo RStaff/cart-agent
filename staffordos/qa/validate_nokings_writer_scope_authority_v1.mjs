@@ -159,6 +159,7 @@ function run() {
   const frontendDir = path.join(repoRoot, "staffordos/ui/operator-frontend");
   const commercialRunDir = path.join(repoRoot, "staffordos/proof_runs/internal_shopifixer_dry_run_v1");
   const missionRunDir = path.join(repoRoot, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1");
+  const missionDir = missionRunDir;
   const exercisesDir = path.join(missionRunDir, "exercises");
   const manifestPath = path.join(repoRoot, "staffordos/proof_runs/output/evidence_manifest_v1.json");
 
@@ -178,8 +179,8 @@ function run() {
   const commercialSealPath = path.join(commercialRunDir, "merchant_proof_package.seal.json");
   const missionBeforePath = path.join(missionRunDir, "before_evidence.md");
   const missionAfterPath = path.join(missionRunDir, "after_evidence.md");
-  const missionProofPackagePath = path.join(missionRunDir, "mission_proof_package.md");
-  const missionSealPath = path.join(missionRunDir, "mission_proof_package.seal.json");
+  const missionProofPackagePath = path.join(missionRunDir, "exercises/exercise_005/mission_proof_package.md");
+  const missionSealPath = path.join(missionRunDir, "exercises/exercise_005/mission_proof_package.seal.json");
 
   writeText(rootIndexPath, `# Mission Scope Index\n\nStatus:\nDeprecated\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nActive Exercise:\nExercise 005 - Collection Page Inventory\n\nExercise 004 Scope Path:\nstaffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_004/fix_scope.md\n\nExercise 005 Scope Path:\nstaffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/fix_scope.md\n\nScope Authority:\nExercise-specific\n\nNotes:\n- Do not write scope content directly here.\n- Do not treat this file as authoritative scope payload.\n- Exercise 005 - Collection Page Inventory is the governed active exercise.\n`);
   writeText(ex004Path, scopeContent({
@@ -197,6 +198,10 @@ function run() {
     inScope: ["Collection page file-stack inventory", "Filter and sorting dependency mapping", "Pagination and infinite-scroll dependency mapping"],
     outOfScope: ["Shopify theme edits", "Payment changes", "Completion changes"]
   }));
+  writeText(path.join(missionDir, "before_evidence.md"), `# Before Evidence Index\n\nStatus:\nDeprecated\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nActive Exercise:\nExercise 005 - Collection Page Inventory\n\nExercise 004 Before Evidence Path:\nstaffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_004/before_evidence.md\n\nExercise 005 Before Evidence Path:\nstaffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md\n\nPayload Authority:\nExercise-specific\n\nNotes:\n- Do not write evidence content directly here.\n- Do not treat this file as authoritative evidence payload.\n`);
+  writeText(path.join(missionDir, "execution_notes.md"), `# Execution Notes Index\n\nStatus:\nDeprecated\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nActive Exercise:\nExercise 005 - Collection Page Inventory\n\nExercise 004 Execution Notes Path:\nstaffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_004/execution_notes.md\n\nExercise 005 Execution Notes Path:\nstaffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/execution_notes.md\n\nPayload Authority:\nExercise-specific\n\nNotes:\n- Do not write analysis content directly here.\n- Do not treat this file as authoritative execution payload.\n`);
+  writeText(path.join(missionDir, "after_evidence.md"), `# After Evidence Index\n\nStatus:\nDeprecated\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nActive Exercise:\nExercise 005 - Collection Page Inventory\n\nExercise 004 After Evidence Path:\nstaffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_004/after_evidence.md\n\nExercise 005 After Evidence Path:\nstaffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md\n\nPayload Authority:\nExercise-specific\n\nNotes:\n- Do not write evidence content directly here.\n- Do not treat this file as authoritative evidence payload.\n`);
+  writeText(path.join(missionDir, "mission_proof_package.md"), `# Mission Proof Package Index\n\nStatus:\nDeprecated\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nActive Exercise:\nExercise 005 - Collection Page Inventory\n\nExercise 004 Proof Package Path:\nstaffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_004/mission_proof_package.md\n\nExercise 005 Proof Package Path:\nstaffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/mission_proof_package.md\n\nPayload Authority:\nExercise-specific\n\nNotes:\n- Do not write proof content directly here.\n- Do not treat this file as authoritative proof payload.\n`);
   const rootBefore = snapshot(rootIndexPath);
 
   const commercialBeforeFixture = `# BEFORE EVIDENCE\n\nStore:\ncart-agent-dev.myshopify.com\n\nDate:\n2026-07-11\n\nAffected Page / Artifact:\nCommercial default scope writer\n\nIssue:\nCommercial default behavior\n\nWhy It Matters:\nBaseline for the commercial path\n\nScreenshot:\nhttps://example.com/before.png\n\nNotes:\nCommercial scope writer baseline.\n`;
@@ -274,7 +279,7 @@ function run() {
       merchantStore: "no-kings-athletics.myshopify.com"
     }), null, 2) + "\n");
     const missionProofPackageResult = writeShopifixerProofPackage({
-      proofRunDir: missionRunDir,
+      proofRunDir: path.join(missionRunDir, "exercises/exercise_005"),
       scopePath: ex005Path,
       beforePath: missionBeforePath,
       afterPath: missionAfterPath,
@@ -283,12 +288,12 @@ function run() {
       manifestPath
     });
 
-    assert(endsWithRepoRelative(missionProofPackageResult.outputPath, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/mission_proof_package.md"), "mission proof package writes to the mission-specific proof run", failures);
+    assert(endsWithRepoRelative(missionProofPackageResult.outputPath, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/mission_proof_package.md"), "mission proof package writes to the exercise-specific proof run", failures);
     const missionProofText = readText(missionProofPackagePath);
     assert(missionProofText.includes("Exercise 005 - Collection Page Inventory"), "mission proof package reads the exercise-specific scope", failures);
     assert(missionProofText.includes("no-kings-athletics.myshopify.com"), "mission proof package preserves mission store identity", failures);
     const missionSeal = JSON.parse(readText(missionSealPath));
-    assert(endsWithRepoRelative(missionSeal.proof_package_path, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/mission_proof_package.md"), "mission seal uses the canonical mission proof package path", failures);
+    assert(endsWithRepoRelative(missionSeal.proof_package_path, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/mission_proof_package.md"), "mission seal uses the canonical exercise-specific proof package path", failures);
     assert(missionSeal.manifest_path === "staffordos/proof_runs/output/evidence_manifest_v1.json", "mission seal uses the canonical manifest path", failures);
     assert(missionSeal.proof_run_id === "mission_001_nokings_shopifixer_v1", "mission seal keeps the mission proof run id", failures);
     assert(snapshot(rootIndexPath).sha256 === rootBefore.sha256, "root mission scope index remains unchanged by mission proof generation", failures);
