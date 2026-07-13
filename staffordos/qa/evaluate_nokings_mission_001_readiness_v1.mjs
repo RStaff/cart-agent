@@ -267,8 +267,8 @@ function evaluateNokingsMissionReadiness({
           ? (scopeIsExercise005 ? "Perform governed read-only collection page inventory" : "Perform governed read-only product page inventory")
         : !afterEvidenceCaptured
           ? "Capture After Evidence"
-          : !proofReady
-            ? "Generate Mission Proof Package"
+        : !proofReady
+            ? (scopeIsExercise005 ? "Generate Exercise 005 Mission Proof Package" : "Generate Mission Proof Package")
             : !certificationMemoReady
               ? "Certify Mission 001 Exercise 004"
               : paymentRequired

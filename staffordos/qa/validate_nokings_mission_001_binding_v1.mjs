@@ -294,7 +294,16 @@ function writeFixture({
     writeText(path.join(activeExerciseDir, "execution_notes.md"), `# Execution Notes\n\nStatus:\nComplete\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise:\n${activeExercise}\n\nStore:\nno-kings-athletics.myshopify.com\n\nTarget Files:\n- ${activeExercise === "Exercise 005 - Collection Page Inventory" ? "templates/collection.json" : "templates/product.json"}\n\nNotes:\n- Controlled training inventory only.\n- No Shopify mutation occurred.\n`);
   }
   if (includeAfter) {
-    writeText(path.join(activeExerciseDir, "after_evidence.md"), `# After Evidence\n\nStatus:\nComplete\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise:\n${activeExercise}\n\nStore:\nno-kings-athletics.myshopify.com\n\nAffected Page / Artifact:\nNot Yet Available\n\nObserved Improvement:\nNot Yet Available\n\nMerchant-Facing Summary:\nNot Yet Available\n\nRemaining Limitations:\nNot Yet Available\n\nScreenshot:\nNot Yet Available\n\nNotes:\n- Controlled training evidence only.\n`);
+    const affectedPage = activeExercise === "Exercise 005 - Collection Page Inventory"
+      ? "Collection page inventory completion evidence"
+      : "Product page inventory completion evidence";
+    const issue = activeExercise === "Exercise 005 - Collection Page Inventory"
+      ? "Collection page inventory completed from repository-backed source files."
+      : "Product page inventory completed from repository-backed source files.";
+    const notes = activeExercise === "Exercise 005 - Collection Page Inventory"
+      ? "- Collection page after evidence only.\n- No Shopify mutation occurred."
+      : "- Product page after evidence only.\n- No Shopify mutation occurred.";
+    writeText(path.join(activeExerciseDir, "after_evidence.md"), `# After Evidence\n\nStatus:\nComplete\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise:\n${activeExercise}\n\nStore:\nno-kings-athletics.myshopify.com\n\nAffected Page / Artifact:\n${affectedPage}\n\nIssue:\n${issue}\n\nObserved Improvement:\nNot Claimed\n\nMerchant-Facing Summary:\nNot Claimed\n\nRemaining Limitations:\nNot Yet Available\n\nScreenshot:\nNot Yet Available\n\nNotes:\n${notes}\n`);
   }
   if (includeProof) {
     writeText(path.join(activeExerciseDir, "mission_proof_package.md"), `# Mission Proof Package\n\nStatus:\nAssembled\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise:\n${activeExercise}\n\nStore:\nno-kings-athletics.myshopify.com\n\nProof Run ID:\nmission_001_nokings_shopifixer_v1\n\nProof Package Version:\nv1\n\nGenerated At:\n2026-07-11T00:00:00.000Z\n\nManifest Path:\nNot Yet Available\n\nEvidence Source Paths:\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/${activeExerciseSlug}/fix_scope.md\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/${activeExerciseSlug}/before_evidence.md\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/${activeExerciseSlug}/after_evidence.md\n- staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/${activeExerciseSlug}/execution_notes.md\n\nSeal Status:\nNot Yet Available\n\nNotes:\n- Mission proof package scaffold only.\n`);
@@ -471,6 +480,19 @@ function run() {
   assert(completedInventoryReport.next_safe_action === "Capture After Evidence", "completed exercise 005 inventory next action is after evidence", failures);
   assert(completedInventoryReport.gates.execution.status === "pass", "execution gate passes when exercise 005 inventory is valid", failures);
 
+  writeText(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md"), `# After Evidence\n\nStatus:\nComplete\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise:\nExercise 005 - Collection Page Inventory\n\nStore:\nno-kings-athletics.myshopify.com\n\nAffected Page / Artifact:\nCollection page inventory completion evidence\n\nIssue:\nCollection page inventory completed from repository-backed Exercise 005 artifacts.\n\nObserved Improvement:\nNot Claimed\n\nMerchant-Facing Summary:\nNot Claimed\n\nRemaining Limitations:\n- Runtime storefront behavior is Not Yet Proven.\n\nScreenshot:\nNot Yet Available\n\nNotes:\n- Collection page after evidence only.\n- No Shopify mutation occurred.\n`);
+  const completedAfterEvidenceReport = evaluateNokingsMissionReadiness({
+    repoRoot: REPO_ROOT,
+    bindingPath: path.join(exercise005Root, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
+    proofRunDir: path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"),
+    certificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md")
+  });
+  assert(completedAfterEvidenceReport.current_phase === "proof_package", "completed exercise 005 after evidence advances to proof_package", failures);
+  assert(completedAfterEvidenceReport.current_blocker === "Proof Package Missing", "completed exercise 005 after evidence exposes the proof package blocker", failures);
+  assert(completedAfterEvidenceReport.next_safe_action === "Generate Exercise 005 Mission Proof Package", "completed exercise 005 after evidence next action is proof package generation", failures);
+  assert(completedAfterEvidenceReport.gates.after_evidence.status === "pass", "after evidence gate passes when exercise 005 after evidence is valid", failures);
+  assert(completedAfterEvidenceReport.gates.proof.status === "blocked", "proof gate blocks until exercise 005 proof package is generated", failures);
+
   writeText(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/fix_scope.md"), scopeContent({
     exercise: "Exercise 004 - Product Page Inventory",
     objective: "The governed training objective is to map the NoKings product page file stack and media / CTA dependencies before any reversible implementation is considered.",
@@ -550,15 +572,16 @@ function run() {
   });
   assert(actualReport.status === "CONDITIONAL_GO", "current readiness status remains CONDITIONAL_GO", failures);
   assert(actualReport.active_exercise === "Exercise 005 - Collection Page Inventory", "active exercise is Exercise 005", failures);
-  assert(actualReport.current_phase === "after_evidence", "current phase is after_evidence", failures);
-  assert(actualReport.current_blocker === "After Evidence Missing", "current blocker is After Evidence Missing", failures);
-  assert(actualReport.next_safe_action === "Capture After Evidence", "next safe action is Capture After Evidence", failures);
+  assert(actualReport.current_phase === "proof_package", "current phase is proof_package", failures);
+  assert(actualReport.current_blocker === "Proof Package Missing", "current blocker is Proof Package Missing", failures);
+  assert(actualReport.next_safe_action === "Generate Exercise 005 Mission Proof Package", "next safe action is Generate Exercise 005 Mission Proof Package", failures);
   assert(actualReport.payment_required === false, "payment_required remains false", failures);
   assert(actualReport.completion_permitted === false, "completion remains prohibited", failures);
   assert(actualReport.gates.scope.status === "pass", "scope remains complete", failures);
   assert(actualReport.gates.before_evidence.status === "pass", "before evidence is complete", failures);
   assert(actualReport.gates.execution.status === "pass", "collection inventory gate passes after the inventory is performed", failures);
-  assert(actualReport.gates.after_evidence.status === "blocked", "after evidence is still blocked after inventory", failures);
+  assert(actualReport.gates.after_evidence.status === "pass", "after evidence is complete after P11.5", failures);
+  assert(actualReport.gates.proof.status === "blocked", "proof package remains blocked until P11.6", failures);
 
   if (failures.length) {
     console.error(JSON.stringify({ status: "failed", failures }, null, 2));
