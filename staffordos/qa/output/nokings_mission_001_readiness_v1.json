@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.nokings_mission_001_readiness.v1",
-  "generated_at": "2026-07-13T02:36:49.036Z",
+  "generated_at": "2026-07-13T03:03:03.688Z",
   "status": "CONDITIONAL_GO",
   "production_operation_permitted": true,
   "completion_permitted": false,
@@ -16,12 +16,12 @@
     "proof_run_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"
   },
   "active_exercise": "Exercise 005 - Collection Page Inventory",
-  "current_phase": "mission_certification",
-  "current_blocker": "Mission Certification Missing",
+  "current_phase": "exercise_006_planning",
+  "current_blocker": "Exercise 006 Planning Missing",
   "blocking_reasons": [
-    "Mission Certification Missing"
+    "Exercise 006 Planning Missing"
   ],
-  "next_safe_action": "Certify Exercise 005",
+  "next_safe_action": "Plan Exercise 006 - Cart Inventory",
   "payment_required": false,
   "scope_authority": {
     "index_path": "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/fix_scope.md",
@@ -54,12 +54,16 @@
       "reason": "Mission proof package recognized"
     },
     "mission_certification": {
-      "status": "blocked",
-      "reason": "Mission Certification Missing"
+      "status": "pass",
+      "reason": "Mission 001 Exercise 005 certified"
     },
     "exercise_005_planning": {
       "status": "blocked",
-      "reason": "Mission Certification Missing"
+      "reason": "Superseded by Exercise 006 planning"
+    },
+    "exercise_006_planning": {
+      "status": "blocked",
+      "reason": "Exercise 006 Planning Missing"
     },
     "rollback": {
       "status": "pass",
@@ -77,11 +81,11 @@
     "execution": 100,
     "after_evidence": 100,
     "proof": 100,
-    "mission_certification": 0,
+    "mission_certification": 100,
     "exercise_005_planning": 0,
     "rollback": 100,
     "payment": 100,
-    "overall": 70
+    "overall": 80
   },
   "evidence_sources": [
     "STAFFORDOS_MISSION_001_NOKINGS_TRAINING_V1.md",
@@ -103,7 +107,7 @@
     "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
     "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/mission_proof_package.md",
     "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/execution_notes.md",
-    "/Users/rossstafford/projects/cart-agent/staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md"
+    "/Users/rossstafford/projects/cart-agent/staffordos/implementation/p11_7_mission_001_exercise_005_certification_v1.md"
   ],
   "warnings": [
     "Mission 001 is a controlled training environment, not paid-commercial work.",
