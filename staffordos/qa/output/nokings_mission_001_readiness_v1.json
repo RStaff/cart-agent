@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.nokings_mission_001_readiness.v1",
-  "generated_at": "2026-07-14T17:46:18.724Z",
+  "generated_at": "2026-07-14T22:31:57.219Z",
   "status": "CONDITIONAL_GO",
   "production_operation_permitted": true,
   "completion_permitted": false,
@@ -16,14 +16,13 @@
     "proof_run_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"
   },
   "active_exercise": "Exercise 007 - Header Navigation Inventory",
-  "current_phase": "header_navigation_inventory",
-  "current_blocker": "Header Navigation Inventory Not Performed",
+  "current_phase": "after_evidence",
+  "current_blocker": "After Evidence Missing",
   "blocking_reasons": [
-    "Header Navigation Inventory Not Performed",
     "After Evidence Missing",
     "Proof Package Missing"
   ],
-  "next_safe_action": "Perform governed read-only header navigation inventory",
+  "next_safe_action": "Capture After Evidence",
   "payment_required": false,
   "scope_authority": {
     "index_path": "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/fix_scope.md",
@@ -44,8 +43,8 @@
       "reason": "Before evidence scaffold present"
     },
     "execution": {
-      "status": "blocked",
-      "reason": "Header Navigation Inventory Not Performed"
+      "status": "pass",
+      "reason": "Governed analysis completed and next phase may proceed"
     },
     "after_evidence": {
       "status": "blocked",
@@ -84,7 +83,7 @@
     "merchant_binding": 100,
     "scope": 100,
     "before_evidence": 100,
-    "execution": 0,
+    "execution": 100,
     "after_evidence": 0,
     "proof": 0,
     "mission_certification": 0,
