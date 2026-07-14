@@ -147,6 +147,87 @@ function stageStatus(status, reason) {
   };
 }
 
+const EXERCISE_DEFINITIONS = [
+  {
+    slug: "exercise_004",
+    label: "Exercise 004 - Product Page Inventory",
+    scopePattern: /Exercise 004 - Product Page Inventory/i,
+    targetPattern: /templates\/product\.json|product page inventory/i,
+    evidencePattern: /product/i,
+    analysisPhase: "product_page_inventory",
+    analysisBlocker: "Product Page Inventory Not Performed",
+    analysisAction: "Perform governed read-only product page inventory",
+    proofAction: "Generate Mission Proof Package",
+    certificationAction: "Certify Mission 001 Exercise 004",
+    nextPlanningPhase: "exercise_005_planning",
+    nextPlanningBlocker: "Exercise 005 Planning Missing",
+    nextPlanningAction: "Plan Exercise 005 - Collection Page Inventory"
+  },
+  {
+    slug: "exercise_005",
+    label: "Exercise 005 - Collection Page Inventory",
+    scopePattern: /Exercise 005 - Collection Page Inventory/i,
+    targetPattern: /templates\/collection\.json|collection page inventory/i,
+    evidencePattern: /collection/i,
+    analysisPhase: "collection_page_inventory",
+    analysisBlocker: "Collection Page Inventory Not Performed",
+    analysisAction: "Perform governed read-only collection page inventory",
+    proofAction: "Generate Exercise 005 Mission Proof Package",
+    certificationAction: "Certify Exercise 005",
+    nextPlanningPhase: "exercise_006_planning",
+    nextPlanningBlocker: "Exercise 006 Planning Missing",
+    nextPlanningAction: "Plan Exercise 006 - Cart Inventory"
+  },
+  {
+    slug: "exercise_006",
+    label: "Exercise 006 - Cart Inventory",
+    scopePattern: /Exercise 006 - Cart Inventory/i,
+    targetPattern: /templates\/cart\.json|cart inventory/i,
+    evidencePattern: /cart/i,
+    analysisPhase: "cart_inventory",
+    analysisBlocker: "Cart Inventory Not Performed",
+    analysisAction: "Perform governed read-only cart inventory",
+    proofAction: "Generate Exercise 006 Mission Proof Package",
+    certificationAction: "Certify Exercise 006",
+    nextPlanningPhase: "exercise_007_planning",
+    nextPlanningBlocker: "Exercise 007 Planning Missing",
+    nextPlanningAction: "Plan Exercise 007 - Header Navigation Inventory"
+  },
+  {
+    slug: "exercise_007",
+    label: "Exercise 007 - Header Navigation Inventory",
+    scopePattern: /Exercise 007 - Header Navigation Inventory/i,
+    targetPattern: /sections\/header-group\.json|sections\/header\.liquid|header navigation inventory/i,
+    evidencePattern: /header|navigation|mobile menu/i,
+    analysisPhase: "header_navigation_inventory",
+    analysisBlocker: "Header Navigation Inventory Not Performed",
+    analysisAction: "Perform governed read-only header navigation inventory",
+    proofAction: "Generate Exercise 007 Mission Proof Package",
+    certificationAction: "Certify Exercise 007",
+    nextPlanningPhase: "exercise_008_planning",
+    nextPlanningBlocker: "Exercise 008 Planning Missing",
+    nextPlanningAction: "Plan Exercise 008 - Trust Badge Inventory"
+  }
+];
+
+function exerciseByLabel(label) {
+  return EXERCISE_DEFINITIONS.find((exercise) => exercise.scopePattern.test(label)) || null;
+}
+
+function exerciseBySlug(slug) {
+  return EXERCISE_DEFINITIONS.find((exercise) => exercise.slug === slug) || null;
+}
+
+function latestExistingExercise(proofRunDir) {
+  return [...EXERCISE_DEFINITIONS]
+    .reverse()
+    .find((exercise) => fs.existsSync(path.join(proofRunDir, "exercises", exercise.slug, "fix_scope.md"))) || null;
+}
+
+function exerciseIndex(exercise) {
+  return exercise ? EXERCISE_DEFINITIONS.findIndex((candidate) => candidate.slug === exercise.slug) : -1;
+}
+
 function evaluateNokingsMissionReadiness({
   repoRoot = DEFAULT_REPO_ROOT,
   bindingPath = DEFAULT_BINDING_PATH,
@@ -158,17 +239,14 @@ function evaluateNokingsMissionReadiness({
   const binding = loadBinding(bindingPath);
   const scopeIndexPath = path.join(proofRunDir, "fix_scope.md");
   const missionScopeIndex = parseMarkdownFields(readText(scopeIndexPath));
-  const exercise006ScopePath = path.join(proofRunDir, "exercises", "exercise_006", "fix_scope.md");
-  const exercise006ScopeExists = fs.existsSync(exercise006ScopePath);
   const rootActiveExerciseLabel = clean(missionScopeIndex.activeExercise);
-  const activeExerciseLabel = exercise006ScopeExists ? "Exercise 006 - Cart Inventory" : rootActiveExerciseLabel;
-  const activeExerciseSlug = /Exercise 004 - Product Page Inventory/i.test(activeExerciseLabel)
-    ? "exercise_004"
-    : /Exercise 005 - Collection Page Inventory/i.test(activeExerciseLabel)
-      ? "exercise_005"
-      : /Exercise 006 - Cart Inventory/i.test(activeExerciseLabel)
-        ? "exercise_006"
-        : "";
+  const latestExercise = latestExistingExercise(proofRunDir);
+  const rootExercise = exerciseByLabel(rootActiveExerciseLabel);
+  const activeExercise = latestExercise && exerciseIndex(latestExercise) > exerciseIndex(rootExercise)
+    ? latestExercise
+    : rootExercise || latestExercise;
+  const activeExerciseLabel = activeExercise?.label || rootActiveExerciseLabel;
+  const activeExerciseSlug = activeExercise?.slug || "";
   const activeScopePath = activeExerciseSlug ? path.join(proofRunDir, "exercises", activeExerciseSlug, "fix_scope.md") : "";
   const activeScopeExists = activeScopePath ? fs.existsSync(activeScopePath) : false;
   const activeScope = parseMarkdownFields(readText(activeScopePath));
@@ -206,13 +284,11 @@ function evaluateNokingsMissionReadiness({
   const scopeIsExercise004 = /Exercise 004 - Product Page Inventory/i.test(activeScopeObjective) || /templates\/product\.json|product page inventory/i.test(activeScopeTarget);
   const scopeIsExercise005 = /Exercise 005 - Collection Page Inventory/i.test(activeScopeObjective) || /templates\/collection\.json|collection page inventory/i.test(activeScopeTarget);
   const scopeIsExercise006 = /Exercise 006 - Cart Inventory/i.test(activeScopeObjective) || /templates\/cart\.json|cart inventory/i.test(activeScopeTarget);
-  const scopeMatchesActiveExercise = activeExerciseSlug === "exercise_004"
-    ? scopeIsExercise004
-    : activeExerciseSlug === "exercise_005"
-      ? scopeIsExercise005
-      : activeExerciseSlug === "exercise_006"
-        ? scopeIsExercise006
-        : false;
+  const scopeIsExercise007 = /Exercise 007 - Header Navigation Inventory/i.test(activeScopeObjective) || /sections\/header-group\.json|sections\/header\.liquid|header navigation inventory/i.test(activeScopeTarget);
+  const activeExerciseDefinition = exerciseBySlug(activeExerciseSlug);
+  const scopeMatchesActiveExercise = activeExerciseDefinition
+    ? (activeExerciseDefinition.scopePattern.test(activeScopeObjective) || activeExerciseDefinition.targetPattern.test(activeScopeTarget))
+    : false;
   const scopeComplete = Boolean(activeExerciseSlug && activeScopeExists && clean(activeScope.status).toLowerCase() === "complete" && activeScopeStore === "no-kings-athletics.myshopify.com" && scopeMatchesActiveExercise);
   const scopeBlocker = !activeExerciseSlug || !activeScopeExists
     ? "Active exercise scope missing"
@@ -222,38 +298,23 @@ function evaluateNokingsMissionReadiness({
         ? "Scope Incomplete"
         : "";
   const beforeEvidenceText = [beforeEvidence.objective, beforeEvidence.issue, beforeEvidence.affectedPage, beforeEvidence.notes, beforeEvidence.screenshot].join(" ");
-  const beforeEvidenceRelevant = scopeIsExercise006
-    ? /cart/i.test(beforeEvidenceText)
-    : scopeIsExercise005
-      ? /collection/i.test(beforeEvidenceText)
-      : /product/i.test(beforeEvidenceText);
+  const beforeEvidenceRelevant = activeExerciseDefinition ? activeExerciseDefinition.evidencePattern.test(beforeEvidenceText) : false;
   const beforeEvidenceCaptured = (clean(beforeEvidence.status).toLowerCase() === "complete" || clean(beforeEvidence.status).toLowerCase() === "captured") && beforeEvidenceRelevant;
-  const analysisPhase = scopeIsExercise006
-    ? "cart_inventory"
-    : scopeIsExercise005
-      ? "collection_page_inventory"
-      : "product_page_inventory";
+  const analysisPhase = activeExerciseDefinition?.analysisPhase || "product_page_inventory";
+  const analysisBlocker = activeExerciseDefinition?.analysisBlocker || "Product Page Inventory Not Performed";
   const executionNotesText = [executionNotes.objective, executionNotes.issue, executionNotes.affectedPage, executionNotes.notes].join(" ");
-  const analysisComplete = scopeIsExercise006
-    ? clean(executionNotes.status).toLowerCase() === "complete" && /cart/i.test(executionNotesText)
-    : scopeIsExercise005
-      ? clean(executionNotes.status).toLowerCase() === "complete" && /collection/i.test(executionNotesText)
-      : clean(executionNotes.status).toLowerCase() === "complete" || clean(executionNotes.status).toLowerCase() === "captured";
+  const analysisComplete = activeExerciseDefinition
+    ? clean(executionNotes.status).toLowerCase() === "complete" && activeExerciseDefinition.evidencePattern.test(executionNotesText)
+    : clean(executionNotes.status).toLowerCase() === "complete" || clean(executionNotes.status).toLowerCase() === "captured";
   const executionAuthorityPass = merchantBindingPass && scopeComplete && beforeEvidenceCaptured && analysisComplete;
   const afterEvidenceText = [afterEvidence.objective, afterEvidence.issue, afterEvidence.affectedPage, afterEvidence.notes].join(" ");
-  const afterEvidenceCaptured = scopeIsExercise006
-    ? (clean(afterEvidence.status).toLowerCase() === "complete" || clean(afterEvidence.status).toLowerCase() === "captured") && /cart/i.test(afterEvidenceText)
-    : scopeIsExercise005
-      ? (clean(afterEvidence.status).toLowerCase() === "complete" || clean(afterEvidence.status).toLowerCase() === "captured") && /collection/i.test(afterEvidenceText)
-      : clean(afterEvidence.status).toLowerCase() === "complete" || clean(afterEvidence.status).toLowerCase() === "captured";
+  const afterEvidenceCaptured = activeExerciseDefinition
+    ? (clean(afterEvidence.status).toLowerCase() === "complete" || clean(afterEvidence.status).toLowerCase() === "captured") && activeExerciseDefinition.evidencePattern.test(afterEvidenceText)
+    : clean(afterEvidence.status).toLowerCase() === "complete" || clean(afterEvidence.status).toLowerCase() === "captured";
   const proofPackageStoreMatches = normalizeStore(proofPackage.store) === normalizeStore(binding?.canonical_store_domain);
-  const proofPackageMatchesActiveExercise = scopeIsExercise005
-    ? /Exercise 005 - Collection Page Inventory/i.test(proofPackageText) && /collection/i.test(proofPackageText)
-    : scopeIsExercise004
-      ? /Exercise 004 - Product Page Inventory/i.test(proofPackageText) && /product/i.test(proofPackageText)
-      : scopeIsExercise006
-        ? /Exercise 006 - Cart Inventory/i.test(proofPackageText) && /cart/i.test(proofPackageText)
-        : false;
+  const proofPackageMatchesActiveExercise = activeExerciseDefinition
+    ? activeExerciseDefinition.scopePattern.test(proofPackageText) && activeExerciseDefinition.evidencePattern.test(proofPackageText)
+    : false;
   const proofReady = ["complete", "assembled", "recognized"].includes(clean(proofPackage.status).toLowerCase()) && proofPackageStoreMatches && proofPackageMatchesActiveExercise;
   const certificationDecision = clean(certificationMemo.certificationDecision).toUpperCase();
   const exercise005CertificationDecision = clean(exercise005CertificationMemo.certificationDecision).toUpperCase();
@@ -307,15 +368,15 @@ function evaluateNokingsMissionReadiness({
       : scopeIsExercise006
         ? exercise006CertificationReady
         : false;
-  const nextPlanningBlocker = scopeIsExercise006 ? "Exercise 007 Planning Missing" : scopeIsExercise005 ? "Exercise 006 Planning Missing" : "Exercise 005 Planning Missing";
-  const nextPlanningPhase = scopeIsExercise006 ? "exercise_007_planning" : scopeIsExercise005 ? "exercise_006_planning" : "exercise_005_planning";
+  const nextPlanningBlocker = activeExerciseDefinition?.nextPlanningBlocker || "Exercise 005 Planning Missing";
+  const nextPlanningPhase = activeExerciseDefinition?.nextPlanningPhase || "exercise_005_planning";
   const rollbackReady = Boolean(merchantBindingPass && proofRunPathExists);
 
   const gatingReasons = [
     !merchantBindingPass ? "Merchant binding incomplete" : "",
     !scopeComplete ? scopeBlocker : "",
     !beforeEvidenceCaptured ? "Before Evidence Missing" : "",
-    !analysisComplete ? (scopeIsExercise006 ? "Cart Inventory Not Performed" : scopeIsExercise005 ? "Collection Page Inventory Not Performed" : "Product Page Inventory Not Performed") : "",
+    !analysisComplete ? analysisBlocker : "",
     !afterEvidenceCaptured ? "After Evidence Missing" : "",
     !proofReady ? "Proof Package Missing" : !certificationMemoReady ? "Mission Certification Missing" : nextPlanningBlocker,
     paymentRequired ? "Payment required by mission binding" : ""
@@ -343,20 +404,20 @@ function evaluateNokingsMissionReadiness({
   const nextSafeAction = !merchantBindingPass
     ? "Complete mission binding"
     : !scopeComplete
-      ? (scopeIsExercise006 ? "Establish governed Exercise 006 scope" : "Establish governed mission scope")
+      ? (scopeIsExercise007 ? "Establish governed Exercise 007 scope" : scopeIsExercise006 ? "Establish governed Exercise 006 scope" : "Establish governed mission scope")
       : !beforeEvidenceCaptured
         ? "Capture Before Evidence"
         : !analysisComplete
-          ? (scopeIsExercise006 ? "Perform governed read-only cart inventory" : scopeIsExercise005 ? "Perform governed read-only collection page inventory" : "Perform governed read-only product page inventory")
+          ? (activeExerciseDefinition?.analysisAction || "Perform governed read-only product page inventory")
         : !afterEvidenceCaptured
           ? "Capture After Evidence"
         : !proofReady
-            ? (scopeIsExercise006 ? "Generate Exercise 006 Mission Proof Package" : scopeIsExercise005 ? "Generate Exercise 005 Mission Proof Package" : "Generate Mission Proof Package")
+            ? (activeExerciseDefinition?.proofAction || "Generate Mission Proof Package")
             : !certificationMemoReady
-              ? (scopeIsExercise006 ? "Certify Exercise 006" : scopeIsExercise005 ? "Certify Exercise 005" : "Certify Mission 001 Exercise 004")
+              ? (activeExerciseDefinition?.certificationAction || "Certify Mission 001 Exercise 004")
               : paymentRequired
                 ? "Resolve payment applicability"
-                : (scopeIsExercise006 ? "Plan Exercise 007 - Header Navigation Inventory" : scopeIsExercise005 ? "Plan Exercise 006 - Cart Inventory" : "Plan Exercise 005 - Collection Page Inventory");
+                : (activeExerciseDefinition?.nextPlanningAction || "Plan Exercise 005 - Collection Page Inventory");
 
   const productionOperationPermitted = merchantBindingPass;
   const completionPermitted = false;
@@ -394,7 +455,7 @@ function evaluateNokingsMissionReadiness({
       merchant_binding: merchantBindingPass ? stageStatus("pass", "NoKings binding established") : stageStatus("blocked", "NoKings binding incomplete"),
       scope: scopeComplete ? stageStatus("pass", "Governed mission scope established") : stageStatus("blocked", scopeBlocker),
       before_evidence: beforeEvidenceCaptured ? stageStatus("pass", "Before evidence scaffold present") : stageStatus("blocked", "Before Evidence Missing"),
-      execution: executionAuthorityPass ? stageStatus("pass", "Governed analysis completed and next phase may proceed") : stageStatus("blocked", scopeIsExercise006 ? "Cart Inventory Not Performed" : scopeIsExercise005 ? "Collection Page Inventory Not Performed" : "Product Page Inventory Not Performed"),
+      execution: executionAuthorityPass ? stageStatus("pass", "Governed analysis completed and next phase may proceed") : stageStatus("blocked", analysisBlocker),
       after_evidence: afterEvidenceCaptured ? stageStatus("pass", "After evidence scaffold present") : stageStatus("blocked", "After Evidence Missing"),
       proof: proofReady ? stageStatus("pass", "Mission proof package recognized") : stageStatus("blocked", "Proof Package Missing"),
       mission_certification: proofReady
@@ -402,8 +463,9 @@ function evaluateNokingsMissionReadiness({
             ? stageStatus("pass", scopeIsExercise006 ? "Mission 001 Exercise 006 certified" : scopeIsExercise005 ? "Mission 001 Exercise 005 certified" : "Mission 001 Exercise 004 certified")
             : stageStatus("blocked", "Mission Certification Missing"))
         : stageStatus("blocked", "Proof Package Missing"),
-      exercise_005_planning: scopeIsExercise004 && certificationMemoReady ? stageStatus("blocked", "Exercise 005 Planning Missing") : stageStatus("blocked", scopeIsExercise006 ? "Superseded by Exercise 006 scope" : scopeIsExercise005 ? "Superseded by Exercise 006 planning" : "Mission Certification Missing"),
-      exercise_006_planning: scopeIsExercise006 ? stageStatus("pass", "Exercise 006 scope created") : scopeIsExercise005 && certificationMemoReady ? stageStatus("blocked", "Exercise 006 Planning Missing") : stageStatus("blocked", "Mission Certification Missing"),
+      exercise_005_planning: scopeIsExercise004 && certificationMemoReady ? stageStatus("blocked", "Exercise 005 Planning Missing") : stageStatus("blocked", scopeIsExercise007 ? "Superseded by Exercise 007 scope" : scopeIsExercise006 ? "Superseded by Exercise 006 scope" : scopeIsExercise005 ? "Superseded by Exercise 006 planning" : "Mission Certification Missing"),
+      exercise_006_planning: (scopeIsExercise006 || scopeIsExercise007) ? stageStatus("pass", "Exercise 006 scope created") : scopeIsExercise005 && certificationMemoReady ? stageStatus("blocked", "Exercise 006 Planning Missing") : stageStatus("blocked", "Mission Certification Missing"),
+      exercise_007_planning: scopeIsExercise007 ? stageStatus("pass", "Exercise 007 scope created") : scopeIsExercise006 && certificationMemoReady ? stageStatus("blocked", "Exercise 007 Planning Missing") : stageStatus("blocked", "Mission Certification Missing"),
       rollback: rollbackReady ? stageStatus("pass", "Separate mission proof-run path is available for rollback") : stageStatus("blocked", "Rollback path not yet established"),
       payment_applicability: paymentRequired
         ? stageStatus("blocked", paymentAuthority)
