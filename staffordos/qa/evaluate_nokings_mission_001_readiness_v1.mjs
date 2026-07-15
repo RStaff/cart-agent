@@ -11,6 +11,7 @@ const DEFAULT_CERTIFICATION_MEMO_PATH = path.join(DEFAULT_REPO_ROOT, "staffordos
 const DEFAULT_EXERCISE_005_CERTIFICATION_MEMO_PATH = path.join(DEFAULT_REPO_ROOT, "staffordos/implementation/p11_7_mission_001_exercise_005_certification_v1.md");
 const DEFAULT_EXERCISE_006_CERTIFICATION_MEMO_PATH = path.join(DEFAULT_REPO_ROOT, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md");
 const DEFAULT_EXERCISE_007_CERTIFICATION_MEMO_PATH = path.join(DEFAULT_REPO_ROOT, "staffordos/implementation/p11_21_mission_001_exercise_007_certification_v1.md");
+const DEFAULT_EXERCISE_008_CERTIFICATION_MEMO_PATH = path.join(DEFAULT_REPO_ROOT, "staffordos/implementation/p11_28_mission_001_exercise_008_certification_v1.md");
 const DEFAULT_OUTPUT_PATH = path.join(MODULE_DIR, "output", "nokings_mission_001_readiness_v1.json");
 
 function clean(value, fallback = "Not Yet Available") {
@@ -126,6 +127,7 @@ function parseCertificationMemo(content) {
     collectionArchitectureCertified: hasSection("Collection Architecture Certified"),
     cartArchitectureCertified: hasSection("Cart Architecture Certified"),
     headerNavigationArchitectureCertified: hasSection("Header Navigation Architecture Certified"),
+    trustBadgeArchitectureCertified: hasSection("Trust Badge Architecture Certified"),
     repositoryTruthReviewed: hasSection("Repository Truth Reviewed"),
     readinessAssessment: hasSection("Readiness Assessment"),
     recommendation: hasSection("Recommendation for Exercise 005"),
@@ -135,6 +137,7 @@ function parseCertificationMemo(content) {
     exercise006Recommended: hasLine("Exercise 006 - Cart Inventory") && hasLine("ex_006_cart_inventory"),
     exercise007Recommended: hasLine("Exercise 007 - Header Navigation Inventory") && hasLine("ex_007_header_navigation_inventory"),
     exercise008Recommended: hasLine("Exercise 008 - Trust Badge Inventory") && hasLine("ex_008_trust_badge_inventory"),
+    exercise009Recommended: hasLine("Exercise 009 - Footer Inventory") && hasLine("ex_009_footer_inventory"),
     noShopifyMutation: hasLine("No Shopify mutation occurred")
   };
 }
@@ -253,7 +256,8 @@ function evaluateNokingsMissionReadiness({
   certificationMemoPath = DEFAULT_CERTIFICATION_MEMO_PATH,
   exercise005CertificationMemoPath = DEFAULT_EXERCISE_005_CERTIFICATION_MEMO_PATH,
   exercise006CertificationMemoPath = DEFAULT_EXERCISE_006_CERTIFICATION_MEMO_PATH,
-  exercise007CertificationMemoPath = DEFAULT_EXERCISE_007_CERTIFICATION_MEMO_PATH
+  exercise007CertificationMemoPath = DEFAULT_EXERCISE_007_CERTIFICATION_MEMO_PATH,
+  exercise008CertificationMemoPath = DEFAULT_EXERCISE_008_CERTIFICATION_MEMO_PATH
 } = {}) {
   const binding = loadBinding(bindingPath);
   const scopeIndexPath = path.join(proofRunDir, "fix_scope.md");
@@ -278,6 +282,7 @@ function evaluateNokingsMissionReadiness({
   const exercise005CertificationMemo = parseCertificationMemo(readText(exercise005CertificationMemoPath));
   const exercise006CertificationMemo = parseCertificationMemo(readText(exercise006CertificationMemoPath));
   const exercise007CertificationMemo = parseCertificationMemo(readText(exercise007CertificationMemoPath));
+  const exercise008CertificationMemo = parseCertificationMemo(readText(exercise008CertificationMemoPath));
 
   const beforeEvidence = parseMarkdownFields(readText(beforePath));
   const afterEvidence = parseMarkdownFields(readText(afterPath));
@@ -341,6 +346,7 @@ function evaluateNokingsMissionReadiness({
   const exercise005CertificationDecision = clean(exercise005CertificationMemo.certificationDecision).toUpperCase();
   const exercise006CertificationDecision = clean(exercise006CertificationMemo.certificationDecision).toUpperCase();
   const exercise007CertificationDecision = clean(exercise007CertificationMemo.certificationDecision).toUpperCase();
+  const exercise008CertificationDecision = clean(exercise008CertificationMemo.certificationDecision).toUpperCase();
   const exercise004CertificationReady = Boolean(certificationMemo.present &&
       certificationMemo.missionId === "mission_001" &&
       certificationMemo.exercise === "Exercise 004 - Product Page Inventory" &&
@@ -398,6 +404,21 @@ function evaluateNokingsMissionReadiness({
       exercise007CertificationMemo.nextCanonicalExercise &&
       exercise007CertificationMemo.exercise008Recommended &&
       exercise007CertificationMemo.noShopifyMutation);
+  const exercise008CertificationReady = Boolean(exercise008CertificationMemo.present &&
+      exercise008CertificationMemo.missionId === "mission_001" &&
+      exercise008CertificationMemo.exercise === "Exercise 008 - Trust Badge Inventory" &&
+      normalizeStore(exercise008CertificationMemo.canonicalStore) === "no-kings-athletics.myshopify.com" &&
+      exercise008CertificationMemo.merchant === "NoKings Athletics" &&
+      ["GO", "CONDITIONAL GO"].includes(exercise008CertificationDecision) &&
+      exercise008CertificationMemo.evidenceChainReviewed &&
+      exercise008CertificationMemo.trustBadgeArchitectureCertified &&
+      exercise008CertificationMemo.repositoryTruthReviewed &&
+      exercise008CertificationMemo.readinessAssessment &&
+      exercise008CertificationMemo.unsupportedClaimsExcluded &&
+      exercise008CertificationMemo.mutationAndRollbackAssessment &&
+      exercise008CertificationMemo.nextCanonicalExercise &&
+      exercise008CertificationMemo.exercise009Recommended &&
+      exercise008CertificationMemo.noShopifyMutation);
   const certificationMemoReady = scopeIsExercise004
     ? exercise004CertificationReady
     : scopeIsExercise005
@@ -407,7 +428,7 @@ function evaluateNokingsMissionReadiness({
         : scopeIsExercise007
           ? exercise007CertificationReady
           : scopeIsExercise008
-            ? false
+            ? exercise008CertificationReady
             : false;
   const nextPlanningBlocker = activeExerciseDefinition?.nextPlanningBlocker || "Exercise 005 Planning Missing";
   const nextPlanningPhase = activeExerciseDefinition?.nextPlanningPhase || "exercise_005_planning";
@@ -501,7 +522,7 @@ function evaluateNokingsMissionReadiness({
       proof: proofReady ? stageStatus("pass", "Mission proof package recognized") : stageStatus("blocked", "Proof Package Missing"),
       mission_certification: proofReady
         ? (certificationMemoReady
-            ? stageStatus("pass", scopeIsExercise007 ? "Mission 001 Exercise 007 certified" : scopeIsExercise006 ? "Mission 001 Exercise 006 certified" : scopeIsExercise005 ? "Mission 001 Exercise 005 certified" : "Mission 001 Exercise 004 certified")
+            ? stageStatus("pass", scopeIsExercise008 ? "Mission 001 Exercise 008 certified" : scopeIsExercise007 ? "Mission 001 Exercise 007 certified" : scopeIsExercise006 ? "Mission 001 Exercise 006 certified" : scopeIsExercise005 ? "Mission 001 Exercise 005 certified" : "Mission 001 Exercise 004 certified")
             : stageStatus("blocked", "Mission Certification Missing"))
         : stageStatus("blocked", "Proof Package Missing"),
       exercise_005_planning: scopeIsExercise004 && certificationMemoReady ? stageStatus("blocked", "Exercise 005 Planning Missing") : stageStatus("blocked", scopeIsExercise008 ? "Superseded by Exercise 008 scope" : scopeIsExercise007 ? "Superseded by Exercise 007 scope" : scopeIsExercise006 ? "Superseded by Exercise 006 scope" : scopeIsExercise005 ? "Superseded by Exercise 006 planning" : "Mission Certification Missing"),
@@ -546,7 +567,7 @@ function evaluateNokingsMissionReadiness({
       afterPath,
       proofPackagePath,
       executionNotesPath,
-      scopeIsExercise008 ? exercise007CertificationMemoPath : scopeIsExercise007 ? exercise007CertificationMemoPath : scopeIsExercise006 ? exercise006CertificationMemoPath : scopeIsExercise005 ? exercise005CertificationMemoPath : certificationMemoPath
+      scopeIsExercise008 ? exercise008CertificationMemoPath : scopeIsExercise007 ? exercise007CertificationMemoPath : scopeIsExercise006 ? exercise006CertificationMemoPath : scopeIsExercise005 ? exercise005CertificationMemoPath : certificationMemoPath
     ],
     warnings: [
       "Mission 001 is a controlled training environment, not paid-commercial work.",
