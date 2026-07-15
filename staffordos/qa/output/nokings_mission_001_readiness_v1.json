@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.nokings_mission_001_readiness.v1",
-  "generated_at": "2026-07-15T02:54:16.376Z",
+  "generated_at": "2026-07-15T12:59:34.338Z",
   "status": "CONDITIONAL_GO",
   "production_operation_permitted": true,
   "completion_permitted": false,
@@ -16,15 +16,14 @@
     "proof_run_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"
   },
   "active_exercise": "Exercise 008 - Trust Badge Inventory",
-  "current_phase": "before_evidence",
-  "current_blocker": "Before Evidence Missing",
+  "current_phase": "trust_badge_inventory",
+  "current_blocker": "Trust Badge Inventory Not Performed",
   "blocking_reasons": [
-    "Before Evidence Missing",
     "Trust Badge Inventory Not Performed",
     "After Evidence Missing",
     "Proof Package Missing"
   ],
-  "next_safe_action": "Capture Before Evidence",
+  "next_safe_action": "Perform governed read-only trust badge inventory",
   "payment_required": false,
   "scope_authority": {
     "index_path": "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/fix_scope.md",
@@ -41,8 +40,8 @@
       "reason": "Governed mission scope established"
     },
     "before_evidence": {
-      "status": "blocked",
-      "reason": "Before Evidence Missing"
+      "status": "pass",
+      "reason": "Before evidence scaffold present"
     },
     "execution": {
       "status": "blocked",
@@ -88,7 +87,7 @@
   "scores": {
     "merchant_binding": 100,
     "scope": 100,
-    "before_evidence": 0,
+    "before_evidence": 100,
     "execution": 0,
     "after_evidence": 0,
     "proof": 0,
@@ -96,7 +95,7 @@
     "exercise_005_planning": 0,
     "rollback": 100,
     "payment": 100,
-    "overall": 40
+    "overall": 70
   },
   "evidence_sources": [
     "STAFFORDOS_MISSION_001_NOKINGS_TRAINING_V1.md",
