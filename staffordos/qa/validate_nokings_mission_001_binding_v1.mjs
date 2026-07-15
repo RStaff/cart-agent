@@ -593,6 +593,7 @@ function run() {
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_008/mission_proof_package.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_009/fix_scope.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_009/before_evidence.md",
+    "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_009/execution_notes.md",
     "staffordos/ui/operator-frontend/app/operator/shopifixer-pilot/page.tsx",
     "staffordos/ui/operator-frontend/components/operator/ShopifixerPilotWorkspace.tsx"
   ]);
@@ -1127,6 +1128,7 @@ function run() {
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_008/mission_proof_package.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_009/fix_scope.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_009/before_evidence.md",
+    "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_009/execution_notes.md",
     "staffordos/ui/operator-frontend/app/operator/shopifixer-pilot/page.tsx",
     "staffordos/ui/operator-frontend/components/operator/ShopifixerPilotWorkspace.tsx"
   ]);
@@ -1152,14 +1154,14 @@ function run() {
   });
   assert(actualReport.status === "CONDITIONAL_GO", "current readiness status remains CONDITIONAL_GO", failures);
   assert(actualReport.active_exercise === "Exercise 009 - Footer Inventory", "active exercise is Exercise 009", failures);
-  assert(actualReport.current_phase === "footer_inventory", "current phase is footer_inventory after Exercise 009 baseline", failures);
-  assert(actualReport.current_blocker === "Footer Inventory Not Performed", "current blocker is Footer Inventory Not Performed after Exercise 009 baseline", failures);
-  assert(actualReport.next_safe_action === "Perform governed read-only footer inventory", "next safe action is the Exercise 009 footer inventory", failures);
+  assert(actualReport.current_phase === "after_evidence", "current phase is after_evidence after Exercise 009 footer inventory", failures);
+  assert(actualReport.current_blocker === "After Evidence Missing", "current blocker is After Evidence Missing after Exercise 009 footer inventory", failures);
+  assert(actualReport.next_safe_action === "Capture After Evidence", "next safe action is Exercise 009 after evidence", failures);
   assert(actualReport.payment_required === false, "payment_required remains false", failures);
   assert(actualReport.completion_permitted === false, "completion remains prohibited", failures);
   assert(actualReport.gates.scope.status === "pass", "exercise 009 scope resolves from exercise_009/fix_scope.md", failures);
   assert(actualReport.gates.before_evidence.status === "pass", "exercise 009 before evidence gate passes when baseline is valid", failures);
-  assert(actualReport.gates.execution.status === "blocked", "footer inventory remains blocked until performed", failures);
+  assert(actualReport.gates.execution.status === "pass", "exercise 009 execution gate passes when footer inventory is valid", failures);
   assert(actualReport.gates.after_evidence.status === "blocked", "exercise 009 after evidence remains blocked until captured", failures);
   assert(actualReport.gates.proof.status === "blocked", "exercise 009 proof remains blocked until proof package exists", failures);
   assert(actualReport.gates.mission_certification.status === "blocked", "exercise 009 certification remains blocked until proof package exists", failures);
