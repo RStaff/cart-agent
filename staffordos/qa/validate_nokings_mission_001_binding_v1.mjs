@@ -396,6 +396,77 @@ function exercise006CertificationMemo({
 `;
 }
 
+function exercise007CertificationMemo({
+  exercise = "Exercise 007 - Header Navigation Inventory",
+  canonicalStore = "no-kings-athletics.myshopify.com",
+  decision = "CONDITIONAL GO"
+} = {}) {
+  return `# Mission 001 Exercise 007 Certification
+
+## Identity
+- Mission ID: \`mission_001\`
+- Mission: \`Mission 001 - NoKings Shopify Engineering Training\`
+- Exercise ID: \`exercise_007\`
+- Exercise: \`${exercise}\`
+- Merchant: \`NoKings Athletics\`
+- Canonical store: \`${canonicalStore}\`
+- Product: \`ShopiFixer\`
+- Environment type: \`controlled_training\`
+- Authority mode: \`analysis-only\`
+- Payment required: \`false\`
+
+## Evidence Chain Verification
+- Exercise-specific scope, before evidence, execution notes, after evidence, and mission proof package were reviewed.
+- No mission-root payload file was used as active authority.
+
+## Header Navigation Architecture Certified
+- Header group entry point: \`sections/header-group.json\`
+- Header section: \`sections/header.liquid\`
+- Desktop navigation, mobile drawer, header actions, search, predictive search, and mega-menu architecture were certified from repository-backed evidence.
+
+## Repository Truth Reviewed
+- Mission binding
+- Exercise 007 scope
+- Exercise 007 before evidence
+- Exercise 007 execution notes
+- Exercise 007 after evidence
+- Exercise 007 mission proof package
+
+## Unsupported Claims Explicitly Excluded
+- Runtime menu state
+- Runtime predictive search behavior
+- Runtime mega-menu state
+- Conversion improvement
+- Merchant outcomes
+- Production deployment
+- Revenue impact
+- Payment
+- Completion of Mission 001
+
+## Mutation And Rollback Assessment
+- Shopify mutations performed: None
+- Shopify rollback required: No
+
+## Readiness Assessment
+- Current phase before certification: \`mission_certification\`
+- Next phase after certification: \`exercise_008_planning\`
+
+## Next Canonical Exercise
+- Exercise ID: \`ex_008_trust_badge_inventory\`
+- Exercise: \`Exercise 008 - Trust Badge Inventory\`
+- Objective: identify how trust badges and CTA trust styling are implemented.
+
+## Certification Decision
+**${decision}**
+
+## Confirmation
+- No Shopify mutation occurred.
+- Exercise 007 is closed.
+- Mission 001 remains active.
+
+`;
+}
+
 function writeFixture({
   root,
   binding,
@@ -479,7 +550,8 @@ function runReadiness(root) {
     proofRunDir: path.join(root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"),
     certificationMemoPath: path.join(root, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md"),
     exercise005CertificationMemoPath: path.join(root, "staffordos/implementation/p11_7_mission_001_exercise_005_certification_v1.md"),
-    exercise006CertificationMemoPath: path.join(root, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md")
+    exercise006CertificationMemoPath: path.join(root, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md"),
+    exercise007CertificationMemoPath: path.join(root, "staffordos/implementation/p11_21_mission_001_exercise_007_certification_v1.md")
   });
 }
 
@@ -497,6 +569,7 @@ function run() {
     "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md",
     "staffordos/implementation/p11_7_mission_001_exercise_005_certification_v1.md",
     "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md",
+    "staffordos/implementation/p11_21_mission_001_exercise_007_certification_v1.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/fix_scope.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/before_evidence.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/execution_notes.md",
@@ -757,7 +830,8 @@ function run() {
     proofRunDir: path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"),
     certificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md"),
     exercise005CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_7_mission_001_exercise_005_certification_v1.md"),
-    exercise006CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md")
+    exercise006CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md"),
+    exercise007CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_21_mission_001_exercise_007_certification_v1.md")
   });
   assert(completedCartProofPackageReport.current_phase === "mission_certification", "completed exercise 006 proof package advances to mission_certification", failures);
   assert(completedCartProofPackageReport.current_blocker === "Mission Certification Missing", "completed exercise 006 proof package exposes the certification blocker", failures);
@@ -772,7 +846,8 @@ function run() {
     proofRunDir: path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"),
     certificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md"),
     exercise005CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_7_mission_001_exercise_005_certification_v1.md"),
-    exercise006CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md")
+    exercise006CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md"),
+    exercise007CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_21_mission_001_exercise_007_certification_v1.md")
   });
   assert(completedCartCertificationReport.current_phase === "exercise_007_planning", "valid exercise 006 certification advances to exercise_007_planning", failures);
   assert(completedCartCertificationReport.current_blocker === "Exercise 007 Planning Missing", "valid exercise 006 certification exposes exercise 007 planning blocker", failures);
@@ -791,7 +866,8 @@ function run() {
     proofRunDir: path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"),
     certificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md"),
     exercise005CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_7_mission_001_exercise_005_certification_v1.md"),
-    exercise006CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md")
+    exercise006CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md"),
+    exercise007CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_21_mission_001_exercise_007_certification_v1.md")
   });
   assert(exercise007ScopeReport.active_exercise === "Exercise 007 - Header Navigation Inventory", "valid exercise 007 scope becomes the active exercise", failures);
   assert(exercise007ScopeReport.current_phase === "before_evidence", "valid exercise 007 scope advances to before_evidence", failures);
@@ -809,7 +885,8 @@ function run() {
     proofRunDir: path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"),
     certificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md"),
     exercise005CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_7_mission_001_exercise_005_certification_v1.md"),
-    exercise006CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md")
+    exercise006CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md"),
+    exercise007CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_21_mission_001_exercise_007_certification_v1.md")
   });
   assert(exercise007BaselineReport.current_phase === "header_navigation_inventory", "valid exercise 007 baseline advances to header_navigation_inventory", failures);
   assert(exercise007BaselineReport.current_blocker === "Header Navigation Inventory Not Performed", "valid exercise 007 baseline exposes the header navigation inventory blocker", failures);
@@ -823,7 +900,8 @@ function run() {
     proofRunDir: path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"),
     certificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md"),
     exercise005CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_7_mission_001_exercise_005_certification_v1.md"),
-    exercise006CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md")
+    exercise006CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md"),
+    exercise007CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_21_mission_001_exercise_007_certification_v1.md")
   });
   assert(exercise007InventoryReport.current_phase === "after_evidence", "valid exercise 007 inventory advances to after_evidence", failures);
   assert(exercise007InventoryReport.current_blocker === "After Evidence Missing", "valid exercise 007 inventory exposes the after evidence blocker", failures);
@@ -837,7 +915,8 @@ function run() {
     proofRunDir: path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"),
     certificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md"),
     exercise005CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_7_mission_001_exercise_005_certification_v1.md"),
-    exercise006CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md")
+    exercise006CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md"),
+    exercise007CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_21_mission_001_exercise_007_certification_v1.md")
   });
   assert(exercise007AfterEvidenceReport.current_phase === "proof_package", "valid exercise 007 after evidence advances to proof_package", failures);
   assert(exercise007AfterEvidenceReport.current_blocker === "Proof Package Missing", "valid exercise 007 after evidence exposes the proof package blocker", failures);
@@ -851,13 +930,31 @@ function run() {
     proofRunDir: path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"),
     certificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md"),
     exercise005CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_7_mission_001_exercise_005_certification_v1.md"),
-    exercise006CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md")
+    exercise006CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md"),
+    exercise007CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_21_mission_001_exercise_007_certification_v1.md")
   });
   assert(exercise007ProofPackageReport.current_phase === "mission_certification", "valid exercise 007 proof package advances to mission_certification", failures);
   assert(exercise007ProofPackageReport.current_blocker === "Mission Certification Missing", "valid exercise 007 proof package exposes the mission certification blocker", failures);
   assert(exercise007ProofPackageReport.next_safe_action === "Certify Exercise 007", "valid exercise 007 proof package next action is certification", failures);
   assert(exercise007ProofPackageReport.gates.proof.status === "pass", "exercise 007 proof gate passes when proof package is valid", failures);
   assert(exercise007ProofPackageReport.gates.mission_certification.status === "blocked", "exercise 007 mission certification remains blocked until certified", failures);
+
+  writeText(path.join(exercise005Root, "staffordos/implementation/p11_21_mission_001_exercise_007_certification_v1.md"), exercise007CertificationMemo());
+  const exercise007CertificationReport = evaluateNokingsMissionReadiness({
+    repoRoot: REPO_ROOT,
+    bindingPath: path.join(exercise005Root, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
+    proofRunDir: path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"),
+    certificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md"),
+    exercise005CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_7_mission_001_exercise_005_certification_v1.md"),
+    exercise006CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md"),
+    exercise007CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_21_mission_001_exercise_007_certification_v1.md")
+  });
+  assert(exercise007CertificationReport.current_phase === "exercise_008_planning", "valid exercise 007 certification advances to exercise_008_planning", failures);
+  assert(exercise007CertificationReport.current_blocker === "Exercise 008 Planning Missing", "valid exercise 007 certification exposes exercise 008 planning blocker", failures);
+  assert(exercise007CertificationReport.next_safe_action === "Plan Exercise 008 - Trust Badge Inventory", "valid exercise 007 certification next action is Exercise 008 planning", failures);
+  assert(exercise007CertificationReport.gates.mission_certification.status === "pass", "mission certification gate passes when Exercise 007 certification is valid", failures);
+  assert(exercise007CertificationReport.payment_required === false, "exercise 007 certification keeps payment not required", failures);
+  assert(exercise007CertificationReport.completion_permitted === false, "exercise 007 certification keeps completion prohibited", failures);
   fs.unlinkSync(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/mission_proof_package.md"));
   fs.unlinkSync(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/after_evidence.md"));
   fs.unlinkSync(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/execution_notes.md"));
@@ -924,6 +1021,7 @@ function run() {
     "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md",
     "staffordos/implementation/p11_7_mission_001_exercise_005_certification_v1.md",
     "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md",
+    "staffordos/implementation/p11_21_mission_001_exercise_007_certification_v1.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/fix_scope.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/before_evidence.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/execution_notes.md",
@@ -949,13 +1047,14 @@ function run() {
     proofRunDir: PROOF_RUN_DIR,
     certificationMemoPath: path.join(REPO_ROOT, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md"),
     exercise005CertificationMemoPath: path.join(REPO_ROOT, "staffordos/implementation/p11_7_mission_001_exercise_005_certification_v1.md"),
-    exercise006CertificationMemoPath: path.join(REPO_ROOT, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md")
+    exercise006CertificationMemoPath: path.join(REPO_ROOT, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md"),
+    exercise007CertificationMemoPath: path.join(REPO_ROOT, "staffordos/implementation/p11_21_mission_001_exercise_007_certification_v1.md")
   });
   assert(actualReport.status === "CONDITIONAL_GO", "current readiness status remains CONDITIONAL_GO", failures);
   assert(actualReport.active_exercise === "Exercise 007 - Header Navigation Inventory", "active exercise is Exercise 007", failures);
-  assert(actualReport.current_phase === "mission_certification", "current phase is mission_certification after Exercise 007 proof package", failures);
-  assert(actualReport.current_blocker === "Mission Certification Missing", "current blocker is Mission Certification Missing after Exercise 007 proof package", failures);
-  assert(actualReport.next_safe_action === "Certify Exercise 007", "next safe action is certification after Exercise 007 proof package", failures);
+  assert(actualReport.current_phase === "exercise_008_planning", "current phase is exercise_008_planning after Exercise 007 certification", failures);
+  assert(actualReport.current_blocker === "Exercise 008 Planning Missing", "current blocker is Exercise 008 Planning Missing after Exercise 007 certification", failures);
+  assert(actualReport.next_safe_action === "Plan Exercise 008 - Trust Badge Inventory", "next safe action is Exercise 008 planning after Exercise 007 certification", failures);
   assert(actualReport.payment_required === false, "payment_required remains false", failures);
   assert(actualReport.completion_permitted === false, "completion remains prohibited", failures);
   assert(actualReport.gates.scope.status === "pass", "exercise 007 scope is complete", failures);
@@ -963,9 +1062,10 @@ function run() {
   assert(actualReport.gates.execution.status === "pass", "header navigation inventory passes after inventory is performed", failures);
   assert(actualReport.gates.after_evidence.status === "pass", "after evidence passes after Exercise 007 after evidence is captured", failures);
   assert(actualReport.gates.proof.status === "pass", "proof package passes after Exercise 007 proof package exists", failures);
-  assert(actualReport.gates.mission_certification.status === "blocked", "mission certification is blocked until Exercise 007 is certified", failures);
+  assert(actualReport.gates.mission_certification.status === "pass", "mission certification passes after Exercise 007 is certified", failures);
   assert(actualReport.gates.exercise_006_planning.status === "pass", "Exercise 006 planning passes after scope creation", failures);
   assert(actualReport.gates.exercise_007_planning.status === "pass", "Exercise 007 planning passes after scope creation", failures);
+  assert(actualReport.gates.exercise_008_planning.status === "blocked", "Exercise 008 planning is the next blocker after Exercise 007 certification", failures);
 
   if (failures.length) {
     console.error(JSON.stringify({ status: "failed", failures }, null, 2));
