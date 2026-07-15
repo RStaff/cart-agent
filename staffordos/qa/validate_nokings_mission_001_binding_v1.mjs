@@ -500,6 +500,8 @@ function run() {
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/fix_scope.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/before_evidence.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/execution_notes.md",
+    "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/after_evidence.md",
+    "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/mission_proof_package.md",
     "staffordos/ui/operator-frontend/app/operator/shopifixer-pilot/page.tsx",
     "staffordos/ui/operator-frontend/components/operator/ShopifixerPilotWorkspace.tsx"
   ]);
@@ -828,6 +830,36 @@ function run() {
   assert(exercise007InventoryReport.next_safe_action === "Capture After Evidence", "valid exercise 007 inventory next action is after evidence", failures);
   assert(exercise007InventoryReport.gates.execution.status === "pass", "exercise 007 execution gate passes when header navigation inventory is valid", failures);
   assert(exercise007InventoryReport.gates.after_evidence.status === "blocked", "exercise 007 after evidence remains blocked until captured", failures);
+  writeText(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/after_evidence.md"), `# After Evidence\n\nStatus:\nComplete\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise:\nExercise 007 - Header Navigation Inventory\n\nStore:\nno-kings-athletics.myshopify.com\n\nObjective:\nHeader navigation inventory completion evidence.\n\nAffected Page / Artifact:\nHeader Navigation Inventory completion evidence\n\nIssue:\nHeader navigation inventory completed from repository-backed source files.\n\nObserved Improvement:\nNot Claimed\n\nMerchant-Facing Summary:\nNot Claimed\n\nRemaining Limitations:\nRuntime header navigation behavior remains Not Yet Proven.\n\nScreenshot:\nNot Yet Proven\n\nNotes:\n- Header navigation after evidence only.\n- No Shopify mutation occurred.\n`);
+  const exercise007AfterEvidenceReport = evaluateNokingsMissionReadiness({
+    repoRoot: REPO_ROOT,
+    bindingPath: path.join(exercise005Root, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
+    proofRunDir: path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"),
+    certificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md"),
+    exercise005CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_7_mission_001_exercise_005_certification_v1.md"),
+    exercise006CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md")
+  });
+  assert(exercise007AfterEvidenceReport.current_phase === "proof_package", "valid exercise 007 after evidence advances to proof_package", failures);
+  assert(exercise007AfterEvidenceReport.current_blocker === "Proof Package Missing", "valid exercise 007 after evidence exposes the proof package blocker", failures);
+  assert(exercise007AfterEvidenceReport.next_safe_action === "Generate Exercise 007 Mission Proof Package", "valid exercise 007 after evidence next action is proof package", failures);
+  assert(exercise007AfterEvidenceReport.gates.after_evidence.status === "pass", "exercise 007 after evidence gate passes when completion evidence is valid", failures);
+  assert(exercise007AfterEvidenceReport.gates.proof.status === "blocked", "exercise 007 proof remains blocked until proof package is generated", failures);
+  writeText(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/mission_proof_package.md"), `# Mission Proof Package\n\nStatus:\nAssembled\n\nMission ID:\nmission_001\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise ID:\nexercise_007\n\nExercise:\nExercise 007 - Header Navigation Inventory\n\nMerchant:\nNoKings Athletics\n\nStore:\nno-kings-athletics.myshopify.com\n\nObjective:\nHeader navigation proof package from exercise-specific artifacts.\n\nNotes:\n- Header navigation proof package only.\n- No Shopify mutation occurred.\n`);
+  const exercise007ProofPackageReport = evaluateNokingsMissionReadiness({
+    repoRoot: REPO_ROOT,
+    bindingPath: path.join(exercise005Root, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
+    proofRunDir: path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"),
+    certificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md"),
+    exercise005CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_7_mission_001_exercise_005_certification_v1.md"),
+    exercise006CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md")
+  });
+  assert(exercise007ProofPackageReport.current_phase === "mission_certification", "valid exercise 007 proof package advances to mission_certification", failures);
+  assert(exercise007ProofPackageReport.current_blocker === "Mission Certification Missing", "valid exercise 007 proof package exposes the mission certification blocker", failures);
+  assert(exercise007ProofPackageReport.next_safe_action === "Certify Exercise 007", "valid exercise 007 proof package next action is certification", failures);
+  assert(exercise007ProofPackageReport.gates.proof.status === "pass", "exercise 007 proof gate passes when proof package is valid", failures);
+  assert(exercise007ProofPackageReport.gates.mission_certification.status === "blocked", "exercise 007 mission certification remains blocked until certified", failures);
+  fs.unlinkSync(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/mission_proof_package.md"));
+  fs.unlinkSync(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/after_evidence.md"));
   fs.unlinkSync(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/execution_notes.md"));
   fs.unlinkSync(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/before_evidence.md"));
   fs.unlinkSync(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/fix_scope.md"));
@@ -895,6 +927,8 @@ function run() {
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/fix_scope.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/before_evidence.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/execution_notes.md",
+    "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/after_evidence.md",
+    "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/mission_proof_package.md",
     "staffordos/ui/operator-frontend/app/operator/shopifixer-pilot/page.tsx",
     "staffordos/ui/operator-frontend/components/operator/ShopifixerPilotWorkspace.tsx"
   ]);
@@ -919,17 +953,17 @@ function run() {
   });
   assert(actualReport.status === "CONDITIONAL_GO", "current readiness status remains CONDITIONAL_GO", failures);
   assert(actualReport.active_exercise === "Exercise 007 - Header Navigation Inventory", "active exercise is Exercise 007", failures);
-  assert(actualReport.current_phase === "after_evidence", "current phase is after_evidence after Exercise 007 inventory", failures);
-  assert(actualReport.current_blocker === "After Evidence Missing", "current blocker is After Evidence Missing after Exercise 007 inventory", failures);
-  assert(actualReport.next_safe_action === "Capture After Evidence", "next safe action is after evidence after Exercise 007 inventory", failures);
+  assert(actualReport.current_phase === "mission_certification", "current phase is mission_certification after Exercise 007 proof package", failures);
+  assert(actualReport.current_blocker === "Mission Certification Missing", "current blocker is Mission Certification Missing after Exercise 007 proof package", failures);
+  assert(actualReport.next_safe_action === "Certify Exercise 007", "next safe action is certification after Exercise 007 proof package", failures);
   assert(actualReport.payment_required === false, "payment_required remains false", failures);
   assert(actualReport.completion_permitted === false, "completion remains prohibited", failures);
   assert(actualReport.gates.scope.status === "pass", "exercise 007 scope is complete", failures);
   assert(actualReport.gates.before_evidence.status === "pass", "before evidence passes after Exercise 007 baseline is captured", failures);
   assert(actualReport.gates.execution.status === "pass", "header navigation inventory passes after inventory is performed", failures);
-  assert(actualReport.gates.after_evidence.status === "blocked", "after evidence is blocked until after evidence is captured", failures);
-  assert(actualReport.gates.proof.status === "blocked", "proof package is blocked until Exercise 007 evidence exists", failures);
-  assert(actualReport.gates.mission_certification.status === "blocked", "mission certification is blocked until Exercise 007 proof exists", failures);
+  assert(actualReport.gates.after_evidence.status === "pass", "after evidence passes after Exercise 007 after evidence is captured", failures);
+  assert(actualReport.gates.proof.status === "pass", "proof package passes after Exercise 007 proof package exists", failures);
+  assert(actualReport.gates.mission_certification.status === "blocked", "mission certification is blocked until Exercise 007 is certified", failures);
   assert(actualReport.gates.exercise_006_planning.status === "pass", "Exercise 006 planning passes after scope creation", failures);
   assert(actualReport.gates.exercise_007_planning.status === "pass", "Exercise 007 planning passes after scope creation", failures);
 
