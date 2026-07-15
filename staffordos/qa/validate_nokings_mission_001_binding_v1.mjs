@@ -588,6 +588,7 @@ function run() {
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_008/fix_scope.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_008/before_evidence.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_008/execution_notes.md",
+    "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_008/after_evidence.md",
     "staffordos/ui/operator-frontend/app/operator/shopifixer-pilot/page.tsx",
     "staffordos/ui/operator-frontend/components/operator/ShopifixerPilotWorkspace.tsx"
   ]);
@@ -1023,6 +1024,22 @@ function run() {
   assert(exercise008InventoryReport.next_safe_action === "Capture After Evidence", "valid exercise 008 inventory next action is after evidence", failures);
   assert(exercise008InventoryReport.gates.execution.status === "pass", "exercise 008 execution gate passes when trust badge inventory is valid", failures);
   assert(exercise008InventoryReport.gates.after_evidence.status === "blocked", "exercise 008 after evidence remains blocked until captured", failures);
+  writeText(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_008/after_evidence.md"), `# After Evidence\n\nStatus:\nComplete\n\nMission:\nMission 001 - NoKings Shopify Engineering Training\n\nExercise:\nExercise 008 - Trust Badge Inventory\n\nStore:\nno-kings-athletics.myshopify.com\n\nObjective:\nTrust badge inventory completion evidence.\n\nAffected Page / Artifact:\nTrust Badge Inventory completion evidence\n\nIssue:\nTrust badge, payment icon, checkout-readiness, shipping, returns, and CTA reassurance inventory completed from repository-backed source files.\n\nObserved Improvement:\nNot Claimed\n\nMerchant-Facing Summary:\nNot Claimed\n\nRemaining Limitations:\nRuntime trust, payment, policy, app, metafield, and checkout behavior remain Not Yet Proven.\n\nScreenshot:\nNot Yet Proven\n\nNotes:\n- Trust badge after evidence only.\n- No Shopify mutation occurred.\n`);
+  const exercise008AfterEvidenceReport = evaluateNokingsMissionReadiness({
+    repoRoot: REPO_ROOT,
+    bindingPath: path.join(exercise005Root, "staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json"),
+    proofRunDir: path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"),
+    certificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md"),
+    exercise005CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_7_mission_001_exercise_005_certification_v1.md"),
+    exercise006CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md"),
+    exercise007CertificationMemoPath: path.join(exercise005Root, "staffordos/implementation/p11_21_mission_001_exercise_007_certification_v1.md")
+  });
+  assert(exercise008AfterEvidenceReport.current_phase === "proof_package", "valid exercise 008 after evidence advances to proof_package", failures);
+  assert(exercise008AfterEvidenceReport.current_blocker === "Proof Package Missing", "valid exercise 008 after evidence exposes proof package blocker", failures);
+  assert(exercise008AfterEvidenceReport.next_safe_action === "Generate Exercise 008 Mission Proof Package", "valid exercise 008 after evidence next action is proof package generation", failures);
+  assert(exercise008AfterEvidenceReport.gates.after_evidence.status === "pass", "exercise 008 after evidence gate passes when completion evidence is valid", failures);
+  assert(exercise008AfterEvidenceReport.gates.proof.status === "blocked", "exercise 008 proof remains blocked until proof package exists", failures);
+  fs.unlinkSync(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_008/after_evidence.md"));
   fs.unlinkSync(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_008/execution_notes.md"));
   fs.unlinkSync(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_008/before_evidence.md"));
   fs.unlinkSync(path.join(exercise005Root, "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_008/fix_scope.md"));
@@ -1101,6 +1118,7 @@ function run() {
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_008/fix_scope.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_008/before_evidence.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_008/execution_notes.md",
+    "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_008/after_evidence.md",
     "staffordos/ui/operator-frontend/app/operator/shopifixer-pilot/page.tsx",
     "staffordos/ui/operator-frontend/components/operator/ShopifixerPilotWorkspace.tsx"
   ]);
@@ -1126,15 +1144,15 @@ function run() {
   });
   assert(actualReport.status === "CONDITIONAL_GO", "current readiness status remains CONDITIONAL_GO", failures);
   assert(actualReport.active_exercise === "Exercise 008 - Trust Badge Inventory", "active exercise is Exercise 008", failures);
-  assert(actualReport.current_phase === "after_evidence", "current phase is after_evidence after Exercise 008 inventory", failures);
-  assert(actualReport.current_blocker === "After Evidence Missing", "current blocker is After Evidence Missing after Exercise 008 inventory", failures);
-  assert(actualReport.next_safe_action === "Capture After Evidence", "next safe action is after evidence after Exercise 008 inventory", failures);
+  assert(actualReport.current_phase === "proof_package", "current phase is proof_package after Exercise 008 after evidence", failures);
+  assert(actualReport.current_blocker === "Proof Package Missing", "current blocker is Proof Package Missing after Exercise 008 after evidence", failures);
+  assert(actualReport.next_safe_action === "Generate Exercise 008 Mission Proof Package", "next safe action is Exercise 008 proof package generation", failures);
   assert(actualReport.payment_required === false, "payment_required remains false", failures);
   assert(actualReport.completion_permitted === false, "completion remains prohibited", failures);
   assert(actualReport.gates.scope.status === "pass", "exercise 008 scope is complete", failures);
   assert(actualReport.gates.before_evidence.status === "pass", "before evidence passes after Exercise 008 baseline is captured", failures);
   assert(actualReport.gates.execution.status === "pass", "trust badge inventory passes after Exercise 008 inventory is performed", failures);
-  assert(actualReport.gates.after_evidence.status === "blocked", "after evidence remains blocked until Exercise 008 after evidence is captured", failures);
+  assert(actualReport.gates.after_evidence.status === "pass", "after evidence passes after Exercise 008 after evidence is captured", failures);
   assert(actualReport.gates.proof.status === "blocked", "proof package remains blocked until Exercise 008 proof package exists", failures);
   assert(actualReport.gates.mission_certification.status === "blocked", "mission certification remains blocked until Exercise 008 proof package exists", failures);
   assert(actualReport.gates.exercise_006_planning.status === "pass", "Exercise 006 planning passes after scope creation", failures);
