@@ -581,6 +581,7 @@ function run() {
     "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md",
     "staffordos/implementation/p11_21_mission_001_exercise_007_certification_v1.md",
     "staffordos/implementation/p11_28_mission_001_exercise_008_certification_v1.md",
+    "staffordos/implementation/p11_36_mission_001_exercise_009_certification_v1.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/fix_scope.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/before_evidence.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/execution_notes.md",
@@ -1118,6 +1119,7 @@ function run() {
     "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md",
     "staffordos/implementation/p11_21_mission_001_exercise_007_certification_v1.md",
     "staffordos/implementation/p11_28_mission_001_exercise_008_certification_v1.md",
+    "staffordos/implementation/p11_36_mission_001_exercise_009_certification_v1.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/fix_scope.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/before_evidence.md",
     "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_007/execution_notes.md",
@@ -1158,9 +1160,9 @@ function run() {
   });
   assert(actualReport.status === "CONDITIONAL_GO", "current readiness status remains CONDITIONAL_GO", failures);
   assert(actualReport.active_exercise === "Exercise 009 - Footer Inventory", "active exercise is Exercise 009", failures);
-  assert(actualReport.current_phase === "mission_certification", "current phase is mission_certification after Exercise 009 proof package", failures);
-  assert(actualReport.current_blocker === "Mission Certification Missing", "current blocker is Mission Certification Missing after Exercise 009 proof package", failures);
-  assert(actualReport.next_safe_action === "Certify Exercise 009", "next safe action is Exercise 009 certification", failures);
+  assert(actualReport.current_phase === "exercise_010_planning", "current phase is exercise_010_planning after Exercise 009 certification", failures);
+  assert(actualReport.current_blocker === "Exercise 010 Planning Missing", "current blocker is Exercise 010 Planning Missing after Exercise 009 certification", failures);
+  assert(actualReport.next_safe_action === "Plan Exercise 010 - Safe Edit Simulation", "next safe action is Exercise 010 planning", failures);
   assert(actualReport.payment_required === false, "payment_required remains false", failures);
   assert(actualReport.completion_permitted === false, "completion remains prohibited", failures);
   assert(actualReport.gates.scope.status === "pass", "exercise 009 scope resolves from exercise_009/fix_scope.md", failures);
@@ -1168,7 +1170,7 @@ function run() {
   assert(actualReport.gates.execution.status === "pass", "exercise 009 execution gate passes when footer inventory is valid", failures);
   assert(actualReport.gates.after_evidence.status === "pass", "exercise 009 after evidence gate passes when completion evidence is valid", failures);
   assert(actualReport.gates.proof.status === "pass", "exercise 009 proof gate passes when proof package is valid", failures);
-  assert(actualReport.gates.mission_certification.status === "blocked", "exercise 009 certification remains blocked until certified", failures);
+  assert(actualReport.gates.mission_certification.status === "pass", "mission certification passes after Exercise 009 certification exists", failures);
   assert(actualReport.gates.exercise_006_planning.status === "pass", "Exercise 006 planning passes after scope creation", failures);
   assert(actualReport.gates.exercise_007_planning.status === "pass", "Exercise 007 planning passes after scope creation", failures);
   assert(actualReport.gates.exercise_008_planning.status === "pass", "Exercise 008 planning passes after scope creation", failures);
