@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.nokings_mission_001_readiness.v1",
-  "generated_at": "2026-07-16T20:28:15.681Z",
+  "generated_at": "2026-07-16T21:22:03.321Z",
   "status": "CONDITIONAL_GO",
   "production_operation_permitted": true,
   "completion_permitted": false,
@@ -15,18 +15,21 @@
     "proof_run_id": "mission_001_nokings_shopifixer_v1",
     "proof_run_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"
   },
-  "active_exercise": "Exercise 009 - Footer Inventory",
-  "current_phase": "exercise_010_planning",
-  "current_blocker": "Exercise 010 Planning Missing",
+  "active_exercise": "Exercise 010 - Safe Edit Simulation",
+  "current_phase": "before_evidence",
+  "current_blocker": "Before Evidence Missing",
   "blocking_reasons": [
-    "Exercise 010 Planning Missing"
+    "Before Evidence Missing",
+    "Safe Edit Simulation Not Performed",
+    "After Evidence Missing",
+    "Proof Package Missing"
   ],
-  "next_safe_action": "Plan Exercise 010 - Safe Edit Simulation",
+  "next_safe_action": "Capture Before Evidence",
   "payment_required": false,
   "scope_authority": {
     "index_path": "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/fix_scope.md",
-    "active_scope_path": "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_009/fix_scope.md",
-    "active_exercise": "Exercise 009 - Footer Inventory"
+    "active_scope_path": "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_010/fix_scope.md",
+    "active_exercise": "Exercise 010 - Safe Edit Simulation"
   },
   "gates": {
     "merchant_binding": {
@@ -38,28 +41,28 @@
       "reason": "Governed mission scope established"
     },
     "before_evidence": {
-      "status": "pass",
-      "reason": "Before evidence scaffold present"
+      "status": "blocked",
+      "reason": "Before Evidence Missing"
     },
     "execution": {
-      "status": "pass",
-      "reason": "Governed analysis completed and next phase may proceed"
+      "status": "blocked",
+      "reason": "Safe Edit Simulation Not Performed"
     },
     "after_evidence": {
-      "status": "pass",
-      "reason": "After evidence scaffold present"
+      "status": "blocked",
+      "reason": "After Evidence Missing"
     },
     "proof": {
-      "status": "pass",
-      "reason": "Mission proof package recognized"
+      "status": "blocked",
+      "reason": "Proof Package Missing"
     },
     "mission_certification": {
-      "status": "pass",
-      "reason": "Mission 001 Exercise 009 certified"
+      "status": "blocked",
+      "reason": "Proof Package Missing"
     },
     "exercise_005_planning": {
       "status": "blocked",
-      "reason": "Superseded by Exercise 009 scope"
+      "reason": "Mission Certification Missing"
     },
     "exercise_006_planning": {
       "status": "pass",
@@ -77,6 +80,10 @@
       "status": "pass",
       "reason": "Exercise 009 scope created"
     },
+    "exercise_010_planning": {
+      "status": "pass",
+      "reason": "Exercise 010 scope created"
+    },
     "rollback": {
       "status": "pass",
       "reason": "Separate mission proof-run path is available for rollback"
@@ -89,15 +96,15 @@
   "scores": {
     "merchant_binding": 100,
     "scope": 100,
-    "before_evidence": 100,
-    "execution": 100,
-    "after_evidence": 100,
-    "proof": 100,
-    "mission_certification": 100,
+    "before_evidence": 0,
+    "execution": 0,
+    "after_evidence": 0,
+    "proof": 0,
+    "mission_certification": 0,
     "exercise_005_planning": 0,
     "rollback": 100,
     "payment": 100,
-    "overall": 80
+    "overall": 40
   },
   "evidence_sources": [
     "STAFFORDOS_MISSION_001_NOKINGS_TRAINING_V1.md",
@@ -114,12 +121,12 @@
     "staffordos/audits/no_kings/execution_truth/theme_pull_test_v2.txt",
     "/Users/rossstafford/projects/cart-agent/staffordos/missions/mission_001_nokings_shopifixer_binding_v1.json",
     "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/fix_scope.md",
-    "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_009/fix_scope.md",
-    "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_009/before_evidence.md",
-    "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_009/after_evidence.md",
-    "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_009/mission_proof_package.md",
-    "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_009/execution_notes.md",
-    "/Users/rossstafford/projects/cart-agent/staffordos/implementation/p11_36_mission_001_exercise_009_certification_v1.md"
+    "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_010/fix_scope.md",
+    "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_010/before_evidence.md",
+    "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_010/after_evidence.md",
+    "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_010/mission_proof_package.md",
+    "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_010/execution_notes.md",
+    "/Users/rossstafford/projects/cart-agent/staffordos/implementation/p10_9_mission_001_exercise_004_certification_v1.md"
   ],
   "warnings": [
     "Mission 001 is a controlled training environment, not paid-commercial work.",

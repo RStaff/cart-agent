@@ -1159,22 +1159,23 @@ function run() {
     exercise007CertificationMemoPath: path.join(REPO_ROOT, "staffordos/implementation/p11_21_mission_001_exercise_007_certification_v1.md")
   });
   assert(actualReport.status === "CONDITIONAL_GO", "current readiness status remains CONDITIONAL_GO", failures);
-  assert(actualReport.active_exercise === "Exercise 009 - Footer Inventory", "active exercise is Exercise 009", failures);
-  assert(actualReport.current_phase === "exercise_010_planning", "current phase is exercise_010_planning after Exercise 009 certification", failures);
-  assert(actualReport.current_blocker === "Exercise 010 Planning Missing", "current blocker is Exercise 010 Planning Missing after Exercise 009 certification", failures);
-  assert(actualReport.next_safe_action === "Plan Exercise 010 - Safe Edit Simulation", "next safe action is Exercise 010 planning", failures);
+  assert(actualReport.active_exercise === "Exercise 010 - Safe Edit Simulation", "active exercise is Exercise 010", failures);
+  assert(actualReport.current_phase === "before_evidence", "current phase is before_evidence after Exercise 010 scope creation", failures);
+  assert(actualReport.current_blocker === "Before Evidence Missing", "current blocker is Before Evidence Missing after Exercise 010 scope creation", failures);
+  assert(actualReport.next_safe_action === "Capture Before Evidence", "next safe action is capture before evidence", failures);
   assert(actualReport.payment_required === false, "payment_required remains false", failures);
   assert(actualReport.completion_permitted === false, "completion remains prohibited", failures);
-  assert(actualReport.gates.scope.status === "pass", "exercise 009 scope resolves from exercise_009/fix_scope.md", failures);
-  assert(actualReport.gates.before_evidence.status === "pass", "exercise 009 before evidence gate passes when baseline is valid", failures);
-  assert(actualReport.gates.execution.status === "pass", "exercise 009 execution gate passes when footer inventory is valid", failures);
-  assert(actualReport.gates.after_evidence.status === "pass", "exercise 009 after evidence gate passes when completion evidence is valid", failures);
-  assert(actualReport.gates.proof.status === "pass", "exercise 009 proof gate passes when proof package is valid", failures);
-  assert(actualReport.gates.mission_certification.status === "pass", "mission certification passes after Exercise 009 certification exists", failures);
+  assert(actualReport.gates.scope.status === "pass", "exercise 010 scope resolves from exercise_010/fix_scope.md", failures);
+  assert(actualReport.gates.before_evidence.status === "blocked", "exercise 010 before evidence remains blocked until baseline is captured", failures);
+  assert(actualReport.gates.execution.status === "blocked", "exercise 010 execution remains blocked until the safe edit simulation is performed", failures);
+  assert(actualReport.gates.after_evidence.status === "blocked", "exercise 010 after evidence remains blocked until captured", failures);
+  assert(actualReport.gates.proof.status === "blocked", "exercise 010 proof remains blocked until the proof package is generated", failures);
+  assert(actualReport.gates.mission_certification.status === "blocked", "exercise 010 mission certification remains blocked until the proof package exists", failures);
   assert(actualReport.gates.exercise_006_planning.status === "pass", "Exercise 006 planning passes after scope creation", failures);
   assert(actualReport.gates.exercise_007_planning.status === "pass", "Exercise 007 planning passes after scope creation", failures);
   assert(actualReport.gates.exercise_008_planning.status === "pass", "Exercise 008 planning passes after scope creation", failures);
   assert(actualReport.gates.exercise_009_planning.status === "pass", "Exercise 009 planning passes after scope creation", failures);
+  assert(actualReport.gates.exercise_010_planning.status === "pass", "Exercise 010 planning passes after scope creation", failures);
 
   if (failures.length) {
     console.error(JSON.stringify({ status: "failed", failures }, null, 2));

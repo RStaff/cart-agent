@@ -246,6 +246,21 @@ const EXERCISE_DEFINITIONS = [
     nextPlanningPhase: "exercise_010_planning",
     nextPlanningBlocker: "Exercise 010 Planning Missing",
     nextPlanningAction: "Plan Exercise 010 - Safe Edit Simulation"
+  },
+  {
+    slug: "exercise_010",
+    label: "Exercise 010 - Safe Edit Simulation",
+    scopePattern: /Exercise 010 - Safe Edit Simulation/i,
+    targetPattern: /safe edit simulation|smallest-safe change|proposed diff/i,
+    evidencePattern: /safe edit|smallest-safe|rollback|proposed|diff|baseline|simulation/i,
+    analysisPhase: "safe_edit_simulation",
+    analysisBlocker: "Safe Edit Simulation Not Performed",
+    analysisAction: "Perform governed proposal-only safe edit simulation",
+    proofAction: "Generate Exercise 010 Mission Proof Package",
+    certificationAction: "Certify Exercise 010",
+    nextPlanningPhase: "mission_001_gate_assessment",
+    nextPlanningBlocker: "Mission 001 Gate Assessment Missing",
+    nextPlanningAction: "Assess Mission 001 readiness gate"
   }
 ];
 
@@ -332,6 +347,7 @@ function evaluateNokingsMissionReadiness({
   const scopeIsExercise007 = /Exercise 007 - Header Navigation Inventory/i.test(activeScopeObjective) || /sections\/header-group\.json|sections\/header\.liquid|header navigation inventory/i.test(activeScopeTarget);
   const scopeIsExercise008 = /Exercise 008 - Trust Badge Inventory/i.test(activeScopeObjective) || /trust badge inventory|snippets\/buy-buttons-styles\.liquid|blocks\/payment-icons\.liquid|snippets\/product-badges-styles\.liquid|snippets\/button\.liquid/i.test(activeScopeTarget);
   const scopeIsExercise009 = /Exercise 009 - Footer Inventory/i.test(activeScopeObjective) || /footer inventory|sections\/footer-group\.json|sections\/footer\.liquid|sections\/footer-utilities\.liquid/i.test(activeScopeTarget);
+  const scopeIsExercise010 = /Exercise 010 - Safe Edit Simulation/i.test(activeScopeObjective) || /safe edit simulation|smallest-safe change|proposed diff/i.test(activeScopeTarget);
   const activeExerciseDefinition = exerciseBySlug(activeExerciseSlug);
   const scopeMatchesActiveExercise = activeExerciseDefinition
     ? (activeExerciseDefinition.scopePattern.test(activeScopeObjective) || activeExerciseDefinition.targetPattern.test(activeScopeTarget))
@@ -505,7 +521,7 @@ function evaluateNokingsMissionReadiness({
   const nextSafeAction = !merchantBindingPass
     ? "Complete mission binding"
     : !scopeComplete
-      ? (scopeIsExercise009 ? "Establish governed Exercise 009 scope" : scopeIsExercise008 ? "Establish governed Exercise 008 scope" : scopeIsExercise007 ? "Establish governed Exercise 007 scope" : scopeIsExercise006 ? "Establish governed Exercise 006 scope" : "Establish governed mission scope")
+      ? (scopeIsExercise010 ? "Establish governed Exercise 010 scope" : scopeIsExercise009 ? "Establish governed Exercise 009 scope" : scopeIsExercise008 ? "Establish governed Exercise 008 scope" : scopeIsExercise007 ? "Establish governed Exercise 007 scope" : scopeIsExercise006 ? "Establish governed Exercise 006 scope" : "Establish governed mission scope")
       : !beforeEvidenceCaptured
         ? "Capture Before Evidence"
         : !analysisComplete
@@ -565,10 +581,11 @@ function evaluateNokingsMissionReadiness({
             : stageStatus("blocked", "Mission Certification Missing"))
         : stageStatus("blocked", "Proof Package Missing"),
       exercise_005_planning: scopeIsExercise004 && certificationMemoReady ? stageStatus("blocked", "Exercise 005 Planning Missing") : stageStatus("blocked", scopeIsExercise009 ? "Superseded by Exercise 009 scope" : scopeIsExercise008 ? "Superseded by Exercise 008 scope" : scopeIsExercise007 ? "Superseded by Exercise 007 scope" : scopeIsExercise006 ? "Superseded by Exercise 006 scope" : scopeIsExercise005 ? "Superseded by Exercise 006 planning" : "Mission Certification Missing"),
-      exercise_006_planning: (scopeIsExercise006 || scopeIsExercise007 || scopeIsExercise008 || scopeIsExercise009) ? stageStatus("pass", "Exercise 006 scope created") : scopeIsExercise005 && certificationMemoReady ? stageStatus("blocked", "Exercise 006 Planning Missing") : stageStatus("blocked", "Mission Certification Missing"),
-      exercise_007_planning: (scopeIsExercise007 || scopeIsExercise008 || scopeIsExercise009) ? stageStatus("pass", "Exercise 007 scope created") : scopeIsExercise006 && certificationMemoReady ? stageStatus("blocked", "Exercise 007 Planning Missing") : stageStatus("blocked", "Mission Certification Missing"),
-      exercise_008_planning: (scopeIsExercise008 || scopeIsExercise009) ? stageStatus("pass", "Exercise 008 scope created") : scopeIsExercise007 && certificationMemoReady ? stageStatus("blocked", "Exercise 008 Planning Missing") : stageStatus("blocked", "Mission Certification Missing"),
-      exercise_009_planning: scopeIsExercise009 ? stageStatus("pass", "Exercise 009 scope created") : scopeIsExercise008 && certificationMemoReady ? stageStatus("blocked", "Exercise 009 Planning Missing") : stageStatus("blocked", "Mission Certification Missing"),
+      exercise_006_planning: (scopeIsExercise006 || scopeIsExercise007 || scopeIsExercise008 || scopeIsExercise009 || scopeIsExercise010) ? stageStatus("pass", "Exercise 006 scope created") : scopeIsExercise005 && certificationMemoReady ? stageStatus("blocked", "Exercise 006 Planning Missing") : stageStatus("blocked", "Mission Certification Missing"),
+      exercise_007_planning: (scopeIsExercise007 || scopeIsExercise008 || scopeIsExercise009 || scopeIsExercise010) ? stageStatus("pass", "Exercise 007 scope created") : scopeIsExercise006 && certificationMemoReady ? stageStatus("blocked", "Exercise 007 Planning Missing") : stageStatus("blocked", "Mission Certification Missing"),
+      exercise_008_planning: (scopeIsExercise008 || scopeIsExercise009 || scopeIsExercise010) ? stageStatus("pass", "Exercise 008 scope created") : scopeIsExercise007 && certificationMemoReady ? stageStatus("blocked", "Exercise 008 Planning Missing") : stageStatus("blocked", "Mission Certification Missing"),
+      exercise_009_planning: (scopeIsExercise009 || scopeIsExercise010) ? stageStatus("pass", "Exercise 009 scope created") : scopeIsExercise008 && certificationMemoReady ? stageStatus("blocked", "Exercise 009 Planning Missing") : stageStatus("blocked", "Mission Certification Missing"),
+      exercise_010_planning: scopeIsExercise010 ? stageStatus("pass", "Exercise 010 scope created") : scopeIsExercise009 && certificationMemoReady ? stageStatus("blocked", "Exercise 010 Planning Missing") : stageStatus("blocked", "Mission Certification Missing"),
       rollback: rollbackReady ? stageStatus("pass", "Separate mission proof-run path is available for rollback") : stageStatus("blocked", "Rollback path not yet established"),
       payment_applicability: paymentRequired
         ? stageStatus("blocked", paymentAuthority)
