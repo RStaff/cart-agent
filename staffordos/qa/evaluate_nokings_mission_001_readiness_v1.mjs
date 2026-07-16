@@ -255,7 +255,7 @@ const EXERCISE_DEFINITIONS = [
     evidencePattern: /safe edit|smallest-safe|rollback|proposed|diff|baseline|simulation/i,
     analysisPhase: "safe_edit_simulation",
     analysisBlocker: "Safe Edit Simulation Not Performed",
-    analysisAction: "Perform governed proposal-only safe edit simulation",
+    analysisAction: "Perform governed safe edit simulation",
     proofAction: "Generate Exercise 010 Mission Proof Package",
     certificationAction: "Certify Exercise 010",
     nextPlanningPhase: "mission_001_gate_assessment",
