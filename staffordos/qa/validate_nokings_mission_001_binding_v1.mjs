@@ -1160,14 +1160,14 @@ function run() {
   });
   assert(actualReport.status === "CONDITIONAL_GO", "current readiness status remains CONDITIONAL_GO", failures);
   assert(actualReport.active_exercise === "Exercise 010 - Safe Edit Simulation", "active exercise is Exercise 010", failures);
-  assert(actualReport.current_phase === "safe_edit_simulation", "current phase is safe_edit_simulation after Exercise 010 before evidence", failures);
-  assert(actualReport.current_blocker === "Safe Edit Simulation Not Performed", "current blocker is Safe Edit Simulation Not Performed after Exercise 010 before evidence", failures);
-  assert(actualReport.next_safe_action === "Perform governed safe edit simulation", "next safe action is perform governed safe edit simulation", failures);
+  assert(actualReport.current_phase === "after_evidence", "current phase is after_evidence after Exercise 010 safe edit simulation", failures);
+  assert(actualReport.current_blocker === "After Evidence Missing", "current blocker is After Evidence Missing after Exercise 010 safe edit simulation", failures);
+  assert(actualReport.next_safe_action === "Capture After Evidence", "next safe action is capture after evidence", failures);
   assert(actualReport.payment_required === false, "payment_required remains false", failures);
   assert(actualReport.completion_permitted === false, "completion remains prohibited", failures);
   assert(actualReport.gates.scope.status === "pass", "exercise 010 scope resolves from exercise_010/fix_scope.md", failures);
   assert(actualReport.gates.before_evidence.status === "pass", "exercise 010 before evidence gate passes when baseline is valid", failures);
-  assert(actualReport.gates.execution.status === "blocked", "exercise 010 execution remains blocked until the safe edit simulation is performed", failures);
+  assert(actualReport.gates.execution.status === "pass", "exercise 010 execution gate passes when the safe edit simulation is valid", failures);
   assert(actualReport.gates.after_evidence.status === "blocked", "exercise 010 after evidence remains blocked until captured", failures);
   assert(actualReport.gates.proof.status === "blocked", "exercise 010 proof remains blocked until the proof package is generated", failures);
   assert(actualReport.gates.mission_certification.status === "blocked", "exercise 010 mission certification remains blocked until the proof package exists", failures);

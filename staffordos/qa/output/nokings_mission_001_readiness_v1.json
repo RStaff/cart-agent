@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.nokings_mission_001_readiness.v1",
-  "generated_at": "2026-07-16T21:56:44.286Z",
+  "generated_at": "2026-07-16T22:18:45.489Z",
   "status": "CONDITIONAL_GO",
   "production_operation_permitted": true,
   "completion_permitted": false,
@@ -16,14 +16,13 @@
     "proof_run_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"
   },
   "active_exercise": "Exercise 010 - Safe Edit Simulation",
-  "current_phase": "safe_edit_simulation",
-  "current_blocker": "Safe Edit Simulation Not Performed",
+  "current_phase": "after_evidence",
+  "current_blocker": "After Evidence Missing",
   "blocking_reasons": [
-    "Safe Edit Simulation Not Performed",
     "After Evidence Missing",
     "Proof Package Missing"
   ],
-  "next_safe_action": "Perform governed safe edit simulation",
+  "next_safe_action": "Capture After Evidence",
   "payment_required": false,
   "scope_authority": {
     "index_path": "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/fix_scope.md",
@@ -44,8 +43,8 @@
       "reason": "Before evidence scaffold present"
     },
     "execution": {
-      "status": "blocked",
-      "reason": "Safe Edit Simulation Not Performed"
+      "status": "pass",
+      "reason": "Governed analysis completed and next phase may proceed"
     },
     "after_evidence": {
       "status": "blocked",
@@ -96,7 +95,7 @@
     "merchant_binding": 100,
     "scope": 100,
     "before_evidence": 100,
-    "execution": 0,
+    "execution": 100,
     "after_evidence": 0,
     "proof": 0,
     "mission_certification": 0,
