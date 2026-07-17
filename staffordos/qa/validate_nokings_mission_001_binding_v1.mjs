@@ -1161,8 +1161,8 @@ function run() {
   assert(actualReport.status === "CONDITIONAL_GO", "current readiness status remains CONDITIONAL_GO", failures);
   assert(actualReport.active_exercise === "Exercise 010 - Safe Edit Simulation", "active exercise is Exercise 010", failures);
   assert(actualReport.current_phase === "mission_001_gate_remediation", "current phase is mission_001_gate_remediation after the gate assessment", failures);
-  assert(actualReport.current_blocker === "Mission 001 Gate Unmet: Safe-Fix Pattern Exercises 1 Of 3", "current blocker is the unmet safe-fix pattern gate count after the gate assessment", failures);
-  assert(actualReport.next_safe_action === "Authorize governed applied-change remediation mission to meet the Mission 001 gate", "next safe action is authorize the governed applied-change remediation mission", failures);
+  assert(actualReport.current_blocker === "Mission 001 Gate Unmet: Applied-Change And Executed-Rollback Capability Classes Missing", "current blocker is the amended capability-class gate after the gate assessment", failures);
+  assert(actualReport.next_safe_action === "Authorize governed applied-change remediation mission to demonstrate applied-change and executed-rollback capability classes", "next safe action is authorize the governed applied-change remediation mission", failures);
   assert(actualReport.payment_required === false, "payment_required remains false", failures);
   assert(actualReport.completion_permitted === false, "completion remains prohibited after the gate assessment", failures);
   assert(actualReport.gates.scope.status === "pass", "exercise 010 scope resolves from exercise_010/fix_scope.md", failures);

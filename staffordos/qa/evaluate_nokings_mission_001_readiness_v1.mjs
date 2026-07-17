@@ -16,6 +16,8 @@ const DEFAULT_EXERCISE_009_CERTIFICATION_MEMO_PATH = path.join(DEFAULT_REPO_ROOT
 const DEFAULT_EXERCISE_010_CERTIFICATION_MEMO_PATH = path.join(DEFAULT_REPO_ROOT, "staffordos/implementation/p11_43_mission_001_exercise_010_certification_v1.md");
 const DEFAULT_GATE_ASSESSMENT_PATH = path.join(DEFAULT_REPO_ROOT, "staffordos/implementation/p11_44_mission_001_readiness_gate_assessment_v1.md");
 const DEFAULT_OUTPUT_PATH = path.join(MODULE_DIR, "output", "nokings_mission_001_readiness_v1.json");
+const MISSION_001_CAPABILITY_GATE_BLOCKER = "Mission 001 Gate Unmet: Applied-Change And Executed-Rollback Capability Classes Missing";
+const MISSION_001_CAPABILITY_GATE_ACTION = "Authorize governed applied-change remediation mission to demonstrate applied-change and executed-rollback capability classes";
 
 function clean(value, fallback = "Not Yet Available") {
   const text = String(value ?? "").trim();
@@ -513,13 +515,13 @@ function evaluateNokingsMissionReadiness({
   const gateAssessmentPresent = Boolean(gateAssessmentText.trim()) && /Gate Decision/i.test(gateAssessmentText) && /CONDITIONAL_GO/.test(gateAssessmentText);
   const gateRemediationActive = scopeIsExercise010 && certificationMemoReady && gateAssessmentPresent;
   const nextPlanningBlocker = gateRemediationActive
-    ? "Mission 001 Gate Unmet: Safe-Fix Pattern Exercises 1 Of 3"
+    ? MISSION_001_CAPABILITY_GATE_BLOCKER
     : (activeExerciseDefinition?.nextPlanningBlocker || "Exercise 005 Planning Missing");
   const nextPlanningPhase = gateRemediationActive
     ? "mission_001_gate_remediation"
     : (activeExerciseDefinition?.nextPlanningPhase || "exercise_005_planning");
   const nextPlanningAction = gateRemediationActive
-    ? "Authorize governed applied-change remediation mission to meet the Mission 001 gate"
+    ? MISSION_001_CAPABILITY_GATE_ACTION
     : (activeExerciseDefinition?.nextPlanningAction || "Plan Exercise 005 - Collection Page Inventory");
   const rollbackReady = Boolean(merchantBindingPass && proofRunPathExists);
 
