@@ -14,6 +14,7 @@ const DEFAULT_EXERCISE_007_CERTIFICATION_MEMO_PATH = path.join(DEFAULT_REPO_ROOT
 const DEFAULT_EXERCISE_008_CERTIFICATION_MEMO_PATH = path.join(DEFAULT_REPO_ROOT, "staffordos/implementation/p11_28_mission_001_exercise_008_certification_v1.md");
 const DEFAULT_EXERCISE_009_CERTIFICATION_MEMO_PATH = path.join(DEFAULT_REPO_ROOT, "staffordos/implementation/p11_36_mission_001_exercise_009_certification_v1.md");
 const DEFAULT_EXERCISE_010_CERTIFICATION_MEMO_PATH = path.join(DEFAULT_REPO_ROOT, "staffordos/implementation/p11_43_mission_001_exercise_010_certification_v1.md");
+const DEFAULT_GATE_ASSESSMENT_PATH = path.join(DEFAULT_REPO_ROOT, "staffordos/implementation/p11_44_mission_001_readiness_gate_assessment_v1.md");
 const DEFAULT_OUTPUT_PATH = path.join(MODULE_DIR, "output", "nokings_mission_001_readiness_v1.json");
 
 function clean(value, fallback = "Not Yet Available") {
@@ -295,7 +296,8 @@ function evaluateNokingsMissionReadiness({
   exercise007CertificationMemoPath = DEFAULT_EXERCISE_007_CERTIFICATION_MEMO_PATH,
   exercise008CertificationMemoPath = DEFAULT_EXERCISE_008_CERTIFICATION_MEMO_PATH,
   exercise009CertificationMemoPath = DEFAULT_EXERCISE_009_CERTIFICATION_MEMO_PATH,
-  exercise010CertificationMemoPath = DEFAULT_EXERCISE_010_CERTIFICATION_MEMO_PATH
+  exercise010CertificationMemoPath = DEFAULT_EXERCISE_010_CERTIFICATION_MEMO_PATH,
+  gateAssessmentPath = DEFAULT_GATE_ASSESSMENT_PATH
 } = {}) {
   const binding = loadBinding(bindingPath);
   const scopeIndexPath = path.join(proofRunDir, "fix_scope.md");
@@ -507,8 +509,18 @@ function evaluateNokingsMissionReadiness({
               : scopeIsExercise010
                 ? exercise010CertificationReady
                 : false;
-  const nextPlanningBlocker = activeExerciseDefinition?.nextPlanningBlocker || "Exercise 005 Planning Missing";
-  const nextPlanningPhase = activeExerciseDefinition?.nextPlanningPhase || "exercise_005_planning";
+  const gateAssessmentText = readText(gateAssessmentPath);
+  const gateAssessmentPresent = Boolean(gateAssessmentText.trim()) && /Gate Decision/i.test(gateAssessmentText) && /CONDITIONAL_GO/.test(gateAssessmentText);
+  const gateRemediationActive = scopeIsExercise010 && certificationMemoReady && gateAssessmentPresent;
+  const nextPlanningBlocker = gateRemediationActive
+    ? "Mission 001 Gate Unmet: Safe-Fix Pattern Exercises 1 Of 3"
+    : (activeExerciseDefinition?.nextPlanningBlocker || "Exercise 005 Planning Missing");
+  const nextPlanningPhase = gateRemediationActive
+    ? "mission_001_gate_remediation"
+    : (activeExerciseDefinition?.nextPlanningPhase || "exercise_005_planning");
+  const nextPlanningAction = gateRemediationActive
+    ? "Authorize governed applied-change remediation mission to meet the Mission 001 gate"
+    : (activeExerciseDefinition?.nextPlanningAction || "Plan Exercise 005 - Collection Page Inventory");
   const rollbackReady = Boolean(merchantBindingPass && proofRunPathExists);
 
   const gatingReasons = [
@@ -556,7 +568,7 @@ function evaluateNokingsMissionReadiness({
               ? (activeExerciseDefinition?.certificationAction || "Certify Mission 001 Exercise 004")
               : paymentRequired
                 ? "Resolve payment applicability"
-                : (activeExerciseDefinition?.nextPlanningAction || "Plan Exercise 005 - Collection Page Inventory");
+                : nextPlanningAction;
 
   const productionOperationPermitted = merchantBindingPass;
   const completionPermitted = false;

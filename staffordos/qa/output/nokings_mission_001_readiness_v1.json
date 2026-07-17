@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.nokings_mission_001_readiness.v1",
-  "generated_at": "2026-07-17T01:58:34.126Z",
+  "generated_at": "2026-07-17T10:34:55.758Z",
   "status": "CONDITIONAL_GO",
   "production_operation_permitted": true,
   "completion_permitted": false,
@@ -16,12 +16,12 @@
     "proof_run_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"
   },
   "active_exercise": "Exercise 010 - Safe Edit Simulation",
-  "current_phase": "mission_001_gate_assessment",
-  "current_blocker": "Mission 001 Gate Assessment Missing",
+  "current_phase": "mission_001_gate_remediation",
+  "current_blocker": "Mission 001 Gate Unmet: Safe-Fix Pattern Exercises 1 Of 3",
   "blocking_reasons": [
-    "Mission 001 Gate Assessment Missing"
+    "Mission 001 Gate Unmet: Safe-Fix Pattern Exercises 1 Of 3"
   ],
-  "next_safe_action": "Assess Mission 001 readiness gate",
+  "next_safe_action": "Authorize governed applied-change remediation mission to meet the Mission 001 gate",
   "payment_required": false,
   "scope_authority": {
     "index_path": "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/fix_scope.md",
