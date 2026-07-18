@@ -1,6 +1,6 @@
 {
   "schema": "staffordos.command_center_qa_gate.v1",
-  "generated_at": "2026-05-05T00:08:17.492Z",
+  "generated_at": "2026-07-10T04:19:40.503Z",
   "page": "/operator/command-center",
   "version": "operator_home_v1_cta_execution",
   "verdict": "pass",
@@ -8,7 +8,7 @@
   "findings": [],
   "required_next_move": "CTA execution wiring is validated. Next: connect specific action handlers such as follow-up send/payment close.",
   "snapshot_primary_action": {
-    "action_id": "primary_1777922106443",
+    "action_id": "primary_1780957885173",
     "action_label": "Follow up on real ShopiFixer offer and close payment.",
     "action_type": "revenue_close",
     "domain_id": "shopifixer",
@@ -27,6 +27,7 @@
       "Ross-owned action can be advanced immediately.",
       "Next action explicitly targets payment close.",
       "Follow-up is the active bottleneck after offer send.",
+      "Open work is actionable.",
       "Merchant value proven: $100 gap between recovered value and Stafford revenue captured.",
       "Current UX integrity score is 37; decision layer needed before further UI polish."
     ],
@@ -44,6 +45,265 @@
       "staffordos/gates/confidence_gate_v1.json",
       "staffordos/ux_audit/output/operator_command_center_ux_integrity_v1.json"
     ],
-    "generated_at": "2026-05-04T19:15:06.441Z"
+    "decision_trace": {
+      "engine": "resolve_primary_action_v1",
+      "generated_at": "2026-06-29T18:41:51.771Z",
+      "candidate_source": "staffordos/snapshots/unit_work_snapshot_v1.json: open_work[]",
+      "source_fields_read": [
+        "staffordos/snapshots/unit_work_snapshot_v1.json: open_work[].unit_id",
+        "staffordos/snapshots/unit_work_snapshot_v1.json: open_work[].type",
+        "staffordos/snapshots/unit_work_snapshot_v1.json: open_work[].stage",
+        "staffordos/snapshots/unit_work_snapshot_v1.json: open_work[].status",
+        "staffordos/snapshots/unit_work_snapshot_v1.json: open_work[].domain_id",
+        "staffordos/snapshots/unit_work_snapshot_v1.json: open_work[].owner",
+        "staffordos/snapshots/unit_work_snapshot_v1.json: open_work[].next_action",
+        "staffordos/clients/client_registry_v1.json: clients[] for matching client context",
+        "staffordos/clients/operator_dashboard_snapshot_v1.json: primary_focus and revenue_gaps[] for context",
+        "staffordos/gates/confidence_gate_v1.json: thresholds.auto_fix_allowed_min_confidence for risk wording",
+        "staffordos/ux_audit/output/operator_command_center_ux_integrity_v1.json: score.ux for evidence"
+      ],
+      "score_cap": 100,
+      "sort_order": "descending priority_score; first candidate wins",
+      "tie_behavior": "Equal capped scores keep the earlier candidate order produced by Array.sort in this runtime.",
+      "candidates": [
+        {
+          "rank": 1,
+          "selected": true,
+          "unit_id": "opp_cart-agent-dev.myshopify.com",
+          "action_type": "revenue_close",
+          "domain_id": "shopifixer",
+          "owner": "ross",
+          "status": "open",
+          "stage": "proposal_sent",
+          "next_action": "Follow up on real ShopiFixer offer and close payment.",
+          "raw_score": 110,
+          "priority_score": 100,
+          "score_components": [
+            {
+              "component": "revenue_capture_potential",
+              "points": 45,
+              "reason": "Active proposal has direct revenue capture potential.",
+              "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+              "source_field": "open_work[].type + open_work[].stage"
+            },
+            {
+              "component": "domain_priority",
+              "points": 18,
+              "reason": "ShopiFixer is the current immediate one-time revenue path.",
+              "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+              "source_field": "open_work[].domain_id"
+            },
+            {
+              "component": "owner_executability",
+              "points": 10,
+              "reason": "Ross-owned action can be advanced immediately.",
+              "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+              "source_field": "open_work[].owner"
+            },
+            {
+              "component": "payment_closure_language",
+              "points": 20,
+              "reason": "Next action explicitly targets payment close.",
+              "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+              "source_field": "open_work[].next_action"
+            },
+            {
+              "component": "followup_bottleneck",
+              "points": 12,
+              "reason": "Follow-up is the active bottleneck after offer send.",
+              "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+              "source_field": "open_work[].next_action"
+            },
+            {
+              "component": "open_work_status",
+              "points": 5,
+              "reason": "Open work is actionable.",
+              "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+              "source_field": "open_work[].status"
+            }
+          ]
+        },
+        {
+          "rank": 2,
+          "selected": false,
+          "unit_id": "action_cart-agent-dev.myshopify.com_followup_offer",
+          "action_type": "revenue_followup",
+          "domain_id": "shopifixer",
+          "owner": "ross",
+          "status": "open",
+          "stage": null,
+          "next_action": "Follow up on real ShopiFixer offer and close payment.",
+          "raw_score": 100,
+          "priority_score": 100,
+          "score_components": [
+            {
+              "component": "revenue_followup",
+              "points": 35,
+              "reason": "Follow-up action can move an active opportunity toward payment.",
+              "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+              "source_field": "open_work[].type + open_work[].next_action"
+            },
+            {
+              "component": "domain_priority",
+              "points": 18,
+              "reason": "ShopiFixer is the current immediate one-time revenue path.",
+              "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+              "source_field": "open_work[].domain_id"
+            },
+            {
+              "component": "owner_executability",
+              "points": 10,
+              "reason": "Ross-owned action can be advanced immediately.",
+              "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+              "source_field": "open_work[].owner"
+            },
+            {
+              "component": "payment_closure_language",
+              "points": 20,
+              "reason": "Next action explicitly targets payment close.",
+              "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+              "source_field": "open_work[].next_action"
+            },
+            {
+              "component": "followup_bottleneck",
+              "points": 12,
+              "reason": "Follow-up is the active bottleneck after offer send.",
+              "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+              "source_field": "open_work[].next_action"
+            },
+            {
+              "component": "open_work_status",
+              "points": 5,
+              "reason": "Open work is actionable.",
+              "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+              "source_field": "open_work[].status"
+            }
+          ]
+        },
+        {
+          "rank": 3,
+          "selected": false,
+          "unit_id": "delivery_cart-agent-dev.myshopify.com_shopifixer",
+          "action_type": "payment_waiting",
+          "domain_id": "shopifixer",
+          "owner": "ross",
+          "status": "waiting_for_payment",
+          "stage": "pre_delivery",
+          "next_action": "Wait for payment or follow up before starting fix delivery.",
+          "raw_score": 73,
+          "priority_score": 73,
+          "score_components": [
+            {
+              "component": "payment_waiting",
+              "points": 25,
+              "reason": "Delivery is blocked until payment is captured.",
+              "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+              "source_field": "open_work[].type + open_work[].status"
+            },
+            {
+              "component": "domain_priority",
+              "points": 18,
+              "reason": "ShopiFixer is the current immediate one-time revenue path.",
+              "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+              "source_field": "open_work[].domain_id"
+            },
+            {
+              "component": "owner_executability",
+              "points": 10,
+              "reason": "Ross-owned action can be advanced immediately.",
+              "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+              "source_field": "open_work[].owner"
+            },
+            {
+              "component": "followup_bottleneck",
+              "points": 12,
+              "reason": "Follow-up is the active bottleneck after offer send.",
+              "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+              "source_field": "open_work[].next_action"
+            },
+            {
+              "component": "payment_waiting_status",
+              "points": 8,
+              "reason": "Work is waiting for payment.",
+              "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+              "source_field": "open_work[].status"
+            }
+          ]
+        },
+        {
+          "rank": 4,
+          "selected": false,
+          "unit_id": "delivery_internal_dev_schema_foundation_v1",
+          "action_type": "internal_dev",
+          "domain_id": "internal_dev",
+          "owner": "system",
+          "status": "active",
+          "stage": "schema_foundation",
+          "next_action": "Use schema foundation to connect Ask, Operate, Memory, Opportunity, Issue, Delivery, and Outcome layers.",
+          "raw_score": 6,
+          "priority_score": 6,
+          "score_components": [
+            {
+              "component": "domain_priority",
+              "points": 6,
+              "reason": "Internal dev improves system capability but is not immediate cash capture.",
+              "source_file": "staffordos/snapshots/unit_work_snapshot_v1.json",
+              "source_field": "open_work[].domain_id"
+            }
+          ]
+        }
+      ],
+      "selected_unit_id": "opp_cart-agent-dev.myshopify.com",
+      "selected_reason": "Highest scored open work candidate after resolver scoring.",
+      "alternatives_considered": [
+        {
+          "unit_id": "action_cart-agent-dev.myshopify.com_followup_offer",
+          "action_type": "revenue_followup",
+          "domain_id": "shopifixer",
+          "raw_score": 100,
+          "priority_score": 100,
+          "next_action": "Follow up on real ShopiFixer offer and close payment.",
+          "why_not_primary": "Comparable priority but not selected."
+        },
+        {
+          "unit_id": "delivery_cart-agent-dev.myshopify.com_shopifixer",
+          "action_type": "payment_waiting",
+          "domain_id": "shopifixer",
+          "raw_score": 73,
+          "priority_score": 73,
+          "next_action": "Wait for payment or follow up before starting fix delivery.",
+          "why_not_primary": "Lower combined revenue/urgency score than primary action."
+        },
+        {
+          "unit_id": "delivery_internal_dev_schema_foundation_v1",
+          "action_type": "internal_dev",
+          "domain_id": "internal_dev",
+          "raw_score": 6,
+          "priority_score": 6,
+          "next_action": "Use schema foundation to connect Ask, Operate, Memory, Opportunity, Issue, Delivery, and Outcome layers.",
+          "why_not_primary": "Lower combined revenue/urgency score than primary action."
+        }
+      ]
+    },
+    "generated_at": "2026-06-29T18:41:51.771Z",
+    "execution_status": "blocked",
+    "last_execution_result": "blocked_by_execution_mode",
+    "last_execution_reason": [
+      "Score is below the automation threshold."
+    ],
+    "last_execution_recommendation": "rerun_with_operator_approved",
+    "last_launched_at": "2026-07-06T00:03:46.204Z",
+    "last_completed_at": null,
+    "last_failed_at": "2026-07-06T00:03:46.269Z",
+    "last_execution_event_id": "operator_action_1783296226205",
+    "last_execution_artifacts": [
+      "staffordos/events/operator_action_events_v1.json",
+      "staffordos/events/outcome_event_log_v1.json",
+      "staffordos/execution/output/agent_loop_latest.json",
+      "staffordos/events/outcome_scores_v1.json",
+      "staffordos/agents/agent_performance_v1.json",
+      "staffordos/rules/rule_suggestions_v1.json",
+      "staffordos/loop_d/output/loop_d_feedback_report_v1.json"
+    ]
   }
 }

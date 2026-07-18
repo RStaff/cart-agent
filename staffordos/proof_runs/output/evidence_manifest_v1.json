@@ -1,10 +1,2784 @@
 {
   "schema": "staffordos.evidence_manifest.v1",
-  "generated_at": "",
+  "generated_at": "2026-07-18T22:44:21.420Z",
   "manifest_version": 1,
   "proof_run_id": "internal_shopifixer_dry_run_v1",
   "merchant": {
-    "store": "unavailable"
+    "store": "no-kings-athletics.myshopify.com"
   },
-  "artifacts": []
+  "artifacts": [
+    {
+      "artifact_id": "ev_a11f5512fd29a2d7",
+      "stage": "before_evidence",
+      "created_at": "2026-07-12T20:10:27.990Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-12T20:10:27.990Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_d3025f2178eebee1",
+      "stage": "after_evidence",
+      "created_at": "2026-07-12T20:10:27.992Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-12T20:10:27.992Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_dbc5bba79faab353",
+      "stage": "before_evidence",
+      "created_at": "2026-07-12T20:11:37.118Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-12T20:11:37.118Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_29ee55cb7dac74ac",
+      "stage": "after_evidence",
+      "created_at": "2026-07-12T20:11:37.119Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-12T20:11:37.119Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_31f4e08ea837704f",
+      "stage": "before_evidence",
+      "created_at": "2026-07-12T20:12:34.234Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-12T20:12:34.234Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_bae9ea70467ac90c",
+      "stage": "after_evidence",
+      "created_at": "2026-07-12T20:12:34.236Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-12T20:12:34.236Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_2e8c43ceac7aede1",
+      "stage": "before_evidence",
+      "created_at": "2026-07-12T20:21:21.664Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-12T20:21:21.664Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_bc4fcbeb273d6c8d",
+      "stage": "after_evidence",
+      "created_at": "2026-07-12T20:21:21.667Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-12T20:21:21.667Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_fe6bdabcf2c0bfac",
+      "stage": "before_evidence",
+      "created_at": "2026-07-12T21:05:14.066Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-12T21:05:14.066Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_9f4f59ebac279289",
+      "stage": "after_evidence",
+      "created_at": "2026-07-12T21:05:14.067Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-12T21:05:14.067Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_8a9d8ad63a097fd6",
+      "stage": "before_evidence",
+      "created_at": "2026-07-12T21:18:47.576Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-12T21:18:47.576Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_4eb24fcc09e9dcef",
+      "stage": "after_evidence",
+      "created_at": "2026-07-12T21:18:47.578Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-12T21:18:47.578Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_416d081b1c7e0f68",
+      "stage": "before_evidence",
+      "created_at": "2026-07-12T21:19:33.305Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-12T21:19:33.305Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_38b53e49355a7aee",
+      "stage": "after_evidence",
+      "created_at": "2026-07-12T21:19:33.307Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-12T21:19:33.307Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_5f84b9e1e01f89b6",
+      "stage": "before_evidence",
+      "created_at": "2026-07-12T21:19:52.189Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-12T21:19:52.189Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_b576478bd4edf04c",
+      "stage": "after_evidence",
+      "created_at": "2026-07-12T21:19:52.191Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-12T21:19:52.191Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_d1e4803bd9fba494",
+      "stage": "before_evidence",
+      "created_at": "2026-07-12T21:20:40.720Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-12T21:20:40.720Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_0820159a96d81fff",
+      "stage": "after_evidence",
+      "created_at": "2026-07-12T21:20:40.722Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-12T21:20:40.722Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_84eebb98a1253eac",
+      "stage": "before_evidence",
+      "created_at": "2026-07-13T00:16:15.129Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-13T00:16:15.129Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_96721668674740d6",
+      "stage": "after_evidence",
+      "created_at": "2026-07-13T00:16:15.130Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-13T00:16:15.130Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_76148cb416d4fe5e",
+      "stage": "before_evidence",
+      "created_at": "2026-07-13T00:44:26.401Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-13T00:44:26.401Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_790a7ead788b2822",
+      "stage": "after_evidence",
+      "created_at": "2026-07-13T00:44:26.403Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-13T00:44:26.403Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_a02a454e4a4dba02",
+      "stage": "before_evidence",
+      "created_at": "2026-07-13T00:54:09.324Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-13T00:54:09.324Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_81d74394c08fb11e",
+      "stage": "after_evidence",
+      "created_at": "2026-07-13T00:54:09.325Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-13T00:54:09.325Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_c1c13cabbaef30bd",
+      "stage": "before_evidence",
+      "created_at": "2026-07-13T01:37:23.581Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-13T01:37:23.581Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_20d523cea5f0424d",
+      "stage": "after_evidence",
+      "created_at": "2026-07-13T01:37:23.582Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-13T01:37:23.582Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_20c8b4045ff3e320",
+      "stage": "before_evidence",
+      "created_at": "2026-07-13T02:01:35.109Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-13T02:01:35.109Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_2acef389eb7eec7e",
+      "stage": "after_evidence",
+      "created_at": "2026-07-13T02:01:35.111Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-13T02:01:35.111Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_5d74e026f9e8eee6",
+      "stage": "before_evidence",
+      "created_at": "2026-07-13T02:36:57.722Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-13T02:36:57.722Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_9a8780562bdb3fff",
+      "stage": "after_evidence",
+      "created_at": "2026-07-13T02:36:57.723Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-13T02:36:57.723Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_ec956bec6c6b4890",
+      "stage": "before_evidence",
+      "created_at": "2026-07-13T03:03:13.591Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-13T03:03:13.591Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_3399785749f656b1",
+      "stage": "after_evidence",
+      "created_at": "2026-07-13T03:03:13.593Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-13T03:03:13.593Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_bb6257f8469daace",
+      "stage": "before_evidence",
+      "created_at": "2026-07-13T11:25:12.157Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-13T11:25:12.157Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_22d82e3fb9e9db85",
+      "stage": "after_evidence",
+      "created_at": "2026-07-13T11:25:12.158Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-13T11:25:12.158Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_39f6af3ea6177c9a",
+      "stage": "before_evidence",
+      "created_at": "2026-07-13T12:05:07.675Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-13T12:05:07.675Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_6a472f690e219dc5",
+      "stage": "after_evidence",
+      "created_at": "2026-07-13T12:05:07.676Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-13T12:05:07.676Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_cea4e7509fab546c",
+      "stage": "before_evidence",
+      "created_at": "2026-07-13T17:05:46.142Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-13T17:05:46.142Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_4369dadce5e9267d",
+      "stage": "after_evidence",
+      "created_at": "2026-07-13T17:05:46.144Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-13T17:05:46.144Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_af21dda1dce54f1d",
+      "stage": "before_evidence",
+      "created_at": "2026-07-13T22:11:40.352Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-13T22:11:40.352Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_1179f330d1b3d14f",
+      "stage": "after_evidence",
+      "created_at": "2026-07-13T22:11:40.353Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-13T22:11:40.353Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_bbd36ebeb6a41be9",
+      "stage": "before_evidence",
+      "created_at": "2026-07-13T22:32:54.669Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-13T22:32:54.669Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_32023b5ed4a35570",
+      "stage": "after_evidence",
+      "created_at": "2026-07-13T22:32:54.671Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-13T22:32:54.671Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_e1f88d36f80275e4",
+      "stage": "before_evidence",
+      "created_at": "2026-07-13T23:02:28.863Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-13T23:02:28.863Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_5a8bd379fda6dcf6",
+      "stage": "after_evidence",
+      "created_at": "2026-07-13T23:02:28.865Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-13T23:02:28.865Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_b2c8e837be34dda4",
+      "stage": "before_evidence",
+      "created_at": "2026-07-14T12:12:20.695Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-14T12:12:20.695Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_a14eab7d4ecca7be",
+      "stage": "after_evidence",
+      "created_at": "2026-07-14T12:12:20.697Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-14T12:12:20.697Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_63a3644704a8b00c",
+      "stage": "before_evidence",
+      "created_at": "2026-07-14T12:12:54.461Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-14T12:12:54.461Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_a86f39e49b008535",
+      "stage": "after_evidence",
+      "created_at": "2026-07-14T12:12:54.462Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-14T12:12:54.462Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_ee0e6b7f6f613b22",
+      "stage": "before_evidence",
+      "created_at": "2026-07-14T17:46:46.794Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-14T17:46:46.794Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_7cfde050c0c9c8e3",
+      "stage": "after_evidence",
+      "created_at": "2026-07-14T17:46:46.796Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-14T17:46:46.796Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_55b3325d94a0905f",
+      "stage": "before_evidence",
+      "created_at": "2026-07-14T22:30:42.967Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-14T22:30:42.967Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_3e6381acd3266cd9",
+      "stage": "after_evidence",
+      "created_at": "2026-07-14T22:30:42.968Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-14T22:30:42.968Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_9280998345ac3092",
+      "stage": "before_evidence",
+      "created_at": "2026-07-14T22:32:05.917Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-14T22:32:05.917Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_8d2bcc7acb8f648f",
+      "stage": "after_evidence",
+      "created_at": "2026-07-14T22:32:05.918Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-14T22:32:05.918Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_694eef948c15dc91",
+      "stage": "before_evidence",
+      "created_at": "2026-07-14T22:57:44.547Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-14T22:57:44.547Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_04e67a94f32f2764",
+      "stage": "after_evidence",
+      "created_at": "2026-07-14T22:57:44.548Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-14T22:57:44.548Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_6e3501694f16ff2e",
+      "stage": "before_evidence",
+      "created_at": "2026-07-14T22:58:37.252Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-14T22:58:37.252Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_f340f69583e27762",
+      "stage": "after_evidence",
+      "created_at": "2026-07-14T22:58:37.253Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-14T22:58:37.253Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_e17d1197a6ddb5ba",
+      "stage": "before_evidence",
+      "created_at": "2026-07-15T01:14:09.371Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-15T01:14:09.371Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_6e412e0c1d5456ce",
+      "stage": "after_evidence",
+      "created_at": "2026-07-15T01:14:09.374Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-15T01:14:09.374Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_39b3224ebcf32cc0",
+      "stage": "before_evidence",
+      "created_at": "2026-07-15T01:15:17.594Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-15T01:15:17.594Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_877e973e613a2892",
+      "stage": "after_evidence",
+      "created_at": "2026-07-15T01:15:17.595Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-15T01:15:17.595Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_a850527cbebc3aa3",
+      "stage": "before_evidence",
+      "created_at": "2026-07-15T01:52:25.770Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-15T01:52:25.770Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_e8922ad4e2bbc5a6",
+      "stage": "after_evidence",
+      "created_at": "2026-07-15T01:52:25.771Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-15T01:52:25.771Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_b676b76f0ff88f64",
+      "stage": "before_evidence",
+      "created_at": "2026-07-15T02:54:27.128Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-15T02:54:27.128Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_23d89b7ab65d871a",
+      "stage": "after_evidence",
+      "created_at": "2026-07-15T02:54:27.130Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-15T02:54:27.130Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_a191525983597525",
+      "stage": "before_evidence",
+      "created_at": "2026-07-15T12:59:41.471Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-15T12:59:41.471Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_83a69abbe9214087",
+      "stage": "after_evidence",
+      "created_at": "2026-07-15T12:59:41.473Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-15T12:59:41.473Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_cbfb329da1e89304",
+      "stage": "before_evidence",
+      "created_at": "2026-07-15T15:46:14.635Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-15T15:46:14.635Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_d62f97d1cd50d056",
+      "stage": "after_evidence",
+      "created_at": "2026-07-15T15:46:14.637Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-15T15:46:14.637Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_083a0f029a7ca281",
+      "stage": "before_evidence",
+      "created_at": "2026-07-15T16:27:25.065Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-15T16:27:25.065Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_3fcc4bb00a7529f1",
+      "stage": "after_evidence",
+      "created_at": "2026-07-15T16:27:25.066Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-15T16:27:25.066Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_ea72e8707df6da6d",
+      "stage": "before_evidence",
+      "created_at": "2026-07-15T17:21:34.644Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-15T17:21:34.644Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_f848a3d6a8583639",
+      "stage": "after_evidence",
+      "created_at": "2026-07-15T17:21:34.646Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-15T17:21:34.646Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_f5984cbe920e7229",
+      "stage": "before_evidence",
+      "created_at": "2026-07-15T17:32:22.388Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-15T17:32:22.388Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_849b32fd59d95465",
+      "stage": "after_evidence",
+      "created_at": "2026-07-15T17:32:22.391Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-15T17:32:22.391Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_b0fc44b88b22d4e8",
+      "stage": "before_evidence",
+      "created_at": "2026-07-15T19:07:39.512Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-15T19:07:39.512Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_fa9b470352e9ec79",
+      "stage": "after_evidence",
+      "created_at": "2026-07-15T19:07:39.514Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-15T19:07:39.514Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_8f4dd52a1697ec00",
+      "stage": "before_evidence",
+      "created_at": "2026-07-15T20:25:33.885Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-15T20:25:33.885Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_551ae317390d84cf",
+      "stage": "after_evidence",
+      "created_at": "2026-07-15T20:25:33.887Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-15T20:25:33.887Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_c3706edfb35706ea",
+      "stage": "before_evidence",
+      "created_at": "2026-07-15T20:33:21.211Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-15T20:33:21.211Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_352af446b6701354",
+      "stage": "after_evidence",
+      "created_at": "2026-07-15T20:33:21.213Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-15T20:33:21.213Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_1dcc4fda0f5e1983",
+      "stage": "before_evidence",
+      "created_at": "2026-07-15T22:21:05.502Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-15T22:21:05.502Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_a9f52f3c985bcca2",
+      "stage": "after_evidence",
+      "created_at": "2026-07-15T22:21:05.503Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-15T22:21:05.503Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_17ab71e74715d888",
+      "stage": "before_evidence",
+      "created_at": "2026-07-16T02:37:12.385Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-16T02:37:12.385Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_9118e3bd535ee3c9",
+      "stage": "after_evidence",
+      "created_at": "2026-07-16T02:37:12.388Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-16T02:37:12.388Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_09ea8333baf3f348",
+      "stage": "before_evidence",
+      "created_at": "2026-07-16T13:22:32.648Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-16T13:22:32.648Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_d2a15a7bb21149f6",
+      "stage": "after_evidence",
+      "created_at": "2026-07-16T13:22:32.650Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-16T13:22:32.650Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_7b4a0a4ca55f2b50",
+      "stage": "before_evidence",
+      "created_at": "2026-07-16T21:20:24.551Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-16T21:20:24.551Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_c5c3c751e1355eeb",
+      "stage": "after_evidence",
+      "created_at": "2026-07-16T21:20:24.553Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-16T21:20:24.553Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_3c8f3f54a8276b38",
+      "stage": "before_evidence",
+      "created_at": "2026-07-16T21:22:45.011Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-16T21:22:45.011Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_0c60e5ccba9e26c6",
+      "stage": "after_evidence",
+      "created_at": "2026-07-16T21:22:45.013Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-16T21:22:45.013Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_4f5a938c9f15a936",
+      "stage": "before_evidence",
+      "created_at": "2026-07-16T21:56:44.542Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-16T21:56:44.542Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_7fb9eae1bf0745cf",
+      "stage": "after_evidence",
+      "created_at": "2026-07-16T21:56:44.544Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-16T21:56:44.544Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_06ce68eb55420189",
+      "stage": "before_evidence",
+      "created_at": "2026-07-16T22:18:45.743Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-16T22:18:45.743Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_e7f9a295dc01e5de",
+      "stage": "after_evidence",
+      "created_at": "2026-07-16T22:18:45.745Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-16T22:18:45.745Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_3d418ea89b48ac0a",
+      "stage": "before_evidence",
+      "created_at": "2026-07-16T22:32:46.575Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-16T22:32:46.575Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_d31a8580a4642a52",
+      "stage": "after_evidence",
+      "created_at": "2026-07-16T22:32:46.577Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-16T22:32:46.577Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_9540d832dbde70c8",
+      "stage": "before_evidence",
+      "created_at": "2026-07-17T01:43:37.629Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-17T01:43:37.629Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_e7df7d42c9b462a8",
+      "stage": "after_evidence",
+      "created_at": "2026-07-17T01:43:37.632Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-17T01:43:37.632Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_109e1494dad50576",
+      "stage": "before_evidence",
+      "created_at": "2026-07-17T01:58:34.528Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-17T01:58:34.528Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_3b5aa527fb3b34f7",
+      "stage": "after_evidence",
+      "created_at": "2026-07-17T01:58:34.530Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-17T01:58:34.530Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_be9cec2ee042a78f",
+      "stage": "before_evidence",
+      "created_at": "2026-07-17T10:34:56.025Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-17T10:34:56.025Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_cc36fa6944151064",
+      "stage": "after_evidence",
+      "created_at": "2026-07-17T10:34:56.027Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-17T10:34:56.027Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_aba26da0ccc89388",
+      "stage": "before_evidence",
+      "created_at": "2026-07-17T21:25:15.970Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-17T21:25:15.970Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_5d93345b4cd132f9",
+      "stage": "after_evidence",
+      "created_at": "2026-07-17T21:25:15.972Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-17T21:25:15.972Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_d0ce3c261afb6646",
+      "stage": "before_evidence",
+      "created_at": "2026-07-17T21:45:57.576Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-17T21:45:57.576Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_415c7e25c3a990c3",
+      "stage": "after_evidence",
+      "created_at": "2026-07-17T21:45:57.577Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-17T21:45:57.577Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_631c8f2a54d689d3",
+      "stage": "before_evidence",
+      "created_at": "2026-07-18T03:05:55.803Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-18T03:05:55.803Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_954cb07685dec93b",
+      "stage": "after_evidence",
+      "created_at": "2026-07-18T03:05:55.804Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-18T03:05:55.804Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_68bc0cc8f14298f9",
+      "stage": "before_evidence",
+      "created_at": "2026-07-18T20:55:12.766Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-18T20:55:12.766Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_4dc38f0088cc0a32",
+      "stage": "after_evidence",
+      "created_at": "2026-07-18T20:55:12.768Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-18T20:55:12.768Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_a0b7074d2189fa8c",
+      "stage": "before_evidence",
+      "created_at": "2026-07-18T21:31:48.261Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-18T21:31:48.261Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_c3e1b24badee7d99",
+      "stage": "after_evidence",
+      "created_at": "2026-07-18T21:31:48.263Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-18T21:31:48.263Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_cc3bd7420c6ff287",
+      "stage": "before_evidence",
+      "created_at": "2026-07-18T22:05:18.879Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-18T22:05:18.879Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_4e1674cc757e8e1d",
+      "stage": "after_evidence",
+      "created_at": "2026-07-18T22:05:18.880Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-18T22:05:18.880Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_8dd87289acbce3d9",
+      "stage": "before_evidence",
+      "created_at": "2026-07-18T22:44:21.418Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/before_evidence.md",
+      "source_writer": "writeShopifixerBeforeEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline."
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "937b024a24ecba0f",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/937b024a24ecba0f.png",
+          "exists": false,
+          "stage": "before_evidence",
+          "created_at": "2026-07-18T22:44:21.418Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    },
+    {
+      "artifact_id": "ev_51f1d8039cf0ffbd",
+      "stage": "after_evidence",
+      "created_at": "2026-07-18T22:44:21.420Z",
+      "output_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_005/after_evidence.md",
+      "source_writer": "writeShopifixerAfterEvidence",
+      "references": [
+        "Collection page inventory",
+        "Mission-specific baseline.",
+        "Not Yet Available"
+      ],
+      "screenshot_artifacts": [
+        {
+          "artifact_id": "91d32bddba0de1c5",
+          "original_reference": "Not Yet Available",
+          "stored_path": "../../../../../../../Users/rossstafford/projects/cart-agent/staffordos/proof_runs/output/artifacts/91d32bddba0de1c5.png",
+          "exists": false,
+          "stage": "after_evidence",
+          "created_at": "2026-07-18T22:44:21.420Z",
+          "status": "referenced_missing"
+        }
+      ],
+      "status": "written"
+    }
+  ]
 }

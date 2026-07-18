@@ -690,10 +690,10 @@
         "Score is below the automation threshold."
       ],
       "last_execution_recommendation": "rerun_with_operator_approved",
-      "last_launched_at": "2026-06-08T20:31:06.728Z",
+      "last_launched_at": "2026-07-06T00:03:46.204Z",
       "last_completed_at": null,
-      "last_failed_at": "2026-06-08T20:31:06.761Z",
-      "last_execution_event_id": "operator_action_1780950666730",
+      "last_failed_at": "2026-07-06T00:03:46.269Z",
+      "last_execution_event_id": "operator_action_1783296226205",
       "last_execution_artifacts": [
         "staffordos/events/operator_action_events_v1.json",
         "staffordos/events/outcome_event_log_v1.json",
