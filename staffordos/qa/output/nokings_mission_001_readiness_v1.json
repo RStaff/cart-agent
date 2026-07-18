@@ -1,9 +1,9 @@
 {
   "schema": "staffordos.nokings_mission_001_readiness.v1",
-  "generated_at": "2026-07-17T21:25:07.226Z",
-  "status": "CONDITIONAL_GO",
+  "generated_at": "2026-07-18T03:06:27.346Z",
+  "status": "GO",
   "production_operation_permitted": true,
-  "completion_permitted": false,
+  "completion_permitted": true,
   "merchant": {
     "merchant_name": "NoKings Athletics",
     "store": "no-kings-athletics.myshopify.com",
@@ -16,12 +16,10 @@
     "proof_run_path": "staffordos/proof_runs/mission_001_nokings_shopifixer_v1"
   },
   "active_exercise": "Exercise 010 - Safe Edit Simulation",
-  "current_phase": "mission_001_gate_remediation",
-  "current_blocker": "Mission 001 Gate Unmet: Applied-Change And Executed-Rollback Capability Classes Missing",
-  "blocking_reasons": [
-    "Mission 001 Gate Unmet: Applied-Change And Executed-Rollback Capability Classes Missing"
-  ],
-  "next_safe_action": "Authorize governed applied-change remediation mission to demonstrate applied-change and executed-rollback capability classes",
+  "current_phase": "mission_001_complete",
+  "current_blocker": "None",
+  "blocking_reasons": [],
+  "next_safe_action": "Begin next governed mission selection after Mission 001 completion certification",
   "payment_required": false,
   "scope_authority": {
     "index_path": "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/fix_scope.md",
@@ -81,6 +79,14 @@
       "status": "pass",
       "reason": "Exercise 010 scope created"
     },
+    "mission_001_capability_gate": {
+      "status": "pass",
+      "reason": "Amended Mission 001 capability-class gate is satisfied"
+    },
+    "mission_001_completion_certification": {
+      "status": "pass",
+      "reason": "Mission 001 completion certification recognized"
+    },
     "rollback": {
       "status": "pass",
       "reason": "Separate mission proof-run path is available for rollback"
@@ -98,10 +104,12 @@
     "after_evidence": 100,
     "proof": 100,
     "mission_certification": 100,
+    "mission_001_capability_gate": 100,
+    "mission_001_completion_certification": 100,
     "exercise_005_planning": 0,
     "rollback": 100,
     "payment": 100,
-    "overall": 80
+    "overall": 100
   },
   "evidence_sources": [
     "STAFFORDOS_MISSION_001_NOKINGS_TRAINING_V1.md",
@@ -123,7 +131,10 @@
     "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_010/after_evidence.md",
     "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_010/mission_proof_package.md",
     "/Users/rossstafford/projects/cart-agent/staffordos/proof_runs/mission_001_nokings_shopifixer_v1/exercises/exercise_010/execution_notes.md",
-    "/Users/rossstafford/projects/cart-agent/staffordos/implementation/p11_43_mission_001_exercise_010_certification_v1.md"
+    "/Users/rossstafford/projects/cart-agent/staffordos/implementation/p11_43_mission_001_exercise_010_certification_v1.md",
+    "/Users/rossstafford/projects/cart-agent/staffordos/implementation/p11_51_mission_001_governed_applied_change_execution_v1.md",
+    "/Users/rossstafford/projects/cart-agent/staffordos/implementation/p11_52_mission_001_governed_rollback_rehearsal_v1.md",
+    "/Users/rossstafford/projects/cart-agent/staffordos/implementation/p11_53_mission_001_completion_certification_v1.md"
   ],
   "warnings": [
     "Mission 001 is a controlled training environment, not paid-commercial work.",

@@ -15,9 +15,15 @@ const DEFAULT_EXERCISE_008_CERTIFICATION_MEMO_PATH = path.join(DEFAULT_REPO_ROOT
 const DEFAULT_EXERCISE_009_CERTIFICATION_MEMO_PATH = path.join(DEFAULT_REPO_ROOT, "staffordos/implementation/p11_36_mission_001_exercise_009_certification_v1.md");
 const DEFAULT_EXERCISE_010_CERTIFICATION_MEMO_PATH = path.join(DEFAULT_REPO_ROOT, "staffordos/implementation/p11_43_mission_001_exercise_010_certification_v1.md");
 const DEFAULT_GATE_ASSESSMENT_PATH = path.join(DEFAULT_REPO_ROOT, "staffordos/implementation/p11_44_mission_001_readiness_gate_assessment_v1.md");
+const DEFAULT_APPLIED_CHANGE_EXECUTION_PATH = path.join(DEFAULT_REPO_ROOT, "staffordos/implementation/p11_51_mission_001_governed_applied_change_execution_v1.md");
+const DEFAULT_ROLLBACK_REHEARSAL_PATH = path.join(DEFAULT_REPO_ROOT, "staffordos/implementation/p11_52_mission_001_governed_rollback_rehearsal_v1.md");
+const DEFAULT_MISSION_001_COMPLETION_CERTIFICATION_PATH = path.join(DEFAULT_REPO_ROOT, "staffordos/implementation/p11_53_mission_001_completion_certification_v1.md");
 const DEFAULT_OUTPUT_PATH = path.join(MODULE_DIR, "output", "nokings_mission_001_readiness_v1.json");
 const MISSION_001_CAPABILITY_GATE_BLOCKER = "Mission 001 Gate Unmet: Applied-Change And Executed-Rollback Capability Classes Missing";
 const MISSION_001_CAPABILITY_GATE_ACTION = "Authorize governed applied-change remediation mission to demonstrate applied-change and executed-rollback capability classes";
+const MISSION_001_COMPLETION_CERTIFICATION_BLOCKER = "Mission 001 Completion Certification Missing";
+const MISSION_001_COMPLETION_CERTIFICATION_ACTION = "Certify Mission 001 completion under amended capability-class gate";
+const MISSION_001_COMPLETE_ACTION = "Begin next governed mission selection after Mission 001 completion certification";
 
 function clean(value, fallback = "Not Yet Available") {
   const text = String(value ?? "").trim();
@@ -148,6 +154,76 @@ function parseCertificationMemo(content) {
     exercise009Recommended: hasLine("Exercise 009 - Footer Inventory") && hasLine("ex_009_footer_inventory"),
     exercise010Recommended: hasLine("Exercise 010 - Safe Edit Simulation") && hasLine("ex_010_safe_edit_simulation"),
     noShopifyMutation: hasLine("No Shopify mutation occurred")
+  };
+}
+
+function parseAppliedChangeExecution(content) {
+  const text = String(content || "");
+  const has = (needle) => text.includes(needle);
+  return {
+    present: Boolean(text.trim()),
+    mission: has("Mission 001 - NoKings Shopify Engineering Training"),
+    store: has("no-kings-athletics.myshopify.com"),
+    theme: has("Horizon") && has("166489554980") && has("live"),
+    asset: has("templates/index.json"),
+    path: has(".sections.section_fDNEmL.blocks.text_UEkm8A.settings.text"),
+    beforeValue: has("<h2>JOIN THE RELENTLES</h2>"),
+    afterValue: has("<h2>JOIN THE RELENTLESS</h2>"),
+    beforeHash: has("8cf9c0fa3960e4e5df13d4c2398f019960acde4137cfe1f5dcec0ec62fce5e1e"),
+    afterHash: has("10e2dcf14d5ef49235a94f99f2053b69f5957799718d995d2b2b2e9aec9f02b7"),
+    desktopValidated: has("After desktop rendered target text: `JOIN THE RELENTLESS`"),
+    mobileValidated: has("After mobile rendered target text: `JOIN THE RELENTLESS`"),
+    oneAsset: has("Shopify assets pushed: one") && has("Asset pushed: `templates/index.json`"),
+    oneValue: has("JSON values changed: one") || has("Diff scope: one logical JSON value"),
+    emergencyRollbackNotRequired: /Emergency rollback status:\s*not required/i.test(text),
+    noPayment: has("Payment activity: none")
+  };
+}
+
+function parseRollbackRehearsal(content) {
+  const text = String(content || "");
+  const has = (needle) => text.includes(needle);
+  return {
+    present: Boolean(text.trim()),
+    mission: has("Mission 001 - NoKings Shopify Engineering Training"),
+    store: has("no-kings-athletics.myshopify.com"),
+    theme: has("Horizon") && has("166489554980") && has("live"),
+    asset: has("templates/index.json"),
+    path: has(".sections.section_fDNEmL.blocks.text_UEkm8A.settings.text"),
+    currentValue: has("<h2>JOIN THE RELENTLESS</h2>"),
+    rollbackValue: has("<h2>JOIN THE RELENTLES</h2>"),
+    rollbackHash: has("8cf9c0fa3960e4e5df13d4c2398f019960acde4137cfe1f5dcec0ec62fce5e1e"),
+    postChangeHash: has("10e2dcf14d5ef49235a94f99f2053b69f5957799718d995d2b2b2e9aec9f02b7"),
+    desktopValidated: has("Final desktop rendered target text: `JOIN THE RELENTLES`"),
+    mobileValidated: has("Final mobile rendered target text: `JOIN THE RELENTLES`"),
+    oneAsset: has("Shopify assets pushed: one") && has("Asset pushed: `templates/index.json`"),
+    oneValue: has("JSON values restored: one"),
+    restoredBaseline: has("Diff against captured rollback baseline: none"),
+    noPayment: has("Payment activity: none")
+  };
+}
+
+function parseMissionCompletionCertification(content) {
+  const text = String(content || "");
+  const has = (needle) => text.includes(needle);
+  const hasSection = (heading) => new RegExp(`##\\s+${heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, "i").test(text);
+  return {
+    present: Boolean(text.trim()),
+    mission: has("Mission 001 - NoKings Shopify Engineering Training"),
+    store: has("no-kings-athletics.myshopify.com"),
+    doctrineAuthority: hasSection("Doctrine Authority"),
+    evidenceReviewed: hasSection("Evidence Reviewed"),
+    capabilityMatrix: hasSection("Capability-Class Matrix"),
+    appliedChangeSummary: hasSection("P11.51 Applied-Change Summary"),
+    rollbackSummary: hasSection("P11.52 Rollback Summary"),
+    restorationProof: hasSection("Source And Hash Restoration Proof"),
+    scopeControlProof: hasSection("Scope-Control Proof"),
+    gateEvaluation: hasSection("Amended Gate Evaluation"),
+    competencyDecision: hasSection("Competency Update Decision"),
+    finalStatus: has("Mission 001 status: `complete`"),
+    verdict: /\*\*(GO|CONDITIONAL GO)\*\*/i.test(text),
+    completionPassed: has("MISSION 001 COMPLETION CERTIFICATION PASSED"),
+    noSecrets: !/(token|cookie|session_secret|access_token)\s*[:=]/i.test(text)
   };
 }
 
@@ -299,7 +375,10 @@ function evaluateNokingsMissionReadiness({
   exercise008CertificationMemoPath = DEFAULT_EXERCISE_008_CERTIFICATION_MEMO_PATH,
   exercise009CertificationMemoPath = DEFAULT_EXERCISE_009_CERTIFICATION_MEMO_PATH,
   exercise010CertificationMemoPath = DEFAULT_EXERCISE_010_CERTIFICATION_MEMO_PATH,
-  gateAssessmentPath = DEFAULT_GATE_ASSESSMENT_PATH
+  gateAssessmentPath = DEFAULT_GATE_ASSESSMENT_PATH,
+  appliedChangeExecutionPath = DEFAULT_APPLIED_CHANGE_EXECUTION_PATH,
+  rollbackRehearsalPath = DEFAULT_ROLLBACK_REHEARSAL_PATH,
+  mission001CompletionCertificationPath = DEFAULT_MISSION_001_COMPLETION_CERTIFICATION_PATH
 } = {}) {
   const binding = loadBinding(bindingPath);
   const scopeIndexPath = path.join(proofRunDir, "fix_scope.md");
@@ -327,6 +406,9 @@ function evaluateNokingsMissionReadiness({
   const exercise008CertificationMemo = parseCertificationMemo(readText(exercise008CertificationMemoPath));
   const exercise009CertificationMemo = parseCertificationMemo(readText(exercise009CertificationMemoPath));
   const exercise010CertificationMemo = parseCertificationMemo(readText(exercise010CertificationMemoPath));
+  const appliedChangeExecution = parseAppliedChangeExecution(readText(appliedChangeExecutionPath));
+  const rollbackRehearsal = parseRollbackRehearsal(readText(rollbackRehearsalPath));
+  const mission001CompletionCertification = parseMissionCompletionCertification(readText(mission001CompletionCertificationPath));
 
   const beforeEvidence = parseMarkdownFields(readText(beforePath));
   const afterEvidence = parseMarkdownFields(readText(afterPath));
@@ -513,16 +595,80 @@ function evaluateNokingsMissionReadiness({
                 : false;
   const gateAssessmentText = readText(gateAssessmentPath);
   const gateAssessmentPresent = Boolean(gateAssessmentText.trim()) && /Gate Decision/i.test(gateAssessmentText) && /CONDITIONAL_GO/.test(gateAssessmentText);
-  const gateRemediationActive = scopeIsExercise010 && certificationMemoReady && gateAssessmentPresent;
-  const nextPlanningBlocker = gateRemediationActive
-    ? MISSION_001_CAPABILITY_GATE_BLOCKER
-    : (activeExerciseDefinition?.nextPlanningBlocker || "Exercise 005 Planning Missing");
-  const nextPlanningPhase = gateRemediationActive
-    ? "mission_001_gate_remediation"
-    : (activeExerciseDefinition?.nextPlanningPhase || "exercise_005_planning");
-  const nextPlanningAction = gateRemediationActive
-    ? MISSION_001_CAPABILITY_GATE_ACTION
-    : (activeExerciseDefinition?.nextPlanningAction || "Plan Exercise 005 - Collection Page Inventory");
+  const appliedChangeReady = Boolean(appliedChangeExecution.present &&
+    appliedChangeExecution.mission &&
+    appliedChangeExecution.store &&
+    appliedChangeExecution.theme &&
+    appliedChangeExecution.asset &&
+    appliedChangeExecution.path &&
+    appliedChangeExecution.beforeValue &&
+    appliedChangeExecution.afterValue &&
+    appliedChangeExecution.beforeHash &&
+    appliedChangeExecution.afterHash &&
+    appliedChangeExecution.desktopValidated &&
+    appliedChangeExecution.mobileValidated &&
+    appliedChangeExecution.oneAsset &&
+    appliedChangeExecution.oneValue &&
+    appliedChangeExecution.emergencyRollbackNotRequired &&
+    appliedChangeExecution.noPayment);
+  const rollbackRehearsalReady = Boolean(rollbackRehearsal.present &&
+    rollbackRehearsal.mission &&
+    rollbackRehearsal.store &&
+    rollbackRehearsal.theme &&
+    rollbackRehearsal.asset &&
+    rollbackRehearsal.path &&
+    rollbackRehearsal.currentValue &&
+    rollbackRehearsal.rollbackValue &&
+    rollbackRehearsal.rollbackHash &&
+    rollbackRehearsal.postChangeHash &&
+    rollbackRehearsal.desktopValidated &&
+    rollbackRehearsal.mobileValidated &&
+    rollbackRehearsal.oneAsset &&
+    rollbackRehearsal.oneValue &&
+    rollbackRehearsal.restoredBaseline &&
+    rollbackRehearsal.noPayment);
+  const safeFixProposalReady = Boolean(scopeIsExercise010 && exercise010CertificationReady);
+  const missionCapabilityGateMet = Boolean(scopeIsExercise010 && certificationMemoReady && gateAssessmentPresent && safeFixProposalReady && appliedChangeReady && rollbackRehearsalReady);
+  const mission001CompletionCertificationReady = Boolean(mission001CompletionCertification.present &&
+    mission001CompletionCertification.mission &&
+    mission001CompletionCertification.store &&
+    mission001CompletionCertification.doctrineAuthority &&
+    mission001CompletionCertification.evidenceReviewed &&
+    mission001CompletionCertification.capabilityMatrix &&
+    mission001CompletionCertification.appliedChangeSummary &&
+    mission001CompletionCertification.rollbackSummary &&
+    mission001CompletionCertification.restorationProof &&
+    mission001CompletionCertification.scopeControlProof &&
+    mission001CompletionCertification.gateEvaluation &&
+    mission001CompletionCertification.competencyDecision &&
+    mission001CompletionCertification.finalStatus &&
+    mission001CompletionCertification.verdict &&
+    mission001CompletionCertification.completionPassed &&
+    mission001CompletionCertification.noSecrets);
+  const mission001Complete = Boolean(missionCapabilityGateMet && mission001CompletionCertificationReady && !paymentRequired);
+  const gateRemediationActive = scopeIsExercise010 && certificationMemoReady && gateAssessmentPresent && !missionCapabilityGateMet;
+  const missionCompletionCertificationActive = scopeIsExercise010 && certificationMemoReady && gateAssessmentPresent && missionCapabilityGateMet && !mission001CompletionCertificationReady;
+  const nextPlanningBlocker = mission001Complete
+    ? ""
+    : missionCompletionCertificationActive
+      ? MISSION_001_COMPLETION_CERTIFICATION_BLOCKER
+      : gateRemediationActive
+        ? MISSION_001_CAPABILITY_GATE_BLOCKER
+        : (activeExerciseDefinition?.nextPlanningBlocker || "Exercise 005 Planning Missing");
+  const nextPlanningPhase = mission001Complete
+    ? "mission_001_complete"
+    : missionCompletionCertificationActive
+      ? "mission_001_completion_certification"
+      : gateRemediationActive
+        ? "mission_001_gate_remediation"
+        : (activeExerciseDefinition?.nextPlanningPhase || "exercise_005_planning");
+  const nextPlanningAction = mission001Complete
+    ? MISSION_001_COMPLETE_ACTION
+    : missionCompletionCertificationActive
+      ? MISSION_001_COMPLETION_CERTIFICATION_ACTION
+      : gateRemediationActive
+        ? MISSION_001_CAPABILITY_GATE_ACTION
+        : (activeExerciseDefinition?.nextPlanningAction || "Plan Exercise 005 - Collection Page Inventory");
   const rollbackReady = Boolean(merchantBindingPass && proofRunPathExists);
 
   const gatingReasons = [
@@ -553,7 +699,7 @@ function evaluateNokingsMissionReadiness({
                 ? "delivery_payment"
                 : nextPlanningPhase;
 
-  const currentBlocker = gatingReasons[0] || "Not Yet Available";
+  const currentBlocker = gatingReasons[0] || (mission001Complete ? "None" : "Not Yet Available");
   const nextSafeAction = !merchantBindingPass
     ? "Complete mission binding"
     : !scopeComplete
@@ -573,7 +719,7 @@ function evaluateNokingsMissionReadiness({
                 : nextPlanningAction;
 
   const productionOperationPermitted = merchantBindingPass;
-  const completionPermitted = false;
+  const completionPermitted = mission001Complete;
   const status = merchantBindingPass && !paymentRequired && gatingReasons.length > 0 ? "CONDITIONAL_GO" : merchantBindingPass && !gatingReasons.length ? "GO" : "NO_GO";
 
   const report = {
@@ -622,6 +768,14 @@ function evaluateNokingsMissionReadiness({
       exercise_008_planning: (scopeIsExercise008 || scopeIsExercise009 || scopeIsExercise010) ? stageStatus("pass", "Exercise 008 scope created") : scopeIsExercise007 && certificationMemoReady ? stageStatus("blocked", "Exercise 008 Planning Missing") : stageStatus("blocked", "Mission Certification Missing"),
       exercise_009_planning: (scopeIsExercise009 || scopeIsExercise010) ? stageStatus("pass", "Exercise 009 scope created") : scopeIsExercise008 && certificationMemoReady ? stageStatus("blocked", "Exercise 009 Planning Missing") : stageStatus("blocked", "Mission Certification Missing"),
       exercise_010_planning: scopeIsExercise010 ? stageStatus("pass", "Exercise 010 scope created") : scopeIsExercise009 && certificationMemoReady ? stageStatus("blocked", "Exercise 010 Planning Missing") : stageStatus("blocked", "Mission Certification Missing"),
+      mission_001_capability_gate: missionCapabilityGateMet
+        ? stageStatus("pass", "Amended Mission 001 capability-class gate is satisfied")
+        : stageStatus("blocked", gateRemediationActive ? MISSION_001_CAPABILITY_GATE_BLOCKER : "Mission 001 capability-class gate not yet evaluable"),
+      mission_001_completion_certification: missionCapabilityGateMet
+        ? (mission001CompletionCertificationReady
+            ? stageStatus("pass", "Mission 001 completion certification recognized")
+            : stageStatus("blocked", MISSION_001_COMPLETION_CERTIFICATION_BLOCKER))
+        : stageStatus("blocked", MISSION_001_CAPABILITY_GATE_BLOCKER),
       rollback: rollbackReady ? stageStatus("pass", "Separate mission proof-run path is available for rollback") : stageStatus("blocked", "Rollback path not yet established"),
       payment_applicability: paymentRequired
         ? stageStatus("blocked", paymentAuthority)
@@ -635,10 +789,12 @@ function evaluateNokingsMissionReadiness({
       after_evidence: afterEvidenceCaptured ? 100 : 0,
       proof: proofReady ? 100 : 0,
       mission_certification: certificationMemoReady ? 100 : 0,
+      mission_001_capability_gate: missionCapabilityGateMet ? 100 : 0,
+      mission_001_completion_certification: mission001CompletionCertificationReady ? 100 : 0,
       exercise_005_planning: certificationMemoReady ? 0 : 0,
       rollback: rollbackReady ? 100 : 50,
       payment: paymentRequired ? 0 : 100,
-      overall: merchantBindingPass ? (scopeComplete ? (beforeEvidenceCaptured ? (certificationMemoReady ? 80 : 70) : 40) : 35) : 0
+      overall: mission001Complete ? 100 : merchantBindingPass ? (scopeComplete ? (beforeEvidenceCaptured ? (certificationMemoReady ? 80 : 70) : 40) : 35) : 0
     },
     evidence_sources: [
       "STAFFORDOS_MISSION_001_NOKINGS_TRAINING_V1.md",
@@ -660,7 +816,10 @@ function evaluateNokingsMissionReadiness({
       afterPath,
       proofPackagePath,
       executionNotesPath,
-      scopeIsExercise010 ? exercise010CertificationMemoPath : scopeIsExercise009 ? exercise009CertificationMemoPath : scopeIsExercise008 ? exercise008CertificationMemoPath : scopeIsExercise007 ? exercise007CertificationMemoPath : scopeIsExercise006 ? exercise006CertificationMemoPath : scopeIsExercise005 ? exercise005CertificationMemoPath : certificationMemoPath
+      scopeIsExercise010 ? exercise010CertificationMemoPath : scopeIsExercise009 ? exercise009CertificationMemoPath : scopeIsExercise008 ? exercise008CertificationMemoPath : scopeIsExercise007 ? exercise007CertificationMemoPath : scopeIsExercise006 ? exercise006CertificationMemoPath : scopeIsExercise005 ? exercise005CertificationMemoPath : certificationMemoPath,
+      appliedChangeExecutionPath,
+      rollbackRehearsalPath,
+      mission001CompletionCertificationPath
     ],
     warnings: [
       "Mission 001 is a controlled training environment, not paid-commercial work.",

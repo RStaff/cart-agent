@@ -1,18 +1,57 @@
 {
   "schema": "staffordos.competency_engine_sync.v1",
-  "generated_at": "2026-06-29T18:41:51.980Z",
+  "generated_at": "2026-07-18T03:04:08.000Z",
   "task_type": "competency_engine_sync",
   "status": "passed",
   "synced_documents": [
     "MISSION_001_CONSOLIDATION_CERTIFICATION_V1.md",
-    "SHOPIFIXER_COMPETENCY_ENGINE_V1.md"
+    "SHOPIFIXER_COMPETENCY_ENGINE_V1.md",
+    "staffordos/implementation/p11_51_mission_001_governed_applied_change_execution_v1.md",
+    "staffordos/implementation/p11_52_mission_001_governed_rollback_rehearsal_v1.md",
+    "staffordos/implementation/p11_53_mission_001_completion_certification_v1.md"
   ],
   "capability_score": 38,
-  "next_recommended_exercise": "Exercise 004 - Product Page Analysis",
+  "capability_score_authority": "Retained from the canonical competency record; Mission 001 completion doctrine does not define an exact post-completion numeric scoring delta.",
+  "classification": "mission_001_complete_supervised_fix_gate_demonstrated",
+  "mission_001": {
+    "status": "complete",
+    "completion_certification": "staffordos/implementation/p11_53_mission_001_completion_certification_v1.md",
+    "completed_exercises": [
+      "Exercise 001 - Homepage Architecture Discovery",
+      "Exercise 002 - Promote Homepage Primary CTA",
+      "Exercise 003 - Product List Analysis",
+      "Exercise 004 - Product Page Inventory",
+      "Exercise 005 - Collection Page Inventory",
+      "Exercise 006 - Cart Inventory",
+      "Exercise 007 - Header Navigation Inventory",
+      "Exercise 008 - Trust Badge Inventory",
+      "Exercise 009 - Footer Inventory",
+      "Exercise 010 - Safe Edit Simulation"
+    ],
+    "completed_capability_classes": {
+      "mechanically_actionable_safe_fix_proposal": {
+        "status": "demonstrated",
+        "evidence": "staffordos/implementation/p11_43_mission_001_exercise_010_certification_v1.md"
+      },
+      "governed_applied_and_validated_storefront_change": {
+        "status": "demonstrated",
+        "evidence": "staffordos/implementation/p11_51_mission_001_governed_applied_change_execution_v1.md"
+      },
+      "executed_rollback_rehearsal": {
+        "status": "demonstrated",
+        "evidence": "staffordos/implementation/p11_52_mission_001_governed_rollback_rehearsal_v1.md"
+      }
+    },
+    "active_blocker": null
+  },
+  "next_recommended_exercise": "Mission 001 complete - select next governed mission or run competency-engine recomputation",
   "proof": {
-    "documentation_only": true,
+    "documentation_only": false,
     "sent_messages": false,
     "revenue_action": false,
-    "runtime_mutation": false
+    "runtime_mutation": true,
+    "runtime_mutation_scope": "NoKings controlled-training Shopify theme setting changed and rolled back in P11.51/P11.52",
+    "rollback_rehearsal_executed": true,
+    "rollback_restored_baseline_hash": "8cf9c0fa3960e4e5df13d4c2398f019960acde4137cfe1f5dcec0ec62fce5e1e"
   }
 }

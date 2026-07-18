@@ -1158,13 +1158,13 @@ function run() {
     exercise006CertificationMemoPath: path.join(REPO_ROOT, "staffordos/implementation/p11_14_mission_001_exercise_006_certification_v1.md"),
     exercise007CertificationMemoPath: path.join(REPO_ROOT, "staffordos/implementation/p11_21_mission_001_exercise_007_certification_v1.md")
   });
-  assert(actualReport.status === "CONDITIONAL_GO", "current readiness status remains CONDITIONAL_GO", failures);
+  assert(actualReport.status === "GO", "current readiness status is GO after Mission 001 completion certification", failures);
   assert(actualReport.active_exercise === "Exercise 010 - Safe Edit Simulation", "active exercise is Exercise 010", failures);
-  assert(actualReport.current_phase === "mission_001_gate_remediation", "current phase is mission_001_gate_remediation after the gate assessment", failures);
-  assert(actualReport.current_blocker === "Mission 001 Gate Unmet: Applied-Change And Executed-Rollback Capability Classes Missing", "current blocker is the amended capability-class gate after the gate assessment", failures);
-  assert(actualReport.next_safe_action === "Authorize governed applied-change remediation mission to demonstrate applied-change and executed-rollback capability classes", "next safe action is authorize the governed applied-change remediation mission", failures);
+  assert(actualReport.current_phase === "mission_001_complete", "current phase is mission_001_complete after completion certification", failures);
+  assert(actualReport.current_blocker === "None", "current blocker is cleared after completion certification", failures);
+  assert(actualReport.next_safe_action === "Begin next governed mission selection after Mission 001 completion certification", "next safe action is next governed mission selection", failures);
   assert(actualReport.payment_required === false, "payment_required remains false", failures);
-  assert(actualReport.completion_permitted === false, "completion remains prohibited after the gate assessment", failures);
+  assert(actualReport.completion_permitted === true, "completion is permitted after capability gate and completion certification pass", failures);
   assert(actualReport.gates.scope.status === "pass", "exercise 010 scope resolves from exercise_010/fix_scope.md", failures);
   assert(actualReport.gates.before_evidence.status === "pass", "exercise 010 before evidence gate passes when baseline is valid", failures);
   assert(actualReport.gates.execution.status === "pass", "exercise 010 execution gate passes when the safe edit simulation is valid", failures);
@@ -1176,6 +1176,8 @@ function run() {
   assert(actualReport.gates.exercise_008_planning.status === "pass", "Exercise 008 planning passes after scope creation", failures);
   assert(actualReport.gates.exercise_009_planning.status === "pass", "Exercise 009 planning passes after scope creation", failures);
   assert(actualReport.gates.exercise_010_planning.status === "pass", "Exercise 010 planning passes after scope creation", failures);
+  assert(actualReport.gates.mission_001_capability_gate.status === "pass", "Mission 001 capability-class gate passes after applied change and rollback evidence", failures);
+  assert(actualReport.gates.mission_001_completion_certification.status === "pass", "Mission 001 completion certification gate passes", failures);
 
   if (failures.length) {
     console.error(JSON.stringify({ status: "failed", failures }, null, 2));
@@ -1195,7 +1197,9 @@ function run() {
       production_truth_unchanged: true,
       generic_pilot_unchanged: true,
       abando_unchanged: true,
-      current_readiness_correct: true
+      current_readiness_correct: true,
+      mission_001_capability_gate_complete: true,
+      mission_001_completion_certification_recognized: true
     }
   }, null, 2));
 }
