@@ -20,9 +20,53 @@ function readText(filePath) {
   }
 }
 
+function readJson(filePath) {
+  try {
+    return JSON.parse(readText(filePath));
+  } catch {
+    return null;
+  }
+}
+
 function writeText(filePath, text) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, text, "utf8");
+}
+
+function stableStringify(value) {
+  if (Array.isArray(value)) {
+    return `[${value.map((item) => stableStringify(item)).join(",")}]`;
+  }
+
+  if (value && typeof value === "object") {
+    return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stableStringify(value[key])}`).join(",")}}`;
+  }
+
+  return JSON.stringify(value);
+}
+
+function normalizeNokingsReadinessForSemanticDeterminism(readiness) {
+  const normalized = JSON.parse(JSON.stringify(readiness ?? null));
+
+  if (
+    normalized &&
+    typeof normalized === "object" &&
+    normalized.schema === "staffordos.nokings_mission_001_readiness.v1"
+  ) {
+    // P11.61 policy: evaluator execution-time generated_at is operational metadata.
+    normalized.generated_at = "<normalized-readiness-generated_at>";
+  }
+
+  return normalized;
+}
+
+function nokingsReadinessSemanticallyEqual(left, right) {
+  return stableStringify(normalizeNokingsReadinessForSemanticDeterminism(left)) ===
+    stableStringify(normalizeNokingsReadinessForSemanticDeterminism(right));
+}
+
+function hasOperationalGeneratedAt(readiness) {
+  return typeof readiness?.generated_at === "string" && readiness.generated_at.trim().length > 0;
 }
 
 function snapshot(paths) {
@@ -1179,6 +1223,32 @@ function run() {
   assert(actualReport.gates.mission_001_capability_gate.status === "pass", "Mission 001 capability-class gate passes after applied change and rollback evidence", failures);
   assert(actualReport.gates.mission_001_completion_certification.status === "pass", "Mission 001 completion certification gate passes", failures);
 
+  const persistedReadiness = readJson(READINESS_OUTPUT_PATH);
+  assert(Boolean(persistedReadiness), "current readiness output is readable JSON", failures);
+  assert(hasOperationalGeneratedAt(persistedReadiness), "current readiness output preserves operational generated_at metadata", failures);
+  assert(hasOperationalGeneratedAt(actualReport), "evaluator output preserves operational generated_at metadata", failures);
+  assert(
+    nokingsReadinessSemanticallyEqual(persistedReadiness, actualReport),
+    "current readiness output semantically matches evaluator output with only generated_at normalized",
+    failures
+  );
+  assert(
+    nokingsReadinessSemanticallyEqual(
+      actualReport,
+      { ...actualReport, generated_at: "2099-01-01T00:00:00.000Z" }
+    ),
+    "readiness semantic determinism accepts timestamp-only generated_at variance",
+    failures
+  );
+  assert(
+    !nokingsReadinessSemanticallyEqual(
+      actualReport,
+      { ...actualReport, status: actualReport.status === "GO" ? "NO_GO" : "GO" }
+    ),
+    "readiness semantic determinism rejects canonical status variance",
+    failures
+  );
+
   if (failures.length) {
     console.error(JSON.stringify({ status: "failed", failures }, null, 2));
     process.exit(1);
@@ -1198,6 +1268,8 @@ function run() {
       generic_pilot_unchanged: true,
       abando_unchanged: true,
       current_readiness_correct: true,
+      readiness_generated_at_semantically_normalized: true,
+      readiness_canonical_fields_remain_strict: true,
       mission_001_capability_gate_complete: true,
       mission_001_completion_certification_recognized: true
     }
