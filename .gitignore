@@ -42,6 +42,7 @@ out/
 # StaffordOS runtime / generated outputs
 staffordos/system_inventory/output/
 staffordos/system_inventory/runtime_truth_v2.json
+staffordos/operating_loop/output/stop_workday_*/
 
 # Hygiene outputs
 staffordos/hygiene/output/
