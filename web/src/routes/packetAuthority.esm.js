@@ -104,7 +104,7 @@ export function installPacketAuthority(app) {
         statusUrl.searchParams.set("reservation_id", packet.reservation_id);
       }
 
-      return res.redirect(302, `${statusUrl.pathname}?${statusUrl.searchParams.toString()}`);
+      return res.redirect(302, statusUrl.toString());
     } catch (error) {
       return res.status(500).json({
         ok: false,
