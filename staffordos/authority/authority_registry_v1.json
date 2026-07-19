@@ -1,7 +1,7 @@
 {
   "schema": "staffordos.authority_registry.v1",
-  "status": "SEED_V1",
-  "current_blocker": "S2F_STRIPE_AUTHORITY_UNIFICATION",
+  "status": "RECONCILED_V2",
+  "current_blocker": null,
   "authorities": [
     {
       "name": "Checkout Authority",
@@ -44,8 +44,8 @@
       "allowed_state_transitions": [
         "payment_pending -> payment_received"
       ],
-      "status": "active_but_unverified",
-      "risk": "canonical webhook can currently mark payment_received without Stripe signature verification"
+      "status": "active_verified_source_authority",
+      "risk": "live payment validation still requires a separately authorized S2H controlled real payment event"
     },
     {
       "name": "Billing Authority",
@@ -55,13 +55,33 @@
         "Contains Stripe webhook verification example"
       ],
       "status": "non_canonical_for_shopifixer_packet_payments",
-      "required_action": "Merge verification authority into canonical Stripe webhook authority"
+      "required_action": "Retain as non-canonical legacy/subscription billing authority; do not use for ShopiFixer packet payment_received transitions"
     }
   ],
   "blocked_actions": [
-    "real_payment_validation",
     "paid_packet_execution",
-    "merchant_execution_workflow"
+    "merchant_execution_workflow",
+    "shopify_mutation_for_paid_packet",
+    "proof_package_creation_for_paid_packet"
   ],
-  "next_required_phase": "S2F_STRIPE_AUTHORITY_UNIFICATION"
+  "next_required_phase": "S2H_CONTROLLED_REAL_PAYMENT_VALIDATION",
+  "separate_authority_required": [
+    "controlled_real_payment_validation",
+    "paid_packet_lifecycle_execution",
+    "merchant_execution_workflow",
+    "shopify_mutation_for_paid_packet",
+    "proof_package_creation_for_paid_packet"
+  ],
+  "reconciliation": {
+    "previous_blocker": "S2F_STRIPE_AUTHORITY_UNIFICATION",
+    "replacement_authority": "S2H_CONTROLLED_REAL_PAYMENT_VALIDATION",
+    "reason": "S2F source authority is complete in repository truth: the canonical Stripe webhook uses STRIPE_WEBHOOK_SECRET, stripe.webhooks.constructEvent(), and raw body parsing before global JSON parsing.",
+    "supporting_sources": [
+      "web/src/routes/stripeWebhook.esm.js",
+      "web/src/index.js",
+      "staffordos/authority/output/payment_authority_source_validation_v1.json",
+      "staffordos/authority/output/s2f_completion_report_v1.md",
+      "staffordos/implementation/p11_57_mission_002_authority_definition_v1.md"
+    ]
+  }
 }

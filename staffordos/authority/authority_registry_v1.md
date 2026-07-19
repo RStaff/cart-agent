@@ -47,6 +47,13 @@ Required:
 Only Allowed State Transition:
 payment_pending -> payment_received
 
+Current Source Authority Status:
+S2F source-authority blocker: none
+
+Current Limitation:
+Live payment validation still requires separate S2H controlled real payment
+authority.
+
 ---
 
 ## Billing Authority
@@ -55,12 +62,32 @@ Owner:
 web/src/routes/billing.js
 
 Current Status:
-Contains verification logic
+Non-canonical for ShopiFixer packet payments
 
 Required Action:
-Merge verification authority into canonical Stripe webhook authority
+Retain as legacy/subscription billing authority. Do not use for ShopiFixer
+packet `payment_received` transitions.
 
 ---
 
 Registry Status:
-SEED_V1
+RECONCILED_V2
+
+Previous Authority:
+S2F_STRIPE_AUTHORITY_UNIFICATION
+
+Replacement Authority:
+S2H_CONTROLLED_REAL_PAYMENT_VALIDATION
+
+Reason:
+Repository source authority now shows the canonical Stripe webhook requires
+`STRIPE_WEBHOOK_SECRET`, verifies signatures with `stripe.webhooks.constructEvent`,
+and is mounted before global JSON parsing. The persisted payment source
+validation output reports `status: passed` and `current_blocker: null`.
+
+Still Requires Separate Authority:
+- controlled real payment validation
+- paid packet lifecycle execution
+- merchant execution workflow
+- Shopify mutation for a paid packet
+- proof package creation for a paid packet

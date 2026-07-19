@@ -2,10 +2,11 @@
   "schema": "staffordos.authority_registry_validation.v1",
   "status": "passed",
   "failures": [],
-  "next_required_phase": "S2F_STRIPE_AUTHORITY_UNIFICATION",
+  "next_required_phase": "S2H_CONTROLLED_REAL_PAYMENT_VALIDATION",
   "blocked_actions": [
-    "real_payment_validation",
     "paid_packet_execution",
-    "merchant_execution_workflow"
+    "merchant_execution_workflow",
+    "shopify_mutation_for_paid_packet",
+    "proof_package_creation_for_paid_packet"
   ]
 }

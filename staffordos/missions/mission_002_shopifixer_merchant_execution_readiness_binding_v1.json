@@ -1,0 +1,159 @@
+{
+  "schema": "staffordos.mission_binding.shopifixer_merchant_execution_readiness.v1",
+  "mission_id": "mission_002_shopifixer_merchant_execution_readiness",
+  "mission_name": "Mission 002 - ShopiFixer Merchant Execution Readiness Authority",
+  "product": "ShopiFixer",
+  "environment_type": "governed_merchant_execution_readiness",
+  "authority_mode": "governance_only_until_separate_execution_authority",
+  "status": "governance_binding_established",
+  "created_at": "2026-07-19T14:02:01Z",
+  "updated_at": "2026-07-19T14:02:01Z",
+  "mission_001_dependency": {
+    "mission_id": "mission_001",
+    "status": "complete",
+    "completion_certification": "staffordos/implementation/p11_53_mission_001_completion_certification_v1.md",
+    "production_restoration": "staffordos/implementation/p11_55_governed_production_typo_restoration_v1.md",
+    "readiness_output": "staffordos/qa/output/nokings_mission_001_readiness_v1.json",
+    "required_state": {
+      "status": "GO",
+      "current_phase": "mission_001_complete",
+      "current_blocker": "None",
+      "completion_permitted": true
+    }
+  },
+  "authority_sources": {
+    "governed": [
+      "staffordos/implementation/p11_57_mission_002_authority_definition_v1.md",
+      "STAFFORDOS_CANONICAL_CONTINUITY_ROUTE_AUDIT_V1.md",
+      "STAFFORDOS_MERCHANT_WORKSPACE_ARCHITECTURE_V1.md",
+      "staffordos/authority/payment_lifecycle_registry_v1.md",
+      "staffordos/authority/authority_registry_v1.json",
+      "staffordos/authority/authority_registry_v1.md",
+      "staffordos/authority/output/payment_authority_source_validation_v1.json",
+      "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md"
+    ],
+    "supporting": [
+      "SHOPIFIXER_FIRST_CUSTOMER_EVIDENCE_PACKAGE_TEMPLATE_V1.md",
+      "SHOPIFIXER_FIRST_CUSTOMER_OPERATIONS_RUNBOOK_V1.md",
+      "SHOPIFIXER_PRODUCTION_PILOT_DECISION_RECORD_V1.md",
+      "STAFFORDOS_OPERATOR_SURFACE_INVENTORY_V1.md",
+      "STAFFORDOS_OPERATOR_DAILY_WORKFLOW_V1.md",
+      "STAFFORDOS_OPERATOR_GAP_CLOSURE_PLAN_V1.md",
+      "staffordos/operations/operator_design_system_v1.md",
+      "staffordos/operations/operator_visibility_architecture_v1.md"
+    ],
+    "historical_or_superseded": [
+      "SHOPIFIXER_COMPETENCY_ENGINE_V1.md",
+      "staffordos/operator_daemon/write_competency_engine_sync_v1.mjs",
+      "staffordos/authority/output/current_roadmap_lock_v1.md"
+    ]
+  },
+  "mission_boundaries": {
+    "application_code_changes_permitted_by_this_binding": false,
+    "runtime_changes_permitted_by_this_binding": false,
+    "deployment_permitted_by_this_binding": false,
+    "shopify_mutation_permitted": false,
+    "stripe_write_permitted": false,
+    "payment_activity_permitted": false,
+    "packet_or_reservation_mutation_permitted": false,
+    "database_schema_change_permitted": false,
+    "merchant_execution_permitted_by_this_binding": false,
+    "first_engineering_slice_requires_separate_authority": true
+  },
+  "payment_authority": {
+    "canonical_authority": "Stripe Webhook Authority",
+    "owner": "web/src/routes/stripeWebhook.esm.js",
+    "allowed_transition": "payment_pending -> payment_received",
+    "required_proof": [
+      "valid Stripe signature",
+      "verified checkout.session.completed event",
+      "existing packet_id",
+      "matching store_domain",
+      "existing packet record"
+    ],
+    "forbidden_paid_sources": [
+      "/payment-return",
+      "/api/packets/prepare",
+      "checkout creation",
+      "operator manual action",
+      "unverified webhook JSON"
+    ],
+    "current_source_authority_status": "S2F source authority reconciled",
+    "next_payment_phase": "S2H_CONTROLLED_REAL_PAYMENT_VALIDATION",
+    "real_payment_validation_requires_separate_authority": true
+  },
+  "packet_authority": {
+    "canonical_repository": "web/src/lib/packetRepository.js",
+    "read_routes": [
+      "GET /api/packets/:packetId",
+      "GET /api/operator/packets",
+      "GET /api/operator/packets/:packetId"
+    ],
+    "write_routes": [
+      "POST /api/packets/prepare",
+      "POST /api/packets/:packetId/execution"
+    ],
+    "governance_rule": "Packet Authority must preserve payment lifecycle boundaries and must not grant payment_received without Stripe webhook verification."
+  },
+  "merchant_continuity_authority": {
+    "canonical_customer_route": "/fix-status",
+    "legacy_repository_route": "/shopifixer/status",
+    "durable_source": "GET /api/packets/:packetId",
+    "known_implementation_gap": "No repository route implementation named /fix-status was found during M002.01 discovery.",
+    "first_route_work_requires_separate_authority": true
+  },
+  "fulfillment_start_gate": {
+    "required_packet_state": {
+      "status": "payment_received",
+      "execution_status": "not_started",
+      "proof_status": "not_started",
+      "completion_status": "not_started"
+    },
+    "must_not_start_when": [
+      "status is payment_pending",
+      "payment was not verified through Stripe webhook",
+      "packet identity is unclear",
+      "store domain is unclear",
+      "fix scope is unclear",
+      "proof requirements are missing"
+    ]
+  },
+  "evidence_requirements": {
+    "future_payment_or_packet_preflight": [
+      "store identity",
+      "route and environment authority",
+      "packet identity",
+      "payment authority status",
+      "rollback or compensating-evidence plan"
+    ],
+    "future_merchant_execution": [
+      "intake summary",
+      "fix scope",
+      "before-state evidence",
+      "execution notes",
+      "after-state evidence",
+      "merchant-facing proof package",
+      "completion decision"
+    ],
+    "future_continuity_validation": [
+      "canonical route response",
+      "packet hydration result",
+      "visible merchant state",
+      "operator continuity link",
+      "failure state behavior"
+    ]
+  },
+  "required_artifacts": {
+    "binding": "staffordos/missions/mission_002_shopifixer_merchant_execution_readiness_binding_v1.json",
+    "readiness_plan": "staffordos/implementation/p11_58_mission_002_binding_and_readiness_plan_v1.md",
+    "evaluator": "staffordos/qa/evaluate_mission_002_shopifixer_execution_readiness_v1.mjs",
+    "validator": "staffordos/qa/validate_mission_002_shopifixer_execution_binding_v1.mjs",
+    "readiness_output": "staffordos/qa/output/mission_002_shopifixer_execution_readiness_v1.json"
+  },
+  "competency_relationship": {
+    "current_canonical_score": 38,
+    "score_change_authorized": false,
+    "score_deferral_authority": "Mission 002 does not update the numeric score until deterministic scoring inputs are governed."
+  },
+  "next_safe_action": "Authorize the first read-side Mission 002 engineering slice with exact file scope, validation, rollback, and evidence capture."
+}

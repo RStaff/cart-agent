@@ -1,0 +1,122 @@
+{
+  "schema": "staffordos.mission_002_shopifixer_execution_readiness.v1",
+  "generated_at": "2026-07-19T14:06:17.621Z",
+  "mission_id": "mission_002_shopifixer_merchant_execution_readiness",
+  "mission_name": "Mission 002 - ShopiFixer Merchant Execution Readiness Authority",
+  "status": "GO",
+  "current_phase": "ready_for_first_engineering_slice",
+  "current_blocker": "None",
+  "next_safe_action": "Authorize the first read-side Mission 002 engineering slice with exact file scope, validation, rollback, and evidence capture.",
+  "completion_permitted": false,
+  "first_engineering_slice_permitted": true,
+  "separate_engineering_authorization_required": true,
+  "payment_activity_permitted": false,
+  "shopify_mutation_permitted": false,
+  "runtime_mutation_permitted": false,
+  "application_code_change_permitted_by_this_binding": false,
+  "current_canonical_score": 38,
+  "next_payment_phase": "S2H_CONTROLLED_REAL_PAYMENT_VALIDATION",
+  "payment_phase_requires_separate_authority": true,
+  "canonical_continuity_route": "/fix-status",
+  "known_implementation_gaps": [
+    "No repository route implementation named /fix-status is present.",
+    "Live payment validation has not been executed by this governance binding.",
+    "Merchant execution and proof package creation require separate future authority."
+  ],
+  "gates": {
+    "mission_001_complete": {
+      "status": "pass",
+      "detail": "Mission 001 completion and production restoration are governed.",
+      "evidence": [
+        "staffordos/qa/output/nokings_mission_001_readiness_v1.json",
+        "staffordos/implementation/p11_53_mission_001_completion_certification_v1.md",
+        "staffordos/implementation/p11_55_governed_production_typo_restoration_v1.md"
+      ]
+    },
+    "mission_002_definition": {
+      "status": "pass",
+      "detail": "Mission 002 definition authority exists.",
+      "evidence": [
+        "staffordos/implementation/p11_57_mission_002_authority_definition_v1.md"
+      ]
+    },
+    "mission_002_binding": {
+      "status": "pass",
+      "detail": "Mission 002 binding is established and non-executing.",
+      "evidence": [
+        "staffordos/missions/mission_002_shopifixer_merchant_execution_readiness_binding_v1.json"
+      ]
+    },
+    "readiness_artifacts": {
+      "status": "pass",
+      "detail": "Mission 002 readiness evaluator, validator, output, and plan exist.",
+      "evidence": [
+        "staffordos/implementation/p11_58_mission_002_binding_and_readiness_plan_v1.md",
+        "staffordos/qa/evaluate_mission_002_shopifixer_execution_readiness_v1.mjs",
+        "staffordos/qa/validate_mission_002_shopifixer_execution_binding_v1.mjs",
+        "staffordos/qa/output/mission_002_shopifixer_execution_readiness_v1.json"
+      ]
+    },
+    "payment_authority_reconciled": {
+      "status": "pass",
+      "detail": "Stale S2F source-authority blocker is reconciled; S2H requires separate authority.",
+      "evidence": [
+        "staffordos/authority/authority_registry_v1.json",
+        "staffordos/authority/authority_registry_v1.md",
+        "staffordos/authority/payment_lifecycle_registry_v1.md",
+        "staffordos/authority/output/payment_authority_source_validation_v1.json"
+      ]
+    },
+    "packet_authority_boundary": {
+      "status": "pass",
+      "detail": "Checkout and Packet Authority cannot grant payment_received; Stripe Webhook Authority owns the paid transition.",
+      "evidence": [
+        "staffordos/authority/authority_registry_v1.json"
+      ]
+    },
+    "merchant_continuity_authority": {
+      "status": "pass",
+      "detail": "Canonical /fix-status authority and legacy /shopifixer/status gap are explicit.",
+      "evidence": [
+        "STAFFORDOS_CANONICAL_CONTINUITY_ROUTE_AUDIT_V1.md",
+        "STAFFORDOS_MERCHANT_WORKSPACE_ARCHITECTURE_V1.md",
+        "staffordos/missions/mission_002_shopifixer_merchant_execution_readiness_binding_v1.json"
+      ]
+    },
+    "fulfillment_start_gate": {
+      "status": "pass",
+      "detail": "Fulfillment start conditions and proof package requirements are governed.",
+      "evidence": [
+        "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md"
+      ]
+    },
+    "competency_score_deferral": {
+      "status": "pass",
+      "detail": "Capability score remains 38 until deterministic scoring authority exists.",
+      "evidence": [
+        "staffordos/missions/mission_002_shopifixer_merchant_execution_readiness_binding_v1.json",
+        "staffordos/implementation/p11_57_mission_002_authority_definition_v1.md"
+      ]
+    }
+  },
+  "evidence_sources": [
+    "staffordos/missions/mission_002_shopifixer_merchant_execution_readiness_binding_v1.json",
+    "staffordos/implementation/p11_57_mission_002_authority_definition_v1.md",
+    "staffordos/implementation/p11_58_mission_002_binding_and_readiness_plan_v1.md",
+    "staffordos/qa/output/nokings_mission_001_readiness_v1.json",
+    "staffordos/implementation/p11_53_mission_001_completion_certification_v1.md",
+    "staffordos/implementation/p11_55_governed_production_typo_restoration_v1.md",
+    "STAFFORDOS_CANONICAL_CONTINUITY_ROUTE_AUDIT_V1.md",
+    "STAFFORDOS_MERCHANT_WORKSPACE_ARCHITECTURE_V1.md",
+    "staffordos/authority/payment_lifecycle_registry_v1.md",
+    "staffordos/authority/authority_registry_v1.json",
+    "staffordos/authority/authority_registry_v1.md",
+    "staffordos/authority/output/payment_authority_source_validation_v1.json",
+    "staffordos/authority/output/shopifixer_fulfillment_authority_v1.md"
+  ],
+  "warnings": [
+    "This readiness artifact authorizes governance readiness only.",
+    "No payment, packet mutation, Shopify mutation, application implementation, deployment, or merchant execution is authorized by this artifact.",
+    "The canonical /fix-status route remains an engineering gap for a separately authorized read-side slice."
+  ]
+}

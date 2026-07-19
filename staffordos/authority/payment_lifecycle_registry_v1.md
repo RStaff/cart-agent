@@ -35,4 +35,16 @@ payment_pending -> payment_received from:
 
 ## Current Blocker
 
-Canonical webhook needs Stripe signature verification before paid validation.
+None for S2F source authority.
+
+## Current Next Phase
+
+S2H_CONTROLLED_REAL_PAYMENT_VALIDATION
+
+## Current Limits
+
+- Controlled real payment validation requires separate explicit authority.
+- Paid packet execution remains blocked until a verified Stripe webhook event
+  transitions a packet to `payment_received`.
+- Merchant execution and proof package creation remain blocked until paid packet
+  authority and separate execution authority exist.
