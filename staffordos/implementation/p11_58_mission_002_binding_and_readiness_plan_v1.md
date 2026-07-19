@@ -103,8 +103,10 @@ Mission 002 governance readiness passes only when:
 - Payment source validation output passes.
 - Packet authority preserves the `payment_received` boundary.
 - `/fix-status` is recognized as canonical continuity authority.
-- The missing `/fix-status` implementation is recorded as an engineering gap,
-  not hidden.
+- The `/fix-status` repository implementation is present at
+  `abando-frontend/app/fix-status/page.tsx`.
+- `/shopifixer/status` remains the legacy compatibility implementation until a
+  later governed slice changes that route.
 - Fulfillment-start gates and proof-package requirements are present.
 - Competency score remains deferred at 38 until deterministic scoring authority
   exists.
@@ -131,12 +133,15 @@ Not permitted by this plan:
 The first engineering slice after this governance layer should be separately
 authorized and should prefer read-side work.
 
-Candidate supported by M002.01:
+Candidate supported by M002.01 and completed by M002.03:
 
 - establish the canonical `/fix-status` continuity surface or compatibility
   route using existing packet-read authority
 
-This plan does not authorize that implementation.
+M002.03 implemented `/fix-status` as a wrapper around the existing
+`/shopifixer/status` read-side implementation. Future route, runtime-handoff,
+payment, packet, merchant-execution, or proof-package work still requires
+separate authority.
 
 ## Validation
 

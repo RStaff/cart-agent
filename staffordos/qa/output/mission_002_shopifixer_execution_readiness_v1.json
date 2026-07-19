@@ -1,14 +1,16 @@
 {
   "schema": "staffordos.mission_002_shopifixer_execution_readiness.v1",
-  "generated_at": "2026-07-19T14:06:17.621Z",
+  "generated_at": "2026-07-19T15:24:49.485Z",
   "mission_id": "mission_002_shopifixer_merchant_execution_readiness",
   "mission_name": "Mission 002 - ShopiFixer Merchant Execution Readiness Authority",
   "status": "GO",
-  "current_phase": "ready_for_first_engineering_slice",
+  "current_phase": "ready_for_continuity_runtime_preflight",
   "current_blocker": "None",
-  "next_safe_action": "Authorize the first read-side Mission 002 engineering slice with exact file scope, validation, rollback, and evidence capture.",
+  "next_safe_action": "Authorize read-side runtime preflight for the payment-return to /fix-status handoff before controlled real payment validation.",
   "completion_permitted": false,
-  "first_engineering_slice_permitted": true,
+  "first_engineering_slice_permitted": false,
+  "first_engineering_slice_completed": true,
+  "next_engineering_slice_permitted": true,
   "separate_engineering_authorization_required": true,
   "payment_activity_permitted": false,
   "shopify_mutation_permitted": false,
@@ -18,8 +20,10 @@
   "next_payment_phase": "S2H_CONTROLLED_REAL_PAYMENT_VALIDATION",
   "payment_phase_requires_separate_authority": true,
   "canonical_continuity_route": "/fix-status",
+  "canonical_continuity_route_implementation": "abando-frontend/app/fix-status/page.tsx",
+  "legacy_compatibility_route": "/shopifixer/status",
+  "legacy_compatibility_route_implementation": "abando-frontend/app/shopifixer/status/page.tsx",
   "known_implementation_gaps": [
-    "No repository route implementation named /fix-status is present.",
     "Live payment validation has not been executed by this governance binding.",
     "Merchant execution and proof package creation require separate future authority."
   ],
@@ -76,11 +80,13 @@
     },
     "merchant_continuity_authority": {
       "status": "pass",
-      "detail": "Canonical /fix-status authority and legacy /shopifixer/status gap are explicit.",
+      "detail": "Canonical /fix-status route is implemented; legacy /shopifixer/status remains a compatibility surface.",
       "evidence": [
         "STAFFORDOS_CANONICAL_CONTINUITY_ROUTE_AUDIT_V1.md",
         "STAFFORDOS_MERCHANT_WORKSPACE_ARCHITECTURE_V1.md",
-        "staffordos/missions/mission_002_shopifixer_merchant_execution_readiness_binding_v1.json"
+        "staffordos/missions/mission_002_shopifixer_merchant_execution_readiness_binding_v1.json",
+        "abando-frontend/app/fix-status/page.tsx",
+        "abando-frontend/app/shopifixer/status/page.tsx"
       ]
     },
     "fulfillment_start_gate": {
@@ -108,6 +114,8 @@
     "staffordos/implementation/p11_55_governed_production_typo_restoration_v1.md",
     "STAFFORDOS_CANONICAL_CONTINUITY_ROUTE_AUDIT_V1.md",
     "STAFFORDOS_MERCHANT_WORKSPACE_ARCHITECTURE_V1.md",
+    "abando-frontend/app/fix-status/page.tsx",
+    "abando-frontend/app/shopifixer/status/page.tsx",
     "staffordos/authority/payment_lifecycle_registry_v1.md",
     "staffordos/authority/authority_registry_v1.json",
     "staffordos/authority/authority_registry_v1.md",
@@ -117,6 +125,6 @@
   "warnings": [
     "This readiness artifact authorizes governance readiness only.",
     "No payment, packet mutation, Shopify mutation, application implementation, deployment, or merchant execution is authorized by this artifact.",
-    "The canonical /fix-status route remains an engineering gap for a separately authorized read-side slice."
+    "Runtime handoff validation for payment-return to /fix-status requires separate read-side authority."
   ]
 }

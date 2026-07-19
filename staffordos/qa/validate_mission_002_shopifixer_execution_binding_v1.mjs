@@ -8,6 +8,8 @@ const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(MODULE_DIR, "..", "..");
 const BINDING_PATH = path.join(REPO_ROOT, "staffordos/missions/mission_002_shopifixer_merchant_execution_readiness_binding_v1.json");
 const READINESS_OUTPUT_PATH = path.join(MODULE_DIR, "output", "mission_002_shopifixer_execution_readiness_v1.json");
+const FIX_STATUS_ROUTE_PATH = "abando-frontend/app/fix-status/page.tsx";
+const LEGACY_STATUS_ROUTE_PATH = "abando-frontend/app/shopifixer/status/page.tsx";
 
 function readText(filePath) {
   try {
@@ -75,16 +77,33 @@ function run() {
   assert(binding?.mission_boundaries?.runtime_changes_permitted_by_this_binding === false, "binding does not authorize runtime changes", failures);
   assert(binding?.mission_boundaries?.payment_activity_permitted === false, "binding does not authorize payment activity", failures);
   assert(binding?.mission_boundaries?.first_engineering_slice_requires_separate_authority === true, "binding requires separate engineering authority", failures);
+  assert(binding?.merchant_continuity_authority?.canonical_route_implementation === FIX_STATUS_ROUTE_PATH, "binding records canonical /fix-status implementation path", failures);
+  assert(binding?.merchant_continuity_authority?.legacy_compatibility_implementation === LEGACY_STATUS_ROUTE_PATH, "binding records legacy compatibility route path", failures);
+  assert(binding?.merchant_continuity_authority?.implementation_status === "implemented_by_m002_03", "binding records M002.03 route implementation status", failures);
+  assert(!binding?.merchant_continuity_authority?.known_implementation_gap, "binding no longer reports /fix-status as missing", failures);
+
+  const fixStatusRoute = readText(path.join(REPO_ROOT, FIX_STATUS_ROUTE_PATH));
+  const legacyStatusRoute = readText(path.join(REPO_ROOT, LEGACY_STATUS_ROUTE_PATH));
+  assert(fixStatusRoute.includes("../shopifixer/status/page"), "canonical /fix-status route reuses legacy status implementation", failures);
+  assert(legacyStatusRoute.includes("/api/packets/"), "legacy status implementation still hydrates from packet authority", failures);
 
   assert(Boolean(persistedReadiness), "Mission 002 readiness output is readable", failures);
   assert(persistedReadiness?.status === "GO", "Mission 002 governance readiness status is GO", failures);
-  assert(persistedReadiness?.current_phase === "ready_for_first_engineering_slice", "Mission 002 current phase is ready_for_first_engineering_slice", failures);
+  assert(persistedReadiness?.current_phase === "ready_for_continuity_runtime_preflight", "Mission 002 current phase is ready_for_continuity_runtime_preflight", failures);
   assert(persistedReadiness?.current_blocker === "None", "Mission 002 current blocker is None", failures);
   assert(persistedReadiness?.completion_permitted === false, "Mission 002 completion is not certified by this binding", failures);
-  assert(persistedReadiness?.first_engineering_slice_permitted === true, "first engineering slice may be separately authorized", failures);
+  assert(persistedReadiness?.first_engineering_slice_permitted === false, "first engineering slice is no longer pending after M002.03", failures);
+  assert(persistedReadiness?.first_engineering_slice_completed === true, "first engineering slice is complete after M002.03", failures);
+  assert(persistedReadiness?.next_engineering_slice_permitted === true, "next engineering slice may be separately authorized", failures);
   assert(persistedReadiness?.payment_activity_permitted === false, "Mission 002 readiness output does not authorize payment activity", failures);
   assert(persistedReadiness?.shopify_mutation_permitted === false, "Mission 002 readiness output does not authorize Shopify mutation", failures);
   assert(persistedReadiness?.runtime_mutation_permitted === false, "Mission 002 readiness output does not authorize runtime mutation", failures);
+  assert(persistedReadiness?.canonical_continuity_route_implementation === FIX_STATUS_ROUTE_PATH, "readiness output records canonical /fix-status implementation path", failures);
+  assert(
+    !persistedReadiness?.known_implementation_gaps?.some((gap) => String(gap).includes("/fix-status") && String(gap).includes("present")),
+    "readiness output no longer reports /fix-status as missing",
+    failures
+  );
 
   assert(
     readinessSemanticallyEqual(persistedReadiness, evaluatedReadiness),
@@ -139,8 +158,9 @@ function run() {
       mission_002_readiness_output: true,
       generated_at_semantically_normalized: true,
       canonical_fields_remain_strict: true,
+      canonical_fix_status_route_implemented: true,
       payment_authority_reconciled: true,
-      first_engineering_slice_requires_separate_authority: true,
+      next_engineering_slice_requires_separate_authority: true,
       no_payment_or_runtime_authority_granted: true
     }
   }, null, 2));

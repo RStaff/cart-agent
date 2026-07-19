@@ -71,6 +71,8 @@ function evaluateMission002ShopifixerReadiness(options = {}) {
   const evaluatorPath = "staffordos/qa/evaluate_mission_002_shopifixer_execution_readiness_v1.mjs";
   const validatorPath = "staffordos/qa/validate_mission_002_shopifixer_execution_binding_v1.mjs";
   const outputPath = "staffordos/qa/output/mission_002_shopifixer_execution_readiness_v1.json";
+  const fixStatusRoutePath = "abando-frontend/app/fix-status/page.tsx";
+  const legacyStatusRoutePath = "abando-frontend/app/shopifixer/status/page.tsx";
 
   const missionDefinition = readText(path.join(repoRoot, missionDefinitionPath));
   const readinessPlan = readText(path.join(repoRoot, readinessPlanPath));
@@ -84,6 +86,8 @@ function evaluateMission002ShopifixerReadiness(options = {}) {
   const authorityRegistryDoc = readText(path.join(repoRoot, authorityRegistryDocPath));
   const paymentSourceOutput = readJson(path.join(repoRoot, paymentSourceOutputPath), null);
   const fulfillmentAuthority = readText(path.join(repoRoot, fulfillmentAuthorityPath));
+  const fixStatusRoute = readText(path.join(repoRoot, fixStatusRoutePath));
+  const legacyStatusRoute = readText(path.join(repoRoot, legacyStatusRoutePath));
 
   const checkoutAuthority = findAuthority(authorityRegistry, "Checkout Authority");
   const packetAuthority = findAuthority(authorityRegistry, "Packet Authority");
@@ -142,12 +146,23 @@ function evaluateMission002ShopifixerReadiness(options = {}) {
     billingAuthority?.status === "non_canonical_for_shopifixer_packet_payments"
   );
 
+  const fixStatusRouteImplemented = Boolean(
+    exists(repoRoot, fixStatusRoutePath) &&
+    has(fixStatusRoute, "../shopifixer/status/page") &&
+    has(fixStatusRoute, 'export const dynamic = "force-dynamic"') &&
+    exists(repoRoot, legacyStatusRoutePath) &&
+    has(legacyStatusRoute, "/api/packets/")
+  );
+
   const continuityAuthorityReady = Boolean(
     has(continuityAudit, "Canonical post-payment continuity route in the active payment flow:** `/fix-status`") &&
-    has(continuityAudit, "No Next page or route handler named `/fix-status` exists in this repository.") &&
     has(continuityAudit, "Legacy continuity implementation still present in this repository:** `/shopifixer/status`") &&
     has(merchantWorkspace, "`/fix-status` should become the permanent Merchant Workspace shell.") &&
-    binding?.merchant_continuity_authority?.known_implementation_gap
+    binding?.merchant_continuity_authority?.canonical_customer_route === "/fix-status" &&
+    binding?.merchant_continuity_authority?.canonical_route_implementation === fixStatusRoutePath &&
+    binding?.merchant_continuity_authority?.legacy_compatibility_implementation === legacyStatusRoutePath &&
+    binding?.merchant_continuity_authority?.implementation_status === "implemented_by_m002_03" &&
+    fixStatusRouteImplemented
   );
 
   const fulfillmentGateReady = Boolean(
@@ -185,7 +200,7 @@ function evaluateMission002ShopifixerReadiness(options = {}) {
       ? stageStatus("pass", "Checkout and Packet Authority cannot grant payment_received; Stripe Webhook Authority owns the paid transition.", [authorityRegistryPath])
       : stageStatus("blocked", "Packet/payment authority boundary is incomplete.", [authorityRegistryPath]),
     merchant_continuity_authority: continuityAuthorityReady
-      ? stageStatus("pass", "Canonical /fix-status authority and legacy /shopifixer/status gap are explicit.", [continuityAuditPath, merchantWorkspacePath, rel(bindingPath)])
+      ? stageStatus("pass", "Canonical /fix-status route is implemented; legacy /shopifixer/status remains a compatibility surface.", [continuityAuditPath, merchantWorkspacePath, rel(bindingPath), fixStatusRoutePath, legacyStatusRoutePath])
       : stageStatus("blocked", "Merchant continuity route authority is unclear.", [continuityAuditPath, merchantWorkspacePath, rel(bindingPath)]),
     fulfillment_start_gate: fulfillmentGateReady
       ? stageStatus("pass", "Fulfillment start conditions and proof package requirements are governed.", [fulfillmentAuthorityPath])
@@ -200,10 +215,10 @@ function evaluateMission002ShopifixerReadiness(options = {}) {
     .map((gate) => gate.detail);
 
   const status = failures.length ? "NO_GO" : "GO";
-  const currentPhase = status === "GO" ? "ready_for_first_engineering_slice" : "mission_002_governance_reconciliation";
+  const currentPhase = status === "GO" ? "ready_for_continuity_runtime_preflight" : "mission_002_governance_reconciliation";
   const currentBlocker = status === "GO" ? "None" : failures[0];
   const nextSafeAction = status === "GO"
-    ? "Authorize the first read-side Mission 002 engineering slice with exact file scope, validation, rollback, and evidence capture."
+    ? "Authorize read-side runtime preflight for the payment-return to /fix-status handoff before controlled real payment validation."
     : "Complete Mission 002 binding, readiness, and payment-authority reconciliation before engineering.";
 
   return {
@@ -216,7 +231,9 @@ function evaluateMission002ShopifixerReadiness(options = {}) {
     current_blocker: currentBlocker,
     next_safe_action: nextSafeAction,
     completion_permitted: false,
-    first_engineering_slice_permitted: status === "GO",
+    first_engineering_slice_permitted: false,
+    first_engineering_slice_completed: status === "GO" && fixStatusRouteImplemented,
+    next_engineering_slice_permitted: status === "GO",
     separate_engineering_authorization_required: true,
     payment_activity_permitted: false,
     shopify_mutation_permitted: false,
@@ -226,8 +243,10 @@ function evaluateMission002ShopifixerReadiness(options = {}) {
     next_payment_phase: "S2H_CONTROLLED_REAL_PAYMENT_VALIDATION",
     payment_phase_requires_separate_authority: true,
     canonical_continuity_route: "/fix-status",
+    canonical_continuity_route_implementation: fixStatusRoutePath,
+    legacy_compatibility_route: "/shopifixer/status",
+    legacy_compatibility_route_implementation: legacyStatusRoutePath,
     known_implementation_gaps: [
-      "No repository route implementation named /fix-status is present.",
       "Live payment validation has not been executed by this governance binding.",
       "Merchant execution and proof package creation require separate future authority."
     ],
@@ -241,6 +260,8 @@ function evaluateMission002ShopifixerReadiness(options = {}) {
       productionRestorationPath,
       continuityAuditPath,
       merchantWorkspacePath,
+      fixStatusRoutePath,
+      legacyStatusRoutePath,
       paymentLifecyclePath,
       authorityRegistryPath,
       authorityRegistryDocPath,
@@ -250,7 +271,7 @@ function evaluateMission002ShopifixerReadiness(options = {}) {
     warnings: [
       "This readiness artifact authorizes governance readiness only.",
       "No payment, packet mutation, Shopify mutation, application implementation, deployment, or merchant execution is authorized by this artifact.",
-      "The canonical /fix-status route remains an engineering gap for a separately authorized read-side slice."
+      "Runtime handoff validation for payment-return to /fix-status requires separate read-side authority."
     ]
   };
 }

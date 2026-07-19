@@ -7,7 +7,7 @@
   "authority_mode": "governance_only_until_separate_execution_authority",
   "status": "governance_binding_established",
   "created_at": "2026-07-19T14:02:01Z",
-  "updated_at": "2026-07-19T14:02:01Z",
+  "updated_at": "2026-07-19T15:22:35Z",
   "mission_001_dependency": {
     "mission_id": "mission_001",
     "status": "complete",
@@ -97,10 +97,13 @@
   },
   "merchant_continuity_authority": {
     "canonical_customer_route": "/fix-status",
+    "canonical_route_implementation": "abando-frontend/app/fix-status/page.tsx",
     "legacy_repository_route": "/shopifixer/status",
+    "legacy_compatibility_implementation": "abando-frontend/app/shopifixer/status/page.tsx",
     "durable_source": "GET /api/packets/:packetId",
-    "known_implementation_gap": "No repository route implementation named /fix-status was found during M002.01 discovery.",
-    "first_route_work_requires_separate_authority": true
+    "implementation_status": "implemented_by_m002_03",
+    "implementation_authority": "m002.03-fix-status-route",
+    "future_route_work_requires_separate_authority": true
   },
   "fulfillment_start_gate": {
     "required_packet_state": {
