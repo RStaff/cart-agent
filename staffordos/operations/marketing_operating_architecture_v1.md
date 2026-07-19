@@ -51,7 +51,11 @@ Marketing succeeds when it:
 
 - Generates **awareness** among Shopify store owners.
 - Generates **qualified merchants** (leads with enough signal to qualify).
-- Supports **ShopiFixer growth** (the $950 Fix Sprint service).
+- Supports **ShopiFixer growth** (the $950 Fix Sprint service, positioned as a
+  Governed Conversion Intervention — see
+  `staffordos/shopifixer/shopifixer_commercial_definition_v1.md` and
+  `staffordos/marketing/shopifixer_governed_conversion_intervention_messaging_v1.md`).
+  The price ($950 flat) and single-scoped-problem boundary are unchanged.
 - Supports **Abando growth** (the separate SaaS product), including seeding
   post-ShopiFixer upsell interest — without bundling Abando into ShopiFixer.
 - Produces **measurable ROI** — Campaign ROI measured on captured Stafford Revenue
@@ -87,8 +91,10 @@ Each quarter, Marketing plans campaigns. A campaign should define:
 
 - **Purpose** — the outcome it drives (awareness, lead gen, reactivation, referral).
 - **Audience** — the merchant segment targeted.
-- **Offer** — the ShopiFixer Fix Sprint ($950) or Abando subscription being
-  promoted (never a merged offer).
+- **Offer** — the ShopiFixer Fix Sprint ($950, a Governed Conversion Intervention:
+  one prioritized customer-journey problem, a bounded group of coordinated
+  storefront changes) or an Abando subscription being promoted (never a merged
+  offer — ShopiFixer and Abando remain separate products).
 - **CTA** — the requested next action.
 - **Budget** — planned spend.
 - **Owner** — Marketing (a named owner within Marketing).
