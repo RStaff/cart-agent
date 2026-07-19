@@ -12,6 +12,7 @@ dist/
 build/
 coverage/
 out/
+*.tsbuildinfo
 
 # =========================
 # LOCAL TEMP / SYSTEM FILES
