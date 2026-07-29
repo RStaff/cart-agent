@@ -19,6 +19,7 @@ import { installGuidedAuditRoute } from "./routes/guidedAudit.esm.js";
 import { installSmcAlign } from "./smc-align.js";
 import { upsertShopifixerLead } from "./lib/shopifixerLeadRegistry.js";
 import { trackShopifixerLifecycle } from "./lib/shopifixerLifecycleTracker.js";
+import { persistShopifixerAudit } from "./lib/shopifixerDurableAuditAdapter.js";
 import checkoutPublic from "./checkout-public.js";
 import { installPacketAuthority } from "./routes/packetAuthority.esm.js";
 import { installStripeWebhook } from "./routes/stripeWebhook.esm.js";
@@ -35,6 +36,7 @@ import { installMerchantSummary } from "./routes/merchantSummary.esm.js";
 import { installRecoveryTrigger } from "./routes/recoveryTrigger.esm.js";
 import { installRecoveryExecution } from "./routes/recoveryExecution.esm.js";
 import { installSendOffer } from "./routes/sendOffer.esm.js";
+import { installShopifixerAuditRetrieval } from "./routes/shopifixerAuditRetrieval.esm.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, "..", "..");
@@ -304,6 +306,7 @@ installSendOffer(app);
 installCheckoutSignals(app);
 installPlayground(app);
 installPricingRoute(app);
+installShopifixerAuditRetrieval(app);
 
 // Ask Abando API route
 installAskAbandoRoute(app);
@@ -433,6 +436,28 @@ app.post("/api/fix-audit", async (req, res) => {
     }
 
     const analysis = await analyzeStore(storeUrl);
+    const payload = buildCanonicalPayload({ storeUrl, analysis });
+    const durableAudit = await persistShopifixerAudit({
+      storeUrl,
+      email,
+      analysis,
+      payload,
+      packetId: req.body?.packetId || req.body?.packet_id,
+      requestId:
+        req.get("X-Request-Id") ||
+        req.get("X-Correlation-Id") ||
+        req.body?.requestId ||
+        req.body?.correlationId,
+      source: req.body?.source || "fix_page",
+    });
+    console.info("[fix-audit] durable audit persisted", {
+      storeUrl,
+      merchantId: durableAudit.merchantId,
+      leadId: durableAudit.leadId,
+      auditId: durableAudit.auditId,
+      packetLinkId: durableAudit.packetLinkId,
+    });
+
     const lead = await createFixAuditLead({ storeUrl, email, analysis });
     const registryResult = upsertShopifixerLead({
       repoRoot,
@@ -440,7 +465,6 @@ app.post("/api/fix-audit", async (req, res) => {
       email,
       analysis
     });
-    const payload = buildCanonicalPayload({ storeUrl, analysis });
     await saveCanonicalPayload(payload);
 
     let emailResult = null;
