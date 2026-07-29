@@ -21,23 +21,23 @@ model Shop {
 }
 
 model Cart {
-  id                           String       @id @default(cuid())
-  cartId                       String       @unique
-  userEmail                    String
-  items                        Json
-  status                       String       @default("abandoned")
-  createdAt                    DateTime     @default(now())
-  updatedAt                    DateTime     @updatedAt
-  shopId                       String?
-  attributedOrderId            String?
-  attributedOrderValueCents    Int?
-  attributedShopDomain         String?
-  attributedSource             String?
-  attributedCurrency           String?
-  attributionMatchedAt         DateTime?
-  attributionIsSynthetic       Boolean      @default(false)
-  shop                         Shop?        @relation(fields: [shopId], references: [id])
-  emailQueues                  EmailQueue[] @relation("Cart_EmailQueue")
+  id                        String       @id @default(cuid())
+  cartId                    String       @unique
+  userEmail                 String
+  items                     Json
+  status                    String       @default("abandoned")
+  createdAt                 DateTime     @default(now())
+  updatedAt                 DateTime     @updatedAt
+  shopId                    String?
+  attributedOrderId         String?
+  attributedOrderValueCents Int?
+  attributedShopDomain      String?
+  attributedSource          String?
+  attributedCurrency        String?
+  attributionMatchedAt      DateTime?
+  attributionIsSynthetic    Boolean      @default(false)
+  shop                      Shop?        @relation(fields: [shopId], references: [id])
+  emailQueues               EmailQueue[] @relation("Cart_EmailQueue")
 
   @@index([shopId])
   @@index([shopId, attributionIsSynthetic])
@@ -128,7 +128,7 @@ model SystemEvent {
 }
 
 model DecisionLog {
-  id                String   @id @default(cuid())
+  id                String    @id @default(cuid())
   shopDomain        String
   packetId          String?
   cartToken         String?
@@ -136,15 +136,15 @@ model DecisionLog {
   decision          String
   decisionReason    String
   interventionType  String
-  outcome           String   @default("unknown")
+  outcome           String    @default("unknown")
   decisionTimestamp DateTime
   outcomeTimestamp  DateTime?
   cartValueCents    Int?
   sessionMarker     String?
-  validationMode    Boolean  @default(false)
+  validationMode    Boolean   @default(false)
   relatedEventId    String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   @@index([shopDomain, decisionTimestamp])
   @@index([packetId, decisionTimestamp])
@@ -164,18 +164,205 @@ model Packet {
   proofStatus      String   @default("not_started") @map("proof_status")
   completionStatus String   @default("not_started") @map("completion_status")
 
+  shopifixerLeadEvents      ShopifixerLeadEvent[]
+  shopifixerPacketLinks     ShopifixerPacketLink[]
+  shopifixerProofReferences ShopifixerProofReference[]
+
   @@index([storeDomain, createdAt])
   @@index([paymentReference])
   @@map("packets")
 }
 
+model ShopifixerMerchant {
+  id                      String   @id @default(cuid())
+  normalizedShopifyDomain String   @unique
+  displayName             String?
+  classification          String   @default("merchant")
+  status                  String   @default("identified")
+  source                  String   @default("staffordmedia_shopifixer")
+  controlledTest          Boolean  @default(false)
+  sourceMetadata          Json?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  leads           ShopifixerLead[]
+  audits          ShopifixerAudit[]
+  events          ShopifixerLeadEvent[]
+  packetLinks     ShopifixerPacketLink[]
+  proofReferences ShopifixerProofReference[]
+
+  @@index([status, updatedAt])
+  @@index([source, createdAt])
+}
+
+model ShopifixerLead {
+  id                String   @id @default(cuid())
+  merchantId        String
+  legacyLeadAlias   String?  @unique
+  idempotencyKey    String   @unique
+  productSurface    String   @default("staffordmedia_shopifixer")
+  source            String   @default("staffordmedia")
+  status            String   @default("lead_created")
+  currentStage      String   @default("lead_created")
+  submittedEmail    String?
+  contactConfidence String?
+  nextAction        String?
+  sourceMetadata    Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  merchant ShopifixerMerchant    @relation(fields: [merchantId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  audits   ShopifixerAudit[]
+  events   ShopifixerLeadEvent[]
+
+  @@index([merchantId, updatedAt])
+  @@index([status, updatedAt])
+  @@index([currentStage, updatedAt])
+}
+
+model ShopifixerAudit {
+  id                      String    @id @default(cuid())
+  merchantId              String
+  leadId                  String
+  normalizedShopifyDomain String
+  auditSequence           Int
+  idempotencyKey          String    @unique
+  requestFingerprint      String
+  status                  String    @default("requested")
+  source                  String    @default("staffordmedia_shopifixer")
+  inputSnapshot           Json
+  analysisSnapshot        Json?
+  findingsSnapshot        Json?
+  findingSummary          Json?
+  topIssue                String?
+  recommendedAction       String?
+  auditScore              Int?
+  estimatedRevenueLoss    String?
+  analyzerVersion         String?
+  sourceCommit            String?
+  sourceBuildId           String?
+  requestedAt             DateTime  @default(now())
+  completedAt             DateTime?
+  failedAt                DateTime?
+  supersededByAuditId     String?
+  failureKind             String?
+  failureMessage          String?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  merchant        ShopifixerMerchant         @relation(fields: [merchantId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  lead            ShopifixerLead             @relation(fields: [leadId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  events          ShopifixerLeadEvent[]
+  packetLinks     ShopifixerPacketLink[]
+  proofReferences ShopifixerProofReference[]
+
+  @@unique([merchantId, auditSequence])
+  @@index([merchantId, createdAt])
+  @@index([leadId, createdAt])
+  @@index([normalizedShopifyDomain, createdAt])
+  @@index([status, updatedAt])
+  @@index([supersededByAuditId])
+}
+
+model ShopifixerLeadEvent {
+  id               String   @id @default(cuid())
+  merchantId       String
+  leadId           String?
+  auditId          String?
+  packetId         String?
+  proofReferenceId String?
+  eventType        String
+  visibility       String   @default("system")
+  source           String
+  idempotencyKey   String?  @unique
+  payload          Json?
+  createdAt        DateTime @default(now())
+
+  merchant       ShopifixerMerchant        @relation(fields: [merchantId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  lead           ShopifixerLead?           @relation(fields: [leadId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  audit          ShopifixerAudit?          @relation(fields: [auditId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  packet         Packet?                   @relation(fields: [packetId], references: [packetId], onDelete: SetNull, onUpdate: Cascade)
+  proofReference ShopifixerProofReference? @relation(fields: [proofReferenceId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@index([merchantId, createdAt])
+  @@index([leadId, createdAt])
+  @@index([auditId, createdAt])
+  @@index([packetId, createdAt])
+  @@index([eventType, createdAt])
+}
+
+model ShopifixerPacketLink {
+  id                  String    @id @default(cuid())
+  merchantId          String
+  auditId             String
+  packetId            String
+  purpose             String    @default("execution")
+  status              String    @default("active")
+  activeKey           String?   @unique
+  idempotencyKey      String    @unique
+  authorizedBy        String?
+  authorizationSource String?
+  sourceMetadata      Json?
+  canceledAt          DateTime?
+  supersededAt        DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  merchant        ShopifixerMerchant         @relation(fields: [merchantId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  audit           ShopifixerAudit            @relation(fields: [auditId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  packet          Packet                     @relation(fields: [packetId], references: [packetId], onDelete: Restrict, onUpdate: Cascade)
+  proofReferences ShopifixerProofReference[]
+
+  @@unique([auditId, packetId, purpose])
+  @@index([merchantId, createdAt])
+  @@index([auditId, createdAt])
+  @@index([packetId])
+  @@index([status, updatedAt])
+}
+
+model ShopifixerProofReference {
+  id                  String    @id @default(cuid())
+  merchantId          String
+  auditId             String
+  packetId            String
+  packetLinkId        String?
+  proofVersion        Int       @default(1)
+  proofType           String    @default("before_after")
+  status              String    @default("recorded")
+  idempotencyKey      String    @unique
+  artifactUri         String?
+  artifactHash        String?
+  beforeEvidence      Json?
+  afterEvidence       Json?
+  rollbackEvidence    Json?
+  verificationSummary Json?
+  immutableMetadata   Json?
+  capturedAt          DateTime  @default(now())
+  verifiedAt          DateTime?
+  verifier            String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  merchant   ShopifixerMerchant    @relation(fields: [merchantId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  audit      ShopifixerAudit       @relation(fields: [auditId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  packet     Packet                @relation(fields: [packetId], references: [packetId], onDelete: Restrict, onUpdate: Cascade)
+  packetLink ShopifixerPacketLink? @relation(fields: [packetLinkId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  events     ShopifixerLeadEvent[]
+
+  @@unique([auditId, packetId, proofVersion])
+  @@index([merchantId, createdAt])
+  @@index([auditId, createdAt])
+  @@index([packetId, createdAt])
+  @@index([status, updatedAt])
+}
+
 model Invite {
-  id                  String   @id @default(cuid())
+  id                  String    @id @default(cuid())
   inviterShopDomain   String
   targetEmail         String?
   targetStoreDomain   String?
   sourceSurface       String
-  createdAt           DateTime @default(now())
+  createdAt           DateTime  @default(now())
   clickedAt           DateTime?
   installStartedAt    DateTime?
   installCompletedAt  DateTime?
@@ -183,25 +370,28 @@ model Invite {
   installedShopDomain String?
   installPath         String?
   sessionSurface      String?
-  createdInValidation Boolean @default(false)
+  createdInValidation Boolean   @default(false)
 
   @@index([inviterShopDomain, createdAt])
   @@index([targetEmail])
   @@index([targetStoreDomain])
   @@index([installedShopDomain])
 }
-/* --- abando billing + usage models --- */
-model User {
-  id               String   @id @default(cuid())
-  email            String   @unique
-  stripeCustomerId String?  @unique
-  stripeSubStatus  String?
-  freeCredits      Int      @default(20)
-  creditsResetAt   DateTime?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
 
-  usages           Usage[]
+/**
+ * --- abando billing + usage models ---
+ */
+model User {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  stripeCustomerId String?   @unique
+  stripeSubStatus  String?
+  freeCredits      Int       @default(20)
+  creditsResetAt   DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  usages Usage[]
 }
 
 model Usage {
@@ -212,41 +402,37 @@ model Usage {
   meta      Json?
   createdAt DateTime @default(now())
 
-  user      User     @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 }
-
 
 /// Daily per-store aggregates for Abando v1 → StaffordOS exports
 
-
-
-
 // DailyAggregates + related fields for Abando v1
 model DailyAggregate {
-  id                     Int      @id @default(autoincrement())
-  storeId                Int
-  date                   DateTime
+  id      Int      @id @default(autoincrement())
+  storeId Int
+  date    DateTime
 
-  cartsCreated           Int      @default(0)
-  cartsAbandoned         Int      @default(0)
-  cartsRecovered         Int      @default(0)
+  cartsCreated   Int @default(0)
+  cartsAbandoned Int @default(0)
+  cartsRecovered Int @default(0)
 
-  recoveryAttemptsSent   Int      @default(0)
-  recoveryClicks         Int      @default(0)
-  recoveriesCount        Int      @default(0)
+  recoveryAttemptsSent Int @default(0)
+  recoveryClicks       Int @default(0)
+  recoveriesCount      Int @default(0)
 
-  potentialRevenue       Decimal  @default(0)
-  revenueRecovered       Decimal  @default(0)
+  potentialRevenue Decimal @default(0)
+  revenueRecovered Decimal @default(0)
 
-  abandonmentRate        Decimal?
-  recoveryRate           Decimal?
-  clickThroughRate       Decimal?
-  conversionRate         Decimal?
+  abandonmentRate  Decimal?
+  recoveryRate     Decimal?
+  clickThroughRate Decimal?
+  conversionRate   Decimal?
 
   avgCartValue           Decimal?
   avgTimeToRecoveryHours Decimal?
 
-  createdAt              DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@unique([storeId, date])
   @@index([storeId, date])
