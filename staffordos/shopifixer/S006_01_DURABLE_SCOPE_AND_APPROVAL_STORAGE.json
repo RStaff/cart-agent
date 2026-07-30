@@ -1,0 +1,237 @@
+{
+  "mission": "S006.01_DURABLE_SCOPE_AND_APPROVAL_STORAGE",
+  "mode": "LOCAL_IMPLEMENTATION_ONLY",
+  "gate": "S006_01_IMPLEMENTED_LOCALLY",
+  "baseline": {
+    "repository_root": "/Users/rossstafford/projects/cart-agent",
+    "branch": "main",
+    "head": "cb13ecaf5696344282f8f03c9a4a46be37d5931f",
+    "origin_main": "cb13ecaf5696344282f8f03c9a4a46be37d5931f",
+    "staged_files": [],
+    "production_health": 200,
+    "production_migration_latest_successful": "20260727013000_add_shopifixer_durable_continuity",
+    "schema_or_migration_preexisting_diff": false,
+    "packet_authority_preexisting_diff": false,
+    "result": "READY_FOR_S006_01_IMPLEMENTATION"
+  },
+  "files_changed": {
+    "schema": [
+      "web/prisma/schema.prisma"
+    ],
+    "migration": [
+      "web/prisma/migrations/20260729190000_add_shopifixer_scope_approval_authority/migration.sql"
+    ],
+    "source": [
+      "web/src/index.js",
+      "web/src/lib/shopifixerRepairScopeAdapter.js",
+      "web/src/lib/shopifixerScopeAuthorityRepository.js",
+      "web/src/routes/shopifixerAuditRetrieval.esm.js",
+      "web/src/routes/shopifixerScopeAuthority.esm.js"
+    ],
+    "tests": [
+      "web/src/lib/shopifixerScopeAuthorityRepository.test.js",
+      "web/src/routes/shopifixerAuditRetrieval.test.js",
+      "web/src/routes/shopifixerScopeAuthority.test.js"
+    ],
+    "artifact": [
+      "staffordos/shopifixer/S006_01_DURABLE_SCOPE_AND_APPROVAL_STORAGE.md",
+      "staffordos/shopifixer/S006_01_DURABLE_SCOPE_AND_APPROVAL_STORAGE.json"
+    ]
+  },
+  "prisma_models_added": [
+    "ShopifixerRepairScope",
+    "ShopifixerRepairApproval"
+  ],
+  "migration": {
+    "name": "20260729190000_add_shopifixer_scope_approval_authority",
+    "additive": true,
+    "destructive_sql": false,
+    "packet_schema_changed": false,
+    "production_applied": false
+  },
+  "scope_identity_contract": {
+    "scopeId": "deterministic S004-derived id independent of planning approval status",
+    "scopeVersion": "positive integer, default 1",
+    "scopeFingerprint": "SHA-256 over normalized authority-bearing scope content",
+    "unique_constraints": [
+      "scopeId",
+      "auditId_scopeVersion",
+      "auditId_scopeFingerprint"
+    ]
+  },
+  "scope_fingerprint_contract": {
+    "algorithm": "sha256",
+    "includes": [
+      "auditId",
+      "normalized store",
+      "scopeVersion",
+      "sourceEvidenceVersion",
+      "included repair ids and contents",
+      "excluded repair ids and contents",
+      "deferred repair ids and contents",
+      "assumptions",
+      "dependencies",
+      "not-in-scope boundaries",
+      "verification criteria",
+      "rollback expectations",
+      "implementation size"
+    ],
+    "excludes": [
+      "generatedAt",
+      "request IDs",
+      "transport metadata",
+      "actor display formatting",
+      "planning approval state"
+    ],
+    "stable_object_key_ordering": true,
+    "stable_non_semantic_array_ordering": true
+  },
+  "scope_immutability": {
+    "updates_snapshot": false,
+    "idempotent_replay_returns_existing": true,
+    "conflicting_identity_rejected": true
+  },
+  "approval_contract": {
+    "model": "ShopifixerRepairApproval",
+    "statuses": [
+      "APPROVED",
+      "REVOKED",
+      "EXPIRED"
+    ],
+    "planning_states_persisted": false,
+    "actor_required": true,
+    "source_required": true,
+    "evidence_required": true,
+    "terms_boundary_required": true,
+    "operator_mediated_distinguished_from_merchant_auth": true
+  },
+  "approval_idempotency": {
+    "duplicate_same_idempotency_returns_existing": true,
+    "conflicting_idempotency_reuse_rejected": true,
+    "active_scope_approval_key": "shopifixer:repair_approval:<scopeId>:active"
+  },
+  "revocation": {
+    "supported": true,
+    "idempotent_same_input": true,
+    "evidence_retained": true,
+    "event": "repair_scope_revoked"
+  },
+  "expiry": {
+    "mode": "computed_without_write",
+    "expired_approval_active": false
+  },
+  "events": [
+    "repair_scope_stored",
+    "repair_scope_approved",
+    "repair_scope_revoked"
+  ],
+  "routes_added": [
+    "POST /internal/shopifixer/audits/:auditId/scopes",
+    "POST /internal/shopifixer/scopes/:scopeId/approvals",
+    "POST /internal/shopifixer/approvals/:approvalId/revoke",
+    "GET /internal/shopifixer/scopes/:scopeId",
+    "GET /internal/shopifixer/approvals/:approvalId"
+  ],
+  "s004_integration": {
+    "request_time_approved_rejected_by_route": true,
+    "scope_id_excludes_approval_status": true,
+    "scope_version_in_scope_id": true
+  },
+  "s005_integration": {
+    "classification": "execution_manifest",
+    "requires_durable_scope_and_approval_for_route": true,
+    "canonical_packet_created": false,
+    "execution_authorized": false
+  },
+  "authority_evaluation": {
+    "implemented": true,
+    "EXECUTION_AUTHORIZED": false,
+    "expected_failed_conditions": [
+      "canonical_packet_missing",
+      "packet_execution_not_permitted"
+    ]
+  },
+  "local_database_proof": {
+    "database": "local_isolated_s00601_scope_authority",
+    "migration_deploy": "passed",
+    "migration_status": "database_schema_up_to_date",
+    "scopeStored": true,
+    "approvalStored": true,
+    "scopeRetrieved": true,
+    "approvalRetrieved": true,
+    "scopeFingerprintMatchesApproval": true,
+    "scopeVersionMatchesApproval": true,
+    "executionAuthorizedBeforeRevoke": false,
+    "failedBeforeRevoke": [
+      "canonical_packet_missing",
+      "packet_execution_not_permitted"
+    ],
+    "revoked": true,
+    "executionAuthorizedAfterRevoke": false,
+    "packetBefore": 0,
+    "packetAfter": 0,
+    "packetLinkBefore": 0,
+    "packetLinkAfter": 0,
+    "eventTypes": [
+      "repair_scope_stored",
+      "repair_scope_approved",
+      "repair_scope_revoked"
+    ],
+    "temporary_postgres_stopped": true
+  },
+  "validation": {
+    "focused_tests": {
+      "command": "node --test web/src/lib/shopifixerDurableAuditAdapter.test.js web/src/lib/shopifixerDurableAuditRetrievalAdapter.test.js web/src/lib/shopifixerRepairPlanAdapter.test.js web/src/lib/shopifixerRepairScopeAdapter.test.js web/src/lib/shopifixerExecutionPacketAdapter.test.js web/src/lib/shopifixerScopeAuthorityRepository.test.js web/src/routes/shopifixerAuditRetrieval.test.js web/src/routes/shopifixerScopeAuthority.test.js",
+      "passed": 55,
+      "failed": 0
+    },
+    "prisma_format": "passed",
+    "prisma_validate": "passed",
+    "prisma_generate": "passed",
+    "local_migration_application": "passed",
+    "local_migration_status": "passed",
+    "syntax_checks": "passed",
+    "git_diff_check": "passed",
+    "local_health": {
+      "/health": 200,
+      "/": 200
+    },
+    "internal_authorization_probes": {
+      "no_key": 401,
+      "wrong_key": 401,
+      "valid_local_key_missing_scope": 404
+    },
+    "prohibited_call_scan": {
+      "packet_create_or_update_added": false,
+      "shopify_mutation_added": false
+    }
+  },
+  "rollback": [
+    "remove S006.01 route mount from web/src/index.js",
+    "remove web/src/routes/shopifixerScopeAuthority.esm.js",
+    "remove web/src/lib/shopifixerScopeAuthorityRepository.js",
+    "remove S006.01 focused tests",
+    "revert S004/S005 route integration changes",
+    "remove ShopifixerRepairScope and ShopifixerRepairApproval models and relation arrays from schema.prisma",
+    "remove migration 20260729190000_add_shopifixer_scope_approval_authority",
+    "regenerate Prisma client",
+    "recreate isolated local test database if local cleanup is required"
+  ],
+  "remaining_blockers": [
+    "canonical Packet creation or association from durable approval is not implemented",
+    "execution authority remains false until Packet association and Packet lifecycle gate exist",
+    "Shopify mutation remains unauthorized"
+  ],
+  "confirmation": {
+    "production_change": false,
+    "environment_change": false,
+    "packet_record_change": false,
+    "payment_change": false,
+    "webhook_sent": false,
+    "shopify_mutation": false,
+    "customer_contact": false,
+    "commit": false,
+    "push": false,
+    "deployment": false
+  }
+}

@@ -1,0 +1,237 @@
+{
+  "mission": "S006.02_CANONICAL_PACKET_CREATION_AND_ASSOCIATION",
+  "mode": "LOCAL_IMPLEMENTATION_ONLY",
+  "gate": "S006_02_IMPLEMENTED_LOCALLY",
+  "baseline": {
+    "repository_root": "/Users/rossstafford/projects/cart-agent",
+    "branch": "main",
+    "head": "cb13ecaf5696344282f8f03c9a4a46be37d5931f",
+    "origin_main": "cb13ecaf5696344282f8f03c9a4a46be37d5931f",
+    "staged_files": [],
+    "production_health": 200,
+    "production_latest_successful_migration": "20260727013000_add_shopifixer_durable_continuity",
+    "s00601_production_applied": false,
+    "s00602_production_applied": false,
+    "production_unfinished_migrations": [],
+    "production_rolled_back_migrations_observed": [
+      "20260310154047_add_jobs_and_system_events"
+    ],
+    "result": "READY_FOR_S006_02_IMPLEMENTATION"
+  },
+  "files_changed": {
+    "schema": [
+      "web/prisma/schema.prisma"
+    ],
+    "migration": [
+      "web/prisma/migrations/20260729193000_add_shopifixer_packet_authority_link/migration.sql"
+    ],
+    "source": [
+      "web/src/lib/shopifixerCanonicalPacketAuthority.js",
+      "web/src/lib/shopifixerDurableAuditRetrievalAdapter.js",
+      "web/src/lib/shopifixerExecutionPacketAdapter.js",
+      "web/src/lib/shopifixerScopeAuthorityRepository.js",
+      "web/src/routes/shopifixerAuditRetrieval.esm.js",
+      "web/src/routes/shopifixerScopeAuthority.esm.js"
+    ],
+    "tests": [
+      "web/src/lib/shopifixerCanonicalPacketAuthority.test.js",
+      "web/src/lib/shopifixerExecutionPacketAdapter.test.js",
+      "web/src/routes/shopifixerAuditRetrieval.test.js",
+      "web/src/routes/shopifixerScopeAuthority.test.js"
+    ],
+    "artifact": [
+      "staffordos/shopifixer/S006_02_CANONICAL_PACKET_CREATION_AND_ASSOCIATION.md",
+      "staffordos/shopifixer/S006_02_CANONICAL_PACKET_CREATION_AND_ASSOCIATION.json"
+    ]
+  },
+  "packet_creation_authority": {
+    "canonical_table": "public.packets",
+    "canonical_primary_key": "packet_id",
+    "repository": "web/src/lib/packetRepository.js",
+    "function_used": "createPacket",
+    "bindPacketPayment_called": false,
+    "updatePacketLifecycle_called": false,
+    "direct_packet_insert_added": false
+  },
+  "association_design": {
+    "selected": "ADDITIVE_PACKET_LINK_FIELDS_REQUIRED",
+    "table": "ShopifixerPacketLink",
+    "new_fields": [
+      "repairScopeId",
+      "repairApprovalId",
+      "authorityFingerprint",
+      "authorityVersion"
+    ],
+    "parallel_packet_authority_created": false
+  },
+  "migration": {
+    "decision": "ONE_ADDITIVE_MIGRATION_REQUIRED",
+    "name": "20260729193000_add_shopifixer_packet_authority_link",
+    "additive": true,
+    "destructive_sql": false,
+    "public_packets_altered": false,
+    "payment_fields_changed": false,
+    "packet_lifecycle_fields_changed": false,
+    "production_applied": false
+  },
+  "idempotency": {
+    "authority_version": "shopifixer.canonical_packet_authority.v1",
+    "purpose": "shopifixer_repair_execution",
+    "identity_inputs": [
+      "auditId",
+      "merchantId",
+      "normalizedStore",
+      "scopeId",
+      "scopeVersion",
+      "scopeFingerprint",
+      "approvalId",
+      "approvalFingerprint",
+      "approvedScopeFingerprint",
+      "approvedScopeVersion",
+      "purpose",
+      "authorityVersion"
+    ],
+    "excludes": [
+      "generatedAt",
+      "transport request IDs",
+      "display labels",
+      "non-authoritative metadata"
+    ],
+    "replay_returns_existing_packet": true,
+    "replay_returns_existing_packet_link": true,
+    "conflicting_idempotency_reuse_rejected": true
+  },
+  "packet_initial_state": {
+    "status": "prepared",
+    "execution_status": "not_started",
+    "proof_status": "not_started",
+    "completion_status": "not_started",
+    "payment_reference_present": false,
+    "execution_authorized_by_initial_state": false
+  },
+  "approval_gate": {
+    "active_approval_required": true,
+    "scope_fingerprint_recalculated": true,
+    "approval_scope_match_required": true,
+    "approval_fingerprint_match_required": true,
+    "approval_version_match_required": true,
+    "revoked_approval_rejected": true,
+    "expired_approval_rejected": true,
+    "approval_evidence_required": true,
+    "actor_and_source_required": true
+  },
+  "manifest_contract": {
+    "canonicalPacketId": "public.packets.packet_id",
+    "manifestId": "deterministic S005 projection identifier",
+    "packetId_alias_for_manifest": false,
+    "manifest_id_stored_as_canonical_packet_id": false
+  },
+  "authority_evaluation": {
+    "canonical_packet_missing_after_association": false,
+    "packet_association_missing_after_association": false,
+    "EXECUTION_AUTHORIZED": false,
+    "remaining_failed_conditions": [
+      "packet_execution_not_permitted"
+    ]
+  },
+  "routes": [
+    "POST /internal/shopifixer/scopes/:scopeId/canonical-packet",
+    "GET /internal/shopifixer/scopes/:scopeId/canonical-packet",
+    "GET /internal/shopifixer/audits/:auditId/execution-packet"
+  ],
+  "events": [
+    "canonical_packet_created",
+    "canonical_packet_associated"
+  ],
+  "local_database_proof": {
+    "database": "local_isolated_s00602_packet_authority",
+    "packetBefore": 0,
+    "linkBefore": 0,
+    "packetCreated": true,
+    "associationCreated": true,
+    "replayCreatedPacket": false,
+    "replayCreatedAssociation": false,
+    "packetAfterReplay": 1,
+    "linkAfterReplay": 1,
+    "packetAfterRevoke": 1,
+    "linkAfterRevoke": 1,
+    "manifestIdDistinctFromCanonicalPacketId": true,
+    "packetStatus": "prepared",
+    "packetExecutionStatus": "not_started",
+    "paymentReferencePresent": false,
+    "executionAuthorizedAfterAssociation": false,
+    "failedAfterAssociation": [
+      "packet_execution_not_permitted"
+    ],
+    "retrievedPacketMatches": true,
+    "revoked": true,
+    "executionAuthorizedAfterRevoke": false,
+    "failedAfterRevoke": [
+      "approval_not_active",
+      "approval_revoked",
+      "packet_execution_not_permitted"
+    ],
+    "eventTypes": [
+      "audit_completed",
+      "repair_scope_stored",
+      "repair_scope_approved",
+      "canonical_packet_created",
+      "canonical_packet_associated",
+      "repair_scope_revoked"
+    ],
+    "temporary_postgres_stopped": true,
+    "temporary_local_app_stopped": true
+  },
+  "validation": {
+    "focused_tests": {
+      "command": "node --test web/src/lib/shopifixerDurableAuditAdapter.test.js web/src/lib/shopifixerDurableAuditRetrievalAdapter.test.js web/src/lib/shopifixerRepairPlanAdapter.test.js web/src/lib/shopifixerRepairScopeAdapter.test.js web/src/lib/shopifixerExecutionPacketAdapter.test.js web/src/lib/shopifixerScopeAuthorityRepository.test.js web/src/lib/shopifixerCanonicalPacketAuthority.test.js web/src/routes/shopifixerAuditRetrieval.test.js web/src/routes/shopifixerScopeAuthority.test.js",
+      "passed": 61,
+      "failed": 0
+    },
+    "syntax_checks": "passed",
+    "prisma_format": "passed",
+    "prisma_validate": "passed",
+    "prisma_generate": "passed",
+    "local_migration_deploy": "passed",
+    "local_migration_status": "database_schema_up_to_date",
+    "local_health": {
+      "/health": 200,
+      "/": 200
+    },
+    "local_internal_authorization_probes": {
+      "no_key": 401,
+      "wrong_key": 401,
+      "valid_local_key_missing_scope": 404
+    },
+    "git_diff_check": "passed",
+    "static_safety": "S006_02_STATIC_SAFETY_CERTIFIED"
+  },
+  "rollback": [
+    "remove S006.02 canonical Packet routes",
+    "remove web/src/lib/shopifixerCanonicalPacketAuthority.js",
+    "revert authority evaluator Packet association checks",
+    "revert S005 manifest projection naming changes",
+    "remove S006.02 PacketLink fields from schema.prisma",
+    "remove migration 20260729193000_add_shopifixer_packet_authority_link",
+    "regenerate Prisma client",
+    "discard or recreate isolated local database",
+    "remove S006.02 focused tests and artifacts if desired"
+  ],
+  "remaining_blockers": [
+    "Packet lifecycle has not been transitioned into an execution-authorized state",
+    "Shopify mutation remains unauthorized",
+    "future governed execution gate required before merchant work"
+  ],
+  "confirmation": {
+    "production_data_change": false,
+    "environment_change": false,
+    "payment_change": false,
+    "webhook_sent": false,
+    "shopify_mutation": false,
+    "customer_contact": false,
+    "commit": false,
+    "push": false,
+    "deployment": false,
+    "render_configuration_change": false
+  }
+}

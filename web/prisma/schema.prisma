@@ -190,6 +190,8 @@ model ShopifixerMerchant {
   events          ShopifixerLeadEvent[]
   packetLinks     ShopifixerPacketLink[]
   proofReferences ShopifixerProofReference[]
+  repairScopes    ShopifixerRepairScope[]
+  repairApprovals ShopifixerRepairApproval[]
 
   @@index([status, updatedAt])
   @@index([source, createdAt])
@@ -255,6 +257,8 @@ model ShopifixerAudit {
   events          ShopifixerLeadEvent[]
   packetLinks     ShopifixerPacketLink[]
   proofReferences ShopifixerProofReference[]
+  repairScopes    ShopifixerRepairScope[]
+  repairApprovals ShopifixerRepairApproval[]
 
   @@unique([merchantId, auditSequence])
   @@index([merchantId, createdAt])
@@ -292,31 +296,120 @@ model ShopifixerLeadEvent {
 }
 
 model ShopifixerPacketLink {
-  id                  String    @id @default(cuid())
-  merchantId          String
-  auditId             String
-  packetId            String
-  purpose             String    @default("execution")
-  status              String    @default("active")
-  activeKey           String?   @unique
-  idempotencyKey      String    @unique
-  authorizedBy        String?
-  authorizationSource String?
-  sourceMetadata      Json?
-  canceledAt          DateTime?
-  supersededAt        DateTime?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  id                   String    @id @default(cuid())
+  merchantId           String
+  auditId              String
+  packetId             String
+  repairScopeId        String?
+  repairApprovalId     String?
+  purpose              String    @default("execution")
+  status               String    @default("active")
+  activeKey            String?   @unique
+  idempotencyKey       String    @unique
+  authorityFingerprint String?   @unique
+  authorityVersion     String?
+  authorizedBy         String?
+  authorizationSource  String?
+  sourceMetadata       Json?
+  canceledAt           DateTime?
+  supersededAt         DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
   merchant        ShopifixerMerchant         @relation(fields: [merchantId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   audit           ShopifixerAudit            @relation(fields: [auditId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   packet          Packet                     @relation(fields: [packetId], references: [packetId], onDelete: Restrict, onUpdate: Cascade)
+  repairScope     ShopifixerRepairScope?     @relation(fields: [repairScopeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  repairApproval  ShopifixerRepairApproval?  @relation(fields: [repairApprovalId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   proofReferences ShopifixerProofReference[]
 
   @@unique([auditId, packetId, purpose])
+  @@unique([repairScopeId, repairApprovalId, purpose])
   @@index([merchantId, createdAt])
   @@index([auditId, createdAt])
   @@index([packetId])
+  @@index([repairScopeId, createdAt])
+  @@index([repairApprovalId, createdAt])
+  @@index([status, updatedAt])
+}
+
+model ShopifixerRepairScope {
+  id                      String    @id @default(cuid())
+  merchantId              String
+  auditId                 String
+  scopeId                 String    @unique
+  scopeVersion            Int       @default(1)
+  scopeFingerprint        String
+  sourceEvidenceVersion   String?
+  sourceRepairPlanVersion String?
+  status                  String    @default("stored")
+  includedRepairs         Json
+  excludedRepairs         Json
+  deferredRepairs         Json
+  assumptions             Json?
+  dependencies            Json?
+  notInScope              Json?
+  implementationSize      String?
+  verificationCriteria    Json?
+  rollbackExpectations    Json?
+  normalizedSnapshot      Json
+  createdByActorType      String
+  createdByActorId        String?
+  supersededAt            DateTime?
+  createdAt               DateTime  @default(now())
+
+  merchant    ShopifixerMerchant         @relation(fields: [merchantId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  audit       ShopifixerAudit            @relation(fields: [auditId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  approvals   ShopifixerRepairApproval[]
+  packetLinks ShopifixerPacketLink[]
+
+  @@unique([auditId, scopeVersion])
+  @@unique([auditId, scopeFingerprint])
+  @@index([merchantId, createdAt])
+  @@index([auditId, createdAt])
+  @@index([scopeFingerprint])
+  @@index([status, createdAt])
+}
+
+model ShopifixerRepairApproval {
+  id                        String    @id @default(cuid())
+  approvalId                String    @unique
+  repairScopeId             String
+  merchantId                String
+  auditId                   String
+  approvalIdempotencyKey    String    @unique
+  approvalFingerprint       String
+  activeKey                 String?   @unique
+  actorType                 String
+  actorId                   String
+  actorDisplayLabel         String?
+  approvalSource            String
+  operatorMediated          Boolean   @default(false)
+  merchantAuthenticated     Boolean   @default(false)
+  approvalEvidence          Json
+  approvedTermsBoundary     Json
+  approvedIncludedRepairIds Json
+  approvedScopeFingerprint  String
+  approvedScopeVersion      Int
+  status                    String    @default("APPROVED")
+  approvedAt                DateTime  @default(now())
+  expiresAt                 DateTime?
+  revokedAt                 DateTime?
+  revokedByActorType        String?
+  revokedByActorId          String?
+  revocationReason          String?
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
+
+  repairScope ShopifixerRepairScope  @relation(fields: [repairScopeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  merchant    ShopifixerMerchant     @relation(fields: [merchantId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  audit       ShopifixerAudit        @relation(fields: [auditId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  packetLinks ShopifixerPacketLink[]
+
+  @@index([repairScopeId, createdAt])
+  @@index([merchantId, createdAt])
+  @@index([auditId, createdAt])
+  @@index([approvalFingerprint])
   @@index([status, updatedAt])
 }
 

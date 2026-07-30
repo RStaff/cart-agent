@@ -1,0 +1,357 @@
+{
+  "mission": "S006_DURABLE_APPROVAL_AND_PACKET_AUTHORITY_RECONCILIATION",
+  "mode": "READ_ONLY_AUTHORITY_DISCOVERY_AND_IMPLEMENTATION_DESIGN",
+  "gate": "S006_AUTHORITY_MODEL_CERTIFIED",
+  "timestamp": "2026-07-29",
+  "baseline": {
+    "repository_root": "/Users/rossstafford/projects/cart-agent",
+    "branch": "main",
+    "head": "cb13ecaf5696344282f8f03c9a4a46be37d5931f",
+    "origin_main": "cb13ecaf5696344282f8f03c9a4a46be37d5931f",
+    "staged_files": [],
+    "production_service": "cart-agent-api",
+    "latest_live_deployment": "dep-d9l3ocbm8hqs7396v8ig",
+    "production_health": {
+      "health_endpoint_status": 200
+    },
+    "production_database": {
+      "database_name": "cart_agent_db",
+      "postgresql_version": "17.9",
+      "packet_row_count": 16
+    },
+    "migration_history": {
+      "repository_migration_count": 21,
+      "successful_unique_production_migration_names": 21,
+      "unfinished_migrations": [],
+      "latest_successful_migration": "20260727013000_add_shopifixer_durable_continuity",
+      "historical_rolled_back_names": [
+        "20260310154047_add_jobs_and_system_events"
+      ],
+      "reconciliation_status": "RECONCILED"
+    },
+    "local_worktree": {
+      "schema_or_migration_drift": false,
+      "packet_authority_source_drift": false,
+      "s004_s005_local_files": [
+        "web/src/routes/shopifixerAuditRetrieval.esm.js",
+        "web/src/routes/shopifixerAuditRetrieval.test.js",
+        "web/src/lib/shopifixerRepairScopeAdapter.js",
+        "web/src/lib/shopifixerRepairScopeAdapter.test.js",
+        "web/src/lib/shopifixerExecutionPacketAdapter.js",
+        "web/src/lib/shopifixerExecutionPacketAdapter.test.js"
+      ],
+      "staffordos_evidence_present": [
+        "staffordos/shopifixer/S004_MERCHANT_REPAIR_SCOPE_SELECTION_AND_APPROVAL.md",
+        "staffordos/shopifixer/S005_EXECUTION_PACKET_GENERATION.md"
+      ]
+    },
+    "result": "READY_FOR_PACKET_AUTHORITY_RECONCILIATION"
+  },
+  "packet_authority_inventory": [
+    {
+      "path": "web/prisma/schema.prisma",
+      "component": "Packet model",
+      "behavior": "canonical Prisma mapping for public.packets",
+      "read_write": "schema_mapping",
+      "authorization_boundary": "repository_schema",
+      "production_reachable": true,
+      "status": "CURRENT"
+    },
+    {
+      "path": "web/src/lib/packetRepository.js",
+      "component": "ensurePacketTable",
+      "behavior": "runtime table, index, and reservation_id assurance",
+      "read_write": "DDL_if_missing",
+      "authorization_boundary": "DATABASE_URL runtime role",
+      "production_reachable": true,
+      "status": "CURRENT_LEGACY_OPERATIONAL_PATTERN"
+    },
+    {
+      "path": "web/src/lib/packetRepository.js",
+      "component": "createPacket",
+      "behavior": "create or update Packet by packet_id",
+      "read_write": "WRITE_packets",
+      "authorization_boundary": "caller_route",
+      "durable_fields": [
+        "packet_id",
+        "reservation_id",
+        "store_domain",
+        "payment_reference",
+        "status",
+        "updated_at"
+      ],
+      "production_reachable": true,
+      "status": "CURRENT"
+    },
+    {
+      "path": "web/src/lib/packetRepository.js",
+      "component": "bindPacketPayment",
+      "behavior": "insert or update payment binding and payment status",
+      "read_write": "WRITE_packets",
+      "authorization_boundary": "payment_return_or_stripe_webhook_context",
+      "durable_fields": [
+        "reservation_id",
+        "store_domain",
+        "payment_reference",
+        "status",
+        "updated_at"
+      ],
+      "production_reachable": true,
+      "status": "CURRENT"
+    },
+    {
+      "path": "web/src/routes/packetAuthority.esm.js",
+      "component": "Packet routes",
+      "behavior": "prepare, read, list, execution lifecycle update, and payment return",
+      "read_write": "READ_WRITE_packets",
+      "authorization_boundary": "no explicit middleware observed on Packet routes",
+      "production_reachable": true,
+      "status": "CURRENT"
+    },
+    {
+      "path": "web/src/checkout-public.js",
+      "component": "public checkout",
+      "behavior": "creates Packet and Stripe session, then binds payment_reference",
+      "read_write": "WRITE_packets_AND_STRIPE_SESSION",
+      "authorization_boundary": "public checkout plus Stripe credential authority",
+      "production_reachable": true,
+      "status": "CURRENT"
+    },
+    {
+      "path": "web/src/routes/stripeWebhook.esm.js",
+      "component": "Stripe webhook",
+      "behavior": "verified webhook updates Packet payment status to payment_received and appends proof events",
+      "read_write": "WRITE_packets_AND_PROOF_EVENTS",
+      "authorization_boundary": "Stripe signature and STRIPE_WEBHOOK_SECRET",
+      "production_reachable": true,
+      "status": "CURRENT"
+    },
+    {
+      "path": "web/src/lib/shopifixerDurableAuditAdapter.js",
+      "component": "ShopiFixer audit Packet link",
+      "behavior": "links durable audit to existing Packet only when packetId exists and store matches",
+      "read_write": "WRITE_shopifixer_packet_link",
+      "authorization_boundary": "existing audit route input",
+      "production_reachable": true,
+      "status": "CURRENT"
+    },
+    {
+      "path": "web/src/lib/shopifixerExecutionPacketAdapter.js",
+      "component": "S005 execution packet adapter",
+      "behavior": "builds deterministic planning manifest with shopifixer_exec_packet identifier",
+      "read_write": "NO_WRITE",
+      "authorization_boundary": "internal route if mounted",
+      "production_reachable": false,
+      "status": "LOCAL_ONLY"
+    }
+  ],
+  "packet_database_contract": {
+    "verification": "PACKET_DATABASE_CONTRACT_VERIFIED",
+    "table": "public.packets",
+    "primary_identifier": {
+      "column": "packet_id",
+      "type": "text",
+      "constraint": "PRIMARY KEY"
+    },
+    "columns": [
+      "packet_id",
+      "store_domain",
+      "payment_reference",
+      "status",
+      "created_at",
+      "updated_at",
+      "execution_status",
+      "proof_status",
+      "completion_status",
+      "reservation_id"
+    ],
+    "indexes": [
+      "packets_pkey",
+      "packets_store_domain_created_at_idx",
+      "packets_payment_reference_idx"
+    ],
+    "shopifixer_foreign_keys_to_packets": [
+      {
+        "table": "ShopifixerLeadEvent",
+        "column": "packetId",
+        "delete_rule": "SET NULL",
+        "update_rule": "CASCADE"
+      },
+      {
+        "table": "ShopifixerPacketLink",
+        "column": "packetId",
+        "delete_rule": "RESTRICT",
+        "update_rule": "CASCADE"
+      },
+      {
+        "table": "ShopifixerProofReference",
+        "column": "packetId",
+        "delete_rule": "RESTRICT",
+        "update_rule": "CASCADE"
+      }
+    ]
+  },
+  "packet_lifecycle": {
+    "verification": "PACKET_LIFECYCLE_VERIFIED",
+    "status_values_observed_in_code": [
+      "prepared",
+      "payment_pending",
+      "payment_received"
+    ],
+    "lifecycle_fields": [
+      "execution_status",
+      "proof_status",
+      "completion_status"
+    ],
+    "default_lifecycle_value": "not_started",
+    "constraints": "No enum or check constraint observed for lifecycle strings",
+    "represents": {
+      "audit_continuity": "INDIRECT_THROUGH_SHOPIFIXER_PACKET_LINK",
+      "merchant_repair_approval": "NOT_PROVEN",
+      "payment_authority": "PROVEN",
+      "engineering_execution_authority": "PARTIAL",
+      "proof_continuity": "PARTIAL"
+    }
+  },
+  "s004_approval": {
+    "classification": "PLANNING_STATE_ONLY",
+    "approval_status_source": "options or request query",
+    "caller_can_request_approved": true,
+    "merchant_authenticated": false,
+    "durable": false,
+    "stable_scope_id": true,
+    "survives_restart": false,
+    "weaknesses": [
+      "request_time_approved_state",
+      "no_durable_approval_record",
+      "no_merchant_actor_authentication",
+      "no_approval_timestamp",
+      "no_scope_version_persistence",
+      "no_replay_protection"
+    ]
+  },
+  "s005_packet_semantics": {
+    "classification": "S005_IS_EXECUTION_MANIFEST",
+    "packet_id_prefix": "shopifixer_exec_packet",
+    "canonical_packet_id_relationship": "NO_CURRENT_RELATIONSHIP_TO_public.packets.packet_id",
+    "generated_at_affects_identity": false,
+    "identical_input_stable": true,
+    "database_write": false,
+    "canonical_packet_mutation": false,
+    "duplicate_authority_risk": "HIGH_IF_PROMOTED_AS_PACKET_AUTHORITY_WITHOUT_RENAMING_OR_DURABLE_LINKAGE"
+  },
+  "authority_gap_summary": {
+    "blocking_gaps": [
+      "repair_scope_not_durable",
+      "merchant_approval_not_durable",
+      "approval_actor_timestamp_evidence_expiry_revocation_missing",
+      "approved_scope_version_not_persisted",
+      "canonical_packet_not_created_from_approval",
+      "packet_lifecycle_not_gated_by_durable_approval",
+      "s005_manifest_not_canonical_packet_authority",
+      "shopify_mutation_gate_missing"
+    ]
+  },
+  "storage_options": {
+    "selected": "OPTION_C_ADDITIVE_APPROVAL_AND_SCOPE_MODELS",
+    "evaluations": [
+      {
+        "option": "OPTION_A_USE_EXISTING_PACKET_FIELDS",
+        "decision": "REJECTED",
+        "reason": "No immutable scope, approval actor, evidence, expiry, or idempotency fields exist in packets"
+      },
+      {
+        "option": "OPTION_B_EXISTING_SHOPIFIXER_TABLES_PLUS_PACKET_LINK",
+        "decision": "REJECTED_AS_COMPLETE_SOLUTION",
+        "reason": "ShopifixerPacketLink can bridge audit and Packet but cannot represent immutable scope and merchant approval without overloading metadata"
+      },
+      {
+        "option": "OPTION_C_ADDITIVE_APPROVAL_AND_SCOPE_MODELS",
+        "decision": "SELECTED",
+        "reason": "Preserves Packet authority while adding explicit durable approval and scope authority"
+      },
+      {
+        "option": "OPTION_D_JSON_SNAPSHOT_IN_EXISTING_FIELD",
+        "decision": "REJECTED",
+        "reason": "Would overload audit evidence or link metadata as approval authority"
+      }
+    ]
+  },
+  "migration_decision": {
+    "result": "ADDITIVE_MIGRATION_REQUIRED",
+    "proposed_models_or_fields": [
+      "ShopifixerRepairScope",
+      "ShopifixerMerchantApproval",
+      "repairScopeId and merchantApprovalId bridge fields on ShopifixerPacketLink or equivalent additive link model"
+    ],
+    "backfill_required": false,
+    "compatibility": "Existing Packet rows and existing ShopiFixer audits remain compatible"
+  },
+  "execution_gate": {
+    "EXECUTION_AUTHORIZED": false,
+    "failed_conditions": [
+      "repair_scope_not_durable",
+      "merchant_approval_not_durable",
+      "approved_scope_version_not_persisted",
+      "canonical_packet_not_created_or_linked_to_approval",
+      "s005_manifest_not_backed_by_canonical_packet",
+      "packet_status_execution_gate_not_implemented",
+      "shopify_mutation_authority_not_established"
+    ]
+  },
+  "s004_s005_promotion_recommendation": "HELD_UNTIL_DURABLE_AUTHORITY_EXISTS",
+  "implementation_sequence": [
+    {
+      "slice": "S006.01",
+      "objective": "Durable approval and immutable scope storage",
+      "schema_impact": "additive",
+      "prohibited_actions": [
+        "Packet creation",
+        "Shopify mutation",
+        "payment",
+        "webhook"
+      ]
+    },
+    {
+      "slice": "S006.02",
+      "objective": "Canonical Packet creation or association from durable approval",
+      "schema_impact": "none_or_additive_link_fields_from_S006_01",
+      "prohibited_actions": [
+        "Shopify mutation",
+        "payment initiation",
+        "customer contact"
+      ]
+    },
+    {
+      "slice": "S006.03",
+      "objective": "Authorized retrieval and execution-gate verification",
+      "schema_impact": "none_expected",
+      "prohibited_actions": [
+        "Shopify mutation"
+      ]
+    },
+    {
+      "slice": "S006.04",
+      "objective": "Controlled production promotion and proof without Shopify mutation",
+      "schema_impact": "deploy reviewed additive migration if required",
+      "prohibited_actions": [
+        "Shopify mutation"
+      ]
+    }
+  ],
+  "confirmation": {
+    "source_edited": false,
+    "schema_edited": false,
+    "migration_edited": false,
+    "packet_records_changed": false,
+    "production_data_changed": false,
+    "environment_changed": false,
+    "shopify_changed": false,
+    "payment_changed": false,
+    "webhook_sent": false,
+    "customer_contacted": false,
+    "commit": false,
+    "push": false,
+    "deployment": false
+  }
+}

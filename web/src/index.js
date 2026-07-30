@@ -37,6 +37,7 @@ import { installRecoveryTrigger } from "./routes/recoveryTrigger.esm.js";
 import { installRecoveryExecution } from "./routes/recoveryExecution.esm.js";
 import { installSendOffer } from "./routes/sendOffer.esm.js";
 import { installShopifixerAuditRetrieval } from "./routes/shopifixerAuditRetrieval.esm.js";
+import { installShopifixerScopeAuthority } from "./routes/shopifixerScopeAuthority.esm.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, "..", "..");
@@ -307,6 +308,7 @@ installCheckoutSignals(app);
 installPlayground(app);
 installPricingRoute(app);
 installShopifixerAuditRetrieval(app);
+installShopifixerScopeAuthority(app);
 
 // Ask Abando API route
 installAskAbandoRoute(app);
