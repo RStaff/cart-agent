@@ -145,16 +145,17 @@ jobs:
           mkdir -p preview
           pack() {
             local R="$1"
-            local OUT="preview/$(echo "$R" | tr '/.' '__')"
+            local OUT
+            OUT="preview/$(echo "$R" | tr '/.' '__')"
             mkdir -p "$OUT"
             cp -a "$R/.next/standalone/." "$OUT"/
             mkdir -p "$OUT/.next/static"
             cp -a "$R/.next/static/." "$OUT/.next/static/" 2>/dev/null || true
             [ -d "$R/public" ] && cp -a "$R/public" "$OUT"/
-            cat > "$OUT/README.txt" <<TXT
-Run locally:
-  PORT=3000 node server.js
-TXT
+            {
+              echo "Run locally:"
+              echo "  PORT=3000 node server.js"
+            } > "$OUT/README.txt"
           }
           while IFS= read -r R; do
             echo "=== Next root: $R ==="
@@ -189,7 +190,7 @@ TXT
 
           echo "Waiting up to 30s for readiness…"
           ok=0
-          for i in {1..30}; do
+          for _ in {1..30}; do
             if curl -fsS "http://localhost:4000/api/status" > ../preview-curl.out 2> ../preview-curl.err || \
                curl -fsS "http://localhost:4000/" > ../preview-curl.out 2> ../preview-curl.err; then
               ok=1; break
