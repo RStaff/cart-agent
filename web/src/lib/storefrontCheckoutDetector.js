@@ -24,7 +24,7 @@ function getStorefrontCheckoutDetectorScript() {
       var idleTimer = null;
       var cartToken = null;
       var interceptShown = false;
-      var interceptSessionKey = 'abando_intercept_seen_v1';
+      var interceptSessionKey = ['abando', 'intercept', 'seen', 'v1'].join('_');
       var interceptNode = null;
       var interceptDebugBadge = null;
       var lastSignalEvent = 'pending';

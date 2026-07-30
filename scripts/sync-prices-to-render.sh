@@ -51,7 +51,8 @@ fi
 echo "✅ Using Render service: $RENDER_SERVICE_ID"
 
 # --- Stripe: pull recurring prices and map them ---
-PRES="$(curl -sS -w $'\nHTTP:%{http_code}\n' -u "$STRIPE_SECRET_KEY:" -G https://api.stripe.com/v1/prices \
+STRIPE_AUTH_HEADER="Authorization: Bearer ${STRIPE_SECRET_KEY:?}"
+PRES="$(curl -sS -w $'\nHTTP:%{http_code}\n' -H "$STRIPE_AUTH_HEADER" -G https://api.stripe.com/v1/prices \
   --data-urlencode active=true --data-urlencode limit=100 --data-urlencode "expand[]=data.product")"
 PCODE="$(printf '%s' "$PRES" | sed -n '$s/^HTTP://p')"
 PBODY="$(printf '%s' "$PRES" | sed '$d')"

@@ -2,20 +2,6 @@
 set -Eeuo pipefail
 trap 'echo "✖ Failed at line $LINENO"; exit 1' ERR
 
-<<<<<<< HEAD
-# Ensure Abando repo root
-test -d .git && test -f package.json || { echo "✖ Run from Abando (cart-agent) repo root"; exit 2; }
-
-git fetch origin main --quiet
-git add -A
-git commit -m "wip: capture untracked before branch switch" || true
-
-BR="chore/abando-wire-align-$(date +%Y%m%d%H%M%S)"
-git switch -c "$BR" >/dev/null 2>&1 || git checkout -B "$BR"
-git rebase origin/main || { echo "Rebase failed; trying merge --no-ff"; git merge --no-ff -m "merge origin/main" origin/main || true; }
-
-echo "→ Scanning for Express entries (excluding node_modules/backups)"
-=======
 # Ensure Abando repo (cart-agent) root
 test -d .git && test -f package.json || { echo "✖ Run from Abando repo root (cart-agent)"; exit 2; }
 
@@ -24,17 +10,12 @@ BR="chore/abando-wire-align-$(date +%Y%m%d%H%M%S)"
 git switch -c "$BR" origin/main >/dev/null 2>&1 || git checkout -B "$BR" origin/main
 
 echo "→ Scanning for live Express entries (excluding node_modules/backups)"
->>>>>>> origin/main
 mapfile -t ENTRIES < <(
   grep -RIl --include="*.js" -E '\bapp\s*=\s*express\s*\(' web 2>/dev/null \
   | grep -v '/node_modules/' | grep -v '\.backup\.' | grep -v '\.bak$' | sort -u
 )
 [[ ${#ENTRIES[@]} -gt 0 ]] || { echo "✖ No Express entries under web/. Aborting."; exit 3; }
-<<<<<<< HEAD
-printf "→ Found %d entries:\n" "${#ENTRIES[@]}"; printf '   - %s\n' "${ENTRIES[@]}"
-=======
 printf "→ Found %d candidate entries:\n" "${#ENTRIES[@]}"; printf '   - %s\n' "${ENTRIES[@]}"
->>>>>>> origin/main
 
 make_router_here () {
   local dir="$1"
@@ -105,14 +86,10 @@ JS
 patch_entry () {
   local entry="$1"
   local dir="$(cd "$(dirname "$entry")" && pwd)"
-<<<<<<< HEAD
-  make_router_here "$dir"
-=======
 
   # drop router next to the entry so require is always "./smc-align"
   make_router_here "$dir"
 
->>>>>>> origin/main
   ENTRY="$entry" node - <<'JS'
 const fs=require('fs');
 const entry=process.env.ENTRY;
@@ -148,19 +125,11 @@ for e in "${ENTRIES[@]}"; do
   patch_entry "$e"
 done
 
-<<<<<<< HEAD
-# Keep installs deterministic & ignore noisy caches (non-blocking)
-[[ -f .npmrc ]] || echo "optional=false" > .npmrc
-grep -q "^.eslintcache$" .gitignore 2>/dev/null || echo ".eslintcache" >> .gitignore
-
-# CI guard to keep alignment mounted
-=======
 # Build stability & ignore noisy caches
 [[ -f .npmrc ]] || echo "optional=false" > .npmrc
 grep -q "^.eslintcache$" .gitignore 2>/dev/null || echo ".eslintcache" >> .gitignore
 
 # CI guard to ensure router stays mounted
->>>>>>> origin/main
 mkdir -p .github/workflows
 cat > .github/workflows/abando-align-validate.yml <<'YML'
 name: abando-align-validate
@@ -185,17 +154,9 @@ jobs:
 YML
 
 git add -A
-<<<<<<< HEAD
-git commit -m "abando: mount alignment router into live Express entry; status/SEO/self-test; npm stability; CI guard" || true
-=======
 git commit -m "abando: mount alignment router in real Express entries; self-test & SEO; npm stability; CI guard" || true
->>>>>>> origin/main
 git push -u origin "$BR"
 gh pr create --fill --head "$BR" || true
 gh pr merge --squash --admin -d || true
 
-<<<<<<< HEAD
-echo "✅ Abando router submitted. Next: force deploy."
-=======
 echo "✅ Abando router submitted via PR. Next: force deploy so routes go live."
->>>>>>> origin/main
