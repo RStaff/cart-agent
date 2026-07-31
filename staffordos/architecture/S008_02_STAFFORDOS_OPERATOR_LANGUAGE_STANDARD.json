@@ -1,0 +1,573 @@
+{
+  "schema": "staffordos.architecture.operator_language_standard.v1",
+  "mission": "S008_02_OPERATOR_LANGUAGE_STANDARD_DISCOVERY_AND_CREATION",
+  "classification": "LANGUAGE_STANDARD_READY",
+  "existing_language_authority_result": "PARTIAL_STANDARD_EXISTS",
+  "mission_boundary": {
+    "documentation_only": true,
+    "application_code_changed": false,
+    "routes_changed": false,
+    "components_changed": false,
+    "css_changed": false,
+    "business_logic_changed": false,
+    "authentication_changed": false,
+    "stripe_changed": false,
+    "shopifixer_production_behavior_changed": false,
+    "deployment_changed": false,
+    "commit_created": false,
+    "push_performed": false
+  },
+  "sources_inspected": [
+    {
+      "path": "staffordos/authority/canonical_vocabulary_v1.md",
+      "governs": "Canonical business terms, synonyms, deprecated terms, forbidden terms, and AI usage rules.",
+      "assessment": "Authoritative for meaning; partial for UI copy."
+    },
+    {
+      "path": "staffordos/operations/operator_design_system_v1.md",
+      "governs": "Operator layout, UI behavior, status meanings, alerts, evidence cards, and readability principles.",
+      "assessment": "Authoritative design system; partial language standard."
+    },
+    {
+      "path": "staffordos/operations/operator_visibility_architecture_v1.md",
+      "governs": "Operator visibility model, route anchors, metric truth, and decision surfaces.",
+      "assessment": "Authoritative visibility architecture."
+    },
+    {
+      "path": "staffordos/ux_audit/scope/command_center_ux_scope_v1.md",
+      "governs": "Command Center purpose and primary-action UX model.",
+      "assessment": "Authoritative for Command Center UX."
+    },
+    {
+      "path": "staffordos/ux_audit/output/operator_command_center_ux_integrity_v1.json",
+      "governs": "Current Command Center findings.",
+      "assessment": "Audit evidence."
+    },
+    {
+      "path": "staffordos/authority/canonical_business_lifecycle_v1.md",
+      "governs": "Business lifecycle and gates.",
+      "assessment": "Authoritative lifecycle."
+    },
+    {
+      "path": "staffordos/authority/canonical_department_architecture_v1.md",
+      "governs": "Department ownership and human gates.",
+      "assessment": "Authoritative ownership model."
+    },
+    {
+      "path": "staffordos/operations/campaign_operating_architecture_v1.md",
+      "governs": "Campaign information architecture and revenue labeling rules.",
+      "assessment": "Partial capability authority."
+    },
+    {
+      "path": "staffordos/authority/product_definitions_v1.md",
+      "governs": "Product, service, platform, and reserved-name classification.",
+      "assessment": "Authoritative identity model."
+    },
+    {
+      "path": "staffordos/SYSTEM_RULES.md",
+      "governs": "Control-plane and product-engine boundary.",
+      "assessment": "Governance rule source."
+    },
+    {
+      "path": "staffordos/architecture/S008_00_STAFFORDOS_FOUNDATION_ARCHITECTURE.md",
+      "governs": "New /os shell foundation.",
+      "assessment": "Recent framework scope."
+    },
+    {
+      "path": "staffordos/architecture/S008_01_EXISTING_OPERATOR_UI_AND_NEW_OS_SHELL_RECONCILIATION.md",
+      "governs": "Route reconciliation strategy.",
+      "assessment": "Current route strategy authority."
+    },
+    {
+      "path": "staffordos/ui/operator-frontend/components/operator/OperatorShell.tsx",
+      "governs": "Existing /operator shell labels, quick actions, and status bar.",
+      "assessment": "Implementation evidence."
+    },
+    {
+      "path": "staffordos/ui/operator-frontend/app/operator/page.tsx",
+      "governs": "Operator Home visible copy and status terms.",
+      "assessment": "Implementation evidence."
+    },
+    {
+      "path": "staffordos/ui/operator-frontend/app/operator/leads/page.tsx",
+      "governs": "Lead Command visible copy and table labels.",
+      "assessment": "Implementation evidence."
+    },
+    {
+      "path": "staffordos/ui/operator-frontend/app/operator/revenue-command/page.tsx",
+      "governs": "Revenue Queue visible copy, blocker language, and next action language.",
+      "assessment": "Implementation evidence."
+    },
+    {
+      "path": "staffordos/ui/operator-frontend/app/operator/campaigns/page.tsx",
+      "governs": "Campaign Command labels and revenue-at-stake wording.",
+      "assessment": "Implementation evidence."
+    },
+    {
+      "path": "staffordos/ui/operator-frontend/app/operator/system-map/page.tsx",
+      "governs": "System Map, raw map, policy, and blocker language.",
+      "assessment": "Implementation evidence."
+    },
+    {
+      "path": "staffordos/ui/operator-frontend/lib/staffordos/workspaces.ts",
+      "governs": "S008.00 canonical /os section names and operating questions.",
+      "assessment": "Implementation evidence."
+    },
+    {
+      "path": "staffordos/ui/operator-frontend/components/staffordos/NextActionCard.tsx",
+      "governs": "S008.00 decision-card field labels.",
+      "assessment": "Implementation evidence."
+    }
+  ],
+  "current_terminology_findings": [
+    {
+      "term": "Operator Home",
+      "classification": "ACCEPTABLE_WITH_CONTEXT",
+      "operator_direction": "Use Home in canonical /os; keep Operator Home as legacy route context until migration."
+    },
+    {
+      "term": "Morning surface",
+      "classification": "ACCEPTABLE_WITH_CONTEXT",
+      "operator_direction": "Prefer Start My Day when the surface is action-oriented."
+    },
+    {
+      "term": "Executive",
+      "classification": "AMBIGUOUS",
+      "operator_direction": "Prefer Command or Company Priorities depending on route purpose."
+    },
+    {
+      "term": "Revenue Command",
+      "classification": "ACCEPTABLE_WITH_CONTEXT",
+      "operator_direction": "Prefer Money to Collect for operator-facing action queues."
+    },
+    {
+      "term": "Lead Command",
+      "classification": "ACCEPTABLE_WITH_CONTEXT",
+      "operator_direction": "Prefer People to Contact when the page is a lead action queue."
+    },
+    {
+      "term": "Campaign Command",
+      "classification": "ACCEPTABLE_WITH_CONTEXT",
+      "operator_direction": "Prefer Marketing Activity or Campaigns depending on detail level."
+    },
+    {
+      "term": "Validation Status",
+      "classification": "TOO_TECHNICAL",
+      "operator_direction": "Prefer Checks to Clear or Checks Passed."
+    },
+    {
+      "term": "Campaign Registry",
+      "classification": "TOO_TECHNICAL",
+      "operator_direction": "Prefer Marketing Records or Campaign Records."
+    },
+    {
+      "term": "Campaign Attribution",
+      "classification": "ACCEPTABLE_WITH_CONTEXT",
+      "operator_direction": "Prefer Where Leads Came From or Where Customers Came From."
+    },
+    {
+      "term": "System Health",
+      "classification": "ACCEPTABLE_WITH_CONTEXT",
+      "operator_direction": "Prefer Is Everything Working? for summary pages."
+    },
+    {
+      "term": "Execution Log",
+      "classification": "TOO_TECHNICAL",
+      "operator_direction": "Prefer Recent Activity; keep technical label in evidence views."
+    },
+    {
+      "term": "Proof Gate",
+      "classification": "GOVERNANCE_LANGUAGE",
+      "operator_direction": "Prefer What Still Needs to Be Proven in UI."
+    },
+    {
+      "term": "Readiness Score",
+      "classification": "TOO_ABSTRACT",
+      "operator_direction": "Prefer Ready to Move? plus evidence."
+    },
+    {
+      "term": "Relationship Registry",
+      "classification": "INTERNAL_ONLY",
+      "operator_direction": "Prefer Customers and Contacts in navigation."
+    },
+    {
+      "term": "Packet",
+      "classification": "INTERNAL_ONLY",
+      "operator_direction": "Prefer Work Package; show Packet ID only in technical evidence."
+    },
+    {
+      "term": "Execute",
+      "classification": "NEEDS_RENAMING",
+      "operator_direction": "Prefer concrete verbs such as Send follow-up, Review proof, or Start approved work."
+    },
+    {
+      "term": "Revenue at stake",
+      "classification": "NEEDS_RENAMING",
+      "operator_direction": "Use Pipeline Value (estimate)."
+    },
+    {
+      "term": "Not Yet Implemented",
+      "classification": "TOO_TECHNICAL",
+      "operator_direction": "Prefer Not available yet plus next expected source or dependency."
+    }
+  ],
+  "voice_principles": [
+    "clear",
+    "direct",
+    "calm",
+    "specific",
+    "evidence-based",
+    "respectful",
+    "action-oriented",
+    "honest about uncertainty"
+  ],
+  "core_language_questions": [
+    "What happened?",
+    "Why does it matter?",
+    "What should I do?",
+    "What is blocking me?",
+    "What happens next?",
+    "What will prove completion?"
+  ],
+  "operating_loop": [
+    "Observe",
+    "Interpret",
+    "Decide",
+    "Act",
+    "Prove",
+    "Learn"
+  ],
+  "language_boundaries": {
+    "operator_facing_ui": {
+      "use": [
+        "business outcomes",
+        "next actions",
+        "evidence",
+        "risks",
+        "approvals",
+        "deadlines"
+      ],
+      "avoid": [
+        "raw enum names",
+        "file paths as primary messages",
+        "stack traces",
+        "unexplained authority jargon"
+      ]
+    },
+    "internal_architecture": {
+      "use": [
+        "canonical terms",
+        "system boundaries",
+        "models",
+        "route strategy",
+        "authority names"
+      ],
+      "avoid": [
+        "casual renames that obscure source-of-truth meaning"
+      ]
+    },
+    "developer_debug": {
+      "use": [
+        "file paths",
+        "API routes",
+        "enum values",
+        "validator output",
+        "raw maps"
+      ],
+      "avoid": [
+        "presenting debug labels as primary operator guidance"
+      ]
+    },
+    "governance": {
+      "use": [
+        "authority",
+        "audit",
+        "approval",
+        "proof",
+        "fingerprint",
+        "immutable state"
+      ],
+      "avoid": [
+        "hiding required gates"
+      ]
+    },
+    "customer_facing": {
+      "use": [
+        "merchant benefit",
+        "proof",
+        "scope",
+        "price",
+        "next customer step"
+      ],
+      "avoid": [
+        "internal StaffordOS terminology",
+        "AI-agent internals",
+        "Packet language"
+      ]
+    }
+  },
+  "terminology_map": [
+    {
+      "operator_label": "Home",
+      "internal_term": "Operator Home",
+      "technical_term_allowed_when": "Breadcrumbs during route migration.",
+      "rationale": "Matches /os canonical taxonomy.",
+      "priority": "P1"
+    },
+    {
+      "operator_label": "Start My Day",
+      "internal_term": "Morning surface, Workday Control",
+      "technical_term_allowed_when": "Architecture docs and implementation identifiers.",
+      "rationale": "Describes the operator action.",
+      "priority": "P1"
+    },
+    {
+      "operator_label": "Company Priorities",
+      "internal_term": "Executive, Executive Command Center",
+      "technical_term_allowed_when": "Legacy route labels until migration.",
+      "rationale": "Clearer than role-based Executive.",
+      "priority": "P1"
+    },
+    {
+      "operator_label": "Current Work",
+      "internal_term": "Command Center when fulfillment-oriented",
+      "technical_term_allowed_when": "Architecture docs if route remains mixed-purpose.",
+      "rationale": "Names work in motion instead of generic command.",
+      "priority": "P1"
+    },
+    {
+      "operator_label": "Money to Collect",
+      "internal_term": "Revenue Command, Revenue Queue",
+      "technical_term_allowed_when": "Finance architecture and route names.",
+      "rationale": "Makes the operator goal obvious.",
+      "priority": "P1"
+    },
+    {
+      "operator_label": "People to Contact",
+      "internal_term": "Lead Command",
+      "technical_term_allowed_when": "Internal route and file names.",
+      "rationale": "Better for an action queue than Lead Command.",
+      "priority": "P1"
+    },
+    {
+      "operator_label": "Marketing Activity",
+      "internal_term": "Campaign Command, Campaign Registry",
+      "technical_term_allowed_when": "Campaign authority docs and registry evidence.",
+      "rationale": "Describes activity without exposing registry mechanics.",
+      "priority": "P1"
+    },
+    {
+      "operator_label": "Where Customers Came From",
+      "internal_term": "Campaign Attribution",
+      "technical_term_allowed_when": "Evidence and analytics detail.",
+      "rationale": "Explains attribution in plain language.",
+      "priority": "P2"
+    },
+    {
+      "operator_label": "Checks to Clear",
+      "internal_term": "Validation Status",
+      "technical_term_allowed_when": "Validator and debug detail.",
+      "rationale": "Tells Ross whether work is blocked.",
+      "priority": "P1"
+    },
+    {
+      "operator_label": "Is Everything Working?",
+      "internal_term": "System Health",
+      "technical_term_allowed_when": "System and admin detail.",
+      "rationale": "Converts health into the operator question.",
+      "priority": "P2"
+    },
+    {
+      "operator_label": "Recent Activity",
+      "internal_term": "Execution Log",
+      "technical_term_allowed_when": "Developer/debug logs and audit evidence.",
+      "rationale": "Less technical for global navigation.",
+      "priority": "P1"
+    },
+    {
+      "operator_label": "What Still Needs to Be Proven",
+      "internal_term": "Proof Gate",
+      "technical_term_allowed_when": "Governance and authority docs.",
+      "rationale": "Preserves proof requirement in plain language.",
+      "priority": "P1"
+    },
+    {
+      "operator_label": "Customers and Contacts",
+      "internal_term": "Relationship Registry",
+      "technical_term_allowed_when": "Architecture and entity docs.",
+      "rationale": "Names the human and business object.",
+      "priority": "P2"
+    },
+    {
+      "operator_label": "Ready to Move?",
+      "internal_term": "Readiness Score",
+      "technical_term_allowed_when": "Evidence detail showing score formula.",
+      "rationale": "Turns abstract score into decision support.",
+      "priority": "P2"
+    },
+    {
+      "operator_label": "What is stopping this?",
+      "internal_term": "Blocker",
+      "technical_term_allowed_when": "Tables and diagnostics.",
+      "rationale": "Makes blocker actionable.",
+      "priority": "P2"
+    },
+    {
+      "operator_label": "Pipeline Value (estimate)",
+      "internal_term": "Revenue at stake",
+      "technical_term_allowed_when": "Technical evidence that identifies source field.",
+      "rationale": "Prevents estimates from sounding like captured revenue.",
+      "priority": "P0"
+    },
+    {
+      "operator_label": "Not available yet",
+      "internal_term": "Not Yet Implemented",
+      "technical_term_allowed_when": "Developer backlog and source comments.",
+      "rationale": "Sounds like a product state, not a code failure.",
+      "priority": "P2"
+    }
+  ],
+  "action_language": {
+    "rules": [
+      "Start with a verb.",
+      "Name the object.",
+      "Avoid vague system verbs.",
+      "Match the consequence.",
+      "Add approval language when the action is governed."
+    ],
+    "prefer": [
+      "Contact this lead",
+      "Review the proposal",
+      "Open payment details",
+      "Start today's work",
+      "See why this matters",
+      "Mark as complete",
+      "Ask for approval",
+      "Review proof"
+    ],
+    "avoid": [
+      "Execute",
+      "Process",
+      "Submit action",
+      "Run operation",
+      "Open module",
+      "Manage entity"
+    ]
+  },
+  "status_language_examples": [
+    {
+      "internal": "payment_pending",
+      "operator": "Waiting for payment"
+    },
+    {
+      "internal": "not_started",
+      "operator": "Not started"
+    },
+    {
+      "internal": "proof_status=missing",
+      "operator": "Proof still needed"
+    },
+    {
+      "internal": "send_initial_outreach",
+      "operator": "Ready to contact"
+    },
+    {
+      "internal": "at_risk",
+      "operator": "At risk"
+    },
+    {
+      "internal": "prepared",
+      "operator": "Prepared"
+    },
+    {
+      "internal": "authorized",
+      "operator": "Approved to move to the next lifecycle state"
+    }
+  ],
+  "warning_language": {
+    "must_explain": [
+      "what is wrong",
+      "what it affects",
+      "whether work can continue",
+      "what the operator should do next"
+    ],
+    "technical_details_policy": "Raw file paths, enum names, stack details, missing JSON filenames, and implementation errors belong in secondary technical details, not as the primary message."
+  },
+  "ai_recommendation_language": {
+    "required_fields": [
+      "What to do",
+      "Why now",
+      "Evidence",
+      "Expected result",
+      "Risk or uncertainty",
+      "Required approval",
+      "What completion will prove"
+    ],
+    "certainty_policy": "Avoid unsupported certainty. State uncertainty when evidence is incomplete."
+  },
+  "migration_priorities": {
+    "P0": [
+      "Replace vague or high-risk action words where consequence is unclear.",
+      "Replace estimate-as-revenue labels.",
+      "Ensure warnings explain impact and next step."
+    ],
+    "P1": [
+      "Reconcile Executive, Command, and Command Center.",
+      "Reconcile Revenue Command and Pipeline.",
+      "Reconcile Lead Command and People to Contact.",
+      "Reconcile Execution Log and Recent Activity.",
+      "Add display labels to /os capability links without moving routes."
+    ],
+    "P2": [
+      "Translate Validation Status, Campaign Registry, Campaign Attribution, and System Health in primary UI.",
+      "Add Technical details affordances for raw file paths, enum values, and source artifacts.",
+      "Turn readiness scores into decision questions."
+    ],
+    "P3": [
+      "Normalize title case versus sentence case.",
+      "Tighten subtitles.",
+      "Reduce repeated command language.",
+      "Make empty states explain what is needed next."
+    ]
+  },
+  "s008_01_reconciliation": {
+    "route_strategy": "/os becomes canonical over time; /operator remains runtime-canonical until parity is proven.",
+    "language_strategy": "Add operator-facing labels in metadata first and do not rename routes prematurely.",
+    "do_not_touch_during_migration": [
+      "write-capable routes",
+      "ShopiFixer proof writers",
+      "Workday actions",
+      "lead lifecycle actions",
+      "primary-action execution routes",
+      "authentication",
+      "Stripe",
+      "deployment",
+      "environment variables"
+    ]
+  },
+  "next_narrow_implementation_slice": {
+    "mission": "S008_03_OS_CAPABILITY_LINK_MAP",
+    "objective": "Add a read-only capability link map that lets /os point to existing /operator surfaces using this language standard for display labels.",
+    "allowed_scope": [
+      "Add staffordos/ui/operator-frontend/lib/staffordos/capabilities.ts.",
+      "Add a small reusable CapabilityLinkPanel component.",
+      "Render section-specific links on /os workspace pages.",
+      "Use operator-facing labels from this standard.",
+      "Keep link targets pointed at existing /operator routes."
+    ],
+    "prohibited_scope": [
+      "Do not import existing data loaders into /os.",
+      "Do not move or duplicate API routes.",
+      "Do not touch authentication, Stripe, ShopiFixer production behavior, deployment, or environment variables."
+    ],
+    "rollback": [
+      "Delete the capability map.",
+      "Delete the link panel.",
+      "Remove the panel from /os workspace pages."
+    ]
+  },
+  "artifacts_created": [
+    "staffordos/architecture/S008_02_STAFFORDOS_OPERATOR_LANGUAGE_STANDARD.md",
+    "staffordos/architecture/S008_02_STAFFORDOS_OPERATOR_LANGUAGE_STANDARD.json"
+  ]
+}

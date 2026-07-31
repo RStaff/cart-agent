@@ -1,0 +1,359 @@
+{
+  "mission": "S008_01_EXISTING_OPERATOR_UI_AND_NEW_OS_SHELL_RECONCILIATION",
+  "classification": "RECONCILIATION_READY",
+  "mode": "read_only_architecture_discovery_and_reconciliation",
+  "scope_confirmation": {
+    "application_code_modified": false,
+    "deployment_performed": false,
+    "commit_performed": false,
+    "push_performed": false,
+    "shopifixer_production_behavior_modified": false,
+    "authentication_modified": false,
+    "stripe_modified": false,
+    "artifacts_created": [
+      "staffordos/architecture/S008_01_EXISTING_OPERATOR_UI_AND_NEW_OS_SHELL_RECONCILIATION.md",
+      "staffordos/architecture/S008_01_EXISTING_OPERATOR_UI_AND_NEW_OS_SHELL_RECONCILIATION.json"
+    ]
+  },
+  "existing_routes": [
+    {
+      "route": "/",
+      "file": "staffordos/ui/operator-frontend/app/page.tsx",
+      "surface": "Root redirect",
+      "authority": "redirects to /operator",
+      "classification": "RETAIN_AS_CANONICAL until migration"
+    },
+    {
+      "route": "/operator",
+      "file": "staffordos/ui/operator-frontend/app/operator/page.tsx",
+      "surface": "Operator Home / morning surface",
+      "authority": "primary action, validation, campaign, lead, CEO truth, daemon, heartbeat, dashboard artifacts",
+      "classification": "MOVE_UNDER_OS",
+      "canonical_section": "Home"
+    },
+    {
+      "route": "/operator/command-center",
+      "file": "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx",
+      "surface": "Fulfillment-oriented command center",
+      "authority": "primary action, preflight, QA, unit work, ShopiFixer command center, ShopiFixer evidence/proof/completion server actions",
+      "classification": "KEEP_AS_CAPABILITY_LENS",
+      "canonical_section": "Work"
+    },
+    {
+      "route": "/operator/revenue-command",
+      "file": "staffordos/ui/operator-frontend/app/operator/revenue-command/page.tsx",
+      "surface": "Revenue Queue",
+      "authority": "lead registry, revenue truth, dashboard snapshot",
+      "classification": "MOVE_UNDER_OS",
+      "canonical_section": "Pipeline"
+    },
+    {
+      "route": "/operator/leads",
+      "file": "staffordos/ui/operator-frontend/app/operator/leads/page.tsx",
+      "surface": "Lead Command",
+      "authority": "real lead registry plus lead lifecycle action posts",
+      "classification": "MOVE_UNDER_OS",
+      "canonical_section": "Pipeline"
+    },
+    {
+      "route": "/operator/campaigns",
+      "file": "staffordos/ui/operator-frontend/app/operator/campaigns/page.tsx",
+      "surface": "Campaign Command",
+      "authority": "campaign resolver report over campaign and relationship truth",
+      "classification": "MOVE_UNDER_OS",
+      "canonical_section": "Pipeline"
+    },
+    {
+      "route": "/operator/cockpit",
+      "file": "staffordos/ui/operator-frontend/app/operator/cockpit/page.tsx",
+      "surface": "CEO Truth Snapshot",
+      "authority": "client fetches /api/operator/ceo-truth-snapshot and may show primary action execution CTA",
+      "classification": "MERGE_WITH_EXISTING_OS_SECTION",
+      "canonical_section": "Command"
+    },
+    {
+      "route": "/operator/execution-log",
+      "file": "staffordos/ui/operator-frontend/app/operator/execution-log/page.tsx",
+      "surface": "Execution Log",
+      "authority": "execution events, outcome events, agent performance, rule suggestions",
+      "classification": "MOVE_UNDER_OS",
+      "canonical_section": "Knowledge"
+    },
+    {
+      "route": "/operator/system-map",
+      "file": "staffordos/ui/operator-frontend/app/operator/system-map/page.tsx",
+      "surface": "True System Map",
+      "authority": "system map sources, manifest panel, Abando proof action panel",
+      "classification": "MOVE_UNDER_OS",
+      "canonical_section": "System"
+    },
+    {
+      "route": "/operator/products",
+      "file": "staffordos/ui/operator-frontend/app/operator/products/page.tsx",
+      "surface": "Product Overview",
+      "authority": "Abando summary API when configured; other product placeholders",
+      "classification": "MOVE_UNDER_OS",
+      "canonical_section": "System"
+    },
+    {
+      "route": "/operator/analytics",
+      "file": "staffordos/ui/operator-frontend/app/operator/analytics/page.tsx",
+      "surface": "Operator Analytics placeholders",
+      "authority": "no connected analytics summary APIs",
+      "classification": "DEPRECATE_LATER",
+      "canonical_section": "Knowledge"
+    },
+    {
+      "route": "/operator/capacity",
+      "file": "staffordos/ui/operator-frontend/app/operator/capacity/page.tsx",
+      "surface": "Service Capacity Board",
+      "authority": "static manual placeholder data",
+      "classification": "NEEDS_MORE_EVIDENCE",
+      "canonical_section": "Work"
+    },
+    {
+      "route": "/operator/slice-truth",
+      "file": "staffordos/ui/operator-frontend/app/operator/slice-truth/page.tsx",
+      "surface": "Slice Truth / Operator Lock",
+      "authority": "slice truth and lock JSON, disabled buttons",
+      "classification": "MOVE_UNDER_OS",
+      "canonical_section": "Governance"
+    },
+    {
+      "route": "/operator/shopifixer-pilot",
+      "file": "staffordos/ui/operator-frontend/app/operator/shopifixer-pilot/page.tsx",
+      "surface": "ShopiFixer pilot proof workspace",
+      "authority": "ShopiFixer artifact parsing and evidence/proof/completion writers",
+      "classification": "KEEP_AS_CAPABILITY_LENS",
+      "canonical_section": "Work"
+    },
+    {
+      "route": "/operator/relationship/[id]",
+      "file": "staffordos/ui/operator-frontend/app/operator/relationship/[id]/page.tsx",
+      "surface": "Relationship 360",
+      "authority": "relationship, action, decision, revenue, fulfillment, execution, outcome, and packet authority data",
+      "classification": "KEEP_AS_CAPABILITY_LENS",
+      "canonical_section": "Pipeline"
+    }
+  ],
+  "new_os_routes": [
+    {
+      "route": "/os",
+      "file": "staffordos/ui/operator-frontend/app/os/page.tsx",
+      "section": "Home",
+      "data_authority": "static section metadata only"
+    },
+    {
+      "route": "/os/command",
+      "file": "staffordos/ui/operator-frontend/app/os/command/page.tsx",
+      "section": "Command",
+      "data_authority": "static section metadata only"
+    },
+    {
+      "route": "/os/work",
+      "file": "staffordos/ui/operator-frontend/app/os/work/page.tsx",
+      "section": "Work",
+      "data_authority": "static section metadata only"
+    },
+    {
+      "route": "/os/pipeline",
+      "file": "staffordos/ui/operator-frontend/app/os/pipeline/page.tsx",
+      "section": "Pipeline",
+      "data_authority": "static section metadata only"
+    },
+    {
+      "route": "/os/knowledge",
+      "file": "staffordos/ui/operator-frontend/app/os/knowledge/page.tsx",
+      "section": "Knowledge",
+      "data_authority": "static section metadata only"
+    },
+    {
+      "route": "/os/governance",
+      "file": "staffordos/ui/operator-frontend/app/os/governance/page.tsx",
+      "section": "Governance",
+      "data_authority": "static section metadata only"
+    },
+    {
+      "route": "/os/system",
+      "file": "staffordos/ui/operator-frontend/app/os/system/page.tsx",
+      "section": "System",
+      "data_authority": "static section metadata only"
+    }
+  ],
+  "navigation_models": {
+    "existing_operator_shell": "staffordos/ui/operator-frontend/components/operator/OperatorShell.tsx",
+    "existing_operator_nav": "staffordos/ui/operator-frontend/components/operator/OperatorNav.tsx",
+    "new_os_registry": "staffordos/ui/operator-frontend/lib/staffordos/workspaces.ts",
+    "finding": "Three navigation definitions currently describe overlapping StaffordOS surfaces."
+  },
+  "component_inventory": {
+    "shells": [
+      "staffordos/ui/operator-frontend/components/operator/OperatorShell.tsx",
+      "staffordos/ui/operator-frontend/components/staffordos/StaffordOsShell.tsx"
+    ],
+    "navigation": [
+      "staffordos/ui/operator-frontend/components/operator/OperatorNav.tsx",
+      "staffordos/ui/operator-frontend/lib/staffordos/workspaces.ts"
+    ],
+    "decision_and_action": [
+      "staffordos/ui/operator-frontend/components/operator/PrimaryActionPanel.tsx",
+      "staffordos/ui/operator-frontend/components/operator/ActionFirstDashboard.tsx",
+      "staffordos/ui/operator-frontend/components/operator/OperatorHomeV1.tsx",
+      "staffordos/ui/operator-frontend/components/operator/RossCommandCenterSurface.tsx",
+      "staffordos/ui/operator-frontend/components/operator/ExecutePrimaryActionButton.tsx",
+      "staffordos/ui/operator-frontend/components/staffordos/NextActionCard.tsx"
+    ],
+    "workflow": [
+      "staffordos/ui/operator-frontend/components/operator/WorkdayControlPanel.tsx",
+      "staffordos/ui/operator-frontend/components/operator/LeadQueue.tsx",
+      "staffordos/ui/operator-frontend/components/operator/ProofRunWorkbench.tsx",
+      "staffordos/ui/operator-frontend/components/operator/ShopifixerPilotWorkspace.tsx"
+    ],
+    "system_map": [
+      "staffordos/ui/operator-frontend/components/system-map/SystemMapManifestPanel.tsx",
+      "staffordos/ui/operator-frontend/components/system-map/PrimaryBlockerActionPanel.tsx"
+    ],
+    "placeholder_or_summary": [
+      "staffordos/ui/operator-frontend/components/operator/AbandoProductSummaryCard.tsx",
+      "staffordos/ui/operator-frontend/components/operator/ProductSummaryPlaceholderCard.tsx",
+      "staffordos/ui/operator-frontend/components/operator/AnalyticsPlaceholderCard.tsx",
+      "staffordos/ui/operator-frontend/components/operator/UnitWorkSnapshotPanel.tsx",
+      "staffordos/ui/operator-frontend/components/staffordos/WorkspacePage.tsx"
+    ]
+  },
+  "overlap_findings": [
+    "OperatorShell and StaffordOsShell duplicate shell, navigation, search, and notification concepts.",
+    "OperatorShell SIDEBAR_ITEMS, OperatorShell QUICK_ACTIONS, OperatorNav CONTROL_PLANE_ROUTES, and STAFFORDOS_SECTIONS can drift.",
+    "NextActionCard overlaps with existing primary-action and action-first cards that already use real evidence.",
+    "/os placeholders duplicate route real estate without reusing existing operator data-backed surfaces.",
+    "Command, Executive, Command Center, Revenue Command, Lead Command, Work, Fulfillment, and Pipeline terminology currently overlaps."
+  ],
+  "workflow_coverage": [
+    {
+      "stage": "Awareness",
+      "ui_support": ["/operator/campaigns", "/operator/leads"],
+      "data_support": ["campaign registry", "lead registry", "attribution report"],
+      "status": "partial real support"
+    },
+    {
+      "stage": "Outreach",
+      "ui_support": ["/operator/leads"],
+      "data_support": ["lead registry", "send ledger", "send execution log"],
+      "status": "real dry-run/operator proof support"
+    },
+    {
+      "stage": "Lead",
+      "ui_support": ["/operator/leads"],
+      "data_support": ["staffordos/leads/lead_registry_v1.json"],
+      "status": "real support"
+    },
+    {
+      "stage": "Qualification",
+      "ui_support": ["/operator/relationship/[id]", "/operator/revenue-command"],
+      "data_support": ["relationship resolver", "decision engine", "engagement stages"],
+      "status": "partial real support"
+    },
+    {
+      "stage": "Opportunity",
+      "ui_support": ["/operator/revenue-command", "/operator/campaigns"],
+      "data_support": ["revenue truth", "dashboard snapshot", "campaign resolver"],
+      "status": "partial real support"
+    },
+    {
+      "stage": "Proposal",
+      "ui_support": ["/operator/revenue-command", "/operator/relationship/[id]"],
+      "data_support": ["proposal_sent stage", "payment waiting state"],
+      "status": "partial support"
+    },
+    {
+      "stage": "Agreement",
+      "ui_support": ["/operator/relationship/[id]", "/operator/shopifixer-pilot"],
+      "data_support": ["client lifecycle", "merchant lifecycle", "packet authority where available"],
+      "status": "weak implicit support"
+    },
+    {
+      "stage": "Payment",
+      "ui_support": ["/operator/revenue-command", "/operator/relationship/[id]", "/operator/shopifixer-pilot"],
+      "data_support": ["packet authority reads", "revenue truth", "fulfillment truth"],
+      "status": "partial support"
+    },
+    {
+      "stage": "Fulfillment",
+      "ui_support": ["/operator/command-center", "/operator/shopifixer-pilot"],
+      "data_support": ["ShopiFixer command center", "fulfillment truth", "proof-run artifacts"],
+      "status": "real product-specific support"
+    },
+    {
+      "stage": "Proof",
+      "ui_support": ["/operator/shopifixer-pilot", "/operator/execution-log", "/operator/system-map"],
+      "data_support": ["proof packages", "seals", "evidence manifests", "execution/outcome logs"],
+      "status": "real support"
+    },
+    {
+      "stage": "Customer Success",
+      "ui_support": ["/operator/relationship/[id]", "/operator/execution-log"],
+      "data_support": ["outcome events", "relationship outcome facets"],
+      "status": "partial support"
+    },
+    {
+      "stage": "Expansion",
+      "ui_support": ["/operator/campaigns"],
+      "data_support": ["campaign registry"],
+      "status": "partial support"
+    },
+    {
+      "stage": "Referral",
+      "ui_support": ["/operator/campaigns"],
+      "data_support": ["referral expansion campaign type"],
+      "status": "weak placeholder support"
+    }
+  ],
+  "recommended_route_strategy": {
+    "selected": "A",
+    "name": "/os becomes canonical shell and existing /operator surfaces migrate beneath it incrementally",
+    "lowest_risk_interpretation": [
+      "Keep /operator as runtime canonical until individual /os surfaces reach parity.",
+      "Use /os as the canonical information architecture and taxonomy.",
+      "Connect /os to existing /operator surfaces with links or read-only wrappers first.",
+      "Move read-only surfaces before write-capable surfaces.",
+      "Keep ShopiFixer Pilot and proof writers last.",
+      "Add redirects only after route parity and authority boundaries are proven."
+    ],
+    "do_not_touch_during_initial_migration": [
+      "authentication",
+      "Stripe",
+      "ShopiFixer production behavior",
+      "Packet lifecycle",
+      "ShopiFixer proof/completion writers",
+      "lead lifecycle mutation API",
+      "workday start/stop routes",
+      "primary-action execution route",
+      "deployment configuration"
+    ]
+  },
+  "next_narrow_implementation_slice": {
+    "mission": "S008_02_OS_CAPABILITY_LINK_MAP",
+    "objective": "Add a single read-only capability map that connects each /os top-level section to existing /operator surfaces without moving routes, duplicating business logic, or changing actions.",
+    "allowed_changes": [
+      "Add staffordos/ui/operator-frontend/lib/staffordos/capabilities.ts",
+      "Add a small reusable CapabilityLinkPanel component",
+      "Render section-specific links on /os workspace pages",
+      "Keep links pointing to existing /operator pages"
+    ],
+    "prohibited_changes": [
+      "Do not import existing data loaders into /os",
+      "Do not move API routes",
+      "Do not duplicate action handlers",
+      "Do not alter authentication",
+      "Do not alter Stripe",
+      "Do not alter ShopiFixer production behavior",
+      "Do not deploy"
+    ],
+    "rollback": [
+      "Delete capabilities.ts",
+      "Delete CapabilityLinkPanel",
+      "Remove the panel from WorkspacePage"
+    ]
+  },
+  "final_decision": "The canonical product direction should be /os, but current operating truth lives in /operator. The next implementation should make /os an index into existing operator surfaces before any route migration."
+}

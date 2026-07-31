@@ -1812,3 +1812,337 @@ textarea {
     grid-template-columns: 1fr;
   }
 }
+
+/* StaffordOS foundation shell */
+.staffordOsShell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  background: #f5f7f9;
+  color: #15181d;
+}
+
+.staffordOsSidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  padding: 18px;
+  border-right: 1px solid #d9dee5;
+  background: #15181d;
+  color: #f5f7f9;
+  overflow-y: auto;
+}
+
+.staffordOsBrand {
+  display: grid;
+  gap: 4px;
+  min-height: 76px;
+  padding: 14px;
+  border: 1px solid rgba(245, 247, 249, 0.16);
+  border-radius: 8px;
+  background: #20242b;
+}
+
+.staffordOsBrand span,
+.staffordEyebrow,
+.staffordOsCommandQuestion span,
+.staffordOsSearch span,
+.staffordOsNotifications span,
+.staffordWorkspaceStatus span,
+.staffordNextActionHeader span,
+.staffordNextActionField span,
+.staffordWorkspaceTile span {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.staffordOsBrand span {
+  color: #90d8c5;
+}
+
+.staffordOsBrand strong {
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.staffordOsNav {
+  display: grid;
+  gap: 6px;
+  margin-top: 18px;
+}
+
+.staffordOsNavItem {
+  display: grid;
+  gap: 4px;
+  min-height: 58px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #dfe5ea;
+  text-decoration: none;
+}
+
+.staffordOsNavItem:hover {
+  border-color: rgba(144, 216, 197, 0.48);
+  background: rgba(144, 216, 197, 0.1);
+}
+
+.staffordOsNavItemActive {
+  border-color: #90d8c5;
+  background: #26342f;
+  color: #ffffff;
+}
+
+.staffordOsNavItem span {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.staffordOsNavItem small {
+  color: #aeb8c2;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.staffordOsMain {
+  min-width: 0;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.staffordOsCommandBar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: minmax(220px, 1.15fr) minmax(260px, 1fr) 170px;
+  gap: 12px;
+  align-items: center;
+  min-height: 78px;
+  padding: 14px 22px;
+  border-bottom: 1px solid #d9dee5;
+  background: rgba(245, 247, 249, 0.96);
+}
+
+.staffordOsCommandQuestion,
+.staffordOsNotifications,
+.staffordOsSearch {
+  min-height: 50px;
+  border: 1px solid #d9dee5;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.staffordOsCommandQuestion,
+.staffordOsNotifications {
+  display: grid;
+  gap: 4px;
+  padding: 9px 12px;
+}
+
+.staffordOsCommandQuestion span,
+.staffordOsSearch span,
+.staffordOsNotifications span,
+.staffordWorkspaceStatus span,
+.staffordNextActionHeader span,
+.staffordNextActionField span,
+.staffordWorkspaceTile span {
+  color: #66717e;
+}
+
+.staffordOsCommandQuestion strong,
+.staffordOsNotifications strong {
+  color: #15181d;
+  font-size: 14px;
+}
+
+.staffordOsSearch {
+  display: grid;
+  gap: 4px;
+  padding: 7px 12px;
+}
+
+.staffordOsSearch input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #15181d;
+  font: inherit;
+}
+
+.staffordOsSearch input::placeholder {
+  color: #7b8693;
+}
+
+.staffordOsContent {
+  padding: 24px;
+}
+
+.staffordWorkspace {
+  display: grid;
+  gap: 18px;
+  max-width: 1180px;
+}
+
+.staffordWorkspaceHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 18px;
+  align-items: stretch;
+  padding: 22px;
+  border: 1px solid #d9dee5;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.staffordWorkspaceHeader h1 {
+  margin: 6px 0 0;
+  font-size: 34px;
+  line-height: 1.08;
+  color: #15181d;
+}
+
+.staffordWorkspaceHeader p {
+  margin: 10px 0 0;
+  max-width: 680px;
+  color: #4f5a66;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.staffordEyebrow {
+  color: #23695d;
+}
+
+.staffordWorkspaceStatus {
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid #cbd4dd;
+  border-radius: 8px;
+  background: #f5f7f9;
+}
+
+.staffordWorkspaceStatus strong {
+  color: #23695d;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.staffordNextAction {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid #cbd4dd;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.staffordNextActionHeader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.staffordNextActionHeader strong {
+  color: #23695d;
+  font-size: 13px;
+}
+
+.staffordNextAction h2 {
+  margin: 0;
+  color: #15181d;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.staffordNextActionGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.staffordNextActionField,
+.staffordWorkspaceTile {
+  min-height: 96px;
+  padding: 12px;
+  border: 1px solid #d9dee5;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.staffordNextActionField {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.staffordNextActionField strong,
+.staffordWorkspaceTile strong {
+  color: #15181d;
+  font-size: 14px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.staffordWorkspaceGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.staffordWorkspaceTile {
+  display: grid;
+  gap: 10px;
+}
+
+@media (max-width: 1020px) {
+  .staffordOsShell {
+    grid-template-columns: 1fr;
+  }
+
+  .staffordOsSidebar {
+    position: static;
+    height: auto;
+    border-right: 0;
+    border-bottom: 1px solid #d9dee5;
+  }
+
+  .staffordOsNav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .staffordOsCommandBar {
+    position: static;
+    grid-template-columns: 1fr;
+  }
+
+  .staffordWorkspaceHeader,
+  .staffordNextActionGrid,
+  .staffordWorkspaceGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .staffordOsSidebar,
+  .staffordOsContent,
+  .staffordOsCommandBar {
+    padding: 14px;
+  }
+
+  .staffordOsNav {
+    grid-template-columns: 1fr;
+  }
+
+  .staffordWorkspaceHeader h1 {
+    font-size: 28px;
+  }
+}
