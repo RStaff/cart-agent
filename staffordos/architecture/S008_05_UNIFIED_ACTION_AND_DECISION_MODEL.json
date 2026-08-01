@@ -1,0 +1,644 @@
+{
+  "schema": "staffordos.architecture.s008_05_unified_action_and_decision_model.v1",
+  "mission": "S008_05_UNIFIED_ACTION_AND_DECISION_MODEL",
+  "classification": "UNIFIED_ACTION_MODEL_READY_FOR_LOCAL_COMMIT",
+  "mission_boundary": {
+    "type": "architecture_documentation_only",
+    "application_code_changed": false,
+    "routes_changed": false,
+    "components_changed": false,
+    "css_changed": false,
+    "authentication_changed": false,
+    "stripe_changed": false,
+    "shopifixer_behavior_changed": false,
+    "abando_behavior_changed": false,
+    "apis_changed": false,
+    "workflows_changed": false,
+    "database_schema_changed": false,
+    "migration_changed": false,
+    "deployment_changed": false,
+    "render_changed": false,
+    "production_changed": false
+  },
+  "checkpoint_authority": {
+    "branch_at_discovery": "main",
+    "head_at_discovery": "cd0757caacaf8d7c1523bc2bea63e0b715da9561",
+    "required_commits_present": [
+      {
+        "name": "S008 Foundation",
+        "commit": "7d661d1cea4e447e855dfec59e80d6b8feb44bad",
+        "status": "present"
+      },
+      {
+        "name": "S008 Capability Map",
+        "commit": "4503ebb5a15484384d5dbb463dcdce551c3e9293",
+        "status": "present"
+      },
+      {
+        "name": "S008 Multi-Workspace Architecture",
+        "commit": "cd0757caacaf8d7c1523bc2bea63e0b715da9561",
+        "status": "present_current_head_at_discovery"
+      }
+    ],
+    "unrelated_worktree_changes_excluded": true
+  },
+  "existing_model_discovery": [
+    {
+      "concept": "Primary action",
+      "source": "staffordos/decision/resolve_primary_action_v1.mjs",
+      "current_meaning": "Single canonical answer to what Ross should do next.",
+      "gap": "Business-only snapshot; not a general workspace action object."
+    },
+    {
+      "concept": "Primary action snapshot",
+      "source": "staffordos/snapshots/primary_action_snapshot_v1.json",
+      "current_meaning": "Snapshot with action label, type, domain, owner, priority, urgency, confidence, evidence, risk, next step, expected outcome, alternatives, and decision trace.",
+      "gap": "Not generalized across Business, Professional, and Personal."
+    },
+    {
+      "concept": "Action candidate",
+      "source": "staffordos/ui/operator-frontend/lib/operator/actionResolver.ts",
+      "current_meaning": "Relationship-based action candidate with ranking and blocker metadata.",
+      "gap": "Tied to current operator business data."
+    },
+    {
+      "concept": "Decision report",
+      "source": "staffordos/ui/operator-frontend/lib/operator/decisionEngineResolver.ts",
+      "current_meaning": "Top action selection and arbitration by business category.",
+      "gap": "Read model, not canonical platform decision authority."
+    },
+    {
+      "concept": "CEO next best action",
+      "source": "staffordos/ui/operator-frontend/app/api/operator/ceo-snapshot/route.ts",
+      "current_meaning": "Read-only route projection over lead, client, dashboard, and proof sources.",
+      "gap": "Route projection, not durable decision authority."
+    },
+    {
+      "concept": "Next Action Card",
+      "source": "staffordos/ui/operator-frontend/components/staffordos/NextActionCard.tsx",
+      "current_meaning": "Placeholder decision-ready card fields.",
+      "gap": "Needs future projection from canonical Action and Decision context."
+    },
+    {
+      "concept": "Capability registry",
+      "source": "staffordos/ui/operator-frontend/lib/staffordos/capabilities.ts",
+      "current_meaning": "Read-only /os map to existing /operator surfaces.",
+      "gap": "Needs future workspace, authority, and action-readiness metadata."
+    },
+    {
+      "concept": "Workspace registry",
+      "source": "staffordos/ui/operator-frontend/lib/staffordos/workspaces.ts",
+      "current_meaning": "Top-level /os sections and operating questions.",
+      "gap": "Needs future workspace context, not route renaming now."
+    },
+    {
+      "concept": "Operator language standard",
+      "source": "staffordos/architecture/S008_02_STAFFORDOS_OPERATOR_LANGUAGE_STANDARD.md",
+      "current_meaning": "Operator-facing wording, content, and terminology rules.",
+      "gap": "No gap for this mission; remains valid."
+    },
+    {
+      "concept": "Business lifecycle",
+      "source": "staffordos/authority/canonical_business_lifecycle_v1.md",
+      "current_meaning": "Business stages, ownership, evidence, and human gates.",
+      "gap": "Business-specific; should feed shared objects."
+    },
+    {
+      "concept": "Memory units",
+      "source": "staffordos/memory/memory_units_v1.json",
+      "current_meaning": "Memory can be fact, event, insight, preference, or decision and is domain-scoped.",
+      "gap": "Needs future workspace and learning destination mapping."
+    },
+    {
+      "concept": "Agent registry",
+      "source": "staffordos/agents/agent_registry_v1.json",
+      "current_meaning": "Agents declare allowed actions, forbidden actions, approval needs, and constraints.",
+      "gap": "Agents need workspace context inheritance later."
+    },
+    {
+      "concept": "Abando system loop",
+      "source": "docs/abando-system-overview.md",
+      "current_meaning": "Product-engine loop from signals through operator brain.",
+      "gap": "Must remain product-engine bounded and API-driven."
+    }
+  ],
+  "canonical_operating_objects": [
+    {
+      "object": "MISSION",
+      "definition": "A meaningful outcome StaffordOS is pursuing.",
+      "owner": "workspace owner or delegated operator",
+      "lifecycle": [
+        "proposed",
+        "accepted",
+        "active",
+        "paused",
+        "completed",
+        "archived"
+      ]
+    },
+    {
+      "object": "OBJECTIVE",
+      "definition": "A measurable or observable result that advances a mission.",
+      "owner": "mission owner",
+      "lifecycle": [
+        "draft",
+        "committed",
+        "in_progress",
+        "met",
+        "missed",
+        "retired"
+      ]
+    },
+    {
+      "object": "ACTION",
+      "definition": "The next concrete thing a person or approved agent may prepare or do.",
+      "owner": "assigned owner",
+      "lifecycle": [
+        "candidate",
+        "recommended",
+        "selected",
+        "prepared",
+        "approved_if_required",
+        "in_progress",
+        "done",
+        "blocked",
+        "cancelled",
+        "expired"
+      ]
+    },
+    {
+      "object": "DECISION",
+      "definition": "A recorded choice: what changed, why, by whom, with which evidence and authority.",
+      "owner": "human approver or authorized system authority",
+      "lifecycle": [
+        "proposed",
+        "decided",
+        "enacted",
+        "observed",
+        "reviewed",
+        "retained_or_superseded"
+      ]
+    },
+    {
+      "object": "EVIDENCE",
+      "definition": "Source-backed information used to interpret state or support a recommendation.",
+      "owner": "source authority owner",
+      "lifecycle": [
+        "captured",
+        "validated",
+        "referenced",
+        "stale_or_replaced"
+      ]
+    },
+    {
+      "object": "PROOF",
+      "definition": "Evidence that completion occurred and claims are supportable.",
+      "owner": "work owner and verifier",
+      "lifecycle": [
+        "required",
+        "collected",
+        "verified",
+        "accepted_or_rejected",
+        "archived"
+      ]
+    },
+    {
+      "object": "LEARNING",
+      "definition": "A reusable lesson StaffordOS should retain after a decision or outcome.",
+      "owner": "workspace owner or AI Governance",
+      "lifecycle": [
+        "captured",
+        "classified",
+        "approved_if_sensitive",
+        "applied",
+        "reviewed"
+      ]
+    },
+    {
+      "object": "RISK",
+      "definition": "A possible loss, error, leakage, authority failure, or bad tradeoff.",
+      "owner": "relevant workspace or governance owner",
+      "lifecycle": [
+        "identified",
+        "assessed",
+        "mitigated_or_accepted",
+        "monitored",
+        "closed"
+      ]
+    },
+    {
+      "object": "BLOCKER",
+      "definition": "A current condition that prevents or should prevent progress.",
+      "owner": "owning workspace or capability",
+      "lifecycle": [
+        "detected",
+        "assigned",
+        "clearing_action_selected",
+        "cleared_or_waived_or_expired"
+      ]
+    },
+    {
+      "object": "OPPORTUNITY",
+      "definition": "A potential gain that may justify action.",
+      "owner": "workspace owner or product owner",
+      "lifecycle": [
+        "detected",
+        "evaluated",
+        "qualified",
+        "pursued_or_declined",
+        "converted_or_lost_or_learned"
+      ]
+    },
+    {
+      "object": "OUTCOME",
+      "definition": "What happened after action or decision.",
+      "owner": "action owner or system authority",
+      "lifecycle": [
+        "expected",
+        "observed",
+        "verified",
+        "scored",
+        "learned"
+      ]
+    },
+    {
+      "object": "RELATIONSHIP",
+      "definition": "A person, organization, merchant, stakeholder, family member, guest, or entity that work relates to.",
+      "owner": "workspace owner or delegated relationship owner",
+      "lifecycle": [
+        "identified",
+        "linked",
+        "active",
+        "dormant_or_closed",
+        "archived"
+      ]
+    },
+    {
+      "object": "CAPABILITY",
+      "definition": "A bounded StaffordOS ability that can be read-only, guided, or action-capable.",
+      "owner": "platform owner or capability owner",
+      "lifecycle": [
+        "planned",
+        "available",
+        "governed",
+        "deprecated_or_retired"
+      ]
+    },
+    {
+      "object": "WORKSPACE",
+      "definition": "The privacy, policy, membership, language, and data boundary in which work occurs.",
+      "owner": "workspace owner",
+      "lifecycle": [
+        "created",
+        "configured",
+        "active",
+        "paused_or_archived"
+      ]
+    }
+  ],
+  "relationship_model": {
+    "primary_chain": [
+      "Mission",
+      "Objectives",
+      "Actions",
+      "Evidence",
+      "Decision",
+      "Proof",
+      "Learning"
+    ],
+    "cross_object_rules": [
+      {
+        "relationship": "Risk -> Decision",
+        "meaning": "Risk affects a decision and must be visible in reasoning."
+      },
+      {
+        "relationship": "Blocker -> Action",
+        "meaning": "A blocker should create or select an action to clear it."
+      },
+      {
+        "relationship": "Opportunity -> Action",
+        "meaning": "An opportunity creates action only when supported by evidence."
+      },
+      {
+        "relationship": "Relationship -> Mission",
+        "meaning": "A relationship can anchor missions, actions, evidence, proof, and learning."
+      },
+      {
+        "relationship": "Capability -> Workspace",
+        "meaning": "A capability is available only inside permitted workspace boundaries."
+      },
+      {
+        "relationship": "Workspace -> every object",
+        "meaning": "Every object must inherit workspace context before cross-workspace features activate."
+      }
+    ]
+  },
+  "action_model": {
+    "required_conceptual_fields": [
+      "title",
+      "operator_wording",
+      "workspace",
+      "mission",
+      "objective",
+      "evidence",
+      "why_now",
+      "expected_value",
+      "expected_outcome",
+      "confidence",
+      "risk",
+      "effort",
+      "urgency",
+      "priority_reasoning",
+      "approval_needed",
+      "owner",
+      "status",
+      "proof_requirement",
+      "learning_destination",
+      "related_entities",
+      "technical_details",
+      "visibility",
+      "lifecycle_state"
+    ],
+    "lifecycle": [
+      "candidate",
+      "recommended",
+      "selected",
+      "prepared",
+      "approved",
+      "in_progress",
+      "done"
+    ],
+    "alternate_states": [
+      "blocked",
+      "cancelled",
+      "expired",
+      "rejected",
+      "delegated",
+      "waiting"
+    ],
+    "rules": [
+      "No action can establish its own authority.",
+      "Caller-supplied status or approval cannot make an action valid.",
+      "Write-capable actions require explicit authority and audit.",
+      "Read-only actions may still require visibility checks.",
+      "Actions must never hide evidence gaps."
+    ]
+  },
+  "decision_model": {
+    "required_questions": [
+      "What changed?",
+      "Why?",
+      "Evidence?",
+      "Alternatives?",
+      "Tradeoffs?",
+      "Risk?",
+      "Who approved?",
+      "Authority?",
+      "Expected result?",
+      "Proof expected?",
+      "Learning captured?"
+    ],
+    "lifecycle": [
+      "proposed",
+      "decided",
+      "enacted",
+      "observed",
+      "reviewed",
+      "retained_or_superseded"
+    ],
+    "rules": [
+      "Decisions must be attributable.",
+      "Decisions must cite evidence or explicitly record missing evidence.",
+      "Decisions must distinguish recommendation from approval.",
+      "Decisions must preserve alternatives when alternatives affected priority.",
+      "Durable authority is required before decisions mutate state."
+    ]
+  },
+  "next_action_card_model": {
+    "primary_card": [
+      "What to do",
+      "Why now",
+      "Expected result",
+      "Time or effort",
+      "Confidence",
+      "Approval needed",
+      "Deadline or decay"
+    ],
+    "expanded_explanation": [
+      "Evidence",
+      "Priority reasoning",
+      "Alternatives",
+      "Tradeoffs",
+      "Risk",
+      "Related entities",
+      "Expected value"
+    ],
+    "governance_panel": [
+      "Authority required",
+      "Approval state",
+      "Permission or role requirement",
+      "Proof requirement",
+      "Audit trail",
+      "Policy constraints"
+    ],
+    "technical_detail": [
+      "Source files",
+      "Routes",
+      "Internal IDs",
+      "Enum values",
+      "Fingerprints",
+      "Resolver names",
+      "Generated timestamps"
+    ]
+  },
+  "workspace_mapping": {
+    "business": {
+      "action_wording": "Review the next merchant follow-up.",
+      "expected_value": [
+        "pipeline_movement",
+        "captured_revenue",
+        "customer_trust",
+        "delivery_progress"
+      ],
+      "proof": [
+        "payment",
+        "sent_message",
+        "customer_response",
+        "proof_package",
+        "completion_evidence"
+      ]
+    },
+    "professional": {
+      "action_wording": "Prepare for the next interview step.",
+      "expected_value": [
+        "role_fit",
+        "readiness",
+        "time_sensitivity",
+        "relationship_value",
+        "career_learning"
+      ],
+      "proof": [
+        "updated_prep_notes",
+        "approved_materials",
+        "completed_follow_up",
+        "captured_outcome"
+      ]
+    },
+    "personal": {
+      "action_wording": "Choose the next private priority.",
+      "expected_value": [
+        "time",
+        "energy",
+        "health",
+        "safety",
+        "learning",
+        "creative_progress",
+        "family_value"
+      ],
+      "proof": [
+        "private_note",
+        "completed_task",
+        "saved_memory",
+        "approved_shared_plan"
+      ]
+    }
+  },
+  "ai_chief_of_staff_model": {
+    "may": [
+      "summarize",
+      "prioritize",
+      "prepare",
+      "recommend",
+      "explain",
+      "draft",
+      "identify gaps",
+      "surface risks",
+      "capture learning"
+    ],
+    "may_not": [
+      "invent evidence",
+      "override authority",
+      "mutate state without a governed action path",
+      "hide uncertainty",
+      "approve itself",
+      "bypass workspace boundaries",
+      "expose private memory across workspaces",
+      "turn estimates into captured revenue",
+      "treat product-engine access as platform authority"
+    ]
+  },
+  "governance_model": {
+    "approval_boundaries": [
+      "irreversible_changes",
+      "customer_facing_communication",
+      "financial_commitments",
+      "production_changes",
+      "external_submissions",
+      "sharing_changes",
+      "sensitive_personal_or_professional_actions"
+    ],
+    "authority_boundaries": [
+      "StaffordOS platform authority coordinates work.",
+      "Product engines own product execution.",
+      "ShopiFixer and Abando behavior must not be changed by shared model documentation.",
+      "Service authentication is not human authority.",
+      "Workspace membership is not capability permission."
+    ],
+    "audit_required_for": [
+      "privileged_actions",
+      "decisions",
+      "authority_changes",
+      "sharing_changes",
+      "production_changes",
+      "external_communications"
+    ],
+    "isolation": [
+      "workspace",
+      "memory",
+      "agent",
+      "search",
+      "notification"
+    ]
+  },
+  "implementation_impact": {
+    "later_changes": [
+      "Add workspace context metadata before expanding /os.",
+      "Add a unified Action read model over existing action sources.",
+      "Add an Objective registry after current objective sources are reconciled.",
+      "Add a Decision registry after authority and mutation boundaries are explicit.",
+      "Extend action cards to display approval, effort, proof, and expanded reasoning consistently."
+    ],
+    "unchanged_now": [
+      "/operator remains runtime-canonical.",
+      "/os remains isolated and read-only.",
+      "Current primary-action resolver remains unchanged.",
+      "Current action resolver remains unchanged.",
+      "Current decision resolver remains unchanged.",
+      "ShopiFixer, Abando, Stripe, auth, APIs, schemas, migrations, and deployments remain unchanged."
+    ],
+    "component_guidance": {
+      "NextActionCard": "No immediate code change; future projection should come from canonical Action and Decision context.",
+      "WorkspacePage": "Can remain shell placeholder.",
+      "STAFFORDOS_SECTIONS": "Valid, later needs workspace applicability.",
+      "STAFFORDOS_CAPABILITIES": "Valid, later needs workspace, authority, and action-readiness metadata.",
+      "language_standard": "Remains valid."
+    }
+  },
+  "roadmap": [
+    {
+      "mission": "S008.06 Workspace Context Engine",
+      "purpose": "Add a read-only workspace context foundation and owner-first switcher metadata."
+    },
+    {
+      "mission": "S008.07 Unified Home",
+      "purpose": "Present the next action from existing evidence through /os without replacing /operator."
+    },
+    {
+      "mission": "S008.08 Objective Registry",
+      "purpose": "Reconcile existing objective sources into one conceptual/read model."
+    },
+    {
+      "mission": "S008.09 Decision Registry",
+      "purpose": "Define durable decision records and authority boundaries."
+    },
+    {
+      "mission": "S009 AI Chief of Staff",
+      "purpose": "AI recommendations over canonical actions, decisions, evidence, risk, proof, and learning."
+    }
+  ],
+  "validation": {
+    "jq": "passed",
+    "git_diff_check": "passed",
+    "staged_diff_review": "passed_only_authorized_s008_05_artifacts",
+    "runtime_checks": "not_run_documentation_only"
+  },
+  "files_created": [
+    "staffordos/architecture/S008_05_UNIFIED_ACTION_AND_DECISION_MODEL.md",
+    "staffordos/architecture/S008_05_UNIFIED_ACTION_AND_DECISION_MODEL.json"
+  ],
+  "rollback": [
+    "Revert the S008.05 commit if created.",
+    "Or delete only the two S008.05 architecture artifacts.",
+    "No application, route, component, CSS, database, authentication, Stripe, ShopiFixer, Abando, Render, deployment, API, workflow, or migration rollback is required."
+  ],
+  "non_impact_confirmation": {
+    "application_code": false,
+    "ui_routes": false,
+    "components": false,
+    "css": false,
+    "authentication": false,
+    "stripe": false,
+    "shopifixer_behavior": false,
+    "abando_behavior": false,
+    "apis": false,
+    "workflows": false,
+    "schema": false,
+    "migration": false,
+    "database": false,
+    "deployment": false,
+    "render": false,
+    "production": false,
+    "push": false,
+    "external_service_behavior": false
+  }
+}
