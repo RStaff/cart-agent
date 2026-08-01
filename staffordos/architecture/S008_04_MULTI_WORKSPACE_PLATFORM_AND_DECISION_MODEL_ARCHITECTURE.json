@@ -1,0 +1,673 @@
+{
+  "schema": "staffordos.architecture.s008_04_multi_workspace_platform_and_decision_model.v1",
+  "mission": "S008_04_MULTI_WORKSPACE_PLATFORM_AND_DECISION_MODEL_ARCHITECTURE",
+  "classification": "MULTI_WORKSPACE_ARCHITECTURE_READY_FOR_LOCAL_COMMIT",
+  "mission_boundary": {
+    "type": "architecture_documentation_only",
+    "application_code_changed": false,
+    "deployment_changed": false,
+    "authentication_changed": false,
+    "stripe_changed": false,
+    "shopifixer_runtime_changed": false,
+    "abando_runtime_changed": false,
+    "database_schema_changed": false,
+    "migration_changed": false
+  },
+  "checkpoint_authority": {
+    "branch": "main",
+    "head": "4503ebb5a15484384d5dbb463dcdce551c3e9293",
+    "required_history": [
+      "7d661d1cea4e447e855dfec59e80d6b8feb44bad"
+    ],
+    "artifacts_present": [
+      "staffordos/architecture/S008_00_STAFFORDOS_FOUNDATION_ARCHITECTURE.md",
+      "staffordos/architecture/S008_01_EXISTING_OPERATOR_UI_AND_NEW_OS_SHELL_RECONCILIATION.md",
+      "staffordos/architecture/S008_01_EXISTING_OPERATOR_UI_AND_NEW_OS_SHELL_RECONCILIATION.json",
+      "staffordos/architecture/S008_02_STAFFORDOS_OPERATOR_LANGUAGE_STANDARD.md",
+      "staffordos/architecture/S008_02_STAFFORDOS_OPERATOR_LANGUAGE_STANDARD.json",
+      "staffordos/architecture/S008_03_OS_CAPABILITY_LINK_MAP.md",
+      "staffordos/architecture/S008_03_OS_CAPABILITY_LINK_MAP.json"
+    ],
+    "operator_runtime_canonical": true,
+    "os_framework_read_only": true,
+    "unrelated_worktree_changes_excluded": true
+  },
+  "existing_platform_evidence": [
+    {
+      "source": "staffordos/authority/product_definitions_v1.md",
+      "finding": "StaffordOS is the internal operating system, governance system, operational memory, and AI orchestration layer."
+    },
+    {
+      "source": "staffordos/SYSTEM_RULES.md",
+      "finding": "StaffordOS is the control plane; Abando is a product engine; no UI or state-mutation merging is allowed."
+    },
+    {
+      "source": "staffordos/authority/canonical_business_lifecycle_v1.md",
+      "finding": "Business lifecycle spans marketing, leads, qualification, routing, sales, delivery, payment, proof, customer success, referral, and Abando expansion."
+    },
+    {
+      "source": "staffordos/architecture/S008_01_EXISTING_OPERATOR_UI_AND_NEW_OS_SHELL_RECONCILIATION.md",
+      "finding": "/operator remains runtime-canonical and /os should become canonical incrementally after parity."
+    },
+    {
+      "source": "staffordos/architecture/S008_02_STAFFORDOS_OPERATOR_LANGUAGE_STANDARD.md",
+      "finding": "Operator-facing language must answer what happened, why it matters, what to do, what blocks progress, what happens next, and what proves completion."
+    },
+    {
+      "source": "staffordos/architecture/S008_03_OS_CAPABILITY_LINK_MAP.md",
+      "finding": "/os/capabilities links to current /operator routes without duplicating data, actions, loaders, or business logic."
+    },
+    {
+      "source": "staffordos/memory/memory_units_v1.json",
+      "finding": "Memory is explicit, typed, domain-scoped, source-aware, and must not mix family/private memory with business execution unless explicitly linked."
+    },
+    {
+      "source": "web/prisma/schema.prisma",
+      "finding": "Local S007 models include StaffordosOperator, StaffordosOperatorRole, StaffordosOperatorSession, StaffordosOperatorEvent, and StaffordosExecutionGrant."
+    },
+    {
+      "source": "staffordos/scope/scope_forge_v1.json",
+      "finding": "personal_os is documented as a future/not-started scope, not an implemented runtime."
+    }
+  ],
+  "evidence_gaps": [
+    "No implemented Professional workspace found.",
+    "No implemented Family workspace found.",
+    "No implemented StaffordOS media library, watching, creation, upload, or sharing runtime found.",
+    "No general workspace membership schema found.",
+    "No global workspace context middleware found.",
+    "No cross-workspace search, notification, memory, or agent policy engine found."
+  ],
+  "platform_boundary": {
+    "level_1_staffordos_platform_owns": [
+      "identity",
+      "profile",
+      "sessions",
+      "workspace_membership",
+      "roles",
+      "permissions",
+      "capability_access",
+      "navigation",
+      "missions",
+      "objectives",
+      "actions",
+      "decisions",
+      "evidence",
+      "proof",
+      "memory",
+      "governance",
+      "audit",
+      "notifications",
+      "agent_policy"
+    ],
+    "level_2_workspace_families_own": [
+      "domain_objects",
+      "workflows",
+      "views",
+      "language",
+      "policies",
+      "data"
+    ]
+  },
+  "workspace_families": [
+    {
+      "family": "BUSINESS",
+      "includes": [
+        "Stafford Media",
+        "ShopiFixer",
+        "Abando",
+        "Executive",
+        "Marketing",
+        "Leads",
+        "Sales",
+        "Relationships",
+        "Revenue",
+        "Delivery",
+        "Customer Success",
+        "Finance",
+        "Engineering",
+        "AI Operations"
+      ],
+      "default_privacy": "owner_private_unless_explicitly_shared"
+    },
+    {
+      "family": "PROFESSIONAL",
+      "includes": [
+        "Job Search mode",
+        "My Job mode"
+      ],
+      "default_privacy": "owner_private"
+    },
+    {
+      "family": "PERSONAL",
+      "includes": [
+        "private planning",
+        "learning",
+        "life administration",
+        "creative projects",
+        "family activities",
+        "media watching",
+        "media creation",
+        "shared memories",
+        "optional invited access"
+      ],
+      "default_privacy": "owner_private_with_explicit_capability_sharing"
+    }
+  ],
+  "recommended_workspace_model": {
+    "stafford_media": "parent Business workspace",
+    "shopifixer": "first-class Business product/service workspace lens",
+    "abando": "first-class Business product workspace lens with API-only product-engine boundary",
+    "family": "capability area inside Personal initially",
+    "media": "capability area inside Personal initially"
+  },
+  "owner_first_membership_model": {
+    "default": "one_owner_plus_optional_invited_members_plus_access_per_workspace_and_capability",
+    "rules": [
+      "Business data is private to the owner unless explicitly shared.",
+      "Professional data is private to the owner.",
+      "Personal data is owner-private unless explicitly shared.",
+      "Workspace membership and capability permission are separate.",
+      "A shared identity system does not imply shared data access.",
+      "AI agents inherit active user, workspace, role, permission, policy, memory, search, and notification boundaries.",
+      "Cross-workspace actions require explicit owner authorization."
+    ]
+  },
+  "roles": [
+    {
+      "role": "Platform Owner",
+      "visible_workspaces": "all owner-owned workspaces",
+      "actions": "prepare and approve owner-level actions; manage membership and capabilities",
+      "prohibited_access": "no bypass of payment, execution, legal, or external-provider authority"
+    },
+    {
+      "role": "Business Operator",
+      "visible_workspaces": "selected Business workspaces",
+      "actions": "prepare and execute permitted business actions",
+      "prohibited_access": "requires approval for irreversible, financial, customer-facing, or production actions"
+    },
+    {
+      "role": "Business Employee",
+      "visible_workspaces": "assigned Business capabilities",
+      "actions": "prepare and complete assigned work",
+      "prohibited_access": "no owner settings, Personal, Professional, unrelated customer, or security access"
+    },
+    {
+      "role": "Business Contractor",
+      "visible_workspaces": "time-bounded assigned Business project",
+      "actions": "prepare work and submit proof",
+      "prohibited_access": "no broad customer list, finance, platform settings, or retained access after expiration"
+    },
+    {
+      "role": "Professional Owner",
+      "visible_workspaces": "their Professional workspace",
+      "actions": "prepare, decide, and approve personal professional actions",
+      "prohibited_access": "external submission and employer data reuse require explicit owner action"
+    },
+    {
+      "role": "Family Administrator",
+      "visible_workspaces": "selected Family-shared Personal capabilities",
+      "actions": "manage selected family capabilities",
+      "prohibited_access": "no Business, Professional, owner-private Personal, security, or billing access unless separately granted"
+    },
+    {
+      "role": "Family Member",
+      "visible_workspaces": "shared family capabilities",
+      "actions": "view and contribute where allowed",
+      "prohibited_access": "cannot change security, broad sharing, deletion policy, or owner-private records"
+    },
+    {
+      "role": "Child or Restricted Member",
+      "visible_workspaces": "age-appropriate shared or training capabilities",
+      "actions": "create or watch approved items; participate in training",
+      "prohibited_access": "no unrestricted sharing, purchases, external publishing, security changes, or private browsing"
+    },
+    {
+      "role": "Friend or Guest",
+      "visible_workspaces": "explicitly shared item or project",
+      "actions": "view or comment where allowed",
+      "prohibited_access": "no library browsing, resharing, deletion, or cross-workspace visibility"
+    },
+    {
+      "role": "Learner",
+      "visible_workspaces": "training workspace only",
+      "actions": "practice selected creation or operating workflows",
+      "prohibited_access": "no production, customer, financial, infrastructure, or private data access"
+    },
+    {
+      "role": "Media Creator",
+      "visible_workspaces": "approved media projects",
+      "actions": "create, edit, or prepare media within policy",
+      "prohibited_access": "external publishing, asset reuse, and deletion require assigned authority"
+    },
+    {
+      "role": "Viewer",
+      "visible_workspaces": "explicitly granted read-only areas",
+      "actions": "read only",
+      "prohibited_access": "no mutation, sharing, export, or approval authority"
+    }
+  ],
+  "workspace_context_model": {
+    "required_fields": [
+      "workspace_id",
+      "workspace_family",
+      "workspace_type",
+      "current_user_id",
+      "membership_id",
+      "active_role",
+      "permission_set",
+      "capability_set",
+      "policy_set",
+      "data_boundary",
+      "memory_boundary",
+      "search_boundary",
+      "notification_boundary",
+      "enabled_agents",
+      "language_profile",
+      "audit_context"
+    ],
+    "purpose": "Prevent cross-workspace data, memory, search, notification, media, and agent leaks."
+  },
+  "canonical_decision_model": {
+    "question": "What should this person do next in this workspace?",
+    "entities": {
+      "MISSION": "The outcome being pursued.",
+      "OBJECTIVE": "A measurable or observable result that advances the mission.",
+      "ACTION": "What the person or approved agent can do next.",
+      "EVIDENCE": "What supports the recommendation.",
+      "RISK": "What could go wrong or what may be lost.",
+      "PROOF": "What demonstrates successful completion.",
+      "DECISION": "What was chosen, why, by whom, and under what authority.",
+      "LEARNING": "What StaffordOS should retain for future decisions."
+    },
+    "recommendation_fields": [
+      "workspace",
+      "mission",
+      "objective",
+      "operator_facing_action",
+      "why_now",
+      "evidence",
+      "expected_result",
+      "urgency",
+      "confidence",
+      "effort",
+      "risk",
+      "required_authority",
+      "deadline_or_decay",
+      "alternatives",
+      "proof_requirement",
+      "owner",
+      "status",
+      "privacy_classification"
+    ]
+  },
+  "priority_model": {
+    "principle": "Governed workspace-aware priority, not one universal AI score.",
+    "shared_factors": [
+      "objective_alignment",
+      "urgency",
+      "confidence",
+      "risk",
+      "effort",
+      "blocker_removal_value",
+      "relationship_impact",
+      "learning_value",
+      "time_sensitivity",
+      "context_switching_cost",
+      "owner_availability",
+      "workspace_policy"
+    ],
+    "business_factors": [
+      "captured_revenue_impact",
+      "pipeline_movement",
+      "customer_impact",
+      "delivery_deadlines",
+      "risk_reduction",
+      "proof_creation",
+      "product_learning"
+    ],
+    "professional_factors": [
+      "role_fit",
+      "interview_stage",
+      "work_deadlines",
+      "stakeholder_impact",
+      "commitment_risk",
+      "accomplishment_value",
+      "skill_growth",
+      "promotion_readiness"
+    ],
+    "personal_factors": [
+      "safety",
+      "privacy",
+      "time",
+      "energy",
+      "health",
+      "learning",
+      "creative_progress",
+      "family_value",
+      "age_appropriateness",
+      "shared_availability"
+    ]
+  },
+  "next_action_card_model": {
+    "shared_anatomy": [
+      "What to do",
+      "Why now",
+      "Evidence",
+      "Expected result",
+      "Time or effort",
+      "Risk",
+      "Confidence",
+      "Approval needed",
+      "Completion proof"
+    ],
+    "placement": {
+      "primary_card": [
+        "action",
+        "why_now",
+        "expected_result",
+        "deadline_or_effort",
+        "confidence",
+        "approval_needed"
+      ],
+      "see_why": [
+        "evidence",
+        "alternatives",
+        "assumptions",
+        "uncertainty",
+        "previous_related_decisions"
+      ],
+      "rules_and_approvals": [
+        "required_authority",
+        "policy",
+        "role_or_permission",
+        "approval_status",
+        "audit_requirement"
+      ],
+      "technical_details": [
+        "ids",
+        "routes",
+        "enum_values",
+        "fingerprints",
+        "source_files",
+        "system_diagnostics"
+      ]
+    }
+  },
+  "professional_workspace_boundary": {
+    "default_privacy": "owner_private",
+    "modes": {
+      "job_search": [
+        "Discover",
+        "Evaluate",
+        "Apply",
+        "Connect",
+        "Prepare",
+        "Interview",
+        "Follow Up",
+        "Negotiate",
+        "Accept or Decline",
+        "Learn"
+      ],
+      "my_job": [
+        "Onboard",
+        "Understand",
+        "Prioritize",
+        "Deliver",
+        "Collaborate",
+        "Prove",
+        "Learn",
+        "Grow"
+      ]
+    },
+    "mode_transition_rule": "Same workspace, changed active mode, continuous private history.",
+    "strict_boundaries": [
+      "Professional information is owner-private by default.",
+      "Applications, compensation, interview notes, employer feedback, and performance information do not enter Stafford Media automatically.",
+      "AI may organize and prepare but may not invent experience, credentials, accomplishments, feedback, or commitments.",
+      "Employer-confidential information must not be reused externally without explicit authority.",
+      "External communication and application submission require explicit owner approval."
+    ]
+  },
+  "business_shopifixer_abando_model": {
+    "stafford_media": "company-wide Business workspace",
+    "shopifixer": "Business product/service lens with merchant, audit, packet, payment, execution, proof, and customer-success boundaries",
+    "abando": "Business product lens with API-only product-engine boundary",
+    "integration_classification": [
+      {
+        "integration": "Stafford Media business lifecycle",
+        "classification": "repository_backed"
+      },
+      {
+        "integration": "ShopiFixer merchant context",
+        "classification": "repository_backed"
+      },
+      {
+        "integration": "ShopiFixer payment state",
+        "classification": "repository_backed_but_gated"
+      },
+      {
+        "integration": "ShopiFixer execution state",
+        "classification": "repository_backed_but_governed"
+      },
+      {
+        "integration": "Abando merchant context",
+        "classification": "repository_backed_at_product_definition_level"
+      },
+      {
+        "integration": "Abando recovery opportunities",
+        "classification": "repository_backed_partial"
+      },
+      {
+        "integration": "Abando campaign actions",
+        "classification": "requires_discovery"
+      },
+      {
+        "integration": "Abando recovered-value evidence",
+        "classification": "planned_requires_discovery"
+      },
+      {
+        "integration": "Abando customer-success actions",
+        "classification": "conceptual"
+      }
+    ]
+  },
+  "personal_family_media_invited_access": {
+    "personal_default": "owner_private_with_optional_capability_level_sharing",
+    "visibility_classes": [
+      "OWNER_PRIVATE",
+      "FAMILY_SHARED",
+      "FRIEND_SHARED",
+      "TRAINING"
+    ],
+    "boundaries": [
+      "profile_selection",
+      "media_ownership",
+      "private_libraries",
+      "shared_libraries",
+      "creation_rights",
+      "ai_generated_media",
+      "age_appropriate_restrictions",
+      "external_sharing",
+      "comments_and_collaboration",
+      "deletion_rights",
+      "provenance",
+      "moderation",
+      "invitation_expiration",
+      "access_revocation",
+      "audit_history"
+    ]
+  },
+  "information_architecture_impact": {
+    "current_top_level_sections_remain": [
+      "Home",
+      "Command",
+      "Work",
+      "Pipeline",
+      "Knowledge",
+      "Governance",
+      "System"
+    ],
+    "future_adjustments": [
+      "workspace switcher",
+      "workspace-specific Home",
+      "global and workspace Command modes",
+      "permission-scoped Work queue",
+      "workspace-aware Pipeline applicability",
+      "isolated Knowledge",
+      "role-aware Governance",
+      "owner and workspace System settings",
+      "workspace-scoped notifications",
+      "permission-filtered global search",
+      "profile selection",
+      "simplified invited-member experience"
+    ]
+  },
+  "rebuild_risk_assessment": {
+    "requires_full_rebuild": false,
+    "condition": "No full rebuild is required if workspace context and capability-scoped boundaries are added before real multi-workspace data, search, notifications, and AI actions.",
+    "elements": [
+      {
+        "element": "/os shell",
+        "classification": "EXTENSIBLE_WITH_SMALL_CHANGE"
+      },
+      {
+        "element": "section registry",
+        "classification": "EXTENSIBLE_WITH_SMALL_CHANGE"
+      },
+      {
+        "element": "capability registry",
+        "classification": "EXTENSIBLE_WITH_SMALL_CHANGE"
+      },
+      {
+        "element": "NextActionCard",
+        "classification": "EXTENSIBLE_WITH_SMALL_CHANGE"
+      },
+      {
+        "element": "WorkspacePage",
+        "classification": "EXTENSIBLE_WITH_SMALL_CHANGE"
+      },
+      {
+        "element": "language standard",
+        "classification": "EXTENSIBLE_AS_IS"
+      },
+      {
+        "element": "route strategy",
+        "classification": "EXTENSIBLE_AS_IS"
+      },
+      {
+        "element": "identity assumptions",
+        "classification": "REQUIRES_FUTURE_REFACTOR"
+      },
+      {
+        "element": "navigation",
+        "classification": "EXTENSIBLE_WITH_SMALL_CHANGE"
+      },
+      {
+        "element": "decision model",
+        "classification": "REQUIRES_FUTURE_REFACTOR"
+      },
+      {
+        "element": "current owner-only assumptions",
+        "classification": "EXTENSIBLE_WITH_SMALL_CHANGE"
+      },
+      {
+        "element": "future invited-member support",
+        "classification": "REQUIRES_FUTURE_REFACTOR"
+      }
+    ]
+  },
+  "required_architectural_adjustments": [
+    "Add workspace metadata to capability architecture before adding more /os pages.",
+    "Introduce a read-only workspace switcher foundation before Personal, Professional, Family, or invited-member surfaces.",
+    "Define a canonical workspace context contract before global search, notifications, memory retrieval, or AI actions become cross-workspace.",
+    "Extend NextActionCard to include time or effort, approval needed, and completion proof.",
+    "Create a decision read model before AI-generated priority ranking.",
+    "Preserve /operator runtime authority until migrated capabilities reach parity.",
+    "Keep Abando API-bound and read-only until separate product-integration authority exists.",
+    "Treat Personal, Family, Media, Professional, and Learner features as planned until separate implementation missions."
+  ],
+  "incremental_roadmap": [
+    {
+      "mission": "S008.04",
+      "purpose": "Multi-workspace and decision architecture",
+      "boundary": "documentation only"
+    },
+    {
+      "mission": "S008.05",
+      "purpose": "Workspace context and owner-first switcher foundation",
+      "boundary": "read-only shell metadata; no auth or data migration"
+    },
+    {
+      "mission": "S008.06",
+      "purpose": "Operator Home and priority presentation",
+      "boundary": "present next action from existing evidence; no new AI generation"
+    },
+    {
+      "mission": "S008.07",
+      "purpose": "Unified action registry and read model",
+      "boundary": "read model over existing actions; no write-route duplication"
+    },
+    {
+      "mission": "S008.08",
+      "purpose": "Mission, objective, evidence, decision, and proof model",
+      "boundary": "shared conceptual/read model before automation"
+    },
+    {
+      "mission": "S008.09",
+      "purpose": "Stafford Media capability integration",
+      "boundary": "Business workspace integration with /operator parity protection"
+    },
+    {
+      "mission": "S009",
+      "purpose": "AI Chief of Staff",
+      "boundary": "recommendations use evidence, policy, and operator approval"
+    }
+  ],
+  "validation": {
+    "jq": "passed",
+    "git_diff_check": "passed",
+    "staged_diff_review": "passed_only_two_s008_04_artifacts_staged",
+    "runtime_checks": "not_run_documentation_only"
+  },
+  "files_created": [
+    "staffordos/architecture/S008_04_MULTI_WORKSPACE_PLATFORM_AND_DECISION_MODEL_ARCHITECTURE.md",
+    "staffordos/architecture/S008_04_MULTI_WORKSPACE_PLATFORM_AND_DECISION_MODEL_ARCHITECTURE.json"
+  ],
+  "rollback": [
+    "Revert the S008.04 commit if created.",
+    "Or delete only the two S008.04 architecture artifacts.",
+    "No application, database, authentication, Stripe, ShopiFixer, Abando, Render, deployment, or migration rollback is required."
+  ],
+  "remaining_blockers": [
+    "General workspace membership is not implemented.",
+    "Workspace context middleware is not implemented.",
+    "Professional, Family, Media, and Learner runtime capabilities are not implemented.",
+    "Abando write authority remains out of scope.",
+    "Cross-workspace search, notifications, memory retrieval, and AI agents need explicit boundary enforcement before activation."
+  ],
+  "next_mission_recommendation": "S008.05 should implement a read-only workspace context and owner-first workspace switcher foundation in /os using static metadata only.",
+  "non_impact_confirmation": {
+    "application_code": false,
+    "routes": false,
+    "components": false,
+    "css": false,
+    "authentication": false,
+    "stripe": false,
+    "shopifixer_runtime": false,
+    "abando_runtime": false,
+    "database_schema": false,
+    "migrations": false,
+    "deployment": false,
+    "production_configuration": false,
+    "operator_bootstrap": false,
+    "execution_grant": false,
+    "packet_authorization": false,
+    "queueing": false,
+    "execution_token": false,
+    "shopify_mutation": false,
+    "payment_behavior": false,
+    "webhook_behavior": false,
+    "customer_contact": false
+  }
+}
