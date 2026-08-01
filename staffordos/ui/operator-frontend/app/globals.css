@@ -1906,6 +1906,36 @@ textarea {
   line-height: 1.3;
 }
 
+.staffordOsCapabilityNav {
+  display: grid;
+  gap: 4px;
+  margin-top: 18px;
+  min-height: 58px;
+  padding: 10px 12px;
+  border: 1px solid rgba(144, 216, 197, 0.28);
+  border-radius: 8px;
+  background: rgba(144, 216, 197, 0.08);
+  color: #f5f7f9;
+  text-decoration: none;
+}
+
+.staffordOsCapabilityNav:hover,
+.staffordOsCapabilityNavActive {
+  border-color: #90d8c5;
+  background: #26342f;
+}
+
+.staffordOsCapabilityNav span {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.staffordOsCapabilityNav small {
+  color: #aeb8c2;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
 .staffordOsMain {
   min-width: 0;
   display: grid;
@@ -2103,6 +2133,172 @@ textarea {
   gap: 10px;
 }
 
+.staffordCapabilityPage {
+  display: grid;
+  gap: 18px;
+  max-width: 1180px;
+}
+
+.staffordCapabilityNote {
+  display: grid;
+  gap: 6px;
+  padding: 16px 18px;
+  border: 1px solid #cbd4dd;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.staffordCapabilityNote strong {
+  color: #23695d;
+}
+
+.staffordCapabilityNote p {
+  margin: 0;
+  color: #4f5a66;
+  line-height: 1.5;
+}
+
+.staffordCapabilityPanel {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid #cbd4dd;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.staffordCapabilityPanelHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.staffordCapabilityPanelHeader h2 {
+  margin: 4px 0 0;
+  color: #15181d;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.staffordCapabilityPanelHeader p {
+  margin: 8px 0 0;
+  max-width: 720px;
+  color: #4f5a66;
+  line-height: 1.5;
+}
+
+.staffordCapabilityMapLink,
+.staffordCapabilityAction,
+.staffordCapabilityUnavailable {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 1px solid #23695d;
+  border-radius: 8px;
+  background: #23695d;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.staffordCapabilityMapLink:hover,
+.staffordCapabilityAction:hover {
+  background: #195248;
+}
+
+.staffordCapabilityUnavailable {
+  border-color: #cbd4dd;
+  background: #f5f7f9;
+  color: #4f5a66;
+}
+
+.staffordCapabilityGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.staffordCapabilityCard {
+  display: grid;
+  gap: 12px;
+  min-height: 100%;
+  padding: 14px;
+  border: 1px solid #d9dee5;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.staffordCapabilityMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.staffordCapabilityMeta span,
+.staffordCapabilityTechnical {
+  color: #66717e;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.staffordCapabilityMeta span {
+  padding: 5px 8px;
+  border: 1px solid #cbd4dd;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.staffordCapabilityCard h3 {
+  margin: 0;
+  color: #15181d;
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.staffordCapabilityCard p {
+  margin: 0;
+  color: #4f5a66;
+  line-height: 1.45;
+}
+
+.staffordCapabilityFacts {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.staffordCapabilityFacts div {
+  display: grid;
+  gap: 3px;
+}
+
+.staffordCapabilityFacts dt {
+  color: #66717e;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.staffordCapabilityFacts dd {
+  margin: 0;
+  color: #15181d;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.staffordCapabilityFooter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: auto;
+}
+
 @media (max-width: 1020px) {
   .staffordOsShell {
     grid-template-columns: 1fr;
@@ -2126,8 +2322,13 @@ textarea {
 
   .staffordWorkspaceHeader,
   .staffordNextActionGrid,
-  .staffordWorkspaceGrid {
+  .staffordWorkspaceGrid,
+  .staffordCapabilityGrid {
     grid-template-columns: 1fr;
+  }
+
+  .staffordCapabilityPanelHeader {
+    display: grid;
   }
 }
 

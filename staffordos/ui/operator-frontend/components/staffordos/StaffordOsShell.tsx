@@ -38,6 +38,15 @@ export function StaffordOsShell({ children }: StaffordOsShellProps) {
             </Link>
           ))}
         </nav>
+
+        <Link
+          href="/os/capabilities"
+          className={`staffordOsCapabilityNav${isActive(pathname, "/os/capabilities") ? " staffordOsCapabilityNavActive" : ""}`}
+          aria-current={isActive(pathname, "/os/capabilities") ? "page" : undefined}
+        >
+          <span>What StaffordOS Can Do</span>
+          <small>Map of current working pages</small>
+        </Link>
       </aside>
 
       <main className="staffordOsMain">

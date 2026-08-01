@@ -1,0 +1,244 @@
+{
+  "schema": "staffordos.architecture.os_capability_link_map.v1",
+  "mission": "S008_03_OS_CAPABILITY_LINK_MAP",
+  "classification": "CAPABILITY_MAP_READY_FOR_LOCAL_COMMIT",
+  "checkpoint_authority": {
+    "commit": "7d661d1cea4e447e855dfec59e80d6b8feb44bad",
+    "message": "S008 StaffordOS foundation, reconciliation, and operator language standard",
+    "head_matched_checkpoint_before_implementation": true
+  },
+  "mission_boundary": {
+    "read_first": true,
+    "local_only": true,
+    "deployment_performed": false,
+    "push_performed": false,
+    "authentication_changed": false,
+    "stripe_changed": false,
+    "shopifixer_production_behavior_changed": false,
+    "schema_or_migration_changed": false,
+    "operator_routes_moved_or_renamed": false,
+    "write_capable_operator_actions_imported_into_os": false,
+    "unrelated_changes_included": false
+  },
+  "working_tree_exclusions": [
+    "preexisting StaffordOS runtime artifact changes",
+    "preexisting S007 evidence artifacts",
+    "preexisting web and Prisma changes",
+    "preexisting operator issuer files",
+    "preexisting generated next-env.d.ts change",
+    "preexisting production, recovery, restoration, and reconciliation evidence artifacts"
+  ],
+  "capability_registry": {
+    "path": "staffordos/ui/operator-frontend/lib/staffordos/capabilities.ts",
+    "static_only": true,
+    "imports_operator_loaders": false,
+    "imports_action_components": false,
+    "calls_external_services": false,
+    "mutates_runtime_state": false,
+    "fields": [
+      "id",
+      "title",
+      "description",
+      "operatorQuestion",
+      "currentRoute",
+      "destinationLabel",
+      "osSection",
+      "availability",
+      "authority",
+      "access",
+      "readiness",
+      "technicalNote"
+    ]
+  },
+  "capabilities": [
+    {
+      "id": "start-my-day",
+      "title": "Start My Day",
+      "current_route": "/operator",
+      "future_os_section": "home",
+      "availability": "Available now",
+      "access": "Opens guided actions"
+    },
+    {
+      "id": "decide-what-matters",
+      "title": "Decide What Matters",
+      "current_route": "/operator/cockpit",
+      "future_os_section": "command",
+      "availability": "Partially available",
+      "access": "Opens guided actions"
+    },
+    {
+      "id": "find-people-to-contact",
+      "title": "Find People to Contact",
+      "current_route": "/operator/leads",
+      "future_os_section": "pipeline",
+      "availability": "Available now",
+      "access": "Opens guided actions"
+    },
+    {
+      "id": "review-marketing-activity",
+      "title": "Review Marketing Activity",
+      "current_route": "/operator/campaigns",
+      "future_os_section": "pipeline",
+      "availability": "Available now",
+      "access": "Read-only view"
+    },
+    {
+      "id": "see-money-to-collect",
+      "title": "See Money to Collect",
+      "current_route": "/operator/revenue-command",
+      "future_os_section": "pipeline",
+      "availability": "Available now",
+      "access": "Read-only view"
+    },
+    {
+      "id": "manage-current-customer-work",
+      "title": "Manage Current Customer Work",
+      "current_route": "/operator/command-center",
+      "future_os_section": "work",
+      "availability": "Partially available",
+      "access": "Opens guided actions"
+    },
+    {
+      "id": "review-recent-activity",
+      "title": "Review Recent Activity",
+      "current_route": "/operator/execution-log",
+      "future_os_section": "knowledge",
+      "availability": "Available now",
+      "access": "Read-only view"
+    },
+    {
+      "id": "understand-system-connections",
+      "title": "Understand System Connections",
+      "current_route": "/operator/system-map",
+      "future_os_section": "system",
+      "availability": "Available now",
+      "access": "Read-only view"
+    },
+    {
+      "id": "review-rules-and-checks",
+      "title": "Review Rules and Checks",
+      "current_route": "/operator/slice-truth",
+      "future_os_section": "governance",
+      "availability": "Partially available",
+      "access": "Read-only view"
+    }
+  ],
+  "operator_surface": {
+    "route": "/os/capabilities",
+    "purpose": "Plain-language map of current StaffordOS capabilities.",
+    "groups_by_canonical_os_sections": true,
+    "mutation_controls_present": false,
+    "duplicates_operator_data": false,
+    "copies_business_logic": false
+  },
+  "shell_connection": {
+    "secondary_shell_link_added": "What StaffordOS Can Do",
+    "home_preview_added": true,
+    "redirects_added": false,
+    "existing_operator_navigation_changed": false
+  },
+  "language_standard_compliance": {
+    "s008_02_applied": true,
+    "primary_language_plain": true,
+    "technical_terms_limited_to_secondary_notes": true,
+    "avoided_primary_terms": [
+      "registry",
+      "command center",
+      "execution log",
+      "validation status",
+      "attribution",
+      "packet",
+      "runtime",
+      "loader",
+      "endpoint",
+      "architecture version",
+      "not yet implemented"
+    ]
+  },
+  "files_changed": [
+    "staffordos/ui/operator-frontend/lib/staffordos/capabilities.ts",
+    "staffordos/ui/operator-frontend/components/staffordos/CapabilityLinkPanel.tsx",
+    "staffordos/ui/operator-frontend/app/os/capabilities/page.tsx",
+    "staffordos/ui/operator-frontend/app/os/page.tsx",
+    "staffordos/ui/operator-frontend/components/staffordos/StaffordOsShell.tsx",
+    "staffordos/ui/operator-frontend/components/staffordos/WorkspacePage.tsx",
+    "staffordos/ui/operator-frontend/app/globals.css",
+    "staffordos/architecture/S008_03_OS_CAPABILITY_LINK_MAP.md",
+    "staffordos/architecture/S008_03_OS_CAPABILITY_LINK_MAP.json"
+  ],
+  "validation_results": {
+    "build": {
+      "command": "npm run build",
+      "working_directory": "staffordos/ui/operator-frontend",
+      "result": "passed",
+      "exit_code": 0,
+      "notes": [
+        "Next emitted the preexisting non-fatal Turbopack trace warning.",
+        "Next emitted preexisting /operator/shopifixer-pilot server-component serialization messages, then finalized successfully.",
+        "/os/capabilities generated as a static route."
+      ]
+    },
+    "route_checks": [
+      {
+        "route": "/os",
+        "http_status": 200
+      },
+      {
+        "route": "/os/capabilities",
+        "http_status": 200
+      },
+      {
+        "route": "/os/command",
+        "http_status": 200
+      },
+      {
+        "route": "/os/system",
+        "http_status": 200
+      },
+      {
+        "route": "/operator",
+        "http_status": 200
+      },
+      {
+        "route": "/operator/leads",
+        "http_status": 200
+      },
+      {
+        "route": "/operator/campaigns",
+        "http_status": 200
+      },
+      {
+        "route": "/operator/revenue-command",
+        "http_status": 200
+      },
+      {
+        "route": "/operator/command-center",
+        "http_status": 200
+      }
+    ],
+    "git_diff_check": "passed",
+    "json_validation": "passed"
+  },
+  "rollback": [
+    "Revert the S008.03 commit after it is created, or remove the files and edits listed in this artifact.",
+    "Delete staffordos/ui/operator-frontend/app/os/capabilities.",
+    "Delete staffordos/ui/operator-frontend/components/staffordos/CapabilityLinkPanel.tsx.",
+    "Delete staffordos/ui/operator-frontend/lib/staffordos/capabilities.ts.",
+    "Remove the capability link from StaffordOsShell.",
+    "Remove the Home capability preview from app/os/page.tsx.",
+    "Remove the children extension from WorkspacePage if no longer needed.",
+    "Remove S008.03 CSS classes from app/globals.css.",
+    "Delete S008.03 architecture artifacts."
+  ],
+  "confirmation": {
+    "deployment": false,
+    "push": false,
+    "auth_change": false,
+    "stripe_change": false,
+    "shopifixer_change": false,
+    "migration_change": false,
+    "database_change": false,
+    "business_logic_change": false
+  }
+}

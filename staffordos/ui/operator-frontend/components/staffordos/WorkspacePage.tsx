@@ -1,8 +1,10 @@
 import { NextActionCard } from "./NextActionCard";
+import type { ReactNode } from "react";
 import type { StaffordOsSection } from "../../lib/staffordos/workspaces";
 
 type WorkspacePageProps = {
   section: StaffordOsSection;
+  children?: ReactNode;
 };
 
 const FOUNDATION_STATES = [
@@ -12,7 +14,7 @@ const FOUNDATION_STATES = [
   "Reusable knowledge output",
 ] as const;
 
-export function WorkspacePage({ section }: WorkspacePageProps) {
+export function WorkspacePage({ section, children }: WorkspacePageProps) {
   return (
     <div className="staffordWorkspace">
       <section className="staffordWorkspaceHeader">
@@ -47,6 +49,8 @@ export function WorkspacePage({ section }: WorkspacePageProps) {
           </article>
         ))}
       </section>
+
+      {children}
     </div>
   );
 }
