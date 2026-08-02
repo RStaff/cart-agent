@@ -1,0 +1,469 @@
+{
+  "schema": "staffordos.architecture.s008_09_decision_registry_and_decision_memory_foundation.v1",
+  "mission": "S008_09_DECISION_REGISTRY_AND_DECISION_MEMORY_FOUNDATION",
+  "classification": "DECISION_MEMORY_READY_FOR_LOCAL_COMMIT",
+  "mission_boundary": {
+    "reran_s008_08": false,
+    "deployment_changed": false,
+    "push_performed": false,
+    "production_changed": false,
+    "authentication_changed": false,
+    "oauth_changed": false,
+    "kms_changed": false,
+    "jwt_issuer_changed": false,
+    "stripe_changed": false,
+    "shopifixer_runtime_changed": false,
+    "abando_runtime_changed": false,
+    "database_changed": false,
+    "prisma_changed": false,
+    "migration_changed": false,
+    "api_changed": false,
+    "queue_changed": false,
+    "packet_changed": false,
+    "operator_behavior_changed": false,
+    "ai_decision_making_implemented": false,
+    "approval_workflow_implemented": false,
+    "execution_workflow_implemented": false,
+    "runtime_state_persisted": false
+  },
+  "checkpoint_authority": {
+    "head_at_discovery": "33af5d22361ca6e3960e3445ceb01e2d2c25e5f7",
+    "required_commits": [
+      {
+        "commit": "7d661d1cea4e447e855dfec59e80d6b8feb44bad",
+        "status": "present"
+      },
+      {
+        "commit": "4503ebb5a15484384d5dbb463dcdce551c3e9293",
+        "status": "present"
+      },
+      {
+        "commit": "cd0757caacaf8d7c1523bc2bea63e0b715da9561",
+        "status": "present"
+      },
+      {
+        "commit": "e386645f2d2c0aa625c2bec11edfd3b6c5c92f6a",
+        "status": "present"
+      },
+      {
+        "commit": "735c4a5fad194afdc3cfbef28411cac77bfc7ddd",
+        "status": "present"
+      },
+      {
+        "commit": "122bee6872099c4f909b5c025b3d375745af3134",
+        "status": "present"
+      },
+      {
+        "commit": "33af5d22361ca6e3960e3445ceb01e2d2c25e5f7",
+        "status": "present_current_checkpoint_at_discovery"
+      }
+    ],
+    "s008_09_preexisting_artifact_found": false,
+    "unrelated_worktree_changes_excluded": true
+  },
+  "existing_decision_discovery": {
+    "canonical_decision_registry_found": false,
+    "partial_sources": [
+      {
+        "path": "staffordos/architecture/S008_05_UNIFIED_ACTION_AND_DECISION_MODEL.md",
+        "finding": "Defines Decision conceptually."
+      },
+      {
+        "path": "staffordos/decision/resolve_primary_action_v1.mjs",
+        "finding": "Produces a resolver-specific decision trace for primary action selection."
+      },
+      {
+        "path": "staffordos/snapshots/primary_action_snapshot_v1.json",
+        "finding": "Stores primary-action alternatives and decision trace; not a workspace Decision registry."
+      },
+      {
+        "path": "staffordos/governance/operator_action_authority/operator_action_authority_v1.md",
+        "finding": "Confirms current action authority is partial and top-1 oriented."
+      },
+      {
+        "path": "staffordos/governance/READINESS_ARTIFACT_DETERMINISM_POLICY_V1.md",
+        "finding": "Contains governance decisions but not a reusable /os Decision Memory surface."
+      }
+    ],
+    "authority_decision": "Create a static read-side Decision registry for established S008 architecture decisions only."
+  },
+  "decision_registry_contract": {
+    "file": "staffordos/ui/operator-frontend/lib/staffordos/decisionRegistry.ts",
+    "read_methods": [
+      "getDecisionsForWorkspace",
+      "getChosenDecisionsForWorkspace",
+      "getDecisionById",
+      "getDecisionsForObjective",
+      "getDecisionsForMission",
+      "getDecisionsForAction"
+    ],
+    "write_methods_added": false,
+    "approval_methods_added": false,
+    "execution_methods_added": false,
+    "persistence_added": false,
+    "api_calls_added": false,
+    "database_access_added": false,
+    "ai_generation_added": false,
+    "fields": [
+      "id",
+      "workspaceId",
+      "missionId",
+      "objectiveId",
+      "actionId",
+      "title",
+      "summary",
+      "situation",
+      "decision",
+      "why",
+      "evidenceReferences",
+      "alternativesConsidered",
+      "tradeoffs",
+      "risks",
+      "uncertainty",
+      "confidenceClassification",
+      "decisionOwner",
+      "authorityClassification",
+      "approvalStatus",
+      "timestamp",
+      "expectedResult",
+      "proofRequirement",
+      "outcomeStatus",
+      "learningDestination",
+      "privacyClassification",
+      "sourceClassification",
+      "authorityStatus"
+    ]
+  },
+  "source_and_authority_classification": {
+    "source_labels": {
+      "repository_backed": "Repository-backed",
+      "operator_recorded": "Operator-recorded",
+      "imported": "Imported",
+      "ai_prepared": "AI-prepared",
+      "planned_example": "Planned example",
+      "needs_verification": "Needs verification"
+    },
+    "authority_labels": {
+      "owner_decision": "Owner decision",
+      "approved_delegate_decision": "Approved delegate decision",
+      "policy_governed_decision": "Policy-governed decision",
+      "recommendation_only": "Recommendation only",
+      "historical_evidence": "Historical evidence",
+      "needs_authority_review": "Needs authority review"
+    },
+    "rules": [
+      "AI-prepared does not mean approved.",
+      "Recommendation only does not mean chosen.",
+      "Planned examples never appear as current decisions.",
+      "Repository-backed decisions require exact artifact references.",
+      "Decisions without proven authority fail closed as Needs review.",
+      "A Decision cannot approve itself.",
+      "Decision authority and execution authority remain separate."
+    ]
+  },
+  "stafford_media_decisions": [
+    {
+      "id": "s008-operator-runtime-canonical",
+      "title": "Keep the current operator pages as the working source",
+      "status": "Chosen",
+      "source": "Repository-backed",
+      "authority": "Owner decision"
+    },
+    {
+      "id": "s008-operator-first-language",
+      "title": "Use language Ross can act on",
+      "status": "Chosen",
+      "source": "Repository-backed",
+      "authority": "Owner decision"
+    },
+    {
+      "id": "s008-workspace-families",
+      "title": "Use Business, Professional, and Personal workspace families",
+      "status": "Chosen",
+      "source": "Repository-backed",
+      "authority": "Owner decision"
+    },
+    {
+      "id": "s008-stafford-media-now-planned-boundary",
+      "title": "Make Stafford Media available now and keep the other workspaces planned",
+      "status": "Chosen",
+      "source": "Repository-backed",
+      "authority": "Owner decision"
+    },
+    {
+      "id": "s008-start-my-day-static-home-action",
+      "title": "Start Stafford Media Home with Start My Day",
+      "status": "Chosen",
+      "source": "Repository-backed",
+      "authority": "Owner decision"
+    }
+  ],
+  "professional_boundary": {
+    "current_decision_records": 0,
+    "job_search_data_connected": false,
+    "employer_data_connected": false,
+    "stafford_media_decisions_visible": false
+  },
+  "personal_boundary": {
+    "current_decision_records": 0,
+    "private_data_connected": false,
+    "family_or_media_data_connected": false,
+    "stafford_media_decisions_visible": false
+  },
+  "decision_surface": {
+    "route": "/os/decisions",
+    "title": "Decisions and Why We Made Them",
+    "component": "staffordos/ui/operator-frontend/components/staffordos/DecisionSurface.tsx",
+    "shell_reused": true,
+    "read_only": true,
+    "approves_work": false,
+    "executes_actions": false,
+    "shows_live_business_decisions": false
+  },
+  "objective_alignment": {
+    "mapping_source": "explicit objectiveId values",
+    "title_or_route_inference": false,
+    "objective_mutation": false,
+    "cross_workspace_mapping": false,
+    "current_mappings": [
+      {
+        "decision_id": "s008-operator-runtime-canonical",
+        "objective_id": "stafford-media-operating-loop"
+      },
+      {
+        "decision_id": "s008-operator-first-language",
+        "objective_id": "stafford-media-operating-loop"
+      },
+      {
+        "decision_id": "s008-workspace-families",
+        "objective_id": "stafford-media-operating-loop"
+      },
+      {
+        "decision_id": "s008-stafford-media-now-planned-boundary",
+        "objective_id": "stafford-media-operating-loop"
+      },
+      {
+        "decision_id": "s008-start-my-day-static-home-action",
+        "objective_id": "stafford-media-operating-loop"
+      }
+    ]
+  },
+  "home_and_knowledge_integration": {
+    "home_secondary_link_added": true,
+    "knowledge_link_added": true,
+    "primary_action_added_or_changed": false,
+    "navigation_redesigned": false,
+    "operator_behavior_changed": false
+  },
+  "decision_lifecycle": {
+    "sequence": [
+      "Situation",
+      "Evidence",
+      "Decision",
+      "Action",
+      "Expected result",
+      "Proof",
+      "Outcome",
+      "Learning"
+    ],
+    "expected_results_are_outcomes": false,
+    "plans_are_proof": false
+  },
+  "ai_boundary": {
+    "ai_may_later": [
+      "summarize evidence",
+      "compare alternatives",
+      "identify missing information",
+      "draft a recommendation",
+      "explain tradeoffs",
+      "propose proof requirements",
+      "flag uncertainty"
+    ],
+    "ai_may_not": [
+      "approve its own recommendation",
+      "invent evidence",
+      "hide uncertainty",
+      "mark a Decision as Chosen",
+      "execute the related Action",
+      "rewrite historical reasoning silently"
+    ],
+    "autonomous_ai_authority_added": false
+  },
+  "boundary_safety": {
+    "stafford_media_decisions_only_in_stafford_media": true,
+    "professional_current_decisions": 0,
+    "personal_current_decisions": 0,
+    "planned_examples_returned_as_chosen": false,
+    "recommendation_only_returned_as_approved": false,
+    "write_or_approval_methods_added": false,
+    "operator_loaders_imported": false,
+    "api_requests_added": false,
+    "database_access_added": false,
+    "actions_executed": false,
+    "authorization_changed": false,
+    "operator_routes_changed": false
+  },
+  "operator_language_review": {
+    "standard": "staffordos/architecture/S008_02_STAFFORDOS_OPERATOR_LANGUAGE_STANDARD.md",
+    "preferred_visible_language": [
+      "Decisions and Why We Made Them",
+      "What we chose",
+      "Why",
+      "Evidence",
+      "Other options",
+      "Authority",
+      "Expected result",
+      "Proof needed",
+      "Needs review"
+    ],
+    "avoided_primary_language": [
+      "registry",
+      "entity",
+      "enum",
+      "foreign key",
+      "resolver",
+      "persistence",
+      "runtime binding"
+    ]
+  },
+  "files_changed": {
+    "application": [
+      "staffordos/ui/operator-frontend/app/os/decisions/page.tsx",
+      "staffordos/ui/operator-frontend/app/os/knowledge/page.tsx",
+      "staffordos/ui/operator-frontend/components/staffordos/DecisionSurface.tsx",
+      "staffordos/ui/operator-frontend/components/staffordos/UnifiedHome.tsx",
+      "staffordos/ui/operator-frontend/lib/staffordos/decisionRegistry.ts"
+    ],
+    "tests": [
+      "staffordos/ui/operator-frontend/lib/staffordos/decisionRegistry.test.mjs"
+    ],
+    "documentation": [
+      "staffordos/architecture/S008_09_DECISION_REGISTRY_AND_DECISION_MEMORY_FOUNDATION.md",
+      "staffordos/architecture/S008_09_DECISION_REGISTRY_AND_DECISION_MEMORY_FOUNDATION.json"
+    ],
+    "css_changed": false,
+    "objective_registry_modified": false
+  },
+  "validation": {
+    "focused_tests": {
+      "decision_registry_tests": "18 passing",
+      "objective_registry_tests": "14 passing",
+      "home_presentation_tests": "11 passing",
+      "workspace_registry_tests": "8 passing"
+    },
+    "build": {
+      "command": "npm run build",
+      "working_directory": "staffordos/ui/operator-frontend",
+      "result": "passed",
+      "exit_code": 0,
+      "warnings": [
+        "Existing Turbopack trace warning from next.config.mjs and /api/operator/ceo-snapshot route.",
+        "Existing /operator/shopifixer-pilot server/client serialization warnings during static generation."
+      ]
+    },
+    "route_checks": {
+      "result": "passed",
+      "server": "next start -p 3319",
+      "routes": [
+        {
+          "path": "/os",
+          "http_status": 200
+        },
+        {
+          "path": "/os/objectives",
+          "http_status": 200
+        },
+        {
+          "path": "/os/decisions",
+          "http_status": 200
+        },
+        {
+          "path": "/os/capabilities",
+          "http_status": 200
+        },
+        {
+          "path": "/os/knowledge",
+          "http_status": 200
+        },
+        {
+          "path": "/os/command",
+          "http_status": 200
+        },
+        {
+          "path": "/os/work",
+          "http_status": 200
+        },
+        {
+          "path": "/os/pipeline",
+          "http_status": 200
+        },
+        {
+          "path": "/os/governance",
+          "http_status": 200
+        },
+        {
+          "path": "/os/system",
+          "http_status": 200
+        },
+        {
+          "path": "/operator",
+          "http_status": 200
+        },
+        {
+          "path": "/operator/cockpit",
+          "http_status": 200
+        },
+        {
+          "path": "/operator/leads",
+          "http_status": 200
+        },
+        {
+          "path": "/operator/campaigns",
+          "http_status": 200
+        },
+        {
+          "path": "/operator/revenue-command",
+          "http_status": 200
+        },
+        {
+          "path": "/operator/command-center",
+          "http_status": 200
+        }
+      ]
+    },
+    "boundary_scans": {
+      "api_or_loader_imports_found": false,
+      "write_or_mutation_imports_found": false,
+      "forbidden_primary_language_found": false,
+      "false_ai_authority_claim_found": false
+    },
+    "json_validation": {
+      "command": "jq . staffordos/architecture/S008_09_DECISION_REGISTRY_AND_DECISION_MEMORY_FOUNDATION.json",
+      "result": "passed"
+    },
+    "diff_check": {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  },
+  "rollback": {
+    "procedure": "git revert <S008.09 commit SHA>",
+    "requires_database_rollback": false,
+    "requires_authentication_rollback": false,
+    "requires_stripe_rollback": false,
+    "requires_shopifixer_rollback": false,
+    "requires_abando_rollback": false,
+    "requires_production_rollback": false
+  },
+  "known_limitations": [
+    "No live Decision registry exists yet.",
+    "No live approval workflow exists.",
+    "No Action registry exists.",
+    "No AI decision-making is implemented.",
+    "No runtime persistence exists.",
+    "Decision records are static architecture memory only.",
+    "Professional and Personal remain planned presentation states.",
+    "/operator remains runtime-canonical until parity is proven."
+  ],
+  "next_mission_recommendation": "S008.10 should define the first read-only Action alignment model that connects static Objectives, static Decision Memory, existing capability links, and the current primary-action truth without claiming live ranking, approval, or execution authority."
+}

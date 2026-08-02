@@ -146,6 +146,14 @@ function StaffordMediaHome() {
         </div>
       </section>
 
+      <section className="staffordObjectiveNote">
+        <strong>Decision memory</strong>
+        <p>Review the architecture choices behind this operating surface before changing direction.</p>
+        <Link href="/os/decisions" className="staffordHomeActionLink">
+          Decisions and Why We Made Them
+        </Link>
+      </section>
+
       <section className="staffordHomeTransparency" aria-label="What is real today">
         <StatusNote label="Available now">{presentation.evidenceNote}</StatusNote>
         <StatusNote label="Not connected yet">{presentation.limitationNote}</StatusNote>
