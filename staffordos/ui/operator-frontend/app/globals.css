@@ -2162,6 +2162,13 @@ textarea {
   line-height: 1.2;
 }
 
+.staffordNextActionNote {
+  margin: 0;
+  max-width: 760px;
+  color: #4f5a66;
+  line-height: 1.5;
+}
+
 .staffordNextActionGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2189,6 +2196,28 @@ textarea {
   font-size: 14px;
   line-height: 1.4;
   overflow-wrap: anywhere;
+}
+
+.staffordNextActionContinue,
+.staffordHomeActionLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: start;
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 1px solid #23695d;
+  border-radius: 8px;
+  background: #23695d;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.staffordNextActionContinue:hover,
+.staffordHomeActionLink:hover {
+  background: #195248;
 }
 
 .staffordWorkspaceGrid {
@@ -2431,6 +2460,135 @@ textarea {
   line-height: 1.5;
 }
 
+.staffordUnifiedHome {
+  display: grid;
+  gap: 18px;
+  max-width: 1180px;
+}
+
+.staffordHomeHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 18px;
+  align-items: stretch;
+  padding: 22px;
+  border: 1px solid #d9dee5;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.staffordHomeHeader h1 {
+  margin: 6px 0 0;
+  color: #15181d;
+  font-size: 34px;
+  line-height: 1.08;
+}
+
+.staffordHomeHeader p {
+  margin: 10px 0 0;
+  max-width: 700px;
+  color: #4f5a66;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.staffordHomeAttention,
+.staffordHomeSupport,
+.staffordHomePlannedPanel {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid #cbd4dd;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.staffordHomeAttention {
+  grid-template-columns: minmax(220px, 0.34fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.staffordHomeAttentionCopy h2,
+.staffordHomeSectionHeader h2,
+.staffordHomePlannedPanel h2 {
+  margin: 4px 0 0;
+  color: #15181d;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.staffordHomeAttentionCopy p,
+.staffordHomeSectionHeader p,
+.staffordHomePlannedPanel p {
+  margin: 8px 0 0;
+  color: #4f5a66;
+  line-height: 1.5;
+}
+
+.staffordHomeSupportGrid,
+.staffordHomePlannedGrid,
+.staffordHomeTransparency {
+  display: grid;
+  gap: 12px;
+}
+
+.staffordHomeSupportGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.staffordHomePlannedGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.staffordHomeTransparency {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.staffordHomeSupportCard,
+.staffordHomePlannedCard,
+.staffordHomeStatusNote {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid #d9dee5;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.staffordHomeSupportCard {
+  align-content: space-between;
+  min-height: 210px;
+}
+
+.staffordHomeSupportCard span,
+.staffordHomeStatusNote span {
+  color: #66717e;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.staffordHomeSupportCard h3,
+.staffordHomePlannedCard h3 {
+  margin: 6px 0 0;
+  color: #15181d;
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.staffordHomeSupportCard p,
+.staffordHomePlannedCard p {
+  margin: 8px 0 0;
+  color: #4f5a66;
+  line-height: 1.45;
+}
+
+.staffordHomeStatusNote strong {
+  color: #15181d;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
 @media (max-width: 1020px) {
   .staffordOsShell {
     grid-template-columns: 1fr;
@@ -2453,9 +2611,14 @@ textarea {
   }
 
   .staffordWorkspaceHeader,
+  .staffordHomeHeader,
+  .staffordHomeAttention,
   .staffordNextActionGrid,
   .staffordWorkspaceGrid,
-  .staffordCapabilityGrid {
+  .staffordCapabilityGrid,
+  .staffordHomeSupportGrid,
+  .staffordHomePlannedGrid,
+  .staffordHomeTransparency {
     grid-template-columns: 1fr;
   }
 
@@ -2475,7 +2638,8 @@ textarea {
     grid-template-columns: 1fr;
   }
 
-  .staffordWorkspaceHeader h1 {
+  .staffordWorkspaceHeader h1,
+  .staffordHomeHeader h1 {
     font-size: 28px;
   }
 }

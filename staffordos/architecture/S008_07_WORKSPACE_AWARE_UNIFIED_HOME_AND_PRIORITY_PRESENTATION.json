@@ -1,0 +1,272 @@
+{
+  "schema": "staffordos.architecture.s008_07_workspace_aware_unified_home_and_priority_presentation.v1",
+  "mission": "S008_07_WORKSPACE_AWARE_UNIFIED_HOME_AND_PRIORITY_PRESENTATION",
+  "classification": "UNIFIED_HOME_READY_FOR_LOCAL_COMMIT",
+  "mission_boundary": {
+    "deployment_changed": false,
+    "push_performed": false,
+    "production_changed": false,
+    "authentication_changed": false,
+    "oauth_changed": false,
+    "kms_changed": false,
+    "jwt_issuer_changed": false,
+    "stripe_changed": false,
+    "shopifixer_runtime_changed": false,
+    "abando_runtime_changed": false,
+    "database_changed": false,
+    "prisma_schema_changed": false,
+    "migration_changed": false,
+    "api_changed": false,
+    "queue_changed": false,
+    "operator_behavior_changed": false,
+    "ai_ranking_implemented": false,
+    "real_scoring_implemented": false,
+    "automated_recommendations_implemented": false,
+    "invited_users_implemented": false,
+    "professional_workflows_implemented": false,
+    "family_or_media_access_implemented": false
+  },
+  "checkpoint_authority": {
+    "required_commits": [
+      {
+        "name": "S008 foundation",
+        "commit": "7d661d1cea4e447e855dfec59e80d6b8feb44bad",
+        "status": "present"
+      },
+      {
+        "name": "S008 capability map",
+        "commit": "4503ebb5a15484384d5dbb463dcdce551c3e9293",
+        "status": "present"
+      },
+      {
+        "name": "S008 multi-workspace architecture",
+        "commit": "cd0757caacaf8d7c1523bc2bea63e0b715da9561",
+        "status": "present"
+      },
+      {
+        "name": "S008 unified action and decision model",
+        "commit": "e386645f2d2c0aa625c2bec11edfd3b6c5c92f6a",
+        "status": "present"
+      },
+      {
+        "name": "S008 workspace context",
+        "commit": "735c4a5fad194afdc3cfbef28411cac77bfc7ddd",
+        "status": "present_current_checkpoint"
+      }
+    ],
+    "unrelated_worktree_changes_excluded": true
+  },
+  "existing_home_discovery": {
+    "previous_os_home": "Generic WorkspacePage wrapper with placeholder NextActionCard and a small capability panel.",
+    "operator_runtime_surfaces_reused_by_link_only": true,
+    "operator_loaders_imported": false,
+    "write_capable_actions_imported": false,
+    "canonical_runtime_priority_engine_found_for_os": false
+  },
+  "home_presentation_model": {
+    "file": "staffordos/ui/operator-frontend/lib/staffordos/homePresentation.ts",
+    "model_type": "static_typed_presentation_model",
+    "fields": [
+      "workspaceId",
+      "heading",
+      "summary",
+      "primaryAction",
+      "supportingActions",
+      "plannedCapabilities",
+      "evidenceNote",
+      "authorityNote",
+      "limitationNote",
+      "returnWorkspaceLabel"
+    ],
+    "unsupported_fields_invented": false
+  },
+  "stafford_media_primary_action": {
+    "title": "Start My Day",
+    "capability_id": "start-my-day",
+    "current_route": "/operator",
+    "source": "repository_backed",
+    "availability": "Available now",
+    "reason": "It is the current StaffordOS Home surface for the workday, main priority, current risks, business health, and workday controls.",
+    "live_priority_ranking_claimed": false
+  },
+  "stafford_media_supporting_actions": [
+    {
+      "title": "Find People to Contact",
+      "current_route": "/operator/leads"
+    },
+    {
+      "title": "See Money to Collect",
+      "current_route": "/operator/revenue-command"
+    },
+    {
+      "title": "Manage Current Customer Work",
+      "current_route": "/operator/command-center"
+    }
+  ],
+  "professional_planned_home": {
+    "planned_only": true,
+    "future_modes_named": [
+      "Job Search",
+      "My Job"
+    ],
+    "professional_data_connected": false,
+    "jobs_or_applications_rendered": false,
+    "operator_links_exposed": false
+  },
+  "personal_planned_home": {
+    "planned_only": true,
+    "future_areas_named": [
+      "Private Planning",
+      "Learning",
+      "Family and Media"
+    ],
+    "personal_data_connected": false,
+    "family_or_media_data_rendered": false,
+    "operator_links_exposed": false,
+    "privacy_statement": "Personal is owner-private by default. Family and Media access will require explicit sharing."
+  },
+  "next_action_card_changes": {
+    "file": "staffordos/ui/operator-frontend/components/staffordos/NextActionCard.tsx",
+    "backward_compatible": true,
+    "new_optional_fields": [
+      "headerLabel",
+      "headerStatus",
+      "expectedResult",
+      "effort",
+      "approvalNeeded",
+      "completionProof",
+      "continueHref",
+      "continueLabel",
+      "transparencyNote"
+    ],
+    "requires_confidence": false,
+    "fake_score_added": false,
+    "mutation_control_added": false
+  },
+  "authority_and_transparency": {
+    "available_now": "Repository-backed current routes that work today.",
+    "planned": "Workspace capabilities without runtime workflows.",
+    "not_connected_yet": [
+      "live ranking",
+      "real action records",
+      "AI recommendations",
+      "objective tracking",
+      "evidence aggregation"
+    ],
+    "static_presentation_disclosed": true
+  },
+  "boundary_safety": {
+    "stafford_media_links_only_repository_backed_routes": true,
+    "professional_operator_links_exposed": false,
+    "personal_operator_links_exposed": false,
+    "operator_loaders_imported": false,
+    "api_requests_added": false,
+    "data_mutations_added": false,
+    "action_records_created": false,
+    "decision_records_created": false,
+    "workspace_selection_authorization_claim": false,
+    "direct_operator_routes_changed": false
+  },
+  "operator_language_review": {
+    "standard": "staffordos/architecture/S008_02_STAFFORDOS_OPERATOR_LANGUAGE_STANDARD.md",
+    "preferred_visible_language": [
+      "What Deserves Attention",
+      "Start here",
+      "Look here first",
+      "Available now",
+      "Planned",
+      "Continue",
+      "Return to Stafford Media",
+      "Not connected yet"
+    ],
+    "avoided_primary_language": [
+      "decision engine",
+      "ranking algorithm",
+      "action registry",
+      "data source",
+      "runtime",
+      "context provider",
+      "capability resolver",
+      "authority object",
+      "not implemented"
+    ]
+  },
+  "files_changed": {
+    "application": [
+      "staffordos/ui/operator-frontend/app/os/page.tsx",
+      "staffordos/ui/operator-frontend/components/staffordos/UnifiedHome.tsx",
+      "staffordos/ui/operator-frontend/components/staffordos/NextActionCard.tsx",
+      "staffordos/ui/operator-frontend/lib/staffordos/homePresentation.ts",
+      "staffordos/ui/operator-frontend/app/globals.css"
+    ],
+    "tests": [
+      "staffordos/ui/operator-frontend/lib/staffordos/homePresentation.test.mjs"
+    ],
+    "documentation": [
+      "staffordos/architecture/S008_07_WORKSPACE_AWARE_UNIFIED_HOME_AND_PRIORITY_PRESENTATION.md",
+      "staffordos/architecture/S008_07_WORKSPACE_AWARE_UNIFIED_HOME_AND_PRIORITY_PRESENTATION.json"
+    ]
+  },
+  "validation": {
+    "focused_tests": {
+      "workspace_registry_tests": "8 passing",
+      "home_presentation_tests": "11 passing"
+    },
+    "build": {
+      "command": "npm run build",
+      "working_directory": "staffordos/ui/operator-frontend",
+      "result": "passed",
+      "exit_code": 0,
+      "warnings": [
+        "Existing Turbopack trace warning from next.config.mjs and /api/operator/ceo-snapshot route.",
+        "Existing /operator/shopifixer-pilot server/client serialization warnings during static generation."
+      ]
+    },
+    "route_checks": {
+      "result": "passed",
+      "port": 3317,
+      "routes": {
+        "/os": 200,
+        "/os/capabilities": 200,
+        "/os/command": 200,
+        "/os/work": 200,
+        "/os/pipeline": 200,
+        "/os/knowledge": 200,
+        "/os/governance": 200,
+        "/os/system": 200,
+        "/operator": 200,
+        "/operator/cockpit": 200,
+        "/operator/leads": 200,
+        "/operator/campaigns": 200,
+        "/operator/revenue-command": 200,
+        "/operator/command-center": 200
+      }
+    },
+    "json_validation": "passed",
+    "diff_check": "passed",
+    "boundary_scans": {
+      "api_or_loader_imports_found": false,
+      "write_or_mutation_imports_found": false,
+      "forbidden_primary_language_found": false,
+      "false_live_intelligence_claim_found": false
+    }
+  },
+  "rollback": {
+    "procedure": "git revert <S008.07 commit SHA>",
+    "requires_database_rollback": false,
+    "requires_authentication_rollback": false,
+    "requires_stripe_rollback": false,
+    "requires_shopifixer_rollback": false,
+    "requires_abando_rollback": false,
+    "requires_production_rollback": false
+  },
+  "known_limitations": [
+    "No live priority engine is connected to /os Home.",
+    "No runtime Action registry exists yet.",
+    "No runtime Decision registry exists yet.",
+    "No evidence aggregation is connected to /os Home.",
+    "Professional and Personal remain planned presentation states.",
+    "/operator remains runtime-canonical until parity is proven."
+  ],
+  "next_mission_recommendation": "S008.08 should define the first Objective read model or registry boundary before live ranking or AI Chief of Staff behavior is introduced."
+}
