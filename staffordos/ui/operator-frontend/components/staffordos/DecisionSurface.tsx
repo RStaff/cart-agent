@@ -11,6 +11,7 @@ import {
   getDecisionsForWorkspace,
   type StaffordOsDecision,
 } from "../../lib/staffordos/decisionRegistry";
+import { getEvidenceForDecision } from "../../lib/staffordos/evidenceFoundation";
 import { getObjectiveById } from "../../lib/staffordos/objectiveRegistry";
 import {
   DEFAULT_STAFFORDOS_WORKSPACE_ID,
@@ -20,6 +21,7 @@ import { useStaffordOsWorkspace } from "./WorkspaceContext";
 
 function DecisionCard({ decision }: { decision: StaffordOsDecision }) {
   const objective = getObjectiveById(decision.objectiveId);
+  const evidence = getEvidenceForDecision(decision.id);
 
   return (
     <article className="staffordObjectiveCard">
@@ -67,6 +69,21 @@ function DecisionCard({ decision }: { decision: StaffordOsDecision }) {
           </div>
         </div>
       ) : null}
+
+      <div className="staffordObjectiveCapabilities">
+        <span>Supporting evidence</span>
+        <div>
+          {evidence.length ? (
+            evidence.map((record) => (
+              <Link key={record.id} href="/os/evidence">
+                {record.title}
+              </Link>
+            ))
+          ) : (
+            <span>Needs review</span>
+          )}
+        </div>
+      </div>
 
       <details className="staffordObjectiveEvidence">
         <summary>Evidence and tradeoffs</summary>

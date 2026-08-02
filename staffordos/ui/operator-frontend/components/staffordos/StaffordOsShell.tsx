@@ -64,6 +64,15 @@ function StaffordOsShellFrame({ children }: StaffordOsShellProps) {
           <span>What We Are Working Toward</span>
           <small>Objective alignment</small>
         </Link>
+
+        <Link
+          href="/os/evidence"
+          className={`staffordOsCapabilityNav${isActive(pathname, "/os/evidence") ? " staffordOsCapabilityNavActive" : ""}`}
+          aria-current={isActive(pathname, "/os/evidence") ? "page" : undefined}
+        >
+          <span>Why We Believe This</span>
+          <small>Evidence behind current actions</small>
+        </Link>
       </aside>
 
       <main className="staffordOsMain">

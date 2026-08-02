@@ -148,9 +148,17 @@ function StaffordMediaHome() {
 
       <section className="staffordObjectiveNote">
         <strong>Action list</strong>
-        <p>Review the current static actions and the goal and decision behind each one.</p>
+        <p>Review the current static actions and the goal, decision, and evidence behind each one.</p>
         <Link href="/os/actions" className="staffordHomeActionLink">
           What To Do Next
+        </Link>
+      </section>
+
+      <section className="staffordObjectiveNote">
+        <strong>Evidence behind actions</strong>
+        <p>Current actions are supported by repository-backed evidence before any proof is claimed.</p>
+        <Link href="/os/evidence" className="staffordHomeActionLink">
+          Why We Believe This
         </Link>
       </section>
 

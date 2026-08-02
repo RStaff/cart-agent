@@ -1,0 +1,327 @@
+{
+  "mission": "S008_11_EVIDENCE_FOUNDATION",
+  "status": "READY_FOR_LOCAL_COMMIT",
+  "operator_question": "Why do we believe this action is worth taking?",
+  "checkpoint_authority": {
+    "verified_head": "229d8419b51474c41fcf36de30dd8f8643f821d7",
+    "required_commits_present": [
+      "7d661d1cea4e447e855dfec59e80d6b8feb44bad",
+      "4503ebb5a15484384d5dbb463dcdce551c3e9293",
+      "cd0757caacaf8d7c1523bc2bea63e0b715da9561",
+      "e386645f2d2c0aa625c2bec11edfd3b6c5c92f6a",
+      "735c4a5fad194afdc3cfbef28411cac77bfc7ddd",
+      "122bee6872099c4f909b5c025b3d375745af3134",
+      "33af5d22361ca6e3960e3445ceb01e2d2c25e5f7",
+      "7fe3ee99da92fbf6e4184be43bd4778fb44036cd",
+      "229d8419b51474c41fcf36de30dd8f8643f821d7"
+    ],
+    "canonical_evidence_foundation_preexisted": false
+  },
+  "discovery": {
+    "related_noncanonical_sources": [
+      {
+        "path": "staffordos/ui/operator-frontend/lib/staffordos/decisionRegistry.ts",
+        "finding": "Decision records had evidenceReferences artifact paths, but no canonical Evidence model."
+      },
+      {
+        "path": "staffordos/ui/operator-frontend/components/staffordos/DecisionSurface.tsx",
+        "finding": "Decision surface displayed artifact references under decision tradeoffs."
+      },
+      {
+        "path": "staffordos/architecture/S008_05_UNIFIED_ACTION_AND_DECISION_MODEL.md",
+        "finding": "Defined Evidence conceptually as part of the operating model."
+      },
+      {
+        "path": "staffordos/architecture/S008_10_UNIFIED_ACTION_REGISTRY_FOUNDATION.md",
+        "finding": "Created Action records that can be explicitly supported by Evidence."
+      }
+    ]
+  },
+  "evidence_contract": {
+    "path": "staffordos/ui/operator-frontend/lib/staffordos/evidenceFoundation.ts",
+    "fields": [
+      "id",
+      "workspaceId",
+      "objectiveId",
+      "decisionId",
+      "actionId",
+      "title",
+      "summary",
+      "evidenceType",
+      "source",
+      "confidence",
+      "collectedAt",
+      "owner",
+      "visibility",
+      "authority",
+      "supports",
+      "notes",
+      "sourceArtifacts"
+    ],
+    "safe_read_methods": [
+      "getEvidenceForWorkspace",
+      "getEvidenceForAction",
+      "getEvidenceForDecision",
+      "getEvidenceById"
+    ],
+    "forbidden_methods_absent": [
+      "create",
+      "update",
+      "delete",
+      "sync",
+      "persist",
+      "API access",
+      "database access",
+      "AI reasoning",
+      "AI ranking"
+    ]
+  },
+  "stafford_media_evidence": [
+    {
+      "id": "evidence-start-my-day-current-source",
+      "title": "The current Home page is the working starting point",
+      "actionId": "start-my-day-home-action",
+      "decisionId": "s008-start-my-day-static-home-action",
+      "objectiveId": "stafford-media-operating-loop",
+      "source": "repository_backed",
+      "confidence": "high"
+    },
+    {
+      "id": "evidence-people-to-contact-route",
+      "title": "People to contact has an existing working page",
+      "actionId": "review-people-to-contact-action",
+      "decisionId": "s008-operator-runtime-canonical",
+      "objectiveId": "stafford-media-convert-opportunities",
+      "source": "repository_backed",
+      "confidence": "high"
+    },
+    {
+      "id": "evidence-money-to-collect-route",
+      "title": "Money to collect has an existing working page",
+      "actionId": "review-money-to-collect-action",
+      "decisionId": "s008-operator-runtime-canonical",
+      "objectiveId": "stafford-media-convert-opportunities",
+      "source": "repository_backed",
+      "confidence": "high"
+    },
+    {
+      "id": "evidence-active-work-route",
+      "title": "Active work has an existing customer-work surface",
+      "actionId": "review-active-work-action",
+      "decisionId": "s008-operator-runtime-canonical",
+      "objectiveId": "stafford-media-complete-work-with-proof",
+      "source": "repository_backed",
+      "confidence": "medium"
+    },
+    {
+      "id": "evidence-current-goals-static",
+      "title": "Current goals are static and repository-backed",
+      "actionId": "review-current-objectives-action",
+      "decisionId": "s008-operator-runtime-canonical",
+      "objectiveId": "stafford-media-operating-loop",
+      "source": "repository_backed",
+      "confidence": "high"
+    },
+    {
+      "id": "evidence-recent-decisions-static",
+      "title": "Recent decisions explain the current operating shape",
+      "actionId": "review-recent-decisions-action",
+      "decisionId": "s008-operator-runtime-canonical",
+      "objectiveId": "stafford-media-operating-loop",
+      "source": "repository_backed",
+      "confidence": "high"
+    }
+  ],
+  "workspace_boundaries": {
+    "professional": {
+      "current_evidence_records": 0,
+      "status": "planned",
+      "forbidden_current_data": [
+        "employer evidence",
+        "resumes",
+        "interviews",
+        "work history"
+      ]
+    },
+    "personal": {
+      "current_evidence_records": 0,
+      "status": "planned",
+      "forbidden_current_data": [
+        "family evidence",
+        "media",
+        "memories",
+        "journals"
+      ]
+    }
+  },
+  "evidence_surface": {
+    "route": "/os/evidence",
+    "operator_title": "Why We Believe This",
+    "shows": [
+      "what we know",
+      "why we believe it",
+      "source",
+      "confidence",
+      "supported Action",
+      "related Decision"
+    ],
+    "mutation_controls": false
+  },
+  "action_integration": {
+    "surface": "/os/actions",
+    "relationship": "explicit actionId only",
+    "visible_label": "Why we believe this",
+    "runtime_aggregation": false,
+    "scoring": false
+  },
+  "decision_integration": {
+    "surface": "/os/decisions",
+    "relationship": "explicit decisionId only",
+    "visible_label": "Supporting evidence",
+    "inference_used": false
+  },
+  "home_integration": {
+    "redesigned": false,
+    "added_note": "Evidence behind actions",
+    "link": "/os/evidence"
+  },
+  "boundary_safety": {
+    "stafford_media_only_for_stafford_media": true,
+    "professional_evidence_empty": true,
+    "personal_evidence_empty": true,
+    "operator_loader_imports": false,
+    "api_calls": false,
+    "database_access": false,
+    "persistence": false,
+    "execution_methods": false,
+    "approval_methods": false,
+    "ai_reasoning": false,
+    "ai_ranking": false,
+    "operator_runtime_changed": false
+  },
+  "validation": {
+    "focused_tests": [
+      {
+        "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/evidenceFoundation.test.mjs",
+        "result": "passed",
+        "tests": "15/15"
+      },
+      {
+        "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/actionRegistry.test.mjs",
+        "result": "passed",
+        "tests": "14/14"
+      },
+      {
+        "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/decisionRegistry.test.mjs",
+        "result": "passed",
+        "tests": "18/18"
+      },
+      {
+        "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/objectiveRegistry.test.mjs",
+        "result": "passed",
+        "tests": "14/14"
+      },
+      {
+        "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/homePresentation.test.mjs",
+        "result": "passed",
+        "tests": "11/11"
+      },
+      {
+        "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/workspaceRegistry.test.mjs",
+        "result": "passed",
+        "tests": "8/8"
+      }
+    ],
+    "build": {
+      "command": "npm run build",
+      "workdir": "staffordos/ui/operator-frontend",
+      "result": "passed",
+      "known_warnings": [
+        "Turbopack traced next.config.mjs through /api/operator/ceo-snapshot.",
+        "Existing /operator/shopifixer-pilot client/server-function serialization warnings during static generation."
+      ]
+    },
+    "route_checks": [
+      {
+        "route": "/os",
+        "status": 200
+      },
+      {
+        "route": "/os/actions",
+        "status": 200
+      },
+      {
+        "route": "/os/decisions",
+        "status": 200
+      },
+      {
+        "route": "/os/objectives",
+        "status": 200
+      },
+      {
+        "route": "/os/evidence",
+        "status": 200
+      },
+      {
+        "route": "/operator",
+        "status": 200
+      }
+    ]
+  },
+  "files_changed": {
+    "added": [
+      "staffordos/ui/operator-frontend/lib/staffordos/evidenceFoundation.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/evidenceFoundation.test.mjs",
+      "staffordos/ui/operator-frontend/components/staffordos/EvidenceSurface.tsx",
+      "staffordos/ui/operator-frontend/app/os/evidence/page.tsx",
+      "staffordos/architecture/S008_11_EVIDENCE_FOUNDATION.md",
+      "staffordos/architecture/S008_11_EVIDENCE_FOUNDATION.json"
+    ],
+    "modified": [
+      "staffordos/ui/operator-frontend/components/staffordos/ActionSurface.tsx",
+      "staffordos/ui/operator-frontend/components/staffordos/DecisionSurface.tsx",
+      "staffordos/ui/operator-frontend/components/staffordos/StaffordOsShell.tsx",
+      "staffordos/ui/operator-frontend/components/staffordos/UnifiedHome.tsx"
+    ]
+  },
+  "known_limitations": [
+    "Evidence is static and repository-backed only.",
+    "No runtime Evidence table exists.",
+    "No Evidence persistence exists.",
+    "No Proof Registry exists yet.",
+    "No Learning Registry exists yet.",
+    "No Evidence scoring exists.",
+    "No AI reasoning exists.",
+    "Professional and Personal Evidence are intentionally absent.",
+    "Evidence does not validate live business state."
+  ],
+  "rollback": {
+    "command": "git revert <S008.11 commit SHA>",
+    "requires_production_rollback": false,
+    "requires_database_rollback": false,
+    "requires_authentication_rollback": false,
+    "requires_stripe_rollback": false,
+    "requires_shopifixer_rollback": false,
+    "requires_abando_rollback": false
+  },
+  "non_impact_confirmation": {
+    "deploy": false,
+    "push": false,
+    "production_modified": false,
+    "shopifixer_runtime_modified": false,
+    "abando_runtime_modified": false,
+    "authentication_modified": false,
+    "oauth_kms_jwt_issuer_modified": false,
+    "database_modified": false,
+    "prisma_modified": false,
+    "api_modified": false,
+    "queue_modified": false,
+    "packet_modified": false,
+    "operator_runtime_modified": false,
+    "persistence_implemented": false,
+    "ai_reasoning_implemented": false,
+    "ai_ranking_implemented": false,
+    "automation_implemented": false,
+    "execution_workflows_implemented": false
+  }
+}

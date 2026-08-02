@@ -10,6 +10,7 @@ import {
   type StaffordOsAction,
 } from "../../lib/staffordos/actionRegistry";
 import { getDecisionById } from "../../lib/staffordos/decisionRegistry";
+import { getEvidenceForAction } from "../../lib/staffordos/evidenceFoundation";
 import { getObjectiveById } from "../../lib/staffordos/objectiveRegistry";
 import {
   DEFAULT_STAFFORDOS_WORKSPACE_ID,
@@ -20,6 +21,7 @@ import { useStaffordOsWorkspace } from "./WorkspaceContext";
 function ActionCard({ action }: { action: StaffordOsAction }) {
   const objective = getObjectiveById(action.objectiveId);
   const decision = getDecisionById(action.decisionId);
+  const evidence = getEvidenceForAction(action.id);
 
   return (
     <article className="staffordObjectiveCard">
@@ -73,6 +75,21 @@ function ActionCard({ action }: { action: StaffordOsAction }) {
         </div>
       </div>
 
+      <div className="staffordObjectiveCapabilities">
+        <span>Why we believe this</span>
+        <div>
+          {evidence.length ? (
+            evidence.map((record) => (
+              <Link key={record.id} href="/os/evidence">
+                {record.title}
+              </Link>
+            ))
+          ) : (
+            <span>Needs review</span>
+          )}
+        </div>
+      </div>
+
       {action.continueHref ? (
         <div className="staffordObjectiveCapabilities">
           <span>Where this starts</span>
@@ -83,7 +100,7 @@ function ActionCard({ action }: { action: StaffordOsAction }) {
       ) : null}
 
       <details className="staffordObjectiveEvidence">
-        <summary>Evidence</summary>
+        <summary>Source details</summary>
         <ul>
           <li>Owner: {action.owner}</li>
           <li>Visibility: {action.visibility}</li>
@@ -154,7 +171,7 @@ function StaffordMediaActions() {
         <strong>Static foundation</strong>
         <p>
           The action list is not live ranking, automation, or execution. It connects current actions to goals,
-          decisions, and proof.
+          decisions, evidence, and proof.
         </p>
       </section>
 
