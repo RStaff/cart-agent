@@ -1,0 +1,368 @@
+{
+  "mission": "S009_01_STATIC_FIXTURE_AND_DETERMINISTIC_RESPONSE_VALIDATOR",
+  "status": "READY_FOR_LOCAL_COMMIT",
+  "checkpointAuthority": {
+    "verifiedHeadAtDiscovery": "e176416802e6dcb56ee3c9e04a0e4111b9c4395a",
+    "branch": "main",
+    "canonicalAuthoritiesVerified": [
+      "staffordos/architecture/STAFFORDOS_ARCHITECTURE_V1.md",
+      "staffordos/architecture/S009_00_READ_ONLY_CHIEF_OF_STAFF_CONTRACT.md",
+      "staffordos/architecture/S009_00_READ_ONLY_CHIEF_OF_STAFF_CONTRACT.json",
+      "staffordos/architecture/schemas/s009_00_chief_of_staff_request.example.json",
+      "staffordos/architecture/schemas/s009_00_source_snapshot.example.json",
+      "staffordos/architecture/schemas/s009_00_source_traced_claim.example.json",
+      "staffordos/architecture/schemas/s009_00_candidate_recommendation.example.json",
+      "staffordos/architecture/schemas/s009_00_chief_of_staff_response.example.json",
+      "staffordos/architecture/schemas/s009_00_validation_failure.example.json",
+      "staffordos/architecture/schemas/s009_00_audit_envelope.example.json",
+      "staffordos/ui/operator-frontend/lib/staffordos/workspaceRegistry.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/capabilities.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/objectiveRegistry.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/decisionRegistry.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/actionRegistry.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/evidenceFoundation.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/proofFoundation.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/learningFoundation.ts"
+    ],
+    "canonicalValidatorAlreadyExisted": false
+  },
+  "workingTreeExclusions": {
+    "excludedCategories": [
+      "S007_IDENTITY_OR_ISSUER",
+      "RUNTIME_OR_DAEMON",
+      "WEB_OR_PRISMA",
+      "GENERATED",
+      "MISSION_EVIDENCE",
+      "PREEXISTING_UNRELATED",
+      "UNKNOWN_REQUIRES_REVIEW"
+    ],
+    "authorizedFiles": [
+      "staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffValidator.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffValidator.test.mjs",
+      "staffordos/architecture/S009_01_STATIC_FIXTURE_AND_DETERMINISTIC_RESPONSE_VALIDATOR.md",
+      "staffordos/architecture/S009_01_STATIC_FIXTURE_AND_DETERMINISTIC_RESPONSE_VALIDATOR.json"
+    ]
+  },
+  "existingValidatorDiscovery": {
+    "canonicalStructuredResponseValidatorFound": false,
+    "llmRuntimeFound": false,
+    "chatInterfaceFound": false,
+    "providerSdkAdded": false,
+    "newDependencyAdded": false,
+    "decision": "Create one isolated deterministic validator using existing TypeScript and Node test conventions."
+  },
+  "staticSourceFixtureContract": {
+    "fields": [
+      "sourceId",
+      "sourceType",
+      "workspaceId",
+      "authorityClassification",
+      "freshness",
+      "privacyClassification",
+      "immutable",
+      "title",
+      "contentSummary",
+      "exactSourceReference",
+      "limitations",
+      "availability",
+      "supportedClaimIds",
+      "supportedStatements",
+      "supportedNumbers",
+      "conflictGroup",
+      "conflictValue"
+    ],
+    "allowedSourceTypes": [
+      "workspace",
+      "capability",
+      "objective",
+      "decision",
+      "action",
+      "evidence",
+      "proof",
+      "learning",
+      "architecture"
+    ],
+    "staffordMediaSourceCount": 9,
+    "professionalFixtures": "planned-only",
+    "personalFixtures": "planned-only",
+    "noInventedData": [
+      "customers",
+      "revenue",
+      "deadlines",
+      "performance metrics",
+      "payment state",
+      "campaign results",
+      "employees",
+      "jobs",
+      "family information",
+      "personal information"
+    ]
+  },
+  "governedRequestFixture": {
+    "requestId": "s009-01-request-stafford-media-attention",
+    "workspaceId": "stafford-media",
+    "workspaceFamily": "business",
+    "currentUserId": "static-fixture-owner-not-authenticated",
+    "operatorQuestion": "What deserves my attention, and why?",
+    "authorizationBoundary": false,
+    "notes": "The request fixture is deterministic and test-only. It does not claim authentication, authorization, membership, role, or permission authority."
+  },
+  "responseDataContract": {
+    "responseFields": [
+      "responseId",
+      "workspaceId",
+      "headline",
+      "summary",
+      "attentionItems",
+      "supportingClaims",
+      "missingInformation",
+      "candidateActions",
+      "risks",
+      "approvalsNeeded",
+      "proofExpected",
+      "learningReferences",
+      "sources",
+      "limitations",
+      "generatedAt",
+      "authorityStatus"
+    ],
+    "claimFields": [
+      "claimId",
+      "claimType",
+      "statement",
+      "supportingSourceIds",
+      "confidenceClassification",
+      "limitation",
+      "workspaceId",
+      "authorityStatus"
+    ],
+    "recommendationFields": [
+      "recommendationId",
+      "workspaceId",
+      "operatorFacingAction",
+      "whyNow",
+      "objectiveId",
+      "decisionId",
+      "supportingActionId",
+      "evidenceIds",
+      "proofStatus",
+      "learningIds",
+      "riskSummary",
+      "uncertainty",
+      "authorityNeeded",
+      "authorityStatus",
+      "expectedResult",
+      "proofNeeded",
+      "alternatives",
+      "sourceTrace",
+      "recommendationStatus"
+    ],
+    "allowedRecommendationStatuses": [
+      "Candidate",
+      "Needs more information",
+      "Needs authority",
+      "Not recommended",
+      "Ready for operator review"
+    ],
+    "rejectedRecommendationStatuses": [
+      "Approved",
+      "Executing",
+      "Completed"
+    ]
+  },
+  "deterministicValidator": {
+    "file": "staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffValidator.ts",
+    "inputs": [
+      "governed request",
+      "authorized source fixtures",
+      "proposed structured response"
+    ],
+    "outputs": [
+      "valid",
+      "validationStatus",
+      "errors",
+      "warnings",
+      "checkedClaimCount",
+      "checkedRecommendationCount",
+      "checkedSourceCount"
+    ],
+    "pure": true,
+    "mutatesInputs": false,
+    "networkCalls": false,
+    "databaseCalls": false,
+    "apiCalls": false,
+    "aiCalls": false,
+    "persistence": false
+  },
+  "validationRulesImplemented": [
+    "RESPONSE_WORKSPACE_MISMATCH",
+    "CLAIM_WORKSPACE_MISMATCH",
+    "SOURCE_WORKSPACE_MISMATCH",
+    "SOURCE_NOT_ALLOWED",
+    "SOURCE_NOT_FOUND",
+    "CLAIM_WITHOUT_SOURCE",
+    "INVALID_CLAIM_TYPE",
+    "UNSUPPORTED_SOURCE_FACT",
+    "INFERENCE_NOT_LABELED",
+    "RECOMMENDATION_STATUS_NOT_ALLOWED",
+    "RECOMMENDATION_WITHOUT_AUTHORITY_STATUS",
+    "RECOMMENDATION_WITHOUT_SOURCE_TRACE",
+    "PLANNED_CAPABILITY_PRESENTED_AS_AVAILABLE",
+    "UNSUPPORTED_NUMERIC_VALUE",
+    "EXPECTED_RESULT_PRESENTED_AS_OUTCOME",
+    "EVIDENCE_PRESENTED_AS_PROOF",
+    "PROOF_PRESENTED_AS_COMPLETION",
+    "LEARNING_PRESENTED_AS_POLICY",
+    "AI_AUTHORITY_CLAIM",
+    "MISSING_LIMITATION",
+    "MISSING_AUTHORITY_STATUS",
+    "UNKNOWN_NOT_USED",
+    "CONFLICT_SILENTLY_RESOLVED",
+    "STALE_SOURCE_NOT_DISCLOSED",
+    "PRIVATE_SOURCE_NOT_AUTHORIZED"
+  ],
+  "validResponseFixture": {
+    "responseId": "s009-01-valid-response-stafford-media-attention",
+    "operatorQuestion": "What deserves my attention, and why?",
+    "accepted": true,
+    "claims": [
+      "Start My Day is the current static primary Action for Stafford Media.",
+      "Start My Day supports the objective Run the business from one clear loop.",
+      "The current guidance is static and not dynamically ranked.",
+      "Live business data and AI recommendations are not connected.",
+      "The recommendation is ready for operator review, not approved."
+    ]
+  },
+  "invalidResponseFixtures": [
+    "unsourced claim",
+    "missing source",
+    "cross-workspace claim",
+    "cross-workspace source leakage",
+    "disallowed source type",
+    "planned Professional capability presented as available",
+    "planned Personal capability presented as available",
+    "Approved recommendation",
+    "Executing recommendation",
+    "Completed recommendation",
+    "recommendation without source trace",
+    "recommendation without authority status",
+    "unsupported numeric business claim",
+    "expected result presented as Outcome",
+    "Evidence presented as Proof",
+    "Proof presented as automatic completion",
+    "Learning presented as Policy",
+    "AI approval claim",
+    "AI execution claim",
+    "missing limitation",
+    "missing authority status",
+    "confident unsupported answer",
+    "stale source without disclosure",
+    "private source outside request authority"
+  ],
+  "conflictHandling": {
+    "syntheticFixturesOnly": true,
+    "silentResolutionRejected": true,
+    "disclosedConflictAccepted": true,
+    "operatorReviewRequired": true
+  },
+  "safeUnknownFallback": {
+    "statement": "I cannot verify that from the current StaffordOS sources.",
+    "acceptedWhen": [
+      "claim type is UNKNOWN",
+      "limitation is present",
+      "authority status is present",
+      "no invented answer follows"
+    ]
+  },
+  "validationReportFormatter": {
+    "validHeadline": "Response follows the current StaffordOS rules.",
+    "invalidHeadline": "Response cannot be shown as trusted.",
+    "technicalDetailsContainCodesOnly": true,
+    "operatorSafe": true
+  },
+  "tests": {
+    "chiefOfStaffValidator": {
+      "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffValidator.test.mjs",
+      "passed": 37,
+      "failed": 0
+    },
+    "s008Regression": {
+      "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/workspaceRegistry.test.mjs staffordos/ui/operator-frontend/lib/staffordos/homePresentation.test.mjs staffordos/ui/operator-frontend/lib/staffordos/objectiveRegistry.test.mjs staffordos/ui/operator-frontend/lib/staffordos/decisionRegistry.test.mjs staffordos/ui/operator-frontend/lib/staffordos/actionRegistry.test.mjs staffordos/ui/operator-frontend/lib/staffordos/evidenceFoundation.test.mjs staffordos/ui/operator-frontend/lib/staffordos/proofFoundation.test.mjs staffordos/ui/operator-frontend/lib/staffordos/learningFoundation.test.mjs",
+      "passed": 127,
+      "failed": 0
+    }
+  },
+  "build": {
+    "command": "npm run build",
+    "workingDirectory": "staffordos/ui/operator-frontend",
+    "passed": true,
+    "notes": [
+      "Existing Turbopack/NFT warning appeared.",
+      "Existing /operator/shopifixer-pilot static-generation warnings appeared.",
+      "Build exited 0."
+    ]
+  },
+  "boundarySafety": {
+    "externalAiServiceCalled": false,
+    "providerSdkAdded": false,
+    "chatInterfaceAdded": false,
+    "runtimePromptAdded": false,
+    "networkCallExists": false,
+    "databaseCallExists": false,
+    "apiCallExists": false,
+    "persistenceExists": false,
+    "operatorLoaderImported": false,
+    "realAuthenticationClaim": false,
+    "productionDataRead": false,
+    "professionalOrPersonalDataConnected": false,
+    "recommendationCanBeApprovedExecutingOrCompleted": false,
+    "validatorMutatesInputs": false,
+    "operatorBehaviorChanged": false
+  },
+  "filesChanged": {
+    "added": [
+      "staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffValidator.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffValidator.test.mjs",
+      "staffordos/architecture/S009_01_STATIC_FIXTURE_AND_DETERMINISTIC_RESPONSE_VALIDATOR.md",
+      "staffordos/architecture/S009_01_STATIC_FIXTURE_AND_DETERMINISTIC_RESPONSE_VALIDATOR.json"
+    ],
+    "modified": []
+  },
+  "knownLimitations": [
+    "No response generation exists.",
+    "No LLM or provider integration exists.",
+    "No chat interface exists.",
+    "No runtime identity enforcement exists.",
+    "No persistence, retrieval, embeddings, source adapter, or API exists.",
+    "The request fixture is not authorization.",
+    "SOURCE_FACT support uses deterministic explicit mappings rather than semantic inference.",
+    "The validator is not a full JSON Schema validator."
+  ],
+  "recommendedNextMission": {
+    "mission": "S009_02_READ_ONLY_CHIEF_OF_STAFF_DEMONSTRATION_SURFACE",
+    "scope": "Render a static prepared Chief of Staff response and deterministic validation report inside /os using Stafford Media fixtures only.",
+    "exclusions": [
+      "LLM",
+      "provider SDK",
+      "retrieval",
+      "persistence",
+      "API writes",
+      "execution",
+      "approval",
+      "/operator behavior change"
+    ]
+  },
+  "rollback": "git revert <S009.01 commit SHA>",
+  "nonImpact": [
+    "no deployment",
+    "no push",
+    "no production change",
+    "no /operator behavior change",
+    "no ShopiFixer runtime change",
+    "no Abando runtime change",
+    "no authentication change",
+    "no OAuth, KMS, JWT, or issuer change",
+    "no Stripe change",
+    "no database, Prisma, migration, queue, packet, or execution workflow change"
+  ]
+}
