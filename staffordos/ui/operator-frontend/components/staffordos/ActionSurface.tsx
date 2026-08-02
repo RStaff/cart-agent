@@ -11,6 +11,7 @@ import {
 } from "../../lib/staffordos/actionRegistry";
 import { getDecisionById } from "../../lib/staffordos/decisionRegistry";
 import { getEvidenceForAction } from "../../lib/staffordos/evidenceFoundation";
+import { getLearningForAction } from "../../lib/staffordos/learningFoundation";
 import { getObjectiveById } from "../../lib/staffordos/objectiveRegistry";
 import { PROOF_VERIFICATION_LABELS, getProofForAction } from "../../lib/staffordos/proofFoundation";
 import {
@@ -23,6 +24,7 @@ function ActionCard({ action }: { action: StaffordOsAction }) {
   const objective = getObjectiveById(action.objectiveId);
   const decision = getDecisionById(action.decisionId);
   const evidence = getEvidenceForAction(action.id);
+  const learning = getLearningForAction(action.id);
   const proof = getProofForAction(action.id);
 
   return (
@@ -116,6 +118,21 @@ function ActionCard({ action }: { action: StaffordOsAction }) {
             ))
           ) : (
             <span>Not yet proven</span>
+          )}
+        </div>
+      </div>
+
+      <div className="staffordObjectiveCapabilities">
+        <span>What we have learned</span>
+        <div>
+          {learning.length ? (
+            learning.map((record) => (
+              <Link key={record.id} href="/os/learning">
+                {record.title}
+              </Link>
+            ))
+          ) : (
+            <span>No lesson recorded yet</span>
           )}
         </div>
       </div>

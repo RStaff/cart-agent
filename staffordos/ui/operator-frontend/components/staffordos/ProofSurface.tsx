@@ -13,6 +13,7 @@ import {
 } from "../../lib/staffordos/proofFoundation";
 import { getActionById } from "../../lib/staffordos/actionRegistry";
 import { getDecisionById } from "../../lib/staffordos/decisionRegistry";
+import { getLearningForProof } from "../../lib/staffordos/learningFoundation";
 import { getObjectiveById } from "../../lib/staffordos/objectiveRegistry";
 import {
   DEFAULT_STAFFORDOS_WORKSPACE_ID,
@@ -23,6 +24,7 @@ import { useStaffordOsWorkspace } from "./WorkspaceContext";
 function ProofCard({ proof }: { proof: StaffordOsProof }) {
   const action = getActionById(proof.actionId);
   const decision = getDecisionById(proof.decisionId);
+  const learning = getLearningForProof(proof.id);
   const objective = getObjectiveById(proof.objectiveId);
 
   return (
@@ -81,6 +83,21 @@ function ProofCard({ proof }: { proof: StaffordOsProof }) {
         <span>Related decision</span>
         <div>
           {decision ? <Link href="/os/decisions">{decision.title}</Link> : <span>Needs review</span>}
+        </div>
+      </div>
+
+      <div className="staffordObjectiveCapabilities">
+        <span>Lesson captured</span>
+        <div>
+          {learning.length ? (
+            learning.map((record) => (
+              <Link key={record.id} href="/os/learning">
+                {record.title}
+              </Link>
+            ))
+          ) : (
+            <span>No lesson recorded yet</span>
+          )}
         </div>
       </div>
 

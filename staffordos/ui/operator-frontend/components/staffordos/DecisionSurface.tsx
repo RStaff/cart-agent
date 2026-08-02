@@ -12,6 +12,7 @@ import {
   type StaffordOsDecision,
 } from "../../lib/staffordos/decisionRegistry";
 import { getEvidenceForDecision } from "../../lib/staffordos/evidenceFoundation";
+import { getLearningForDecision } from "../../lib/staffordos/learningFoundation";
 import { getObjectiveById } from "../../lib/staffordos/objectiveRegistry";
 import { getProofForDecision } from "../../lib/staffordos/proofFoundation";
 import {
@@ -23,6 +24,7 @@ import { useStaffordOsWorkspace } from "./WorkspaceContext";
 function DecisionCard({ decision }: { decision: StaffordOsDecision }) {
   const objective = getObjectiveById(decision.objectiveId);
   const evidence = getEvidenceForDecision(decision.id);
+  const learning = getLearningForDecision(decision.id);
   const proof = getProofForDecision(decision.id);
 
   return (
@@ -98,6 +100,21 @@ function DecisionCard({ decision }: { decision: StaffordOsDecision }) {
             ))
           ) : (
             <span>Not yet proven</span>
+          )}
+        </div>
+      </div>
+
+      <div className="staffordObjectiveCapabilities">
+        <span>What we have learned</span>
+        <div>
+          {learning.length ? (
+            learning.map((record) => (
+              <Link key={record.id} href="/os/learning">
+                {record.title}
+              </Link>
+            ))
+          ) : (
+            <span>No lesson recorded yet</span>
           )}
         </div>
       </div>

@@ -31,7 +31,7 @@ export type StaffordOsProofStatus =
 
 export type StaffordOsProofConfidence = "high" | "medium" | "low" | "needs_review";
 
-export type StaffordOsProofLearningStatus = "ready_for_learning" | "learning_not_connected" | "needs_review";
+export type StaffordOsProofLearningStatus = "lesson_recorded" | "ready_for_learning" | "learning_not_connected" | "needs_review";
 
 export type StaffordOsProof = {
   id: string;
@@ -104,6 +104,7 @@ export const PROOF_CONFIDENCE_LABELS: Record<StaffordOsProofConfidence, string> 
 };
 
 export const PROOF_LEARNING_LABELS: Record<StaffordOsProofLearningStatus, string> = {
+  lesson_recorded: "Lesson recorded",
   ready_for_learning: "Ready for future learning",
   learning_not_connected: "Learning not connected yet",
   needs_review: "Needs review",
@@ -135,7 +136,7 @@ export const STAFFORDOS_PROOF: StaffordOsProof[] = [
     privacyClassification: "Owner-private Stafford Media proof.",
     visibility: "Visible inside Stafford Media /os proof surfaces.",
     notes: "This proves route availability only. It does not prove that business work was completed.",
-    learningStatus: "learning_not_connected",
+    learningStatus: "lesson_recorded",
   },
   {
     id: "proof-people-to-contact-route-available",
@@ -162,7 +163,7 @@ export const STAFFORDOS_PROOF: StaffordOsProof[] = [
     privacyClassification: "Owner-private Stafford Media proof.",
     visibility: "Visible inside Stafford Media /os proof surfaces.",
     notes: "This proves page availability only. It does not prove outreach happened or that a lead advanced.",
-    learningStatus: "learning_not_connected",
+    learningStatus: "lesson_recorded",
   },
   {
     id: "proof-money-to-collect-route-available",
@@ -189,7 +190,7 @@ export const STAFFORDOS_PROOF: StaffordOsProof[] = [
     privacyClassification: "Owner-private Stafford Media proof.",
     visibility: "Visible inside Stafford Media /os proof surfaces.",
     notes: "This proves page availability only. It does not prove that payment was collected or revenue changed.",
-    learningStatus: "learning_not_connected",
+    learningStatus: "lesson_recorded",
   },
   {
     id: "proof-active-work-route-available",
@@ -216,7 +217,7 @@ export const STAFFORDOS_PROOF: StaffordOsProof[] = [
     privacyClassification: "Owner-private Stafford Media proof.",
     visibility: "Visible inside Stafford Media /os proof surfaces.",
     notes: "This proves page availability only. It does not prove delivery completion or customer proof.",
-    learningStatus: "learning_not_connected",
+    learningStatus: "lesson_recorded",
   },
   {
     id: "proof-current-goals-static-tests-passed",
@@ -243,7 +244,7 @@ export const STAFFORDOS_PROOF: StaffordOsProof[] = [
     privacyClassification: "Owner-private Stafford Media proof.",
     visibility: "Visible inside Stafford Media /os proof surfaces.",
     notes: "This proves the static objective foundation passed local validation. It does not prove any business objective is complete.",
-    learningStatus: "learning_not_connected",
+    learningStatus: "lesson_recorded",
   },
   {
     id: "proof-recent-decisions-static-tests-passed",
@@ -270,7 +271,7 @@ export const STAFFORDOS_PROOF: StaffordOsProof[] = [
     privacyClassification: "Owner-private Stafford Media proof.",
     visibility: "Visible inside Stafford Media /os proof surfaces.",
     notes: "This proves the static decision memory foundation passed local validation. It does not approve future decisions.",
-    learningStatus: "learning_not_connected",
+    learningStatus: "lesson_recorded",
   },
 ];
 

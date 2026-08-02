@@ -171,6 +171,14 @@ function StaffordMediaHome() {
       </section>
 
       <section className="staffordObjectiveNote">
+        <strong>Lessons captured</strong>
+        <p>Review narrow lessons from S008 proof. These do not change priorities or policy.</p>
+        <Link href="/os/learning" className="staffordHomeActionLink">
+          What We Have Learned
+        </Link>
+      </section>
+
+      <section className="staffordObjectiveNote">
         <strong>Decision memory</strong>
         <p>Review the architecture choices behind this operating surface before changing direction.</p>
         <Link href="/os/decisions" className="staffordHomeActionLink">

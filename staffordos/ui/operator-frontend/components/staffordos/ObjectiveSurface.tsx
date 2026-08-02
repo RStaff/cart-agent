@@ -13,6 +13,7 @@ import {
   OBJECTIVE_STATUS_LABELS,
   type StaffordOsObjective,
 } from "../../lib/staffordos/objectiveRegistry";
+import { getLearningForObjective } from "../../lib/staffordos/learningFoundation";
 import { getProofForObjective } from "../../lib/staffordos/proofFoundation";
 import {
   DEFAULT_STAFFORDOS_WORKSPACE_ID,
@@ -31,7 +32,8 @@ function capabilityForId(capabilityId: string) {
 function ObjectiveCard({ objective }: { objective: StaffordOsObjective }) {
   const capabilities = objective.relatedCapabilities
     .map((capabilityId) => capabilityForId(capabilityId))
-    .filter((capability): capability is StaffordOsCapability => Boolean(capability));
+      .filter((capability): capability is StaffordOsCapability => Boolean(capability));
+  const learning = getLearningForObjective(objective.id);
   const proof = getProofForObjective(objective.id);
 
   return (
@@ -92,6 +94,21 @@ function ObjectiveCard({ objective }: { objective: StaffordOsObjective }) {
             ))
           ) : (
             <span>Not yet proven</span>
+          )}
+        </div>
+      </div>
+
+      <div className="staffordObjectiveCapabilities">
+        <span>What we have learned</span>
+        <div>
+          {learning.length ? (
+            learning.map((record) => (
+              <Link key={record.id} href="/os/learning">
+                {record.title}
+              </Link>
+            ))
+          ) : (
+            <span>No lesson recorded yet</span>
           )}
         </div>
       </div>
