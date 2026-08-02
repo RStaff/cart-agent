@@ -4,6 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { STAFFORDOS_SECTIONS } from "../../lib/staffordos/workspaces";
+import { DEFAULT_STAFFORDOS_WORKSPACE_ID } from "../../lib/staffordos/workspaceRegistry";
+import { StaffordOsWorkspaceProvider, useStaffordOsWorkspace } from "./WorkspaceContext";
+import { WorkspaceSelector } from "./WorkspaceSelector";
 
 type StaffordOsShellProps = {
   children: ReactNode;
@@ -14,8 +17,11 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function StaffordOsShell({ children }: StaffordOsShellProps) {
+function StaffordOsShellFrame({ children }: StaffordOsShellProps) {
   const pathname = usePathname();
+  const { activeWorkspace } = useStaffordOsWorkspace();
+  const capabilityNavLabel =
+    activeWorkspace.id === DEFAULT_STAFFORDOS_WORKSPACE_ID ? "Map of current working pages" : "Planned capability overview";
 
   return (
     <div className="staffordOsShell">
@@ -24,6 +30,8 @@ export function StaffordOsShell({ children }: StaffordOsShellProps) {
           <span>StaffordOS</span>
           <strong>Operating System</strong>
         </div>
+
+        <WorkspaceSelector />
 
         <nav className="staffordOsNav" aria-label="StaffordOS workspaces">
           {STAFFORDOS_SECTIONS.map((section) => (
@@ -45,7 +53,7 @@ export function StaffordOsShell({ children }: StaffordOsShellProps) {
           aria-current={isActive(pathname, "/os/capabilities") ? "page" : undefined}
         >
           <span>What StaffordOS Can Do</span>
-          <small>Map of current working pages</small>
+          <small>{capabilityNavLabel}</small>
         </Link>
       </aside>
 
@@ -70,5 +78,13 @@ export function StaffordOsShell({ children }: StaffordOsShellProps) {
         <div className="staffordOsContent">{children}</div>
       </main>
     </div>
+  );
+}
+
+export function StaffordOsShell({ children }: StaffordOsShellProps) {
+  return (
+    <StaffordOsWorkspaceProvider>
+      <StaffordOsShellFrame>{children}</StaffordOsShellFrame>
+    </StaffordOsWorkspaceProvider>
   );
 }

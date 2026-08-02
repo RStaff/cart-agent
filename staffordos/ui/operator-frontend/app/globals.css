@@ -1873,6 +1873,75 @@ textarea {
   margin-top: 18px;
 }
 
+.staffordWorkspaceSelector {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 12px;
+  border: 1px solid rgba(245, 247, 249, 0.16);
+  border-radius: 8px;
+  background: #20242b;
+}
+
+.staffordWorkspaceSelectorHeader {
+  display: grid;
+  gap: 3px;
+}
+
+.staffordWorkspaceSelectorHeader span {
+  color: #90d8c5;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.staffordWorkspaceSelectorHeader strong {
+  color: #ffffff;
+  font-size: 16px;
+}
+
+.staffordWorkspaceChoices {
+  display: grid;
+  gap: 6px;
+}
+
+.staffordWorkspaceChoice {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid rgba(245, 247, 249, 0.14);
+  border-radius: 8px;
+  background: rgba(21, 24, 29, 0.72);
+  color: #dfe5ea;
+  cursor: pointer;
+  text-align: left;
+}
+
+.staffordWorkspaceChoice:hover,
+.staffordWorkspaceChoiceActive {
+  border-color: #90d8c5;
+  background: #26342f;
+  color: #ffffff;
+}
+
+.staffordWorkspaceChoice span {
+  font-weight: 800;
+}
+
+.staffordWorkspaceChoice small {
+  color: #aeb8c2;
+  font-size: 12px;
+}
+
+.staffordWorkspaceSelector p {
+  margin: 0;
+  color: #cbd4dd;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 .staffordOsNavItem {
   display: grid;
   gap: 4px;
@@ -2133,6 +2202,63 @@ textarea {
   gap: 10px;
 }
 
+.staffordPlannedWorkspace {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid #cbd4dd;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.staffordPlannedWorkspace h2 {
+  margin: 4px 0 0;
+  color: #15181d;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.staffordPlannedWorkspace p {
+  margin: 8px 0 0;
+  max-width: 680px;
+  color: #4f5a66;
+  line-height: 1.5;
+}
+
+.staffordPlannedList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.staffordPlannedList span {
+  padding: 7px 10px;
+  border: 1px solid #cbd4dd;
+  border-radius: 999px;
+  background: #f5f7f9;
+  color: #15181d;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.staffordReturnWorkspace {
+  justify-self: start;
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 1px solid #23695d;
+  border-radius: 8px;
+  background: #23695d;
+  color: #ffffff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.staffordReturnWorkspace:hover {
+  background: #195248;
+}
+
 .staffordCapabilityPage {
   display: grid;
   gap: 18px;
@@ -2297,6 +2423,12 @@ textarea {
   gap: 10px;
   align-items: center;
   margin-top: auto;
+}
+
+.staffordCapabilityEmpty {
+  margin: 0;
+  color: #4f5a66;
+  line-height: 1.5;
 }
 
 @media (max-width: 1020px) {

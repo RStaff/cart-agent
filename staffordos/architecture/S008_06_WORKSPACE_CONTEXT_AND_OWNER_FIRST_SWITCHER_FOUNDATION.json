@@ -1,0 +1,332 @@
+{
+  "schema": "staffordos.architecture.s008_06_workspace_context_and_owner_first_switcher_foundation.v1",
+  "mission": "S008_06_WORKSPACE_CONTEXT_AND_OWNER_FIRST_SWITCHER_FOUNDATION",
+  "classification": "WORKSPACE_CONTEXT_READY_FOR_LOCAL_COMMIT",
+  "mission_boundary": {
+    "type": "narrow_local_os_presentation_foundation",
+    "deployment_changed": false,
+    "push_performed": false,
+    "production_changed": false,
+    "authentication_changed": false,
+    "oauth_changed": false,
+    "kms_changed": false,
+    "jwt_issuer_changed": false,
+    "stripe_changed": false,
+    "shopifixer_runtime_changed": false,
+    "abando_runtime_changed": false,
+    "database_changed": false,
+    "prisma_schema_changed": false,
+    "migration_changed": false,
+    "api_changed": false,
+    "operator_behavior_changed": false,
+    "real_authorization_implemented": false,
+    "membership_implemented": false,
+    "invited_users_implemented": false,
+    "cross_workspace_data_implemented": false
+  },
+  "checkpoint_authority": {
+    "branch_at_discovery": "main",
+    "head_at_discovery": "e386645f2d2c0aa625c2bec11edfd3b6c5c92f6a",
+    "required_commits_present": [
+      {
+        "name": "S008 foundation, reconciliation, and language",
+        "commit": "7d661d1cea4e447e855dfec59e80d6b8feb44bad",
+        "status": "present"
+      },
+      {
+        "name": "S008 capability map",
+        "commit": "4503ebb5a15484384d5dbb463dcdce551c3e9293",
+        "status": "present"
+      },
+      {
+        "name": "S008 multi-workspace architecture",
+        "commit": "cd0757caacaf8d7c1523bc2bea63e0b715da9561",
+        "status": "present"
+      },
+      {
+        "name": "S008 unified action and decision model",
+        "commit": "e386645f2d2c0aa625c2bec11edfd3b6c5c92f6a",
+        "status": "present_current_head_at_discovery"
+      }
+    ],
+    "unrelated_worktree_changes_excluded": true
+  },
+  "existing_workspace_model_discovery": {
+    "existing_section_registry": "staffordos/ui/operator-frontend/lib/staffordos/workspaces.ts",
+    "existing_capability_registry": "staffordos/ui/operator-frontend/lib/staffordos/capabilities.ts",
+    "architecture_sources": [
+      "staffordos/architecture/S008_02_STAFFORDOS_OPERATOR_LANGUAGE_STANDARD.md",
+      "staffordos/architecture/S008_03_OS_CAPABILITY_LINK_MAP.md",
+      "staffordos/architecture/S008_04_MULTI_WORKSPACE_PLATFORM_AND_DECISION_MODEL_ARCHITECTURE.md",
+      "staffordos/architecture/S008_05_UNIFIED_ACTION_AND_DECISION_MODEL.md"
+    ],
+    "operator_identity_concepts_found": [
+      "StaffordosOperator",
+      "StaffordosOperatorRole",
+      "StaffordosOperatorSession",
+      "StaffordosOperatorEvent",
+      "requireAuthenticatedOperator",
+      "canOperator",
+      "requireOperatorPermission"
+    ],
+    "existing_canonical_workspace_runtime_model": "not_found",
+    "authority_decision": "Create a small read-only /os presentation context rather than a competing authorization model."
+  },
+  "workspace_registry": {
+    "file": "staffordos/ui/operator-frontend/lib/staffordos/workspaceRegistry.ts",
+    "default_workspace_id": "stafford-media",
+    "availability_labels": {
+      "available_now": "Available now",
+      "planned": "Planned",
+      "needs_review": "Needs review"
+    },
+    "workspaces": [
+      {
+        "id": "stafford-media",
+        "name": "Stafford Media",
+        "family": "business",
+        "availability": "available_now",
+        "authority_status": "Current operating workspace.",
+        "privacy": "Owner-private unless Business access is explicitly granted later.",
+        "current_capabilities": 9
+      },
+      {
+        "id": "professional",
+        "name": "Professional",
+        "family": "professional",
+        "availability": "planned",
+        "authority_status": "Architecture defined; no runtime workflow yet.",
+        "privacy": "Owner-private.",
+        "planned_modes": [
+          "Job Search",
+          "My Job"
+        ]
+      },
+      {
+        "id": "personal",
+        "name": "Personal",
+        "family": "personal",
+        "availability": "planned",
+        "authority_status": "Architecture defined; no runtime workflow yet.",
+        "privacy": "Owner-private by default.",
+        "future_capability_groups": [
+          "private planning",
+          "learning",
+          "family",
+          "media",
+          "creation",
+          "memories",
+          "governed learner access"
+        ]
+      }
+    ]
+  },
+  "workspace_context_contract": {
+    "file": "staffordos/ui/operator-frontend/components/staffordos/WorkspaceContext.tsx",
+    "exposes": [
+      "activeWorkspaceId",
+      "activeWorkspace",
+      "availableWorkspaces",
+      "setActiveWorkspace"
+    ],
+    "default_active_workspace": "stafford-media",
+    "state_mechanism": "React useState",
+    "persists_selection": false,
+    "uses_url_state": false,
+    "uses_cookies": false,
+    "uses_local_storage": false,
+    "uses_session_storage": false,
+    "uses_backend": false,
+    "uses_authentication": false,
+    "explicit_warning": "This context controls the current /os presentation only. It is not an authorization boundary."
+  },
+  "owner_first_workspace_selector": {
+    "file": "staffordos/ui/operator-frontend/components/staffordos/WorkspaceSelector.tsx",
+    "integrated_in": "staffordos/ui/operator-frontend/components/staffordos/StaffordOsShell.tsx",
+    "visible_choices": [
+      "Stafford Media - Available now",
+      "Professional - Planned",
+      "Personal - Planned"
+    ],
+    "planned_state_message": "This workspace is planned. Stafford Media is the part of StaffordOS you can use today.",
+    "creates_accounts": false,
+    "creates_memberships": false,
+    "creates_permissions": false,
+    "creates_sessions": false
+  },
+  "workspace_aware_home": {
+    "stafford_media": [
+      "Default workspace.",
+      "Preserves existing foundation behavior.",
+      "Shows current capability links."
+    ],
+    "professional": [
+      "Shows planned overview only.",
+      "Mentions Job Search and My Job as future modes.",
+      "Does not render fake jobs, applications, employer data, accomplishments, or /operator links."
+    ],
+    "personal": [
+      "Shows planned overview only.",
+      "Mentions private planning, learning, family, media, creation, memories, and governed learner access.",
+      "Does not render fake family members, media, memories, shared projects, or /operator links."
+    ]
+  },
+  "workspace_aware_capability_map": {
+    "registry_file": "staffordos/ui/operator-frontend/lib/staffordos/capabilities.ts",
+    "source_types": [
+      "repository_backed",
+      "planned_architecture"
+    ],
+    "stafford_media_operator_routes": [
+      "/operator",
+      "/operator/cockpit",
+      "/operator/leads",
+      "/operator/campaigns",
+      "/operator/revenue-command",
+      "/operator/command-center",
+      "/operator/execution-log",
+      "/operator/system-map",
+      "/operator/slice-truth"
+    ],
+    "professional_operator_routes": [],
+    "personal_operator_routes": [],
+    "planned_route_value": null
+  },
+  "boundary_safety_results": {
+    "stafford_media_safe_default": true,
+    "exact_initial_workspaces": true,
+    "stafford_media_available_now": true,
+    "professional_planned": true,
+    "personal_planned": true,
+    "stafford_media_capabilities_only_under_stafford_media": true,
+    "professional_exposes_operator_links": false,
+    "personal_exposes_operator_links": false,
+    "workspace_selection_changes_presentation_only": true,
+    "planned_workspaces_import_operator_loaders": false,
+    "planned_workspaces_call_apis": false,
+    "planned_workspaces_create_actions": false,
+    "selection_changes_real_authorization": false,
+    "placeholder_workspace_loads_real_data": false,
+    "operator_routes_modified": false
+  },
+  "focused_tests": {
+    "file": "staffordos/ui/operator-frontend/lib/staffordos/workspaceRegistry.test.mjs",
+    "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/workspaceRegistry.test.mjs",
+    "tests": 8,
+    "passing": 8,
+    "failing": 0,
+    "result": "passed"
+  },
+  "operator_language_review": {
+    "approved_visible_terms": [
+      "Current workspace",
+      "Stafford Media",
+      "Professional",
+      "Personal",
+      "Available now",
+      "Planned",
+      "What StaffordOS Can Help With",
+      "Return to Stafford Media",
+      "Planned for later"
+    ],
+    "avoided_primary_terms": [
+      "tenant",
+      "namespace",
+      "context ID",
+      "scope resolver",
+      "active principal",
+      "unauthorized",
+      "unimplemented module"
+    ]
+  },
+  "validation": {
+    "focused_tests": "passed_8_passing_0_failing",
+    "build": {
+      "command": "npm run build",
+      "working_directory": "staffordos/ui/operator-frontend",
+      "result": "passed_exit_code_0",
+      "notes": [
+        "Preexisting non-fatal Turbopack trace warning emitted.",
+        "Known /operator/shopifixer-pilot server-component serialization messages emitted.",
+        "Build finalized successfully."
+      ]
+    },
+    "route_checks": {
+      "/os": 200,
+      "/os/capabilities": 200,
+      "/os/command": 200,
+      "/os/system": 200,
+      "/operator": 200,
+      "/operator/leads": 200,
+      "/operator/campaigns": 200,
+      "/operator/revenue-command": 200,
+      "/operator/command-center": 200
+    },
+    "jq": "passed",
+    "git_diff_check": "passed"
+  },
+  "files_changed": {
+    "application": [
+      "staffordos/ui/operator-frontend/lib/staffordos/workspaceRegistry.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/capabilities.ts",
+      "staffordos/ui/operator-frontend/components/staffordos/WorkspaceContext.tsx",
+      "staffordos/ui/operator-frontend/components/staffordos/WorkspaceSelector.tsx",
+      "staffordos/ui/operator-frontend/components/staffordos/StaffordOsShell.tsx",
+      "staffordos/ui/operator-frontend/components/staffordos/WorkspacePage.tsx",
+      "staffordos/ui/operator-frontend/components/staffordos/CapabilityLinkPanel.tsx",
+      "staffordos/ui/operator-frontend/app/os/capabilities/page.tsx",
+      "staffordos/ui/operator-frontend/app/globals.css"
+    ],
+    "tests": [
+      "staffordos/ui/operator-frontend/lib/staffordos/workspaceRegistry.test.mjs"
+    ],
+    "documentation": [
+      "staffordos/architecture/S008_06_WORKSPACE_CONTEXT_AND_OWNER_FIRST_SWITCHER_FOUNDATION.md",
+      "staffordos/architecture/S008_06_WORKSPACE_CONTEXT_AND_OWNER_FIRST_SWITCHER_FOUNDATION.json"
+    ]
+  },
+  "known_limitations": [
+    "Presentation state only, not real workspace authorization.",
+    "No invited-member model exists.",
+    "No server-side workspace context exists.",
+    "No Professional workflow exists.",
+    "No Personal, Family, Media, or learner workflow exists.",
+    "No cross-workspace search, notification, memory, or agent policy runtime exists.",
+    "The selector does not persist selection after refresh."
+  ],
+  "rollback": [
+    "Revert the S008.06 commit after it is created.",
+    "No database rollback is required.",
+    "No authentication rollback is required.",
+    "No Stripe rollback is required.",
+    "No ShopiFixer rollback is required.",
+    "No Abando rollback is required.",
+    "No production rollback is required."
+  ],
+  "non_impact_confirmation": {
+    "deployment": false,
+    "push": false,
+    "production": false,
+    "authentication": false,
+    "oauth": false,
+    "kms": false,
+    "jwt_issuer": false,
+    "stripe": false,
+    "shopifixer_runtime": false,
+    "abando_runtime": false,
+    "database": false,
+    "prisma_schema": false,
+    "migration": false,
+    "api": false,
+    "workflow": false,
+    "operator_bootstrap": false,
+    "packet_action": false,
+    "execution_grant": false,
+    "queueing": false,
+    "shopify_mutation": false,
+    "payment_change": false,
+    "webhook_change": false,
+    "customer_contact": false,
+    "external_service_mutation": false
+  }
+}
