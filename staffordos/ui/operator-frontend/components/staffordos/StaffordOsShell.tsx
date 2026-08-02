@@ -82,6 +82,15 @@ function StaffordOsShellFrame({ children }: StaffordOsShellProps) {
           <span>What Has Been Proven</span>
           <small>Outcome verification</small>
         </Link>
+
+        <Link
+          href="/os/chief-of-staff"
+          className={`staffordOsCapabilityNav${isActive(pathname, "/os/chief-of-staff") ? " staffordOsCapabilityNavActive" : ""}`}
+          aria-current={isActive(pathname, "/os/chief-of-staff") ? "page" : undefined}
+        >
+          <span>Chief of Staff</span>
+          <small>Validated read-only demo</small>
+        </Link>
       </aside>
 
       <main className="staffordOsMain">

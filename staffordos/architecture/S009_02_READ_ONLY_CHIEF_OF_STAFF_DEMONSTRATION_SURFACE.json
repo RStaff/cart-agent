@@ -1,0 +1,300 @@
+{
+  "mission": "S009_02_READ_ONLY_CHIEF_OF_STAFF_DEMONSTRATION_SURFACE",
+  "status": "READY_FOR_LOCAL_COMMIT",
+  "checkpointAuthority": {
+    "verifiedHeadAtDiscovery": "99e8cdde8ffd33751840d1adcf8c4993b0fb8758",
+    "branch": "main",
+    "canonicalAuthoritiesVerified": [
+      "staffordos/architecture/STAFFORDOS_ARCHITECTURE_V1.md",
+      "staffordos/architecture/S009_00_READ_ONLY_CHIEF_OF_STAFF_CONTRACT.md",
+      "staffordos/architecture/S009_01_STATIC_FIXTURE_AND_DETERMINISTIC_RESPONSE_VALIDATOR.md",
+      "staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffValidator.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffValidator.test.mjs",
+      "staffordos/ui/operator-frontend/lib/staffordos/workspaceRegistry.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/capabilities.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/objectiveRegistry.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/decisionRegistry.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/actionRegistry.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/evidenceFoundation.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/proofFoundation.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/learningFoundation.ts"
+    ],
+    "canonicalDemoAlreadyExisted": false
+  },
+  "workingTreeExclusions": {
+    "excludedCategories": [
+      "S007_IDENTITY_OR_ISSUER",
+      "RUNTIME_OR_DAEMON",
+      "WEB_OR_PRISMA",
+      "GENERATED",
+      "MISSION_EVIDENCE",
+      "PREEXISTING_UNRELATED",
+      "UNKNOWN_REQUIRES_REVIEW"
+    ],
+    "authorizedFiles": [
+      "staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffDemo.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffDemo.test.mjs",
+      "staffordos/ui/operator-frontend/components/staffordos/ChiefOfStaffDemoSurface.tsx",
+      "staffordos/ui/operator-frontend/app/os/chief-of-staff/page.tsx",
+      "staffordos/ui/operator-frontend/components/staffordos/StaffordOsShell.tsx",
+      "staffordos/ui/operator-frontend/components/staffordos/UnifiedHome.tsx",
+      "staffordos/architecture/S009_02_READ_ONLY_CHIEF_OF_STAFF_DEMONSTRATION_SURFACE.md",
+      "staffordos/architecture/S009_02_READ_ONLY_CHIEF_OF_STAFF_DEMONSTRATION_SURFACE.json"
+    ]
+  },
+  "existingSurfaceDiscovery": {
+    "chiefOfStaffSurfaceFound": false,
+    "existingShellReused": true,
+    "newShellCreated": false,
+    "runtimeAiFound": false,
+    "promptOrProviderPathFound": false,
+    "decision": "Add one isolated /os/chief-of-staff read-only surface using S009.01 validator fixtures."
+  },
+  "demonstrationData": {
+    "file": "staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffDemo.ts",
+    "exports": [
+      "governed static Stafford Media request",
+      "authorized Stafford Media sources",
+      "valid structured Chief of Staff response",
+      "blocked demonstration responses",
+      "validator results",
+      "operator-safe validation reports",
+      "planned-only Professional presentation",
+      "planned-only Personal presentation"
+    ],
+    "question": "What deserves my attention, and why?",
+    "staffordMediaOnly": true,
+    "professionalAndPersonal": "planned-only",
+    "noInventedData": [
+      "customers",
+      "revenue",
+      "deadlines",
+      "live counts",
+      "production health",
+      "payments",
+      "jobs",
+      "employer data",
+      "family data",
+      "personal data",
+      "numeric confidence"
+    ]
+  },
+  "validatedResponseGate": {
+    "validator": "validateChiefOfStaffResponse",
+    "validResponseTrustedOnlyWhenValidatorValid": true,
+    "invalidResponsesTrusted": false,
+    "hardcodedTrustedBypass": false,
+    "formattedBy": "formatChiefOfStaffValidationReport"
+  },
+  "trustedResponsePresentation": {
+    "route": "/os/chief-of-staff",
+    "title": "Chief of Staff",
+    "sections": [
+      "What deserves attention",
+      "Why it matters",
+      "What we know",
+      "What is uncertain or not connected",
+      "Suggested next step",
+      "Authority or review needed",
+      "What success would prove",
+      "Sources"
+    ],
+    "claimsShown": [
+      "Start My Day is the current static primary Stafford Media Action.",
+      "It supports Run the business from one clear loop.",
+      "The current guidance is static and not dynamically ranked.",
+      "Live business data and AI recommendations are not connected.",
+      "The candidate remains ready for operator review."
+    ],
+    "falseClaimsAvoided": [
+      "urgency",
+      "dynamic prioritization",
+      "current customer work",
+      "current revenue",
+      "live production state",
+      "autonomous AI reasoning",
+      "approval",
+      "execution",
+      "verification",
+      "real authentication"
+    ]
+  },
+  "sourceTracePresentation": {
+    "fieldsShown": [
+      "title",
+      "source type",
+      "authority",
+      "freshness",
+      "limitation",
+      "exact source reference"
+    ],
+    "technicalDetailsSecondary": true,
+    "everyVisibleMaterialClaimHasDisplayedSource": true
+  },
+  "trustAndLimitationsPanel": {
+    "currentStatus": [
+      "Response passed StaffordOS validation.",
+      "Static Stafford Media sources only.",
+      "Informational and candidate guidance only.",
+      "Operator review required."
+    ],
+    "notConnected": [
+      "live ranking",
+      "live Objectives",
+      "runtime Actions",
+      "production data",
+      "Professional data",
+      "Personal data",
+      "external AI",
+      "execution authority",
+      "approval authority",
+      "verification authority"
+    ],
+    "authorizationGuaranteeClaimed": false
+  },
+  "blockedResponseExamples": [
+    "unsourced claim",
+    "cross-workspace source",
+    "approval claim",
+    "unsupported numeric value"
+  ],
+  "safeUnknownDemonstration": {
+    "statement": "I cannot verify that from the current StaffordOS sources.",
+    "freeFormQuestionBoxAdded": false
+  },
+  "workspaceBehavior": {
+    "staffordMedia": "Shows static validated demonstration and blocked examples.",
+    "professional": "Planned-state guidance only; no Stafford Media response or source IDs.",
+    "personal": "Planned-state guidance only; no Stafford Media response or source IDs.",
+    "workspaceContextAuthorization": false
+  },
+  "homeAndNavigationIntegration": {
+    "homeLink": "Open Chief of Staff",
+    "shellLink": "Chief of Staff",
+    "primaryStartMyDayChanged": false,
+    "navigationRedesigned": false
+  },
+  "determinism": {
+    "staticRequest": true,
+    "staticSources": true,
+    "staticResponse": true,
+    "staticTimestampOnly": true,
+    "usesDateNow": false,
+    "usesRandomIds": false,
+    "usesBrowserStorageAsAuthority": false,
+    "usesNetworkState": false,
+    "usesEnvironmentDerivedResponseContent": false
+  },
+  "tests": {
+    "s00902Focused": {
+      "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffDemo.test.mjs",
+      "passed": 18,
+      "failed": 0
+    },
+    "s00901Regression": {
+      "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffValidator.test.mjs",
+      "passed": 37,
+      "failed": 0
+    },
+    "s008Regression": {
+      "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/workspaceRegistry.test.mjs staffordos/ui/operator-frontend/lib/staffordos/homePresentation.test.mjs staffordos/ui/operator-frontend/lib/staffordos/objectiveRegistry.test.mjs staffordos/ui/operator-frontend/lib/staffordos/decisionRegistry.test.mjs staffordos/ui/operator-frontend/lib/staffordos/actionRegistry.test.mjs staffordos/ui/operator-frontend/lib/staffordos/evidenceFoundation.test.mjs staffordos/ui/operator-frontend/lib/staffordos/proofFoundation.test.mjs staffordos/ui/operator-frontend/lib/staffordos/learningFoundation.test.mjs",
+      "passed": 127,
+      "failed": 0
+    }
+  },
+  "build": {
+    "command": "npm run build",
+    "workingDirectory": "staffordos/ui/operator-frontend",
+    "passed": true,
+    "notes": [
+      "Existing Turbopack/NFT warning appeared.",
+      "Existing /operator/shopifixer-pilot static-generation warnings appeared.",
+      "Build exited 0."
+    ]
+  },
+  "routeResults": [
+    {"route": "/os", "status": 200},
+    {"route": "/os/chief-of-staff", "status": 200},
+    {"route": "/os/actions", "status": 200},
+    {"route": "/os/objectives", "status": 200},
+    {"route": "/os/decisions", "status": 200},
+    {"route": "/os/evidence", "status": 200},
+    {"route": "/os/proof", "status": 200},
+    {"route": "/os/learning", "status": 200},
+    {"route": "/os/knowledge", "status": 200},
+    {"route": "/os/capabilities", "status": 200},
+    {"route": "/operator", "status": 200}
+  ],
+  "boundarySafety": {
+    "llmImplemented": false,
+    "aiProviderSdkAdded": false,
+    "chatInputAdded": false,
+    "freeFormPromptInputAdded": false,
+    "runtimePromptAdded": false,
+    "networkCallExists": false,
+    "apiCallExists": false,
+    "databaseAccessExists": false,
+    "persistenceExists": false,
+    "retrievalEmbeddingsVectorQueueOrchestrationExists": false,
+    "operatorLoaderImported": false,
+    "realAuthenticationClaim": false,
+    "productionDataRead": false,
+    "professionalOrPersonalDataRead": false,
+    "invalidResponseCanEnterTrustedDisplay": false,
+    "trustedRecommendationCanBeApprovedExecutingOrCompleted": false,
+    "approvalExecutionCompletionVerifyRegenerateOrSubmitControl": false,
+    "operatorBehaviorChanged": false
+  },
+  "filesChanged": {
+    "added": [
+      "staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffDemo.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffDemo.test.mjs",
+      "staffordos/ui/operator-frontend/components/staffordos/ChiefOfStaffDemoSurface.tsx",
+      "staffordos/ui/operator-frontend/app/os/chief-of-staff/page.tsx",
+      "staffordos/architecture/S009_02_READ_ONLY_CHIEF_OF_STAFF_DEMONSTRATION_SURFACE.md",
+      "staffordos/architecture/S009_02_READ_ONLY_CHIEF_OF_STAFF_DEMONSTRATION_SURFACE.json"
+    ],
+    "modified": [
+      "staffordos/ui/operator-frontend/components/staffordos/StaffordOsShell.tsx",
+      "staffordos/ui/operator-frontend/components/staffordos/UnifiedHome.tsx"
+    ]
+  },
+  "knownLimitations": [
+    "No response generation exists.",
+    "No LLM or provider integration exists.",
+    "No chat surface exists.",
+    "No runtime identity enforcement exists.",
+    "No runtime source adapters exist.",
+    "No persistence, retrieval, embeddings, vector search, API, queue, or orchestration exists.",
+    "Professional and Personal remain planned-only.",
+    "The demo proves deterministic validation and presentation only."
+  ],
+  "recommendedNextMission": {
+    "mission": "S009_03_PROVIDER_NEUTRAL_MODEL_ADAPTER_INTERFACE",
+    "scope": "Define a provider-neutral adapter interface only. Keep adapters inert and unconfigured. Require deterministic validator gating before any output can be trusted.",
+    "exclusions": [
+      "provider calls",
+      "secrets",
+      "runtime prompts",
+      "chat",
+      "retrieval",
+      "persistence",
+      "execution",
+      "approval",
+      "/operator behavior change"
+    ]
+  },
+  "rollback": "git revert <S009.02 commit SHA>",
+  "nonImpact": [
+    "no deployment",
+    "no push",
+    "no production change",
+    "no /operator behavior change",
+    "no ShopiFixer runtime change",
+    "no Abando runtime change",
+    "no authentication change",
+    "no OAuth, KMS, JWT, or issuer change",
+    "no Stripe change",
+    "no database, Prisma, migration, queue, packet, API, or execution workflow change"
+  ]
+}

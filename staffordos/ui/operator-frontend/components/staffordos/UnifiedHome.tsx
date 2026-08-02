@@ -186,6 +186,14 @@ function StaffordMediaHome() {
         </Link>
       </section>
 
+      <section className="staffordObjectiveNote">
+        <strong>Chief of Staff demonstration</strong>
+        <p>See how a read-only answer is checked against StaffordOS sources before it can be trusted.</p>
+        <Link href="/os/chief-of-staff" className="staffordHomeActionLink">
+          Open Chief of Staff
+        </Link>
+      </section>
+
       <section className="staffordHomeTransparency" aria-label="What is real today">
         <StatusNote label="Available now">{presentation.evidenceNote}</StatusNote>
         <StatusNote label="Not connected yet">{presentation.limitationNote}</StatusNote>
