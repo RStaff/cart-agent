@@ -1,0 +1,709 @@
+{
+  "mission": "S009_04A_LOCAL_MODEL_RUNTIME_SELECTION_AND_INSTALLATION_PLAN",
+  "mission_type": "read_only_machine_and_repository_discovery_model_runtime_selection_isolation_design_installation_planning_documentation_validation_and_optional_local_documentation_commit",
+  "status": "LOCAL_MODEL_PLAN_READY_FOR_LOCAL_COMMIT",
+  "checkpoint_authority": {
+    "starting_head_verified": "fc9cd1889d84fc729886bbb5bd8825032c7cd972",
+    "branch_observed": "main",
+    "s009_04_implementation_or_commit_exists": false,
+    "required_authorities_verified": [
+      "staffordos/architecture/STAFFORDOS_ARCHITECTURE_V1.md",
+      "staffordos/architecture/S009_00_READ_ONLY_CHIEF_OF_STAFF_CONTRACT.md",
+      "staffordos/architecture/S009_01_STATIC_FIXTURE_AND_DETERMINISTIC_RESPONSE_VALIDATOR.md",
+      "staffordos/architecture/S009_02_READ_ONLY_CHIEF_OF_STAFF_DEMONSTRATION_SURFACE.md",
+      "staffordos/architecture/S009_03_PROVIDER_NEUTRAL_MODEL_ADAPTER_INTERFACE.md"
+    ],
+    "certified_baseline": [
+      "S009.04 stopped because no authorized model path existed.",
+      "No model call occurred.",
+      "No model runtime was installed or started.",
+      "No local model identity was proven.",
+      "No sandbox boundary was established.",
+      "Static Stafford Media fixtures remain the only authorized model-proof input.",
+      "Adapter output remains untrusted until structural and StaffordOS validation pass.",
+      "Professional and Personal remain Planned.",
+      "No production, customer, merchant, family, employer, or personal data is authorized."
+    ]
+  },
+  "working_tree_exclusions": {
+    "preexisting_unrelated_changes_present": true,
+    "excluded_categories": [
+      "S007 identity or issuer artifacts",
+      "runtime and daemon outputs",
+      "web, Prisma, and migration work",
+      "generated frontend files",
+      "ShopiFixer, production, recovery, reconciliation, and mission-evidence artifacts",
+      "unknown unrelated files requiring separate review"
+    ],
+    "authorized_files_only": [
+      "staffordos/architecture/S009_04A_LOCAL_MODEL_RUNTIME_SELECTION_AND_INSTALLATION_PLAN.md",
+      "staffordos/architecture/S009_04A_LOCAL_MODEL_RUNTIME_SELECTION_AND_INSTALLATION_PLAN.json"
+    ],
+    "excluded_from_touch_stage_format_commit": true
+  },
+  "machine_authority": {
+    "operating_system": "macOS 26.5.1 build 25F80",
+    "architecture": "arm64",
+    "machine": "MacBook Pro",
+    "model_identifier": "Mac14,9",
+    "chip": "Apple M2 Pro",
+    "cpu": "10 cores, 6 performance and 4 efficiency",
+    "physical_memory": "16 GB",
+    "disk": {
+      "root_total": "about 460 GiB",
+      "root_free": "about 87 GiB"
+    },
+    "tooling_present": {
+      "homebrew": "5.1.10 at /opt/homebrew/bin/brew",
+      "node": "20.19.5 through Volta",
+      "npm": "10.8.2",
+      "python": "3.9.6",
+      "pip": "21.2.4",
+      "docker_cli": "28.2.2",
+      "git": "present",
+      "rosetta_package": "present"
+    },
+    "docker_daemon": "unavailable during inspection",
+    "secret_related_environment_variable_names_present_values_not_read": [
+      "OPENAI_API_KEY",
+      "CF_API_TOKEN",
+      "DATABASE_URL",
+      "GMAIL_APP_PASSWORD",
+      "SERPER_API_KEY"
+    ],
+    "model_relevant_local_listeners_detected": false,
+    "common_model_cache_directories_detected": false,
+    "capacity_classification": "LOCAL_MODEL_CAPABLE_WITH_SMALL_MODEL",
+    "capacity_reason": "The Mac has Apple Silicon, 16 GB RAM, and about 87 GiB free disk, which is enough for a small local model proof but not a prudent basis for 7B+ models or long-context runs at this stage."
+  },
+  "resource_and_disk_safety": {
+    "maximum_model_download_size": "2 GB",
+    "maximum_total_installed_footprint": "5 GB",
+    "minimum_free_disk_after_install": "70 GiB",
+    "expected_ram_use": "small-model class, target under 6 GB during proof",
+    "expected_context_size": "4096 tokens",
+    "maximum_proof_attempts": 2,
+    "maximum_process_duration": "20 minutes total for proof activity",
+    "maximum_concurrent_model_requests": 1,
+    "maximum_loaded_models": 1,
+    "stability_classification": "resource-safe only for a small bounded model proof"
+  },
+  "existing_runtime_inventory": [
+    {
+      "runtime": "Ollama",
+      "installed": false,
+      "command_path": null,
+      "listening_address": null,
+      "model_cache_detected": false,
+      "suitability": "not installed; suitable to install"
+    },
+    {
+      "runtime": "llama.cpp CLI/server",
+      "installed": false,
+      "command_path": null,
+      "listening_address": null,
+      "model_cache_detected": false,
+      "suitability": "not installed; viable but more operational work"
+    },
+    {
+      "runtime": "LM Studio",
+      "installed": false,
+      "command_path": null,
+      "listening_address": null,
+      "model_cache_detected": false,
+      "suitability": "not installed; not recommended for this proof"
+    },
+    {
+      "runtime": "MLX / mlx-lm",
+      "installed": false,
+      "command_path": null,
+      "listening_address": null,
+      "model_cache_detected": false,
+      "suitability": "not recommended for first proof"
+    },
+    {
+      "runtime": "vLLM",
+      "installed": false,
+      "command_path": null,
+      "listening_address": null,
+      "model_cache_detected": false,
+      "suitability": "incompatible for this machine proof"
+    },
+    {
+      "runtime": "GPT4All",
+      "installed": false,
+      "command_path": null,
+      "listening_address": null,
+      "model_cache_detected": false,
+      "suitability": "insufficient evidence"
+    },
+    {
+      "runtime": "Jan",
+      "installed": false,
+      "command_path": null,
+      "listening_address": null,
+      "model_cache_detected": false,
+      "suitability": "insufficient evidence"
+    },
+    {
+      "runtime": "LocalAI",
+      "installed": false,
+      "command_path": null,
+      "listening_address": null,
+      "model_cache_detected": false,
+      "suitability": "not recommended"
+    }
+  ],
+  "ross_llm_observation": {
+    "present_locally": true,
+    "used_as_s009_04_path": false,
+    "reason_not_selected": "The local ross-llm evidence shows chat, retrieval, pgvector, embeddings, Docker services, env-file configuration, and memory directories, which are outside the authorized S009.04 proof boundary."
+  },
+  "runtime_candidate_comparison": [
+    {
+      "runtime": "Ollama",
+      "classification": "RECOMMENDED",
+      "fit": [
+        "Apple Silicon compatible",
+        "local default API",
+        "structured JSON output support",
+        "clear model cache location",
+        "Homebrew installation path",
+        "foreground localhost server suitable for one bounded proof"
+      ],
+      "constraints": [
+        "installation and model pull require external network",
+        "cloud features must be disabled for proof",
+        "localhost binding must be verified"
+      ]
+    },
+    {
+      "runtime": "llama.cpp",
+      "classification": "VIABLE",
+      "fit": [
+        "strong local control",
+        "localhost server default",
+        "schema or grammar constrained output possible"
+      ],
+      "constraints": [
+        "manual binary or build path",
+        "manual GGUF model sourcing",
+        "more operator steps and misconfiguration risk"
+      ]
+    },
+    {
+      "runtime": "LM Studio",
+      "classification": "NOT_RECOMMENDED",
+      "fit": [
+        "Apple Silicon compatible",
+        "local server and structured output support"
+      ],
+      "constraints": [
+        "GUI and model manager broaden surface",
+        "chat, MCP/tool, documents, RAG, and logs require more exclusion work",
+        "less narrow than Ollama for this proof"
+      ]
+    }
+  ],
+  "selected_runtime": {
+    "runtime": "Ollama",
+    "classification": "RECOMMENDED",
+    "installation_path": "brew install ollama",
+    "execution_style": "foreground CLI server only",
+    "planned_bind_address": "127.0.0.1:11434",
+    "cloud_setting": "OLLAMA_NO_CLOUD=1 for the proof process or disable_ollama_cloud in ~/.ollama/server.json",
+    "reason_selected": "Ollama provides the smallest operational surface that satisfies local-only execution, structured JSON output, Apple Silicon compatibility, clear model cache location, no provider SDK requirement, and straightforward uninstall."
+  },
+  "model_candidate_comparison": [
+    {
+      "model": "qwen2.5:1.5b",
+      "classification": "RECOMMENDED",
+      "family": "Qwen2.5 instruct",
+      "parameters": "1.5B",
+      "quantization": "Ollama library default for tag",
+      "approximate_download_size": "986 MB",
+      "digest_observed": "65ec06548149",
+      "context_capability": "32K listed by Ollama",
+      "structured_output_suitability": "Qwen2.5 model notes mention structured output, especially JSON",
+      "license_note": "Ollama page states all Qwen2.5 models except 3B and 72B are Apache 2.0",
+      "selected": true
+    },
+    {
+      "model": "llama3.2:3b",
+      "classification": "VIABLE",
+      "parameters": "3B",
+      "approximate_download_size": "2.0 GB",
+      "digest_observed": "a80c4f17acd5",
+      "context_capability": "128K listed by Ollama",
+      "selected": false,
+      "reason_not_selected": "Larger than needed for the first bounded S009.04 proof"
+    },
+    {
+      "model": "gemma3:1b",
+      "classification": "VIABLE",
+      "parameters": "1B",
+      "approximate_download_size": "815 MB",
+      "context_capability": "32K listed by Ollama",
+      "selected": false,
+      "reason_not_selected": "Qwen2.5 documentation is more directly aligned to structured JSON output for this proof"
+    }
+  ],
+  "selected_model": {
+    "primary_model": "qwen2.5:1.5b",
+    "fallback_model": "qwen2.5:0.5b",
+    "fallback_digest_observed": "a8b0c5157701",
+    "fallback_approximate_download_size": "398 MB",
+    "fallback_use_condition": "Only if qwen2.5:1.5b cannot be downloaded or loaded safely.",
+    "expected_download": "about 986 MB",
+    "conservative_total_footprint": "under 5 GB including runtime, model cache, manifest, and logs",
+    "expected_ram_class": "small local model, target under 6 GB for one bounded proof",
+    "expected_installation_time": "short to moderate depending on network"
+  },
+  "local_only_isolation_design": {
+    "requirements": [
+      "localhost binding only at 127.0.0.1:11434",
+      "no public interface",
+      "no custom domain",
+      "no tunnel",
+      "no inbound internet exposure",
+      "no tool use",
+      "no shell access granted to the model",
+      "no filesystem tools granted to the model",
+      "no browser tools",
+      "no email or calendar tools",
+      "no database tools",
+      "no retrieval",
+      "no embeddings",
+      "no vector database",
+      "no persistent conversation memory",
+      "no production data",
+      "no unrestricted repository access",
+      "fixed static Stafford Media source snapshot only",
+      "one request at a time",
+      "maximum two attempts",
+      "process can be stopped immediately",
+      "cache location known",
+      "logs location known",
+      "uninstall and removal paths known"
+    ],
+    "model_weight_storage": "allowed only after explicit operator approval",
+    "conversation_or_business_memory_persistence": "prohibited"
+  },
+  "network_authority_plan": {
+    "installation_download_network": [
+      "Homebrew installation may require internet access unless cached.",
+      "ollama pull qwen2.5:1.5b requires internet access."
+    ],
+    "model_execution_network": [
+      "execution must be localhost only",
+      "future proof adapter may call only http://127.0.0.1:11434",
+      "future proof must not call external model providers or external Ollama APIs"
+    ],
+    "verification_requirements": [
+      "lsof must show localhost-only listener",
+      "local tags endpoint must list only local models",
+      "no public 0.0.0.0 or wildcard listener may be accepted",
+      "proof should work after external network is disabled where practical",
+      "only qwen2.5:1.5b should be made available to the proof adapter"
+    ]
+  },
+  "data_retention_plan": {
+    "expected_local_storage": [
+      "Homebrew runtime files under Homebrew-managed locations",
+      "model weights under ~/.ollama/models",
+      "Ollama config under ~/.ollama",
+      "Ollama logs under ~/.ollama/logs",
+      "temporary Homebrew/model download files during installation"
+    ],
+    "requirements": [
+      "disable cloud features for proof",
+      "do not use desktop chat UI",
+      "do not use launch integrations",
+      "do not use tools, web search, retrieval, embeddings, or document chat",
+      "do not include prohibited data in the request",
+      "use only static Stafford Media fixture source summaries",
+      "use keep_alive: \"0\" where supported to unload after response",
+      "confirm logs do not contain prohibited input before retaining proof artifacts"
+    ],
+    "cleanup": [
+      "ollama rm qwen2.5:1.5b",
+      "brew uninstall ollama",
+      "optional residual deletion only after explicit operator confirmation"
+    ]
+  },
+  "planned_installation_procedure": [
+    {
+      "step": "Pre-install resource check",
+      "commands": [
+        "df -h /",
+        "vm_stat"
+      ],
+      "planned_not_executed": true
+    },
+    {
+      "step": "Runtime installation",
+      "commands": [
+        "brew install ollama"
+      ],
+      "planned_not_executed": true
+    },
+    {
+      "step": "Runtime version verification",
+      "commands": [
+        "ollama --version"
+      ],
+      "planned_not_executed": true
+    },
+    {
+      "step": "Model download",
+      "commands": [
+        "ollama pull qwen2.5:1.5b"
+      ],
+      "planned_not_executed": true
+    },
+    {
+      "step": "Model identity verification",
+      "commands": [
+        "ollama show qwen2.5:1.5b"
+      ],
+      "planned_not_executed": true
+    },
+    {
+      "step": "Cache-location verification",
+      "commands": [
+        "ls -ld ~/.ollama ~/.ollama/models"
+      ],
+      "planned_not_executed": true
+    },
+    {
+      "step": "Localhost-only process start",
+      "commands": [
+        "OLLAMA_NO_CLOUD=1 OLLAMA_HOST=127.0.0.1:11434 ollama serve"
+      ],
+      "planned_not_executed": true
+    },
+    {
+      "step": "Listener verification",
+      "commands": [
+        "lsof -nP -iTCP:11434 -sTCP:LISTEN"
+      ],
+      "planned_not_executed": true
+    },
+    {
+      "step": "Safe local model-list check",
+      "commands": [
+        "curl -sS http://127.0.0.1:11434/api/tags | jq ."
+      ],
+      "planned_not_executed": true
+    },
+    {
+      "step": "Process stop",
+      "commands": [
+        "pkill -f \"ollama serve\""
+      ],
+      "planned_not_executed": true
+    },
+    {
+      "step": "Model removal",
+      "commands": [
+        "ollama rm qwen2.5:1.5b"
+      ],
+      "planned_not_executed": true
+    },
+    {
+      "step": "Runtime uninstall",
+      "commands": [
+        "brew uninstall ollama"
+      ],
+      "planned_not_executed": true
+    },
+    {
+      "step": "Residual-file inspection",
+      "commands": [
+        "ls -ld ~/.ollama ~/Library/Application\\ Support/Ollama ~/Library/Caches/ollama 2>/dev/null"
+      ],
+      "planned_not_executed": true
+    },
+    {
+      "step": "Full residual cleanup only after explicit operator confirmation",
+      "commands": [
+        "rm -rf ~/.ollama"
+      ],
+      "planned_not_executed": true
+    },
+    {
+      "step": "Rollback verification",
+      "commands": [
+        "command -v ollama",
+        "lsof -nP -iTCP:11434 -sTCP:LISTEN"
+      ],
+      "planned_not_executed": true
+    }
+  ],
+  "planned_verification_procedure": [
+    "runtime command exists",
+    "runtime version is recorded",
+    "model tag and digest are recorded",
+    "process owner is Ross",
+    "listener is 127.0.0.1:11434",
+    "no public listener exists",
+    "cloud features are disabled",
+    "no tools are attached",
+    "no retrieval or embeddings are used",
+    "model cache location is known",
+    "fixed Stafford Media static source snapshot is the only input",
+    "S009.03 structural guard runs before S009.01 semantic validation",
+    "invalid output fails closed",
+    "process stops cleanly",
+    "cleanup path works"
+  ],
+  "planned_cleanup_and_uninstall_procedure": {
+    "preferred_cleanup_commands": [
+      "pkill -f \"ollama serve\"",
+      "ollama rm qwen2.5:1.5b"
+    ],
+    "full_runtime_cleanup_commands": [
+      "brew uninstall ollama"
+    ],
+    "residual_inspection_commands": [
+      "ls -ld ~/.ollama ~/Library/Application\\ Support/Ollama ~/Library/Caches/ollama 2>/dev/null"
+    ],
+    "destructive_residual_cleanup_requires_explicit_operator_confirmation": [
+      "rm -rf ~/.ollama"
+    ],
+    "rollback_scope": "No production, database, identity, Stripe, ShopiFixer, Abando, provider-account, or deployment rollback is required for S009.04A because no installation occurred."
+  },
+  "installation_authority_gate": {
+    "operator_approval_required_before": [
+      "installing Ollama",
+      "downloading qwen2.5:1.5b",
+      "starting ollama serve",
+      "opening any local listener",
+      "creating or changing any local environment setting or Ollama config",
+      "creating a runtime-specific S009.04 adapter",
+      "invoking the model"
+    ],
+    "approval_packet": {
+      "runtime": "Ollama",
+      "model": "qwen2.5:1.5b",
+      "approximate_model_download": "986 MB",
+      "approximate_total_footprint": "under 5 GB",
+      "expected_ram_class": "small local model, target under 6 GB",
+      "expected_installation_time": "short to moderate depending on network",
+      "installation_network": "Homebrew and Ollama model pull",
+      "execution_network": "localhost only",
+      "cleanup_path": "ollama rm qwen2.5:1.5b; brew uninstall ollama; optional residual deletion",
+      "main_risks": [
+        "public listener",
+        "cloud feature misconfiguration",
+        "logs retaining input",
+        "model output failing validation",
+        "resource pressure"
+      ]
+    },
+    "recommendation": "Proceed to S009.04B only after Ross approves the exact installation and model download plan."
+  },
+  "s009_04_resumption_evidence": [
+    "runtime command path",
+    "runtime version",
+    "model name and exact tag or digest",
+    "process owner",
+    "listening address",
+    "listener protocol",
+    "external-network requirement",
+    "cloud disabled proof",
+    "tool capability disabled proof",
+    "retrieval disabled proof",
+    "persistence disabled or bounded proof",
+    "model-cache location",
+    "successful bounded local health check",
+    "successful stop/restart check",
+    "no production data supplied",
+    "no secrets supplied",
+    "rollback path verified"
+  ],
+  "risk_review": [
+    {
+      "risk": "Disk exhaustion",
+      "likelihood": "Low",
+      "impact": "Medium",
+      "mitigation": "Keep first model under 2 GB and footprint under 5 GB.",
+      "stop_condition": "Free disk would fall below 70 GiB.",
+      "rollback_action": "Remove model and uninstall runtime."
+    },
+    {
+      "risk": "Memory pressure",
+      "likelihood": "Medium",
+      "impact": "Medium",
+      "mitigation": "Use 1.5B model and 4096 context.",
+      "stop_condition": "Swap or frontend instability increases.",
+      "rollback_action": "Stop server and remove model if needed."
+    },
+    {
+      "risk": "Thermal or CPU load",
+      "likelihood": "Medium",
+      "impact": "Low",
+      "mitigation": "One request at a time, max two attempts.",
+      "stop_condition": "Machine becomes unstable or noisy for sustained period.",
+      "rollback_action": "Stop server."
+    },
+    {
+      "risk": "Public listener exposure",
+      "likelihood": "Low",
+      "impact": "High",
+      "mitigation": "Bind to 127.0.0.1 and verify with lsof.",
+      "stop_condition": "Listener shows 0.0.0.0 or wildcard.",
+      "rollback_action": "Stop server immediately."
+    },
+    {
+      "risk": "Telemetry or cloud behavior",
+      "likelihood": "Medium",
+      "impact": "High",
+      "mitigation": "Use OLLAMA_NO_CLOUD=1 and verify logs where possible.",
+      "stop_condition": "Cloud remains enabled or unclear.",
+      "rollback_action": "Stop and block S009.04."
+    },
+    {
+      "risk": "Hidden external calls",
+      "likelihood": "Low",
+      "impact": "High",
+      "mitigation": "Disable cloud and run local endpoint only.",
+      "stop_condition": "Any external execution call observed.",
+      "rollback_action": "Stop and block."
+    },
+    {
+      "risk": "Model cache growth",
+      "likelihood": "Medium",
+      "impact": "Low",
+      "mitigation": "Pull one model only.",
+      "stop_condition": "Additional unapproved model appears.",
+      "rollback_action": "Remove unapproved model."
+    },
+    {
+      "risk": "Incompatible architecture",
+      "likelihood": "Low",
+      "impact": "Medium",
+      "mitigation": "Use Apple Silicon-supported runtime.",
+      "stop_condition": "Runtime cannot run arm64 locally.",
+      "rollback_action": "Uninstall."
+    },
+    {
+      "risk": "License restrictions",
+      "likelihood": "Low",
+      "impact": "Medium",
+      "mitigation": "Prefer Qwen2.5 1.5B based on Apache 2.0 note.",
+      "stop_condition": "License terms conflict with intended use.",
+      "rollback_action": "Remove model and reassess."
+    },
+    {
+      "risk": "Structured JSON failure",
+      "likelihood": "Medium",
+      "impact": "Medium",
+      "mitigation": "Use format or schema and validator gate.",
+      "stop_condition": "Output fails contract twice.",
+      "rollback_action": "Preserve failure and stop."
+    },
+    {
+      "risk": "Hallucination",
+      "likelihood": "Medium",
+      "impact": "Medium",
+      "mitigation": "Validator rejects unsupported claims.",
+      "stop_condition": "Unsupported claim appears.",
+      "rollback_action": "Block output."
+    },
+    {
+      "risk": "Process remains active",
+      "likelihood": "Medium",
+      "impact": "Low",
+      "mitigation": "Foreground server and explicit stop.",
+      "stop_condition": "Listener remains after stop.",
+      "rollback_action": "Kill process."
+    },
+    {
+      "risk": "Accidental production data use",
+      "likelihood": "Low",
+      "impact": "High",
+      "mitigation": "Static fixture input only.",
+      "stop_condition": "Any production/customer data enters prompt.",
+      "rollback_action": "Stop and discard attempt."
+    },
+    {
+      "risk": "Accidental ross-llm retrieval or memory merge",
+      "likelihood": "Low",
+      "impact": "High",
+      "mitigation": "Do not use ross-llm runtime or memory.",
+      "stop_condition": "Retrieval, pgvector, or memory appears in path.",
+      "rollback_action": "Stop and block."
+    }
+  ],
+  "selected_next_mission": {
+    "mission": "S009_04B_INSTALL_AND_CERTIFY_SELECTED_LOCAL_MODEL_RUNTIME",
+    "classification": "selected",
+    "scope": [
+      "install and certify Ollama and qwen2.5:1.5b locally",
+      "prove localhost-only binding, disabled cloud behavior, model identity, cache location, and cleanup",
+      "return evidence required before S009.04 can resume"
+    ],
+    "exclusions": [
+      "no production data",
+      "no application behavior change",
+      "no /operator modification",
+      "no provider SDK",
+      "no external AI provider call",
+      "no retrieval, embeddings, persistence, or memory"
+    ],
+    "dependency": "explicit Ross approval of installation, download, listener start, and model invocation"
+  },
+  "external_source_index": [
+    "https://docs.ollama.com/macos",
+    "https://docs.ollama.com/faq",
+    "https://docs.ollama.com/api/generate",
+    "https://docs.ollama.com/api/introduction",
+    "https://docs.ollama.com/api/tags",
+    "https://docs.ollama.com/api-reference/show-model-details",
+    "https://ollama.com/library/qwen2.5/tags",
+    "https://ollama.com/library/llama3.2/tags",
+    "https://www.ollama.com/library/gemma3",
+    "https://formulae.brew.sh/formula/ollama",
+    "https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md",
+    "https://github.com/ggml-org/llama.cpp/blob/master/grammars/README.md",
+    "https://www.lmstudio.ai/docs/app/system-requirements",
+    "https://beta.lmstudio.ai/docs/developer/openai-compat/structured-output"
+  ],
+  "artifacts_created": [
+    "staffordos/architecture/S009_04A_LOCAL_MODEL_RUNTIME_SELECTION_AND_INSTALLATION_PLAN.md",
+    "staffordos/architecture/S009_04A_LOCAL_MODEL_RUNTIME_SELECTION_AND_INSTALLATION_PLAN.json"
+  ],
+  "validation": {
+    "json_validation": "passed with jq -e",
+    "diff_check": "passed for the two S009.04A artifacts",
+    "build_or_route_probe_required": false,
+    "reason_build_or_route_probe_not_required": "This mission created documentation only and changed no route or runtime code."
+  },
+  "commit": {
+    "commit_message": "S009 plan local model runtime authority",
+    "status": "eligible after staging only the two authorized S009.04A documentation artifacts"
+  },
+  "rollback": {
+    "procedure": "git revert <S009.04A commit SHA>",
+    "runtime_or_model_rollback_required": false,
+    "reason": "S009.04A did not install, download, start, or invoke any runtime or model."
+  },
+  "confirmation_of_non_impact": [
+    "No runtime installed.",
+    "No model downloaded.",
+    "No model server started.",
+    "No model invoked.",
+    "No provider SDK added.",
+    "No package dependency added.",
+    "No secrets, credentials, tokens, or environment variables added.",
+    "No application code modified.",
+    "No S009.01, S009.02, or S009.03 code modified.",
+    "No /operator behavior modified.",
+    "No ShopiFixer or Abando runtime behavior modified.",
+    "No authentication, OAuth, KMS, JWT, issuer, Stripe, database, Prisma, migration, API, queue, packet, or execution workflow modified.",
+    "No ross-llm file modified.",
+    "No unrelated working-tree change included."
+  ],
+  "final_classification": "LOCAL_MODEL_PLAN_READY_FOR_OPERATOR_APPROVAL"
+}
