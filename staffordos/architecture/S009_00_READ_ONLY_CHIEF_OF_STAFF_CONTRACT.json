@@ -1,0 +1,553 @@
+{
+  "mission": "S009_00_READ_ONLY_CHIEF_OF_STAFF_CONTRACT",
+  "status": "READY_FOR_LOCAL_COMMIT",
+  "checkpointAuthority": {
+    "verifiedHeadAtDiscovery": "cf2825e644111dca7dae7835c7c9aaac086140e5",
+    "branch": "main",
+    "canonicalAuthoritiesVerified": [
+      "staffordos/architecture/STAFFORDOS_ARCHITECTURE_V1.md",
+      "staffordos/architecture/S008_14_STAFFORDOS_OPERATING_MODEL_CONSOLIDATION_AND_S009_READINESS.md",
+      "staffordos/architecture/S008_14_STAFFORDOS_OPERATING_MODEL_CONSOLIDATION_AND_S009_READINESS.json",
+      "staffordos/architecture/S008_02_STAFFORDOS_OPERATOR_LANGUAGE_STANDARD.md",
+      "staffordos/architecture/S008_04_MULTI_WORKSPACE_PLATFORM_AND_DECISION_MODEL_ARCHITECTURE.md",
+      "staffordos/architecture/S008_05_UNIFIED_ACTION_AND_DECISION_MODEL.md",
+      "staffordos/architecture/S008_06_WORKSPACE_CONTEXT_AND_OWNER_FIRST_SWITCHER_FOUNDATION.md",
+      "staffordos/architecture/S008_08_OBJECTIVE_REGISTRY_AND_MISSION_ALIGNMENT_FOUNDATION.md",
+      "staffordos/architecture/S008_09_DECISION_REGISTRY_AND_DECISION_MEMORY_FOUNDATION.md",
+      "staffordos/architecture/S008_10_UNIFIED_ACTION_REGISTRY_FOUNDATION.md",
+      "staffordos/architecture/S008_11_EVIDENCE_FOUNDATION.md",
+      "staffordos/architecture/S008_12_PROOF_FOUNDATION_AND_OUTCOME_VERIFICATION.md",
+      "staffordos/architecture/S008_13_LEARNING_FOUNDATION_AND_INSTITUTIONAL_MEMORY.md"
+    ],
+    "canonicalChiefOfStaffContractAlreadyExisted": false
+  },
+  "workingTreeExclusions": {
+    "excludedCategories": [
+      "S007_IDENTITY_OR_ISSUER",
+      "RUNTIME_OR_DAEMON",
+      "WEB_OR_PRISMA",
+      "GENERATED",
+      "MISSION_EVIDENCE",
+      "PREEXISTING_UNRELATED",
+      "UNKNOWN_REQUIRES_REVIEW"
+    ],
+    "authorizedFiles": [
+      "staffordos/architecture/S009_00_READ_ONLY_CHIEF_OF_STAFF_CONTRACT.md",
+      "staffordos/architecture/S009_00_READ_ONLY_CHIEF_OF_STAFF_CONTRACT.json",
+      "staffordos/architecture/schemas/s009_00_chief_of_staff_request.example.json",
+      "staffordos/architecture/schemas/s009_00_source_snapshot.example.json",
+      "staffordos/architecture/schemas/s009_00_source_traced_claim.example.json",
+      "staffordos/architecture/schemas/s009_00_candidate_recommendation.example.json",
+      "staffordos/architecture/schemas/s009_00_chief_of_staff_response.example.json",
+      "staffordos/architecture/schemas/s009_00_validation_failure.example.json",
+      "staffordos/architecture/schemas/s009_00_audit_envelope.example.json"
+    ]
+  },
+  "existingChiefOfStaffDiscovery": {
+    "canonicalContractFound": false,
+    "sources": [
+      {
+        "source": "staffordos/architecture/STAFFORDOS_ARCHITECTURE_V1.md",
+        "finding": "Defines a future governed read-only Chief of Staff boundary."
+      },
+      {
+        "source": "staffordos/architecture/S008_14_STAFFORDOS_OPERATING_MODEL_CONSOLIDATION_AND_S009_READINESS.md",
+        "finding": "Selects S009_00_READ_ONLY_CHIEF_OF_STAFF_CONTRACT as the next mission."
+      },
+      {
+        "source": "staffordos/architecture/S008_05_UNIFIED_ACTION_AND_DECISION_MODEL.md",
+        "finding": "Defines AI may summarize, recommend, explain, draft, identify gaps, surface risks, and capture learning, but may not invent evidence, override authority, or hide uncertainty."
+      },
+      {
+        "source": "staffordos/architecture/S008_06_WORKSPACE_CONTEXT_AND_OWNER_FIRST_SWITCHER_FOUNDATION.md",
+        "finding": "States WorkspaceContext is presentation-only and not authorization."
+      },
+      {
+        "source": "staffordos/governance/next_action_engine_provenance_audit/next_action_engine_provenance_audit_v1.md",
+        "finding": "Classifies older next-action engine behavior as dormant intended authority, not current runtime truth."
+      }
+    ]
+  },
+  "chiefOfStaffRole": {
+    "definition": "Governed read-only reasoning layer that helps answer what deserves attention, why, and what to do next.",
+    "may": [
+      "summarize authorized workspace state",
+      "explain current Objectives",
+      "explain existing Decisions",
+      "explain why an Action is present",
+      "trace an Action to Evidence",
+      "show available Proof",
+      "retrieve confirmed Learning",
+      "identify missing information",
+      "compare explicit alternatives",
+      "explain uncertainty",
+      "propose a candidate next action",
+      "draft operator-facing summaries",
+      "suggest questions the operator should answer",
+      "identify where authority or evidence is missing"
+    ],
+    "mayNot": [
+      "create operating truth silently",
+      "mark a Decision as chosen",
+      "approve anything",
+      "execute an Action",
+      "update an Objective",
+      "verify Proof",
+      "confirm Learning",
+      "create Policy",
+      "change permissions",
+      "cross workspace boundaries",
+      "send messages",
+      "contact customers",
+      "create payments",
+      "mutate APIs",
+      "write to databases",
+      "trigger jobs",
+      "modify files",
+      "deploy code",
+      "invent facts, metrics, customers, deadlines, confidence, or outcomes"
+    ]
+  },
+  "authorizedInputContract": {
+    "fields": [
+      "request_id",
+      "current_user_id",
+      "workspace_id",
+      "workspace_family",
+      "active_role",
+      "permission_summary",
+      "capability_summary",
+      "operator_question",
+      "conversation_context",
+      "allowed_source_types",
+      "source_snapshot_ids",
+      "current_time",
+      "privacy_classification",
+      "policy_context",
+      "requested_output_type"
+    ],
+    "trustedRuntimeIdentityRequiredFor": [
+      "current_user_id",
+      "workspace_id",
+      "active_role",
+      "permissions",
+      "policy_context"
+    ],
+    "preIdentityRule": "Local prototypes may use static test fixtures only and must not claim real authorization."
+  },
+  "authorizedSourceModel": {
+    "initialStaticSourceTypes": [
+      "Workspace Registry",
+      "Capability Registry",
+      "Objective Registry",
+      "Decision Registry",
+      "Action Registry",
+      "Evidence Foundation",
+      "Proof Foundation",
+      "Learning Foundation",
+      "StaffordOS architecture documents",
+      "explicit operator-provided question context"
+    ],
+    "futureRuntimeSourceTypesNotAuthorizedHere": [
+      "governed /operator read models",
+      "ShopiFixer Packet summaries",
+      "Abando summaries",
+      "approved calendar data",
+      "approved email data",
+      "approved Professional data",
+      "approved Personal data"
+    ],
+    "sourceSnapshotFields": [
+      "source_id",
+      "source_type",
+      "workspace_id",
+      "authority_classification",
+      "freshness",
+      "privacy_classification",
+      "mutable_status",
+      "content_summary",
+      "exact_source_reference",
+      "limitations"
+    ],
+    "notAuthorized": [
+      "unrestricted repository search",
+      "filesystem access",
+      "email access",
+      "calendar access",
+      "internet access",
+      "cross-workspace memory"
+    ]
+  },
+  "sourceTraceabilityContract": {
+    "claimTypes": [
+      "SOURCE_FACT",
+      "DERIVED_SUMMARY",
+      "INFERENCE",
+      "CANDIDATE_RECOMMENDATION",
+      "UNKNOWN",
+      "BLOCKED_BY_AUTHORITY",
+      "PLANNED_CAPABILITY"
+    ],
+    "claimFields": [
+      "claim_id",
+      "claim_type",
+      "statement",
+      "supporting_source_ids",
+      "confidence_classification",
+      "limitation",
+      "workspace_id",
+      "authority_status"
+    ],
+    "confidenceClassifications": [
+      "High confidence",
+      "Moderate confidence",
+      "Low confidence",
+      "Not enough evidence"
+    ],
+    "numericConfidenceDefined": false
+  },
+  "responseContract": {
+    "operatorFacingSections": [
+      "What deserves attention",
+      "Why it matters",
+      "What we know",
+      "What is uncertain or missing",
+      "Suggested next step",
+      "Required authority or approval",
+      "What success would prove",
+      "Sources"
+    ],
+    "fields": [
+      "response_id",
+      "workspace_id",
+      "headline",
+      "summary",
+      "attention_items",
+      "supporting_claims",
+      "missing_information",
+      "candidate_actions",
+      "risks",
+      "approvals_needed",
+      "proof_expected",
+      "learning_references",
+      "sources",
+      "limitations",
+      "generated_at"
+    ],
+    "mustWorkWithoutAiProvider": true
+  },
+  "candidateRecommendationContract": {
+    "fields": [
+      "recommendation_id",
+      "workspace_id",
+      "operator_facing_action",
+      "why_now",
+      "objective_id",
+      "decision_id",
+      "supporting_action_id",
+      "evidence_ids",
+      "proof_status",
+      "learning_ids",
+      "risk_summary",
+      "uncertainty",
+      "authority_needed",
+      "expected_result",
+      "proof_needed",
+      "alternatives",
+      "source_trace",
+      "recommendation_status"
+    ],
+    "allowedStatuses": [
+      "Candidate",
+      "Needs more information",
+      "Needs authority",
+      "Not recommended",
+      "Ready for operator review"
+    ],
+    "forbiddenStatuses": [
+      "Approved",
+      "Executing",
+      "Completed"
+    ]
+  },
+  "missingInformationContract": {
+    "allowedStatements": [
+      "I do not have enough evidence.",
+      "This information is not connected.",
+      "This workspace is planned.",
+      "I need operator confirmation.",
+      "I cannot verify this from current sources.",
+      "This action requires authority not present here."
+    ],
+    "questionTypes": [
+      "clarification",
+      "authority confirmation",
+      "evidence request",
+      "objective selection",
+      "risk acceptance",
+      "workspace selection",
+      "source freshness check"
+    ],
+    "mustNotAskFor": [
+      "secrets",
+      "passwords",
+      "raw tokens",
+      "private keys",
+      "unrestricted account access"
+    ]
+  },
+  "workspaceIsolationContract": {
+    "staffordMedia": "May use only authorized Stafford Media sources.",
+    "professional": "Planned only. No real professional data is authorized.",
+    "personal": "Planned only. No real personal, family, or media data is authorized.",
+    "rules": [
+      "no cross-workspace source mixing",
+      "no global memory by default",
+      "no hidden source reuse",
+      "no Stafford Media data in Professional or Personal responses",
+      "no future Professional or Personal data in Stafford Media responses",
+      "no guest or family access to Business sources",
+      "no employee access to Personal or Professional sources",
+      "no AI retrieval outside active workspace and permission context",
+      "presentation-only WorkspaceContext is insufficient for enforcement"
+    ]
+  },
+  "authorityAndGovernanceContract": {
+    "responseAuthorityStates": [
+      "Informational only",
+      "Candidate recommendation",
+      "Operator review required",
+      "Approval required",
+      "Blocked by missing authority",
+      "Not authorized"
+    ],
+    "chiefOfStaffHasNoAuthorityFor": [
+      "approval",
+      "execution",
+      "verification",
+      "policy",
+      "permission management"
+    ],
+    "futureWrites": "Must hand off to a separate governed command path with explicit operator approval and audit."
+  },
+  "unsupportedClaimDefenses": {
+    "mandatoryDefenses": [
+      "source allowlist",
+      "workspace filter",
+      "explicit source snapshots",
+      "claim-to-source mapping",
+      "unsupported-answer fallback",
+      "no hidden web knowledge",
+      "no invented numeric values",
+      "no invented current state",
+      "no invented identities",
+      "no invented customer or employer facts",
+      "no inferred completion",
+      "no inferred approval",
+      "no inferred causality",
+      "no silent conflict resolution",
+      "no use of planned examples as facts"
+    ],
+    "safeFallback": "I cannot verify that from the current StaffordOS sources."
+  },
+  "conflictAndStalenessHandling": {
+    "must": [
+      "preserve both claims",
+      "identify conflicting sources",
+      "compare authority and freshness",
+      "avoid silently choosing one",
+      "explain what must be checked",
+      "downgrade confidence",
+      "recommend operator review where necessary"
+    ],
+    "freshnessClassifications": [
+      "Current",
+      "Recent",
+      "Historical",
+      "Unknown",
+      "Stale"
+    ],
+    "automaticFreshnessScoringImplemented": false
+  },
+  "auditContract": {
+    "futureAuditFields": [
+      "request_id",
+      "user and workspace context",
+      "source snapshot IDs",
+      "source authorities",
+      "model/provider identity",
+      "prompt or instruction version",
+      "generated claims",
+      "source mappings",
+      "recommendations",
+      "limitations",
+      "authority status",
+      "operator feedback",
+      "whether any recommendation was later accepted",
+      "timestamp",
+      "privacy classification"
+    ],
+    "persistenceImplemented": false
+  },
+  "modelProviderNeutrality": {
+    "layers": [
+      "Source preparation",
+      "Governed reasoning request",
+      "Model adapter",
+      "Structured response validation",
+      "Source-trace validation",
+      "Operator-facing rendering",
+      "Audit capture"
+    ],
+    "futureCompatibleWith": [
+      "OpenAI",
+      "Anthropic",
+      "Google",
+      "local models",
+      "deterministic non-AI logic"
+    ],
+    "providerSelected": false,
+    "providerIntegrated": false
+  },
+  "firstStaticUseCases": [
+    {
+      "useCase": "Explain the current static primary Action",
+      "operatorQuestion": "What should I look at first?",
+      "allowedSources": ["Workspace Registry", "Capability Registry", "Action Registry", "Objective Registry", "Evidence Foundation", "Proof Foundation"],
+      "expectedOutput": "Candidate explanation for Start My Day with sources.",
+      "unsupportedClaimsToReject": ["live ranking", "AI selection", "deadline", "metric"],
+      "authorityStatus": "Informational only",
+      "proofOfCorrectBehavior": "Claim traces to static Action and Evidence."
+    },
+    {
+      "useCase": "Summarize current Objectives",
+      "operatorQuestion": "What are we working toward?",
+      "allowedSources": ["Objective Registry", "StaffordOS architecture documents"],
+      "expectedOutput": "Three Stafford Media Objectives and limitations.",
+      "unsupportedClaimsToReject": ["live progress", "revenue", "completion"],
+      "authorityStatus": "Informational only",
+      "proofOfCorrectBehavior": "Each Objective traces to source artifacts."
+    },
+    {
+      "useCase": "Explain a Decision and Evidence",
+      "operatorQuestion": "Why is /operator still the working source?",
+      "allowedSources": ["Decision Registry", "Evidence Foundation", "S008.01", "S008.14"],
+      "expectedOutput": "Decision rationale and supporting sources.",
+      "unsupportedClaimsToReject": ["approval to migrate", "redirect authority"],
+      "authorityStatus": "Informational only",
+      "proofOfCorrectBehavior": "Decision ID and Evidence IDs are cited."
+    },
+    {
+      "useCase": "Show what has and has not been proven",
+      "operatorQuestion": "What do we know worked?",
+      "allowedSources": ["Proof Foundation", "Evidence Foundation"],
+      "expectedOutput": "Narrow Proof summaries and not-proven limits.",
+      "unsupportedClaimsToReject": ["business outcome verification"],
+      "authorityStatus": "Informational only",
+      "proofOfCorrectBehavior": "Expected result remains separate from observed outcome."
+    },
+    {
+      "useCase": "Retrieve relevant Learning",
+      "operatorQuestion": "What should StaffordOS remember here?",
+      "allowedSources": ["Learning Foundation", "Proof Foundation"],
+      "expectedOutput": "Confirmed Learning with applicability and limits.",
+      "unsupportedClaimsToReject": ["policy creation", "automatic priority change"],
+      "authorityStatus": "Informational only",
+      "proofOfCorrectBehavior": "Learning references supporting Proof."
+    }
+  ],
+  "responseValidationRules": {
+    "rejectWhen": [
+      "a claim has no source",
+      "a source belongs to another workspace",
+      "a recommendation claims approval",
+      "a recommendation claims execution",
+      "a planned capability is presented as available",
+      "a numeric value is unsupported",
+      "an outcome is inferred from an expected result",
+      "Evidence is mislabeled as Proof",
+      "Learning is presented as Policy",
+      "a source reference is missing",
+      "authority status is absent",
+      "limitations are omitted where required"
+    ],
+    "validatorCodeImplemented": false
+  },
+  "s009ImplementationRoadmap": [
+    {
+      "mission": "S009.00",
+      "purpose": "Read-only Chief of Staff contract",
+      "identityDependency": "CAN_BUILD_BEFORE_DEPLOYED_IDENTITY"
+    },
+    {
+      "mission": "S009.01",
+      "purpose": "Static fixture and deterministic response validator",
+      "identityDependency": "CAN_BUILD_BEFORE_DEPLOYED_IDENTITY"
+    },
+    {
+      "mission": "S009.02",
+      "purpose": "Read-only Chief of Staff demonstration surface",
+      "identityDependency": "CAN_BUILD_BEFORE_DEPLOYED_IDENTITY_IF_STATIC_ONLY"
+    },
+    {
+      "mission": "S009.03",
+      "purpose": "Provider-neutral model adapter interface",
+      "identityDependency": "CAN_BUILD_BEFORE_DEPLOYED_IDENTITY_IF_NO_CALLS_OCCUR"
+    },
+    {
+      "mission": "S009.04",
+      "purpose": "Local or sandboxed model proof",
+      "identityDependency": "CAN_BUILD_BEFORE_DEPLOYED_IDENTITY_IF_LOCAL_SANDBOXED_AND_NON_PRODUCTION"
+    },
+    {
+      "mission": "S009.05",
+      "purpose": "Governed /operator read-model adapter discovery",
+      "identityDependency": "CAN_START_BEFORE_IDENTITY_RUNTIME_USE_NEEDS_AUTHORITY"
+    },
+    {
+      "mission": "S009.06",
+      "purpose": "Runtime identity and workspace enforcement integration",
+      "identityDependency": "MUST_WAIT_FOR_DEPLOYED_IDENTITY"
+    },
+    {
+      "mission": "S009.07",
+      "purpose": "Audited read-only production pilot",
+      "identityDependency": "MUST_WAIT_FOR_DEPLOYED_IDENTITY"
+    }
+  ],
+  "schemaExamples": [
+    "staffordos/architecture/schemas/s009_00_chief_of_staff_request.example.json",
+    "staffordos/architecture/schemas/s009_00_source_snapshot.example.json",
+    "staffordos/architecture/schemas/s009_00_source_traced_claim.example.json",
+    "staffordos/architecture/schemas/s009_00_candidate_recommendation.example.json",
+    "staffordos/architecture/schemas/s009_00_chief_of_staff_response.example.json",
+    "staffordos/architecture/schemas/s009_00_validation_failure.example.json",
+    "staffordos/architecture/schemas/s009_00_audit_envelope.example.json"
+  ],
+  "confirmationOfNonImpact": {
+    "llmImplemented": false,
+    "chatInterfaceAdded": false,
+    "modelProviderSdkAdded": false,
+    "runtimePromptAdded": false,
+    "externalAiServiceCalled": false,
+    "retrievalImplemented": false,
+    "embeddingsImplemented": false,
+    "vectorSearchImplemented": false,
+    "persistenceImplemented": false,
+    "adaptersImplemented": false,
+    "runtimeOrchestrationImplemented": false,
+    "deployed": false,
+    "pushed": false,
+    "productionModified": false,
+    "operatorBehaviorModified": false,
+    "shopifixerRuntimeModified": false,
+    "abandoRuntimeModified": false,
+    "authenticationModified": false,
+    "oauthKmsJwtIssuerModified": false,
+    "stripeModified": false,
+    "databasePrismaMigrationModified": false,
+    "apiQueuePacketExecutionModified": false
+  },
+  "rollbackProcedure": "git revert <S009.00 commit SHA>",
+  "finalClassification": "CHIEF_OF_STAFF_CONTRACT_READY_FOR_LOCAL_COMMIT"
+}

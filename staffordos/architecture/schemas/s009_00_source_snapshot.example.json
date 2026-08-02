@@ -1,0 +1,17 @@
+{
+  "source_id": "s009-00-source-action-start-my-day",
+  "source_type": "Action Registry",
+  "workspace_id": "stafford-media",
+  "authority_classification": "Repository-backed",
+  "freshness": "Current",
+  "privacy_classification": "owner_private_stafford_media_fixture",
+  "mutable_status": "immutable_at_snapshot",
+  "content_summary": "Static Action record for Start My Day. It directs the operator to the current Stafford Media Home page and states that live ranking and execution are not connected.",
+  "exact_source_reference": "staffordos/ui/operator-frontend/lib/staffordos/actionRegistry.ts#start-my-day-home-action",
+  "limitations": [
+    "Static repository-backed source only.",
+    "Does not prove live priority ranking.",
+    "Does not authorize execution.",
+    "Does not mutate operator state."
+  ]
+}

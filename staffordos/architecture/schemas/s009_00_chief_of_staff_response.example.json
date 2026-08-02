@@ -1,0 +1,60 @@
+{
+  "response_id": "s009-00-response-example-001",
+  "workspace_id": "stafford-media",
+  "headline": "Start with Stafford Media Home.",
+  "summary": "The current static operating model points to Start My Day as the first place to look. This is source-traced guidance, not live AI ranking.",
+  "attention_items": [
+    {
+      "title": "Start My Day",
+      "reason": "It is the current static primary Action for Stafford Media.",
+      "claim_ids": ["s009-00-claim-start-my-day-source-fact"]
+    }
+  ],
+  "supporting_claims": [
+    {
+      "claim_id": "s009-00-claim-start-my-day-source-fact",
+      "claim_type": "SOURCE_FACT",
+      "statement": "Start My Day is the current static primary Stafford Media Action.",
+      "supporting_source_ids": ["s009-00-source-action-start-my-day"],
+      "confidence_classification": "High confidence",
+      "limitation": "This is static source truth only.",
+      "workspace_id": "stafford-media",
+      "authority_status": "Informational only"
+    }
+  ],
+  "missing_information": [
+    {
+      "type": "source freshness check",
+      "statement": "Live priority ranking and runtime evidence aggregation are not connected."
+    }
+  ],
+  "candidate_actions": [
+    {
+      "recommendation_id": "s009-00-recommendation-start-my-day",
+      "operator_facing_action": "Start My Day",
+      "recommendation_status": "Candidate"
+    }
+  ],
+  "risks": [
+    "Do not treat this as approval, execution, or proof of a business outcome."
+  ],
+  "approvals_needed": [
+    "Operator review is required before taking any live business action."
+  ],
+  "proof_expected": "The current Home page opens without changing work state.",
+  "learning_references": [
+    "learning-os-grows-beside-operator"
+  ],
+  "sources": [
+    {
+      "source_id": "s009-00-source-action-start-my-day",
+      "exact_source_reference": "staffordos/ui/operator-frontend/lib/staffordos/actionRegistry.ts#start-my-day-home-action"
+    }
+  ],
+  "limitations": [
+    "No external AI provider was called.",
+    "No live ranking was performed.",
+    "No runtime state was mutated."
+  ],
+  "generated_at": "2026-08-01T12:00:00-04:00"
+}

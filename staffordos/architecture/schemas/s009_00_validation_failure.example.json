@@ -1,0 +1,19 @@
+{
+  "validation_id": "s009-00-validation-failure-example-001",
+  "response_id": "s009-00-response-invalid-example",
+  "validation_status": "rejected",
+  "failures": [
+    {
+      "rule": "source_workspace_must_match_response_workspace",
+      "message": "A Stafford Media response cannot cite a Personal workspace source.",
+      "claim_id": "invalid-claim-cross-workspace",
+      "source_id": "personal-planned-source-example"
+    },
+    {
+      "rule": "candidate_recommendation_must_not_claim_approval",
+      "message": "A read-only Chief of Staff recommendation cannot use the status Approved.",
+      "recommendation_id": "invalid-approved-recommendation"
+    }
+  ],
+  "safe_fallback": "I cannot verify that from the current StaffordOS sources."
+}

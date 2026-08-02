@@ -1,0 +1,57 @@
+{
+  "audit_id": "s009-00-audit-envelope-example-001",
+  "request_id": "s009-00-request-example-001",
+  "response_id": "s009-00-response-example-001",
+  "user_context": {
+    "current_user_id": "static-fixture-owner",
+    "active_role": "owner_fixture",
+    "trusted_identity_source": "static_fixture_only"
+  },
+  "workspace_context": {
+    "workspace_id": "stafford-media",
+    "workspace_family": "business",
+    "workspace_context_authorization": "not_authorization"
+  },
+  "source_snapshot_ids": [
+    "s009-00-source-action-start-my-day"
+  ],
+  "source_authorities": [
+    {
+      "source_id": "s009-00-source-action-start-my-day",
+      "authority_classification": "Repository-backed",
+      "freshness": "Current"
+    }
+  ],
+  "model_provider_identity": {
+    "provider": "not_applicable_static_contract",
+    "model": "not_applicable",
+    "external_call_performed": false
+  },
+  "instruction_version": "S009_00_READ_ONLY_CHIEF_OF_STAFF_CONTRACT",
+  "generated_claim_ids": [
+    "s009-00-claim-start-my-day-source-fact"
+  ],
+  "source_mappings": [
+    {
+      "claim_id": "s009-00-claim-start-my-day-source-fact",
+      "source_ids": ["s009-00-source-action-start-my-day"]
+    }
+  ],
+  "recommendations": [
+    {
+      "recommendation_id": "s009-00-recommendation-start-my-day",
+      "status": "Candidate"
+    }
+  ],
+  "limitations": [
+    "Static fixture only.",
+    "No real authorization.",
+    "No AI provider call.",
+    "No mutation."
+  ],
+  "authority_status": "Informational only",
+  "operator_feedback": null,
+  "recommendation_later_accepted": null,
+  "timestamp": "2026-08-01T12:00:00-04:00",
+  "privacy_classification": "owner_private_stafford_media_fixture"
+}

@@ -1,0 +1,46 @@
+{
+  "request_id": "s009-00-request-example-001",
+  "current_user_id": "static-fixture-owner",
+  "workspace_id": "stafford-media",
+  "workspace_family": "business",
+  "active_role": "owner_fixture",
+  "permission_summary": {
+    "classification": "static_fixture_only",
+    "description": "This fixture is not trusted authorization and must not be used as a security boundary."
+  },
+  "capability_summary": {
+    "available_now": ["start-my-day", "find-people-to-contact", "see-money-to-collect"],
+    "planned": []
+  },
+  "operator_question": "What should I look at first?",
+  "conversation_context": [
+    {
+      "turn_id": "fixture-turn-001",
+      "summary": "Operator is asking about the current static Stafford Media starting point."
+    }
+  ],
+  "allowed_source_types": [
+    "Workspace Registry",
+    "Capability Registry",
+    "Objective Registry",
+    "Decision Registry",
+    "Action Registry",
+    "Evidence Foundation",
+    "Proof Foundation",
+    "Learning Foundation",
+    "StaffordOS architecture documents",
+    "explicit operator-provided question context"
+  ],
+  "source_snapshot_ids": [
+    "s009-00-source-action-start-my-day"
+  ],
+  "current_time": "2026-08-01T12:00:00-04:00",
+  "privacy_classification": "owner_private_stafford_media_fixture",
+  "policy_context": {
+    "mode": "read_only_contract",
+    "writes_allowed": false,
+    "external_ai_allowed": false,
+    "workspace_context_authorization": "not_authorization"
+  },
+  "requested_output_type": "source_traced_attention_summary"
+}

@@ -1,0 +1,38 @@
+{
+  "recommendation_id": "s009-00-recommendation-start-my-day",
+  "workspace_id": "stafford-media",
+  "operator_facing_action": "Start My Day",
+  "why_now": "This is the current static starting point for Stafford Media operating work.",
+  "objective_id": "stafford-media-operating-loop",
+  "decision_id": "s008-start-my-day-static-home-action",
+  "supporting_action_id": "start-my-day-home-action",
+  "evidence_ids": [
+    "evidence-start-my-day-current-source"
+  ],
+  "proof_status": "Proof available for route availability only",
+  "learning_ids": [
+    "learning-os-grows-beside-operator"
+  ],
+  "risk_summary": "Do not treat this as live ranking, approval, execution, or business outcome proof.",
+  "uncertainty": "Live priority ranking and runtime evidence aggregation are not connected.",
+  "authority_needed": "Operator review required before acting on any live business work.",
+  "expected_result": "The operator opens the current Stafford Media Home page.",
+  "proof_needed": "The current Home page opens without changing work state.",
+  "alternatives": [
+    {
+      "label": "Review People to Contact",
+      "reason": "Use when outreach is the known next concern."
+    },
+    {
+      "label": "Review Money to Collect",
+      "reason": "Use when payment or revenue follow-up is the known next concern."
+    }
+  ],
+  "source_trace": [
+    {
+      "claim_id": "s009-00-claim-start-my-day-source-fact",
+      "source_ids": ["s009-00-source-action-start-my-day"]
+    }
+  ],
+  "recommendation_status": "Candidate"
+}

@@ -1,0 +1,12 @@
+{
+  "claim_id": "s009-00-claim-start-my-day-source-fact",
+  "claim_type": "SOURCE_FACT",
+  "statement": "Start My Day is the current static primary Stafford Media Action.",
+  "supporting_source_ids": [
+    "s009-00-source-action-start-my-day"
+  ],
+  "confidence_classification": "High confidence",
+  "limitation": "This is a static Action Registry fact, not live AI ranking or execution authority.",
+  "workspace_id": "stafford-media",
+  "authority_status": "Informational only"
+}
