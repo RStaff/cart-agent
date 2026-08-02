@@ -11,6 +11,7 @@ const shellPath = path.join(root, "staffordos/ui/operator-frontend/components/st
 const homeModelPath = path.join(root, "staffordos/ui/operator-frontend/lib/staffordos/homePresentation.ts");
 const unifiedHomePath = path.join(root, "staffordos/ui/operator-frontend/components/staffordos/UnifiedHome.tsx");
 const nextActionCardPath = path.join(root, "staffordos/ui/operator-frontend/components/staffordos/NextActionCard.tsx");
+const actionPath = path.join(root, "staffordos/ui/operator-frontend/lib/staffordos/actionRegistry.ts");
 
 const objectiveSource = readFileSync(objectivePath, "utf8");
 const objectivePageSource = readFileSync(objectivePagePath, "utf8");
@@ -19,6 +20,7 @@ const shellSource = readFileSync(shellPath, "utf8");
 const homeModelSource = readFileSync(homeModelPath, "utf8");
 const unifiedHomeSource = readFileSync(unifiedHomePath, "utf8");
 const nextActionCardSource = readFileSync(nextActionCardPath, "utf8");
+const actionSource = readFileSync(actionPath, "utf8");
 
 function objectiveBlocksFor(workspaceId) {
   return objectiveSource
@@ -93,8 +95,10 @@ test("no write method exists in the registry", () => {
 });
 
 test("Stafford Media Home primary action references a valid Objective", () => {
-  assert.match(homeModelSource, /getObjectiveById\("stafford-media-operating-loop"\)/);
-  assert.match(homeModelSource, /supportedObjectiveTitle: operatingLoopObjective\?\.title/);
+  assert.match(homeModelSource, /getPrimaryAction\(DEFAULT_STAFFORDOS_WORKSPACE_ID\)/);
+  assert.match(homeModelSource, /getObjectiveById\(action\.objectiveId\)/);
+  assert.match(actionSource, /id: "start-my-day-home-action"[\s\S]*objectiveId: "stafford-media-operating-loop"/);
+  assert.match(homeModelSource, /supportedObjectiveTitle: objective\?\.title/);
   assert.match(unifiedHomeSource, /supports=\{primaryAction\.supportedObjectiveTitle\}/);
   assert.match(nextActionCardSource, /Supports:/);
 });

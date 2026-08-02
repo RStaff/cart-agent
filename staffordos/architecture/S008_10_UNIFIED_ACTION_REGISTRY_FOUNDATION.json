@@ -1,0 +1,325 @@
+{
+  "mission": "S008_10_UNIFIED_ACTION_REGISTRY_FOUNDATION",
+  "status": "READY_FOR_LOCAL_COMMIT",
+  "operator_question": "What should be done next?",
+  "checkpoint_authority": {
+    "verified_head": "7fe3ee99da92fbf6e4184be43bd4778fb44036cd",
+    "required_commits_present": [
+      "7d661d1cea4e447e855dfec59e80d6b8feb44bad",
+      "4503ebb5a15484384d5dbb463dcdce551c3e9293",
+      "cd0757caacaf8d7c1523bc2bea63e0b715da9561",
+      "e386645f2d2c0aa625c2bec11edfd3b6c5c92f6a",
+      "735c4a5fad194afdc3cfbef28411cac77bfc7ddd",
+      "122bee6872099c4f909b5c025b3d375745af3134",
+      "33af5d22361ca6e3960e3445ceb01e2d2c25e5f7",
+      "7fe3ee99da92fbf6e4184be43bd4778fb44036cd"
+    ],
+    "canonical_action_registry_preexisted": false
+  },
+  "discovery": {
+    "related_noncanonical_sources": [
+      {
+        "path": "staffordos/ui/operator-frontend/lib/operator/actionResolver.ts",
+        "finding": "Existing business-specific action candidate resolver; not a StaffordOS-wide Action Registry."
+      },
+      {
+        "path": "staffordos/decision/resolve_primary_action_v1.mjs",
+        "finding": "Existing primary-action snapshot resolver; not a static canonical Action model."
+      },
+      {
+        "path": "staffordos/snapshots/primary_action_snapshot_v1.json",
+        "finding": "Business action evidence snapshot; not a canonical registry."
+      },
+      {
+        "path": "staffordos/ui/operator-frontend/components/staffordos/NextActionCard.tsx",
+        "finding": "Reusable read-only presentation component."
+      },
+      {
+        "path": "staffordos/ui/operator-frontend/lib/staffordos/objectiveRegistry.ts",
+        "finding": "Provides Objective anchors for explicit Action linking."
+      },
+      {
+        "path": "staffordos/ui/operator-frontend/lib/staffordos/decisionRegistry.ts",
+        "finding": "Provides Decision anchors for explicit Action linking."
+      }
+    ]
+  },
+  "action_contract": {
+    "path": "staffordos/ui/operator-frontend/lib/staffordos/actionRegistry.ts",
+    "fields": [
+      "id",
+      "workspaceId",
+      "objectiveId",
+      "decisionId",
+      "capabilityId",
+      "title",
+      "summary",
+      "reason",
+      "expectedResult",
+      "proofNeeded",
+      "owner",
+      "authority",
+      "priorityClassification",
+      "effortClassification",
+      "visibility",
+      "status",
+      "source",
+      "createdFrom",
+      "learningTarget",
+      "continueHref",
+      "continueLabel"
+    ],
+    "safe_read_methods": [
+      "getActionsForWorkspace",
+      "getActionById",
+      "getActionsForDecision",
+      "getActionsForObjective",
+      "getPrimaryAction"
+    ],
+    "forbidden_methods_absent": [
+      "create",
+      "update",
+      "delete",
+      "execute",
+      "complete",
+      "approve",
+      "persistence",
+      "API access",
+      "database access",
+      "AI ranking"
+    ]
+  },
+  "stafford_media_actions": [
+    {
+      "id": "start-my-day-home-action",
+      "title": "Start My Day",
+      "route": "/operator",
+      "objectiveId": "stafford-media-operating-loop",
+      "decisionId": "s008-start-my-day-static-home-action",
+      "source": "repository_backed"
+    },
+    {
+      "id": "review-people-to-contact-action",
+      "title": "Review People to Contact",
+      "route": "/operator/leads",
+      "objectiveId": "stafford-media-convert-opportunities",
+      "decisionId": "s008-operator-runtime-canonical",
+      "source": "repository_backed"
+    },
+    {
+      "id": "review-money-to-collect-action",
+      "title": "Review Money to Collect",
+      "route": "/operator/revenue-command",
+      "objectiveId": "stafford-media-convert-opportunities",
+      "decisionId": "s008-operator-runtime-canonical",
+      "source": "repository_backed"
+    },
+    {
+      "id": "review-active-work-action",
+      "title": "Review Active Work",
+      "route": "/operator/command-center",
+      "objectiveId": "stafford-media-complete-work-with-proof",
+      "decisionId": "s008-operator-runtime-canonical",
+      "source": "repository_backed"
+    },
+    {
+      "id": "review-current-objectives-action",
+      "title": "Review Current Goals",
+      "route": "/os/objectives",
+      "objectiveId": "stafford-media-operating-loop",
+      "decisionId": "s008-operator-runtime-canonical",
+      "source": "repository_backed"
+    },
+    {
+      "id": "review-recent-decisions-action",
+      "title": "Review Recent Decisions",
+      "route": "/os/decisions",
+      "objectiveId": "stafford-media-operating-loop",
+      "decisionId": "s008-operator-runtime-canonical",
+      "source": "repository_backed"
+    }
+  ],
+  "workspace_boundaries": {
+    "professional": {
+      "current_actions": 0,
+      "status": "planned",
+      "forbidden_current_data": [
+        "employers",
+        "jobs",
+        "applications",
+        "interviews",
+        "professional workflow state"
+      ]
+    },
+    "personal": {
+      "current_actions": 0,
+      "status": "planned",
+      "forbidden_current_data": [
+        "family members",
+        "media",
+        "learning history",
+        "sharing"
+      ]
+    }
+  },
+  "action_surface": {
+    "route": "/os/actions",
+    "operator_title": "What To Do Next",
+    "shows": [
+      "what to do",
+      "why it matters",
+      "what success looks like",
+      "proof needed",
+      "related goal",
+      "related decision",
+      "authority",
+      "effort",
+      "where the action starts"
+    ],
+    "mutation_controls": false
+  },
+  "home_integration": {
+    "primary_action_source": "getPrimaryAction(DEFAULT_STAFFORDOS_WORKSPACE_ID)",
+    "live_prioritization_claim": false,
+    "automation_claim": false,
+    "execution_claim": false
+  },
+  "linking": {
+    "decision_linking": "explicit decisionId only",
+    "objective_linking": "explicit objectiveId only",
+    "inference_used": false,
+    "unsupported_lookup_behavior": "null or empty list"
+  },
+  "boundary_safety": {
+    "stafford_media_only_for_stafford_media": true,
+    "professional_actions_empty": true,
+    "personal_actions_empty": true,
+    "operator_loader_imports": false,
+    "api_calls": false,
+    "database_access": false,
+    "persistence": false,
+    "execution_methods": false,
+    "approval_methods": false,
+    "operator_runtime_changed": false
+  },
+  "validation": {
+    "focused_tests": [
+      {
+        "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/actionRegistry.test.mjs",
+        "result": "passed",
+        "tests": "14/14"
+      },
+      {
+        "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/decisionRegistry.test.mjs",
+        "result": "passed",
+        "tests": "18/18"
+      },
+      {
+        "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/objectiveRegistry.test.mjs",
+        "result": "passed",
+        "tests": "14/14"
+      },
+      {
+        "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/homePresentation.test.mjs",
+        "result": "passed",
+        "tests": "11/11"
+      },
+      {
+        "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/workspaceRegistry.test.mjs",
+        "result": "passed",
+        "tests": "8/8"
+      }
+    ],
+    "build": {
+      "command": "npm run build",
+      "workdir": "staffordos/ui/operator-frontend",
+      "result": "passed",
+      "known_warnings": [
+        "Turbopack traced next.config.mjs through /api/operator/ceo-snapshot.",
+        "Existing /operator/shopifixer-pilot client/server-function serialization warnings during static generation."
+      ]
+    },
+    "route_checks": [
+      {
+        "route": "/os",
+        "status": 200
+      },
+      {
+        "route": "/os/actions",
+        "status": 200
+      },
+      {
+        "route": "/os/objectives",
+        "status": 200
+      },
+      {
+        "route": "/os/decisions",
+        "status": 200
+      },
+      {
+        "route": "/os/capabilities",
+        "status": 200
+      },
+      {
+        "route": "/operator",
+        "status": 200
+      }
+    ]
+  },
+  "files_changed": {
+    "added": [
+      "staffordos/ui/operator-frontend/app/os/actions/page.tsx",
+      "staffordos/ui/operator-frontend/components/staffordos/ActionSurface.tsx",
+      "staffordos/ui/operator-frontend/lib/staffordos/actionRegistry.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/actionRegistry.test.mjs",
+      "staffordos/architecture/S008_10_UNIFIED_ACTION_REGISTRY_FOUNDATION.md",
+      "staffordos/architecture/S008_10_UNIFIED_ACTION_REGISTRY_FOUNDATION.json"
+    ],
+    "modified": [
+      "staffordos/ui/operator-frontend/components/staffordos/UnifiedHome.tsx",
+      "staffordos/ui/operator-frontend/lib/staffordos/homePresentation.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/homePresentation.test.mjs",
+      "staffordos/ui/operator-frontend/lib/staffordos/objectiveRegistry.test.mjs"
+    ]
+  },
+  "known_limitations": [
+    "Actions are static and repository-backed only.",
+    "No runtime Action table exists.",
+    "No Action persistence exists.",
+    "No Action completion exists.",
+    "No approval workflow exists.",
+    "No AI prioritization exists.",
+    "Professional and Personal Actions are intentionally absent.",
+    "Live evidence aggregation is not connected."
+  ],
+  "rollback": {
+    "command": "git revert <S008.10 commit SHA>",
+    "requires_production_rollback": false,
+    "requires_database_rollback": false,
+    "requires_authentication_rollback": false,
+    "requires_stripe_rollback": false,
+    "requires_shopifixer_rollback": false,
+    "requires_abando_rollback": false
+  },
+  "non_impact_confirmation": {
+    "deploy": false,
+    "push": false,
+    "production_modified": false,
+    "shopifixer_runtime_modified": false,
+    "abando_runtime_modified": false,
+    "authentication_modified": false,
+    "oauth_kms_jwt_issuer_modified": false,
+    "stripe_modified": false,
+    "database_modified": false,
+    "prisma_modified": false,
+    "api_modified": false,
+    "queue_modified": false,
+    "packet_modified": false,
+    "operator_runtime_modified": false,
+    "execution_workflows_implemented": false,
+    "persistence_implemented": false,
+    "ai_ranking_implemented": false,
+    "ai_execution_implemented": false,
+    "automation_implemented": false
+  }
+}

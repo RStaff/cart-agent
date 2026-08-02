@@ -147,6 +147,14 @@ function StaffordMediaHome() {
       </section>
 
       <section className="staffordObjectiveNote">
+        <strong>Action list</strong>
+        <p>Review the current static actions and the goal and decision behind each one.</p>
+        <Link href="/os/actions" className="staffordHomeActionLink">
+          What To Do Next
+        </Link>
+      </section>
+
+      <section className="staffordObjectiveNote">
         <strong>Decision memory</strong>
         <p>Review the architecture choices behind this operating surface before changing direction.</p>
         <Link href="/os/decisions" className="staffordHomeActionLink">

@@ -10,6 +10,7 @@ const nextActionCardPath = path.join(root, "staffordos/ui/operator-frontend/comp
 const pagePath = path.join(root, "staffordos/ui/operator-frontend/app/os/page.tsx");
 const capabilityPath = path.join(root, "staffordos/ui/operator-frontend/lib/staffordos/capabilities.ts");
 const registryPath = path.join(root, "staffordos/ui/operator-frontend/lib/staffordos/workspaceRegistry.ts");
+const actionPath = path.join(root, "staffordos/ui/operator-frontend/lib/staffordos/actionRegistry.ts");
 
 const homeModelSource = readFileSync(homeModelPath, "utf8");
 const homeComponentSource = readFileSync(homeComponentPath, "utf8");
@@ -17,6 +18,7 @@ const nextActionCardSource = readFileSync(nextActionCardPath, "utf8");
 const pageSource = readFileSync(pagePath, "utf8");
 const capabilitySource = readFileSync(capabilityPath, "utf8");
 const registrySource = readFileSync(registryPath, "utf8");
+const actionSource = readFileSync(actionPath, "utf8");
 
 function presentationBlock(workspaceId) {
   const exportName = {
@@ -37,8 +39,9 @@ test("Stafford Media remains the safe default workspace", () => {
 test("Stafford Media Home renders one primary repository-backed action", () => {
   const staffordBlock = presentationBlock("stafford-media");
 
-  assert.match(staffordBlock, /primaryAction: actionFromCapability\(startMyDay/);
-  assert.match(staffordBlock, /whatToDo: "Start My Day"/);
+  assert.match(staffordBlock, /primaryAction: primaryStaffordMediaAction \? actionFromRegisteredAction\(primaryStaffordMediaAction\) : null/);
+  assert.match(homeModelSource, /getPrimaryAction\(DEFAULT_STAFFORDOS_WORKSPACE_ID\)/);
+  assert.match(actionSource, /id: "start-my-day-home-action"[\s\S]*?source: "repository_backed"/);
   assert.match(homeModelSource, /source: capability\.source/);
   assert.match(capabilitySource, /id: "start-my-day"[\s\S]*?source: "repository_backed"[\s\S]*?currentRoute: "\/operator"/);
 });

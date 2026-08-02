@@ -9,6 +9,12 @@ import {
   type StaffordOsWorkspaceId,
 } from "./workspaceRegistry";
 import { getObjectiveById } from "./objectiveRegistry";
+import {
+  ACTION_EFFORT_LABELS,
+  ACTION_STATUS_LABELS,
+  getPrimaryAction,
+  type StaffordOsAction,
+} from "./actionRegistry";
 
 export type HomeActionPresentation = {
   id: string;
@@ -75,6 +81,32 @@ function actionFromCapability(
   };
 }
 
+function actionFromRegisteredAction(action: StaffordOsAction): HomeActionPresentation {
+  const capability = action.capabilityId ? capabilityById(action.workspaceId, action.capabilityId) : null;
+  const objective = getObjectiveById(action.objectiveId);
+
+  return {
+    id: action.id,
+    capabilityId: action.capabilityId || "",
+    title: action.title,
+    whatToDo: action.title,
+    whyNow: action.reason,
+    expectedResult: action.expectedResult,
+    evidence: action.summary,
+    effort: ACTION_EFFORT_LABELS[action.effortClassification],
+    risk: "Live priority ranking is not connected here yet.",
+    completionProof: action.proofNeeded,
+    supportedObjectiveId: objective?.id,
+    supportedObjectiveTitle: objective?.title,
+    objectiveAlignmentNote:
+      "Action guidance is based on the static Action Registry. Live ranking and execution are not connected yet.",
+    continueHref: action.continueHref,
+    continueLabel: action.continueLabel,
+    availabilityLabel: ACTION_STATUS_LABELS[action.status],
+    source: capability?.source || "repository_backed",
+  };
+}
+
 function requiredCapability(workspaceId: StaffordOsWorkspaceId, capabilityId: string) {
   const capability = capabilityById(workspaceId, capabilityId);
   if (!capability) {
@@ -83,28 +115,14 @@ function requiredCapability(workspaceId: StaffordOsWorkspaceId, capabilityId: st
   return capability;
 }
 
-const startMyDay = requiredCapability(DEFAULT_STAFFORDOS_WORKSPACE_ID, "start-my-day");
-const operatingLoopObjective = getObjectiveById("stafford-media-operating-loop");
+const primaryStaffordMediaAction = getPrimaryAction(DEFAULT_STAFFORDOS_WORKSPACE_ID);
 
 export const STAFFORD_MEDIA_HOME_PRESENTATION: HomePresentation = {
   workspaceId: "stafford-media",
   heading: "What Deserves Attention",
   summary:
     "Start with the current Stafford Media operating page. It is the working place StaffordOS can use today.",
-  primaryAction: actionFromCapability(startMyDay, {
-    whatToDo: "Start My Day",
-    whyNow:
-      "This is the current Home surface for the workday, the main priority, current risks, and business health.",
-    expectedResult:
-      "You continue in the current operating Home page instead of working from a duplicate view.",
-    evidence: "Backed by the current StaffordOS Home page and the S008 capability map.",
-    risk: "Live priority ranking is not connected here yet.",
-    completionProof: "The current Home page opens and remains the place to continue today.",
-    supportedObjectiveId: operatingLoopObjective?.id,
-    supportedObjectiveTitle: operatingLoopObjective?.title,
-    objectiveAlignmentNote:
-      "Objective alignment is based on the current StaffordOS structure. Live measurement is not connected yet.",
-  }),
+  primaryAction: primaryStaffordMediaAction ? actionFromRegisteredAction(primaryStaffordMediaAction) : null,
   supportingActions: [
     actionFromCapability(requiredCapability("stafford-media", "find-people-to-contact"), {
       whyNow: "Use this when the next useful move is outreach or relationship follow-up.",
