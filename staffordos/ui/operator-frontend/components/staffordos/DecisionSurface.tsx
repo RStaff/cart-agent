@@ -13,6 +13,7 @@ import {
 } from "../../lib/staffordos/decisionRegistry";
 import { getEvidenceForDecision } from "../../lib/staffordos/evidenceFoundation";
 import { getObjectiveById } from "../../lib/staffordos/objectiveRegistry";
+import { getProofForDecision } from "../../lib/staffordos/proofFoundation";
 import {
   DEFAULT_STAFFORDOS_WORKSPACE_ID,
   WORKSPACE_AVAILABILITY_LABELS,
@@ -22,6 +23,7 @@ import { useStaffordOsWorkspace } from "./WorkspaceContext";
 function DecisionCard({ decision }: { decision: StaffordOsDecision }) {
   const objective = getObjectiveById(decision.objectiveId);
   const evidence = getEvidenceForDecision(decision.id);
+  const proof = getProofForDecision(decision.id);
 
   return (
     <article className="staffordObjectiveCard">
@@ -81,6 +83,21 @@ function DecisionCard({ decision }: { decision: StaffordOsDecision }) {
             ))
           ) : (
             <span>Needs review</span>
+          )}
+        </div>
+      </div>
+
+      <div className="staffordObjectiveCapabilities">
+        <span>Proof</span>
+        <div>
+          {proof.length ? (
+            proof.map((record) => (
+              <Link key={record.id} href="/os/proof">
+                {record.title}
+              </Link>
+            ))
+          ) : (
+            <span>Not yet proven</span>
           )}
         </div>
       </div>

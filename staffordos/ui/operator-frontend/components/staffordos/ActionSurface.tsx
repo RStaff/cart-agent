@@ -12,6 +12,7 @@ import {
 import { getDecisionById } from "../../lib/staffordos/decisionRegistry";
 import { getEvidenceForAction } from "../../lib/staffordos/evidenceFoundation";
 import { getObjectiveById } from "../../lib/staffordos/objectiveRegistry";
+import { PROOF_VERIFICATION_LABELS, getProofForAction } from "../../lib/staffordos/proofFoundation";
 import {
   DEFAULT_STAFFORDOS_WORKSPACE_ID,
   WORKSPACE_AVAILABILITY_LABELS,
@@ -22,6 +23,7 @@ function ActionCard({ action }: { action: StaffordOsAction }) {
   const objective = getObjectiveById(action.objectiveId);
   const decision = getDecisionById(action.decisionId);
   const evidence = getEvidenceForAction(action.id);
+  const proof = getProofForAction(action.id);
 
   return (
     <article className="staffordObjectiveCard">
@@ -50,6 +52,10 @@ function ActionCard({ action }: { action: StaffordOsAction }) {
         <div>
           <dt>Proof needed</dt>
           <dd>{action.proofNeeded}</dd>
+        </div>
+        <div>
+          <dt>Proof status</dt>
+          <dd>{proof.length ? PROOF_VERIFICATION_LABELS[proof[0].verificationStatus] : "Not yet proven"}</dd>
         </div>
         <div>
           <dt>Authority</dt>
@@ -98,6 +104,21 @@ function ActionCard({ action }: { action: StaffordOsAction }) {
           </div>
         </div>
       ) : null}
+
+      <div className="staffordObjectiveCapabilities">
+        <span>What has been proven</span>
+        <div>
+          {proof.length ? (
+            proof.map((record) => (
+              <Link key={record.id} href="/os/proof">
+                {record.title}
+              </Link>
+            ))
+          ) : (
+            <span>Not yet proven</span>
+          )}
+        </div>
+      </div>
 
       <details className="staffordObjectiveEvidence">
         <summary>Source details</summary>

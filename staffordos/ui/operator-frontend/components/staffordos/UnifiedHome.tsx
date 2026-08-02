@@ -163,6 +163,14 @@ function StaffordMediaHome() {
       </section>
 
       <section className="staffordObjectiveNote">
+        <strong>Proof status</strong>
+        <p>Review narrow validation proof for routes and static S008 foundations. This does not complete actions.</p>
+        <Link href="/os/proof" className="staffordHomeActionLink">
+          What Has Been Proven
+        </Link>
+      </section>
+
+      <section className="staffordObjectiveNote">
         <strong>Decision memory</strong>
         <p>Review the architecture choices behind this operating surface before changing direction.</p>
         <Link href="/os/decisions" className="staffordHomeActionLink">

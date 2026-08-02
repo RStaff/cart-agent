@@ -13,6 +13,7 @@ import {
   OBJECTIVE_STATUS_LABELS,
   type StaffordOsObjective,
 } from "../../lib/staffordos/objectiveRegistry";
+import { getProofForObjective } from "../../lib/staffordos/proofFoundation";
 import {
   DEFAULT_STAFFORDOS_WORKSPACE_ID,
   WORKSPACE_AVAILABILITY_LABELS,
@@ -31,6 +32,7 @@ function ObjectiveCard({ objective }: { objective: StaffordOsObjective }) {
   const capabilities = objective.relatedCapabilities
     .map((capabilityId) => capabilityForId(capabilityId))
     .filter((capability): capability is StaffordOsCapability => Boolean(capability));
+  const proof = getProofForObjective(objective.id);
 
   return (
     <article className="staffordObjectiveCard">
@@ -78,6 +80,21 @@ function ObjectiveCard({ objective }: { objective: StaffordOsObjective }) {
           </div>
         </div>
       ) : null}
+
+      <div className="staffordObjectiveCapabilities">
+        <span>Proof</span>
+        <div>
+          {proof.length ? (
+            proof.map((record) => (
+              <Link key={record.id} href="/os/proof">
+                {record.title}
+              </Link>
+            ))
+          ) : (
+            <span>Not yet proven</span>
+          )}
+        </div>
+      </div>
 
       <details className="staffordObjectiveEvidence">
         <summary>Evidence sources</summary>
