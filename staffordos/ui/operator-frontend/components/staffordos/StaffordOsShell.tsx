@@ -55,6 +55,15 @@ function StaffordOsShellFrame({ children }: StaffordOsShellProps) {
           <span>What StaffordOS Can Do</span>
           <small>{capabilityNavLabel}</small>
         </Link>
+
+        <Link
+          href="/os/objectives"
+          className={`staffordOsCapabilityNav${isActive(pathname, "/os/objectives") ? " staffordOsCapabilityNavActive" : ""}`}
+          aria-current={isActive(pathname, "/os/objectives") ? "page" : undefined}
+        >
+          <span>What We Are Working Toward</span>
+          <small>Objective alignment</small>
+        </Link>
       </aside>
 
       <main className="staffordOsMain">

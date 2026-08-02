@@ -2169,6 +2169,18 @@ textarea {
   line-height: 1.5;
 }
 
+.staffordNextActionSupport {
+  margin: 0;
+  color: #15181d;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.staffordNextActionSupport span {
+  color: #23695d;
+  font-weight: 800;
+}
+
 .staffordNextActionGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2589,6 +2601,182 @@ textarea {
   line-height: 1.45;
 }
 
+.staffordObjectivePage {
+  display: grid;
+  gap: 18px;
+  max-width: 1180px;
+}
+
+.staffordObjectiveHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 18px;
+  align-items: stretch;
+  padding: 22px;
+  border: 1px solid #d9dee5;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.staffordObjectiveHeader h1 {
+  margin: 6px 0 0;
+  color: #15181d;
+  font-size: 34px;
+  line-height: 1.08;
+}
+
+.staffordObjectiveHeader p {
+  margin: 10px 0 0;
+  max-width: 700px;
+  color: #4f5a66;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.staffordObjectiveNote {
+  display: grid;
+  gap: 6px;
+  padding: 16px 18px;
+  border: 1px solid #cbd4dd;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.staffordObjectiveNote strong {
+  color: #23695d;
+}
+
+.staffordObjectiveNote p {
+  margin: 0;
+  color: #4f5a66;
+  line-height: 1.5;
+}
+
+.staffordObjectiveGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.staffordObjectiveCard {
+  display: grid;
+  gap: 14px;
+  min-height: 100%;
+  padding: 16px;
+  border: 1px solid #d9dee5;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.staffordObjectiveMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.staffordObjectiveMeta span {
+  padding: 5px 8px;
+  border: 1px solid #cbd4dd;
+  border-radius: 999px;
+  background: #f5f7f9;
+  color: #66717e;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.staffordObjectiveCard h2 {
+  margin: 0;
+  color: #15181d;
+  font-size: 21px;
+  line-height: 1.2;
+}
+
+.staffordObjectiveCard p {
+  margin: 0;
+  color: #4f5a66;
+  line-height: 1.45;
+}
+
+.staffordObjectiveFacts {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.staffordObjectiveFacts div {
+  display: grid;
+  gap: 3px;
+}
+
+.staffordObjectiveFacts dt,
+.staffordObjectiveCapabilities span {
+  color: #66717e;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.staffordObjectiveFacts dd {
+  margin: 0;
+  color: #15181d;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.staffordObjectiveCapabilities {
+  display: grid;
+  gap: 8px;
+}
+
+.staffordObjectiveCapabilities div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.staffordObjectiveCapabilities a,
+.staffordObjectiveCapabilities div > span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid #cbd4dd;
+  border-radius: 8px;
+  background: #f5f7f9;
+  color: #15181d;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.staffordObjectiveCapabilities a:hover {
+  border-color: #23695d;
+  color: #23695d;
+}
+
+.staffordObjectiveEvidence {
+  margin-top: auto;
+  color: #4f5a66;
+  font-size: 13px;
+}
+
+.staffordObjectiveEvidence summary {
+  cursor: pointer;
+  color: #23695d;
+  font-weight: 800;
+}
+
+.staffordObjectiveEvidence ul {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding-left: 18px;
+}
+
+.staffordObjectiveEvidence li {
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 1020px) {
   .staffordOsShell {
     grid-template-columns: 1fr;
@@ -2612,10 +2800,12 @@ textarea {
 
   .staffordWorkspaceHeader,
   .staffordHomeHeader,
+  .staffordObjectiveHeader,
   .staffordHomeAttention,
   .staffordNextActionGrid,
   .staffordWorkspaceGrid,
   .staffordCapabilityGrid,
+  .staffordObjectiveGrid,
   .staffordHomeSupportGrid,
   .staffordHomePlannedGrid,
   .staffordHomeTransparency {
@@ -2639,7 +2829,8 @@ textarea {
   }
 
   .staffordWorkspaceHeader h1,
-  .staffordHomeHeader h1 {
+  .staffordHomeHeader h1,
+  .staffordObjectiveHeader h1 {
     font-size: 28px;
   }
 }

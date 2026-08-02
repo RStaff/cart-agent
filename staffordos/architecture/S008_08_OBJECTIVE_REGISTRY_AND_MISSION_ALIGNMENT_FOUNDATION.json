@@ -1,0 +1,410 @@
+{
+  "schema": "staffordos.architecture.s008_08_objective_registry_and_mission_alignment_foundation.v1",
+  "mission": "S008_08_OBJECTIVE_REGISTRY_AND_MISSION_ALIGNMENT_FOUNDATION",
+  "classification": "OBJECTIVE_REGISTRY_READY_FOR_LOCAL_COMMIT",
+  "mission_boundary": {
+    "deployment_changed": false,
+    "push_performed": false,
+    "production_changed": false,
+    "authentication_changed": false,
+    "oauth_changed": false,
+    "kms_changed": false,
+    "jwt_issuer_changed": false,
+    "stripe_changed": false,
+    "shopifixer_runtime_changed": false,
+    "abando_runtime_changed": false,
+    "database_changed": false,
+    "prisma_schema_changed": false,
+    "migration_changed": false,
+    "api_changed": false,
+    "queue_changed": false,
+    "packet_changed": false,
+    "operator_behavior_changed": false,
+    "ai_ranking_implemented": false,
+    "automated_prioritization_implemented": false,
+    "live_objective_registry_implemented": false,
+    "real_objectives_created": false,
+    "employee_access_implemented": false,
+    "invited_users_implemented": false,
+    "professional_workflows_implemented": false,
+    "personal_workflows_implemented": false,
+    "cross_workspace_data_implemented": false
+  },
+  "checkpoint_authority": {
+    "required_commits": [
+      {
+        "name": "S008 foundation",
+        "commit": "7d661d1cea4e447e855dfec59e80d6b8feb44bad",
+        "status": "present"
+      },
+      {
+        "name": "S008 capability map",
+        "commit": "4503ebb5a15484384d5dbb463dcdce551c3e9293",
+        "status": "present"
+      },
+      {
+        "name": "S008 multi-workspace architecture",
+        "commit": "cd0757caacaf8d7c1523bc2bea63e0b715da9561",
+        "status": "present"
+      },
+      {
+        "name": "S008 unified action and decision model",
+        "commit": "e386645f2d2c0aa625c2bec11edfd3b6c5c92f6a",
+        "status": "present"
+      },
+      {
+        "name": "S008 workspace context",
+        "commit": "735c4a5fad194afdc3cfbef28411cac77bfc7ddd",
+        "status": "present"
+      },
+      {
+        "name": "S008 unified Home",
+        "commit": "122bee6872099c4f909b5c025b3d375745af3134",
+        "status": "present_current_checkpoint"
+      }
+    ],
+    "unrelated_worktree_changes_excluded": true
+  },
+  "existing_objective_discovery": {
+    "canonical_runtime_objective_model_found": false,
+    "partial_sources": [
+      {
+        "path": "staffordos/architecture/S008_05_UNIFIED_ACTION_AND_DECISION_MODEL.md",
+        "finding": "Defines Objective conceptually."
+      },
+      {
+        "path": "staffordos/system_inventory/objective_binding_v1.json",
+        "finding": "Lists business objectives and requirements, but is not a workspace runtime registry."
+      },
+      {
+        "path": "staffordos/authority/output/staffordos_business_core_definition_of_done_v1.md",
+        "finding": "Defines business-core questions and done-state evidence."
+      },
+      {
+        "path": "staffordos/authority/canonical_business_lifecycle_v1.md",
+        "finding": "Defines marketing through referral and Abando expansion lifecycle."
+      },
+      {
+        "path": "staffordos/snapshots/primary_action_snapshot_v1.json",
+        "finding": "Business-only primary action snapshot; not a generalized Objective registry."
+      }
+    ],
+    "authority_decision": "Create a static read-side Objective registry for /os presentation only."
+  },
+  "objective_registry_contract": {
+    "file": "staffordos/ui/operator-frontend/lib/staffordos/objectiveRegistry.ts",
+    "read_methods": [
+      "getObjectivesForWorkspace",
+      "getActiveObjectivesForWorkspace",
+      "getObjectiveById",
+      "getObjectivesForCapability"
+    ],
+    "write_methods_added": false,
+    "persistence_added": false,
+    "api_calls_added": false,
+    "database_access_added": false,
+    "ai_creation_added": false,
+    "scoring_added": false,
+    "fields": [
+      "id",
+      "workspaceId",
+      "missionId",
+      "title",
+      "description",
+      "whyItMatters",
+      "objectiveType",
+      "status",
+      "priorityClass",
+      "owner",
+      "successCondition",
+      "proofRequirement",
+      "evidenceStatus",
+      "timeframe",
+      "relatedCapabilities",
+      "relatedActions",
+      "privacyClassification",
+      "authorityStatus",
+      "source",
+      "sourceArtifacts"
+    ]
+  },
+  "source_and_authority_classification": {
+    "source_labels": {
+      "repository_backed": "Repository-backed",
+      "operator_defined": "Operator-defined",
+      "imported": "Imported",
+      "ai_proposed": "AI-proposed",
+      "planned_example": "Planned example",
+      "needs_verification": "Needs verification"
+    },
+    "rules": [
+      "AI-proposed objectives are never automatically active.",
+      "Planned examples must never appear as current operating truth.",
+      "Repository-backed objectives cite exact artifacts.",
+      "Operator-defined objectives require explicit owner approval in a future runtime model.",
+      "Imported objectives require source and workspace validation in a future import path.",
+      "Unsupported objectives fail closed as Needs review."
+    ]
+  },
+  "stafford_media_objectives": [
+    {
+      "id": "stafford-media-operating-loop",
+      "title": "Run the business from one clear loop",
+      "status": "Active",
+      "source": "Repository-backed"
+    },
+    {
+      "id": "stafford-media-convert-opportunities",
+      "title": "Turn opportunities into paid work",
+      "status": "Active",
+      "source": "Repository-backed"
+    },
+    {
+      "id": "stafford-media-complete-work-with-proof",
+      "title": "Complete customer work with proof",
+      "status": "Active",
+      "source": "Repository-backed"
+    }
+  ],
+  "professional_boundary": {
+    "active_runtime_objectives": 0,
+    "planned_examples": [
+      "Secure the right role",
+      "Succeed in the current role"
+    ],
+    "links_to_stafford_media_routes": false,
+    "professional_data_connected": false
+  },
+  "personal_boundary": {
+    "active_runtime_objectives": 0,
+    "planned_examples": [
+      "Protect private priorities"
+    ],
+    "links_to_stafford_media_routes": false,
+    "personal_data_connected": false
+  },
+  "objective_surface": {
+    "route": "/os/objectives",
+    "title": "What We Are Working Toward",
+    "component": "staffordos/ui/operator-frontend/components/staffordos/ObjectiveSurface.tsx",
+    "shell_reused": true,
+    "read_only": true,
+    "shows_fake_progress": false,
+    "shows_fake_revenue": false,
+    "shows_fake_due_dates": false,
+    "claims_automatic_measurement": false
+  },
+  "home_objective_alignment": {
+    "home_model": "staffordos/ui/operator-frontend/lib/staffordos/homePresentation.ts",
+    "primary_action": "Start My Day",
+    "supported_objective_id": "stafford-media-operating-loop",
+    "supported_objective_title": "Run the business from one clear loop",
+    "dynamic_selection_claimed": false,
+    "live_measurement_claimed": false
+  },
+  "capability_alignment": {
+    "mapping_source": "explicit relatedCapabilities arrays",
+    "inferred_from_titles_or_routes": false,
+    "mappings": {
+      "stafford-media-operating-loop": [
+        "start-my-day",
+        "decide-what-matters",
+        "review-recent-activity",
+        "understand-system-connections",
+        "review-rules-and-checks"
+      ],
+      "stafford-media-convert-opportunities": [
+        "find-people-to-contact",
+        "review-marketing-activity",
+        "see-money-to-collect",
+        "decide-what-matters"
+      ],
+      "stafford-media-complete-work-with-proof": [
+        "manage-current-customer-work",
+        "review-rules-and-checks",
+        "review-recent-activity"
+      ]
+    }
+  },
+  "mission_and_objective_relationship": {
+    "mission": "broader outcome or sustained purpose",
+    "objective": "specific result that advances a Mission",
+    "action": "next step that advances an Objective",
+    "proof": "evidence that an Action or Objective reached its intended result",
+    "learning": "what StaffordOS retains afterward",
+    "runtime_mission_registry_created": false
+  },
+  "boundary_safety": {
+    "stafford_media_objectives_only_in_stafford_media": true,
+    "professional_active_objectives": 0,
+    "personal_active_objectives": 0,
+    "planned_examples_visibly_planned": true,
+    "live_measurement_claimed": false,
+    "mutations_added": false,
+    "operator_loaders_imported": false,
+    "api_requests_added": false,
+    "database_access_added": false,
+    "ai_recommendation_generated": false,
+    "authorization_changed": false,
+    "workspace_selection_authorization_claim": false,
+    "operator_routes_changed": false
+  },
+  "operator_language_review": {
+    "standard": "staffordos/architecture/S008_02_STAFFORDOS_OPERATOR_LANGUAGE_STANDARD.md",
+    "preferred_visible_language": [
+      "What We Are Working Toward",
+      "Why this matters",
+      "What completion looks like",
+      "Proof needed",
+      "Supported by",
+      "Active",
+      "Planned",
+      "Needs review"
+    ],
+    "avoided_primary_language": [
+      "objective registry",
+      "entity",
+      "source enum",
+      "foreign key",
+      "resolver",
+      "runtime binding",
+      "mission-object relation",
+      "persistence layer"
+    ]
+  },
+  "files_changed": {
+    "application": [
+      "staffordos/ui/operator-frontend/app/os/objectives/page.tsx",
+      "staffordos/ui/operator-frontend/components/staffordos/ObjectiveSurface.tsx",
+      "staffordos/ui/operator-frontend/components/staffordos/StaffordOsShell.tsx",
+      "staffordos/ui/operator-frontend/components/staffordos/NextActionCard.tsx",
+      "staffordos/ui/operator-frontend/components/staffordos/UnifiedHome.tsx",
+      "staffordos/ui/operator-frontend/lib/staffordos/homePresentation.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/objectiveRegistry.ts",
+      "staffordos/ui/operator-frontend/app/globals.css"
+    ],
+    "tests": [
+      "staffordos/ui/operator-frontend/lib/staffordos/objectiveRegistry.test.mjs"
+    ],
+    "documentation": [
+      "staffordos/architecture/S008_08_OBJECTIVE_REGISTRY_AND_MISSION_ALIGNMENT_FOUNDATION.md",
+      "staffordos/architecture/S008_08_OBJECTIVE_REGISTRY_AND_MISSION_ALIGNMENT_FOUNDATION.json"
+    ]
+  },
+  "validation": {
+    "focused_tests": {
+      "objective_registry_tests": "14 passing",
+      "workspace_registry_tests": "8 passing",
+      "home_presentation_tests": "11 passing"
+    },
+    "build": {
+      "command": "npm run build",
+      "working_directory": "staffordos/ui/operator-frontend",
+      "result": "passed",
+      "exit_code": 0,
+      "warnings": [
+        "Existing Turbopack trace warning from next.config.mjs and /api/operator/ceo-snapshot route.",
+        "Existing /operator/shopifixer-pilot server/client serialization warnings during static generation."
+      ]
+    },
+    "route_checks": {
+      "result": "passed",
+      "server": "next start -p 3318",
+      "routes": [
+        {
+          "path": "/os",
+          "http_status": 200
+        },
+        {
+          "path": "/os/objectives",
+          "http_status": 200
+        },
+        {
+          "path": "/os/capabilities",
+          "http_status": 200
+        },
+        {
+          "path": "/os/command",
+          "http_status": 200
+        },
+        {
+          "path": "/os/work",
+          "http_status": 200
+        },
+        {
+          "path": "/os/pipeline",
+          "http_status": 200
+        },
+        {
+          "path": "/os/knowledge",
+          "http_status": 200
+        },
+        {
+          "path": "/os/governance",
+          "http_status": 200
+        },
+        {
+          "path": "/os/system",
+          "http_status": 200
+        },
+        {
+          "path": "/operator",
+          "http_status": 200
+        },
+        {
+          "path": "/operator/cockpit",
+          "http_status": 200
+        },
+        {
+          "path": "/operator/leads",
+          "http_status": 200
+        },
+        {
+          "path": "/operator/campaigns",
+          "http_status": 200
+        },
+        {
+          "path": "/operator/revenue-command",
+          "http_status": 200
+        },
+        {
+          "path": "/operator/command-center",
+          "http_status": 200
+        }
+      ]
+    },
+    "json_validation": {
+      "command": "jq . staffordos/architecture/S008_08_OBJECTIVE_REGISTRY_AND_MISSION_ALIGNMENT_FOUNDATION.json",
+      "result": "passed"
+    },
+    "diff_check": {
+      "command": "git diff --check",
+      "result": "passed"
+    },
+    "boundary_scans": {
+      "api_or_loader_imports_found": false,
+      "write_or_mutation_imports_found": false,
+      "forbidden_primary_language_found": false,
+      "false_live_measurement_claim_found": false
+    }
+  },
+  "rollback": {
+    "procedure": "git revert <S008.08 commit SHA>",
+    "requires_database_rollback": false,
+    "requires_authentication_rollback": false,
+    "requires_stripe_rollback": false,
+    "requires_shopifixer_rollback": false,
+    "requires_abando_rollback": false,
+    "requires_production_rollback": false
+  },
+  "known_limitations": [
+    "No live Objective registry exists yet.",
+    "No live objective measurement is connected.",
+    "No runtime Mission registry is created.",
+    "No Action or Decision registry is created.",
+    "No AI ranking or objective scoring is implemented.",
+    "Professional and Personal remain planned presentation states.",
+    "/operator remains runtime-canonical until parity is proven."
+  ],
+  "next_mission_recommendation": "S008.09 should define the first read-only Action alignment model that connects static objectives, existing capability links, and existing primary-action truth without claiming live cross-workspace ranking."
+}

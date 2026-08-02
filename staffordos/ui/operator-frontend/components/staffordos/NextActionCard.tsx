@@ -2,6 +2,7 @@ type NextActionCardProps = {
   action?: string;
   headerLabel?: string;
   headerStatus?: string;
+  supports?: string;
   whyNow?: string;
   evidence?: string;
   expectedValue?: string;
@@ -23,6 +24,7 @@ const DEFAULT_NEXT_ACTION = {
   action: "Next action placeholder",
   headerLabel: "Next Action",
   headerStatus: "Decision-ready card",
+  supports: "",
   whyNow: "Priority rationale placeholder",
   evidence: "Evidence placeholder",
   expectedValue: "Expected value placeholder",
@@ -66,6 +68,11 @@ export function NextActionCard(props: NextActionCardProps) {
         <strong>{nextAction.headerStatus}</strong>
       </div>
       <h2>{nextAction.action}</h2>
+      {nextAction.supports ? (
+        <p className="staffordNextActionSupport">
+          <span>Supports:</span> {nextAction.supports}
+        </p>
+      ) : null}
       {nextAction.transparencyNote ? <p className="staffordNextActionNote">{nextAction.transparencyNote}</p> : null}
       <div className="staffordNextActionGrid">
         {detailFields.map(([label, key]) => (

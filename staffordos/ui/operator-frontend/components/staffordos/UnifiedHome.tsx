@@ -122,9 +122,13 @@ function StaffordMediaHome() {
             evidence={primaryAction.evidence}
             risk={primaryAction.risk}
             completionProof={primaryAction.completionProof}
+            supports={primaryAction.supportedObjectiveTitle}
             continueHref={primaryAction.continueHref}
             continueLabel={primaryAction.continueLabel}
-            transparencyNote="This is a static starting point based on the current StaffordOS structure."
+            transparencyNote={
+              primaryAction.objectiveAlignmentNote ||
+              "This is a static starting point based on the current StaffordOS structure."
+            }
           />
         ) : null}
       </section>

@@ -8,6 +8,7 @@ import {
   DEFAULT_STAFFORDOS_WORKSPACE_ID,
   type StaffordOsWorkspaceId,
 } from "./workspaceRegistry";
+import { getObjectiveById } from "./objectiveRegistry";
 
 export type HomeActionPresentation = {
   id: string;
@@ -22,6 +23,9 @@ export type HomeActionPresentation = {
   confidence?: string;
   approvalNeeded?: string;
   completionProof?: string;
+  supportedObjectiveId?: string;
+  supportedObjectiveTitle?: string;
+  objectiveAlignmentNote?: string;
   continueHref: string | null;
   continueLabel: string;
   availabilityLabel: string;
@@ -80,6 +84,7 @@ function requiredCapability(workspaceId: StaffordOsWorkspaceId, capabilityId: st
 }
 
 const startMyDay = requiredCapability(DEFAULT_STAFFORDOS_WORKSPACE_ID, "start-my-day");
+const operatingLoopObjective = getObjectiveById("stafford-media-operating-loop");
 
 export const STAFFORD_MEDIA_HOME_PRESENTATION: HomePresentation = {
   workspaceId: "stafford-media",
@@ -95,6 +100,10 @@ export const STAFFORD_MEDIA_HOME_PRESENTATION: HomePresentation = {
     evidence: "Backed by the current StaffordOS Home page and the S008 capability map.",
     risk: "Live priority ranking is not connected here yet.",
     completionProof: "The current Home page opens and remains the place to continue today.",
+    supportedObjectiveId: operatingLoopObjective?.id,
+    supportedObjectiveTitle: operatingLoopObjective?.title,
+    objectiveAlignmentNote:
+      "Objective alignment is based on the current StaffordOS structure. Live measurement is not connected yet.",
   }),
   supportingActions: [
     actionFromCapability(requiredCapability("stafford-media", "find-people-to-contact"), {
@@ -116,7 +125,7 @@ export const STAFFORD_MEDIA_HOME_PRESENTATION: HomePresentation = {
   authorityNote:
     "StaffordOS is using the current operating structure. Live priority ranking, objectives, and evidence aggregation are planned.",
   limitationNote:
-    "Not connected yet: live ranking, real action records, AI recommendations, objective tracking, and evidence aggregation.",
+    "Not connected yet: live ranking, real action records, AI recommendations, live objective measurement, and evidence aggregation.",
 };
 
 export const PROFESSIONAL_HOME_PRESENTATION: HomePresentation = {
