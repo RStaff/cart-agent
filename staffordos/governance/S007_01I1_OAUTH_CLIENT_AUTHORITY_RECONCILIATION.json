@@ -1,0 +1,210 @@
+{
+  "mission": "S007_01I1_OAUTH_CLIENT_AUTHORITY_RECONCILIATION",
+  "date": "2026-08-03",
+  "evidenceTimestamp": "2026-08-03T19:45:40-0400",
+  "finalClassification": "OAUTH_CLIENT_AUTHORITY_RECONCILED_WITH_CORRECTIONS",
+  "scope": {
+    "documentationOnly": true,
+    "googleCloudModified": false,
+    "secretRotated": false,
+    "secretCreated": false,
+    "secretDisabled": false,
+    "secretDeleted": false,
+    "secretValueRecorded": false,
+    "maskedSecretEndingRecorded": false,
+    "browserOAuthFlowRan": false,
+    "issuerStarted": false,
+    "localEnvironmentChanged": false,
+    "sourceCodeChanged": false,
+    "operatorWriteOccurred": false,
+    "deployed": false,
+    "pushed": false
+  },
+  "checkpointAuthority": {
+    "startingHead": "1d1891547ef38fe0888fe3b1d1f43933a5b8accd",
+    "projectAuthority": "staffordos-identity-prod",
+    "sourceBackedLocalCallbackUri": "http://127.0.0.1:8787/auth/google/callback",
+    "requiredAuthoritiesPresent": true,
+    "issuerPort8787Listening": false,
+    "ollamaPort11434Listening": false
+  },
+  "repositoryReferenceInventory": {
+    "clientIdEnv": {
+      "name": "GOOGLE_CLIENT_ID",
+      "classification": "ACTIVE_EXPECTED"
+    },
+    "clientSecretEnv": {
+      "name": "GOOGLE_CLIENT_SECRET",
+      "classification": "ACTIVE_EXPECTED",
+      "valueInspected": false
+    },
+    "redirectUriEnv": {
+      "name": "GOOGLE_REDIRECT_URI",
+      "classification": "ACTIVE_EXPECTED"
+    },
+    "googleIssuerEnv": {
+      "name": "GOOGLE_ISSUER",
+      "classification": "ACTIVE_EXPECTED"
+    },
+    "googleAudienceEnv": {
+      "name": "GOOGLE_AUDIENCE",
+      "classification": "ACTIVE_EXPECTED"
+    },
+    "localCallbackUri": {
+      "value": "http://127.0.0.1:8787/auth/google/callback",
+      "classification": "ACTIVE_EXPECTED"
+    },
+    "productionStyleCallbackUri": {
+      "value": "https://staffordos-operator.staffordmedia.ai/auth/google/callback",
+      "classification": "PLANNED"
+    },
+    "localIssuerEnvFile": {
+      "path": "staffordos/operator-issuer/.env.local",
+      "status": "VALUE_ABSENT",
+      "gitIgnored": true
+    }
+  },
+  "googleCloudAccessMethod": {
+    "method": "GOOGLE_CLOUD_CONSOLE_OPERATOR_OBSERVATION",
+    "operator": "Ross",
+    "cliOauthClientEnumerationUsed": false,
+    "reason": "Repository authority says gcloud IAP/IAM OAuth commands do not enumerate the required generic Google Auth Platform Web Application OAuth client."
+  },
+  "oauthClientCandidates": [
+    {
+      "candidateId": "S007-01I1-GOOGLE-OAUTH-CLIENT-001",
+      "displayName": "StaffordOS Operator Issuer",
+      "clientType": "Web application",
+      "projectId": "staffordos-identity-prod",
+      "redactedClientId": "109364024720-...q0i.apps.googleusercontent.com",
+      "providerRedirectUris": [
+        "https://staffordos-operator.staffordmedia.ai/auth/google/callback"
+      ],
+      "providerJavascriptOrigins": [
+        "https://staffordos-operator.staffordmedia.ai"
+      ],
+      "creationDate": "2026-07-30",
+      "lastUsedDate": "2026-07-30",
+      "lastUsedDateLimitation": "Provider UI says usage data may be delayed by a day or more.",
+      "secretSlotCount": 2,
+      "secretRows": [
+        {
+          "createdAt": "2026-07-30T19:50:41-04:00",
+          "status": "Enabled",
+          "secretValueRecorded": false,
+          "maskedEndingRecorded": false
+        },
+        {
+          "createdAt": "2026-07-30T19:55:52-04:00",
+          "status": "Enabled",
+          "secretValueRecorded": false,
+          "maskedEndingRecorded": false
+        }
+      ],
+      "repositoryMatch": "PARTIAL_MATCH",
+      "callbackMatch": "REQUIRED_LOCAL_CALLBACK_MISSING",
+      "localConfigMatch": "VALUE_ABSENT",
+      "confidence": "HIGH_WITH_REQUIRED_CONFIGURATION_CORRECTIONS",
+      "disposition": "AUTHORITATIVE_STAFFORDOS_CLIENT"
+    }
+  ],
+  "authoritativeClientResult": {
+    "displayName": "StaffordOS Operator Issuer",
+    "clientType": "Web application",
+    "projectId": "staffordos-identity-prod",
+    "redactedClientId": "109364024720-...q0i.apps.googleusercontent.com",
+    "result": "AUTHORITATIVE_CLIENT_IDENTIFIED"
+  },
+  "clientIdMatchResult": "VALUE_ABSENT",
+  "redirectUriResult": {
+    "classification": "REQUIRED_URI_MISSING",
+    "requiredLocalUri": "http://127.0.0.1:8787/auth/google/callback",
+    "providerUris": [
+      "https://staffordos-operator.staffordmedia.ai/auth/google/callback"
+    ],
+    "requiredLocalUriPresent": false,
+    "googleCloudModified": false
+  },
+  "javascriptOriginResult": {
+    "classification": "PRESENT_BUT_NOT_REQUIRED",
+    "providerOrigins": [
+      "https://staffordos-operator.staffordmedia.ai"
+    ],
+    "requiredForCurrentLocalIssuerFlow": false
+  },
+  "secretSlotMetadata": {
+    "classification": "MULTIPLE_SECRET_CUTOVER_SUPPORTED",
+    "slotReviewRequiredBeforeRotation": true,
+    "enabledSecretRows": 2,
+    "secretValuesRecorded": false,
+    "maskedSecretEndingsRecorded": false,
+    "creationTimestamps": [
+      "2026-07-30T19:50:41-04:00",
+      "2026-07-30T19:55:52-04:00"
+    ]
+  },
+  "consentScreenContext": {
+    "publishingStatus": "Testing",
+    "userType": "External",
+    "scopesVisible": false,
+    "googleCloudModified": false
+  },
+  "authorizedOperatorEligibility": {
+    "classification": "TEST_USER_REQUIRED",
+    "rossListedAsTestUser": false,
+    "fullAccountIdentifierRecorded": false
+  },
+  "duplicateOrLegacyClientResult": {
+    "classification": "NO_DUPLICATE_STAFFORDOS_CLIENT_OBSERVED",
+    "staffordosRelatedWebApplicationClientsObserved": 1
+  },
+  "clientAuthorityDecision": "CLIENT_REQUIRED_REDIRECT_MISSING",
+  "rotationReadinessUpdate": {
+    "decision": "BLOCKED_ON_REDIRECT_CORRECTION",
+    "secretRotationReady": false,
+    "additionalPrerequisites": [
+      "consent_test_user_eligibility",
+      "enabled_secret_slot_review",
+      "local_ignored_issuer_configuration"
+    ]
+  },
+  "configurationCorrectionPlan": [
+    "Plan addition of exact local redirect URI http://127.0.0.1:8787/auth/google/callback.",
+    "Plan External/Testing test-user eligibility correction for Ross without recording the full account identifier.",
+    "Review production-style redirect and JavaScript origin before deployment.",
+    "Review two enabled secret rows and define safe old-secret handling before rotation.",
+    "Create or update ignored local issuer configuration only in a later authorized mission."
+  ],
+  "evidenceCapture": {
+    "captured": [
+      "project ID",
+      "client display name",
+      "client type",
+      "redacted client ID",
+      "redirect classifications",
+      "origin classifications",
+      "consent status",
+      "secret-slot count and creation timestamps",
+      "local-config match result",
+      "operator confirmation"
+    ],
+    "excluded": [
+      "client secret value",
+      "masked secret ending",
+      "authorization code",
+      "token",
+      "cookie",
+      "JWT",
+      "private key",
+      "screenshot"
+    ]
+  },
+  "filesCreated": [
+    "staffordos/governance/S007_01I1_OAUTH_CLIENT_AUTHORITY_RECONCILIATION.md",
+    "staffordos/governance/S007_01I1_OAUTH_CLIENT_AUTHORITY_RECONCILIATION.json",
+    "staffordos/governance/S007_01I1_OAUTH_CLIENT_CANDIDATE_REGISTER.md",
+    "staffordos/governance/S007_01I1_OAUTH_CLIENT_OPERATOR_DECISION_BRIEF.md"
+  ],
+  "selectedNextMission": "S007_01I2_OAUTH_CLIENT_CONFIGURATION_CORRECTION_PLAN",
+  "rollback": "git revert <S007.01I1 commit SHA>"
+}
