@@ -190,8 +190,8 @@ export const JOB_SEARCH_COMMAND_PRESENTATION: JobCommandPresentation = {
     {
       id: "job-opportunity-intake",
       label: "Job opportunity intake",
-      state: "Not connected yet",
-      detail: "No live or durable opportunities are connected to this screen.",
+      state: "Local bridge ready",
+      detail: "Private JSON intake can be validated outside Git; this screen still needs a safe server boundary for real records.",
     },
     {
       id: "fit-analysis",
@@ -233,6 +233,7 @@ export const JOB_SEARCH_COMMAND_PRESENTATION: JobCommandPresentation = {
   dataAuthority: {
     available: [
       "private career source intake exists outside Git",
+      "local Job Opportunity intake bridge",
       "read-only Job Command shell",
       "operator approval model",
     ],

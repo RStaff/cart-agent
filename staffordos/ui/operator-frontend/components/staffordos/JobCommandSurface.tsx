@@ -1,5 +1,9 @@
 import { NextActionCard } from "./NextActionCard";
 import { JOB_SEARCH_COMMAND_PRESENTATION } from "../../lib/staffordos/jobSearchCommandPresentation";
+import {
+  EMPTY_JOB_OPPORTUNITY_QUEUE_PRESENTATION,
+  type JobOpportunityQueuePresentation,
+} from "../../lib/staffordos/jobOpportunityQueuePresentation";
 
 const presentation = JOB_SEARCH_COMMAND_PRESENTATION;
 
@@ -32,7 +36,53 @@ function JobCommandSectionCard({
   );
 }
 
-export function JobCommandSurface() {
+function OpportunityQueueCard({ queue }: { queue: JobOpportunityQueuePresentation }) {
+  return (
+    <article className="staffordHomeSupportCard staffordJobOpportunityQueueCard">
+      <div>
+        <span>{queue.state}</span>
+        <h3>{queue.title}</h3>
+        <p>{queue.summary}</p>
+      </div>
+
+      <div className="staffordJobOpportunityQueueList" aria-label="Private opportunities to review">
+        {queue.opportunities.map((opportunity) => (
+          <div key={opportunity.id} className="staffordJobOpportunityQueueItem">
+            <strong>{opportunity.role}</strong>
+            <span>{opportunity.company}</span>
+            <dl className="staffordJobOpportunityMeta">
+              <div>
+                <dt>Freshness</dt>
+                <dd>{opportunity.freshness}</dd>
+              </div>
+              <div>
+                <dt>Location</dt>
+                <dd>{opportunity.location}</dd>
+              </div>
+              <div>
+                <dt>Work arrangement</dt>
+                <dd>{opportunity.workArrangement}</dd>
+              </div>
+              <div>
+                <dt>Next action</dt>
+                <dd>{opportunity.nextAction}</dd>
+              </div>
+            </dl>
+            <p>{opportunity.reviewStatus}. {opportunity.approvalStatus}</p>
+          </div>
+        ))}
+      </div>
+    </article>
+  );
+}
+
+export function JobCommandSurface({
+  opportunityQueue = EMPTY_JOB_OPPORTUNITY_QUEUE_PRESENTATION,
+}: {
+  opportunityQueue?: JobOpportunityQueuePresentation;
+}) {
+  const hasOpportunityQueue = opportunityQueue.opportunities.length > 0;
+
   return (
     <div className="staffordJobCommand">
       <section className="staffordHomeHeader">
@@ -77,17 +127,25 @@ export function JobCommandSurface() {
         <div className="staffordHomeSectionHeader">
           <span className="staffordEyebrow">Queues</span>
           <h2>What is connected right now</h2>
-          <p>These sections are truthful empty states. No job, application, follow-up, interview, or outcome record is connected.</p>
+          <p>
+            {hasOpportunityQueue
+              ? "Validated private opportunities can be shown read-only. No application, follow-up, interview, or outcome record is connected."
+              : "These sections are truthful empty states. No job, application, follow-up, interview, or outcome record is connected."}
+          </p>
         </div>
         <div className="staffordHomeSupportGrid">
-          {presentation.supportingSections.map((section) => (
-            <JobCommandSectionCard
-              key={section.id}
-              title={section.title}
-              state={section.state}
-              summary={section.summary}
-            />
-          ))}
+          {presentation.supportingSections.map((section) =>
+            section.id === "strong-opportunities" && hasOpportunityQueue ? (
+              <OpportunityQueueCard key={section.id} queue={opportunityQueue} />
+            ) : (
+              <JobCommandSectionCard
+                key={section.id}
+                title={section.title}
+                state={section.state}
+                summary={section.summary}
+              />
+            ),
+          )}
         </div>
       </section>
 

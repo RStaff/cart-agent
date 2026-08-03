@@ -1,0 +1,316 @@
+{
+  "mission": "J001_02_LOCAL_JOB_OPPORTUNITY_INTAKE_BRIDGE",
+  "classification": "LOCAL_JOB_OPPORTUNITY_BRIDGE_VALIDATED",
+  "checkpoint_authority": {
+    "repository_root": "/Users/rossstafford/projects/cart-agent",
+    "branch": "main",
+    "required_starting_head": "d95be89f2c4648afc90ca82b517bcba62018b375",
+    "authorities_verified": [
+      "J001 UI Authority Reconciliation",
+      "J001 Job Search Information Architecture",
+      "J001 UI Duplication and Reuse Matrix",
+      "J001.01 Professional Job Command shell",
+      "S010.00 Professional Job Search discovery",
+      "S010.01 Job Opportunity and Requirement contracts",
+      "S010.02A through S010.02C2 Career Evidence authorities",
+      "staffordos/ui/operator-frontend canonical UI root",
+      "/operator Stafford Media runtime-canonical",
+      "/os canonical multi-workspace shell",
+      "/os/professional/jobs Job Command route"
+    ]
+  },
+  "worktree_exclusions": {
+    "summary": "Pre-existing unrelated modified and untracked files were excluded from this mission.",
+    "excluded_categories": [
+      "generated StaffordOS JSON and daemon output files",
+      "unrelated web and ShopiFixer backend changes",
+      "unrelated architecture, S007, S008, M00x, auth, execution, and production documentation",
+      "generated Next.js support file next-env.d.ts",
+      "untracked J001 discovery artifacts used as authority but not staged by this mission"
+    ]
+  },
+  "private_storage_boundary": {
+    "intake_directory": "~/.staffordos/private/professional/job-search/intake/",
+    "normalized_opportunity_directory": "~/.staffordos/private/professional/job-search/opportunities/",
+    "outside_git": true,
+    "owner_private_permissions": true,
+    "directories_created": true,
+    "real_intake_file_count": 0,
+    "real_normalized_output_count": 0,
+    "private_files_read": false,
+    "private_files_written": false
+  },
+  "intake_contract": {
+    "schema_version": "staffordos.job_search.private_opportunity_intake.v1",
+    "required_fields": [
+      "schemaVersion",
+      "workspaceId",
+      "sourceUrl",
+      "sourceProvider",
+      "sourceObservedAt",
+      "roleTitle",
+      "companyName",
+      "listingText or sourceSummary",
+      "privacy",
+      "sourceAuthority",
+      "limitations"
+    ],
+    "optional_source_backed_fields": [
+      "sourceProviderRecordId",
+      "location",
+      "workArrangement",
+      "compensationText",
+      "employmentType",
+      "listingPublishedAt",
+      "listingExpiresAt",
+      "operatorNotes"
+    ],
+    "rules": [
+      "workspaceId must equal professional",
+      "sourceUrl is an alias not a primary ID",
+      "provider IDs are aliases not primary IDs",
+      "unknown values remain unknown",
+      "open or current status is not accepted from intake alone",
+      "operator notes remain private and separate from source facts",
+      "application, interview, offer, fit, model recommendation, and resume-selection fields are rejected"
+    ]
+  },
+  "intake_template": {
+    "function": "buildPrivateJobOpportunityIntakeTemplate",
+    "contains_real_job_values": false,
+    "contains_real_company": false,
+    "contains_real_role": false,
+    "contains_real_source_url": false,
+    "contains_salary": false,
+    "operator_process": "Create a private JSON file from the empty template outside Git, then run the bridge from a governed local command or future server boundary."
+  },
+  "validation_rules": {
+    "fails_closed_for": [
+      "missing or non-Professional workspace",
+      "missing malformed or non-HTTPS source URL",
+      "missing role",
+      "missing company",
+      "missing source provider",
+      "missing observed date",
+      "missing source text or source-backed summary",
+      "missing or unsupported source authority",
+      "non-private privacy classification",
+      "intake-supplied primary IDs",
+      "application fields",
+      "interview fields",
+      "offer fields",
+      "fit fields",
+      "model recommendation fields",
+      "unsupported numeric compensation normalization",
+      "unsupported open or current listing status",
+      "repository intake or output paths",
+      "malformed schema version"
+    ],
+    "deterministic": true,
+    "mutates_input": false
+  },
+  "durable_id_result": {
+    "opportunity_prefix": "privjobopp_",
+    "source_prefix": "privjobsrc_",
+    "raw_url_used_as_primary_id": false,
+    "company_plus_title_used_as_primary_id": false,
+    "provider_id_used_as_primary_id": false,
+    "sequential_public_identifier": false
+  },
+  "duplicate_handling": {
+    "classifications": [
+      "EXACT_SOURCE_DUPLICATE",
+      "SAME_PROVIDER_ALIAS",
+      "POSSIBLE_CONTENT_DUPLICATE",
+      "POSSIBLE_ROLE_VARIANT",
+      "DISTINCT_OPPORTUNITY",
+      "NEEDS_OPERATOR_REVIEW"
+    ],
+    "silent_merge": false,
+    "operator_review_required_for_uncertainty": true
+  },
+  "freshness_handling": {
+    "classifications": [
+      "CURRENT",
+      "RECENT",
+      "HISTORICAL",
+      "STALE",
+      "UNKNOWN"
+    ],
+    "claims_listing_open": false,
+    "missing_publication_date": "UNKNOWN",
+    "import_time_used_as_publication_date": false,
+    "expired_listing": "STALE",
+    "historical_context": "HISTORICAL"
+  },
+  "private_normalized_output": {
+    "schema_version": "staffordos.job_search.private_opportunity.normalized.v1",
+    "noncanonical": true,
+    "no_application_created": true,
+    "no_fit_assessment_created": true,
+    "full_listing_text_duplicated": false,
+    "source_text_retained_in_private_intake": true,
+    "written_during_mission": false
+  },
+  "read_model_result": {
+    "file": "staffordos/ui/operator-frontend/lib/staffordos/jobOpportunityQueuePresentation.ts",
+    "workspace": "professional",
+    "included_fields": [
+      "role",
+      "company",
+      "source freshness",
+      "known location",
+      "known work arrangement",
+      "explicit compensation text",
+      "review status",
+      "source status",
+      "next action",
+      "approval status",
+      "limitations"
+    ],
+    "excluded_fields": [
+      "full source text",
+      "private paths",
+      "raw operator notes",
+      "contact details",
+      "recruiter identity",
+      "application state",
+      "fit score",
+      "AI recommendation",
+      "application controls"
+    ]
+  },
+  "job_command_integration": {
+    "component": "staffordos/ui/operator-frontend/components/staffordos/JobCommandSurface.tsx",
+    "default_queue_state": "No opportunities imported yet.",
+    "optional_redacted_queue_prop": true,
+    "react_component_reads_private_files": false,
+    "operator_loader_imported": false
+  },
+  "real_opportunity_connection_status": {
+    "real_private_records_present": false,
+    "bridge_status": "implementation-ready awaiting operator intake",
+    "display_status": "not connected to real private records",
+    "safe_server_boundary_certified": false
+  },
+  "server_and_client_boundary": {
+    "filesystem_access_file": "staffordos/ui/operator-frontend/lib/staffordos/privateJobOpportunityIntake.ts",
+    "ui_consumes_redacted_presentation_only": true,
+    "new_api_route_created": false,
+    "client_storage_authoritative": false
+  },
+  "human_authority": {
+    "staffordos_can": [
+      "organize job information",
+      "prepare source-backed review material"
+    ],
+    "ross_must_decide": [
+      "whether the role is worth reviewing",
+      "whether the source is trustworthy",
+      "whether to pursue the role",
+      "which resume may later be used",
+      "whether to apply",
+      "whether any message may be sent"
+    ],
+    "intake_grants_application_or_communication_authority": false
+  },
+  "components_reused": [
+    "StaffordOsShell",
+    "WorkspaceSelector",
+    "WorkspaceContext",
+    "/os layout",
+    "JobCommandSurface",
+    "existing StaffordOS card, panel, and empty-state styling"
+  ],
+  "components_created": [
+    "privateJobOpportunityIntake.ts",
+    "privateJobOpportunityIntake.test.mjs",
+    "jobOpportunityQueuePresentation.ts",
+    "jobOpportunityQueuePresentation.test.mjs"
+  ],
+  "files_changed": [
+    "staffordos/ui/operator-frontend/lib/staffordos/privateJobOpportunityIntake.ts",
+    "staffordos/ui/operator-frontend/lib/staffordos/privateJobOpportunityIntake.test.mjs",
+    "staffordos/ui/operator-frontend/lib/staffordos/jobOpportunityQueuePresentation.ts",
+    "staffordos/ui/operator-frontend/lib/staffordos/jobOpportunityQueuePresentation.test.mjs",
+    "staffordos/ui/operator-frontend/components/staffordos/JobCommandSurface.tsx",
+    "staffordos/ui/operator-frontend/lib/staffordos/jobSearchCommandPresentation.ts",
+    "staffordos/ui/operator-frontend/app/globals.css",
+    "staffordos/job-search/J001_02_LOCAL_JOB_OPPORTUNITY_INTAKE_BRIDGE.md",
+    "staffordos/job-search/J001_02_LOCAL_JOB_OPPORTUNITY_INTAKE_BRIDGE.json"
+  ],
+  "tests": {
+    "focused": {
+      "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/privateJobOpportunityIntake.test.mjs staffordos/ui/operator-frontend/lib/staffordos/jobOpportunityQueuePresentation.test.mjs",
+      "result": "passed",
+      "assertions": 52
+    },
+    "j001_01_regression": {
+      "result": "passed",
+      "assertions": 30
+    },
+    "s010_regression": {
+      "result": "passed",
+      "assertions": 140
+    },
+    "s009_regression": {
+      "result": "passed",
+      "assertions": 126
+    },
+    "s008_regression": {
+      "result": "passed",
+      "assertions": 127
+    },
+    "build": {
+      "result": "passed",
+      "note": "Existing /operator/shopifixer-pilot static-generation warnings remain."
+    },
+    "routes": {
+      "result": "passed",
+      "checked": [
+        "/os",
+        "/os/professional/jobs",
+        "/os/capabilities",
+        "/os/actions",
+        "/os/objectives",
+        "/os/decisions",
+        "/os/chief-of-staff",
+        "/operator",
+        "/operator/leads",
+        "/operator/campaigns",
+        "/operator/revenue-command",
+        "/operator/command-center"
+      ],
+      "http_status": 200
+    }
+  },
+  "privacy_scan": {
+    "real_private_job_data_staged": false,
+    "scanned_for": [
+      "real employer names",
+      "real role names",
+      "real URLs",
+      "salaries",
+      "locations",
+      "listing text",
+      "recruiter names",
+      "contact details",
+      "operator notes",
+      "private source IDs tied to real records",
+      "private paths",
+      "real JobOpportunity records"
+    ]
+  },
+  "known_limitations": [
+    "No real opportunity is connected to the UI yet.",
+    "No safe server read boundary exists for private opportunity files.",
+    "No requirement extraction exists.",
+    "No career-evidence mapping exists.",
+    "No fit recommendation exists.",
+    "No application object exists.",
+    "No submission or messaging authority exists.",
+    "Professional workspace context remains presentation-only and is not authorization."
+  ],
+  "rollback": "git revert <J001.02 commit SHA>",
+  "recommended_next_mission": "J001_03_JOB_REQUIREMENT_EXTRACTION_AND_CAREER_EVIDENCE_MAPPING"
+}
