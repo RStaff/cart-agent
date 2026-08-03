@@ -1,0 +1,440 @@
+{
+  "mission": "S010_02A_CAREER_EVIDENCE_DISCOVERY_AND_CANONICAL_AUTHORITY",
+  "mission_type": "read-only architectural discovery and canonical authority design",
+  "checkpoint_authority": {
+    "starting_head_required": "5d4bda198fa07bc17f10768ec7b6f6a0185803ee",
+    "starting_head_verified": "5d4bda198fa07bc17f10768ec7b6f6a0185803ee",
+    "branch": "main",
+    "preexisting_s010_02a_artifact_found": false,
+    "s010_01_present": true,
+    "professional_status": "Planned",
+    "professional_privacy": "Owner-private",
+    "s009_modified": false,
+    "runtime_code_modified": false
+  },
+  "working_tree_exclusions": {
+    "status": "broad preexisting unrelated dirty tree excluded",
+    "categories": [
+      "RUNTIME_OR_DAEMON",
+      "WEB_OR_PRISMA",
+      "S007_IDENTITY_OR_ISSUER",
+      "MISSION_EVIDENCE",
+      "GENERATED",
+      "PREEXISTING_UNRELATED",
+      "UNKNOWN_REQUIRES_REVIEW"
+    ],
+    "authorized_files": [
+      "staffordos/architecture/S010_02A_CAREER_EVIDENCE_DISCOVERY_AND_CANONICAL_AUTHORITY.md",
+      "staffordos/architecture/S010_02A_CAREER_EVIDENCE_DISCOVERY_AND_CANONICAL_AUTHORITY.json"
+    ]
+  },
+  "ollama_stopped_state": {
+    "port_11434_listener": false,
+    "ollama_started": false,
+    "ollama_invoked": false
+  },
+  "authority_chain": [
+    "FACT",
+    "EVIDENCE",
+    "POSITIONING"
+  ],
+  "discovery_summary": {
+    "canonical_career_evidence_authority_exists": false,
+    "resume_fact_registry_exists": false,
+    "tracked_resume_authority_found": false,
+    "employment_store_exists": false,
+    "education_store_exists": false,
+    "certification_store_exists": false,
+    "portfolio_store_exists": false,
+    "interview_story_store_exists": false,
+    "publication_store_exists": false,
+    "reference_store_exists": false,
+    "bosch_durable_record_exists": false,
+    "resume_search_note": "Search hits for resume in runtime code refer to checkout recovery links, not Ross career resumes."
+  },
+  "existing_authority_inventory": [
+    {
+      "area": "Professional workspace",
+      "finding": "Planned, owner-private, with Job Search and My Job modes.",
+      "classification": "REUSABLE_ARCHITECTURE"
+    },
+    {
+      "area": "Professional capabilities",
+      "finding": "Job Search, career materials, interview prep, and current-role support are planned only.",
+      "classification": "REUSABLE_ARCHITECTURE"
+    },
+    {
+      "area": "Professional objectives",
+      "finding": "Secure the right role and Succeed in the current role are planned examples.",
+      "classification": "PLANNED_ONLY"
+    },
+    {
+      "area": "S010.01 Job contracts",
+      "finding": "Static synthetic JobSource, JobOpportunity, and JobRequirement contracts exist.",
+      "classification": "REUSABLE_CONTRACT"
+    },
+    {
+      "area": "Resume, employment, education, certification, reference, and publication records",
+      "finding": "No canonical Professional records found.",
+      "classification": "ABSENT"
+    },
+    {
+      "area": "Bosch outcome",
+      "finding": "No durable repository record found.",
+      "classification": "CONTINUITY_CONTEXT_ONLY"
+    }
+  ],
+  "candidate_career_evidence": [
+    {
+      "evidence_area": "StaffordOS architecture",
+      "current_authority": "S008, S009, and S010 architecture/contracts",
+      "future_support": "Architecture, governance, validation, source-tracing, and operating-system design examples",
+      "current_limitation": "Business/platform evidence only; not yet a Professional career fact"
+    },
+    {
+      "evidence_area": "Product definitions",
+      "current_authority": "staffordos/authority/product_definitions_v1.md",
+      "future_support": "Product and platform identity for Stafford Media, StaffordOS, ShopiFixer, and Abando",
+      "current_limitation": "Defines products, not Ross accomplishments"
+    },
+    {
+      "evidence_area": "ShopiFixer training and certification",
+      "current_authority": "Mission 001 and P11 certification artifacts",
+      "future_support": "Shopify engineering, proof, rollback, QA, and governed execution examples after review",
+      "current_limitation": "Contains merchant/training context; not resume authority yet"
+    },
+    {
+      "evidence_area": "ShopiFixer and Stafford Media integration evidence",
+      "current_authority": "Reconciliation and production certification artifacts",
+      "future_support": "Systems integration, lifecycle, packet, proof, and operating-boundary examples after review",
+      "current_limitation": "Includes customer or merchant-sensitive and runtime authority boundaries"
+    },
+    {
+      "evidence_area": "S009 local provider proof",
+      "current_authority": "S009.04B documentation",
+      "future_support": "Local model boundary, structured validation, and AI-governance examples after review",
+      "current_limitation": "Proof-of-architecture only; no production AI authority"
+    },
+    {
+      "evidence_area": "S008 Evidence, Proof, and Learning foundations",
+      "current_authority": "Static Stafford Media foundations",
+      "future_support": "Evidence, Proof, and Learning patterns reusable for Professional evidence design",
+      "current_limitation": "Professional records are absent"
+    }
+  ],
+  "negative_findings": [
+    "No verified employment-history store exists.",
+    "No verified education store exists.",
+    "No verified certification store exists.",
+    "No canonical skill or technology registry for Ross exists.",
+    "No canonical portfolio item registry exists.",
+    "No canonical interview-story registry exists.",
+    "No canonical publication or reference registry exists.",
+    "No resume-fact authority exists.",
+    "PMP background is mentioned as a possible future evidence class in S010.00, but this mission found no certified PMP credential record."
+  ],
+  "reusable_architecture": [
+    {
+      "primitive": "Workspace",
+      "reuse_decision": "REUSE_WITH_PROFESSIONAL_SCOPE"
+    },
+    {
+      "primitive": "Capability",
+      "reuse_decision": "REUSE_WITH_PROFESSIONAL_SCOPE"
+    },
+    {
+      "primitive": "Objective",
+      "reuse_decision": "REUSE_WITH_PROFESSIONAL_SCOPE"
+    },
+    {
+      "primitive": "Decision",
+      "reuse_decision": "REUSE_WITH_PROFESSIONAL_SCOPE"
+    },
+    {
+      "primitive": "Action",
+      "reuse_decision": "REUSE_WITH_PROFESSIONAL_SCOPE"
+    },
+    {
+      "primitive": "Evidence",
+      "reuse_decision": "REUSE_WITH_PROFESSIONAL_SCOPE"
+    },
+    {
+      "primitive": "Proof",
+      "reuse_decision": "REUSE_WITH_PROFESSIONAL_SCOPE"
+    },
+    {
+      "primitive": "Learning",
+      "reuse_decision": "REUSE_WITH_PROFESSIONAL_SCOPE"
+    },
+    {
+      "primitive": "S009 source tracing",
+      "reuse_decision": "REUSE_DIRECTLY"
+    },
+    {
+      "primitive": "S010.01 JobSource",
+      "reuse_decision": "REUSE_DIRECTLY_FOR_JOB_LISTINGS"
+    },
+    {
+      "primitive": "S010.01 JobRequirement",
+      "reuse_decision": "REUSE_DIRECTLY_FOR_ROLE_REQUIREMENTS"
+    },
+    {
+      "primitive": "Product definitions",
+      "reuse_decision": "REUSE_AS_SUPPORTING_SOURCE"
+    }
+  ],
+  "direct_reuse_rejections": [
+    "merchant leads",
+    "business campaigns",
+    "revenue records",
+    "packet records",
+    "payment records",
+    "customer relationships"
+  ],
+  "missing_canonical_entities": [
+    "CareerEvidenceSource",
+    "CareerFact",
+    "Employment",
+    "Education",
+    "Certification",
+    "Skill",
+    "Technology",
+    "Project",
+    "Product",
+    "Architecture",
+    "Presentation",
+    "Achievement",
+    "LeadershipExample",
+    "InterviewStory",
+    "Publication",
+    "Reference",
+    "ResumeFact",
+    "CareerEvidenceReview"
+  ],
+  "canonical_authority_model": [
+    {
+      "layer": "CareerEvidenceSource",
+      "purpose": "Capture where a fact came from and preserve origin, privacy, freshness, exact reference, digest or future integrity reference, limitations, and review status."
+    },
+    {
+      "layer": "CareerFact",
+      "purpose": "Represent normalized career facts and point to one or more evidence sources."
+    },
+    {
+      "layer": "CareerEvidenceLink",
+      "purpose": "Connect a fact to source evidence and preserve excerpts, support strength, limitation, and support classification."
+    },
+    {
+      "layer": "Positioning",
+      "purpose": "Represent resume bullets, application answers, portfolio copy, interview narratives, or AI recommendations as downstream presentation."
+    },
+    {
+      "layer": "Review",
+      "purpose": "Promote, reject, correct, supersede, or limit a fact under Ross or governed review."
+    }
+  ],
+  "fact_states": [
+    "UNVERIFIED",
+    "SOURCE_SUPPORTED",
+    "OPERATOR_CONFIRMED",
+    "CONFLICTED",
+    "NEEDS_REVIEW",
+    "SUPERSEDED",
+    "REJECTED"
+  ],
+  "evidence_support_levels": [
+    "DIRECT",
+    "PARTIAL",
+    "TRANSFERABLE",
+    "CONFLICTING",
+    "INSUFFICIENT",
+    "UNKNOWN"
+  ],
+  "positioning_states": [
+    "DRAFT",
+    "READY_FOR_REVIEW",
+    "APPROVED_FOR_USE",
+    "SUPERSEDED",
+    "REJECTED"
+  ],
+  "numeric_scoring_defined": false,
+  "entity_authority_requirements": [
+    {
+      "entity": "Employment",
+      "minimum_authority": "Verified source or Ross-confirmed fact with limitation",
+      "must_not": "Invent titles, dates, employer names, or outcomes"
+    },
+    {
+      "entity": "Education",
+      "minimum_authority": "Diploma, transcript, resume source, or Ross confirmation",
+      "must_not": "Convert coursework into degree completion without source"
+    },
+    {
+      "entity": "Certification",
+      "minimum_authority": "Certificate, issuer record, or Ross confirmation",
+      "must_not": "Claim active status without freshness"
+    },
+    {
+      "entity": "Skill",
+      "minimum_authority": "Project, employment, education, or certification evidence",
+      "must_not": "Infer proficiency or years from keywords"
+    },
+    {
+      "entity": "Technology",
+      "minimum_authority": "Work artifact, project, employment, or certification source",
+      "must_not": "Treat package presence as personal expertise by itself"
+    },
+    {
+      "entity": "Project",
+      "minimum_authority": "Repository, artifact, proof, or operator-confirmed source",
+      "must_not": "Claim client results or commercial outcomes without proof"
+    },
+    {
+      "entity": "Product",
+      "minimum_authority": "Product definition or runtime authority",
+      "must_not": "Treat product existence as personal achievement"
+    },
+    {
+      "entity": "Architecture",
+      "minimum_authority": "Architecture artifact and role boundary",
+      "must_not": "Claim production impact unless proof exists"
+    },
+    {
+      "entity": "Presentation",
+      "minimum_authority": "Deck, invite, recording, or operator confirmation",
+      "must_not": "Claim audience, employer, or publication status without source"
+    },
+    {
+      "entity": "Achievement",
+      "minimum_authority": "Proof and exact observed outcome",
+      "must_not": "Inflate metrics, revenue, customer impact, or scope"
+    },
+    {
+      "entity": "LeadershipExample",
+      "minimum_authority": "Project or employment evidence or operator confirmation",
+      "must_not": "Convert solo work into people-management claim without source"
+    },
+    {
+      "entity": "InterviewStory",
+      "minimum_authority": "Underlying facts and limitations",
+      "must_not": "Add facts for narrative strength"
+    },
+    {
+      "entity": "Publication",
+      "minimum_authority": "URL, document, publisher, or operator confirmation",
+      "must_not": "Treat drafts as published"
+    },
+    {
+      "entity": "Reference",
+      "minimum_authority": "Operator confirmation and private handling",
+      "must_not": "Expose contact details without approval"
+    },
+    {
+      "entity": "ResumeFact",
+      "minimum_authority": "Approved facts and evidence links",
+      "must_not": "Let resume wording become primary authority"
+    }
+  ],
+  "resume_authority_boundary": {
+    "canonical_resume_authority_exists": false,
+    "resume_file_is_primary_truth": false,
+    "resume_bullet_layer": "Positioning",
+    "resume_fact_must_cite_career_fact": true,
+    "tailoring_may_adjust": [
+      "emphasis",
+      "ordering",
+      "wording"
+    ],
+    "tailoring_must_not_add": [
+      "unverified claims",
+      "unsupported metrics",
+      "unsupported years",
+      "inflated titles",
+      "fabricated tools"
+    ]
+  },
+  "privacy_and_workspace_boundary": {
+    "workspace": "professional",
+    "default_privacy": "owner-private",
+    "stafford_media_access_by_default": false,
+    "personal_access_by_default": false,
+    "family_access_by_default": false,
+    "guest_access_by_default": false,
+    "business_evidence_reuse_requires_owner_approval": true,
+    "workspace_context_is_authorization": false,
+    "runtime_use_requires_s007_identity": true
+  },
+  "chief_of_staff_compatibility": {
+    "future_source_types": [
+      "career_fact_snapshot",
+      "career_evidence_source_snapshot",
+      "resume_fact_snapshot",
+      "project_evidence_snapshot",
+      "achievement_snapshot",
+      "interview_story_snapshot"
+    ],
+    "required_source_fields": [
+      "source ID",
+      "Professional workspace ID",
+      "authority classification",
+      "privacy classification",
+      "freshness",
+      "limitations",
+      "exact source reference",
+      "excluded fields",
+      "permission requirement",
+      "review status"
+    ],
+    "authorized_for_model_use_now": false
+  },
+  "failure_closed_rules": [
+    "fact has no source",
+    "source belongs to the wrong workspace",
+    "resume fact has no approved underlying fact",
+    "skill has no evidence",
+    "years of experience are inferred",
+    "credential lacks issuer or review authority",
+    "achievement lacks proof",
+    "publication is only a draft",
+    "reference exposes contact details without approval",
+    "business artifact is reused without Professional owner approval",
+    "positioning statement adds facts",
+    "conflicting sources are silently resolved"
+  ],
+  "safe_fallback": "I cannot verify that from the current Career Evidence sources.",
+  "implementation_boundary": {
+    "documentation_only": true,
+    "runtime_code_created": false,
+    "routes_created": false,
+    "prisma_or_migration_created": false,
+    "database_records_created": false,
+    "resume_generation": false,
+    "tailored_resume_output": false,
+    "job_board_integration": false,
+    "fit_scoring": false,
+    "ollama_invoked": false,
+    "s009_modified": false,
+    "real_career_facts_created": false,
+    "bosch_record_created": false
+  },
+  "recommended_next_slice": {
+    "mission": "S010_02B_CAREER_EVIDENCE_CONTRACT_AND_STATIC_VALIDATOR",
+    "scope": [
+      "create static TypeScript contracts for CareerEvidenceSource, CareerFact, CareerEvidenceLink, and ResumeFact",
+      "create synthetic test-only fixtures",
+      "create deterministic validators",
+      "prove FACT -> EVIDENCE -> POSITIONING",
+      "prove no resume generation, fit scoring, external source access, persistence, route, or model call exists"
+    ],
+    "real_ross_facts_allowed": false,
+    "real_fact_intake_requires_later_owner_approved_mission": true
+  },
+  "validation": {
+    "jq_required": true,
+    "git_diff_check_required": true,
+    "jq_result": "passed",
+    "git_diff_check_result": "passed"
+  },
+  "rollback": "git revert <S010.02A commit SHA>",
+  "final_classification": "CAREER_EVIDENCE_AUTHORITY_DISCOVERY_COMMITTED"
+}
