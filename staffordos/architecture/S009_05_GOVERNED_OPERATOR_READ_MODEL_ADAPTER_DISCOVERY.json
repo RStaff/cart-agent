@@ -1,0 +1,912 @@
+{
+  "mission": "S009_05_GOVERNED_OPERATOR_READ_MODEL_ADAPTER_DISCOVERY",
+  "mission_type": "repository-first read-only authority discovery, runtime-source mapping, governance design, documentation, validation, and governed local commit",
+  "checkpoint_authority": {
+    "starting_head": "82acb03f217b2a0b988ef6368ea77248373bcec4",
+    "branch": "main",
+    "s009_05_preexisting": false,
+    "verified_authorities": [
+      "staffordos/architecture/STAFFORDOS_ARCHITECTURE_V1.md",
+      "staffordos/architecture/S009_00_READ_ONLY_CHIEF_OF_STAFF_CONTRACT.md",
+      "staffordos/architecture/S009_01_STATIC_FIXTURE_AND_DETERMINISTIC_RESPONSE_VALIDATOR.md",
+      "staffordos/architecture/S009_02_READ_ONLY_CHIEF_OF_STAFF_DEMONSTRATION_SURFACE.md",
+      "staffordos/architecture/S009_03_PROVIDER_NEUTRAL_MODEL_ADAPTER_INTERFACE.md",
+      "staffordos/architecture/S009_04A_LOCAL_MODEL_RUNTIME_SELECTION_AND_INSTALLATION_PLAN.md",
+      "staffordos/architecture/S009_04B_CERTIFY_LOCAL_MODEL_PROVIDER_BOUNDARY.md",
+      "staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffValidator.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffModelAdapter.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffOllamaAdapter.ts",
+      "S008 Workspace, Objective, Decision, Action, Evidence, Proof, and Learning foundations"
+    ],
+    "baseline": [
+      "The static StaffordOS operating model is certified.",
+      "The deterministic validator is authoritative for Chief of Staff responses.",
+      "A provider-neutral model boundary exists.",
+      "Ollama plus qwen2.5:1.5b passed one bounded local provider proof.",
+      "Current Chief of Staff sources are static fixtures only.",
+      "/operator remains runtime-canonical.",
+      "/os remains presentation-focused.",
+      "WorkspaceContext remains presentation-only and is not authorization.",
+      "No deployed runtime identity enforcement exists.",
+      "Professional and Personal remain Planned.",
+      "No write, approval, execution, verification, or autonomous learning authority exists."
+    ]
+  },
+  "working_tree_exclusions": {
+    "authorized_files": [
+      "staffordos/architecture/S009_05_GOVERNED_OPERATOR_READ_MODEL_ADAPTER_DISCOVERY.md",
+      "staffordos/architecture/S009_05_GOVERNED_OPERATOR_READ_MODEL_ADAPTER_DISCOVERY.json"
+    ],
+    "excluded_categories": [
+      "S007_IDENTITY_OR_ISSUER",
+      "RUNTIME_OR_DAEMON",
+      "WEB_OR_PRISMA",
+      "MISSION_EVIDENCE",
+      "GENERATED",
+      "PREEXISTING_UNRELATED",
+      "UNKNOWN_REQUIRES_REVIEW"
+    ],
+    "staged_before_mission": []
+  },
+  "ollama_stopped_state": {
+    "port_11434_listener": "none",
+    "process_check": "no ollama, llama-server, or proof process found except the inspection command itself",
+    "ollama_started_or_invoked": false
+  },
+  "operator_route_inventory": [
+    {
+      "route": "/operator",
+      "purpose": "Morning surface for primary action, system truth, revenue truth, campaign coverage, blockers, and workday controls.",
+      "backing_files": [
+        "staffordos/ui/operator-frontend/app/operator/page.tsx",
+        "staffordos/ui/operator-frontend/lib/operator/loadPrimaryActionSnapshot.ts",
+        "staffordos/ui/operator-frontend/components/operator/WorkdayControlPanel.tsx"
+      ],
+      "data_source": "local truth files plus primary action loader",
+      "source_authority": "runtime-canonical presentation",
+      "classification": [
+        "READ_WITH_FIELD_FILTERING"
+      ],
+      "risk": "Contains revenue context and workday start/stop adjacency."
+    },
+    {
+      "route": "/operator/cockpit",
+      "purpose": "CEO truth cockpit with revenue, pipeline, fulfillment, Abando, health, primary action, and top actions.",
+      "backing_files": [
+        "staffordos/ui/operator-frontend/app/operator/cockpit/page.tsx",
+        "staffordos/ui/operator-frontend/app/api/operator/ceo-truth-snapshot/route.ts"
+      ],
+      "data_source": "staffordos/cockpit/ceo_truth_snapshot_v1.json",
+      "source_authority": "runtime-canonical read snapshot",
+      "classification": [
+        "WRITE_ADJACENT"
+      ],
+      "risk": "Client component includes execution button path."
+    },
+    {
+      "route": "/operator/leads",
+      "purpose": "Lead command with registry, queue, readiness, send ledger, and actions.",
+      "backing_files": [
+        "staffordos/ui/operator-frontend/app/operator/leads/page.tsx",
+        "staffordos/ui/operator-frontend/app/operator/leads/LeadActions.tsx",
+        "staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts"
+      ],
+      "data_source": "lead registry, lead events, send ledger, and .tmp queues",
+      "source_authority": "runtime read model",
+      "classification": [
+        "READ_WITH_FIELD_FILTERING",
+        "WRITE_ADJACENT"
+      ],
+      "risk": "Lead email/contact fields and POST actions."
+    },
+    {
+      "route": "/operator/campaigns",
+      "purpose": "Campaign command and resolver report.",
+      "backing_files": [
+        "staffordos/ui/operator-frontend/app/operator/campaigns/page.tsx",
+        "staffordos/ui/operator-frontend/lib/operator/campaignResolver.ts"
+      ],
+      "data_source": "campaign registry plus relationship, action, decision, fulfillment, execution, outcome, and revenue resolvers",
+      "source_authority": "derived runtime read model",
+      "classification": [
+        "READ_WITH_FIELD_FILTERING"
+      ],
+      "risk": "Revenue-at-stake, relationship IDs, and conflict context."
+    },
+    {
+      "route": "/operator/revenue-command",
+      "purpose": "Revenue queue for payment, offers, warm opportunities, active campaigns, and stale opportunities.",
+      "backing_files": [
+        "staffordos/ui/operator-frontend/app/operator/revenue-command/page.tsx"
+      ],
+      "data_source": "lead registry, revenue truth, and operator dashboard snapshot",
+      "source_authority": "runtime read model",
+      "classification": [
+        "READ_WITH_FIELD_FILTERING"
+      ],
+      "risk": "Merchant names, lead states, revenue values, and contact gaps."
+    },
+    {
+      "route": "/operator/command-center",
+      "purpose": "Executive command center and ShopiFixer proof/evidence workbench.",
+      "backing_files": [
+        "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx",
+        "staffordos/ui/operator-frontend/components/operator/OperatorHomeV1.tsx",
+        "staffordos/ui/operator-frontend/lib/operator/writeShopifixerBeforeEvidence.ts",
+        "staffordos/ui/operator-frontend/lib/operator/writeShopifixerAfterEvidence.ts",
+        "staffordos/ui/operator-frontend/lib/operator/writeShopifixerScopedFix.ts",
+        "staffordos/ui/operator-frontend/lib/operator/writeShopifixerProofPackage.ts",
+        "staffordos/ui/operator-frontend/lib/operator/writeShopifixerCompletion.ts"
+      ],
+      "data_source": "primary action, preflight, QA, unit work, and ShopiFixer command center",
+      "source_authority": "runtime-canonical operator surface",
+      "classification": [
+        "WRITE_ADJACENT",
+        "NOT_SUITABLE"
+      ],
+      "risk": "Server actions write evidence, proof package, scoped fix, and completion artifacts."
+    },
+    {
+      "route": "/operator/execution-log",
+      "purpose": "Execution, outcome, agent usage, and rule suggestion view.",
+      "backing_files": [
+        "staffordos/ui/operator-frontend/app/operator/execution-log/page.tsx",
+        "staffordos/ui/operator-frontend/lib/operator/loadExecutionLog.ts"
+      ],
+      "data_source": "execution log, outcome events, legacy events, agent performance, rule suggestions, loop report",
+      "source_authority": "mixed runtime and generated summaries",
+      "classification": [
+        "READ_WITH_FIELD_FILTERING",
+        "GENERATED_OR_MOCK"
+      ],
+      "risk": "Generated fallback IDs use Date.now and records may contain customer names and rule suggestions."
+    },
+    {
+      "route": "/operator/system-map",
+      "purpose": "System map read-only surface.",
+      "backing_files": [
+        "staffordos/ui/operator-frontend/app/operator/system-map/page.tsx",
+        "staffordos/ui/operator-frontend/app/api/operator/system-map/route.ts"
+      ],
+      "data_source": "lead registry, send ledger, agent registry, system inventory, governance files",
+      "source_authority": "derived system summary",
+      "classification": [
+        "READ_WITH_FIELD_FILTERING"
+      ],
+      "risk": "Generated timestamps and planned or partial nodes."
+    },
+    {
+      "route": "/operator/slice-truth",
+      "purpose": "Operator lock and slice verification surface.",
+      "backing_files": [
+        "staffordos/ui/operator-frontend/app/operator/slice-truth/page.tsx"
+      ],
+      "data_source": "system-map slice truth and operator lock state",
+      "source_authority": "runtime/generated local files",
+      "classification": [
+        "OPERATOR_PRIVATE_ONLY"
+      ],
+      "risk": "Internal lock and repair language."
+    },
+    {
+      "route": "/operator/shopifixer-pilot",
+      "purpose": "ShopiFixer proof-run workspace.",
+      "backing_files": [
+        "staffordos/ui/operator-frontend/app/operator/shopifixer-pilot/page.tsx",
+        "staffordos/ui/operator-frontend/components/operator/ShopifixerPilotWorkspace.tsx",
+        "staffordos/ui/operator-frontend/lib/operator/writeShopifixerBeforeEvidence.ts",
+        "staffordos/ui/operator-frontend/lib/operator/writeShopifixerAfterEvidence.ts",
+        "staffordos/ui/operator-frontend/lib/operator/writeShopifixerScopedFix.ts",
+        "staffordos/ui/operator-frontend/lib/operator/writeShopifixerProofPackage.ts",
+        "staffordos/ui/operator-frontend/lib/operator/writeShopifixerCompletion.ts"
+      ],
+      "data_source": "ShopiFixer command center, leads, campaign resolver, and proof-run artifacts",
+      "source_authority": "operator proof-run authority",
+      "classification": [
+        "WRITE_ADJACENT",
+        "NOT_SUITABLE"
+      ],
+      "risk": "Multiple server actions write proof-run and completion artifacts."
+    },
+    {
+      "route": "/operator/relationship/[id]",
+      "purpose": "Relationship 360 view.",
+      "backing_files": [
+        "staffordos/ui/operator-frontend/app/operator/relationship/[id]/page.tsx",
+        "staffordos/ui/operator-frontend/lib/operator/relationshipResolver.ts",
+        "staffordos/ui/operator-frontend/lib/operator/actionResolver.ts",
+        "staffordos/ui/operator-frontend/lib/operator/decisionEngineResolver.ts"
+      ],
+      "data_source": "relationship resolver, packet authority fetches, revenue truth, and fulfillment truth",
+      "source_authority": "runtime and derived read model",
+      "classification": [
+        "BLOCKED_BY_IDENTITY",
+        "READ_WITH_FIELD_FILTERING"
+      ],
+      "risk": "Contact email, packet IDs, payment reference, merchant data, and external packet fetches."
+    },
+    {
+      "route": "/operator/analytics",
+      "purpose": "Placeholder analytics status.",
+      "backing_files": [
+        "staffordos/ui/operator-frontend/app/operator/analytics/page.tsx"
+      ],
+      "data_source": "static placeholder content",
+      "source_authority": "planned only",
+      "classification": [
+        "GENERATED_OR_MOCK",
+        "NOT_SUITABLE"
+      ],
+      "risk": "Not live truth."
+    },
+    {
+      "route": "/operator/products",
+      "purpose": "Product overview with Abando summary fetch and placeholders.",
+      "backing_files": [
+        "staffordos/ui/operator-frontend/app/operator/products/page.tsx"
+      ],
+      "data_source": "Abando summary endpoint if configured, placeholders",
+      "source_authority": "product summary surface",
+      "classification": [
+        "BLOCKED_BY_DATA_AUTHORITY"
+      ],
+      "risk": "External product fetch and future product data."
+    },
+    {
+      "route": "/operator/capacity",
+      "purpose": "Service capacity board.",
+      "backing_files": [
+        "staffordos/ui/operator-frontend/app/operator/capacity/page.tsx"
+      ],
+      "data_source": "manual placeholder arrays and planning docs",
+      "source_authority": "planning only",
+      "classification": [
+        "GENERATED_OR_MOCK",
+        "NOT_SUITABLE"
+      ],
+      "risk": "Placeholder merchants and non-live estimates."
+    }
+  ],
+  "api_route_inventory": [
+    {
+      "route": "/api/operator/ceo-truth-snapshot",
+      "method": "GET",
+      "behavior": "Reads staffordos/cockpit/ceo_truth_snapshot_v1.json.",
+      "classification": "SAFE_READ_CANDIDATE after field filtering"
+    },
+    {
+      "route": "/api/operator/ceo-snapshot",
+      "method": "GET",
+      "behavior": "Aggregates lead, client, dashboard, and send-ledger files with generated timestamp.",
+      "classification": "READ_WITH_FIELD_FILTERING"
+    },
+    {
+      "route": "/api/operator/dashboard-snapshot",
+      "method": "GET",
+      "behavior": "Reads operator dashboard snapshot.",
+      "classification": "READ_WITH_FIELD_FILTERING"
+    },
+    {
+      "route": "/api/operator/lead-registry",
+      "method": "GET",
+      "behavior": "Returns loadOperatorLeads output.",
+      "classification": "READ_WITH_FIELD_FILTERING"
+    },
+    {
+      "route": "/api/operator/send-proof",
+      "method": "GET",
+      "behavior": "Reads send ledger proof counts and latest proofs.",
+      "classification": "READ_WITH_FIELD_FILTERING"
+    },
+    {
+      "route": "/api/operator/system-map",
+      "method": "GET",
+      "behavior": "Builds generated system map summary.",
+      "classification": "GENERATED_OR_MOCK"
+    },
+    {
+      "route": "/api/operator/execute-primary-action",
+      "method": "POST",
+      "behavior": "Writes operator action, outcome, and related logs; can spawn Node command.",
+      "classification": "WRITE_OR_EXECUTION_INSTRUCTION"
+    },
+    {
+      "route": "/api/operator/lead-registry/action",
+      "method": "POST",
+      "behavior": "Mutates lead registry, lead events, send ledger, and send execution log.",
+      "classification": "WRITE_OR_EXECUTION_INSTRUCTION"
+    },
+    {
+      "route": "/api/operator/workday/start",
+      "method": "POST",
+      "behavior": "Runs workday start script.",
+      "classification": "WRITE_OR_EXECUTION_INSTRUCTION"
+    },
+    {
+      "route": "/api/operator/workday/stop",
+      "method": "POST",
+      "behavior": "Runs workday stop script.",
+      "classification": "WRITE_OR_EXECUTION_INSTRUCTION"
+    }
+  ],
+  "read_model_and_resolver_inventory": [
+    {
+      "file": "staffordos/ui/operator-frontend/lib/operator/loadPrimaryActionSnapshot.ts",
+      "exports": [
+        "loadPrimaryActionSnapshot"
+      ],
+      "inputs": [
+        "localhost /api/operator/ceo-snapshot",
+        "staffordos/clients/operator_dashboard_snapshot_v1.json",
+        "staffordos/merchant_registry/merchant_lifecycle_registry_v1.json",
+        "staffordos/clients/client_registry_v1.json",
+        "staffordos/leads/lead_registry_v1.json"
+      ],
+      "sensitivity": [
+        "merchant",
+        "product",
+        "revenue gap",
+        "confidence scores"
+      ],
+      "classification": "RECOMMENDED_FIRST only through field allowlist and no API fetch in snapshot adapter"
+    },
+    {
+      "file": "staffordos/ui/operator-frontend/lib/operator/actionResolver.ts",
+      "exports": [
+        "resolveActionCandidates",
+        "resolveActionCandidateById",
+        "getActionResolverReport"
+      ],
+      "inputs": [
+        "dashboard",
+        "revenue truth",
+        "fulfillment truth",
+        "execution log",
+        "outcome events",
+        "relationship resolver"
+      ],
+      "sensitivity": [
+        "revenue impact",
+        "confidence",
+        "relationship IDs",
+        "conflict state"
+      ],
+      "classification": "SAFE_AFTER_FIELD_FILTERING"
+    },
+    {
+      "file": "staffordos/ui/operator-frontend/lib/operator/decisionEngineResolver.ts",
+      "exports": [
+        "resolveDecisionEngine",
+        "getDecisionEngineReport"
+      ],
+      "inputs": [
+        "action resolver",
+        "relationship resolver",
+        "revenue truth",
+        "fulfillment truth",
+        "execution truth",
+        "outcome truth"
+      ],
+      "sensitivity": [
+        "derived ranking",
+        "commercial context"
+      ],
+      "classification": "SAFE_AFTER_FIELD_FILTERING"
+    },
+    {
+      "file": "staffordos/ui/operator-frontend/lib/operator/relationshipResolver.ts",
+      "exports": [
+        "resolveRelationships",
+        "resolveRelationshipById",
+        "getRelationshipResolverReport"
+      ],
+      "inputs": [
+        "lead",
+        "client",
+        "merchant",
+        "fulfillment",
+        "execution",
+        "outcome files"
+      ],
+      "sensitivity": [
+        "emails",
+        "domains",
+        "merchant shops",
+        "payment and proof state",
+        "conflict notes"
+      ],
+      "classification": "BLOCKED_BY_IDENTITY"
+    },
+    {
+      "file": "staffordos/ui/operator-frontend/lib/leads/loadOperatorLeads.ts",
+      "exports": [
+        "loadOperatorLeads"
+      ],
+      "inputs": [
+        "lead registry",
+        "lead events",
+        "send ledger",
+        ".tmp send queue",
+        ".tmp send ready",
+        ".tmp send console"
+      ],
+      "sensitivity": [
+        "email",
+        "send target",
+        "names",
+        "domains",
+        "outreach state"
+      ],
+      "classification": "BLOCKED_BY_IDENTITY for full data; summary only after filtering"
+    },
+    {
+      "file": "staffordos/ui/operator-frontend/lib/operator/loadShopifixerCommandCenter.ts",
+      "exports": [
+        "loadShopifixerCommandCenter",
+        "deriveCustomerOutcome"
+      ],
+      "inputs": [
+        "merchant lifecycle",
+        "client registry",
+        "fulfillment truth",
+        "packet API fetches"
+      ],
+      "sensitivity": [
+        "packet IDs",
+        "payment reference",
+        "customer outcome",
+        "external fetch"
+      ],
+      "classification": "BLOCKED_BY_DATA_AUTHORITY"
+    },
+    {
+      "file": "staffordos/ui/operator-frontend/lib/operator/loadExecutionLog.ts",
+      "exports": [
+        "loadExecutionLog"
+      ],
+      "inputs": [
+        "execution log",
+        "outcome events",
+        "legacy operator events",
+        "agent performance",
+        "rule suggestions",
+        "loop report"
+      ],
+      "sensitivity": [
+        "customer names",
+        "generated IDs",
+        "rule suggestions"
+      ],
+      "classification": "SAFE_AFTER_FIELD_FILTERING"
+    }
+  ],
+  "field_level_classification": {
+    "OPERATOR_SAFE_SUMMARY": [
+      "primary action label",
+      "next step",
+      "expected outcome",
+      "broad product/domain label",
+      "source file references",
+      "explicit limitations"
+    ],
+    "OPERATOR_SAFE_WITH_REDACTION": [
+      "merchant display name",
+      "relationship ID",
+      "campaign ID",
+      "lead stage",
+      "conflict note",
+      "blocker"
+    ],
+    "INTERNAL_TECHNICAL": [
+      "schema",
+      "generated_at",
+      "source file paths",
+      "resolver validation status",
+      "source health"
+    ],
+    "OPERATOR_PRIVATE": [
+      "workday state",
+      "operator daemon status",
+      "preflight findings",
+      "QA findings",
+      "rule suggestions"
+    ],
+    "MERCHANT_OR_CUSTOMER_SENSITIVE": [
+      "lead name",
+      "domain",
+      "email",
+      "send target",
+      "merchant shop",
+      "client ID",
+      "packet ID",
+      "reservation ID",
+      "payment reference",
+      "revenue values",
+      "customer outcomes"
+    ],
+    "CREDENTIAL_OR_SECRET": [
+      "environment values",
+      "tokens",
+      "API keys",
+      "private keys",
+      "OAuth materials"
+    ],
+    "WRITE_OR_EXECUTION_INSTRUCTION": [
+      "execute-primary-action",
+      "lead action",
+      "workday start/stop",
+      "proof/evidence write helpers",
+      "packet mutation paths"
+    ],
+    "PROVIDER_METADATA": [
+      "packet provider status",
+      "Ollama provider metadata",
+      "model/runtime metadata"
+    ],
+    "GENERATED_OR_UNVERIFIED": [
+      "system-map generated_at",
+      "Date.now fallback IDs",
+      "placeholder capacity entries",
+      "generated summaries"
+    ],
+    "PLANNED_OR_PLACEHOLDER": [
+      "analytics placeholders",
+      "products placeholders",
+      "capacity placeholder merchants"
+    ]
+  },
+  "runtime_source_snapshot_contract": {
+    "fields": [
+      "snapshot_id",
+      "adapter_id",
+      "source_type",
+      "source_record_id",
+      "workspace_id",
+      "product_scope",
+      "captured_at",
+      "source_updated_at",
+      "freshness",
+      "authority_classification",
+      "privacy_classification",
+      "permission_requirement",
+      "content_summary",
+      "structured_facts",
+      "excluded_fields",
+      "exact_source_reference",
+      "limitations",
+      "conflict_status",
+      "immutable_digest"
+    ],
+    "never_include": [
+      "raw database access",
+      "unrestricted API access",
+      "mutable object references",
+      "write routes",
+      "secrets",
+      "credentials",
+      "rollback commands",
+      "execution tokens",
+      "customer data outside authority",
+      "other workspace data"
+    ],
+    "implemented_now": false
+  },
+  "identity_and_authorization_dependencies": [
+    {
+      "function": "Static fixture validation and deterministic source-shape tests",
+      "classification": "CAN_BUILD_WITH_STATIC_LOCAL_FIXTURES"
+    },
+    {
+      "function": "Primary Action Snapshot source adapter as an unwired library with local test fixtures",
+      "classification": "CAN_BUILD_AS_LIBRARY_WITHOUT_RUNTIME_USE"
+    },
+    {
+      "function": "Runtime invocation for operator-private sources",
+      "classification": "MUST_WAIT_FOR_OPERATOR_IDENTITY"
+    },
+    {
+      "function": "Workspace-scoped runtime reads",
+      "classification": "MUST_WAIT_FOR_WORKSPACE_MEMBERSHIP"
+    },
+    {
+      "function": "Customer-sensitive lead, merchant, packet, revenue, or fulfillment records",
+      "classification": "MUST_WAIT_FOR_PERMISSION_CLAIMS"
+    },
+    {
+      "function": "Production source adapter",
+      "classification": "MUST_WAIT_FOR_SERVER_AUTHORIZATION"
+    }
+  ],
+  "mutation_and_write_adjacency": {
+    "write_capable_paths": [
+      "staffordos/ui/operator-frontend/app/api/operator/execute-primary-action/route.ts",
+      "staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts",
+      "staffordos/ui/operator-frontend/app/api/operator/workday/start/route.ts",
+      "staffordos/ui/operator-frontend/app/api/operator/workday/stop/route.ts",
+      "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx",
+      "staffordos/ui/operator-frontend/app/operator/shopifixer-pilot/page.tsx",
+      "staffordos/ui/operator-frontend/lib/operator/writeShopifixerBeforeEvidence.ts",
+      "staffordos/ui/operator-frontend/lib/operator/writeShopifixerAfterEvidence.ts",
+      "staffordos/ui/operator-frontend/lib/operator/writeShopifixerScopedFix.ts",
+      "staffordos/ui/operator-frontend/lib/operator/writeShopifixerProofPackage.ts",
+      "staffordos/ui/operator-frontend/lib/operator/writeShopifixerCompletion.ts",
+      "staffordos/ui/operator-frontend/components/operator/ExecutePrimaryActionButton.tsx",
+      "staffordos/ui/operator-frontend/app/operator/leads/LeadActions.tsx",
+      "staffordos/ui/operator-frontend/components/operator/LeadQueue.tsx",
+      "staffordos/ui/operator-frontend/components/operator/WorkdayControlPanel.tsx"
+    ],
+    "future_static_scans": [
+      "no writeShopifixer imports",
+      "no app/api/operator route imports",
+      "no mutation-capable component imports",
+      "no POST, writeFileSync, execFile, queue, payment, packet mutation, approval, reject, retry, deploy, rollback, or completion dependencies",
+      "no direct /operator page imports",
+      "no direct model access to /operator"
+    ]
+  },
+  "freshness_and_conflict_model": {
+    "freshness_classifications": [
+      "Current",
+      "Recent",
+      "Historical",
+      "Unknown",
+      "Stale"
+    ],
+    "universal_threshold_defined": false,
+    "conflict_rules": [
+      "Preserve both source claims when read models disagree.",
+      "Runtime canonical state may own only its bounded runtime claim.",
+      "Generated summaries have lower authority than canonical records.",
+      "If /operator and /os static fixtures disagree, use the safe UNKNOWN fallback until a governed snapshot resolves it."
+    ]
+  },
+  "provenance_and_source_authority": {
+    "authority_levels": [
+      "Runtime canonical",
+      "Repository canonical",
+      "Provider confirmed",
+      "Operator confirmed",
+      "Derived read model",
+      "Generated summary",
+      "Historical evidence",
+      "Needs verification"
+    ],
+    "selected_source_authority": "Runtime canonical primary action snapshot transformed into a field-filtered governed source snapshot."
+  },
+  "candidate_adapter_comparison": [
+    {
+      "candidate": "Primary Action Snapshot Adapter",
+      "value": "Directly answers what deserves attention and why.",
+      "sensitivity": "medium after filtering",
+      "identity_dependency": "library can be built with fixtures; runtime use waits for identity",
+      "classification": "RECOMMENDED_FIRST"
+    },
+    {
+      "candidate": "Current Objectives Adapter",
+      "value": "Useful context but already static in S008.",
+      "sensitivity": "low",
+      "identity_dependency": "none for static use",
+      "classification": "DEFER"
+    },
+    {
+      "candidate": "Recent Decisions Adapter",
+      "value": "Useful why-context but already static in S008.",
+      "sensitivity": "low",
+      "identity_dependency": "none for static use",
+      "classification": "DEFER"
+    },
+    {
+      "candidate": "Proof and Learning Summary Adapter",
+      "value": "Useful source trace.",
+      "sensitivity": "low to medium",
+      "identity_dependency": "runtime proof requires governance",
+      "classification": "SAFE_AFTER_FIELD_FILTERING"
+    },
+    {
+      "candidate": "Lead or Revenue Summary Adapter",
+      "value": "High business value.",
+      "sensitivity": "high customer, contact, merchant, and revenue sensitivity",
+      "identity_dependency": "must wait for identity and permissions",
+      "classification": "SAFE_AFTER_IDENTITY"
+    },
+    {
+      "candidate": "System Health Summary Adapter",
+      "value": "Useful operational context.",
+      "sensitivity": "medium technical/internal",
+      "identity_dependency": "operator identity required for some fields",
+      "classification": "SAFE_AFTER_FIELD_FILTERING"
+    },
+    {
+      "candidate": "Relationship 360 Adapter",
+      "value": "High account value.",
+      "sensitivity": "very high",
+      "identity_dependency": "must wait for identity, permission, and data authority",
+      "classification": "DEFER"
+    }
+  ],
+  "selected_first_adapter": {
+    "mission": "S009_06_PRIMARY_ACTION_READ_MODEL_SOURCE_ADAPTER",
+    "source": "Primary Action Snapshot",
+    "classification": "RECOMMENDED_FIRST",
+    "scope": "library-only source adapter with deterministic fixtures; no /operator or model integration",
+    "included_fields": [
+      "workspace_id",
+      "source_type",
+      "source_record_id",
+      "title",
+      "summary",
+      "why",
+      "status",
+      "source_references",
+      "limitations",
+      "freshness"
+    ],
+    "excluded_fields": [
+      "lead email",
+      "contact data",
+      "send targets",
+      "message bodies",
+      "packet IDs",
+      "reservation IDs",
+      "payment references",
+      "session IDs",
+      "raw merchant/customer identifiers unless separately redacted",
+      "exact revenue amounts",
+      "numeric business metrics",
+      "numeric priority or confidence scores",
+      "raw resolver candidates and alternatives",
+      "write route paths",
+      "shell commands",
+      "scripts",
+      "API mutation endpoints",
+      "environment-derived URLs and environment values",
+      "Date.now generated fallback IDs"
+    ]
+  },
+  "static_to_runtime_compatibility": {
+    "replaces_or_supplements": "supplements current static S009 fixtures",
+    "source_id_strategy": "explicit source IDs remain required",
+    "validator_rules_changed": false,
+    "response_shape_changed": false,
+    "ollama_adapter_changed": false,
+    "frontier_provider_adapters_changed": false
+  },
+  "failure_closed_design": {
+    "canonical_fallback": "I cannot verify that from the current StaffordOS sources.",
+    "failure_classifications": [
+      "SOURCE_UNAVAILABLE",
+      "UNAUTHORIZED_REQUEST",
+      "WORKSPACE_MISMATCH",
+      "STALE_SOURCE",
+      "MALFORMED_SOURCE",
+      "MISSING_TIMESTAMP",
+      "CONFLICTING_RECORDS",
+      "PROVIDER_TIMEOUT",
+      "EMPTY_RESULT",
+      "SENSITIVE_FIELD_PRESENT",
+      "WRITE_CAPABLE_DEPENDENCY",
+      "UNEXPECTED_SCHEMA",
+      "PARTIAL_DATA"
+    ],
+    "trusted_snapshot_on_failure": false
+  },
+  "audit_contract": [
+    "adapter_execution_id",
+    "user_identity_reference",
+    "workspace_id",
+    "permission_decision",
+    "source_requested",
+    "source_authority",
+    "fields_included",
+    "fields_excluded",
+    "snapshot_id",
+    "capture_time",
+    "source_update_time",
+    "freshness",
+    "conflicts",
+    "limitations",
+    "success_or_failure_status",
+    "downstream_request_id",
+    "privacy_classification"
+  ],
+  "test_strategy": [
+    "exact source allowlist",
+    "exact field allowlist",
+    "excluded secrets and sensitive fields",
+    "workspace enforcement",
+    "permission enforcement",
+    "read-only dependency graph",
+    "no write imports",
+    "no mutation calls",
+    "deterministic transformation",
+    "provenance preservation",
+    "freshness classification",
+    "conflict preservation",
+    "empty result",
+    "unavailable source",
+    "malformed source",
+    "static validator compatibility",
+    "provider-neutral compatibility",
+    "no Ollama dependency",
+    "no model invocation",
+    "input immutability"
+  ],
+  "ui_impact_review": {
+    "ui_change_required_now": false,
+    "future_considerations": [
+      "show source freshness",
+      "distinguish static from runtime-backed sources",
+      "display runtime authority",
+      "display unavailable state",
+      "display conflicts",
+      "show operator-review requirement",
+      "preserve the existing source trace section"
+    ]
+  },
+  "model_provider_boundary": {
+    "runtime_source_upstream_of_model_adapters": true,
+    "works_with": [
+      "deterministic fixture adapter",
+      "local Ollama adapter",
+      "future OpenAI adapter",
+      "future Anthropic adapter",
+      "future Google adapter",
+      "non-AI deterministic reasoning"
+    ],
+    "coupled_to_qwen": false,
+    "model_may_query_operator_directly": false,
+    "ollama_remained_stopped": true
+  },
+  "selected_next_implementation_slice": {
+    "mission": "S009_06_PRIMARY_ACTION_READ_MODEL_SOURCE_ADAPTER",
+    "scope": [
+      "Implement one library-only Primary Action Snapshot source adapter.",
+      "Use deterministic local fixtures and/or direct read-side projection tests only.",
+      "Produce a governed source snapshot object compatible with the S009 Chief of Staff request model.",
+      "Do not wire the adapter into /os display.",
+      "Do not call Ollama.",
+      "Do not invoke any model.",
+      "Do not modify /operator."
+    ],
+    "identity_assumptions": [
+      "Local tests may use static Stafford Media fixtures.",
+      "Runtime invocation remains off.",
+      "Trusted operator identity, workspace membership, permission claims, and server authorization remain future dependencies."
+    ],
+    "expected_outcome": "A deterministic source adapter contract proves the first runtime-canonical source can be transformed into an immutable, source-traced, field-filtered snapshot without weakening the Chief of Staff validator or provider-neutral model boundary."
+  },
+  "artifacts_created": [
+    "staffordos/architecture/S009_05_GOVERNED_OPERATOR_READ_MODEL_ADAPTER_DISCOVERY.md",
+    "staffordos/architecture/S009_05_GOVERNED_OPERATOR_READ_MODEL_ADAPTER_DISCOVERY.json"
+  ],
+  "validation": {
+    "jq_required": true,
+    "git_diff_check_required": true,
+    "route_probes_required": false,
+    "reason": "No application code or routes changed."
+  },
+  "residual_risks": [
+    "Primary action runtime data currently blends safe action guidance with sensitive merchant and revenue context.",
+    "loadPrimaryActionSnapshot can call localhost /api/operator/ceo-snapshot; a future adapter should avoid API self-fetch in favor of an explicit source boundary.",
+    "Some /operator read models use generated timestamps or fallback IDs and are not immutable snapshots today.",
+    "/operator command-center and ShopiFixer pilot pages are write-adjacent.",
+    "Lead, relationship, revenue, packet, and fulfillment surfaces require identity and data-authority work before runtime Chief of Staff ingestion.",
+    "No deployed S007 identity authority exists yet."
+  ],
+  "rollback": "git revert <S009.05 commit SHA>",
+  "confirmation_of_non_impact": {
+    "ollama_started_or_invoked": false,
+    "model_connected_to_os": false,
+    "runtime_adapter_implemented": false,
+    "operator_modified": false,
+    "application_code_modified": false,
+    "auth_oauth_kms_jwt_issuer_modified": false,
+    "stripe_modified": false,
+    "database_prisma_migrations_api_queue_packet_execution_modified": false,
+    "shopifixer_or_abando_runtime_modified": false,
+    "deployed": false,
+    "pushed": false,
+    "unrelated_changes_included": false
+  },
+  "final_classification": "READ_MODEL_DISCOVERY_COMMITTED"
+}
