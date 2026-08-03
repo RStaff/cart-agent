@@ -33,6 +33,7 @@ function DecisionCard({ decision }: { decision: StaffordOsDecision }) {
         <span>{DECISION_STATUS_LABELS[decision.approvalStatus]}</span>
         <span>{DECISION_SOURCE_LABELS[decision.sourceClassification]}</span>
         <span>{DECISION_AUTHORITY_LABELS[decision.authorityClassification]}</span>
+        <span>{decision.staticity === "HISTORICAL" ? "Historical record" : "Static reference"}</span>
       </div>
 
       <h2>{decision.title}</h2>
@@ -54,6 +55,10 @@ function DecisionCard({ decision }: { decision: StaffordOsDecision }) {
         <div>
           <dt>Authority</dt>
           <dd>{decision.decisionOwner}. {decision.authorityStatus}</dd>
+        </div>
+        <div>
+          <dt>As of</dt>
+          <dd>{decision.asOf}. Historical decision memory may have changed if a later architecture record supersedes it.</dd>
         </div>
         <div>
           <dt>Expected result</dt>
@@ -125,6 +130,12 @@ function DecisionCard({ decision }: { decision: StaffordOsDecision }) {
           <li>Situation: {decision.situation}</li>
           <li>Confidence: {DECISION_CONFIDENCE_LABELS[decision.confidenceClassification]}</li>
           <li>Outcome status: {DECISION_OUTCOME_LABELS[decision.outcomeStatus]}</li>
+          <li>Staticity: {decision.staticity === "HISTORICAL" ? "Historical record" : "Static reference"}</li>
+          <li>Freshness: {decision.freshness === "HISTORICAL" ? "Historical record" : decision.freshness}</li>
+          {decision.supersededBy.length ? <li>Superseded by: {decision.supersededBy.join(", ")}</li> : null}
+          {decision.limitations.map((limitation) => (
+            <li key={limitation}>Limitation: {limitation}</li>
+          ))}
           <li>Uncertainty: {decision.uncertainty}</li>
           <li>Risks: {decision.risks.join(" ")}</li>
           <li>Tradeoffs: {decision.tradeoffs.join(" ")}</li>
@@ -141,6 +152,7 @@ function DecisionCard({ decision }: { decision: StaffordOsDecision }) {
 function PlannedWorkspaceDecisions() {
   const { activeWorkspace, setActiveWorkspace } = useStaffordOsWorkspace();
   const decisions = getDecisionsForWorkspace(activeWorkspace.id);
+  const isProfessional = activeWorkspace.id === "professional";
 
   return (
     <div className="staffordObjectivePage">
@@ -148,7 +160,11 @@ function PlannedWorkspaceDecisions() {
         <div>
           <span className="staffordEyebrow">{activeWorkspace.name}</span>
           <h1>Decisions and Why We Made Them</h1>
-          <p>This workspace is planned. No decisions are recorded here yet.</p>
+          <p>
+            {isProfessional
+              ? "Professional has a read-only foundation, but no decisions are recorded here yet."
+              : "This workspace is planned. No decisions are recorded here yet."}
+          </p>
         </div>
         <div className="staffordWorkspaceStatus">
           <span>{WORKSPACE_AVAILABILITY_LABELS[activeWorkspace.availability]}</span>
@@ -157,9 +173,11 @@ function PlannedWorkspaceDecisions() {
       </section>
 
       <section className="staffordObjectiveNote">
-        <strong>Planned only</strong>
+        <strong>{isProfessional ? "Not connected yet" : "Planned only"}</strong>
         <p>
-          Decisions shown here later will stay inside this workspace. Stafford Media decisions are not shown here.
+          {isProfessional
+            ? "Professional decision records need a governed read-model adapter before they appear here. Stafford Media decisions are not shown here."
+            : "Decisions shown here later will stay inside this workspace. Stafford Media decisions are not shown here."}
         </p>
       </section>
 
@@ -192,7 +210,7 @@ function StaffordMediaDecisions() {
         <div>
           <span className="staffordEyebrow">{activeWorkspace.name}</span>
           <h1>Decisions and Why We Made Them</h1>
-          <p>These records explain established architecture choices. They do not approve or execute work.</p>
+          <p>These records explain historical repository-backed architecture choices. They do not approve or execute work.</p>
         </div>
         <div className="staffordWorkspaceStatus">
           <span>{WORKSPACE_AVAILABILITY_LABELS[activeWorkspace.availability]}</span>
@@ -203,8 +221,8 @@ function StaffordMediaDecisions() {
       <section className="staffordObjectiveNote">
         <strong>Decision memory</strong>
         <p>
-          These are repository-backed architecture decisions. Live customer, payment, staffing, job, family, and
-          personal decisions are not recorded here.
+          These are static historical records shown as of their recorded decision time. Live customer, payment,
+          staffing, job, family, and personal decisions are not recorded here.
         </p>
       </section>
 

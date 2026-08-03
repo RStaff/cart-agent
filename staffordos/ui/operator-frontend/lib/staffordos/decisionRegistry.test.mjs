@@ -45,6 +45,18 @@ test("every current record has authority classification", () => {
   assert.ok(currentStaffordDecisionBlocks().every((block) => /authorityClassification: "/.test(block)));
 });
 
+test("every current record has static historical metadata", () => {
+  assert.ok(currentStaffordDecisionBlocks().every((block) => /staticity: "HISTORICAL"/.test(block)));
+  assert.ok(currentStaffordDecisionBlocks().every((block) => /freshness: "HISTORICAL"/.test(block)));
+  assert.ok(currentStaffordDecisionBlocks().every((block) => /asOf: "2026-/.test(block)));
+  assert.ok(currentStaffordDecisionBlocks().every((block) => /limitations: \[/.test(block)));
+});
+
+test("superseded historical workspace record stays auditable", () => {
+  assert.match(decisionSource, /id: "s008-stafford-media-now-planned-boundary"[\s\S]*?supersededBy: \["G002_00_PROFESSIONAL_MODE_AND_WORKSPACE_REGISTRY_RECONCILIATION"\]/);
+  assert.match(decisionSource, /Professional now has Career Home and Job Search foundations/);
+});
+
 test("every record belongs to exactly one workspace", () => {
   for (const block of decisionSource.split(/\n  \{\n/).filter((candidate) => /id: "[^"]+"/.test(candidate) && candidate.includes("workspaceId:"))) {
     const matches = block.match(/workspaceId: "/g) || [];

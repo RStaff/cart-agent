@@ -1,4 +1,5 @@
 import type { StaffordOsWorkspaceId } from "./workspaceRegistry";
+import type { SourceConflictStatus, SourceFreshness, SourceStaticity } from "./sourceSnapshot";
 
 export type StaffordOsDecisionStatus =
   | "proposed"
@@ -50,6 +51,13 @@ export type StaffordOsDecision = {
   authorityClassification: StaffordOsDecisionAuthority;
   approvalStatus: StaffordOsDecisionStatus;
   timestamp: string;
+  recordedAt: string;
+  asOf: string;
+  staticity: SourceStaticity;
+  freshness: SourceFreshness;
+  conflictStatus: SourceConflictStatus;
+  supersededBy: string[];
+  limitations: string[];
   expectedResult: string;
   proofRequirement: string;
   outcomeStatus: StaffordOsOutcomeStatus;
@@ -136,6 +144,15 @@ export const STAFFORDOS_DECISIONS: StaffordOsDecision[] = [
     authorityClassification: "owner_decision",
     approvalStatus: "chosen",
     timestamp: "2026-07-30T23:16:21-04:00",
+    recordedAt: "2026-07-30T23:16:21-04:00",
+    asOf: "2026-07-30T23:16:21-04:00",
+    staticity: "HISTORICAL",
+    freshness: "HISTORICAL",
+    conflictStatus: "NO_CONFLICT",
+    supersededBy: [],
+    limitations: [
+      "Historical repository-backed decision memory; it records the decision as it stood when recorded and may be superseded by later architecture.",
+    ],
     expectedResult: "StaffordOS can grow without breaking or duplicating the existing operator workflow.",
     proofRequirement: "/operator routes remain unchanged and /os routes stay read-only presentation surfaces.",
     outcomeStatus: "expected",
@@ -177,6 +194,15 @@ export const STAFFORDOS_DECISIONS: StaffordOsDecision[] = [
     authorityClassification: "owner_decision",
     approvalStatus: "chosen",
     timestamp: "2026-07-30T23:16:21-04:00",
+    recordedAt: "2026-07-30T23:16:21-04:00",
+    asOf: "2026-07-30T23:16:21-04:00",
+    staticity: "HISTORICAL",
+    freshness: "HISTORICAL",
+    conflictStatus: "NO_CONFLICT",
+    supersededBy: [],
+    limitations: [
+      "Historical repository-backed decision memory; it records the decision as it stood when recorded and may be superseded by later architecture.",
+    ],
     expectedResult: "Future surfaces explain choices, evidence, risk, and proof in operator-readable language.",
     proofRequirement: "Visible S008 UI copy avoids internal implementation terms as primary labels.",
     outcomeStatus: "expected",
@@ -217,6 +243,15 @@ export const STAFFORDOS_DECISIONS: StaffordOsDecision[] = [
     authorityClassification: "owner_decision",
     approvalStatus: "chosen",
     timestamp: "2026-08-01T19:24:17-04:00",
+    recordedAt: "2026-08-01T19:24:17-04:00",
+    asOf: "2026-08-01T19:24:17-04:00",
+    staticity: "HISTORICAL",
+    freshness: "HISTORICAL",
+    conflictStatus: "NO_CONFLICT",
+    supersededBy: [],
+    limitations: [
+      "Historical repository-backed decision memory; it records the decision as it stood when recorded and may be superseded by later architecture.",
+    ],
     expectedResult: "StaffordOS can add Abando, Professional, Personal, Family, and Media later without collapsing privacy boundaries.",
     proofRequirement: "Current /os workspace selector presents only approved initial workspace families.",
     outcomeStatus: "expected",
@@ -258,6 +293,16 @@ export const STAFFORDOS_DECISIONS: StaffordOsDecision[] = [
     authorityClassification: "owner_decision",
     approvalStatus: "chosen",
     timestamp: "2026-08-01T20:04:29-04:00",
+    recordedAt: "2026-08-01T20:04:29-04:00",
+    asOf: "2026-08-01T20:04:29-04:00",
+    staticity: "HISTORICAL",
+    freshness: "HISTORICAL",
+    conflictStatus: "NO_CONFLICT",
+    supersededBy: ["G002_00_PROFESSIONAL_MODE_AND_WORKSPACE_REGISTRY_RECONCILIATION"],
+    limitations: [
+      "Historical repository-backed decision memory.",
+      "G002 supersedes the Professional planned-only portion; Professional now has Career Home and Job Search foundations while My Job and Personal remain planned.",
+    ],
     expectedResult: "Ross can see which part of StaffordOS is usable today without confusing planned workspaces for live systems.",
     proofRequirement: "Professional and Personal render planned-state content only and expose no Stafford Media operating links.",
     outcomeStatus: "expected",
@@ -300,6 +345,15 @@ export const STAFFORDOS_DECISIONS: StaffordOsDecision[] = [
     authorityClassification: "owner_decision",
     approvalStatus: "chosen",
     timestamp: "2026-08-01T20:19:24-04:00",
+    recordedAt: "2026-08-01T20:19:24-04:00",
+    asOf: "2026-08-01T20:19:24-04:00",
+    staticity: "HISTORICAL",
+    freshness: "HISTORICAL",
+    conflictStatus: "NO_CONFLICT",
+    supersededBy: [],
+    limitations: [
+      "Historical repository-backed decision memory; it records the decision as it stood when recorded and may be superseded by later architecture.",
+    ],
     expectedResult: "The operator has one clear place to continue without duplicating existing /operator behavior.",
     proofRequirement: "/os Home renders Start My Day as a static available action and links to /operator.",
     outcomeStatus: "expected",

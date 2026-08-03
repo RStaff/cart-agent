@@ -1,0 +1,204 @@
+{
+  "missionId": "G003_00_ADAPTER_ONLY_READ_MODEL_AND_STATICITY_AUTHORITY",
+  "schemaVersion": "staffordos.governance.g003.v1",
+  "createdAt": "2026-08-03T00:00:00-04:00",
+  "checkpointAuthority": {
+    "startingHead": "f572828429ec7cbf7a5d6902a606fb20fbba3b83",
+    "requiredCommits": [
+      "625b9150",
+      "eae4f9dd",
+      "d6a09095",
+      "f5728284",
+      "d95be89f",
+      "f4f2efa8"
+    ],
+    "operatorRuntimeAuthority": "/operator",
+    "parentWorkspaceShell": "/os",
+    "privateDataConnected": false
+  },
+  "currentDataEntryInventory": [
+    {
+      "pathFamily": "workspace mode capability action objective decision evidence proof learning registries",
+      "classification": "STATIC_REPOSITORY",
+      "result": "direct import allowed only with static or historical disclosure"
+    },
+    {
+      "pathFamily": "primary action source adapter",
+      "classification": "GOVERNED_ADAPTER",
+      "result": "existing S009.06 read-model adapter pattern preserved"
+    },
+    {
+      "pathFamily": "job command and opportunity queue presentation",
+      "classification": "STATIC_REPOSITORY",
+      "result": "no real private opportunity connected"
+    },
+    {
+      "pathFamily": "workspace context",
+      "classification": "CLIENT_LOCAL_PRESENTATION",
+      "result": "presentation only and not authorization"
+    },
+    {
+      "pathFamily": "chief of staff demo records",
+      "classification": "GENERATED_PROPOSAL",
+      "result": "static demo only and not live operator truth"
+    }
+  ],
+  "adapterOnlyRule": {
+    "nonStaticDataRequiresGovernedAdapter": true,
+    "clientPrivateFileReadsAllowed": false,
+    "operatorLoaderReuseAllowedInOs": false,
+    "browserStorageAuthorityAllowed": false,
+    "writeOrExecutionBehaviorAllowed": false,
+    "staticRepositoryDirectImportAllowedWithDisclosure": true
+  },
+  "sourceSnapshotContract": {
+    "file": "staffordos/ui/operator-frontend/lib/staffordos/sourceSnapshot.ts",
+    "sourceTypes": [
+      "STATIC_REPOSITORY",
+      "HISTORICAL_RECORD",
+      "PRIVATE_LOCAL",
+      "RUNTIME_READ_MODEL",
+      "PROVIDER_CONFIRMED",
+      "OPERATOR_CONFIRMED",
+      "GENERATED_PROPOSAL",
+      "PLANNED_PLACEHOLDER"
+    ],
+    "staticityValues": [
+      "LIVE_RUNTIME",
+      "CAPTURED_SNAPSHOT",
+      "STATIC_REPOSITORY",
+      "HISTORICAL",
+      "GENERATED",
+      "PLANNED"
+    ],
+    "freshnessValues": [
+      "CURRENT",
+      "RECENT",
+      "HISTORICAL",
+      "STALE",
+      "UNKNOWN"
+    ],
+    "immutableOutput": true,
+    "failsClosed": true
+  },
+  "readModelEnvelope": {
+    "file": "staffordos/ui/operator-frontend/lib/staffordos/readModelEnvelope.ts",
+    "requiresSourceSnapshots": true,
+    "requiresAsOfForStaticHistoricalCaptured": true,
+    "assembledAtMaySubstituteForAsOf": false,
+    "immutableOutput": true,
+    "emptyStateReasons": [
+      "NO_RECORDS",
+      "SOURCE_UNAVAILABLE",
+      "UNAUTHORIZED",
+      "NOT_CONNECTED",
+      "VALIDATION_FAILED",
+      "PLANNED"
+    ]
+  },
+  "authorizationStatusModel": [
+    "NOT_REQUIRED_FOR_PUBLIC_STATIC",
+    "TEST_FIXTURE_ONLY",
+    "PRESENTATION_ONLY_NOT_AUTHORIZED",
+    "AUTHORIZED_BY_SERVER_POLICY",
+    "AUTHORIZED_BY_PROVIDER",
+    "OPERATOR_CONFIRMED",
+    "AUTHORIZATION_UNKNOWN",
+    "DENIED"
+  ],
+  "conflictModel": [
+    "NO_CONFLICT",
+    "CONFLICT_DISCLOSED",
+    "CONFLICT_REQUIRES_REVIEW",
+    "BLOCKING_CONFLICT",
+    "UNKNOWN"
+  ],
+  "staticRegistryAudit": {
+    "directOsPrivateFileReadsFound": false,
+    "operatorLoaderImportsFound": false,
+    "providerDirectCallsFound": false,
+    "historicalDecisionAmbiguityFound": true,
+    "historicalDecisionMetadataAdded": true,
+    "professionalDecisionCopyCorrected": true
+  },
+  "historicalDecisionHandling": {
+    "decisionsRewritten": false,
+    "recordedAtAdded": true,
+    "asOfAdded": true,
+    "staticityAdded": true,
+    "supersessionAdded": true,
+    "supersededBy": [
+      "G002_00_PROFESSIONAL_MODE_AND_WORKSPACE_REGISTRY_RECONCILIATION"
+    ]
+  },
+  "jobOpportunityAdapterReadiness": {
+    "futurePath": [
+      "PRIVATE JOB INTAKE FILE",
+      "PRIVATE NORMALIZED OPPORTUNITY",
+      "SERVER-SIDE PRIVATE SOURCE ADAPTER",
+      "SOURCE SNAPSHOT",
+      "REDACTED OPPORTUNITY QUEUE READ MODEL",
+      "JOB COMMAND"
+    ],
+    "status": "BLOCKED_ON_SERVER_AUTHORIZATION",
+    "realPrivateOpportunityConnected": false
+  },
+  "uiDisclosureDecision": {
+    "newComponentCreated": false,
+    "decisionSurfaceUpdated": true,
+    "reason": "existing panel and text patterns were sufficient"
+  },
+  "filesChanged": [
+    "staffordos/ui/operator-frontend/lib/staffordos/sourceSnapshot.ts",
+    "staffordos/ui/operator-frontend/lib/staffordos/sourceSnapshot.test.mjs",
+    "staffordos/ui/operator-frontend/lib/staffordos/readModelEnvelope.ts",
+    "staffordos/ui/operator-frontend/lib/staffordos/readModelEnvelope.test.mjs",
+    "staffordos/ui/operator-frontend/lib/staffordos/decisionRegistry.ts",
+    "staffordos/ui/operator-frontend/lib/staffordos/decisionRegistry.test.mjs",
+    "staffordos/ui/operator-frontend/components/staffordos/DecisionSurface.tsx",
+    "staffordos/governance/G003_00_ADAPTER_ONLY_READ_MODEL_AND_STATICITY_AUTHORITY.md",
+    "staffordos/governance/G003_00_ADAPTER_ONLY_READ_MODEL_AND_STATICITY_AUTHORITY.json"
+  ],
+  "validation": {
+    "focusedG003Tests": {
+      "status": "passed",
+      "testCount": 56
+    },
+    "fullStaffordOsLibrarySweep": {
+      "status": "passed",
+      "testCount": 533
+    },
+    "g002Regression": "passed",
+    "j001Regression": "passed",
+    "s010Regression": "passed",
+    "s009Regression": "passed",
+    "s008Regression": "passed",
+    "build": {
+      "status": "passed",
+      "nonBlockingWarnings": "Existing non-G003 operator build warnings observed."
+    },
+    "routeChecks": {
+      "status": "passed",
+      "routesChecked": 16,
+      "expectedStatus": 200
+    },
+    "jsonValidation": "passed",
+    "diffChecks": {
+      "unstagedDiffCheck": "passed",
+      "stagedDiffCheck": "commit gate"
+    }
+  },
+  "knownLimitations": [
+    "No StaffordOS-wide runtime persistence was added.",
+    "No authentication or authorization was implemented.",
+    "No real private Job Opportunity is connected to the UI.",
+    "No provider adapter, database, API, migration, or route was added.",
+    "Operator write-surface risk remains for a later decision mission."
+  ],
+  "rollback": "git revert <G003 commit SHA>",
+  "selectedNextMission": {
+    "id": "G004_00_OPERATOR_WRITE_SURFACE_RISK_DECISION",
+    "reason": "write-surface risk is the highest-risk prerequisite before private read-model UI connection"
+  },
+  "finalClassification": "ADAPTER_STATICITY_AUTHORITY_COMMITTED"
+}
