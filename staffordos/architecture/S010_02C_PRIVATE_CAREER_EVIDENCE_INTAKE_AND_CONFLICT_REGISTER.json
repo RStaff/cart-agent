@@ -1,0 +1,220 @@
+{
+  "mission": "S010_02C_PRIVATE_CAREER_EVIDENCE_INTAKE_AND_CONFLICT_REGISTER",
+  "mission_type": "private local career-document intake and conflict-register preparation",
+  "checkpoint_authority": {
+    "starting_head_required": "8c515090df176b49c5f55d3132ecb8e8f2418f3c",
+    "starting_head_verified": "8c515090df176b49c5f55d3132ecb8e8f2418f3c",
+    "branch": "main",
+    "career_fact_contract_exists": true,
+    "career_evidence_contract_exists": true,
+    "real_career_records_preexisted_in_canonical_authority": false,
+    "resume_is_canonical_truth": false,
+    "ollama_invoked": false
+  },
+  "working_tree_exclusions": {
+    "status": "broad preexisting unrelated dirty tree excluded",
+    "authorized_committed_files": [
+      "staffordos/ui/operator-frontend/lib/staffordos/privateCareerEvidenceIntake.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/privateCareerEvidenceIntake.test.mjs",
+      "staffordos/architecture/S010_02C_PRIVATE_CAREER_EVIDENCE_INTAKE_AND_CONFLICT_REGISTER.md",
+      "staffordos/architecture/S010_02C_PRIVATE_CAREER_EVIDENCE_INTAKE_AND_CONFLICT_REGISTER.json"
+    ]
+  },
+  "ollama_stopped_state": {
+    "port_11434_listener": false,
+    "ollama_started": false,
+    "ollama_invoked": false
+  },
+  "authorized_private_intake_location": {
+    "path_redacted": "~/staffordos-private-intake/career",
+    "inside_git_repository": false,
+    "scope_decision": "process DOCX only; ignore .DS_Store; defer .pages files without content inspection"
+  },
+  "source_document_inventory": {
+    "supported_docx": 3,
+    "deferred_pages": 29,
+    "ignored_ds_store": 1,
+    "other_unsupported": 0,
+    "pages_count_note": "Filesystem inventory observed 29 .pages files during the mission run.",
+    "filenames_committed": false
+  },
+  "private_storage_boundary": {
+    "private_output_directory_redacted": "~/.staffordos/private/professional/career/s010_02c",
+    "outside_git_repository": true,
+    "owner_readable_writable_private_files": true,
+    "repository_symlink_created": false,
+    "web_server_exposure": false,
+    "model_access": false,
+    "database_access": false,
+    "cloud_upload": false
+  },
+  "content_extraction_result": {
+    "docx_sources_processed": 3,
+    "docx_extraction_failures": 0,
+    "source_files_modified": false,
+    "ocr_used": false,
+    "macros_or_embedded_content_executed": false,
+    "external_upload": false,
+    "model_invocation": false,
+    "section_level_provenance_preserved": true
+  },
+  "candidate_career_facts": {
+    "total": 98,
+    "by_type": {
+      "ACHIEVEMENT": 5,
+      "CERTIFICATION": 10,
+      "EDUCATION": 13,
+      "EMPLOYMENT": 22,
+      "LEADERSHIP": 23,
+      "PROJECT": 9,
+      "TECHNOLOGY": 16
+    },
+    "verified_count": 0,
+    "canonical_count": 0,
+    "allowed_initial_statuses": [
+      "PROPOSED",
+      "NEEDS_EVIDENCE",
+      "PARTIALLY_SUPPORTED",
+      "CONFLICTING",
+      "HISTORICAL_ONLY"
+    ]
+  },
+  "career_evidence_result": {
+    "evidence_records": 3,
+    "authority_classification": "GENERATED_DOCUMENT",
+    "resume_verifies_truth_by_itself": false
+  },
+  "conflicts": {
+    "total": 6,
+    "by_type": {
+      "CERTIFICATION_CONFLICT": 1,
+      "EDUCATION_CONFLICT": 1,
+      "METRIC_CONFLICT": 1,
+      "PROJECT_STATUS_CONFLICT": 1,
+      "SKILL_CONTEXT_CONFLICT": 1,
+      "START_DATE_CONFLICT": 1
+    },
+    "selected_winner_count": 0
+  },
+  "skill_and_technology_context": {
+    "technology_candidate_facts": 16,
+    "production_use_inferred_from_skill_list": false,
+    "proficiency_inferred": false,
+    "years_inferred": false
+  },
+  "accomplishment_and_metric_review": {
+    "achievement_candidate_facts": 5,
+    "metric_review_items": 7,
+    "metrics_verified": 0
+  },
+  "business_to_professional_evidence_references": {
+    "cross_workspace_candidate_references": 1,
+    "business_data_copied_to_professional": false,
+    "model_use_authorized": false
+  },
+  "document_version_and_duplicate_review": {
+    "docx_sources": 3,
+    "exact_duplicates_detected": 0,
+    "content_variants_present": true,
+    "canonical_resume_selected": false,
+    "modification_time_used_as_fact_authority": false
+  },
+  "operator_review_queue": {
+    "review_items": 14,
+    "by_category": {
+      "Identity and contact details": 1,
+      "EMPLOYMENT": 1,
+      "EDUCATION": 1,
+      "CERTIFICATION": 1,
+      "PROJECT": 1,
+      "TECHNOLOGY": 1,
+      "ACHIEVEMENT": 1,
+      "Accomplishments and metrics": 7
+    },
+    "automatic_selection": false
+  },
+  "deferred_pages_sources": {
+    "count": 29,
+    "status": "DEFERRED_UNSUPPORTED_SOURCE_FILE",
+    "required_operator_action": "export to PDF or DOCX",
+    "content_inspected": false,
+    "opened": false,
+    "parsed": false,
+    "converted": false,
+    "renamed": false,
+    "moved": false,
+    "copied": false,
+    "deleted": false,
+    "modified": false
+  },
+  "docx_extraction_failures": {
+    "count": 0,
+    "unsafe_fallback_attempted": false
+  },
+  "private_local_artifacts": {
+    "directory_redacted": "~/.staffordos/private/professional/career/s010_02c",
+    "files": [
+      "career_source_inventory.private.json",
+      "deferred_sources.private.json",
+      "candidate_career_facts.private.json",
+      "career_evidence.private.json",
+      "career_conflicts.private.json",
+      "career_review_queue.private.json"
+    ],
+    "committed_to_git": false,
+    "canonical": false
+  },
+  "real_data_commit_scan": {
+    "private_source_text_in_committed_diff": false,
+    "contact_values_in_committed_diff": false,
+    "private_file_paths_in_committed_diff": false,
+    "extracted_real_facts_in_committed_diff": false,
+    "resume_text_in_committed_diff": false,
+    "private_source_filenames_committed": false
+  },
+  "tests": {
+    "focused_test_command": "node --test staffordos/ui/operator-frontend/lib/staffordos/privateCareerEvidenceIntake.test.mjs",
+    "focused_test_result": "24/24 passed",
+    "s010_02b_regression": "38/38 passed",
+    "s010_01_regression": "37/37 passed",
+    "s009_regression": "126/126 passed",
+    "s008_regression": "127/127 passed",
+    "build": "passed with existing Next/Turbopack and /operator/shopifixer-pilot static-generation warnings",
+    "committed_json_validation": "passed",
+    "private_json_validation": "passed",
+    "diff_check": "passed"
+  },
+  "boundary_safety": {
+    "external_upload_occurred": false,
+    "model_invoked": false,
+    "source_file_modified": false,
+    "resume_rewritten": false,
+    "fact_silently_verified": false,
+    "conflict_silently_resolved": false,
+    "private_output_staged": false,
+    "personal_information_entered_git": false,
+    "database_or_api_used": false,
+    "route_or_ui_added": false,
+    "application_created": false,
+    "job_fit_calculated": false,
+    "external_communication_occurred": false
+  },
+  "files_changed": [
+    "staffordos/ui/operator-frontend/lib/staffordos/privateCareerEvidenceIntake.ts",
+    "staffordos/ui/operator-frontend/lib/staffordos/privateCareerEvidenceIntake.test.mjs",
+    "staffordos/architecture/S010_02C_PRIVATE_CAREER_EVIDENCE_INTAKE_AND_CONFLICT_REGISTER.md",
+    "staffordos/architecture/S010_02C_PRIVATE_CAREER_EVIDENCE_INTAKE_AND_CONFLICT_REGISTER.json"
+  ],
+  "known_limitations": [
+    "Only DOCX files are processed in this mission.",
+    ".pages files require a separate operator-controlled export mission.",
+    "Extraction is deterministic and heuristic; it prepares review, not truth.",
+    "Candidate facts are not canonical.",
+    "Contact values remain isolated.",
+    "No resume generation, fit scoring, persistence, UI, route, or model use exists.",
+    "Future verification requires Ross's explicit review."
+  ],
+  "operator_export_action_required": "Export deferred .pages files to PDF or DOCX in a separate operator-controlled mission if they should be included.",
+  "rollback": "git revert <S010.02C commit SHA>",
+  "recommended_next_mission": "S010_02D_PRIVATE_CAREER_EVIDENCE_OPERATOR_REVIEW_DECISIONS"
+}
