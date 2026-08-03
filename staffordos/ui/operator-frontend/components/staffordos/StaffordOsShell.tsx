@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
+import { careerNavigationForWorkspace } from "../../lib/staffordos/jobSearchCommandPresentation";
 import { STAFFORDOS_SECTIONS } from "../../lib/staffordos/workspaces";
 import { DEFAULT_STAFFORDOS_WORKSPACE_ID } from "../../lib/staffordos/workspaceRegistry";
 import { StaffordOsWorkspaceProvider, useStaffordOsWorkspace } from "./WorkspaceContext";
@@ -19,9 +20,19 @@ function isActive(pathname: string, href: string) {
 
 function StaffordOsShellFrame({ children }: StaffordOsShellProps) {
   const pathname = usePathname();
-  const { activeWorkspace } = useStaffordOsWorkspace();
+  const { activeWorkspace, setActiveWorkspace } = useStaffordOsWorkspace();
+  const isProfessionalRoute = pathname.startsWith("/os/professional");
+  const careerNavigation = careerNavigationForWorkspace(
+    isProfessionalRoute ? "professional" : activeWorkspace.id,
+  );
   const capabilityNavLabel =
     activeWorkspace.id === DEFAULT_STAFFORDOS_WORKSPACE_ID ? "Map of current working pages" : "Planned capability overview";
+
+  useEffect(() => {
+    if (isProfessionalRoute && activeWorkspace.id !== "professional") {
+      setActiveWorkspace("professional");
+    }
+  }, [activeWorkspace.id, isProfessionalRoute, setActiveWorkspace]);
 
   return (
     <div className="staffordOsShell">
@@ -46,6 +57,30 @@ function StaffordOsShellFrame({ children }: StaffordOsShellProps) {
             </Link>
           ))}
         </nav>
+
+        {careerNavigation.length ? (
+          <section className="staffordOsNavGroup" aria-label="Career">
+            <span className="staffordOsNavGroupLabel">Career</span>
+            {careerNavigation.map((item) =>
+              item.href ? (
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  className={`staffordOsNavItem${isActive(pathname, item.href) ? " staffordOsNavItemActive" : ""}`}
+                  aria-current={isActive(pathname, item.href) ? "page" : undefined}
+                >
+                  <span>{item.label}</span>
+                  <small>{item.description}</small>
+                </Link>
+              ) : (
+                <span key={item.id} className="staffordOsNavItem staffordOsNavItemPlanned" aria-disabled="true">
+                  <span>{item.label}</span>
+                  <small>{item.description}</small>
+                </span>
+              ),
+            )}
+          </section>
+        ) : null}
 
         <Link
           href="/os/capabilities"

@@ -1,0 +1,161 @@
+{
+  "mission": "J001_01_CANONICAL_CAREER_NAVIGATION_AND_JOB_COMMAND_SHELL",
+  "classification": "JOB_COMMAND_SHELL_VALIDATED",
+  "checkpoint_authority": {
+    "repository_root": "/Users/rossstafford/projects/cart-agent",
+    "branch": "main",
+    "required_starting_head": "6ff2106ad47f5ec7dbdf24dfe13a9c0d4463dfa7",
+    "j001_discovery_artifacts_available": [
+      "staffordos/job-search/J001_UI_AUTHORITY_RECONCILIATION.md",
+      "staffordos/job-search/J001_UI_AUTHORITY_RECONCILIATION.json",
+      "staffordos/job-search/J001_JOB_SEARCH_INFORMATION_ARCHITECTURE.md",
+      "staffordos/job-search/J001_UI_DUPLICATION_AND_REUSE_MATRIX.md"
+    ]
+  },
+  "canonical_ui_root": "staffordos/ui/operator-frontend",
+  "shell_reused": {
+    "layout": "staffordos/ui/operator-frontend/app/os/layout.tsx",
+    "shell": "staffordos/ui/operator-frontend/components/staffordos/StaffordOsShell.tsx",
+    "workspace_selector": "staffordos/ui/operator-frontend/components/staffordos/WorkspaceSelector.tsx",
+    "workspace_context": "presentation-only"
+  },
+  "route_added": {
+    "path": "/os/professional/jobs",
+    "file": "staffordos/ui/operator-frontend/app/os/professional/jobs/page.tsx",
+    "title": "Job Command",
+    "primary_question": "What should I do next in my job search?"
+  },
+  "career_navigation": [
+    {
+      "label": "Job Command",
+      "state": "Available now",
+      "route": "/os/professional/jobs"
+    },
+    {
+      "label": "Opportunities",
+      "state": "Planned",
+      "route": null
+    },
+    {
+      "label": "Applications",
+      "state": "Planned",
+      "route": null
+    },
+    {
+      "label": "Relationships",
+      "state": "Planned",
+      "route": null
+    },
+    {
+      "label": "Interviews",
+      "state": "Planned",
+      "route": null
+    },
+    {
+      "label": "Outcomes",
+      "state": "Planned",
+      "route": null
+    }
+  ],
+  "presentation_contract": {
+    "file": "staffordos/ui/operator-frontend/lib/staffordos/jobSearchCommandPresentation.ts",
+    "deterministic": true,
+    "uses_private_files": false,
+    "uses_runtime_api": false,
+    "uses_network": false,
+    "uses_browser_storage_as_authority": false
+  },
+  "available_states": [
+    "read-only Job Command shell",
+    "Professional-only Career navigation",
+    "private career source intake acknowledged as outside Git",
+    "operator approval model"
+  ],
+  "planned_states": [
+    "Opportunities",
+    "Applications",
+    "Relationships",
+    "Interviews",
+    "Outcomes"
+  ],
+  "human_approval_boundary": {
+    "staffordos_may": [
+      "prepare",
+      "compare",
+      "explain",
+      "draft"
+    ],
+    "ross_must_approve": [
+      "resume changes",
+      "applications",
+      "recruiter messages",
+      "interview follow-ups",
+      "withdrawals",
+      "offer decisions",
+      "any final representation made in his name"
+    ]
+  },
+  "data_not_connected": [
+    "live jobs",
+    "job-board search",
+    "durable opportunities",
+    "requirement extraction",
+    "fit assessment",
+    "canonical resume facts",
+    "application state",
+    "recruiters",
+    "interviews",
+    "outcomes",
+    "external AI",
+    "automated submissions"
+  ],
+  "components_reused": [
+    "StaffordOsShell",
+    "WorkspaceSelector",
+    "WorkspaceContext",
+    "/os layout",
+    "NextActionCard",
+    "existing StaffordOS header, status, panel, empty-state, and grid styles"
+  ],
+  "components_created": [
+    "staffordos/ui/operator-frontend/components/staffordos/JobCommandSurface.tsx"
+  ],
+  "tests": {
+    "focused_test": "node --test staffordos/ui/operator-frontend/lib/staffordos/jobSearchCommandPresentation.test.mjs",
+    "focused_result": "passed, 30 assertions",
+    "s008_result": "passed, 127 assertions",
+    "s009_result": "passed, 126 assertions",
+    "s010_result": "passed, 140 assertions",
+    "build_result": "passed with existing pre-existing route-generation and tracing warnings",
+    "status": "passed"
+  },
+  "route_checks": {
+    "required_routes": [
+      "/os",
+      "/os/professional/jobs",
+      "/os/capabilities",
+      "/os/actions",
+      "/os/objectives",
+      "/os/decisions",
+      "/os/chief-of-staff",
+      "/operator",
+      "/operator/leads",
+      "/operator/campaigns",
+      "/operator/revenue-command",
+      "/operator/command-center"
+    ],
+    "status": "passed, all required routes returned HTTP 200 from a local server bound to 127.0.0.1"
+  },
+  "known_limitations": [
+    "Job opportunities are not connected.",
+    "Applications are not connected.",
+    "Recruiter and follow-up records are not connected.",
+    "Interviews are not connected.",
+    "Governed outcomes are not connected.",
+    "Career evidence review is not connected to this screen.",
+    "Professional workspace context is presentation-only, not authorization.",
+    "The capability map remains conservative until Job Search runtime authority is implemented."
+  ],
+  "rollback": "git revert <J001.01 commit SHA>",
+  "recommended_next_mission": "J001_02_LOCAL_JOB_OPPORTUNITY_INTAKE_BRIDGE"
+}

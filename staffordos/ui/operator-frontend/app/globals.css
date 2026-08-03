@@ -1873,6 +1873,22 @@ textarea {
   margin-top: 18px;
 }
 
+.staffordOsNavGroup {
+  display: grid;
+  gap: 6px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(245, 247, 249, 0.14);
+}
+
+.staffordOsNavGroupLabel {
+  color: #90d8c5;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .staffordWorkspaceSelector {
   display: grid;
   gap: 10px;
@@ -1962,6 +1978,11 @@ textarea {
   border-color: #90d8c5;
   background: #26342f;
   color: #ffffff;
+}
+
+.staffordOsNavItemPlanned {
+  opacity: 0.78;
+  cursor: default;
 }
 
 .staffordOsNavItem span {
@@ -2601,6 +2622,59 @@ textarea {
   line-height: 1.45;
 }
 
+.staffordJobCommand {
+  display: grid;
+  gap: 18px;
+  max-width: 1180px;
+}
+
+.staffordJobCommandDisabledAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: start;
+  min-height: 38px;
+  margin-top: 16px;
+  padding: 8px 12px;
+  border: 1px solid #cbd4dd;
+  border-radius: 8px;
+  background: #f5f7f9;
+  color: #4f5a66;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: not-allowed;
+}
+
+.staffordJobCommandControlNote {
+  margin: 10px 0 0;
+  color: #4f5a66;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.staffordJobCommandHealthGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.staffordJobCommandHealthGrid p {
+  margin: 0;
+  color: #4f5a66;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.staffordJobCommandApprovalList {
+  display: grid;
+  gap: 6px;
+  margin: 6px 0 0;
+  padding-left: 20px;
+  color: #15181d;
+  line-height: 1.45;
+}
+
 .staffordObjectivePage {
   display: grid;
   gap: 18px;
@@ -2808,7 +2882,8 @@ textarea {
   .staffordObjectiveGrid,
   .staffordHomeSupportGrid,
   .staffordHomePlannedGrid,
-  .staffordHomeTransparency {
+  .staffordHomeTransparency,
+  .staffordJobCommandHealthGrid {
     grid-template-columns: 1fr;
   }
 
