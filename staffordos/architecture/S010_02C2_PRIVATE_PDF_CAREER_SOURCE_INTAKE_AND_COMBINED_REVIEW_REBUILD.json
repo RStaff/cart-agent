@@ -1,0 +1,168 @@
+{
+  "mission": "S010_02C2_PRIVATE_PDF_CAREER_SOURCE_INTAKE_AND_COMBINED_REVIEW_REBUILD",
+  "mission_type": "private local PDF and DOCX career-evidence intake and combined review rebuild",
+  "checkpoint_authority": {
+    "starting_head_required": "329eeb4da17bdcc68a96d50e1d26f3a56a849528",
+    "starting_head_verified": "329eeb4da17bdcc68a96d50e1d26f3a56a849528",
+    "branch": "main",
+    "s010_02a_exists": true,
+    "s010_02b_exists": true,
+    "s010_02c_exists": true,
+    "private_s010_02c_artifacts_exist": true,
+    "s010_02c1_commit_exists": false,
+    "ollama_invoked": false
+  },
+  "source_inventory": {
+    "supported_sources": 20,
+    "pdf_sources": 16,
+    "docx_sources": 4,
+    "text_markdown_sources": 0,
+    "deferred_pages_file_entries": 29,
+    "deferred_pages_package_entries_observed": 1,
+    "ignored_system_files": 1,
+    "unsupported_files": 0,
+    "private_filenames_committed": false
+  },
+  "extraction": {
+    "pdf_extraction_method": "local textutil",
+    "pdf_extraction_successes": 16,
+    "pdf_extraction_failures": 0,
+    "docx_extraction_method": "local DOCX XML reader",
+    "docx_extraction_successes": 4,
+    "docx_extraction_failures": 0,
+    "ocr_used": false,
+    "external_api_used": false,
+    "external_upload": false,
+    "embedded_links_opened": false,
+    "source_mutation_detected": false
+  },
+  "pages_and_uncertified_exports": {
+    "pages_inspected": false,
+    "pages_opened": false,
+    "pages_converted": false,
+    "s010_02c1_uncertified_exports_used": false
+  },
+  "document_purpose_counts": {
+    "LINKEDIN_OR_PROFILE_EXPORT": 9,
+    "NEEDS_OPERATOR_REVIEW": 3,
+    "NON_CAREER_DOCUMENT": 35,
+    "PROJECT_OR_PRODUCT_EVIDENCE": 3
+  },
+  "document_version_counts": {
+    "EXACT_DUPLICATE": 7,
+    "FORMAT_DERIVATIVE": 4,
+    "NON_CAREER_SOURCE": 5,
+    "UNIQUE_EVIDENCE_SOURCE": 4,
+    "UNKNOWN_PURPOSE": 30,
+    "canonical_resume_selected": false,
+    "modification_time_used_as_authority": false,
+    "repeated_wording_verified_claim": false
+  },
+  "candidate_facts": {
+    "total": 795,
+    "verified_count": 0,
+    "canonical_count": 0,
+    "by_type": {
+      "ACHIEVEMENT": 26,
+      "CERTIFICATION": 11,
+      "EDUCATION": 19,
+      "EMPLOYMENT": 20,
+      "LEADERSHIP": 48,
+      "PRESENTATION": 2,
+      "PRODUCT": 607,
+      "PROJECT": 3,
+      "TECHNOLOGY": 59
+    }
+  },
+  "evidence": {
+    "records": 11,
+    "resume_or_profile_repetition_verifies_truth": false
+  },
+  "conflicts": {
+    "total": 8,
+    "by_type": {
+      "CERTIFICATION_CONFLICT": 1,
+      "EDUCATION_CONFLICT": 1,
+      "METRIC_CONFLICT": 1,
+      "OTHER": 1,
+      "PROJECT_STATUS_CONFLICT": 2,
+      "SKILL_CONTEXT_CONFLICT": 1,
+      "START_DATE_CONFLICT": 1
+    },
+    "selected_winner_count": 0
+  },
+  "review_queue": {
+    "items": 36,
+    "by_category": {
+      "ACHIEVEMENT": 1,
+      "Accomplishments and metrics": 22,
+      "CERTIFICATION": 1,
+      "Contact and identity consistency": 1,
+      "EDUCATION": 1,
+      "EMPLOYMENT": 1,
+      "Material metrics": 4,
+      "PRESENTATION": 1,
+      "PRODUCT": 1,
+      "PROJECT": 1,
+      "Positioning variants": 1,
+      "TECHNOLOGY": 1
+    },
+    "automatic_selection": false,
+    "prior_queue_supersession": "SUPERSEDED_BY_S010_02C2_COMBINED_REVIEW"
+  },
+  "privacy_controls": {
+    "real_source_filenames_committed": false,
+    "private_absolute_paths_committed": false,
+    "contact_values_committed": false,
+    "employer_values_committed": false,
+    "title_values_committed": false,
+    "date_values_committed": false,
+    "school_values_committed": false,
+    "certification_values_committed": false,
+    "metric_values_committed": false,
+    "raw_pdf_text_committed": false,
+    "raw_resume_text_committed": false,
+    "private_artifacts_staged": false
+  },
+  "private_artifacts": {
+    "directory_redacted": "~/.staffordos/private/professional/career/s010_02c2",
+    "files": [
+      "combined_source_inventory.private.json",
+      "combined_document_classification.private.json",
+      "combined_document_version_review.private.json",
+      "combined_candidate_career_facts.private.json",
+      "combined_career_evidence.private.json",
+      "combined_conflicts.private.json",
+      "combined_contact_review.private.json",
+      "combined_skill_context.private.json",
+      "combined_project_product_review.private.json",
+      "combined_metric_review.private.json",
+      "combined_cross_workspace_evidence.private.json",
+      "combined_operator_review_queue.private.json"
+    ],
+    "committed_to_git": false,
+    "canonical": false,
+    "verified": false
+  },
+  "tests": {
+    "focused_s010_02c2": "41/41 passed",
+    "s010_02c_regression": "24/24 passed",
+    "s010_02b_regression": "38/38 passed",
+    "s010_01_regression": "37/37 passed",
+    "s009_regression": "126/126 passed",
+    "s008_regression": "127/127 passed",
+    "build": "passed with existing Next/Turbopack NFT warning and existing /operator/shopifixer-pilot static-generation messages",
+    "json_validation": "committed S010.02C2 JSON and private S010.02C2 JSON artifacts passed jq",
+    "diff_review": "passed"
+  },
+  "known_limitations": [
+    "PDF extraction uses local textutil and may preserve line-level rather than semantically rich page structure.",
+    "Candidate facts are heuristic review inputs, not canonical truth.",
+    "Product and project claims require Ross review before verification.",
+    "Apple Pages sources remain deferred.",
+    "Uncertified S010.02C1 private exports remain excluded.",
+    "No resume generation, job-fit scoring, persistence, UI, route, or model use exists."
+  ],
+  "rollback": "git revert <S010.02C2 commit SHA>",
+  "recommended_next_mission": "S010_02D_PRIVATE_CAREER_EVIDENCE_OPERATOR_REVIEW_DECISIONS"
+}
