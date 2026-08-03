@@ -1,0 +1,568 @@
+{
+  "mission": "S010_00_PROFESSIONAL_WORKSPACE_JOB_SEARCH_COMMAND_DISCOVERY",
+  "mission_type": "repository-first read-only architecture discovery, authority mapping, reuse analysis, MVP definition, documentation, validation, and governed local commit",
+  "checkpoint_authority": {
+    "starting_head_required": "e246ea254bec1735e7d2c4dbac9c2ca7be990de8",
+    "starting_head_verified": "e246ea254bec1735e7d2c4dbac9c2ca7be990de8",
+    "branch": "main",
+    "preexisting_s010_00_artifact_found": false,
+    "authorities_verified": [
+      "staffordos/architecture/STAFFORDOS_ARCHITECTURE_V1.md",
+      "S008 workspace architecture",
+      "S008 operator language standard",
+      "S008 Objective Foundation",
+      "S008 Decision Foundation",
+      "S008 Action Foundation",
+      "S008 Evidence Foundation",
+      "S008 Proof Foundation",
+      "S008 Learning Foundation",
+      "S009 Chief of Staff contract",
+      "S009 deterministic validator",
+      "S009 provider-neutral adapter boundary",
+      "S009 local provider certification",
+      "S009 Primary Action source adapter",
+      "current /operator runtime surfaces",
+      "current /os workspace context",
+      "current Professional planned-state behavior"
+    ],
+    "baseline": {
+      "stafford_media": "Available now",
+      "professional": "Planned",
+      "personal": "Planned",
+      "operator": "runtime-canonical",
+      "os": "emerging canonical shell",
+      "workspace_context_authorization": false,
+      "s007_deployed_identity_available": false,
+      "job_search_runtime_capability": false,
+      "automatic_application_or_messaging_authorized": false
+    }
+  },
+  "working_tree_exclusions": {
+    "status": "broad preexisting unrelated dirty tree excluded",
+    "categories": [
+      "RUNTIME_OR_DAEMON",
+      "WEB_OR_PRISMA",
+      "S007_IDENTITY_OR_ISSUER",
+      "MISSION_EVIDENCE",
+      "GENERATED",
+      "PREEXISTING_UNRELATED",
+      "UNKNOWN_REQUIRES_REVIEW"
+    ],
+    "tracked_modified_examples": [
+      "staffordos/operator_daemon/operator_daemon_state_v1.json",
+      "staffordos/revenue/revenue_truth_v1.json",
+      "staffordos/leads/lead_registry_v1.json",
+      "staffordos/snapshots/primary_action_snapshot_v1.json",
+      "staffordos/ui/operator-frontend/next-env.d.ts",
+      "web/prisma/schema.prisma",
+      "web/src/index.js"
+    ],
+    "untracked_group_examples": [
+      "staffordos/operator-issuer/",
+      "staffordos/production/",
+      "staffordos/recovery/",
+      "staffordos/reconciliation/",
+      "staffordos/shopifixer/S007_*",
+      "web/prisma/migrations/20260730120000_add_staffordos_operator_identity_authority/",
+      "web/src/routes/staffordosOperatorAuthority.esm.js"
+    ],
+    "authorized_files": [
+      "staffordos/architecture/S010_00_PROFESSIONAL_WORKSPACE_JOB_SEARCH_COMMAND_DISCOVERY.md",
+      "staffordos/architecture/S010_00_PROFESSIONAL_WORKSPACE_JOB_SEARCH_COMMAND_DISCOVERY.json"
+    ]
+  },
+  "ollama_stopped_state": {
+    "port_11434_listener": false,
+    "ollama_started": false,
+    "ollama_invoked": false,
+    "model_connected_to_os": false
+  },
+  "existing_job_search_authority": [
+    {
+      "artifact": "staffordos/ui/operator-frontend/lib/staffordos/workspaceRegistry.ts",
+      "purpose": "Defines Professional as a planned owner-private workspace with Job Search and My Job modes.",
+      "authority": "static S008 authority",
+      "classification": "CANONICAL_REUSABLE"
+    },
+    {
+      "artifact": "staffordos/ui/operator-frontend/lib/staffordos/capabilities.ts",
+      "purpose": "Defines planned Professional Job Search, career materials, interview prep, and current-role capabilities.",
+      "authority": "static S008 authority",
+      "classification": "CANONICAL_REUSABLE"
+    },
+    {
+      "artifact": "staffordos/ui/operator-frontend/lib/staffordos/homePresentation.ts",
+      "purpose": "States no jobs, applications, resumes, employers, meetings, or recommendations are connected.",
+      "authority": "static S008 authority",
+      "classification": "CANONICAL_REUSABLE"
+    },
+    {
+      "artifact": "staffordos/ui/operator-frontend/lib/staffordos/objectiveRegistry.ts",
+      "purpose": "Provides planned objectives: Secure the right role and Succeed in the current role.",
+      "authority": "static S008 authority",
+      "classification": "PARTIAL_REUSABLE"
+    },
+    {
+      "artifact": "S008 Decision, Action, Evidence, Proof, and Learning foundations",
+      "purpose": "Keep Professional empty of current operating records.",
+      "authority": "static S008 authority",
+      "classification": "CANONICAL_REUSABLE"
+    },
+    {
+      "artifact": "S009 Chief of Staff Professional fixture",
+      "purpose": "States Professional is planned and has no real Professional data connected.",
+      "authority": "static S009 authority",
+      "classification": "CANONICAL_REUSABLE"
+    },
+    {
+      "artifact": "candidate_opportunities/",
+      "purpose": "Generated merchant checkout and growth opportunities.",
+      "authority": "commerce runtime/generated",
+      "classification": "NOT_SUITABLE"
+    },
+    {
+      "artifact": "web/src/jobs/ and Prisma Job",
+      "purpose": "Background execution queue keyed by shop domain, packet, attempts, and status.",
+      "authority": "runtime queue",
+      "classification": "NOT_SUITABLE"
+    },
+    {
+      "artifact": "/operator lead, campaign, and relationship surfaces",
+      "purpose": "Business CRM, revenue, customer, and merchant operating views.",
+      "authority": "runtime-canonical Business",
+      "classification": "PARTIAL_REUSABLE"
+    },
+    {
+      "artifact": "resume or career artifacts",
+      "purpose": "No canonical resume file, resume-fact registry, or Professional resume store found.",
+      "authority": "none",
+      "classification": "NEEDS_REVIEW"
+    },
+    {
+      "artifact": "Bosch rejection",
+      "purpose": "No durable repository record found.",
+      "authority": "continuity context only",
+      "classification": "HISTORICAL_EVIDENCE"
+    }
+  ],
+  "staffordos_placement": {
+    "workspace": "Professional",
+    "mode": "Job Search",
+    "not_a_standalone_job_board": true,
+    "not_a_second_operating_system": true,
+    "primary_surfaces": [
+      "Job Command",
+      "Opportunities to Review",
+      "Application Pipeline",
+      "Follow-Up Command",
+      "Interview Command",
+      "Outcomes and Learning"
+    ],
+    "surface_strategy": "Professional capability lenses over shared StaffordOS objects with narrow Professional-specific durable objects where required"
+  },
+  "reuse_analysis": [
+    { "primitive": "Workspace", "classification": "REUSE_WITH_PROFESSIONAL_SCOPE" },
+    { "primitive": "Capability", "classification": "EXTEND_NARROWLY" },
+    { "primitive": "Objective", "classification": "REUSE_WITH_PROFESSIONAL_SCOPE" },
+    { "primitive": "Decision", "classification": "REUSE_WITH_PROFESSIONAL_SCOPE" },
+    { "primitive": "Action", "classification": "REUSE_WITH_PROFESSIONAL_SCOPE" },
+    { "primitive": "Evidence", "classification": "REUSE_WITH_PROFESSIONAL_SCOPE" },
+    { "primitive": "Proof", "classification": "REUSE_WITH_PROFESSIONAL_SCOPE" },
+    { "primitive": "Learning", "classification": "REUSE_WITH_PROFESSIONAL_SCOPE" },
+    { "primitive": "Relationship", "classification": "EXTEND_NARROWLY" },
+    { "primitive": "Contact", "classification": "EXTEND_NARROWLY" },
+    { "primitive": "Lead", "classification": "DO_NOT_REUSE" },
+    { "primitive": "Campaign", "classification": "REUSE_CONCEPT_ONLY" },
+    { "primitive": "Task", "classification": "REUSE_CONCEPT_ONLY" },
+    { "primitive": "Activity/Event", "classification": "REUSE_CONCEPT_ONLY" },
+    { "primitive": "Document/Artifact", "classification": "EXTEND_NARROWLY" },
+    { "primitive": "Approval", "classification": "REUSE_CONCEPT_ONLY" },
+    { "primitive": "Audit", "classification": "REUSE_CONCEPT_ONLY" },
+    { "primitive": "Next Action", "classification": "REUSE_WITH_PROFESSIONAL_SCOPE" }
+  ],
+  "canonical_job_search_objects": [
+    { "object": "JobOpportunity", "mvp": true, "new_object_required": true },
+    { "object": "JobSource", "mvp": true, "new_object_required": true },
+    { "object": "Company", "mvp": false, "new_object_required": false },
+    { "object": "JobRequirement", "mvp": true, "new_object_required": true },
+    { "object": "CandidateEvidence", "mvp": true, "new_object_required": true },
+    { "object": "JobFitAssessment", "mvp": true, "new_object_required": true },
+    { "object": "Application", "mvp": true, "new_object_required": true },
+    { "object": "ApplicationEvent", "mvp": false, "new_object_required": true },
+    { "object": "ResumeVersion", "mvp": false, "new_object_required": true },
+    { "object": "ApplicationResumeLink", "mvp": false, "new_object_required": true },
+    { "object": "Contact", "mvp": false, "new_object_required": true },
+    { "object": "JobRelationship", "mvp": false, "new_object_required": true },
+    { "object": "FollowUpTask", "mvp": false, "new_object_required": true },
+    { "object": "Interview", "mvp": false, "new_object_required": true },
+    { "object": "InterviewEvent", "mvp": false, "new_object_required": true },
+    { "object": "Offer", "mvp": false, "new_object_required": true },
+    { "object": "JobOutcome", "mvp": false, "new_object_required": true },
+    { "object": "JobSearchLearning", "mvp": false, "new_object_required": true },
+    { "object": "JobSearchNextAction", "mvp": true, "new_object_required": true }
+  ],
+  "workflow": {
+    "canonical_flow": [
+      "Job discovery",
+      "Qualification and fit evaluation",
+      "Evidence-based positioning",
+      "Resume selection",
+      "Narrow resume tailoring",
+      "Human approval",
+      "Application submission",
+      "Follow-up",
+      "Recruiter and relationship tracking",
+      "Interview preparation",
+      "Interview progression",
+      "Offer evaluation",
+      "Outcome capture",
+      "Learning and strategy refinement"
+    ],
+    "states": [
+      "DISCOVERED",
+      "UNDER_REVIEW",
+      "QUALIFIED",
+      "REJECTED_BY_ROSS",
+      "RESUME_PREPARATION",
+      "READY_FOR_APPROVAL",
+      "APPROVED_TO_APPLY",
+      "SUBMITTED",
+      "FOLLOW_UP_DUE",
+      "RECRUITER_CONTACT",
+      "SCREENING",
+      "INTERVIEW",
+      "FINAL_INTERVIEW",
+      "OFFER",
+      "WITHDRAWN",
+      "REJECTED_BY_EMPLOYER",
+      "CLOSED"
+    ],
+    "refinements_needed": [
+      "FOLLOW_UP_DUE may become a task state",
+      "RECRUITER_CONTACT may become a relationship event",
+      "SCREENING, INTERVIEW, and FINAL_INTERVIEW may become Interview stage values"
+    ]
+  },
+  "fit_evidence_model": {
+    "classifications": [
+      "PROVEN",
+      "PARTIAL",
+      "TRANSFERABLE",
+      "MISSING",
+      "UNKNOWN"
+    ],
+    "required_fields": [
+      "requirement text",
+      "requirement type",
+      "importance",
+      "evidence reference",
+      "evidence classification",
+      "explanation",
+      "limitation",
+      "source authority",
+      "resume compatibility",
+      "operator review status"
+    ],
+    "rules": [
+      "no invented equivalence",
+      "no unsupported proficiency level",
+      "no unsupported years of experience",
+      "no inflated title",
+      "no fabricated result",
+      "no silent conversion of transferable experience into proven experience"
+    ]
+  },
+  "explainable_recommendation_model": {
+    "single_unexplained_percentage_allowed": false,
+    "dimensions": [
+      "required-skill coverage",
+      "preferred-skill coverage",
+      "role-level alignment",
+      "domain alignment",
+      "leadership alignment",
+      "technical alignment",
+      "compensation alignment",
+      "location and work-arrangement alignment",
+      "evidence strength",
+      "application effort",
+      "strategic value",
+      "major blockers"
+    ],
+    "outcomes": [
+      "STRONG_APPLY",
+      "APPLY_WITH_POSITIONING",
+      "REVIEW_REQUIRED",
+      "LOW_PRIORITY",
+      "DO_NOT_APPLY",
+      "INSUFFICIENT_EVIDENCE"
+    ],
+    "numeric_scoring_status": "future design requiring validation authority"
+  },
+  "resume_authority": {
+    "canonical_resume_found": false,
+    "canonical_resume_fact_registry_found": false,
+    "professional_resume_store_found": false,
+    "future_rules": [
+      "preserve verified facts",
+      "tailor positioning, not history",
+      "track exact resume version",
+      "record source facts",
+      "require Ross review",
+      "block unsupported additions",
+      "retain application-specific copy",
+      "mark stale versions",
+      "never overwrite canonical authority silently"
+    ],
+    "modified_resume_files": false
+  },
+  "relationship_and_follow_up_model": {
+    "existing_business_relationship_reuse": "concept only or narrow extension after Professional privacy contract",
+    "automatic_communication_allowed": false,
+    "boundary": {
+      "drafting": "may be AI-assisted later",
+      "approval": "Ross",
+      "sending": "separate explicit action",
+      "delivery_confirmation": "proof, not intent",
+      "response_capture": "source and date required"
+    }
+  },
+  "interview_model": {
+    "calendar_or_email_connected": false,
+    "future_read_model_fields": [
+      "company",
+      "role",
+      "interview stage",
+      "interviewer",
+      "scheduled date",
+      "requirements",
+      "preparation questions",
+      "evidence-backed stories",
+      "architecture examples",
+      "likely objections",
+      "questions Ross should ask",
+      "follow-up due date",
+      "preparation status",
+      "evidence sources",
+      "approval state"
+    ]
+  },
+  "outcome_and_learning_model": {
+    "bosch": {
+      "company": "Bosch / Robert Bosch LLC",
+      "role": "Digital Solutions and Automation Specialist",
+      "location": "Watertown, Massachusetts",
+      "outcome": "Rejected",
+      "stage": "Application review",
+      "reason_supplied": "None",
+      "durable_repository_record_found": false,
+      "disposition": "continuity context only",
+      "allowed_interpretation": "standard rejection with no evidence-supported reason supplied",
+      "unsupported_interpretations": [
+        "age",
+        "compensation",
+        "resume quality",
+        "experience",
+        "ATS",
+        "internal candidate"
+      ]
+    },
+    "learning_rule": "S008.13 applies; one rejection must not become a universal rule"
+  },
+  "privacy_and_workspace_boundary": {
+    "workspace": "Professional",
+    "default_privacy": "owner-private",
+    "stafford_media_access_by_default": false,
+    "family_or_guest_access_by_default": false,
+    "personal_workspace_mixing": false,
+    "business_workspace_use_requires_explicit_cross_workspace_authority": true,
+    "workspace_context_is_authorization": false,
+    "runtime_requires_s007_identity_and_server_authorization": true
+  },
+  "ai_and_human_authority": {
+    "ai_may_later": [
+      "discover roles",
+      "summarize descriptions",
+      "extract requirements",
+      "map evidence",
+      "identify gaps",
+      "recommend priority",
+      "select a resume candidate",
+      "draft supported tailoring",
+      "draft application responses",
+      "draft follow-ups",
+      "prepare interview material",
+      "summarize outcomes",
+      "propose lessons"
+    ],
+    "ai_may_not": [
+      "submit an application",
+      "send communication",
+      "contact a recruiter",
+      "accept an offer",
+      "decline an offer",
+      "withdraw an application",
+      "change canonical resume facts",
+      "invent evidence",
+      "represent Ross externally",
+      "schedule interviews",
+      "disclose private information",
+      "infer rejection reasons as fact"
+    ],
+    "ross_approval_required_before_external_action": true
+  },
+  "first_mvp_definition": {
+    "flow": [
+      "JobOpportunity intake",
+      "durable source capture",
+      "requirement extraction",
+      "evidence mapping",
+      "explainable recommendation",
+      "next-action presentation"
+    ],
+    "excluded": [
+      "automatic job discovery",
+      "automatic submission",
+      "messaging",
+      "calendar integration",
+      "email integration",
+      "offer automation",
+      "full relationship management",
+      "full interview workflow",
+      "external AI provider integration",
+      "multi-user access"
+    ],
+    "can_begin_before_deployed_s007_identity": "only as local owner-only fixture-backed contract or library implementation"
+  },
+  "route_and_ui_strategy": {
+    "recommended_routes": [
+      "/os/professional",
+      "/os/professional/jobs",
+      "/os/professional/jobs/[jobId]",
+      "/os/professional/applications",
+      "/os/professional/interviews"
+    ],
+    "rejected_initial_route": "/os/jobs",
+    "reason": "Professional-prefixed routes preserve workspace clarity, privacy, future My Job mode separation, and later authorization boundaries",
+    "operator_labels": [
+      "Job Command",
+      "Opportunities to Review",
+      "Applications",
+      "Follow-Ups",
+      "Interviews",
+      "Outcomes and Learning"
+    ],
+    "routes_created": false
+  },
+  "data_and_persistence_options": [
+    { "option": "Local static fixtures", "classification": "SUITABLE_FOR_LOCAL_MVP" },
+    { "option": "S008 static registries", "classification": "SUITABLE_FOR_LOCAL_MVP" },
+    { "option": "Append-only JSON", "classification": "TEMPORARY_ONLY" },
+    { "option": "Existing Prisma database", "classification": "SUITABLE_AFTER_IDENTITY" },
+    { "option": "Prisma Job queue", "classification": "NOT_SUITABLE" },
+    { "option": "Application database tables", "classification": "SUITABLE_FOR_PRODUCTION" },
+    { "option": "Separate Professional storage", "classification": "NEEDS_MORE_DISCOVERY" }
+  ],
+  "chief_of_staff_compatibility": {
+    "future_source_types": [
+      "job_opportunity_snapshot",
+      "job_fit_assessment",
+      "application_state_snapshot",
+      "follow_up_snapshot",
+      "interview_snapshot",
+      "job_outcome_snapshot",
+      "job_search_learning"
+    ],
+    "required_source_fields": [
+      "source ID",
+      "Professional workspace ID",
+      "authority classification",
+      "privacy classification",
+      "freshness",
+      "limitations",
+      "exact source reference",
+      "excluded fields",
+      "permission requirement"
+    ],
+    "job_search_source_authorized_for_model_use_now": false,
+    "ollama_invoked": false,
+    "validator_modified": false
+  },
+  "gap_and_risk_register": [
+    { "risk": "No canonical job opportunity store", "likelihood": "High", "impact": "High", "mitigation": "Start with contracts and fixtures", "future_authority": "S010.01 contract" },
+    { "risk": "No canonical resume-fact authority", "likelihood": "High", "impact": "High", "mitigation": "Create resume authority mission before applying", "future_authority": "Resume evidence authority" },
+    { "risk": "Unsupported historical resume content", "likelihood": "Medium", "impact": "High", "mitigation": "Treat existing resumes as unverified until reviewed", "future_authority": "Ross approval" },
+    { "risk": "No application-state authority", "likelihood": "High", "impact": "High", "mitigation": "Define states before persistence", "future_authority": "Application contract" },
+    { "risk": "No source ingestion contract", "likelihood": "High", "impact": "Medium", "mitigation": "Capture source text and provenance first", "future_authority": "JobSource contract" },
+    { "risk": "No identity enforcement", "likelihood": "High", "impact": "High", "mitigation": "Local fixture-only until S007 runtime authority", "future_authority": "S007 identity" },
+    { "risk": "Sensitive Professional data", "likelihood": "High", "impact": "High", "mitigation": "Owner-private by default and no sharing", "future_authority": "Server authorization" },
+    { "risk": "Duplicate CRM/job pipeline risk", "likelihood": "Medium", "impact": "Medium", "mitigation": "Reuse concepts, not merchant schemas", "future_authority": "Professional model contract" },
+    { "risk": "Application automation risk", "likelihood": "Medium", "impact": "High", "mitigation": "Human approval before submission", "future_authority": "Approval workflow" },
+    { "risk": "Fabricated-fit risk", "likelihood": "High", "impact": "High", "mitigation": "Requirement mapping must cite evidence", "future_authority": "CandidateEvidence review" },
+    { "risk": "Stale job listing risk", "likelihood": "Medium", "impact": "Medium", "mitigation": "Store captured_at and source_updated_at", "future_authority": "Freshness contract" },
+    { "risk": "Uncontrolled resume variants", "likelihood": "High", "impact": "High", "mitigation": "Track exact resume version per application", "future_authority": "ResumeVersion contract" },
+    { "risk": "Communication without approval", "likelihood": "Medium", "impact": "High", "mitigation": "Draft/approve/send separation", "future_authority": "Communication approval" },
+    { "risk": "External-source terms risk", "likelihood": "Medium", "impact": "Medium", "mitigation": "Manual source capture first", "future_authority": "Source policy review" },
+    { "risk": "Model hallucination risk", "likelihood": "Medium", "impact": "High", "mitigation": "Keep S009 source snapshots and validator gate", "future_authority": "S009 validation" },
+    { "risk": "Overfitting from one rejection", "likelihood": "Medium", "impact": "Medium", "mitigation": "Record as one outcome only", "future_authority": "Learning review" },
+    { "risk": "Metric fixation on volume", "likelihood": "Medium", "impact": "Medium", "mitigation": "Use explainable dimensions and no arbitrary weights", "future_authority": "Strategy review" }
+  ],
+  "selected_next_implementation_slice": {
+    "mission": "S010_01_JOB_OPPORTUNITY_AND_REQUIREMENT_CONTRACT",
+    "scope": [
+      "define static contracts for JobOpportunity, JobSource, JobRequirement, CandidateEvidence, JobFitAssessment, and JobSearchNextAction",
+      "create deterministic owner-private Professional fixtures only",
+      "define source, privacy, evidence, and approval boundaries",
+      "add focused contract tests if implementation is authorized",
+      "create documentation and local commit"
+    ],
+    "dependencies": [
+      "S008 operating model foundations",
+      "S009 source-tracing and validator doctrine",
+      "S010.00 discovery"
+    ],
+    "exclusions": [
+      "routes",
+      "database",
+      "Prisma",
+      "resume edits",
+      "application submissions",
+      "email",
+      "calendar",
+      "messaging",
+      "model invocation",
+      "runtime adapter",
+      "multi-user access"
+    ],
+    "expected_outcome": "A narrow owner-private source-backed Job Opportunity and Requirement contract ready for a local MVP without pretending Professional is runtime-backed."
+  },
+  "artifacts_created": [
+    "staffordos/architecture/S010_00_PROFESSIONAL_WORKSPACE_JOB_SEARCH_COMMAND_DISCOVERY.md",
+    "staffordos/architecture/S010_00_PROFESSIONAL_WORKSPACE_JOB_SEARCH_COMMAND_DISCOVERY.json"
+  ],
+  "validation": {
+    "jq": "passed",
+    "git_diff_check": "passed",
+    "commit_gate": "passed",
+    "tests": "not required; documentation-only mission",
+    "build": "not required; documentation-only mission",
+    "route_probes": "not required; no route or UI change"
+  },
+  "non_impact": {
+    "application_code_modified": false,
+    "routes_created": false,
+    "schemas_or_migrations_created": false,
+    "resume_modified": false,
+    "job_records_created": false,
+    "ollama_started": false,
+    "model_invoked": false,
+    "operator_behavior_modified": false,
+    "shopifixer_modified": false,
+    "abando_modified": false,
+    "authentication_modified": false,
+    "stripe_modified": false,
+    "database_modified": false,
+    "deployment_or_push": false
+  },
+  "rollback": "git revert <S010.00 commit SHA>",
+  "final_classification": "JOB_SEARCH_DISCOVERY_COMMITTED"
+}
