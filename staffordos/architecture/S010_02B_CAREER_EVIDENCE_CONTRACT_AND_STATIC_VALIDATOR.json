@@ -1,0 +1,426 @@
+{
+  "mission": "S010_02B_CAREER_EVIDENCE_CONTRACT_AND_STATIC_VALIDATOR",
+  "mission_type": "narrow local contract implementation and deterministic static validation",
+  "checkpoint_authority": {
+    "starting_head_required": "3d79aff50112bf4e70554d78241581a8d2224f6f",
+    "starting_head_verified": "3d79aff50112bf4e70554d78241581a8d2224f6f",
+    "branch": "main",
+    "preexisting_s010_02b_artifact_found": false,
+    "canonical_career_evidence_authority_preexisted": false,
+    "professional_status": "Planned",
+    "professional_privacy": "Owner-private",
+    "ollama_required": false,
+    "ollama_invoked": false
+  },
+  "working_tree_exclusions": {
+    "status": "broad preexisting unrelated dirty tree excluded",
+    "categories": [
+      "RUNTIME_OR_DAEMON",
+      "WEB_OR_PRISMA",
+      "S007_IDENTITY_OR_ISSUER",
+      "MISSION_EVIDENCE",
+      "GENERATED",
+      "PREEXISTING_UNRELATED"
+    ],
+    "authorized_files": [
+      "staffordos/ui/operator-frontend/lib/staffordos/careerEvidenceContracts.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/careerEvidenceContracts.test.mjs",
+      "staffordos/architecture/S010_02B_CAREER_EVIDENCE_CONTRACT_AND_STATIC_VALIDATOR.md",
+      "staffordos/architecture/S010_02B_CAREER_EVIDENCE_CONTRACT_AND_STATIC_VALIDATOR.json"
+    ]
+  },
+  "ollama_stopped_state": {
+    "port_11434_listener_before_editing": false,
+    "ollama_started": false,
+    "ollama_invoked": false
+  },
+  "existing_contract_discovery": {
+    "compatible_canonical_fact_contract_found": false,
+    "compatible_canonical_evidence_contract_found": false,
+    "resume_fact_authority_found": false,
+    "real_career_records_authorized": false,
+    "reused_authorities": [
+      "S010.02A Career Evidence authority model",
+      "S010.01 JobRequirement compatibility needs",
+      "S008 Evidence and Proof distinction",
+      "S009 future source-tracing principles"
+    ],
+    "rejected_reuse": [
+      "merchant leads",
+      "business campaigns",
+      "revenue records",
+      "packet records",
+      "payment records",
+      "customer relationships"
+    ]
+  },
+  "career_fact_contract": {
+    "purpose": "A specific Professional career claim.",
+    "fields": [
+      "id",
+      "workspaceId",
+      "factType",
+      "subject",
+      "statement",
+      "normalizedStatement",
+      "startDate",
+      "endDate",
+      "current",
+      "organization",
+      "roleOrTitle",
+      "location",
+      "classification",
+      "supportLevel",
+      "verificationStatus",
+      "authorityClassification",
+      "privacyClassification",
+      "sourceEvidenceIds",
+      "conflictingEvidenceIds",
+      "conflictTypes",
+      "metricClassification",
+      "measurementAuthority",
+      "experienceClassification",
+      "proficiencyLabel",
+      "yearsOfExperience",
+      "yearsAuthority",
+      "deploymentClaim",
+      "customerUseClaim",
+      "technologyOrSkill",
+      "limitations",
+      "operatorNotes",
+      "positioningBoundaries",
+      "createdAt",
+      "updatedAt",
+      "testOnly"
+    ],
+    "fact_types": [
+      "EMPLOYMENT",
+      "EDUCATION",
+      "CERTIFICATION",
+      "SKILL",
+      "TECHNOLOGY",
+      "PROJECT",
+      "PRODUCT",
+      "ARCHITECTURE",
+      "ACHIEVEMENT",
+      "LEADERSHIP",
+      "PRESENTATION",
+      "PUBLICATION",
+      "INTERVIEW_STORY",
+      "REFERENCE",
+      "OTHER"
+    ]
+  },
+  "career_evidence_contract": {
+    "purpose": "Source material that supports, challenges, or preserves wording about a CareerFact.",
+    "fields": [
+      "id",
+      "workspaceId",
+      "evidenceType",
+      "title",
+      "summary",
+      "sourceType",
+      "sourceReference",
+      "sourceArtifact",
+      "sourceOwner",
+      "observedAt",
+      "sourceCreatedAt",
+      "authorityClassification",
+      "privacyClassification",
+      "freshness",
+      "supportsFactIds",
+      "challengesFactIds",
+      "contentDigest",
+      "excerptReference",
+      "limitations",
+      "operatorReviewStatus",
+      "testOnly"
+    ],
+    "evidence_types": [
+      "RESUME",
+      "EMPLOYMENT_RECORD",
+      "EDUCATION_RECORD",
+      "CERTIFICATION_RECORD",
+      "PROJECT_ARTIFACT",
+      "PRODUCT_ARTIFACT",
+      "ARCHITECTURE_ARTIFACT",
+      "PRESENTATION",
+      "PUBLICATION",
+      "INTERVIEW_NOTE",
+      "OPERATOR_ATTESTATION",
+      "PROVIDER_CONFIRMATION",
+      "HISTORICAL_DOCUMENT",
+      "OTHER"
+    ],
+    "rule": "Evidence may support or challenge a fact, but it does not automatically verify a fact."
+  },
+  "verification_status_model": {
+    "statuses": [
+      "PROPOSED",
+      "NEEDS_EVIDENCE",
+      "PARTIALLY_SUPPORTED",
+      "VERIFIED",
+      "CONFLICTING",
+      "REJECTED",
+      "SUPERSEDED",
+      "HISTORICAL_ONLY"
+    ],
+    "verified_requires": [
+      "supporting evidence",
+      "direct support",
+      "no unresolved conflicts",
+      "no generated-resume-only authority"
+    ],
+    "automatic_promotion": false
+  },
+  "authority_classifications": [
+    "PROVIDER_CONFIRMED",
+    "OFFICIAL_DOCUMENT",
+    "OPERATOR_CONFIRMED",
+    "REPOSITORY_BACKED",
+    "PUBLIC_ARTIFACT",
+    "IMPORTED_DOCUMENT",
+    "GENERATED_DOCUMENT",
+    "THIRD_PARTY_STATEMENT",
+    "HISTORICAL_CONTINUITY",
+    "NEEDS_VERIFICATION"
+  ],
+  "fact_evidence_positioning_boundary": {
+    "fact": "What is asserted as career truth.",
+    "evidence": "What supports or challenges the assertion.",
+    "positioning": "How verified or explicitly approved facts are selected and explained for a target role.",
+    "positioning_may_not": [
+      "change employer",
+      "change job title",
+      "change dates",
+      "invent responsibility",
+      "invent scope",
+      "invent metrics",
+      "upgrade transferable evidence to direct experience",
+      "turn partial support into verified fact",
+      "imply certification not held"
+    ]
+  },
+  "accomplishment_and_metric_rules": {
+    "metric_classifications": [
+      "VERIFIED_METRIC",
+      "OPERATOR_ESTIMATE",
+      "DERIVED_ESTIMATE",
+      "THIRD_PARTY_REPORTED",
+      "UNSUPPORTED",
+      "NOT_APPLICABLE"
+    ],
+    "unsupported_metrics_rejected": true,
+    "percent_improvements_require_baseline_and_source": true,
+    "revenue_user_customer_project_system_team_size_claims_require_evidence": true
+  },
+  "skill_and_technology_rules": {
+    "experience_classifications": [
+      "USED_IN_PRODUCTION",
+      "USED_IN_CONTROLLED_PROJECT",
+      "USED_IN_TRAINING",
+      "STUDIED",
+      "FAMILIAR",
+      "TRANSFERABLE",
+      "NEEDS_VERIFICATION"
+    ],
+    "unsupported_proficiency_labels_rejected": true,
+    "years_inference_allowed": false,
+    "controlled_or_studied_use_can_become_production_use": false
+  },
+  "project_and_product_authority": {
+    "local_is_not_deployed": true,
+    "deployed_is_not_customer_use": true,
+    "tested_is_not_commercially_proven": true,
+    "architecture_documented_is_not_fully_implemented": true,
+    "repository_backed_scope_limited": true
+  },
+  "privacy_and_workspace_boundary": {
+    "required_workspace_id": "professional",
+    "current_authority": "owner-private only",
+    "stafford_media_access_default": false,
+    "personal_workspace_mixing_allowed": false,
+    "presentation_workspace_context_is_authorization": false
+  },
+  "static_fixtures": {
+    "career_fact_count": 8,
+    "career_evidence_count": 9,
+    "all_test_only": true,
+    "real_career_data_created": false,
+    "fixture_cases": [
+      "verified education fact supported by an official-document fixture",
+      "certification fact needing provider confirmation",
+      "project fact supported by repository artifacts",
+      "technology used in controlled project",
+      "technology only studied",
+      "employment-title and date conflict",
+      "unsupported accomplishment metric",
+      "historical generated resume wording",
+      "operator-confirmed fact with clear limitation"
+    ]
+  },
+  "validation_rules": [
+    "WORKSPACE_NOT_PROFESSIONAL",
+    "DURABLE_ID_REQUIRED",
+    "URL_USED_AS_PRIMARY_ID",
+    "FIELD_REQUIRED",
+    "VERIFIED_REQUIRES_EVIDENCE",
+    "SOURCE_EVIDENCE_NOT_FOUND",
+    "EVIDENCE_DOES_NOT_SUPPORT_FACT",
+    "GENERATED_RESUME_CANNOT_VERIFY_FACT",
+    "PARTIALLY_SUPPORTED_PRESENTED_VERIFIED",
+    "CONFLICT_SILENTLY_RESOLVED",
+    "TITLE_CONFLICT_SILENTLY_RESOLVED",
+    "DATE_CONFLICT_SILENTLY_RESOLVED",
+    "UNSUPPORTED_METRIC",
+    "UNSUPPORTED_YEARS_OF_EXPERIENCE",
+    "UNSUPPORTED_PROFICIENCY_LABEL",
+    "PRODUCTION_USE_UNSUPPORTED",
+    "PROJECT_DEPLOYMENT_UNSUPPORTED",
+    "CUSTOMER_USE_UNSUPPORTED",
+    "CERTIFICATION_WITHOUT_AUTHORITY",
+    "GENERATED_DOCUMENT_TREATED_AS_OFFICIAL_RECORD",
+    "HISTORICAL_WORDING_PRESENTED_CURRENT",
+    "POSITIONING_CHANGES_FACT",
+    "BUSINESS_OR_PERSONAL_LEAKAGE"
+  ],
+  "conflict_model": {
+    "conflict_types": [
+      "EMPLOYER_CONFLICT",
+      "TITLE_CONFLICT",
+      "START_DATE_CONFLICT",
+      "END_DATE_CONFLICT",
+      "EDUCATION_CONFLICT",
+      "CERTIFICATION_CONFLICT",
+      "METRIC_CONFLICT",
+      "PROJECT_STATUS_CONFLICT",
+      "SKILL_CONTEXT_CONFLICT",
+      "SOURCE_AUTHORITY_CONFLICT",
+      "OTHER"
+    ],
+    "behavior": [
+      "preserve conflicting evidence IDs",
+      "return no canonical verified value",
+      "require review",
+      "do not choose newest automatically",
+      "do not choose most flattering automatically"
+    ]
+  },
+  "verification_eligibility": {
+    "statuses": [
+      "ELIGIBLE_FOR_OPERATOR_VERIFICATION",
+      "NEEDS_MORE_EVIDENCE",
+      "CONFLICT_REQUIRES_REVIEW",
+      "NOT_ELIGIBLE",
+      "HISTORICAL_ONLY"
+    ],
+    "marks_fact_verified": false
+  },
+  "resume_boundary": {
+    "resume_is_downstream": true,
+    "resume_generator_implemented": false,
+    "resume_parser_implemented": false,
+    "resume_file_modified": false,
+    "future_resume_claims_must_link_to": [
+      "CareerFact IDs",
+      "CareerEvidence IDs",
+      "positioning decision",
+      "version",
+      "target role",
+      "approval state"
+    ]
+  },
+  "job_requirement_compatibility": {
+    "future_mapping": "JobRequirement -> CandidateEvidence -> CareerFact -> CareerEvidence -> Fit classification",
+    "candidate_evidence_implemented": false,
+    "fit_mapping_implemented": false,
+    "available_fields": [
+      "fact type",
+      "statement",
+      "technology or skill context",
+      "authority",
+      "verification status",
+      "source references",
+      "limitations",
+      "workspace",
+      "privacy"
+    ]
+  },
+  "chief_of_staff_compatibility": {
+    "future_source_types": [
+      "career_fact_snapshot",
+      "career_evidence_snapshot",
+      "career_conflict_snapshot"
+    ],
+    "authorized_for_model_use_now": false,
+    "s009_validator_modified": false
+  },
+  "operator_language_review": {
+    "preferred_terms": [
+      "Career fact",
+      "Supporting evidence",
+      "Verified",
+      "Needs evidence",
+      "Partly supported",
+      "Conflicting evidence",
+      "Needs Ross's review",
+      "What this proves",
+      "What this does not prove",
+      "Where this came from",
+      "Technical details"
+    ],
+    "avoided_primary_terms": [
+      "entity",
+      "canonical tuple",
+      "join model",
+      "evidence graph node",
+      "normalization schema",
+      "foreign key",
+      "confidence vector",
+      "semantic match"
+    ]
+  },
+  "tests": {
+    "focused_test_command": "node --test staffordos/ui/operator-frontend/lib/staffordos/careerEvidenceContracts.test.mjs",
+    "focused_test_result": "38/38 passed",
+    "s010_01_regression_result": "37/37 passed",
+    "s009_regression_result": "126/126 passed",
+    "s008_regression_result": "127/127 passed",
+    "frontend_build_result": "passed with existing /operator/shopifixer-pilot static generation warnings",
+    "json_validation": "passed with jq",
+    "diff_check": "passed"
+  },
+  "boundary_safety": {
+    "real_resume_read": false,
+    "real_resume_modified": false,
+    "real_career_fact_created": false,
+    "ross_employment_data_added": false,
+    "education_data_added": false,
+    "certification_data_added": false,
+    "accomplishment_invented": false,
+    "metric_invented": false,
+    "job_fit_calculated": false,
+    "resume_generated": false,
+    "ai_invoked": false,
+    "database_or_api_added": false,
+    "route_or_ui_added": false,
+    "operator_behavior_changed": false
+  },
+  "files_changed": [
+    "staffordos/ui/operator-frontend/lib/staffordos/careerEvidenceContracts.ts",
+    "staffordos/ui/operator-frontend/lib/staffordos/careerEvidenceContracts.test.mjs",
+    "staffordos/architecture/S010_02B_CAREER_EVIDENCE_CONTRACT_AND_STATIC_VALIDATOR.md",
+    "staffordos/architecture/S010_02B_CAREER_EVIDENCE_CONTRACT_AND_STATIC_VALIDATOR.json"
+  ],
+  "known_limitations": [
+    "Contracts are static and fixture-backed only.",
+    "No real Professional career record exists.",
+    "No resume fact authority exists yet.",
+    "No CandidateEvidence or JobFitAssessment contract exists yet.",
+    "No persistence, import, parser, route, or UI exists.",
+    "Verification eligibility does not verify facts.",
+    "Future runtime use requires Professional owner identity, privacy, audit, and persistence authority."
+  ],
+  "rollback": "git revert <S010.02B commit SHA>",
+  "recommended_next_mission": "S010_02C_CANONICAL_RESUME_FACT_AND_POSITIONING_BOUNDARY"
+}
