@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import {
+  OPERATOR_WRITE_DENIED_STATUS,
+  evaluateOperatorWriteIsolation,
+  operatorWriteDeniedResponseBody,
+} from "../../../../../lib/operator/operatorWriteIsolation";
 
 function readEnvValue(filePath: string, key: string) {
   if (!fs.existsSync(filePath)) return "";
@@ -25,7 +30,12 @@ function repoRootFromCwd() {
     : process.cwd();
 }
 
-export async function POST() {
+export async function POST(request: Request) {
+  const writeGate = evaluateOperatorWriteIsolation({ request, env: process.env });
+  if (!writeGate.allowed) {
+    return NextResponse.json(operatorWriteDeniedResponseBody(writeGate), { status: OPERATOR_WRITE_DENIED_STATUS });
+  }
+
   const repoRoot = repoRootFromCwd();
   const webEnvPath = path.join(repoRoot, "web", ".env");
   const webDatabaseUrl = readEnvValue(webEnvPath, "DATABASE_URL");

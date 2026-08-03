@@ -1,0 +1,187 @@
+{
+  "mission": "G004_01_MINIMAL_OPERATOR_WRITE_SURFACE_ISOLATION",
+  "date": "2026-08-03",
+  "finalClassification": "MINIMAL_OPERATOR_WRITE_ISOLATION_COMMITTED",
+  "checkpointAuthority": {
+    "startingHead": "d121d6eb394a7303349ec51d27731ec8a5675e2f",
+    "requiredAuthoritiesPresent": [
+      "G004.00 Operator Write Surface Risk Decision",
+      "G004.00 Operator Write Surface Matrix",
+      "G004.00 Operator Decision Brief",
+      "G003 adapter-only read-model and staticity authority",
+      "G002 Professional workspace-mode reconciliation",
+      "G001 private-data Git backstop",
+      "S007 local identity and issuer artifacts"
+    ]
+  },
+  "scope": {
+    "implemented": "interim fail-closed server-side write isolation",
+    "notImplemented": [
+      "authentication",
+      "role authorization",
+      "action-specific approval",
+      "replay protection",
+      "multi-user access",
+      "runtime persistence",
+      "provider integration",
+      "deployment"
+    ],
+    "noWriteRoutesInvoked": true,
+    "noServerActionsInvoked": true,
+    "noPrivateDataRead": true,
+    "noSecretValuesRead": true
+  },
+  "canonicalGate": {
+    "file": "staffordos/ui/operator-frontend/lib/operator/operatorWriteIsolation.ts",
+    "enablementEnvironmentVariable": "STAFFORDOS_LOCAL_OPERATOR_WRITES_ENABLED",
+    "enabledValue": "true",
+    "flagIsCredential": false,
+    "requiresExplicitEnablement": true,
+    "requiresLoopbackBoundary": true,
+    "allowedHosts": [
+      "localhost",
+      "127.0.0.1",
+      "::1"
+    ],
+    "deniedBoundaries": [
+      "missing host",
+      "LAN host",
+      "public host",
+      ".local host",
+      "forwarded or proxied request metadata",
+      "preview deployment marker",
+      "cloud deployment marker",
+      "non-development runtime",
+      "malformed enablement flag",
+      "absent enablement flag"
+    ],
+    "productionModeLoopbackWritesAllowed": false
+  },
+  "gateResultCodes": [
+    "ALLOWED_LOCAL_EXPLICIT",
+    "DENIED_NOT_ENABLED",
+    "DENIED_NON_LOCAL",
+    "DENIED_UNKNOWN_HOST",
+    "DENIED_FORWARDED_REQUEST",
+    "DENIED_PRODUCTION_MODE",
+    "DENIED_PREVIEW_MODE",
+    "DENIED_INVALID_CONFIGURATION"
+  ],
+  "denialResponse": {
+    "httpStatus": 403,
+    "body": {
+      "ok": false,
+      "error": "OPERATOR_WRITE_DISABLED",
+      "message": "Operator changes are not available in this runtime."
+    },
+    "rawHeadersExposed": false,
+    "environmentValuesExposed": false,
+    "secretValuesExposed": false,
+    "internalPathsExposed": false
+  },
+  "postRouteCoverage": [
+    {
+      "surfaceId": "G004-API-001",
+      "file": "staffordos/ui/operator-frontend/app/api/operator/execute-primary-action/route.ts",
+      "guardedBefore": "execution timestamp and runtime JSON writes"
+    },
+    {
+      "surfaceId": "G004-API-002",
+      "file": "staffordos/ui/operator-frontend/app/api/operator/workday/start/route.ts",
+      "guardedBefore": "workday script path creation"
+    },
+    {
+      "surfaceId": "G004-API-003",
+      "file": "staffordos/ui/operator-frontend/app/api/operator/workday/stop/route.ts",
+      "guardedBefore": "workday script path creation"
+    },
+    {
+      "surfaceId": "G004-API-004",
+      "file": "staffordos/ui/operator-frontend/app/api/operator/lead-registry/action/route.ts",
+      "guardedBefore": "request-body parsing"
+    },
+    {
+      "surfaceId": "G004-API-005",
+      "file": "staffordos/ui/operator-frontend/app/api/proof/abando-recovery/run/route.ts",
+      "guardedBefore": "environment-file reads, worker execution, and proof writes"
+    }
+  ],
+  "serverActionCoverage": [
+    {
+      "surfaceIds": [
+        "G004-SA-001",
+        "G004-SA-002",
+        "G004-SA-003",
+        "G004-SA-004",
+        "G004-SA-005"
+      ],
+      "file": "staffordos/ui/operator-frontend/app/operator/command-center/page.tsx",
+      "guardedBefore": "form reads and write helpers"
+    },
+    {
+      "surfaceIds": [
+        "G004-SA-006",
+        "G004-SA-007",
+        "G004-SA-008",
+        "G004-SA-009",
+        "G004-SA-010"
+      ],
+      "file": "staffordos/ui/operator-frontend/app/operator/shopifixer-pilot/page.tsx",
+      "guardedBefore": "form reads and write helpers"
+    }
+  ],
+  "operatorWorkflow": {
+    "workingDirectory": "staffordos/ui/operator-frontend",
+    "intentionalLocalWriteCommand": "STAFFORDOS_LOCAL_OPERATOR_WRITES_ENABLED=true npm run dev",
+    "writesDisabledWithoutFlag": true,
+    "nonLoopbackDeniedEvenWithFlag": true,
+    "restartWithoutFlagReturnsFailClosed": true,
+    "commitEnvLocal": false,
+    "tunnelsAndProxiesAllowed": false,
+    "authenticationClaimed": false,
+    "approvalClaimed": false
+  },
+  "operatorDisclosureResult": {
+    "broadPageDisclosureAdded": false,
+    "denialMessage": "Operator changes are not available in this runtime.",
+    "laterUiPolishRecommendedAfterSessionModel": true
+  },
+  "futureS007IntegrationSeam": [
+    "authenticated session",
+    "operator identity",
+    "workspace membership",
+    "role authorization",
+    "capability permission",
+    "action-specific approval",
+    "request and audit context"
+  ],
+  "staticCoverageScan": {
+    "postRoutesGuarded": 5,
+    "serverActionDirectivesGuarded": 10,
+    "duplicateIsolationUtilities": 0,
+    "hardcodedBypassFound": false,
+    "permissiveFallbackFound": false,
+    "osRoutesImportGate": false,
+    "readOnlyOperatorLoadersImportGate": false
+  },
+  "validation": {
+    "focusedTests": "PASS",
+    "regressionTests": "PASS",
+    "build": "PASS_WITH_EXISTING_NON_FATAL_DIAGNOSTICS",
+    "buildNote": "npm run build exited 0. Next emitted an existing Turbopack NFT warning and non-fatal /operator/shopifixer-pilot server-action serialization diagnostics during static page generation; the route returned HTTP 200 in GET-only validation.",
+    "getOnlyRouteChecks": "PASS",
+    "jsonValidation": "PASS",
+    "diffChecks": "PASS"
+  },
+  "knownLimitations": [
+    "not authentication",
+    "not authorization",
+    "not action-specific approval",
+    "not production-ready",
+    "server actions still need durable StaffordOS permission model",
+    "private Job Opportunity UI display remains blocked until server authorization exists",
+    "S007 verifier and session integration remains required before deployment or multi-user write usage"
+  ],
+  "rollback": "git revert <G004.01 commit SHA>",
+  "selectedNextMission": "S007_01I_OAUTH_SECRET_ROTATION_AND_BROWSER_PROOF_PLAN"
+}

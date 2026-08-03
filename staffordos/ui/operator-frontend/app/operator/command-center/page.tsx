@@ -1,10 +1,12 @@
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { OperatorHomeV1 } from "../../../components/operator/OperatorHomeV1";
 import { loadPrimaryActionSnapshot } from "../../../lib/operator/loadPrimaryActionSnapshot";
 import { loadPreflightReport } from "../../../lib/operator/loadPreflightReport";
 import { loadCommandCenterQaReport } from "../../../lib/operator/loadCommandCenterQaReport";
 import { loadUnitWorkSnapshot } from "../../../lib/operator/loadUnitWorkSnapshot";
 import { loadShopifixerCommandCenter } from "../../../lib/operator/loadShopifixerCommandCenter";
+import { assertOperatorWriteAllowed } from "../../../lib/operator/operatorWriteIsolation";
 import { writeShopifixerBeforeEvidence } from "../../../lib/operator/writeShopifixerBeforeEvidence";
 import { writeShopifixerAfterEvidence } from "../../../lib/operator/writeShopifixerAfterEvidence";
 import { writeShopifixerScopedFix } from "../../../lib/operator/writeShopifixerScopedFix";
@@ -37,6 +39,7 @@ export default async function RossCommandCenterPage({ searchParams }: RossComman
 
   async function captureBeforeEvidence(formData: FormData) {
     "use server";
+    assertOperatorWriteAllowed({ headers: await headers(), env: process.env });
 
     const store = String(formData.get("store") || shopifixerCommandCenter.merchant?.store || "unavailable");
     const date = String(formData.get("date") || beforeEvidenceDate);
@@ -61,6 +64,7 @@ export default async function RossCommandCenterPage({ searchParams }: RossComman
 
   async function captureAfterEvidence(formData: FormData) {
     "use server";
+    assertOperatorWriteAllowed({ headers: await headers(), env: process.env });
 
     const store = String(formData.get("store") || shopifixerCommandCenter.merchant?.store || "unavailable");
     const date = String(formData.get("date") || beforeEvidenceDate);
@@ -87,6 +91,7 @@ export default async function RossCommandCenterPage({ searchParams }: RossComman
 
   async function captureScopedFix(formData: FormData) {
     "use server";
+    assertOperatorWriteAllowed({ headers: await headers(), env: process.env });
 
     const store = String(formData.get("store") || shopifixerCommandCenter.merchant?.store || "unavailable");
     const date = String(formData.get("date") || beforeEvidenceDate);
@@ -116,6 +121,7 @@ export default async function RossCommandCenterPage({ searchParams }: RossComman
 
   async function captureProofPackage(formData: FormData) {
     "use server";
+    assertOperatorWriteAllowed({ headers: await headers(), env: process.env });
 
     const _store = String(formData.get("store") || shopifixerCommandCenter.merchant?.store || "unavailable");
     const _date = String(formData.get("date") || beforeEvidenceDate);
@@ -127,6 +133,7 @@ export default async function RossCommandCenterPage({ searchParams }: RossComman
 
   async function captureCompletion(formData: FormData) {
     "use server";
+    assertOperatorWriteAllowed({ headers: await headers(), env: process.env });
 
     const store = String(formData.get("store") || shopifixerCommandCenter.merchant?.store || "unavailable");
     const date = String(formData.get("date") || completionDate);
