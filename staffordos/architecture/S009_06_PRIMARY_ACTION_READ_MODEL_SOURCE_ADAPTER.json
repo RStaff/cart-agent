@@ -1,0 +1,465 @@
+{
+  "mission": "S009_06_PRIMARY_ACTION_READ_MODEL_SOURCE_ADAPTER",
+  "mission_type": "repository-first narrow local read-only library implementation, static fixture certification, focused tests, documentation, validation, and governed local commit",
+  "checkpoint_authority": {
+    "starting_head": "2bb491056b3931427005be142d8c0c4ede075de8",
+    "branch": "main",
+    "s009_06_preexisting": false,
+    "verified_authorities": [
+      "staffordos/architecture/STAFFORDOS_ARCHITECTURE_V1.md",
+      "staffordos/architecture/S009_00_READ_ONLY_CHIEF_OF_STAFF_CONTRACT.md",
+      "staffordos/architecture/S009_01_STATIC_FIXTURE_AND_DETERMINISTIC_RESPONSE_VALIDATOR.md",
+      "staffordos/architecture/S009_02_READ_ONLY_CHIEF_OF_STAFF_DEMONSTRATION_SURFACE.md",
+      "staffordos/architecture/S009_03_PROVIDER_NEUTRAL_MODEL_ADAPTER_INTERFACE.md",
+      "staffordos/architecture/S009_04B_CERTIFY_LOCAL_MODEL_PROVIDER_BOUNDARY.md",
+      "staffordos/architecture/S009_05_GOVERNED_OPERATOR_READ_MODEL_ADAPTER_DISCOVERY.md",
+      "staffordos/ui/operator-frontend/lib/operator/loadPrimaryActionSnapshot.ts",
+      "S008 Action, Objective, Decision, Evidence, Proof, and Learning foundations"
+    ],
+    "baseline": [
+      "/operator remains runtime-canonical.",
+      "/os remains presentation-focused.",
+      "Ollama is installed but stopped.",
+      "No listener exists on port 11434.",
+      "No model may read /operator directly.",
+      "S009.05 selected Primary Action Snapshot as the first source-adapter candidate.",
+      "Runtime use remains blocked by undeployed identity and permission authority.",
+      "A library-only, fixture-backed adapter may be implemented now.",
+      "WorkspaceContext remains presentation-only and is not authorization.",
+      "Professional and Personal remain Planned.",
+      "No write, execution, approval, verification, or mutation authority exists."
+    ]
+  },
+  "working_tree_exclusions": {
+    "authorized_files": [
+      "staffordos/ui/operator-frontend/lib/staffordos/primaryActionSourceAdapter.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/primaryActionSourceAdapter.test.mjs",
+      "staffordos/architecture/S009_06_PRIMARY_ACTION_READ_MODEL_SOURCE_ADAPTER.md",
+      "staffordos/architecture/S009_06_PRIMARY_ACTION_READ_MODEL_SOURCE_ADAPTER.json"
+    ],
+    "excluded_categories": [
+      "S007_IDENTITY_OR_ISSUER",
+      "RUNTIME_OR_DAEMON",
+      "WEB_OR_PRISMA",
+      "MISSION_EVIDENCE",
+      "GENERATED",
+      "PREEXISTING_UNRELATED",
+      "UNKNOWN_REQUIRES_REVIEW"
+    ],
+    "staged_before_mission": []
+  },
+  "ollama_stopped_state": {
+    "port_11434_listener": "none",
+    "ollama_started": false,
+    "model_invoked": false,
+    "proof_command_run": false
+  },
+  "primary_action_source_authority": {
+    "canonical_read_side_authority": "staffordos/ui/operator-frontend/lib/operator/loadPrimaryActionSnapshot.ts",
+    "inspected_runtime_snapshot": "staffordos/snapshots/primary_action_snapshot_v1.json",
+    "adapter_imports_loader": false,
+    "reason_loader_not_imported": "loadPrimaryActionSnapshot can call localhost /api/operator/ceo-snapshot and synthesize from local files; S009.06 requires explicit adapter input only.",
+    "source_boundary": "explicitly supplied read-model record or deterministic fixture only"
+  },
+  "input_contract": {
+    "type": "PrimaryActionSourceAdapterInput",
+    "fields": [
+      "adapterExecutionId",
+      "requestWorkspaceId",
+      "permissionDecision",
+      "primaryActionRecord",
+      "sourceReference",
+      "capturedAt",
+      "sourceUpdatedAt",
+      "privacyClassification",
+      "authorityClassification",
+      "fallbackClassification",
+      "conflicts"
+    ],
+    "never_accepts": [
+      "database clients",
+      "API clients",
+      "mutation handlers",
+      "command handlers",
+      "queue clients",
+      "execution tokens",
+      "credentials",
+      "unrestricted request objects",
+      "browser state as authority",
+      "client-selected permissions as trusted authority"
+    ]
+  },
+  "safe_field_allowlist": [
+    {
+      "field": "actionId",
+      "source_path": "primaryActionRecord.primary_action.action_id",
+      "operator_meaning": "Stable action identifier",
+      "transformation": "Copied only when non-empty",
+      "limitation": "Identifier only; it does not prove execution or completion."
+    },
+    {
+      "field": "operatorFacingTitle",
+      "source_path": "primaryActionRecord.primary_action.action_label",
+      "operator_meaning": "Current primary action label",
+      "transformation": "Copied after prohibited-value screening",
+      "limitation": "Action label only; it does not approve the action."
+    },
+    {
+      "field": "operatorFacingSummary",
+      "source_path": "primaryActionRecord.primary_action.next_step",
+      "operator_meaning": "Plain-language next step",
+      "transformation": "Copied after prohibited-value screening",
+      "limitation": "Summary only; no live execution state is claimed."
+    },
+    {
+      "field": "whyItMatters",
+      "source_path": "primaryActionRecord.primary_action.why_now",
+      "operator_meaning": "Why it deserves attention",
+      "transformation": "Copied after prohibited-value screening",
+      "limitation": "Reasoning from the supplied read model; not model judgment."
+    },
+    {
+      "field": "expectedResult",
+      "source_path": "primaryActionRecord.primary_action.expected_outcome",
+      "operator_meaning": "Expected result if acted on later",
+      "transformation": "Copied after prohibited-value screening",
+      "limitation": "Expected result only; not an observed Outcome."
+    },
+    {
+      "field": "productScope",
+      "source_path": "primaryActionRecord.primary_action.product_id",
+      "operator_meaning": "Broad product scope",
+      "transformation": "Reduced to a broad product label",
+      "limitation": "Does not include merchant, customer, packet, or payment identifiers."
+    },
+    {
+      "field": "relatedObjectiveId",
+      "source_path": "primaryActionRecord.primary_action.objective_id",
+      "operator_meaning": "Explicit Objective mapping when supplied",
+      "transformation": "Copied only when supplied",
+      "limitation": "No title-based inference is performed."
+    },
+    {
+      "field": "relatedDecisionId",
+      "source_path": "primaryActionRecord.primary_action.decision_id",
+      "operator_meaning": "Explicit Decision mapping when supplied",
+      "transformation": "Copied only when supplied",
+      "limitation": "No historical Decision is rewritten."
+    }
+  ],
+  "excluded_field_classifications": [
+    "merchant_or_customer_identifier",
+    "customer_contact",
+    "store_domain",
+    "payment_reference",
+    "packet_or_checkout_identifier",
+    "revenue_or_numeric_business_metric",
+    "priority_or_confidence_score",
+    "raw_notes_or_contact_content",
+    "execution_or_mutation_instruction",
+    "credential_or_secret",
+    "provider_token",
+    "rollback_command",
+    "hidden_prompt",
+    "generated_or_unverified_claim"
+  ],
+  "hard_fail_excluded_classifications": [
+    "credential_or_secret",
+    "provider_token",
+    "rollback_command",
+    "execution_or_mutation_instruction",
+    "hidden_prompt"
+  ],
+  "source_snapshot_contract": {
+    "type": "PrimaryActionSourceSnapshot",
+    "source_type": "primary_action_snapshot",
+    "fields": [
+      "sourceId",
+      "sourceType",
+      "workspaceId",
+      "productScope",
+      "authorityClassification",
+      "freshness",
+      "privacyClassification",
+      "immutable",
+      "title",
+      "contentSummary",
+      "structuredFacts",
+      "exactSourceReference",
+      "sourceUpdatedAt",
+      "capturedAt",
+      "limitations",
+      "excludedFieldClassifications",
+      "conflictStatus",
+      "permissionRequirement",
+      "adapterId"
+    ],
+    "chief_of_staff_compatibility_projection": "toChiefOfStaffSourceFixture",
+    "projection_source_type": "action",
+    "validator_rules_changed": false
+  },
+  "permission_decision_contract": {
+    "fixture": "PRIMARY_ACTION_PERMISSION_DECISION_FIXTURE",
+    "workspace": "stafford-media",
+    "test_only": true,
+    "real_authentication": false,
+    "server_authorization": false,
+    "failure_rules": [
+      "allowed=false returns no snapshot",
+      "missing permission returns no snapshot",
+      "permission workspace mismatch returns no snapshot",
+      "unsupported permission authority returns no snapshot",
+      "client-selected workspace alone is insufficient"
+    ]
+  },
+  "workspace_enforcement": {
+    "allowed_workspace": "stafford-media",
+    "professional_behavior": "fails_closed",
+    "personal_behavior": "fails_closed",
+    "unknown_workspace_behavior": "fails_closed",
+    "source_record_workspace_override_allowed": false,
+    "workspace_context_authorizes_runtime_reads": false
+  },
+  "freshness_classification": {
+    "policy": "S009.06 deterministic fixture policy only",
+    "current": "source timestamp is no more than one day older than capture time",
+    "recent": "source timestamp is more than one day and no more than seven days older",
+    "historical": "source timestamp is more than seven days and no more than ninety days older",
+    "stale": "source timestamp is more than ninety days older",
+    "unknown": "timestamp authority is missing, invalid, or contradictory",
+    "missing_timestamp_current": false
+  },
+  "provenance": {
+    "preserved": [
+      "exact source reference",
+      "source authority",
+      "adapter identity",
+      "included field list",
+      "excluded field classifications",
+      "capture time",
+      "source update time",
+      "fallback classification",
+      "fixture permission status"
+    ],
+    "source_write_authority": false
+  },
+  "conflict_handling": {
+    "non_blocking_conflict": "preserved as Needs review",
+    "blocking_conflict": "returns no snapshot",
+    "silent_reconciliation": false,
+    "model_judgment_used": false,
+    "failure_codes": [
+      "SOURCE_CONFLICT",
+      "STATIC_RUNTIME_CONFLICT",
+      "GENERATED_FALLBACK_CONFLICT",
+      "SOURCE_AUTHORITY_AMBIGUOUS"
+    ]
+  },
+  "fallback_and_generated_data": {
+    "classifications": [
+      "NONE",
+      "REPOSITORY_BACKED_FALLBACK",
+      "GENERATED_PLACEHOLDER",
+      "MOCK_DATA",
+      "OPERATOR_DEFAULT",
+      "UNKNOWN"
+    ],
+    "generated_placeholder_behavior": "fails_closed",
+    "mock_data_behavior": "fails_closed",
+    "repository_backed_or_unknown_behavior": "visible limitation"
+  },
+  "write_adjacency_safety": {
+    "imports_operator_loader": false,
+    "imports_operator_pages": false,
+    "imports_write_helpers": false,
+    "calls_api": false,
+    "calls_database": false,
+    "calls_queue": false,
+    "calls_model": false,
+    "mutation_methods": false,
+    "scanned_for": [
+      "execute-primary-action",
+      "WorkdayControlPanel",
+      "LeadActions",
+      "writeShopifixer",
+      "fetch(",
+      "prisma",
+      "ollama",
+      "openai",
+      "anthropic",
+      "app/operator",
+      "app/api/operator",
+      "execFile",
+      "writeFileSync"
+    ]
+  },
+  "static_fixtures": [
+    "valid Stafford Media Primary Action",
+    "permission denied",
+    "missing permission",
+    "workspace mismatch",
+    "Professional workspace",
+    "Personal workspace",
+    "sensitive fields present in raw source",
+    "missing timestamps",
+    "stale source",
+    "conflicting source",
+    "generated fallback",
+    "malformed source"
+  ],
+  "chief_of_staff_compatibility": {
+    "s009_01_validator_rules_changed": false,
+    "s009_03_adapter_changed": false,
+    "ollama_adapter_changed": false,
+    "response_shape_changed": false,
+    "claim_shape_changed": false,
+    "recommendation_status_rules_changed": false,
+    "model_invoked": false,
+    "compatibility_test": "successful snapshot projects to existing action source contract and validates"
+  },
+  "audit_summary": {
+    "persisted": false,
+    "fields": [
+      "adapterExecutionId",
+      "adapterId",
+      "workspaceId",
+      "permissionDecision",
+      "sourceReference",
+      "includedFields",
+      "excludedFieldClassifications",
+      "sourceUpdatedAt",
+      "capturedAt",
+      "freshness",
+      "conflictStatus",
+      "resultStatus",
+      "failureCode",
+      "privacyClassification",
+      "limitations",
+      "fallbackClassification",
+      "testOnly"
+    ],
+    "contains_sensitive_excluded_values": false
+  },
+  "failure_closed_behavior": {
+    "operator_safe_message": "I cannot verify the current primary action from the available StaffordOS source.",
+    "returns_no_snapshot_when": [
+      "permission is denied",
+      "permission is missing",
+      "permission authority is unsupported",
+      "workspace mismatches",
+      "source is malformed",
+      "source authority is missing",
+      "source provenance is missing",
+      "credential, token, rollback, prompt, or write-instruction fields are present",
+      "generated or mock fallback data is supplied as runtime truth",
+      "conflict makes the source unsafe"
+    ]
+  },
+  "tests": {
+    "focused_adapter_tests": {
+      "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/primaryActionSourceAdapter.test.mjs",
+      "passed": 32,
+      "failed": 0
+    },
+    "s009_03_adapter_tests": {
+      "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffModelAdapter.test.mjs",
+      "passed": 25,
+      "failed": 0
+    },
+    "s009_02_demonstration_tests": {
+      "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffDemo.test.mjs",
+      "passed": 18,
+      "failed": 0
+    },
+    "s009_01_validator_tests": {
+      "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffValidator.test.mjs",
+      "passed": 37,
+      "failed": 0
+    },
+    "s008_regression_tests": {
+      "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/workspaceRegistry.test.mjs staffordos/ui/operator-frontend/lib/staffordos/homePresentation.test.mjs staffordos/ui/operator-frontend/lib/staffordos/objectiveRegistry.test.mjs staffordos/ui/operator-frontend/lib/staffordos/decisionRegistry.test.mjs staffordos/ui/operator-frontend/lib/staffordos/actionRegistry.test.mjs staffordos/ui/operator-frontend/lib/staffordos/evidenceFoundation.test.mjs staffordos/ui/operator-frontend/lib/staffordos/proofFoundation.test.mjs staffordos/ui/operator-frontend/lib/staffordos/learningFoundation.test.mjs",
+      "passed": 127,
+      "failed": 0
+    }
+  },
+  "build": {
+    "command": "npm run build",
+    "workdir": "staffordos/ui/operator-frontend",
+    "result": "passed",
+    "warnings": [
+      "Existing Turbopack NFT tracing warning in next.config.mjs import trace through app/api/operator/ceo-snapshot/route.ts.",
+      "Existing /operator/shopifixer-pilot static-generation warnings about functions passed to Client Components."
+    ]
+  },
+  "validation": {
+    "jq": {
+      "command": "jq . staffordos/architecture/S009_06_PRIMARY_ACTION_READ_MODEL_SOURCE_ADAPTER.json",
+      "result": "passed"
+    },
+    "git_diff_check": {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  },
+  "files_changed": [
+    "staffordos/ui/operator-frontend/lib/staffordos/primaryActionSourceAdapter.ts",
+    "staffordos/ui/operator-frontend/lib/staffordos/primaryActionSourceAdapter.test.mjs",
+    "staffordos/architecture/S009_06_PRIMARY_ACTION_READ_MODEL_SOURCE_ADAPTER.md",
+    "staffordos/architecture/S009_06_PRIMARY_ACTION_READ_MODEL_SOURCE_ADAPTER.json"
+  ],
+  "known_limitations": [
+    "Runtime use remains blocked by undeployed S007 identity, workspace membership, permission claims, and server authorization.",
+    "The adapter uses deterministic test permission authority only.",
+    "The adapter does not retrieve live data.",
+    "The adapter does not persist snapshots or audit summaries.",
+    "The adapter does not invoke any model.",
+    "The adapter does not update the Chief of Staff demonstration UI.",
+    "The existing S009 validator source-type union was not changed; compatibility uses the existing action source type."
+  ],
+  "runtime_blockers": [
+    "trusted operator identity must be deployed",
+    "server-side workspace membership must be proven",
+    "permission claims must be available",
+    "source read authority must be enforced server-side",
+    "source snapshots must be captured immutably",
+    "customer, merchant, payment, packet, and revenue data authority must be explicit before inclusion",
+    "WorkspaceContext must not be treated as authorization"
+  ],
+  "recommended_next_mission": {
+    "mission": "S009_07_GOVERNED_SOURCE_SNAPSHOT_ASSEMBLY_AND_IDENTITY_GATE",
+    "scope": [
+      "define a governed source-snapshot assembler for static StaffordOS sources plus supplied Primary Action source snapshots",
+      "keep runtime reads disabled",
+      "prove identity and permission gate requirements before any live adapter use",
+      "preserve S009.01 validator authority and provider neutrality",
+      "do not invoke models or modify /operator"
+    ]
+  },
+  "rollback": {
+    "procedure": "git revert <S009.06 commit SHA>",
+    "requires_runtime_rollback": false,
+    "requires_model_rollback": false,
+    "requires_database_rollback": false,
+    "requires_identity_rollback": false,
+    "requires_stripe_rollback": false,
+    "requires_shopifixer_or_abando_rollback": false,
+    "requires_deployment_rollback": false
+  },
+  "confirmation_of_non_impact": {
+    "ollama_started_or_invoked": false,
+    "operator_modified": false,
+    "os_modified": false,
+    "chief_of_staff_demo_ui_modified": false,
+    "api_called": false,
+    "database_accessed": false,
+    "provider_sdk_added": false,
+    "credentials_or_environment_added": false,
+    "authentication_modified": false,
+    "stripe_modified": false,
+    "prisma_migrations_queues_packets_or_execution_modified": false,
+    "shopifixer_or_abando_runtime_modified": false,
+    "deployed": false,
+    "pushed": false,
+    "unrelated_working_tree_changes_included": false
+  }
+}
