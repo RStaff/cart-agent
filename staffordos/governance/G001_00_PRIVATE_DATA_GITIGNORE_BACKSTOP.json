@@ -1,0 +1,170 @@
+{
+  "schemaVersion": "G001_00.v1",
+  "mission": "G001_00_PRIVATE_DATA_GITIGNORE_BACKSTOP_AND_REPOSITORY_CONTAINMENT",
+  "status": "complete_repository_privacy_hardening",
+  "checkpoint": {
+    "startHead": "eae4f9ddccec4ae50f28e44822b213d7be766108",
+    "requiredCommitsPresent": [
+      "625b9150",
+      "eae4f9dd"
+    ],
+    "authority": [
+      "STAFFORDOS_ENTERPRISE_ARCHITECTURE_REVIEW_V1",
+      "A001_00_ASSET_AUTHORITY_DISCOVERY_AND_ARCHITECTURE",
+      "STAFFORDOS_ASSET_AUTHORITY_V1"
+    ]
+  },
+  "existingIgnoreAuthority": {
+    "rootGitignore": "partially_sufficient",
+    "nestedGitignoreFiles": "package_specific_generated_output_only",
+    "gitInfoExclude": "observed_only_not_modified",
+    "missingProtection": [
+      "predictable StaffordOS private roots",
+      "private runtime artifact suffixes",
+      "private intake directory names"
+    ]
+  },
+  "threatModel": {
+    "gitMustNotStore": [
+      "user content",
+      "private runtime records",
+      "resumes",
+      "career source material",
+      "real job descriptions",
+      "real Job Opportunity records",
+      "family or personal media",
+      "customer content",
+      "provider credentials",
+      "private model conversations",
+      "real operator decision records"
+    ],
+    "ignoredPrivateDataStillProhibitedInRepository": true
+  },
+  "externalPrivateRootBoundary": {
+    "roots": [
+      "$HOME/.staffordos/private/",
+      "$HOME/staffordos-private-intake/"
+    ],
+    "repositoryGitignoreProtectsExternalRootsDirectly": false,
+    "repositoryGitignoreBackstopPurpose": "protect accidental in-repository copies or generated equivalents"
+  },
+  "classificationModel": {
+    "mustIgnore": [
+      "/.staffordos/",
+      "**/.staffordos/private/",
+      "/staffordos-private-intake/",
+      "**/staffordos-private-intake/",
+      "**/private-intake/",
+      "**/private-runtime/",
+      "**/private-data/",
+      "*.private.json",
+      "*.private.ndjson",
+      "*.private.jsonl",
+      "*.private.sqlite",
+      "*.private.db",
+      "*.private.log"
+    ],
+    "mustTrack": [
+      "source code",
+      "deterministic tests",
+      "synthetic fixtures without private suffixes",
+      "architecture",
+      "doctrine",
+      "schemas",
+      "migrations",
+      "sealed or redacted evidence",
+      "governed configuration"
+    ],
+    "conditional": [
+      "exports",
+      "provider caches",
+      "local snapshots",
+      "test outputs",
+      "generated reports"
+    ],
+    "prohibitedLocation": [
+      "real resumes",
+      "private Career facts",
+      "real Job Opportunity records",
+      "private contact information",
+      "family media",
+      "customer content",
+      "provider credentials",
+      "raw media libraries",
+      "private model conversations"
+    ]
+  },
+  "rulesAdded": [
+    "/.staffordos/",
+    "**/.staffordos/private/",
+    "/staffordos-private-intake/",
+    "**/staffordos-private-intake/",
+    "**/private-intake/",
+    "**/private-runtime/",
+    "**/private-data/",
+    "*.private.json",
+    "*.private.ndjson",
+    "*.private.jsonl",
+    "*.private.sqlite",
+    "*.private.db",
+    "*.private.log"
+  ],
+  "rulesRejectedAsTooBroad": [
+    "private/",
+    "data/",
+    "*.json",
+    "*.pdf",
+    "*.docx",
+    "*.pages",
+    "media/",
+    "uploads/",
+    "documents/",
+    "resumes/"
+  ],
+  "trackedFileCollision": {
+    "result": "no_collision_with_added_patterns",
+    "trackedFilesUntrackedOrRemoved": false
+  },
+  "trackedPrivateDataScan": {
+    "result": "no_tracked_private_data_by_path_pattern",
+    "fileContentsInspected": false
+  },
+  "symlinkDefense": {
+    "trackedSymlinksFound": false,
+    "privateRootSymlinkFound": false,
+    "symlinksFollowed": false
+  },
+  "containmentCheckDecision": {
+    "newUtilityCreated": false,
+    "reason": "Git path checks and synthetic git-check-ignore validation are sufficient for this narrow ignore-rule mission.",
+    "futureUtilityTrigger": "Add a path-only scanner if private workflows start producing repository-adjacent artifacts more often."
+  },
+  "validation": {
+    "gitCheckIgnoreSyntheticPaths": "passed",
+    "trackedFileCollisionScan": "passed",
+    "trackedPrivatePathScan": "passed",
+    "symlinkMetadataScan": "passed",
+    "jq": "passed",
+    "diffCheck": "passed"
+  },
+  "filesChanged": [
+    ".gitignore",
+    "staffordos/governance/G001_00_PRIVATE_DATA_GITIGNORE_BACKSTOP.md",
+    "staffordos/governance/G001_00_PRIVATE_DATA_GITIGNORE_BACKSTOP.json"
+  ],
+  "selectedNextMission": "G002_00_PROFESSIONAL_MODE_AND_WORKSPACE_REGISTRY_RECONCILIATION",
+  "nonImpact": {
+    "privateContentsRead": false,
+    "privateDataMoved": false,
+    "privateDataCopied": false,
+    "privateDataDeleted": false,
+    "gitRmUsed": false,
+    "sourceApplicationsChanged": false,
+    "prismaChanged": false,
+    "routesOrUiChanged": false,
+    "operatorOrOsChanged": false,
+    "ollamaInvoked": false,
+    "deployed": false,
+    "pushed": false
+  }
+}

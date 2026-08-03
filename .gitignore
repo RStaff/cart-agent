@@ -29,6 +29,28 @@ out/
 .env.*.local
 
 # =========================
+# STAFFORDOS PRIVATE DATA BACKSTOP
+# =========================
+# StaffordOS private user/runtime data must remain outside this repository,
+# typically under $HOME/.staffordos/private/ or $HOME/staffordos-private-intake/.
+# These rules are defense in depth for accidental in-repository copies. Ignored
+# private data is still in a prohibited repository location and must not be used
+# as source, architecture, fixtures, or governed evidence.
+/.staffordos/
+**/.staffordos/private/
+/staffordos-private-intake/
+**/staffordos-private-intake/
+**/private-intake/
+**/private-runtime/
+**/private-data/
+*.private.json
+*.private.ndjson
+*.private.jsonl
+*.private.sqlite
+*.private.db
+*.private.log
+
+# =========================
 # EDITOR / OS
 # =========================
 .vscode/
