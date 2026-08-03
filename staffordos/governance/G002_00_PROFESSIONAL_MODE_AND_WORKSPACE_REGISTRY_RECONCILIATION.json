@@ -1,0 +1,278 @@
+{
+  "schemaVersion": "G002_00.v1",
+  "mission": "G002_00_PROFESSIONAL_MODE_AND_WORKSPACE_REGISTRY_RECONCILIATION",
+  "status": "complete_workspace_model_reconciliation",
+  "checkpoint": {
+    "startHead": "d6a09095ebee5dd0ea8a60f100dd552f6b79a75c",
+    "requiredCommitsPresent": [
+      "625b9150",
+      "eae4f9dd",
+      "d6a09095"
+    ],
+    "authorities": [
+      "StaffordOS Enterprise Architecture Review V1",
+      "StaffordOS Target Platform and Workspace Model V2",
+      "StaffordOS Anti-Drift Register V1",
+      "S008 multi-workspace architecture",
+      "S008 workspace registry and presentation-only WorkspaceContext",
+      "J001 Professional Job Command shell",
+      "J001 local Job Opportunity intake bridge"
+    ]
+  },
+  "canonicalWorkspaces": [
+    "stafford-media",
+    "professional",
+    "personal"
+  ],
+  "professionalModes": [
+    {
+      "modeId": "CAREER_HOME",
+      "availability": "available_now",
+      "route": "/os/professional",
+      "operatorQuestion": "What deserves my attention in my professional life?"
+    },
+    {
+      "modeId": "JOB_SEARCH",
+      "availability": "available_now",
+      "route": "/os/professional/jobs",
+      "operatorQuestion": "What should I do next in my job search?"
+    },
+    {
+      "modeId": "MY_JOB",
+      "availability": "planned",
+      "route": null,
+      "operatorQuestion": "What should I do next to succeed in my role?"
+    }
+  ],
+  "taxonomyDiscovery": [
+    {
+      "concept": "workspaceRegistry.ts",
+      "classification": "StaffordOS top-level workspace registry",
+      "decision": "canonical registry for stafford-media, professional, and personal"
+    },
+    {
+      "concept": "WorkspaceContext.tsx",
+      "classification": "UI-only presentation context",
+      "decision": "preserved as presentation-only, not access control"
+    },
+    {
+      "concept": "StaffordOsShell.tsx",
+      "classification": "canonical /os shell",
+      "decision": "reused without creating a second Professional shell"
+    },
+    {
+      "concept": "capabilities.ts",
+      "classification": "capability registry",
+      "decision": "Professional Career Home and Job Search foundation are available; My Job remains planned"
+    },
+    {
+      "concept": "/os/professional/jobs",
+      "classification": "Job Search foundation route",
+      "decision": "preserved"
+    },
+    {
+      "concept": "/os/professional",
+      "classification": "Professional mode route",
+      "decision": "added as static Career Home"
+    },
+    {
+      "concept": "domains/domain_registry_v1.json",
+      "classification": "legacy life-domain map",
+      "decision": "not edited in G002"
+    },
+    {
+      "concept": "merchant workspace wording",
+      "classification": "merchant or execution context",
+      "decision": "not a top-level StaffordOS workspace"
+    }
+  ],
+  "transitionRules": [
+    "A mode change does not delete records.",
+    "Job opportunities and applications can become historical or less active, but they are not erased.",
+    "Career evidence survives mode changes.",
+    "Resume authority survives mode changes.",
+    "Professional relationships survive mode changes.",
+    "Achievements survive mode changes.",
+    "Learning survives mode changes.",
+    "Decisions and outcomes survive mode changes.",
+    "Employment records remain separate from applications.",
+    "A job offer does not automatically activate My Job.",
+    "Ross explicitly confirms an employment transition.",
+    "Changing presentation mode does not grant access or permission."
+  ],
+  "retainedProfessionalRecords": [
+    "CareerFact",
+    "CareerEvidence",
+    "ResumeVersion",
+    "Achievement",
+    "Project",
+    "Skill and technology context",
+    "Certification",
+    "Education",
+    "Professional Relationship",
+    "Decision",
+    "Action",
+    "Evidence",
+    "Proof",
+    "Learning",
+    "Asset reference",
+    "Job Outcome",
+    "employment history"
+  ],
+  "jobSearchSpecificRecords": [
+    "JobOpportunity",
+    "JobRequirement",
+    "Application",
+    "Interview",
+    "recruiter follow-up",
+    "offer",
+    "rejection",
+    "withdrawal"
+  ],
+  "myJobFutureRecords": [
+    "Employment",
+    "Role Responsibility",
+    "Objective",
+    "Work Project",
+    "Commitment",
+    "Meeting reference",
+    "Manager or coworker relationship",
+    "Accomplishment",
+    "Feedback",
+    "Performance Review",
+    "Promotion Goal",
+    "Compensation event",
+    "Learning plan"
+  ],
+  "registryContradictionsCorrected": [
+    "workspaceRegistry.ts",
+    "WorkspaceSelector.tsx",
+    "WorkspacePage.tsx",
+    "homePresentation.ts",
+    "UnifiedHome.tsx",
+    "capabilities.ts",
+    "jobSearchCommandPresentation.ts",
+    "S009 Chief of Staff fixture/copy text"
+  ],
+  "professionalNavigation": {
+    "linkedRoutes": [
+      "/os/professional",
+      "/os/professional/jobs"
+    ],
+    "unlinkedPlannedOrNotConnectedItems": [
+      "Opportunities",
+      "Applications",
+      "Relationships",
+      "Interviews",
+      "Outcomes",
+      "My Job",
+      "Career Evidence",
+      "Achievements",
+      "Learning"
+    ]
+  },
+  "careerHomeRouteDecision": {
+    "added": true,
+    "route": "/os/professional",
+    "reason": "CAREER_HOME is available now and needs a direct static Professional landing route while reusing the existing /os layout."
+  },
+  "staticityDisclosures": [
+    "available foundation",
+    "planned capability",
+    "not connected yet",
+    "private data not connected",
+    "live prioritization not connected",
+    "access controls not connected",
+    "Ross decides when his work status changes"
+  ],
+  "validationResults": {
+    "focusedG002Tests": {
+      "status": "passed",
+      "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/professionalModes.test.mjs"
+    },
+    "staffordosLibrarySweep": {
+      "status": "passed",
+      "testsPassed": 495,
+      "testsFailed": 0,
+      "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/*.test.mjs"
+    },
+    "build": {
+      "status": "passed",
+      "exitCode": 0,
+      "command": "npm run build",
+      "note": "Next emitted an existing NFT warning and recoverable static-generation messages from /operator/shopifixer-pilot; G002 did not modify /operator."
+    },
+    "routes": [
+      {
+        "route": "/os",
+        "status": 200
+      },
+      {
+        "route": "/os/professional",
+        "status": 200
+      },
+      {
+        "route": "/os/professional/jobs",
+        "status": 200
+      },
+      {
+        "route": "/os/capabilities",
+        "status": 200
+      },
+      {
+        "route": "/os/actions",
+        "status": 200
+      },
+      {
+        "route": "/os/objectives",
+        "status": 200
+      },
+      {
+        "route": "/os/decisions",
+        "status": 200
+      },
+      {
+        "route": "/os/chief-of-staff",
+        "status": 200
+      },
+      {
+        "route": "/operator",
+        "status": 200
+      },
+      {
+        "route": "/operator/leads",
+        "status": 200
+      },
+      {
+        "route": "/operator/campaigns",
+        "status": 200
+      },
+      {
+        "route": "/operator/revenue-command",
+        "status": 200
+      },
+      {
+        "route": "/operator/command-center",
+        "status": 200
+      }
+    ],
+    "ollamaTcp11434": "absent"
+  },
+  "nonImpact": {
+    "privateCareerDataConnected": false,
+    "jobOpportunityRecordsChanged": false,
+    "myJobRuntimeFeaturesAdded": false,
+    "fakeEmploymentDataAdded": false,
+    "authenticationAdded": false,
+    "operatorModified": false,
+    "deployed": false,
+    "pushed": false,
+    "ollamaInvoked": false,
+    "externalAiCalled": false,
+    "apiCreated": false,
+    "prismaChanged": false,
+    "migrationCreated": false,
+    "privateFilesAccessed": false
+  },
+  "selectedNextMission": "G003_00_ADAPTER_ONLY_READ_MODEL_AND_STATICITY_AUTHORITY"
+}

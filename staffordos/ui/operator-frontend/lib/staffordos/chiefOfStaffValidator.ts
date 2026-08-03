@@ -408,13 +408,14 @@ export const PROFESSIONAL_CHIEF_OF_STAFF_SOURCE_FIXTURES: ChiefOfStaffSourceFixt
     freshness: "Current",
     privacyClassification: "owner_private_professional_fixture",
     immutable: true,
-    title: "Professional workspace planned",
-    contentSummary: "Professional remains planned. No real job, employer, application, interview, meeting, or accomplishment data is connected.",
+    title: "Professional workspace foundation",
+    contentSummary:
+      "Professional has a read-only foundation. No real job, employer, application, interview, meeting, or accomplishment data is connected.",
     exactSourceReference: "staffordos/ui/operator-frontend/lib/staffordos/workspaceRegistry.ts#professional",
-    limitations: ["Planned workspace only. Not available as current operating truth."],
-    availability: "planned",
+    limitations: ["Foundation only. Live Professional records and access controls are not connected."],
+    availability: "available_now",
     supportedClaimIds: ["claim-professional-planned"],
-    supportedStatements: ["Professional is planned and has no real professional data connected."],
+    supportedStatements: ["Professional has a read-only foundation and no real Professional data connected."],
   },
 ];
 

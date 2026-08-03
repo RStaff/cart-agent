@@ -6,6 +6,7 @@ import { DEFAULT_STAFFORDOS_WORKSPACE_ID, WORKSPACE_AVAILABILITY_LABELS } from "
 export function WorkspaceSelector() {
   const { activeWorkspace, availableWorkspaces, setActiveWorkspace } = useStaffordOsWorkspace();
   const isStaffordMedia = activeWorkspace.id === DEFAULT_STAFFORDOS_WORKSPACE_ID;
+  const isProfessional = activeWorkspace.id === "professional";
 
   return (
     <section className="staffordWorkspaceSelector" aria-label="Choose current workspace">
@@ -32,7 +33,9 @@ export function WorkspaceSelector() {
       <p>
         {isStaffordMedia
           ? "Stafford Media is the part of StaffordOS you can use today."
-          : "This workspace is planned. Stafford Media is the part of StaffordOS you can use today."}
+          : isProfessional
+            ? "Professional has a read-only Career foundation. This only changes what /os shows."
+            : "This workspace is planned. Stafford Media is the part of StaffordOS you can use today."}
       </p>
     </section>
   );

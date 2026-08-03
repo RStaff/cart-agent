@@ -35,9 +35,10 @@ function SupportingActionCard({ action }: { action: HomeActionPresentation }) {
   );
 }
 
-function PlannedHome() {
+function WorkspaceOverviewHome() {
   const { activeWorkspace, setActiveWorkspace } = useStaffordOsWorkspace();
   const presentation = homePresentationForWorkspace(activeWorkspace.id);
+  const isProfessional = activeWorkspace.id === "professional";
 
   return (
     <div className="staffordUnifiedHome">
@@ -55,16 +56,22 @@ function PlannedHome() {
 
       <section className="staffordHomePlannedPanel">
         <div>
-          <span className="staffordEyebrow">Planned</span>
-          <h2>What this workspace will support</h2>
+          <span className="staffordEyebrow">{isProfessional ? "Career" : "Planned"}</span>
+          <h2>{isProfessional ? "Professional modes" : "What this workspace will support"}</h2>
           <p>{presentation.limitationNote}</p>
         </div>
 
         <div className="staffordHomePlannedGrid">
           {presentation.plannedCapabilities.map((capability) => (
             <article key={capability.id} className="staffordHomePlannedCard">
+              {capability.status ? <span>{capability.status}</span> : null}
               <h3>{capability.title}</h3>
               <p>{capability.summary}</p>
+              {capability.href ? (
+                <Link href={capability.href} className="staffordHomeActionLink">
+                  {capability.actionLabel || "Open"}
+                </Link>
+              ) : null}
             </article>
           ))}
         </div>
@@ -206,7 +213,7 @@ export function UnifiedHome() {
   const { activeWorkspace } = useStaffordOsWorkspace();
 
   if (activeWorkspace.id !== DEFAULT_STAFFORDOS_WORKSPACE_ID) {
-    return <PlannedHome />;
+    return <WorkspaceOverviewHome />;
   }
 
   return <StaffordMediaHome />;

@@ -42,6 +42,9 @@ export type PlannedHomeCapability = {
   id: string;
   title: string;
   summary: string;
+  status?: string;
+  href?: string | null;
+  actionLabel?: string;
 };
 
 export type HomePresentation = {
@@ -148,26 +151,58 @@ export const STAFFORD_MEDIA_HOME_PRESENTATION: HomePresentation = {
 
 export const PROFESSIONAL_HOME_PRESENTATION: HomePresentation = {
   workspaceId: "professional",
-  heading: "Professional Is Planned",
+  heading: "Professional",
   summary:
-    "This workspace is intended for private career decisions. No professional data is connected yet.",
+    "Use one private Professional workspace for finding work now and succeeding at work later.",
   primaryAction: null,
   supportingActions: [],
   plannedCapabilities: [
     {
+      id: "career-home",
+      title: "Career Home",
+      summary: "A read-only overview for Professional modes, transition rules, and what is connected.",
+      status: "Available now",
+      href: "/os/professional",
+      actionLabel: "Open Career Home",
+    },
+    {
       id: "job-search",
       title: "Job Search",
-      summary: "A future private place to compare opportunities, prepare materials, and follow up.",
+      summary: "Use Job Command to review the current foundation and what still needs Ross's review.",
+      status: "Available now",
+      href: "/os/professional/jobs",
+      actionLabel: "Open Job Command",
     },
     {
       id: "my-job",
       title: "My Job",
-      summary: "A future private place to protect commitments, capture proof, and prepare for growth.",
+      summary: "A planned mode for succeeding in a role after Ross confirms a work transition.",
+      status: "Planned",
+    },
+    {
+      id: "career-evidence",
+      title: "Career Evidence",
+      summary: "Private source intake exists outside Git, but review is not connected to this screen yet.",
+      status: "Not connected yet",
+    },
+    {
+      id: "achievements",
+      title: "Achievements",
+      summary: "Achievement review is planned and will depend on verified career evidence.",
+      status: "Planned",
+    },
+    {
+      id: "learning",
+      title: "Learning",
+      summary: "Professional learning review is planned and will remain separate from Job Search records.",
+      status: "Planned",
     },
   ],
-  evidenceNote: "No jobs, applications, resumes, employers, meetings, or recommendations are connected.",
-  authorityNote: "Professional is owner-private by design.",
-  limitationNote: "Stafford Media is the part of StaffordOS you can use today.",
+  evidenceNote:
+    "Available now: read-only Career Home, Job Command foundation, and local Job Opportunity intake bridge. No private Professional records are connected here.",
+  authorityNote: "Professional is owner-private by design. Workspace selection changes presentation only.",
+  limitationNote:
+    "Not connected yet: canonical career facts, live job ranking, My Job records, employment management, access controls, and external integrations.",
   returnWorkspaceLabel: "Return to Stafford Media",
 };
 

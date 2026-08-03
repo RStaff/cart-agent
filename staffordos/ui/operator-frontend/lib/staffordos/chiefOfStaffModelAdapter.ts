@@ -1031,7 +1031,7 @@ export const CrossWorkspaceLeakAdapter = invalidFixtureAdapter(
   "cross-workspace-leak-adapter",
   "S009.03 cross-workspace leak fixture",
   () => responseWithClaim(
-    "Professional is planned and has no real professional data connected.",
+    "Professional has a read-only foundation and no real Professional data connected.",
     ["source-professional-planned"],
     "claim-adapter-cross-workspace",
   ),

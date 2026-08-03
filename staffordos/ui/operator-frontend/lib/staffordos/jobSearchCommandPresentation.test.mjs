@@ -26,21 +26,30 @@ const implementationSource = [
   shellSource,
 ].join("\n");
 
-function compileModule(source, filename) {
-  const compiled = ts.transpileModule(source, {
-    compilerOptions: {
-      module: ts.ModuleKind.CommonJS,
-      target: ts.ScriptTarget.ES2020,
-    },
-  });
-  const mod = new Module(filename);
-  mod.filename = filename;
-  mod.paths = Module._nodeModulePaths(path.dirname(filename));
-  mod._compile(compiled.outputText, filename);
-  return mod.exports;
+function registerTypeScriptRequire() {
+  const originalTsExtension = Module._extensions[".ts"];
+  Module._extensions[".ts"] = function compileTypeScriptModule(mod, filename) {
+    const source = readFileSync(filename, "utf8");
+    const compiled = ts.transpileModule(source, {
+      compilerOptions: {
+        module: ts.ModuleKind.CommonJS,
+        target: ts.ScriptTarget.ES2020,
+      },
+    });
+    mod._compile(compiled.outputText, filename);
+  };
+  return () => {
+    if (originalTsExtension) {
+      Module._extensions[".ts"] = originalTsExtension;
+    } else {
+      delete Module._extensions[".ts"];
+    }
+  };
 }
 
-const presentation = compileModule(presentationSource, presentationPath);
+const restoreTypeScriptRequire = registerTypeScriptRequire();
+const presentation = requireFromFrontend(presentationPath);
+restoreTypeScriptRequire();
 
 const {
   JOB_COMMAND_PRIMARY_QUESTION,
@@ -85,16 +94,16 @@ test("Job Command does not appear in Personal capability output", () => {
 test("Career navigation is Professional-only", () => {
   assert.equal(careerNavigationForWorkspace("stafford-media").length, 0);
   assert.equal(careerNavigationForWorkspace("personal").length, 0);
-  assert.equal(careerNavigationForWorkspace("professional").length, 6);
-  assert.match(shellSource, /careerNavigationForWorkspace/);
+  assert.equal(careerNavigationForWorkspace("professional").length, 11);
+  assert.match(shellSource, /professionalNavigationForWorkspace/);
   assert.match(shellSource, /activeWorkspace\.id !== "professional"/);
 });
 
-test("Only Job Command is available now", () => {
+test("Career Home and Job Command are available now", () => {
   const availableItems = PROFESSIONAL_CAREER_NAVIGATION.filter((item) => item.status === "available_now");
 
-  assert.deepEqual(availableItems.map((item) => item.label), ["Job Command"]);
-  assert.equal(availableItems[0].href, JOB_COMMAND_ROUTE);
+  assert.deepEqual(availableItems.map((item) => item.label), ["Career Home", "Job Command"]);
+  assert.deepEqual(availableItems.map((item) => item.href), ["/os/professional", JOB_COMMAND_ROUTE]);
 });
 
 test("Opportunities is Planned", () => {
@@ -129,6 +138,20 @@ test("Outcomes is Planned", () => {
   const item = PROFESSIONAL_CAREER_NAVIGATION.find((navItem) => navItem.id === "outcomes");
 
   assert.equal(item.status, "planned");
+  assert.equal(item.href, null);
+});
+
+test("My Job is Planned", () => {
+  const item = PROFESSIONAL_CAREER_NAVIGATION.find((navItem) => navItem.id === "my-job");
+
+  assert.equal(item.status, "planned");
+  assert.equal(item.href, null);
+});
+
+test("Career Evidence is not connected to UI yet", () => {
+  const item = PROFESSIONAL_CAREER_NAVIGATION.find((navItem) => navItem.id === "career-evidence");
+
+  assert.equal(item.status, "not_connected_yet");
   assert.equal(item.href, null);
 });
 

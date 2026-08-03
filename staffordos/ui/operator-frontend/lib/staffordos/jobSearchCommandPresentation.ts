@@ -1,19 +1,17 @@
 import type { StaffordOsWorkspaceId } from "./workspaceRegistry";
+import {
+  PROFESSIONAL_NAVIGATION,
+  type ProfessionalNavigationItem,
+  type ProfessionalNavigationStatus,
+} from "./professionalModes";
 
 export const JOB_COMMAND_WORKSPACE_ID: StaffordOsWorkspaceId = "professional";
 export const JOB_COMMAND_ROUTE = "/os/professional/jobs";
 export const JOB_COMMAND_TITLE = "Job Command";
 export const JOB_COMMAND_PRIMARY_QUESTION = "What should I do next in my job search?";
 
-export type CareerNavigationStatus = "available_now" | "planned";
-
-export type CareerNavigationItem = {
-  id: string;
-  label: string;
-  status: CareerNavigationStatus;
-  href: string | null;
-  description: string;
-};
+export type CareerNavigationStatus = ProfessionalNavigationStatus;
+export type CareerNavigationItem = ProfessionalNavigationItem;
 
 export type JobCommandSection = {
   id: string;
@@ -73,50 +71,7 @@ export type JobCommandPresentation = {
   };
 };
 
-export const PROFESSIONAL_CAREER_NAVIGATION: readonly CareerNavigationItem[] = [
-  {
-    id: "job-command",
-    label: "Job Command",
-    status: "available_now",
-    href: JOB_COMMAND_ROUTE,
-    description: "Review what should move next in the job search.",
-  },
-  {
-    id: "opportunities",
-    label: "Opportunities",
-    status: "planned",
-    href: null,
-    description: "Job intake will be connected in a later governed slice.",
-  },
-  {
-    id: "applications",
-    label: "Applications",
-    status: "planned",
-    href: null,
-    description: "Application records are not connected yet.",
-  },
-  {
-    id: "relationships",
-    label: "Relationships",
-    status: "planned",
-    href: null,
-    description: "People and follow-up records are not connected yet.",
-  },
-  {
-    id: "interviews",
-    label: "Interviews",
-    status: "planned",
-    href: null,
-    description: "Interview records are not connected yet.",
-  },
-  {
-    id: "outcomes",
-    label: "Outcomes",
-    status: "planned",
-    href: null,
-    description: "Governed outcome records are not connected yet.",
-  },
-] as const;
+export const PROFESSIONAL_CAREER_NAVIGATION: readonly CareerNavigationItem[] = PROFESSIONAL_NAVIGATION;
 
 export const JOB_SEARCH_COMMAND_PRESENTATION: JobCommandPresentation = {
   workspaceId: JOB_COMMAND_WORKSPACE_ID,

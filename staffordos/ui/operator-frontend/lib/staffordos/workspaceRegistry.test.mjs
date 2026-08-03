@@ -34,7 +34,7 @@ test("workspace registry contains exactly the approved initial families", () => 
 
 test("workspace availability matches the owner-first launch boundary", () => {
   assert.match(registrySource, /id: "stafford-media"[\s\S]*?availability: "available_now"/);
-  assert.match(registrySource, /id: "professional"[\s\S]*?availability: "planned"/);
+  assert.match(registrySource, /id: "professional"[\s\S]*?availability: "available_now"/);
   assert.match(registrySource, /id: "personal"[\s\S]*?availability: "planned"/);
 });
 
@@ -47,15 +47,17 @@ test("Stafford Media capabilities are the only current operator links", () => {
   assert.ok(staffordMediaCapabilities.every((block) => /currentRoute: "\/operator/.test(block)));
   assert.ok(professionalCapabilities.length > 0);
   assert.ok(personalCapabilities.length > 0);
-  assert.ok(professionalCapabilities.every((block) => /currentRoute: null/.test(block)));
+  assert.ok(professionalCapabilities.every((block) => !/currentRoute: "\/operator/.test(block)));
+  assert.ok(professionalCapabilities.some((block) => /id: "professional-career-home"[\s\S]*?currentRoute: "\/os\/professional"/.test(block)));
+  assert.ok(professionalCapabilities.some((block) => /id: "professional-job-search"[\s\S]*?currentRoute: "\/os\/professional\/jobs"/.test(block)));
   assert.ok(personalCapabilities.every((block) => /currentRoute: null/.test(block)));
 });
 
-test("Professional and Personal planned content do not expose Stafford Media operator routes", () => {
+test("Professional and Personal content do not expose Stafford Media operator routes", () => {
   const plannedCapabilitySource = [...capabilityBlocksFor("professional"), ...capabilityBlocksFor("personal")].join("\n");
 
   assert.doesNotMatch(plannedCapabilitySource, /currentRoute: "\/operator/);
-  assert.doesNotMatch(plannedCapabilitySource, /technicalNote: "Current route:/);
+  assert.doesNotMatch(plannedCapabilitySource, /technicalNote: "Current route: \/operator/);
 });
 
 test("existing Stafford Media capability links remain correct", () => {

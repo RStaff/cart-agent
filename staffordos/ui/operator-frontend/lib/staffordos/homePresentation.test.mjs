@@ -60,11 +60,15 @@ test("Stafford Media Home does not claim live AI ranking", () => {
   assert.doesNotMatch(visibleHomeSource, /ranking algorithm/);
 });
 
-test("Professional Home is planned content only", () => {
+test("Professional Home shows available foundation without private records", () => {
   const professionalBlock = presentationBlock("professional");
 
   assert.match(professionalBlock, /primaryAction: null/);
-  assert.match(professionalBlock, /No jobs, applications, resumes, employers, meetings, or recommendations are connected/);
+  assert.match(professionalBlock, /Use one private Professional workspace for finding work now and succeeding at work later/);
+  assert.match(professionalBlock, /Career Home/);
+  assert.match(professionalBlock, /Job Search/);
+  assert.match(professionalBlock, /My Job/);
+  assert.match(professionalBlock, /No private Professional records are connected here/);
   assert.doesNotMatch(professionalBlock, /continueHref: "\/operator/);
   assert.doesNotMatch(professionalBlock, /currentRoute: "\/operator/);
 });

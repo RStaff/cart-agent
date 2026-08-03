@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
-import { careerNavigationForWorkspace } from "../../lib/staffordos/jobSearchCommandPresentation";
+import { professionalNavigationForWorkspace } from "../../lib/staffordos/professionalModes";
 import { STAFFORDOS_SECTIONS } from "../../lib/staffordos/workspaces";
 import { DEFAULT_STAFFORDOS_WORKSPACE_ID } from "../../lib/staffordos/workspaceRegistry";
 import { StaffordOsWorkspaceProvider, useStaffordOsWorkspace } from "./WorkspaceContext";
@@ -22,7 +22,7 @@ function StaffordOsShellFrame({ children }: StaffordOsShellProps) {
   const pathname = usePathname();
   const { activeWorkspace, setActiveWorkspace } = useStaffordOsWorkspace();
   const isProfessionalRoute = pathname.startsWith("/os/professional");
-  const careerNavigation = careerNavigationForWorkspace(
+  const professionalNavigation = professionalNavigationForWorkspace(
     isProfessionalRoute ? "professional" : activeWorkspace.id,
   );
   const capabilityNavLabel =
@@ -58,10 +58,10 @@ function StaffordOsShellFrame({ children }: StaffordOsShellProps) {
           ))}
         </nav>
 
-        {careerNavigation.length ? (
+        {professionalNavigation.length ? (
           <section className="staffordOsNavGroup" aria-label="Career">
             <span className="staffordOsNavGroupLabel">Career</span>
-            {careerNavigation.map((item) =>
+            {professionalNavigation.map((item) =>
               item.href ? (
                 <Link
                   key={item.id}

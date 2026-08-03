@@ -230,7 +230,7 @@ export const CHIEF_OF_STAFF_BLOCKED_EXAMPLES: ChiefOfStaffBlockedExample[] = [
     "An answer cites another workspace while answering Stafford Media.",
     responseWithClaim(sourceFact({
       claimId: "claim-demo-cross-workspace-source",
-      statement: "Professional is planned and has no real professional data connected.",
+      statement: "Professional has a read-only foundation and no real Professional data connected.",
       supportingSourceIds: ["source-professional-planned"],
     })),
     [
@@ -265,8 +265,9 @@ export const PROFESSIONAL_CHIEF_OF_STAFF_DEMO_PRESENTATION: ChiefOfStaffPlannedP
   workspaceId: "professional",
   kind: "planned",
   title: "Chief of Staff",
-  summary: "This workspace is planned. Professional data is not connected, so no Chief of Staff response is shown here.",
-  status: "Planned",
+  summary:
+    "Professional has a read-only foundation. Professional data is not connected to Chief of Staff yet, so no response is shown here.",
+  status: "Not connected yet",
   returnLabel: "Return to Stafford Media",
   sources: [],
 };

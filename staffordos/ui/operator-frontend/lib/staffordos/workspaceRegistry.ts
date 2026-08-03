@@ -19,6 +19,10 @@ export type StaffordOsWorkspace = {
   languageProfile: string;
   privacyClassification: string;
   currentAuthorityStatus: string;
+  supportedModes?: string[];
+  currentDefaultMode?: string;
+  modeLabels?: string[];
+  limitations?: string[];
   plannedModes?: string[];
   futureCapabilityGroups?: string[];
 };
@@ -59,22 +63,31 @@ export const STAFFORDOS_WORKSPACES: StaffordOsWorkspace[] = [
   {
     id: "professional",
     name: "Professional",
-    shortDescription: "Plan private career decisions before and after employment.",
+    shortDescription: "Manage private career work for finding work now and succeeding at work later.",
     family: "professional",
-    availability: "planned",
-    ownerAccess: "Owner-only placeholder.",
+    availability: "available_now",
+    ownerAccess: "Owner can use the read-only Professional foundation today.",
     invitedAccess: "No invited access planned by default.",
     enabledSections: ["home", "command", "work", "pipeline", "knowledge", "governance", "system"],
     enabledCapabilities: [
+      "professional-career-home",
       "professional-job-search",
       "professional-application-materials",
       "professional-interview-prep",
       "professional-current-role",
     ],
-    languageProfile: "Private professional planning.",
+    languageProfile: "Private Professional planning across Job Search and My Job.",
     privacyClassification: "Owner-private.",
-    currentAuthorityStatus: "Architecture defined; no runtime workflow yet.",
-    plannedModes: ["Job Search", "My Job"],
+    currentAuthorityStatus:
+      "Foundation available: Career Home, Job Command, and local intake bridge; live Professional records and access controls are not connected.",
+    supportedModes: ["CAREER_HOME", "JOB_SEARCH", "MY_JOB"],
+    currentDefaultMode: "CAREER_HOME",
+    modeLabels: ["Career Home", "Job Search", "My Job"],
+    limitations: [
+      "Private Professional records remain outside Git.",
+      "My Job is planned and has no runtime records.",
+      "Workspace selection changes presentation only.",
+    ],
   },
   {
     id: "personal",

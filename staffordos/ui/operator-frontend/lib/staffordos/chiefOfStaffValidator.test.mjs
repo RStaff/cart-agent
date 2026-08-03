@@ -172,7 +172,7 @@ test("response workspace mismatch fails", () => {
 test("cross-workspace source fails", () => {
   const response = minimalResponse(sourceFact({
     claimId: "claim-professional-leak",
-    statement: "Professional is planned and has no real professional data connected.",
+    statement: "Professional has a read-only foundation and no real Professional data connected.",
     supportingSourceIds: ["source-professional-planned"],
   }));
   const sources = [...STAFFORD_MEDIA_CHIEF_OF_STAFF_SOURCE_FIXTURES, ...PROFESSIONAL_CHIEF_OF_STAFF_SOURCE_FIXTURES];
@@ -187,15 +187,15 @@ test("disallowed source type fails", () => {
   expectError(validate(validResponse(), STAFFORD_MEDIA_CHIEF_OF_STAFF_SOURCE_FIXTURES, request), "SOURCE_NOT_ALLOWED");
 });
 
-test("planned Professional capability presented as available fails", () => {
+test("Professional foundation source cannot support Stafford Media availability claims", () => {
   const response = minimalResponse(sourceFact({
     claimId: "claim-professional-available-now",
-    statement: "Professional is available now.",
+    statement: "Professional is available now at foundation level.",
     supportingSourceIds: ["source-professional-planned"],
   }));
   const sources = [...STAFFORD_MEDIA_CHIEF_OF_STAFF_SOURCE_FIXTURES, ...PROFESSIONAL_CHIEF_OF_STAFF_SOURCE_FIXTURES];
 
-  expectError(validate(response, sources), "PLANNED_CAPABILITY_PRESENTED_AS_AVAILABLE");
+  expectError(validate(response, sources), "SOURCE_WORKSPACE_MISMATCH");
 });
 
 test("planned Personal capability presented as available fails", () => {
@@ -469,10 +469,14 @@ test("validator does not mutate its inputs", () => {
   assert.equal(JSON.stringify({ request, sources, response }), before);
 });
 
-test("Professional and Personal fixtures remain planned-only", () => {
+test("Professional fixture reflects foundation while Personal remains planned-only", () => {
   assert.ok(PROFESSIONAL_CHIEF_OF_STAFF_SOURCE_FIXTURES.length > 0);
   assert.ok(PERSONAL_CHIEF_OF_STAFF_SOURCE_FIXTURES.length > 0);
-  assert.ok(PROFESSIONAL_CHIEF_OF_STAFF_SOURCE_FIXTURES.every((source) => source.availability === "planned"));
+  assert.ok(PROFESSIONAL_CHIEF_OF_STAFF_SOURCE_FIXTURES.every((source) => source.availability === "available_now"));
+  assert.match(
+    PROFESSIONAL_CHIEF_OF_STAFF_SOURCE_FIXTURES.map((source) => source.supportedStatements.join(" ")).join(" "),
+    /read-only foundation/,
+  );
   assert.ok(PERSONAL_CHIEF_OF_STAFF_SOURCE_FIXTURES.every((source) => source.availability === "planned"));
 });
 

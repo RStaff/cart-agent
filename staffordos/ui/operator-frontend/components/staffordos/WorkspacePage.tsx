@@ -23,14 +23,19 @@ const FOUNDATION_STATES = [
 
 function PlannedWorkspaceSummary() {
   const { activeWorkspace, setActiveWorkspace } = useStaffordOsWorkspace();
-  const plannedItems = activeWorkspace.plannedModes || activeWorkspace.futureCapabilityGroups || [];
+  const isProfessional = activeWorkspace.id === "professional";
+  const plannedItems = activeWorkspace.modeLabels || activeWorkspace.plannedModes || activeWorkspace.futureCapabilityGroups || [];
 
   return (
     <section className="staffordPlannedWorkspace">
       <div>
-        <span className="staffordEyebrow">Planned workspace</span>
-        <h2>{activeWorkspace.name} is planned</h2>
-        <p>This workspace is planned. Stafford Media is the part of StaffordOS you can use today.</p>
+        <span className="staffordEyebrow">{isProfessional ? "Professional foundation" : "Planned workspace"}</span>
+        <h2>{isProfessional ? "Professional modes" : `${activeWorkspace.name} is planned`}</h2>
+        <p>
+          {isProfessional
+            ? "Professional supports finding work now and succeeding at work later. This section is not connected to Professional records yet."
+            : "This workspace is planned. Stafford Media is the part of StaffordOS you can use today."}
+        </p>
       </div>
 
       {plannedItems.length ? (
@@ -51,12 +56,15 @@ function PlannedWorkspaceSummary() {
 export function WorkspacePage({ section, children }: WorkspacePageProps) {
   const { activeWorkspace } = useStaffordOsWorkspace();
   const isStaffordMedia = activeWorkspace.id === DEFAULT_STAFFORDOS_WORKSPACE_ID;
+  const isProfessional = activeWorkspace.id === "professional";
   const heading = section.key === "home" ? activeWorkspace.name : section.label;
   const intro = isStaffordMedia
     ? section.key === "home"
       ? "What StaffordOS can help with today."
       : section.operatingQuestion
-    : "This workspace is planned. Stafford Media is the part of StaffordOS you can use today.";
+    : isProfessional
+      ? "Professional has a read-only foundation. Live Professional records are not connected to this section yet."
+      : "This workspace is planned. Stafford Media is the part of StaffordOS you can use today.";
   const statusLabel = isStaffordMedia ? "Current operating workspace" : activeWorkspace.currentAuthorityStatus;
 
   return (

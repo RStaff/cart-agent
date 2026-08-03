@@ -147,12 +147,14 @@ test("safe UNKNOWN fallback is present", () => {
   );
 });
 
-test("Professional returns planned-state presentation only", () => {
+test("Professional Chief of Staff remains not connected without calling the workspace planned", () => {
   const presentation = getChiefOfStaffDemoPresentation("professional");
 
   assert.equal(presentation.kind, "planned");
   assert.equal(presentation.sources.length, 0);
-  assert.match(presentation.summary, /Professional data is not connected/);
+  assert.match(presentation.summary, /Professional has a read-only foundation/);
+  assert.match(presentation.summary, /Professional data is not connected to Chief of Staff yet/);
+  assert.equal(presentation.status, "Not connected yet");
 });
 
 test("Personal returns planned-state presentation only", () => {
