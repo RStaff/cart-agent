@@ -1,0 +1,137 @@
+{
+  "schema": "staffordos.enterprise_architecture_review.v1",
+  "review": "STAFFORDOS_INDEPENDENT_ENTERPRISE_ARCHITECTURE_REVIEW_V1",
+  "reviewer_posture": "independent_principal_enterprise_architect",
+  "basis": "repository_evidence_only",
+  "final_classification": "STAFFORDOS_ARCHITECTURE_SOUND_WITH_CORRECTIONS",
+  "companion_artifacts": [
+    "staffordos/architecture/STAFFORDOS_ENTERPRISE_ARCHITECTURE_REVIEW_V1.md",
+    "staffordos/architecture/STAFFORDOS_TARGET_PLATFORM_AND_WORKSPACE_MODEL_V2.md",
+    "staffordos/architecture/STAFFORDOS_MEDIA_AND_PROVIDER_BOUNDARY_V1.md",
+    "staffordos/architecture/STAFFORDOS_ANTI_DRIFT_REGISTER_V1.md"
+  ],
+  "certified_model_verification": {
+    "parent_os_trajectory": "confirmed_at_shell_and_architecture_layer",
+    "os_not_duplicating_operator": "confirmed_in_code_zero_shared_loaders_or_writes",
+    "operator_runtime_canonical": "confirmed_root_redirect_and_live_loaders",
+    "ai_advisory_only": "confirmed_fixture_demo_validator_localhost_proof_only",
+    "private_professional_records_outside_git": "confirmed_zero_tracked_private_files",
+    "workspace_families": ["stafford-media", "professional", "personal"],
+    "family_media_creative_as_capabilities": "confirmed_no_premature_elevation"
+  },
+  "key_findings": [
+    {
+      "id": "F1",
+      "title": "Repo-as-database",
+      "severity": "high",
+      "status": "actual",
+      "evidence": "/operator write routes and server actions write git-tracked JSON (staffordos/events/*, snapshots, proof_runs); the local untracked ADR_0001 artifact concedes file-backed surfaces are not durable on Render",
+      "correction": "Execute ADR_0001: move runtime truth to Postgres; Git keeps code, doctrine, sealed evidence exports"
+    },
+    {
+      "id": "F2",
+      "title": "Duplicated truth",
+      "severity": "high",
+      "status": "actual",
+      "evidence": ">=11 lead/merchant/client/contact stores reconciled at read time by relationshipResolver.ts with explicit conflict states; 3 decision stores; 3+ action stores; 4 evidence representations; 3 mission-ID namespaces; triple-defined workspace taxonomy",
+      "correction": "Single persistence authority per object; Party/Relationship consolidation; mission-namespace reconciliation doc"
+    },
+    {
+      "id": "F3",
+      "title": "Identity built but unplugged",
+      "severity": "high_at_network_exposure",
+      "status": "actual",
+      "evidence": "operator-issuer (EdDSA JWT, roles) + Prisma StaffordosOperator* models + web verifier exist; observed write-capable UI surfaces include 5 POST API routes and 10 server-action directives; issuer permissions all shopifixer.*; role maps duplicated in two codebases",
+      "correction": "Minimal token on write endpoints now (or accepted-risk record while local-only); deploy issuer + generalize permissions before any second user"
+    },
+    {
+      "id": "F4",
+      "title": "Static registries vs runtime truth divergence",
+      "severity": "medium",
+      "status": "actual_once_observed",
+      "evidence": "All S008 foundations are hardcoded TS arrays with no write path; one real private job opportunity exists on disk while committed UI permanently renders empty queue",
+      "correction": "asOf/freshness labeling; governed read-model adapters (S009_05 pattern) as the only wiring path"
+    },
+    {
+      "id": "F5",
+      "title": "Uncommitted authority chain",
+      "severity": "medium_high",
+      "status": "actual_recurring",
+      "evidence": "J001 discovery docs (cited by committed J001_01), operator-issuer, M007/M008/RECOVERY_001 records, and many other governance artifacts are untracked; A001 validation observed 153 untracked paths before review ratification; same pattern flagged in P11.58",
+      "correction": "Containment commit wave; treat cited-authority-must-be-committed as a gate rule"
+    },
+    {
+      "id": "F6",
+      "title": "Private-data defense is single-layer",
+      "severity": "medium",
+      "status": "risk",
+      "evidence": "Code guards reject repo-internal private paths (privateCareerEvidenceIntake.ts, privateJobOpportunityIntake.ts); zero private files tracked; but no .gitignore entries for *.private.json, staffordos-private-intake/, .staffordos/",
+      "correction": "Add .gitignore backstop (defense in depth)"
+    },
+    {
+      "id": "F7",
+      "title": "Professional registry contradiction",
+      "severity": "low",
+      "status": "actual",
+      "evidence": "workspaceRegistry.ts says Professional 'planned / no runtime workflow yet' while /os/professional/jobs ships as Available now (J001_01)",
+      "correction": "Update registry; add professionalMode field (job_search|my_job|mode_neutral) to Professional contracts"
+    },
+    {
+      "id": "F8",
+      "title": "Asset/file authority absent and needed before Media",
+      "severity": "medium",
+      "status": "gap",
+      "evidence": "Evidence manifest contains machine-specific /var/folders temp paths with exists:false; 4 evidence representations; no asset model",
+      "correction": "Adopt Asset model per review section 12 before any Personal/Media implementation"
+    }
+  ],
+  "architecture_answers": {
+    "parent_os": "becoming_parent_os_at_shell_layer_data_plane_unification_missing",
+    "workspace_model": "three_families_sufficient_family_media_creative_remain_capabilities",
+    "professional_continuity": "clean_transition_supported_by_fact_evidence_positioning_doctrine_add_mode_field",
+    "ui_authority": "boundary_sound_and_held_duplication_is_staleness_and_legacy_not_code",
+    "media_boundary": "jellyfin_playback_and_library_catalog_authority_staffordos_governance_overlay_only",
+    "content_creation": "one_shared_studio_viable_only_on_asset_model_publication_authority_per_workspace",
+    "child_safety": "full_gate_stack_defined_nothing_needed_until_multi_user",
+    "provider_model": "s009_adapter_is_canonical_template_formalize_contract_for_all_providers",
+    "deployment": "three_tier_target_cloud_home_server_device_local_current_blocker_is_repo_as_database"
+  },
+  "roadmap": {
+    "before_more_job_search": [
+      "commit uncommitted authority chain",
+      "gitignore backstop for private paths",
+      "fix Professional registry contradiction + professionalMode field",
+      "governed read-adapter rule for jobs queue wiring",
+      "minimal auth on write endpoints or accepted-risk record"
+    ],
+    "before_personal_media": [
+      "ratify Asset/File authority model",
+      "define membership + guardian model",
+      "ratify media/provider boundary",
+      "ADR_0001 execution plan (events/snapshots/actions to Postgres first)"
+    ],
+    "can_wait_until_abando_scale": [
+      "Party/Relationship consolidation (11 to 1)",
+      "email mechanism unification"
+    ],
+    "can_wait_until_multi_user": [
+      "full RBAC in UI",
+      "notifications",
+      "search",
+      "share tokens"
+    ],
+    "long_term_only": [
+      "mission namespace unification",
+      "legacy UI deletion wave",
+      "cockpit/command-center consolidation",
+      "monorepo product split"
+    ]
+  },
+  "non_impact_confirmation": {
+    "source_code_modified": false,
+    "routes_components_schemas_migrations_created": false,
+    "commits_or_pushes": false,
+    "existing_authority_documents_modified": false,
+    "artifacts_created_documentation_only": 5
+  }
+}
