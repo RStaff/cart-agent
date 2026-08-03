@@ -1,0 +1,506 @@
+{
+  "mission": "S010_01_JOB_OPPORTUNITY_AND_REQUIREMENT_CONTRACT",
+  "mission_type": "repository-first narrow local contract implementation, deterministic fixtures, focused tests, documentation, validation, and governed local commit",
+  "checkpoint_authority": {
+    "starting_head_required": "8b859d067f6ef5a075e251f4af44f8d2a1be47f5",
+    "starting_head_verified": "8b859d067f6ef5a075e251f4af44f8d2a1be47f5",
+    "branch": "main",
+    "preexisting_s010_01_artifact_found": false,
+    "preexisting_contract_found": false,
+    "authorities_verified": [
+      "staffordos/architecture/STAFFORDOS_ARCHITECTURE_V1.md",
+      "S008 Professional workspace architecture",
+      "S008 Objective Foundation",
+      "S008 Decision Foundation",
+      "S008 Action Foundation",
+      "S008 Evidence Foundation",
+      "S008 Proof Foundation",
+      "S008 Learning Foundation",
+      "S009 Chief of Staff contracts and validators",
+      "staffordos/architecture/S010_00_PROFESSIONAL_WORKSPACE_JOB_SEARCH_COMMAND_DISCOVERY.md",
+      "current workspace registry",
+      "current capability registry",
+      "S008 operator language standard"
+    ],
+    "baseline": {
+      "professional_job_search": "architecture-defined, not runtime-backed",
+      "professional": "Planned",
+      "job_search_privacy": "owner-private by default",
+      "canonical_job_opportunity_store_exists": false,
+      "canonical_job_requirement_contract_exists": false,
+      "canonical_resume_authority_exists": false,
+      "real_job_record_authorized": false,
+      "bosch_durable_record_exists": false,
+      "local_deterministic_fixtures_authorized": true,
+      "runtime_persistence_requires_future_authority": true,
+      "ross_approval_authority": true
+    }
+  },
+  "working_tree_exclusions": {
+    "status": "broad preexisting unrelated dirty tree excluded",
+    "categories": [
+      "RUNTIME_OR_DAEMON",
+      "WEB_OR_PRISMA",
+      "S007_IDENTITY_OR_ISSUER",
+      "MISSION_EVIDENCE",
+      "GENERATED",
+      "PREEXISTING_UNRELATED",
+      "UNKNOWN_REQUIRES_REVIEW"
+    ],
+    "authorized_files": [
+      "staffordos/ui/operator-frontend/lib/staffordos/jobSearchContracts.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/jobSearchContracts.test.mjs",
+      "staffordos/architecture/S010_01_JOB_OPPORTUNITY_AND_REQUIREMENT_CONTRACT.md",
+      "staffordos/architecture/S010_01_JOB_OPPORTUNITY_AND_REQUIREMENT_CONTRACT.json"
+    ]
+  },
+  "ollama_stopped_state": {
+    "port_11434_listener": false,
+    "ollama_started": false,
+    "ollama_invoked": false
+  },
+  "existing_contract_discovery": {
+    "compatible_job_opportunity_contract_found": false,
+    "compatible_job_requirement_contract_found": false,
+    "canonical_reusable": [
+      "workspaceRegistry.ts Professional planned workspace",
+      "capabilities.ts professional-job-search planned capability",
+      "S008 planned Professional boundaries",
+      "S010.00 selected contract slice"
+    ],
+    "not_suitable": [
+      "candidate_opportunities merchant opportunity generation",
+      "web/src/jobs execution queue",
+      "Prisma Job execution queue"
+    ],
+    "reuse_concept_only": [
+      "/operator lead surfaces",
+      "/operator campaign surfaces",
+      "/operator relationship surfaces"
+    ]
+  },
+  "job_source_contract": {
+    "fields": [
+      "id",
+      "workspaceId",
+      "sourceType",
+      "providerName",
+      "providerRecordId",
+      "sourceUrl",
+      "canonicalUrl",
+      "observedAt",
+      "publishedAt",
+      "updatedAt",
+      "retrievedBy",
+      "authorityClassification",
+      "freshness",
+      "privacyClassification",
+      "termsOrAccessLimitation",
+      "rawContentReference",
+      "contentDigest",
+      "duplicateGroupId",
+      "status",
+      "limitations",
+      "testOnly"
+    ],
+    "source_types": [
+      "Employer career site",
+      "Recruiter-provided",
+      "Professional network",
+      "Job board",
+      "Operator-entered",
+      "Imported document",
+      "Historical continuity context",
+      "Needs verification"
+    ],
+    "rules_enforced": [
+      "workspaceId must be professional",
+      "fixtures must be testOnly",
+      "provider IDs and URLs are aliases",
+      "source URL does not prove listing open",
+      "missing published and updated dates remain Unknown or Needs verification",
+      "historical context cannot appear current",
+      "rawContentReference and contentDigest preserve source content authority"
+    ]
+  },
+  "job_opportunity_contract": {
+    "fields": [
+      "id",
+      "workspaceId",
+      "sourceId",
+      "companyId",
+      "companyName",
+      "roleTitle",
+      "roleTitleNormalized",
+      "employmentType",
+      "seniority",
+      "locationText",
+      "workArrangement",
+      "compensationText",
+      "compensationMinimum",
+      "compensationMaximum",
+      "compensationCurrency",
+      "compensationPeriod",
+      "description",
+      "responsibilities",
+      "qualificationsSummary",
+      "applicationUrl",
+      "discoveredAt",
+      "publishedAt",
+      "sourceUpdatedAt",
+      "listingFreshness",
+      "opportunityStatus",
+      "operatorInterest",
+      "privacyClassification",
+      "authorityClassification",
+      "sourceReference",
+      "duplicateStatus",
+      "duplicateGroupId",
+      "limitations",
+      "createdAt",
+      "updatedAt",
+      "testOnly"
+    ],
+    "rules_enforced": [
+      "workspaceId must be professional",
+      "privacyClassification must be Professional owner-private",
+      "unknown values remain null or explicitly unknown",
+      "unsupported statuses fail",
+      "missing status does not become open",
+      "sourceId must reference supplied JobSource",
+      "numeric compensation requires source compensation text",
+      "Application fields are rejected",
+      "fit-assessment fields are rejected"
+    ],
+    "not_inferred": [
+      "compensation",
+      "seniority",
+      "remote eligibility",
+      "sponsorship",
+      "hiring urgency",
+      "application deadline",
+      "recruiter identity",
+      "likelihood of interview",
+      "likelihood of offer"
+    ]
+  },
+  "opportunity_status_model": [
+    { "status": "DISCOVERED", "label": "Found", "terminal": false, "ross_approval_required": false },
+    { "status": "UNDER_REVIEW", "label": "Reviewing fit", "terminal": false, "ross_approval_required": false },
+    { "status": "QUALIFIED", "label": "Worth applying", "terminal": false, "ross_approval_required": true },
+    { "status": "LOW_PRIORITY", "label": "Low priority", "terminal": false, "ross_approval_required": false },
+    { "status": "REJECTED_BY_ROSS", "label": "Passed on this role", "terminal": true, "ross_approval_required": true },
+    { "status": "CLOSED", "label": "Closed", "terminal": true, "ross_approval_required": true },
+    { "status": "NEEDS_VERIFICATION", "label": "Needs verification", "terminal": false, "ross_approval_required": false }
+  ],
+  "job_requirement_contract": {
+    "fields": [
+      "id",
+      "workspaceId",
+      "jobOpportunityId",
+      "sourceId",
+      "requirementText",
+      "normalizedRequirement",
+      "requirementCategory",
+      "requirementLevel",
+      "importanceClassification",
+      "evidenceExpectation",
+      "yearsMentioned",
+      "degreeMentioned",
+      "certificationMentioned",
+      "technologyOrSkill",
+      "responsibilityOrQualification",
+      "extractionMethod",
+      "extractionConfidence",
+      "sourceExcerptReference",
+      "operatorReviewStatus",
+      "ambiguity",
+      "limitations",
+      "createdAt",
+      "testOnly"
+    ],
+    "categories": [
+      "Required skill",
+      "Preferred skill",
+      "Experience",
+      "Leadership",
+      "Domain",
+      "Education",
+      "Certification",
+      "Responsibility",
+      "Location or work arrangement",
+      "Compensation",
+      "Travel",
+      "Legal or employment eligibility",
+      "Other",
+      "Unknown"
+    ],
+    "levels": [
+      "REQUIRED",
+      "PREFERRED",
+      "DESIRED",
+      "RESPONSIBILITY",
+      "INFORMATIONAL",
+      "UNCLEAR"
+    ],
+    "rules_enforced": [
+      "required and preferred language remain distinct",
+      "ambiguous requirements remain UNCLEAR",
+      "or equivalent wording is preserved",
+      "years of experience must appear in source text",
+      "sourceExcerptReference is required",
+      "fit and application fields are rejected"
+    ]
+  },
+  "extraction_authority": {
+    "methods": [
+      "SOURCE_EXPLICIT",
+      "OPERATOR_ENTERED",
+      "DETERMINISTIC_EXTRACTION",
+      "AI_PROPOSED",
+      "IMPORTED",
+      "NEEDS_REVIEW"
+    ],
+    "rules": [
+      "AI_PROPOSED cannot be operator-confirmed in this contract",
+      "source text must trace to a passage or section",
+      "normalized text must preserve meaning",
+      "ambiguous language stays ambiguous",
+      "years of experience are not invented",
+      "degree and certification language preserves exact wording",
+      "no Ross fit classification is assigned"
+    ],
+    "ai_called": false
+  },
+  "durable_id_and_duplicate_model": {
+    "id_prefixes": {
+      "JobSource": "jobsrc_",
+      "JobOpportunity": "jobopp_",
+      "JobRequirement": "jobreq_"
+    },
+    "forbidden_primary_ids": [
+      "URL",
+      "canonical URL",
+      "provider record ID",
+      "company plus title"
+    ],
+    "duplicate_statuses": [
+      "NOT_EVALUATED",
+      "POSSIBLE_DUPLICATE",
+      "CONFIRMED_DUPLICATE",
+      "DISTINCT_LISTING",
+      "SUPERSEDED_LISTING"
+    ],
+    "fuzzy_matching_implemented": false,
+    "silent_merge_allowed": false
+  },
+  "freshness_and_staleness": {
+    "classifications": [
+      "Current",
+      "Recent",
+      "Historical",
+      "Unknown",
+      "Stale",
+      "Closed by source",
+      "Needs verification"
+    ],
+    "universal_thresholds_defined": false,
+    "operator_language": [
+      "Recently observed",
+      "Source date unknown",
+      "Listing may be stale",
+      "Source reports closed",
+      "Needs verification"
+    ]
+  },
+  "privacy_and_workspace_boundary": {
+    "required_workspace": "professional",
+    "current_fixture_scope": "synthetic owner-private Professional handling",
+    "forbidden_workspaces": [
+      "stafford-media",
+      "personal",
+      "family"
+    ],
+    "stafford_media_access": false,
+    "guest_employee_contractor_access": false,
+    "workspace_context_is_authorization": false
+  },
+  "authority_classifications": [
+    "Source explicit",
+    "Operator confirmed",
+    "Derived normalization",
+    "Imported",
+    "AI proposed",
+    "Historical continuity context",
+    "Needs verification"
+  ],
+  "static_fixtures": {
+    "job_sources": 2,
+    "job_opportunities": 2,
+    "job_requirements": 8,
+    "all_test_only": true,
+    "coverage": [
+      "clear employer-source role",
+      "listing with unknown source date and incomplete compensation",
+      "required requirement",
+      "preferred requirement",
+      "ambiguous requirement",
+      "education requirement with or equivalent language",
+      "work-arrangement information",
+      "possible duplicate classification"
+    ],
+    "real_records_created": false,
+    "bosch_record_created": false,
+    "resume_evidence_created": false
+  },
+  "failure_behavior": {
+    "throws_for_expected_failures": false,
+    "covered_failures": [
+      "missing workspace",
+      "wrong workspace",
+      "missing source",
+      "missing role title",
+      "missing company",
+      "malformed URL",
+      "source URL used as primary ID",
+      "provider record ID used as primary ID",
+      "unsupported source or opportunity status",
+      "requirement missing source trace",
+      "required/preferred meaning changed",
+      "invented years of experience",
+      "listing falsely classified as open",
+      "historical context presented as current",
+      "duplicate silently merged",
+      "Personal or Business workspace leakage",
+      "Application fields added too early",
+      "fit-assessment fields added too early"
+    ]
+  },
+  "immutability_and_provenance": {
+    "fixtures_frozen": true,
+    "validators_mutate_inputs": false,
+    "preserved": [
+      "source ID",
+      "source reference",
+      "content reference",
+      "content digest",
+      "normalization boundary",
+      "extraction method",
+      "authority",
+      "freshness",
+      "limitations"
+    ]
+  },
+  "application_boundary": {
+    "job_opportunity_is_application": false,
+    "application_created": false,
+    "forbidden_fields": [
+      "application date",
+      "submitted status",
+      "recruiter response",
+      "interview state",
+      "employer rejection state",
+      "offer state"
+    ],
+    "rejected_by_ross_meaning": "Ross chose not to pursue the role, not employer rejection"
+  },
+  "fit_assessment_boundary": {
+    "job_requirement_implies_ross_has_requirement": false,
+    "candidate_evidence_created": false,
+    "job_fit_assessment_created": false,
+    "forbidden_fields": [
+      "fit percentage",
+      "apply recommendation",
+      "skill match",
+      "years match",
+      "resume recommendation",
+      "likelihood of success",
+      "evidence classification for Ross",
+      "placeholder scores"
+    ]
+  },
+  "chief_of_staff_compatibility": {
+    "future_source_types_defined": [
+      "job_opportunity_snapshot",
+      "job_requirement_snapshot"
+    ],
+    "compatibility_fields": [
+      "source ID",
+      "workspace",
+      "authority",
+      "freshness",
+      "privacy",
+      "exact source reference",
+      "limitations",
+      "excluded fields",
+      "permission requirement"
+    ],
+    "s009_validator_modified": false,
+    "ollama_invoked": false,
+    "model_snapshot_created": false
+  },
+  "tests": {
+    "focused": "node --test staffordos/ui/operator-frontend/lib/staffordos/jobSearchContracts.test.mjs: 37/37 passed",
+    "s009_regression": "node --test Chief of Staff validator, demo, model adapter, Ollama adapter, and Primary Action source-adapter tests: 126/126 passed",
+    "s008_regression": "node --test workspace, Home, Objective, Decision, Action, Evidence, Proof, and Learning foundation tests: 127/127 passed",
+    "build": "npm run build in staffordos/ui/operator-frontend exited 0; route generation completed; existing Next/Turbopack warnings observed for next.config.mjs NFT trace and /operator/shopifixer-pilot static generation"
+  },
+  "files_changed": [
+    "staffordos/ui/operator-frontend/lib/staffordos/jobSearchContracts.ts",
+    "staffordos/ui/operator-frontend/lib/staffordos/jobSearchContracts.test.mjs",
+    "staffordos/architecture/S010_01_JOB_OPPORTUNITY_AND_REQUIREMENT_CONTRACT.md",
+    "staffordos/architecture/S010_01_JOB_OPPORTUNITY_AND_REQUIREMENT_CONTRACT.json"
+  ],
+  "known_limitations": [
+    "Professional remains planned and not runtime-backed.",
+    "No real job record exists.",
+    "No Bosch record was created.",
+    "No canonical resume authority exists yet.",
+    "No Candidate Evidence or Job Fit Assessment exists yet.",
+    "No Application contract exists yet.",
+    "No persistence, audit store, identity enforcement, or route exists.",
+    "No job-board access or model call exists.",
+    "Duplicate detection is conceptual only.",
+    "Freshness has classifications only; no universal thresholds."
+  ],
+  "rollback": "git revert <S010.01 commit SHA>",
+  "recommended_next_mission": {
+    "mission": "S010_02_CANONICAL_RESUME_AND_CANDIDATE_EVIDENCE_AUTHORITY",
+    "scope": [
+      "discover canonical resume files and career fact authority",
+      "define verified candidate evidence records",
+      "define unsupported resume-content rejection rules",
+      "prepare later fit-assessment contract"
+    ],
+    "exclusions": [
+      "resume edits",
+      "tailored resume generation",
+      "applications",
+      "external communication",
+      "model invocation",
+      "persistence unless separately authorized"
+    ]
+  },
+  "non_impact": {
+    "application_routes_modified": false,
+    "operator_modified": false,
+    "prisma_modified": false,
+    "database_modified": false,
+    "resume_modified": false,
+    "real_job_record_created": false,
+    "bosch_record_created": false,
+    "job_board_accessed": false,
+    "external_ai_called": false,
+    "ollama_started": false,
+    "ollama_invoked": false,
+    "message_sent": false,
+    "application_submitted": false,
+    "shopifixer_modified": false,
+    "abando_modified": false,
+    "authentication_modified": false,
+    "stripe_modified": false,
+    "deployed": false,
+    "pushed": false
+  },
+  "final_classification": "JOB_OPPORTUNITY_CONTRACT_COMMITTED"
+}
