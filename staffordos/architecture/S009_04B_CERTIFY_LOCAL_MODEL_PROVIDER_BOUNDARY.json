@@ -1,0 +1,286 @@
+{
+  "mission": "S009_04B_CERTIFY_LOCAL_MODEL_PROVIDER_BOUNDARY",
+  "mission_purpose": "Certify that StaffordOS can safely use one interchangeable local AI provider behind the governed Chief of Staff architecture.",
+  "status": "LOCAL_PROVIDER_CERTIFIED_READY_FOR_LOCAL_COMMIT",
+  "authority_hierarchy": [
+    "StaffordOS Governance",
+    "StaffordOS Validation",
+    "StaffordOS Source Authority",
+    "Provider Adapter",
+    "Model"
+  ],
+  "checkpoint_authority": {
+    "starting_head": "29a378734e2a5b2f7eb856ec4a1290004590d766",
+    "s009_04a_commit_message": "S009 plan local model runtime authority",
+    "required_authorities_verified": [
+      "staffordos/architecture/STAFFORDOS_ARCHITECTURE_V1.md",
+      "staffordos/architecture/S009_00_READ_ONLY_CHIEF_OF_STAFF_CONTRACT.md",
+      "staffordos/architecture/S009_01_STATIC_FIXTURE_AND_DETERMINISTIC_RESPONSE_VALIDATOR.md",
+      "staffordos/architecture/S009_02_READ_ONLY_CHIEF_OF_STAFF_DEMONSTRATION_SURFACE.md",
+      "staffordos/architecture/S009_03_PROVIDER_NEUTRAL_MODEL_ADAPTER_INTERFACE.md",
+      "staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffValidator.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffModelAdapter.ts"
+    ]
+  },
+  "working_tree_exclusions": {
+    "preexisting_unrelated_changes_present": true,
+    "excluded_categories": [
+      "S007 identity or issuer artifacts",
+      "runtime and daemon outputs",
+      "web, Prisma, migration, packet, and API work",
+      "ShopiFixer, Abando, production, recovery, reconciliation, and mission-evidence artifacts",
+      "generated frontend files",
+      "unknown unrelated files requiring separate review"
+    ],
+    "authorized_repository_changes": [
+      "Ollama provider adapter",
+      "bounded proof harness",
+      "deterministic tests",
+      "S009.04B documentation"
+    ]
+  },
+  "runtime_installation": {
+    "command_executed": "brew install ollama",
+    "runtime_command": "/opt/homebrew/bin/ollama",
+    "runtime_version": "0.32.5",
+    "formula_footprint": "/opt/homebrew/Cellar/ollama/0.32.5, about 49 MB",
+    "homebrew_side_effects": [
+      "Homebrew auto-updated.",
+      "Homebrew installed Ollama formula dependencies.",
+      "Homebrew upgraded selected Homebrew-managed dependencies required by the formula.",
+      "Homebrew cleanup removed older formula versions and one older Homebrew Git version while Apple Git remained available."
+    ],
+    "background_service_started": false,
+    "repository_package_dependency_added": false
+  },
+  "model_installation": {
+    "command_executed": "ollama pull qwen2.5:1.5b",
+    "only_authorized_model_downloaded": true,
+    "name": "qwen2.5:1.5b",
+    "digest": "65ec06548149b04c096a120e4a6da9d4017ea809c91734ea5631e89f96ddc57b",
+    "size_bytes": 986061892,
+    "format": "gguf",
+    "family": "qwen2",
+    "parameter_size": "1.5B",
+    "quantization": "Q4_K_M",
+    "context_length": 32768,
+    "license_metadata": "apache-2.0",
+    "local_cache_footprint": "about 940 MB under /Users/rossstafford/.ollama"
+  },
+  "localhost_boundary": {
+    "serve_command": "OLLAMA_NO_CLOUD=1 OLLAMA_HOST=127.0.0.1:11434 ollama serve",
+    "listener_verified": "127.0.0.1:11434",
+    "public_listener_detected": false,
+    "cloud_disabled_log": true,
+    "underlying_runner": {
+      "host": "127.0.0.1",
+      "offline": true,
+      "webui": false
+    },
+    "listener_stopped_before_completion": true,
+    "post_stop_listener_found": false,
+    "post_stop_processes_found": false
+  },
+  "tool_retrieval_persistence_boundary": {
+    "tools_supplied_by_staffordos": false,
+    "retrieval_supplied": false,
+    "embeddings_supplied": false,
+    "vector_search_supplied": false,
+    "filesystem_access_supplied": false,
+    "shell_access_supplied": false,
+    "browser_access_supplied": false,
+    "email_or_calendar_access_supplied": false,
+    "database_access_supplied": false,
+    "api_mutation_authority_supplied": false,
+    "production_data_supplied": false,
+    "professional_data_supplied": false,
+    "personal_data_supplied": false,
+    "family_data_supplied": false,
+    "ross_llm_connected": false,
+    "ollama_model_capabilities_reported": [
+      "completion",
+      "tools"
+    ],
+    "tools_capability_interpretation": "The model metadata advertises generic tool capability, but no tools were supplied and no StaffordOS tool bridge exists.",
+    "staffordos_persistence_added": false,
+    "runtime_storage_observed": [
+      "local runtime/model files under ~/.ollama",
+      "local Ollama runtime key under ~/.ollama",
+      "model weights under ~/.ollama/models"
+    ],
+    "ollama_logs_directory_present_after_proof": false,
+    "prompt_cache_limitation": "Ollama server logs showed an in-process prompt cache while the model was loaded. keep_alive: \"0\" unloaded the model and /api/ps returned no loaded models after generation."
+  },
+  "provider_adapter": {
+    "file": "staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffOllamaAdapter.ts",
+    "adapter_id": "ollama-local-chief-of-staff-adapter",
+    "provider_name": "Ollama local",
+    "model_name": "qwen2.5:1.5b",
+    "contract_version": "S009.00",
+    "endpoint": "http://127.0.0.1:11434",
+    "endpoint_enforced": true,
+    "format": "json",
+    "stream": false,
+    "keep_alive": "0",
+    "temperature": 0,
+    "num_ctx": 4096,
+    "timeout_ms": 60000,
+    "provider_sdk_added": false,
+    "secrets_or_environment_values_used": false,
+    "marks_output_trusted": false,
+    "validation_gate": [
+      "S009.03 structural guard",
+      "S009.01 deterministic StaffordOS validator"
+    ]
+  },
+  "proof_harness": {
+    "file": "staffordos/ui/operator-frontend/lib/staffordos/runOllamaChiefOfStaffProof.mjs",
+    "writes_files": false,
+    "prints_raw_model_output": false,
+    "exits_nonzero_on_blocked_response": true,
+    "source_input": "fixed static Stafford Media source snapshot only"
+  },
+  "live_model_attempt": {
+    "completed_attempts": 1,
+    "attempt_1": {
+      "endpoint": "http://127.0.0.1:11434",
+      "model": "qwen2.5:1.5b",
+      "digest": "65ec06548149b04c096a120e4a6da9d4017ea809c91734ea5631e89f96ddc57b",
+      "operator_question": "What deserves my attention, and why?",
+      "source_count": 9,
+      "generation_status": "Proposed",
+      "structural_validation_passed": true,
+      "staffordos_validation_passed": true,
+      "trusted_response_available": true,
+      "validation_error_codes": [],
+      "trusted_response_headline": "Start with Start My Day.",
+      "recommendation_status": "Ready for operator review",
+      "claims_checked": 4,
+      "recommendations_checked": 1,
+      "sources_checked": 9,
+      "duration_ms": 19137,
+      "prompt_eval_count": 3762,
+      "eval_count": 1312
+    },
+    "interrupted_pre_timeout_command": {
+      "occurred": true,
+      "api_generate_entry_present": false,
+      "node_process_left_running": false,
+      "counted_as_completed_model_attempt": false
+    }
+  },
+  "validation_authority_result": {
+    "trusted_only_after_adapter_envelope": true,
+    "trusted_only_after_structural_guard": true,
+    "trusted_only_after_staffordos_validator": true,
+    "provider_success_creates_trust": false,
+    "model_is_authority": false
+  },
+  "fail_closed_proof": {
+    "invalid_live_model_output_requested": false,
+    "deterministic_invalid_fixtures_used": true,
+    "failures_proven": [
+      "malformed output fails closed",
+      "empty output fails closed",
+      "transport failure fails closed",
+      "timeout fails closed",
+      "unsupported recommendation status fails closed",
+      "invalid output does not create trustedResponse",
+      "Professional and Personal sources cannot be supplied",
+      "non-localhost endpoints are rejected before transport"
+    ]
+  },
+  "resource_observations": {
+    "model_cache_footprint": "about 940 MB",
+    "free_disk_after_pull": "about 85 GiB",
+    "execution": "Apple M2 Pro Metal",
+    "projected_device_memory": "about 1.1 GiB",
+    "operator_frontend_disrupted": false
+  },
+  "runtime_stop_result": {
+    "stop_command": "pkill -f \"ollama serve\"",
+    "listener_after_stop": false,
+    "ollama_process_after_stop": false,
+    "llama_server_process_after_stop": false,
+    "proof_node_process_after_stop": false,
+    "staffordos_tests_passed_with_runtime_stopped": true
+  },
+  "tests": {
+    "s009_04b_focused": {
+      "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffOllamaAdapter.test.mjs",
+      "passed": 14,
+      "failed": 0
+    },
+    "s009_03_regression": {
+      "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffModelAdapter.test.mjs",
+      "passed": 25,
+      "failed": 0
+    },
+    "s009_01_regression": {
+      "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffValidator.test.mjs",
+      "passed": 37,
+      "failed": 0
+    },
+    "all_staffordos_focused": {
+      "command": "node --test staffordos/ui/operator-frontend/lib/staffordos/*.test.mjs",
+      "passed": 221,
+      "failed": 0
+    }
+  },
+  "build": {
+    "command": "npm run build in staffordos/ui/operator-frontend",
+    "status": "passed_exit_0_with_existing_nonblocking_warnings",
+    "notes": [
+      "Build emitted an existing NFT tracing warning for app/api/operator/ceo-snapshot/route.ts.",
+      "Build emitted existing /operator/shopifixer-pilot function-serialization errors while still completing static generation and exiting 0.",
+      "S009.04B did not modify /operator, ShopiFixer runtime code, or route behavior."
+    ]
+  },
+  "json_validation": {
+    "command": "jq -e staffordos/architecture/S009_04B_CERTIFY_LOCAL_MODEL_PROVIDER_BOUNDARY.json",
+    "status": "passed"
+  },
+  "diff_review": {
+    "git_diff_check": "passed_for_s009_04b_paths",
+    "authorized_files_only": [
+      "staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffOllamaAdapter.ts",
+      "staffordos/ui/operator-frontend/lib/staffordos/chiefOfStaffOllamaAdapter.test.mjs",
+      "staffordos/ui/operator-frontend/lib/staffordos/runOllamaChiefOfStaffProof.mjs",
+      "staffordos/architecture/S009_04B_CERTIFY_LOCAL_MODEL_PROVIDER_BOUNDARY.md",
+      "staffordos/architecture/S009_04B_CERTIFY_LOCAL_MODEL_PROVIDER_BOUNDARY.json"
+    ]
+  },
+  "known_limitations": [
+    "This does not prove robust reasoning quality.",
+    "The prompt included an exact expected response template, so this certifies the provider boundary and validation gate, not autonomous response design.",
+    "The model metadata advertises generic tool capability, but no tools were supplied or connected.",
+    "Ollama stores local model weights and a local runtime key under ~/.ollama.",
+    "Ollama server logs showed an in-process prompt cache while the model was loaded; future certification should continue to verify that no conversation or business memory survives model unload.",
+    "The provider remains local proof infrastructure only and is not a permanent StaffordOS reasoning engine."
+  ],
+  "rollback": {
+    "repository": "git revert <S009.04B commit SHA>",
+    "local_runtime_cleanup_if_requested": [
+      "pkill -f \"ollama serve\"",
+      "ollama rm qwen2.5:1.5b",
+      "brew uninstall ollama",
+      "inspect residual local files under ~/.ollama"
+    ],
+    "production_rollback_required": false
+  },
+  "confirmation_of_non_impact": [
+    "No production connection.",
+    "No ShopiFixer runtime connection.",
+    "No Abando runtime connection.",
+    "No Professional workspace connection.",
+    "No Personal workspace connection.",
+    "No Family workspace connection.",
+    "No email or calendar connection.",
+    "No filesystem, shell, browser, database, API, retrieval, embedding, vector, or persistent memory tool was connected to the model.",
+    "No authentication, OAuth, KMS, JWT, issuer, Stripe, database, Prisma, migration, packet, queue, or business logic file was modified.",
+    "No provider SDK or package dependency was added.",
+    "No deployment or push occurred.",
+    "No unrelated repository file was staged."
+  ],
+  "final_classification": "LOCAL_PROVIDER_CERTIFIED"
+}
