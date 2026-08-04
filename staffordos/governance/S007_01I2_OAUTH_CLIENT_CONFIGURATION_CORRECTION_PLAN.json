@@ -1,0 +1,237 @@
+{
+  "mission": "S007_01I2_OAUTH_CLIENT_CONFIGURATION_CORRECTION_PLAN",
+  "date": "2026-08-03",
+  "missionClass": "documentation_reconciliation_and_implementation_planning_only",
+  "finalClassification": "OAUTH_CLIENT_CONFIGURATION_CORRECTION_PLAN_COMMITTED",
+  "scope": {
+    "googleCloudModified": false,
+    "redirectUriAdded": false,
+    "testUserAdded": false,
+    "secretRotated": false,
+    "secretCreated": false,
+    "secretDisabled": false,
+    "secretDeleted": false,
+    "secretValueRecorded": false,
+    "maskedSecretEndingRecorded": false,
+    "sourceCodeChanged": false,
+    "environmentFileChanged": false,
+    "issuerStarted": false,
+    "browserAuthenticationStarted": false,
+    "deployed": false,
+    "pushed": false
+  },
+  "authorities": {
+    "headAtStart": "fe0cbc994e183cc8efd1047c4d147f98a35f473f",
+    "providerAuthoritySource": "S007_01I1_OAUTH_CLIENT_AUTHORITY_RECONCILIATION",
+    "project": "staffordos-identity-prod",
+    "clientDisplayName": "StaffordOS Operator Issuer",
+    "clientType": "Web application",
+    "redactedClientId": "109364024720-...q0i.apps.googleusercontent.com",
+    "repositoryRequiredLocalCallbackUri": "http://127.0.0.1:8787/auth/google/callback"
+  },
+  "currentProviderConfiguration": {
+    "redirectUris": [
+      "https://staffordos-operator.staffordmedia.ai/auth/google/callback"
+    ],
+    "javascriptOrigins": [
+      "https://staffordos-operator.staffordmedia.ai"
+    ],
+    "userType": "External",
+    "publishingStatus": "Testing",
+    "rossListedAsTestUser": false,
+    "scopesVisibleDuringObservation": false,
+    "enabledSecretRows": 2,
+    "secretCreationTimestamps": [
+      "2026-07-30T19:50:41-04:00",
+      "2026-07-30T19:55:52-04:00"
+    ],
+    "secretValuesRecorded": false,
+    "maskedSecretEndingsRecorded": false
+  },
+  "repositoryRequiredConfiguration": {
+    "localCallbackUri": "http://127.0.0.1:8787/auth/google/callback",
+    "issuerRoutes": [
+      "GET /login",
+      "GET /auth/google/callback",
+      "GET /public-key",
+      "GET /health"
+    ],
+    "requiredEnvironmentNames": [
+      "GOOGLE_CLIENT_ID",
+      "GOOGLE_CLIENT_SECRET",
+      "GOOGLE_REDIRECT_URI",
+      "GOOGLE_ISSUER",
+      "GOOGLE_AUDIENCE"
+    ],
+    "localIssuerEnvironmentFile": {
+      "path": "staffordos/operator-issuer/.env.local",
+      "status": "absent",
+      "gitIgnored": true
+    },
+    "javascriptOriginRequiredForLocalProof": false
+  },
+  "configurationGaps": [
+    {
+      "id": "S007-01I2-CORRECTION-001",
+      "name": "Add exact local callback URI",
+      "classification": "REQUIRED",
+      "completionCriteria": [
+        "Provider redirect URI list contains http://127.0.0.1:8787/auth/google/callback.",
+        "No wildcard, tunnel, LAN, preview, or arbitrary-port URI is added.",
+        "Post-change redirect list is captured in redacted evidence."
+      ]
+    },
+    {
+      "id": "S007-01I2-CORRECTION-002",
+      "name": "Resolve Ross External/Testing eligibility",
+      "classification": "REQUIRED",
+      "completionCriteria": [
+        "Ross is eligible to complete the OAuth flow while the app remains Testing.",
+        "Committed evidence records eligibility result only.",
+        "Full account identifier is not committed."
+      ]
+    },
+    {
+      "id": "S007-01I2-CORRECTION-003",
+      "name": "Review two enabled secret rows",
+      "classification": "REQUIRED",
+      "completionCriteria": [
+        "Secret-slot count is reviewed immediately before rotation.",
+        "Old/new handling is identified by non-secret metadata such as creation timestamp.",
+        "No secret value or masked ending is recorded."
+      ]
+    },
+    {
+      "id": "S007-01I2-CORRECTION-004",
+      "name": "Create or update ignored local issuer configuration",
+      "classification": "REQUIRED",
+      "completionCriteria": [
+        "Ignored local issuer configuration exists only after a later authorized mission.",
+        "Required key names are present.",
+        "Provider client ID match is verified privately without printing values."
+      ]
+    },
+    {
+      "id": "S007-01I2-CORRECTION-005",
+      "name": "Confirm consent scopes",
+      "classification": "RECOMMENDED",
+      "completionCriteria": [
+        "Operator-visible or browser-proof evidence confirms expected OIDC scopes only.",
+        "Any unexpected scope blocks browser proof pending review."
+      ]
+    },
+    {
+      "id": "S007-01I2-CORRECTION-006",
+      "name": "Review production-style redirect",
+      "classification": "RECOMMENDED",
+      "completionCriteria": [
+        "Production-style redirect is classified as deployment-planned, retained with reason, or scheduled for separate approved removal."
+      ]
+    },
+    {
+      "id": "S007-01I2-CORRECTION-007",
+      "name": "Review production-style JavaScript origin",
+      "classification": "RECOMMENDED",
+      "completionCriteria": [
+        "Production-style origin is classified as deployment-planned, retained with reason, or scheduled for separate approved removal."
+      ]
+    },
+    {
+      "id": "S007-01I2-CORRECTION-008",
+      "name": "OAuth secret rotation",
+      "classification": "BLOCKED",
+      "completionCriteria": [
+        "Remains unperformed until redirect, eligibility, slot handling, and local ignored configuration prerequisites are complete."
+      ]
+    },
+    {
+      "id": "S007-01I2-CORRECTION-009",
+      "name": "Browser OAuth proof",
+      "classification": "BLOCKED",
+      "completionCriteria": [
+        "Remains unperformed until provider corrections are complete and S007.01J or equivalent browser-proof mission is explicitly authorized."
+      ]
+    }
+  ],
+  "requiredCorrectionOrder": [
+    "Reconfirm active project and client.",
+    "Add exact local callback URI.",
+    "Resolve Ross External/Testing eligibility.",
+    "Review provider scopes.",
+    "Review production-style redirect and JavaScript origin.",
+    "Review two enabled secret rows and define old/new handling.",
+    "Create or update ignored local issuer configuration only in a later authorized mission.",
+    "Proceed to controlled rotation and browser proof only after correction evidence passes."
+  ],
+  "browserProofPrerequisites": [
+    "Exact local callback URI present.",
+    "Ross eligible for External/Testing app.",
+    "Ignored local issuer configuration exists and privately matches authoritative client ID.",
+    "G004.01 writes confirmed disabled.",
+    "Issuer started only by authorized browser-proof mission.",
+    "Login alone does not authorize writes.",
+    "Evidence capture rules ready."
+  ],
+  "secretRotationPrerequisites": [
+    "Provider redirect configuration supports local proof.",
+    "Ross can complete consent.",
+    "Two enabled secret rows reviewed.",
+    "Provider behavior and slot capacity confirmed immediately before action.",
+    "Local ignored secret storage ready.",
+    "Rollback preserves a working prior secret until replacement proof passes.",
+    "No secret value is printed, screenshotted, committed, or pasted into chat."
+  ],
+  "rollbackStrategy": {
+    "providerConfiguration": [
+      "Capture pre-change provider metadata in redacted form.",
+      "Apply only approved correction in a later execution mission.",
+      "Capture post-change metadata.",
+      "If local proof plan still fails before secret rotation, revert only the non-secret provider configuration change that caused the failure.",
+      "Do not touch client secrets during configuration rollback."
+    ],
+    "secretRotation": [
+      "Keep a working prior secret enabled until replacement proof succeeds if provider behavior allows.",
+      "If two enabled rows block replacement creation, stop for Ross approval of row handling.",
+      "Never commit secret values, masked endings, tokens, cookies, JWTs, authorization codes, or sensitive screenshots."
+    ]
+  },
+  "validationChecklist": [
+    "jq validation",
+    "git diff --check",
+    "git diff --cached --check",
+    "staged scope review",
+    "secret absence scan",
+    "token and cookie absence scan",
+    "decision consistency check"
+  ],
+  "evidenceRequiredForCertification": [
+    "project ID",
+    "client display name",
+    "client type",
+    "redacted client ID",
+    "pre-change redirect URI list",
+    "approved correction intent",
+    "post-change redirect URI list",
+    "JavaScript origin classification",
+    "consent user type and publishing status",
+    "Ross eligibility result without full account identifier",
+    "secret-slot count and creation timestamps without values or masked endings",
+    "timestamp",
+    "operator confirmation",
+    "no-secret/no-token scan result"
+  ],
+  "prohibitedEvidence": [
+    "client secret value",
+    "masked secret ending",
+    "authorization code",
+    "ID token",
+    "access token",
+    "refresh token",
+    "StaffordOS JWT or assertion",
+    "cookie",
+    "private key",
+    "screenshot containing sensitive values"
+  ],
+  "selectedNextMission": "S007_01I3_OPERATOR_CONTROLLED_OAUTH_CLIENT_CONFIGURATION_CORRECTION",
+  "rollback": "git revert <S007.01I2 commit SHA>"
+}
