@@ -1,0 +1,200 @@
+{
+  "mission": "S007_01I3_OPERATOR_CONTROLLED_OAUTH_CLIENT_CONFIGURATION_CORRECTION",
+  "date": "2026-08-03",
+  "correctionTimestamp": "2026-08-03T21:00:57-04:00",
+  "missionType": "interactive_operator_controlled_google_oauth_configuration_correction",
+  "finalClassification": "OAUTH_CLIENT_CONFIGURATION_CORRECTED",
+  "checkpointAuthority": {
+    "startingHead": "41fb2cf42cff12b8c3d39fd07c202fc4265205f3",
+    "branch": "main",
+    "authoritiesVerified": [
+      "S007.01H Local Operator Issuer",
+      "S007.01I OAuth Rotation and Browser Proof Plan",
+      "S007.01I1 OAuth Client Authority Reconciliation",
+      "S007.01I2 OAuth Client Configuration Correction Plan",
+      "G004.01 Minimal Operator Write Surface Isolation"
+    ],
+    "issuerPort8787Listening": false,
+    "ollamaPort11434Listening": false,
+    "operatorWriteEnablementFlagPresent": false,
+    "localIssuerEnvLocalPresent": false,
+    "localIssuerEnvLocalIgnored": true
+  },
+  "authorizedProviderChanges": [
+    {
+      "changeId": "S007-01I3-CHANGE-001",
+      "description": "Add exact local callback URI",
+      "authorized": true,
+      "completed": true,
+      "value": "http://127.0.0.1:8787/auth/google/callback"
+    },
+    {
+      "changeId": "S007-01I3-CHANGE-002",
+      "description": "Add Ross as OAuth test user",
+      "authorized": true,
+      "completed": true,
+      "recordedValue": "ROSS_TEST_USER_PRESENT"
+    }
+  ],
+  "providerAuthority": {
+    "project": "staffordos-identity-prod",
+    "clientDisplayName": "StaffordOS Operator Issuer",
+    "clientType": "Web application",
+    "redactedClientId": "109364024720-...q0i.apps.googleusercontent.com",
+    "audience": "External",
+    "publishingStatus": "Testing",
+    "staffordosRelatedWebClientCount": 1
+  },
+  "redirectBeforeState": {
+    "productionCallbackPresent": true,
+    "productionCallback": "https://staffordos-operator.staffordmedia.ai/auth/google/callback",
+    "localCallbackPresent": false,
+    "localCallback": "http://127.0.0.1:8787/auth/google/callback"
+  },
+  "redirectCorrectionResult": {
+    "classification": "LOCAL_REDIRECT_CORRECTED",
+    "redirectUrisAfterSave": [
+      "https://staffordos-operator.staffordmedia.ai/auth/google/callback",
+      "http://127.0.0.1:8787/auth/google/callback"
+    ],
+    "unexpectedRedirectAdded": false,
+    "productionCallbackRemoved": false,
+    "localhostVariantAdded": false,
+    "wildcardAdded": false,
+    "lanTunnelPreviewOrTemporaryUrlAdded": false
+  },
+  "testUserBeforeState": {
+    "audience": "External",
+    "publishingStatus": "Testing",
+    "rossTestUserPresent": false
+  },
+  "testUserCorrectionResult": {
+    "classification": "ROSS_TEST_USER_ELIGIBILITY_CORRECTED",
+    "rossEligibility": "ROSS_TEST_USER_PRESENT",
+    "rossEmailRecorded": false,
+    "additionalTestUserAddedByMission": false
+  },
+  "postChangeProviderVerification": {
+    "classification": "CONFIGURATION_CORRECTIONS_VERIFIED",
+    "displayNameUnchanged": true,
+    "clientTypeUnchanged": true,
+    "productionCallbackStillPresent": true,
+    "exactLocalCallbackNowPresent": true,
+    "onlyExpectedRedirectUrisPresent": true,
+    "javascriptOriginUnchanged": true,
+    "javascriptOrigins": [
+      "https://staffordos-operator.staffordmedia.ai"
+    ],
+    "secretRowCountUnchanged": true,
+    "enabledSecretRows": 2,
+    "audienceUnchanged": true,
+    "publishingStatusUnchanged": true,
+    "scopesChanged": false,
+    "brandingChanged": false
+  },
+  "secretNonImpact": {
+    "classification": "SECRET_CONFIGURATION_UNCHANGED",
+    "secretCreated": false,
+    "secretRevealed": false,
+    "secretDisabled": false,
+    "secretDeleted": false,
+    "secretRotated": false,
+    "secretValueCopied": false,
+    "maskedSecretEndingCopiedOrRecorded": false,
+    "tokenCreatedOrRecorded": false,
+    "authorizationCodeCreatedOrRecorded": false,
+    "cookieCreatedOrRecorded": false,
+    "jwtCreatedOrRecorded": false,
+    "localSecretConfigurationCreated": false
+  },
+  "browserProofReadiness": {
+    "classification": "BLOCKED_ON_LOCAL_SECRET_CONFIGURATION",
+    "providerConfigurationReady": true,
+    "authoritativeClientProven": true,
+    "localRedirectPresent": true,
+    "rossTestUserEligibilityPresent": true,
+    "clientRemainsExternalTesting": true,
+    "localIssuerCallbackAuthorityUnchanged": true,
+    "unexpectedRedirectConflict": false,
+    "secretRowsUnchanged": true,
+    "localEnvLocalAbsent": true,
+    "secretRotationPreviouslyRequired": true,
+    "issuerStarted": false,
+    "browserOAuthStarted": false
+  },
+  "evidenceCapture": {
+    "included": [
+      "project identifier",
+      "client display name",
+      "client type",
+      "redacted client ID",
+      "correction timestamp",
+      "exact local redirect classification",
+      "production redirect preserved",
+      "test-user eligibility status",
+      "External/Testing status",
+      "secret-row count unchanged",
+      "operator confirmation",
+      "limitations"
+    ],
+    "excluded": [
+      "Ross email address",
+      "client secret value",
+      "masked secret ending",
+      "full client ID",
+      "screenshots",
+      "authorization code",
+      "ID token",
+      "access token",
+      "refresh token",
+      "StaffordOS JWT or assertion",
+      "session cookie",
+      "private key"
+    ]
+  },
+  "providerRollbackProcedure": {
+    "automaticRollbackAuthorized": false,
+    "requiresSeparateRossApproval": true,
+    "mayRemoveOnly": [
+      "local callback URI added by this mission",
+      "Ross test-user entry added by this mission"
+    ],
+    "mustNotRemoveOrModify": [
+      "production callback",
+      "production JavaScript origin",
+      "OAuth client",
+      "client secrets",
+      "other test users",
+      "audience",
+      "publishing status",
+      "scopes",
+      "branding"
+    ]
+  },
+  "repositoryRollbackProcedure": "git revert <S007.01I3 commit SHA>",
+  "selectedNextMission": "S007_01I4_LOCAL_ISSUER_SECRET_CONFIGURATION_AUTHORITY",
+  "confirmationOfNonImpact": {
+    "anotherOauthClientCreated": false,
+    "clientRenamed": false,
+    "clientTypeChanged": false,
+    "productionCallbackRemoved": false,
+    "productionJavascriptOriginRemovedOrModified": false,
+    "localhostVariantAdded": false,
+    "wildcardRedirectAdded": false,
+    "lanTunnelPreviewOrTemporaryUrlAdded": false,
+    "additionalTestUserAdded": false,
+    "publishingStatusChanged": false,
+    "audienceChanged": false,
+    "scopesChanged": false,
+    "brandingChanged": false,
+    "secretCreatedDisabledDeletedRevealedOrRotated": false,
+    "localIssuerStarted": false,
+    "browserOauthRun": false,
+    "envLocalModified": false,
+    "sourceCodeChanged": false,
+    "privateDataChanged": false,
+    "operatorWriteInvoked": false,
+    "deployed": false,
+    "pushed": false
+  }
+}
