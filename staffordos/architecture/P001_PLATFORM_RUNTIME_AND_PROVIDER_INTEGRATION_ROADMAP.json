@@ -1,0 +1,321 @@
+{
+  "mission": "P001_PLATFORM_RUNTIME_AND_PROVIDER_INTEGRATION_ROADMAP",
+  "date": "2026-08-04",
+  "mode": "READ_ONLY_ARCHITECTURE",
+  "status": "PLATFORM_RUNTIME_PROVIDER_ROADMAP_DOCUMENTED",
+  "authority_basis": [
+    "STAFFORDOS_ENTERPRISE_ARCHITECTURE_REVIEW_V1",
+    "STAFFORDOS_TARGET_PLATFORM_AND_WORKSPACE_MODEL_V2",
+    "STAFFORDOS_MEDIA_AND_PROVIDER_BOUNDARY_V1",
+    "STAFFORDOS_ANTI_DRIFT_REGISTER_V1",
+    "STAFFORDOS_ASSET_AUTHORITY_V1",
+    "STAFFORDOS_ASSET_PROVIDER_REFERENCE_CONTRACT_V1",
+    "STAFFORDOS_ASSET_PRIVACY_RIGHTS_AND_PROVENANCE_V1",
+    "STAFFORDOS_ASSET_STORAGE_AND_LIFECYCLE_V1",
+    "ADR_0001_CANONICAL_PERSISTENCE_AUTHORITY",
+    "ADR_0002_ASSET_METADATA_AND_PROVIDER_REFERENCE_AUTHORITY",
+    "G001_PRIVATE_DATA_GITIGNORE_BACKSTOP",
+    "G002_PROFESSIONAL_MODE_AND_WORKSPACE_REGISTRY_RECONCILIATION",
+    "G003_ADAPTER_ONLY_READ_MODEL_AND_STATICITY_AUTHORITY",
+    "G004_OPERATOR_WRITE_SURFACE_RISK_DECISION",
+    "G004_01_MINIMAL_OPERATOR_WRITE_SURFACE_ISOLATION",
+    "S007_LOCAL_OPERATOR_ISSUER_AND_OAUTH_CONFIGURATION_CHAIN",
+    "S008_MULTI_WORKSPACE_PLATFORM_ARCHITECTURE",
+    "S009_GOVERNED_CHIEF_OF_STAFF_AND_ADAPTER_BOUNDARY",
+    "S010_PROFESSIONAL_JOB_SEARCH_AND_CAREER_EVIDENCE_AUTHORITY",
+    "J001_JOB_COMMAND_AND_PRIVATE_JOB_OPPORTUNITY_INTAKE_BRIDGE"
+  ],
+  "canonical_runtime_topology": {
+    "current": [
+      {
+        "surface": "/operator",
+        "role": "Current Stafford Media runtime-canonical operator surface",
+        "authority": "Runtime-canonical for current Stafford Media operations; write surfaces isolated by G004.01"
+      },
+      {
+        "surface": "/os",
+        "role": "Parent StaffordOS shell and information architecture",
+        "authority": "Static/read-model only; non-static data requires governed read-model adapters"
+      },
+      {
+        "surface": "web",
+        "role": "Existing product runtime for Abando and ShopiFixer-related routes",
+        "authority": "Product runtime authority where implemented; ADR-0001 still blocks file-backed audit/lead/finding continuity"
+      },
+      {
+        "surface": "staffordos/operator-issuer",
+        "role": "Standalone local operator issuer",
+        "authority": "Local only; KMS proof passed; not deployed, not browser-proven, and not connected to StaffordOS sessions"
+      },
+      {
+        "surface": "device-local private roots",
+        "role": "Private Professional and Personal source boundary",
+        "authority": "Outside Git; not connected to UI without future server authorization"
+      },
+      {
+        "surface": "home server",
+        "role": "Future storage, Jellyfin, backup, and local model tier",
+        "authority": "Planned/provider tier, not current StaffordOS runtime authority"
+      }
+    ],
+    "target": [
+      "device-local private tier",
+      "home server tier",
+      "cloud product/runtime tier",
+      "shared StaffordOS platform services",
+      "top-level workspaces: stafford-media, professional, personal"
+    ]
+  },
+  "workspace_ownership_boundaries": {
+    "top_level_workspaces": [
+      "stafford-media",
+      "professional",
+      "personal"
+    ],
+    "not_top_level_workspaces": [
+      "family",
+      "media",
+      "creative",
+      "shopifixer",
+      "abando",
+      "job-search",
+      "my-job",
+      "jellyfin"
+    ],
+    "stafford_media": {
+      "owns": [
+        "business operations",
+        "ShopiFixer service lens",
+        "Abando product lens",
+        "customer-authorized business assets",
+        "Stafford Media operator decisions"
+      ],
+      "excludes": [
+        "Professional private records",
+        "Personal and family content",
+        "provider internal state"
+      ]
+    },
+    "professional": {
+      "owns": [
+        "Career Home",
+        "Job Search",
+        "future My Job",
+        "career evidence",
+        "resume authority",
+        "private professional decisions"
+      ],
+      "excludes": [
+        "Stafford Media customer data",
+        "Personal records",
+        "employer system truth",
+        "automatic publication"
+      ]
+    },
+    "personal": {
+      "owns": [
+        "private planning",
+        "learning",
+        "memories",
+        "Media Studio",
+        "family sharing overlay after gates",
+        "child-safe learning and creativity after gates"
+      ],
+      "excludes": [
+        "Stafford Media operations",
+        "Professional career records",
+        "Jellyfin playback authority"
+      ]
+    }
+  },
+  "capability_ownership": {
+    "shopifixer": "Stafford Media capability/service lens",
+    "abando": "Stafford Media capability/product lens",
+    "professional_career_home": "Professional mode",
+    "job_search": "Professional mode",
+    "my_job": "Professional planned mode",
+    "media_studio": "Personal planned capability",
+    "family_sharing": "Personal planned sharing and membership overlay",
+    "chief_of_staff_ai": "Shared platform service",
+    "identity_membership_permissions_audit": "Shared platform service",
+    "asset_authority": "Shared platform service"
+  },
+  "provider_boundaries": {
+    "rule": "Provider systems enter StaffordOS through governed adapters or provider references; UI components do not call providers directly for authoritative state.",
+    "jellyfin": "Playback and library-catalog provider for items it manages; not rights, provenance, ownership, sharing, or StaffordOS Asset ID authority.",
+    "storage": "Payload storage provider; StaffordOS owns Asset metadata and governance, not every payload.",
+    "identity": "Google and KMS provide authentication/signing inputs; StaffordOS must still enforce sessions, membership, permissions, approvals, and audit.",
+    "payments_and_commerce": "Stripe and Shopify retain provider truth; StaffordOS governs approved business actions and evidence.",
+    "deployment": "Render and Vercel retain provider runtime/deployment state; StaffordOS records deployment authority and limitations.",
+    "ai_models": "Model providers generate proposals only; StaffordOS source selection, validation, review, and approval remain authoritative."
+  },
+  "asset_flow": [
+    "source material or provider item",
+    "provider reference for storage, catalog, playback, creation, transformation, publication, or backup",
+    "StaffordOS Asset record",
+    "workspace, owner, capability, privacy, rights, provenance, lifecycle, and limitations",
+    "review and approval state",
+    "relationships to originals, versions, derivatives, evidence, proof, publications, or shares",
+    "retention, deletion, and audit history"
+  ],
+  "identity_flow": {
+    "current": [
+      "Google OAuth provider configuration corrected",
+      "local issuer exists",
+      "KMS proof passed",
+      "local issuer configuration absent",
+      "browser proof not run",
+      "issuer not deployed",
+      "verifier/session not connected",
+      "G004.01 local write isolation remains separate from authentication"
+    ],
+    "target": [
+      "Google OAuth login",
+      "StaffordOS issuer assertion or session",
+      "verifier middleware or server library",
+      "server-derived user identity",
+      "workspace membership",
+      "role and capability permission",
+      "action-specific approval for high-impact actions",
+      "audit context and request ID",
+      "guarded read or write surface"
+    ]
+  },
+  "ai_orchestration_flow": {
+    "current": "Read-only advisory Chief of Staff foundation with deterministic validation and one bounded local Ollama proof.",
+    "target": [
+      "workspace-scoped request",
+      "governed source selection",
+      "read-model adapter",
+      "immutable source snapshot",
+      "provider-neutral model request",
+      "replaceable model provider adapter",
+      "structural guard",
+      "deterministic validator",
+      "advisory response or fail-closed result",
+      "optional human-approved action through normal StaffordOS authority"
+    ],
+    "prohibited_ai_authority": [
+      "approve",
+      "execute",
+      "publish",
+      "delete",
+      "share",
+      "grant access",
+      "claim rights",
+      "override retention"
+    ]
+  },
+  "data_authority": {
+    "git": "Source, governance, architecture, tests, and redacted evidence only",
+    "repository_runtime_json": "Current operator runtime debt; must not become durable platform authority",
+    "database": "Target durable authority for product/platform runtime records where authorized",
+    "device_local": "Private Professional and Personal sources outside Git",
+    "home_server": "Future bulk media, backups, Jellyfin-accessible media, and local models",
+    "cloud": "Product runtimes, shared metadata, provider integrations, and approved publications",
+    "providers": "Provider-internal state; cached with asOf and limitations unless StaffordOS adopts it through governance"
+  },
+  "future_deployment_topology": [
+    {
+      "tier": "device-local",
+      "role": "Private intake, local issuer proof, sensitive drafts",
+      "required_gates": [
+        "G001 containment",
+        "local secret handling",
+        "server-only adapters before UI display"
+      ]
+    },
+    {
+      "tier": "home server",
+      "role": "Bulk media, Jellyfin playback, local backups, local model runtime",
+      "required_gates": [
+        "Asset authority",
+        "provider contract",
+        "membership and sharing",
+        "child-safe access policy"
+      ]
+    },
+    {
+      "tier": "cloud product runtime",
+      "role": "Abando, ShopiFixer, product APIs, customer-authorized assets",
+      "required_gates": [
+        "ADR-0001 persistence",
+        "provider contracts",
+        "deployment governance",
+        "audit"
+      ]
+    },
+    {
+      "tier": "cloud identity runtime",
+      "role": "Future deployed issuer or verifier support",
+      "required_gates": [
+        "OAuth rotation",
+        "browser proof",
+        "verifier/session integration",
+        "deployment policy",
+        "secret management"
+      ]
+    }
+  ],
+  "remaining_architectural_risks": [
+    "repo-as-database debt",
+    "identity not connected",
+    "write authorization gap",
+    "private Professional display blocked on server authorization",
+    "Asset runtime absent",
+    "provider contract not uniformly applied",
+    "Jellyfin/media boundary planned only",
+    "Relationship and Party duplication",
+    "historical/static records mistaken as live",
+    "Family and child access gates absent",
+    "product/provider deployment drift",
+    "mission namespace drift"
+  ],
+  "anti_drift_validation": [
+    "top-level workspaces remain exactly Stafford Media, Professional, and Personal",
+    "Family, Media, Creative, ShopiFixer, Abando, Job Search, My Job, and Jellyfin are not top-level workspaces",
+    "/operator remains runtime-canonical for current Stafford Media operations until authorized parity migration",
+    "/os does not import /operator loaders or server actions",
+    "/os receives non-static data only through governed read-model adapters",
+    "static and historical surfaces show asOf, freshness, staticity, and limitations",
+    "WorkspaceContext is not authorization",
+    "private Professional and Personal data remain outside Git and outside client components",
+    "Git does not store user content, private runtime records, media payloads, credentials, or provider secrets",
+    "provider locators do not become StaffordOS Asset IDs",
+    "Jellyfin remains a provider, not a StaffordOS playback rebuild",
+    "AI remains advisory, guarded, validated, fail-closed, and unable to approve or execute",
+    "write surfaces remain isolated until identity, authorization, approval, and audit exist",
+    "provider state does not silently replace StaffordOS governance history",
+    "child and family access waits for membership, guardian, rights, visibility, and audit gates"
+  ],
+  "recommended_implementation_sequence_after_oauth": [
+    "S007 verifier and session integration architecture",
+    "server-derived workspace membership and capability permission context",
+    "action-specific approval and audit for high-impact writes",
+    "ADR-0001 runtime persistence execution plan",
+    "first governed runtime read-model adapter connection",
+    "Private Job Opportunity server-adapter prerequisites",
+    "Asset contract and static validator",
+    "Party and Relationship authority reconciliation",
+    "provider contract application to existing product integrations",
+    "home server and Jellyfin provider planning",
+    "Personal Media Studio and family/child access gates"
+  ],
+  "immediate_oauth_prerequisite": "S007_01I5_LOCAL_ISSUER_SECRET_CONFIGURATION_OPERATOR_RUNBOOK",
+  "non_impact": {
+    "source_code_changed": false,
+    "routes_changed": false,
+    "ui_changed": false,
+    "apis_changed": false,
+    "schemas_or_migrations_changed": false,
+    "asset_model_created": false,
+    "provider_connected": false,
+    "jellyfin_contacted": false,
+    "ollama_started": false,
+    "issuer_started": false,
+    "browser_oauth_started": false,
+    "private_data_read": false,
+    "deployment_or_push": false,
+    "implementation_commit": false
+  }
+}
