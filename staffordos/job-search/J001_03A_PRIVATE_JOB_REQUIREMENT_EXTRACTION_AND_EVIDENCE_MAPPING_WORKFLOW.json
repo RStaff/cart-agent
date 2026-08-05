@@ -1,0 +1,118 @@
+{
+  "schemaVersion": "staffordos.job_search.j001_03a_private_requirement_evidence_workflow.v1",
+  "mission": "J001_03A_PRIVATE_JOB_REQUIREMENT_EXTRACTION_AND_EVIDENCE_MAPPING_WORKFLOW",
+  "date": "2026-08-05",
+  "status": "PRIVATE_JOB_ANALYSIS_WORKFLOW_DOCUMENTED",
+  "checkpointAuthority": {
+    "p001Committed": true,
+    "g00401WriteIsolationPreserved": true,
+    "s007OAuthAuthorityPreserved": true,
+    "s010CareerEvidenceContractsReused": true,
+    "j001JobOpportunityIntakeReused": true,
+    "g003AdapterStaticityPreserved": true,
+    "a001AssetAuthorityPreserved": true
+  },
+  "privateWorkflow": {
+    "scope": "one operator-selected private Job Opportunity at a time",
+    "realInputsRemainOutsideGit": true,
+    "realOutputsRemainOutsideGit": true,
+    "uiConnectionCreated": false,
+    "apiCreated": false,
+    "providerFetchCreated": false,
+    "externalAiInvoked": false,
+    "ollamaInvoked": false,
+    "applicationSubmitted": false,
+    "messageSent": false,
+    "resumeMutated": false
+  },
+  "contractsReused": [
+    "PrivateNormalizedJobOpportunity",
+    "JobRequirement",
+    "CareerFact",
+    "CareerEvidence",
+    "G001 private-data containment",
+    "G003 adapter/staticity authority",
+    "G004.01 write isolation"
+  ],
+  "requirementExtraction": {
+    "method": "deterministic_local",
+    "preservesExplicitRequirementsOnly": true,
+    "preservesRequiredPreferredResponsibilityInformationalUnclear": true,
+    "preservesSourceTrace": true,
+    "inventsYears": false,
+    "inventsProficiency": false,
+    "inventsMandatoryStatus": false
+  },
+  "evidenceMapping": {
+    "classifications": [
+      "PROVEN",
+      "PARTIAL",
+      "TRANSFERABLE",
+      "MISSING",
+      "UNKNOWN"
+    ],
+    "resumeWordingAloneCanVerifyFact": false,
+    "repositoryPresenceCanProveProductionUse": false,
+    "localTestingCanProveCustomerUse": false
+  },
+  "assessmentModel": {
+    "usesEmployerSuccessProbability": false,
+    "usesUnexplainedFitScore": false,
+    "allowedRecommendations": [
+      "STRONG_APPLY",
+      "APPLY_WITH_POSITIONING",
+      "REVIEW_REQUIRED",
+      "LOW_PRIORITY",
+      "DO_NOT_APPLY",
+      "INSUFFICIENT_EVIDENCE",
+      "ALREADY_APPLIED_MONITOR"
+    ],
+    "manualExternalSubmissionState": "SUBMITTED_MANUAL_EXTERNAL"
+  },
+  "privateOutputContract": {
+    "root": "$HOME/.staffordos/private/professional/job-search/analysis/<opportunity>/<run>/",
+    "ownerPrivatePermissions": true,
+    "overwritePriorRuns": false,
+    "artifacts": [
+      "requirements.json",
+      "requirement_evidence_mappings.json",
+      "fit_assessment.json",
+      "positioning_brief.json",
+      "role_review_queue.json",
+      "application_event.json",
+      "next_action.json",
+      "processing_audit_summary.json"
+    ]
+  },
+  "redactedLocalProof": {
+    "operatorSelectedOpportunityProcessed": true,
+    "requirementsExtracted": 33,
+    "mappingCoverage": {
+      "PROVEN": 0,
+      "PARTIAL": 0,
+      "TRANSFERABLE": 3,
+      "MISSING": 2,
+      "UNKNOWN": 28
+    },
+    "applicationState": "SUBMITTED_MANUAL_EXTERNAL",
+    "finalRecommendation": "ALREADY_APPLIED_MONITOR",
+    "roleSpecificReviewQuestions": 15,
+    "privateOutputCommitted": false
+  },
+  "limitations": [
+    "Deterministic extraction does not replace Ross review.",
+    "Unresolved private Career review items can leave mappings UNKNOWN.",
+    "No UI surface displays real private analysis.",
+    "No application, message, provider fetch, or resume mutation is authorized.",
+    "No OAuth, identity, authorization, or /os connection is added."
+  ],
+  "rollback": {
+    "repository": "git revert <J001.03A commit SHA>",
+    "privateOutputRollbackAutomatic": false,
+    "privateOutputRollbackRequiresRossChoice": true
+  },
+  "selectedNextMission": {
+    "id": "J001_03B_PRIVATE_JOB_ANALYSIS_OPERATOR_SURFACE",
+    "reason": "Ross needs an ergonomic local operator surface to select one private Opportunity, review redacted summaries, answer role-specific questions, and access private artifacts without exposing them through /os or requiring full OAuth deployment."
+  }
+}
