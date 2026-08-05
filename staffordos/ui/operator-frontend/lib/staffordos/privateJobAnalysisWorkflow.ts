@@ -529,3 +529,8 @@ export function loadSelectedPrivateOpportunityInputs(options: {
 }
 
 export { buildManualExternalApplicationEvent };
+export {
+  buildNextAction as buildPrivateJobAnalysisNextAction,
+  buildPositioningBrief as buildPrivateJobPositioningBrief,
+  buildReviewQueue as buildPrivateJobAnalysisReviewQueue,
+};

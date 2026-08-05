@@ -1,0 +1,176 @@
+{
+  "schemaVersion": "staffordos.job_search.j001_03b_private_analysis_operator_surface.v1",
+  "mission": "J001_03B_PRIVATE_JOB_ANALYSIS_OPERATOR_SURFACE",
+  "date": "2026-08-05",
+  "status": "PRIVATE_JOB_ANALYSIS_SURFACE_DOCUMENTED",
+  "checkpointAuthority": {
+    "startingHead": "723783ef9d779ec300f41f832569dab803fec6d1",
+    "p001": true,
+    "j00101": true,
+    "j00102": true,
+    "j00103a": true,
+    "s010": true,
+    "g001": true,
+    "g003": true,
+    "g00401": true,
+    "g002": true,
+    "a001": true
+  },
+  "certifiedJ00103AResult": {
+    "privateAnalysisExistsOutsideGit": true,
+    "applicationState": "SUBMITTED_MANUAL_EXTERNAL",
+    "requirementsExtracted": 33,
+    "mappingCoverage": {
+      "PROVEN": 0,
+      "PARTIAL": 0,
+      "TRANSFERABLE": 3,
+      "MISSING": 2,
+      "UNKNOWN": 28
+    },
+    "roleSpecificReviewQuestions": 15,
+    "recommendation": "ALREADY_APPLIED_MONITOR",
+    "privateDataConnectedToOs": false,
+    "resumeModified": false,
+    "submissionOrMessagePerformed": false
+  },
+  "surfaceFormDecision": {
+    "selected": "INTERACTIVE_CLI",
+    "loopbackServerCreated": false,
+    "staticHtmlReportCreated": false,
+    "reason": "Smallest usable owner-private surface with no server, route, public exposure, or authentication claim."
+  },
+  "commands": [
+    "list",
+    "summary --latest",
+    "next-question --latest",
+    "inspect-requirement --latest --requirement-id <id>",
+    "decide --latest --review-question-id <id> --requirement-id <id> --decision-type <type> --confirm yes",
+    "regenerate --latest"
+  ],
+  "reviewPresentationModel": {
+    "opportunitySummary": true,
+    "requirementSummary": true,
+    "evidenceCoverage": true,
+    "priorityReviewQuestions": true,
+    "majorGaps": true,
+    "positioningSummary": true,
+    "privatePathVisible": false,
+    "rawListingTextVisibleByDefault": false,
+    "sourceUrlVisible": false,
+    "contactVisible": false,
+    "compensationVisibleByDefault": false
+  },
+  "operatorDecisionContract": {
+    "appendOnly": true,
+    "supersessionExplicit": true,
+    "operatorConfirmationRequired": true,
+    "decisionTypes": [
+      "CONFIRM_SUPPORTED",
+      "CONFIRM_PARTIALLY_SUPPORTED",
+      "CONFIRM_TRANSFERABLE",
+      "CONFIRM_MISSING",
+      "KEEP_UNKNOWN",
+      "REJECT_CANDIDATE_EVIDENCE",
+      "DEFER",
+      "FLAG_CONFLICT",
+      "ADD_OPERATOR_CONTEXT"
+    ],
+    "canonicalCareerFactUpdated": false,
+    "unsupportedMetricsCanBeConfirmed": false,
+    "unsupportedYearsCanBeConfirmed": false,
+    "resumeWordingAloneCanVerify": false
+  },
+  "deterministicReanalysis": {
+    "loadOriginalAnalysis": true,
+    "loadAppendOnlyDecisions": true,
+    "applyLatestDecisionPerRequirement": true,
+    "preserveUnaffectedMappings": true,
+    "preserveSourceTraces": true,
+    "preserveConflicts": true,
+    "recalculateCoverage": true,
+    "recalculateAssessment": true,
+    "recalculatePositioning": true,
+    "recalculateNextAction": true,
+    "writeNewVersion": true,
+    "overwriteOriginal": false
+  },
+  "changeReport": {
+    "createdDuringCommit": false,
+    "reason": "Ross had not selected a decision type to save before the repository commit.",
+    "artifactWhenRegenerated": "change_report.json"
+  },
+  "applicationStateProtection": {
+    "manualExternalStatePreserved": true,
+    "duplicateApplicationCreated": false,
+    "submissionActionCreated": false,
+    "messageActionCreated": false,
+    "submissionDateInvented": false,
+    "resumeFilenameInvented": false
+  },
+  "privateOutputHandling": {
+    "decisionRoot": "$HOME/.staffordos/private/professional/job-search/analysis-decisions/<opportunity>/<analysis-run>/decisions.ndjson",
+    "regeneratedAnalysisRoot": "$HOME/.staffordos/private/professional/job-search/analysis/<opportunity>/<run>/",
+    "ownerPrivatePermissionsRequired": true,
+    "privateArtifactsCommitted": false
+  },
+  "nonImpact": {
+    "osModified": false,
+    "operatorModified": false,
+    "publicRouteCreated": false,
+    "serverCreated": false,
+    "apiCreated": false,
+    "databaseCreated": false,
+    "prismaModified": false,
+    "oauthModified": false,
+    "g00401Weakened": false,
+    "externalAiInvoked": false,
+    "ollamaInvoked": false,
+    "providerFetchCreated": false,
+    "resumeMutated": false,
+    "applicationSubmitted": false,
+    "messageSent": false,
+    "deployed": false,
+    "pushed": false
+  },
+  "validation": {
+    "focusedJ00103BTests": {
+      "passed": 15,
+      "failed": 0
+    },
+    "focusedJ00103BAndJ00103AWorkflowBatch": {
+      "passed": 40,
+      "failed": 0
+    },
+    "j001RegressionTests": {
+      "passed": 121,
+      "failed": 0
+    },
+    "s010RegressionTests": {
+      "passed": 103,
+      "failed": 0
+    },
+    "s009RegressionTests": {
+      "passed": 126,
+      "failed": 0
+    },
+    "s008G002G003G004RegressionBatch": {
+      "passed": 202,
+      "failed": 0
+    },
+    "operatorFrontendBuild": {
+      "passed": true,
+      "nonBlockingExistingWarnings": [
+        "Turbopack NFT tracing warning for the existing operator-frontend ceo-snapshot route.",
+        "Existing /operator/shopifixer-pilot static generation serialization messages."
+      ]
+    },
+    "repositoryJsonValidationPassed": true,
+    "privateAnalysisJsonValidationPassed": true,
+    "privatePermissionCheckPassed": true,
+    "privateDataAbsenceScanPassed": true
+  },
+  "selectedNextMission": {
+    "id": "S010_02D_ROLE_FOCUSED_CAREER_EVIDENCE_REVIEW",
+    "reason": "The surface exists, but many mappings remain UNKNOWN; the next value slice is resolving the small role-focused Career evidence questions before resume positioning."
+  }
+}
