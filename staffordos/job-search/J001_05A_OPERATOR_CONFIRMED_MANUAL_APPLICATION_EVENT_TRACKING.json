@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "staffordos.job_search.j001_05a_manual_application_event_tracking.v1",
+  "mission": "J001_05A_OPERATOR_CONFIRMED_MANUAL_APPLICATION_EVENT_TRACKING",
+  "date": "2026-08-07",
+  "status": "MANUAL_APPLICATION_EVENT_TRACKING_IMPLEMENTED",
+  "authority": [
+    "J001.01 Professional Job Command shell",
+    "J001.02 private Job Opportunity intake bridge",
+    "J001.03A private Job Requirement and Evidence Mapping",
+    "J001.03B private Job Analysis Review CLI",
+    "J001.04 Explainable Fit and Positioning",
+    "S010.02D role-focused Career evidence review",
+    "S010.02E high-value Career fact verification",
+    "G001 private-data Git backstop",
+    "G002 Professional workspace modes",
+    "G003 adapter-only read-model authority",
+    "G004.01 minimal operator write isolation",
+    "P001 platform runtime and provider roadmap"
+  ],
+  "workspaceArchitecture": {
+    "workspace": "Professional",
+    "capabilityFamily": "Career Operations",
+    "careerOsCreated": false,
+    "newShellCreated": false,
+    "newAuthenticationDomainCreated": false
+  },
+  "applicationContract": {
+    "stateSeparateFromOpportunity": true,
+    "manualExternalSubmissionState": "SUBMITTED_MANUAL_EXTERNAL",
+    "futureStaffordOSSubmissionCreatedByThisMission": false,
+    "employerInterestInferred": false,
+    "fitInferred": false,
+    "interviewProbabilityInferred": false
+  },
+  "applicationEventContract": {
+    "eventBasedHistory": true,
+    "supportedEvents": [
+      "APPLICATION_CREATED",
+      "RESUME_SELECTED",
+      "COVER_LETTER_USED",
+      "SUBMITTED_MANUAL_EXTERNAL",
+      "FOLLOW_UP_REVIEW_SCHEDULED",
+      "RECRUITER_CONTACT_RECORDED",
+      "SCREENING_RECORDED",
+      "INTERVIEW_SCHEDULED",
+      "INTERVIEW_COMPLETED",
+      "EMPLOYER_REJECTION_RECORDED",
+      "OFFER_RECORDED",
+      "WITHDRAWAL_RECORDED",
+      "APPLICATION_CLOSED"
+    ],
+    "eventsWithoutOccurrenceCreated": false
+  },
+  "privateCapture": {
+    "operatorConfirmedManualApplicationsEligible": 3,
+    "incompleteCandidatesHeldForConfirmation": 1,
+    "realValuesCommitted": false,
+    "realResumesCopiedIntoGit": false,
+    "coverLettersCopiedIntoGit": false,
+    "sourceUrlsCommitted": false,
+    "portalCredentialsStored": false,
+    "privateContactsCommitted": false
+  },
+  "duplicateHandling": {
+    "opportunityIdUsedWhenAvailable": true,
+    "fallbackKey": "company_role_requisition_submitted_date",
+    "possibleDuplicatesRequireOperatorReview": true,
+    "silentMergeAllowed": false,
+    "silentOverwriteAllowed": false
+  },
+  "resumeReferenceBoundary": {
+    "resumeFilesCopied": false,
+    "legacyPrivateReferenceAllowed": true,
+    "assetAuthorityPending": true,
+    "resumeIsCanonicalCareerTruth": false
+  },
+  "followUpModel": {
+    "reviewTaskOnly": true,
+    "communicationAllowed": false,
+    "operatorApprovalRequired": true,
+    "genericTimingBusinessDays": 10,
+    "messageSent": false
+  },
+  "pipelineModel": {
+    "tracksSubmittedApplications": true,
+    "tracksFollowUpReviews": true,
+    "tracksResponsesAndOutcomes": true,
+    "conversionRatesAvailable": false,
+    "vanityMetricsGenerated": false
+  },
+  "outcomeAndLearningBoundary": {
+    "observationSeparateFromAssessment": true,
+    "hypothesisSeparateFromLearning": true,
+    "outcomesRequiredBeforeLearning": true
+  },
+  "futureUiReadModel": {
+    "prepared": true,
+    "connectedToOs": false,
+    "connectedToOperator": false,
+    "apiCreated": false,
+    "databaseCreated": false,
+    "privatePathsVisible": false,
+    "rawResumesVisible": false,
+    "rawCoverLettersVisible": false,
+    "portalCredentialsVisible": false,
+    "privateContactsVisible": false
+  },
+  "surface": {
+    "type": "OWNER_PRIVATE_LOCAL_CLI",
+    "sourceFiles": [
+      "manualApplicationEventTracking.ts",
+      "runManualApplicationEventTracking.mjs"
+    ],
+    "osRouteCreated": false,
+    "operatorRouteCreated": false,
+    "publicRouteCreated": false,
+    "serverStarted": false
+  },
+  "nonImpact": {
+    "applicationSubmitted": false,
+    "messageSent": false,
+    "resumeMutated": false,
+    "linkedInMutated": false,
+    "providerFetched": false,
+    "externalAiInvoked": false,
+    "ollamaInvoked": false,
+    "oauthChanged": false,
+    "g004WriteIsolationChanged": false,
+    "deployed": false,
+    "pushed": false
+  },
+  "tests": {
+    "focused": "manualApplicationEventTracking.test.mjs",
+    "fixturesSyntheticOnly": true,
+    "realApplicationValuesCommitted": false
+  },
+  "limitations": [
+    "The workflow is a local CLI and private artifact writer, not a browser UI.",
+    "Incomplete application candidates remain blocked until Ross confirms required fields.",
+    "Actual resume-to-application Asset linkage remains pending J001.06.",
+    "Follow-up tasks do not send communication."
+  ],
+  "rollback": {
+    "repository": "git revert <J001.05A commit SHA>",
+    "privateRecordRollbackRequiresRossApproval": true
+  },
+  "selectedNextMission": "J001_05B_PRIVATE_APPLICATION_PIPELINE_REVIEW"
+}
