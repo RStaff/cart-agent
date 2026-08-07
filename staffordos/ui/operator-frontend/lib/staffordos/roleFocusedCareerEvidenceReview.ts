@@ -315,13 +315,13 @@ export function loadPrivateCareerEvidenceStore(options: {
     assertOutsideRepository(root, options.repositoryRoot, "Private Career evidence root");
     for (const filePath of walkFiles(root)) {
       const filename = path.basename(filePath);
-      if (/(candidate_career_facts|combined_candidate_career_facts).*\.json$/.test(filename)) {
+      if (/(candidate_career_facts|combined_candidate_career_facts|canonical_career_facts).*\.json$/.test(filename)) {
         for (const record of payloadArray(filePath)) {
           const summary = factSummary(record);
           if (summary.id !== "UNKNOWN") factMap.set(summary.id, summary);
         }
       }
-      if (/(career_evidence|combined_career_evidence).*\.json$/.test(filename)) {
+      if (/(career_evidence|combined_career_evidence|canonical_career_evidence).*\.json$/.test(filename)) {
         for (const record of payloadArray(filePath)) {
           const summary = evidenceSummary(record);
           if (summary.id !== "UNKNOWN") evidenceMap.set(summary.id, summary);

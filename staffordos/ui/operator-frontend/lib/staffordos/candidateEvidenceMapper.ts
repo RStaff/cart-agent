@@ -180,9 +180,23 @@ function hasConflict(facts: readonly Partial<CareerFact>[], evidenceRecords: rea
   );
 }
 
-function hasVerifiedSupport(facts: readonly Partial<CareerFact>[], evidenceRecords: readonly Partial<CareerEvidence>[]) {
+function directlySupportsRequirement(requirement: PrivateJobRequirementRecord, fact: Partial<CareerFact>) {
+  if (fact.factType === "CERTIFICATION") {
+    return (
+      requirement.requirementCategory === "Certification" ||
+      Boolean(requirement.certificationMentioned) ||
+      /\b(certification|certified|credential|pmp|project management professional)\b/i.test(requirement.requirementText)
+    );
+  }
+  if (fact.factType === "EDUCATION") {
+    return requirement.requirementCategory === "Education" || Boolean(requirement.degreeMentioned) || /\b(degree|education|master|bachelor)\b/i.test(requirement.requirementText);
+  }
+  return true;
+}
+
+function hasVerifiedSupport(requirement: PrivateJobRequirementRecord, facts: readonly Partial<CareerFact>[], evidenceRecords: readonly Partial<CareerEvidence>[]) {
   return (
-    facts.some((fact) => fact.verificationStatus === "VERIFIED") &&
+    facts.some((fact) => fact.verificationStatus === "VERIFIED" && directlySupportsRequirement(requirement, fact)) &&
     evidenceRecords.length > 0 &&
     !hasResumeOnlyEvidence(evidenceRecords)
   );
@@ -195,6 +209,7 @@ function hasPartialSupport(facts: readonly Partial<CareerFact>[], evidenceRecord
       const explicitlyTransferable =
         fact.supportLevel === "TRANSFERABLE" || fact.experienceClassification === "TRANSFERABLE";
       const operatorReviewStatus = (fact as { operatorReviewStatus?: unknown }).operatorReviewStatus;
+      if (explicitlyTransferable) return false;
       return (
         fact.verificationStatus === "PARTIALLY_SUPPORTED" ||
         fact.supportLevel === "PARTIAL" ||
@@ -226,7 +241,7 @@ function classifyMapping(
 ): RequirementEvidenceClassification {
   if (!facts.length) return "MISSING";
   if (hasConflict(facts, evidenceRecords)) return "UNKNOWN";
-  if (hasVerifiedSupport(facts, evidenceRecords)) return "PROVEN";
+  if (hasVerifiedSupport(requirement, facts, evidenceRecords)) return "PROVEN";
   if (hasPartialSupport(facts, evidenceRecords)) return "PARTIAL";
   if (hasTransferableSupport(requirement, facts, evidenceRecords)) return "TRANSFERABLE";
   if (evidenceRecords.length > 0 || facts.length > 0) return "UNKNOWN";
