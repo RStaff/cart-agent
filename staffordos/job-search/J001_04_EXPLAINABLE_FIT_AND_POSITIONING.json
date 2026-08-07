@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "staffordos.job_search.j001_04_explainable_fit_and_positioning.v1",
+  "mission": "J001_04_EXPLAINABLE_FIT_AND_POSITIONING",
+  "date": "2026-08-06",
+  "status": "EXPLAINABLE_FIT_AND_POSITIONING_IMPLEMENTED",
+  "surface": {
+    "type": "OWNER_PRIVATE_LOCAL_CLI",
+    "osRouteCreated": false,
+    "operatorRouteCreated": false,
+    "apiCreated": false,
+    "databaseCreated": false,
+    "providerIntegrationCreated": false,
+    "externalAiInvocationCreated": false,
+    "ollamaInvocationCreated": false
+  },
+  "inputs": {
+    "privateJobAnalysisRun": true,
+    "latestOwnerPrivateCareerEvidenceReview": true,
+    "canonicalCareerFacts": true,
+    "approvedEvidenceMappings": true,
+    "privateRecordsRemainOutsideGit": true
+  },
+  "outputs": [
+    "explainable_fit_summary",
+    "positioning_knowledge_base",
+    "positioning_cards",
+    "resume_positioning_recommendations",
+    "linkedin_positioning_guidance",
+    "interview_guidance",
+    "recruiter_talking_points",
+    "reusability_report",
+    "owner_private_markdown_report"
+  ],
+  "evidenceBoundary": {
+    "unknownCanBecomeVerified": false,
+    "transferableCanBecomeProven": false,
+    "yearsCanBeInferred": false,
+    "productionDeploymentsCanBeInferred": false,
+    "ownershipCanBeInvented": false,
+    "certificationsCanBeInferred": false,
+    "employerResponsibilitiesCanBeInferred": false,
+    "resumeWordingAloneCanVerify": false
+  },
+  "positioningCategories": [
+    "AI Product",
+    "AI Governance",
+    "AI Automation",
+    "Digital Transformation",
+    "Technical Program Management",
+    "Marketing Technology",
+    "DevOps",
+    "Platform Operations",
+    "Customer Discovery",
+    "Stakeholder Management",
+    "Leadership",
+    "Data",
+    "Analytics",
+    "Automation"
+  ],
+  "nonImpact": {
+    "applicationSubmitted": false,
+    "messageSent": false,
+    "resumeMutated": false,
+    "linkedInMutated": false,
+    "publicArtifactCreated": false,
+    "providerFetched": false,
+    "deployed": false,
+    "pushed": false
+  },
+  "rollback": {
+    "repository": "git revert <J001.04 commit SHA>",
+    "privateRecordRollbackRequiresRossApproval": true
+  }
+}
