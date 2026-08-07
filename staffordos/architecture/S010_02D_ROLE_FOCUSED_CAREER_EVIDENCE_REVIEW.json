@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "staffordos.architecture.s010_02d_role_focused_career_evidence_review.v1",
+  "mission": "S010_02D_ROLE_FOCUSED_CAREER_EVIDENCE_REVIEW",
+  "date": "2026-08-06",
+  "status": "ROLE_FOCUSED_CAREER_EVIDENCE_REVIEW_IMPLEMENTED",
+  "objective": "Add a narrow owner-private local workflow for reviewing high-impact Career evidence questions from one private Job Analysis run.",
+  "surface": {
+    "type": "OWNER_PRIVATE_LOCAL_CLI",
+    "osRouteCreated": false,
+    "operatorRouteCreated": false,
+    "publicUiCreated": false,
+    "apiCreated": false,
+    "databaseCreated": false,
+    "providerIntegrationCreated": false,
+    "aiInvocationCreated": false,
+    "ollamaInvocationCreated": false
+  },
+  "allowedOutcomes": [
+    "VERIFIED",
+    "PARTIALLY_SUPPORTED",
+    "TRANSFERABLE",
+    "NEEDS_EVIDENCE",
+    "CONFLICTING",
+    "REJECTED",
+    "DEFERRED"
+  ],
+  "verificationBoundary": {
+    "resumeWordingAloneCanVerify": false,
+    "operatorRecollectionAloneCanVerify": false,
+    "localTestingBecomesProductionUse": false,
+    "repositoryPresenceBecomesProfessionalUse": false,
+    "plannedArchitectureBecomesImplementedCapability": false,
+    "unsupportedMetricsYearsTitlesDatesOrCertificationsCanVerify": false,
+    "verifiedRequiresDirectNonResumeAuthority": true
+  },
+  "reviewScope": {
+    "entireHistoricalCareerQueueReviewed": false,
+    "unknownAndTransferableMappingsOnly": true,
+    "reusableLanes": [
+      "AI Product",
+      "AI Governance",
+      "AI Platform",
+      "Agentic Development",
+      "Automation",
+      "Technical Product"
+    ],
+    "excludedFromFocusedReview": [
+      "compensation",
+      "benefits",
+      "legal policy",
+      "accommodation language",
+      "employment-type metadata",
+      "section headings"
+    ]
+  },
+  "privateOutputHandling": {
+    "decisionsOutsideGit": true,
+    "regeneratedAnalysisOutsideGit": true,
+    "privatePathsDisplayed": false,
+    "originalAnalysisOverwritten": false,
+    "canonicalCareerEvidenceUpdatedAutomatically": false
+  },
+  "nonImpact": {
+    "applicationSubmitted": false,
+    "messageSent": false,
+    "resumeMutated": false,
+    "externalAiInvoked": false,
+    "providerFetched": false,
+    "deployed": false,
+    "pushed": false
+  },
+  "rollback": {
+    "repository": "git revert <S010.02D commit SHA>",
+    "privateRecordRollbackRequiresRossApproval": true
+  }
+}
