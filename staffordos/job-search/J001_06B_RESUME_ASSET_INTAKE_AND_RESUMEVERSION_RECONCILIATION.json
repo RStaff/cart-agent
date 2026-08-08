@@ -1,0 +1,188 @@
+{
+  "schemaVersion": "staffordos.job_search.j001_06b_resume_asset_reconciliation.v1",
+  "mission": "J001_06B_RESUME_ASSET_INTAKE_AND_RESUMEVERSION_RECONCILIATION",
+  "date": "2026-08-08",
+  "status": "RESUME_ASSET_RECONCILIATION_READY_FOR_OPERATOR_REVIEW",
+  "checkpoint": {
+    "head": "d277de84f82a8ec9850daa6f598b3faab62978fb",
+    "j00106AuthorityReused": true,
+    "j00106RebuiltOrReplaced": false,
+    "j00106aAuthorityPresent": true
+  },
+  "approvedSourceAuthority": {
+    "approvedRootRedacted": "~/staffordos-private-intake/career",
+    "sourceRootExists": true,
+    "sourceRootOwnerPrivateMode": "0700",
+    "repositoryRootScanned": false,
+    "entireHomeDirectoryScanned": false,
+    "downloadsScanned": false,
+    "desktopScanned": false,
+    "icloudScanned": false,
+    "unrelatedDirectoriesScanned": false
+  },
+  "scopeBoundary": {
+    "resumeAssetIntakeOnly": true,
+    "applicationResumeLinkCreated": false,
+    "applicationMutated": false,
+    "resumeGenerated": false,
+    "resumeMutated": false,
+    "resumeRenamed": false,
+    "resumeDeleted": false,
+    "careerFactPromoted": false,
+    "careerEvidenceMutated": false,
+    "externalProviderCalled": false,
+    "externalAiInvoked": false,
+    "ollamaInvoked": false,
+    "osConnected": false,
+    "operatorConnected": false,
+    "deployed": false,
+    "pushed": false
+  },
+  "sourceInventoryResult": {
+    "supportedSourceDocuments": 20,
+    "recursiveApprovedRootScan": true,
+    "unsupportedSecretLikeFilesExcluded": true,
+    "filenameUsedAsPrimaryIdentity": false,
+    "canonicalDigestAlgorithm": "SHA-256"
+  },
+  "documentClassificationResult": {
+    "resumeDocuments": 12,
+    "coverLetters": 1,
+    "careerSources": 0,
+    "unknownDocuments": 7,
+    "nonCareerDocuments": 0,
+    "coverLettersBecameResumeVersions": false,
+    "unknownDocumentsForcedIntoResumeAuthority": false
+  },
+  "assetCompatibleSourceResult": {
+    "assetCompatibleSourceRecords": 20,
+    "productionAssetDatabaseCreated": false,
+    "sourceIdentityIndependentOfFilename": true,
+    "sourceDocumentsMoved": false,
+    "sourceDocumentsCopiedIntoGit": false
+  },
+  "resumeVersionReconciliationResult": {
+    "resumeDocuments": 12,
+    "canonicalResumeVersions": 9,
+    "j00106ContractReused": true,
+    "exactDuplicatesCanonicalizedByDigest": true,
+    "likelyVersionsMerged": false,
+    "supersessionCreated": false
+  },
+  "exactDuplicateResult": {
+    "exactDuplicateGroups": 2,
+    "detectedByContentDigest": true,
+    "automaticMergeAllowed": false,
+    "sourceFilesDeleted": false
+  },
+  "formatDerivativeResult": {
+    "formatDerivativeGroups": 0,
+    "requiresDeterministicTextEvidence": true,
+    "inferredFromFilenameAlone": false,
+    "sourceFilesConverted": false
+  },
+  "likelyVersionResult": {
+    "likelyVersionFamilies": 2,
+    "canonicalSupersessionCreated": false,
+    "automaticMergeAllowed": false,
+    "operatorReviewRequired": true
+  },
+  "factSafetyResult": {
+    "resumeContentVerifiesCareerFacts": false,
+    "careerFactsPromoted": 0,
+    "careerEvidenceMutated": false,
+    "pmpSupportsCredentialOnly": true,
+    "resumeVersionsNeedingReview": 9
+  },
+  "sourceIntegrityResult": {
+    "beforeAfterDigestChecksRun": true,
+    "allProcessedSourcesUnchanged": true,
+    "sourceDocumentsMutated": false,
+    "sourceDocumentsRenamed": false,
+    "sourceDocumentsDeleted": false
+  },
+  "historicalResumeVersionResult": {
+    "found": 7,
+    "duplicate": 5,
+    "missing": 0,
+    "orphanResumeVersions": 0,
+    "historicalRecordsDeleted": false
+  },
+  "resumeLibraryHealth": {
+    "totalSupportedSourceDocuments": 20,
+    "resumeDocuments": 12,
+    "coverLetters": 1,
+    "careerSources": 0,
+    "unknownDocuments": 7,
+    "resumeVersions": 9,
+    "exactDuplicateGroups": 2,
+    "formatDerivativeGroups": 0,
+    "likelyVersionFamilies": 2,
+    "generalResumes": 0,
+    "roleTargetedResumes": 9,
+    "conflictingResumes": 9,
+    "staleResumes": 0,
+    "needsReviewResumes": 9,
+    "orphanResumeVersions": 0,
+    "sourceRecordsLackingResumeVersion": 0,
+    "arbitraryScoreGenerated": false,
+    "successProbabilityGenerated": false
+  },
+  "operatorReviewQueue": {
+    "items": 4,
+    "privatePathVisible": false,
+    "rawResumeContentVisible": false,
+    "requiresReviewBeforeCleanupOrLinkage": true
+  },
+  "applicationLinkageReadiness": {
+    "records": 4,
+    "exactSourceReady": 0,
+    "multipleCandidates": 3,
+    "sourceNotPresent": 1,
+    "needsOperatorReview": 0,
+    "noMatch": 0,
+    "applicationResumeLinksCreated": 0,
+    "existingUnknownDecisionsChanged": false,
+    "resumeLinkConfirmedEventsCreated": 0
+  },
+  "privateOutputs": {
+    "outsideGit": true,
+    "artifactCount": 14,
+    "directoryMode": "0700",
+    "fileMode": "0600",
+    "privateFilenamesCommitted": false,
+    "privateDigestsCommitted": false,
+    "privateApplicationValuesCommitted": false,
+    "privatePathsCommitted": false
+  },
+  "cli": {
+    "runner": "runResumeAssetReconciliation.mjs",
+    "commands": [
+      "resume-inventory",
+      "resume-reconcile",
+      "resume-health",
+      "resume-review-queue"
+    ],
+    "normalOutputCountsOrSafeLabelsOnly": true,
+    "manualJsonEditingRequired": false
+  },
+  "validation": {
+    "focusedTests": "PASS",
+    "privateJsonValidation": "PASS",
+    "privatePermissionCheck": "PASS",
+    "sourceIntegrityCheck": "PASS"
+  },
+  "limitations": [
+    "This mission does not perform ApplicationResumeLink confirmation.",
+    "Three submitted Applications have multiple possible candidates.",
+    "One submitted Application has no matching source document in the approved intake root.",
+    "Likely version families and duplicate groups require operator review before cleanup, supersession, or submitted-resume linkage.",
+    "Fact-safety analysis is conservative and does not modify resumes or Career facts."
+  ],
+  "rollback": {
+    "repository": "git revert <J001.06B commit SHA>",
+    "privateRecordRollbackRequiresRossApproval": true
+  },
+  "selectedNextMission": "J001_06C_RESUME_SOURCE_GAP_AND_REVIEW_QUEUE_RESOLUTION",
+  "finalClassification": "RESUME_ASSET_RECONCILIATION_READY_FOR_OPERATOR_REVIEW"
+}

@@ -360,6 +360,34 @@ function formatFor(extension: SupportedResumeSourceExtension | "UNSUPPORTED"): S
   return "UNSUPPORTED" as const;
 }
 
+function sourceEntryExcluded(relativePath: string) {
+  const normalized = normalizeText(relativePath).replace(/[^a-z0-9]+/g, " ");
+  return /\b(secret|secrets|credential|credentials|recovery|recovery code|recovery codes|password|passphrase|token|api key|apikey|private key)\b/.test(
+    normalized,
+  );
+}
+
+function walkSupportedSourceFiles(sourceRoot: string) {
+  const output: string[] = [];
+  const visit = (directory: string) => {
+    for (const entry of readdirSync(directory, { withFileTypes: true }).sort((left, right) => left.name.localeCompare(right.name))) {
+      const filePath = path.join(directory, entry.name);
+      const relativePath = path.relative(sourceRoot, filePath);
+      if (sourceEntryExcluded(relativePath)) continue;
+      if (entry.isDirectory()) {
+        if (entry.name.startsWith(".")) continue;
+        visit(filePath);
+        continue;
+      }
+      if (!entry.isFile()) continue;
+      if (extensionFor(filePath) === "UNSUPPORTED") continue;
+      output.push(filePath);
+    }
+  };
+  visit(sourceRoot);
+  return output;
+}
+
 function normalizeText(value: string | null | undefined) {
   return (value || "").trim().toLowerCase().replace(/\s+/g, " ");
 }
@@ -609,21 +637,21 @@ function inventorySourceRoot(input: {
   const resumeVersions: PrivateResumeVersionRecord[] = [];
   const coverLetters: PrivateCoverLetterReferenceRecord[] = [];
 
-  for (const entry of readdirSync(input.sourceRoot, { withFileTypes: true }).filter((item) => item.isFile())) {
-    const filePath = path.join(input.sourceRoot, entry.name);
+  for (const filePath of walkSupportedSourceFiles(input.sourceRoot)) {
+    const originalFilename = path.basename(filePath);
     const extension = extensionFor(filePath);
     if (extension === "UNSUPPORTED") continue;
     const format = formatFor(extension);
     const bytes = readFileSync(filePath);
     const contentDigest = sha256Buffer(bytes);
     const stats = statSync(filePath);
-    const sourceId = opaqueId("privresumesource", [contentDigest, entry.name, stats.size]);
+    const sourceId = opaqueId("privresumesource", [contentDigest, originalFilename, stats.size]);
     const text = extractDocumentText({ filePath, format, cacheDirectory: input.cacheDirectory, sourceId });
-    const classification = classifyDocument(text, entry.name);
+    const classification = classifyDocument(text, originalFilename);
     const source: PrivateResumeSourceRecord = {
       privateSourceId: sourceId,
       workspaceId: "professional",
-      originalFilename: entry.name,
+      originalFilename,
       extension,
       documentFormat: format,
       sourceRootAuthority: "APPROVED_PRIVATE_CAREER_SOURCE_ROOT",
@@ -664,14 +692,14 @@ function inventorySourceRoot(input: {
           sourcePath: filePath,
           sourcePathRedacted: source.sourcePathRedacted,
         },
-        originalFilename: entry.name,
+        originalFilename,
         contentDigest,
         documentFormat: format,
         observedAt: input.generatedAt,
         createdAt: null,
         modifiedAtObserved: source.modifiedAtObserved,
-        purpose: purposeForResume(text, entry.name),
-        targetRoleFamily: targetRoleFamilyFor(text, entry.name),
+        purpose: purposeForResume(text, originalFilename),
+        targetRoleFamily: targetRoleFamilyFor(text, originalFilename),
         targetCompanyReference: null,
         targetRoleReference: null,
         sourceAuthority: "PRIVATE_CAREER_SOURCE_DOCUMENT",
@@ -696,7 +724,7 @@ function inventorySourceRoot(input: {
         workspaceId: "professional",
         applicationId: null,
         sourceDocumentId: source.privateSourceId,
-        originalFilename: entry.name,
+        originalFilename,
         contentDigest,
         documentFormat: format,
         sourceAuthority: "PRIVATE_CAREER_SOURCE_DOCUMENT",
