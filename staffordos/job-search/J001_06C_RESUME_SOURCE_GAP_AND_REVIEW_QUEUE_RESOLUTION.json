@@ -1,0 +1,124 @@
+{
+  "mission": "J001_06C_RESUME_SOURCE_GAP_AND_REVIEW_QUEUE_RESOLUTION",
+  "classification": "owner_private_resume_review_queue_resolution",
+  "authority": {
+    "dependsOn": [
+      "J001.05A",
+      "J001.05B",
+      "J001.06",
+      "J001.06A",
+      "J001.06B",
+      "S010.02B",
+      "S010.02C",
+      "S010.02C2",
+      "S010.02D",
+      "S010.02E",
+      "A001",
+      "G001",
+      "G002",
+      "G003",
+      "G004.01",
+      "P001"
+    ],
+    "rebuildsPriorContracts": false,
+    "applicationResumeLinkCreationAllowed": false,
+    "usedForSubmissionAllowed": false
+  },
+  "baseline": {
+    "supportedCareerSourceDocuments": 20,
+    "resumeDocuments": 12,
+    "coverLetters": 1,
+    "unknownDocuments": 7,
+    "canonicalResumeVersions": 9,
+    "exactDuplicateGroups": 2,
+    "formatDerivativeGroups": 0,
+    "likelyVersionFamilies": 2,
+    "operatorReviewItems": 4,
+    "applicationReadinessRecords": 4,
+    "multipleCandidates": 3,
+    "sourceNotPresent": 1,
+    "exactSourceReady": 0,
+    "usedForSubmissionLinks": 0
+  },
+  "approvedSourceAuthority": {
+    "sourceRoot": "APPROVED_PRIVATE_CAREER_SOURCE_ROOT",
+    "entireHomeDirectoryScanAllowed": false,
+    "downloadsScanAllowed": false,
+    "desktopScanAllowed": false,
+    "icloudScanAllowed": false
+  },
+  "reviewReasons": [
+    "DUPLICATE_SOURCE_ALIAS",
+    "LIKELY_VERSION_FAMILY",
+    "MULTIPLE_ROLE_TARGETED_CANDIDATES",
+    "FILENAME_VARIATION",
+    "TIMESTAMP_AMBIGUITY",
+    "SOURCE_NOT_PRESENT",
+    "ROLE_CONTEXT_AMBIGUITY",
+    "MULTIPLE_FORMATS",
+    "INSUFFICIENT_METADATA",
+    "OTHER"
+  ],
+  "candidateEliminationReasons": [
+    "ROLE_MISMATCH",
+    "COMPANY_TARGET_MISMATCH",
+    "DATE_AFTER_APPLICATION",
+    "DUPLICATE_ALIAS_OF_OTHER_CANDIDATE",
+    "DOCUMENT_NOT_RESUME",
+    "COVER_LETTER",
+    "SOURCE_MISSING",
+    "EXACT_DIGEST_ALREADY_REPRESENTED",
+    "OTHER_DETERMINISTIC_CONFLICT"
+  ],
+  "operatorDecisionTypes": [
+    "CANDIDATE_PREFERRED",
+    "CANDIDATE_REJECTED",
+    "UNKNOWN",
+    "DEFER",
+    "SOURCE_MISSING_CONFIRMED"
+  ],
+  "readinessStates": [
+    "EXACT_SOURCE_READY",
+    "SINGLE_CANDIDATE_NEEDS_OPERATOR_CONFIRMATION",
+    "MULTIPLE_CANDIDATES",
+    "SOURCE_NOT_PRESENT",
+    "UNRESOLVED",
+    "CONFIRMED_SOURCE_GAP"
+  ],
+  "privateOutputs": [
+    "review_queue_explanations",
+    "candidate_eliminations",
+    "duplicate_collapse",
+    "likely_version_family_analysis",
+    "source_gap_records",
+    "operator_review_decisions",
+    "application_linkage_readiness",
+    "processing_audit_summary"
+  ],
+  "safety": {
+    "applicationResumeLinksCreated": 0,
+    "usedForSubmissionLinksCreated": 0,
+    "resumeLinkConfirmedEventsCreated": 0,
+    "resumeGenerated": false,
+    "resumeMutated": false,
+    "careerFactPromoted": false,
+    "applicationSubmitted": false,
+    "messageSent": false,
+    "externalAiInvoked": false,
+    "ollamaInvoked": false,
+    "externalProviderCalled": false,
+    "osPrivateConnectionAdded": false,
+    "operatorPrivateConnectionAdded": false
+  },
+  "futureBoundary": {
+    "nextEligibleMission": "J001_06D_OPERATOR_CONFIRMED_EXACT_RESUME_LINKAGE",
+    "requiresExactSourceReadyOrSingleCandidate": true,
+    "stillRequiresExplicitOperatorConfirmation": true
+  },
+  "knownLimitations": [
+    "This mission narrows ambiguity but does not prove which resume was submitted.",
+    "Applications may remain unresolved when deterministic evidence is insufficient.",
+    "Source-gap resolution does not import missing documents."
+  ],
+  "testFixtures": "synthetic_only"
+}
