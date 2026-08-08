@@ -1,0 +1,177 @@
+{
+  "schemaVersion": "staffordos.job_search.j001_05b_private_application_pipeline_review.v1",
+  "mission": "J001_05B_PRIVATE_APPLICATION_PIPELINE_REVIEW",
+  "date": "2026-08-07",
+  "status": "PRIVATE_APPLICATION_PIPELINE_REVIEW_IMPLEMENTED",
+  "checkpoint": {
+    "head": "6f81413f4143b8fb1457da0a5442237535fd6cde",
+    "authorities": [
+      "J001.05A Manual Application Event Tracking",
+      "J001.04 Explainable Fit and Positioning",
+      "J001.03A Private Job Requirement and Evidence Mapping",
+      "J001.03B Private Job Analysis Review CLI",
+      "S010.02D Role-Focused Career Evidence Review",
+      "S010.02E High-Value Career Fact Verification",
+      "G001 Private Data Git Backstop",
+      "G002 Professional workspace modes",
+      "G003 adapter-only read-model authority",
+      "G004.01 minimal operator write isolation",
+      "P001 Platform Runtime and Provider Integration Roadmap"
+    ]
+  },
+  "privateBaseline": {
+    "confirmedManualExternalApplications": 3,
+    "followUpReviewTasks": 3,
+    "confirmationNeededCandidates": 1,
+    "automatedSubmissions": 0,
+    "automatedMessages": 0,
+    "privateUiConnection": false
+  },
+  "surface": {
+    "type": "OWNER_PRIVATE_LOCAL_CLI",
+    "library": "privateApplicationPipelineReview.ts",
+    "runner": "runPrivateApplicationPipelineReview.mjs",
+    "commands": [
+      "inventory",
+      "summary",
+      "review"
+    ],
+    "newApplicationShellCreated": false,
+    "publicRouteCreated": false,
+    "osRouteConnected": false,
+    "operatorRouteConnected": false
+  },
+  "priorityRules": [
+    "INTERVIEW_OR_RECRUITER_RESPONSE_REQUIRING_ACTION",
+    "FOLLOW_UP_REVIEW_DUE",
+    "APPLICATION_MISSING_CRITICAL_CONFIRMATION",
+    "HIGH_VALUE_SUBMITTED_APPLICATION_NEEDING_PREPARATION",
+    "OPPORTUNITY_ANALYSIS_WITH_UNRESOLVED_EVIDENCE_QUESTIONS",
+    "RESUME_LINKAGE_MISSING_WHERE_MATERIALLY_USEFUL",
+    "OLDER_APPLICATION_WITH_NO_RECORDED_OUTCOME",
+    "LOW_PRIORITY_ADMINISTRATIVE_CLEANUP"
+  ],
+  "dailyCommand": {
+    "primaryQuestion": "What should Ross do next in his job search today?",
+    "sections": [
+      "PRIMARY_NEXT_ACTION",
+      "APPLICATIONS_NEEDING_ATTENTION",
+      "FOLLOW_UPS_DUE",
+      "INTERVIEWS_OR_RECRUITER_CONTACT",
+      "CONFIRMATION_NEEDED",
+      "SUBMITTED_APPLICATIONS",
+      "RECENT_OUTCOMES",
+      "EVIDENCE_POSITIONING_TASKS",
+      "SEARCH_HEALTH"
+    ],
+    "vanityMetricsGenerated": false,
+    "successProbabilityGenerated": false,
+    "employerInterestInferred": false,
+    "fitInferred": false,
+    "interviewProbabilityInferred": false
+  },
+  "followUpReview": {
+    "reviewTaskOnly": true,
+    "communicationAllowed": false,
+    "operatorApprovalRequired": true,
+    "messageSent": false,
+    "allowedDecisions": [
+      "CONTINUE_MONITORING",
+      "PREPARE_FOLLOW_UP_DRAFT",
+      "REVIEW_EMPLOYER_GUIDANCE",
+      "RECORD_RECRUITER_RESPONSE",
+      "CLOSE_FOLLOW_UP",
+      "DEFER",
+      "PREPARE_INTERVIEW_EVIDENCE"
+    ]
+  },
+  "confirmationNeeded": {
+    "applicationCreatedFromPartialContext": false,
+    "minimumFields": [
+      "exact role",
+      "whether submission occurred",
+      "submission date",
+      "submission channel",
+      "resume used if known"
+    ]
+  },
+  "outcomeRecording": {
+    "appendOnly": true,
+    "supportedOutcomes": [
+      "RECRUITER_CONTACT_RECORDED",
+      "SCREENING_RECORDED",
+      "INTERVIEW_SCHEDULED",
+      "EMPLOYER_REJECTION_RECORDED",
+      "OFFER_RECORDED",
+      "WITHDRAWAL_RECORDED",
+      "APPLICATION_CLOSED"
+    ],
+    "rejectionReasonInvented": false,
+    "offerDecisionAutomated": false
+  },
+  "privateOutputs": {
+    "outsideGit": true,
+    "ownerPrivatePermissions": true,
+    "artifacts": [
+      "daily_job_search_command.json",
+      "pipeline_summary.json",
+      "next_actions.json",
+      "follow_up_review_decisions.json",
+      "confirmation_decisions.json",
+      "application_events.json",
+      "future_ui_read_model.json",
+      "processing_audit_summary.json"
+    ],
+    "privatePathsCommitted": false,
+    "rawResumesCommitted": false,
+    "rawCoverLettersCommitted": false,
+    "portalCredentialsCommitted": false,
+    "privateContactsCommitted": false
+  },
+  "futureUiReadiness": {
+    "readModelPrepared": true,
+    "connectedToOs": false,
+    "connectedToOperator": false,
+    "apiCreated": false,
+    "databaseCreated": false,
+    "privatePathVisible": false,
+    "rawResumeVisible": false,
+    "rawCoverLetterVisible": false,
+    "portalCredentialsVisible": false,
+    "privateContactVisible": false,
+    "g003RemainsAuthoritative": true
+  },
+  "nonImpact": {
+    "applicationSubmitted": false,
+    "messageSent": false,
+    "resumeMutated": false,
+    "linkedInMutated": false,
+    "providerFetched": false,
+    "externalAiInvoked": false,
+    "ollamaInvoked": false,
+    "oauthChanged": false,
+    "g004WriteIsolationChanged": false,
+    "sourceRoutesChanged": false,
+    "deployed": false,
+    "pushed": false
+  },
+  "tests": {
+    "focused": "privateApplicationPipelineReview.test.mjs",
+    "focusedAssertions": 26,
+    "j00105aRegression": "manualApplicationEventTracking.test.mjs",
+    "fixturesSyntheticOnly": true,
+    "realApplicationValuesCommitted": false
+  },
+  "limitations": [
+    "The workflow is a local CLI rather than a visual UI.",
+    "Incomplete candidates remain blocked until Ross confirms required fields.",
+    "Application records are not overwritten in place; decisions and generated events are append-only.",
+    "Resume-to-application Asset linkage remains pending J001.06.",
+    "Follow-up drafts, relationship tracking, and interview preparation remain future slices."
+  ],
+  "rollback": {
+    "repository": "git revert <J001.05B commit SHA>",
+    "privateRecordRollbackRequiresRossApproval": true
+  },
+  "selectedNextMission": "J001_06_RESUME_VERSION_AND_APPLICATION_LINKAGE"
+}
