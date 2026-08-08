@@ -88,10 +88,7 @@ function generatedAt(args) {
 
 function buildResult(args, decisions = []) {
   const currentRoots = roots(args);
-  const applicationStore = linkage.loadResumeLinkageApplicationStore({
-    applicationRoot: currentRoots.applicationRoot,
-    repositoryRoot,
-  });
+  const applicationStore = loadApplicationStore(currentRoots);
   return linkage.buildResumeVersionApplicationLinkage({
     sourceRoots: currentRoots.sourceRoots,
     careerRoots: currentRoots.careerRoots,
@@ -100,6 +97,13 @@ function buildResult(args, decisions = []) {
     generatedAt: generatedAt(args),
     outputRoot: currentRoots.outputRoot,
     decisions,
+  });
+}
+
+function loadApplicationStore(currentRoots) {
+  return linkage.loadResumeLinkageApplicationStore({
+    applicationRoot: currentRoots.applicationRoot,
+    repositoryRoot,
   });
 }
 
@@ -136,13 +140,18 @@ function actionCandidates(result, applicationId) {
   return result.applicationCandidates.filter((candidate) => candidate.applicationId === applicationId);
 }
 
-function printApplicationPrompt(result, applicationId, index, total) {
+function printApplicationPrompt(result, application, index, total) {
+  const applicationId = application.applicationId;
   const link = result.applicationResumeLinks.find((item) => item.applicationId === applicationId);
   const candidates = actionCandidates(result, applicationId);
   printLines([
     "",
     `Application ${index + 1} of ${total}`,
+    `Company: ${application.companyReference.label}`,
+    `Role: ${application.roleReference.title}`,
+    `Submission date: ${application.submittedAt ? application.submittedAt.slice(0, 10) : "UNKNOWN"}`,
     `Application ID: ${applicationId}`,
+    `Resume reference status: ${application.resumeReference.status}`,
     `Current resume link: ${link?.linkType || "UNKNOWN"}`,
     "",
     "Candidate versions:",
@@ -170,14 +179,19 @@ function parseDecision(answer, candidates) {
 async function commandReview(args) {
   const currentRoots = roots(args);
   let result = buildResult(args);
-  const applicationIds = result.applicationResumeLinks.map((link) => link.applicationId);
+  const applicationStore = loadApplicationStore(currentRoots);
+  const applicationsById = new Map(applicationStore.applications.map((application) => [application.applicationId, application]));
+  const applications = result.applicationResumeLinks
+    .map((link) => applicationsById.get(link.applicationId))
+    .filter(Boolean);
   const decisions = [];
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   try {
-    for (let index = 0; index < applicationIds.length; index += 1) {
-      const applicationId = applicationIds[index];
+    for (let index = 0; index < applications.length; index += 1) {
+      const application = applications[index];
+      const applicationId = application.applicationId;
       const candidates = actionCandidates(result, applicationId);
-      printApplicationPrompt(result, applicationId, index, applicationIds.length);
+      printApplicationPrompt(result, application, index, applications.length);
       const answer = await rl.question("> ");
       const parsed = parseDecision(answer, candidates);
       if (parsed === "STOP") break;

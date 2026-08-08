@@ -1,0 +1,144 @@
+{
+  "schemaVersion": "staffordos.job_search.j001_06a_vista_application_resume_linkage_reconciliation.v1",
+  "mission": "J001_06A_VISTA_APPLICATION_AND_RESUME_LINKAGE_RECONCILIATION",
+  "date": "2026-08-08",
+  "status": "VISTA_APPLICATION_RESUME_LINKAGE_READY_FOR_OPERATOR",
+  "checkpoint": {
+    "head": "450f61d4d564e80863a233256bf1a728d648a7c0",
+    "j00106CommitPresent": true,
+    "j00106Authority": "COMPLETED"
+  },
+  "j00106Baseline": {
+    "supportedPrivateSourceRecordsInventoried": 20,
+    "resumeVersionRecords": 12,
+    "coverLetterCandidates": 1,
+    "exactDuplicateGroups": 2,
+    "likelyVersionGroups": 2,
+    "confirmedUsedForSubmissionLinks": 0,
+    "confirmedApplicationsWithUnknownResumeLinkage": 3,
+    "confirmationNeededCandidatesBlockedFromResumeLinkage": 1,
+    "contractsRebuilt": false
+  },
+  "vistaApplicationReconciliation": {
+    "privateApplicationCreated": true,
+    "status": "SUBMITTED_MANUAL_EXTERNAL",
+    "submissionMethod": "MANUAL_EXTERNAL",
+    "employerResponseStatus": "NONE_RECORDED",
+    "resumeFilenameStoredAsPrivateLegacyReference": true,
+    "resumeFilenameCommitted": false,
+    "coverLetterStatus": "UNKNOWN",
+    "staffordOsSubmissionRole": "NONE",
+    "staffordOsSubmittedApplication": false,
+    "employerInterestInferred": false,
+    "interviewProbabilityInferred": false,
+    "validatedFitInferred": false,
+    "successProbabilityInferred": false,
+    "recruiterIntentInferred": false,
+    "overqualificationEmployerJudgmentInferred": false
+  },
+  "positioningBoundary": {
+    "operatorAssessedThemesPreservedPrivately": true,
+    "subjectiveEstimatePreservedAsOperatorAssessmentOnly": true,
+    "promotedToCanonicalLearning": false,
+    "treatedAsEmployerConfirmedStrengths": false
+  },
+  "applicationEventResult": {
+    "privateApplicationEventsCreated": 3,
+    "eventTypes": [
+      "APPLICATION_CREATED",
+      "SUBMITTED_MANUAL_EXTERNAL",
+      "FOLLOW_UP_REVIEW_SCHEDULED"
+    ],
+    "appendOnly": true,
+    "externalActionPerformedByStaffordOS": false
+  },
+  "followUpResult": {
+    "privateFollowUpTasksCreated": 1,
+    "communicationAllowed": false,
+    "operatorApprovalRequired": true,
+    "messageSent": false,
+    "employerResponseInferred": false
+  },
+  "resumeInventoryRefresh": {
+    "usedExistingJ00106Workflow": true,
+    "applicationsLoaded": 4,
+    "confirmationNeededCandidates": 1,
+    "resumeSourcesInventoried": 20,
+    "resumeVersionsCreated": 12,
+    "coverLettersFound": 1,
+    "exactDuplicateGroups": 2,
+    "likelyVersionGroups": 2,
+    "sourceDocumentsMutated": false
+  },
+  "resumeLinkageReview": {
+    "confirmedApplicationsReviewed": 4,
+    "operatorDecisionsSaved": 4,
+    "allDecisions": "UNKNOWN",
+    "confirmedUsedForSubmissionLinks": 0,
+    "unknownApplicationLinks": 4,
+    "resumeLinkConfirmedEvents": 0,
+    "filenameSimilarityUsedForSubmittedLinkage": false,
+    "privatePathDisplayed": false,
+    "rawResumeContentDisplayed": false
+  },
+  "existingApplicationLinkageResult": {
+    "preExistingConfirmedApplicationsRemainUnknown": 3,
+    "newApplicationExactResumeVersionLink": "UNKNOWN",
+    "confirmationNeededCandidateLinkageBlocked": true
+  },
+  "cliResult": {
+    "existingCliReused": true,
+    "narrowUsabilityFixApplied": true,
+    "reviewPromptShowsSafeApplicationContext": true,
+    "reviewPromptShowsPrivatePaths": false,
+    "reviewPromptShowsRawResumeText": false,
+    "reviewPromptShowsSourceDocumentContents": false
+  },
+  "pipelineSummary": {
+    "confirmedManualExternalApplications": 4,
+    "applicationEvents": 11,
+    "followUpReviewTasks": 4,
+    "confirmationNeededCandidates": 1,
+    "recruiterResponses": 0,
+    "screenings": 0,
+    "interviews": 0,
+    "offers": 0,
+    "rejections": 0,
+    "automatedSubmissions": 0,
+    "automatedMessages": 0
+  },
+  "privateOutputs": {
+    "outsideGit": true,
+    "ownerPrivatePermissions": true,
+    "realApplicationDataCommitted": false,
+    "submittedResumeFilenameCommitted": false,
+    "sourceResumeMetadataCommitted": false,
+    "privatePathsCommitted": false
+  },
+  "nonImpact": {
+    "resumeGenerated": false,
+    "resumeMutated": false,
+    "applicationSubmitted": false,
+    "messageSent": false,
+    "linkedInMutated": false,
+    "externalProviderCall": false,
+    "externalAiInvoked": false,
+    "ollamaInvoked": false,
+    "osRouteConnected": false,
+    "operatorRouteConnected": false,
+    "deployed": false,
+    "pushed": false
+  },
+  "limitations": [
+    "Exact submitted ResumeVersion links remain unknown until source documents are present under approved private Career source authority and Ross confirms a candidate.",
+    "The private legacy submitted-resume filename does not establish a submitted ResumeVersion link.",
+    "No trusted Professional UI read-model connection exists yet.",
+    "Private record rollback requires separate Ross approval."
+  ],
+  "rollback": {
+    "repository": "git revert <J001.06A commit SHA>",
+    "privateRecordRollbackRequiresRossApproval": true
+  },
+  "selectedNextMission": "J001_07_RELATIONSHIP_AND_FOLLOW_UP",
+  "finalClassification": "VISTA_APPLICATION_RESUME_LINKAGE_READY_FOR_OPERATOR"
+}

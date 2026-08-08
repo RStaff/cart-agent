@@ -286,6 +286,71 @@ test("resume linkage cannot be inferred from filename alone", () => {
   }
 });
 
+test("follow-on legacy filename remains unknown when no private source match exists", () => {
+  const { fixture, result } = build({
+    applicationOverrides: {
+      resumeStatus: "PRIVATE_LEGACY_REFERENCE",
+      resumeFilename: "Synthetic Submitted Resume Not In Source Root.pdf",
+    },
+  });
+  try {
+    assert.equal(result.sourceInventory.some((sourceRecord) => sourceRecord.originalFilename === "Synthetic Submitted Resume Not In Source Root.pdf"), false);
+    assert.equal(result.resumeVersions.some((version) => version.originalFilename === "Synthetic Submitted Resume Not In Source Root.pdf"), false);
+    assert.equal(result.applicationResumeLinks[0].linkType, "UNKNOWN");
+    assert.equal(result.applicationResumeLinks[0].usedForSubmission, false);
+    assert.equal(result.resumeLinkApplicationEvents.length, 0);
+  } finally {
+    rmSync(fixture.base, { recursive: true, force: true });
+  }
+});
+
+test("follow-on exact source match still requires operator confirmation before submitted linkage", () => {
+  const sourceFilename = "Synthetic Role Submitted Resume.txt";
+  const initial = build({
+    resumeFilename: sourceFilename,
+    applicationOverrides: {
+      resumeStatus: "PRIVATE_LEGACY_REFERENCE",
+      resumeFilename: sourceFilename,
+    },
+  });
+  const applicationId = initial.applicationStore.applications[0].applicationId;
+  const resumeVersionId = initial.result.resumeVersions[0].resumeVersionId;
+  try {
+    assert.equal(initial.result.applicationCandidates[0].confidence, "HIGH_REQUIRES_OPERATOR_CONFIRMATION");
+    assert.equal(initial.result.applicationResumeLinks[0].linkType, "UNKNOWN");
+  } finally {
+    rmSync(initial.fixture.base, { recursive: true, force: true });
+  }
+
+  const confirmed = build({
+    resumeFilename: sourceFilename,
+    applications: [
+      application({
+        applicationId,
+        resumeStatus: "PRIVATE_LEGACY_REFERENCE",
+        resumeFilename: sourceFilename,
+      }),
+    ],
+    decisions: [
+      {
+        applicationId,
+        resumeVersionId,
+        outcome: "CONFIRM_USED",
+        operatorConfirmed: true,
+        createdAt: "2026-08-07T12:00:00Z",
+      },
+    ],
+  });
+  try {
+    assert.equal(confirmed.result.applicationResumeLinks[0].linkType, "USED_FOR_SUBMISSION");
+    assert.equal(confirmed.result.applicationResumeLinks[0].operatorConfirmed, true);
+    assert.equal(confirmed.result.resumeLinkApplicationEvents[0].eventType, "RESUME_LINK_CONFIRMED");
+    assert.equal(confirmed.result.resumeLinkApplicationEvents[0].submittedByStaffordOS, false);
+  } finally {
+    rmSync(confirmed.fixture.base, { recursive: true, force: true });
+  }
+});
+
 test("cover letter remains separate", () => {
   const { fixture, result } = build({ coverLetter: true });
   try {
@@ -527,6 +592,15 @@ test("summary exposes counts only", () => {
   } finally {
     rmSync(fixture.base, { recursive: true, force: true });
   }
+});
+
+test("review CLI presents safe application context without private paths or resume content", () => {
+  assert.match(cliSource, /Company: \$\{application\.companyReference\.label\}/);
+  assert.match(cliSource, /Role: \$\{application\.roleReference\.title\}/);
+  assert.match(cliSource, /Submission date: \$\{application\.submittedAt/);
+  assert.match(cliSource, /Resume reference status: \$\{application\.resumeReference\.status\}/);
+  assert.match(cliSource, /No resume content or private filesystem path is printed/);
+  assert.doesNotMatch(cliSource, /sourcePath|originalFilename|readFileSync\(.*resume/i);
 });
 
 test("no resume generation, mutation, submit, message, provider, AI, API, database, or route import exists", () => {
