@@ -1,0 +1,259 @@
+{
+  "schemaVersion": "staffordos.job_search.j001_06_resume_version_application_linkage.v1",
+  "mission": "J001_06_RESUME_VERSION_AND_APPLICATION_LINKAGE",
+  "date": "2026-08-08",
+  "status": "RESUME_VERSION_APPLICATION_LINKAGE_READY_FOR_REVIEW",
+  "checkpoint": {
+    "head": "512ac5b85b67892ba5f237e58ffb1b09e2ad1544",
+    "authorities": [
+      "J001.05A Manual Application Event Tracking",
+      "J001.05B Private Application Pipeline Review",
+      "J001.04 Explainable Fit and Positioning",
+      "J001.03A Private Job Requirement and Evidence Mapping",
+      "J001.03B Private Job Analysis Review CLI",
+      "S010.02B Career Evidence Contract",
+      "S010.02C Career Evidence Intake",
+      "S010.02C2 Career Evidence Intake",
+      "S010.02D Role-Focused Review",
+      "S010.02E High-Value Fact Verification",
+      "A001 Asset Authority architecture",
+      "G001 Private Data Git Backstop",
+      "G002 Professional workspace modes",
+      "G003 adapter-only read-model authority",
+      "G004.01 operator write isolation",
+      "P001 Platform Runtime Roadmap"
+    ]
+  },
+  "canonicalRule": {
+    "order": [
+      "CAREER_FACT",
+      "CAREER_EVIDENCE",
+      "POSITIONING",
+      "RESUME_VERSION",
+      "APPLICATION"
+    ],
+    "resumeVersionIsCareerTruth": false,
+    "resumeMayContainVerifiedFacts": true,
+    "resumeMayContainTransferablePositioning": true,
+    "resumeMayContainUnsupportedClaims": true,
+    "resumeMayContainUnknownClaims": true
+  },
+  "privateBaseline": {
+    "confirmedManualExternalApplications": 3,
+    "applicationEvents": 8,
+    "followUpTasks": 3,
+    "confirmationNeededCandidates": 1,
+    "resumeReferencesIncompleteOrUnknown": true,
+    "newlyVerifiedCanonicalCareerFactScope": "CERTIFICATION_FACT_ONLY",
+    "privateProfessionalDataConnectedToOs": false
+  },
+  "sourceInventory": {
+    "approvedSourceRootsOnly": true,
+    "entireHomeDirectorySearched": false,
+    "supportedFormats": [
+      "PDF",
+      "DOCX",
+      "TXT",
+      "MD",
+      "MARKDOWN"
+    ],
+    "deferredFormatsInspected": false,
+    "classifications": [
+      "RESUME",
+      "COVER_LETTER",
+      "CAREER_SOURCE",
+      "UNKNOWN_DOCUMENT",
+      "NON_CAREER_DOCUMENT"
+    ],
+    "filenameOnlyResumeClassificationAllowed": false
+  },
+  "privateRunSummary": {
+    "applicationsLoaded": 3,
+    "confirmationNeededCandidates": 1,
+    "resumeSourcesInventoried": 20,
+    "resumeVersionsCreated": 12,
+    "coverLettersFound": 1,
+    "exactDuplicateGroups": 2,
+    "likelyVersionGroups": 2,
+    "confirmedUsedForSubmissionLinks": 0,
+    "unknownApplicationLinks": 3,
+    "artifactCount": 9,
+    "privatePathVisible": false
+  },
+  "resumeVersionContract": {
+    "schema": "staffordos.job_search.private_resume_version.v1",
+    "filenamePrimaryId": false,
+    "fields": [
+      "resumeVersionId",
+      "workspaceId",
+      "assetReferenceId",
+      "sourceDocumentReference",
+      "originalFilename",
+      "contentDigest",
+      "documentFormat",
+      "observedAt",
+      "createdAt",
+      "modifiedAtObserved",
+      "purpose",
+      "targetRoleFamily",
+      "targetCompanyReference",
+      "targetRoleReference",
+      "sourceAuthority",
+      "privacy",
+      "reviewStatus",
+      "factSafetyStatus",
+      "supersedesResumeVersionId",
+      "derivedFromResumeVersionId",
+      "limitations"
+    ]
+  },
+  "applicationResumeLinkContract": {
+    "schema": "staffordos.job_search.private_application_resume_link.v1",
+    "allowedLinkTypes": [
+      "USED_FOR_SUBMISSION",
+      "PREPARED_FOR_APPLICATION",
+      "CONSIDERED",
+      "SUPERSEDED",
+      "UNKNOWN"
+    ],
+    "usedForSubmissionRequiresOperatorConfirmation": true,
+    "filenameSimilarityCanConfirmSubmission": false,
+    "appendOnlyEventWhenConfirmed": "RESUME_LINK_CONFIRMED"
+  },
+  "coverLetterBoundary": {
+    "schema": "staffordos.job_search.private_cover_letter_reference.v1",
+    "separateFromResume": true,
+    "contentCopiedIntoApplication": false,
+    "wordingVerifiesCareerFact": false
+  },
+  "duplicateVersionRules": {
+    "exactDuplicateUsesDigest": true,
+    "likelyVersionDoesNotMergeSilently": true,
+    "sourceFilesDeleted": false,
+    "sourceFilesRenamed": false,
+    "sourceFilesMoved": false
+  },
+  "factSafetyRules": {
+    "classifications": [
+      "SUPPORTED_VERIFIED",
+      "SUPPORTED_TRANSFERABLE",
+      "PARTIALLY_SUPPORTED",
+      "NEEDS_EVIDENCE",
+      "CONFLICTING",
+      "STALE",
+      "UNSUPPORTED",
+      "UNKNOWN"
+    ],
+    "resumeWordingVerifiesCareerFact": false,
+    "unsupportedMetricRemainsUnsupported": true,
+    "unsupportedYearRemainsUnsupported": true,
+    "conflictingEmploymentFactRemainsConflicting": true,
+    "safetyReportOnly": true,
+    "resumeRewritten": false
+  },
+  "pmpTreatment": {
+    "verifiedCredentialMaySupportCredentialClaim": true,
+    "impliesYearsOfExperience": false,
+    "impliesProjectScale": false,
+    "impliesEmployerResponsibility": false,
+    "impliesFinancialImpact": false,
+    "impliesProgramOutcome": false
+  },
+  "applicationReconciliation": {
+    "confirmedApplicationsProcessed": 3,
+    "confirmedUsedForSubmissionLinks": 0,
+    "unknownLinksPendingOperatorConfirmation": 3,
+    "confirmationNeededCandidateLinkCreated": false,
+    "submissionHistoryRewritten": false
+  },
+  "cli": {
+    "type": "OWNER_PRIVATE_LOCAL_CLI",
+    "library": "resumeVersionApplicationLinkage.ts",
+    "runner": "runResumeVersionApplicationLinkage.mjs",
+    "commands": [
+      "inventory",
+      "inventory --write",
+      "review"
+    ],
+    "normalOutputAggregateOnly": true,
+    "rawResumeTextPrinted": false,
+    "privatePathsPrintedByDefault": false
+  },
+  "assetCompatibility": {
+    "a001Compatible": true,
+    "productionAssetDatabaseCreated": false,
+    "sourceFilesMoved": false,
+    "sourceFilesCopiedIntoGit": false,
+    "migrationPath": [
+      "ResumeVersion",
+      "Asset metadata",
+      "storage/provider reference"
+    ]
+  },
+  "futureUiReadiness": {
+    "readModelPrepared": true,
+    "connectedToOs": false,
+    "connectedToOperator": false,
+    "apiCreated": false,
+    "databaseCreated": false,
+    "providerConnected": false,
+    "privatePathVisible": false,
+    "rawResumeTextVisible": false,
+    "privateContactVisible": false,
+    "credentialsVisible": false,
+    "g003RemainsAuthoritative": true
+  },
+  "privateOutputs": {
+    "outsideGit": true,
+    "ownerPrivatePermissions": true,
+    "artifacts": [
+      "resume_inventory.json",
+      "resume_versions.json",
+      "duplicate_version_analysis.json",
+      "resume_fact_safety_reports.json",
+      "application_resume_links.json",
+      "cover_letter_references.json",
+      "resume_link_application_events.json",
+      "future_ui_read_model.json",
+      "processing_audit_summary.json"
+    ],
+    "realResumeFilesCommitted": false,
+    "realResumeMetadataCommitted": false,
+    "privatePathsCommitted": false
+  },
+  "nonImpact": {
+    "resumeGenerated": false,
+    "resumeMutated": false,
+    "resumeDeleted": false,
+    "resumeCopiedIntoGit": false,
+    "applicationSubmitted": false,
+    "messageSent": false,
+    "linkedInMutated": false,
+    "providerFetched": false,
+    "externalAiInvoked": false,
+    "ollamaInvoked": false,
+    "oauthChanged": false,
+    "osRouteConnected": false,
+    "operatorRouteConnected": false,
+    "deployed": false,
+    "pushed": false
+  },
+  "tests": {
+    "focused": "resumeVersionApplicationLinkage.test.mjs",
+    "focusedAssertions": 26,
+    "fixturesSyntheticOnly": true,
+    "realResumeValuesCommitted": false
+  },
+  "limitations": [
+    "No exact submitted-resume link is confirmed until Ross chooses the exact private ResumeVersion.",
+    "Deferred formats are not inspected.",
+    "Fact-safety analysis is conservative and does not rewrite resumes.",
+    "No production Asset database is created.",
+    "The future UI read model is not connected to any route, API, database, or provider."
+  ],
+  "rollback": {
+    "repository": "git revert <J001.06 commit SHA>",
+    "privateRecordRollbackRequiresRossApproval": true
+  },
+  "selectedNextMission": "J001_07_RELATIONSHIP_AND_FOLLOW_UP"
+}
