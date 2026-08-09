@@ -175,6 +175,16 @@ function setupFixture(options = {}) {
       workspaceId: "professional",
       statement: "Employment title or date conflict requires review.",
       verificationStatus: "CONFLICTING",
+      canonical: true,
+    });
+  }
+  if (options.nonCanonicalConflictingEmployment) {
+    facts.push({
+      id: "synthetic_candidate_fact_employment_conflict",
+      workspaceId: "professional",
+      statement: "Employment title or date conflict requires review.",
+      verificationStatus: "CONFLICTING",
+      canonical: false,
     });
   }
   writeFileSync(path.join(careerRoot, "canonical_career_facts.private.json"), JSON.stringify(facts, null, 2));
@@ -401,6 +411,18 @@ test("conflicting employment fact remains conflicting", () => {
   try {
     const employment = result.factSafetyReports[0].claims.find((claim) => claim.claimType === "EMPLOYMENT");
     assert.equal(employment.classification, "CONFLICTING");
+  } finally {
+    rmSync(fixture.base, { recursive: true, force: true });
+  }
+});
+
+test("non-canonical conflicting employment facts do not mark resume claims conflicting", () => {
+  const { fixture, result } = build({ nonCanonicalConflictingEmployment: true });
+  try {
+    const employment = result.factSafetyReports[0].claims.find((claim) => claim.claimType === "EMPLOYMENT");
+    assert.equal(employment.classification, "UNKNOWN");
+    assert.match(employment.limitations.join(" "), /Non-canonical conflicting candidate facts exist/);
+    assert.equal(result.factSafetyReports[0].factSafetyStatus, "NEEDS_EVIDENCE");
   } finally {
     rmSync(fixture.base, { recursive: true, force: true });
   }

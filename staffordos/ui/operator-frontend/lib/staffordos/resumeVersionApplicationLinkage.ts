@@ -268,6 +268,7 @@ type CareerAuthorityStore = {
   verifiedPmpFactIds: string[];
   verifiedEducationFactIds: string[];
   conflictingEmploymentFactIds: string[];
+  nonCanonicalConflictingEmploymentFactCount: number;
   evidenceIds: string[];
 };
 
@@ -471,6 +472,7 @@ function loadCareerAuthorityStore(careerRoots: readonly string[], repositoryRoot
   const verifiedPmpFactIds: string[] = [];
   const verifiedEducationFactIds: string[] = [];
   const conflictingEmploymentFactIds: string[] = [];
+  let nonCanonicalConflictingEmploymentFactCount = 0;
   const evidenceIds: string[] = [];
   for (const careerRoot of careerRoots) {
     if (!careerRoot || !existsSync(careerRoot)) continue;
@@ -493,7 +495,11 @@ function loadCareerAuthorityStore(careerRoots: readonly string[], repositoryRoot
           verifiedEducationFactIds.push(id);
         }
         if (id && verificationStatus === "CONFLICTING" && /\b(employer|employment|title|role|date)\b/i.test(statement)) {
-          conflictingEmploymentFactIds.push(id);
+          if (record.canonical === true) {
+            conflictingEmploymentFactIds.push(id);
+          } else {
+            nonCanonicalConflictingEmploymentFactCount += 1;
+          }
         }
         if (id && typeof record.evidenceType === "string") {
           evidenceIds.push(id);
@@ -505,6 +511,7 @@ function loadCareerAuthorityStore(careerRoots: readonly string[], repositoryRoot
     verifiedPmpFactIds: [...new Set(verifiedPmpFactIds)],
     verifiedEducationFactIds: [...new Set(verifiedEducationFactIds)],
     conflictingEmploymentFactIds: [...new Set(conflictingEmploymentFactIds)],
+    nonCanonicalConflictingEmploymentFactCount,
     evidenceIds: [...new Set(evidenceIds)],
   };
 }
@@ -578,7 +585,12 @@ function buildClaimSafety(input: {
       input.careerAuthority.conflictingEmploymentFactIds.length ? "CONFLICTING" : "UNKNOWN",
       input.careerAuthority.conflictingEmploymentFactIds,
       [],
-      ["Employment, title, and date claims require canonical Career authority."],
+      [
+        "Employment, title, and date claims require canonical Career authority.",
+        input.careerAuthority.nonCanonicalConflictingEmploymentFactCount
+          ? "Non-canonical conflicting candidate facts exist in private Career authority; they require review but do not by themselves make this resume claim conflicting."
+          : "No non-canonical conflict context was found for this claim.",
+      ],
     );
   }
   if (/\b(staffordos|shopifixer|abando|automation|agent|platform|governance|architecture)\b/i.test(text)) {

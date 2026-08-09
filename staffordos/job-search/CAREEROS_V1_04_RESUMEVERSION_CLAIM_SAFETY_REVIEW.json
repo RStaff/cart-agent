@@ -1,0 +1,104 @@
+{
+  "mission": "CAREEROS_V1_04_RESUMEVERSION_CLAIM_SAFETY_REVIEW",
+  "classification": "RESUMEVERSION_CLAIM_SAFETY_REVIEW_COMPLETED_WITH_OPERATOR_REVIEW_BLOCKER",
+  "authority": {
+    "startingHead": "515768e7",
+    "branch": "main",
+    "reusedAuthorities": [
+      "J001 Career Evidence / Resume authority / Explainable Fit",
+      "J002 Real Opportunity Discovery",
+      "J003 Recommendation and application-preparation workflow",
+      "J004.01 Follow-up and response tracking",
+      "CAREEROS_V1_01 Daily Job Search Experience",
+      "CAREEROS_V1_02 Live Job Search Activation",
+      "CAREEROS_V1_03 Resume Evidence Readiness"
+    ]
+  },
+  "strategicCohort": {
+    "selectedResumeVersions": 4,
+    "families": [
+      "AI Automation",
+      "AI Governance",
+      "Technical Program Management"
+    ],
+    "selectionReason": "Smallest high-value cohort aligned to the strongest real REVIEW opportunities and target lanes."
+  },
+  "rootCauseFinding": {
+    "issue": "Non-canonical conflicting candidate Career facts were treated as hard ResumeVersion conflicts.",
+    "fix": "Only canonical conflicting employment authority marks employment/title/date resume claims as CONFLICTING. Non-canonical conflicts remain review context.",
+    "thresholdsChanged": false,
+    "recommendationLogicChanged": false
+  },
+  "claimConflictInventory": {
+    "before": {
+      "resumeVersionsEvaluated": 9,
+      "conflictingResumeVersions": 9,
+      "safeRecommendedResumeVersions": 0
+    },
+    "after": {
+      "resumeVersionsEvaluated": 9,
+      "conflictingResumeVersions": 0,
+      "needsEvidenceResumeVersions": 9,
+      "operatorReviewRequired": 9,
+      "safeToReuse": 0
+    }
+  },
+  "conflictsResolved": [
+    "Non-canonical candidate CareerFact conflicts no longer hard-block all employment/title/date resume claims.",
+    "Canonical conflicting employment facts still hard-block reuse.",
+    "Resume wording remains downstream positioning and does not verify Career truth."
+  ],
+  "conflictsRemaining": [
+    "Metric or quantified outcome claims need direct evidence.",
+    "Years-of-experience wording needs authority.",
+    "Employment, title, and date wording needs canonical Career authority.",
+    "Project, product, technology, production-use, customer-use, and impact wording need stronger evidence or limited positioning.",
+    "Stale source warnings on older documents require review."
+  ],
+  "resumeVersionSafetyResult": {
+    "selectedCohort": 4,
+    "safeToReuse": 0,
+    "safeWithLimitations": 0,
+    "needsOperatorReview": 4,
+    "notSafeToReuse": 0,
+    "careerTruthPromotedFromResume": false
+  },
+  "recommendationRerunResult": {
+    "recommendationsCreated": 276,
+    "applyNow": 0,
+    "review": 45,
+    "wait": 208,
+    "skip": 23,
+    "resumeVersionsEvaluated": 9,
+    "opportunitiesWithRecommendedResumeVersion": 276,
+    "readyForOperatorApprovedApplication": 0,
+    "thresholdsChanged": false,
+    "hiringProbabilityGenerated": false,
+    "interviewProbabilityGenerated": false,
+    "aiConfidenceScoreGenerated": false
+  },
+  "dailyUiVerification": {
+    "route": "/os/professional/jobs",
+    "realOpportunitiesVisible": true,
+    "resumeVersionCandidateVisible": true,
+    "needsEvidenceVisible": true,
+    "applicationReadinessBlocked": true,
+    "externalActionControlsEnabled": false
+  },
+  "nonImpact": {
+    "resumeGenerated": false,
+    "resumeMutated": false,
+    "careerFactInvented": false,
+    "careerFactPromoted": false,
+    "careerEvidenceMutated": false,
+    "applicationCreated": false,
+    "applicationSubmitted": false,
+    "messageSent": false,
+    "providerAdded": false,
+    "externalAiUsed": false,
+    "ollamaUsed": false,
+    "deployed": false,
+    "pushed": false
+  },
+  "recommendedNextAction": "Run a narrow operator evidence review for the selected cohort, then rerun recommendations."
+}
