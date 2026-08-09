@@ -1,0 +1,147 @@
+{
+  "mission": "J003_01_OPPORTUNITY_RECOMMENDATION_ENGINE",
+  "classification": "OPPORTUNITY_RECOMMENDATION_ENGINE_COMPLETED",
+  "workspace": {
+    "topLevelWorkspace": "Professional",
+    "capabilityFamily": "Career Operations",
+    "newWorkspaceCreated": false
+  },
+  "authority": {
+    "startingHead": "35f4c100",
+    "dependsOn": [
+      "J001 Know Me",
+      "J001.03A Explainable Fit",
+      "J001.06 ResumeVersion authority",
+      "J002.01 Job Discovery and Prioritization",
+      "J002.02A Private Job Source Import Queue",
+      "J002.02B Greenhouse Discovery MVP",
+      "G001 Private Data Git Backstop",
+      "G003 Adapter-Only Read Model Authority",
+      "G004.01 Operator Write Isolation"
+    ],
+    "discoveryRebuilt": false,
+    "additionalProviderAdded": false,
+    "rankingLogicModified": false,
+    "explainableFitReused": true,
+    "resumeVersionAuthorityReused": true
+  },
+  "pipeline": [
+    "Opportunity Queue",
+    "Explainable Fit",
+    "ResumeVersion Selection",
+    "Gap Analysis",
+    "Recommendation",
+    "Application Readiness"
+  ],
+  "recommendationContract": {
+    "schemaVersion": "staffordos.job_search.private_opportunity_recommendation.v1",
+    "allowedRecommendations": [
+      "APPLY_NOW",
+      "REVIEW",
+      "WAIT",
+      "SKIP"
+    ],
+    "requiredOutputs": [
+      "Explainable Fit",
+      "Recommended ResumeVersion",
+      "Supporting Career Evidence",
+      "Missing Skills",
+      "Estimated Resume Update Effort",
+      "Recommended Next Action",
+      "Application Readiness"
+    ],
+    "hiringProbabilityGenerated": false,
+    "interviewProbabilityGenerated": false,
+    "aiConfidenceScoreGenerated": false
+  },
+  "resumeVersionSelection": {
+    "usesExistingResumeVersions": true,
+    "usesFilenameAsIdentity": false,
+    "readsRawResumeText": false,
+    "mutatesResume": false,
+    "generatesResume": false,
+    "resumeIsCareerTruth": false,
+    "reuseStatuses": [
+      "SELECTED_EXISTING_RESUMEVERSION",
+      "REVIEW_BEFORE_REUSE",
+      "NO_SAFE_EXISTING_RESUMEVERSION",
+      "NO_RESUMEVERSION_AVAILABLE"
+    ]
+  },
+  "gapAnalysis": {
+    "usesExistingCareerEvidenceMappings": true,
+    "supportingClassifications": [
+      "PROVEN",
+      "PARTIAL",
+      "TRANSFERABLE"
+    ],
+    "gapClassifications": [
+      "MISSING",
+      "UNKNOWN"
+    ],
+    "careerFactsPromoted": false,
+    "careerEvidenceMutated": false
+  },
+  "applicationReadiness": {
+    "states": [
+      "READY_FOR_OPERATOR_APPROVED_APPLICATION",
+      "NEEDS_EVIDENCE_REVIEW",
+      "NEEDS_RESUME_REVIEW",
+      "WAITING_FOR_SOURCE_OR_DUPLICATE_REVIEW",
+      "BLOCKED_EXISTING_APPLICATION",
+      "SKIP_RECOMMENDED"
+    ],
+    "applyNowSubmitsApplication": false,
+    "rossApprovalRequiredBeforeApplication": true
+  },
+  "privateOutputs": [
+    "opportunity_recommendations.json",
+    "application_readiness.json",
+    "resume_selection.json",
+    "gap_analysis.json",
+    "future_read_model.json",
+    "recommendation_audit.json"
+  ],
+  "cli": {
+    "command": "node staffordos/ui/operator-frontend/lib/staffordos/runOpportunityRecommendationEngine.mjs recommend --queue-result <queue-result.json>",
+    "privateOutputOnly": true,
+    "printsPrivatePaths": false,
+    "printsRawResumeText": false,
+    "printsRawJobText": false
+  },
+  "outOfScope": {
+    "resumeGeneration": false,
+    "coverLetterGeneration": false,
+    "applicationSubmission": false,
+    "autoApply": false,
+    "browserAutomation": false,
+    "linkedIn": false,
+    "oauth": false,
+    "additionalProviders": false,
+    "recruiterMessaging": false,
+    "deployment": false,
+    "push": false
+  },
+  "tests": {
+    "focused": "staffordos/ui/operator-frontend/lib/staffordos/opportunityRecommendationEngine.test.mjs",
+    "regressionsRequired": [
+      "J002.02B",
+      "J002.02A",
+      "J002.01",
+      "J001",
+      "S010",
+      "G003/G004"
+    ]
+  },
+  "limitations": [
+    "Recommendations depend on supplied queue, fit, and ResumeVersion artifacts.",
+    "The engine does not import Opportunities or create Applications.",
+    "The engine does not create ApplicationResumeLinks.",
+    "APPLY_NOW is planning output only and still requires Ross approval."
+  ],
+  "rollback": {
+    "procedure": "git revert <J003.01 commit>",
+    "privateArtifacts": "Remove owner-private J003.01 output artifacts separately if desired."
+  },
+  "recommendedNextMission": "J003_02_OPERATOR_REVIEW_AND_OPPORTUNITY_IMPORT_DECISIONS"
+}
