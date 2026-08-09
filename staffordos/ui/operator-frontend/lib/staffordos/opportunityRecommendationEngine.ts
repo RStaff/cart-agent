@@ -892,6 +892,7 @@ export function writeOpportunityRecommendationOutputs(input: {
   const runDirectory = path.join(input.outputRoot, `J003_01_${compactTimestamp(input.result.generatedAt)}`);
   ensurePrivateDirectory(runDirectory);
   const artifacts = {
+    "opportunity_recommendation_result.json": input.result,
     "opportunity_recommendations.json": input.result.recommendations,
     "application_readiness.json": input.result.recommendations.map((record) => ({
       recommendationId: record.recommendationId,

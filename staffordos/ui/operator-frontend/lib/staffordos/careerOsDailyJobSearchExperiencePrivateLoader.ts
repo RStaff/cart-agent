@@ -10,6 +10,14 @@ import {
   buildCareerOsCommandCenterPresentation,
 } from "./careerOsCommandCenterPresentation";
 import {
+  GREENHOUSE_DISCOVERY_RESULT_SCHEMA_VERSION,
+  GREENHOUSE_DISCOVERY_VERSION,
+  GREENHOUSE_PROVIDER_MANIFEST_SCHEMA_VERSION,
+  type GreenhouseDiscoveryResult,
+  type GreenhouseEligibilityReview,
+  type GreenhouseRetrievalResult,
+} from "./greenhouseDiscoveryProvider";
+import {
   buildCareerOsDailyJobSearchExperience,
   type CareerOsDailyJobSearchExperience,
   type CareerOsDailyJobSearchExperienceInput,
@@ -21,6 +29,10 @@ import type {
   OpportunityRecommendationRecord,
   OpportunityRecommendationResult,
 } from "./opportunityRecommendationEngine";
+import type {
+  JobSourceImportQueueItem,
+  PrivateJobSourceImportQueueResult,
+} from "./privateJobSourceImportQueue";
 import type {
   PrivateApplicationPipelineReviewResult,
   PrivateDailyJobSearchCommand,
@@ -82,6 +94,91 @@ function latestJson<T>(root: string, filename: string): T | null {
   const directory = latestDirectory(root);
   if (!directory) return null;
   return readJsonFile<T>(path.join(directory, filename));
+}
+
+function latestGreenhouseDiscoveryResult(root: string): GreenhouseDiscoveryResult | null {
+  const directory = latestDirectory(path.join(root, "greenhouse-discovery"));
+  if (!directory) return null;
+
+  const providerManifest = readJsonFile<GreenhouseDiscoveryResult["providerManifest"]>(
+    path.join(directory, "greenhouse_provider_manifest_snapshot.json"),
+  );
+  const retrievals = readJsonFile<GreenhouseRetrievalResult[]>(
+    path.join(directory, "greenhouse_retrievals.json"),
+  ) || [];
+  const eligibilityReviews = readJsonFile<GreenhouseEligibilityReview[]>(
+    path.join(directory, "eligibility_reviews.json"),
+  ) || [];
+  const queueResult = readJsonFile<PrivateJobSourceImportQueueResult>(
+    path.join(directory, "job_source_import_queue_result.json"),
+  );
+  const opportunityQueue = readJsonFile<JobSourceImportQueueItem[]>(
+    path.join(directory, "opportunity_queue.json"),
+  ) || queueResult?.importQueue || [];
+  const explainableFitArtifacts = readJsonFile<GreenhouseDiscoveryResult["explainableFitArtifacts"]>(
+    path.join(directory, "explainable_fit_artifacts.json"),
+  ) || [];
+  const auditSummary = readJsonFile<GreenhouseDiscoveryResult["auditSummary"]>(
+    path.join(directory, "greenhouse_discovery_audit.json"),
+  );
+
+  if (!providerManifest || !queueResult) return null;
+
+  const boardsRetrieved = retrievals.filter((retrieval) => retrieval.status === "RETRIEVED").length;
+  const boardsFailed = retrievals.filter((retrieval) => retrieval.status === "FAILED").length;
+  const eligibleJobs = eligibilityReviews.filter((review) => review.status === "ELIGIBLE").length;
+  const rejectedJobs = eligibilityReviews.filter((review) => review.status === "REJECTED").length;
+
+  return {
+    schemaVersion: GREENHOUSE_DISCOVERY_RESULT_SCHEMA_VERSION,
+    workflowVersion: GREENHOUSE_DISCOVERY_VERSION,
+    generatedAt: queueResult.generatedAt,
+    providerManifest: {
+      schemaVersion: GREENHOUSE_PROVIDER_MANIFEST_SCHEMA_VERSION,
+      sourceCount: providerManifest.sourceCount,
+      enabledGreenhouseSources: providerManifest.enabledGreenhouseSources,
+      limitations: providerManifest.limitations || [],
+    },
+    retrievals,
+    eligibilityReviews,
+    jobSourceImportQueue: queueResult,
+    opportunityQueue,
+    explainableFitArtifacts,
+    summary: {
+      companiesRequested: providerManifest.sourceCount,
+      boardsRetrieved,
+      boardsFailed,
+      publishedJobsRetrieved: retrievals.reduce((count, retrieval) => count + retrieval.jobCount, 0),
+      eligibleJobs,
+      rejectedJobs,
+      normalizedRecords: queueResult.summary.normalizedRecords,
+      queueItems: queueResult.summary.queueItems,
+      readyForOpportunityImport: queueResult.summary.readyForOpportunityImport,
+      duplicateItems: queueResult.summary.duplicateItems,
+      existingApplicationItems: queueResult.summary.existingApplicationItems,
+      externalProviderCalls: retrievals.length,
+    },
+    auditSummary: auditSummary || {
+      publicGreenhouseApiOnly: true,
+      noAuthentication: true,
+      noCookies: true,
+      noBrowserAutomation: true,
+      noScraping: true,
+      noApplicationSubmitted: true,
+      noApplicationCreated: true,
+      noResumeGenerated: true,
+      noCoverLetterGenerated: true,
+      noMessageSent: true,
+      noExternalAi: true,
+      noOllama: true,
+      noLinkedIn: true,
+      noWorkday: true,
+      noLever: true,
+      noAshby: true,
+      noDeployment: true,
+      noPush: true,
+    },
+  };
 }
 
 function generatedAtFromDailyCommand(command: PrivateDailyJobSearchCommand | null) {
@@ -244,9 +341,11 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
     generatedAt,
   });
   const pipeline = applicationPipelineResult(dailyCommand);
+  const greenhouseDiscovery = latestGreenhouseDiscoveryResult(root);
   const commandCenter = buildCareerOsCommandCenterPresentation({
     recommendationResult: recommendation,
     applicationPipelineResult: pipeline,
+    greenhouseDiscoveryResult: greenhouseDiscovery,
   });
   const experienceInput: CareerOsDailyJobSearchExperienceInput = {
     commandCenter,
@@ -263,7 +362,7 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
       applicationEngagement: Boolean(engagementReadModel),
       applicationPackages: Boolean(applicationPackageReadModel),
       applicationReviewWorkspace: Boolean(applicationReviewReadModel),
-      greenhouseDiscovery: Boolean(latestDirectory(path.join(root, "greenhouse-discovery"))),
+      greenhouseDiscovery: Boolean(greenhouseDiscovery),
     },
     missingArtifacts,
     auditSummary: {

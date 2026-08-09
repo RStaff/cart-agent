@@ -440,12 +440,14 @@ test("private writer stores packages outside Git and creates no Application arti
 
   assert.equal(written.privatePathVisible, false);
   assert.equal(statSync(written.runDirectory).mode & 0o777, 0o700);
+  assert.equal(written.artifactNames.includes("application_package_result.json"), true);
   assert.equal(written.artifactNames.includes("application_packages.json"), true);
   assert.equal(written.artifactNames.includes("application_package_read_model.json"), true);
   assert.equal(written.artifactNames.includes("applications.json"), false);
   assert.equal(written.artifactNames.includes("messages.json"), false);
   assert.equal(written.artifactNames.includes("resume_writes.json"), false);
   assert.equal(existsSync(path.join(written.runDirectory, "application_packages.json")), true);
+  assert.equal(existsSync(path.join(written.runDirectory, "application_package_result.json")), true);
 });
 
 test("private writer rejects repository output roots", () => {
@@ -499,7 +501,7 @@ test("CLI summary is redacted and preserves closed execution flags", () => {
     recommendationResult: result,
     queueResult: queueResult([ready]),
   });
-  const summary = packages.buildReadyToApplyPackageCliSummary(packageResult, 7);
+  const summary = packages.buildReadyToApplyPackageCliSummary(packageResult, 8);
   const serialized = JSON.stringify(summary);
 
   assert.equal(summary.packagesCreated, 1);

@@ -634,6 +634,7 @@ export function writeReadyToApplyApplicationPackageOutputs(input: {
   const runDirectory = path.join(input.outputRoot, `J003_04_${compactTimestamp(input.result.generatedAt)}`);
   ensurePrivateDirectory(runDirectory);
   const artifacts = {
+    "application_package_result.json": input.result,
     "application_packages.json": input.result.packages,
     "application_package_read_model.json": input.result.readModel,
     "ready_packages.json": input.result.packages.filter((pkg) => pkg.applicationReadiness === "READY"),

@@ -364,6 +364,112 @@ test("private loader reads latest governed artifacts and degrades when optional 
   assert.equal(result.auditSummary.noNewPrivateDataRoute, true);
 });
 
+test("private loader connects redacted Greenhouse discovery status without provider calls", () => {
+  const privateRoot = mkdtempSync(path.join(tmpdir(), "careeros-v1-greenhouse-"));
+  const jobSearchRoot = path.join(privateRoot, "job-search");
+  const discoveryRoot = path.join(jobSearchRoot, "greenhouse-discovery", "J002_02B_20260809");
+  writeJson(path.join(discoveryRoot, "greenhouse_provider_manifest_snapshot.json"), {
+    schemaVersion: "staffordos.job_search.greenhouse_provider_manifest.v1",
+    sourceCount: 2,
+    enabledGreenhouseSources: 2,
+    limitations: ["Synthetic private discovery fixture."],
+  });
+  writeJson(path.join(discoveryRoot, "greenhouse_retrievals.json"), [
+    {
+      retrievalId: "retrieval_one",
+      company: "Example",
+      provider: "greenhouse",
+      boardToken: "example",
+      endpoint: "https://boards-api.greenhouse.io/v1/boards/example/jobs?content=true",
+      retrievedAt: "2026-08-09T12:00:00.000Z",
+      status: "RETRIEVED",
+      httpStatus: 200,
+      jobCount: 3,
+      jobs: [],
+      limitations: [],
+      noAuthentication: true,
+      noCookies: true,
+      noBrowserAutomation: true,
+      noScraping: true,
+    },
+    {
+      retrievalId: "retrieval_two",
+      company: "Example Two",
+      provider: "greenhouse",
+      boardToken: "exampletwo",
+      endpoint: "https://boards-api.greenhouse.io/v1/boards/exampletwo/jobs?content=true",
+      retrievedAt: "2026-08-09T12:00:00.000Z",
+      status: "RETRIEVED",
+      httpStatus: 200,
+      jobCount: 2,
+      jobs: [],
+      limitations: [],
+      noAuthentication: true,
+      noCookies: true,
+      noBrowserAutomation: true,
+      noScraping: true,
+    },
+  ]);
+  writeJson(path.join(discoveryRoot, "eligibility_reviews.json"), [
+    { status: "ELIGIBLE" },
+    { status: "REJECTED" },
+    { status: "ELIGIBLE" },
+  ]);
+  writeJson(path.join(discoveryRoot, "job_source_import_queue_result.json"), {
+    generatedAt: "2026-08-09T12:00:00.000Z",
+    normalizedSourceRecords: [],
+    sourceSnapshots: [],
+    importQueue: [{ queueItemId: "queue_one" }, { queueItemId: "queue_two" }],
+    prioritization: { workflowVersion: "J002.01" },
+    providerCapabilityMatrix: [],
+    summary: {
+      normalizedRecords: 2,
+      queueItems: 2,
+      readyForOpportunityImport: 1,
+      needsOperatorReview: 1,
+      duplicateItems: 0,
+      existingApplicationItems: 0,
+      invalidItems: 0,
+      importedOpportunities: 0,
+      externalProviderCalls: 0,
+      authenticatedSourcesRejected: 0,
+    },
+  });
+  writeJson(path.join(discoveryRoot, "opportunity_queue.json"), [
+    { queueItemId: "queue_one" },
+    { queueItemId: "queue_two" },
+  ]);
+  writeJson(path.join(discoveryRoot, "explainable_fit_artifacts.json"), []);
+  writeJson(path.join(discoveryRoot, "greenhouse_discovery_audit.json"), {
+    publicGreenhouseApiOnly: true,
+    noAuthentication: true,
+    noCookies: true,
+    noBrowserAutomation: true,
+    noScraping: true,
+    noApplicationSubmitted: true,
+    noApplicationCreated: true,
+    noResumeGenerated: true,
+    noCoverLetterGenerated: true,
+    noMessageSent: true,
+    noExternalAi: true,
+    noOllama: true,
+    noLinkedIn: true,
+    noWorkday: true,
+    noLever: true,
+    noAshby: true,
+    noDeployment: true,
+    noPush: true,
+  });
+
+  const result = loader.loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts({ jobSearchRoot });
+
+  assert.equal(result.loadedArtifacts.greenhouseDiscovery, true);
+  assert.equal(result.experience.systemHealth.providerStatus, "Greenhouse: GREENHOUSE_DISCOVERY_RUN_AVAILABLE");
+  assert.equal(result.experience.systemHealth.lastDiscoveryRun, "2026-08-09T12:00:00.000Z");
+  assert.equal(result.experience.systemHealth.openOpportunityBacklog, 2);
+  assert.equal(result.auditSummary.noProviderCalled, true);
+});
+
 test("surface and route expose the V1 daily experience without internal architecture language", () => {
   assert.match(routeSource, /loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts/);
   assert.match(routeSource, /force-dynamic/);

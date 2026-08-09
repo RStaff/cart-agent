@@ -375,7 +375,8 @@ test("private output writer rejects repository paths and writes owner-private fi
     result,
   });
 
-  assert.equal(written.artifactNames.length, 6);
+  assert.equal(written.artifactNames.length, 7);
+  assert.equal(written.artifactNames.includes("opportunity_recommendation_result.json"), true);
   assert.equal(written.privatePathVisible, false);
   assert.equal(statSync(written.runDirectory).mode & 0o777, 0o700);
   for (const filePath of written.writtenFiles) {
@@ -405,10 +406,10 @@ test("source and CLI expose no forbidden execution capabilities or extra provide
 
 test("CLI summary is redacted and reports all execution flags closed", () => {
   const { result } = buildRecommendation();
-  const summary = recommendations.buildOpportunityRecommendationCliSummary(result, 6);
+  const summary = recommendations.buildOpportunityRecommendationCliSummary(result, 7);
 
   assert.equal(summary.privatePathVisible, false);
-  assert.equal(summary.privateArtifactsWritten, 6);
+  assert.equal(summary.privateArtifactsWritten, 7);
   assert.equal(summary.noApplicationSubmitted, true);
   assert.equal(summary.noApplicationCreated, true);
   assert.equal(summary.noResumeGenerated, true);

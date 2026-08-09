@@ -1,0 +1,83 @@
+{
+  "mission": "CAREEROS_V1_02_LIVE_JOB_SEARCH_ACTIVATION",
+  "classification": "LIVE_JOB_SEARCH_ACTIVATION_COMPLETED_WITH_DATA_READINESS_BLOCKER",
+  "authority": {
+    "headAtStart": "23ab6b12",
+    "branch": "main",
+    "reusedAuthorities": [
+      "J001 private application tracking and pipeline review",
+      "J002 real Greenhouse opportunity discovery",
+      "J003 recommendation workflow and application preparation",
+      "J004.01 follow-up and response tracking",
+      "CAREEROS_V1_01 daily job-search experience"
+    ],
+    "newProviderAdded": false,
+    "uiRedesigned": false
+  },
+  "liveDiscovery": {
+    "provider": "GREENHOUSE",
+    "publicApiOnly": true,
+    "privateManifestCommitted": false,
+    "sourcesAttempted": 8,
+    "sourcesRetrieved": 8,
+    "sourcesFailed": 0,
+    "publishedJobsRetrieved": 2200,
+    "eligibleJobs": 276,
+    "rejectedJobs": 282,
+    "queueItems": 276,
+    "readyForOpportunityImport": 45,
+    "duplicateItems": 24,
+    "existingApplicationMatches": 0
+  },
+  "recommendationResult": {
+    "recommendationsCreated": 276,
+    "applyNow": 0,
+    "review": 45,
+    "wait": 210,
+    "skip": 21,
+    "readyToApplyPackages": 0,
+    "reasonNoApplyNow": "Current ResumeVersion safety and evidence mappings do not support application readiness."
+  },
+  "blockers": [
+    {
+      "severity": "HIGH",
+      "type": "PRIVATE_ARTIFACT_HANDOFF",
+      "status": "FIXED",
+      "summary": "Private writers now emit full result companion files for existing downstream CLIs."
+    },
+    {
+      "severity": "HIGH",
+      "type": "DAILY_EXPERIENCE_DISCOVERY_STATUS",
+      "status": "FIXED",
+      "summary": "The daily private loader now reconstructs redacted Greenhouse status from existing private artifacts."
+    },
+    {
+      "severity": "HIGH",
+      "type": "RESUMEVERSION_AND_EVIDENCE_READINESS",
+      "status": "OPEN_DATA_READINESS",
+      "summary": "No current ResumeVersion was safe enough for reuse and no live opportunity received mapped supporting evidence."
+    }
+  ],
+  "dailyExperience": {
+    "route": "/os/professional/jobs",
+    "realOpportunitiesDisplayed": true,
+    "applicationPipelineDisplayed": true,
+    "greenhouseStatusDisplayed": true,
+    "externalActionsAvailable": false
+  },
+  "nonImpact": {
+    "applicationsSubmitted": 0,
+    "applicationsCreated": 0,
+    "messagesSent": 0,
+    "resumesGenerated": 0,
+    "resumesMutated": 0,
+    "coverLettersGenerated": 0,
+    "externalAiUsed": false,
+    "ollamaUsed": false,
+    "browserAutomationUsed": false,
+    "oauthChanged": false,
+    "deployed": false,
+    "pushed": false
+  },
+  "recommendedNextAction": "Resolve ResumeVersion fact-safety and Career Evidence mapping for the highest-value REVIEW opportunities, then rerun recommendation."
+}

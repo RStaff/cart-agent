@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import Module from "node:module";
-import { readFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, statSync } from "node:fs";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
@@ -304,8 +305,33 @@ test("private output writer rejects repository paths", async () => {
         repositoryRoot: root,
         result,
       }),
-    /outside the repository/,
+      /outside the repository/,
   );
+});
+
+test("private output writer stores a full queue result for downstream recommendation handoff", async () => {
+  const result = await greenhouse.buildGreenhouseDiscoveryQueue({
+    manifest: manifest(),
+    generatedAt: "2026-08-08T12:00:00Z",
+    fetcher: mockFetcher({ example: [job()] }),
+  });
+  const outputRoot = mkdtempSync(path.join(tmpdir(), "greenhouse-discovery-"));
+  const written = greenhouse.writeGreenhouseDiscoveryOutputs({
+    outputRoot,
+    repositoryRoot: root,
+    result,
+  });
+  const runDirectory = path.dirname(written[0]);
+  const fullQueueResultPath = path.join(runDirectory, "job_source_import_queue_result.json");
+  const fullQueueResult = JSON.parse(readFileSync(fullQueueResultPath, "utf8"));
+
+  assert.equal(written.length, 8);
+  assert.equal(statSync(runDirectory).mode & 0o777, 0o700);
+  assert.equal(existsSync(path.join(runDirectory, "job_source_import_queue.json")), true);
+  assert.equal(existsSync(fullQueueResultPath), true);
+  assert.equal(statSync(fullQueueResultPath).mode & 0o777, 0o600);
+  assert.equal(Array.isArray(fullQueueResult.importQueue), true);
+  assert.equal(fullQueueResult.prioritization.workflowVersion, "J002.01");
 });
 
 test("source and CLI contain no forbidden execution surfaces", () => {

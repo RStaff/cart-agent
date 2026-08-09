@@ -864,6 +864,7 @@ export function writeGreenhouseDiscoveryOutputs(input: {
     })),
     "eligibility_reviews.json": input.result.eligibilityReviews,
     "job_source_import_queue.json": input.result.jobSourceImportQueue.importQueue,
+    "job_source_import_queue_result.json": input.result.jobSourceImportQueue,
     "opportunity_queue.json": input.result.opportunityQueue,
     "explainable_fit_artifacts.json": input.result.explainableFitArtifacts,
     "greenhouse_discovery_audit.json": input.result.auditSummary,
