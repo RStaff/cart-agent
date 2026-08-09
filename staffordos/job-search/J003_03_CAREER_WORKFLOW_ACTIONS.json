@@ -1,0 +1,146 @@
+{
+  "mission": "J003_03_CAREER_WORKFLOW_ACTIONS",
+  "classification": "CAREER_WORKFLOW_ACTIONS_COMPLETED",
+  "authority": {
+    "startingHead": "0e5c61d6",
+    "branch": "main",
+    "dependsOn": [
+      "J001 Know Me",
+      "J001 Application Tracking",
+      "J002.01 Job Discovery and Prioritization",
+      "J002.02A Private Job Source Import Queue",
+      "J002.02B Greenhouse Discovery MVP",
+      "J003.01 Opportunity Recommendation Engine",
+      "J003.02 CareerOS Command Center",
+      "Explainable Fit",
+      "ResumeVersion authority",
+      "G001 Private Data Git Backstop",
+      "G003 Adapter-Only Read Model Authority",
+      "G004.01 Operator Write Isolation"
+    ],
+    "discoveryModified": false,
+    "recommendationLogicModified": false,
+    "providerAdded": false,
+    "externalAiAdded": false
+  },
+  "workflowActionContract": {
+    "actions": [
+      "APPLY",
+      "REVIEW_LATER",
+      "SKIP",
+      "NOT_INTERESTED"
+    ],
+    "exactlyOneActionPerRecommendation": true,
+    "operatorConfirmationRequired": true,
+    "deterministicTransitionsOnly": true,
+    "appendOnlyPrivateDecisions": true
+  },
+  "stateModel": {
+    "source": "J003.01 OpportunityRecommendationResult",
+    "states": [
+      "READY_TO_APPLY",
+      "REVIEW_LATER",
+      "SKIPPED",
+      "NOT_INTERESTED"
+    ],
+    "pendingState": "NO_WORKFLOW_ACTION_RECORDED",
+    "authoritativeAfterAction": true
+  },
+  "actionSemantics": {
+    "APPLY": {
+      "state": "READY_TO_APPLY",
+      "effect": "MOVE_TO_APPLICATION_WORKSPACE_READY_TO_APPLY",
+      "requiresRecommendation": "APPLY_NOW",
+      "requiresApplicationReadiness": "READY_FOR_OPERATOR_APPROVED_APPLICATION",
+      "applicationCreated": false,
+      "applicationSubmitted": false
+    },
+    "REVIEW_LATER": {
+      "state": "REVIEW_LATER",
+      "effect": "RETURN_TO_FUTURE_WORK_QUEUE"
+    },
+    "SKIP": {
+      "state": "SKIPPED",
+      "effect": "REMOVE_FROM_TODAYS_QUEUE",
+      "futureRecommendationsExcluded": false
+    },
+    "NOT_INTERESTED": {
+      "state": "NOT_INTERESTED",
+      "effect": "EXCLUDE_FROM_FUTURE_RECOMMENDATIONS",
+      "restoreRequiresFutureOperatorWorkflow": true
+    }
+  },
+  "readModelReuse": {
+    "opportunityQueueReused": true,
+    "recommendationReadModelReused": true,
+    "explainableFitReused": true,
+    "resumeVersionReadModelReused": true,
+    "applicationTrackingBoundaryReused": true,
+    "rankingRecomputed": false,
+    "fitRecomputed": false,
+    "duplicateDetectionRecomputed": false,
+    "discoveryRun": false
+  },
+  "privateOutputs": [
+    "workflow_actions.ndjson",
+    "workflow_state.json",
+    "application_workspace_ready_to_apply.json",
+    "future_work_queue.json",
+    "todays_queue.json",
+    "skipped_today.json",
+    "excluded_from_future_recommendations.json",
+    "workflow_audit.json"
+  ],
+  "cli": {
+    "command": "node staffordos/ui/operator-frontend/lib/staffordos/runCareerWorkflowActions.mjs",
+    "commands": [
+      "state",
+      "act"
+    ],
+    "recordActionRequiresConfirmYes": true,
+    "printsPrivatePaths": false
+  },
+  "safetyBoundary": {
+    "applicationCreated": false,
+    "applicationSubmitted": false,
+    "resumeGenerated": false,
+    "resumeMutated": false,
+    "coverLetterGenerated": false,
+    "messageSent": false,
+    "providerCalled": false,
+    "browserAutomation": false,
+    "oauth": false,
+    "linkedInModified": false,
+    "externalAi": false,
+    "ollama": false,
+    "privateOsLoader": false,
+    "operatorPrivateConnection": false,
+    "deployment": false,
+    "push": false
+  },
+  "tests": {
+    "focused": "staffordos/ui/operator-frontend/lib/staffordos/careerWorkflowActions.test.mjs",
+    "regressionsRequired": [
+      "J003.02 CareerOS Command Center",
+      "J003.01 Opportunity Recommendation Engine",
+      "J002.02B Greenhouse Discovery MVP",
+      "J002.02A Private Job Source Import Queue",
+      "J002.01 Job Discovery and Prioritization",
+      "J001 regressions",
+      "S010 regressions",
+      "S009 regressions",
+      "S008/G002/G003/G004 regressions"
+    ]
+  },
+  "limitations": [
+    "Restore for NOT_INTERESTED is intentionally outside this mission.",
+    "READY_TO_APPLY is private planning state and does not create an Application.",
+    "A future mission must convert ready planning items into an operator-reviewed application package before any external action exists.",
+    "The Command Center remains disconnected from private runtime storage."
+  ],
+  "rollback": {
+    "procedure": "git revert <J003.03 commit>",
+    "privateArtifacts": "Remove owner-private J003.03 workflow action/state artifacts separately if runtime decisions should be discarded."
+  },
+  "recommendedNextMission": "J003_04_READY_TO_APPLY_APPLICATION_PACKAGE"
+}
