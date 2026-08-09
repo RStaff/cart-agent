@@ -1,0 +1,304 @@
+{
+  "mission": "J002_02_PRIVATE_JOB_SOURCE_ADAPTER_AND_IMPORT_QUEUE",
+  "classification": "PRIVATE_JOB_SOURCE_IMPORT_QUEUE_COMPLETED",
+  "workspace": {
+    "topLevelWorkspace": "Professional",
+    "capabilityFamily": "Career Operations",
+    "careerOsInterpretation": "CareerOS is treated as Professional Career Operations, not a new top-level workspace."
+  },
+  "authority": {
+    "checkpointHead": "e2de2e9c1077fb36a0ec1226c5984fe291e989ca",
+    "dependsOn": [
+      "J001 JobOpportunity private intake",
+      "J001 Application tracking",
+      "J001 ResumeVersion authority",
+      "J001 private application pipeline",
+      "J002.01 Job Discovery and Prioritization Engine",
+      "S010 Career Evidence authority",
+      "A001 Asset Authority",
+      "G001 Private Data Git Backstop",
+      "G002 Professional Workspace modes",
+      "G003 Adapter-Only Read Model authority",
+      "G004.01 Operator write isolation",
+      "P001 Platform Runtime and Provider Integration roadmap"
+    ],
+    "privateUiConnection": "NOT_CONNECTED",
+    "externalAi": false,
+    "ollama": false,
+    "externalProviderCalls": false,
+    "browserAutomation": false,
+    "providerCredentialsRead": false
+  },
+  "targetSearchLanes": {
+    "primary": [
+      "AI Automation",
+      "AI Product",
+      "AI Product Operations",
+      "AI Governance",
+      "Responsible AI",
+      "AI Operations",
+      "AI Platform Operations",
+      "Technical Product Manager",
+      "Technical Product Owner",
+      "Technical Program Manager",
+      "Business Technology",
+      "Business Systems Analyst",
+      "Automation Engineer",
+      "AI Solutions",
+      "AI Integration",
+      "RevOps AI",
+      "GTM AI",
+      "Platform Operations",
+      "Digital Transformation"
+    ],
+    "secondaryBridge": [
+      "Marketing Technology",
+      "Marketing Operations",
+      "Marketing Automation",
+      "Marketing Systems",
+      "CRM Operations",
+      "Salesforce Operations",
+      "Revenue Operations",
+      "Lifecycle Operations",
+      "Campaign Operations",
+      "Marketing Analytics",
+      "Digital Technology"
+    ],
+    "excludedByDefault": [
+      "Social Media Manager",
+      "SEO Specialist",
+      "PPC Specialist",
+      "Content Marketing Specialist",
+      "Email Marketing Specialist",
+      "Marketing Coordinator"
+    ]
+  },
+  "adapterContract": {
+    "readOnly": true,
+    "readMethods": [
+      "normalize",
+      "validate",
+      "buildSourceSnapshot",
+      "buildImportCandidate"
+    ],
+    "writeMethodsAvailable": false,
+    "forbiddenMethods": [
+      "apply",
+      "submit",
+      "message",
+      "browserControl",
+      "credentialAccess",
+      "cookieAccess"
+    ]
+  },
+  "accessModes": {
+    "supportedNow": [
+      "OPERATOR_PASTED_URL",
+      "OPERATOR_PASTED_TEXT",
+      "OPERATOR_IMPORTED_JSON"
+    ],
+    "recognizedNotConnected": [
+      "PUBLIC_API",
+      "PUBLIC_FEED",
+      "PUBLIC_PAGE",
+      "OPERATOR_IMPORTED_FILE",
+      "UNSUPPORTED_AUTHENTICATED_SOURCE"
+    ],
+    "authenticatedAccess": "AUTHENTICATED_ACCESS_NOT_CONNECTED"
+  },
+  "normalizedJobSourceRecord": {
+    "schemaVersion": "staffordos.job_search.private_job_source_record.v1",
+    "fields": [
+      "jobSourceRecordId",
+      "providerId",
+      "providerJobId",
+      "sourceUrl",
+      "sourceDigest",
+      "observedAt",
+      "publicationDate",
+      "publicationDateAuthority",
+      "title",
+      "company",
+      "location",
+      "remoteState",
+      "employmentType",
+      "compensationText",
+      "descriptionTextReference",
+      "descriptionDigest",
+      "requisitionId",
+      "sourceAuthority",
+      "freshness",
+      "laneDisposition",
+      "limitations",
+      "privacy"
+    ],
+    "unknownsRemainUnknown": true,
+    "observedAtIsPublicationDate": false,
+    "compensationInvented": false,
+    "remoteStateInvented": false
+  },
+  "sourceProvenance": {
+    "usesG003SourceSnapshot": true,
+    "snapshotSchemaVersion": "staffordos.source_snapshot.v1",
+    "retainsDigest": true,
+    "retainsAuthorizationStatus": true,
+    "rawDescriptionsCommitted": false
+  },
+  "privateImportQueue": {
+    "schemaVersion": "staffordos.job_search.private_job_source_import_queue.v1",
+    "states": [
+      "DISCOVERED",
+      "NORMALIZED",
+      "DUPLICATE",
+      "EXISTING_APPLICATION",
+      "NEEDS_OPERATOR_REVIEW",
+      "READY_FOR_OPPORTUNITY_IMPORT",
+      "REJECTED_BY_OPERATOR",
+      "IMPORTED",
+      "STALE",
+      "INVALID"
+    ],
+    "rossApprovalRequired": true,
+    "applicationCreatedAutomatically": false
+  },
+  "rankingIntegration": {
+    "reusesJ00201": true,
+    "weights": {
+      "aiAutomation": 45,
+      "businessTechnology": 25,
+      "productTpm": 15,
+      "marketingTechnology": 15
+    },
+    "probabilitiesGenerated": false,
+    "employerInterestInferred": false
+  },
+  "duplicatePrevention": {
+    "reusesJ00201Signals": true,
+    "silentMergeAllowed": false,
+    "existingApplicationBlocksApplyRecommendation": true
+  },
+  "operatorApproval": {
+    "decisionSchemaVersion": "staffordos.job_search.private_job_source_import_decision.v1",
+    "allowedDecisions": [
+      "APPROVE_IMPORT_OPPORTUNITY",
+      "REJECT",
+      "DEFER",
+      "INSPECT_SUMMARY",
+      "STOP"
+    ],
+    "approvedImportCreates": "Private JobOpportunity intake candidate",
+    "approvedImportDoesNotCreate": [
+      "Application",
+      "ApplicationEvent",
+      "ResumeVersion",
+      "resume",
+      "cover letter",
+      "message",
+      "provider action"
+    ]
+  },
+  "providerCapabilityMatrix": {
+    "GREENHOUSE": "NOT_CONNECTED",
+    "LEVER": "NOT_CONNECTED",
+    "ASHBY": "NOT_CONNECTED",
+    "WORKDAY": "AUTHENTICATED_ACCESS_NOT_CONNECTED",
+    "LINKEDIN": "AUTHENTICATED_ACCESS_NOT_CONNECTED",
+    "INDEED": "NOT_CONNECTED",
+    "EMPLOYER_CAREER_SITE": "OPERATOR_INPUT_ONLY",
+    "OTHER": "OPERATOR_INPUT_ONLY"
+  },
+  "cli": {
+    "command": "node staffordos/ui/operator-frontend/lib/staffordos/runPrivateJobSourceImport.mjs inspect",
+    "commands": [
+      "inspect",
+      "import-url",
+      "import-text",
+      "import-json",
+      "queue",
+      "review",
+      "prioritize"
+    ],
+    "fetchesUrls": false,
+    "repositoryJsonInputAllowed": false
+  },
+  "privateOutputs": [
+    "source_snapshots.json",
+    "normalized_source_records.json",
+    "import_queue.json",
+    "priority_queue.json",
+    "provider_capability_matrix.json",
+    "import_audit.json"
+  ],
+  "futureRoadmap": [
+    "J002.03 real read-only provider discovery",
+    "J002.04 scheduled discovery and dedupe",
+    "J002.05 Opportunity review plus ResumeVersion recommendation",
+    "J002.06 resume and cover-letter preparation",
+    "J002.07 operator approval package",
+    "future governed application execution"
+  ],
+  "futureApplicationSafetyBoundary": {
+    "requiresSeparateAuthorityFor": [
+      "human identity",
+      "session authorization",
+      "per-application approval",
+      "exact ResumeVersion",
+      "application-question review",
+      "employer-specific terms",
+      "external communication approval",
+      "audit",
+      "replay prevention",
+      "failure handling",
+      "final submission proof"
+    ],
+    "j00202ContainsExecutionCapabilities": false
+  },
+  "tests": [
+    "Adapters are read-only.",
+    "No adapter exposes apply, submit, or message behavior.",
+    "Authenticated-source access fails closed.",
+    "Unknown publication date remains unknown.",
+    "observedAt does not become publicationDate.",
+    "Normalization does not invent compensation or remote state.",
+    "G003 source provenance is preserved.",
+    "Duplicate detection reuses J002.01.",
+    "Existing Applications block duplicate apply recommendations.",
+    "Import requires Ross approval.",
+    "Import creates Opportunity intake, not Application.",
+    "Ranking reuses J002.01.",
+    "Raw descriptions remain private.",
+    "No CareerFact is promoted.",
+    "No resume or cover letter is generated.",
+    "No message is sent.",
+    "No application is submitted.",
+    "No external AI, Ollama, provider call, /os, or /operator connection is added."
+  ],
+  "knownLimitations": [
+    "No real provider discovery is implemented.",
+    "No authenticated provider access is connected.",
+    "No scheduled discovery is implemented.",
+    "No Applications are created.",
+    "No ResumeVersion recommendations are produced."
+  ],
+  "rollback": {
+    "procedure": "git revert <J002.02 commit SHA>",
+    "privateDataImpact": "No committed private job source payloads are required for rollback."
+  },
+  "recommendedNextMission": "J002_03_REAL_READ_ONLY_JOB_DISCOVERY_PROVIDER",
+  "nonImpact": {
+    "applicationsSubmitted": false,
+    "applicationsCreated": false,
+    "resumesGenerated": false,
+    "resumesModified": false,
+    "coverLettersGenerated": false,
+    "messagesSent": false,
+    "linkedinModified": false,
+    "providerLogin": false,
+    "browserAutomation": false,
+    "externalAiInvoked": false,
+    "ollamaInvoked": false,
+    "osPrivateConnection": false,
+    "operatorPrivateConnection": false,
+    "pushed": false
+  }
+}
