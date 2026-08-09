@@ -1,0 +1,208 @@
+{
+  "mission": "J002_01_JOB_DISCOVERY_AND_PRIORITIZATION_ENGINE",
+  "classification": "JOB_DISCOVERY_ENGINE_COMPLETED",
+  "workspace": {
+    "topLevelWorkspace": "Professional",
+    "capabilityFamily": "Career Operations",
+    "careerOsInterpretation": "CareerOS is treated as the existing Professional Career Operations capability family, not a new top-level workspace."
+  },
+  "authority": {
+    "dependsOn": [
+      "J001.05A Manual Application Event Tracking",
+      "J001.05B Private Application Pipeline Review",
+      "J001.06 Resume Version and Application Linkage",
+      "J001.06A Vista Application and Resume Linkage Reconciliation",
+      "J001.06B Resume Asset Intake and ResumeVersion Reconciliation",
+      "J001.06C Resume Source Gap and Review Queue Resolution",
+      "J001.04 Explainable Fit and Positioning",
+      "J001.03A/03B Job Analysis and Review",
+      "S010 Career Evidence authority",
+      "G001 Private Data Git Backstop",
+      "G002 Professional Workspace Modes",
+      "G003 Adapter-Only Read Model Authority",
+      "G004.01 Operator Write Isolation"
+    ],
+    "providersImplemented": "MOCK_ONLY",
+    "privateUiConnection": "NOT_CONNECTED",
+    "externalAi": false,
+    "externalProviderCalls": false,
+    "browserAutomation": false
+  },
+  "opportunityContract": {
+    "schemaVersion": "staffordos.job_search.private_discovered_opportunity.v1",
+    "fields": [
+      "opportunityId",
+      "workspaceId",
+      "capabilityFamily",
+      "sourceRecordId",
+      "providerName",
+      "providerRecordId",
+      "sourceUrl",
+      "sourceTextDigest",
+      "sourceAuthority",
+      "companyReference",
+      "roleReference",
+      "locationText",
+      "workArrangement",
+      "employmentType",
+      "descriptionSummary",
+      "responsibilities",
+      "requirements",
+      "discoveredAt",
+      "publishedAt",
+      "duplicateStatus",
+      "duplicateGroupId",
+      "applicationComparison",
+      "ranking",
+      "recommendedAction",
+      "priorityTier",
+      "privacy",
+      "limitations"
+    ],
+    "separateFromApplication": true,
+    "applicationCreatedByDiscovery": false
+  },
+  "rankingModel": {
+    "deterministicRulesOnly": true,
+    "weights": {
+      "aiAutomation": 45,
+      "businessTechnology": 25,
+      "productTpm": 15,
+      "marketingTechnology": 15
+    },
+    "dimensions": [
+      "AI_ENGINEERING",
+      "AI_AUTOMATION",
+      "AI_GOVERNANCE",
+      "BUSINESS_TECHNOLOGY",
+      "TECHNICAL_PRODUCT_MANAGEMENT",
+      "TECHNICAL_PROGRAM_MANAGEMENT",
+      "BUSINESS_SYSTEMS_ANALYSIS",
+      "MARKETING_TECHNOLOGY",
+      "REVOPS",
+      "PLATFORM_OPERATIONS",
+      "DIGITAL_TRANSFORMATION"
+    ],
+    "notGenerated": [
+      "employer interest",
+      "interview probability",
+      "offer probability",
+      "success probability",
+      "validated fit"
+    ]
+  },
+  "duplicateDetection": {
+    "statuses": [
+      "NO_DUPLICATE",
+      "EXACT_SOURCE_DUPLICATE",
+      "SAME_PROVIDER_RECORD",
+      "SAME_REQUISITION_ALIAS",
+      "SAME_COMPANY_ROLE",
+      "POSSIBLE_ROLE_VARIANT",
+      "NEEDS_OPERATOR_REVIEW"
+    ],
+    "signals": [
+      "provider record alias",
+      "canonical source URL",
+      "source text digest",
+      "normalized company plus requisition alias",
+      "normalized company plus role title"
+    ],
+    "silentMergeAllowed": false
+  },
+  "applicationComparison": {
+    "statuses": [
+      "NO_APPLICATION_MATCH",
+      "EXISTING_APPLICATION_MATCH",
+      "POSSIBLE_APPLICATION_DUPLICATE",
+      "APPLICATION_STATUS_UNKNOWN"
+    ],
+    "duplicateApplicationPrevention": "EXISTING_APPLICATION_MATCH removes the opportunity from the application-review queue and sets DO_NOT_APPLY_DUPLICATE.",
+    "opportunityStateSeparateFromApplicationState": true
+  },
+  "priorityQueue": {
+    "schemaVersion": "staffordos.job_search.private_opportunity_queue.v1",
+    "recommendedActions": [
+      "REVIEW_FOR_APPLICATION",
+      "REVIEW_DUPLICATE_BEFORE_APPLICATION",
+      "DO_NOT_APPLY_DUPLICATE",
+      "NEEDS_OPERATOR_REVIEW",
+      "LOW_PRIORITY_REVIEW"
+    ],
+    "rossApprovalRequiredBeforeApplication": true,
+    "submitsApplications": false
+  },
+  "readModel": {
+    "schemaVersion": "staffordos.job_search.private_opportunity_read_model.v1",
+    "allowedFutureFields": [
+      "company",
+      "role",
+      "priorityTier",
+      "recommendedAction",
+      "totalScore",
+      "duplicateStatus",
+      "applicationComparisonStatus",
+      "discoveredAt",
+      "capturedAsOf",
+      "limitations"
+    ],
+    "excluded": [
+      "private filesystem paths",
+      "raw source text",
+      "source URLs",
+      "recruiter contacts",
+      "portal credentials",
+      "resume files",
+      "application submission controls",
+      "message controls"
+    ],
+    "connectedToOs": false,
+    "connectedToOperator": false
+  },
+  "cli": {
+    "command": "node staffordos/ui/operator-frontend/lib/staffordos/runJobDiscoveryPrioritization.mjs mock-preview",
+    "writeCommand": "node staffordos/ui/operator-frontend/lib/staffordos/runJobDiscoveryPrioritization.mjs mock-preview --write",
+    "providers": "Synthetic mocked provider adapter only"
+  },
+  "privateOutputs": [
+    "opportunity_queue.json",
+    "opportunities.json",
+    "duplicate_review.json",
+    "opportunity_read_model.json",
+    "audit_summary.json"
+  ],
+  "tests": [
+    "priority weights match mission",
+    "mock providers do not call external sources",
+    "Opportunity remains separate from Application",
+    "ranking is deterministic and explainable",
+    "duplicate detection preserves duplicate records",
+    "existing Application match blocks duplicate application recommendation",
+    "read model hides private paths, source text, URLs, and controls",
+    "private output writer rejects repository paths",
+    "no submission, resume generation, messaging, external AI, /os, or /operator connection"
+  ],
+  "knownLimitations": [
+    "No real provider adapters are implemented in this mission.",
+    "No external job discovery is performed.",
+    "Ranking is deterministic queue prioritization, not employer validation.",
+    "No private Professional UI connection is authorized by this mission.",
+    "The engine can compare only the Applications supplied to it by the governed private store."
+  ],
+  "rollback": {
+    "procedure": "git revert <J002.01 commit SHA>",
+    "privateDataImpact": "No committed private data is required for rollback."
+  },
+  "recommendedNextMission": "J002_02_PRIVATE_JOB_SOURCE_ADAPTER_AND_IMPORT_QUEUE",
+  "nonImpact": {
+    "applicationsSubmitted": false,
+    "resumesGenerated": false,
+    "resumesModified": false,
+    "coverLettersGenerated": false,
+    "messagesSent": false,
+    "linkedinModified": false,
+    "externalAiInvoked": false,
+    "ollamaInvoked": false,
+    "pushed": false
+  }
+}
