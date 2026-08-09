@@ -1,0 +1,164 @@
+{
+  "mission": "J003_04_READY_TO_APPLY_APPLICATION_PACKAGE",
+  "classification": "READY_TO_APPLY_APPLICATION_PACKAGE_COMPLETED",
+  "authority": {
+    "startingHead": "31c99236",
+    "branch": "main",
+    "dependsOn": [
+      "J001 Know Me",
+      "J001 Application Tracking",
+      "J002.01 Job Discovery and Prioritization",
+      "J002.02A Private Job Source Import Queue",
+      "J002.02B Greenhouse Discovery MVP",
+      "J003.01 Opportunity Recommendation Engine",
+      "J003.02 CareerOS Command Center",
+      "J003.03 Career Workflow Actions",
+      "Explainable Fit",
+      "ResumeVersion authority",
+      "Career Evidence authority",
+      "G001 Private Data Git Backstop",
+      "G003 Adapter-Only Read Model Authority",
+      "G004.01 Operator Write Isolation"
+    ],
+    "discoveryModified": false,
+    "recommendationLogicModified": false,
+    "providerAdded": false,
+    "externalAiAdded": false
+  },
+  "packageFlow": [
+    "READY_TO_APPLY",
+    "Opportunity",
+    "Existing Explainable Fit",
+    "Existing Recommended ResumeVersion",
+    "Supporting Career Evidence",
+    "Gap Analysis",
+    "Application Package",
+    "Human Review Required"
+  ],
+  "applicationPackage": {
+    "sourceState": "READY_TO_APPLY",
+    "humanReviewRequired": true,
+    "fields": [
+      "Opportunity ID",
+      "Company",
+      "Role",
+      "Canonical job URL",
+      "Recommendation state",
+      "Explainable Fit summary",
+      "Recommended ResumeVersion",
+      "Supporting Career Evidence",
+      "Relevant strengths",
+      "Missing skills / gaps",
+      "Resume update requirements",
+      "Application readiness",
+      "Blocking issues",
+      "Recommended next action"
+    ],
+    "applicationContentGenerated": false
+  },
+  "readinessStates": [
+    "READY",
+    "NEEDS_RESUME_REVIEW",
+    "NEEDS_EVIDENCE_REVIEW",
+    "BLOCKED"
+  ],
+  "readinessRules": {
+    "readyMeaning": "Existing ResumeVersion and Career Evidence are sufficient for human review and manual application planning.",
+    "readyDoesNotMeanSubmitted": true,
+    "missingCanonicalJobUrlBlocks": true,
+    "unsafeResumeFactSafetyBlocks": [
+      "CONFLICTING",
+      "STALE",
+      "UNSUPPORTED"
+    ],
+    "resumeReviewStatuses": [
+      "REVIEW_BEFORE_REUSE",
+      "NEEDS_EVIDENCE",
+      "PARTIALLY_SUPPORTED",
+      "UNKNOWN"
+    ],
+    "evidenceReviewSources": [
+      "missing skills",
+      "unknown requirement mappings",
+      "missing requirement mappings",
+      "major blockers",
+      "no supporting Career Evidence"
+    ]
+  },
+  "reuse": {
+    "workflowStateReused": true,
+    "opportunityQueueReused": true,
+    "recommendationReadModelReused": true,
+    "explainableFitReused": true,
+    "resumeVersionReused": true,
+    "careerEvidenceReused": true,
+    "duplicateDetectionRecomputed": false,
+    "rankingRecomputed": false,
+    "fitRecomputed": false
+  },
+  "privateOutputs": [
+    "application_packages.json",
+    "application_package_read_model.json",
+    "ready_packages.json",
+    "resume_review_required.json",
+    "evidence_review_required.json",
+    "blocked_packages.json",
+    "application_package_audit.json"
+  ],
+  "cli": {
+    "command": "node staffordos/ui/operator-frontend/lib/staffordos/runReadyToApplyApplicationPackage.mjs",
+    "commands": [
+      "package"
+    ],
+    "requiresWorkflowState": true,
+    "requiresRecommendationResult": true,
+    "queueResultSuppliesCanonicalJobUrl": true,
+    "printsPrivatePaths": false
+  },
+  "safetyBoundary": {
+    "applicationCreated": false,
+    "applicationSubmitted": false,
+    "applicationContentGenerated": false,
+    "resumeGenerated": false,
+    "resumeMutated": false,
+    "resumeVersionCreated": false,
+    "coverLetterGenerated": false,
+    "messageSent": false,
+    "providerCalled": false,
+    "browserAutomation": false,
+    "oauth": false,
+    "linkedInModified": false,
+    "externalAi": false,
+    "ollama": false,
+    "privateOsLoader": false,
+    "operatorPrivateConnection": false,
+    "deployment": false,
+    "push": false
+  },
+  "tests": {
+    "focused": "staffordos/ui/operator-frontend/lib/staffordos/readyToApplyApplicationPackage.test.mjs",
+    "regressionsRequired": [
+      "J003.03 Career Workflow Actions",
+      "J003.02 CareerOS Command Center",
+      "J003.01 Opportunity Recommendation Engine",
+      "J002.02B Greenhouse Discovery MVP",
+      "J002.02A Private Job Source Import Queue",
+      "J002.01 Job Discovery and Prioritization",
+      "J001 regressions",
+      "S010 regressions",
+      "S009 regressions",
+      "S008/G002/G003/G004 regressions"
+    ]
+  },
+  "limitations": [
+    "Application packages are preparation artifacts only and do not create Applications.",
+    "Canonical job URL depends on the supplied J002 queue result.",
+    "Resume edits, cover letters, and external application execution remain out of scope.",
+    "The Command Center remains disconnected from private runtime storage."
+  ],
+  "rollback": {
+    "procedure": "git revert <J003.04 commit>",
+    "privateArtifacts": "Remove owner-private J003.04 application package artifacts separately if runtime output should be discarded."
+  },
+  "recommendedNextMission": "J003_05_OPERATOR_REVIEWED_MANUAL_APPLICATION_HANDOFF"
+}
