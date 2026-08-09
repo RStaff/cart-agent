@@ -1,0 +1,156 @@
+{
+  "mission": "J004_01_APPLICATION_FOLLOW_UP_AND_RESPONSE_TRACKING",
+  "classification": "APPLICATION_FOLLOW_UP_RESPONSE_TRACKING_COMPLETED",
+  "authority": {
+    "startingHead": "f433194a",
+    "branch": "main",
+    "reusedAuthorities": [
+      "J001 Application Tracking",
+      "J001 ApplicationEvents",
+      "J001 Follow-Up Review Tasks",
+      "J001 Private Application Pipeline",
+      "J002 Opportunity Authority",
+      "J003 Governed Pre-Application Workflow",
+      "G001 Private Data Git Backstop",
+      "G003 Adapter-Only Read Model Authority",
+      "G004.01 Operator Write Isolation"
+    ],
+    "parallelApplicationContractCreated": false,
+    "applicationRecordsMutated": false,
+    "applicationEventsCreated": false,
+    "discoveryModified": false,
+    "recommendationLogicModified": false,
+    "providerAdded": false
+  },
+  "workflow": [
+    "Existing Application",
+    "Application Event History",
+    "Follow-Up State",
+    "Response State",
+    "Next Engagement Action",
+    "Career Engagement Queue"
+  ],
+  "followUpModel": {
+    "states": [
+      "NOT_DUE",
+      "DUE",
+      "OVERDUE",
+      "COMPLETED",
+      "NOT_REQUIRED"
+    ],
+    "authorities": [
+      "FOLLOW_UP_REVIEW_TASK",
+      "APPLICATION_NEXT_REVIEW",
+      "DETERMINISTIC_10_BUSINESS_DAY_POLICY",
+      "NONE"
+    ],
+    "fallbackPolicy": "If no existing follow-up task or Application next-review date exists and a valid submitted date exists, calculate a local 10-business-day review date without writing it back.",
+    "employerIntentInferred": false,
+    "responseProbabilityGenerated": false
+  },
+  "responseModel": {
+    "states": [
+      "NO_RESPONSE",
+      "RECRUITER_CONTACT",
+      "HIRING_MANAGER_CONTACT",
+      "INTERVIEW_REQUEST",
+      "REJECTION",
+      "WITHDRAWN",
+      "OTHER_RESPONSE"
+    ],
+    "preferredAuthority": "ApplicationEvent history",
+    "fallbackAuthority": "Application record currentStage and employerResponseStatus",
+    "speculativeInterpretationsCreated": false,
+    "interviewProbabilityGenerated": false
+  },
+  "careerEngagementQueue": {
+    "itemFields": [
+      "applicationId",
+      "company",
+      "role",
+      "applicationDate",
+      "currentApplicationStatus",
+      "currentStage",
+      "lastApplicationEvent",
+      "followUpState",
+      "followUpDueDate",
+      "responseState",
+      "recommendedNextEngagementAction",
+      "blockingIssues",
+      "limitations"
+    ],
+    "nextActions": [
+      "FOLLOW_UP",
+      "REVIEW_RESPONSE",
+      "PREPARE_FOR_INTERVIEW",
+      "NO_ACTION",
+      "CLOSE_OUT"
+    ],
+    "planningOnly": true,
+    "communicationAllowed": false,
+    "operatorApprovalRequired": true
+  },
+  "privateOutputs": [
+    "career_engagement_queue.json",
+    "application_engagement_items.json",
+    "application_engagement_read_model.json",
+    "follow_up_states.json",
+    "response_states.json",
+    "career_engagement_audit.json"
+  ],
+  "cli": {
+    "path": "staffordos/ui/operator-frontend/lib/staffordos/runApplicationFollowUpResponseTracking.mjs",
+    "commands": [
+      "queue",
+      "inspect"
+    ],
+    "operatesOnlyOnExistingApplications": true,
+    "manualJsonEditingRequired": false
+  },
+  "nonImpact": {
+    "emailSent": false,
+    "recruiterMessageSent": false,
+    "messageGenerated": false,
+    "applicationCreated": false,
+    "applicationSubmitted": false,
+    "applicationMutated": false,
+    "applicationEventCreated": false,
+    "resumeGenerated": false,
+    "resumeMutated": false,
+    "coverLetterGenerated": false,
+    "browserAutomationUsed": false,
+    "calendarIntegrated": false,
+    "linkedinModified": false,
+    "oauthModified": false,
+    "externalProviderCall": false,
+    "externalAiUsed": false,
+    "ollamaUsed": false,
+    "osConnectionAdded": false,
+    "operatorConnectionAdded": false,
+    "deployed": false,
+    "pushed": false
+  },
+  "tests": {
+    "focused": "node --test staffordos/ui/operator-frontend/lib/staffordos/applicationFollowUpResponseTracking.test.mjs",
+    "regression": "node --test staffordos/ui/operator-frontend/lib/staffordos/*.test.mjs",
+    "build": "npm run build in staffordos/ui/operator-frontend",
+    "jsonValidation": "jq empty on this file and staffordos/job-search JSON",
+    "privateDataAbsenceScan": "scoped scan of new J004.01 files",
+    "sensitiveValueScan": "scoped scan of new J004.01 files",
+    "diffChecks": [
+      "git diff --check",
+      "git diff --cached --check"
+    ]
+  },
+  "limitations": [
+    "The queue depends on recorded Application authority; absent responses remain NO_RESPONSE.",
+    "HIRING_MANAGER_CONTACT is a supported state but is not currently emitted by the existing ApplicationEvent vocabulary.",
+    "The 10-business-day fallback is a planning date only and does not overwrite existing records.",
+    "Interview preparation is only surfaced as a handoff for a later mission."
+  ],
+  "rollback": {
+    "source": "git revert <J004.01 commit>",
+    "privateArtifacts": "Remove owner-private J004.01 engagement artifacts separately if runtime output should be discarded."
+  },
+  "nextMission": "J004_02_FOLLOW_UP_DRAFT_PREPARATION"
+}
