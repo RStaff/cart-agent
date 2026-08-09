@@ -114,12 +114,34 @@ function sourceEvidenceIds(fact: Partial<CareerFact>) {
   return [...ids];
 }
 
+function recordId(record: { id?: unknown }) {
+  return typeof record.id === "string" && record.id ? record.id : null;
+}
+
+function supportedFactIds(evidence: Partial<CareerEvidence>) {
+  const ids = new Set<string>();
+  const supported = (evidence as { supportsFactIds?: unknown }).supportsFactIds;
+  const supportedOne = (evidence as { supportsFactId?: unknown }).supportsFactId;
+  if (Array.isArray(supported)) {
+    for (const id of supported) if (typeof id === "string" && id) ids.add(id);
+  }
+  if (typeof supportedOne === "string" && supportedOne) ids.add(supportedOne);
+  return [...ids];
+}
+
 function relatedEvidence(facts: readonly Partial<CareerFact>[], evidence: readonly Partial<CareerEvidence>[]) {
   const ids = new Set<string>();
+  const factIds = new Set<string>();
   for (const fact of facts) {
+    const id = recordId(fact);
+    if (id) factIds.add(id);
     for (const id of sourceEvidenceIds(fact)) ids.add(id);
   }
-  return evidence.filter((item) => typeof item.id === "string" && ids.has(item.id));
+  return evidence.filter((item) => {
+    const evidenceId = recordId(item);
+    if (evidenceId && ids.has(evidenceId)) return true;
+    return supportedFactIds(item).some((id) => factIds.has(id));
+  });
 }
 
 function scoreFact(requirement: PrivateJobRequirementRecord, fact: Partial<CareerFact>) {

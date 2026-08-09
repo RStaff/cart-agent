@@ -103,6 +103,19 @@ test("verified facts with non-resume evidence can become PROVEN", () => {
   assert.equal(mappings[0].classification, "PROVEN");
 });
 
+test("evidence supportsFactIds can link facts that do not carry sourceEvidenceIds", () => {
+  const requirements = requirementsFrom("Requirements\n- Must have experience with AI automation workflows.");
+  const mappings = mapRequirementsToCareerEvidence({
+    requirements,
+    careerFacts: [fact({ sourceEvidenceIds: [] })],
+    careerEvidence: [evidence({ supportsFactIds: ["careerfact_synthetic_product_ai"] })],
+    createdAt: "2026-08-04T12:00:00Z",
+  });
+
+  assert.equal(mappings[0].classification, "PROVEN");
+  assert.deepEqual(mappings[0].careerEvidenceIds, ["careerev_synthetic_project"]);
+});
+
 test("career facts without evidence cannot become PROVEN", () => {
   const requirements = requirementsFrom("Requirements\n- Must have experience with AI automation workflows.");
   const mappings = mapRequirementsToCareerEvidence({

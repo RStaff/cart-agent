@@ -128,6 +128,17 @@ function latestGreenhouseDiscoveryResult(root: string): GreenhouseDiscoveryResul
   const boardsFailed = retrievals.filter((retrieval) => retrieval.status === "FAILED").length;
   const eligibleJobs = eligibilityReviews.filter((review) => review.status === "ELIGIBLE").length;
   const rejectedJobs = eligibilityReviews.filter((review) => review.status === "REJECTED").length;
+  const careerFactsLoadedFromAuthority = Math.max(
+    0,
+    ...explainableFitArtifacts.map((artifact) => artifact.careerFactsLoadedFromAuthority || 0),
+  );
+  const careerEvidenceRecordsLoadedFromAuthority = Math.max(
+    0,
+    ...explainableFitArtifacts.map((artifact) => artifact.careerEvidenceRecordsLoadedFromAuthority || 0),
+  );
+  const fitArtifactsWithSupportingEvidence = explainableFitArtifacts.filter((artifact) =>
+    artifact.mappings.some((mapping) => mapping.careerFactIds.length || mapping.careerEvidenceIds.length),
+  ).length;
 
   return {
     schemaVersion: GREENHOUSE_DISCOVERY_RESULT_SCHEMA_VERSION,
@@ -157,6 +168,9 @@ function latestGreenhouseDiscoveryResult(root: string): GreenhouseDiscoveryResul
       duplicateItems: queueResult.summary.duplicateItems,
       existingApplicationItems: queueResult.summary.existingApplicationItems,
       externalProviderCalls: retrievals.length,
+      careerFactsLoadedFromAuthority,
+      careerEvidenceRecordsLoadedFromAuthority,
+      fitArtifactsWithSupportingEvidence,
     },
     auditSummary: auditSummary || {
       publicGreenhouseApiOnly: true,
@@ -171,6 +185,8 @@ function latestGreenhouseDiscoveryResult(root: string): GreenhouseDiscoveryResul
       noMessageSent: true,
       noExternalAi: true,
       noOllama: true,
+      noCareerFactPromoted: true,
+      noCareerEvidenceMutated: true,
       noLinkedIn: true,
       noWorkday: true,
       noLever: true,

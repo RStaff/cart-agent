@@ -43,10 +43,17 @@ function parseArgs(argv) {
     if (!token.startsWith("--")) continue;
     const key = token.slice(2);
     const next = rest[index + 1];
+    const assign = (value) => {
+      if (Object.prototype.hasOwnProperty.call(args, key)) {
+        args[key] = Array.isArray(args[key]) ? [...args[key], value] : [args[key], value];
+      } else {
+        args[key] = value;
+      }
+    };
     if (!next || next.startsWith("--")) {
-      args[key] = true;
+      assign(true);
     } else {
-      args[key] = next;
+      assign(next);
       index += 1;
     }
   }
@@ -74,11 +81,25 @@ function positiveInt(value, fallback) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
+function stringList(value) {
+  if (Array.isArray(value)) return value.filter((item) => typeof item === "string" && item.trim());
+  return typeof value === "string" && value.trim() ? [value] : [];
+}
+
 async function discover(args) {
+  const careerRoots = stringList(args["career-root"]);
+  const careerStore = careerRoots.length
+    ? greenhouse.loadGreenhouseCareerEvidenceAuthority({
+        careerRoots,
+        repositoryRoot,
+      })
+    : { facts: [], evidence: [] };
   const result = await greenhouse.buildGreenhouseDiscoveryQueue({
     manifest: manifestFromArgs(args),
     generatedAt: generatedAt(args),
     applications: [],
+    careerFacts: careerStore.facts,
+    careerEvidence: careerStore.evidence,
     maxJobsPerSource: positiveInt(args["max-jobs-per-source"], 60),
   });
   let writtenCount = 0;
@@ -104,6 +125,7 @@ function printHelp() {
       "",
       "Options:",
       "  --max-jobs-per-source <n>             Limit retrieval processed per board after public API response.",
+      "  --career-root <private-root>          Load existing private Career Evidence authority; may be repeated.",
       "  --write                               Write private outputs outside Git.",
       "  --as-of YYYY-MM-DD",
       "  --output-root <private-output-root>",

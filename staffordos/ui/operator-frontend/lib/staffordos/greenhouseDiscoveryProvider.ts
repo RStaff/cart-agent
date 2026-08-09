@@ -7,6 +7,8 @@ import {
 } from "node:fs";
 import * as path from "node:path";
 import { mapRequirementsToCareerEvidence, type PrivateRequirementEvidenceMapping } from "./candidateEvidenceMapper";
+import type { CareerEvidence, CareerFact } from "./careerEvidenceContracts";
+import { loadHighValueCareerEvidenceStore } from "./highValueCareerFactVerification";
 import { buildPrivateJobFitAssessment, type ManualApplicationEvent, type PrivateJobFitAssessment } from "./jobFitAssessment";
 import { extractPrivateJobRequirements, type PrivateJobRequirementRecord } from "./jobRequirementExtractor";
 import type { PrivateApplicationRecord } from "./manualApplicationEventTracking";
@@ -135,6 +137,8 @@ export type GreenhouseExplainableFitArtifact = {
   noResumeGenerated: true;
   noApplicationSubmitted: true;
   noExternalAi: true;
+  careerFactsLoadedFromAuthority: number;
+  careerEvidenceRecordsLoadedFromAuthority: number;
   limitations: string[];
 };
 
@@ -166,6 +170,9 @@ export type GreenhouseDiscoveryResult = {
     duplicateItems: number;
     existingApplicationItems: number;
     externalProviderCalls: number;
+    careerFactsLoadedFromAuthority: number;
+    careerEvidenceRecordsLoadedFromAuthority: number;
+    fitArtifactsWithSupportingEvidence: number;
   };
   auditSummary: {
     publicGreenhouseApiOnly: true;
@@ -180,6 +187,8 @@ export type GreenhouseDiscoveryResult = {
     noMessageSent: true;
     noExternalAi: true;
     noOllama: true;
+    noCareerFactPromoted: true;
+    noCareerEvidenceMutated: true;
     noLinkedIn: true;
     noWorkday: true;
     noLever: true;
@@ -193,6 +202,8 @@ export type GreenhouseDiscoveryOptions = {
   manifest: GreenhouseProviderManifest;
   generatedAt: string;
   applications?: readonly Partial<PrivateApplicationRecord>[];
+  careerFacts?: readonly Partial<CareerFact>[];
+  careerEvidence?: readonly Partial<CareerEvidence>[];
   fetcher?: GreenhouseFetch;
   maxJobsPerSource?: number;
 };
@@ -304,8 +315,28 @@ function scalarText(value: unknown) {
   return optionalText(value);
 }
 
+function decodeHtmlEntities(value: string) {
+  return value
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/gi, "'")
+    .replace(/&rsquo;/gi, "'")
+    .replace(/&lsquo;/gi, "'")
+    .replace(/&rdquo;/gi, '"')
+    .replace(/&ldquo;/gi, '"')
+    .replace(/&ndash;/gi, "-")
+    .replace(/&mdash;/gi, "-")
+    .replace(/&#(\d+);/g, (_match, code) => {
+      const parsed = Number.parseInt(code, 10);
+      return Number.isFinite(parsed) ? String.fromCharCode(parsed) : " ";
+    });
+}
+
 function stripHtml(value: string | null | undefined) {
-  return (value || "")
+  return decodeHtmlEntities(value || "")
     .replace(/<script[\s\S]*?<\/script>/gi, " ")
     .replace(/<style[\s\S]*?<\/style>/gi, " ")
     .replace(/<br\s*\/?>/gi, "\n")
@@ -653,8 +684,13 @@ function opportunityIdForQueueItem(item: JobSourceImportQueueItem) {
 function buildExplainableFitArtifacts(input: {
   queue: PrivateJobSourceImportQueueResult;
   generatedAt: string;
+  careerFacts?: readonly Partial<CareerFact>[];
+  careerEvidence?: readonly Partial<CareerEvidence>[];
 }): GreenhouseExplainableFitArtifact[] {
   const recordsById = new Map(input.queue.normalizedSourceRecords.map((record) => [record.jobSourceRecordId, record]));
+  const careerFacts = input.careerFacts || [];
+  const careerEvidence = input.careerEvidence || [];
+  const careerEvidenceLoaded = careerFacts.length > 0 || careerEvidence.length > 0;
 
   return input.queue.importQueue.map((queueItem) => {
     const record = recordsById.get(queueItem.sourceRecordId);
@@ -673,8 +709,8 @@ function buildExplainableFitArtifacts(input: {
     });
     const mappings = mapRequirementsToCareerEvidence({
       requirements,
-      careerFacts: [],
-      careerEvidence: [],
+      careerFacts,
+      careerEvidence,
       createdAt: input.generatedAt,
     });
     const fitAssessment = buildPrivateJobFitAssessment({
@@ -701,12 +737,26 @@ function buildExplainableFitArtifacts(input: {
       noResumeGenerated: true,
       noApplicationSubmitted: true,
       noExternalAi: true,
+      careerFactsLoadedFromAuthority: careerFacts.length,
+      careerEvidenceRecordsLoadedFromAuthority: careerEvidence.length,
       limitations: [
         "Uses existing J001.03A fit-assessment primitive with deterministic requirement extraction.",
-        "No private Career evidence is loaded by this discovery MVP.",
-        "Mappings therefore remain missing or unknown until a later private analysis mission reviews evidence.",
+        careerEvidenceLoaded
+          ? "Existing private Career Evidence authority was loaded for deterministic mapping; no Career facts were promoted or mutated."
+          : "No private Career Evidence authority was supplied to this discovery run.",
+        "Mappings remain review output and do not authorize resume wording, applications, messages, or external representation.",
       ],
     };
+  });
+}
+
+export function loadGreenhouseCareerEvidenceAuthority(options: {
+  careerRoots: readonly string[];
+  repositoryRoot: string;
+}) {
+  return loadHighValueCareerEvidenceStore({
+    careerRoots: options.careerRoots,
+    repositoryRoot: options.repositoryRoot,
   });
 }
 
@@ -754,6 +804,8 @@ export async function buildGreenhouseDiscoveryQueue(options: GreenhouseDiscovery
   const explainableFitArtifacts = buildExplainableFitArtifacts({
     queue: jobSourceImportQueue,
     generatedAt: options.generatedAt,
+    careerFacts: options.careerFacts || [],
+    careerEvidence: options.careerEvidence || [],
   });
 
   return {
@@ -788,6 +840,11 @@ export async function buildGreenhouseDiscoveryQueue(options: GreenhouseDiscovery
       duplicateItems: jobSourceImportQueue.summary.duplicateItems,
       existingApplicationItems: jobSourceImportQueue.summary.existingApplicationItems,
       externalProviderCalls: retrievals.length,
+      careerFactsLoadedFromAuthority: options.careerFacts?.length || 0,
+      careerEvidenceRecordsLoadedFromAuthority: options.careerEvidence?.length || 0,
+      fitArtifactsWithSupportingEvidence: explainableFitArtifacts.filter((artifact) =>
+        artifact.mappings.some((mapping) => mapping.careerFactIds.length || mapping.careerEvidenceIds.length),
+      ).length,
     },
     auditSummary: {
       publicGreenhouseApiOnly: true,
@@ -802,6 +859,8 @@ export async function buildGreenhouseDiscoveryQueue(options: GreenhouseDiscovery
       noMessageSent: true,
       noExternalAi: true,
       noOllama: true,
+      noCareerFactPromoted: true,
+      noCareerEvidenceMutated: true,
       noLinkedIn: true,
       noWorkday: true,
       noLever: true,
@@ -903,6 +962,9 @@ export function buildGreenhouseDiscoveryCliSummary(result: GreenhouseDiscoveryRe
     duplicateItems: result.summary.duplicateItems,
     existingApplicationItems: result.summary.existingApplicationItems,
     externalProviderCalls: result.summary.externalProviderCalls,
+    careerFactsLoadedFromAuthority: result.summary.careerFactsLoadedFromAuthority,
+    careerEvidenceRecordsLoadedFromAuthority: result.summary.careerEvidenceRecordsLoadedFromAuthority,
+    fitArtifactsWithSupportingEvidence: result.summary.fitArtifactsWithSupportingEvidence,
     explainableFitArtifacts: result.explainableFitArtifacts.length,
     noAuthentication: result.auditSummary.noAuthentication,
     noCookies: result.auditSummary.noCookies,
@@ -913,6 +975,8 @@ export function buildGreenhouseDiscoveryCliSummary(result: GreenhouseDiscoveryRe
     noMessageSent: result.auditSummary.noMessageSent,
     noExternalAi: result.auditSummary.noExternalAi,
     noOllama: result.auditSummary.noOllama,
+    noCareerFactPromoted: result.auditSummary.noCareerFactPromoted,
+    noCareerEvidenceMutated: result.auditSummary.noCareerEvidenceMutated,
     privateArtifactsWritten: writtenCount,
   };
 }

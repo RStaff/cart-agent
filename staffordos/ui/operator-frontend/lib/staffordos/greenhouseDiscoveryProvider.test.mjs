@@ -277,6 +277,68 @@ test("existing explainable fit artifacts are generated without CareerFact promot
   assert.ok(artifact.requirementCount > 0);
 });
 
+test("discovery can load existing Career Evidence into fit artifacts without promoting facts", async () => {
+  const result = await greenhouse.buildGreenhouseDiscoveryQueue({
+    manifest: manifest(),
+    generatedAt: "2026-08-08T12:00:00Z",
+    fetcher: mockFetcher({ example: [job()] }),
+    careerFacts: [
+      {
+        id: "careerfact_synthetic_ai_automation",
+        factType: "PROJECT",
+        statement: "AI automation platform workflow delivery.",
+        normalizedStatement: "ai automation platform workflow delivery",
+        technologyOrSkill: "AI",
+        verificationStatus: "VERIFIED",
+        supportLevel: "DIRECT",
+        authorityClassification: "OPERATOR_CONFIRMED",
+        conflictTypes: [],
+        conflictingEvidenceIds: [],
+      },
+    ],
+    careerEvidence: [
+      {
+        id: "careerev_synthetic_ai_automation",
+        evidenceType: "PROJECT_ARTIFACT",
+        sourceType: "PROJECT_ARTIFACT",
+        authorityClassification: "OPERATOR_CONFIRMED",
+        supportsFactIds: ["careerfact_synthetic_ai_automation"],
+        challengesFactIds: [],
+      },
+    ],
+  });
+  const artifact = result.explainableFitArtifacts[0];
+  const supportedMappings = artifact.mappings.filter((mapping) => mapping.careerEvidenceIds.includes("careerev_synthetic_ai_automation"));
+
+  assert.equal(result.summary.careerFactsLoadedFromAuthority, 1);
+  assert.equal(result.summary.careerEvidenceRecordsLoadedFromAuthority, 1);
+  assert.equal(result.summary.fitArtifactsWithSupportingEvidence, 1);
+  assert.equal(result.auditSummary.noCareerFactPromoted, true);
+  assert.equal(result.auditSummary.noCareerEvidenceMutated, true);
+  assert.ok(supportedMappings.length >= 1);
+  assert.equal(artifact.careerFactsLoadedFromAuthority, 1);
+  assert.equal(artifact.careerEvidenceRecordsLoadedFromAuthority, 1);
+});
+
+test("Greenhouse escaped HTML is cleaned before requirement extraction", async () => {
+  const result = await greenhouse.buildGreenhouseDiscoveryQueue({
+    manifest: manifest(),
+    generatedAt: "2026-08-08T12:00:00Z",
+    fetcher: mockFetcher({
+      example: [
+        job({
+          content:
+            "&lt;ul&gt;&lt;li&gt;You will lead AI automation workflows and product roadmap delivery.&lt;/li&gt;&lt;li&gt;Partner with stakeholders on APIs and analytics.&lt;/li&gt;&lt;/ul&gt;",
+        }),
+      ],
+    }),
+  });
+  const requirementText = result.explainableFitArtifacts[0].requirements.map((requirement) => requirement.requirementText).join(" ");
+
+  assert.doesNotMatch(requirementText, /&lt;|&gt;|<li>|<\/li>|<ul>/i);
+  assert.match(requirementText, /lead AI automation workflows/i);
+});
+
 test("failed Greenhouse board is recorded without fallback scraping", async () => {
   const result = await greenhouse.buildGreenhouseDiscoveryQueue({
     manifest: manifest({ boardToken: "missing" }),

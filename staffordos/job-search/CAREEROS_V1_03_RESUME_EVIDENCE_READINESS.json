@@ -1,0 +1,93 @@
+{
+  "mission": "CAREEROS_V1_03_RESUME_EVIDENCE_READINESS",
+  "classification": "RESUME_EVIDENCE_READINESS_COMPLETED_WITH_RESUME_SAFETY_BLOCKER",
+  "authority": {
+    "startingHead": "f3488a05",
+    "branch": "main",
+    "reusedAuthorities": [
+      "J001 Career Evidence / Resume authority / Explainable Fit",
+      "J002 Real Opportunity Discovery",
+      "J003 Recommendation and application-preparation workflow",
+      "J004.01 Follow-up and response tracking",
+      "CAREEROS_V1_01 Daily Job Search Experience",
+      "CAREEROS_V1_02 Live Job Search Activation"
+    ]
+  },
+  "rootCauseFinding": {
+    "fixed": [
+      "Live Greenhouse fit artifacts did not load existing private Career Evidence authority.",
+      "Requirement evidence mapping did not consume evidence-to-fact supportsFactIds links.",
+      "Escaped Greenhouse HTML inflated extracted requirements and false gaps."
+    ],
+    "remainingBlocker": "Existing ResumeVersions remain conflicting and need operator review before safe reuse."
+  },
+  "realDiscoveryResult": {
+    "sourcesRequested": 8,
+    "sourcesRetrieved": 8,
+    "publishedJobsRetrieved": 2200,
+    "eligibleOpportunities": 276,
+    "queueItems": 276,
+    "readyForOpportunityImport": 45,
+    "duplicateItems": 24,
+    "existingApplicationMatches": 0
+  },
+  "careerEvidenceMappingResult": {
+    "careerFactsLoadedFromAuthority": 895,
+    "careerEvidenceRecordsLoadedFromAuthority": 16,
+    "fitArtifactsWithSupportingEvidence": 276,
+    "careerFactPromoted": false,
+    "careerEvidenceMutated": false
+  },
+  "resumeReadinessResult": {
+    "resumeVersionsEvaluated": 9,
+    "readyToReuse": 0,
+    "reviewBeforeReuse": 0,
+    "notSafeToReuse": 9,
+    "opportunitiesWithRecommendedResumeVersion": 0,
+    "blockingReasons": [
+      "All ResumeVersions have conflicting fact-safety status.",
+      "All ResumeVersions require operator review before reuse.",
+      "Some ResumeVersions include claims needing evidence, unknown claim safety, or stale-source warnings."
+    ]
+  },
+  "recommendationRerunResult": {
+    "recommendationsCreated": 276,
+    "applyNow": 0,
+    "review": 45,
+    "wait": 208,
+    "skip": 23,
+    "readyForOperatorApprovedApplication": 0,
+    "hiringProbabilityGenerated": false,
+    "interviewProbabilityGenerated": false,
+    "aiConfidenceScoreGenerated": false
+  },
+  "applicationWorkflowResult": {
+    "workflowActionsRecorded": 0,
+    "readyToApply": 0,
+    "applicationPackagesCreated": 0,
+    "reviewWorkspacePackagesLoaded": 0
+  },
+  "dailyUiVerification": {
+    "route": "/os/professional/jobs",
+    "realOpportunitiesVisible": true,
+    "latestDiscoveryVisible": true,
+    "resumeSafetyBlockerVisible": true,
+    "externalActionControlsEnabled": false
+  },
+  "nonImpact": {
+    "resumeGenerated": false,
+    "resumeMutated": false,
+    "careerFactInvented": false,
+    "careerFactPromoted": false,
+    "careerEvidenceMutated": false,
+    "applicationCreated": false,
+    "applicationSubmitted": false,
+    "messageSent": false,
+    "providerAdded": false,
+    "externalAiUsed": false,
+    "ollamaUsed": false,
+    "deployed": false,
+    "pushed": false
+  },
+  "recommendedNextAction": "Resolve ResumeVersion claim safety and operator review status for a small strategic cohort before expecting APPLY_NOW recommendations."
+}
