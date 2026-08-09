@@ -49,6 +49,8 @@ export type CareerOsTopRecommendation = {
 export type CareerOsPipelineSummary = {
   applicationsSubmitted: number;
   interviews: number;
+  offers: number;
+  closedApplications: number;
   followUpsDue: number;
   sourceAuthority: string;
   limitations: string[];
@@ -227,6 +229,8 @@ function pipelineSummary(input: CareerOsCommandCenterInput): CareerOsPipelineSum
     return {
       applicationsSubmitted: 0,
       interviews: 0,
+      offers: 0,
+      closedApplications: 0,
       followUpsDue: 0,
       sourceAuthority: "No J001.05B application pipeline read model connected",
       limitations: [...ZERO_LIMITATIONS],
@@ -236,6 +240,8 @@ function pipelineSummary(input: CareerOsCommandCenterInput): CareerOsPipelineSum
   return {
     applicationsSubmitted: pipeline.pipelineSummary.submittedApplications,
     interviews: pipeline.searchHealth.interviewsActive,
+    offers: pipeline.pipelineSummary.offers,
+    closedApplications: pipeline.pipelineSummary.closedApplications,
     followUpsDue: pipeline.pipelineSummary.followUpReviewsDue,
     sourceAuthority: "J001.05B private application pipeline read model",
     limitations: [...pipeline.limitations, ...pipeline.pipelineSummary.limitations],

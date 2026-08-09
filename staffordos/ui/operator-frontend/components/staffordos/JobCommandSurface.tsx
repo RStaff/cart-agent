@@ -1,170 +1,256 @@
 import {
-  EMPTY_CAREEROS_COMMAND_CENTER_PRESENTATION,
-  type CareerOsBriefItem,
-  type CareerOsCommandCenterPresentation,
-  type CareerOsTopRecommendation,
-} from "../../lib/staffordos/careerOsCommandCenterPresentation";
+  EMPTY_CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE,
+  type CareerOsDailyApplicationWorkItem,
+  type CareerOsDailyBriefMetric,
+  type CareerOsDailyJobSearchExperience,
+  type CareerOsDailyPipelineStage,
+  type CareerOsDailyPriority,
+  type CareerOsDailyTopOpportunity,
+} from "../../lib/staffordos/careerOsDailyJobSearchExperience";
 
-function BriefMetric({ item }: { item: CareerOsBriefItem }) {
+function BriefMetric({ item }: { item: CareerOsDailyBriefMetric }) {
   return (
     <article className="staffordCareerCommandMetric">
       <span>{item.label}</span>
       <strong>{item.value}</strong>
+      <p>{item.detail}</p>
     </article>
   );
 }
 
-function PipelineMetric({
-  label,
-  value,
-}: {
-  label: string;
-  value: number;
-}) {
+function PriorityItem({ item }: { item: CareerOsDailyPriority }) {
   return (
-    <article className="staffordCareerCommandMetric">
-      <span>{label}</span>
-      <strong>{value}</strong>
+    <article className="staffordCareerDailyTask">
+      <header>
+        <div>
+          <span>{item.category}</span>
+          <h3>{item.title}</h3>
+          {item.company && item.role ? <p>{item.company} / {item.role}</p> : null}
+        </div>
+        <strong>{item.urgency === "today" ? "Today" : item.urgency === "next" ? "Next" : "Later"}</strong>
+      </header>
+      <p>{item.detail}</p>
+      <footer>
+        <span>{item.status}</span>
+        <button type="button" className="staffordJobCommandDisabledAction" disabled>
+          {item.action}
+        </button>
+      </footer>
     </article>
   );
 }
 
-function RecommendationRow({ recommendation }: { recommendation: CareerOsTopRecommendation }) {
+function OpportunityItem({ item }: { item: CareerOsDailyTopOpportunity }) {
   return (
     <article className="staffordCareerCommandRecommendation">
       <header>
         <div>
-          <span>{recommendation.recommendation}</span>
-          <h3>{recommendation.position}</h3>
-          <p>{recommendation.company}</p>
+          <span>{item.recommendation}</span>
+          <h3>{item.position}</h3>
+          <p>{item.company}</p>
         </div>
-        <strong>{recommendation.applicationReadiness}</strong>
+        <strong>{item.nextAction}</strong>
       </header>
       <dl className="staffordCareerCommandDetails">
         <div>
           <dt>Explainable Fit</dt>
-          <dd>{recommendation.explainableFit}</dd>
+          <dd>{item.explainableFit}</dd>
         </div>
         <div>
-          <dt>ResumeVersion</dt>
-          <dd>{recommendation.resumeVersion}</dd>
+          <dt>Resume</dt>
+          <dd>{item.resumeVersion}</dd>
         </div>
         <div>
           <dt>Next Action</dt>
-          <dd>{recommendation.nextAction}</dd>
-        </div>
-        <div>
-          <dt>Evidence / Gaps</dt>
-          <dd>
-            {recommendation.supportingEvidenceCount} supporting, {recommendation.missingSkillCount} missing or unknown
-          </dd>
+          <dd>{item.detail}</dd>
         </div>
       </dl>
     </article>
   );
 }
 
+function WorkItem({ item }: { item: CareerOsDailyApplicationWorkItem }) {
+  return (
+    <article className="staffordCareerDailyTask">
+      <header>
+        <div>
+          <span>{item.task}</span>
+          <h3>{item.role}</h3>
+          <p>{item.company}</p>
+        </div>
+        <strong>{item.status}</strong>
+      </header>
+      <p>{item.detail}</p>
+      <footer>
+        <span>{item.applicationDate || "Date not shown"}</span>
+        <button type="button" className="staffordJobCommandDisabledAction" disabled>
+          {item.task}
+        </button>
+      </footer>
+    </article>
+  );
+}
+
+function PipelineMetric({ item }: { item: CareerOsDailyPipelineStage }) {
+  return (
+    <article className="staffordCareerCommandMetric">
+      <span>{item.label}</span>
+      <strong>{item.value}</strong>
+      <p>{item.detail}</p>
+    </article>
+  );
+}
+
 export function JobCommandSurface({
-  commandCenter = EMPTY_CAREEROS_COMMAND_CENTER_PRESENTATION,
+  experience = EMPTY_CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE,
 }: {
-  commandCenter?: CareerOsCommandCenterPresentation;
+  experience?: CareerOsDailyJobSearchExperience;
 }) {
-  const hasRecommendations = commandCenter.topRecommendations.length > 0;
-  const primaryProviderStatus = commandCenter.systemHealth.providerStatus[0];
+  const hasPriorities = experience.todaysPriorities.length > 0;
+  const hasOpportunities = experience.topOpportunities.length > 0;
+  const hasApplicationWork = experience.applicationWork.length > 0;
 
   return (
     <div className="staffordJobCommand">
       <section className="staffordHomeHeader">
         <div>
-          <span className="staffordEyebrow">Professional</span>
-          <h1>{commandCenter.title}</h1>
-          <p>{commandCenter.primaryQuestion}</p>
-          <p>{commandCenter.summary}</p>
+          <span className="staffordEyebrow">{experience.greeting}</span>
+          <h1>{experience.title}</h1>
+          <p>{experience.primaryQuestion}</p>
+          <p>{experience.dailyBriefing.headline}</p>
         </div>
         <div className="staffordWorkspaceStatus">
-          <span>{commandCenter.capturedAsOf}</span>
-          <strong>Read-only Career Operations</strong>
+          <span>{experience.dailyBriefing.capturedAsOf}</span>
+          <strong>Daily Job Search</strong>
         </div>
       </section>
 
       <section className="staffordHomeSupport" aria-label="Today's Brief">
         <div className="staffordHomeSectionHeader">
           <span className="staffordEyebrow">Today's Brief</span>
-          <h2>Opportunity and application posture</h2>
-          <p>{commandCenter.authorityStatement}</p>
+          <h2>What should I do today?</h2>
+          <p>{experience.dailyBriefing.summary}</p>
         </div>
         <div className="staffordCareerCommandBriefGrid">
-          {commandCenter.todaysBrief.map((item) => (
+          {experience.dailyBriefing.metrics.map((item) => (
             <BriefMetric key={item.id} item={item} />
           ))}
         </div>
       </section>
 
-      <section className="staffordHomeSupport" aria-label="Top Recommendations">
+      <section className="staffordHomeSupport" aria-label="Today's Priorities">
         <div className="staffordHomeSectionHeader">
-          <span className="staffordEyebrow">Top Recommendations</span>
-          <h2>What should be reviewed first</h2>
-          <p>
-            {hasRecommendations
-              ? "Recommendation order and content come from the existing J003.01 recommendation read model."
-              : "No recommendation read model is connected to this route yet."}
-          </p>
+          <span className="staffordEyebrow">Today's Priorities</span>
+          <h2>Do this first</h2>
+          <p>Tasks are ordered from existing opportunity, application, and follow-up information.</p>
         </div>
-        {hasRecommendations ? (
-          <div className="staffordCareerCommandRecommendationList">
-            {commandCenter.topRecommendations.map((recommendation) => (
-              <RecommendationRow key={recommendation.id} recommendation={recommendation} />
+        {hasPriorities ? (
+          <div className="staffordCareerDailyTaskList">
+            {experience.todaysPriorities.map((item) => (
+              <PriorityItem key={item.id} item={item} />
             ))}
           </div>
         ) : (
           <article className="staffordHomeStatusNote">
-            <span>No recommendations connected</span>
-            <strong>Run the existing private discovery and recommendation pipeline, then supply its read model.</strong>
+            <span>No priority due</span>
+            <strong>{experience.emptyState || "No current action is due from connected artifacts."}</strong>
           </article>
         )}
       </section>
 
-      <section className="staffordHomeSupport" aria-label="Pipeline">
+      <section className="staffordHomeSupport" aria-label="Today's Top Opportunities">
         <div className="staffordHomeSectionHeader">
-          <span className="staffordEyebrow">Pipeline</span>
-          <h2>Application state</h2>
-          <p>{commandCenter.pipeline.sourceAuthority}</p>
+          <span className="staffordEyebrow">Today's Top Opportunities</span>
+          <h2>Best opportunities to inspect</h2>
+          <p>Shown from existing opportunity recommendations.</p>
+        </div>
+        {hasOpportunities ? (
+          <div className="staffordCareerCommandRecommendationList">
+            {experience.topOpportunities.map((item) => (
+              <OpportunityItem key={item.id} item={item} />
+            ))}
+          </div>
+        ) : (
+          <article className="staffordHomeStatusNote">
+            <span>No opportunities connected</span>
+            <strong>Run the existing discovery and recommendation workflow to populate this section.</strong>
+          </article>
+        )}
+      </section>
+
+      <section className="staffordHomeSupport" aria-label="Application Work">
+        <div className="staffordHomeSectionHeader">
+          <span className="staffordEyebrow">Application Work</span>
+          <h2>Application review, follow-ups, and interview handoffs</h2>
+          <p>Each item is planning-only until Ross performs any external action himself.</p>
+        </div>
+        {hasApplicationWork ? (
+          <div className="staffordCareerDailyTaskList">
+            {experience.applicationWork.map((item) => (
+              <WorkItem key={item.id} item={item} />
+            ))}
+          </div>
+        ) : (
+          <article className="staffordHomeStatusNote">
+            <span>No application work connected</span>
+            <strong>Application review and follow-up details will appear here when available.</strong>
+          </article>
+        )}
+      </section>
+
+      <section className="staffordHomeSupport" aria-label="Application Pipeline">
+        <div className="staffordHomeSectionHeader">
+          <span className="staffordEyebrow">Application Pipeline</span>
+          <h2>Current application stages</h2>
+          <p>Counts come from existing application tracking and outcome history.</p>
         </div>
         <div className="staffordCareerCommandPipelineGrid">
-          <PipelineMetric label="Applications Submitted" value={commandCenter.pipeline.applicationsSubmitted} />
-          <PipelineMetric label="Interviews" value={commandCenter.pipeline.interviews} />
-          <PipelineMetric label="Follow-ups Due" value={commandCenter.pipeline.followUpsDue} />
+          {experience.applicationPipeline.map((item) => (
+            <PipelineMetric key={item.id} item={item} />
+          ))}
         </div>
       </section>
 
-      <section className="staffordHomeSupport" aria-label="System Health">
+      <section className="staffordHomeSupport" aria-label="Daily Actions">
         <div className="staffordHomeSectionHeader">
-          <span className="staffordEyebrow">System Health</span>
-          <h2>Discovery and queue status</h2>
-          <p>{commandCenter.systemHealth.sourceAuthority}</p>
+          <span className="staffordEyebrow">Daily Actions</span>
+          <h2>Available planning actions</h2>
+          <p>No action here submits, sends, edits, or contacts an external system.</p>
+        </div>
+        <div className="staffordCareerDailyActionRow">
+          {experience.dailyActions.map((item) => (
+            <button key={item.action} type="button" className="staffordJobCommandDisabledAction" disabled>
+              {item.label}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="staffordHomeSupport" aria-label="Search Health">
+        <div className="staffordHomeSectionHeader">
+          <span className="staffordEyebrow">Search Health</span>
+          <h2>Discovery and tracking status</h2>
+          <p>{experience.systemHealth.detail}</p>
         </div>
         <div className="staffordJobCommandHealthGrid">
           <article className="staffordHomeStatusNote">
             <span>Provider Status</span>
-            <strong>{primaryProviderStatus ? `${primaryProviderStatus.label}: ${primaryProviderStatus.state}` : "UNKNOWN"}</strong>
-            <p>{primaryProviderStatus?.detail || "No provider status read model is connected."}</p>
+            <strong>{experience.systemHealth.providerStatus}</strong>
           </article>
           <article className="staffordHomeStatusNote">
-            <span>Last Discovery Run</span>
-            <strong>{commandCenter.systemHealth.lastDiscoveryRun}</strong>
-            <p>Discovery timestamps come from existing provider or import queue results.</p>
+            <span>Last Discovery</span>
+            <strong>{experience.systemHealth.lastDiscoveryRun}</strong>
           </article>
           <article className="staffordHomeStatusNote">
-            <span>Queue Size</span>
-            <strong>{commandCenter.systemHealth.queueSize}</strong>
-            <p>Queue size is read from the existing opportunity queue or recommendation result.</p>
+            <span>Opportunity Backlog</span>
+            <strong>{experience.systemHealth.openOpportunityBacklog}</strong>
           </article>
         </div>
       </section>
 
       <section className="staffordObjectiveNote" aria-label="Approval boundary">
-        <strong>Operator authority remains closed</strong>
-        <p>{commandCenter.approvalStatement}</p>
+        <strong>Human review before external action</strong>
+        <p>{experience.approvalBoundary}</p>
       </section>
     </div>
   );

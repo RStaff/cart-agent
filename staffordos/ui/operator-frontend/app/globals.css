@@ -2664,7 +2664,7 @@ textarea {
 }
 
 .staffordCareerCommandPipelineGrid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .staffordCareerCommandMetric {
@@ -2688,6 +2688,13 @@ textarea {
   color: #15181d;
   font-size: 34px;
   line-height: 1;
+}
+
+.staffordCareerCommandMetric p {
+  margin: 0;
+  color: #4f5a66;
+  font-size: 12px;
+  line-height: 1.35;
 }
 
 .staffordCareerCommandRecommendationList {
@@ -2741,7 +2748,7 @@ textarea {
 
 .staffordCareerCommandDetails {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin: 0;
 }
@@ -2778,6 +2785,75 @@ textarea {
   color: #4f5a66;
   font-size: 13px;
   line-height: 1.45;
+}
+
+.staffordCareerDailyTaskList {
+  display: grid;
+  gap: 12px;
+}
+
+.staffordCareerDailyTask {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #d9dee5;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.staffordCareerDailyTask header,
+.staffordCareerDailyTask footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(130px, auto);
+  gap: 12px;
+  align-items: start;
+}
+
+.staffordCareerDailyTask span {
+  color: #66717e;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.staffordCareerDailyTask h3 {
+  margin: 5px 0 0;
+  color: #15181d;
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.staffordCareerDailyTask p {
+  margin: 0;
+  color: #4f5a66;
+  line-height: 1.45;
+}
+
+.staffordCareerDailyTask header p {
+  margin-top: 5px;
+}
+
+.staffordCareerDailyTask strong {
+  justify-self: end;
+  color: #15181d;
+  font-size: 12px;
+  line-height: 1.35;
+  text-align: right;
+}
+
+.staffordCareerDailyTask footer .staffordJobCommandDisabledAction {
+  margin-top: 0;
+  justify-self: end;
+}
+
+.staffordCareerDailyActionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.staffordCareerDailyActionRow .staffordJobCommandDisabledAction {
+  margin-top: 0;
 }
 
 .staffordJobOpportunityQueueCard {

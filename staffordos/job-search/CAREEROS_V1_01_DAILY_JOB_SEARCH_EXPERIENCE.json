@@ -1,0 +1,112 @@
+{
+  "mission": "CAREEROS_V1_01_DAILY_JOB_SEARCH_EXPERIENCE",
+  "classification": "CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE_COMPLETED",
+  "authority": {
+    "startingHead": "9e0fd139",
+    "branch": "main",
+    "completedPrerequisites": [
+      "J001 Know Me",
+      "J002 Opportunity Discovery",
+      "J003 Recommendation Workflow",
+      "J004.01 Career Engagement Follow-up"
+    ],
+    "principles": [
+      "action first",
+      "reuse existing read models",
+      "no duplicated recommendation logic",
+      "human review before external action",
+      "no provider or browser automation",
+      "no external AI or Ollama"
+    ]
+  },
+  "implementation": {
+    "route": "/os/professional/jobs",
+    "surface": "JobCommandSurface",
+    "presentationBuilder": "careerOsDailyJobSearchExperience",
+    "privateArtifactLoader": "careerOsDailyJobSearchExperiencePrivateLoader",
+    "dynamicRendering": true,
+    "newPrivateDataRouteCreated": false,
+    "visibleInternalArchitectureLanguage": false
+  },
+  "experience": {
+    "primaryQuestion": "What should I do next in my job search?",
+    "sections": [
+      "Good morning",
+      "Today's Brief",
+      "Today's Priorities",
+      "Today's Top Opportunities",
+      "Application Work",
+      "Application Pipeline",
+      "Daily Actions",
+      "Search Health",
+      "Human review boundary"
+    ],
+    "userFacingRecommendations": [
+      "APPLY NOW",
+      "REVIEW",
+      "WAIT",
+      "SKIP"
+    ],
+    "dailyActions": [
+      "Review Package",
+      "Open Opportunity",
+      "View Resume",
+      "Review Evidence",
+      "Follow Up",
+      "Prepare Interview"
+    ]
+  },
+  "reuse": {
+    "opportunityQueue": true,
+    "recommendationOutput": true,
+    "explainableFit": true,
+    "resumeVersion": true,
+    "careerEvidence": true,
+    "applicationPipeline": true,
+    "applicationPackages": true,
+    "applicationReviewWorkspace": true,
+    "followUpTracking": true,
+    "commandCenterPresentation": true
+  },
+  "privacy": {
+    "rawInternalDataVisible": false,
+    "privatePathVisible": false,
+    "rawJobTextVisible": false,
+    "rawResumeTextVisible": false,
+    "sourceSnapshotInternalsVisible": false,
+    "clientSidePrivateLoaderCreated": false,
+    "apiRouteCreated": false
+  },
+  "nonImpact": {
+    "applicationCreated": false,
+    "applicationSubmitted": false,
+    "messageSent": false,
+    "outreachGenerated": false,
+    "resumeGenerated": false,
+    "resumeMutated": false,
+    "coverLetterGenerated": false,
+    "providerAdded": false,
+    "providerCalled": false,
+    "browserAutomationUsed": false,
+    "oauthModified": false,
+    "externalAiUsed": false,
+    "ollamaUsed": false,
+    "deployed": false,
+    "pushed": false
+  },
+  "tests": {
+    "focused": "node --test staffordos/ui/operator-frontend/lib/staffordos/careerOsDailyJobSearchExperience.test.mjs",
+    "requiredRegression": "node --test staffordos/ui/operator-frontend/lib/staffordos/*.test.mjs",
+    "build": "npm run build in staffordos/ui/operator-frontend"
+  },
+  "rollback": {
+    "procedure": "git revert <mission_commit>",
+    "privateArtifacts": "Read-only inputs; no private artifact rollback required."
+  },
+  "knownLimitations": [
+    "Sections populate only when existing owner-private CareerOS artifacts are present.",
+    "Daily action controls are display-only planning controls in this slice.",
+    "The route reads governed local artifacts server-side but does not create an API route."
+  ],
+  "recommendedNextMission": "CAREEROS_V1_02_INTERNAL_DETAIL_NAVIGATION_AND_REVIEW_FLOW"
+}
