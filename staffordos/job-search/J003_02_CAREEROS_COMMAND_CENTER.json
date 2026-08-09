@@ -1,0 +1,132 @@
+{
+  "mission": "J003_02_CAREEROS_COMMAND_CENTER",
+  "classification": "CAREEROS_COMMAND_CENTER_COMPLETED",
+  "workspace": {
+    "topLevelWorkspace": "Professional",
+    "capabilityFamily": "Career Operations",
+    "route": "/os/professional/jobs",
+    "newWorkspaceCreated": false,
+    "newRouteCreated": false,
+    "newApplicationShellCreated": false
+  },
+  "authority": {
+    "startingHead": "3a2cc55a",
+    "branch": "main",
+    "dependsOn": [
+      "J001 Know Me",
+      "J001 Application Tracking",
+      "J002.01 Job Discovery and Prioritization",
+      "J002.02A Private Job Source Import Queue",
+      "J002.02B Greenhouse Discovery MVP",
+      "J003.01 Opportunity Recommendation Engine",
+      "Explainable Fit",
+      "ResumeVersion authority",
+      "G001 Private Data Git Backstop",
+      "G003 Adapter-Only Read Model Authority",
+      "G004.01 Operator Write Isolation"
+    ],
+    "discoveryRebuilt": false,
+    "recommendationLogicModified": false,
+    "providerAdded": false,
+    "externalAiAdded": false
+  },
+  "dashboard": {
+    "title": "CareerOS Command Center",
+    "displaySections": [
+      "Today's Brief",
+      "Top Recommendations",
+      "Pipeline",
+      "System Health"
+    ],
+    "readOnlyPresentationAdapter": true,
+    "businessLogicAdded": false,
+    "recommendationLogicDuplicated": false
+  },
+  "readModelInputs": [
+    "J003.01 OpportunityRecommendationResult",
+    "J002.02A PrivateJobSourceImportQueueResult",
+    "J002.02B GreenhouseDiscoveryResult",
+    "J001.05B PrivateApplicationPipelineReviewResult"
+  ],
+  "todaysBrief": {
+    "metrics": [
+      "New Opportunities",
+      "Ready to Apply",
+      "Review",
+      "Waiting",
+      "Skipped"
+    ],
+    "sourceAuthority": "Existing Opportunity Queue and Recommendation read models",
+    "vanityMetricsGenerated": false
+  },
+  "topRecommendations": {
+    "fields": [
+      "Position",
+      "Company",
+      "Recommendation",
+      "Explainable Fit",
+      "ResumeVersion",
+      "Next Action"
+    ],
+    "orderingSource": "J003.01 recommendation output",
+    "rankingRecalculated": false,
+    "fitRecalculated": false
+  },
+  "pipeline": {
+    "fields": [
+      "Applications Submitted",
+      "Interviews",
+      "Follow-ups Due"
+    ],
+    "sourceAuthority": "J001.05B application pipeline read model",
+    "outcomesInferred": false
+  },
+  "systemHealth": {
+    "fields": [
+      "Provider Status",
+      "Last Discovery Run",
+      "Queue Size"
+    ],
+    "providerCalledByDashboard": false,
+    "sourceAuthority": "Existing provider, import queue, and recommendation read models"
+  },
+  "safetyBoundary": {
+    "applicationSubmitted": false,
+    "applicationCreated": false,
+    "resumeGenerated": false,
+    "resumeMutated": false,
+    "coverLetterGenerated": false,
+    "messageSent": false,
+    "browserAutomation": false,
+    "oauth": false,
+    "externalAi": false,
+    "ollama": false,
+    "privateOsLoader": false,
+    "operatorPrivateConnection": false,
+    "deployment": false,
+    "push": false
+  },
+  "tests": {
+    "focused": "staffordos/ui/operator-frontend/lib/staffordos/careerOsCommandCenterPresentation.test.mjs",
+    "regressionsRequired": [
+      "J003.01 Opportunity Recommendation Engine",
+      "J002.02B Greenhouse Discovery MVP",
+      "J002.02A Private Job Source Import Queue",
+      "J002.01 Job Discovery and Prioritization",
+      "J001 regressions",
+      "S010 regressions",
+      "S009 regressions",
+      "S008/G002/G003/G004 regressions"
+    ]
+  },
+  "limitations": [
+    "The route renders a safe empty dashboard unless a future governed read-model connection supplies private CareerOS artifacts.",
+    "The Command Center does not provide operator review decisions or application import approval.",
+    "The dashboard does not load private storage directly."
+  ],
+  "rollback": {
+    "procedure": "git revert <J003.02 commit>",
+    "privateArtifacts": "No private runtime artifacts are created by this mission."
+  },
+  "recommendedNextMission": "J003_03_OPERATOR_REVIEW_AND_OPPORTUNITY_IMPORT_DECISIONS"
+}

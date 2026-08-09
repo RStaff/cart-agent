@@ -2653,6 +2653,120 @@ textarea {
   line-height: 1.45;
 }
 
+.staffordCareerCommandBriefGrid,
+.staffordCareerCommandPipelineGrid {
+  display: grid;
+  gap: 12px;
+}
+
+.staffordCareerCommandBriefGrid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.staffordCareerCommandPipelineGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.staffordCareerCommandMetric {
+  display: grid;
+  gap: 8px;
+  min-height: 116px;
+  padding: 14px;
+  border: 1px solid #d9dee5;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.staffordCareerCommandMetric span {
+  color: #66717e;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.staffordCareerCommandMetric strong {
+  color: #15181d;
+  font-size: 34px;
+  line-height: 1;
+}
+
+.staffordCareerCommandRecommendationList {
+  display: grid;
+  gap: 12px;
+}
+
+.staffordCareerCommandRecommendation {
+  display: grid;
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid #d9dee5;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.staffordCareerCommandRecommendation header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(150px, auto);
+  gap: 12px;
+  align-items: start;
+}
+
+.staffordCareerCommandRecommendation span {
+  color: #66717e;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.staffordCareerCommandRecommendation h3 {
+  margin: 5px 0 0;
+  color: #15181d;
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.staffordCareerCommandRecommendation p {
+  margin: 5px 0 0;
+  color: #4f5a66;
+  line-height: 1.4;
+}
+
+.staffordCareerCommandRecommendation header > strong {
+  justify-self: end;
+  color: #15181d;
+  font-size: 12px;
+  line-height: 1.35;
+  text-align: right;
+}
+
+.staffordCareerCommandDetails {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.staffordCareerCommandDetails div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.staffordCareerCommandDetails dt {
+  color: #66717e;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.staffordCareerCommandDetails dd {
+  margin: 0;
+  color: #15181d;
+  font-size: 13px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
 .staffordJobCommandHealthGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2932,6 +3046,10 @@ textarea {
   .staffordHomeHeader,
   .staffordObjectiveHeader,
   .staffordHomeAttention,
+  .staffordCareerCommandBriefGrid,
+  .staffordCareerCommandPipelineGrid,
+  .staffordCareerCommandDetails,
+  .staffordCareerCommandRecommendation header,
   .staffordNextActionGrid,
   .staffordWorkspaceGrid,
   .staffordCapabilityGrid,

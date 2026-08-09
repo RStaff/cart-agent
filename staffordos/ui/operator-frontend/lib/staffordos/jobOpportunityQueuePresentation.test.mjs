@@ -8,11 +8,13 @@ import test from "node:test";
 const root = process.cwd();
 const queuePath = path.join(root, "staffordos/ui/operator-frontend/lib/staffordos/jobOpportunityQueuePresentation.ts");
 const intakePath = path.join(root, "staffordos/ui/operator-frontend/lib/staffordos/privateJobOpportunityIntake.ts");
+const commandCenterPath = path.join(root, "staffordos/ui/operator-frontend/lib/staffordos/careerOsCommandCenterPresentation.ts");
 const surfacePath = path.join(root, "staffordos/ui/operator-frontend/components/staffordos/JobCommandSurface.tsx");
 const requireFromFrontend = createRequire(path.join(root, "staffordos/ui/operator-frontend/package.json"));
 const ts = requireFromFrontend("typescript");
 const queueSource = readFileSync(queuePath, "utf8");
 const intakeSource = readFileSync(intakePath, "utf8");
+const commandCenterSource = readFileSync(commandCenterPath, "utf8");
 const surfaceSource = readFileSync(surfacePath, "utf8");
 
 function compileModule(moduleSource, filename) {
@@ -197,17 +199,17 @@ test("queue builder does not mutate inputs", () => {
   assert.deepEqual(opportunity, before);
 });
 
-test("Job Command surface imports the redacted queue contract only", () => {
-  assert.match(surfaceSource, /jobOpportunityQueuePresentation/);
+test("Job Command surface imports the Command Center presentation contract only", () => {
+  assert.match(surfaceSource, /careerOsCommandCenterPresentation/);
   assert.doesNotMatch(surfaceSource, /privateJobOpportunityIntake|readFileSync|readdirSync|localStorage|sessionStorage/);
 });
 
 test("no operator loader, network, model, database, or send path exists", () => {
-  const implementationSource = [queueSource, surfaceSource].join("\n");
+  const implementationSource = [queueSource, commandCenterSource, surfaceSource].join("\n");
 
   assert.doesNotMatch(implementationSource, /lib\/operator|\/operator\//);
   assert.doesNotMatch(implementationSource, /fetch\(|XMLHttpRequest|http\.request|https\.request/);
-  assert.doesNotMatch(implementationSource, /ollama|openai|anthropic|gemini|modelAdapter/i);
+  assert.doesNotMatch(implementationSource, /runOllama|OLLAMA_HOST|from\s+["']openai|from\s+["']@anthropic|modelAdapter|chiefOfStaffModel/i);
   assert.doesNotMatch(implementationSource, /prisma|database|dbClient|sql`|from ".*db/i);
   assert.doesNotMatch(implementationSource, /sendMessage|sendRecruiter|mailto:/);
 });

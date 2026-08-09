@@ -1,184 +1,170 @@
-import { NextActionCard } from "./NextActionCard";
-import { JOB_SEARCH_COMMAND_PRESENTATION } from "../../lib/staffordos/jobSearchCommandPresentation";
 import {
-  EMPTY_JOB_OPPORTUNITY_QUEUE_PRESENTATION,
-  type JobOpportunityQueuePresentation,
-} from "../../lib/staffordos/jobOpportunityQueuePresentation";
+  EMPTY_CAREEROS_COMMAND_CENTER_PRESENTATION,
+  type CareerOsBriefItem,
+  type CareerOsCommandCenterPresentation,
+  type CareerOsTopRecommendation,
+} from "../../lib/staffordos/careerOsCommandCenterPresentation";
 
-const presentation = JOB_SEARCH_COMMAND_PRESENTATION;
-
-function StatusNote({ label, children }: { label: string; children: string }) {
+function BriefMetric({ item }: { item: CareerOsBriefItem }) {
   return (
-    <article className="staffordHomeStatusNote">
-      <span>{label}</span>
-      <strong>{children}</strong>
+    <article className="staffordCareerCommandMetric">
+      <span>{item.label}</span>
+      <strong>{item.value}</strong>
     </article>
   );
 }
 
-function JobCommandSectionCard({
-  title,
-  state,
-  summary,
+function PipelineMetric({
+  label,
+  value,
 }: {
-  title: string;
-  state: string;
-  summary: string;
+  label: string;
+  value: number;
 }) {
   return (
-    <article className="staffordHomeSupportCard">
-      <div>
-        <span>{state}</span>
-        <h3>{title}</h3>
-        <p>{summary}</p>
-      </div>
+    <article className="staffordCareerCommandMetric">
+      <span>{label}</span>
+      <strong>{value}</strong>
     </article>
   );
 }
 
-function OpportunityQueueCard({ queue }: { queue: JobOpportunityQueuePresentation }) {
+function RecommendationRow({ recommendation }: { recommendation: CareerOsTopRecommendation }) {
   return (
-    <article className="staffordHomeSupportCard staffordJobOpportunityQueueCard">
-      <div>
-        <span>{queue.state}</span>
-        <h3>{queue.title}</h3>
-        <p>{queue.summary}</p>
-      </div>
-
-      <div className="staffordJobOpportunityQueueList" aria-label="Private opportunities to review">
-        {queue.opportunities.map((opportunity) => (
-          <div key={opportunity.id} className="staffordJobOpportunityQueueItem">
-            <strong>{opportunity.role}</strong>
-            <span>{opportunity.company}</span>
-            <dl className="staffordJobOpportunityMeta">
-              <div>
-                <dt>Freshness</dt>
-                <dd>{opportunity.freshness}</dd>
-              </div>
-              <div>
-                <dt>Location</dt>
-                <dd>{opportunity.location}</dd>
-              </div>
-              <div>
-                <dt>Work arrangement</dt>
-                <dd>{opportunity.workArrangement}</dd>
-              </div>
-              <div>
-                <dt>Next action</dt>
-                <dd>{opportunity.nextAction}</dd>
-              </div>
-            </dl>
-            <p>{opportunity.reviewStatus}. {opportunity.approvalStatus}</p>
-          </div>
-        ))}
-      </div>
+    <article className="staffordCareerCommandRecommendation">
+      <header>
+        <div>
+          <span>{recommendation.recommendation}</span>
+          <h3>{recommendation.position}</h3>
+          <p>{recommendation.company}</p>
+        </div>
+        <strong>{recommendation.applicationReadiness}</strong>
+      </header>
+      <dl className="staffordCareerCommandDetails">
+        <div>
+          <dt>Explainable Fit</dt>
+          <dd>{recommendation.explainableFit}</dd>
+        </div>
+        <div>
+          <dt>ResumeVersion</dt>
+          <dd>{recommendation.resumeVersion}</dd>
+        </div>
+        <div>
+          <dt>Next Action</dt>
+          <dd>{recommendation.nextAction}</dd>
+        </div>
+        <div>
+          <dt>Evidence / Gaps</dt>
+          <dd>
+            {recommendation.supportingEvidenceCount} supporting, {recommendation.missingSkillCount} missing or unknown
+          </dd>
+        </div>
+      </dl>
     </article>
   );
 }
 
 export function JobCommandSurface({
-  opportunityQueue = EMPTY_JOB_OPPORTUNITY_QUEUE_PRESENTATION,
+  commandCenter = EMPTY_CAREEROS_COMMAND_CENTER_PRESENTATION,
 }: {
-  opportunityQueue?: JobOpportunityQueuePresentation;
+  commandCenter?: CareerOsCommandCenterPresentation;
 }) {
-  const hasOpportunityQueue = opportunityQueue.opportunities.length > 0;
+  const hasRecommendations = commandCenter.topRecommendations.length > 0;
+  const primaryProviderStatus = commandCenter.systemHealth.providerStatus[0];
 
   return (
     <div className="staffordJobCommand">
       <section className="staffordHomeHeader">
         <div>
           <span className="staffordEyebrow">Professional</span>
-          <h1>{presentation.title}</h1>
-          <p>{presentation.primaryQuestion}</p>
-          <p>{presentation.summary}</p>
+          <h1>{commandCenter.title}</h1>
+          <p>{commandCenter.primaryQuestion}</p>
+          <p>{commandCenter.summary}</p>
         </div>
         <div className="staffordWorkspaceStatus">
-          <span>{presentation.availabilityState}</span>
-          <strong>Professional owner-private planning</strong>
+          <span>{commandCenter.capturedAsOf}</span>
+          <strong>Read-only Career Operations</strong>
         </div>
       </section>
 
-      <section className="staffordHomeAttention">
-        <div className="staffordHomeAttentionCopy">
-          <span className="staffordEyebrow">Start here</span>
-          <h2>{presentation.primaryAction.label}</h2>
-          <p>{presentation.primaryAction.headline}</p>
-          <button type="button" className="staffordJobCommandDisabledAction" disabled>
-            {presentation.primaryAction.controlLabel}
-          </button>
-          <p className="staffordJobCommandControlNote">{presentation.primaryAction.controlNote}</p>
-        </div>
-
-        <NextActionCard
-          headerLabel={presentation.primaryAction.label}
-          headerStatus={presentation.primaryAction.state}
-          action={presentation.primaryAction.headline}
-          whyNow={presentation.primaryAction.explanation[0]}
-          evidence={presentation.primaryAction.explanation[1]}
-          approvalNeeded={presentation.primaryAction.explanation[2]}
-          governance={presentation.authorityStatement}
-          risk="StaffordOS cannot safely compare jobs or tailor resumes until career facts are reviewed."
-          expectedResult="Career evidence is ready for governed review before job intake or fit analysis."
-          transparencyNote={presentation.primaryAction.controlState}
-        />
-      </section>
-
-      <section className="staffordHomeSupport" aria-label="Job search queues">
+      <section className="staffordHomeSupport" aria-label="Today's Brief">
         <div className="staffordHomeSectionHeader">
-          <span className="staffordEyebrow">Queues</span>
-          <h2>What is connected right now</h2>
+          <span className="staffordEyebrow">Today's Brief</span>
+          <h2>Opportunity and application posture</h2>
+          <p>{commandCenter.authorityStatement}</p>
+        </div>
+        <div className="staffordCareerCommandBriefGrid">
+          {commandCenter.todaysBrief.map((item) => (
+            <BriefMetric key={item.id} item={item} />
+          ))}
+        </div>
+      </section>
+
+      <section className="staffordHomeSupport" aria-label="Top Recommendations">
+        <div className="staffordHomeSectionHeader">
+          <span className="staffordEyebrow">Top Recommendations</span>
+          <h2>What should be reviewed first</h2>
           <p>
-            {hasOpportunityQueue
-              ? "Validated private opportunities can be shown read-only. No application, follow-up, interview, or outcome record is connected."
-              : "These sections are truthful empty states. No job, application, follow-up, interview, or outcome record is connected."}
+            {hasRecommendations
+              ? "Recommendation order and content come from the existing J003.01 recommendation read model."
+              : "No recommendation read model is connected to this route yet."}
           </p>
         </div>
-        <div className="staffordHomeSupportGrid">
-          {presentation.supportingSections.map((section) =>
-            section.id === "strong-opportunities" && hasOpportunityQueue ? (
-              <OpportunityQueueCard key={section.id} queue={opportunityQueue} />
-            ) : (
-              <JobCommandSectionCard
-                key={section.id}
-                title={section.title}
-                state={section.state}
-                summary={section.summary}
-              />
-            ),
-          )}
+        {hasRecommendations ? (
+          <div className="staffordCareerCommandRecommendationList">
+            {commandCenter.topRecommendations.map((recommendation) => (
+              <RecommendationRow key={recommendation.id} recommendation={recommendation} />
+            ))}
+          </div>
+        ) : (
+          <article className="staffordHomeStatusNote">
+            <span>No recommendations connected</span>
+            <strong>Run the existing private discovery and recommendation pipeline, then supply its read model.</strong>
+          </article>
+        )}
+      </section>
+
+      <section className="staffordHomeSupport" aria-label="Pipeline">
+        <div className="staffordHomeSectionHeader">
+          <span className="staffordEyebrow">Pipeline</span>
+          <h2>Application state</h2>
+          <p>{commandCenter.pipeline.sourceAuthority}</p>
+        </div>
+        <div className="staffordCareerCommandPipelineGrid">
+          <PipelineMetric label="Applications Submitted" value={commandCenter.pipeline.applicationsSubmitted} />
+          <PipelineMetric label="Interviews" value={commandCenter.pipeline.interviews} />
+          <PipelineMetric label="Follow-ups Due" value={commandCenter.pipeline.followUpsDue} />
         </div>
       </section>
 
-      <section className="staffordHomeSupport" aria-label="Search health">
+      <section className="staffordHomeSupport" aria-label="System Health">
         <div className="staffordHomeSectionHeader">
-          <span className="staffordEyebrow">Search Health</span>
-          <h2>What is available and what is not connected yet</h2>
-          <p>{presentation.authorityStatement}</p>
+          <span className="staffordEyebrow">System Health</span>
+          <h2>Discovery and queue status</h2>
+          <p>{commandCenter.systemHealth.sourceAuthority}</p>
         </div>
         <div className="staffordJobCommandHealthGrid">
-          {presentation.searchHealth.map((item) => (
-            <article key={item.id} className="staffordHomeStatusNote">
-              <span>{item.label}</span>
-              <strong>{item.state}</strong>
-              <p>{item.detail}</p>
-            </article>
-          ))}
+          <article className="staffordHomeStatusNote">
+            <span>Provider Status</span>
+            <strong>{primaryProviderStatus ? `${primaryProviderStatus.label}: ${primaryProviderStatus.state}` : "UNKNOWN"}</strong>
+            <p>{primaryProviderStatus?.detail || "No provider status read model is connected."}</p>
+          </article>
+          <article className="staffordHomeStatusNote">
+            <span>Last Discovery Run</span>
+            <strong>{commandCenter.systemHealth.lastDiscoveryRun}</strong>
+            <p>Discovery timestamps come from existing provider or import queue results.</p>
+          </article>
+          <article className="staffordHomeStatusNote">
+            <span>Queue Size</span>
+            <strong>{commandCenter.systemHealth.queueSize}</strong>
+            <p>Queue size is read from the existing opportunity queue or recommendation result.</p>
+          </article>
         </div>
       </section>
 
-      <section className="staffordObjectiveNote" aria-label="Human approval boundary">
-        <strong>{presentation.humanAuthority.summary}</strong>
-        <p>{presentation.approvalStatement}</p>
-        <ul className="staffordJobCommandApprovalList">
-          {presentation.humanAuthority.rossMustApprove.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="staffordHomeTransparency" aria-label="Data authority">
-        <StatusNote label="Available">{presentation.dataAuthority.available.join("; ")}</StatusNote>
-        <StatusNote label="Not connected yet">{presentation.dataAuthority.notConnectedYet.join("; ")}</StatusNote>
+      <section className="staffordObjectiveNote" aria-label="Approval boundary">
+        <strong>Operator authority remains closed</strong>
+        <p>{commandCenter.approvalStatement}</p>
       </section>
     </div>
   );
