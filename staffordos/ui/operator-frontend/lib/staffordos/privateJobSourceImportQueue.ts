@@ -214,6 +214,7 @@ export type RawJobSourceInput = {
   sourceText?: string | null;
   importedJson?: Record<string, unknown> | null;
   observedAt: string;
+  providerJobId?: string | null;
   publicationDate?: string | null;
   title?: string | null;
   company?: string | null;
@@ -223,6 +224,7 @@ export type RawJobSourceInput = {
   compensationText?: string | null;
   descriptionText?: string | null;
   requisitionId?: string | null;
+  sourceAuthority?: "OPERATOR_SUPPLIED_READ_ONLY" | "PUBLIC_READ_ONLY_PROVIDER";
   limitations?: string[];
 };
 
@@ -251,7 +253,7 @@ export type NormalizedJobSourceRecord = {
   descriptionTextReference: string;
   descriptionDigest: string;
   requisitionId: string | null;
-  sourceAuthority: "OPERATOR_SUPPLIED_READ_ONLY";
+  sourceAuthority: "OPERATOR_SUPPLIED_READ_ONLY" | "PUBLIC_READ_ONLY_PROVIDER";
   freshness: "RECENT" | "UNKNOWN" | "STALE";
   laneDisposition:
     | "PRIMARY_LANE"
@@ -525,10 +527,20 @@ function sourcePayloadForDigest(input: RawJobSourceInput) {
     descriptionText: descriptionFor(input),
     title: input.title || jsonField(input.importedJson, ["title", "roleTitle", "jobTitle"]),
     company: input.company || jsonField(input.importedJson, ["company", "companyName", "employer"]),
+    providerJobId: input.providerJobId || jsonField(input.importedJson, ["providerJobId", "jobId", "id"]),
+    requisitionId: input.requisitionId || jsonField(input.importedJson, ["requisitionId", "reqId"]),
   });
 }
 
 function isStale(input: RawJobSourceInput, generatedAt: string) {
+  if (
+    input.sourceAuthority === "PUBLIC_READ_ONLY_PROVIDER" ||
+    input.accessMode === "PUBLIC_API" ||
+    input.accessMode === "PUBLIC_FEED" ||
+    input.accessMode === "PUBLIC_PAGE"
+  ) {
+    return false;
+  }
   const publicationDate = parseTimestamp(input.publicationDate || jsonField(input.importedJson, ["publicationDate", "publishedAt", "datePosted"]));
   const generated = parseTimestamp(generatedAt);
   if (!publicationDate || !generated) return false;
@@ -677,17 +689,24 @@ export function normalizeJobSourceInput(input: RawJobSourceInput, generatedAt: s
   const descriptionText = descriptionFor(input);
   const sourceDigest = `sha256:${sha256Text(sourcePayloadForDigest(input))}`;
   const descriptionDigest = `sha256:${sha256Text(descriptionText)}`;
-  const requisitionId = optionalText(input.requisitionId) || jsonField(imported, ["requisitionId", "jobId", "providerJobId", "reqId"]);
+  const providerJobId = optionalText(input.providerJobId) || jsonField(imported, ["providerJobId", "jobId", "id"]);
+  const requisitionId = optionalText(input.requisitionId) || jsonField(imported, ["requisitionId", "reqId"]);
   const access = accessMode(input.accessMode);
   const recordId = opaqueId("privjobsource", [
     PRIVATE_JOB_SOURCE_IMPORT_QUEUE_VERSION,
     providerId,
+    providerJobId,
     sourceUrl,
     requisitionId,
     title,
     company,
     sourceDigest,
   ]);
+  const sourceAuthority =
+    input.sourceAuthority ||
+    (access === "PUBLIC_API" || access === "PUBLIC_FEED" || access === "PUBLIC_PAGE"
+      ? "PUBLIC_READ_ONLY_PROVIDER"
+      : "OPERATOR_SUPPLIED_READ_ONLY");
 
   return {
     schemaVersion: PRIVATE_JOB_SOURCE_RECORD_SCHEMA_VERSION,
@@ -697,7 +716,7 @@ export function normalizeJobSourceInput(input: RawJobSourceInput, generatedAt: s
     providerId,
     providerName,
     providerType: input.providerType || providerType(providerId),
-    providerJobId: requisitionId,
+    providerJobId,
     accessMode: access,
     sourceUrl,
     sourceDigest,
@@ -714,7 +733,7 @@ export function normalizeJobSourceInput(input: RawJobSourceInput, generatedAt: s
     descriptionTextReference: `private-job-source://${recordId}#raw-description`,
     descriptionDigest,
     requisitionId,
-    sourceAuthority: "OPERATOR_SUPPLIED_READ_ONLY",
+    sourceAuthority,
     freshness: isStale(input, generatedAt) ? "STALE" : publicationDate ? "RECENT" : "UNKNOWN",
     laneDisposition: laneDispositionFor({
       title,
@@ -741,10 +760,11 @@ export function normalizeJobSourceInput(input: RawJobSourceInput, generatedAt: s
 }
 
 export function buildJobSourceSnapshot(record: NormalizedJobSourceRecord, generatedAt: string): SourceSnapshot {
+  const publicProvider = record.sourceAuthority === "PUBLIC_READ_ONLY_PROVIDER";
   const result = createSourceSnapshot({
     snapshotId: opaqueId("privjobsnapshot", [record.jobSourceRecordId, record.sourceDigest, generatedAt]),
     workspaceId: "professional",
-    sourceType: "PRIVATE_LOCAL",
+    sourceType: publicProvider ? "PROVIDER_CONFIRMED" : "PRIVATE_LOCAL",
     sourceReference: `private-job-source://${record.jobSourceRecordId}`,
     sourceAuthority: record.sourceAuthority,
     privacyClassification: "Professional owner-private",
@@ -753,7 +773,7 @@ export function buildJobSourceSnapshot(record: NormalizedJobSourceRecord, genera
     sourceUpdatedAt: record.publicationDate,
     freshness: record.freshness === "RECENT" ? "RECENT" : record.freshness === "STALE" ? "STALE" : "UNKNOWN",
     staticity: "CAPTURED_SNAPSHOT",
-    authorizationStatus: "OPERATOR_CONFIRMED",
+    authorizationStatus: publicProvider ? "AUTHORIZED_BY_PROVIDER" : "OPERATOR_CONFIRMED",
     conflictStatus: "UNKNOWN",
     includedFields: [
       "provider",
@@ -790,13 +810,13 @@ export function buildJobSourceSnapshot(record: NormalizedJobSourceRecord, genera
 function toRankingRecord(record: NormalizedJobSourceRecord) {
   return {
     providerName: record.providerName,
-    providerRecordId: record.providerJobId || record.jobSourceRecordId,
+    providerRecordId: record.providerJobId || record.requisitionId || record.jobSourceRecordId,
     sourceUrl: record.sourceUrl,
     sourceObservedAt: record.observedAt,
     publishedAt: record.publicationDate,
     companyName: record.company,
     roleTitle: record.title,
-    requisitionAlias: record.requisitionId,
+    requisitionAlias: record.requisitionId || record.providerJobId,
     locationText: record.location,
     workArrangement: record.remoteState,
     employmentType: record.employmentType,
@@ -818,7 +838,7 @@ function toIntakeRecord(record: NormalizedJobSourceRecord): PrivateJobOpportunit
     workspaceId: "professional",
     sourceUrl: record.sourceUrl || `private-job-source://${record.jobSourceRecordId}`,
     sourceProvider: record.providerName,
-    sourceProviderRecordId: record.providerJobId,
+    sourceProviderRecordId: record.providerJobId || record.requisitionId,
     sourceObservedAt: record.observedAt,
     sourceSummary: `Private normalized source record ${record.jobSourceRecordId}. Raw description retained privately.`,
     listingText: null,
@@ -911,7 +931,7 @@ export function buildPrivateJobSourceImportQueue(options: QueueBuildOptions): Pr
     ]),
   );
   const importQueue = normalizedSourceRecords.map((record): JobSourceImportQueueItem => {
-    const priority = priorityByProviderRecord.get(record.providerJobId || record.jobSourceRecordId);
+    const priority = priorityByProviderRecord.get(record.providerJobId || record.requisitionId || record.jobSourceRecordId);
     if (!priority) {
       throw new Error(`Missing prioritization for ${record.jobSourceRecordId}`);
     }
@@ -1181,6 +1201,7 @@ export function readImportedJsonInput(filePath: string): RawJobSourceInput {
     providerType: providerType(jsonField(record, ["providerType", "providerId"])),
     sourceUrl: jsonField(record, ["sourceUrl", "url", "applyUrl"]),
     observedAt: jsonField(record, ["observedAt", "sourceObservedAt"]) || new Date().toISOString(),
+    providerJobId: jsonField(record, ["providerJobId", "jobId", "id"]),
     publicationDate: jsonField(record, ["publicationDate", "publishedAt", "datePosted"]),
     title: jsonField(record, ["title", "roleTitle", "jobTitle"]),
     company: jsonField(record, ["company", "companyName", "employer"]),
@@ -1189,7 +1210,7 @@ export function readImportedJsonInput(filePath: string): RawJobSourceInput {
     employmentType: jsonField(record, ["employmentType"]),
     compensationText: jsonField(record, ["compensationText", "salary", "payRange"]),
     descriptionText: jsonField(record, ["descriptionText", "description", "jobDescription", "body", "summary"]),
-    requisitionId: jsonField(record, ["requisitionId", "jobId", "providerJobId", "reqId"]),
+    requisitionId: jsonField(record, ["requisitionId", "reqId"]),
     importedJson: record,
     limitations: stringArray(record.limitations),
   };
