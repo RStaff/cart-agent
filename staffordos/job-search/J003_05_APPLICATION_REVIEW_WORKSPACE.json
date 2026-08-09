@@ -1,0 +1,158 @@
+{
+  "mission": "J003_05_APPLICATION_REVIEW_WORKSPACE",
+  "classification": "APPLICATION_REVIEW_WORKSPACE_COMPLETED",
+  "authority": {
+    "startingHead": "3ec2df8b",
+    "branch": "main",
+    "reusedAuthorities": [
+      "J003.04 Ready To Apply Application Package",
+      "J003.03 Career Workflow Actions",
+      "J003.01 Opportunity Recommendation Engine",
+      "J002 Opportunity Queue",
+      "Explainable Fit",
+      "ResumeVersion authority",
+      "Career Evidence authority",
+      "Application tracking authority",
+      "G001 Private Data Git Backstop",
+      "G003 Adapter-Only Read Model Authority",
+      "G004.01 Operator Write Isolation"
+    ],
+    "systemsRedesigned": false,
+    "discoveryModified": false,
+    "recommendationLogicModified": false,
+    "providerAdded": false
+  },
+  "workflow": [
+    "READY_TO_APPLY",
+    "Application Package",
+    "Human Review Workspace",
+    "Review Decision",
+    "Manual Application Ready"
+  ],
+  "reviewWorkspace": {
+    "sourceArtifact": "J003.04 ReadyToApplyApplicationPackageResult",
+    "packageLogicDuplicated": false,
+    "displaysExistingPackageFields": [
+      "company",
+      "role",
+      "canonical job URL",
+      "opportunity ID",
+      "recommendation",
+      "Explainable Fit summary",
+      "recommended ResumeVersion",
+      "supporting Career Evidence",
+      "relevant strengths",
+      "missing skills and gaps",
+      "resume update requirements",
+      "blocking issues",
+      "application readiness",
+      "recommended next action",
+      "human review required"
+    ]
+  },
+  "reviewDecisions": {
+    "allowed": [
+      "REVIEWED_READY",
+      "NEEDS_CHANGES",
+      "HOLD",
+      "CANCELLED"
+    ],
+    "states": [
+      "PENDING_REVIEW",
+      "MANUAL_APPLICATION_READY",
+      "NEEDS_CHANGES",
+      "HELD",
+      "CANCELLED"
+    ],
+    "reviewedReadyMeaning": "Ross reviewed the package and considers it ready for manual application outside StaffordOS.",
+    "reviewedReadyDoesNotSubmit": true,
+    "reviewedReadyRequiresReadyPackage": true,
+    "appendOnly": true,
+    "latestProjectionDeterministic": true
+  },
+  "persistence": {
+    "realRuntimeDataOutsideGit": true,
+    "decisionLog": "application_review_decisions.ndjson",
+    "preservedFields": [
+      "packageId",
+      "opportunityId",
+      "recommendationId",
+      "queueItemId",
+      "sourceRecordId",
+      "company",
+      "role",
+      "reviewDecision",
+      "reviewedAt",
+      "packageBlockingIssues",
+      "reviewNotes",
+      "sourceAuthorityReferences",
+      "supersedesDecisionId"
+    ],
+    "silentMutation": false,
+    "hiddenStateTransitions": false
+  },
+  "privateOutputs": [
+    "application_review_decisions.ndjson",
+    "application_review_workspace.json",
+    "application_review_read_model.json",
+    "manual_application_ready.json",
+    "pending_review.json",
+    "needs_changes.json",
+    "held_packages.json",
+    "cancelled_packages.json",
+    "application_review_audit.json"
+  ],
+  "cli": {
+    "path": "staffordos/ui/operator-frontend/lib/staffordos/runApplicationReviewWorkspace.mjs",
+    "commands": [
+      "workspace",
+      "decide"
+    ],
+    "requiresConfirmYesForDecision": true,
+    "manualJsonEditingRequired": false
+  },
+  "nonImpact": {
+    "applicationCreated": false,
+    "applicationSubmitted": false,
+    "resumeGenerated": false,
+    "resumeMutated": false,
+    "coverLetterGenerated": false,
+    "messageSent": false,
+    "browserAutomationUsed": false,
+    "externalProviderCall": false,
+    "externalAiUsed": false,
+    "ollamaUsed": false,
+    "osConnectionAdded": false,
+    "operatorConnectionAdded": false,
+    "careerEvidenceMutated": false,
+    "careerFactPromoted": false,
+    "linkedinModified": false,
+    "oauthModified": false,
+    "deployed": false,
+    "pushed": false
+  },
+  "tests": {
+    "focused": "node --test staffordos/ui/operator-frontend/lib/staffordos/applicationReviewWorkspace.test.mjs",
+    "regression": "node --test staffordos/ui/operator-frontend/lib/staffordos/*.test.mjs",
+    "build": "npm run build in staffordos/ui/operator-frontend",
+    "jsonValidation": "jq empty on this file and staffordos/job-search JSON",
+    "privateDataAbsenceScan": "scoped scan of new J003.05 files",
+    "sensitiveValueScan": "scoped scan of new J003.05 files",
+    "diffChecks": [
+      "git diff --check",
+      "git diff --cached --check"
+    ]
+  },
+  "limitations": [
+    "J003.05 does not create Application records.",
+    "J003.05 does not generate application content.",
+    "J003.05 does not mutate ResumeVersion or Career Evidence.",
+    "J003.05 requires existing J003.04 package artifacts.",
+    "Owner-private workspace output may display canonical job URLs, but redacted read models omit URL values."
+  ],
+  "rollback": {
+    "source": "git revert <J003.05 commit>",
+    "privateArtifacts": "Remove owner-private J003.05 review artifacts separately if runtime output should be discarded."
+  },
+  "nextMission": "J003_06_MANUAL_APPLICATION_EXECUTION_PROOF"
+}
