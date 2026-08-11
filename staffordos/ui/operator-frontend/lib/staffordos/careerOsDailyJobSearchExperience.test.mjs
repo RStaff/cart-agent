@@ -231,6 +231,46 @@ function reviewItem(overrides = {}) {
   };
 }
 
+function intelligenceItem(overrides = {}) {
+  return {
+    schemaVersion: "staffordos.careeros.application_intelligence_packet_read_model.v1",
+    packetId: "packet_apply",
+    jobOpportunityId: "opp_apply",
+    company: "Example Automation",
+    role: "AI Automation Product Manager",
+    recommendation: "REVIEW",
+    fitRecommendation: "APPLY_WITH_POSITIONING",
+    fitSummary: "Evidence-backed fit requires resume review.",
+    rankedLaneLabels: ["AI / Automation", "Business Technology"],
+    matchedRequirementCount: 3,
+    unmatchedRequirementCount: 1,
+    skillGapCount: 0,
+    evidenceGapCount: 1,
+    unsupportedRequirementCount: 0,
+    supportingEvidenceCount: 2,
+    careerFactReferenceCount: 2,
+    resumeVersionLabel: "ROLE_TARGETED_RESUME / PDF / NEEDS_REVIEW",
+    resumeVersionStatus: "REVIEW_BEFORE_REUSE",
+    resumeSafetyState: "NEEDS_OPERATOR_REVIEW",
+    resumeSafeToReuse: false,
+    blockerCount: 2,
+    nextAction: "REVIEW_RESUME",
+    humanReviewRequired: true,
+    applicationCreated: false,
+    applicationSubmitted: false,
+    resumeGenerated: false,
+    resumeMutated: false,
+    coverLetterGenerated: false,
+    messageSent: false,
+    privatePathVisible: false,
+    rawJobTextVisible: false,
+    rawResumeTextVisible: false,
+    sourceUrlVisible: false,
+    limitations: ["Synthetic packet fixture."],
+    ...overrides,
+  };
+}
+
 function writeJson(filePath, value) {
   mkdirSync(path.dirname(filePath), { recursive: true });
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
@@ -298,6 +338,21 @@ test("application work includes package review, manual-ready, and follow-up task
   assert.equal(experience.applicationWork.some((item) => item.task === "Follow Up"), true);
   assert.equal(experience.applicationWork.some((item) => item.task === "Review Package"), true);
   assert.equal(experience.applicationWork.every((item) => item.externalActionAvailable === false), true);
+});
+
+test("application intelligence packet read models are displayed without raw private data", () => {
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    applicationIntelligenceReadModel: [intelligenceItem()],
+  });
+  const item = experience.applicationIntelligence[0];
+
+  assert.equal(item.company, "Example Automation");
+  assert.equal(item.nextAction, "View Resume");
+  assert.equal(item.externalActionAvailable, false);
+  assert.doesNotMatch(JSON.stringify(item), /\/Users\/|sourceUrl|raw job|raw resume/i);
+  assert.match(surfaceSource, /Application Intelligence/);
+  assert.match(surfaceSource, /View Intelligence/);
 });
 
 test("private loader reads latest governed artifacts and degrades when optional outputs are absent", () => {

@@ -1,0 +1,74 @@
+{
+  "mission": "CAREEROS_APPLICATION_INTELLIGENCE_V1_02_APPLICATION_INTELLIGENCE_PACKET",
+  "schemaVersion": "staffordos.job_search.mission_report.v1",
+  "checkpointAuthority": {
+    "branch": "main",
+    "startingHead": "e4ddb6d41787e60157fe053ef60dc873c2b52de4",
+    "localOnlyCommitPath": "staffordos/operator_daemon/run_task_with_local_commit_gate_v1.sh"
+  },
+  "packetContract": {
+    "schemaVersion": "staffordos.careeros.application_intelligence_packet.v1",
+    "contractDecision": "CREATE_MINIMAL_PRIVATE_PACKET_ORCHESTRATION_LAYER",
+    "reusedAuthorities": [
+      "JobOpportunity",
+      "JobSourceImportQueue",
+      "ExplainableFit",
+      "OpportunityRecommendation",
+      "CareerEvidence",
+      "CareerFact",
+      "ResumeVersion",
+      "ApplicationPrevention"
+    ],
+    "newFitEngineCreated": false,
+    "newRecommendationEngineCreated": false,
+    "newResumeVersionModelCreated": false,
+    "newApplicationTrackerCreated": false
+  },
+  "truthBoundary": {
+    "careerFactsAreAuthority": true,
+    "careerEvidenceSupportsFacts": true,
+    "resumesAreDownstreamArtifacts": true,
+    "resumeWordingDoesNotVerifyCareerTruth": true,
+    "unsupportedClaimsPromoted": false
+  },
+  "privateOutputs": [
+    "application_intelligence_packet_result.json",
+    "application_intelligence_packets.json",
+    "application_intelligence_packet_read_model.json",
+    "resume_blockers.json",
+    "unsupported_claims.json",
+    "application_intelligence_packet_audit.json"
+  ],
+  "privacy": {
+    "rawJobDescriptionsCommitted": false,
+    "rawResumeContentCommitted": false,
+    "privateCareerEvidenceCommitted": false,
+    "privatePathsCommitted": false,
+    "ownerPrivateDirectoryMode": "0700",
+    "ownerPrivateFileMode": "0600"
+  },
+  "externalActionBoundary": {
+    "applicationCreated": false,
+    "applicationSubmitted": false,
+    "resumeGenerated": false,
+    "resumeMutated": false,
+    "coverLetterGenerated": false,
+    "messageSent": false,
+    "providerCall": false,
+    "browserAutomation": false,
+    "externalAi": false,
+    "ollama": false,
+    "deployment": false,
+    "push": false
+  },
+  "validationPlan": [
+    "focused packet tests",
+    "J001/J002/J003/J004 regressions",
+    "broader frontend suite",
+    "build",
+    "JSON validation",
+    "privacy and secret scans",
+    "git diff checks"
+  ],
+  "recommendedNextMission": "CAREEROS_APPLICATION_INTELLIGENCE_V1_03_TRUTH_BOUND_RESUME_DRAFT_AND_ARTIFACT_VERSIONING"
+}

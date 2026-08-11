@@ -1,6 +1,7 @@
 import {
   EMPTY_CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE,
   type CareerOsDailyApplicationWorkItem,
+  type CareerOsDailyApplicationIntelligenceItem,
   type CareerOsDailyBriefMetric,
   type CareerOsDailyJobSearchExperience,
   type CareerOsDailyPipelineStage,
@@ -91,6 +92,50 @@ function WorkItem({ item }: { item: CareerOsDailyApplicationWorkItem }) {
   );
 }
 
+function IntelligenceItem({ item }: { item: CareerOsDailyApplicationIntelligenceItem }) {
+  return (
+    <article className="staffordCareerCommandRecommendation">
+      <header>
+        <div>
+          <span>{item.recommendation}</span>
+          <h3>{item.role}</h3>
+          <p>{item.company}</p>
+        </div>
+        <strong>{item.nextAction}</strong>
+      </header>
+      <details className="staffordCareerIntelligenceDetails">
+        <summary>View Intelligence</summary>
+        <dl className="staffordCareerCommandDetails">
+          <div>
+            <dt>Fit</dt>
+            <dd>{item.fit}</dd>
+          </div>
+          <div>
+            <dt>Evidence</dt>
+            <dd>{item.evidence}</dd>
+          </div>
+          <div>
+            <dt>Gaps</dt>
+            <dd>{item.gaps}</dd>
+          </div>
+          <div>
+            <dt>Resume</dt>
+            <dd>{item.resumeVersion}</dd>
+          </div>
+          <div>
+            <dt>Safety</dt>
+            <dd>{item.resumeSafety}</dd>
+          </div>
+          <div>
+            <dt>Next Action</dt>
+            <dd>{item.detail}</dd>
+          </div>
+        </dl>
+      </details>
+    </article>
+  );
+}
+
 function PipelineMetric({ item }: { item: CareerOsDailyPipelineStage }) {
   return (
     <article className="staffordCareerCommandMetric">
@@ -111,6 +156,7 @@ export function JobCommandSurface({
   const hasPriorities = experience.todaysPriorities.length > 0;
   const hasOpportunities = experience.topOpportunities.length > 0;
   const hasApplicationWork = experience.applicationWork.length > 0;
+  const hasApplicationIntelligence = experience.applicationIntelligence.length > 0;
 
   return (
     <div className="staffordJobCommand">
@@ -196,6 +242,26 @@ export function JobCommandSurface({
           <article className="staffordHomeStatusNote">
             <span>No application work connected</span>
             <strong>Application review and follow-up details will appear here when available.</strong>
+          </article>
+        )}
+      </section>
+
+      <section className="staffordHomeSupport" aria-label="Application Intelligence">
+        <div className="staffordHomeSectionHeader">
+          <span className="staffordEyebrow">Application Intelligence</span>
+          <h2>Fit, evidence, gaps, and resume safety</h2>
+          <p>Shown from private packet read models created by existing CareerOS workflows.</p>
+        </div>
+        {hasApplicationIntelligence ? (
+          <div className="staffordCareerCommandRecommendationList">
+            {experience.applicationIntelligence.map((item) => (
+              <IntelligenceItem key={item.id} item={item} />
+            ))}
+          </div>
+        ) : (
+          <article className="staffordHomeStatusNote">
+            <span>No packet connected</span>
+            <strong>Analyze a job or run the packet workflow to populate this section.</strong>
           </article>
         )}
       </section>

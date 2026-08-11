@@ -38,6 +38,10 @@ import type {
   PrivateDailyJobSearchCommand,
 } from "./privateApplicationPipelineReview";
 import type { ReadyToApplyApplicationPackageReadModelRecord } from "./readyToApplyApplicationPackage";
+import {
+  loadLatestApplicationIntelligencePacketReadModel,
+  type ApplicationIntelligencePacketReadModelRecord,
+} from "./applicationIntelligencePacket";
 
 export const CAREEROS_DAILY_PRIVATE_ARTIFACT_LOADER_VERSION = "CAREEROS_V1.01";
 
@@ -49,6 +53,7 @@ export type CareerOsDailyPrivateArtifactLoadResult = {
     applicationEngagement: boolean;
     applicationPackages: boolean;
     applicationReviewWorkspace: boolean;
+    applicationIntelligencePackets: boolean;
     greenhouseDiscovery: boolean;
   };
   missingArtifacts: string[];
@@ -346,6 +351,10 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
   );
   if (!applicationReviewReadModel) missingArtifacts.push("application review workspace output");
 
+  const applicationIntelligenceReadModel: ApplicationIntelligencePacketReadModelRecord[] =
+    loadLatestApplicationIntelligencePacketReadModel(root);
+  if (!applicationIntelligenceReadModel.length) missingArtifacts.push("application intelligence packet output");
+
   const generatedAt =
     generatedAtFromDailyCommand(dailyCommand) ||
     recommendationReadModel?.[0]?.capturedAsOf ||
@@ -368,6 +377,7 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
     applicationEngagementReadModel: engagementReadModel || [],
     applicationPackageReadModel: applicationPackageReadModel || [],
     applicationReviewReadModel: applicationReviewReadModel || [],
+    applicationIntelligenceReadModel,
   };
 
   return {
@@ -378,6 +388,7 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
       applicationEngagement: Boolean(engagementReadModel),
       applicationPackages: Boolean(applicationPackageReadModel),
       applicationReviewWorkspace: Boolean(applicationReviewReadModel),
+      applicationIntelligencePackets: applicationIntelligenceReadModel.length > 0,
       greenhouseDiscovery: Boolean(greenhouseDiscovery),
     },
     missingArtifacts,

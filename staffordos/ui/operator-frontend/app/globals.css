@@ -2845,6 +2845,18 @@ textarea {
   overflow-wrap: anywhere;
 }
 
+.staffordCareerIntelligenceDetails {
+  display: grid;
+  gap: 10px;
+}
+
+.staffordCareerIntelligenceDetails summary {
+  cursor: pointer;
+  color: #15181d;
+  font-size: 13px;
+  font-weight: 800;
+}
+
 .staffordJobCommandHealthGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

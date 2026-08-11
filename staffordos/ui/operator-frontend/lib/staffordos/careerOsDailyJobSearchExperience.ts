@@ -23,6 +23,7 @@ import type {
   ReadyToApplyApplicationPackageReadModelRecord,
   ReadyToApplyApplicationPackageResult,
 } from "./readyToApplyApplicationPackage";
+import type { ApplicationIntelligencePacketReadModelRecord } from "./applicationIntelligencePacket";
 
 export const CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE_VERSION = "CAREEROS_V1.01";
 export const CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE_SCHEMA_VERSION =
@@ -32,6 +33,7 @@ export type CareerOsDailyRecommendation = "APPLY NOW" | "REVIEW" | "WAIT" | "SKI
 export type CareerOsDailyActionKind =
   | "Review Package"
   | "Open Opportunity"
+  | "View Intelligence"
   | "View Resume"
   | "Review Evidence"
   | "Follow Up"
@@ -97,6 +99,23 @@ export type CareerOsDailyApplicationWorkItem = {
   limitations: string[];
 };
 
+export type CareerOsDailyApplicationIntelligenceItem = {
+  id: string;
+  company: string;
+  role: string;
+  recommendation: CareerOsDailyRecommendation;
+  fit: string;
+  rankedLanes: string[];
+  resumeVersion: string;
+  resumeSafety: string;
+  gaps: string;
+  evidence: string;
+  nextAction: CareerOsDailyActionKind;
+  detail: string;
+  externalActionAvailable: false;
+  limitations: string[];
+};
+
 export type CareerOsDailyPipelineStage = {
   id: "applied" | "interview" | "offer" | "closed";
   label: "Applied" | "Interview" | "Offer" | "Closed";
@@ -128,6 +147,7 @@ export type CareerOsDailyJobSearchExperience = {
   todaysPriorities: CareerOsDailyPriority[];
   topOpportunities: CareerOsDailyTopOpportunity[];
   applicationWork: CareerOsDailyApplicationWorkItem[];
+  applicationIntelligence: CareerOsDailyApplicationIntelligenceItem[];
   applicationPipeline: CareerOsDailyPipelineStage[];
   dailyActions: Array<{
     action: CareerOsDailyActionKind;
@@ -170,6 +190,7 @@ export type CareerOsDailyJobSearchExperienceInput = CareerOsCommandCenterInput &
   applicationPackageReadModel?: readonly ReadyToApplyApplicationPackageReadModelRecord[];
   applicationReviewWorkspaceResult?: ApplicationReviewWorkspaceResult | null;
   applicationReviewReadModel?: readonly ApplicationReviewWorkspaceReadModelRecord[];
+  applicationIntelligenceReadModel?: readonly ApplicationIntelligencePacketReadModelRecord[];
 };
 
 const EMPTY_STATE =
@@ -200,6 +221,10 @@ function packageItems(input: CareerOsDailyJobSearchExperienceInput) {
 
 function reviewItems(input: CareerOsDailyJobSearchExperienceInput) {
   return input.applicationReviewWorkspaceResult?.readModel || input.applicationReviewReadModel || [];
+}
+
+function intelligenceItems(input: CareerOsDailyJobSearchExperienceInput) {
+  return input.applicationIntelligenceReadModel || [];
 }
 
 function countBrief(commandCenter: CareerOsCommandCenterPresentation, label: string) {
@@ -282,6 +307,39 @@ function actionForRecommendation(recommendation: CareerOsDailyRecommendation): C
   if (recommendation === "REVIEW") return "Review Evidence";
   if (recommendation === "WAIT") return "Open Opportunity";
   return "No Action";
+}
+
+function actionForPacket(item: ApplicationIntelligencePacketReadModelRecord): CareerOsDailyActionKind {
+  if (item.nextAction === "REVIEW_RESUME") return "View Resume";
+  if (item.nextAction === "REVIEW_EVIDENCE") return "Review Evidence";
+  if (item.nextAction === "READY_TO_APPLY" || item.nextAction === "REVIEW_APPLICATION_PACKAGE") return "Review Package";
+  if (item.nextAction === "SKIP" || item.nextAction === "HOLD") return "Open Opportunity";
+  return "View Intelligence";
+}
+
+function applicationIntelligence(
+  input: CareerOsDailyJobSearchExperienceInput,
+): CareerOsDailyApplicationIntelligenceItem[] {
+  return intelligenceItems(input).slice(0, 5).map((item) => ({
+    id: item.packetId,
+    company: item.company,
+    role: item.role,
+    recommendation: userRecommendation(item.recommendation),
+    fit: item.fitRecommendation || item.fitSummary,
+    rankedLanes: [...item.rankedLaneLabels],
+    resumeVersion: item.resumeVersionLabel || item.resumeVersionStatus,
+    resumeSafety: item.resumeSafetyState,
+    gaps: `${item.skillGapCount} skill / ${item.evidenceGapCount} evidence`,
+    evidence: `${item.supportingEvidenceCount} support / ${item.careerFactReferenceCount} fact refs`,
+    nextAction: actionForPacket(item),
+    detail: item.fitSummary,
+    externalActionAvailable: false,
+    limitations: [
+      "Shown from the existing private Application Intelligence Packet read model.",
+      "No application, message, resume change, browser action, provider call, or external AI action is available here.",
+      ...item.limitations,
+    ],
+  }));
 }
 
 function topOpportunities(commandCenter: CareerOsCommandCenterPresentation): CareerOsDailyTopOpportunity[] {
@@ -549,11 +607,13 @@ export function buildCareerOsDailyJobSearchExperience(
 ): CareerOsDailyJobSearchExperience {
   const commandCenter = input.commandCenter || buildCareerOsCommandCenterPresentation(input);
   const top = topOpportunities(commandCenter);
+  const intelligence = applicationIntelligence(input);
   const priorities = todaysPriorities(input, top);
   const work = applicationWork(input);
   const hasConnectedWork =
     priorities.length > 0 ||
     top.length > 0 ||
+    intelligence.length > 0 ||
     work.length > 0 ||
     commandCenter.pipeline.applicationsSubmitted > 0 ||
     commandCenter.systemHealth.queueSize > 0;
@@ -570,6 +630,7 @@ export function buildCareerOsDailyJobSearchExperience(
     todaysPriorities: priorities,
     topOpportunities: top,
     applicationWork: work,
+    applicationIntelligence: intelligence,
     applicationPipeline: pipelineStages(commandCenter.pipeline),
     dailyActions: dailyActions(priorities),
     systemHealth: systemHealth(commandCenter.systemHealth),
