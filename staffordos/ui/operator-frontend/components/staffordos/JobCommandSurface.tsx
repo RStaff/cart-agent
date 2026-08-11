@@ -103,8 +103,10 @@ function PipelineMetric({ item }: { item: CareerOsDailyPipelineStage }) {
 
 export function JobCommandSurface({
   experience = EMPTY_CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE,
+  jobIntakeAction,
 }: {
   experience?: CareerOsDailyJobSearchExperience;
+  jobIntakeAction?: (formData: FormData) => void | Promise<void>;
 }) {
   const hasPriorities = experience.todaysPriorities.length > 0;
   const hasOpportunities = experience.topOpportunities.length > 0;
@@ -209,6 +211,28 @@ export function JobCommandSurface({
             <PipelineMetric key={item.id} item={item} />
           ))}
         </div>
+      </section>
+
+      <section className="staffordHomeSupport" aria-label="Add Job">
+        <div className="staffordHomeSectionHeader">
+          <span className="staffordEyebrow">Add Job</span>
+          <h2>Analyze a job from another source</h2>
+          <p>Paste a public job URL with the description to add it to the existing CareerOS review flow.</p>
+        </div>
+        <form className="staffordJobIntakeForm" action={jobIntakeAction}>
+          <label>
+            <span>Job URL</span>
+            <input name="jobUrl" type="url" placeholder="https://..." />
+          </label>
+          <label>
+            <span>Job Description</span>
+            <textarea name="jobDescription" rows={8} placeholder="Paste the job description here." />
+          </label>
+          <div className="staffordJobIntakeActions">
+            <button type="submit">Analyze Job</button>
+            <p>No application, message, resume, or cover letter is created.</p>
+          </div>
+        </form>
       </section>
 
       <section className="staffordHomeSupport" aria-label="Daily Actions">

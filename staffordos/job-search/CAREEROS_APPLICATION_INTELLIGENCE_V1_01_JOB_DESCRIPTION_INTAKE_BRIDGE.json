@@ -1,0 +1,92 @@
+{
+  "mission": "CAREEROS_APPLICATION_INTELLIGENCE_V1_01_JOB_DESCRIPTION_INTAKE_BRIDGE",
+  "classification": "implementation",
+  "authority": {
+    "extends": "J002.02 private Job Source Import Queue",
+    "reused": [
+      "privateJobSourceImportQueue.ts",
+      "privateJobOpportunityIntake.ts",
+      "jobSearchContracts.ts",
+      "jobDiscoveryPrioritization.ts",
+      "privateJobAnalysisWorkflow.ts",
+      "opportunityRecommendationEngine.ts",
+      "CareerOS daily job-search experience"
+    ],
+    "new_parallel_contracts_created": false
+  },
+  "supported_intake_modes": {
+    "pasted_description": {
+      "state": "supported",
+      "notes": "Normalizes explicit deterministic fields and routes through the existing import queue."
+    },
+    "url_plus_description": {
+      "state": "supported",
+      "notes": "Uses HTTPS URL as provenance and pasted description as source content."
+    },
+    "url_only": {
+      "state": "fail_closed",
+      "result": "DESCRIPTION_REQUIRED",
+      "notes": "Generic URL retrieval is not enabled."
+    }
+  },
+  "normalization": {
+    "fields": [
+      "company",
+      "role/title",
+      "location",
+      "remote state",
+      "employment type",
+      "compensation",
+      "job URL",
+      "publication date",
+      "requisition ID",
+      "observed timestamp",
+      "source digest",
+      "description digest",
+      "provenance"
+    ],
+    "guessing_allowed": false,
+    "missing_values": "UNKNOWN_OR_REVIEW_REQUIRED"
+  },
+  "pipeline": [
+    "operator source",
+    "private Job Source Import Queue",
+    "duplicate detection",
+    "existing-application detection",
+    "JobOpportunity candidate",
+    "Explainable Fit",
+    "Opportunity Recommendation Engine",
+    "CareerOS daily experience"
+  ],
+  "ui": {
+    "route": "/os/professional/jobs",
+    "new_route_created": false,
+    "surface": "Add Job form"
+  },
+  "privacy": {
+    "raw_job_descriptions_in_git": false,
+    "real_job_values_in_docs": false,
+    "private_directory_mode": "0700",
+    "private_file_mode": "0600"
+  },
+  "non_impact": {
+    "application_created": false,
+    "application_submitted": false,
+    "resume_generated": false,
+    "resume_mutated": false,
+    "cover_letter_generated": false,
+    "message_sent": false,
+    "browser_automation": false,
+    "provider_login": false,
+    "external_ai": false,
+    "ollama": false,
+    "ranking_weights_changed": false,
+    "recommendation_thresholds_changed": false,
+    "provider_added": false
+  },
+  "tests": {
+    "focused": "jobDescriptionIntakeBridge.test.mjs",
+    "fixtures": "synthetic_only"
+  },
+  "recommended_next_mission": "CAREEROS_APPLICATION_INTELLIGENCE_V1_02_APPLICATION_INTELLIGENCE_PACKET"
+}
