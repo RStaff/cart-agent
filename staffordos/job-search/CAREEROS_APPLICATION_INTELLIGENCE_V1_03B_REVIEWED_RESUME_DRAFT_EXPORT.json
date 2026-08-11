@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "staffordos.job_search.mission_summary.v1",
+  "mission": "CAREEROS_APPLICATION_INTELLIGENCE_V1_03B_REVIEWED_RESUME_DRAFT_EXPORT",
+  "startingHead": "df1415c0658b7ce00a63b5c9301d4e5e7e25d3bd",
+  "branch": "main",
+  "primaryBusinessObjective": "Turn an operator-reviewed truth-bound CareerOS resume draft into a private ATS-friendly DOCX application artifact without weakening evidence governance.",
+  "authoritiesReused": [
+    "Application Intelligence Packet",
+    "ApplicationArtifactVersion",
+    "Truth-bound structured resume draft",
+    "CareerFact",
+    "CareerEvidence",
+    "approved chronology/evidence authority",
+    "CareerOS Daily Job Search Experience",
+    "StaffordOS governed local-only commit path"
+  ],
+  "contentAuthority": {
+    "structuredDraftIsAuthority": true,
+    "careerFactsRemainTruth": true,
+    "careerEvidenceRemainsTruth": true,
+    "historicalResumeVersionsValidateClaims": false
+  },
+  "reviewPrecondition": {
+    "requiredSafetyState": "APPROVED_FOR_EXPORT",
+    "requiredOperatorApprovalState": "APPROVED",
+    "autoApprovalAllowed": false,
+    "blockedDraftExportsAllowed": false
+  },
+  "export": {
+    "docxImplemented": true,
+    "docxWriter": "MINIMAL_DETERMINISTIC_OOXML_WRITER",
+    "pdfImplemented": false,
+    "pdfReason": "No safe existing PDF conversion path was found; PDF is deferred rather than adding a broader document platform."
+  },
+  "artifactVersioning": {
+    "schemaVersion": "staffordos.careeros.application_artifact_version.v1",
+    "artifactTypeImplemented": "RESUME",
+    "jobSpecificArtifact": true,
+    "canonicalResumeVersionCreated": false,
+    "submissionStatus": "NOT_SUBMITTED"
+  },
+  "privacy": {
+    "privateOutputOutsideGit": true,
+    "directoryMode": "0700",
+    "fileMode": "0600",
+    "rawResumeContentCommitted": false,
+    "rawJobDescriptionCommitted": false,
+    "careerFactsCommitted": false,
+    "careerEvidenceCommitted": false,
+    "privatePathsInReadModel": false
+  },
+  "nonImpact": {
+    "applicationCreated": false,
+    "applicationSubmitted": false,
+    "resumeVersionCreated": false,
+    "resumeVersionMutated": false,
+    "coverLetterGenerated": false,
+    "messageSent": false,
+    "browserAutomationUsed": false,
+    "providerCalled": false,
+    "externalAiUsed": false,
+    "ollamaUsed": false,
+    "deployment": false,
+    "push": false
+  },
+  "recommendedNextMission": "CAREEROS_APPLICATION_INTELLIGENCE_V1_04_MANUAL_SUBMISSION_RECORD_AND_ARTIFACT_LINKAGE"
+}

@@ -12,6 +12,9 @@ import {
 import {
   runTruthBoundResumeDraftsFromPrivateArtifacts,
 } from "../../../../lib/staffordos/truthBoundResumeDraft";
+import {
+  runReviewedResumeDraftExportFromPrivateArtifacts,
+} from "../../../../lib/staffordos/reviewedResumeDraftExport";
 
 export const dynamic = "force-dynamic";
 
@@ -54,6 +57,19 @@ async function prepareResumeDraftAction(formData: FormData) {
   redirect("/os/professional/jobs");
 }
 
+async function exportResumeDraftAction(formData: FormData) {
+  "use server";
+  const artifactVersionId = String(formData.get("artifactVersionId") || "").trim();
+  runReviewedResumeDraftExportFromPrivateArtifacts({
+    artifactIds: artifactVersionId ? [artifactVersionId] : [],
+    approveForExport: true,
+    limit: 1,
+    repositoryRoot: process.cwd(),
+    writeOutputs: true,
+  });
+  redirect("/os/professional/jobs");
+}
+
 export default function ProfessionalJobCommandPage() {
   const { experience } = loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts();
   return (
@@ -61,6 +77,7 @@ export default function ProfessionalJobCommandPage() {
       experience={experience}
       jobIntakeAction={analyzeJobAction}
       resumeDraftAction={prepareResumeDraftAction}
+      resumeExportAction={exportResumeDraftAction}
     />
   );
 }

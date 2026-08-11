@@ -46,6 +46,10 @@ import {
   loadLatestTruthBoundResumeDraftReadModel,
   type TruthBoundResumeDraftReadModelRecord,
 } from "./truthBoundResumeDraft";
+import {
+  loadLatestReviewedResumeDraftExportReadModel,
+  type ReviewedResumeDraftExportReadModelRecord,
+} from "./reviewedResumeDraftExport";
 
 export const CAREEROS_DAILY_PRIVATE_ARTIFACT_LOADER_VERSION = "CAREEROS_V1.01";
 
@@ -59,6 +63,7 @@ export type CareerOsDailyPrivateArtifactLoadResult = {
     applicationReviewWorkspace: boolean;
     applicationIntelligencePackets: boolean;
     truthBoundResumeDrafts: boolean;
+    reviewedResumeDraftExports: boolean;
     greenhouseDiscovery: boolean;
   };
   missingArtifacts: string[];
@@ -364,6 +369,9 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
     loadLatestTruthBoundResumeDraftReadModel(root);
   if (!resumeDraftReadModel.length) missingArtifacts.push("truth-bound resume draft output");
 
+  const resumeExportReadModel: ReviewedResumeDraftExportReadModelRecord[] =
+    loadLatestReviewedResumeDraftExportReadModel(root);
+
   const generatedAt =
     generatedAtFromDailyCommand(dailyCommand) ||
     recommendationReadModel?.[0]?.capturedAsOf ||
@@ -388,6 +396,7 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
     applicationReviewReadModel: applicationReviewReadModel || [],
     applicationIntelligenceReadModel,
     resumeDraftReadModel,
+    resumeExportReadModel,
   };
 
   return {
@@ -400,6 +409,7 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
       applicationReviewWorkspace: Boolean(applicationReviewReadModel),
       applicationIntelligencePackets: applicationIntelligenceReadModel.length > 0,
       truthBoundResumeDrafts: resumeDraftReadModel.length > 0,
+      reviewedResumeDraftExports: resumeExportReadModel.length > 0,
       greenhouseDiscovery: Boolean(greenhouseDiscovery),
     },
     missingArtifacts,

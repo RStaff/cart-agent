@@ -6,6 +6,7 @@ import {
   type CareerOsDailyJobSearchExperience,
   type CareerOsDailyPipelineStage,
   type CareerOsDailyPriority,
+  type CareerOsDailyResumeExportItem,
   type CareerOsDailyResumeDraftItem,
   type CareerOsDailyTopOpportunity,
 } from "../../lib/staffordos/careerOsDailyJobSearchExperience";
@@ -151,7 +152,17 @@ function IntelligenceItem({
   );
 }
 
-function ResumeDraftItem({ item }: { item: CareerOsDailyResumeDraftItem }) {
+function ResumeDraftItem({
+  item,
+  resumeExportAction,
+}: {
+  item: CareerOsDailyResumeDraftItem;
+  resumeExportAction?: (formData: FormData) => void | Promise<void>;
+}) {
+  const exportAvailable =
+    resumeExportAction &&
+    (item.safetyState === "DRAFT_READY_FOR_REVIEW" || item.safetyState === "APPROVED_FOR_EXPORT");
+
   return (
     <article className="staffordCareerCommandRecommendation">
       <header>
@@ -182,9 +193,65 @@ function ResumeDraftItem({ item }: { item: CareerOsDailyResumeDraftItem }) {
       </dl>
       <footer>
         <span>{item.detail}</span>
-        <button type="button" className="staffordJobCommandDisabledAction" disabled>
-          Review Draft
-        </button>
+        {exportAvailable ? (
+          <form action={resumeExportAction}>
+            <input type="hidden" name="artifactVersionId" value={item.id} />
+            <button type="submit" className="staffordJobCommandSecondaryAction">
+              Approve for Export
+            </button>
+          </form>
+        ) : (
+          <button type="button" className="staffordJobCommandDisabledAction" disabled>
+            {item.safetyState === "DRAFT_NEEDS_EVIDENCE_REVIEW" || item.safetyState === "DRAFT_BLOCKED"
+              ? "Evidence Review Required"
+              : "Review Draft"}
+          </button>
+        )}
+      </footer>
+    </article>
+  );
+}
+
+function ResumeExportItem({ item }: { item: CareerOsDailyResumeExportItem }) {
+  return (
+    <article className="staffordCareerCommandRecommendation">
+      <header>
+        <div>
+          <span>{item.exportState}</span>
+          <h3>{item.role}</h3>
+          <p>{item.company}</p>
+        </div>
+        <strong>v{item.version}</strong>
+      </header>
+      <dl className="staffordCareerCommandDetails">
+        <div>
+          <dt>DOCX</dt>
+          <dd>{item.docxFilename || "Not available"}</dd>
+        </div>
+        <div>
+          <dt>PDF</dt>
+          <dd>{item.pdfCreated ? "Available" : "Not supported yet"}</dd>
+        </div>
+        <div>
+          <dt>Submission</dt>
+          <dd>{item.submissionStatus}</dd>
+        </div>
+        <div>
+          <dt>Validation</dt>
+          <dd>{item.validationIssueCount} blocking issues</dd>
+        </div>
+      </dl>
+      <footer>
+        <span>{item.detail}</span>
+        {item.docxCreated && item.downloadPath ? (
+          <a className="staffordJobCommandSecondaryAction" href={item.downloadPath}>
+            Download DOCX
+          </a>
+        ) : (
+          <button type="button" className="staffordJobCommandDisabledAction" disabled>
+            Review Evidence
+          </button>
+        )}
       </footer>
     </article>
   );
@@ -204,16 +271,19 @@ export function JobCommandSurface({
   experience = EMPTY_CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE,
   jobIntakeAction,
   resumeDraftAction,
+  resumeExportAction,
 }: {
   experience?: CareerOsDailyJobSearchExperience;
   jobIntakeAction?: (formData: FormData) => void | Promise<void>;
   resumeDraftAction?: (formData: FormData) => void | Promise<void>;
+  resumeExportAction?: (formData: FormData) => void | Promise<void>;
 }) {
   const hasPriorities = experience.todaysPriorities.length > 0;
   const hasOpportunities = experience.topOpportunities.length > 0;
   const hasApplicationWork = experience.applicationWork.length > 0;
   const hasApplicationIntelligence = experience.applicationIntelligence.length > 0;
   const hasResumeDrafts = experience.resumeDrafts.length > 0;
+  const hasResumeExports = experience.resumeExports.length > 0;
 
   return (
     <div className="staffordJobCommand">
@@ -332,13 +402,33 @@ export function JobCommandSurface({
         {hasResumeDrafts ? (
           <div className="staffordCareerCommandRecommendationList">
             {experience.resumeDrafts.map((item) => (
-              <ResumeDraftItem key={item.id} item={item} />
+              <ResumeDraftItem key={item.id} item={item} resumeExportAction={resumeExportAction} />
             ))}
           </div>
         ) : (
           <article className="staffordHomeStatusNote">
             <span>No resume draft connected</span>
             <strong>Prepare a draft from an Application Intelligence packet when evidence authority supports it.</strong>
+          </article>
+        )}
+      </section>
+
+      <section className="staffordHomeSupport" aria-label="Resume Files">
+        <div className="staffordHomeSectionHeader">
+          <span className="staffordEyebrow">Resume Files</span>
+          <h2>Reviewed application artifacts</h2>
+          <p>DOCX files are rendered from approved truth-bound drafts. No submission has occurred.</p>
+        </div>
+        {hasResumeExports ? (
+          <div className="staffordCareerCommandRecommendationList">
+            {experience.resumeExports.map((item) => (
+              <ResumeExportItem key={item.id} item={item} />
+            ))}
+          </div>
+        ) : (
+          <article className="staffordHomeStatusNote">
+            <span>No exported resume file</span>
+            <strong>Approve a ready truth-bound draft to create a private DOCX artifact.</strong>
           </article>
         )}
       </section>

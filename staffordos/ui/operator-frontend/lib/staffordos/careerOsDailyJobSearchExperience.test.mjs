@@ -12,6 +12,10 @@ const dailyPath = path.join(root, "staffordos/ui/operator-frontend/lib/staffordo
 const loaderPath = path.join(root, "staffordos/ui/operator-frontend/lib/staffordos/careerOsDailyJobSearchExperiencePrivateLoader.ts");
 const surfacePath = path.join(root, "staffordos/ui/operator-frontend/components/staffordos/JobCommandSurface.tsx");
 const routePath = path.join(root, "staffordos/ui/operator-frontend/app/os/professional/jobs/page.tsx");
+const exportRoutePath = path.join(
+  root,
+  "staffordos/ui/operator-frontend/app/os/professional/jobs/artifacts/[artifactVersionId]/docx/route.ts",
+);
 const requireFromFrontend = createRequire(frontendPackage);
 const ts = requireFromFrontend("typescript");
 
@@ -19,7 +23,8 @@ const dailySource = readFileSync(dailyPath, "utf8");
 const loaderSource = readFileSync(loaderPath, "utf8");
 const surfaceSource = readFileSync(surfacePath, "utf8");
 const routeSource = readFileSync(routePath, "utf8");
-const implementationSource = [dailySource, loaderSource, surfaceSource, routeSource].join("\n");
+const exportRouteSource = readFileSync(exportRoutePath, "utf8");
+const implementationSource = [dailySource, loaderSource, surfaceSource, routeSource, exportRouteSource].join("\n");
 
 function registerTypeScriptRequire() {
   const originalTsExtension = Module._extensions[".ts"];
@@ -303,6 +308,32 @@ function resumeDraftItem(overrides = {}) {
   };
 }
 
+function resumeExportItem(overrides = {}) {
+  return {
+    schemaVersion: "staffordos.careeros.reviewed_resume_draft_export_read_model.v1",
+    artifactVersionId: "artifact_resume_export",
+    sourceDraftArtifactVersionId: "artifact_resume_draft",
+    packetId: "packet_apply",
+    jobOpportunityId: "opp_apply",
+    company: "Example Automation",
+    role: "AI Automation Product Manager",
+    version: 1,
+    exportState: "DOCX_READY",
+    docxCreated: true,
+    pdfCreated: false,
+    docxFilename: "Ross_Stafford_Example_Automation_AI_Automation_Product_Manager_Resume_v1.docx",
+    downloadPath: "/os/professional/jobs/artifacts/artifact_resume_export/docx",
+    submissionStatus: "NOT_SUBMITTED",
+    validationIssueCount: 0,
+    privatePathVisible: false,
+    draftContentVisible: false,
+    sourceAuthorityIdsVisible: false,
+    nextAction: "DOWNLOAD_DOCX",
+    limitations: ["Synthetic export fixture."],
+    ...overrides,
+  };
+}
+
 function writeJson(filePath, value) {
   mkdirSync(path.dirname(filePath), { recursive: true });
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
@@ -313,6 +344,7 @@ test("empty CareerOS daily experience is action-first and disconnected", () => {
   assert.equal(EMPTY_CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE.greeting, "Good morning");
   assert.equal(EMPTY_CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE.primaryQuestion, "What should I do next in my job search?");
   assert.equal(EMPTY_CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE.todaysPriorities.length, 0);
+  assert.equal(EMPTY_CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE.resumeExports.length, 0);
   assert.equal(EMPTY_CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE.auditSummary.noNewPrivateDataRoute, true);
 });
 
@@ -395,12 +427,33 @@ test("truth-bound resume draft read models are displayed without draft content o
   const item = experience.resumeDrafts[0];
 
   assert.equal(item.company, "Example Automation");
-  assert.equal(item.nextAction, "Review Draft");
+  assert.equal(item.nextAction, "Approve for Export");
   assert.equal(item.externalActionAvailable, false);
   assert.equal(item.humanReviewRequired, true);
   assert.doesNotMatch(JSON.stringify(item), /career_fact|career_evidence|draftText|\/Users\//i);
   assert.match(surfaceSource, /Resume Drafts/);
   assert.match(surfaceSource, /Review Draft/);
+});
+
+test("reviewed resume export read models expose DOCX download without private content", () => {
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    resumeExportReadModel: [resumeExportItem()],
+  });
+  const item = experience.resumeExports[0];
+
+  assert.equal(item.company, "Example Automation");
+  assert.equal(item.nextAction, "Download DOCX");
+  assert.equal(item.docxCreated, true);
+  assert.equal(item.submissionStatus, "NOT_SUBMITTED");
+  assert.equal(item.externalActionAvailable, false);
+  assert.equal(item.privatePathVisible, false);
+  assert.equal(experience.todaysPriorities.some((priority) => priority.action === "Download DOCX"), true);
+  assert.doesNotMatch(JSON.stringify(item), /career_fact|career_evidence|draftText|\/Users\//i);
+  assert.match(surfaceSource, /Resume Files/);
+  assert.match(surfaceSource, /Download DOCX/);
+  assert.match(routeSource, /runReviewedResumeDraftExportFromPrivateArtifacts/);
+  assert.match(exportRouteSource, /readLatestDocxExport/);
 });
 
 test("private loader reads latest governed artifacts and degrades when optional outputs are absent", () => {
