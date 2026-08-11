@@ -42,6 +42,10 @@ import {
   loadLatestApplicationIntelligencePacketReadModel,
   type ApplicationIntelligencePacketReadModelRecord,
 } from "./applicationIntelligencePacket";
+import {
+  loadLatestTruthBoundResumeDraftReadModel,
+  type TruthBoundResumeDraftReadModelRecord,
+} from "./truthBoundResumeDraft";
 
 export const CAREEROS_DAILY_PRIVATE_ARTIFACT_LOADER_VERSION = "CAREEROS_V1.01";
 
@@ -54,6 +58,7 @@ export type CareerOsDailyPrivateArtifactLoadResult = {
     applicationPackages: boolean;
     applicationReviewWorkspace: boolean;
     applicationIntelligencePackets: boolean;
+    truthBoundResumeDrafts: boolean;
     greenhouseDiscovery: boolean;
   };
   missingArtifacts: string[];
@@ -355,6 +360,10 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
     loadLatestApplicationIntelligencePacketReadModel(root);
   if (!applicationIntelligenceReadModel.length) missingArtifacts.push("application intelligence packet output");
 
+  const resumeDraftReadModel: TruthBoundResumeDraftReadModelRecord[] =
+    loadLatestTruthBoundResumeDraftReadModel(root);
+  if (!resumeDraftReadModel.length) missingArtifacts.push("truth-bound resume draft output");
+
   const generatedAt =
     generatedAtFromDailyCommand(dailyCommand) ||
     recommendationReadModel?.[0]?.capturedAsOf ||
@@ -378,6 +387,7 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
     applicationPackageReadModel: applicationPackageReadModel || [],
     applicationReviewReadModel: applicationReviewReadModel || [],
     applicationIntelligenceReadModel,
+    resumeDraftReadModel,
   };
 
   return {
@@ -389,6 +399,7 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
       applicationPackages: Boolean(applicationPackageReadModel),
       applicationReviewWorkspace: Boolean(applicationReviewReadModel),
       applicationIntelligencePackets: applicationIntelligenceReadModel.length > 0,
+      truthBoundResumeDrafts: resumeDraftReadModel.length > 0,
       greenhouseDiscovery: Boolean(greenhouseDiscovery),
     },
     missingArtifacts,

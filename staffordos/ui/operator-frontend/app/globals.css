@@ -2647,6 +2647,24 @@ textarea {
   cursor: not-allowed;
 }
 
+.staffordJobCommandSecondaryAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: start;
+  min-height: 38px;
+  margin-top: 16px;
+  padding: 8px 12px;
+  border: 1px solid #9fb0bf;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #242d38;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
 .staffordJobCommandControlNote {
   margin: 10px 0 0;
   color: #4f5a66;

@@ -24,6 +24,7 @@ import type {
   ReadyToApplyApplicationPackageResult,
 } from "./readyToApplyApplicationPackage";
 import type { ApplicationIntelligencePacketReadModelRecord } from "./applicationIntelligencePacket";
+import type { TruthBoundResumeDraftReadModelRecord } from "./truthBoundResumeDraft";
 
 export const CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE_VERSION = "CAREEROS_V1.01";
 export const CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE_SCHEMA_VERSION =
@@ -34,6 +35,7 @@ export type CareerOsDailyActionKind =
   | "Review Package"
   | "Open Opportunity"
   | "View Intelligence"
+  | "Review Draft"
   | "View Resume"
   | "Review Evidence"
   | "Follow Up"
@@ -116,6 +118,24 @@ export type CareerOsDailyApplicationIntelligenceItem = {
   limitations: string[];
 };
 
+export type CareerOsDailyResumeDraftItem = {
+  id: string;
+  packetId: string;
+  company: string;
+  role: string;
+  version: number;
+  safetyState: string;
+  operatorApprovalState: string;
+  tracedClaimCount: number;
+  blockedIssueCount: number;
+  reviewIssueCount: number;
+  nextAction: CareerOsDailyActionKind;
+  detail: string;
+  humanReviewRequired: true;
+  externalActionAvailable: false;
+  limitations: string[];
+};
+
 export type CareerOsDailyPipelineStage = {
   id: "applied" | "interview" | "offer" | "closed";
   label: "Applied" | "Interview" | "Offer" | "Closed";
@@ -148,6 +168,7 @@ export type CareerOsDailyJobSearchExperience = {
   topOpportunities: CareerOsDailyTopOpportunity[];
   applicationWork: CareerOsDailyApplicationWorkItem[];
   applicationIntelligence: CareerOsDailyApplicationIntelligenceItem[];
+  resumeDrafts: CareerOsDailyResumeDraftItem[];
   applicationPipeline: CareerOsDailyPipelineStage[];
   dailyActions: Array<{
     action: CareerOsDailyActionKind;
@@ -191,6 +212,7 @@ export type CareerOsDailyJobSearchExperienceInput = CareerOsCommandCenterInput &
   applicationReviewWorkspaceResult?: ApplicationReviewWorkspaceResult | null;
   applicationReviewReadModel?: readonly ApplicationReviewWorkspaceReadModelRecord[];
   applicationIntelligenceReadModel?: readonly ApplicationIntelligencePacketReadModelRecord[];
+  resumeDraftReadModel?: readonly TruthBoundResumeDraftReadModelRecord[];
 };
 
 const EMPTY_STATE =
@@ -225,6 +247,10 @@ function reviewItems(input: CareerOsDailyJobSearchExperienceInput) {
 
 function intelligenceItems(input: CareerOsDailyJobSearchExperienceInput) {
   return input.applicationIntelligenceReadModel || [];
+}
+
+function draftItems(input: CareerOsDailyJobSearchExperienceInput) {
+  return input.resumeDraftReadModel || [];
 }
 
 function countBrief(commandCenter: CareerOsCommandCenterPresentation, label: string) {
@@ -317,6 +343,12 @@ function actionForPacket(item: ApplicationIntelligencePacketReadModelRecord): Ca
   return "View Intelligence";
 }
 
+function actionForDraft(item: TruthBoundResumeDraftReadModelRecord): CareerOsDailyActionKind {
+  if (item.nextAction === "BLOCKED") return "Review Evidence";
+  if (item.nextAction === "REVIEW_EVIDENCE") return "Review Evidence";
+  return "Review Draft";
+}
+
 function applicationIntelligence(
   input: CareerOsDailyJobSearchExperienceInput,
 ): CareerOsDailyApplicationIntelligenceItem[] {
@@ -337,6 +369,31 @@ function applicationIntelligence(
     limitations: [
       "Shown from the existing private Application Intelligence Packet read model.",
       "No application, message, resume change, browser action, provider call, or external AI action is available here.",
+      ...item.limitations,
+    ],
+  }));
+}
+
+function resumeDrafts(input: CareerOsDailyJobSearchExperienceInput): CareerOsDailyResumeDraftItem[] {
+  return draftItems(input).slice(0, 5).map((item) => ({
+    id: item.artifactVersionId,
+    packetId: item.packetId,
+    company: item.company,
+    role: item.role,
+    version: item.version,
+    safetyState: item.safetyState,
+    operatorApprovalState: item.operatorApprovalState,
+    tracedClaimCount: item.tracedClaimCount,
+    blockedIssueCount: item.blockedIssueCount,
+    reviewIssueCount: item.reviewIssueCount,
+    nextAction: actionForDraft(item),
+    detail: `${item.tracedClaimCount} traced claims / ${item.blockedIssueCount} blocking / ${item.reviewIssueCount} review issues`,
+    humanReviewRequired: true,
+    externalActionAvailable: false,
+    limitations: [
+      "Shown from the existing private truth-bound resume draft read model.",
+      "Generated draft content, private paths, and source authority IDs are not exposed in this read model.",
+      "No application, export, upload, message, browser action, provider call, or model action is available here.",
       ...item.limitations,
     ],
   }));
@@ -608,12 +665,14 @@ export function buildCareerOsDailyJobSearchExperience(
   const commandCenter = input.commandCenter || buildCareerOsCommandCenterPresentation(input);
   const top = topOpportunities(commandCenter);
   const intelligence = applicationIntelligence(input);
+  const drafts = resumeDrafts(input);
   const priorities = todaysPriorities(input, top);
   const work = applicationWork(input);
   const hasConnectedWork =
     priorities.length > 0 ||
     top.length > 0 ||
     intelligence.length > 0 ||
+    drafts.length > 0 ||
     work.length > 0 ||
     commandCenter.pipeline.applicationsSubmitted > 0 ||
     commandCenter.systemHealth.queueSize > 0;
@@ -631,6 +690,7 @@ export function buildCareerOsDailyJobSearchExperience(
     topOpportunities: top,
     applicationWork: work,
     applicationIntelligence: intelligence,
+    resumeDrafts: drafts,
     applicationPipeline: pipelineStages(commandCenter.pipeline),
     dailyActions: dailyActions(priorities),
     systemHealth: systemHealth(commandCenter.systemHealth),

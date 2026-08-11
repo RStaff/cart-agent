@@ -271,6 +271,38 @@ function intelligenceItem(overrides = {}) {
   };
 }
 
+function resumeDraftItem(overrides = {}) {
+  return {
+    schemaVersion: "staffordos.careeros.truth_bound_resume_draft_read_model.v1",
+    artifactVersionId: "artifact_resume_draft",
+    packetId: "packet_apply",
+    jobOpportunityId: "opp_apply",
+    company: "Example Automation",
+    role: "AI Automation Product Manager",
+    artifactType: "RESUME",
+    version: 1,
+    safetyState: "DRAFT_READY_FOR_REVIEW",
+    operatorApprovalState: "PENDING_REVIEW",
+    humanReviewRequired: true,
+    tracedClaimCount: 4,
+    blockedIssueCount: 0,
+    reviewIssueCount: 0,
+    omittedUnsupportedClaimCount: 0,
+    sectionCount: 3,
+    draftContentVisible: false,
+    privatePathVisible: false,
+    sourceAuthorityIdsVisible: false,
+    nextAction: "REVIEW_DRAFT",
+    applicationCreated: false,
+    applicationSubmitted: false,
+    resumeExported: false,
+    resumeUploaded: false,
+    messageSent: false,
+    limitations: ["Synthetic draft fixture."],
+    ...overrides,
+  };
+}
+
 function writeJson(filePath, value) {
   mkdirSync(path.dirname(filePath), { recursive: true });
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
@@ -353,6 +385,22 @@ test("application intelligence packet read models are displayed without raw priv
   assert.doesNotMatch(JSON.stringify(item), /\/Users\/|sourceUrl|raw job|raw resume/i);
   assert.match(surfaceSource, /Application Intelligence/);
   assert.match(surfaceSource, /View Intelligence/);
+});
+
+test("truth-bound resume draft read models are displayed without draft content or source IDs", () => {
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    resumeDraftReadModel: [resumeDraftItem()],
+  });
+  const item = experience.resumeDrafts[0];
+
+  assert.equal(item.company, "Example Automation");
+  assert.equal(item.nextAction, "Review Draft");
+  assert.equal(item.externalActionAvailable, false);
+  assert.equal(item.humanReviewRequired, true);
+  assert.doesNotMatch(JSON.stringify(item), /career_fact|career_evidence|draftText|\/Users\//i);
+  assert.match(surfaceSource, /Resume Drafts/);
+  assert.match(surfaceSource, /Review Draft/);
 });
 
 test("private loader reads latest governed artifacts and degrades when optional outputs are absent", () => {

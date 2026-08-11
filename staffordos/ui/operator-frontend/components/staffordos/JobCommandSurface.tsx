@@ -6,6 +6,7 @@ import {
   type CareerOsDailyJobSearchExperience,
   type CareerOsDailyPipelineStage,
   type CareerOsDailyPriority,
+  type CareerOsDailyResumeDraftItem,
   type CareerOsDailyTopOpportunity,
 } from "../../lib/staffordos/careerOsDailyJobSearchExperience";
 
@@ -92,7 +93,13 @@ function WorkItem({ item }: { item: CareerOsDailyApplicationWorkItem }) {
   );
 }
 
-function IntelligenceItem({ item }: { item: CareerOsDailyApplicationIntelligenceItem }) {
+function IntelligenceItem({
+  item,
+  resumeDraftAction,
+}: {
+  item: CareerOsDailyApplicationIntelligenceItem;
+  resumeDraftAction?: (formData: FormData) => void | Promise<void>;
+}) {
   return (
     <article className="staffordCareerCommandRecommendation">
       <header>
@@ -132,6 +139,53 @@ function IntelligenceItem({ item }: { item: CareerOsDailyApplicationIntelligence
           </div>
         </dl>
       </details>
+      {resumeDraftAction ? (
+        <form action={resumeDraftAction}>
+          <input type="hidden" name="packetId" value={item.id} />
+          <button type="submit" className="staffordJobCommandSecondaryAction">
+            Prepare Resume Draft
+          </button>
+        </form>
+      ) : null}
+    </article>
+  );
+}
+
+function ResumeDraftItem({ item }: { item: CareerOsDailyResumeDraftItem }) {
+  return (
+    <article className="staffordCareerCommandRecommendation">
+      <header>
+        <div>
+          <span>{item.safetyState}</span>
+          <h3>{item.role}</h3>
+          <p>{item.company}</p>
+        </div>
+        <strong>v{item.version}</strong>
+      </header>
+      <dl className="staffordCareerCommandDetails">
+        <div>
+          <dt>Traceability</dt>
+          <dd>{item.tracedClaimCount} traced claims</dd>
+        </div>
+        <div>
+          <dt>Review</dt>
+          <dd>{item.blockedIssueCount} blocking / {item.reviewIssueCount} review issues</dd>
+        </div>
+        <div>
+          <dt>Approval</dt>
+          <dd>{item.operatorApprovalState}</dd>
+        </div>
+        <div>
+          <dt>Next Action</dt>
+          <dd>{item.nextAction}</dd>
+        </div>
+      </dl>
+      <footer>
+        <span>{item.detail}</span>
+        <button type="button" className="staffordJobCommandDisabledAction" disabled>
+          Review Draft
+        </button>
+      </footer>
     </article>
   );
 }
@@ -149,14 +203,17 @@ function PipelineMetric({ item }: { item: CareerOsDailyPipelineStage }) {
 export function JobCommandSurface({
   experience = EMPTY_CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE,
   jobIntakeAction,
+  resumeDraftAction,
 }: {
   experience?: CareerOsDailyJobSearchExperience;
   jobIntakeAction?: (formData: FormData) => void | Promise<void>;
+  resumeDraftAction?: (formData: FormData) => void | Promise<void>;
 }) {
   const hasPriorities = experience.todaysPriorities.length > 0;
   const hasOpportunities = experience.topOpportunities.length > 0;
   const hasApplicationWork = experience.applicationWork.length > 0;
   const hasApplicationIntelligence = experience.applicationIntelligence.length > 0;
+  const hasResumeDrafts = experience.resumeDrafts.length > 0;
 
   return (
     <div className="staffordJobCommand">
@@ -255,13 +312,33 @@ export function JobCommandSurface({
         {hasApplicationIntelligence ? (
           <div className="staffordCareerCommandRecommendationList">
             {experience.applicationIntelligence.map((item) => (
-              <IntelligenceItem key={item.id} item={item} />
+              <IntelligenceItem key={item.id} item={item} resumeDraftAction={resumeDraftAction} />
             ))}
           </div>
         ) : (
           <article className="staffordHomeStatusNote">
             <span>No packet connected</span>
             <strong>Analyze a job or run the packet workflow to populate this section.</strong>
+          </article>
+        )}
+      </section>
+
+      <section className="staffordHomeSupport" aria-label="Resume Drafts">
+        <div className="staffordHomeSectionHeader">
+          <span className="staffordEyebrow">Resume Drafts</span>
+          <h2>Truth-bound resume drafts</h2>
+          <p>Draft status is shown from redacted artifact read models. Full draft content remains owner-private.</p>
+        </div>
+        {hasResumeDrafts ? (
+          <div className="staffordCareerCommandRecommendationList">
+            {experience.resumeDrafts.map((item) => (
+              <ResumeDraftItem key={item.id} item={item} />
+            ))}
+          </div>
+        ) : (
+          <article className="staffordHomeStatusNote">
+            <span>No resume draft connected</span>
+            <strong>Prepare a draft from an Application Intelligence packet when evidence authority supports it.</strong>
           </article>
         )}
       </section>

@@ -1,0 +1,107 @@
+{
+  "mission": "CAREEROS_APPLICATION_INTELLIGENCE_V1_03_TRUTH_BOUND_RESUME_DRAFT_AND_ARTIFACT_VERSIONING",
+  "schemaVersion": "staffordos.job_search.mission_report.v1",
+  "checkpointAuthority": {
+    "branch": "main",
+    "startingHead": "ba74758cae7bbbea3508135b5ee44cbf5cf2ad18",
+    "localOnlyCommitPath": "staffordos/operator_daemon/run_task_with_local_commit_gate_v1.sh"
+  },
+  "careerTruthBoundary": {
+    "careerFactsAreAuthority": true,
+    "careerEvidenceSupportsFacts": true,
+    "approvedChronologyReused": true,
+    "resumeVersionsAreDownstreamArtifacts": true,
+    "resumeVersionsUsedAsCareerTruth": false,
+    "newCareerProfileCreated": false
+  },
+  "modelExecutionAuthority": {
+    "approvedPrivateCareerOsModelPathFound": false,
+    "modelUsed": false,
+    "externalAiUsed": false,
+    "ollamaUsed": false,
+    "decision": "USE_DETERMINISTIC_TRUTH_BOUND_ASSEMBLER_UNTIL_PRIVATE_MODEL_AUTHORITY_EXISTS"
+  },
+  "artifactContract": {
+    "schemaVersion": "staffordos.careeros.application_artifact_version.v1",
+    "contractDecision": "CREATE_MINIMAL_APPLICATION_ARTIFACT_VERSION_AUTHORITY",
+    "implementedArtifactTypes": [
+      "RESUME"
+    ],
+    "reservedFutureArtifactTypes": [
+      "COVER_LETTER",
+      "NETWORKING_MESSAGE"
+    ],
+    "resumeVersionOverloaded": false,
+    "applicationCreated": false
+  },
+  "draftSafety": {
+    "states": [
+      "DRAFT_READY_FOR_REVIEW",
+      "DRAFT_NEEDS_EVIDENCE_REVIEW",
+      "DRAFT_BLOCKED",
+      "APPROVED_FOR_EXPORT"
+    ],
+    "approvedForExportAutomatic": false,
+    "humanReviewRequired": true,
+    "evidenceBackedProposedFactsAllowedOnlyAsReviewLimitedDraftClaims": true,
+    "proposedFactsCanBecomeReadyWithoutPromotion": false
+  },
+  "privateOutputs": [
+    "truth_bound_resume_draft_result.json",
+    "application_artifact_versions.json",
+    "resume_drafts.private.json",
+    "resume_draft_read_model.json",
+    "claim_traceability.private.json",
+    "draft_validation.private.json",
+    "application_artifact_audit.json"
+  ],
+  "privacy": {
+    "rawJobDescriptionsCommitted": false,
+    "rawResumeContentCommitted": false,
+    "generatedDraftContentCommitted": false,
+    "privateCareerEvidenceCommitted": false,
+    "privateCareerFactsCommitted": false,
+    "privatePathsCommitted": false,
+    "ownerPrivateDirectoryMode": "0700",
+    "ownerPrivateFileMode": "0600"
+  },
+  "externalActionBoundary": {
+    "structuredResumeDraftPrepared": true,
+    "resumeVersionCreated": false,
+    "resumeMutated": false,
+    "docxGenerated": false,
+    "pdfGenerated": false,
+    "resumeUploaded": false,
+    "coverLetterGenerated": false,
+    "applicationCreated": false,
+    "applicationSubmitted": false,
+    "messageSent": false,
+    "providerCall": false,
+    "browserAutomation": false,
+    "externalAi": false,
+    "ollama": false,
+    "deployment": false,
+    "push": false
+  },
+  "ui": {
+    "route": "/os/professional/jobs",
+    "newShellCreated": false,
+    "newRouteCreated": false,
+    "readModelOnly": true,
+    "draftContentVisibleInUi": false,
+    "prepareDraftActionWritesPrivateArtifact": true
+  },
+  "validationPlan": [
+    "focused truth-bound draft tests",
+    "Application Intelligence Packet regression",
+    "CareerOS Daily Job Search Experience regression",
+    "J001/J002/J003/J004 regressions",
+    "broader frontend suite",
+    "build",
+    "repository JSON validation",
+    "private JSON validation",
+    "privacy and secret scans",
+    "git diff checks"
+  ],
+  "recommendedNextMission": "CAREEROS_APPLICATION_INTELLIGENCE_V1_03B_REVIEWED_RESUME_DRAFT_EXPORT"
+}

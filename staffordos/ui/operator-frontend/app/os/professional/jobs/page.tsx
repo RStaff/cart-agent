@@ -9,6 +9,9 @@ import {
   loadLatestResumeVersionsFromPrivateArtifacts,
   runJobDescriptionIntakeBridgeFromPrivateArtifacts,
 } from "../../../../lib/staffordos/jobDescriptionIntakeBridge";
+import {
+  runTruthBoundResumeDraftsFromPrivateArtifacts,
+} from "../../../../lib/staffordos/truthBoundResumeDraft";
 
 export const dynamic = "force-dynamic";
 
@@ -39,7 +42,25 @@ async function analyzeJobAction(formData: FormData) {
   redirect("/os/professional/jobs");
 }
 
+async function prepareResumeDraftAction(formData: FormData) {
+  "use server";
+  const packetId = String(formData.get("packetId") || "").trim();
+  runTruthBoundResumeDraftsFromPrivateArtifacts({
+    packetIds: packetId ? [packetId] : [],
+    limit: 1,
+    repositoryRoot: process.cwd(),
+    writeOutputs: true,
+  });
+  redirect("/os/professional/jobs");
+}
+
 export default function ProfessionalJobCommandPage() {
   const { experience } = loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts();
-  return <JobCommandSurface experience={experience} jobIntakeAction={analyzeJobAction} />;
+  return (
+    <JobCommandSurface
+      experience={experience}
+      jobIntakeAction={analyzeJobAction}
+      resumeDraftAction={prepareResumeDraftAction}
+    />
+  );
 }
