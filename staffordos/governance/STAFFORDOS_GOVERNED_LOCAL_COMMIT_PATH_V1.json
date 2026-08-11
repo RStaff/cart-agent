@@ -1,0 +1,32 @@
+{
+  "schema": "staffordos.governed_local_commit_path.v1",
+  "task_type": "STAFFORDOS_GOVERNED_LOCAL_COMMIT_PATH_V1",
+  "status": "implemented",
+  "execution": {
+    "runner": "staffordos/operator_daemon/run_task_with_local_commit_gate_v1.sh",
+    "existing_commit_gate": "staffordos/operator_daemon/commit_gate_v1.sh",
+    "push_capable_runner_preserved": "staffordos/operator_daemon/run_task_with_commit_gate_v1.sh"
+  },
+  "safety_properties": {
+    "staging_area_must_start_empty": true,
+    "stages_only_explicitly_approved_paths": true,
+    "runs_git_diff_cached_check": true,
+    "runs_existing_commit_gate": true,
+    "creates_local_commit": true,
+    "git_push_command_present": false,
+    "deploy_command_present": false,
+    "publish_command_present": false,
+    "remote_mutation_authorized": false
+  },
+  "validation": {
+    "focused_test": "staffordos/operator_daemon/run_task_with_local_commit_gate_v1.test.mjs",
+    "expected_artifact_json_validated": true,
+    "existing_runner_regression": "push-capable runner remains unchanged by this local-only path"
+  },
+  "limitations": [
+    "Mission-specific validation must run before invoking the local-only commit runner.",
+    "The existing push-capable runner remains the correct path only when push is separately authorized."
+  ],
+  "no_push": true,
+  "no_deployment": true
+}

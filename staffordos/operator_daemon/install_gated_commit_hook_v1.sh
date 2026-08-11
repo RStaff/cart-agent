@@ -10,6 +10,7 @@ echo "===== PRE-COMMIT GATE ====="
 if [ "${STAFFORDOS_GATED:-}" != "true" ]; then
   echo "🚫 BLOCKED: Direct git commit is not allowed."
   echo "👉 Use: bash staffordos/operator_daemon/run_task_with_commit_gate_v1.sh <task> <artifact> <message>"
+  echo "👉 Or:  bash staffordos/operator_daemon/run_task_with_local_commit_gate_v1.sh <task> <artifact> <message>"
   echo "👉 Or:  bash staffordos/operator_daemon/run_auto_task_with_commit_gate_v1.sh"
   exit 1
 fi
