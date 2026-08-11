@@ -50,6 +50,10 @@ import {
   loadLatestReviewedResumeDraftExportReadModel,
   type ReviewedResumeDraftExportReadModelRecord,
 } from "./reviewedResumeDraftExport";
+import {
+  loadLatestManualSubmissionReadModel,
+  type ManualSubmissionReadModelRecord,
+} from "./manualSubmissionRecordAndArtifactLinkage";
 
 export const CAREEROS_DAILY_PRIVATE_ARTIFACT_LOADER_VERSION = "CAREEROS_V1.01";
 
@@ -64,6 +68,7 @@ export type CareerOsDailyPrivateArtifactLoadResult = {
     applicationIntelligencePackets: boolean;
     truthBoundResumeDrafts: boolean;
     reviewedResumeDraftExports: boolean;
+    manualSubmissionArtifactLinks: boolean;
     greenhouseDiscovery: boolean;
   };
   missingArtifacts: string[];
@@ -372,6 +377,9 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
   const resumeExportReadModel: ReviewedResumeDraftExportReadModelRecord[] =
     loadLatestReviewedResumeDraftExportReadModel(root);
 
+  const manualSubmissionReadModel: ManualSubmissionReadModelRecord[] =
+    loadLatestManualSubmissionReadModel(root);
+
   const generatedAt =
     generatedAtFromDailyCommand(dailyCommand) ||
     recommendationReadModel?.[0]?.capturedAsOf ||
@@ -397,6 +405,7 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
     applicationIntelligenceReadModel,
     resumeDraftReadModel,
     resumeExportReadModel,
+    manualSubmissionReadModel,
   };
 
   return {
@@ -410,6 +419,7 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
       applicationIntelligencePackets: applicationIntelligenceReadModel.length > 0,
       truthBoundResumeDrafts: resumeDraftReadModel.length > 0,
       reviewedResumeDraftExports: resumeExportReadModel.length > 0,
+      manualSubmissionArtifactLinks: manualSubmissionReadModel.length > 0,
       greenhouseDiscovery: Boolean(greenhouseDiscovery),
     },
     missingArtifacts,

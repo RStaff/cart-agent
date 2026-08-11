@@ -26,6 +26,7 @@ import type {
 import type { ApplicationIntelligencePacketReadModelRecord } from "./applicationIntelligencePacket";
 import type { TruthBoundResumeDraftReadModelRecord } from "./truthBoundResumeDraft";
 import type { ReviewedResumeDraftExportReadModelRecord } from "./reviewedResumeDraftExport";
+import type { ManualSubmissionReadModelRecord } from "./manualSubmissionRecordAndArtifactLinkage";
 
 export const CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE_VERSION = "CAREEROS_V1.01";
 export const CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE_SCHEMA_VERSION =
@@ -39,6 +40,7 @@ export type CareerOsDailyActionKind =
   | "Review Draft"
   | "Approve for Export"
   | "Download DOCX"
+  | "Mark as Submitted"
   | "View Resume"
   | "Review Evidence"
   | "Follow Up"
@@ -151,7 +153,12 @@ export type CareerOsDailyResumeExportItem = {
   pdfCreated: false;
   docxFilename: string | null;
   downloadPath: string | null;
-  submissionStatus: "NOT_SUBMITTED";
+  submissionStatus: "NOT_SUBMITTED" | "SUBMITTED";
+  submittedDate: string | null;
+  applicationId: string | null;
+  exactResumeArtifactKnown: boolean;
+  followUpState: string | null;
+  followUpDueDateKnown: boolean;
   validationIssueCount: number;
   nextAction: CareerOsDailyActionKind;
   detail: string;
@@ -239,6 +246,7 @@ export type CareerOsDailyJobSearchExperienceInput = CareerOsCommandCenterInput &
   applicationIntelligenceReadModel?: readonly ApplicationIntelligencePacketReadModelRecord[];
   resumeDraftReadModel?: readonly TruthBoundResumeDraftReadModelRecord[];
   resumeExportReadModel?: readonly ReviewedResumeDraftExportReadModelRecord[];
+  manualSubmissionReadModel?: readonly ManualSubmissionReadModelRecord[];
 };
 
 const EMPTY_STATE =
@@ -281,6 +289,10 @@ function draftItems(input: CareerOsDailyJobSearchExperienceInput) {
 
 function exportItems(input: CareerOsDailyJobSearchExperienceInput) {
   return input.resumeExportReadModel || [];
+}
+
+function manualSubmissionItems(input: CareerOsDailyJobSearchExperienceInput) {
+  return input.manualSubmissionReadModel || [];
 }
 
 function countBrief(commandCenter: CareerOsCommandCenterPresentation, label: string) {
@@ -387,6 +399,19 @@ function actionForExport(item: ReviewedResumeDraftExportReadModelRecord): Career
   return "Review Evidence";
 }
 
+function actionForSubmission(item: ManualSubmissionReadModelRecord): CareerOsDailyActionKind {
+  if (item.nextAction === "PREPARE_FOR_INTERVIEW") return "Prepare Interview";
+  if (item.nextAction === "FOLLOW_UP" || item.nextAction === "REVIEW_RESPONSE") return "Follow Up";
+  return "No Action";
+}
+
+function submissionForExport(
+  item: ReviewedResumeDraftExportReadModelRecord,
+  submissions: readonly ManualSubmissionReadModelRecord[],
+) {
+  return submissions.find((submission) => submission.artifactVersionId === item.artifactVersionId) || null;
+}
+
 function applicationIntelligence(
   input: CareerOsDailyJobSearchExperienceInput,
 ): CareerOsDailyApplicationIntelligenceItem[] {
@@ -438,33 +463,45 @@ function resumeDrafts(input: CareerOsDailyJobSearchExperienceInput): CareerOsDai
 }
 
 function resumeExports(input: CareerOsDailyJobSearchExperienceInput): CareerOsDailyResumeExportItem[] {
-  return exportItems(input).slice(0, 5).map((item) => ({
-    id: item.artifactVersionId,
-    sourceDraftArtifactVersionId: item.sourceDraftArtifactVersionId,
-    packetId: item.packetId,
-    company: item.company,
-    role: item.role,
-    version: item.version,
-    exportState: item.exportState,
-    docxCreated: item.docxCreated,
-    pdfCreated: false,
-    docxFilename: item.docxFilename,
-    downloadPath: item.downloadPath,
-    submissionStatus: item.submissionStatus,
-    validationIssueCount: item.validationIssueCount,
-    nextAction: actionForExport(item),
-    detail: item.docxCreated
-      ? "DOCX is ready for Ross to download and use manually. Nothing has been submitted."
-      : "Export is blocked until evidence or draft review issues are resolved.",
-    externalActionAvailable: false,
-    privatePathVisible: false,
-    limitations: [
-      "Shown from the private reviewed resume export read model.",
-      "Generated resume text, private paths, claim IDs, CareerFact IDs, and CareerEvidence IDs are not exposed in this display.",
-      "Submission status remains NOT_SUBMITTED.",
-      ...item.limitations,
-    ],
-  }));
+  const submissions = manualSubmissionItems(input);
+  return exportItems(input).slice(0, 5).map((item) => {
+    const submission = submissionForExport(item, submissions);
+    return {
+      id: item.artifactVersionId,
+      sourceDraftArtifactVersionId: item.sourceDraftArtifactVersionId,
+      packetId: item.packetId,
+      company: item.company,
+      role: item.role,
+      version: item.version,
+      exportState: item.exportState,
+      docxCreated: item.docxCreated,
+      pdfCreated: false,
+      docxFilename: item.docxFilename,
+      downloadPath: item.downloadPath,
+      submissionStatus: submission ? "SUBMITTED" : item.submissionStatus,
+      submittedDate: submission?.submittedDate || null,
+      applicationId: submission?.applicationId || null,
+      exactResumeArtifactKnown: submission?.exactResumeArtifactKnown || false,
+      followUpState: submission?.followUpState || null,
+      followUpDueDateKnown: submission?.followUpDueDateKnown || false,
+      validationIssueCount: item.validationIssueCount,
+      nextAction: submission ? actionForSubmission(submission) : actionForExport(item),
+      detail: submission
+        ? "Ross confirmed manual submission. The exact resume artifact is linked to the Application record."
+        : item.docxCreated
+          ? "DOCX is ready for Ross to download, use manually, and then mark submitted."
+          : "Export is blocked until evidence or draft review issues are resolved.",
+      externalActionAvailable: false,
+      privatePathVisible: false,
+      limitations: [
+        "Shown from the private reviewed resume export and manual submission read models.",
+        "Generated resume text, private paths, claim IDs, CareerFact IDs, CareerEvidence IDs, and source URLs are not exposed in this display.",
+        submission ? "Submission status is confirmed by an explicit V1.04 artifact linkage." : "Submission status remains NOT_SUBMITTED.",
+        ...item.limitations,
+        ...(submission?.limitations || []),
+      ],
+    };
+  });
 }
 
 function topOpportunities(commandCenter: CareerOsCommandCenterPresentation): CareerOsDailyTopOpportunity[] {
@@ -599,7 +636,7 @@ function opportunityPriorities(records: readonly CareerOsDailyTopOpportunity[]) 
 
 function resumeExportPriorities(records: readonly CareerOsDailyResumeExportItem[]) {
   return records
-    .filter((item) => item.docxCreated || item.validationIssueCount > 0)
+    .filter((item) => item.submissionStatus !== "SUBMITTED" && (item.docxCreated || item.validationIssueCount > 0))
     .slice(0, 3)
     .map((item) => ({
       id: `resume-export:${item.id}`,
@@ -678,8 +715,22 @@ function applicationWork(input: CareerOsDailyJobSearchExperienceInput): CareerOs
       externalActionAvailable: false as const,
       limitations: [...item.limitations],
     }));
+  const fromSubmissions: CareerOsDailyApplicationWorkItem[] = manualSubmissionItems(input).map((item) => ({
+    id: `submission:${item.applicationId}`,
+    company: item.company,
+    role: item.role,
+    task: actionForSubmission(item),
+    status: item.currentStage,
+    detail: item.followUpState
+      ? `Resume ${item.resumeArtifactFilename} v${item.resumeArtifactVersion} linked. Follow-up: ${item.followUpState}.`
+      : `Resume ${item.resumeArtifactFilename} v${item.resumeArtifactVersion} linked.`,
+    applicationDate: item.submittedDate,
+    humanReviewRequired: true,
+    externalActionAvailable: false as const,
+    limitations: [...item.limitations],
+  }));
 
-  return [...fromEngagement, ...fromReviews].sort(
+  return [...fromEngagement, ...fromReviews, ...fromSubmissions].sort(
     (left, right) =>
       left.company.localeCompare(right.company) ||
       left.role.localeCompare(right.role) ||

@@ -1,0 +1,79 @@
+{
+  "mission": "CAREEROS_APPLICATION_INTELLIGENCE_V1_04_MANUAL_SUBMISSION_RECORD_AND_ARTIFACT_LINKAGE",
+  "schemaVersion": "staffordos.careeros.application_intelligence_v1_04_manual_submission_record.v1",
+  "workspace": "professional",
+  "capabilityFamily": "Career Operations",
+  "authority": {
+    "applicationAuthorityReused": true,
+    "applicationEventAuthorityReused": true,
+    "applicationArtifactVersionReused": true,
+    "applicationIntelligencePacketReused": true,
+    "followUpAuthorityReused": true,
+    "parallelApplicationModelCreated": false,
+    "parallelResumeAuthorityCreated": false
+  },
+  "submissionBoundary": {
+    "startsAfterManualExternalSubmission": true,
+    "operatorConfirmationRequired": true,
+    "staffordOsSubmissionAvailable": false,
+    "browserAutomationAvailable": false,
+    "providerUploadAvailable": false,
+    "messageSendingAvailable": false
+  },
+  "preconditions": [
+    "operator confirmation",
+    "submitted date",
+    "Application Intelligence Packet",
+    "JobOpportunity identity",
+    "canonical source URL",
+    "approved DOCX resume ApplicationArtifactVersion",
+    "artifact submissionStatus NOT_SUBMITTED"
+  ],
+  "records": {
+    "application": "existing staffordos.job_search.private_application.v1",
+    "applicationEvent": "existing staffordos.job_search.private_application_event.v2",
+    "artifactSubmissionLink": "staffordos.careeros.application_artifact_submission_link.v1",
+    "submittedArtifactState": "staffordos.careeros.submitted_application_artifact_state.v1",
+    "readModel": "staffordos.careeros.manual_submission_read_model.v1"
+  },
+  "artifactLinkage": {
+    "exactApplicationArtifactVersionRequired": true,
+    "filenameGuessingAllowed": false,
+    "historicalResumeVersionUsedAsSubmittedArtifact": false,
+    "canonicalResumeVersionCreated": false,
+    "artifactContentMutated": false
+  },
+  "followUpIntegration": {
+    "j004FollowUpReused": true,
+    "newReminderEngineCreated": false,
+    "messageGenerated": false,
+    "messageSent": false
+  },
+  "ui": {
+    "route": "/os/professional/jobs",
+    "newShellCreated": false,
+    "manualSubmissionAction": "Mark as Submitted",
+    "rawPrivateContentVisible": false
+  },
+  "privacy": {
+    "runtimeRecordsOutsideGit": true,
+    "privateDirectoriesMode": "0700",
+    "privateFilesMode": "0600",
+    "rawResumeContentCommitted": false,
+    "privateApplicationDataCommitted": false,
+    "privateJobDescriptionsCommitted": false
+  },
+  "nonImpact": {
+    "applicationSubmission": false,
+    "autoApply": false,
+    "resumeGeneration": false,
+    "resumeMutation": false,
+    "coverLetterGeneration": false,
+    "providerAdded": false,
+    "externalAi": false,
+    "ollama": false,
+    "deployment": false,
+    "push": false
+  },
+  "expectedNextMission": "REASSESS_BASED_ON_REAL_JOB_SEARCH_USAGE"
+}

@@ -66,7 +66,11 @@ export type ApplicationStatus = (typeof APPLICATION_STATUSES)[number];
 export type ApplicationEventType = (typeof APPLICATION_EVENT_TYPES)[number];
 export type ApplicationDuplicateStatus = (typeof APPLICATION_DUPLICATE_STATUSES)[number];
 export type SubmittedAtPrecision = "DATE" | "DATE_TIME" | "UNKNOWN";
-export type ResumeReferenceStatus = "UNKNOWN" | "PRIVATE_LEGACY_REFERENCE" | "ASSET_REFERENCE_PENDING";
+export type ResumeReferenceStatus =
+  | "UNKNOWN"
+  | "PRIVATE_LEGACY_REFERENCE"
+  | "ASSET_REFERENCE_PENDING"
+  | "APPLICATION_ARTIFACT_VERSION";
 export type CoverLetterStatus = "UNKNOWN" | "NOT_USED" | "USED" | "DRAFTED_EXTERNALLY";
 export type EmployerResponseStatus =
   | "UNKNOWN"

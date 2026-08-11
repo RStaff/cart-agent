@@ -15,6 +15,9 @@ import {
 import {
   runReviewedResumeDraftExportFromPrivateArtifacts,
 } from "../../../../lib/staffordos/reviewedResumeDraftExport";
+import {
+  runManualSubmissionRecordAndArtifactLinkageFromPrivateArtifacts,
+} from "../../../../lib/staffordos/manualSubmissionRecordAndArtifactLinkage";
 
 export const dynamic = "force-dynamic";
 
@@ -70,6 +73,23 @@ async function exportResumeDraftAction(formData: FormData) {
   redirect("/os/professional/jobs");
 }
 
+async function markSubmittedAction(formData: FormData) {
+  "use server";
+  const artifactVersionId = String(formData.get("artifactVersionId") || "").trim();
+  const submittedAt = String(formData.get("submittedAt") || "").trim();
+  const submissionChannel = String(formData.get("submissionChannel") || "").trim();
+  runManualSubmissionRecordAndArtifactLinkageFromPrivateArtifacts({
+    artifactVersionId,
+    submittedAt: submittedAt || null,
+    submissionChannel: submissionChannel || null,
+    submittedAtPrecision: "DATE",
+    operatorConfirmed: true,
+    repositoryRoot: process.cwd(),
+    writeOutputs: true,
+  });
+  redirect("/os/professional/jobs");
+}
+
 export default function ProfessionalJobCommandPage() {
   const { experience } = loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts();
   return (
@@ -78,6 +98,7 @@ export default function ProfessionalJobCommandPage() {
       jobIntakeAction={analyzeJobAction}
       resumeDraftAction={prepareResumeDraftAction}
       resumeExportAction={exportResumeDraftAction}
+      manualSubmissionAction={markSubmittedAction}
     />
   );
 }

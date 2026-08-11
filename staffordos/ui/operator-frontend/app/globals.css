@@ -2743,6 +2743,49 @@ textarea {
   line-height: 1.4;
 }
 
+.staffordManualSubmissionForm {
+  display: grid;
+  grid-template-columns: minmax(150px, 180px) minmax(180px, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #d9dee5;
+}
+
+.staffordManualSubmissionForm label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.staffordManualSubmissionForm label > span {
+  color: #66717e;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.staffordManualSubmissionForm input {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid #cbd4dd;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #15181d;
+  font-size: 14px;
+}
+
+.staffordManualSubmissionForm p {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #4f5a66;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
 .staffordCareerCommandBriefGrid,
 .staffordCareerCommandPipelineGrid {
   display: grid;
@@ -3227,6 +3270,7 @@ textarea {
   .staffordCareerCommandBriefGrid,
   .staffordCareerCommandPipelineGrid,
   .staffordCareerCommandDetails,
+  .staffordManualSubmissionForm,
   .staffordCareerCommandRecommendation header,
   .staffordNextActionGrid,
   .staffordWorkspaceGrid,

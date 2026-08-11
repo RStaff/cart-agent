@@ -212,7 +212,19 @@ function ResumeDraftItem({
   );
 }
 
-function ResumeExportItem({ item }: { item: CareerOsDailyResumeExportItem }) {
+function ResumeExportItem({
+  item,
+  manualSubmissionAction,
+}: {
+  item: CareerOsDailyResumeExportItem;
+  manualSubmissionAction?: (formData: FormData) => void | Promise<void>;
+}) {
+  const canMarkSubmitted =
+    manualSubmissionAction &&
+    item.submissionStatus === "NOT_SUBMITTED" &&
+    item.docxCreated &&
+    item.downloadPath &&
+    item.validationIssueCount === 0;
   return (
     <article className="staffordCareerCommandRecommendation">
       <header>
@@ -234,8 +246,20 @@ function ResumeExportItem({ item }: { item: CareerOsDailyResumeExportItem }) {
         </div>
         <div>
           <dt>Submission</dt>
-          <dd>{item.submissionStatus}</dd>
+          <dd>{item.submissionStatus === "SUBMITTED" && item.submittedDate ? `SUBMITTED ${item.submittedDate}` : item.submissionStatus}</dd>
         </div>
+        {item.applicationId ? (
+          <div>
+            <dt>Application</dt>
+            <dd>{item.exactResumeArtifactKnown ? "Exact resume artifact linked" : "Resume linkage unknown"}</dd>
+          </div>
+        ) : null}
+        {item.followUpState ? (
+          <div>
+            <dt>Follow-up</dt>
+            <dd>{item.followUpState}</dd>
+          </div>
+        ) : null}
         <div>
           <dt>Validation</dt>
           <dd>{item.validationIssueCount} blocking issues</dd>
@@ -253,6 +277,27 @@ function ResumeExportItem({ item }: { item: CareerOsDailyResumeExportItem }) {
           </button>
         )}
       </footer>
+      {canMarkSubmitted ? (
+        <form className="staffordManualSubmissionForm" action={manualSubmissionAction}>
+          <input type="hidden" name="artifactVersionId" value={item.id} />
+          <label>
+            <span>Submitted Date</span>
+            <input name="submittedAt" type="date" required />
+          </label>
+          <label>
+            <span>Submission Channel</span>
+            <input name="submissionChannel" type="text" placeholder="Company careers site" />
+          </label>
+          <button type="submit" className="staffordJobCommandSecondaryAction">
+            Mark as Submitted
+          </button>
+          <p>Ross must have already submitted this application outside CareerOS.</p>
+        </form>
+      ) : item.submissionStatus === "SUBMITTED" ? (
+        <p className="staffordJobCommandControlNote">
+          Recorded after Ross confirmed manual submission. CareerOS did not submit or upload anything.
+        </p>
+      ) : null}
     </article>
   );
 }
@@ -272,11 +317,13 @@ export function JobCommandSurface({
   jobIntakeAction,
   resumeDraftAction,
   resumeExportAction,
+  manualSubmissionAction,
 }: {
   experience?: CareerOsDailyJobSearchExperience;
   jobIntakeAction?: (formData: FormData) => void | Promise<void>;
   resumeDraftAction?: (formData: FormData) => void | Promise<void>;
   resumeExportAction?: (formData: FormData) => void | Promise<void>;
+  manualSubmissionAction?: (formData: FormData) => void | Promise<void>;
 }) {
   const hasPriorities = experience.todaysPriorities.length > 0;
   const hasOpportunities = experience.topOpportunities.length > 0;
@@ -422,7 +469,7 @@ export function JobCommandSurface({
         {hasResumeExports ? (
           <div className="staffordCareerCommandRecommendationList">
             {experience.resumeExports.map((item) => (
-              <ResumeExportItem key={item.id} item={item} />
+              <ResumeExportItem key={item.id} item={item} manualSubmissionAction={manualSubmissionAction} />
             ))}
           </div>
         ) : (

@@ -12,6 +12,10 @@ const dailyPath = path.join(root, "staffordos/ui/operator-frontend/lib/staffordo
 const loaderPath = path.join(root, "staffordos/ui/operator-frontend/lib/staffordos/careerOsDailyJobSearchExperiencePrivateLoader.ts");
 const surfacePath = path.join(root, "staffordos/ui/operator-frontend/components/staffordos/JobCommandSurface.tsx");
 const routePath = path.join(root, "staffordos/ui/operator-frontend/app/os/professional/jobs/page.tsx");
+const manualSubmissionPath = path.join(
+  root,
+  "staffordos/ui/operator-frontend/lib/staffordos/manualSubmissionRecordAndArtifactLinkage.ts",
+);
 const exportRoutePath = path.join(
   root,
   "staffordos/ui/operator-frontend/app/os/professional/jobs/artifacts/[artifactVersionId]/docx/route.ts",
@@ -23,8 +27,16 @@ const dailySource = readFileSync(dailyPath, "utf8");
 const loaderSource = readFileSync(loaderPath, "utf8");
 const surfaceSource = readFileSync(surfacePath, "utf8");
 const routeSource = readFileSync(routePath, "utf8");
+const manualSubmissionSource = readFileSync(manualSubmissionPath, "utf8");
 const exportRouteSource = readFileSync(exportRoutePath, "utf8");
-const implementationSource = [dailySource, loaderSource, surfaceSource, routeSource, exportRouteSource].join("\n");
+const implementationSource = [
+  dailySource,
+  loaderSource,
+  surfaceSource,
+  routeSource,
+  manualSubmissionSource,
+  exportRouteSource,
+].join("\n");
 
 function registerTypeScriptRequire() {
   const originalTsExtension = Module._extensions[".ts"];
@@ -334,6 +346,34 @@ function resumeExportItem(overrides = {}) {
   };
 }
 
+function manualSubmissionItem(overrides = {}) {
+  return {
+    schemaVersion: "staffordos.careeros.manual_submission_read_model.v1",
+    applicationId: "application_ai_automation",
+    jobOpportunityId: "opp_apply",
+    applicationIntelligencePacketId: "packet_apply",
+    artifactVersionId: "artifact_resume_export",
+    company: "Example Automation",
+    role: "AI Automation Product Manager",
+    submittedDate: "2026-08-11",
+    currentStage: "SUBMITTED_MANUAL_EXTERNAL",
+    resumeArtifactFilename: "Ross_Stafford_Example_Automation_AI_Automation_Product_Manager_Resume_v1.docx",
+    resumeArtifactVersion: 1,
+    exactResumeArtifactKnown: true,
+    sourceUrlKnown: true,
+    followUpState: "NOT_DUE",
+    followUpDueDateKnown: true,
+    nextAction: "NO_ACTION",
+    submissionStatus: "SUBMITTED",
+    privatePathVisible: false,
+    rawResumeVisible: false,
+    rawJobTextVisible: false,
+    sourceUrlVisible: false,
+    limitations: ["Synthetic manual submission fixture."],
+    ...overrides,
+  };
+}
+
 function writeJson(filePath, value) {
   mkdirSync(path.dirname(filePath), { recursive: true });
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
@@ -456,6 +496,25 @@ test("reviewed resume export read models expose DOCX download without private co
   assert.match(exportRouteSource, /readLatestDocxExport/);
 });
 
+test("manual submission read model marks exact exported resume artifact as submitted", () => {
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    resumeExportReadModel: [resumeExportItem()],
+    manualSubmissionReadModel: [manualSubmissionItem()],
+  });
+  const item = experience.resumeExports[0];
+
+  assert.equal(item.submissionStatus, "SUBMITTED");
+  assert.equal(item.submittedDate, "2026-08-11");
+  assert.equal(item.applicationId, "application_ai_automation");
+  assert.equal(item.exactResumeArtifactKnown, true);
+  assert.equal(item.nextAction, "No Action");
+  assert.equal(experience.todaysPriorities.some((priority) => priority.action === "Download DOCX"), false);
+  assert.equal(experience.applicationWork.some((work) => work.id === "submission:application_ai_automation"), true);
+  assert.match(surfaceSource, /Mark as Submitted/);
+  assert.match(routeSource, /runManualSubmissionRecordAndArtifactLinkageFromPrivateArtifacts/);
+});
+
 test("private loader reads latest governed artifacts and degrades when optional outputs are absent", () => {
   const privateRoot = mkdtempSync(path.join(tmpdir(), "careeros-v1-private-"));
   const jobSearchRoot = path.join(privateRoot, "job-search");
@@ -513,11 +572,33 @@ test("private loader reads latest governed artifacts and degrades when optional 
 
   assert.equal(result.loadedArtifacts.applicationPipeline, true);
   assert.equal(result.loadedArtifacts.applicationEngagement, true);
+  assert.equal(result.loadedArtifacts.manualSubmissionArtifactLinks, false);
   assert.equal(result.loadedArtifacts.opportunityRecommendations, false);
   assert.equal(result.experience.applicationPipeline.find((item) => item.id === "applied").value, 2);
   assert.equal(result.experience.todaysPriorities[0].action, "Follow Up");
   assert.equal(result.auditSummary.noProviderCalled, true);
   assert.equal(result.auditSummary.noNewPrivateDataRoute, true);
+});
+
+test("private loader overlays manual submission artifact links when available", () => {
+  const privateRoot = mkdtempSync(path.join(tmpdir(), "careeros-v1-submitted-"));
+  const jobSearchRoot = path.join(privateRoot, "job-search");
+  writeJson(
+    path.join(jobSearchRoot, "application-artifact-exports", "run_20260811", "resume_export_read_model.json"),
+    [resumeExportItem()],
+  );
+  writeJson(
+    path.join(jobSearchRoot, "applications", "careeros-v1-04-submissions", "run_20260811", "manual_submission_read_model.json"),
+    [manualSubmissionItem()],
+  );
+
+  const result = loader.loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts({ jobSearchRoot });
+
+  assert.equal(result.loadedArtifacts.reviewedResumeDraftExports, true);
+  assert.equal(result.loadedArtifacts.manualSubmissionArtifactLinks, true);
+  assert.equal(result.experience.resumeExports[0].submissionStatus, "SUBMITTED");
+  assert.equal(result.experience.resumeExports[0].exactResumeArtifactKnown, true);
+  assert.equal(result.auditSummary.noApplicationSubmitted, true);
 });
 
 test("private loader connects redacted Greenhouse discovery status without provider calls", () => {
