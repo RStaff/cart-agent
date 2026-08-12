@@ -149,6 +149,7 @@ export type ApplicationArtifactVersion = {
   draft: TruthBoundStructuredResumeDraft;
   claimTraceability: TruthBoundResumeDraftClaim[];
   validationIssues: TruthBoundResumeDraftValidationIssue[];
+  omittedUnsupportedClaimCount: number;
   safetyState: ResumeDraftSafetyState;
   operatorApprovalState: ApplicationArtifactOperatorApprovalState;
   humanReviewRequired: true;
@@ -379,6 +380,33 @@ function isEvidenceBackedLimitedFact(fact: Partial<CareerFact> | Record<string, 
   return factVerificationStatus(fact) === "PROPOSED";
 }
 
+function isGenericSafePositioning(text: string) {
+  return (
+    /^Position as adjacent or transferable experience; do not claim exact same-role experience\.$/i.test(text) ||
+    /^Use limited wording that preserves scope, recency, depth, and unresolved limitations\.$/i.test(text) ||
+    /^May be used with evidence-cited wording and no expansion beyond the verified fact\.$/i.test(text)
+  );
+}
+
+function claimTextForSupport(input: {
+  safePositioning: string;
+  usableFacts: readonly (Partial<CareerFact> | Record<string, unknown>)[];
+}) {
+  const safePositioning = input.safePositioning.trim();
+  if (safePositioning && !isGenericSafePositioning(safePositioning)) return safePositioning;
+  return input.usableFacts.map(factStatement).find(Boolean) || safePositioning;
+}
+
+function uniqueClaimsByText(claims: readonly TruthBoundResumeDraftClaim[]) {
+  const seen = new Set<string>();
+  return claims.filter((claim) => {
+    const key = claim.draftText.trim().toLowerCase();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function factHasMetricAuthority(fact: Partial<CareerFact> | Record<string, unknown> | null) {
   if (!fact) return false;
   const record = fact as Record<string, unknown>;
@@ -473,26 +501,34 @@ function selectedPacketClaims(input: {
 }) {
   const claims: TruthBoundResumeDraftClaim[] = [];
   const issues: TruthBoundResumeDraftValidationIssue[] = [];
-  const omittedUnsupportedClaimCount = input.packet.gapsAndRisks.unsupportedRequirements.length +
+  let omittedUnsupportedClaimCount = input.packet.gapsAndRisks.unsupportedRequirements.length +
     input.packet.resume.unsupportedClaims.length;
 
   for (const support of input.packet.verifiedCareerEvidence.supportingEvidence) {
     if (support.disposition !== "SUPPORTED" && support.disposition !== "SUPPORTED_WITH_LIMITATION") continue;
     const factIds = uniqueSorted(support.careerFactIds);
-    const evidenceIds = uniqueSorted(support.careerEvidenceIds);
     const referencedFacts = factIds
       .map((id) => input.careerFacts.get(id) || null)
       .filter((fact): fact is Partial<CareerFact> => Boolean(fact));
+    const evidenceIds = uniqueSorted([
+      ...support.careerEvidenceIds,
+      ...referencedFacts.flatMap(sourceEvidenceIds),
+    ]);
     const supportedFacts = referencedFacts.filter(isSupportedFact);
-    const limitedFacts = referencedFacts.filter(isEvidenceBackedLimitedFact);
     const linkedEvidence = evidenceIds
       .map((id) => input.careerEvidence.get(id) || null)
       .filter((item): item is Partial<CareerEvidence> => Boolean(item));
-    const usableFacts = supportedFacts.length ? supportedFacts : limitedFacts;
+    const primaryFact = supportedFacts.find((fact) => Boolean(factStatement(fact))) || supportedFacts[0] || null;
+    const usableFacts = primaryFact ? [primaryFact] : [];
+    const usableFactIds = uniqueSorted(usableFacts.map(factId));
+    const linkedEvidenceForUsableFacts = linkedEvidence.filter((item) =>
+      evidenceSupportsFactIds(item).some((id) => usableFactIds.includes(id))
+    );
+    const linkedEvidenceIds = uniqueSorted(linkedEvidenceForUsableFacts.map(evidenceId).filter(Boolean));
     const factTypes = usableFacts.map((fact) => factType(fact));
-    const text = support.safePositioning.trim();
-    if (!text) continue;
-    const claimId = opaqueId("privdraftclaim", [input.packet.packetId, support.requirementId, text]);
+    const positioningText = support.safePositioning.trim();
+    const claimSeed = positioningText || support.requirementId || factIds.join(":");
+    const claimId = opaqueId("privdraftclaim", [input.packet.packetId, support.requirementId, claimSeed]);
     if (!factIds.length) {
       issues.push({
         issueId: opaqueId("privdraftissue", [claimId, "missing_fact"]),
@@ -502,6 +538,10 @@ function selectedPacketClaims(input: {
         message: "A packet support item lacked a CareerFact reference and was not used as resume wording.",
         limitations: ["Resume draft claims require CareerFact traceability."],
       });
+      continue;
+    }
+    if (!usableFacts.length) {
+      omittedUnsupportedClaimCount += 1;
       continue;
     }
     if (!evidenceIds.length) {
@@ -515,30 +555,24 @@ function selectedPacketClaims(input: {
       });
       continue;
     }
-    if (linkedEvidence.length !== evidenceIds.length) {
+    if (!linkedEvidenceIds.length) {
       issues.push({
         issueId: opaqueId("privdraftissue", [claimId, "missing_evidence_metadata"]),
         claimId,
         code: "MISSING_CAREER_EVIDENCE_REFERENCE",
         severity: "REVIEW",
-        message: "A packet support item referenced CareerEvidence that is not available in loaded authority and was not used as resume wording.",
-        limitations: ["Resume draft claims require loaded CareerEvidence authority, not just copied evidence IDs."],
+        message: "A packet support item did not resolve to loaded CareerEvidence authority and was not used as resume wording.",
+        limitations: ["Resume draft claims require loaded CareerEvidence authority, not just copied or stale evidence IDs."],
       });
       continue;
     }
-    if (!usableFacts.length) {
-      issues.push({
-        issueId: opaqueId("privdraftissue", [claimId, "missing_metadata"]),
-        claimId,
-        code: "MISSING_CANONICAL_AUTHORITY_METADATA",
-        severity: "REVIEW",
-        message: "CareerFact metadata was not available or not supported enough for this claim.",
-        limitations: ["The packet may reference authority IDs, but the draft validator requires supported or evidence-backed limited CareerFact metadata before user-facing wording is created."],
-      });
-      continue;
-    }
+    const text = claimTextForSupport({
+      safePositioning: support.safePositioning,
+      usableFacts,
+    });
+    if (!text) continue;
     const supportedByEvidence = new Set(linkedEvidence.flatMap(evidenceSupportsFactIds));
-    if (!factIds.some((id) => supportedByEvidence.has(id))) {
+    if (!usableFactIds.some((id) => supportedByEvidence.has(id))) {
       issues.push({
         issueId: opaqueId("privdraftissue", [claimId, "evidence_does_not_support_fact"]),
         claimId,
@@ -548,16 +582,6 @@ function selectedPacketClaims(input: {
         limitations: ["CareerEvidence must explicitly support at least one referenced CareerFact before the wording is draft-ready."],
       });
       continue;
-    }
-    if (!supportedFacts.length && limitedFacts.length) {
-      issues.push({
-        issueId: opaqueId("privdraftissue", [claimId, "limited_fact_requires_review"]),
-        claimId,
-        code: "MISSING_CANONICAL_AUTHORITY_METADATA",
-        severity: "REVIEW",
-        message: "A packet support item used evidence-backed proposed CareerFact authority and requires review before export.",
-        limitations: ["The draft may preserve limited wording for review, but it cannot become DRAFT_READY_FOR_REVIEW until the CareerFact is promoted or otherwise verified."],
-      });
     }
     if (containsNumericMetricClaim(text) && !supportedFacts.some(factHasMetricAuthority)) {
       issues.push({
@@ -576,43 +600,14 @@ function selectedPacketClaims(input: {
       draftText: text,
       disposition: support.disposition,
       packetRequirementIds: [support.requirementId],
-      careerFactIds: factIds,
-      careerEvidenceIds: evidenceIds,
+      careerFactIds: usableFactIds,
+      careerEvidenceIds: linkedEvidenceIds,
       sourcePacketId: input.packet.packetId,
       generatedFrom: "CAREEROS_SAFE_POSITIONING",
       limitations: uniqueSorted([
         "Generated from existing CareerOS safe positioning; not from resume self-validation.",
         ...support.limitations,
       ]),
-    });
-  }
-
-  for (const requirement of input.packet.gapsAndRisks.unsupportedRequirements) {
-    issues.push({
-      issueId: opaqueId("privdraftissue", [input.packet.packetId, requirement.requirementId, "unsupported_requirement"]),
-      claimId: null,
-      code: "UNSUPPORTED_REQUIREMENT_REMAINS",
-      severity: "REVIEW",
-      message: "An unsupported job requirement remains outside the draft.",
-      limitations: [
-        requirement.requirementText,
-        "Unsupported requirements are not transformed into resume claims.",
-      ],
-    });
-  }
-
-  for (const blocker of input.packet.resume.unsupportedClaims) {
-    issues.push({
-      issueId: opaqueId("privdraftissue", [input.packet.packetId, blocker.claimId, "resume_blocker"]),
-      claimId: blocker.claimId,
-      code: "RESUME_CLAIM_BLOCKER_REMAINS",
-      severity: "REVIEW",
-      message: "A historical ResumeVersion claim blocker remains separate from the generated draft.",
-      limitations: [
-        blocker.safeClaimSummary,
-        "Historical ResumeVersion wording is not used as career truth.",
-        ...blocker.limitations,
-      ],
     });
   }
 
@@ -656,8 +651,8 @@ function employmentEntries(input: {
   }
   return [...employmentFacts.entries()]
     .map(([id, fact]) => {
-      const bullets = input.claims
-        .filter((claim) => claim.careerFactIds.includes(id))
+      const factClaims = uniqueClaimsByText(input.claims.filter((claim) => claim.careerFactIds.includes(id)));
+      const bullets = factClaims
         .map((claim) => claim.draftText)
         .slice(0, 4);
       return {
@@ -666,7 +661,7 @@ function employmentEntries(input: {
         startDate: optionalText((fact as Record<string, unknown>).startDate),
         endDate: optionalText((fact as Record<string, unknown>).endDate),
         bullets,
-        claimIds: input.claims.filter((claim) => bullets.includes(claim.draftText)).map((claim) => claim.claimId),
+        claimIds: factClaims.slice(0, 4).map((claim) => claim.claimId),
         limitations: [
           "Employer, title, and dates are included only when present on supported CareerFact authority.",
           ...stringArray((fact as Record<string, unknown>).limitations),
@@ -678,7 +673,7 @@ function employmentEntries(input: {
 }
 
 function projectEntries(claims: readonly TruthBoundResumeDraftClaim[]): TruthBoundResumeDraftProjectEntry[] {
-  const projectClaims = claims.filter((claim) => claim.section === "projects");
+  const projectClaims = uniqueClaimsByText(claims.filter((claim) => claim.section === "projects"));
   return projectClaims.slice(0, 6).map((claim) => ({
     label: "Selected supported project or product evidence",
     bullets: [claim.draftText],
@@ -710,7 +705,8 @@ function buildDraft(input: {
   claims: readonly TruthBoundResumeDraftClaim[];
   careerFacts: Map<string, Partial<CareerFact>>;
 }): TruthBoundStructuredResumeDraft {
-  const summaryClaims = input.claims.slice(0, 3);
+  const uniqueClaims = uniqueClaimsByText(input.claims);
+  const summaryClaims = uniqueClaims.slice(0, 3);
   return {
     summary: summaryClaims.map((claim) => claim.draftText),
     skills: buildSkillClaims({ claims: input.claims, careerFacts: input.careerFacts }),
@@ -853,6 +849,9 @@ function artifactForPacket(input: {
     draft,
     claimTraceability: selected.claims,
     validationIssues: selected.issues,
+    omittedUnsupportedClaimCount:
+      selected.omittedUnsupportedClaimCount +
+      selected.issues.filter((issue) => issue.code === "UNSUPPORTED_METRIC_OMITTED").length,
     safetyState: state,
     operatorApprovalState: "PENDING_REVIEW",
     humanReviewRequired: true,
@@ -906,11 +905,7 @@ function readModelFor(artifact: ApplicationArtifactVersion): TruthBoundResumeDra
     artifact.draft.education.length,
     artifact.draft.certifications.length,
   ].filter((count) => count > 0).length;
-  const omittedUnsupportedClaimCount = artifact.validationIssues.filter((issue) =>
-    issue.code === "UNSUPPORTED_METRIC_OMITTED" ||
-    issue.code === "UNSUPPORTED_REQUIREMENT_REMAINS" ||
-    issue.code === "RESUME_CLAIM_BLOCKER_REMAINS",
-  ).length;
+  const omittedUnsupportedClaimCount = artifact.omittedUnsupportedClaimCount || 0;
   return {
     schemaVersion: TRUTH_BOUND_RESUME_DRAFT_READ_MODEL_SCHEMA_VERSION,
     artifactVersionId: artifact.artifactVersionId,
@@ -1000,12 +995,7 @@ export function buildTruthBoundResumeDrafts(input: TruthBoundResumeDraftInput): 
       approvedForExport: 0,
       tracedClaims: artifactVersions.reduce((sum, artifact) => sum + artifact.claimTraceability.length, 0),
       omittedUnsupportedClaims: artifactVersions.reduce(
-        (sum, artifact) =>
-          sum + artifact.validationIssues.filter((issue) =>
-            issue.code === "UNSUPPORTED_METRIC_OMITTED" ||
-            issue.code === "UNSUPPORTED_REQUIREMENT_REMAINS" ||
-            issue.code === "RESUME_CLAIM_BLOCKER_REMAINS",
-          ).length,
+        (sum, artifact) => sum + (artifact.omittedUnsupportedClaimCount || 0),
         0,
       ),
       applicationsCreated: 0,

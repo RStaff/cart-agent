@@ -281,7 +281,7 @@ test("truth-bound draft uses verified CareerFact and CareerEvidence instead of R
   assert.match(artifact.draft.summary[0], /AI automation workflows/);
 });
 
-test("unsupported job requirements are omitted and retained as review issues", () => {
+test("unsupported job requirements are omitted and counted without blocking export review", () => {
   const result = build({
     packet: {
       unsupportedRequirements: [
@@ -301,9 +301,119 @@ test("unsupported job requirements are omitted and retained as review issues", (
     },
   });
 
-  assert.equal(result.artifactVersions[0].safetyState, "DRAFT_NEEDS_EVIDENCE_REVIEW");
-  assert.ok(result.artifactVersions[0].validationIssues.some((issue) => issue.code === "UNSUPPORTED_REQUIREMENT_REMAINS"));
+  assert.equal(result.artifactVersions[0].safetyState, "DRAFT_READY_FOR_REVIEW");
+  assert.equal(result.artifactVersions[0].omittedUnsupportedClaimCount, 1);
+  assert.equal(result.summary.omittedUnsupportedClaims, 1);
+  assert.equal(result.artifactVersions[0].validationIssues.some((issue) => issue.code === "UNSUPPORTED_REQUIREMENT_REMAINS"), false);
   assert.doesNotMatch(JSON.stringify(result.artifactVersions[0].draft), /newsroom editorial/);
+});
+
+test("promoted CareerFact source evidence can refresh stale packet evidence references", () => {
+  const result = build({
+    packet: {
+      supportingEvidence: [
+        support({
+          careerEvidenceIds: ["stale_packet_evidence"],
+          safePositioning: "Position as adjacent or transferable experience; do not claim exact same-role experience.",
+        }),
+      ],
+    },
+    careerFacts: [
+      careerFact({
+        statement: "Architected governed AI automation workflows with source-of-truth controls and approval boundaries.",
+        sourceEvidenceIds: ["career_evidence_ai_automation"],
+      }),
+    ],
+    careerEvidence: [
+      careerEvidence({
+        supportsFactIds: ["career_fact_ai_automation"],
+      }),
+    ],
+  });
+  const artifact = result.artifactVersions[0];
+
+  assert.equal(artifact.safetyState, "DRAFT_READY_FOR_REVIEW");
+  assert.equal(artifact.claimTraceability[0].careerEvidenceIds.includes("career_evidence_ai_automation"), true);
+  assert.match(JSON.stringify(artifact.draft), /Architected governed AI automation workflows/);
+  assert.doesNotMatch(JSON.stringify(artifact.draft), /Position as adjacent or transferable/);
+});
+
+test("multi-fact support rows bind draft wording to one supported fact without cross-employer contamination", () => {
+  const result = build({
+    packet: {
+      supportingEvidence: [
+        support({
+          requirementId: "requirement_cross_functional",
+          careerFactIds: ["a_navy_fact", "b_csi_fact"],
+          careerEvidenceIds: [],
+          safePositioning: "Position as adjacent or transferable experience; do not claim exact same-role experience.",
+        }),
+        support({
+          requirementId: "requirement_csi_automation",
+          careerFactIds: ["b_csi_fact"],
+          careerEvidenceIds: [],
+          safePositioning: "Position as adjacent or transferable experience; do not claim exact same-role experience.",
+        }),
+        support({
+          requirementId: "requirement_product_roadmap",
+          careerFactIds: ["c_product_fact"],
+          careerEvidenceIds: [],
+          safePositioning: "Position as adjacent or transferable experience; do not claim exact same-role experience.",
+        }),
+        support({
+          requirementId: "requirement_product_governance",
+          careerFactIds: ["c_product_fact"],
+          careerEvidenceIds: [],
+          safePositioning: "Position as adjacent or transferable experience; do not claim exact same-role experience.",
+        }),
+      ],
+    },
+    careerFacts: [
+      careerFact({
+        id: "a_navy_fact",
+        factType: "EMPLOYMENT",
+        statement: "Example Employer A stakeholder requirements and automation work.",
+        organization: "Example Employer A",
+        roleOrTitle: "Solutions Architect",
+        technologyOrSkill: "Automation requirements",
+        sourceEvidenceIds: ["evidence_navy"],
+      }),
+      careerFact({
+        id: "b_csi_fact",
+        factType: "EMPLOYMENT",
+        statement: "Example Employer B CRM automation and lifecycle workflow coordination.",
+        organization: "Example Employer B",
+        roleOrTitle: "Project Manager for Technology Solutions",
+        technologyOrSkill: "CRM automation",
+        sourceEvidenceIds: ["evidence_csi"],
+      }),
+      careerFact({
+        id: "c_product_fact",
+        factType: "PRODUCT",
+        statement: "StaffordOS product roadmap, requirements, and governed AI automation workflows.",
+        technologyOrSkill: "AI automation product operations",
+        sourceEvidenceIds: ["evidence_product"],
+      }),
+    ],
+    careerEvidence: [
+      careerEvidence({ id: "evidence_navy", supportsFactIds: ["a_navy_fact"] }),
+      careerEvidence({ id: "evidence_csi", supportsFactIds: ["b_csi_fact"] }),
+      careerEvidence({ id: "evidence_product", supportsFactIds: ["c_product_fact"] }),
+    ],
+  });
+  const artifact = result.artifactVersions[0];
+  const employerA = artifact.draft.experience.find((entry) => entry.employer === "Example Employer A");
+  const employerB = artifact.draft.experience.find((entry) => entry.employer === "Example Employer B");
+
+  assert.equal(artifact.safetyState, "DRAFT_READY_FOR_REVIEW");
+  assert.ok(employerA);
+  assert.ok(employerB);
+  assert.deepEqual(employerA.bullets, ["Example Employer A stakeholder requirements and automation work."]);
+  assert.deepEqual(employerB.bullets, ["Example Employer B CRM automation and lifecycle workflow coordination."]);
+  assert.equal(artifact.draft.projects.length, 1);
+  assert.deepEqual(artifact.draft.projects[0].bullets, [
+    "StaffordOS product roadmap, requirements, and governed AI automation workflows.",
+  ]);
 });
 
 test("unsupported numeric metrics are excluded from draft claims", () => {
@@ -350,7 +460,7 @@ test("verified metric authority may support numeric wording", () => {
   assert.match(JSON.stringify(result.artifactVersions[0].draft), /30%/);
 });
 
-test("evidence-backed proposed CareerFacts produce review-only draft wording", () => {
+test("evidence-backed proposed CareerFacts are omitted until promoted", () => {
   const result = build({
     careerFacts: [
       careerFact({
@@ -368,10 +478,11 @@ test("evidence-backed proposed CareerFacts produce review-only draft wording", (
   });
   const artifact = result.artifactVersions[0];
 
-  assert.equal(artifact.safetyState, "DRAFT_NEEDS_EVIDENCE_REVIEW");
-  assert.equal(artifact.claimTraceability.length, 1);
-  assert.ok(artifact.validationIssues.some((issue) => issue.code === "MISSING_CANONICAL_AUTHORITY_METADATA"));
-  assert.match(JSON.stringify(artifact.draft), /AI automation workflows/);
+  assert.equal(artifact.safetyState, "DRAFT_BLOCKED");
+  assert.equal(artifact.claimTraceability.length, 0);
+  assert.equal(artifact.omittedUnsupportedClaimCount, 1);
+  assert.ok(artifact.validationIssues.some((issue) => issue.code === "NO_TRACEABLE_SUPPORTED_CLAIMS"));
+  assert.doesNotMatch(JSON.stringify(artifact.draft), /AI automation workflows/);
 });
 
 test("chronology fields are preserved only when supplied by CareerFact authority", () => {
@@ -454,6 +565,11 @@ test("artifact versioning is deterministic and records supersession", () => {
 
 test("missing CareerEvidence reference blocks user-facing draft wording", () => {
   const result = build({
+    careerFacts: [
+      careerFact({
+        sourceEvidenceIds: [],
+      }),
+    ],
     packet: {
       supportingEvidence: [
         support({
