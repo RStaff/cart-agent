@@ -474,6 +474,19 @@ function ResumeDraftItem({
         <summary>View Resume Draft</summary>
         {hasDraftContent ? (
           <div className="staffordCareerResumeDraftBody">
+            {item.sections.header ? (
+              <section aria-label="Resume Header">
+                <h4>{item.sections.header.name}</h4>
+                <p>
+                  {[item.sections.header.location, item.sections.header.email, item.sections.header.phone]
+                    .filter(Boolean)
+                    .join(" | ")}
+                </p>
+                {item.sections.header.links.length ? (
+                  <p>{item.sections.header.links.map((link) => `${link.label}: ${link.url}`).join(" | ")}</p>
+                ) : null}
+              </section>
+            ) : null}
             {item.sections.summary.length ? (
               <section>
                 <h4>Professional Summary</h4>

@@ -64,6 +64,14 @@ export type TruthBoundResumeDraftSectionName =
   | "education"
   | "certifications";
 
+export type TruthBoundResumeIdentity = {
+  name: string;
+  email: string | null;
+  phone: string | null;
+  location: string | null;
+  links: Array<{ label: string; url: string }>;
+};
+
 export type TruthBoundResumeDraftClaim = {
   claimId: string;
   section: TruthBoundResumeDraftSectionName;
@@ -98,6 +106,7 @@ export type TruthBoundResumeDraftProjectEntry = {
 };
 
 export type TruthBoundStructuredResumeDraft = {
+  header: TruthBoundResumeIdentity | null;
   summary: string[];
   skills: string[];
   experience: TruthBoundResumeDraftExperienceEntry[];
@@ -248,6 +257,7 @@ export type TruthBoundResumeDraftReviewReadModelRecord = {
   reviewIssueCount: number;
   omittedUnsupportedClaimCount: number;
   sections: {
+    header: TruthBoundResumeIdentity | null;
     summary: string[];
     skills: string[];
     experience: TruthBoundResumeDraftReviewExperienceEntry[];
@@ -332,6 +342,7 @@ export type TruthBoundResumeDraftInput = {
   packetResult: ApplicationIntelligencePacketResult;
   careerFacts?: readonly Partial<CareerFact>[];
   careerEvidence?: readonly Partial<CareerEvidence>[];
+  resumeIdentity?: TruthBoundResumeIdentity | null;
   previousArtifactVersions?: readonly Partial<ApplicationArtifactVersion>[];
   packetIds?: readonly string[];
   limit?: number;
@@ -388,6 +399,31 @@ function stringArray(value: unknown): string[] {
   return Array.isArray(value)
     ? value.filter((item): item is string => typeof item === "string" && item.trim().length > 0)
     : [];
+}
+
+function safeResumeIdentity(value: unknown): TruthBoundResumeIdentity | null {
+  if (!isRecord(value) || value.operatorConfirmed !== true) return null;
+  const name = optionalText(value.professionalName);
+  if (!name) return null;
+  const contact = isRecord(value.contact) ? value.contact : {};
+  const links = Array.isArray(value.links)
+    ? value.links
+        .filter(isRecord)
+        .map((link) => ({
+          label: optionalText(link.label),
+          url: optionalText(link.url),
+        }))
+        .filter((link): link is { label: string; url: string } =>
+          Boolean(link.label && link.url && /^https:\/\//i.test(link.url) && !/\.private|\.local|\/Users\/|\/home\//i.test(link.url)),
+        )
+    : [];
+  return {
+    name,
+    email: optionalText(contact.email),
+    phone: optionalText(contact.phone),
+    location: optionalText(contact.location),
+    links,
+  };
 }
 
 function uniqueSorted(values: readonly (string | null | undefined)[]) {
@@ -792,6 +828,37 @@ function selectedPacketClaims(input: {
       });
     });
 
+  // Education and certifications are resume sections, not role-fit claims.
+  // Include them only from supported canonical authority with explicit evidence.
+  [...input.careerFacts.values()]
+    .filter((fact) => isSupportedFact(fact) && (factType(fact) === "EDUCATION" || factType(fact) === "CERTIFICATION"))
+    .forEach((fact) => {
+      const id = factId(fact);
+      const text = factStatement(fact);
+      if (!id || !text || containsInternalResumeLanguage(text)) return;
+      const linkedEvidenceIds = uniqueSorted(
+        sourceEvidenceIds(fact)
+          .map((sourceId) => input.careerEvidence.get(sourceId) || null)
+          .filter((item): item is Partial<CareerEvidence> => Boolean(item))
+          .filter((item) => evidenceSupportsFactIds(item).includes(id))
+          .map(evidenceId)
+          .filter(Boolean),
+      );
+      if (!linkedEvidenceIds.length) return;
+      claims.push({
+        claimId: opaqueId("privdraftclaim", [input.packet.packetId, "canonical_resume_field", id]),
+        section: sectionForFactTypes([factType(fact)]),
+        draftText: text,
+        disposition: "SUPPORTED",
+        packetRequirementIds: [],
+        careerFactIds: [id],
+        careerEvidenceIds: linkedEvidenceIds,
+        sourcePacketId: input.packet.packetId,
+        generatedFrom: "CAREERFACT_FIELD",
+        limitations: ["Included from supported canonical resume authority; no additional credential or education detail was inferred."],
+      });
+    });
+
   if (!claims.length) {
     issues.push({
       issueId: opaqueId("privdraftissue", [input.packet.packetId, "no_traceable_claims"]),
@@ -885,10 +952,12 @@ function buildDraft(input: {
   packet: ApplicationIntelligencePacket;
   claims: readonly TruthBoundResumeDraftClaim[];
   careerFacts: Map<string, Partial<CareerFact>>;
+  resumeIdentity: TruthBoundResumeIdentity | null;
 }): TruthBoundStructuredResumeDraft {
   const uniqueClaims = uniqueClaimsByText(input.claims);
   const summaryClaims = uniqueClaims.slice(0, 3);
   return {
+    header: input.resumeIdentity,
     summary: summaryClaims.map((claim) => claim.draftText),
     skills: buildSkillClaims({ claims: input.claims, careerFacts: input.careerFacts }),
     experience: employmentEntries({ claims: input.claims, careerFacts: input.careerFacts }),
@@ -968,6 +1037,7 @@ function artifactForPacket(input: {
   careerFacts: Map<string, Partial<CareerFact>>;
   careerEvidence: Map<string, Partial<CareerEvidence>>;
   previousArtifactVersions: readonly Partial<ApplicationArtifactVersion>[];
+  resumeIdentity: TruthBoundResumeIdentity | null;
 }): ApplicationArtifactVersion {
   const selected = selectedPacketClaims({
     packet: input.packet,
@@ -978,6 +1048,7 @@ function artifactForPacket(input: {
     packet: input.packet,
     claims: selected.claims,
     careerFacts: input.careerFacts,
+    resumeIdentity: input.resumeIdentity,
   });
   const state = safetyStateFor({ claims: selected.claims, issues: selected.issues });
   const version = nextVersion({
@@ -1194,6 +1265,7 @@ function reviewReadModelFor(artifact: ApplicationArtifactVersion): TruthBoundRes
     reviewIssueCount,
     omittedUnsupportedClaimCount: artifact.omittedUnsupportedClaimCount || 0,
     sections: {
+      header: artifact.draft.header,
       summary: sanitizeReviewTextList(artifact.draft.summary),
       skills: sanitizeReviewTextList(artifact.draft.skills),
       experience: artifact.draft.experience.map((entry) => ({
@@ -1264,6 +1336,7 @@ export function buildTruthBoundResumeDrafts(input: TruthBoundResumeDraftInput): 
       careerFacts: maps.facts,
       careerEvidence: maps.evidence,
       previousArtifactVersions: input.previousArtifactVersions || [],
+      resumeIdentity: input.resumeIdentity || null,
     }),
   );
 
@@ -1442,10 +1515,29 @@ export function loadPrivateCareerAuthorityForDrafts(input: {
     DEFAULT_PROFESSIONAL_CAREER_PRIVATE_ROOT,
     jobSearchRoot,
   ]);
-  return loadHighValueCareerEvidenceStore({
+  const store = loadHighValueCareerEvidenceStore({
     careerRoots,
     repositoryRoot,
   });
+  let resumeIdentity: TruthBoundResumeIdentity | null = null;
+  const visit = (directory: string) => {
+    if (!existsSync(directory)) return;
+    for (const entry of readdirSync(directory)) {
+      const entryPath = path.join(directory, entry);
+      let isDirectory = false;
+      try { isDirectory = statSync(entryPath).isDirectory(); } catch (_error) { continue; }
+      if (isDirectory) { visit(entryPath); continue; }
+      if (entry !== "resume_identity_authority.private.json") continue;
+      try {
+        const candidate = safeResumeIdentity(readJson(entryPath));
+        if (candidate) resumeIdentity = candidate;
+      } catch (_error) {
+        // Ignore malformed private identity records and fail closed.
+      }
+    }
+  };
+  careerRoots.forEach(visit);
+  return { ...store, resumeIdentity };
 }
 
 export function buildTruthBoundResumeDraftCliSummary(
@@ -1493,6 +1585,7 @@ export function runTruthBoundResumeDraftsFromPrivateArtifacts(input: {
     packetResult,
     careerFacts: careerStore.facts as Partial<CareerFact>[],
     careerEvidence: careerStore.evidence as Partial<CareerEvidence>[],
+    resumeIdentity: careerStore.resumeIdentity,
     previousArtifactVersions: loadLatestApplicationArtifactVersions(jobSearchRoot),
     packetIds: input.packetIds,
     limit: input.limit ?? 1,

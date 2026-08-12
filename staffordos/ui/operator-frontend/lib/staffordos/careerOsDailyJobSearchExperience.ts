@@ -239,6 +239,13 @@ export type CareerOsDailyResumeDraftItem = {
   reviewIssueCount: number;
   omittedUnsupportedClaimCount: number;
   sections: {
+    header: {
+      name: string;
+      email: string | null;
+      phone: string | null;
+      location: string | null;
+      links: Array<{ label: string; url: string }>;
+    } | null;
     summary: string[];
     skills: string[];
     experience: Array<{
@@ -837,6 +844,7 @@ function resumeDrafts(input: CareerOsDailyJobSearchExperienceInput): CareerOsDai
       reviewIssueCount: item.reviewIssueCount,
       omittedUnsupportedClaimCount: item.omittedUnsupportedClaimCount,
       sections: {
+        header: null,
         summary: [],
         skills: [],
         experience: [],

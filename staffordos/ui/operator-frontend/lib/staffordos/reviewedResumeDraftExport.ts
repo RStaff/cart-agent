@@ -311,7 +311,12 @@ export function buildResumeDocxFilename(input: {
 }
 
 function textLinesFromDraft(draft: TruthBoundStructuredResumeDraft) {
-  const lines: string[] = [OWNER_DISPLAY_NAME];
+  const lines: string[] = [draft.header?.name || OWNER_DISPLAY_NAME];
+  if (draft.header) {
+    const contactLine = [draft.header.location, draft.header.email, draft.header.phone].filter(Boolean).join(" | ");
+    if (contactLine) lines.push(contactLine);
+    lines.push(...draft.header.links.map((link) => `${link.label}: ${link.url}`));
+  }
   if (draft.summary.length) {
     lines.push("PROFESSIONAL SUMMARY", ...draft.summary);
   }

@@ -264,6 +264,7 @@ function build(overrides = {}) {
     packetResult: overrides.packetResult || packetResult(overrides),
     careerFacts: overrides.careerFacts || [careerFact()],
     careerEvidence: overrides.careerEvidence || [careerEvidence()],
+    resumeIdentity: overrides.resumeIdentity || null,
     previousArtifactVersions: overrides.previousArtifactVersions || [],
     limit: overrides.limit || 1,
   });
@@ -279,6 +280,81 @@ test("truth-bound draft uses verified CareerFact and CareerEvidence instead of R
   assert.equal(artifact.safetyState, "DRAFT_READY_FOR_REVIEW");
   assert.equal(artifact.claimTraceability.length, 1);
   assert.match(artifact.draft.summary[0], /AI automation workflows/);
+});
+
+test("operator-confirmed resume identity, education, and documentary certification project safely", () => {
+  const educationEvidence = careerEvidence({
+    id: "career_evidence_operator_education",
+    evidenceType: "OPERATOR_ATTESTATION",
+    authorityClassification: "OPERATOR_CONFIRMED",
+    supportsFactIds: ["fact_wesleyan", "fact_northeastern"],
+  });
+  const pmpEvidence = careerEvidence({
+    id: "career_evidence_pmp_certificate",
+    evidenceType: "CERTIFICATION_RECORD",
+    authorityClassification: "OFFICIAL_DOCUMENT",
+    supportsFactIds: ["fact_pmp"],
+  });
+  const result = build({
+    resumeIdentity: {
+      name: "Ross Stafford",
+      email: "rossstafford1@gmail.com",
+      phone: "(617) 270-3075",
+      location: "Braintree, MA 02184",
+      links: [{ label: "GitHub", url: "https://github.com/RStaff" }],
+    },
+    careerFacts: [
+      careerFact({
+        id: "fact_wesleyan",
+        factType: "EDUCATION",
+        statement: "Bachelor of Arts (B.A.) in American Studies and African American Studies from Wesleyan University, 1999.",
+        sourceEvidenceIds: ["career_evidence_operator_education"],
+        technologyOrSkill: null,
+      }),
+      careerFact({
+        id: "fact_northeastern",
+        factType: "EDUCATION",
+        statement: "Master of Education (M.Ed.) in Education from Northeastern University.",
+        sourceEvidenceIds: ["career_evidence_operator_education"],
+        technologyOrSkill: null,
+      }),
+      careerFact({
+        id: "fact_pmp",
+        factType: "CERTIFICATION",
+        statement: "Project Management Professional (PMP) certification.",
+        sourceEvidenceIds: ["career_evidence_pmp_certificate"],
+        technologyOrSkill: null,
+        authorityClassification: "OFFICIAL_DOCUMENT",
+      }),
+      careerFact({
+        id: "fact_cmm",
+        factType: "CERTIFICATION",
+        statement: "CMM Level 2 certification.",
+        verificationStatus: "CONFLICTING",
+        sourceEvidenceIds: ["career_evidence_ai_automation"],
+        technologyOrSkill: null,
+      }),
+    ],
+    careerEvidence: [careerEvidence(), educationEvidence, pmpEvidence],
+  });
+  const artifact = result.artifactVersions[0];
+  const review = drafts.buildTruthBoundResumeDraftReviewReadModel([artifact])[0];
+
+  assert.equal(artifact.safetyState, "DRAFT_READY_FOR_REVIEW");
+  assert.deepEqual(artifact.draft.header, {
+    name: "Ross Stafford",
+    email: "rossstafford1@gmail.com",
+    phone: "(617) 270-3075",
+    location: "Braintree, MA 02184",
+    links: [{ label: "GitHub", url: "https://github.com/RStaff" }],
+  });
+  assert.equal(artifact.draft.education.length, 2);
+  assert.deepEqual(artifact.draft.certifications, ["Project Management Professional (PMP) certification."]);
+  assert.doesNotMatch(JSON.stringify(artifact.draft), /CMM|SDLC|3700720|street|apartment/i);
+  assert.equal(review.sections.header.email, "rossstafford1@gmail.com");
+  assert.equal(review.sections.header.location, "Braintree, MA 02184");
+  assert.equal(review.privatePathVisible, false);
+  assert.equal(review.careerFactIdsVisible, false);
 });
 
 test("unsupported job requirements are omitted and counted without blocking export review", () => {
