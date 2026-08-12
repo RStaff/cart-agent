@@ -81,14 +81,10 @@ test("required and preferred requirements remain distinct", () => {
 test("responsibilities and informational requirements are not upgraded to required", () => {
   const requirements = extractPrivateJobRequirements(baseInput());
   const responsibility = requirements.find((requirement) => /partner with engineering/.test(requirement.requirementText));
-  const location = requirements.find((requirement) => /^Location:/.test(requirement.requirementText));
-  const compensation = requirements.find((requirement) => /^Compensation:/.test(requirement.requirementText));
 
   assert.equal(responsibility.requirementLevel, "RESPONSIBILITY");
   assert.equal(responsibility.requirementCategory, "Responsibility");
-  assert.equal(location.requirementLevel, "INFORMATIONAL");
-  assert.equal(location.requirementCategory, "Location or work arrangement");
-  assert.equal(compensation.requirementCategory, "Compensation");
+  assert.equal(requirements.some((requirement) => /^Location:|^Work arrangement:|^Compensation:|^Employment type:/.test(requirement.requirementText)), false);
 });
 
 test("explicit years are preserved and unstated years are not invented", () => {
@@ -122,7 +118,71 @@ test("source trace and source authority are preserved", () => {
   assert.ok(requirements.every((requirement) => requirement.sourceAuthority === "SOURCE_EXPLICIT"));
   assert.ok(requirements.every((requirement) => requirement.sourceExcerptReference));
   assert.ok(requirements.some((requirement) => /^listingText:line:/.test(requirement.sourceExcerptReference)));
-  assert.ok(requirements.some((requirement) => /^opportunityMetadata:/.test(requirement.sourceExcerptReference)));
+  assert.ok(requirements.every((requirement) => !/^opportunityMetadata:/.test(requirement.sourceExcerptReference)));
+});
+
+test("required, preferred, and non-requirement posting language are classified separately", () => {
+  const requirements = extractPrivateJobRequirements(baseInput({
+    listingText: `
+Qualifications
+- 5+ years of product management experience.
+- JD and active state bar membership required.
+- CISSP required.
+- Must reside in Boston.
+- Experience managing engineering teams.
+- Salesforce administration experience and SQL proficiency.
+- Bachelor's degree required.
+Preferred Qualifications
+- MBA preferred.
+- Experience with healthcare is a plus.
+- Familiarity with Python preferred.
+About us
+- We are an equal opportunity employer committed to diversity and inclusion.
+- Compensation includes salary, OTE, commission, annual bonus, and equity.
+- Our benefits and employee perks support our mission.
+- How we're different is the way we work together.
+- Rolling applications accepted; deadline to apply is none.
+- Apply through our applicant tracking system and review our privacy notice.
+- #LI-Hybrid
+- Sample customer projects demonstrate our platform.
+Location
+- Boston office.
+Responsibilities
+- You will partner with engineering to define product requirements.
+    `,
+    locationText: "Boston",
+    workArrangement: "Hybrid",
+    compensationText: "$150,000 - $190,000 OTE",
+    employmentType: "Full time",
+  }));
+  const text = requirements.map((requirement) => requirement.requirementText).join("\n");
+
+  for (const expected of [
+    "5+ years of product management experience.",
+    "JD and active state bar membership required.",
+    "CISSP required.",
+    "Must reside in Boston.",
+    "Experience managing engineering teams.",
+    "Salesforce administration experience and SQL proficiency.",
+    "Bachelor's degree required.",
+  ]) assert.match(text, new RegExp(expected.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+
+  assert.equal(requirements.filter((requirement) => requirement.requirementLevel === "PREFERRED").length, 3);
+  assert.doesNotMatch(text, /equal opportunity|compensation|OTE|commission|bonus|equity|benefits|how we're different|rolling|deadline|privacy|#LI-Hybrid|sample customer|Boston office/i);
+  assert.equal(requirements.some((requirement) => /partner with engineering/.test(requirement.requirementText)), true);
+});
+
+test("mandatory location language survives while generic location metadata is excluded", () => {
+  const requirements = extractPrivateJobRequirements(baseInput({
+    listingText: "Location\nRemote or hybrid from any company office.\nQualifications\nMust reside in Boston and attend onsite meetings.",
+    locationText: "Boston office",
+    workArrangement: "Hybrid",
+    compensationText: "$100,000",
+    employmentType: "Full time",
+  }));
+
+  assert.equal(requirements.some((requirement) => /Must reside in Boston/.test(requirement.requirementText)), true);
+  assert.equal(requirements.some((requirement) => /Remote or hybrid|Boston office|Work arrangement|Compensation|Employment type/.test(requirement.requirementText)), false);
 });
 
 test("extractor source has no provider, API, database, AI, application, message, or resume mutation behavior", () => {

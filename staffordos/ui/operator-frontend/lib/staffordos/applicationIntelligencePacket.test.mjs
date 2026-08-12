@@ -311,6 +311,20 @@ test("read model projects human-safe fit, evidence, gap, resume, and next-action
   assert.doesNotMatch(serialized, /CareerFact|CareerEvidence|ApplicationArtifactVersion|packet ID|ResumeVersion|authority digest|career_fact|career_evidence|sha256:|\/Users\//);
 });
 
+test("application intelligence does not surface posting boilerplate as candidate gaps", () => {
+  const result = buildPacket({
+    extraDescription: `
+Equal opportunity employer. Compensation includes OTE, commission, bonus, and equity.
+Benefits and perks are available to employees. How we're different is our culture.
+Applications are accepted on a rolling basis; deadline to apply is none.
+#LI-Hybrid. Sample customer projects are described below. See the privacy notice.
+    `,
+  });
+  const serialized = JSON.stringify(result.readModel[0].humanReview);
+
+  assert.doesNotMatch(serialized, /equal opportunity|compensation|OTE|commission|bonus|equity|benefits|perks|how we're different|rolling|deadline|#LI-Hybrid|sample customer|privacy notice/i);
+});
+
 test("unsupported mappings become gaps, not supporting experience", () => {
   const result = buildPacket({
     careerFacts: [],

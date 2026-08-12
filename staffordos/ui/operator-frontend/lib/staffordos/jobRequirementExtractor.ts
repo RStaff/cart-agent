@@ -7,7 +7,7 @@ import type {
   JobSearchWorkspaceId,
 } from "./jobSearchContracts";
 
-export const PRIVATE_JOB_REQUIREMENT_EXTRACTION_VERSION = "J001.03A";
+export const PRIVATE_JOB_REQUIREMENT_EXTRACTION_VERSION = "J001.03B";
 export const PRIVATE_JOB_REQUIREMENT_SCHEMA_VERSION =
   "staffordos.job_search.private_requirement.v1";
 
@@ -111,13 +111,24 @@ const STOP_REQUIREMENT_LINES = [
   /^our mission\b/i,
 ];
 
+const POSTING_NOISE_PATTERNS = [
+  /\b(?:eeo|equal opportunity employer|affirmative action|diversity|inclusion|belonging|protected veteran|reasonable accommodation|accommodations? for applicants)\b/i,
+  /\b(?:salary|compensation|pay range|base pay|ote|on-target earnings|commission|annual bonus|bonus|equity|total rewards)\b/i,
+  /\b(?:rolling basis|rolling applications?|deadline to apply|application deadline|apply (?:now|here|today)|submit (?:an|your) application|privacy (?:notice|policy)|applicant tracking system|ats notice)\b/i,
+  /\b(?:how (?:we're|we are) different|why join us|why work with us|come work with us|our mission|our vision|our values|company culture|employee benefits?|perks)\b/i,
+  /\b(?:sample|example) (?:projects?|customers?|work|case studies?)\b/i,
+  /(?:^|\s)#(?:li[-_]|hybrid\b|remote\b|onsite\b|hiring\b)/i,
+];
+
+const MANDATORY_LOCATION_PATTERN = /\b(?:must reside|must be located|must live|reside in|located in|based in|onsite in|on-site in|within)\b/i;
+
 function normalizeWhitespace(value: string) {
   return value.replace(/\s+/g, " ").trim();
 }
 
 function normalizeRequirement(value: string) {
   return normalizeWhitespace(value)
-    .replace(/^[\-*•\d.)\s]+/, "")
+    .replace(/^(?:[-*•]\s*|\d+[.)]\s*)/, "")
     .replace(/\s+([,.;:])/g, "$1")
     .trim();
 }
@@ -210,6 +221,16 @@ function hasRequirementCue(value: string, sectionHint: string | null) {
   return /\b(must|required|requirement|qualified|experience|years?|proficien|ability to|responsible for|you will|preferred|nice to have|bonus|desired|degree|certification|remote|hybrid|salary|compensation|travel|authorized|eligible)\b/i.test(value);
 }
 
+function isPostingNoise(value: string, sectionHint: string | null) {
+  if (POSTING_NOISE_PATTERNS.some((pattern) => pattern.test(value))) return true;
+
+  const locationMetadata = /\b(?:location|remote|hybrid|onsite|on-site|office|work arrangement)\b/i.test(value);
+  if (locationMetadata && !MANDATORY_LOCATION_PATTERN.test(value) &&
+      (sectionHint === "location" || /^(?:location|remote|hybrid|onsite|on-site|office|work arrangement)\b/i.test(value))) return true;
+
+  return false;
+}
+
 function classifyLevel(value: string, sectionHint: string | null): JobRequirementLevel {
   if (/\b(preferred|nice to have|bonus|desired|plus)\b/i.test(value) || sectionHint === "preferred") return "PREFERRED";
   if (/\b(responsible for|responsibilities|you will|own\b|lead\b|manage\b|partner with|collaborate)\b/i.test(value) || sectionHint === "responsibilities") return "RESPONSIBILITY";
@@ -272,7 +293,7 @@ function requirementConfidence(value: string, level: JobRequirementLevel) {
 
 function buildRequirement(input: JobRequirementExtractionInput, unit: SourceUnit): PrivateJobRequirementRecord | null {
   const requirementText = normalizeRequirement(unit.text);
-  if (!requirementText || !hasRequirementCue(requirementText, unit.sectionHint)) return null;
+  if (!requirementText || isPostingNoise(requirementText, unit.sectionHint) || !hasRequirementCue(requirementText, unit.sectionHint)) return null;
 
   const level = classifyLevel(requirementText, unit.sectionHint);
   const category = classifyCategory(requirementText, level, unit.sectionHint);
@@ -321,61 +342,6 @@ function buildRequirement(input: JobRequirementExtractionInput, unit: SourceUnit
   };
 }
 
-function metadataRequirement(
-  input: JobRequirementExtractionInput,
-  field: "locationText" | "workArrangement" | "compensationText" | "employmentType",
-  category: JobRequirementCategory,
-  textValue: string | null | undefined,
-): PrivateJobRequirementRecord | null {
-  const value = textValue ? normalizeWhitespace(textValue) : "";
-  if (!value) return null;
-  const label =
-    field === "locationText"
-      ? `Location: ${value}`
-      : field === "workArrangement"
-        ? `Work arrangement: ${value}`
-        : field === "compensationText"
-          ? `Compensation: ${value}`
-          : `Employment type: ${value}`;
-
-  return {
-    schemaVersion: PRIVATE_JOB_REQUIREMENT_SCHEMA_VERSION,
-    id: requirementId(input, label, `opportunityMetadata:${field}`),
-    workspaceId: input.workspaceId || "professional",
-    jobOpportunityId: input.jobOpportunityId,
-    sourceId: input.sourceId,
-    requirementText: label,
-    normalizedRequirement: label.toLowerCase(),
-    requirementCategory: category,
-    requirementLevel: "INFORMATIONAL" as JobRequirementLevel,
-    importanceClassification: "Informational" as const,
-    evidenceExpectation: evidenceExpectation(category),
-    yearsMentioned: null,
-    degreeMentioned: null,
-    certificationMentioned: null,
-    technologyOrSkill: null,
-    responsibilityOrQualification: null,
-    sourceAuthority: "SOURCE_EXPLICIT" as const,
-    sourceLocation: {
-      sourceField: "opportunityMetadata" as const,
-      lineNumber: null,
-      sectionHint: null,
-    },
-    sourceExcerptReference: `opportunityMetadata:${field}`,
-    extractionMethod: "SOURCE_EXPLICIT" as JobExtractionMethod,
-    extractionConfidence: "High" as const,
-    operatorReviewStatus: "Needs review" as JobRequirementReviewStatus,
-    ambiguity: null,
-    limitations: [
-      "Preserved from explicit opportunity metadata.",
-      "Does not prove Ross accepts this condition.",
-    ],
-    createdAt: input.createdAt,
-    privateRecord: true as const,
-    testOnly: false as const,
-  };
-}
-
 export function extractPrivateJobRequirements(input: JobRequirementExtractionInput) {
   const units = [
     ...splitSourceUnits(input.listingText, "listingText"),
@@ -385,15 +351,6 @@ export function extractPrivateJobRequirements(input: JobRequirementExtractionInp
   const requirements = units
     .map((unit) => buildRequirement(input, unit))
     .filter((requirement): requirement is PrivateJobRequirementRecord => Boolean(requirement));
-
-  for (const metadata of [
-    metadataRequirement(input, "locationText", "Location or work arrangement", input.locationText),
-    metadataRequirement(input, "workArrangement", "Location or work arrangement", input.workArrangement),
-    metadataRequirement(input, "compensationText", "Compensation", input.compensationText),
-    metadataRequirement(input, "employmentType", "Other", input.employmentType),
-  ]) {
-    if (metadata) requirements.push(metadata);
-  }
 
   const uniqueByText = new Map<string, PrivateJobRequirementRecord>();
   for (const requirement of requirements) {
