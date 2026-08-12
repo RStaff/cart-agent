@@ -346,7 +346,8 @@ test("private packet writer stores owner-private JSON outside the repository", (
     result,
   });
 
-  assert.equal(writeResult.artifactNames.length, 6);
+  assert.equal(writeResult.artifactNames.length, 7);
+  assert.equal(writeResult.artifactNames.includes("run_lineage.json"), true);
   assert.equal(writeResult.privatePathVisible, false);
   assert.equal((statSync(writeResult.runDirectory).mode & 0o777).toString(8), "700");
   assert.equal((statSync(writeResult.writtenFiles[0]).mode & 0o777).toString(8), "600");

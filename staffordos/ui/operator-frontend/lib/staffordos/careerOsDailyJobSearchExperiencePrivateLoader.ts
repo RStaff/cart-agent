@@ -119,7 +119,7 @@ function latestDirectory(root: string): string | null {
         return false;
       }
     })
-    .sort((left, right) => left.localeCompare(right));
+    .sort((left, right) => statSync(left).mtimeMs - statSync(right).mtimeMs || left.localeCompare(right));
   return directories[directories.length - 1] || null;
 }
 

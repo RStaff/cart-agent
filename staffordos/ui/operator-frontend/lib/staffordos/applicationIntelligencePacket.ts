@@ -1457,9 +1457,21 @@ export function writeApplicationIntelligencePacketOutputs(input: {
     "application-intelligence-packets",
   );
   assertOutsideRepository(outputRoot, input.repositoryRoot, "Private Application Intelligence Packet output root");
-  const runDirectory = path.join(outputRoot, `${APPLICATION_INTELLIGENCE_PACKET_VERSION}_${compactTimestamp(input.result.generatedAt)}`);
+  const runId = createHash("sha256").update(JSON.stringify(input.result)).digest("hex").slice(0, 10);
+  const runDirectory = path.join(outputRoot, `${APPLICATION_INTELLIGENCE_PACKET_VERSION}_${compactTimestamp(input.result.generatedAt)}_${runId}`);
   ensurePrivateDirectory(runDirectory);
   const artifacts = {
+    "run_lineage.json": {
+      workflowVersion: APPLICATION_INTELLIGENCE_PACKET_VERSION,
+      generatedAt: input.result.generatedAt,
+      runId,
+      supersedesRunDirectory: readdirSync(outputRoot, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory() && entry.name.startsWith(`${APPLICATION_INTELLIGENCE_PACKET_VERSION}_`) && entry.name !== path.basename(runDirectory))
+        .map((entry) => entry.name)
+        .sort()
+        .at(-1) || null,
+      privatePathVisible: false,
+    },
     "application_intelligence_packet_result.json": input.result,
     "application_intelligence_packets.json": input.result.packets,
     "application_intelligence_packet_read_model.json": input.result.readModel,
@@ -1510,7 +1522,7 @@ function latestDirectory(root: string): string | null {
         return false;
       }
     })
-    .sort((left, right) => left.localeCompare(right));
+    .sort((left, right) => statSync(left).mtimeMs - statSync(right).mtimeMs || left.localeCompare(right));
   return directories[directories.length - 1] || null;
 }
 

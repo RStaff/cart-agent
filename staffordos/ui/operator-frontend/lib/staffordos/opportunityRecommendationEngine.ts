@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import {
   chmodSync,
   mkdirSync,
+  readdirSync,
   readFileSync,
   writeFileSync,
 } from "node:fs";
@@ -133,6 +134,7 @@ export type OpportunityRecommendationRecord = {
   queueItemId: string;
   sourceRecordId: string;
   opportunityId: string;
+  canonicalOpportunityId: string;
   company: string;
   role: string;
   recommendation: OpportunityApplicationRecommendation;
@@ -172,6 +174,7 @@ export type OpportunityRecommendationRecord = {
 export type OpportunityRecommendationReadModelRecord = {
   schemaVersion: typeof OPPORTUNITY_RECOMMENDATION_READ_MODEL_SCHEMA_VERSION;
   recommendationId: string;
+  canonicalOpportunityId: string;
   queueItemId: string;
   company: string;
   role: string;
@@ -304,6 +307,18 @@ function normalized(value: unknown) {
 
 function queueOpportunityId(queueItem: JobSourceImportQueueItem) {
   return queueItem.normalizedOpportunityCandidateId || queueItem.queueItemId;
+}
+
+export function canonicalOpportunityIdentity(input: {
+  providerId?: string | null;
+  providerJobId?: string | null;
+  sourceUrl?: string | null;
+}) {
+  const provider = String(input.providerId || "").trim().toLowerCase();
+  const providerJobId = String(input.providerJobId || "").trim();
+  const sourceUrl = String(input.sourceUrl || "").trim();
+  if (!provider || (!providerJobId && !sourceUrl)) return null;
+  return `privcanonicalopp_${sha256Text([provider, providerJobId, sourceUrl].join("|")).slice(0, 18)}`;
 }
 
 function safeResumeLabel(version: PrivateResumeVersionRecord) {
@@ -685,6 +700,7 @@ function recommendationFor(input: {
 
 function recommendationRecord(input: {
   queueItem: JobSourceImportQueueItem;
+  canonicalOpportunityId: string;
   fit: OpportunityExplainableFitInput | null;
   resumeVersions: readonly PrivateResumeVersionRecord[];
   generatedAt: string;
@@ -731,6 +747,7 @@ function recommendationRecord(input: {
     queueItemId: input.queueItem.queueItemId,
     sourceRecordId: input.queueItem.sourceRecordId,
     opportunityId,
+    canonicalOpportunityId: input.canonicalOpportunityId,
     company: input.queueItem.company,
     role: input.queueItem.role,
     recommendation: decision.recommendation,
@@ -781,6 +798,7 @@ function readModel(record: OpportunityRecommendationRecord, generatedAt: string)
   return {
     schemaVersion: OPPORTUNITY_RECOMMENDATION_READ_MODEL_SCHEMA_VERSION,
     recommendationId: record.recommendationId,
+    canonicalOpportunityId: record.canonicalOpportunityId,
     queueItemId: record.queueItemId,
     company: record.company,
     role: record.role,
@@ -813,6 +831,7 @@ function readModel(record: OpportunityRecommendationRecord, generatedAt: string)
 
 export function buildOpportunityRecommendationEngine(input: OpportunityRecommendationEngineInput): OpportunityRecommendationResult {
   const fitLookup = buildFitLookup(input.explainableFitArtifacts || []);
+  const sourceRecordsById = new Map(input.queueResult.normalizedSourceRecords.map((record) => [record.jobSourceRecordId, record]));
   const queueItems = [...input.queueResult.importQueue].sort(
     (left, right) =>
       right.rankingSummary.totalScore - left.rankingSummary.totalScore ||
@@ -824,6 +843,9 @@ export function buildOpportunityRecommendationEngine(input: OpportunityRecommend
   const recommendations = queueItems.map((queueItem) =>
     recommendationRecord({
       queueItem,
+      canonicalOpportunityId:
+        canonicalOpportunityIdentity(sourceRecordsById.get(queueItem.sourceRecordId) || {}) ||
+        `privcanonicalopp_${sha256Text([queueItem.company, queueItem.role].join("|")).slice(0, 18)}`,
       fit: fitForQueueItem(queueItem, fitLookup),
       resumeVersions,
       generatedAt: input.generatedAt,
@@ -912,9 +934,21 @@ export function writeOpportunityRecommendationOutputs(input: {
   result: OpportunityRecommendationResult;
 }) {
   assertOutsideRepository(input.outputRoot, input.repositoryRoot, "Private J003.01 opportunity recommendation output root");
-  const runDirectory = path.join(input.outputRoot, `J003_01_${compactTimestamp(input.result.generatedAt)}`);
+  const runId = sha256Text(JSON.stringify(input.result)).slice(0, 10);
+  const runDirectory = path.join(input.outputRoot, `J003_01_${compactTimestamp(input.result.generatedAt)}_${runId}`);
   ensurePrivateDirectory(runDirectory);
   const artifacts = {
+    "run_lineage.json": {
+      workflowVersion: OPPORTUNITY_RECOMMENDATION_ENGINE_VERSION,
+      generatedAt: input.result.generatedAt,
+      runId,
+      supersedesRunDirectory: readdirSync(input.outputRoot, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory() && entry.name.startsWith("J003_01_") && entry.name !== path.basename(runDirectory))
+        .map((entry) => entry.name)
+        .sort()
+        .at(-1) || null,
+      privatePathVisible: false,
+    },
     "opportunity_recommendation_result.json": input.result,
     "opportunity_recommendations.json": input.result.recommendations,
     "application_readiness.json": input.result.recommendations.map((record) => ({

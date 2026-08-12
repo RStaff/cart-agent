@@ -375,7 +375,8 @@ test("private output writer rejects repository paths and writes owner-private fi
     result,
   });
 
-  assert.equal(written.artifactNames.length, 7);
+  assert.equal(written.artifactNames.length, 8);
+  assert.equal(written.artifactNames.includes("run_lineage.json"), true);
   assert.equal(written.artifactNames.includes("opportunity_recommendation_result.json"), true);
   assert.equal(written.privatePathVisible, false);
   assert.equal(statSync(written.runDirectory).mode & 0o777, 0o700);

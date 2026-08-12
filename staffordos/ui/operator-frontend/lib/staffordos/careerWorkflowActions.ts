@@ -14,6 +14,7 @@ import * as path from "node:path";
 import {
   OPPORTUNITY_RECOMMENDATION_ENGINE_VERSION,
   OPPORTUNITY_RECOMMENDATION_RESULT_SCHEMA_VERSION,
+  canonicalOpportunityIdentity,
 } from "./opportunityRecommendationEngine";
 import type {
   ApplicationReadinessState,
@@ -69,6 +70,7 @@ export type CareerWorkflowActionRecord = {
   queueItemId: string;
   sourceRecordId: string | null;
   opportunityId: string | null;
+  canonicalOpportunityId?: string | null;
   company: string;
   role: string;
   actionType: CareerWorkflowActionType;
@@ -122,6 +124,7 @@ export type CareerWorkflowStateItem = {
   queueItemId: string;
   sourceRecordId: string | null;
   opportunityId: string | null;
+  canonicalOpportunityId?: string | null;
   company: string;
   role: string;
   recommendation: OpportunityApplicationRecommendation;
@@ -266,7 +269,7 @@ function latestDirectory(root: string): string | null {
         return false;
       }
     })
-    .sort((left, right) => left.localeCompare(right));
+    .sort((left, right) => statSync(left).mtimeMs - statSync(right).mtimeMs || left.localeCompare(right));
   return directories[directories.length - 1] || null;
 }
 
@@ -468,7 +471,8 @@ function assertActionMatchesReadModel(
   action: CareerWorkflowActionRecord,
   readModel: OpportunityRecommendationReadModelRecord,
 ) {
-  if (action.queueItemId !== readModel.queueItemId) {
+  const stableIdentityMatches = Boolean(action.canonicalOpportunityId && readModel.canonicalOpportunityId && action.canonicalOpportunityId === readModel.canonicalOpportunityId);
+  if (!stableIdentityMatches && action.queueItemId !== readModel.queueItemId) {
     throw new Error(`Workflow action ${action.actionId} does not match the recommendation queue item.`);
   }
   if (action.company !== readModel.company || action.role !== readModel.role) {
@@ -514,6 +518,7 @@ export function createCareerWorkflowAction(input: {
     queueItemId: readModel.queueItemId,
     sourceRecordId: fullRecord?.sourceRecordId || null,
     opportunityId: fullRecord?.opportunityId || null,
+    canonicalOpportunityId: fullRecord?.canonicalOpportunityId || null,
     company: readModel.company,
     role: readModel.role,
     actionType: parsedAction,
@@ -581,6 +586,7 @@ function stateItem(input: {
     queueItemId: input.record.queueItemId,
     sourceRecordId: input.fullRecord?.sourceRecordId || input.action?.sourceRecordId || null,
     opportunityId: input.fullRecord?.opportunityId || input.action?.opportunityId || null,
+    canonicalOpportunityId: input.fullRecord?.canonicalOpportunityId || input.action?.canonicalOpportunityId || null,
     company: input.record.company,
     role: input.record.role,
     recommendation: input.record.recommendation,
@@ -631,12 +637,15 @@ function actionMapFor(
   const readModels = readModelById(recommendationResult);
   const actionByRecommendation = new Map<string, CareerWorkflowActionRecord>();
   for (const action of actions) {
-    const readModel = readModels.get(action.recommendationId);
+    const readModel = readModels.get(action.recommendationId) || [...readModels.values()].find((candidate) =>
+      Boolean(action.canonicalOpportunityId && candidate.canonicalOpportunityId === action.canonicalOpportunityId),
+    );
     if (!readModel) {
+      if (action.canonicalOpportunityId) continue;
       throw new Error(`Workflow action ${action.actionId} references an unknown recommendation.`);
     }
     assertActionMatchesReadModel(action, readModel);
-    actionByRecommendation.set(action.recommendationId, action);
+    actionByRecommendation.set(readModel.recommendationId, action);
   }
   return actionByRecommendation;
 }
@@ -647,13 +656,12 @@ function actionsCompatibleWithRecommendationResult(
 ) {
   const readModels = readModelById(recommendationResult);
   return actions.filter((action) => {
-    const readModel = readModels.get(action.recommendationId);
-    return Boolean(
-      readModel &&
-        readModel.queueItemId === action.queueItemId &&
-        readModel.company === action.company &&
-        readModel.role === action.role,
+    const readModel = readModels.get(action.recommendationId) || [...readModels.values()].find((candidate) =>
+      Boolean(action.canonicalOpportunityId && candidate.canonicalOpportunityId === action.canonicalOpportunityId),
     );
+    return Boolean(readModel &&
+      ((readModel.canonicalOpportunityId && action.canonicalOpportunityId && readModel.canonicalOpportunityId === action.canonicalOpportunityId) ||
+        (readModel.queueItemId === action.queueItemId && readModel.company === action.company && readModel.role === action.role)));
   });
 }
 
@@ -828,7 +836,43 @@ export function loadCareerWorkflowActionsFile(filePath: string): CareerWorkflowA
 
 export function loadLatestCareerWorkflowActions(jobSearchRoot = DEFAULT_CAREER_WORKFLOW_JOB_SEARCH_ROOT) {
   const actionLog = path.join(jobSearchRoot, "career-workflow-actions", "workflow_actions.ndjson");
-  return existsSync(actionLog) ? loadCareerWorkflowActionsFile(actionLog) : [];
+  if (!existsSync(actionLog)) return [];
+  const actions = loadCareerWorkflowActionsFile(actionLog);
+  const recommendationRuns = path.join(jobSearchRoot, "opportunity-recommendations");
+  const historicalRecommendationById = new Map<string, { sourceRecordId: string }>();
+  if (existsSync(recommendationRuns)) {
+    for (const directory of readdirSync(recommendationRuns)) {
+      const filePath = path.join(recommendationRuns, directory, "opportunity_recommendation_result.json");
+      if (!existsSync(filePath)) continue;
+      try {
+        const result = loadOpportunityRecommendationResultFile(filePath);
+        for (const record of result.recommendations) historicalRecommendationById.set(record.recommendationId, { sourceRecordId: record.sourceRecordId });
+      } catch (_error) {
+        // Ignore malformed historical runs; current authority remains fail-closed.
+      }
+    }
+  }
+  const sourceRecordById = new Map<string, { providerId?: string; providerJobId?: string; sourceUrl?: string }>();
+  const discoveryRoot = path.join(jobSearchRoot, "greenhouse-discovery");
+  if (existsSync(discoveryRoot)) {
+    for (const directory of readdirSync(discoveryRoot)) {
+      const filePath = path.join(discoveryRoot, directory, "job_source_import_queue_result.json");
+      if (!existsSync(filePath)) continue;
+      try {
+        const result = JSON.parse(readFileSync(filePath, "utf8"));
+        for (const record of result.normalizedSourceRecords || []) sourceRecordById.set(record.jobSourceRecordId, record);
+      } catch (_error) {
+        // Ignore malformed historical runs; current authority remains fail-closed.
+      }
+    }
+  }
+  return actions.map((action) => {
+    if (action.canonicalOpportunityId) return action;
+    const historical = historicalRecommendationById.get(action.recommendationId);
+    const source = historical ? sourceRecordById.get(historical.sourceRecordId) : null;
+    const canonicalOpportunityId = source ? canonicalOpportunityIdentity(source) : null;
+    return canonicalOpportunityId ? { ...action, canonicalOpportunityId } : action;
+  });
 }
 
 export function loadLatestCareerWorkflowState(jobSearchRoot = DEFAULT_CAREER_WORKFLOW_JOB_SEARCH_ROOT) {

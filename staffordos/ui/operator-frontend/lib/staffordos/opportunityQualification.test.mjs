@@ -79,6 +79,15 @@ test("specialized and unrelated functions do not survive on generic keywords", (
   assert.equal(qualify("Cash Manager, Treasury", [treasury], [mapping(treasury, "TRANSFERABLE", { matchedSignals: ["automation"] })]).state, "HARD_MISMATCH");
 });
 
+test("specialist role families require direct specialist evidence while adjacent lanes remain transferable", () => {
+  const specialist = requirement("5+ years of software engineering experience with production Python and Kubernetes.");
+  const adjacent = requirement("Experience leading cross-functional technical programs and workflow automation.");
+
+  assert.equal(qualify("Applied AI Engineer, Enterprise Tech", [specialist], [mapping(specialist, "TRANSFERABLE", { matchedSignals: ["ai", "automation"] })]).state, "HARD_MISMATCH");
+  assert.equal(qualify("Business Systems Analyst", [adjacent], [mapping(adjacent, "TRANSFERABLE", { matchedSignals: ["workflow", "automation"] })]).state, "TRANSFERABLE_BUT_NOT_DIRECT");
+  assert.equal(qualify("Director, Technical Program Management", [adjacent], [mapping(adjacent, "TRANSFERABLE", { matchedSignals: ["workflow", "program"] })]).state, "TRANSFERABLE_BUT_NOT_DIRECT");
+});
+
 test("unknown evidence remains uncertainty and transferable target lanes survive", () => {
   const requirementRecord = requirement("Experience partnering with business stakeholders on workflow automation.");
   const unknown = qualify("Business Systems Analyst", [requirementRecord], [mapping(requirementRecord)]);

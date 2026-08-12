@@ -113,10 +113,14 @@ const STOP_REQUIREMENT_LINES = [
 
 const POSTING_NOISE_PATTERNS = [
   /\b(?:eeo|equal opportunity employer|affirmative action|diversity|inclusion|belonging|protected veteran|reasonable accommodation|accommodations? for applicants)\b/i,
+  /\b(?:we (?:strongly )?encourage you to apply|we(?:'|’)d love to hear from you|if you(?:'|’)re passionate about .* apply)\b/i,
   /\b(?:salary|compensation|pay range|base pay|ote|on-target earnings|commission|annual bonus|bonus|equity|total rewards)\b/i,
   /\b(?:rolling basis|rolling applications?|deadline to apply|application deadline|apply (?:now|here|today)|submit (?:an|your) application|privacy (?:notice|policy)|applicant tracking system|ats notice)\b/i,
-  /\b(?:how (?:we're|we are) different|why join us|why work with us|come work with us|our mission|our vision|our values|company culture|employee benefits?|perks)\b/i,
-  /\b(?:sample|example) (?:projects?|customers?|work|case studies?)\b/i,
+  /\b(?:how (?:we're|we are) different|why join us|why work with us|come work with us|our mission|our vision|our values|company culture|employee benefits?|parental leave|perks)\b/i,
+  /\b(?:sample|example) (?:projects?|customers?|work|case studies?)\b|\b(?:these are|some of|types of) (?:the )?(?:projects?|customers?|use cases?)\b/i,
+  /\b(?:camera[- ]on|onboarding|workplace policy|candidate legal notices?|privacy and ai guidelines?)\b/i,
+  /\b(?:your privacy|pay transparency disclosure|pay transparency provision|examples of accommodations|we believe that everyone|we comply with)\b/i,
+  /\b(?:department|requisition):\s*[^.;]+$/i,
   /(?:^|\s)#(?:li[-_]|hybrid\b|remote\b|onsite\b|hiring\b)/i,
 ];
 
@@ -145,7 +149,7 @@ function isLikelySectionHeader(value: string) {
   const text = normalizeRequirement(value).replace(/:$/, "");
   if (!text) return false;
   if (text.length > 80) return false;
-  return /^(requirements?|qualifications?|minimum qualifications?|preferred|preferred qualifications?|nice to have|responsibilities|what you(?:'|’)ll do|about the role|benefits?|compensation|salary|pay range|location|work arrangement)$/i.test(text);
+  return /^(requirements?|qualifications?|minimum qualifications?|preferred|preferred qualifications?|nice to have|responsibilities|what you(?:'|’)ll do|what you(?:'|’)ll do at .+|who you are|role overview|about the role|about us|benefits?|compensation|salary|pay range|location|work arrangement)$/i.test(text);
 }
 
 function sectionHintFromText(value: string, current: string | null) {

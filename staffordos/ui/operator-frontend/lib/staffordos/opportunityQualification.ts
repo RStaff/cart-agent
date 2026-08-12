@@ -27,8 +27,10 @@ type QualificationInput = {
 const TARGET_ROLE_PATTERNS = /\b(ai|automation|agent|business systems?|business technolog|marketing technolog|crm|salesforce|workflow|product|technical program|technical product|revops|governance|platform operations|digital transformation)\b/i;
 const LEGAL_ROLE_PATTERN = /\b(counsel|attorney|lawyer|legal)\b/i;
 const MEDICAL_ROLE_PATTERN = /\b(physician|doctor|nurse|clinical|medical|therapist|pharmac|dentist)\b/i;
-const SPECIALIST_ENGINEERING_PATTERN = /\b(infrastructure|kernel|systems|sandbox|site reliability|sre|devops|embedded|firmware|compiler|machine learning engineer)\b/i;
+const SPECIALIST_ENGINEERING_PATTERN = /\b(infrastructure|kernel|systems|sandbox|site reliability|sre|devops|embedded|firmware|compiler|machine learning engineer|software engineer|software engineering|engineering manager|applied ai engineer|security governance.*risk engineer|research scientist|ai research scientist|ai applications ops|physical ai)\b/i;
 const UNRELATED_FUNCTION_PATTERN = /\b(cash manager|treasury|controller|accountant|accounting|financial analyst|investment|recruiter|sales representative)\b/i;
+const SPECIALIST_REQUIREMENT_PATTERN = /\b(?:software engineering|production[- ]grade (?:applications?|systems?)|strong programming|strong background in distributed|deep learning models?|hands[- ]on (?:coding|engineering)|data structures|algorithms|system design|kernel|firecracker|gvisor|qemu|kata|kubernetes|docker|distributed systems|low[- ]level|embedded|firmware|mlops|site reliability|sre|devops|terraform|infrastructure as code|gpu|cuda|reinforcement learning|robotics|autonomous systems|computer vision|foundation models?|distributed training|research publications?|top[- ]tier conferences?|phd in (?:computer science|machine learning)|cyber risk quantification|risk engineering|penetration testing|vulnerability management|high[- ]performing engineering teams|hiring.*engineering teams)\b/i;
+const SECURITY_SPECIALIST_REQUIREMENT_PATTERN = /\b(?:security frameworks?|risk engineering|risk quantification|vulnerability management|security tooling|security controls|cyber risk|second line of defense)\b/i;
 
 function mappingFor(requirement: PrivateJobRequirementRecord, mappings: readonly PrivateRequirementEvidenceMapping[]) {
   return mappings.find((mapping) => mapping.requirementId === requirement.id) || null;
@@ -75,6 +77,13 @@ function hasRelevantSupport(mappings: readonly PrivateRequirementEvidenceMapping
   );
 }
 
+function hasDirectSpecialistSupport(mappings: readonly PrivateRequirementEvidenceMapping[]) {
+  return mappings.some((mapping) =>
+    (mapping.classification === "PROVEN" || mapping.classification === "PARTIAL") &&
+    SPECIALIST_REQUIREMENT_PATTERN.test(`${mapping.explanation} ${mapping.safePositioning} ${(mapping.matchedSignals || []).join(" ")}`),
+  );
+}
+
 export function qualifyOpportunity(input: QualificationInput): OpportunityQualification {
   const role = input.role || "";
   const requirementText = input.requirements.map((requirement) => requirement.requirementText).join(" ");
@@ -115,10 +124,24 @@ export function qualifyOpportunity(input: QualificationInput): OpportunityQualif
   }
 
   if (matches(role, SPECIALIST_ENGINEERING_PATTERN) &&
-      input.requirements.some((requirement) => required(requirement) && matches(requirement.requirementText, /\b(kernel|firecracker|gvisor|qemu|kata|kubernetes|docker|distributed systems|low.level|embedded|firmware)\b/i)) &&
-      !hasRelevantSupport(input.mappings, /\b(kernel|firecracker|gvisor|qemu|kata|kubernetes|docker|distributed systems|low.level|embedded|firmware|infrastructure)\b/i)) {
+      input.requirements.some((requirement) => matches(requirement.requirementText, SPECIALIST_REQUIREMENT_PATTERN)) &&
+      !hasDirectSpecialistSupport(input.mappings)) {
     hardMismatchCategories.push("specialized engineering function");
     reasons.push("The role requires deep specialist engineering experience without confirmed or transferable support.");
+  }
+
+  if (matches(role, SPECIALIST_ENGINEERING_PATTERN) &&
+      input.requirements.some((requirement) => matches(requirement.requirementText, SECURITY_SPECIALIST_REQUIREMENT_PATTERN)) &&
+      !hasDirectSpecialistSupport(input.mappings)) {
+    hardMismatchCategories.push("specialized security or risk engineering function");
+    reasons.push("The role requires specialized security or risk-engineering history without direct supporting evidence.");
+  }
+
+  if (matches(role, /\b(?:research scientist|ai research|robotics|autonomous systems)\b/i) &&
+      input.requirements.some((requirement) => required(requirement) && matches(requirement.requirementText, /\b(?:research|reinforcement learning|gpu|cuda|distributed training|robotics|computer vision|publication|foundation model)\b/i)) &&
+      !hasDirectSpecialistSupport(input.mappings)) {
+    hardMismatchCategories.push("specialized research or advanced engineering function");
+    reasons.push("The role requires specialized research or advanced engineering history without direct supporting evidence.");
   }
 
   if (matches(role, UNRELATED_FUNCTION_PATTERN) && !matches(role, TARGET_ROLE_PATTERNS) && !hasRelevantSupport(input.mappings, /\b(treasury|cash|finance|accounting|recruit|sales)\b/i)) {

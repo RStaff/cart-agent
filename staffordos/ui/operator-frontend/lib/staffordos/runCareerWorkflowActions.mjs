@@ -34,6 +34,7 @@ if (originalTsExtension) {
 }
 
 const defaultActionRoot = path.join(homedir(), ".staffordos/private/professional/job-search/career-workflow-actions");
+const defaultJobSearchRoot = path.dirname(defaultActionRoot);
 const defaultOutputRoot = path.join(homedir(), ".staffordos/private/professional/job-search/career-workflow-state");
 
 function parseArgs(argv) {
@@ -80,7 +81,7 @@ function actionLogPath(args) {
 function loadActions(args) {
   if (typeof args.actions === "string") return workflow.loadCareerWorkflowActionsFile(args.actions);
   const defaultLog = actionLogPath(args);
-  return existsSync(defaultLog) ? workflow.loadCareerWorkflowActionsFile(defaultLog) : [];
+  return existsSync(defaultLog) ? workflow.loadLatestCareerWorkflowActions(args["action-root"] ? path.dirname(args["action-root"]) : defaultJobSearchRoot) : [];
 }
 
 function writeStateIfRequested(args, result) {
