@@ -443,6 +443,7 @@ function intelligenceItem(overrides = {}) {
     schemaVersion: "staffordos.careeros.application_intelligence_packet_read_model.v1",
     packetId: "packet_apply",
     jobOpportunityId: "opp_apply",
+    recommendationId: "rec_apply",
     company: "Example Automation",
     role: "AI Automation Product Manager",
     recommendation: "REVIEW",
@@ -462,6 +463,38 @@ function intelligenceItem(overrides = {}) {
     resumeSafeToReuse: false,
     blockerCount: 2,
     nextAction: "REVIEW_RESUME",
+    humanReview: {
+      whyThisFits: [
+        "The role asks for AI automation and workflow delivery. StaffordOS work supports this positioning.",
+      ],
+      supportingExperience: [
+        {
+          label: "StaffordOS - AI agent orchestration and governance",
+          detail: "Built governed job-search and application workflow components with tests and review boundaries.",
+          supportLevel: "Verified",
+          limitations: [],
+        },
+        {
+          label: "CSI - Salesforce/Pardot automation",
+          detail: "Supported marketing automation requirements, stakeholder coordination, and audience workflow.",
+          supportLevel: "Supported with limitation",
+          limitations: ["Treat this as transferable experience, not exact same-role proof."],
+        },
+      ],
+      gapsAndRisks: [
+        {
+          kind: "Needs verification",
+          requirement: "Experience owning enterprise rollout at the same scale.",
+          detail: "The requirement needs evidence review before it can be used as a positive claim.",
+        },
+      ],
+      resumeReadiness: {
+        label: "Needs review",
+        detail: "The selected resume may be useful, but Ross needs to review evidence or wording before using it.",
+        blockers: ["Resume evidence or wording needs Ross's review before use."],
+      },
+      nextAction: "Review evidence before deciding whether to prepare this application.",
+    },
     humanReviewRequired: true,
     applicationCreated: false,
     applicationSubmitted: false,
@@ -947,6 +980,97 @@ test("application intelligence packet read models are displayed without raw priv
   assert.doesNotMatch(JSON.stringify(item), /\/Users\/|sourceUrl|raw job|raw resume/i);
   assert.match(surfaceSource, /Application Intelligence/);
   assert.match(surfaceSource, /View Intelligence/);
+});
+
+test("application intelligence renders human review reasons, evidence, gaps, resume readiness, and next action", () => {
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    applicationIntelligenceReadModel: [intelligenceItem()],
+  });
+  const item = experience.applicationIntelligence[0];
+
+  assert.match(item.humanReview.whyThisFits[0], /AI automation and workflow delivery/);
+  assert.equal(item.humanReview.supportingExperience[0].label, "StaffordOS - AI agent orchestration and governance");
+  assert.equal(item.humanReview.supportingExperience[1].supportLevel, "Supported with limitation");
+  assert.equal(item.humanReview.gapsAndRisks[0].kind, "Needs verification");
+  assert.match(item.humanReview.gapsAndRisks[0].detail, /evidence review/i);
+  assert.equal(item.humanReview.resumeReadiness.label, "Needs review");
+  assert.match(item.humanReview.resumeReadiness.blockers[0], /review/i);
+  assert.match(item.humanReview.nextAction, /Review evidence/);
+  assert.match(surfaceSource, /Why this fits/);
+  assert.match(surfaceSource, /Supporting experience/);
+  assert.match(surfaceSource, /Gaps \/ uncertainty/);
+  assert.match(surfaceSource, /Resume readiness/);
+  assert.match(surfaceSource, /Next action/);
+});
+
+test("opportunity decisions reuse application intelligence without changing recommendation or Ross decision", () => {
+  const state = workflowStateFixture();
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    careerWorkflowStateResult: state,
+    applicationIntelligenceReadModel: [intelligenceItem({
+      recommendation: "APPLY_NOW",
+      fitRecommendation: "APPLY_WITH_POSITIONING",
+    })],
+  });
+  const decision = experience.opportunityDecisions.find((item) => item.recommendationId === "rec_apply");
+
+  assert.ok(decision);
+  assert.equal(decision.recommendation, "APPLY NOW");
+  assert.equal(decision.operatorDecision, "No Ross decision yet");
+  assert.equal(decision.status, "NEEDS_DECISION");
+  assert.equal(decision.applicationCreated, false);
+  assert.equal(decision.applicationSubmitted, false);
+  assert.equal(decision.resumeGenerated, false);
+  assert.equal(decision.humanReview.supportingExperience[0].label, "StaffordOS - AI agent orchestration and governance");
+  assert.equal(decision.availableActions.find((action) => action.actionType === "APPLY").enabled, true);
+  assert.equal(decision.availableActions.find((action) => action.actionType === "SKIP").enabled, true);
+});
+
+test("human review display excludes internal authority terms and does not present unsupported claims as evidence", () => {
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    applicationIntelligenceReadModel: [intelligenceItem({
+      humanReview: {
+        whyThisFits: ["The role asks for workflow automation. Verified StaffordOS work supports this positioning."],
+        supportingExperience: [
+          {
+            label: "Navy Federal - stakeholder and requirements work",
+            detail: "Supported business requirements, stakeholder coordination, and marketing operations delivery.",
+            supportLevel: "Verified",
+            limitations: [],
+          },
+        ],
+        gapsAndRisks: [
+          {
+            kind: "Clear gap",
+            requirement: "Direct ownership of a public enterprise admin platform at Airtable scale.",
+            detail: "No verified support is currently mapped. This is not proof Ross lacks it.",
+          },
+          {
+            kind: "Uncertain",
+            requirement: "Exact title chronology for a related leadership claim.",
+            detail: "Some related experience may exist, but the current evidence is not clear enough to use confidently.",
+          },
+        ],
+        resumeReadiness: {
+          label: "Blocked",
+          detail: "CareerOS should not use this resume for the opportunity until Ross resolves the listed issue.",
+          blockers: ["Unsupported metric remains blocked."],
+        },
+        nextAction: "Review the evidence and resume wording before using this opportunity.",
+      },
+    })],
+  });
+  const review = experience.applicationIntelligence[0].humanReview;
+  const serialized = JSON.stringify(review);
+
+  assert.equal(review.supportingExperience.some((item) => /unsupported/i.test(`${item.label} ${item.detail}`)), false);
+  assert.equal(review.gapsAndRisks.some((item) => item.kind === "Clear gap"), true);
+  assert.equal(review.gapsAndRisks.some((item) => item.kind === "Uncertain"), true);
+  assert.equal(review.resumeReadiness.label, "Blocked");
+  assert.doesNotMatch(serialized, /CareerFact|CareerEvidence|ApplicationArtifactVersion|packet ID|ResumeVersion|authority digest|career_fact|career_evidence|\/Users\//);
 });
 
 test("truth-bound resume draft review models display human-readable content without source IDs", () => {

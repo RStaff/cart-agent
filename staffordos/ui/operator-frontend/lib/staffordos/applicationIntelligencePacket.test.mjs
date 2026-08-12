@@ -282,6 +282,47 @@ test("read model hides private paths, source URLs, raw job text, and raw resume 
   assert.doesNotMatch(serialized, /\/Users\/|jobs\.example\.invalid|Required: AI automation|sourcePath/);
 });
 
+test("read model projects human-safe fit, evidence, gap, resume, and next-action explanation", () => {
+  const result = buildPacket({
+    careerFacts: [
+      careerFact({
+        organization: "StaffordOS",
+        roleOrTitle: "AI agent orchestration and governance",
+        statement: "Ross built governed AI agent orchestration workflows with review boundaries.",
+        technologyOrSkill: "AI agent orchestration",
+      }),
+    ],
+    careerEvidence: [
+      careerEvidence({
+        title: "StaffordOS governance artifact",
+        summary: "Evidence for governed AI agent orchestration and workflow review boundaries.",
+      }),
+    ],
+  });
+  const review = result.readModel[0].humanReview;
+  const serialized = JSON.stringify(review);
+
+  assert.ok(review.whyThisFits.some((reason) => /role asks/i.test(reason)));
+  assert.ok(review.supportingExperience.some((item) => /StaffordOS/.test(item.label)));
+  assert.ok(review.supportingExperience.some((item) => /governed AI agent orchestration/i.test(item.detail)));
+  assert.ok(review.gapsAndRisks.length >= 1);
+  assert.ok(["Ready to tailor", "Needs review", "Blocked"].includes(review.resumeReadiness.label));
+  assert.match(review.nextAction, /Review|Ready|apply|hold|skip/i);
+  assert.doesNotMatch(serialized, /CareerFact|CareerEvidence|ApplicationArtifactVersion|packet ID|ResumeVersion|authority digest|career_fact|career_evidence|sha256:|\/Users\//);
+});
+
+test("unsupported mappings become gaps, not supporting experience", () => {
+  const result = buildPacket({
+    careerFacts: [],
+    careerEvidence: [],
+  });
+  const review = result.readModel[0].humanReview;
+
+  assert.equal(review.supportingExperience.length, 0);
+  assert.ok(review.gapsAndRisks.some((item) => item.kind === "Clear gap" || item.kind === "Needs verification"));
+  assert.equal(JSON.stringify(review.supportingExperience).includes("No verified support"), false);
+});
+
 test("private packet writer stores owner-private JSON outside the repository", () => {
   const privateRoot = mkdtempSync(path.join(tmpdir(), "careeros-v102-packets-"));
   const result = buildPacket();

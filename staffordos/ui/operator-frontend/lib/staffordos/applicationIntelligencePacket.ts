@@ -88,6 +88,11 @@ export type ApplicationIntelligenceEvidenceReference = {
   safePositioning: string;
   factAuthority: Array<{
     careerFactId: string;
+    label: string | null;
+    statement: string | null;
+    organization: string | null;
+    roleOrTitle: string | null;
+    technologyOrSkill: string | null;
     factType: string | null;
     verificationStatus: string | null;
     authorityClassification: string | null;
@@ -96,6 +101,8 @@ export type ApplicationIntelligenceEvidenceReference = {
   }>;
   evidenceAuthority: Array<{
     careerEvidenceId: string;
+    title: string | null;
+    summary: string | null;
     evidenceType: string | null;
     authorityClassification: string | null;
     supportLevel: string | null;
@@ -245,10 +252,32 @@ export type ApplicationIntelligencePacket = {
   limitations: string[];
 };
 
+export type ApplicationIntelligenceHumanReviewProjection = {
+  whyThisFits: string[];
+  supportingExperience: Array<{
+    label: string;
+    detail: string;
+    supportLevel: "Verified" | "Supported with limitation";
+    limitations: string[];
+  }>;
+  gapsAndRisks: Array<{
+    kind: "Clear gap" | "Needs verification" | "Uncertain" | "Conflicting evidence" | "Resume representation issue";
+    requirement: string;
+    detail: string;
+  }>;
+  resumeReadiness: {
+    label: "Ready to tailor" | "Needs review" | "Blocked";
+    detail: string;
+    blockers: string[];
+  };
+  nextAction: string;
+};
+
 export type ApplicationIntelligencePacketReadModelRecord = {
   schemaVersion: typeof APPLICATION_INTELLIGENCE_PACKET_READ_MODEL_SCHEMA_VERSION;
   packetId: string;
   jobOpportunityId: string;
+  recommendationId: string;
   company: string;
   role: string;
   recommendation: OpportunityApplicationRecommendation;
@@ -268,6 +297,7 @@ export type ApplicationIntelligencePacketReadModelRecord = {
   resumeSafeToReuse: boolean;
   blockerCount: number;
   nextAction: ApplicationIntelligenceNextAction;
+  humanReview: ApplicationIntelligenceHumanReviewProjection;
   humanReviewRequired: true;
   applicationCreated: false;
   applicationSubmitted: false;
@@ -396,6 +426,18 @@ function uniqueSorted(values: readonly (string | null | undefined)[]) {
     .sort((left, right) => left.localeCompare(right));
 }
 
+function uniqueInOrder(values: readonly (string | null | undefined)[]) {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const value of values) {
+    const text = typeof value === "string" ? value.trim() : "";
+    if (!text || seen.has(text)) continue;
+    seen.add(text);
+    result.push(text);
+  }
+  return result;
+}
+
 function recordId(record: { id?: unknown }) {
   return typeof record.id === "string" && record.id ? record.id : null;
 }
@@ -428,6 +470,61 @@ function evidenceDisposition(evidence: Partial<CareerEvidence> | null): Applicat
   if (Array.isArray(evidence.challengesFactIds) && evidence.challengesFactIds.length > 0) return "CONFLICTING";
   if (evidence.authorityClassification === "GENERATED_DOCUMENT") return "AMBIGUOUS";
   return "SUPPORTED_WITH_LIMITATION";
+}
+
+const INTERNAL_REVIEW_TEXT_PATTERN =
+  /\b(CareerFact|CareerEvidence|ApplicationArtifactVersion|ResumeVersion|authority digest|source digest|description digest|packet ID|claim ID)\b|career_fact|career_evidence|priv[a-z0-9_]+|sha256:|\/Users\//i;
+
+const NON_ACTIONABLE_REQUIREMENT_PATTERN =
+  /accommodation|medical condition|religious belief|privacy|collection statement|personal data|VEVRAA|federal contractor|equal opportunity|benefits|restricted stock|salary range|base salary range|compensation package|compensation awarded|successful candidates|applicant|application process|job scam|stay safe|official communication|sensitive information|purchase equipment|if in doubt|learn more|department:|requisition:|who you are|@/i;
+
+function cleanOperatorText(value: string | null | undefined) {
+  let text = typeof value === "string" ? value.trim() : "";
+  if (!text) return null;
+  text = text
+    .replace(/\bResumeVersion\b/g, "resume")
+    .replace(/\bExplainable Fit\b/g, "fit review")
+    .replace(/\boperator\b/gi, "Ross")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!text || INTERNAL_REVIEW_TEXT_PATTERN.test(text)) return null;
+  return text;
+}
+
+function shortOperatorText(value: string | null | undefined, maxLength = 220) {
+  const text = cleanOperatorText(value);
+  if (!text) return null;
+  return text.length <= maxLength ? text : `${text.slice(0, maxLength - 1).trim()}...`;
+}
+
+function actionableRequirementText(requirement: ApplicationIntelligencePacketRequirement) {
+  const text = shortOperatorText(requirement.requirementText, 240);
+  if (!text || NON_ACTIONABLE_REQUIREMENT_PATTERN.test(text)) return null;
+  return text;
+}
+
+function factHumanLabel(fact: Partial<CareerFact> | null) {
+  if (!fact) return null;
+  const organization = cleanOperatorText(fact.organization);
+  const role = cleanOperatorText(fact.roleOrTitle);
+  const skill = cleanOperatorText(fact.technologyOrSkill);
+  const statement = shortOperatorText(fact.statement, 180);
+  const label = [organization, role || skill].filter(Boolean).join(" - ");
+  return label || statement;
+}
+
+function evidenceHumanTitle(evidence: Partial<CareerEvidence> | null) {
+  if (!evidence) return null;
+  return cleanOperatorText(evidence.title) || shortOperatorText(evidence.summary, 180);
+}
+
+function evidenceHumanSummary(evidence: Partial<CareerEvidence> | null) {
+  if (!evidence) return null;
+  return shortOperatorText(evidence.summary, 220);
+}
+
+function supportLevelFor(disposition: ApplicationIntelligenceClaimDisposition) {
+  return disposition === "SUPPORTED" ? "Verified" as const : "Supported with limitation" as const;
 }
 
 function resumeClaimDisposition(classification: ResumeFactSafetyStatus): ApplicationIntelligenceClaimDisposition {
@@ -579,6 +676,11 @@ function evidenceReferences(input: {
       const fact = factById.get(careerFactId) || null;
       return {
         careerFactId,
+        label: factHumanLabel(fact),
+        statement: shortOperatorText(fact?.statement, 220),
+        organization: cleanOperatorText(fact?.organization),
+        roleOrTitle: cleanOperatorText(fact?.roleOrTitle),
+        technologyOrSkill: cleanOperatorText(fact?.technologyOrSkill),
         factType: fact?.factType || null,
         verificationStatus: fact?.verificationStatus || null,
         authorityClassification: fact?.authorityClassification || null,
@@ -593,6 +695,8 @@ function evidenceReferences(input: {
       const evidence = evidenceById.get(careerEvidenceId) || null;
       return {
         careerEvidenceId,
+        title: evidenceHumanTitle(evidence),
+        summary: evidenceHumanSummary(evidence),
         evidenceType: evidence?.evidenceType || evidence?.sourceType || null,
         authorityClassification: evidence?.authorityClassification || null,
         supportLevel: null,
@@ -931,7 +1035,219 @@ function packetFor(input: {
   };
 }
 
-function readModelFor(packet: ApplicationIntelligencePacket): ApplicationIntelligencePacketReadModelRecord {
+function factLookup(records: readonly Partial<CareerFact>[] = []) {
+  return new Map(records.map((fact) => [recordId(fact), fact]).filter((entry): entry is [string, Partial<CareerFact>] => Boolean(entry[0])));
+}
+
+function evidenceLookup(records: readonly Partial<CareerEvidence>[] = []) {
+  return new Map(records.map((evidence) => [recordId(evidence), evidence]).filter((entry): entry is [string, Partial<CareerEvidence>] => Boolean(entry[0])));
+}
+
+function requirementById(packet: ApplicationIntelligencePacket) {
+  return new Map(
+    [...packet.fit.matchedRequirements, ...packet.fit.unmatchedRequirements]
+      .map((requirement) => [requirement.requirementId, requirement] as const),
+  );
+}
+
+function whyFitReasons(packet: ApplicationIntelligencePacket) {
+  const supportedRequirementReasons = packet.fit.matchedRequirements
+    .filter((requirement) => requirement.disposition === "SUPPORTED" || requirement.disposition === "SUPPORTED_WITH_LIMITATION")
+    .map((requirement) => {
+      const requirementText = actionableRequirementText(requirement)?.replace(/[.]+$/, "");
+      const positioning = cleanOperatorText(requirement.safePositioning);
+      if (!requirementText || !positioning) return null;
+      return `The role asks for ${requirementText}. ${positioning}`;
+    });
+  const fitRationale = packet.fit.fitRationale
+    .map((reason) => shortOperatorText(reason, 220))
+    .filter((reason): reason is string =>
+      Boolean(reason && !/^\w[\w /-]+:\s*\d/i.test(reason) && !/\b(missing|unresolved|review|required|resume)\b/i.test(reason)),
+    );
+
+  return uniqueInOrder([...supportedRequirementReasons, ...fitRationale]).slice(0, 4);
+}
+
+function enrichedFactFor(
+  factId: string,
+  packetFact: ApplicationIntelligenceEvidenceReference["factAuthority"][number] | null,
+  canonicalFacts: Map<string, Partial<CareerFact>>,
+) {
+  const fact = canonicalFacts.get(factId) || null;
+  return {
+    label: factHumanLabel(fact) || packetFact?.label || packetFact?.statement || null,
+    statement: shortOperatorText(fact?.statement, 220) || packetFact?.statement || null,
+    disposition: fact ? factDisposition(fact) : packetFact?.disposition || "NEEDS_OPERATOR_REVIEW" as const,
+  };
+}
+
+function enrichedEvidenceFor(
+  evidenceId: string,
+  packetEvidence: ApplicationIntelligenceEvidenceReference["evidenceAuthority"][number] | null,
+  canonicalEvidence: Map<string, Partial<CareerEvidence>>,
+) {
+  const evidence = canonicalEvidence.get(evidenceId) || null;
+  return {
+    title: evidenceHumanTitle(evidence) || packetEvidence?.title || null,
+    summary: evidenceHumanSummary(evidence) || packetEvidence?.summary || null,
+    disposition: evidence ? evidenceDisposition(evidence) : packetEvidence?.disposition || "NEEDS_OPERATOR_REVIEW" as const,
+  };
+}
+
+function supportingExperience(
+  packet: ApplicationIntelligencePacket,
+  enrichment: { careerFacts?: readonly Partial<CareerFact>[]; careerEvidence?: readonly Partial<CareerEvidence>[] } = {},
+): ApplicationIntelligenceHumanReviewProjection["supportingExperience"] {
+  const requirements = requirementById(packet);
+  const facts = factLookup(enrichment.careerFacts || []);
+  const evidence = evidenceLookup(enrichment.careerEvidence || []);
+  const rows = packet.verifiedCareerEvidence.supportingEvidence
+    .filter((support) => support.disposition === "SUPPORTED" || support.disposition === "SUPPORTED_WITH_LIMITATION")
+    .map((support) => {
+      const packetFacts = new Map(support.factAuthority.map((fact) => [fact.careerFactId, fact]));
+      const packetEvidence = new Map(support.evidenceAuthority.map((item) => [item.careerEvidenceId, item]));
+      const factSummaries = support.careerFactIds
+        .map((factId) => enrichedFactFor(factId, packetFacts.get(factId) || null, facts))
+        .filter((fact) => fact.disposition === "SUPPORTED" || fact.disposition === "SUPPORTED_WITH_LIMITATION");
+      const evidenceSummaries = support.careerEvidenceIds
+        .map((evidenceId) => enrichedEvidenceFor(evidenceId, packetEvidence.get(evidenceId) || null, evidence))
+        .filter((item) => item.disposition === "SUPPORTED" || item.disposition === "SUPPORTED_WITH_LIMITATION");
+      const requirement = requirements.get(support.requirementId) || null;
+      const requirementText = requirement ? actionableRequirementText(requirement) : null;
+      const label =
+        factSummaries.map((fact) => fact.label).find(Boolean) ||
+        evidenceSummaries.map((item) => item.title).find(Boolean) ||
+        (requirementText ? `Support for: ${requirementText}` : "Supporting experience");
+      const summary =
+        factSummaries.map((fact) => fact.statement).find(Boolean) ||
+        evidenceSummaries.map((item) => item.summary).find(Boolean) ||
+        cleanOperatorText(support.safePositioning) ||
+        "Evidence is attached in the private record, but only a limited safe summary is available here.";
+      const limitations = [
+        support.disposition === "SUPPORTED_WITH_LIMITATION" ? "Treat this as adjacent or transferable, not exact same-role proof." : null,
+        factSummaries.length || evidenceSummaries.length ? null : "Named evidence details are not included in this packet; the private record still contains the linked support.",
+      ].filter((item): item is string => Boolean(item));
+
+      return {
+        label,
+        detail: summary,
+        supportLevel: supportLevelFor(support.disposition),
+        limitations,
+      };
+    });
+
+  const seen = new Set<string>();
+  return rows.filter((row) => {
+    const key = `${row.label}|${row.detail}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).slice(0, 5);
+}
+
+function gapKind(disposition: ApplicationIntelligenceClaimDisposition): ApplicationIntelligenceHumanReviewProjection["gapsAndRisks"][number]["kind"] {
+  if (disposition === "UNSUPPORTED") return "Clear gap";
+  if (disposition === "AMBIGUOUS") return "Uncertain";
+  if (disposition === "CONFLICTING") return "Conflicting evidence";
+  return "Needs verification";
+}
+
+function gapDetail(disposition: ApplicationIntelligenceClaimDisposition) {
+  if (disposition === "UNSUPPORTED") {
+    return "No verified support is currently mapped. This is not proof Ross lacks it.";
+  }
+  if (disposition === "AMBIGUOUS") return "Some related experience may exist, but the current evidence is not clear enough to use confidently.";
+  if (disposition === "CONFLICTING") return "Existing evidence conflicts and needs Ross's review before it is used.";
+  return "The requirement needs evidence review before it can be used as a positive claim.";
+}
+
+function gapsAndRisks(packet: ApplicationIntelligencePacket): ApplicationIntelligenceHumanReviewProjection["gapsAndRisks"] {
+  const requirementGaps = packet.gapsAndRisks.evidenceGaps
+    .map((requirement) => {
+      const requirementText = actionableRequirementText(requirement);
+      if (!requirementText) return null;
+      return {
+        kind: gapKind(requirement.disposition),
+        requirement: requirementText,
+        detail: gapDetail(requirement.disposition),
+      };
+    })
+    .filter((item): item is ApplicationIntelligenceHumanReviewProjection["gapsAndRisks"][number] => Boolean(item));
+  const resumeGaps = packet.resume.unsupportedClaims
+    .map((claim) => shortOperatorText(claim.safeClaimSummary, 220))
+    .filter((claim): claim is string => Boolean(claim))
+    .map((claim) => ({
+      kind: "Resume representation issue" as const,
+      requirement: claim,
+      detail: "This resume wording is not safe to use until Ross reviews or removes it.",
+    }));
+
+  const seen = new Set<string>();
+  return [...requirementGaps, ...resumeGaps].filter((gap) => {
+    const key = `${gap.kind}|${gap.requirement}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).slice(0, 6);
+}
+
+function resumeReadiness(packet: ApplicationIntelligencePacket): ApplicationIntelligenceHumanReviewProjection["resumeReadiness"] {
+  const nonBlockingResumeNote =
+    /\b(no resume was generated|generated, modified, copied, submitted, or uploaded|reuse candidate only|metadata was not supplied)\b/i;
+  const blockers = uniqueInOrder([
+    ...packet.resume.evidenceGaps,
+    ...packet.resume.unsupportedClaims.map((claim) => claim.safeClaimSummary),
+    ...packet.resume.claimSafetyLimitations,
+  ].map((item) => shortOperatorText(item, 220)))
+    .filter((item) => !nonBlockingResumeNote.test(item))
+    .map((item) => item.replace(/^resume\b/, "The resume"))
+    .slice(0, 5);
+
+  if (packet.resume.safetyState === "SAFE_TO_REUSE" || packet.resume.safetyState === "SAFE_WITH_LIMITATIONS") {
+    return {
+      label: "Ready to tailor",
+      detail: packet.resume.canReuseAsIs
+        ? "The selected resume is safe to tailor from the current evidence."
+        : "The selected resume can be used with the listed limitations reviewed.",
+      blockers,
+    };
+  }
+  if (packet.resume.safetyState === "NOT_SAFE_TO_REUSE" || packet.resume.safetyState === "NO_RESUMEVERSION_AVAILABLE") {
+    return {
+      label: "Blocked",
+      detail: "CareerOS should not use this resume for the opportunity until Ross resolves the listed issue.",
+      blockers: blockers.length ? blockers : ["No safe resume candidate is available for this opportunity."],
+    };
+  }
+  return {
+    label: "Needs review",
+    detail: "The selected resume may be useful, but Ross needs to review evidence or wording before using it.",
+    blockers: blockers.length ? blockers : ["Resume evidence or wording needs Ross's review before use."],
+  };
+}
+
+function nextActionText(packet: ApplicationIntelligencePacket) {
+  return cleanOperatorText(packet.applicationDecision.recommendedNextAction) ||
+    "Review the opportunity and decide whether to continue.";
+}
+
+function humanReviewProjection(
+  packet: ApplicationIntelligencePacket,
+  enrichment: { careerFacts?: readonly Partial<CareerFact>[]; careerEvidence?: readonly Partial<CareerEvidence>[] } = {},
+): ApplicationIntelligenceHumanReviewProjection {
+  return {
+    whyThisFits: whyFitReasons(packet),
+    supportingExperience: supportingExperience(packet, enrichment),
+    gapsAndRisks: gapsAndRisks(packet),
+    resumeReadiness: resumeReadiness(packet),
+    nextAction: nextActionText(packet),
+  };
+}
+
+function readModelFor(
+  packet: ApplicationIntelligencePacket,
+  enrichment: { careerFacts?: readonly Partial<CareerFact>[]; careerEvidence?: readonly Partial<CareerEvidence>[] } = {},
+): ApplicationIntelligencePacketReadModelRecord {
   const blockerCount =
     packet.fit.majorBlockers.length +
     packet.gapsAndRisks.evidenceGaps.length +
@@ -941,6 +1257,7 @@ function readModelFor(packet: ApplicationIntelligencePacket): ApplicationIntelli
     schemaVersion: APPLICATION_INTELLIGENCE_PACKET_READ_MODEL_SCHEMA_VERSION,
     packetId: packet.packetId,
     jobOpportunityId: packet.identity.jobOpportunityId,
+    recommendationId: packet.identity.recommendationId,
     company: packet.identity.company,
     role: packet.identity.role,
     recommendation: packet.applicationDecision.recommendation,
@@ -962,6 +1279,7 @@ function readModelFor(packet: ApplicationIntelligencePacket): ApplicationIntelli
     resumeSafeToReuse: packet.resume.safeToReuse,
     blockerCount,
     nextAction: packet.applicationDecision.deterministicNextAction,
+    humanReview: humanReviewProjection(packet, enrichment),
     humanReviewRequired: true,
     applicationCreated: false,
     applicationSubmitted: false,
@@ -1058,7 +1376,7 @@ export function buildApplicationIntelligencePackets(
       newApplicationTrackerCreated: false,
     },
     packets,
-    readModel: packets.map(readModelFor),
+    readModel: packets.map((packet) => readModelFor(packet)),
     skippedRecommendations,
     summary: {
       recommendationsReviewed: input.recommendationResult.recommendations.length,
@@ -1204,6 +1522,84 @@ function latestJson<T>(root: string, filename: string): T | null {
   return readJson<T>(filePath);
 }
 
+function matchingFiles(root: string, filename: string, maxDepth = 5): string[] {
+  if (!existsSync(root) || maxDepth < 0) return [];
+  let entries: string[] = [];
+  try {
+    entries = readdirSync(root);
+  } catch {
+    return [];
+  }
+  const matches: string[] = [];
+  for (const entry of entries) {
+    const entryPath = path.join(root, entry);
+    let stat = null;
+    try {
+      stat = statSync(entryPath);
+    } catch {
+      continue;
+    }
+    if (stat.isFile() && entry === filename) matches.push(entryPath);
+    if (stat.isDirectory()) matches.push(...matchingFiles(entryPath, filename, maxDepth - 1));
+  }
+  return matches.sort((left, right) => left.localeCompare(right));
+}
+
+function safeJsonArray<T>(filePath: string): T[] {
+  if (!existsSync(filePath)) return [];
+  try {
+    const value = readJson<unknown>(filePath);
+    if (Array.isArray(value)) return value as T[];
+    if (isRecord(value) && Array.isArray(value.records)) return value.records as T[];
+    if (isRecord(value) && Array.isArray(value.careerFacts)) return value.careerFacts as T[];
+    if (isRecord(value) && Array.isArray(value.careerEvidence)) return value.careerEvidence as T[];
+  } catch {
+    return [];
+  }
+  return [];
+}
+
+function uniqueRecordsById<T extends { id?: unknown }>(records: readonly T[]) {
+  const byId = new Map<string, T>();
+  for (const record of records) {
+    const id = recordId(record);
+    if (!id) continue;
+    byId.set(id, record);
+  }
+  return [...byId.values()];
+}
+
+function lastItem<T>(items: readonly T[]) {
+  return items.length ? items[items.length - 1] : undefined;
+}
+
+function loadLatestCanonicalCareerFacts(jobSearchRoot: string): Partial<CareerFact>[] {
+  const professionalRoot = path.dirname(jobSearchRoot);
+  const directFiles = [
+    path.join(professionalRoot, "career/s010_02c/candidate_career_facts.private.json"),
+    path.join(professionalRoot, "career/s010_02c2/combined_candidate_career_facts.private.json"),
+  ];
+  const latestFiles = [
+    lastItem(matchingFiles(path.join(jobSearchRoot, "application-intelligence-evidence-unblock"), "canonical_career_facts.private.json")),
+    lastItem(matchingFiles(path.join(professionalRoot, "career-evidence"), "canonical_career_facts.private.json")),
+  ].filter((file): file is string => Boolean(file));
+  return uniqueRecordsById([...directFiles, ...latestFiles].flatMap((file) => safeJsonArray<Partial<CareerFact>>(file)));
+}
+
+function loadLatestCanonicalCareerEvidence(jobSearchRoot: string): Partial<CareerEvidence>[] {
+  const professionalRoot = path.dirname(jobSearchRoot);
+  const directFiles = [
+    path.join(professionalRoot, "career/s010_02c/career_evidence.private.json"),
+    path.join(professionalRoot, "career/s010_02c2/combined_career_evidence.private.json"),
+  ];
+  const latestFiles = [
+    lastItem(matchingFiles(path.join(jobSearchRoot, "application-intelligence-evidence-unblock"), "canonical_career_evidence.private.json")),
+    lastItem(matchingFiles(path.join(jobSearchRoot, "operator-confirmed-evidence-promotion"), "career_evidence_promoted.private.json")),
+    lastItem(matchingFiles(path.join(professionalRoot, "career-evidence"), "canonical_career_evidence.private.json")),
+  ].filter((file): file is string => Boolean(file));
+  return uniqueRecordsById([...directFiles, ...latestFiles].flatMap((file) => safeJsonArray<Partial<CareerEvidence>>(file)));
+}
+
 export function loadApplicationIntelligencePacketResultFile(filePath: string): ApplicationIntelligencePacketResult {
   const record = readJson<{
     applicationIntelligencePacketResult?: ApplicationIntelligencePacketResult;
@@ -1227,8 +1623,16 @@ export function loadApplicationIntelligencePacketReadModelFile(filePath: string)
 }
 
 export function loadLatestApplicationIntelligencePacketReadModel(jobSearchRoot = DEFAULT_JOB_SEARCH_PRIVATE_ROOT) {
+  const root = path.join(jobSearchRoot, "application-intelligence-packets");
+  const result = latestJson<ApplicationIntelligencePacketResult>(root, "application_intelligence_packet_result.json");
+  if (result?.packets?.length) {
+    return result.packets.map((packet) => readModelFor(packet, {
+      careerFacts: loadLatestCanonicalCareerFacts(jobSearchRoot),
+      careerEvidence: loadLatestCanonicalCareerEvidence(jobSearchRoot),
+    }));
+  }
   return latestJson<ApplicationIntelligencePacketReadModelRecord[]>(
-    path.join(jobSearchRoot, "application-intelligence-packets"),
+    root,
     "application_intelligence_packet_read_model.json",
   ) || [];
 }

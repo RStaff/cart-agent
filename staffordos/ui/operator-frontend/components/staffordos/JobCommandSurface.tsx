@@ -74,6 +74,79 @@ function OpportunityItem({ item }: { item: CareerOsDailyTopOpportunity }) {
   );
 }
 
+function HumanReviewPanel({
+  review,
+}: {
+  review: NonNullable<CareerOsDailyApplicationIntelligenceItem["humanReview"]>;
+}) {
+  return (
+    <div className="staffordCareerHumanReview">
+      <section>
+        <h4>Why this fits</h4>
+        {review.whyThisFits.length ? (
+          <ul>
+            {review.whyThisFits.map((reason, index) => (
+              <li key={`fit-${index}`}>{reason}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>No safe fit reason is available yet.</p>
+        )}
+      </section>
+      <section>
+        <h4>Supporting experience</h4>
+        {review.supportingExperience.length ? (
+          <ul>
+            {review.supportingExperience.map((evidence, index) => (
+              <li key={`support-${index}`}>
+                <strong>{evidence.label}</strong>
+                <span>{evidence.detail}</span>
+                {evidence.limitations.length ? <em>{evidence.limitations.join(" ")}</em> : null}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No verified supporting experience is available in the safe display.</p>
+        )}
+      </section>
+      <section>
+        <h4>Gaps / uncertainty</h4>
+        {review.gapsAndRisks.length ? (
+          <ul>
+            {review.gapsAndRisks.map((gap, index) => (
+              <li key={`gap-${index}`}>
+                <strong>{gap.kind}</strong>
+                <span>{gap.requirement}</span>
+                <em>{gap.detail}</em>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No meaningful gap is shown in the safe display.</p>
+        )}
+      </section>
+      <section>
+        <h4>Resume readiness</h4>
+        <p>
+          <strong>{review.resumeReadiness.label}</strong>
+          <span>{review.resumeReadiness.detail}</span>
+        </p>
+        {review.resumeReadiness.blockers.length ? (
+          <ul>
+            {review.resumeReadiness.blockers.map((blocker, index) => (
+              <li key={`resume-blocker-${index}`}>{blocker}</li>
+            ))}
+          </ul>
+        ) : null}
+      </section>
+      <section>
+        <h4>Next action</h4>
+        <p>{review.nextAction}</p>
+      </section>
+    </div>
+  );
+}
+
 function OpportunityDecisionItem({
   item,
   opportunityDecisionAction,
@@ -102,33 +175,40 @@ function OpportunityDecisionItem({
         </div>
         <div>
           <dt>Readiness</dt>
-          <dd>{item.applicationReadiness}</dd>
+          <dd>{item.humanReview ? item.humanReview.resumeReadiness.label : item.applicationReadiness}</dd>
         </div>
         <div>
           <dt>Fit</dt>
-          <dd>{item.explainableFit}</dd>
+          <dd>{item.humanReview?.whyThisFits[0] || item.explainableFit}</dd>
         </div>
         <div>
           <dt>Evidence</dt>
-          <dd>{item.evidence}</dd>
+          <dd>
+            {item.humanReview
+              ? `${item.humanReview.supportingExperience.length} supporting experience ${item.humanReview.supportingExperience.length === 1 ? "summary" : "summaries"}`
+              : item.evidence}
+          </dd>
         </div>
         <div>
           <dt>Gaps / Risk</dt>
-          <dd>{item.gaps}</dd>
+          <dd>
+            {item.humanReview?.gapsAndRisks[0]?.requirement || item.gaps}
+          </dd>
         </div>
         <div>
           <dt>Resume</dt>
-          <dd>{item.resumeReadiness}</dd>
+          <dd>{item.humanReview?.resumeReadiness.label || item.resumeReadiness}</dd>
         </div>
         <div>
           <dt>Recommended Next</dt>
-          <dd>{item.recommendedNextAction}</dd>
+          <dd>{item.humanReview?.nextAction || item.recommendedNextAction}</dd>
         </div>
         <div>
           <dt>After Decision</dt>
           <dd>{item.currentWorkflowNextAction}</dd>
         </div>
       </dl>
+      {item.humanReview ? <HumanReviewPanel review={item.humanReview} /> : null}
       <p className="staffordJobCommandControlNote">{item.whyItFits}</p>
       <footer className="staffordOpportunityDecisionFooter">
         <span>{item.decisionAuthority}</span>
@@ -301,29 +381,32 @@ function IntelligenceItem({
         <dl className="staffordCareerCommandDetails">
           <div>
             <dt>Fit</dt>
-            <dd>{item.fit}</dd>
+            <dd>{item.humanReview.whyThisFits[0] || item.detail}</dd>
           </div>
           <div>
             <dt>Evidence</dt>
-            <dd>{item.evidence}</dd>
+            <dd>
+              {item.humanReview.supportingExperience.length} supporting experience {item.humanReview.supportingExperience.length === 1 ? "summary" : "summaries"}
+            </dd>
           </div>
           <div>
             <dt>Gaps</dt>
-            <dd>{item.gaps}</dd>
+            <dd>{item.humanReview.gapsAndRisks.length ? `${item.humanReview.gapsAndRisks.length} gaps or uncertainties to review` : "No meaningful gap shown"}</dd>
           </div>
           <div>
             <dt>Resume</dt>
-            <dd>{item.resumeVersion}</dd>
+            <dd>{item.humanReview.resumeReadiness.label}</dd>
           </div>
           <div>
-            <dt>Safety</dt>
-            <dd>{item.resumeSafety}</dd>
+            <dt>Resume Note</dt>
+            <dd>{item.humanReview.resumeReadiness.detail}</dd>
           </div>
           <div>
             <dt>Next Action</dt>
-            <dd>{item.detail}</dd>
+            <dd>{item.humanReview.nextAction}</dd>
           </div>
         </dl>
+        <HumanReviewPanel review={item.humanReview} />
       </details>
       {resumeDraftAction ? (
         <form action={resumeDraftAction}>

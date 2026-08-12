@@ -23,7 +23,10 @@ import type {
   ReadyToApplyApplicationPackageReadModelRecord,
   ReadyToApplyApplicationPackageResult,
 } from "./readyToApplyApplicationPackage";
-import type { ApplicationIntelligencePacketReadModelRecord } from "./applicationIntelligencePacket";
+import type {
+  ApplicationIntelligenceHumanReviewProjection,
+  ApplicationIntelligencePacketReadModelRecord,
+} from "./applicationIntelligencePacket";
 import type {
   TruthBoundResumeDraftReadModelRecord,
   TruthBoundResumeDraftReviewReadModelRecord,
@@ -124,6 +127,7 @@ export type CareerOsDailyOpportunityDecisionItem = {
   whyItFits: string;
   gaps: string;
   evidence: string;
+  humanReview: ApplicationIntelligenceHumanReviewProjection | null;
   recommendedNextAction: string;
   currentWorkflowNextAction: string;
   status: "NEEDS_DECISION" | "READY_TO_APPLY" | "REVIEW_LATER" | "SKIPPED" | "NOT_INTERESTED";
@@ -211,6 +215,7 @@ export type CareerOsDailyApplicationIntelligenceItem = {
   resumeSafety: string;
   gaps: string;
   evidence: string;
+  humanReview: ApplicationIntelligenceHumanReviewProjection;
   nextAction: CareerOsDailyActionKind;
   detail: string;
   externalActionAvailable: false;
@@ -556,6 +561,49 @@ function opportunityDecisionLabel(action: CareerWorkflowStateItem["workflowActio
   return "No Ross decision yet";
 }
 
+function resumeReadinessLabel(item: Pick<ApplicationIntelligencePacketReadModelRecord, "resumeSafetyState" | "resumeSafeToReuse">): ApplicationIntelligenceHumanReviewProjection["resumeReadiness"]["label"] {
+  if (item.resumeSafeToReuse) return "Ready to tailor";
+  if (item.resumeSafetyState === "NOT_SAFE_TO_REUSE" || item.resumeSafetyState === "NO_RESUMEVERSION_AVAILABLE") return "Blocked";
+  return "Needs review";
+}
+
+function fallbackHumanReview(item: ApplicationIntelligencePacketReadModelRecord): ApplicationIntelligenceHumanReviewProjection {
+  const resumeLabel = resumeReadinessLabel(item);
+  const gapSummary = `${item.skillGapCount} skill / ${item.evidenceGapCount} evidence`;
+  return {
+    whyThisFits: [item.fitSummary].filter(Boolean),
+    supportingExperience: item.supportingEvidenceCount > 0
+      ? [{
+          label: "Supporting experience connected",
+          detail: `${item.supportingEvidenceCount} supporting reference${item.supportingEvidenceCount === 1 ? "" : "s"} are connected in the private evidence record.`,
+          supportLevel: "Supported with limitation",
+          limitations: ["Detailed evidence names are not included in this read model."],
+        }]
+      : [],
+    gapsAndRisks: item.skillGapCount || item.evidenceGapCount
+      ? [{
+          kind: "Needs verification",
+          requirement: gapSummary,
+          detail: "Review unmatched or unverified requirements before positioning this application.",
+        }]
+      : [],
+    resumeReadiness: {
+      label: resumeLabel,
+      detail: resumeLabel === "Ready to tailor"
+        ? "The selected resume is safe to tailor from the current evidence."
+        : resumeLabel === "Blocked"
+          ? "Do not use this resume until Ross resolves the blocking issue."
+          : "The selected resume needs Ross's review before use.",
+      blockers: item.blockerCount > 0 ? [`${item.blockerCount} review blocker${item.blockerCount === 1 ? "" : "s"} remain.`] : [],
+    },
+    nextAction: item.fitSummary,
+  };
+}
+
+function humanReviewFor(item: ApplicationIntelligencePacketReadModelRecord) {
+  return item.humanReview || fallbackHumanReview(item);
+}
+
 function decisionStatus(item: CareerWorkflowStateItem): CareerOsDailyOpportunityDecisionItem["status"] {
   if (item.workflowState === "READY_TO_APPLY") return "READY_TO_APPLY";
   if (item.workflowState === "REVIEW_LATER") return "REVIEW_LATER";
@@ -615,9 +663,21 @@ function opportunityDecisions(
   topOpportunityRecords: readonly CareerOsDailyTopOpportunity[],
 ): CareerOsDailyOpportunityDecisionItem[] {
   const topById = new Map(topOpportunityRecords.map((item) => [item.id, item]));
+  const intelligenceByRecommendationId = new Map(
+    intelligenceItems(input)
+      .map((item) => [item.recommendationId, humanReviewFor(item)] as const)
+      .filter((entry): entry is [string, ApplicationIntelligenceHumanReviewProjection] => Boolean(entry[0])),
+  );
+  const intelligenceByCompanyRole = new Map(
+    intelligenceItems(input).map((item) => [`${item.company}\n${item.role}`, humanReviewFor(item)] as const),
+  );
   return activeWorkflowDecisionItems(input).slice(0, 5).map((item) => {
     const top = topById.get(item.recommendationId) || null;
     const recommendation = userRecommendation(item.recommendation);
+    const humanReview =
+      intelligenceByRecommendationId.get(item.recommendationId) ||
+      intelligenceByCompanyRole.get(`${item.company}\n${item.role}`) ||
+      null;
     return {
       id: `decision:${item.recommendationId}`,
       recommendationId: item.recommendationId,
@@ -637,6 +697,7 @@ function opportunityDecisions(
           : "No supporting evidence references are attached in the safe read model.",
       gaps: `${item.missingSkillCount} missing skills / resume effort ${item.estimatedResumeUpdateEffort}`,
       evidence: `${item.supportingEvidenceCount} supporting evidence references`,
+      humanReview,
       recommendedNextAction: item.recommendedNextAction,
       currentWorkflowNextAction: item.currentWorkflowNextAction,
       status: decisionStatus(item),
@@ -698,6 +759,7 @@ function applicationIntelligence(
     resumeSafety: item.resumeSafetyState,
     gaps: `${item.skillGapCount} skill / ${item.evidenceGapCount} evidence`,
     evidence: `${item.supportingEvidenceCount} support / ${item.careerFactReferenceCount} fact refs`,
+    humanReview: humanReviewFor(item),
     nextAction: actionForPacket(item),
     detail: item.fitSummary,
     externalActionAvailable: false,
@@ -1112,7 +1174,7 @@ function opportunityDecisionPriorities(records: readonly CareerOsDailyOpportunit
     role: item.role,
     category: "Opportunity review" as const,
     status: `${item.recommendation} / ${item.operatorDecision}`,
-    detail: item.recommendedNextAction,
+    detail: item.humanReview?.nextAction || item.recommendedNextAction,
     action: "Decide" as const,
     urgency: item.recommendation === "APPLY NOW" || item.recommendation === "REVIEW" ? "today" as const : "next" as const,
     externalActionAvailable: false as const,

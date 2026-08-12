@@ -2929,6 +2929,65 @@ textarea {
   font-weight: 800;
 }
 
+.staffordCareerHumanReview {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #d9dee5;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.staffordCareerHumanReview section {
+  display: grid;
+  gap: 6px;
+}
+
+.staffordCareerHumanReview h4 {
+  margin: 0;
+  color: #15181d;
+  font-size: 12px;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.staffordCareerHumanReview p,
+.staffordCareerHumanReview ul {
+  margin: 0;
+}
+
+.staffordCareerHumanReview ul {
+  display: grid;
+  gap: 7px;
+  padding-left: 18px;
+}
+
+.staffordCareerHumanReview li,
+.staffordCareerHumanReview p {
+  color: #303844;
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.staffordCareerHumanReview li strong,
+.staffordCareerHumanReview p strong {
+  display: block;
+  color: #15181d;
+}
+
+.staffordCareerHumanReview li span,
+.staffordCareerHumanReview p span,
+.staffordCareerHumanReview li em {
+  display: block;
+}
+
+.staffordCareerHumanReview li em {
+  margin-top: 2px;
+  color: #66717e;
+  font-style: normal;
+}
+
 .staffordCareerResumeDraftReview {
   display: grid;
   gap: 12px;
