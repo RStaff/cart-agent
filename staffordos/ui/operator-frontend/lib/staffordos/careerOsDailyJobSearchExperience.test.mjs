@@ -83,7 +83,7 @@ function commandCenterFixture() {
   return {
     capturedAsOf: "2026-08-09T12:00:00.000Z",
     todaysBrief: [
-      { id: "new-opportunities", label: "New Opportunities", value: 3, sourceAuthority: "fixture", limitations: [] },
+      { id: "new-opportunities", label: "Current Opportunities", value: 3, sourceAuthority: "fixture", limitations: [] },
       { id: "ready-to-apply", label: "Ready to Apply", value: 1, sourceAuthority: "fixture", limitations: [] },
       { id: "review", label: "Review", value: 1, sourceAuthority: "fixture", limitations: [] },
       { id: "waiting", label: "Waiting", value: 1, sourceAuthority: "fixture", limitations: [] },
@@ -821,8 +821,8 @@ test("daily briefing combines existing opportunity, package, review, pipeline, a
 
   assert.equal(metrics["Applications needing follow-up"], 1);
   assert.equal(metrics["Ready To Apply"], 1);
-  assert.equal(metrics["Resume Reviews Needed"], 1);
-  assert.equal(metrics["New Opportunities"], 3);
+  assert.equal(metrics["Resume/package reviews needed"], 1);
+  assert.equal(metrics["Current Opportunities"], 3);
   assert.equal(metrics["Interview Activity"], 1);
 });
 
@@ -892,6 +892,50 @@ test("opportunity decisions prioritize actionable recommendations before WAIT an
     experience.opportunityDecisions.map((item) => item.recommendation),
     ["APPLY NOW", "REVIEW", "WAIT", "SKIP"],
   );
+});
+
+test("all shortlisted decision items remain reachable while priority ordering stays deterministic", () => {
+  const base = recommendationResultFixture();
+  const extraReadModel = Array.from({ length: 12 }, (_, index) =>
+    recommendationReadModelRecord(`rec_extra_${index + 1}`, "REVIEW", "NEEDS_EVIDENCE_REVIEW", {
+      company: `Example Shortlist ${index + 1}`,
+      role: "Business Technology Analyst",
+    }),
+  );
+  const expanded = {
+    ...base,
+    readModel: [...base.readModel, ...extraReadModel],
+    recommendations: [...base.recommendations, ...extraReadModel.map((record) => recommendationRecord(record))],
+  };
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    careerWorkflowStateResult: workflow.buildCareerWorkflowState({
+      recommendationResult: expanded,
+      workflowActions: [],
+      generatedAt,
+    }),
+  });
+
+  assert.equal(experience.dailyBriefing.metrics.find((item) => item.label === "Needs Decision").value, 16);
+  assert.equal(experience.opportunityDecisions.length, 16);
+  assert.deepEqual(
+    experience.opportunityDecisions.slice(0, 4).map((item) => item.recommendation),
+    ["APPLY NOW", "REVIEW", "REVIEW", "REVIEW"],
+  );
+  assert.equal(experience.opportunityDecisions.some((item) => item.recommendation === "WAIT"), true);
+  assert.equal(experience.opportunityDecisions.some((item) => item.recommendation === "SKIP"), true);
+  assert.equal(experience.opportunityDecisions.at(-1).recommendationId, "rec_skip");
+  assert.equal(experience.opportunityDecisions.some((item) => item.recommendationId === "rec_extra_12"), true);
+});
+
+test("top opportunities remain connected when active decisions are present", () => {
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    careerWorkflowStateResult: workflowStateFixture(),
+  });
+
+  assert.equal(experience.topOpportunities.length, 2);
+  assert.notEqual(experience.emptyState, "No opportunities connected");
 });
 
 test("opportunity decision actions enforce APPLY readiness without changing recommendation thresholds", () => {

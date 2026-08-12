@@ -150,9 +150,9 @@ function newOpportunityCount(input: CareerOsCommandCenterInput) {
 
 function sourceTimestamp(input: CareerOsCommandCenterInput) {
   return (
+    input.recommendationResult?.generatedAt ??
     input.greenhouseDiscoveryResult?.generatedAt ??
     input.importQueueResult?.generatedAt ??
-    input.recommendationResult?.generatedAt ??
     input.applicationPipelineResult?.generatedAt ??
     CAREEROS_COMMAND_CENTER_EMPTY_AS_OF
   );
@@ -175,7 +175,7 @@ function buildTodaysBrief(input: CareerOsCommandCenterInput): CareerOsBriefItem[
     : "No private recommendation read model connected";
 
   return [
-    briefItem("new-opportunities", "New Opportunities", newOpportunityCount(input), "J002 Opportunity Queue read model", []),
+    briefItem("new-opportunities", "Current Opportunities", newOpportunityCount(input), "J002 Opportunity Queue read model", []),
     briefItem("ready-to-apply", "Ready to Apply", countRecommendation(readModel, "APPLY_NOW"), sourceAuthority, []),
     briefItem("review", "Review", countRecommendation(readModel, "REVIEW"), sourceAuthority, []),
     briefItem("waiting", "Waiting", countRecommendation(readModel, "WAIT"), sourceAuthority, []),

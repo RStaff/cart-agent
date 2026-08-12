@@ -225,13 +225,22 @@ test("Today's Brief counts come from existing opportunity and recommendation rea
   assert.deepEqual(
     Object.fromEntries(commandCenter.todaysBrief.map((item) => [item.label, item.value])),
     {
-      "New Opportunities": 4,
+      "Current Opportunities": 4,
       "Ready to Apply": 1,
       Review: 1,
       Waiting: 1,
       Skipped: 1,
     },
   );
+});
+
+test("recommendation freshness takes precedence over older discovery timestamps", () => {
+  const commandCenter = buildCareerOsCommandCenterPresentation({
+    recommendationResult: { ...recommendationResult, generatedAt: "2026-08-12T12:00:00.000Z" },
+    greenhouseDiscoveryResult: { ...greenhouseDiscoveryResult, generatedAt: "2026-08-09T18:41:34.123Z" },
+  });
+
+  assert.equal(commandCenter.capturedAsOf, "2026-08-12T12:00:00.000Z");
 });
 
 test("Top Recommendations display required fields without recomputing the recommendation", () => {

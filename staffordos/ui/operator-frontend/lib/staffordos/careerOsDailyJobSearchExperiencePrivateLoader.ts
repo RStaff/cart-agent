@@ -442,8 +442,8 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
   if (!careerWorkflowState) missingArtifacts.push("career workflow action state");
 
   const generatedAt =
-    generatedAtFromDailyCommand(dailyCommand) ||
     recommendationReadModel?.[0]?.capturedAsOf ||
+    generatedAtFromDailyCommand(dailyCommand) ||
     engagementReadModel?.[0]?.applicationDate ||
     "NO_PRIVATE_ARTIFACT_TIMESTAMP_AVAILABLE";
   const recommendation = recommendationResult({

@@ -507,7 +507,7 @@ function buildBriefing(
   const ready = readyToApplyCount(input, commandCenter);
   const resumeReviews = resumeReviewsNeeded(input);
   const decisions = opportunitiesRequiringDecision(input);
-  const opportunities = countBrief(commandCenter, "New Opportunities");
+  const opportunities = countBrief(commandCenter, "Current Opportunities");
   const interviews = interviewActivity(input, commandCenter);
   const headline =
     followUps > 0
@@ -531,8 +531,8 @@ function buildBriefing(
       metric("applications-needing-follow-up", "Applications needing follow-up", followUps, "Applications with due follow-up or response review."),
       metric("ready-to-apply", "Ready To Apply", ready, "Opportunities moved into application preparation."),
       metric("opportunities-requiring-decision", "Needs Decision", decisions, "Ranked opportunities awaiting Ross's decision."),
-      metric("resume-reviews-needed", "Resume Reviews Needed", resumeReviews, "Packages that need resume or package changes before applying."),
-      metric("new-opportunities", "New Opportunities", opportunities, "New items available from the existing opportunity pipeline."),
+      metric("resume-reviews-needed", "Resume/package reviews needed", resumeReviews, "Application packages or resume review records requiring Ross's review."),
+      metric("new-opportunities", "Current Opportunities", opportunities, "Current canonical opportunities in the existing opportunity pipeline; this is not a new-item count."),
       metric("interview-activity", "Interview Activity", interviews, "Applications with interview handoff activity."),
     ],
   };
@@ -671,7 +671,7 @@ function opportunityDecisions(
   const intelligenceByCompanyRole = new Map(
     intelligenceItems(input).map((item) => [`${item.company}\n${item.role}`, humanReviewFor(item)] as const),
   );
-  return activeWorkflowDecisionItems(input).slice(0, 5).map((item) => {
+  return activeWorkflowDecisionItems(input).map((item) => {
     const top = topById.get(item.recommendationId) || null;
     const recommendation = userRecommendation(item.recommendation);
     const humanReview =
@@ -906,11 +906,7 @@ function topOpportunities(
   input: CareerOsDailyJobSearchExperienceInput,
   commandCenter: CareerOsCommandCenterPresentation,
 ): CareerOsDailyTopOpportunity[] {
-  const activeRecommendationIds = workflowItems(input).length
-    ? new Set(workflowItems(input).filter((item) => item.inTodaysQueue).map((item) => item.recommendationId))
-    : null;
   return commandCenter.topRecommendations
-    .filter((record) => !activeRecommendationIds || activeRecommendationIds.has(record.id))
     .map((record: CareerOsTopRecommendation) => {
     const recommendation = userRecommendation(record.recommendation);
     return {
