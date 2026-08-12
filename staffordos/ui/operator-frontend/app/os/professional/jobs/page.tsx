@@ -13,7 +13,9 @@ import {
   runTruthBoundResumeDraftsFromPrivateArtifacts,
 } from "../../../../lib/staffordos/truthBoundResumeDraft";
 import {
+  RESUME_DRAFT_EXPORT_REVIEW_DECISIONS,
   runReviewedResumeDraftExportFromPrivateArtifacts,
+  type ResumeDraftExportReviewDecision,
 } from "../../../../lib/staffordos/reviewedResumeDraftExport";
 import {
   runManualSubmissionRecordAndArtifactLinkageFromPrivateArtifacts,
@@ -60,12 +62,21 @@ async function prepareResumeDraftAction(formData: FormData) {
   redirect("/os/professional/jobs");
 }
 
-async function exportResumeDraftAction(formData: FormData) {
+function reviewDecisionFromForm(value: FormDataEntryValue | null): ResumeDraftExportReviewDecision | null {
+  const decision = String(value || "").trim();
+  return RESUME_DRAFT_EXPORT_REVIEW_DECISIONS.includes(decision as ResumeDraftExportReviewDecision)
+    ? decision as ResumeDraftExportReviewDecision
+    : null;
+}
+
+async function reviewResumeDraftAction(formData: FormData) {
   "use server";
   const artifactVersionId = String(formData.get("artifactVersionId") || "").trim();
+  const reviewDecision = reviewDecisionFromForm(formData.get("reviewDecision"));
+  if (!reviewDecision) redirect("/os/professional/jobs");
   runReviewedResumeDraftExportFromPrivateArtifacts({
     artifactIds: artifactVersionId ? [artifactVersionId] : [],
-    approveForExport: true,
+    reviewDecision,
     limit: 1,
     repositoryRoot: process.cwd(),
     writeOutputs: true,
@@ -97,7 +108,7 @@ export default function ProfessionalJobCommandPage() {
       experience={experience}
       jobIntakeAction={analyzeJobAction}
       resumeDraftAction={prepareResumeDraftAction}
-      resumeExportAction={exportResumeDraftAction}
+      resumeReviewAction={reviewResumeDraftAction}
       manualSubmissionAction={markSubmittedAction}
     />
   );

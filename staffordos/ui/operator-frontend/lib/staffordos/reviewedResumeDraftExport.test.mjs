@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, statSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { createRequire } from "node:module";
 import Module from "node:module";
@@ -339,6 +339,8 @@ test("read model exposes download route but hides content, paths, and authority 
   assert.equal(record.docxCreated, true);
   assert.equal(record.nextAction, "DOWNLOAD_DOCX");
   assert.equal(record.downloadPath, `/os/professional/jobs/artifacts/${record.artifactVersionId}/docx`);
+  assert.equal(record.operatorApprovalState, "APPROVED");
+  assert.equal(record.sourceDraftSafetyState, "APPROVED_FOR_EXPORT");
   assert.equal(record.privatePathVisible, false);
   assert.equal(record.draftContentVisible, false);
   assert.equal(record.sourceAuthorityIdsVisible, false);
@@ -358,6 +360,58 @@ test("review decision records approval without creating application or submissio
   assert.equal(review.review.applicationSubmitted, false);
   assert.equal(review.review.resumeUploaded, false);
   assert.equal(review.review.messageSent, false);
+});
+
+test("request changes and reject persist review state without creating DOCX or external side effects", () => {
+  const requestChanges = reviewedExport.recordResumeDraftExportReviewDecision({
+    artifact: sourceArtifact({ artifactVersionId: "draft_request_changes" }),
+    decision: "REQUEST_CHANGES",
+    decidedAt: generatedAt,
+  }).artifact;
+  const rejected = reviewedExport.recordResumeDraftExportReviewDecision({
+    artifact: sourceArtifact({ artifactVersionId: "draft_rejected" }),
+    decision: "REJECT",
+    decidedAt: generatedAt,
+  }).artifact;
+  const result = reviewedExport.buildReviewedResumeDraftExport({
+    generatedAt,
+    artifacts: [requestChanges, rejected],
+  });
+
+  assert.equal(requestChanges.operatorApprovalState, "REQUEST_CHANGES");
+  assert.equal(rejected.operatorApprovalState, "REJECTED");
+  assert.equal(result.summary.docxExportsCreated, 0);
+  assert.equal(result.summary.blockedExports, 2);
+  assert.equal(result.readModel[0].operatorApprovalState, "REQUEST_CHANGES");
+  assert.equal(result.readModel[1].operatorApprovalState, "REJECTED");
+  assert.equal(result.exportArtifacts.every((artifact) => artifact.exportState === "EXPORT_BLOCKED"), true);
+  assert.equal(result.exportArtifacts.every((artifact) => artifact.applicationCreated === false), true);
+  assert.equal(result.exportArtifacts.every((artifact) => artifact.applicationSubmitted === false), true);
+  assert.equal(result.exportArtifacts.every((artifact) => artifact.messageSent === false), true);
+  assert.equal(result.exportArtifacts.every((artifact) => artifact.browserAutomationUsed === false), true);
+  assert.equal(result.exportArtifacts.every((artifact) => artifact.externalAiUsed === false), true);
+});
+
+test("private runner applies explicit review decisions without using approval-only shortcut", () => {
+  const privateRoot = mkdtempSync(path.join(tmpdir(), "careeros-v103b-review-"));
+  const jobSearchRoot = path.join(privateRoot, "job-search");
+  const draftRoot = path.join(jobSearchRoot, "application-artifacts", "run_20260811");
+  const output = sourceArtifact({ artifactVersionId: "draft_review_runner" });
+  mkdirSync(draftRoot, { recursive: true });
+  writeFileSync(path.join(draftRoot, "application_artifact_versions.json"), `${JSON.stringify([output], null, 2)}\n`);
+
+  const { result } = reviewedExport.runReviewedResumeDraftExportFromPrivateArtifacts({
+    generatedAt,
+    jobSearchRoot,
+    repositoryRoot: root,
+    artifactIds: ["draft_review_runner"],
+    reviewDecision: "REQUEST_CHANGES",
+    writeOutputs: false,
+  });
+
+  assert.equal(result.exportArtifacts[0].operatorApprovalState, "REQUEST_CHANGES");
+  assert.equal(result.summary.docxExportsCreated, 0);
+  assert.equal(result.summary.blockedExports, 1);
 });
 
 test("implementation contains no submission, messaging, browser, provider, AI, or PDF generation path", () => {

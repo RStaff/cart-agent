@@ -320,6 +320,70 @@ function resumeDraftItem(overrides = {}) {
   };
 }
 
+function resumeDraftReviewItem(overrides = {}) {
+  return {
+    schemaVersion: "staffordos.careeros.truth_bound_resume_draft_review_read_model.v1",
+    artifactVersionId: "artifact_resume_draft",
+    packetId: "packet_apply",
+    jobOpportunityId: "opp_apply",
+    company: "Example Automation",
+    role: "AI Automation Product Manager",
+    artifactType: "RESUME",
+    version: 1,
+    safetyState: "DRAFT_READY_FOR_REVIEW",
+    operatorApprovalState: "PENDING_REVIEW",
+    reviewStatus: "READY_FOR_REVIEW",
+    approvalAllowed: true,
+    requestChangesAllowed: true,
+    rejectAllowed: true,
+    humanReviewRequired: true,
+    tracedClaimCount: 4,
+    blockedIssueCount: 0,
+    reviewIssueCount: 0,
+    omittedUnsupportedClaimCount: 1,
+    sections: {
+      summary: ["Builds AI automation workflows using verified APIs and structured governance."],
+      skills: ["AI automation", "API integration", "workflow documentation"],
+      experience: [
+        {
+          employer: "Example Systems",
+          title: "Business Technology Lead",
+          dateRange: "2021-01 - 2024-12",
+          bullets: ["Delivered verified automation workflows with documented stakeholder requirements."],
+          limitations: ["Synthetic experience fixture."],
+        },
+      ],
+      projects: [
+        {
+          label: "CareerOS",
+          bullets: ["Built governed job-search workflow components with tests and rollback boundaries."],
+          limitations: ["Synthetic project fixture."],
+        },
+      ],
+      education: ["B.A., Wesleyan University"],
+      certifications: [],
+    },
+    needsAttention: ["Unsupported claims omitted: 1."],
+    draftContentVisible: true,
+    privatePathVisible: false,
+    sourceAuthorityIdsVisible: false,
+    claimIdsVisible: false,
+    careerFactIdsVisible: false,
+    careerEvidenceIdsVisible: false,
+    privateFilesystemPathVisible: false,
+    nextAction: "REVIEW_DRAFT",
+    applicationCreated: false,
+    applicationSubmitted: false,
+    resumeExported: false,
+    resumeUploaded: false,
+    messageSent: false,
+    browserAutomationUsed: false,
+    externalAiUsed: false,
+    limitations: ["Synthetic review fixture."],
+    ...overrides,
+  };
+}
+
 function resumeExportItem(overrides = {}) {
   return {
     schemaVersion: "staffordos.careeros.reviewed_resume_draft_export_read_model.v1",
@@ -330,6 +394,9 @@ function resumeExportItem(overrides = {}) {
     company: "Example Automation",
     role: "AI Automation Product Manager",
     version: 1,
+    sourceDraftSafetyState: "APPROVED_FOR_EXPORT",
+    operatorApprovalState: "APPROVED",
+    operatorApprovalTimestamp: "2026-08-11T12:00:00.000Z",
     exportState: "DOCX_READY",
     docxCreated: true,
     pdfCreated: false,
@@ -459,20 +526,61 @@ test("application intelligence packet read models are displayed without raw priv
   assert.match(surfaceSource, /View Intelligence/);
 });
 
-test("truth-bound resume draft read models are displayed without draft content or source IDs", () => {
+test("truth-bound resume draft review models display human-readable content without source IDs", () => {
   const experience = buildCareerOsDailyJobSearchExperience({
     commandCenter: commandCenterFixture(),
-    resumeDraftReadModel: [resumeDraftItem()],
+    resumeDraftReviewReadModel: [resumeDraftReviewItem()],
   });
   const item = experience.resumeDrafts[0];
 
   assert.equal(item.company, "Example Automation");
-  assert.equal(item.nextAction, "Approve for Export");
+  assert.equal(item.nextAction, "Review Draft");
+  assert.equal(item.approvalAllowed, true);
+  assert.equal(item.requestChangesAllowed, true);
+  assert.equal(item.rejectAllowed, true);
+  assert.match(item.sections.summary[0], /AI automation workflows/);
+  assert.equal(item.sections.experience[0].employer, "Example Systems");
+  assert.equal(item.needsAttention.some((attention) => /unsupported claims omitted/i.test(attention)), true);
   assert.equal(item.externalActionAvailable, false);
   assert.equal(item.humanReviewRequired, true);
-  assert.doesNotMatch(JSON.stringify(item), /career_fact|career_evidence|draftText|\/Users\//i);
+  assert.doesNotMatch(JSON.stringify(item), /career_fact|career_evidence|draftText|claim_|\/Users\//i);
   assert.match(surfaceSource, /Resume Drafts/);
   assert.match(surfaceSource, /Review Draft/);
+  assert.match(surfaceSource, /View Resume Draft/);
+  assert.match(surfaceSource, /Professional Summary/);
+  assert.match(surfaceSource, /Core Skills \/ Technologies/);
+  assert.match(surfaceSource, /Professional Experience/);
+  assert.match(surfaceSource, /Needs Attention/);
+  assert.match(surfaceSource, /Approve for Export/);
+  assert.match(surfaceSource, /Request Changes/);
+  assert.match(surfaceSource, /Reject/);
+  assert.match(surfaceSource, /APPROVE_FOR_EXPORT/);
+  assert.match(surfaceSource, /REQUEST_CHANGES/);
+  assert.match(surfaceSource, /REJECT/);
+  assert.match(routeSource, /reviewDecisionFromForm/);
+  assert.match(routeSource, /RESUME_DRAFT_EXPORT_REVIEW_DECISIONS/);
+});
+
+test("unsafe draft review models block approval while preserving request and reject controls", () => {
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    resumeDraftReviewReadModel: [
+      resumeDraftReviewItem({
+        safetyState: "DRAFT_NEEDS_EVIDENCE_REVIEW",
+        reviewStatus: "NEEDS_EVIDENCE_REVIEW",
+        approvalAllowed: false,
+        blockedIssueCount: 1,
+        reviewIssueCount: 1,
+        nextAction: "REVIEW_EVIDENCE",
+      }),
+    ],
+  });
+  const item = experience.resumeDrafts[0];
+
+  assert.equal(item.approvalAllowed, false);
+  assert.equal(item.requestChangesAllowed, true);
+  assert.equal(item.rejectAllowed, true);
+  assert.equal(item.nextAction, "Review Evidence");
 });
 
 test("reviewed resume export read models expose DOCX download without private content", () => {
@@ -599,6 +707,91 @@ test("private loader overlays manual submission artifact links when available", 
   assert.equal(result.experience.resumeExports[0].submissionStatus, "SUBMITTED");
   assert.equal(result.experience.resumeExports[0].exactResumeArtifactKnown, true);
   assert.equal(result.auditSummary.noApplicationSubmitted, true);
+});
+
+test("private loader projects owner-private resume draft artifacts into reviewable UI content", () => {
+  const privateRoot = mkdtempSync(path.join(tmpdir(), "careeros-v1-draft-review-"));
+  const jobSearchRoot = path.join(privateRoot, "job-search");
+  writeJson(
+    path.join(jobSearchRoot, "application-artifacts", "run_20260811", "application_artifact_versions.json"),
+    [
+      {
+        schemaVersion: "staffordos.careeros.application_artifact_version.v1",
+        workflowVersion: "CAREEROS_APPLICATION_INTELLIGENCE_V1_03",
+        artifactVersionId: "artifact_resume_draft",
+        artifactType: "RESUME",
+        version: 1,
+        createdAt: "2026-08-11T12:00:00.000Z",
+        workspaceId: "professional",
+        applicationIntelligencePacketId: "packet_apply",
+        jobOpportunityId: "opp_apply",
+        company: "Example Automation",
+        role: "AI Automation Product Manager",
+        sourceCareerAuthorityDigest: "sha256:career",
+        sourcePacketDigest: "sha256:packet",
+        draftContentDigest: "sha256:draft",
+        generationMethod: {
+          method: "DETERMINISTIC_TRUTH_BOUND_ASSEMBLER",
+          modelUsed: false,
+          modelProvider: null,
+          modelName: null,
+          instructionVersion: null,
+          externalAiUsed: false,
+          ollamaUsed: false,
+          limitations: [],
+        },
+        draft: resumeDraftReviewItem().sections,
+        claimTraceability: [
+          {
+            claimId: "claim_summary",
+            section: "summary",
+            draftText: "Builds AI automation workflows using verified APIs and structured governance.",
+            disposition: "SUPPORTED",
+            packetRequirementIds: ["requirement_ai"],
+            careerFactIds: ["career_fact_ai"],
+            careerEvidenceIds: ["career_evidence_ai"],
+            sourcePacketId: "packet_apply",
+            generatedFrom: "CAREERFACT_STATEMENT",
+            limitations: [],
+          },
+        ],
+        validationIssues: [],
+        omittedUnsupportedClaimCount: 0,
+        safetyState: "DRAFT_READY_FOR_REVIEW",
+        operatorApprovalState: "PENDING_REVIEW",
+        humanReviewRequired: true,
+        supersedesArtifactVersionId: null,
+        supersededByArtifactVersionId: null,
+        fileReferences: [],
+        privacy: "Professional owner-private",
+        applicationCreated: false,
+        applicationSubmitted: false,
+        resumeExported: false,
+        resumeUploaded: false,
+        coverLetterGenerated: false,
+        messageSent: false,
+        browserAutomationUsed: false,
+        externalProviderCall: false,
+        externalAiUsed: false,
+        ollamaUsed: false,
+        privatePathVisible: false,
+        rawCareerEvidenceVisibleInReadModel: false,
+        limitations: [],
+      },
+    ],
+  );
+  writeJson(
+    path.join(jobSearchRoot, "application-artifacts", "run_20260811", "resume_draft_read_model.json"),
+    [resumeDraftItem()],
+  );
+
+  const result = loader.loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts({ jobSearchRoot });
+
+  assert.equal(result.loadedArtifacts.truthBoundResumeDrafts, true);
+  assert.equal(result.experience.resumeDrafts[0].sections.summary[0], resumeDraftReviewItem().sections.summary[0]);
+  assert.equal(result.experience.resumeDrafts[0].approvalAllowed, true);
+  assert.doesNotMatch(JSON.stringify(result.experience.resumeDrafts[0]), /career_fact_ai|career_evidence_ai|\/Users\//i);
+  assert.equal(result.auditSummary.noNewPrivateDataRoute, true);
 });
 
 test("private loader connects redacted Greenhouse discovery status without provider calls", () => {

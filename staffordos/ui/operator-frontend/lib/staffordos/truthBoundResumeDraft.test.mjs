@@ -633,6 +633,70 @@ test("private writer stores draft content outside Git while read model is redact
   assert.equal(readModel.sourceAuthorityIdsVisible, false);
 });
 
+test("review read model displays draft content while hiding private authority internals", () => {
+  const artifact = build().artifactVersions[0];
+  const reviewModel = drafts.buildTruthBoundResumeDraftReviewReadModel([
+    {
+      ...artifact,
+      draft: {
+        ...artifact.draft,
+        summary: [
+          ...artifact.draft.summary,
+          "Internal career_fact_private_123 and career_evidence_private_456 references must stay private.",
+        ],
+      },
+      limitations: [
+        ...artifact.limitations,
+        "Private source digest sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.",
+      ],
+    },
+  ])[0];
+
+  assert.equal(reviewModel.draftContentVisible, true);
+  assert.equal(reviewModel.privatePathVisible, false);
+  assert.equal(reviewModel.sourceAuthorityIdsVisible, false);
+  assert.equal(reviewModel.claimIdsVisible, false);
+  assert.equal(reviewModel.careerFactIdsVisible, false);
+  assert.equal(reviewModel.careerEvidenceIdsVisible, false);
+  assert.equal(reviewModel.approvalAllowed, true);
+  assert.equal(reviewModel.requestChangesAllowed, true);
+  assert.equal(reviewModel.rejectAllowed, true);
+  assert.equal(reviewModel.reviewStatus, "READY_FOR_REVIEW");
+  assert.equal(reviewModel.nextAction, "REVIEW_DRAFT");
+  assert.match(reviewModel.sections.summary.join("\n"), /AI automation workflows/);
+  assert.doesNotMatch(JSON.stringify(reviewModel), /career_fact_private_123|career_evidence_private_456|sha256:/i);
+  assert.equal(reviewModel.applicationCreated, false);
+  assert.equal(reviewModel.applicationSubmitted, false);
+  assert.equal(reviewModel.messageSent, false);
+  assert.equal(reviewModel.externalAiUsed, false);
+});
+
+test("review read model blocks approval for evidence-review and blocked drafts", () => {
+  const needsEvidence = build({
+    careerFacts: [
+      careerFact({
+        metricClassification: "UNSUPPORTED",
+        measurementAuthority: null,
+      }),
+    ],
+    packet: {
+      supportingEvidence: [
+        support({
+          safePositioning: "Reduced manual workflows by 30% using automation.",
+        }),
+      ],
+    },
+  }).artifactVersions[0];
+  const blocked = build({ careerEvidence: [] }).artifactVersions[0];
+  const reviewModels = drafts.buildTruthBoundResumeDraftReviewReadModel([needsEvidence, blocked]);
+
+  assert.equal(reviewModels[0].approvalAllowed, false);
+  assert.equal(reviewModels[0].reviewStatus, "BLOCKED");
+  assert.equal(reviewModels[0].needsAttention.some((item) => /unsupported/i.test(item)), true);
+  assert.equal(reviewModels[1].approvalAllowed, false);
+  assert.equal(reviewModels[1].nextAction, "BLOCKED");
+});
+
 test("source and CLI expose no external action, application creation, export, or model path", () => {
   const combined = `${draftSource}\n${cliSource}`;
 

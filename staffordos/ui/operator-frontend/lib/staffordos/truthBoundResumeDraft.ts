@@ -28,6 +28,8 @@ export const TRUTH_BOUND_RESUME_DRAFT_RESULT_SCHEMA_VERSION =
   "staffordos.careeros.truth_bound_resume_draft_result.v1";
 export const TRUTH_BOUND_RESUME_DRAFT_READ_MODEL_SCHEMA_VERSION =
   "staffordos.careeros.truth_bound_resume_draft_read_model.v1";
+export const TRUTH_BOUND_RESUME_DRAFT_REVIEW_READ_MODEL_SCHEMA_VERSION =
+  "staffordos.careeros.truth_bound_resume_draft_review_read_model.v1";
 
 export const APPLICATION_ARTIFACT_TYPES = [
   "RESUME",
@@ -204,6 +206,71 @@ export type TruthBoundResumeDraftReadModelRecord = {
   resumeExported: false;
   resumeUploaded: false;
   messageSent: false;
+  limitations: string[];
+};
+
+export type TruthBoundResumeDraftReviewExperienceEntry = {
+  employer: string | null;
+  title: string | null;
+  dateRange: string | null;
+  bullets: string[];
+  limitations: string[];
+};
+
+export type TruthBoundResumeDraftReviewProjectEntry = {
+  label: string;
+  bullets: string[];
+  limitations: string[];
+};
+
+export type TruthBoundResumeDraftReviewReadModelRecord = {
+  schemaVersion: typeof TRUTH_BOUND_RESUME_DRAFT_REVIEW_READ_MODEL_SCHEMA_VERSION;
+  artifactVersionId: string;
+  packetId: string;
+  jobOpportunityId: string;
+  company: string;
+  role: string;
+  artifactType: "RESUME";
+  version: number;
+  safetyState: ResumeDraftSafetyState;
+  operatorApprovalState: ApplicationArtifactOperatorApprovalState;
+  reviewStatus:
+    | "READY_FOR_REVIEW"
+    | "NEEDS_EVIDENCE_REVIEW"
+    | "BLOCKED"
+    | "APPROVED_FOR_EXPORT";
+  approvalAllowed: boolean;
+  requestChangesAllowed: boolean;
+  rejectAllowed: boolean;
+  humanReviewRequired: true;
+  tracedClaimCount: number;
+  blockedIssueCount: number;
+  reviewIssueCount: number;
+  omittedUnsupportedClaimCount: number;
+  sections: {
+    summary: string[];
+    skills: string[];
+    experience: TruthBoundResumeDraftReviewExperienceEntry[];
+    projects: TruthBoundResumeDraftReviewProjectEntry[];
+    education: string[];
+    certifications: string[];
+  };
+  needsAttention: string[];
+  draftContentVisible: true;
+  privatePathVisible: false;
+  sourceAuthorityIdsVisible: false;
+  claimIdsVisible: false;
+  careerFactIdsVisible: false;
+  careerEvidenceIdsVisible: false;
+  privateFilesystemPathVisible: false;
+  nextAction: "REVIEW_DRAFT" | "REVIEW_EVIDENCE" | "BLOCKED" | "EXPORT_READY";
+  applicationCreated: false;
+  applicationSubmitted: false;
+  resumeExported: false;
+  resumeUploaded: false;
+  messageSent: false;
+  browserAutomationUsed: false;
+  externalAiUsed: false;
   limitations: string[];
 };
 
@@ -939,6 +1006,128 @@ function readModelFor(artifact: ApplicationArtifactVersion): TruthBoundResumeDra
   };
 }
 
+const INTERNAL_REFERENCE_PATTERN =
+  /\b(?:priv|comb|career)[a-z0-9_]*(?:fact|evidence|artifact|packet|claim|source|digest)[a-z0-9_]*\b|sha256:[a-f0-9]+/gi;
+
+function sanitizeReviewText(value: string) {
+  return value.replace(INTERNAL_REFERENCE_PATTERN, "[private reference]").trim();
+}
+
+function sanitizeReviewTextList(values: readonly string[]) {
+  return values
+    .map((value) => sanitizeReviewText(value))
+    .filter((value) => value.length > 0);
+}
+
+function dateRangeFor(entry: TruthBoundResumeDraftExperienceEntry) {
+  if (!entry.startDate && !entry.endDate) return null;
+  if (entry.startDate && entry.endDate) return `${entry.startDate} - ${entry.endDate}`;
+  if (entry.startDate) return entry.startDate;
+  return entry.endDate;
+}
+
+function reviewStatusFor(artifact: ApplicationArtifactVersion): TruthBoundResumeDraftReviewReadModelRecord["reviewStatus"] {
+  if (artifact.safetyState === "APPROVED_FOR_EXPORT") return "APPROVED_FOR_EXPORT";
+  if (artifact.safetyState === "DRAFT_READY_FOR_REVIEW") return "READY_FOR_REVIEW";
+  if (artifact.safetyState === "DRAFT_NEEDS_EVIDENCE_REVIEW") return "NEEDS_EVIDENCE_REVIEW";
+  return "BLOCKED";
+}
+
+function reviewNextActionFor(artifact: ApplicationArtifactVersion): TruthBoundResumeDraftReviewReadModelRecord["nextAction"] {
+  if (artifact.safetyState === "APPROVED_FOR_EXPORT") return "EXPORT_READY";
+  if (artifact.safetyState === "DRAFT_READY_FOR_REVIEW") return "REVIEW_DRAFT";
+  if (artifact.safetyState === "DRAFT_NEEDS_EVIDENCE_REVIEW") return "REVIEW_EVIDENCE";
+  return "BLOCKED";
+}
+
+function reviewNeedsAttention(artifact: ApplicationArtifactVersion) {
+  const issueMessages = artifact.validationIssues.map((issue) => issue.message);
+  const issueLimitations = artifact.validationIssues.flatMap((issue) => issue.limitations);
+  return uniqueSorted([
+    artifact.omittedUnsupportedClaimCount > 0
+      ? `Unsupported claims omitted: ${artifact.omittedUnsupportedClaimCount}.`
+      : null,
+    ...issueMessages,
+    ...issueLimitations,
+  ]).map((item) => sanitizeReviewText(item));
+}
+
+function reviewReadModelFor(artifact: ApplicationArtifactVersion): TruthBoundResumeDraftReviewReadModelRecord {
+  const blockedIssueCount = artifact.validationIssues.filter((issue) => issue.severity === "BLOCKING").length;
+  const reviewIssueCount = artifact.validationIssues.filter((issue) => issue.severity === "REVIEW").length;
+  const approvalAllowed =
+    artifact.safetyState === "DRAFT_READY_FOR_REVIEW" &&
+    artifact.operatorApprovalState === "PENDING_REVIEW" &&
+    blockedIssueCount === 0;
+  return {
+    schemaVersion: TRUTH_BOUND_RESUME_DRAFT_REVIEW_READ_MODEL_SCHEMA_VERSION,
+    artifactVersionId: artifact.artifactVersionId,
+    packetId: artifact.applicationIntelligencePacketId,
+    jobOpportunityId: artifact.jobOpportunityId,
+    company: artifact.company,
+    role: artifact.role,
+    artifactType: "RESUME",
+    version: artifact.version,
+    safetyState: artifact.safetyState,
+    operatorApprovalState: artifact.operatorApprovalState,
+    reviewStatus: reviewStatusFor(artifact),
+    approvalAllowed,
+    requestChangesAllowed: artifact.operatorApprovalState === "PENDING_REVIEW",
+    rejectAllowed: artifact.operatorApprovalState === "PENDING_REVIEW",
+    humanReviewRequired: true,
+    tracedClaimCount: artifact.claimTraceability.length,
+    blockedIssueCount,
+    reviewIssueCount,
+    omittedUnsupportedClaimCount: artifact.omittedUnsupportedClaimCount || 0,
+    sections: {
+      summary: sanitizeReviewTextList(artifact.draft.summary),
+      skills: sanitizeReviewTextList(artifact.draft.skills),
+      experience: artifact.draft.experience.map((entry) => ({
+        employer: entry.employer ? sanitizeReviewText(entry.employer) : null,
+        title: entry.title ? sanitizeReviewText(entry.title) : null,
+        dateRange: dateRangeFor(entry),
+        bullets: sanitizeReviewTextList(entry.bullets),
+        limitations: sanitizeReviewTextList(entry.limitations),
+      })),
+      projects: artifact.draft.projects.map((project) => ({
+        label: sanitizeReviewText(project.label),
+        bullets: sanitizeReviewTextList(project.bullets),
+        limitations: sanitizeReviewTextList(project.limitations),
+      })),
+      education: sanitizeReviewTextList(artifact.draft.education),
+      certifications: sanitizeReviewTextList(artifact.draft.certifications),
+    },
+    needsAttention: reviewNeedsAttention(artifact),
+    draftContentVisible: true,
+    privatePathVisible: false,
+    sourceAuthorityIdsVisible: false,
+    claimIdsVisible: false,
+    careerFactIdsVisible: false,
+    careerEvidenceIdsVisible: false,
+    privateFilesystemPathVisible: false,
+    nextAction: reviewNextActionFor(artifact),
+    applicationCreated: false,
+    applicationSubmitted: false,
+    resumeExported: false,
+    resumeUploaded: false,
+    messageSent: false,
+    browserAutomationUsed: false,
+    externalAiUsed: false,
+    limitations: [
+      "Human-readable draft content is projected from the existing private ApplicationArtifactVersion.",
+      "Claim IDs, CareerFact IDs, CareerEvidence IDs, source digests, packet internals, and filesystem paths remain private.",
+      "The review view does not regenerate, rewrite, submit, message, browse, or call an external AI provider.",
+      ...sanitizeReviewTextList(artifact.limitations),
+    ],
+  };
+}
+
+export function buildTruthBoundResumeDraftReviewReadModel(
+  artifacts: readonly ApplicationArtifactVersion[],
+): TruthBoundResumeDraftReviewReadModelRecord[] {
+  return artifacts.map(reviewReadModelFor);
+}
+
 export function buildTruthBoundResumeDrafts(input: TruthBoundResumeDraftInput): TruthBoundResumeDraftResult {
   const maps = buildAuthorityMaps({
     careerFacts: input.careerFacts || [],
@@ -1115,6 +1304,10 @@ export function loadLatestTruthBoundResumeDraftReadModel(jobSearchRoot = DEFAULT
     path.join(jobSearchRoot, "application-artifacts"),
     "resume_draft_read_model.json",
   ) || [];
+}
+
+export function loadLatestTruthBoundResumeDraftReviewReadModel(jobSearchRoot = DEFAULT_JOB_SEARCH_PRIVATE_ROOT) {
+  return buildTruthBoundResumeDraftReviewReadModel(loadLatestApplicationArtifactVersions(jobSearchRoot));
 }
 
 export function loadLatestTruthBoundResumeDraftResult(jobSearchRoot = DEFAULT_JOB_SEARCH_PRIVATE_ROOT) {

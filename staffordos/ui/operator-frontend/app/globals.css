@@ -2919,6 +2919,110 @@ textarea {
   font-weight: 800;
 }
 
+.staffordCareerResumeDraftReview {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #d9dee5;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.staffordCareerResumeDraftReview summary {
+  cursor: pointer;
+  color: #15181d;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.staffordCareerResumeDraftBody {
+  display: grid;
+  gap: 18px;
+  color: #15181d;
+}
+
+.staffordCareerResumeDraftBody section {
+  display: grid;
+  gap: 8px;
+}
+
+.staffordCareerResumeDraftBody h4 {
+  margin: 0;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #d9dee5;
+  color: #15181d;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.staffordCareerResumeDraftBody p {
+  margin: 0;
+  color: #27313c;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.staffordCareerResumeDraftEntry {
+  display: grid;
+  gap: 6px;
+}
+
+.staffordCareerResumeDraftEntry strong {
+  color: #15181d;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.staffordCareerResumeDraftEntry span {
+  color: #66717e;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.staffordCareerResumeDraftEntry ul,
+.staffordCareerResumeDraftAttention ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.staffordCareerResumeDraftEntry li,
+.staffordCareerResumeDraftAttention li {
+  color: #27313c;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.staffordCareerResumeDraftEntry p {
+  color: #66717e;
+  font-size: 12px;
+}
+
+.staffordCareerResumeDraftAttention {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #f1c869;
+  border-radius: 8px;
+  background: #fff8e6;
+}
+
+.staffordCareerResumeDraftAttention span {
+  color: #7a4e00;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.staffordResumeReviewActionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
 .staffordJobCommandHealthGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

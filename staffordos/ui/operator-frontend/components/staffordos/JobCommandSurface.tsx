@@ -154,14 +154,21 @@ function IntelligenceItem({
 
 function ResumeDraftItem({
   item,
-  resumeExportAction,
+  resumeReviewAction,
 }: {
   item: CareerOsDailyResumeDraftItem;
-  resumeExportAction?: (formData: FormData) => void | Promise<void>;
+  resumeReviewAction?: (formData: FormData) => void | Promise<void>;
 }) {
-  const exportAvailable =
-    resumeExportAction &&
-    (item.safetyState === "DRAFT_READY_FOR_REVIEW" || item.safetyState === "APPROVED_FOR_EXPORT");
+  const hasDraftContent =
+    item.sections.summary.length > 0 ||
+    item.sections.skills.length > 0 ||
+    item.sections.experience.length > 0 ||
+    item.sections.projects.length > 0 ||
+    item.sections.education.length > 0 ||
+    item.sections.certifications.length > 0;
+  const approvalAvailable = Boolean(resumeReviewAction && item.approvalAllowed);
+  const requestChangesAvailable = Boolean(resumeReviewAction && item.requestChangesAllowed);
+  const rejectAvailable = Boolean(resumeReviewAction && item.rejectAllowed);
 
   return (
     <article className="staffordCareerCommandRecommendation">
@@ -183,6 +190,10 @@ function ResumeDraftItem({
           <dd>{item.blockedIssueCount} blocking / {item.reviewIssueCount} review issues</dd>
         </div>
         <div>
+          <dt>Omitted</dt>
+          <dd>{item.omittedUnsupportedClaimCount} unsupported claims</dd>
+        </div>
+        <div>
           <dt>Approval</dt>
           <dd>{item.operatorApprovalState}</dd>
         </div>
@@ -191,20 +202,133 @@ function ResumeDraftItem({
           <dd>{item.nextAction}</dd>
         </div>
       </dl>
+      <details className="staffordCareerResumeDraftReview" open>
+        <summary>View Resume Draft</summary>
+        {hasDraftContent ? (
+          <div className="staffordCareerResumeDraftBody">
+            {item.sections.summary.length ? (
+              <section>
+                <h4>Professional Summary</h4>
+                {item.sections.summary.map((line, index) => (
+                  <p key={`summary-${index}`}>{line}</p>
+                ))}
+              </section>
+            ) : null}
+            {item.sections.skills.length ? (
+              <section>
+                <h4>Core Skills / Technologies</h4>
+                <p>{item.sections.skills.join(", ")}</p>
+              </section>
+            ) : null}
+            {item.sections.experience.length ? (
+              <section>
+                <h4>Professional Experience</h4>
+                {item.sections.experience.map((entry, index) => (
+                  <article className="staffordCareerResumeDraftEntry" key={`experience-${index}`}>
+                    <strong>{[entry.title, entry.employer].filter(Boolean).join(" / ") || "Experience"}</strong>
+                    {entry.dateRange ? <span>{entry.dateRange}</span> : null}
+                    <ul>
+                      {entry.bullets.map((bullet, bulletIndex) => (
+                        <li key={`experience-${index}-${bulletIndex}`}>{bullet}</li>
+                      ))}
+                    </ul>
+                    {entry.limitations.length ? <p>{entry.limitations.join(" ")}</p> : null}
+                  </article>
+                ))}
+              </section>
+            ) : null}
+            {item.sections.projects.length ? (
+              <section>
+                <h4>Selected Projects / Products</h4>
+                {item.sections.projects.map((project, index) => (
+                  <article className="staffordCareerResumeDraftEntry" key={`project-${index}`}>
+                    <strong>{project.label}</strong>
+                    <ul>
+                      {project.bullets.map((bullet, bulletIndex) => (
+                        <li key={`project-${index}-${bulletIndex}`}>{bullet}</li>
+                      ))}
+                    </ul>
+                    {project.limitations.length ? <p>{project.limitations.join(" ")}</p> : null}
+                  </article>
+                ))}
+              </section>
+            ) : null}
+            {item.sections.education.length ? (
+              <section>
+                <h4>Education</h4>
+                {item.sections.education.map((line, index) => (
+                  <p key={`education-${index}`}>{line}</p>
+                ))}
+              </section>
+            ) : null}
+            {item.sections.certifications.length ? (
+              <section>
+                <h4>Certifications</h4>
+                {item.sections.certifications.map((line, index) => (
+                  <p key={`certification-${index}`}>{line}</p>
+                ))}
+              </section>
+            ) : null}
+          </div>
+        ) : (
+          <p className="staffordJobCommandControlNote">
+            This draft was created before the review projection was available. Regenerate the draft from the packet to review content here.
+          </p>
+        )}
+      </details>
+      {item.needsAttention.length ? (
+        <section className="staffordCareerResumeDraftAttention" aria-label="Needs Attention">
+          <span>Needs Attention</span>
+          <ul>
+            {item.needsAttention.map((attention, index) => (
+              <li key={`attention-${index}`}>{attention}</li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
       <footer>
         <span>{item.detail}</span>
-        {exportAvailable ? (
-          <form action={resumeExportAction}>
-            <input type="hidden" name="artifactVersionId" value={item.id} />
-            <button type="submit" className="staffordJobCommandSecondaryAction">
-              Approve for Export
-            </button>
-          </form>
+        {resumeReviewAction ? (
+          <div className="staffordResumeReviewActionRow">
+            {approvalAvailable ? (
+              <form action={resumeReviewAction}>
+                <input type="hidden" name="artifactVersionId" value={item.id} />
+                <input type="hidden" name="reviewDecision" value="APPROVE_FOR_EXPORT" />
+                <button type="submit" className="staffordJobCommandSecondaryAction">
+                  Approve for Export
+                </button>
+              </form>
+            ) : (
+              <button type="button" className="staffordJobCommandDisabledAction" disabled>
+                {item.safetyState === "DRAFT_NEEDS_EVIDENCE_REVIEW" || item.safetyState === "DRAFT_BLOCKED"
+                  ? "Evidence Review Required"
+                  : item.operatorApprovalState === "APPROVED"
+                    ? "Approved"
+                    : "Approve Unavailable"}
+              </button>
+            )}
+            {requestChangesAvailable ? (
+              <form action={resumeReviewAction}>
+                <input type="hidden" name="artifactVersionId" value={item.id} />
+                <input type="hidden" name="reviewDecision" value="REQUEST_CHANGES" />
+                <button type="submit" className="staffordJobCommandSecondaryAction">
+                  Request Changes
+                </button>
+              </form>
+            ) : null}
+            {rejectAvailable ? (
+              <form action={resumeReviewAction}>
+                <input type="hidden" name="artifactVersionId" value={item.id} />
+                <input type="hidden" name="reviewDecision" value="REJECT" />
+                <button type="submit" className="staffordJobCommandSecondaryAction">
+                  Reject
+                </button>
+              </form>
+            ) : null}
+          </div>
         ) : (
           <button type="button" className="staffordJobCommandDisabledAction" disabled>
-            {item.safetyState === "DRAFT_NEEDS_EVIDENCE_REVIEW" || item.safetyState === "DRAFT_BLOCKED"
-              ? "Evidence Review Required"
-              : "Review Draft"}
+            Review Draft
           </button>
         )}
       </footer>
@@ -316,13 +440,13 @@ export function JobCommandSurface({
   experience = EMPTY_CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE,
   jobIntakeAction,
   resumeDraftAction,
-  resumeExportAction,
+  resumeReviewAction,
   manualSubmissionAction,
 }: {
   experience?: CareerOsDailyJobSearchExperience;
   jobIntakeAction?: (formData: FormData) => void | Promise<void>;
   resumeDraftAction?: (formData: FormData) => void | Promise<void>;
-  resumeExportAction?: (formData: FormData) => void | Promise<void>;
+  resumeReviewAction?: (formData: FormData) => void | Promise<void>;
   manualSubmissionAction?: (formData: FormData) => void | Promise<void>;
 }) {
   const hasPriorities = experience.todaysPriorities.length > 0;
@@ -449,7 +573,7 @@ export function JobCommandSurface({
         {hasResumeDrafts ? (
           <div className="staffordCareerCommandRecommendationList">
             {experience.resumeDrafts.map((item) => (
-              <ResumeDraftItem key={item.id} item={item} resumeExportAction={resumeExportAction} />
+              <ResumeDraftItem key={item.id} item={item} resumeReviewAction={resumeReviewAction} />
             ))}
           </div>
         ) : (

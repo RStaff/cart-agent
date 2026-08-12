@@ -44,7 +44,9 @@ import {
 } from "./applicationIntelligencePacket";
 import {
   loadLatestTruthBoundResumeDraftReadModel,
+  loadLatestTruthBoundResumeDraftReviewReadModel,
   type TruthBoundResumeDraftReadModelRecord,
+  type TruthBoundResumeDraftReviewReadModelRecord,
 } from "./truthBoundResumeDraft";
 import {
   loadLatestReviewedResumeDraftExportReadModel,
@@ -373,6 +375,8 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
   const resumeDraftReadModel: TruthBoundResumeDraftReadModelRecord[] =
     loadLatestTruthBoundResumeDraftReadModel(root);
   if (!resumeDraftReadModel.length) missingArtifacts.push("truth-bound resume draft output");
+  const resumeDraftReviewReadModel: TruthBoundResumeDraftReviewReadModelRecord[] =
+    loadLatestTruthBoundResumeDraftReviewReadModel(root);
 
   const resumeExportReadModel: ReviewedResumeDraftExportReadModelRecord[] =
     loadLatestReviewedResumeDraftExportReadModel(root);
@@ -404,6 +408,7 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
     applicationReviewReadModel: applicationReviewReadModel || [],
     applicationIntelligenceReadModel,
     resumeDraftReadModel,
+    resumeDraftReviewReadModel,
     resumeExportReadModel,
     manualSubmissionReadModel,
   };

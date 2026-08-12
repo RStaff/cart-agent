@@ -24,7 +24,10 @@ import type {
   ReadyToApplyApplicationPackageResult,
 } from "./readyToApplyApplicationPackage";
 import type { ApplicationIntelligencePacketReadModelRecord } from "./applicationIntelligencePacket";
-import type { TruthBoundResumeDraftReadModelRecord } from "./truthBoundResumeDraft";
+import type {
+  TruthBoundResumeDraftReadModelRecord,
+  TruthBoundResumeDraftReviewReadModelRecord,
+} from "./truthBoundResumeDraft";
 import type { ReviewedResumeDraftExportReadModelRecord } from "./reviewedResumeDraftExport";
 import type { ManualSubmissionReadModelRecord } from "./manualSubmissionRecordAndArtifactLinkage";
 
@@ -131,9 +134,33 @@ export type CareerOsDailyResumeDraftItem = {
   version: number;
   safetyState: string;
   operatorApprovalState: string;
+  reviewStatus: string;
+  approvalAllowed: boolean;
+  requestChangesAllowed: boolean;
+  rejectAllowed: boolean;
   tracedClaimCount: number;
   blockedIssueCount: number;
   reviewIssueCount: number;
+  omittedUnsupportedClaimCount: number;
+  sections: {
+    summary: string[];
+    skills: string[];
+    experience: Array<{
+      employer: string | null;
+      title: string | null;
+      dateRange: string | null;
+      bullets: string[];
+      limitations: string[];
+    }>;
+    projects: Array<{
+      label: string;
+      bullets: string[];
+      limitations: string[];
+    }>;
+    education: string[];
+    certifications: string[];
+  };
+  needsAttention: string[];
   nextAction: CareerOsDailyActionKind;
   detail: string;
   humanReviewRequired: true;
@@ -245,6 +272,7 @@ export type CareerOsDailyJobSearchExperienceInput = CareerOsCommandCenterInput &
   applicationReviewReadModel?: readonly ApplicationReviewWorkspaceReadModelRecord[];
   applicationIntelligenceReadModel?: readonly ApplicationIntelligencePacketReadModelRecord[];
   resumeDraftReadModel?: readonly TruthBoundResumeDraftReadModelRecord[];
+  resumeDraftReviewReadModel?: readonly TruthBoundResumeDraftReviewReadModelRecord[];
   resumeExportReadModel?: readonly ReviewedResumeDraftExportReadModelRecord[];
   manualSubmissionReadModel?: readonly ManualSubmissionReadModelRecord[];
 };
@@ -285,6 +313,10 @@ function intelligenceItems(input: CareerOsDailyJobSearchExperienceInput) {
 
 function draftItems(input: CareerOsDailyJobSearchExperienceInput) {
   return input.resumeDraftReadModel || [];
+}
+
+function draftReviewItems(input: CareerOsDailyJobSearchExperienceInput) {
+  return input.resumeDraftReviewReadModel || [];
 }
 
 function exportItems(input: CareerOsDailyJobSearchExperienceInput) {
@@ -385,12 +417,10 @@ function actionForPacket(item: ApplicationIntelligencePacketReadModelRecord): Ca
   return "View Intelligence";
 }
 
-function actionForDraft(item: TruthBoundResumeDraftReadModelRecord): CareerOsDailyActionKind {
+function actionForDraft(item: TruthBoundResumeDraftReadModelRecord | TruthBoundResumeDraftReviewReadModelRecord): CareerOsDailyActionKind {
   if (item.nextAction === "BLOCKED") return "Review Evidence";
   if (item.nextAction === "REVIEW_EVIDENCE") return "Review Evidence";
-  if (item.safetyState === "DRAFT_READY_FOR_REVIEW" || item.safetyState === "APPROVED_FOR_EXPORT") {
-    return "Approve for Export";
-  }
+  if (item.nextAction === "EXPORT_READY") return "Approve for Export";
   return "Review Draft";
 }
 
@@ -438,28 +468,92 @@ function applicationIntelligence(
 }
 
 function resumeDrafts(input: CareerOsDailyJobSearchExperienceInput): CareerOsDailyResumeDraftItem[] {
-  return draftItems(input).slice(0, 5).map((item) => ({
-    id: item.artifactVersionId,
-    packetId: item.packetId,
-    company: item.company,
-    role: item.role,
-    version: item.version,
-    safetyState: item.safetyState,
-    operatorApprovalState: item.operatorApprovalState,
-    tracedClaimCount: item.tracedClaimCount,
-    blockedIssueCount: item.blockedIssueCount,
-    reviewIssueCount: item.reviewIssueCount,
-    nextAction: actionForDraft(item),
-    detail: `${item.tracedClaimCount} traced claims / ${item.blockedIssueCount} blocking / ${item.reviewIssueCount} review issues`,
-    humanReviewRequired: true,
-    externalActionAvailable: false,
-    limitations: [
-      "Shown from the existing private truth-bound resume draft read model.",
-      "Generated draft content, private paths, and source authority IDs are not exposed in this read model.",
-      "No application, export, upload, message, browser action, provider call, or model action is available here.",
-      ...item.limitations,
-    ],
-  }));
+  const exportByDraftId = new Map(exportItems(input).map((item) => [item.sourceDraftArtifactVersionId, item]));
+  const reviewRecords = draftReviewItems(input);
+  if (reviewRecords.length) {
+    return reviewRecords.slice(0, 5).map((item) => {
+      const latestReview = exportByDraftId.get(item.artifactVersionId);
+      const operatorApprovalState = latestReview?.operatorApprovalState || item.operatorApprovalState;
+      const safetyState = latestReview?.sourceDraftSafetyState || item.safetyState;
+      const approvalAllowed =
+        item.approvalAllowed &&
+        operatorApprovalState === "PENDING_REVIEW" &&
+        safetyState === "DRAFT_READY_FOR_REVIEW";
+      return {
+        id: item.artifactVersionId,
+        packetId: item.packetId,
+        company: item.company,
+        role: item.role,
+        version: item.version,
+        safetyState,
+        operatorApprovalState,
+        reviewStatus: item.reviewStatus,
+        approvalAllowed,
+        requestChangesAllowed: item.requestChangesAllowed && operatorApprovalState === "PENDING_REVIEW",
+        rejectAllowed: item.rejectAllowed && operatorApprovalState === "PENDING_REVIEW",
+        tracedClaimCount: item.tracedClaimCount,
+        blockedIssueCount: item.blockedIssueCount,
+        reviewIssueCount: item.reviewIssueCount,
+        omittedUnsupportedClaimCount: item.omittedUnsupportedClaimCount,
+        sections: item.sections,
+        needsAttention: item.needsAttention,
+        nextAction: actionForDraft({ ...item, safetyState }),
+        detail: `${item.tracedClaimCount} traced claims / ${item.blockedIssueCount} blocking / ${item.reviewIssueCount} review issues`,
+        humanReviewRequired: true,
+        externalActionAvailable: false,
+        limitations: [
+          "Shown from the existing private ApplicationArtifactVersion as a review-safe projection.",
+          "Resume wording is displayed for operator review, but claim IDs, CareerFact IDs, CareerEvidence IDs, source digests, packet internals, and filesystem paths remain private.",
+          "No application, export, upload, message, browser action, provider call, or model action is available here.",
+          ...item.limitations,
+          ...(latestReview?.limitations || []),
+        ],
+      };
+    });
+  }
+
+  return draftItems(input).slice(0, 5).map((item) => {
+    const latestReview = exportByDraftId.get(item.artifactVersionId);
+    const operatorApprovalState = latestReview?.operatorApprovalState || item.operatorApprovalState;
+    const safetyState = latestReview?.sourceDraftSafetyState || item.safetyState;
+    return {
+      id: item.artifactVersionId,
+      packetId: item.packetId,
+      company: item.company,
+      role: item.role,
+      version: item.version,
+      safetyState,
+      operatorApprovalState,
+      reviewStatus: safetyState === "DRAFT_READY_FOR_REVIEW" ? "READY_FOR_REVIEW" : safetyState,
+      approvalAllowed: false,
+      requestChangesAllowed: false,
+      rejectAllowed: false,
+      tracedClaimCount: item.tracedClaimCount,
+      blockedIssueCount: item.blockedIssueCount,
+      reviewIssueCount: item.reviewIssueCount,
+      omittedUnsupportedClaimCount: item.omittedUnsupportedClaimCount,
+      sections: {
+        summary: [],
+        skills: [],
+        experience: [],
+        projects: [],
+        education: [],
+        certifications: [],
+      },
+      needsAttention: [],
+      nextAction: actionForDraft({ ...item, safetyState }),
+      detail: `${item.tracedClaimCount} traced claims / ${item.blockedIssueCount} blocking / ${item.reviewIssueCount} review issues`,
+      humanReviewRequired: true,
+      externalActionAvailable: false,
+      limitations: [
+        "Shown from the existing private truth-bound resume draft read model.",
+        "Generated draft content is unavailable in this legacy status-only read model.",
+        "No application, export, upload, message, browser action, provider call, or model action is available here.",
+        ...item.limitations,
+        ...(latestReview?.limitations || []),
+      ],
+    };
+  });
 }
 
 function resumeExports(input: CareerOsDailyJobSearchExperienceInput): CareerOsDailyResumeExportItem[] {

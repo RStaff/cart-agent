@@ -14,6 +14,7 @@ import {
   APPLICATION_ARTIFACT_VERSION_SCHEMA_VERSION,
   type ApplicationArtifactVersion,
   type ApplicationArtifactOperatorApprovalState,
+  type ResumeDraftSafetyState,
   applyApplicationArtifactReviewDecision,
   loadLatestApplicationArtifactVersions,
   type TruthBoundStructuredResumeDraft,
@@ -84,6 +85,7 @@ export type ReviewedResumeExportArtifactVersion = {
   company: string;
   role: string;
   sourceDraftArtifactVersionId: string;
+  sourceDraftSafetyState: ResumeDraftSafetyState;
   sourceDraftDigest: string;
   sourceCareerAuthorityDigest: string;
   exportedContentDigest: string | null;
@@ -122,6 +124,9 @@ export type ReviewedResumeDraftExportReadModelRecord = {
   company: string;
   role: string;
   version: number;
+  sourceDraftSafetyState: ResumeDraftSafetyState;
+  operatorApprovalState: ApplicationArtifactOperatorApprovalState;
+  operatorApprovalTimestamp: string | null;
   exportState: ResumeDraftExportState;
   docxCreated: boolean;
   pdfCreated: false;
@@ -642,6 +647,7 @@ function exportArtifactFor(input: {
     company: input.artifact.company,
     role: input.artifact.role,
     sourceDraftArtifactVersionId: input.artifact.artifactVersionId,
+    sourceDraftSafetyState: input.artifact.safetyState,
     sourceDraftDigest: input.artifact.draftContentDigest,
     sourceCareerAuthorityDigest: input.artifact.sourceCareerAuthorityDigest,
     exportedContentDigest: exportedDigest,
@@ -711,6 +717,9 @@ function readModelFor(artifact: ReviewedResumeExportArtifactVersion): ReviewedRe
     company: artifact.company,
     role: artifact.role,
     version: artifact.version,
+    sourceDraftSafetyState: artifact.sourceDraftSafetyState,
+    operatorApprovalState: artifact.operatorApprovalState,
+    operatorApprovalTimestamp: artifact.operatorApprovalTimestamp,
     exportState: artifact.exportState,
     docxCreated: Boolean(docx),
     pdfCreated: false,
@@ -963,6 +972,7 @@ export function runReviewedResumeDraftExportFromPrivateArtifacts(input: {
   writeOutputs?: boolean;
   artifactIds?: readonly string[];
   approveForExport?: boolean;
+  reviewDecision?: ResumeDraftExportReviewDecision;
   limit?: number;
 }) {
   const generatedAt = input.generatedAt || new Date().toISOString();
@@ -978,11 +988,12 @@ export function runReviewedResumeDraftExportFromPrivateArtifacts(input: {
       filterIds.has(artifact.jobOpportunityId),
     )
     .slice(0, typeof input.limit === "number" && input.limit > 0 ? input.limit : 1);
-  const reviewed = input.approveForExport
+  const reviewDecision = input.reviewDecision || (input.approveForExport ? "APPROVE_FOR_EXPORT" : null);
+  const reviewed = reviewDecision
     ? selected.map((artifact) =>
         recordResumeDraftExportReviewDecision({
           artifact,
-          decision: "APPROVE_FOR_EXPORT",
+          decision: reviewDecision,
           decidedAt: generatedAt,
         }).artifact,
       )
