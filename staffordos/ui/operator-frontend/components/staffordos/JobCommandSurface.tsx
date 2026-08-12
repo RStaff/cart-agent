@@ -439,7 +439,7 @@ function ResumeDraftItem({
   const rejectAvailable = Boolean(resumeReviewAction && item.rejectAllowed);
 
   return (
-    <article className="staffordCareerCommandRecommendation">
+    <article id={`resume-draft-${item.id}`} className="staffordCareerCommandRecommendation">
       <header>
         <div>
           <span>{item.safetyState}</span>
@@ -725,6 +725,8 @@ export function JobCommandSurface({
   manualSubmissionAction,
   opportunityDecisionAction,
   applicationOutcomeAction,
+  resumeDraftFocusId,
+  resumeDraftError = false,
 }: {
   experience?: CareerOsDailyJobSearchExperience;
   jobIntakeAction?: (formData: FormData) => void | Promise<void>;
@@ -733,6 +735,8 @@ export function JobCommandSurface({
   manualSubmissionAction?: (formData: FormData) => void | Promise<void>;
   opportunityDecisionAction?: (formData: FormData) => void | Promise<void>;
   applicationOutcomeAction?: (formData: FormData) => void | Promise<void>;
+  resumeDraftFocusId?: string | null;
+  resumeDraftError?: boolean;
 }) {
   const hasPriorities = experience.todaysPriorities.length > 0;
   const hasOpportunityDecisions = experience.opportunityDecisions.length > 0;
@@ -742,6 +746,9 @@ export function JobCommandSurface({
   const hasApplicationIntelligence = experience.applicationIntelligence.length > 0;
   const hasResumeDrafts = experience.resumeDrafts.length > 0;
   const hasResumeExports = experience.resumeExports.length > 0;
+  const focusedResumeDraft = resumeDraftFocusId
+    ? experience.resumeDrafts.find((item) => item.id === resumeDraftFocusId) || null
+    : null;
 
   return (
     <div className="staffordJobCommand">
@@ -876,6 +883,22 @@ export function JobCommandSurface({
       </section>
 
       <section className="staffordHomeSupport" aria-label="Resume Drafts">
+        {focusedResumeDraft ? (
+          <article className="staffordHomeStatusNote" role="status">
+            <span>Resume draft ready</span>
+            <strong>{focusedResumeDraft.company} - {focusedResumeDraft.role}</strong>
+            <p>Review the draft below. It remains pending Ross&apos;s review; no export or application was completed.</p>
+            <a href={`#resume-draft-${focusedResumeDraft.id}`} className="staffordJobCommandSecondaryAction">
+              Review Resume Draft
+            </a>
+          </article>
+        ) : resumeDraftError ? (
+          <article className="staffordHomeStatusNote" role="alert">
+            <span>Resume draft not ready</span>
+            <strong>CareerOS could not connect the new draft to this opportunity.</strong>
+            <p>Review the opportunity again or try Prepare Resume Draft once more.</p>
+          </article>
+        ) : null}
         <div className="staffordHomeSectionHeader">
           <span className="staffordEyebrow">Resume Drafts</span>
           <h2>Truth-bound resume drafts</h2>

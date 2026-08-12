@@ -782,7 +782,7 @@ function resumeDrafts(input: CareerOsDailyJobSearchExperienceInput): CareerOsDai
   const exportByDraftId = new Map(exportItems(input).map((item) => [item.sourceDraftArtifactVersionId, item]));
   const reviewRecords = draftReviewItems(input);
   if (reviewRecords.length) {
-    return reviewRecords.slice(0, 5).map((item) => {
+    return reviewRecords.map((item) => {
       const latestReview = exportByDraftId.get(item.artifactVersionId);
       const operatorApprovalState = latestReview?.operatorApprovalState || item.operatorApprovalState;
       const safetyState = latestReview?.sourceDraftSafetyState || item.safetyState;
@@ -823,7 +823,7 @@ function resumeDrafts(input: CareerOsDailyJobSearchExperienceInput): CareerOsDai
     });
   }
 
-  return draftItems(input).slice(0, 5).map((item) => {
+  return draftItems(input).map((item) => {
     const latestReview = exportByDraftId.get(item.artifactVersionId);
     const operatorApprovalState = latestReview?.operatorApprovalState || item.operatorApprovalState;
     const safetyState = latestReview?.sourceDraftSafetyState || item.safetyState;

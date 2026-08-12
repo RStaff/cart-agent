@@ -63,13 +63,19 @@ async function analyzeJobAction(formData: FormData) {
 async function prepareResumeDraftAction(formData: FormData) {
   "use server";
   const packetId = String(formData.get("packetId") || "").trim();
-  runTruthBoundResumeDraftsFromPrivateArtifacts({
+  const { result } = runTruthBoundResumeDraftsFromPrivateArtifacts({
     packetIds: packetId ? [packetId] : [],
     limit: 1,
     repositoryRoot: process.cwd(),
     writeOutputs: true,
   });
-  redirect("/os/professional/jobs");
+  const artifact = result.artifactVersions.find((item) =>
+    item.applicationIntelligencePacketId === packetId,
+  );
+  if (!artifact) {
+    redirect("/os/professional/jobs?resumeDraftError=1");
+  }
+  redirect(`/os/professional/jobs?resumeDraft=${encodeURIComponent(artifact.artifactVersionId)}#resume-draft-${encodeURIComponent(artifact.artifactVersionId)}`);
 }
 
 function reviewDecisionFromForm(value: FormDataEntryValue | null): ResumeDraftExportReviewDecision | null {
@@ -164,11 +170,18 @@ async function recordApplicationOutcomeAction(formData: FormData) {
   redirect("/os/professional/jobs");
 }
 
-export default function ProfessionalJobCommandPage() {
+export default async function ProfessionalJobCommandPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ resumeDraft?: string; resumeDraftError?: string }>;
+}) {
+  const params = (await searchParams) || {};
   const { experience } = loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts();
   return (
     <JobCommandSurface
       experience={experience}
+      resumeDraftFocusId={params.resumeDraft || null}
+      resumeDraftError={params.resumeDraftError === "1"}
       jobIntakeAction={analyzeJobAction}
       resumeDraftAction={prepareResumeDraftAction}
       resumeReviewAction={reviewResumeDraftAction}

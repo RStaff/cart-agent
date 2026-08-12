@@ -1148,8 +1148,32 @@ test("truth-bound resume draft review models display human-readable content with
   assert.match(surfaceSource, /APPROVE_FOR_EXPORT/);
   assert.match(surfaceSource, /REQUEST_CHANGES/);
   assert.match(surfaceSource, /REJECT/);
+  assert.match(surfaceSource, /Resume draft ready/);
   assert.match(routeSource, /reviewDecisionFromForm/);
   assert.match(routeSource, /RESUME_DRAFT_EXPORT_REVIEW_DECISIONS/);
+  assert.match(routeSource, /resumeDraftFocusId/);
+  assert.match(routeSource, /resumeDraftError/);
+  assert.match(routeSource, /applicationIntelligencePacketId === packetId/);
+  assert.match(routeSource, /resume-draft-/);
+});
+
+test("every generated resume draft remains reachable after refresh projection", () => {
+  const second = resumeDraftReviewItem({
+    artifactVersionId: "artifact_resume_draft_second",
+    packetId: "packet_review",
+    company: "Anthropic",
+    role: "Business Systems Analyst",
+  });
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    resumeDraftReviewReadModel: [resumeDraftReviewItem(), second],
+  });
+
+  assert.equal(experience.resumeDrafts.length, 2);
+  assert.deepEqual(experience.resumeDrafts.map((item) => item.id), [
+    "artifact_resume_draft",
+    "artifact_resume_draft_second",
+  ]);
 });
 
 test("unsafe draft review models block approval while preserving request and reject controls", () => {
