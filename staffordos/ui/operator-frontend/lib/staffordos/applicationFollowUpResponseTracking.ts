@@ -9,6 +9,7 @@ import {
 import * as path from "node:path";
 import {
   loadPrivateApplicationPipelineStore,
+  projectApplicationLifecycle,
   type PrivateApplicationPipelineStore,
 } from "./privateApplicationPipelineReview";
 import type {
@@ -466,11 +467,22 @@ function engagementItemFor(input: {
   followUps: readonly PrivateFollowUpReviewTask[];
   generatedAt: string;
 }): ApplicationEngagementItem {
+  const lifecycle = projectApplicationLifecycle({
+    application: input.application,
+    events: input.events,
+  });
+  const application = lifecycle.sourceAuthority === "APPLICATION_EVENT_HISTORY"
+    ? {
+        ...input.application,
+        currentStage: lifecycle.currentStage,
+        employerResponseStatus: lifecycle.employerResponseStatus,
+      }
+    : input.application;
   const lastEvent = latestEventFor(input.application, input.events);
-  const response = responseStateFor({ application: input.application, events: input.events });
+  const response = responseStateFor({ application, events: input.events });
   const followUp = followUpTaskFor(input.application, input.followUps);
   const followUpState = followUpStateFor({
-    application: input.application,
+    application,
     followUp,
     responseState: response.responseState,
     generatedAt: input.generatedAt,
@@ -480,7 +492,7 @@ function engagementItemFor(input: {
     responseState: response.responseState,
   });
   const blockingIssues = blockingIssuesFor({
-    application: input.application,
+    application,
     dueDate: followUpState.dueDate,
     dueDateAuthority: followUpState.dueDateAuthority,
   });
@@ -499,9 +511,9 @@ function engagementItemFor(input: {
     company: input.application.companyReference.label,
     role: input.application.roleReference.title,
     applicationDate: datePart(input.application.submittedAt),
-    currentApplicationStatus: input.application.status,
-    currentStage: input.application.currentStage,
-    employerResponseStatus: input.application.employerResponseStatus,
+    currentApplicationStatus: application.status,
+    currentStage: application.currentStage,
+    employerResponseStatus: application.employerResponseStatus,
     lastApplicationEvent: eventSummary(lastEvent),
     followUpState: followUpState.followUpState,
     followUpDueDate: followUpState.dueDate,

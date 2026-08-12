@@ -2884,6 +2884,11 @@ textarea {
   background: #ffffff;
 }
 
+.staffordApplicationOutcomeCard {
+  border-color: #bfd5c8;
+  background: #ffffff;
+}
+
 .staffordCareerCommandDetails {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -3019,6 +3024,83 @@ textarea {
   font-size: 12px;
   font-weight: 900;
   text-transform: uppercase;
+}
+
+.staffordApplicationOutcomeUnknowns {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #d9dee5;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.staffordApplicationOutcomeUnknowns span {
+  color: #66717e;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.staffordApplicationOutcomeUnknowns ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.staffordApplicationOutcomeUnknowns li {
+  color: #27313c;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.staffordApplicationOutcomeActions {
+  display: grid;
+  gap: 10px;
+}
+
+.staffordApplicationOutcomeActions form {
+  display: grid;
+  grid-template-columns: minmax(120px, 160px) minmax(180px, 1fr) minmax(220px, 1.1fr) auto;
+  gap: 10px;
+  align-items: end;
+  padding-top: 10px;
+  border-top: 1px solid #d9dee5;
+}
+
+.staffordApplicationOutcomeActions label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.staffordApplicationOutcomeActions label > span {
+  color: #66717e;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.staffordApplicationOutcomeActions input[type="date"],
+.staffordApplicationOutcomeActions input[type="text"] {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid #cbd4dd;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #15181d;
+  font-size: 14px;
+}
+
+.staffordApplicationOutcomeConfirm {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+}
+
+.staffordApplicationOutcomeConfirm input {
+  width: 18px;
+  height: 18px;
 }
 
 .staffordResumeReviewActionRow {
@@ -3409,6 +3491,7 @@ textarea {
   .staffordCareerCommandPipelineGrid,
   .staffordCareerCommandDetails,
   .staffordManualSubmissionForm,
+  .staffordApplicationOutcomeActions form,
   .staffordOpportunityDecisionFooter,
   .staffordCareerCommandRecommendation header,
   .staffordNextActionGrid,

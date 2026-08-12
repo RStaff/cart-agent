@@ -8,6 +8,7 @@ import {
   statSync,
   writeFileSync,
 } from "node:fs";
+import { homedir } from "node:os";
 import * as path from "node:path";
 import {
   PRIVATE_APPLICATION_EVENT_SCHEMA_VERSION,
@@ -50,6 +51,11 @@ export const PIPELINE_REVIEW_DECISION_TYPES = [
   "RESOLVE_CONFIRMATION",
   "CONFIRM_RESUME_USED",
 ] as const;
+
+const DEFAULT_JOB_SEARCH_PRIVATE_ROOT = path.join(
+  homedir(),
+  ".staffordos/private/professional/job-search",
+);
 
 export type PipelineReviewDecisionType = (typeof PIPELINE_REVIEW_DECISION_TYPES)[number];
 export type PipelineReviewActionStatus =
@@ -196,6 +202,36 @@ export type PrivateApplicationPipelineReviewResult = {
   };
 };
 
+export type ApplicationLifecycleProjection = {
+  applicationId: string;
+  currentStage: ApplicationStatus;
+  employerResponseStatus: EmployerResponseStatus;
+  latestOutcomeEventId: string | null;
+  latestOutcomeEventType: ApplicationEventType | null;
+  sourceAuthority: "APPLICATION_EVENT_HISTORY" | "APPLICATION_RECORD";
+  applicationRecordMutated: false;
+};
+
+export type PrivateApplicationPipelineDecisionRunResult = {
+  result: PrivateApplicationPipelineReviewResult;
+  decision: PrivateApplicationPipelineReviewDecision | null;
+  generatedApplicationEvents: PrivateApplicationEventRecord[];
+  storeAfterDecision: PrivateApplicationPipelineStore;
+  writeResult: ReturnType<typeof writePrivateApplicationPipelineReviewOutputs> | null;
+  eventWriteResult: {
+    runDirectory: string;
+    artifactNames: string[];
+    writtenFiles: string[];
+    privatePathVisible: false;
+  } | null;
+  blockedReason: string | null;
+  noExternalAction: true;
+  noApplicationSubmitted: true;
+  noMessageSent: true;
+  noBrowserAutomation: true;
+  noExternalAi: true;
+};
+
 type JsonRecord = Record<string, unknown>;
 
 function sha256Text(value: string) {
@@ -310,6 +346,95 @@ function outcomeEvent(event: PrivateApplicationEventRecord) {
   ].includes(event.eventType);
 }
 
+function lifecycleEventSortKey(event: PrivateApplicationEventRecord) {
+  return [event.occurredAt || "", event.createdAt || "", event.eventId].join("|");
+}
+
+function latestOutcomeEventFor(
+  applicationId: string,
+  events: readonly PrivateApplicationEventRecord[],
+): PrivateApplicationEventRecord | null {
+  return events
+    .filter((event) => event.applicationId === applicationId && outcomeEvent(event))
+    .sort((left, right) => lifecycleEventSortKey(right).localeCompare(lifecycleEventSortKey(left)))[0] || null;
+}
+
+function stageForOutcomeEvent(event: PrivateApplicationEventRecord): ApplicationStatus {
+  if (event.eventType === "RECRUITER_CONTACT_RECORDED") return "RECRUITER_CONTACT";
+  if (event.eventType === "SCREENING_RECORDED") return "SCREENING";
+  if (event.eventType === "INTERVIEW_SCHEDULED" || event.eventType === "INTERVIEW_COMPLETED") return "INTERVIEW";
+  if (event.eventType === "OFFER_RECORDED") return "OFFER";
+  if (event.eventType === "EMPLOYER_REJECTION_RECORDED") return "REJECTED_BY_EMPLOYER";
+  if (event.eventType === "WITHDRAWAL_RECORDED") return "WITHDRAWN";
+  if (event.eventType === "APPLICATION_CLOSED") return "CLOSED";
+  return "SUBMITTED_MANUAL_EXTERNAL";
+}
+
+function responseForOutcomeEvent(event: PrivateApplicationEventRecord): EmployerResponseStatus {
+  if (event.eventType === "RECRUITER_CONTACT_RECORDED" || event.eventType === "SCREENING_RECORDED") return "RESPONDED";
+  if (event.eventType === "INTERVIEW_SCHEDULED" || event.eventType === "INTERVIEW_COMPLETED") return "INTERVIEW_REQUESTED";
+  if (event.eventType === "OFFER_RECORDED") return "OFFER";
+  if (event.eventType === "EMPLOYER_REJECTION_RECORDED") return "REJECTED";
+  if (event.eventType === "WITHDRAWAL_RECORDED" || event.eventType === "APPLICATION_CLOSED") return "RESPONDED";
+  return "NONE_RECORDED";
+}
+
+export function projectApplicationLifecycle(input: {
+  application: PrivateApplicationRecord;
+  events: readonly PrivateApplicationEventRecord[];
+}): ApplicationLifecycleProjection {
+  const latest = latestOutcomeEventFor(input.application.applicationId, input.events);
+  if (!latest) {
+    return {
+      applicationId: input.application.applicationId,
+      currentStage: input.application.currentStage,
+      employerResponseStatus: input.application.employerResponseStatus,
+      latestOutcomeEventId: null,
+      latestOutcomeEventType: null,
+      sourceAuthority: "APPLICATION_RECORD",
+      applicationRecordMutated: false,
+    };
+  }
+  return {
+    applicationId: input.application.applicationId,
+    currentStage: stageForOutcomeEvent(latest),
+    employerResponseStatus: responseForOutcomeEvent(latest),
+    latestOutcomeEventId: latest.eventId,
+    latestOutcomeEventType: latest.eventType,
+    sourceAuthority: "APPLICATION_EVENT_HISTORY",
+    applicationRecordMutated: false,
+  };
+}
+
+function projectApplicationForLifecycle(input: {
+  application: PrivateApplicationRecord;
+  events: readonly PrivateApplicationEventRecord[];
+}): PrivateApplicationRecord {
+  const projection = projectApplicationLifecycle(input);
+  if (projection.sourceAuthority !== "APPLICATION_EVENT_HISTORY") return input.application;
+  return {
+    ...input.application,
+    currentStage: projection.currentStage,
+    employerResponseStatus: projection.employerResponseStatus,
+    limitations: uniqueBy(
+      [
+        ...input.application.limitations,
+        "Current lifecycle stage is projected from append-only ApplicationEvent history; the original Application record content is not mutated.",
+      ],
+      (item) => item,
+    ),
+  };
+}
+
+function projectStoreForLifecycle(store: PrivateApplicationPipelineStore): PrivateApplicationPipelineStore {
+  return {
+    ...store,
+    applications: store.applications.map((application) =>
+      projectApplicationForLifecycle({ application, events: store.applicationEvents }),
+    ),
+  };
+}
+
 function actionSortKey(action: PrivatePipelineReviewAction) {
   return [
     String(action.priorityTier).padStart(2, "0"),
@@ -420,6 +545,54 @@ function buildStageAction(application: PrivateApplicationRecord, generatedAt: st
     operatorApprovalRequired: true,
     limitations: [
       "No recruiter message, employer reply, acceptance, rejection, withdrawal, or interview scheduling is performed.",
+    ],
+    privatePathVisible: false,
+  };
+}
+
+function buildRecordOutcomeAction(application: PrivateApplicationRecord, generatedAt: string): PrivatePipelineReviewAction | null {
+  if (application.status !== "SUBMITTED_MANUAL_EXTERNAL") return null;
+  if (isTerminalStage(application.currentStage)) return null;
+  const submittedDate = datePart(application.submittedAt);
+  const today = generatedAt.slice(0, 10);
+  return {
+    actionId: opaqueId("privpipeaction", [application.applicationId, "record-external-outcome"]),
+    applicationId: application.applicationId,
+    confirmationRecordId: null,
+    followUpId: null,
+    title: `Record external response or outcome for ${appLabel(application)}`,
+    reason: "A response can arrive before a follow-up is due; recording it requires explicit Ross confirmation.",
+    priorityTier: 8,
+    status: "RECORD_OUTCOME",
+    dueDate: null,
+    reviewDate: application.nextReviewAt,
+    submittedDate,
+    daysSinceSubmission: daysBetween(submittedDate, today),
+    employerResponseStatus: application.employerResponseStatus,
+    currentStage: application.currentStage,
+    known: [
+      `Application stage is ${application.currentStage}.`,
+      `Employer response state is ${application.employerResponseStatus}.`,
+    ],
+    unknown: ["No new employer response, rejection, interview, offer, withdrawal, or closure is inferred."],
+    whatRossShouldDo: "Record only a response or outcome that happened outside CareerOS.",
+    authorityRequired: "ROSS_CONFIRMATION",
+    completionProof: "An append-only ApplicationEvent records the confirmed external response or outcome.",
+    allowedActions: [
+      "RECORD_RECRUITER_RESPONSE",
+      "RECORD_SCREENING",
+      "RECORD_INTERVIEW",
+      "RECORD_REJECTION",
+      "RECORD_OFFER",
+      "RECORD_WITHDRAWAL",
+      "RECORD_CLOSED",
+      "DEFER",
+    ],
+    communicationAllowed: false,
+    operatorApprovalRequired: true,
+    limitations: [
+      "No rejection, response, interview, offer, withdrawal, closure, or employer intent is inferred from silence.",
+      "No email, message, calendar, provider, browser, or external AI action is available.",
     ],
     privatePathVisible: false,
   };
@@ -760,9 +933,10 @@ export function buildPipelineReviewActions(input: {
   generatedAt: string;
 }): PrivatePipelineReviewAction[] {
   const actions: PrivatePipelineReviewAction[] = [];
-  const applicationsById = new Map(input.store.applications.map((application) => [application.applicationId, application]));
+  const store = projectStoreForLifecycle(input.store);
+  const applicationsById = new Map(store.applications.map((application) => [application.applicationId, application]));
 
-  for (const application of input.store.applications) {
+  for (const application of store.applications) {
     const stageAction = buildStageAction(application, input.generatedAt);
     if (stageAction) pushUniqueAction(actions, stageAction);
 
@@ -771,6 +945,9 @@ export function buildPipelineReviewActions(input: {
 
     const preparationAction = buildPreparationAction(application, input.generatedAt);
     if (preparationAction) pushUniqueAction(actions, preparationAction);
+
+    const recordOutcomeAction = buildRecordOutcomeAction(application, input.generatedAt);
+    if (recordOutcomeAction) pushUniqueAction(actions, recordOutcomeAction);
 
     const evidenceAction = buildEvidenceAction(application, input.generatedAt);
     if (evidenceAction) pushUniqueAction(actions, evidenceAction);
@@ -782,13 +959,14 @@ export function buildPipelineReviewActions(input: {
     if (olderAction) pushUniqueAction(actions, olderAction);
   }
 
-  for (const followUp of input.store.followUpReviews) {
+  for (const followUp of store.followUpReviews) {
     const application = applicationsById.get(followUp.applicationId);
     if (!application) continue;
+    if (isTerminalStage(application.currentStage)) continue;
     pushUniqueAction(actions, buildFollowUpAction(application, followUp, input.generatedAt));
   }
 
-  for (const confirmation of input.store.confirmationNeeded) {
+  for (const confirmation of store.confirmationNeeded) {
     pushUniqueAction(actions, buildConfirmationAction(confirmation));
   }
 
@@ -800,14 +978,15 @@ export function buildDailyJobSearchCommand(input: {
   generatedAt: string;
   actions?: readonly PrivatePipelineReviewAction[];
 }): PrivateDailyJobSearchCommand {
+  const store = projectStoreForLifecycle(input.store);
   const actions = [...(input.actions || buildPipelineReviewActions(input))];
   const pipelineSummary = buildPipelineSummary({
-    applications: input.store.applications,
-    followUps: input.store.followUpReviews,
-    confirmations: input.store.confirmationNeeded,
+    applications: store.applications,
+    followUps: store.followUpReviews,
+    confirmations: store.confirmationNeeded,
     generatedAt: input.generatedAt,
   });
-  const recentOutcomes = input.store.applicationEvents
+  const recentOutcomes = store.applicationEvents
     .filter(outcomeEvent)
     .sort((left, right) => (right.occurredAt || "").localeCompare(left.occurredAt || ""))
     .slice(0, 10)
@@ -817,13 +996,13 @@ export function buildDailyJobSearchCommand(input: {
       eventType: event.eventType,
       occurredAt: event.occurredAt,
     }));
-  const awaitingEmployerResponse = input.store.applications.filter((application) => {
+  const awaitingEmployerResponse = store.applications.filter((application) => {
     return (
       !isTerminalStage(application.currentStage) &&
       ["NONE_RECORDED", "UNKNOWN"].includes(application.employerResponseStatus)
     );
   }).length;
-  const interviewsActive = input.store.applications.filter((application) => {
+  const interviewsActive = store.applications.filter((application) => {
     return ["SCREENING", "INTERVIEW", "FINAL_INTERVIEW"].includes(application.currentStage);
   }).length;
 
@@ -838,7 +1017,7 @@ export function buildDailyJobSearchCommand(input: {
     followUpsDue: actions.filter((action) => action.followUpId && action.status === "DUE"),
     interviewsOrRecruiterContact: actions.filter((action) => action.priorityTier === 1),
     confirmationNeeded: actions.filter((action) => action.status === "NEEDS_OPERATOR_CONFIRMATION"),
-    submittedApplications: input.store.applications
+    submittedApplications: store.applications
       .filter((application) => application.status === "SUBMITTED_MANUAL_EXTERNAL")
       .map((application) => ({
         applicationId: application.applicationId,
@@ -992,6 +1171,7 @@ export function buildPrivateApplicationPipelineReviewResult(input: {
     ...input.store,
     applicationEvents: [...input.store.applicationEvents, ...generatedApplicationEvents],
   };
+  const projectedStoreWithEvents = projectStoreForLifecycle(storeWithEvents);
   const actions = buildPipelineReviewActions({ store: storeWithEvents, generatedAt: input.generatedAt });
   const dailyCommand = buildDailyJobSearchCommand({ store: storeWithEvents, generatedAt: input.generatedAt, actions });
   const decisions = [...(input.decisions || [])];
@@ -1011,7 +1191,7 @@ export function buildPrivateApplicationPipelineReviewResult(input: {
     generatedApplicationEvents,
     followUpReviewDecisions: decisions.filter((decision) => decision.followUpId !== null),
     confirmationDecisions: decisions.filter((decision) => decision.confirmationRecordId !== null),
-    futureReadModel: input.store.applications.map((application) => futureReadModelFor(application, input.generatedAt)),
+    futureReadModel: projectedStoreWithEvents.applications.map((application) => futureReadModelFor(application, input.generatedAt)),
     auditSummary: {
       noApplicationSubmitted: true,
       noMessageSent: true,
@@ -1027,6 +1207,158 @@ export function buildPrivateApplicationPipelineReviewResult(input: {
       applicationHistoryAppendOnly: true,
       privatePathVisible: false,
     },
+  };
+}
+
+function writePrivateApplicationOutcomeEventOutputs(input: {
+  applicationRoot: string;
+  repositoryRoot: string;
+  result: PrivateApplicationPipelineReviewResult;
+}) {
+  assertOutsideRepository(input.applicationRoot, input.repositoryRoot, "Private application root");
+  const outputRoot = path.join(input.applicationRoot, "careeros-v1-08-outcomes");
+  const runDirectory = path.join(outputRoot, `careeros_v1_08_${compactDate(input.result.generatedAt)}`);
+  ensurePrivateDirectory(input.applicationRoot);
+  ensurePrivateDirectory(outputRoot);
+  ensurePrivateDirectory(runDirectory);
+  const artifacts = {
+    "application_outcome_decisions.json": input.result.decisions,
+    "application_events.json": input.result.generatedApplicationEvents,
+    "application_outcome_audit.json": {
+      ...input.result.auditSummary,
+      applicationEventAuthorityReused: true,
+      applicationEventsCreated: input.result.generatedApplicationEvents.length,
+      applicationRecordsMutated: false,
+      silenceClassifiedAsRejection: false,
+      noEmailRead: true,
+      noCalendarIntegration: true,
+      noBrowserAutomation: true,
+      noExternalCommunication: true,
+      privatePathVisible: false,
+    },
+  };
+  const writtenFiles: string[] = [];
+  for (const [name, value] of Object.entries(artifacts)) {
+    const filePath = path.join(runDirectory, name);
+    writeJson(filePath, value);
+    writtenFiles.push(filePath);
+  }
+  return {
+    runDirectory,
+    artifactNames: Object.keys(artifacts),
+    writtenFiles,
+    privatePathVisible: false as const,
+  };
+}
+
+function choosePipelineAction(input: {
+  actions: readonly PrivatePipelineReviewAction[];
+  applicationId: string;
+  actionId?: string | null;
+  decisionType: PipelineReviewDecisionType;
+}) {
+  const matching = input.actions.filter((action) => action.applicationId === input.applicationId);
+  if (input.actionId) {
+    const exact = matching.find((action) => action.actionId === input.actionId);
+    if (exact) return exact;
+  }
+  return matching.find((action) => action.allowedActions.includes(input.decisionType)) || null;
+}
+
+export function runApplicationOutcomeDecisionFromPrivateArtifacts(input: {
+  generatedAt?: string;
+  jobSearchRoot?: string;
+  repositoryRoot?: string;
+  applicationId: string;
+  actionId?: string | null;
+  decisionType: PipelineReviewDecisionType;
+  operatorConfirmed?: boolean;
+  operatorContext?: string | null;
+  employerProvidedReason?: string | null;
+  writeOutputs?: boolean;
+}): PrivateApplicationPipelineDecisionRunResult {
+  const generatedAt = input.generatedAt || new Date().toISOString();
+  const jobSearchRoot = input.jobSearchRoot || DEFAULT_JOB_SEARCH_PRIVATE_ROOT;
+  const repositoryRoot = input.repositoryRoot || process.cwd();
+  const applicationRoot = path.join(jobSearchRoot, "applications");
+  const reviewRoot = path.join(jobSearchRoot, "application-pipeline-review");
+  const store = loadPrivateApplicationPipelineStore({ applicationRoot, repositoryRoot });
+  const current = buildPrivateApplicationPipelineReviewResult({ store, generatedAt });
+  const action = choosePipelineAction({
+    actions: current.nextActions,
+    applicationId: input.applicationId,
+    actionId: input.actionId || null,
+    decisionType: input.decisionType,
+  });
+  if (!input.operatorConfirmed) {
+    return {
+      result: current,
+      decision: null,
+      generatedApplicationEvents: [],
+      storeAfterDecision: store,
+      writeResult: null,
+      eventWriteResult: null,
+      blockedReason: "OPERATOR_CONFIRMATION_REQUIRED",
+      noExternalAction: true,
+      noApplicationSubmitted: true,
+      noMessageSent: true,
+      noBrowserAutomation: true,
+      noExternalAi: true,
+    };
+  }
+  if (!action) {
+    return {
+      result: current,
+      decision: null,
+      generatedApplicationEvents: [],
+      storeAfterDecision: store,
+      writeResult: null,
+      eventWriteResult: null,
+      blockedReason: "NO_SUPPORTED_ACTION_FOR_APPLICATION",
+      noExternalAction: true,
+      noApplicationSubmitted: true,
+      noMessageSent: true,
+      noBrowserAutomation: true,
+      noExternalAi: true,
+    };
+  }
+
+  const decision = buildPipelineReviewDecision({
+    action,
+    decisionType: input.decisionType,
+    operatorConfirmed: true,
+    createdAt: generatedAt,
+    operatorContext: input.operatorContext || null,
+    employerProvidedReason: input.employerProvidedReason || null,
+  });
+  const result = buildPrivateApplicationPipelineReviewResult({
+    store,
+    generatedAt,
+    decisions: [decision],
+  });
+  const storeAfterDecision = {
+    ...store,
+    applicationEvents: [...store.applicationEvents, ...result.generatedApplicationEvents],
+  };
+  const eventWriteResult = input.writeOutputs
+    ? writePrivateApplicationOutcomeEventOutputs({ applicationRoot, repositoryRoot, result })
+    : null;
+  const writeResult = input.writeOutputs
+    ? writePrivateApplicationPipelineReviewOutputs({ outputRoot: reviewRoot, repositoryRoot, result })
+    : null;
+  return {
+    result,
+    decision,
+    generatedApplicationEvents: result.generatedApplicationEvents,
+    storeAfterDecision,
+    writeResult,
+    eventWriteResult,
+    blockedReason: null,
+    noExternalAction: true,
+    noApplicationSubmitted: true,
+    noMessageSent: true,
+    noBrowserAutomation: true,
+    noExternalAi: true,
   };
 }
 

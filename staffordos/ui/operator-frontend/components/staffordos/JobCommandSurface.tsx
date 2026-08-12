@@ -1,5 +1,6 @@
 import {
   EMPTY_CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE,
+  type CareerOsDailyApplicationOutcomeItem,
   type CareerOsDailyApplicationWorkItem,
   type CareerOsDailyApplicationIntelligenceItem,
   type CareerOsDailyBriefMetric,
@@ -177,6 +178,103 @@ function WorkItem({ item }: { item: CareerOsDailyApplicationWorkItem }) {
           {item.task}
         </button>
       </footer>
+    </article>
+  );
+}
+
+function ApplicationOutcomeItem({
+  item,
+  applicationOutcomeAction,
+}: {
+  item: CareerOsDailyApplicationOutcomeItem;
+  applicationOutcomeAction?: (formData: FormData) => void | Promise<void>;
+}) {
+  return (
+    <article className="staffordCareerCommandRecommendation staffordApplicationOutcomeCard">
+      <header>
+        <div>
+          <span>{item.currentStage}</span>
+          <h3>{item.role}</h3>
+          <p>{item.company}</p>
+        </div>
+        <strong>{item.nextAction}</strong>
+      </header>
+      <dl className="staffordCareerCommandDetails">
+        <div>
+          <dt>Submitted</dt>
+          <dd>{item.submittedDate || "UNKNOWN"}</dd>
+        </div>
+        <div>
+          <dt>Resume</dt>
+          <dd>{item.exactResumeArtifactKnown ? item.resumeArtifact : "UNKNOWN"}</dd>
+        </div>
+        <div>
+          <dt>Employer Response</dt>
+          <dd>{item.employerResponseStatus}</dd>
+        </div>
+        <div>
+          <dt>Latest Event</dt>
+          <dd>{item.latestOutcome || "No response recorded"}</dd>
+        </div>
+        <div>
+          <dt>Follow-up</dt>
+          <dd>{item.followUpState}</dd>
+        </div>
+        <div>
+          <dt>Next</dt>
+          <dd>{item.recommendedNextEngagementAction}</dd>
+        </div>
+      </dl>
+      {item.unknowns.length ? (
+        <section className="staffordApplicationOutcomeUnknowns" aria-label="Unknown application details">
+          <span>Unknown</span>
+          <ul>
+            {item.unknowns.map((unknown, index) => (
+              <li key={`unknown-${item.applicationId}-${index}`}>{unknown}</li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+      <p className="staffordJobCommandControlNote">
+        Silence is not a rejection. Record an outcome only after Ross confirms it happened outside CareerOS.
+      </p>
+      {applicationOutcomeAction && item.availableActions.length ? (
+        <div className="staffordApplicationOutcomeActions">
+          {item.availableActions.map((action) => (
+            <form action={applicationOutcomeAction} key={`${item.applicationId}-${action.decisionType}`}>
+              <input type="hidden" name="applicationId" value={item.applicationId} />
+              <input type="hidden" name="actionId" value={action.actionId} />
+              <input type="hidden" name="decisionType" value={action.decisionType} />
+              <label>
+                <span>Date</span>
+                <input name="occurredAt" type="date" />
+              </label>
+              {action.decisionType === "RECORD_REJECTION" ? (
+                <label>
+                  <span>Employer Reason</span>
+                  <input name="employerProvidedReason" type="text" placeholder="Optional" />
+                </label>
+              ) : (
+                <label>
+                  <span>Private Note</span>
+                  <input name="operatorContext" type="text" placeholder="Optional" />
+                </label>
+              )}
+              <label className="staffordApplicationOutcomeConfirm">
+                <input name="operatorConfirmed" type="checkbox" value="true" required />
+                <span>I confirm this happened outside CareerOS.</span>
+              </label>
+              <button type="submit" className="staffordJobCommandSecondaryAction" title={action.reason}>
+                {action.label}
+              </button>
+            </form>
+          ))}
+        </div>
+      ) : (
+        <button type="button" className="staffordJobCommandDisabledAction" disabled>
+          No outcome action available
+        </button>
+      )}
     </article>
   );
 }
@@ -530,6 +628,7 @@ export function JobCommandSurface({
   resumeReviewAction,
   manualSubmissionAction,
   opportunityDecisionAction,
+  applicationOutcomeAction,
 }: {
   experience?: CareerOsDailyJobSearchExperience;
   jobIntakeAction?: (formData: FormData) => void | Promise<void>;
@@ -537,11 +636,13 @@ export function JobCommandSurface({
   resumeReviewAction?: (formData: FormData) => void | Promise<void>;
   manualSubmissionAction?: (formData: FormData) => void | Promise<void>;
   opportunityDecisionAction?: (formData: FormData) => void | Promise<void>;
+  applicationOutcomeAction?: (formData: FormData) => void | Promise<void>;
 }) {
   const hasPriorities = experience.todaysPriorities.length > 0;
   const hasOpportunityDecisions = experience.opportunityDecisions.length > 0;
   const hasOpportunities = experience.topOpportunities.length > 0;
   const hasApplicationWork = experience.applicationWork.length > 0;
+  const hasApplicationOutcomes = experience.applicationOutcomes.length > 0;
   const hasApplicationIntelligence = experience.applicationIntelligence.length > 0;
   const hasResumeDrafts = experience.resumeDrafts.length > 0;
   const hasResumeExports = experience.resumeExports.length > 0;
@@ -729,6 +830,30 @@ export function JobCommandSurface({
             <PipelineMetric key={item.id} item={item} />
           ))}
         </div>
+      </section>
+
+      <section className="staffordHomeSupport" aria-label="Follow-Up and Outcomes">
+        <div className="staffordHomeSectionHeader">
+          <span className="staffordEyebrow">Follow-Up & Outcomes</span>
+          <h2>Submitted application lifecycle</h2>
+          <p>Record only real responses or outcomes Ross received outside CareerOS.</p>
+        </div>
+        {hasApplicationOutcomes ? (
+          <div className="staffordCareerCommandRecommendationList">
+            {experience.applicationOutcomes.map((item) => (
+              <ApplicationOutcomeItem
+                key={item.id}
+                item={item}
+                applicationOutcomeAction={applicationOutcomeAction}
+              />
+            ))}
+          </div>
+        ) : (
+          <article className="staffordHomeStatusNote">
+            <span>No submitted application connected</span>
+            <strong>Submitted applications will appear here after Ross marks a manual application submitted.</strong>
+          </article>
+        )}
       </section>
 
       <section className="staffordHomeSupport" aria-label="Add Job">

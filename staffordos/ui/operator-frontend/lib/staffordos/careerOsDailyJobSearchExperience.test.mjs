@@ -17,6 +17,7 @@ const manualSubmissionPath = path.join(
   root,
   "staffordos/ui/operator-frontend/lib/staffordos/manualSubmissionRecordAndArtifactLinkage.ts",
 );
+const pipelinePath = path.join(root, "staffordos/ui/operator-frontend/lib/staffordos/privateApplicationPipelineReview.ts");
 const exportRoutePath = path.join(
   root,
   "staffordos/ui/operator-frontend/app/os/professional/jobs/artifacts/[artifactVersionId]/docx/route.ts",
@@ -30,6 +31,7 @@ const workflowSource = readFileSync(workflowPath, "utf8");
 const surfaceSource = readFileSync(surfacePath, "utf8");
 const routeSource = readFileSync(routePath, "utf8");
 const manualSubmissionSource = readFileSync(manualSubmissionPath, "utf8");
+const pipelineSource = readFileSync(pipelinePath, "utf8");
 const exportRouteSource = readFileSync(exportRoutePath, "utf8");
 const implementationSource = [
   dailySource,
@@ -38,6 +40,7 @@ const implementationSource = [
   surfaceSource,
   routeSource,
   manualSubmissionSource,
+  pipelineSource,
   exportRouteSource,
 ].join("\n");
 
@@ -628,6 +631,138 @@ function manualSubmissionItem(overrides = {}) {
   };
 }
 
+function pipelineAction(overrides = {}) {
+  return {
+    actionId: overrides.actionId || "pipe_action_follow",
+    applicationId: overrides.applicationId || "application_ai_automation",
+    confirmationRecordId: null,
+    followUpId: overrides.followUpId || "followup_ai_automation",
+    title: "Review follow-up timing for Example Automation - AI Automation Product Manager",
+    reason: "A follow-up review date is due or past due, but no message is authorized.",
+    priorityTier: overrides.priorityTier ?? 2,
+    status: overrides.status || "DUE",
+    dueDate: overrides.dueDate || "2026-08-17",
+    reviewDate: overrides.reviewDate || "2026-08-17",
+    submittedDate: overrides.submittedDate || "2026-08-11",
+    daysSinceSubmission: overrides.daysSinceSubmission ?? 6,
+    employerResponseStatus: overrides.employerResponseStatus || "NONE_RECORDED",
+    currentStage: overrides.currentStage || "SUBMITTED_MANUAL_EXTERNAL",
+    known: ["Synthetic known application state."],
+    unknown: ["No employer response is recorded."],
+    whatRossShouldDo: "Choose whether to keep monitoring, record a response, or defer.",
+    authorityRequired: "ROSS_APPROVAL",
+    completionProof: "A follow-up review decision or employer response event is recorded privately.",
+    allowedActions: overrides.allowedActions || [
+      "CONTINUE_MONITORING",
+      "RECORD_RECRUITER_RESPONSE",
+      "RECORD_INTERVIEW",
+      "RECORD_REJECTION",
+      "RECORD_OFFER",
+      "RECORD_WITHDRAWAL",
+      "RECORD_CLOSED",
+      "DEFER",
+    ],
+    communicationAllowed: false,
+    operatorApprovalRequired: true,
+    limitations: ["Synthetic pipeline action fixture."],
+    privatePathVisible: false,
+    ...overrides,
+  };
+}
+
+function pipelineResultFixture(overrides = {}) {
+  const submittedApplications = overrides.submittedApplications || [
+    {
+      applicationId: "application_ai_automation",
+      company: "Example Automation",
+      role: "AI Automation Product Manager",
+      submittedDate: "2026-08-11",
+      currentStage: overrides.currentStage || "SUBMITTED_MANUAL_EXTERNAL",
+      employerResponseStatus: overrides.employerResponseStatus || "NONE_RECORDED",
+      nextReviewDate: "2026-08-17",
+    },
+  ];
+  const nextActions = overrides.nextActions || [pipelineAction()];
+  return {
+    schemaVersion: "staffordos.job_search.private_application_pipeline_review_audit.v1",
+    workflowVersion: "J001.05B",
+    generatedAt,
+    loaded: {
+      applications: submittedApplications.length,
+      applicationEvents: overrides.applicationEventsLoaded ?? 2,
+      followUpReviews: 1,
+      confirmationNeeded: 0,
+    },
+    dailyCommand: {
+      schemaVersion: "staffordos.job_search.private_daily_job_search_command.v1",
+      workflowVersion: "J001.05B",
+      generatedAt,
+      workspaceId: "professional",
+      capabilityFamily: "Career Operations",
+      primaryNextAction: nextActions[0] || null,
+      applicationsNeedingAttention: nextActions,
+      followUpsDue: nextActions.filter((item) => item.status === "DUE"),
+      interviewsOrRecruiterContact: [],
+      confirmationNeeded: [],
+      submittedApplications,
+      recentOutcomes: overrides.recentOutcomes || [],
+      evidencePositioningTasks: [],
+      pipelineSummary: {
+        schemaVersion: "staffordos.job_search.private_application_pipeline_summary.v1",
+        generatedAt,
+        workspaceId: "professional",
+        capabilityFamily: "Career Operations",
+        submittedApplications: submittedApplications.length,
+        followUpReviewsDue: 1,
+        recruiterResponses: 0,
+        screenings: 0,
+        interviews: submittedApplications.filter((item) => item.currentStage === "INTERVIEW").length,
+        offers: submittedApplications.filter((item) => item.currentStage === "OFFER").length,
+        rejections: submittedApplications.filter((item) => item.currentStage === "REJECTED_BY_EMPLOYER").length,
+        closedApplications: submittedApplications.filter((item) => ["CLOSED", "WITHDRAWN"].includes(item.currentStage)).length,
+        applicationsNeedingOperatorConfirmation: 0,
+        conversionRatesAvailable: false,
+        limitations: [],
+      },
+      searchHealth: {
+        activeSubmittedApplications: submittedApplications.length,
+        awaitingEmployerResponse: submittedApplications.filter((item) => item.employerResponseStatus === "NONE_RECORDED").length,
+        followUpReviewsDue: 1,
+        applicationsNeedingOperatorConfirmation: 0,
+        interviewsActive: submittedApplications.filter((item) => item.currentStage === "INTERVIEW").length,
+        recentOutcomes: 0,
+        descriptiveSummary: "Synthetic pipeline result fixture.",
+        vanityMetricGenerated: false,
+        successProbabilityGenerated: false,
+      },
+      noEmployerSuccessProbability: true,
+      privatePathVisible: false,
+      limitations: ["Synthetic pipeline fixture."],
+    },
+    nextActions,
+    decisions: [],
+    generatedApplicationEvents: [],
+    followUpReviewDecisions: [],
+    confirmationDecisions: [],
+    futureReadModel: [],
+    auditSummary: {
+      noApplicationSubmitted: true,
+      noMessageSent: true,
+      noResumeMutated: true,
+      noLinkedInMutated: true,
+      noExternalProviderCall: true,
+      noExternalAi: true,
+      noOllama: true,
+      noApiCreated: true,
+      noDatabaseCreated: true,
+      noOsConnection: true,
+      noOperatorRouteCreated: true,
+      applicationHistoryAppendOnly: true,
+      privatePathVisible: false,
+    },
+  };
+}
+
 function writeJson(filePath, value) {
   mkdirSync(path.dirname(filePath), { recursive: true });
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
@@ -911,6 +1046,123 @@ test("manual submission read model marks exact exported resume artifact as submi
   assert.match(routeSource, /runManualSubmissionRecordAndArtifactLinkageFromPrivateArtifacts/);
 });
 
+test("application outcome section renders submitted application state with artifact linkage and follow-up controls", () => {
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    applicationPipelineResult: pipelineResultFixture(),
+    applicationEngagementReadModel: [engagementItem({
+      applicationId: "application_ai_automation",
+      engagementItemId: "eng_ai_automation",
+      company: "Example Automation",
+      role: "AI Automation Product Manager",
+      followUpState: "DUE",
+      responseState: "NO_RESPONSE",
+      recommendedNextEngagementAction: "FOLLOW_UP",
+      lastApplicationEventType: "SUBMITTED_MANUAL_EXTERNAL",
+    })],
+    manualSubmissionReadModel: [manualSubmissionItem({ followUpState: "DUE", nextAction: "FOLLOW_UP" })],
+  });
+  const item = experience.applicationOutcomes[0];
+
+  assert.equal(item.company, "Example Automation");
+  assert.equal(item.role, "AI Automation Product Manager");
+  assert.equal(item.submittedDate, "2026-08-11");
+  assert.equal(item.exactResumeArtifactKnown, true);
+  assert.match(item.resumeArtifact, /Ross_Stafford_Example_Automation/);
+  assert.equal(item.followUpState, "DUE");
+  assert.equal(item.nextAction, "Follow Up");
+  assert.equal(item.availableActions.some((action) => action.decisionType === "RECORD_RECRUITER_RESPONSE"), true);
+  assert.equal(item.availableActions.some((action) => action.decisionType === "RECORD_REJECTION"), true);
+  assert.equal(item.availableActions.every((action) => action.requiresExplicitConfirmation), true);
+  assert.equal(item.noRejectionInferred, true);
+  assert.equal(item.externalActionAvailable, false);
+  assert.equal(item.messageSent, false);
+  assert.equal(item.applicationSubmittedByStaffordOS, false);
+  assert.doesNotMatch(JSON.stringify(item), /\/Users\/|sourceDigest|sourceUrl|raw resume|raw job/i);
+  assert.match(surfaceSource, /Follow-Up & Outcomes/);
+  assert.match(surfaceSource, /Silence is not a rejection/);
+  assert.deepEqual(
+    item.availableActions.map((action) => action.label),
+    [
+      "Record response",
+      "Record interview",
+      "Record rejection",
+      "Record offer",
+      "Close / withdraw",
+      "Close application",
+    ],
+  );
+  assert.match(surfaceSource, /I confirm this happened outside CareerOS/);
+  assert.match(routeSource, /recordApplicationOutcomeAction/);
+  assert.match(routeSource, /runApplicationOutcomeDecisionFromPrivateArtifacts/);
+});
+
+test("UNKNOWN artifact linkage remains unknown in application outcome display", () => {
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    applicationPipelineResult: pipelineResultFixture(),
+    applicationEngagementReadModel: [engagementItem({ applicationId: "application_ai_automation" })],
+    manualSubmissionReadModel: [],
+  });
+  const item = experience.applicationOutcomes[0];
+
+  assert.equal(item.resumeArtifact, "UNKNOWN");
+  assert.equal(item.exactResumeArtifactKnown, false);
+  assert.equal(item.unknowns.some((unknown) => /artifact linkage/i.test(unknown)), true);
+});
+
+test("application outcome display distinguishes silence from rejection", () => {
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    applicationPipelineResult: pipelineResultFixture(),
+    applicationEngagementReadModel: [engagementItem({
+      applicationId: "application_ai_automation",
+      responseState: "NO_RESPONSE",
+      followUpState: "OVERDUE",
+      recommendedNextEngagementAction: "FOLLOW_UP",
+    })],
+    manualSubmissionReadModel: [manualSubmissionItem({ nextAction: "FOLLOW_UP", followUpState: "OVERDUE" })],
+  });
+  const item = experience.applicationOutcomes[0];
+
+  assert.equal(item.employerResponseStatus, "NONE_RECORDED");
+  assert.equal(item.latestOutcome, "SUBMITTED_MANUAL_EXTERNAL");
+  assert.equal(item.noRejectionInferred, true);
+  assert.notEqual(item.currentStage, "REJECTED_BY_EMPLOYER");
+  assert.notEqual(item.employerResponseStatus, "REJECTED");
+  assert.equal(experience.applicationPipeline.find((stage) => stage.id === "closed").value, 0);
+});
+
+test("pipeline application outcomes update daily priorities for interviews and closed outcomes", () => {
+  const interviewPipeline = pipelineResultFixture({
+    currentStage: "INTERVIEW",
+    employerResponseStatus: "INTERVIEW_REQUESTED",
+    nextActions: [pipelineAction({
+      priorityTier: 1,
+      currentStage: "INTERVIEW",
+      employerResponseStatus: "INTERVIEW_REQUESTED",
+      allowedActions: ["PREPARE_INTERVIEW_EVIDENCE", "RECORD_INTERVIEW", "RECORD_REJECTION", "DEFER"],
+    })],
+  });
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    applicationPipelineResult: interviewPipeline,
+    applicationEngagementReadModel: [engagementItem({
+      applicationId: "application_ai_automation",
+      currentApplicationStatus: "SUBMITTED_MANUAL_EXTERNAL",
+      responseState: "INTERVIEW_REQUEST",
+      followUpState: "COMPLETED",
+      recommendedNextEngagementAction: "PREPARE_FOR_INTERVIEW",
+    })],
+    manualSubmissionReadModel: [manualSubmissionItem()],
+  });
+
+  assert.equal(experience.applicationOutcomes[0].nextAction, "Prepare Interview");
+  assert.equal(experience.applicationOutcomes[0].availableActions.some((action) => action.decisionType === "RECORD_INTERVIEW"), true);
+  assert.equal(experience.todaysPriorities[0].action, "Prepare Interview");
+  assert.equal(experience.applicationPipeline.find((stage) => stage.id === "interview").value, 1);
+});
+
 test("private loader reads latest governed artifacts and degrades when optional outputs are absent", () => {
   const privateRoot = mkdtempSync(path.join(tmpdir(), "careeros-v1-private-"));
   const jobSearchRoot = path.join(privateRoot, "job-search");
@@ -1026,6 +1278,194 @@ test("private loader overlays manual submission artifact links when available", 
   assert.equal(result.loadedArtifacts.manualSubmissionArtifactLinks, true);
   assert.equal(result.experience.resumeExports[0].submissionStatus, "SUBMITTED");
   assert.equal(result.experience.resumeExports[0].exactResumeArtifactKnown, true);
+  assert.equal(result.auditSummary.noApplicationSubmitted, true);
+});
+
+test("private loader projects persisted outcome events into application outcomes after reload", () => {
+  const privateRoot = mkdtempSync(path.join(tmpdir(), "careeros-v108-loader-"));
+  const jobSearchRoot = path.join(privateRoot, "job-search");
+  writeJson(path.join(jobSearchRoot, "application-pipeline-review", "run_20260812", "daily_job_search_command.json"), {
+    schemaVersion: "staffordos.job_search.private_daily_job_search_command.v1",
+    workflowVersion: "J001.05B",
+    generatedAt: "2026-08-12T12:00:00.000Z",
+    workspaceId: "professional",
+    capabilityFamily: "Career Operations",
+    primaryNextAction: pipelineAction({ actionId: "pipe_action_interview", currentStage: "INTERVIEW" }),
+    applicationsNeedingAttention: [pipelineAction({ actionId: "pipe_action_interview", currentStage: "INTERVIEW" })],
+    followUpsDue: [],
+    interviewsOrRecruiterContact: [pipelineAction({ actionId: "pipe_action_interview", currentStage: "INTERVIEW" })],
+    confirmationNeeded: [],
+    submittedApplications: [
+      {
+        applicationId: "application_ai_automation",
+        company: "Example Automation",
+        role: "AI Automation Product Manager",
+        submittedDate: "2026-08-11",
+        currentStage: "INTERVIEW",
+        employerResponseStatus: "INTERVIEW_REQUESTED",
+        nextReviewDate: "2026-08-17",
+      },
+    ],
+    recentOutcomes: [
+      {
+        eventId: "event_interview",
+        applicationId: "application_ai_automation",
+        eventType: "INTERVIEW_SCHEDULED",
+        occurredAt: "2026-08-12",
+      },
+    ],
+    evidencePositioningTasks: [],
+    pipelineSummary: {
+      schemaVersion: "staffordos.job_search.private_application_pipeline_summary.v1",
+      generatedAt: "2026-08-12T12:00:00.000Z",
+      workspaceId: "professional",
+      capabilityFamily: "Career Operations",
+      submittedApplications: 1,
+      followUpReviewsDue: 0,
+      recruiterResponses: 0,
+      screenings: 0,
+      interviews: 1,
+      offers: 0,
+      rejections: 0,
+      closedApplications: 0,
+      applicationsNeedingOperatorConfirmation: 0,
+      conversionRatesAvailable: false,
+      limitations: [],
+    },
+    searchHealth: {
+      activeSubmittedApplications: 1,
+      awaitingEmployerResponse: 0,
+      followUpReviewsDue: 0,
+      applicationsNeedingOperatorConfirmation: 0,
+      interviewsActive: 1,
+      recentOutcomes: 1,
+      descriptiveSummary: "Synthetic interview outcome fixture.",
+      vanityMetricGenerated: false,
+      successProbabilityGenerated: false,
+    },
+    noEmployerSuccessProbability: true,
+    privatePathVisible: false,
+    limitations: [],
+  });
+  writeJson(path.join(jobSearchRoot, "application-pipeline-review", "run_20260812", "next_actions.json"), [
+    pipelineAction({ actionId: "pipe_action_interview", currentStage: "INTERVIEW", allowedActions: ["RECORD_INTERVIEW", "DEFER"] }),
+  ]);
+  writeJson(path.join(jobSearchRoot, "career-engagement", "run_20260812", "application_engagement_read_model.json"), [
+    engagementItem({
+      applicationId: "application_ai_automation",
+      responseState: "INTERVIEW_REQUEST",
+      recommendedNextEngagementAction: "PREPARE_FOR_INTERVIEW",
+      lastApplicationEventType: "INTERVIEW_SCHEDULED",
+    }),
+  ]);
+  writeJson(
+    path.join(jobSearchRoot, "applications", "careeros-v1-04-submissions", "run_20260812", "manual_submission_read_model.json"),
+    [manualSubmissionItem()],
+  );
+
+  const result = loader.loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts({ jobSearchRoot });
+
+  assert.equal(result.loadedArtifacts.applicationPipeline, true);
+  assert.equal(result.loadedArtifacts.applicationEngagement, true);
+  assert.equal(result.experience.applicationOutcomes[0].currentStage, "INTERVIEW");
+  assert.equal(result.experience.applicationOutcomes[0].latestOutcome, "INTERVIEW_SCHEDULED");
+  assert.equal(result.experience.applicationOutcomes[0].nextAction, "Prepare Interview");
+  assert.equal(result.experience.applicationOutcomes[0].availableActions[0].decisionType, "RECORD_INTERVIEW");
+  assert.equal(result.experience.applicationPipeline.find((item) => item.id === "interview").value, 1);
+});
+
+test("private loader refreshes outcome actions from canonical application records without CLI snapshots", () => {
+  const privateRoot = mkdtempSync(path.join(tmpdir(), "careeros-v108-live-pipeline-"));
+  const jobSearchRoot = path.join(privateRoot, "job-search");
+  const applicationId = "application_live_submitted";
+  writeJson(path.join(jobSearchRoot, "applications", "applications.json"), [
+    {
+      schemaVersion: "staffordos.job_search.private_application.v1",
+      applicationId,
+      workspaceId: "professional",
+      capabilityFamily: "Career Operations",
+      opportunityId: "opp_live",
+      analysisRunId: "analysis_live",
+      companyReference: { label: "Example Applied", requisitionAlias: "REQ-LIVE" },
+      roleReference: { title: "AI Product Lead" },
+      status: "SUBMITTED_MANUAL_EXTERNAL",
+      submissionMethod: "MANUAL_EXTERNAL",
+      submissionChannel: "Synthetic careers portal",
+      submittedAt: "2026-08-03",
+      submittedAtPrecision: "DATE",
+      operatorConfirmed: true,
+      resumeReference: {
+        resumeReferenceId: "resume_unknown",
+        applicationId,
+        status: "UNKNOWN",
+        filename: null,
+        assetReferenceId: null,
+        version: null,
+        createdAt: null,
+        purpose: "Synthetic fixture.",
+        authority: "UNKNOWN",
+        privacy: "Professional owner-private",
+        limitations: ["Synthetic fixture."],
+        resumeIsCanonicalCareerTruth: false,
+      },
+      coverLetterReference: {
+        coverLetterReferenceId: "cover_unknown",
+        applicationId,
+        status: "UNKNOWN",
+        filename: null,
+        authority: "UNKNOWN",
+        privacy: "Professional owner-private",
+        limitations: ["Synthetic fixture."],
+      },
+      employerResponseStatus: "NONE_RECORDED",
+      currentStage: "SUBMITTED_MANUAL_EXTERNAL",
+      nextAction: {
+        nextActionId: "next_live",
+        applicationId,
+        confirmationRecordId: null,
+        what: "Monitor application.",
+        whyNow: "Synthetic fixture.",
+        when: "2026-08-17",
+        proofOfCompletion: "Synthetic proof.",
+        authorityRequired: "ROSS_APPROVAL",
+        limitations: ["Synthetic fixture."],
+      },
+      nextReviewAt: "2026-08-17",
+      sourceAuthority: "ROSS_CONFIRMED_MANUAL_EXTERNAL",
+      privacy: "Professional owner-private",
+      duplicateStatus: "NO_DUPLICATE",
+      limitations: ["Synthetic fixture."],
+      createdAt: "2026-08-03T12:00:00.000Z",
+      updatedAt: "2026-08-03T12:00:00.000Z",
+      submittedByStaffordOS: false,
+      applicationSubmittedByThisWorkflow: false,
+      noEmployerInterestInferred: true,
+      noFitInferred: true,
+      testOnly: true,
+    },
+  ]);
+
+  const result = loader.loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts({ jobSearchRoot });
+  const outcome = result.experience.applicationOutcomes[0];
+
+  assert.equal(result.loadedArtifacts.applicationPipeline, true);
+  assert.equal(outcome.applicationId, applicationId);
+  assert.equal(outcome.currentStage, "SUBMITTED_MANUAL_EXTERNAL");
+  assert.equal(outcome.followUpState, "UNKNOWN");
+  assert.equal(outcome.noRejectionInferred, true);
+  assert.deepEqual(
+    outcome.availableActions.map((action) => action.decisionType),
+    [
+      "RECORD_RECRUITER_RESPONSE",
+      "RECORD_SCREENING",
+      "RECORD_INTERVIEW",
+      "RECORD_REJECTION",
+      "RECORD_OFFER",
+      "RECORD_WITHDRAWAL",
+      "RECORD_CLOSED",
+    ],
+  );
+  assert.equal(result.auditSummary.noProviderCalled, true);
   assert.equal(result.auditSummary.noApplicationSubmitted, true);
 });
 

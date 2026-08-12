@@ -35,7 +35,12 @@ import type {
 } from "./privateJobSourceImportQueue";
 import type {
   PrivateApplicationPipelineReviewResult,
+  PrivatePipelineReviewAction,
   PrivateDailyJobSearchCommand,
+} from "./privateApplicationPipelineReview";
+import {
+  buildPrivateApplicationPipelineReviewResult,
+  loadPrivateApplicationPipelineStore,
 } from "./privateApplicationPipelineReview";
 import type { ReadyToApplyApplicationPackageReadModelRecord } from "./readyToApplyApplicationPackage";
 import {
@@ -229,7 +234,10 @@ function generatedAtFromDailyCommand(command: PrivateDailyJobSearchCommand | nul
   return command?.generatedAt || null;
 }
 
-function applicationPipelineResult(command: PrivateDailyJobSearchCommand | null): PrivateApplicationPipelineReviewResult | null {
+function applicationPipelineResult(
+  command: PrivateDailyJobSearchCommand | null,
+  nextActions: PrivatePipelineReviewAction[] | null,
+): PrivateApplicationPipelineReviewResult | null {
   if (!command) return null;
   return {
     schemaVersion: "staffordos.job_search.private_application_pipeline_review_audit.v1",
@@ -242,7 +250,7 @@ function applicationPipelineResult(command: PrivateDailyJobSearchCommand | null)
       confirmationNeeded: command.pipelineSummary.applicationsNeedingOperatorConfirmation,
     },
     dailyCommand: command,
-    nextActions: [
+    nextActions: nextActions || [
       ...(command.primaryNextAction ? [command.primaryNextAction] : []),
       ...command.applicationsNeedingAttention,
     ],
@@ -267,6 +275,34 @@ function applicationPipelineResult(command: PrivateDailyJobSearchCommand | null)
       privatePathVisible: false,
     },
   };
+}
+
+function currentApplicationPipelineResultFromPrivateStore(input: {
+  root: string;
+  generatedAt: string;
+}): PrivateApplicationPipelineReviewResult | null {
+  const applicationRoot = path.join(input.root, "applications");
+  if (!existsSync(applicationRoot)) return null;
+  try {
+    const store = loadPrivateApplicationPipelineStore({
+      applicationRoot,
+      repositoryRoot: process.cwd(),
+    });
+    if (
+      !store.applications.length &&
+      !store.applicationEvents.length &&
+      !store.followUpReviews.length &&
+      !store.confirmationNeeded.length
+    ) {
+      return null;
+    }
+    return buildPrivateApplicationPipelineReviewResult({
+      store,
+      generatedAt: input.generatedAt,
+    });
+  } catch {
+    return null;
+  }
 }
 
 function recommendationResult(input: {
@@ -344,7 +380,10 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
     path.join(root, "application-pipeline-review"),
     "daily_job_search_command.json",
   );
-  if (!dailyCommand) missingArtifacts.push("application pipeline daily command");
+  const pipelineNextActions = latestJson<PrivatePipelineReviewAction[]>(
+    path.join(root, "application-pipeline-review"),
+    "next_actions.json",
+  );
 
   const recommendationReadModel = latestJson<OpportunityRecommendationReadModelRecord[]>(
     path.join(root, "opportunity-recommendations"),
@@ -412,7 +451,10 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
     recommendations: recommendationRecords,
     generatedAt,
   });
-  const pipeline = applicationPipelineResult(dailyCommand);
+  const pipeline =
+    currentApplicationPipelineResultFromPrivateStore({ root, generatedAt }) ||
+    applicationPipelineResult(dailyCommand, pipelineNextActions);
+  if (!pipeline) missingArtifacts.push("application pipeline daily command");
   const greenhouseDiscovery = latestGreenhouseDiscoveryResult(root);
   const commandCenter = buildCareerOsCommandCenterPresentation({
     recommendationResult: recommendation,
@@ -421,6 +463,7 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
   });
   const experienceInput: CareerOsDailyJobSearchExperienceInput = {
     commandCenter,
+    applicationPipelineResult: pipeline,
     applicationEngagementReadModel: engagementReadModel || [],
     applicationPackageReadModel: applicationPackageReadModel || [],
     applicationReviewReadModel: applicationReviewReadModel || [],
@@ -436,7 +479,7 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
     experience: buildCareerOsDailyJobSearchExperience(experienceInput),
     loadedArtifacts: {
       opportunityRecommendations: Boolean(recommendationReadModel),
-      applicationPipeline: Boolean(dailyCommand),
+      applicationPipeline: Boolean(pipeline),
       applicationEngagement: Boolean(engagementReadModel),
       applicationPackages: Boolean(applicationPackageReadModel),
       applicationReviewWorkspace: Boolean(applicationReviewReadModel),

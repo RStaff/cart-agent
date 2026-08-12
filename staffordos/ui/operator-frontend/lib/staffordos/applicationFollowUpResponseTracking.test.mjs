@@ -321,6 +321,48 @@ test("rejection and withdrawal states close out without inventing reasons", () =
   assert.doesNotMatch(JSON.stringify(result), /because|reason supplied by employer/i);
 });
 
+test("ApplicationEvent outcomes project current stage for follow-up without mutating application records", () => {
+  const app = application({ applicationId: id("application_projected_rejection") });
+  const rejection = event({
+    applicationId: app.applicationId,
+    eventType: "EMPLOYER_REJECTION_RECORDED",
+    occurredAt: "2026-08-16",
+  });
+  const result = build(
+    store({
+      applications: [app],
+      applicationEvents: [event({ applicationId: app.applicationId }), rejection],
+      followUpReviews: [followUp({ applicationId: app.applicationId })],
+    }),
+  );
+  const item = result.engagementItems[0];
+
+  assert.equal(app.currentStage, "SUBMITTED_MANUAL_EXTERNAL");
+  assert.equal(item.currentStage, "REJECTED_BY_EMPLOYER");
+  assert.equal(item.employerResponseStatus, "REJECTED");
+  assert.equal(item.responseState, "REJECTION");
+  assert.equal(item.followUpState, "NOT_REQUIRED");
+  assert.equal(item.recommendedNextEngagementAction, "CLOSE_OUT");
+});
+
+test("silence remains no response and does not become rejection", () => {
+  const app = application({ applicationId: id("application_silent"), submittedAt: "2026-07-01", nextReviewAt: null });
+  const result = build(
+    store({
+      applications: [app],
+      applicationEvents: [event({ applicationId: app.applicationId })],
+      followUpReviews: [],
+    }),
+  );
+  const item = result.engagementItems[0];
+
+  assert.equal(item.responseState, "NO_RESPONSE");
+  assert.notEqual(item.responseState, "REJECTION");
+  assert.equal(item.currentStage, "SUBMITTED_MANUAL_EXTERNAL");
+  assert.equal(item.followUpState, "OVERDUE");
+  assert.equal(result.summary.closeOutItems, 0);
+});
+
 test("read model is redacted and contains no recruiter details or private paths", () => {
   const result = build(store());
   const readModel = result.readModel[0];

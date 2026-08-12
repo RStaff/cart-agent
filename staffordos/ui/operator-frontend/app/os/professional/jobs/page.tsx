@@ -25,6 +25,11 @@ import {
   runCareerWorkflowActionFromPrivateArtifacts,
   type CareerWorkflowActionType,
 } from "../../../../lib/staffordos/careerWorkflowActions";
+import {
+  PIPELINE_REVIEW_DECISION_TYPES,
+  runApplicationOutcomeDecisionFromPrivateArtifacts,
+  type PipelineReviewDecisionType,
+} from "../../../../lib/staffordos/privateApplicationPipelineReview";
 
 export const dynamic = "force-dynamic";
 
@@ -128,6 +133,37 @@ async function decideOpportunityAction(formData: FormData) {
   redirect("/os/professional/jobs");
 }
 
+function pipelineDecisionFromForm(value: FormDataEntryValue | null): PipelineReviewDecisionType | null {
+  const decision = String(value || "").trim();
+  return PIPELINE_REVIEW_DECISION_TYPES.includes(decision as PipelineReviewDecisionType)
+    ? decision as PipelineReviewDecisionType
+    : null;
+}
+
+async function recordApplicationOutcomeAction(formData: FormData) {
+  "use server";
+  const applicationId = String(formData.get("applicationId") || "").trim();
+  const actionId = String(formData.get("actionId") || "").trim();
+  const decisionType = pipelineDecisionFromForm(formData.get("decisionType"));
+  const occurredAt = String(formData.get("occurredAt") || "").trim();
+  const operatorContext = String(formData.get("operatorContext") || "").trim();
+  const employerProvidedReason = String(formData.get("employerProvidedReason") || "").trim();
+  const operatorConfirmed = String(formData.get("operatorConfirmed") || "").trim() === "true";
+  if (!applicationId || !decisionType) redirect("/os/professional/jobs");
+  runApplicationOutcomeDecisionFromPrivateArtifacts({
+    applicationId,
+    actionId: actionId || null,
+    decisionType,
+    generatedAt: occurredAt ? `${occurredAt.slice(0, 10)}T12:00:00Z` : undefined,
+    operatorContext: operatorContext || null,
+    employerProvidedReason: employerProvidedReason || null,
+    operatorConfirmed,
+    repositoryRoot: process.cwd(),
+    writeOutputs: true,
+  });
+  redirect("/os/professional/jobs");
+}
+
 export default function ProfessionalJobCommandPage() {
   const { experience } = loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts();
   return (
@@ -138,6 +174,7 @@ export default function ProfessionalJobCommandPage() {
       resumeReviewAction={reviewResumeDraftAction}
       manualSubmissionAction={markSubmittedAction}
       opportunityDecisionAction={decideOpportunityAction}
+      applicationOutcomeAction={recordApplicationOutcomeAction}
     />
   );
 }

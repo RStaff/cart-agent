@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import Module from "node:module";
 import os from "node:os";
@@ -241,6 +241,23 @@ test("employer response is not invented", () => {
   assert.equal(result.dailyCommand.searchHealth.successProbabilityGenerated, false);
 });
 
+test("submitted applications can record confirmed external outcomes even when follow-up is not due", () => {
+  const result = build(
+    store({
+      applications: [application({ submittedAt: "2026-08-03", nextReviewAt: "2026-08-17" })],
+      followUpReviews: [followUp({ reviewDate: "2026-08-17" })],
+    }),
+  );
+  const outcomeAction = result.nextActions.find(
+    (item) => item.status === "RECORD_OUTCOME" && item.allowedActions.includes("RECORD_REJECTION"),
+  );
+  assert.ok(outcomeAction);
+  assert.equal(outcomeAction.communicationAllowed, false);
+  assert.equal(outcomeAction.operatorApprovalRequired, true);
+  assert.equal(result.dailyCommand.followUpsDue.length, 0);
+  assert.equal(result.dailyCommand.pipelineSummary.rejections, 0);
+});
+
 test("rejection reason is not invented", () => {
   const result = build(
     store({
@@ -471,6 +488,139 @@ test("recent outcomes come only from existing events", () => {
   );
   assert.equal(result.dailyCommand.recentOutcomes.length, 1);
   assert.equal(result.dailyCommand.recentOutcomes[0].eventType, "SCREENING_RECORDED");
+});
+
+test("ApplicationEvent history projects lifecycle stage without mutating Application records", () => {
+  const app = application();
+  const rejection = event({
+    eventId: syntheticActionId("event_rejection"),
+    applicationId: app.applicationId,
+    eventType: "EMPLOYER_REJECTION_RECORDED",
+    occurredAt: "2026-08-08",
+  });
+  const result = review.buildPrivateApplicationPipelineReviewResult({
+    store: store({ applications: [app], applicationEvents: [event(), rejection], followUpReviews: [] }),
+    generatedAt: "2026-08-09T12:00:00Z",
+  });
+
+  assert.equal(app.currentStage, "SUBMITTED_MANUAL_EXTERNAL");
+  assert.equal(result.dailyCommand.submittedApplications[0].currentStage, "REJECTED_BY_EMPLOYER");
+  assert.equal(result.dailyCommand.submittedApplications[0].employerResponseStatus, "REJECTED");
+  assert.equal(result.dailyCommand.pipelineSummary.rejections, 1);
+  assert.equal(result.dailyCommand.searchHealth.awaitingEmployerResponse, 0);
+  assert.equal(result.futureReadModel[0].currentStage, "REJECTED_BY_EMPLOYER");
+});
+
+test("terminal outcome events stop follow-up actions without deleting application history", () => {
+  const app = application({ nextReviewAt: "2026-08-07" });
+  const closed = event({
+    eventId: syntheticActionId("event_closed"),
+    applicationId: app.applicationId,
+    eventType: "APPLICATION_CLOSED",
+    occurredAt: "2026-08-08",
+  });
+  const result = review.buildPrivateApplicationPipelineReviewResult({
+    store: store({
+      applications: [app],
+      applicationEvents: [event({ applicationId: app.applicationId }), closed],
+      followUpReviews: [followUp({ applicationId: app.applicationId, reviewDate: "2026-08-07" })],
+    }),
+    generatedAt: "2026-08-09T12:00:00Z",
+  });
+
+  assert.equal(result.dailyCommand.submittedApplications[0].currentStage, "CLOSED");
+  assert.equal(result.dailyCommand.pipelineSummary.closedApplications, 1);
+  assert.equal(result.nextActions.some((action) => action.followUpId), false);
+  assert.equal(result.dailyCommand.recentOutcomes[0].eventType, "APPLICATION_CLOSED");
+});
+
+test("operator-confirmed outcome runner writes append-only events and refreshes pipeline state", () => {
+  const privateRoot = mkdtempSync(path.join(os.tmpdir(), "careeros-v108-outcomes-"));
+  const jobSearchRoot = path.join(privateRoot, "job-search");
+  const applicationRoot = path.join(jobSearchRoot, "applications");
+  try {
+    const app = application({ submittedAt: "2026-07-01", nextReviewAt: "2026-07-15" });
+    mkdirSync(applicationRoot, { recursive: true });
+    writeFileSync(path.join(applicationRoot, "applications.json"), `${JSON.stringify([app])}\n`, {
+      encoding: "utf8",
+      mode: 0o600,
+    });
+    writeFileSync(
+      path.join(applicationRoot, "application_events.json"),
+      `${JSON.stringify([event({ applicationId: app.applicationId })])}\n`,
+      {
+        encoding: "utf8",
+        mode: 0o600,
+      },
+    );
+    const run = review.runApplicationOutcomeDecisionFromPrivateArtifacts({
+      jobSearchRoot,
+      repositoryRoot: root,
+      applicationId: app.applicationId,
+      decisionType: "RECORD_REJECTION",
+      operatorConfirmed: true,
+      generatedAt: "2026-08-09T12:00:00Z",
+      writeOutputs: true,
+    });
+    const reloaded = review.loadPrivateApplicationPipelineStore({ applicationRoot, repositoryRoot: root });
+    const refreshed = review.buildPrivateApplicationPipelineReviewResult({
+      store: reloaded,
+      generatedAt: "2026-08-09T12:00:00Z",
+    });
+
+    assert.equal(run.blockedReason, null);
+    assert.equal(run.generatedApplicationEvents.length, 1);
+    assert.equal(run.generatedApplicationEvents[0].eventType, "EMPLOYER_REJECTION_RECORDED");
+    assert.equal(run.generatedApplicationEvents[0].externalActionPerformedByStaffordOS, false);
+    assert.equal(reloaded.applications[0].currentStage, "SUBMITTED_MANUAL_EXTERNAL");
+    assert.equal(reloaded.applicationEvents.some((item) => item.eventType === "EMPLOYER_REJECTION_RECORDED"), true);
+    assert.equal(refreshed.dailyCommand.submittedApplications[0].currentStage, "REJECTED_BY_EMPLOYER");
+    assert.equal(refreshed.dailyCommand.pipelineSummary.rejections, 1);
+    assert.equal(run.eventWriteResult.privatePathVisible, false);
+    assert.equal(statSync(run.eventWriteResult.runDirectory).mode & 0o777, 0o700);
+    assert.deepEqual(run.eventWriteResult.artifactNames.sort(), [
+      "application_events.json",
+      "application_outcome_audit.json",
+      "application_outcome_decisions.json",
+    ]);
+  } finally {
+    rmSync(privateRoot, { recursive: true, force: true });
+  }
+});
+
+test("outcome runner requires explicit confirmation and silence never becomes rejection", () => {
+  const privateRoot = mkdtempSync(path.join(os.tmpdir(), "careeros-v108-confirm-"));
+  const jobSearchRoot = path.join(privateRoot, "job-search");
+  const applicationRoot = path.join(jobSearchRoot, "applications");
+  try {
+    const app = application({ submittedAt: "2026-07-01", nextReviewAt: "2026-07-15" });
+    mkdirSync(applicationRoot, { recursive: true });
+    writeFileSync(path.join(applicationRoot, "applications.json"), `${JSON.stringify([app])}\n`, {
+      encoding: "utf8",
+      mode: 0o600,
+    });
+    const run = review.runApplicationOutcomeDecisionFromPrivateArtifacts({
+      jobSearchRoot,
+      repositoryRoot: root,
+      applicationId: app.applicationId,
+      decisionType: "RECORD_REJECTION",
+      operatorConfirmed: false,
+      generatedAt: "2026-08-09T12:00:00Z",
+      writeOutputs: true,
+    });
+    const result = review.buildPrivateApplicationPipelineReviewResult({
+      store: review.loadPrivateApplicationPipelineStore({ applicationRoot, repositoryRoot: root }),
+      generatedAt: "2026-08-09T12:00:00Z",
+    });
+
+    assert.equal(run.blockedReason, "OPERATOR_CONFIRMATION_REQUIRED");
+    assert.equal(run.generatedApplicationEvents.length, 0);
+    assert.equal(result.dailyCommand.submittedApplications[0].currentStage, "SUBMITTED_MANUAL_EXTERNAL");
+    assert.equal(result.dailyCommand.submittedApplications[0].employerResponseStatus, "NONE_RECORDED");
+    assert.equal(result.dailyCommand.pipelineSummary.rejections, 0);
+  } finally {
+    rmSync(privateRoot, { recursive: true, force: true });
+  }
 });
 
 test("repository fixtures use synthetic values only", () => {

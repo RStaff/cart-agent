@@ -35,6 +35,10 @@ import type {
   CareerWorkflowStateItem,
   CareerWorkflowStateResult,
 } from "./careerWorkflowActions";
+import type {
+  PipelineReviewDecisionType,
+  PrivatePipelineReviewAction,
+} from "./privateApplicationPipelineReview";
 
 export const CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE_VERSION = "CAREEROS_V1.01";
 export const CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE_SCHEMA_VERSION =
@@ -150,6 +154,49 @@ export type CareerOsDailyApplicationWorkItem = {
   applicationDate: string | null;
   humanReviewRequired: boolean;
   externalActionAvailable: false;
+  limitations: string[];
+};
+
+export type CareerOsDailyApplicationOutcomeAction = {
+  actionId: string;
+  decisionType: PipelineReviewDecisionType;
+  label:
+    | "Record response"
+    | "Record screening"
+    | "Record interview"
+    | "Record rejection"
+    | "Record offer"
+    | "Close / withdraw"
+    | "Close application";
+  enabled: true;
+  reason: string;
+  requiresExplicitConfirmation: true;
+  externalActionAvailable: false;
+};
+
+export type CareerOsDailyApplicationOutcomeItem = {
+  id: string;
+  applicationId: string;
+  company: string;
+  role: string;
+  submittedDate: string | null;
+  currentStage: string;
+  employerResponseStatus: string;
+  latestOutcome: string | null;
+  resumeArtifact: string;
+  exactResumeArtifactKnown: boolean;
+  followUpState: string;
+  followUpDueDateKnown: boolean;
+  nextAction: CareerOsDailyActionKind;
+  recommendedNextEngagementAction: string;
+  availableActions: CareerOsDailyApplicationOutcomeAction[];
+  unknowns: string[];
+  noRejectionInferred: true;
+  externalActionAvailable: false;
+  applicationSubmittedByStaffordOS: false;
+  messageSent: false;
+  browserAutomationUsed: false;
+  externalAiUsed: false;
   limitations: string[];
 };
 
@@ -270,6 +317,7 @@ export type CareerOsDailyJobSearchExperience = {
   opportunityDecisions: CareerOsDailyOpportunityDecisionItem[];
   topOpportunities: CareerOsDailyTopOpportunity[];
   applicationWork: CareerOsDailyApplicationWorkItem[];
+  applicationOutcomes: CareerOsDailyApplicationOutcomeItem[];
   applicationIntelligence: CareerOsDailyApplicationIntelligenceItem[];
   resumeDrafts: CareerOsDailyResumeDraftItem[];
   resumeExports: CareerOsDailyResumeExportItem[];
@@ -829,6 +877,132 @@ function actionForEngagement(item: ApplicationEngagementReadModelRecord): Career
   return "No Action";
 }
 
+function labelForOutcomeDecision(decisionType: PipelineReviewDecisionType): CareerOsDailyApplicationOutcomeAction["label"] | null {
+  if (decisionType === "RECORD_RECRUITER_RESPONSE") return "Record response";
+  if (decisionType === "RECORD_SCREENING") return "Record screening";
+  if (decisionType === "RECORD_INTERVIEW") return "Record interview";
+  if (decisionType === "RECORD_REJECTION") return "Record rejection";
+  if (decisionType === "RECORD_OFFER") return "Record offer";
+  if (decisionType === "RECORD_WITHDRAWAL") return "Close / withdraw";
+  if (decisionType === "RECORD_CLOSED") return "Close application";
+  return null;
+}
+
+function outcomeActionsFor(actions: readonly PrivatePipelineReviewAction[]): CareerOsDailyApplicationOutcomeAction[] {
+  const byDecision = new Map<PipelineReviewDecisionType, CareerOsDailyApplicationOutcomeAction>();
+  for (const action of actions) {
+    if (!action.applicationId) continue;
+    for (const decisionType of action.allowedActions) {
+      const label = labelForOutcomeDecision(decisionType);
+      if (!label || byDecision.has(decisionType)) continue;
+      byDecision.set(decisionType, {
+        actionId: action.actionId,
+        decisionType,
+        label,
+        enabled: true as const,
+        reason: `${action.whatRossShouldDo} Requires explicit Ross confirmation.`,
+        requiresExplicitConfirmation: true as const,
+        externalActionAvailable: false as const,
+      });
+    }
+  }
+  return [...byDecision.values()];
+}
+
+function actionsByApplication(input: CareerOsDailyJobSearchExperienceInput) {
+  const map = new Map<string, PrivatePipelineReviewAction[]>();
+  const actions = input.applicationPipelineResult?.nextActions || [];
+  for (const action of actions) {
+    if (!action.applicationId) continue;
+    map.set(action.applicationId, [...(map.get(action.applicationId) || []), action]);
+  }
+  return map;
+}
+
+function engagementByApplication(input: CareerOsDailyJobSearchExperienceInput) {
+  return new Map(engagementItems(input).map((item) => [item.applicationId, item]));
+}
+
+function submissionByApplication(input: CareerOsDailyJobSearchExperienceInput) {
+  return new Map(manualSubmissionItems(input).map((item) => [item.applicationId, item]));
+}
+
+function submittedApplicationsFromPipeline(input: CareerOsDailyJobSearchExperienceInput) {
+  return input.applicationPipelineResult?.dailyCommand.submittedApplications || [];
+}
+
+function applicationOutcomes(input: CareerOsDailyJobSearchExperienceInput): CareerOsDailyApplicationOutcomeItem[] {
+  const pipelineApplications = submittedApplicationsFromPipeline(input);
+  const actions = actionsByApplication(input);
+  const engagements = engagementByApplication(input);
+  const submissions = submissionByApplication(input);
+  return pipelineApplications
+    .map((application) => {
+      const applicationActions = actions.get(application.applicationId) || [];
+      const engagement = engagements.get(application.applicationId) || null;
+      const submission = submissions.get(application.applicationId) || null;
+      const outcomeActions = outcomeActionsFor(applicationActions);
+      const currentStage = engagement?.currentApplicationStatus === "SUBMITTED_MANUAL_EXTERNAL"
+        ? application.currentStage
+        : application.currentStage;
+      const followUpState = engagement?.followUpState || submission?.followUpState || "UNKNOWN";
+      const recommendedNext = engagement?.recommendedNextEngagementAction || submission?.nextAction || "NO_ACTION";
+      const unknowns = [
+        submission && !submission.exactResumeArtifactKnown ? "Exact submitted resume artifact is unknown." : null,
+        !submission ? "No V1.04 exact artifact linkage is connected in the current read model." : null,
+        application.employerResponseStatus === "NONE_RECORDED" || application.employerResponseStatus === "UNKNOWN"
+          ? "No employer response is recorded."
+          : null,
+        !application.submittedDate ? "Submission date is unknown." : null,
+      ].filter((item): item is string => Boolean(item));
+      return {
+        id: `application-outcome:${application.applicationId}`,
+        applicationId: application.applicationId,
+        company: application.company,
+        role: application.role,
+        submittedDate: application.submittedDate,
+        currentStage,
+        employerResponseStatus: application.employerResponseStatus,
+        latestOutcome: engagement?.lastApplicationEventType || null,
+        resumeArtifact: submission
+          ? `${submission.resumeArtifactFilename} v${submission.resumeArtifactVersion}`
+          : "UNKNOWN",
+        exactResumeArtifactKnown: Boolean(submission?.exactResumeArtifactKnown),
+        followUpState,
+        followUpDueDateKnown: Boolean(engagement?.followUpDueDateKnown || submission?.followUpDueDateKnown),
+        nextAction: actionForEngagement(engagement || {
+          recommendedNextEngagementAction: recommendedNext,
+          followUpState,
+        } as ApplicationEngagementReadModelRecord),
+        recommendedNextEngagementAction: recommendedNext,
+        availableActions: outcomeActions,
+        unknowns,
+        noRejectionInferred: true as const,
+        externalActionAvailable: false as const,
+        applicationSubmittedByStaffordOS: false as const,
+        messageSent: false as const,
+        browserAutomationUsed: false as const,
+        externalAiUsed: false as const,
+        limitations: [
+          "Shown from existing Application/ApplicationEvent, V1.04 artifact linkage, and J004 engagement authority.",
+          "Outcome buttons record owner-private after-the-fact events only.",
+          "No response, rejection, interview, offer, withdrawal, or employer intent is inferred from silence.",
+          "No email, message, calendar, provider, browser, or external AI action is available here.",
+          ...applicationActions.flatMap((action) => action.limitations),
+          ...(engagement?.limitations || []),
+          ...(submission?.limitations || []),
+        ],
+      };
+    })
+    .sort(
+      (left, right) =>
+        (left.submittedDate || "9999-99-99").localeCompare(right.submittedDate || "9999-99-99") ||
+        left.company.localeCompare(right.company) ||
+        left.role.localeCompare(right.role) ||
+        left.applicationId.localeCompare(right.applicationId),
+    );
+}
+
 function engagementPriorities(items: readonly ApplicationEngagementReadModelRecord[]): CareerOsDailyPriority[] {
   return items
     .filter((item) => item.needsAttention || item.recommendedNextEngagementAction !== "NO_ACTION")
@@ -965,6 +1139,32 @@ function resumeExportPriorities(records: readonly CareerOsDailyResumeExportItem[
     })) satisfies CareerOsDailyPriority[];
 }
 
+function applicationOutcomePriorities(records: readonly CareerOsDailyApplicationOutcomeItem[]) {
+  return records
+    .filter((item) => item.nextAction !== "No Action" || item.availableActions.length > 0)
+    .slice(0, 3)
+    .map((item) => ({
+      id: `application-outcome-priority:${item.applicationId}`,
+      title:
+        item.nextAction === "Prepare Interview"
+          ? "Record or prepare for interview activity"
+          : item.nextAction === "Follow Up"
+            ? "Review application follow-up"
+            : "Review application outcome",
+      company: item.company,
+      role: item.role,
+      category: item.nextAction === "Prepare Interview" ? "Interview activity" : "Application follow-up",
+      status: `${item.currentStage} / ${item.employerResponseStatus}`,
+      detail: item.followUpState === "UNKNOWN"
+        ? "Application state is available; follow-up detail is not connected in the safe display."
+        : `Follow-up state: ${item.followUpState}.`,
+      action: item.nextAction,
+      urgency: item.nextAction === "Prepare Interview" || item.nextAction === "Follow Up" ? "today" as const : "next" as const,
+      externalActionAvailable: false as const,
+      limitations: [...item.limitations],
+    })) satisfies CareerOsDailyPriority[];
+}
+
 function prioritySortKey(item: CareerOsDailyPriority) {
   const urgencyRank = item.urgency === "today" ? "1" : item.urgency === "next" ? "2" : "3";
   const categoryRank =
@@ -987,9 +1187,11 @@ function todaysPriorities(
   topOpportunityRecords: readonly CareerOsDailyTopOpportunity[],
   resumeExportRecords: readonly CareerOsDailyResumeExportItem[],
   opportunityDecisionRecords: readonly CareerOsDailyOpportunityDecisionItem[],
+  applicationOutcomeRecords: readonly CareerOsDailyApplicationOutcomeItem[],
 ) {
   const priorities = [
     ...engagementPriorities(engagementItems(input)),
+    ...(engagementItems(input).length ? [] : applicationOutcomePriorities(applicationOutcomeRecords)),
     ...reviewPriorities(reviewItems(input)),
     ...packagePriorities(packageItems(input)),
     ...resumeExportPriorities(resumeExportRecords),
@@ -1135,7 +1337,8 @@ export function buildCareerOsDailyJobSearchExperience(
   const drafts = resumeDrafts(input);
   const exports = resumeExports(input);
   const decisions = opportunityDecisions(input, top);
-  const priorities = todaysPriorities(input, top, exports, decisions);
+  const outcomes = applicationOutcomes(input);
+  const priorities = todaysPriorities(input, top, exports, decisions, outcomes);
   const work = applicationWork(input);
   const hasConnectedWork =
     priorities.length > 0 ||
@@ -1144,6 +1347,7 @@ export function buildCareerOsDailyJobSearchExperience(
     intelligence.length > 0 ||
     drafts.length > 0 ||
     exports.length > 0 ||
+    outcomes.length > 0 ||
     work.length > 0 ||
     commandCenter.pipeline.applicationsSubmitted > 0 ||
     commandCenter.systemHealth.queueSize > 0;
@@ -1164,6 +1368,7 @@ export function buildCareerOsDailyJobSearchExperience(
     applicationIntelligence: intelligence,
     resumeDrafts: drafts,
     resumeExports: exports,
+    applicationOutcomes: outcomes,
     applicationPipeline: pipelineStages(commandCenter.pipeline),
     dailyActions: dailyActions(priorities),
     systemHealth: systemHealth(commandCenter.systemHealth),
