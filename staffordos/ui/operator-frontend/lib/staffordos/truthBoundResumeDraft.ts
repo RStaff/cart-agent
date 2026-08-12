@@ -464,6 +464,20 @@ function claimTextForSupport(input: {
   return input.usableFacts.map(factStatement).find(Boolean) || safePositioning;
 }
 
+function claimTextForFact(input: {
+  safePositioning: string;
+  fact: Partial<CareerFact> | Record<string, unknown>;
+  supportedFactCount: number;
+}) {
+  // A generic positioning sentence cannot safely describe several employers or
+  // projects at once. Use each authoritative fact statement in that case.
+  if (input.supportedFactCount > 1) return factStatement(input.fact) || input.safePositioning.trim();
+  return claimTextForSupport({
+    safePositioning: input.safePositioning,
+    usableFacts: [input.fact],
+  });
+}
+
 function uniqueClaimsByText(claims: readonly TruthBoundResumeDraftClaim[]) {
   const seen = new Set<string>();
   return claims.filter((claim) => {
@@ -485,6 +499,39 @@ function factHasMetricAuthority(fact: Partial<CareerFact> | Record<string, unkno
 
 function containsNumericMetricClaim(text: string) {
   return /(\b\d+(?:\.\d+)?\s?%|\$\s?\d|\b\d+\+?\s+(?:years?|yrs?|months?|people|employees|customers|clients|markets|properties|web properties|teams|revenue|dollars)\b)/i.test(text);
+}
+
+function containsInternalResumeLanguage(text: string) {
+  return /\b(?:CareerFact|CareerEvidence|ApplicationArtifactVersion|packet\s+ID|authority\s+digest|private\s+artifact|safety\s+enum|source\s+authority)\b/i.test(text);
+}
+
+function resumeRelevanceTokens(packet: ApplicationIntelligencePacket) {
+  const fit = packet.fit as Record<string, unknown>;
+  const rankedLanes = Array.isArray(fit.rankedLanes) ? fit.rankedLanes : [];
+  const laneText = rankedLanes
+    .filter(isRecord)
+    .flatMap((lane) => [lane.label, ...(Array.isArray(lane.matchedTerms) ? lane.matchedTerms : [])])
+    .filter((value): value is string => typeof value === "string")
+    .join(" ");
+  const matchedRequirements = Array.isArray(fit.matchedRequirements) ? fit.matchedRequirements : [];
+  const requirementText = matchedRequirements
+    .filter(isRecord)
+    .map((requirement) => requirement.requirementText)
+    .filter((value): value is string => typeof value === "string")
+    .join(" ");
+  return new Set(
+    `${packet.identity.role} ${packet.identity.company} ${laneText} ${requirementText}`
+      .toLowerCase()
+      .split(/[^a-z0-9+#]+/)
+      .filter((token) => token.length >= 4 && !["with", "from", "that", "this", "into", "have", "your", "will", "role", "work", "team"].includes(token)),
+  );
+}
+
+function factRelevanceScore(fact: Partial<CareerFact>, tokens: ReadonlySet<string>) {
+  const text = `${factStatement(fact) || ""} ${factTechnology(fact) || ""} ${optionalText((fact as Record<string, unknown>).organization) || ""} ${optionalText((fact as Record<string, unknown>).roleOrTitle) || ""}`
+    .toLowerCase();
+  const factTokens = new Set(text.split(/[^a-z0-9+#]+/).filter((token) => token.length >= 4));
+  return [...factTokens].filter((token) => tokens.has(token)).length;
 }
 
 function sectionForFactTypes(types: readonly string[]): TruthBoundResumeDraftSectionName {
@@ -585,8 +632,7 @@ function selectedPacketClaims(input: {
     const linkedEvidence = evidenceIds
       .map((id) => input.careerEvidence.get(id) || null)
       .filter((item): item is Partial<CareerEvidence> => Boolean(item));
-    const primaryFact = supportedFacts.find((fact) => Boolean(factStatement(fact))) || supportedFacts[0] || null;
-    const usableFacts = primaryFact ? [primaryFact] : [];
+    const usableFacts = supportedFacts.filter((fact) => Boolean(factStatement(fact)));
     const usableFactIds = uniqueSorted(usableFacts.map(factId));
     const linkedEvidenceForUsableFacts = linkedEvidence.filter((item) =>
       evidenceSupportsFactIds(item).some((id) => usableFactIds.includes(id))
@@ -633,13 +679,12 @@ function selectedPacketClaims(input: {
       });
       continue;
     }
-    const text = claimTextForSupport({
-      safePositioning: support.safePositioning,
-      usableFacts,
-    });
-    if (!text) continue;
     const supportedByEvidence = new Set(linkedEvidence.flatMap(evidenceSupportsFactIds));
-    if (!usableFactIds.some((id) => supportedByEvidence.has(id))) {
+    const evidencedFacts = usableFacts.filter((fact) => {
+      const id = factId(fact);
+      return Boolean(id && supportedByEvidence.has(id));
+    });
+    if (!evidencedFacts.length) {
       issues.push({
         issueId: opaqueId("privdraftissue", [claimId, "evidence_does_not_support_fact"]),
         claimId,
@@ -650,33 +695,102 @@ function selectedPacketClaims(input: {
       });
       continue;
     }
-    if (containsNumericMetricClaim(text) && !supportedFacts.some(factHasMetricAuthority)) {
-      issues.push({
-        issueId: opaqueId("privdraftissue", [claimId, "unsupported_metric"]),
-        claimId,
-        code: "UNSUPPORTED_METRIC_OMITTED",
-        severity: "BLOCKING",
-        message: "A numeric metric-like claim was omitted because no verified metric authority was linked.",
-        limitations: ["Numbers, percentages, revenue, team sizes, client counts, and years claims require explicit metric authority."],
+    evidencedFacts.forEach((fact, factIndex) => {
+      const factIdValue = factId(fact);
+      if (!factIdValue) return;
+      const text = claimTextForFact({
+        safePositioning: support.safePositioning,
+        fact,
+        supportedFactCount: evidencedFacts.length,
       });
-      continue;
-    }
-    claims.push({
-      claimId,
-      section: sectionForFactTypes(factTypes),
-      draftText: text,
-      disposition: support.disposition,
-      packetRequirementIds: [support.requirementId],
-      careerFactIds: usableFactIds,
-      careerEvidenceIds: linkedEvidenceIds,
-      sourcePacketId: input.packet.packetId,
-      generatedFrom: "CAREEROS_SAFE_POSITIONING",
-      limitations: uniqueSorted([
-        "Generated from existing CareerOS safe positioning; not from resume self-validation.",
-        ...support.limitations,
-      ]),
+      if (!text) return;
+      const factClaimId = opaqueId("privdraftclaim", [claimId, factIdValue, factIndex]);
+      if (containsInternalResumeLanguage(text)) {
+        omittedUnsupportedClaimCount += 1;
+        return;
+      }
+      if (containsNumericMetricClaim(text) && !factHasMetricAuthority(fact)) {
+        issues.push({
+          issueId: opaqueId("privdraftissue", [factClaimId, "unsupported_metric"]),
+          claimId: factClaimId,
+          code: "UNSUPPORTED_METRIC_OMITTED",
+          severity: "BLOCKING",
+          message: "A numeric metric-like claim was omitted because no verified metric authority was linked.",
+          limitations: ["Numbers, percentages, revenue, team sizes, client counts, and years claims require explicit metric authority."],
+        });
+        return;
+      }
+      const factEvidenceIds = uniqueSorted(
+        linkedEvidenceForUsableFacts
+          .filter((item) => evidenceSupportsFactIds(item).includes(factIdValue))
+          .map(evidenceId)
+          .filter(Boolean),
+      );
+      claims.push({
+        claimId: factClaimId,
+        section: sectionForFactTypes([factType(fact)]),
+        draftText: text,
+        disposition: support.disposition,
+        packetRequirementIds: [support.requirementId],
+        careerFactIds: [factIdValue],
+        careerEvidenceIds: factEvidenceIds,
+        sourcePacketId: input.packet.packetId,
+        generatedFrom: evidencedFacts.length > 1 ? "CAREERFACT_STATEMENT" : "CAREEROS_SAFE_POSITIONING",
+        limitations: uniqueSorted([
+          evidencedFacts.length > 1
+            ? "Generated from the authoritative CareerFact statement because the packet support row covered multiple facts."
+            : "Generated from existing CareerOS safe positioning; not from resume self-validation.",
+          ...support.limitations,
+        ]),
+      });
     });
   }
+
+  // Packet mapping is intentionally conservative and can omit a separately
+  // supported project/product fact. Include it only when the canonical fact
+  // has evidence and its wording materially overlaps this role's requirements.
+  const usedFactIds = new Set(claims.flatMap((claim) => claim.careerFactIds));
+  const relevanceTokens = resumeRelevanceTokens(input.packet);
+  [...input.careerFacts.values()]
+    .filter((fact) => isSupportedFact(fact) && factId(fact) && !usedFactIds.has(factId(fact) as string))
+    .map((fact) => ({ fact, score: factRelevanceScore(fact, relevanceTokens) }))
+    .filter(({ score }) => score >= 2)
+    .sort((left, right) => right.score - left.score || (factId(left.fact) || "").localeCompare(factId(right.fact) || ""))
+    .forEach(({ fact, score }) => {
+      const id = factId(fact);
+      const text = factStatement(fact);
+      if (!id || !text || containsInternalResumeLanguage(text) || containsNumericMetricClaim(text) && !factHasMetricAuthority(fact)) {
+        omittedUnsupportedClaimCount += 1;
+        return;
+      }
+      const linkedEvidenceIds = uniqueSorted(
+        sourceEvidenceIds(fact)
+          .map((evidenceIdValue) => input.careerEvidence.get(evidenceIdValue) || null)
+          .filter((item): item is Partial<CareerEvidence> => Boolean(item))
+          .filter((item) => evidenceSupportsFactIds(item).includes(id))
+          .map(evidenceId)
+          .filter(Boolean),
+      );
+      if (!linkedEvidenceIds.length) {
+        omittedUnsupportedClaimCount += 1;
+        return;
+      }
+      claims.push({
+        claimId: opaqueId("privdraftclaim", [input.packet.packetId, "canonical_relevant", id, score]),
+        section: sectionForFactTypes([factType(fact)]),
+        draftText: text,
+        disposition: "SUPPORTED_WITH_LIMITATION",
+        packetRequirementIds: [],
+        careerFactIds: [id],
+        careerEvidenceIds: linkedEvidenceIds,
+        sourcePacketId: input.packet.packetId,
+        generatedFrom: "CAREERFACT_STATEMENT",
+        limitations: [
+          "Selected from existing supported career authority because the packet did not attach this fact directly.",
+          ...stringArray((fact as Record<string, unknown>).limitations),
+        ],
+      });
+    });
 
   if (!claims.length) {
     issues.push({

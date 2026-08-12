@@ -416,6 +416,96 @@ test("multi-fact support rows bind draft wording to one supported fact without c
   ]);
 });
 
+test("all supported facts in a packet contribute complete truthful resume sections", () => {
+  const result = build({
+    packet: {
+      supportingEvidence: [
+        support({
+          requirementId: "requirement_business_systems",
+          careerFactIds: ["career_fact_navy", "career_fact_csi", "career_fact_staffordos"],
+          careerEvidenceIds: [],
+          safePositioning: "Position as adjacent or transferable experience; do not claim exact same-role experience.",
+        }),
+      ],
+    },
+    careerFacts: [
+      careerFact({
+        id: "career_fact_navy",
+        factType: "EMPLOYMENT",
+        statement: "Navy Federal stakeholder interviews and business and technical requirements work.",
+        organization: "Navy Federal Credit Union",
+        roleOrTitle: "Marketing Solutions Architect",
+        technologyOrSkill: "Requirements analysis",
+        sourceEvidenceIds: ["evidence_navy"],
+      }),
+      careerFact({
+        id: "career_fact_csi",
+        factType: "EMPLOYMENT",
+        statement: "CSI Salesforce and Pardot marketing automation coordination.",
+        organization: "Cardiovascular Systems, Inc.",
+        roleOrTitle: "Project Manager for Marketing and IT Solutions",
+        technologyOrSkill: "Salesforce/Pardot",
+        sourceEvidenceIds: ["evidence_csi"],
+      }),
+      careerFact({
+        id: "career_fact_staffordos",
+        factType: "PRODUCT",
+        statement: "StaffordOS governed AI automation product roadmap and requirements.",
+        organization: "Stafford Media Consulting / StaffordOS",
+        roleOrTitle: "Founder and Product Operations Lead",
+        technologyOrSkill: "AI automation product operations",
+        sourceEvidenceIds: ["evidence_staffordos"],
+      }),
+    ],
+    careerEvidence: [
+      careerEvidence({ id: "evidence_navy", supportsFactIds: ["career_fact_navy"] }),
+      careerEvidence({ id: "evidence_csi", supportsFactIds: ["career_fact_csi"] }),
+      careerEvidence({ id: "evidence_staffordos", supportsFactIds: ["career_fact_staffordos"] }),
+    ],
+  });
+  const artifact = result.artifactVersions[0];
+
+  assert.equal(artifact.draft.experience.length, 2);
+  assert.equal(artifact.draft.projects.length, 1);
+  assert.ok(artifact.draft.skills.includes("Requirements analysis"));
+  assert.ok(artifact.draft.skills.includes("Salesforce/Pardot"));
+  assert.ok(artifact.draft.skills.includes("AI automation product operations"));
+  assert.equal(artifact.claimTraceability.every((claim) => claim.careerFactIds.length === 1), true);
+  assert.equal(artifact.claimTraceability.every((claim) => claim.careerEvidenceIds.length > 0), true);
+  const visibleSections = {
+    summary: artifact.draft.summary,
+    skills: artifact.draft.skills,
+    experience: artifact.draft.experience.map((entry) => ({
+      employer: entry.employer,
+      title: entry.title,
+      bullets: entry.bullets,
+    })),
+    projects: artifact.draft.projects.map((project) => ({ label: project.label, bullets: project.bullets })),
+    education: artifact.draft.education,
+    certifications: artifact.draft.certifications,
+  };
+  assert.doesNotMatch(JSON.stringify(visibleSections), /CareerFact|CareerEvidence|authority digest|private artifact/i);
+});
+
+test("internal authority wording is omitted from resume claims while supported facts remain fail-closed", () => {
+  const result = build({
+    careerFacts: [
+      careerFact({
+        statement: "CareerFact authority confirms AI automation workflows.",
+      }),
+    ],
+    packet: {
+      supportingEvidence: [support({ safePositioning: "CareerFact authority confirms AI automation workflows." })],
+    },
+  });
+  const artifact = result.artifactVersions[0];
+
+  assert.equal(artifact.claimTraceability.length, 0);
+  assert.equal(artifact.omittedUnsupportedClaimCount, 1);
+  assert.equal(artifact.safetyState, "DRAFT_BLOCKED");
+  assert.doesNotMatch(JSON.stringify(artifact.draft), /CareerFact authority/);
+});
+
 test("unsupported numeric metrics are excluded from draft claims", () => {
   const result = build({
     packet: {
