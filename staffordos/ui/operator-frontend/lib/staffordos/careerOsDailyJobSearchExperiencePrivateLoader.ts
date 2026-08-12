@@ -56,6 +56,11 @@ import {
   loadLatestManualSubmissionReadModel,
   type ManualSubmissionReadModelRecord,
 } from "./manualSubmissionRecordAndArtifactLinkage";
+import {
+  loadLatestCareerWorkflowState,
+  projectCareerWorkflowStateFromPrivateArtifacts,
+  type CareerWorkflowStateResult,
+} from "./careerWorkflowActions";
 
 export const CAREEROS_DAILY_PRIVATE_ARTIFACT_LOADER_VERSION = "CAREEROS_V1.01";
 
@@ -71,6 +76,7 @@ export type CareerOsDailyPrivateArtifactLoadResult = {
     truthBoundResumeDrafts: boolean;
     reviewedResumeDraftExports: boolean;
     manualSubmissionArtifactLinks: boolean;
+    careerWorkflowState: boolean;
     greenhouseDiscovery: boolean;
   };
   missingArtifacts: string[];
@@ -384,6 +390,18 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
   const manualSubmissionReadModel: ManualSubmissionReadModelRecord[] =
     loadLatestManualSubmissionReadModel(root);
 
+  let careerWorkflowState: CareerWorkflowStateResult | null = null;
+  try {
+    careerWorkflowState = projectCareerWorkflowStateFromPrivateArtifacts({
+      jobSearchRoot: root,
+      repositoryRoot: process.cwd(),
+      generatedAt: recommendationReadModel?.[0]?.capturedAsOf,
+    }) || loadLatestCareerWorkflowState(root);
+  } catch {
+    careerWorkflowState = loadLatestCareerWorkflowState(root);
+  }
+  if (!careerWorkflowState) missingArtifacts.push("career workflow action state");
+
   const generatedAt =
     generatedAtFromDailyCommand(dailyCommand) ||
     recommendationReadModel?.[0]?.capturedAsOf ||
@@ -411,6 +429,7 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
     resumeDraftReviewReadModel,
     resumeExportReadModel,
     manualSubmissionReadModel,
+    careerWorkflowStateResult: careerWorkflowState,
   };
 
   return {
@@ -425,6 +444,7 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
       truthBoundResumeDrafts: resumeDraftReadModel.length > 0,
       reviewedResumeDraftExports: resumeExportReadModel.length > 0,
       manualSubmissionArtifactLinks: manualSubmissionReadModel.length > 0,
+      careerWorkflowState: Boolean(careerWorkflowState),
       greenhouseDiscovery: Boolean(greenhouseDiscovery),
     },
     missingArtifacts,

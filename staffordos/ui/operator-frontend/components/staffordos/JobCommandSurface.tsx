@@ -4,6 +4,7 @@ import {
   type CareerOsDailyApplicationIntelligenceItem,
   type CareerOsDailyBriefMetric,
   type CareerOsDailyJobSearchExperience,
+  type CareerOsDailyOpportunityDecisionItem,
   type CareerOsDailyPipelineStage,
   type CareerOsDailyPriority,
   type CareerOsDailyResumeExportItem,
@@ -68,6 +69,92 @@ function OpportunityItem({ item }: { item: CareerOsDailyTopOpportunity }) {
           <dd>{item.detail}</dd>
         </div>
       </dl>
+    </article>
+  );
+}
+
+function OpportunityDecisionItem({
+  item,
+  opportunityDecisionAction,
+}: {
+  item: CareerOsDailyOpportunityDecisionItem;
+  opportunityDecisionAction?: (formData: FormData) => void | Promise<void>;
+}) {
+  return (
+    <article className="staffordCareerCommandRecommendation staffordCareerOpportunityDecision">
+      <header>
+        <div>
+          <span>{item.recommendation}</span>
+          <h3>{item.role}</h3>
+          <p>{item.company}</p>
+        </div>
+        <strong>{item.operatorDecision}</strong>
+      </header>
+      <dl className="staffordCareerCommandDetails">
+        <div>
+          <dt>CareerOS Recommendation</dt>
+          <dd>{item.recommendation}</dd>
+        </div>
+        <div>
+          <dt>Ross Decision</dt>
+          <dd>{item.operatorDecision}</dd>
+        </div>
+        <div>
+          <dt>Readiness</dt>
+          <dd>{item.applicationReadiness}</dd>
+        </div>
+        <div>
+          <dt>Fit</dt>
+          <dd>{item.explainableFit}</dd>
+        </div>
+        <div>
+          <dt>Evidence</dt>
+          <dd>{item.evidence}</dd>
+        </div>
+        <div>
+          <dt>Gaps / Risk</dt>
+          <dd>{item.gaps}</dd>
+        </div>
+        <div>
+          <dt>Resume</dt>
+          <dd>{item.resumeReadiness}</dd>
+        </div>
+        <div>
+          <dt>Recommended Next</dt>
+          <dd>{item.recommendedNextAction}</dd>
+        </div>
+        <div>
+          <dt>After Decision</dt>
+          <dd>{item.currentWorkflowNextAction}</dd>
+        </div>
+      </dl>
+      <p className="staffordJobCommandControlNote">{item.whyItFits}</p>
+      <footer className="staffordOpportunityDecisionFooter">
+        <span>{item.decisionAuthority}</span>
+        <div className="staffordOpportunityDecisionActionRow">
+          {item.availableActions.map((action) =>
+            opportunityDecisionAction && action.enabled ? (
+              <form action={opportunityDecisionAction} key={action.actionType}>
+                <input type="hidden" name="recommendationId" value={item.recommendationId} />
+                <input type="hidden" name="workflowAction" value={action.actionType} />
+                <button type="submit" className="staffordJobCommandSecondaryAction" title={action.reason}>
+                  {action.label}
+                </button>
+              </form>
+            ) : (
+              <button
+                key={action.actionType}
+                type="button"
+                className="staffordJobCommandDisabledAction"
+                title={action.reason}
+                disabled
+              >
+                {action.label}
+              </button>
+            ),
+          )}
+        </div>
+      </footer>
     </article>
   );
 }
@@ -442,14 +529,17 @@ export function JobCommandSurface({
   resumeDraftAction,
   resumeReviewAction,
   manualSubmissionAction,
+  opportunityDecisionAction,
 }: {
   experience?: CareerOsDailyJobSearchExperience;
   jobIntakeAction?: (formData: FormData) => void | Promise<void>;
   resumeDraftAction?: (formData: FormData) => void | Promise<void>;
   resumeReviewAction?: (formData: FormData) => void | Promise<void>;
   manualSubmissionAction?: (formData: FormData) => void | Promise<void>;
+  opportunityDecisionAction?: (formData: FormData) => void | Promise<void>;
 }) {
   const hasPriorities = experience.todaysPriorities.length > 0;
+  const hasOpportunityDecisions = experience.opportunityDecisions.length > 0;
   const hasOpportunities = experience.topOpportunities.length > 0;
   const hasApplicationWork = experience.applicationWork.length > 0;
   const hasApplicationIntelligence = experience.applicationIntelligence.length > 0;
@@ -500,6 +590,30 @@ export function JobCommandSurface({
           <article className="staffordHomeStatusNote">
             <span>No priority due</span>
             <strong>{experience.emptyState || "No current action is due from connected artifacts."}</strong>
+          </article>
+        )}
+      </section>
+
+      <section className="staffordHomeSupport" aria-label="Opportunity Decisions">
+        <div className="staffordHomeSectionHeader">
+          <span className="staffordEyebrow">Opportunity Decisions</span>
+          <h2>Decide which roles deserve work</h2>
+          <p>CareerOS recommends; Ross decides. Buttons record planning decisions only.</p>
+        </div>
+        {hasOpportunityDecisions ? (
+          <div className="staffordCareerCommandRecommendationList">
+            {experience.opportunityDecisions.map((item) => (
+              <OpportunityDecisionItem
+                key={item.id}
+                item={item}
+                opportunityDecisionAction={opportunityDecisionAction}
+              />
+            ))}
+          </div>
+        ) : (
+          <article className="staffordHomeStatusNote">
+            <span>No pending decision</span>
+            <strong>No ranked opportunity currently needs an Apply, Review later, Skip, or Not interested decision.</strong>
           </article>
         )}
       </section>

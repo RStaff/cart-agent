@@ -20,6 +20,11 @@ import {
 import {
   runManualSubmissionRecordAndArtifactLinkageFromPrivateArtifacts,
 } from "../../../../lib/staffordos/manualSubmissionRecordAndArtifactLinkage";
+import {
+  CAREER_WORKFLOW_ACTION_TYPES,
+  runCareerWorkflowActionFromPrivateArtifacts,
+  type CareerWorkflowActionType,
+} from "../../../../lib/staffordos/careerWorkflowActions";
 
 export const dynamic = "force-dynamic";
 
@@ -101,6 +106,28 @@ async function markSubmittedAction(formData: FormData) {
   redirect("/os/professional/jobs");
 }
 
+function workflowActionFromForm(value: FormDataEntryValue | null): CareerWorkflowActionType | null {
+  const action = String(value || "").trim();
+  return CAREER_WORKFLOW_ACTION_TYPES.includes(action as CareerWorkflowActionType)
+    ? action as CareerWorkflowActionType
+    : null;
+}
+
+async function decideOpportunityAction(formData: FormData) {
+  "use server";
+  const recommendationId = String(formData.get("recommendationId") || "").trim();
+  const workflowAction = workflowActionFromForm(formData.get("workflowAction"));
+  if (!recommendationId || !workflowAction) redirect("/os/professional/jobs");
+  runCareerWorkflowActionFromPrivateArtifacts({
+    recommendationId,
+    actionType: workflowAction,
+    operatorConfirmed: true,
+    repositoryRoot: process.cwd(),
+    writeOutputs: true,
+  });
+  redirect("/os/professional/jobs");
+}
+
 export default function ProfessionalJobCommandPage() {
   const { experience } = loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts();
   return (
@@ -110,6 +137,7 @@ export default function ProfessionalJobCommandPage() {
       resumeDraftAction={prepareResumeDraftAction}
       resumeReviewAction={reviewResumeDraftAction}
       manualSubmissionAction={markSubmittedAction}
+      opportunityDecisionAction={decideOpportunityAction}
     />
   );
 }

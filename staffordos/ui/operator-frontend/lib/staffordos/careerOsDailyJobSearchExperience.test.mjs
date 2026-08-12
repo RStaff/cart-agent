@@ -10,6 +10,7 @@ const root = process.cwd();
 const frontendPackage = path.join(root, "staffordos/ui/operator-frontend/package.json");
 const dailyPath = path.join(root, "staffordos/ui/operator-frontend/lib/staffordos/careerOsDailyJobSearchExperience.ts");
 const loaderPath = path.join(root, "staffordos/ui/operator-frontend/lib/staffordos/careerOsDailyJobSearchExperiencePrivateLoader.ts");
+const workflowPath = path.join(root, "staffordos/ui/operator-frontend/lib/staffordos/careerWorkflowActions.ts");
 const surfacePath = path.join(root, "staffordos/ui/operator-frontend/components/staffordos/JobCommandSurface.tsx");
 const routePath = path.join(root, "staffordos/ui/operator-frontend/app/os/professional/jobs/page.tsx");
 const manualSubmissionPath = path.join(
@@ -25,6 +26,7 @@ const ts = requireFromFrontend("typescript");
 
 const dailySource = readFileSync(dailyPath, "utf8");
 const loaderSource = readFileSync(loaderPath, "utf8");
+const workflowSource = readFileSync(workflowPath, "utf8");
 const surfaceSource = readFileSync(surfacePath, "utf8");
 const routeSource = readFileSync(routePath, "utf8");
 const manualSubmissionSource = readFileSync(manualSubmissionPath, "utf8");
@@ -32,6 +34,7 @@ const exportRouteSource = readFileSync(exportRoutePath, "utf8");
 const implementationSource = [
   dailySource,
   loaderSource,
+  workflowSource,
   surfaceSource,
   routeSource,
   manualSubmissionSource,
@@ -63,12 +66,15 @@ function registerTypeScriptRequire() {
 const restoreTypeScriptRequire = registerTypeScriptRequire();
 const daily = requireFromFrontend(dailyPath);
 const loader = requireFromFrontend(loaderPath);
+const workflow = requireFromFrontend(workflowPath);
 restoreTypeScriptRequire();
 
 const {
   EMPTY_CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE,
   buildCareerOsDailyJobSearchExperience,
 } = daily;
+
+const generatedAt = "2026-08-09T12:00:00.000Z";
 
 function commandCenterFixture() {
   return {
@@ -142,6 +148,187 @@ function commandCenterFixture() {
       limitations: [],
     },
   };
+}
+
+function recommendationReadModelRecord(id, recommendation, applicationReadiness, overrides = {}) {
+  return {
+    schemaVersion: "staffordos.job_search.private_opportunity_recommendation_read_model.v1",
+    recommendationId: id,
+    queueItemId: overrides.queueItemId || `queue_${id}`,
+    company: overrides.company || `Example ${id}`,
+    role: overrides.role || "AI Automation Product Manager",
+    recommendation,
+    applicationReadiness,
+    recommendedResumeVersion: {
+      status: overrides.resumeStatus ?? "SELECTED_EXISTING_RESUMEVERSION",
+      safeLabel: overrides.safeLabel ?? "ROLE_TARGETED_RESUME / PDF / SUPPORTED_VERIFIED / 2026-08-01 / abc12345",
+      factSafetyStatus: overrides.factSafetyStatus ?? "SUPPORTED_VERIFIED",
+    },
+    missingSkillCount: overrides.missingSkillCount ?? 0,
+    supportingEvidenceCount: overrides.supportingEvidenceCount ?? 3,
+    estimatedResumeUpdateEffort: overrides.estimatedResumeUpdateEffort ?? "NONE",
+    recommendedNextAction: overrides.recommendedNextAction ?? "Review the recommendation before recording Ross's decision.",
+    capturedAsOf: generatedAt,
+    limitations: ["Synthetic workflow read-model fixture."],
+    privatePathVisible: false,
+    rawResumeTextVisible: false,
+    sourceUrlVisible: false,
+    applicationActionAvailable: false,
+    messageActionAvailable: false,
+    resumeMutationAvailable: false,
+  };
+}
+
+function recommendationRecord(record, overrides = {}) {
+  return {
+    schemaVersion: "staffordos.job_search.private_opportunity_recommendation.v1",
+    recommendationId: record.recommendationId,
+    queueItemId: record.queueItemId,
+    sourceRecordId: overrides.sourceRecordId || `source_${record.recommendationId}`,
+    opportunityId: overrides.opportunityId || `opportunity_${record.recommendationId}`,
+    company: record.company,
+    role: record.role,
+    recommendation: record.recommendation,
+    explainableFit: {
+      available: true,
+      fitAssessment: null,
+      fitRecommendation: overrides.fitRecommendation || "Existing Explainable Fit recommends review with verified evidence.",
+      coverage: null,
+      majorBlockers: [],
+      limitations: ["Synthetic fit fixture."],
+    },
+    recommendedResumeVersion: {
+      status: record.recommendedResumeVersion.status,
+      resumeVersionId: "resume_version_synthetic",
+      safeLabel: record.recommendedResumeVersion.safeLabel,
+      reason: "Synthetic deterministic resume selection.",
+      evaluatedResumeVersions: [],
+      limitations: ["Synthetic resume fixture."],
+      privatePathVisible: false,
+      rawResumeTextVisible: false,
+      resumeGenerated: false,
+      resumeMutated: false,
+    },
+    supportingCareerEvidence: [],
+    missingSkills: [],
+    estimatedResumeUpdateEffort: record.estimatedResumeUpdateEffort,
+    applicationReadiness: record.applicationReadiness,
+    recommendedNextAction: record.recommendedNextAction,
+    recommendationReasons: ["Synthetic recommendation fixture."],
+    authorityRequired: "ROSS_APPROVAL_BEFORE_APPLICATION",
+    completionProof: "Ross records workflow action.",
+    deterministicRulesOnly: true,
+    hiringProbabilityGenerated: false,
+    interviewProbabilityGenerated: false,
+    aiConfidenceScoreGenerated: false,
+    applicationSubmitted: false,
+    applicationCreated: false,
+    resumeGenerated: false,
+    resumeMutated: false,
+    coverLetterGenerated: false,
+    messageSent: false,
+    externalAiUsed: false,
+    limitations: ["Synthetic recommendation fixture."],
+  };
+}
+
+function recommendationResultFixture() {
+  const readModel = [
+    recommendationReadModelRecord("rec_apply", "APPLY_NOW", "READY_FOR_OPERATOR_APPROVED_APPLICATION", {
+      company: "Example Automation",
+      role: "AI Automation Product Manager",
+      recommendedNextAction: "Proceed only after Ross decides to prepare this application.",
+    }),
+    recommendationReadModelRecord("rec_review", "REVIEW", "NEEDS_EVIDENCE_REVIEW", {
+      company: "Example Systems",
+      role: "Business Technology Analyst",
+      missingSkillCount: 2,
+      estimatedResumeUpdateEffort: "MODERATE",
+      recommendedNextAction: "Review evidence before deciding whether to prepare this application.",
+    }),
+    recommendationReadModelRecord("rec_wait", "WAIT", "WAITING_FOR_SOURCE_OR_DUPLICATE_REVIEW", {
+      company: "Example Platform",
+      role: "AI Platform Operations Lead",
+    }),
+    recommendationReadModelRecord("rec_skip", "SKIP", "SKIP_RECOMMENDED", {
+      company: "Example Duplicate",
+      role: "Traditional Marketing Specialist",
+      resumeStatus: "NO_SAFE_EXISTING_RESUMEVERSION",
+      safeLabel: null,
+      factSafetyStatus: null,
+      missingSkillCount: 3,
+      estimatedResumeUpdateEffort: "HIGH",
+    }),
+  ];
+  return {
+    schemaVersion: "staffordos.job_search.private_opportunity_recommendation_result.v1",
+    workflowVersion: "J003.01",
+    generatedAt,
+    workspaceId: "professional",
+    capabilityFamily: "Career Operations",
+    sourceAuthority: {
+      opportunityQueueReused: true,
+      explainableFitReused: true,
+      resumeVersionAuthorityReused: true,
+      discoveryRebuilt: false,
+      providerAdded: false,
+    },
+    recommendations: readModel.map((record) => recommendationRecord(record)),
+    readModel,
+    summary: {
+      queueItemsReviewed: readModel.length,
+      recommendationsCreated: readModel.length,
+      applyNow: 1,
+      review: 1,
+      wait: 1,
+      skip: 1,
+      resumeVersionsEvaluated: 1,
+      opportunitiesWithRecommendedResumeVersion: 3,
+      opportunitiesMissingSkills: 2,
+      readinessReadyForOperatorApprovedApplication: 1,
+      hiringProbabilityGenerated: false,
+      interviewProbabilityGenerated: false,
+      aiConfidenceScoreGenerated: false,
+    },
+    auditSummary: {
+      noApplicationCreated: true,
+      noApplicationSubmitted: true,
+      noResumeGenerated: true,
+      noResumeMutated: true,
+      noCoverLetterGenerated: true,
+      noMessageSent: true,
+      noLinkedInMutated: true,
+      noBrowserAutomation: true,
+      noProviderAdded: true,
+      noExternalProviderCall: true,
+      noExternalAi: true,
+      noOllama: true,
+      noOsConnection: true,
+      noOperatorConnection: true,
+      noCareerFactPromoted: true,
+      noCareerEvidenceMutated: true,
+      privatePathVisible: false,
+    },
+  };
+}
+
+function workflowStateFixture(actions = []) {
+  return workflow.buildCareerWorkflowState({
+    recommendationResult: recommendationResultFixture(),
+    workflowActions: actions,
+    generatedAt,
+  });
+}
+
+function workflowAction(recommendationId, actionType, existingActions = []) {
+  return workflow.createCareerWorkflowAction({
+    recommendationResult: recommendationResultFixture(),
+    recommendationId,
+    actionType,
+    generatedAt,
+    operatorConfirmed: true,
+    existingActions,
+  });
 }
 
 function engagementItem(overrides = {}) {
@@ -499,6 +686,107 @@ test("top opportunities expose only user-facing recommendations", () => {
   assert.doesNotMatch(JSON.stringify(experience.topOpportunities), /APPLY_NOW|READY_TO_APPLY|workflowState/);
 });
 
+test("opportunity decisions distinguish CareerOS recommendation from Ross operator decision", () => {
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    careerWorkflowStateResult: workflowStateFixture(),
+  });
+  const item = experience.opportunityDecisions[0];
+  const metrics = Object.fromEntries(experience.dailyBriefing.metrics.map((metricItem) => [metricItem.label, metricItem.value]));
+
+  assert.equal(metrics["Needs Decision"], 4);
+  assert.equal(item.company, "Example Automation");
+  assert.equal(item.role, "AI Automation Product Manager");
+  assert.equal(item.recommendation, "APPLY NOW");
+  assert.equal(item.operatorDecision, "No Ross decision yet");
+  assert.equal(item.decisionAuthority, "Awaiting Ross decision");
+  assert.equal(item.status, "NEEDS_DECISION");
+  assert.equal(item.availableActions.length, 4);
+  assert.equal(item.availableActions.find((action) => action.actionType === "APPLY").enabled, true);
+  assert.equal(item.availableActions.find((action) => action.actionType === "REVIEW_LATER").enabled, true);
+  assert.equal(item.applicationCreated, false);
+  assert.equal(item.applicationSubmitted, false);
+  assert.equal(item.resumeGenerated, false);
+  assert.equal(item.messageSent, false);
+  assert.equal(item.externalActionAvailable, false);
+  assert.equal(experience.todaysPriorities[0].action, "Decide");
+  assert.match(experience.todaysPriorities[0].status, /APPLY NOW/);
+  assert.doesNotMatch(JSON.stringify(item), /sourceUrl|raw job|raw resume|\/Users\//i);
+});
+
+test("opportunity decisions prioritize actionable recommendations before WAIT and SKIP diagnostics", () => {
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    careerWorkflowStateResult: workflowStateFixture(),
+  });
+
+  assert.deepEqual(
+    experience.opportunityDecisions.map((item) => item.recommendation),
+    ["APPLY NOW", "REVIEW", "WAIT", "SKIP"],
+  );
+});
+
+test("opportunity decision actions enforce APPLY readiness without changing recommendation thresholds", () => {
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    careerWorkflowStateResult: workflowStateFixture(),
+  });
+  const review = experience.opportunityDecisions.find((item) => item.recommendationId === "rec_review");
+
+  assert.equal(review.availableActions.find((action) => action.actionType === "APPLY").enabled, false);
+  assert.equal(review.availableActions.find((action) => action.actionType === "REVIEW_LATER").enabled, true);
+  assert.equal(review.availableActions.find((action) => action.actionType === "SKIP").enabled, true);
+  assert.equal(review.availableActions.find((action) => action.actionType === "NOT_INTERESTED").enabled, true);
+  assert.match(review.availableActions.find((action) => action.actionType === "APPLY").reason, /readiness permits/);
+});
+
+test("APPLY advances only to existing application preparation state and does not create an Application", () => {
+  const apply = workflowAction("rec_apply", "APPLY");
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    careerWorkflowStateResult: workflowStateFixture([apply]),
+  });
+
+  assert.equal(experience.opportunityDecisions.some((item) => item.recommendationId === "rec_apply"), false);
+  assert.equal(experience.applicationWork.some((item) => item.id === "workflow-ready:rec_apply"), true);
+  const work = experience.applicationWork.find((item) => item.id === "workflow-ready:rec_apply");
+  assert.equal(work.task, "Prepare Resume Draft");
+  assert.equal(work.externalActionAvailable, false);
+  assert.match(work.detail, /Prepare the existing Application Intelligence/);
+  assert.equal(experience.auditSummary.noApplicationCreated, true);
+  assert.equal(experience.auditSummary.noApplicationSubmitted, true);
+});
+
+test("refresh projection removes skipped and not-interested items from today's active decision queue", () => {
+  const skipped = workflowAction("rec_wait", "SKIP");
+  const notInterested = workflowAction("rec_skip", "NOT_INTERESTED", [skipped]);
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    careerWorkflowStateResult: workflowStateFixture([skipped, notInterested]),
+  });
+  const ids = experience.opportunityDecisions.map((item) => item.recommendationId);
+
+  assert.equal(ids.includes("rec_wait"), false);
+  assert.equal(ids.includes("rec_skip"), false);
+  assert.equal(ids.includes("rec_apply"), true);
+  assert.equal(ids.includes("rec_review"), true);
+  assert.equal(experience.topOpportunities.some((item) => item.id === "rec_wait"), false);
+  assert.equal(experience.topOpportunities.some((item) => item.id === "rec_skip"), false);
+});
+
+test("surface and route expose governed opportunity decision controls without external actions", () => {
+  assert.match(surfaceSource, /Opportunity Decisions/);
+  assert.match(surfaceSource, /CareerOS recommends; Ross decides/);
+  assert.match(surfaceSource, /Apply/);
+  assert.match(surfaceSource, /Review later/);
+  assert.match(surfaceSource, /Skip/);
+  assert.match(surfaceSource, /Not interested/);
+  assert.match(surfaceSource, /workflowAction/);
+  assert.match(routeSource, /decideOpportunityAction/);
+  assert.match(routeSource, /runCareerWorkflowActionFromPrivateArtifacts/);
+  assert.doesNotMatch(routeSource, /createApplication|submitApplication|sendMessage|fetch\(/);
+});
+
 test("application work includes package review, manual-ready, and follow-up tasks without external controls", () => {
   const experience = buildCareerOsDailyJobSearchExperience({
     commandCenter: commandCenterFixture(),
@@ -686,6 +974,38 @@ test("private loader reads latest governed artifacts and degrades when optional 
   assert.equal(result.experience.todaysPriorities[0].action, "Follow Up");
   assert.equal(result.auditSummary.noProviderCalled, true);
   assert.equal(result.auditSummary.noNewPrivateDataRoute, true);
+});
+
+test("private loader projects persisted Career workflow actions into today's command view", () => {
+  const privateRoot = mkdtempSync(path.join(tmpdir(), "careeros-v107-workflow-"));
+  const jobSearchRoot = path.join(privateRoot, "job-search");
+  const result = recommendationResultFixture();
+  const action = workflowAction("rec_review", "REVIEW_LATER");
+  writeJson(
+    path.join(jobSearchRoot, "opportunity-recommendations", "run_20260809", "future_read_model.json"),
+    result.readModel,
+  );
+  writeJson(
+    path.join(jobSearchRoot, "opportunity-recommendations", "run_20260809", "opportunity_recommendations.json"),
+    result.recommendations,
+  );
+  mkdirSync(path.join(jobSearchRoot, "career-workflow-actions"), { recursive: true });
+  writeFileSync(
+    path.join(jobSearchRoot, "career-workflow-actions", "workflow_actions.ndjson"),
+    `${JSON.stringify(action)}\n`,
+    { encoding: "utf8", mode: 0o600 },
+  );
+
+  const loaded = loader.loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts({ jobSearchRoot });
+
+  assert.equal(loaded.loadedArtifacts.opportunityRecommendations, true);
+  assert.equal(loaded.loadedArtifacts.careerWorkflowState, true);
+  assert.equal(loaded.experience.opportunityDecisions.some((item) => item.recommendationId === "rec_review"), false);
+  assert.equal(loaded.experience.opportunityDecisions.some((item) => item.recommendationId === "rec_apply"), true);
+  assert.equal(loaded.experience.dailyBriefing.metrics.find((item) => item.label === "Needs Decision").value, 3);
+  assert.equal(loaded.auditSummary.noProviderCalled, true);
+  assert.equal(loaded.auditSummary.noApplicationCreated, true);
+  assert.equal(loaded.auditSummary.noApplicationSubmitted, true);
 });
 
 test("private loader overlays manual submission artifact links when available", () => {

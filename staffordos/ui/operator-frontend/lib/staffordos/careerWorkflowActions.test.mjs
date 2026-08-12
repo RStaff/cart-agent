@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import Module from "node:module";
 import {
   existsSync,
+  mkdirSync,
   mkdtempSync,
   readFileSync,
   statSync,
@@ -469,6 +470,104 @@ test("loader accepts recommendation result and action log files", () => {
 
   assert.equal(workflow.loadOpportunityRecommendationResultFile(recommendationFile).readModel.length, result.readModel.length);
   assert.equal(workflow.loadCareerWorkflowActionsFile(path.join(actionRoot, "workflow_actions.ndjson")).length, 1);
+});
+
+test("private artifact runner records one local workflow decision and projects refresh state", () => {
+  const result = recommendationResult();
+  const privateRoot = mkdtempSync(path.join(tmpdir(), "career-workflow-private-runner-"));
+  const jobSearchRoot = path.join(privateRoot, "job-search");
+  const recommendationRoot = path.join(jobSearchRoot, "opportunity-recommendations", "run_20260809");
+  mkdirSync(recommendationRoot, { recursive: true, mode: 0o700 });
+  writeFileSync(
+    path.join(recommendationRoot, "future_read_model.json"),
+    `${JSON.stringify(result.readModel, null, 2)}\n`,
+    { encoding: "utf8", mode: 0o600, flag: "w" },
+  );
+  writeFileSync(
+    path.join(recommendationRoot, "opportunity_recommendations.json"),
+    `${JSON.stringify(result.recommendations, null, 2)}\n`,
+    { encoding: "utf8", mode: 0o600, flag: "w" },
+  );
+
+  const run = workflow.runCareerWorkflowActionFromPrivateArtifacts({
+    recommendationId: "rec_review",
+    actionType: "REVIEW_LATER",
+    operatorConfirmed: true,
+    generatedAt,
+    jobSearchRoot,
+    repositoryRoot: root,
+    writeOutputs: true,
+  });
+  const refresh = workflow.projectCareerWorkflowStateFromPrivateArtifacts({
+    jobSearchRoot,
+    repositoryRoot: root,
+    generatedAt,
+  });
+
+  assert.equal(run.action.workflowState, "REVIEW_LATER");
+  assert.equal(run.result.futureWorkQueue.length, 1);
+  assert.equal(refresh.futureWorkQueue.length, 1);
+  assert.equal(refresh.todaysQueue.some((item) => item.recommendationId === "rec_review"), false);
+  assert.equal(existsSync(path.join(jobSearchRoot, "career-workflow-actions", "workflow_actions.ndjson")), true);
+  assert.equal(statSync(path.join(jobSearchRoot, "career-workflow-actions")).mode & 0o777, 0o700);
+  assert.equal(statSync(path.join(jobSearchRoot, "career-workflow-actions", "workflow_actions.ndjson")).mode & 0o777, 0o600);
+  assert.equal(run.auditSummary.noApplicationCreated, true);
+  assert.equal(run.auditSummary.noApplicationSubmitted, true);
+  assert.equal(run.auditSummary.noResumeGenerated, true);
+  assert.equal(run.auditSummary.noExternalProviderCall, true);
+  assert.equal(run.auditSummary.noExternalAi, true);
+  assert.throws(
+    () =>
+      workflow.runCareerWorkflowActionFromPrivateArtifacts({
+        recommendationId: "rec_review",
+        actionType: "SKIP",
+        operatorConfirmed: true,
+        generatedAt: "2026-08-09T13:00:00Z",
+        jobSearchRoot,
+        repositoryRoot: root,
+        writeOutputs: true,
+      }),
+    /exactly one workflow action/,
+  );
+});
+
+test("private artifact projection ignores stale action-log entries from superseded recommendation runs", () => {
+  const result = recommendationResult();
+  const privateRoot = mkdtempSync(path.join(tmpdir(), "career-workflow-stale-actions-"));
+  const jobSearchRoot = path.join(privateRoot, "job-search");
+  const recommendationRoot = path.join(jobSearchRoot, "opportunity-recommendations", "run_20260809");
+  const actionRoot = path.join(jobSearchRoot, "career-workflow-actions");
+  const staleAction = {
+    ...createAction(result, "rec_review", "REVIEW_LATER"),
+    recommendationId: "rec_review_old_run",
+  };
+  mkdirSync(recommendationRoot, { recursive: true, mode: 0o700 });
+  mkdirSync(actionRoot, { recursive: true, mode: 0o700 });
+  writeFileSync(
+    path.join(recommendationRoot, "future_read_model.json"),
+    `${JSON.stringify(result.readModel, null, 2)}\n`,
+    { encoding: "utf8", mode: 0o600, flag: "w" },
+  );
+  writeFileSync(
+    path.join(recommendationRoot, "opportunity_recommendations.json"),
+    `${JSON.stringify(result.recommendations, null, 2)}\n`,
+    { encoding: "utf8", mode: 0o600, flag: "w" },
+  );
+  writeFileSync(
+    path.join(actionRoot, "workflow_actions.ndjson"),
+    `${JSON.stringify(staleAction)}\n`,
+    { encoding: "utf8", mode: 0o600, flag: "w" },
+  );
+
+  const refresh = workflow.projectCareerWorkflowStateFromPrivateArtifacts({
+    jobSearchRoot,
+    repositoryRoot: root,
+    generatedAt,
+  });
+
+  assert.equal(refresh.workflowActions.length, 0);
+  assert.equal(refresh.todaysQueue.length, result.readModel.length);
+  assert.equal(refresh.summary.pendingWorkflowAction, result.readModel.length);
 });
 
 test("CLI summary is redacted and preserves closure flags", () => {

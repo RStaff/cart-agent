@@ -4,10 +4,17 @@ import {
   chmodSync,
   existsSync,
   mkdirSync,
+  readdirSync,
   readFileSync,
+  statSync,
   writeFileSync,
 } from "node:fs";
+import { homedir } from "node:os";
 import * as path from "node:path";
+import {
+  OPPORTUNITY_RECOMMENDATION_ENGINE_VERSION,
+  OPPORTUNITY_RECOMMENDATION_RESULT_SCHEMA_VERSION,
+} from "./opportunityRecommendationEngine";
 import type {
   ApplicationReadinessState,
   OpportunityApplicationRecommendation,
@@ -25,6 +32,10 @@ export const CAREER_WORKFLOW_STATE_SCHEMA_VERSION =
   "staffordos.job_search.private_career_workflow_state.v1";
 export const CAREER_WORKFLOW_STATE_ITEM_SCHEMA_VERSION =
   "staffordos.job_search.private_career_workflow_state_item.v1";
+export const DEFAULT_CAREER_WORKFLOW_JOB_SEARCH_ROOT = path.join(
+  homedir(),
+  ".staffordos/private/professional/job-search",
+);
 
 export const CAREER_WORKFLOW_ACTION_TYPES = [
   "APPLY",
@@ -240,6 +251,100 @@ function ensurePrivateDirectory(directory: string) {
 function writeJson(filePath: string, value: unknown) {
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
   chmodSync(filePath, 0o600);
+}
+
+function latestDirectory(root: string): string | null {
+  if (!existsSync(root)) return null;
+  const directories = readdirSync(root)
+    .map((entry) => path.join(root, entry))
+    .filter((entryPath) => {
+      try {
+        return statSync(entryPath).isDirectory();
+      } catch {
+        return false;
+      }
+    })
+    .sort((left, right) => left.localeCompare(right));
+  return directories[directories.length - 1] || null;
+}
+
+function latestJson<T>(root: string, filename: string): T | null {
+  const directory = latestDirectory(root);
+  if (!directory) return null;
+  const filePath = path.join(directory, filename);
+  if (!existsSync(filePath)) return null;
+  return JSON.parse(readFileSync(filePath, "utf8")) as T;
+}
+
+function latestOpportunityRecommendationResult(jobSearchRoot: string): OpportunityRecommendationResult | null {
+  const readModel = latestJson<OpportunityRecommendationReadModelRecord[]>(
+    path.join(jobSearchRoot, "opportunity-recommendations"),
+    "future_read_model.json",
+  );
+  if (!readModel) return null;
+  const recommendations = latestJson<OpportunityRecommendationRecord[]>(
+    path.join(jobSearchRoot, "opportunity-recommendations"),
+    "opportunity_recommendations.json",
+  ) || [];
+  const generatedAt = readModel[0]?.capturedAsOf || new Date().toISOString();
+
+  return {
+    schemaVersion: OPPORTUNITY_RECOMMENDATION_RESULT_SCHEMA_VERSION,
+    workflowVersion: OPPORTUNITY_RECOMMENDATION_ENGINE_VERSION,
+    generatedAt,
+    workspaceId: "professional",
+    capabilityFamily: "Career Operations",
+    sourceAuthority: {
+      opportunityQueueReused: true,
+      explainableFitReused: true,
+      resumeVersionAuthorityReused: true,
+      discoveryRebuilt: false,
+      providerAdded: false,
+    },
+    recommendations,
+    readModel,
+    summary: {
+      queueItemsReviewed: readModel.length,
+      recommendationsCreated: readModel.length,
+      applyNow: readModel.filter((record) => record.recommendation === "APPLY_NOW").length,
+      review: readModel.filter((record) => record.recommendation === "REVIEW").length,
+      wait: readModel.filter((record) => record.recommendation === "WAIT").length,
+      skip: readModel.filter((record) => record.recommendation === "SKIP").length,
+      resumeVersionsEvaluated: recommendations.reduce(
+        (count, record) => count + record.recommendedResumeVersion.evaluatedResumeVersions.length,
+        0,
+      ),
+      opportunitiesWithRecommendedResumeVersion: readModel.filter(
+        (record) => record.recommendedResumeVersion.status === "SELECTED_EXISTING_RESUMEVERSION",
+      ).length,
+      opportunitiesMissingSkills: readModel.filter((record) => record.missingSkillCount > 0).length,
+      readinessReadyForOperatorApprovedApplication: readModel.filter(
+        (record) => record.applicationReadiness === "READY_FOR_OPERATOR_APPROVED_APPLICATION",
+      ).length,
+      hiringProbabilityGenerated: false,
+      interviewProbabilityGenerated: false,
+      aiConfidenceScoreGenerated: false,
+    },
+    auditSummary: {
+      noApplicationCreated: true,
+      noApplicationSubmitted: true,
+      noResumeGenerated: true,
+      noResumeMutated: true,
+      noCoverLetterGenerated: true,
+      noMessageSent: true,
+      noLinkedInMutated: true,
+      noBrowserAutomation: true,
+      noProviderAdded: true,
+      noExternalProviderCall: true,
+      noExternalAi: true,
+      noOllama: true,
+      noOsConnection: true,
+      noOperatorConnection: true,
+      noCareerFactPromoted: true,
+      noCareerEvidenceMutated: true,
+      privatePathVisible: false,
+    },
+  };
 }
 
 function actionType(value: unknown): CareerWorkflowActionType {
@@ -532,6 +637,22 @@ function actionMapFor(
   return actionByRecommendation;
 }
 
+function actionsCompatibleWithRecommendationResult(
+  recommendationResult: OpportunityRecommendationResult,
+  actions: readonly CareerWorkflowActionRecord[],
+) {
+  const readModels = readModelById(recommendationResult);
+  return actions.filter((action) => {
+    const readModel = readModels.get(action.recommendationId);
+    return Boolean(
+      readModel &&
+        readModel.queueItemId === action.queueItemId &&
+        readModel.company === action.company &&
+        readModel.role === action.role,
+    );
+  });
+}
+
 export function buildCareerWorkflowState(input: {
   recommendationResult: OpportunityRecommendationResult;
   workflowActions?: readonly CareerWorkflowActionRecord[];
@@ -699,6 +820,104 @@ export function loadCareerWorkflowActionsFile(filePath: string): CareerWorkflowA
     result?: { workflowActions?: CareerWorkflowActionRecord[] };
   };
   return object.workflowActions || object.actions || object.result?.workflowActions || [];
+}
+
+export function loadLatestCareerWorkflowActions(jobSearchRoot = DEFAULT_CAREER_WORKFLOW_JOB_SEARCH_ROOT) {
+  const actionLog = path.join(jobSearchRoot, "career-workflow-actions", "workflow_actions.ndjson");
+  return existsSync(actionLog) ? loadCareerWorkflowActionsFile(actionLog) : [];
+}
+
+export function loadLatestCareerWorkflowState(jobSearchRoot = DEFAULT_CAREER_WORKFLOW_JOB_SEARCH_ROOT) {
+  return latestJson<CareerWorkflowStateResult>(
+    path.join(jobSearchRoot, "career-workflow-state"),
+    "workflow_state.json",
+  );
+}
+
+export function runCareerWorkflowActionFromPrivateArtifacts(input: {
+  recommendationId: string;
+  actionType: CareerWorkflowActionType;
+  operatorConfirmed: boolean;
+  generatedAt?: string;
+  jobSearchRoot?: string;
+  repositoryRoot?: string;
+  writeOutputs?: boolean;
+}) {
+  const jobSearchRoot = input.jobSearchRoot || DEFAULT_CAREER_WORKFLOW_JOB_SEARCH_ROOT;
+  const repositoryRoot = input.repositoryRoot || process.cwd();
+  assertOutsideRepository(jobSearchRoot, repositoryRoot, "Private CareerOS job-search root");
+  const recommendationResult = latestOpportunityRecommendationResult(jobSearchRoot);
+  if (!recommendationResult) throw new Error("No latest Opportunity Recommendation read model is available.");
+  const existingActions = actionsCompatibleWithRecommendationResult(
+    recommendationResult,
+    loadLatestCareerWorkflowActions(jobSearchRoot),
+  );
+  const generatedAt = input.generatedAt || new Date().toISOString();
+  const action = createCareerWorkflowAction({
+    recommendationResult,
+    recommendationId: input.recommendationId,
+    actionType: input.actionType,
+    generatedAt,
+    operatorConfirmed: input.operatorConfirmed,
+    existingActions,
+  });
+  const actionWrite = input.writeOutputs
+    ? writeCareerWorkflowAction({
+        actionRoot: path.join(jobSearchRoot, "career-workflow-actions"),
+        repositoryRoot,
+        action,
+      })
+    : null;
+  const result = buildCareerWorkflowState({
+    recommendationResult,
+    workflowActions: [...existingActions, action],
+    generatedAt,
+  });
+  const stateWrite = input.writeOutputs
+    ? writeCareerWorkflowStateOutputs({
+        outputRoot: path.join(jobSearchRoot, "career-workflow-state"),
+        repositoryRoot,
+        result,
+      })
+    : null;
+  return {
+    action,
+    result,
+    actionWrite,
+    stateWrite,
+    auditSummary: {
+      noApplicationCreated: result.auditSummary.noApplicationCreated,
+      noApplicationSubmitted: result.auditSummary.noApplicationSubmitted,
+      noResumeGenerated: result.auditSummary.noResumeGenerated,
+      noResumeMutated: result.auditSummary.noResumeMutated,
+      noMessageSent: result.auditSummary.noMessageSent,
+      noExternalProviderCall: result.auditSummary.noExternalProviderCall,
+      noExternalAi: result.auditSummary.noExternalAi,
+      noOllama: result.auditSummary.noOllama,
+      noBrowserAutomation: result.auditSummary.noBrowserAutomation,
+      privatePathVisible: false as const,
+    },
+  };
+}
+
+export function projectCareerWorkflowStateFromPrivateArtifacts(input: {
+  jobSearchRoot?: string;
+  repositoryRoot?: string;
+  generatedAt?: string;
+}) {
+  const jobSearchRoot = input.jobSearchRoot || DEFAULT_CAREER_WORKFLOW_JOB_SEARCH_ROOT;
+  const repositoryRoot = input.repositoryRoot || process.cwd();
+  assertOutsideRepository(jobSearchRoot, repositoryRoot, "Private CareerOS job-search root");
+  const recommendationResult = latestOpportunityRecommendationResult(jobSearchRoot);
+  if (!recommendationResult) return null;
+  return buildCareerWorkflowState({
+    recommendationResult,
+    workflowActions: actionsCompatibleWithRecommendationResult(
+      recommendationResult,
+      loadLatestCareerWorkflowActions(jobSearchRoot),
+    ),
+    generatedAt: input.generatedAt || recommendationResult.generatedAt,
+  });
 }
 
 export function buildCareerWorkflowCliSummary(input: {

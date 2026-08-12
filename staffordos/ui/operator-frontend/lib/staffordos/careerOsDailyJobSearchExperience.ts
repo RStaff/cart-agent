@@ -30,6 +30,11 @@ import type {
 } from "./truthBoundResumeDraft";
 import type { ReviewedResumeDraftExportReadModelRecord } from "./reviewedResumeDraftExport";
 import type { ManualSubmissionReadModelRecord } from "./manualSubmissionRecordAndArtifactLinkage";
+import type {
+  CareerWorkflowActionType,
+  CareerWorkflowStateItem,
+  CareerWorkflowStateResult,
+} from "./careerWorkflowActions";
 
 export const CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE_VERSION = "CAREEROS_V1.01";
 export const CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE_SCHEMA_VERSION =
@@ -39,6 +44,7 @@ export type CareerOsDailyRecommendation = "APPLY NOW" | "REVIEW" | "WAIT" | "SKI
 export type CareerOsDailyActionKind =
   | "Review Package"
   | "Open Opportunity"
+  | "Decide"
   | "View Intelligence"
   | "Review Draft"
   | "Approve for Export"
@@ -46,6 +52,7 @@ export type CareerOsDailyActionKind =
   | "Mark as Submitted"
   | "View Resume"
   | "Review Evidence"
+  | "Prepare Resume Draft"
   | "Follow Up"
   | "Prepare Interview"
   | "Ready for Manual Application"
@@ -55,6 +62,7 @@ export type CareerOsDailyBriefMetric = {
   id:
     | "applications-needing-follow-up"
     | "ready-to-apply"
+    | "opportunities-requiring-decision"
     | "resume-reviews-needed"
     | "new-opportunities"
     | "interview-activity";
@@ -93,6 +101,42 @@ export type CareerOsDailyTopOpportunity = {
   nextAction: CareerOsDailyActionKind;
   detail: string;
   externalActionAvailable: false;
+  limitations: string[];
+};
+
+export type CareerOsDailyOpportunityDecisionItem = {
+  id: string;
+  recommendationId: string;
+  queueItemId: string;
+  company: string;
+  role: string;
+  recommendation: CareerOsDailyRecommendation;
+  operatorDecision: "No Ross decision yet" | "Apply" | "Review later" | "Skipped" | "Not interested";
+  workflowState: string;
+  decisionAuthority: "Ross decision" | "Awaiting Ross decision";
+  applicationReadiness: string;
+  resumeReadiness: string;
+  explainableFit: string;
+  whyItFits: string;
+  gaps: string;
+  evidence: string;
+  recommendedNextAction: string;
+  currentWorkflowNextAction: string;
+  status: "NEEDS_DECISION" | "READY_TO_APPLY" | "REVIEW_LATER" | "SKIPPED" | "NOT_INTERESTED";
+  shownInTodaysQueue: boolean;
+  downstreamStage: "PREPARE_RESUME_DRAFT" | "FUTURE_REVIEW" | "REMOVED_TODAY" | "EXCLUDED_UNTIL_RESTORED" | "AWAITING_DECISION";
+  availableActions: Array<{
+    actionType: CareerWorkflowActionType;
+    label: "Apply" | "Review later" | "Skip" | "Not interested";
+    enabled: boolean;
+    reason: string;
+    nextStep: string;
+  }>;
+  externalActionAvailable: false;
+  applicationCreated: false;
+  applicationSubmitted: false;
+  resumeGenerated: false;
+  messageSent: false;
   limitations: string[];
 };
 
@@ -223,6 +267,7 @@ export type CareerOsDailyJobSearchExperience = {
     metrics: CareerOsDailyBriefMetric[];
   };
   todaysPriorities: CareerOsDailyPriority[];
+  opportunityDecisions: CareerOsDailyOpportunityDecisionItem[];
   topOpportunities: CareerOsDailyTopOpportunity[];
   applicationWork: CareerOsDailyApplicationWorkItem[];
   applicationIntelligence: CareerOsDailyApplicationIntelligenceItem[];
@@ -275,6 +320,8 @@ export type CareerOsDailyJobSearchExperienceInput = CareerOsCommandCenterInput &
   resumeDraftReviewReadModel?: readonly TruthBoundResumeDraftReviewReadModelRecord[];
   resumeExportReadModel?: readonly ReviewedResumeDraftExportReadModelRecord[];
   manualSubmissionReadModel?: readonly ManualSubmissionReadModelRecord[];
+  careerWorkflowStateResult?: CareerWorkflowStateResult | null;
+  careerWorkflowStateItems?: readonly CareerWorkflowStateItem[];
 };
 
 const EMPTY_STATE =
@@ -327,6 +374,33 @@ function manualSubmissionItems(input: CareerOsDailyJobSearchExperienceInput) {
   return input.manualSubmissionReadModel || [];
 }
 
+function workflowItems(input: CareerOsDailyJobSearchExperienceInput) {
+  return input.careerWorkflowStateResult?.stateItems || input.careerWorkflowStateItems || [];
+}
+
+function recommendationActionRank(item: CareerWorkflowStateItem) {
+  if (item.recommendation === "APPLY_NOW") return 0;
+  if (item.recommendation === "REVIEW") return 1;
+  if (item.recommendation === "WAIT") return 2;
+  return 3;
+}
+
+function activeWorkflowDecisionItems(input: CareerOsDailyJobSearchExperienceInput) {
+  return workflowItems(input)
+    .map((item, index) => ({ item, index }))
+    .filter(({ item }) => item.inTodaysQueue && !item.workflowActionType)
+    .sort(
+      (left, right) =>
+        recommendationActionRank(left.item) - recommendationActionRank(right.item) ||
+        left.index - right.index,
+    )
+    .map(({ item }) => item);
+}
+
+function readyWorkflowItems(input: CareerOsDailyJobSearchExperienceInput) {
+  return workflowItems(input).filter((item) => item.readyToApply);
+}
+
 function countBrief(commandCenter: CareerOsCommandCenterPresentation, label: string) {
   return commandCenter.todaysBrief.find((item) => item.label === label)?.value || 0;
 }
@@ -334,6 +408,7 @@ function countBrief(commandCenter: CareerOsCommandCenterPresentation, label: str
 function readyToApplyCount(input: CareerOsDailyJobSearchExperienceInput, commandCenter: CareerOsCommandCenterPresentation) {
   return Math.max(
     countBrief(commandCenter, "Ready to Apply"),
+    readyWorkflowItems(input).length,
     packageItems(input).length,
     reviewItems(input).filter((item) => item.reviewState === "PENDING_REVIEW").length,
   );
@@ -344,6 +419,10 @@ function resumeReviewsNeeded(input: CareerOsDailyJobSearchExperienceInput) {
     packageItems(input).filter((item) => item.applicationReadiness === "NEEDS_RESUME_REVIEW").length +
     reviewItems(input).filter((item) => item.reviewState === "NEEDS_CHANGES").length
   );
+}
+
+function opportunitiesRequiringDecision(input: CareerOsDailyJobSearchExperienceInput) {
+  return activeWorkflowDecisionItems(input).length;
 }
 
 function interviewActivity(input: CareerOsDailyJobSearchExperienceInput, commandCenter: CareerOsCommandCenterPresentation) {
@@ -374,6 +453,7 @@ function buildBriefing(
   const followUps = applicationsNeedingFollowUp(input, commandCenter);
   const ready = readyToApplyCount(input, commandCenter);
   const resumeReviews = resumeReviewsNeeded(input);
+  const decisions = opportunitiesRequiringDecision(input);
   const opportunities = countBrief(commandCenter, "New Opportunities");
   const interviews = interviewActivity(input, commandCenter);
   const headline =
@@ -383,8 +463,10 @@ function buildBriefing(
         ? "Start with application package review."
         : resumeReviews > 0
           ? "Start with resume review."
-          : opportunities > 0
-            ? "Start with the strongest new opportunity."
+          : decisions > 0
+            ? "Start with the highest-ranked opportunity decision."
+            : opportunities > 0
+              ? "Start with the strongest new opportunity."
             : "No urgent job-search action is due from connected artifacts.";
 
   return {
@@ -395,6 +477,7 @@ function buildBriefing(
     metrics: [
       metric("applications-needing-follow-up", "Applications needing follow-up", followUps, "Applications with due follow-up or response review."),
       metric("ready-to-apply", "Ready To Apply", ready, "Opportunities moved into application preparation."),
+      metric("opportunities-requiring-decision", "Needs Decision", decisions, "Ranked opportunities awaiting Ross's decision."),
       metric("resume-reviews-needed", "Resume Reviews Needed", resumeReviews, "Packages that need resume or package changes before applying."),
       metric("new-opportunities", "New Opportunities", opportunities, "New items available from the existing opportunity pipeline."),
       metric("interview-activity", "Interview Activity", interviews, "Applications with interview handoff activity."),
@@ -415,6 +498,117 @@ function actionForPacket(item: ApplicationIntelligencePacketReadModelRecord): Ca
   if (item.nextAction === "READY_TO_APPLY" || item.nextAction === "REVIEW_APPLICATION_PACKAGE") return "Review Package";
   if (item.nextAction === "SKIP" || item.nextAction === "HOLD") return "Open Opportunity";
   return "View Intelligence";
+}
+
+function opportunityDecisionLabel(action: CareerWorkflowStateItem["workflowActionType"]): CareerOsDailyOpportunityDecisionItem["operatorDecision"] {
+  if (action === "APPLY") return "Apply";
+  if (action === "REVIEW_LATER") return "Review later";
+  if (action === "SKIP") return "Skipped";
+  if (action === "NOT_INTERESTED") return "Not interested";
+  return "No Ross decision yet";
+}
+
+function decisionStatus(item: CareerWorkflowStateItem): CareerOsDailyOpportunityDecisionItem["status"] {
+  if (item.workflowState === "READY_TO_APPLY") return "READY_TO_APPLY";
+  if (item.workflowState === "REVIEW_LATER") return "REVIEW_LATER";
+  if (item.workflowState === "SKIPPED") return "SKIPPED";
+  if (item.workflowState === "NOT_INTERESTED") return "NOT_INTERESTED";
+  return "NEEDS_DECISION";
+}
+
+function downstreamStage(item: CareerWorkflowStateItem): CareerOsDailyOpportunityDecisionItem["downstreamStage"] {
+  if (item.readyToApply) return "PREPARE_RESUME_DRAFT";
+  if (item.inFutureWorkQueue) return "FUTURE_REVIEW";
+  if (item.skippedToday) return "REMOVED_TODAY";
+  if (item.excludedFromFutureRecommendations) return "EXCLUDED_UNTIL_RESTORED";
+  return "AWAITING_DECISION";
+}
+
+function userActionFor(action: CareerWorkflowActionType) {
+  if (action === "APPLY") return "Apply";
+  if (action === "REVIEW_LATER") return "Review later";
+  if (action === "SKIP") return "Skip";
+  return "Not interested";
+}
+
+function availableOpportunityActions(item: CareerWorkflowStateItem): CareerOsDailyOpportunityDecisionItem["availableActions"] {
+  const undecided = item.inTodaysQueue && !item.workflowActionType;
+  return (["APPLY", "REVIEW_LATER", "SKIP", "NOT_INTERESTED"] as const).map((actionType) => {
+    const applyAllowed =
+      actionType !== "APPLY" ||
+      (item.recommendation === "APPLY_NOW" &&
+        item.applicationReadiness === "READY_FOR_OPERATOR_APPROVED_APPLICATION");
+    const enabled = undecided && applyAllowed;
+    return {
+      actionType,
+      label: userActionFor(actionType),
+      enabled,
+      reason: enabled
+        ? actionType === "APPLY"
+          ? "Records Ross's intent to proceed into application preparation only."
+          : "Records Ross's private opportunity decision using existing workflow authority."
+        : actionType === "APPLY"
+          ? "Apply is available only when the existing recommendation/readiness permits application planning."
+          : "This opportunity already has a Ross workflow decision or is not in today's queue.",
+      nextStep:
+        actionType === "APPLY"
+          ? "Prepare Resume Draft"
+          : actionType === "REVIEW_LATER"
+            ? "Future review queue"
+            : actionType === "SKIP"
+              ? "Removed from today's queue"
+              : "Excluded until explicitly restored",
+    };
+  });
+}
+
+function opportunityDecisions(
+  input: CareerOsDailyJobSearchExperienceInput,
+  topOpportunityRecords: readonly CareerOsDailyTopOpportunity[],
+): CareerOsDailyOpportunityDecisionItem[] {
+  const topById = new Map(topOpportunityRecords.map((item) => [item.id, item]));
+  return activeWorkflowDecisionItems(input).slice(0, 5).map((item) => {
+    const top = topById.get(item.recommendationId) || null;
+    const recommendation = userRecommendation(item.recommendation);
+    return {
+      id: `decision:${item.recommendationId}`,
+      recommendationId: item.recommendationId,
+      queueItemId: item.queueItemId,
+      company: item.company,
+      role: item.role,
+      recommendation,
+      operatorDecision: opportunityDecisionLabel(item.workflowActionType),
+      workflowState: item.workflowState || "NEEDS_DECISION",
+      decisionAuthority: item.stateAuthority === "ROSS_OPERATOR_DECISION" ? "Ross decision" : "Awaiting Ross decision",
+      applicationReadiness: item.applicationReadiness,
+      resumeReadiness: item.recommendedResumeVersion.safeLabel || item.recommendedResumeVersion.status,
+      explainableFit: top?.explainableFit || "Explainable Fit details are available from the existing recommendation output.",
+      whyItFits:
+        item.supportingEvidenceCount > 0
+          ? `${item.supportingEvidenceCount} supporting evidence references are attached to this recommendation.`
+          : "No supporting evidence references are attached in the safe read model.",
+      gaps: `${item.missingSkillCount} missing skills / resume effort ${item.estimatedResumeUpdateEffort}`,
+      evidence: `${item.supportingEvidenceCount} supporting evidence references`,
+      recommendedNextAction: item.recommendedNextAction,
+      currentWorkflowNextAction: item.currentWorkflowNextAction,
+      status: decisionStatus(item),
+      shownInTodaysQueue: item.inTodaysQueue,
+      downstreamStage: downstreamStage(item),
+      availableActions: availableOpportunityActions(item),
+      externalActionAvailable: false,
+      applicationCreated: false,
+      applicationSubmitted: false,
+      resumeGenerated: false,
+      messageSent: false,
+      limitations: [
+        "Recommendation is CareerOS guidance; Ross's button choice is the separate operator decision.",
+        "Decision display groups existing recommendation states by immediate actionability while preserving original recommendation order inside each group.",
+        "Decision state is projected from the existing J003.03 private workflow action authority.",
+        "No Application, submission, message, provider call, browser action, AI call, resume generation, or resume mutation happens here.",
+        ...item.limitations,
+      ],
+    };
+  });
 }
 
 function actionForDraft(item: TruthBoundResumeDraftReadModelRecord | TruthBoundResumeDraftReviewReadModelRecord): CareerOsDailyActionKind {
@@ -598,8 +792,16 @@ function resumeExports(input: CareerOsDailyJobSearchExperienceInput): CareerOsDa
   });
 }
 
-function topOpportunities(commandCenter: CareerOsCommandCenterPresentation): CareerOsDailyTopOpportunity[] {
-  return commandCenter.topRecommendations.map((record: CareerOsTopRecommendation) => {
+function topOpportunities(
+  input: CareerOsDailyJobSearchExperienceInput,
+  commandCenter: CareerOsCommandCenterPresentation,
+): CareerOsDailyTopOpportunity[] {
+  const activeRecommendationIds = workflowItems(input).length
+    ? new Set(workflowItems(input).filter((item) => item.inTodaysQueue).map((item) => item.recommendationId))
+    : null;
+  return commandCenter.topRecommendations
+    .filter((record) => !activeRecommendationIds || activeRecommendationIds.has(record.id))
+    .map((record: CareerOsTopRecommendation) => {
     const recommendation = userRecommendation(record.recommendation);
     return {
       id: record.id,
@@ -728,6 +930,22 @@ function opportunityPriorities(records: readonly CareerOsDailyTopOpportunity[]) 
     }));
 }
 
+function opportunityDecisionPriorities(records: readonly CareerOsDailyOpportunityDecisionItem[]) {
+  return records.slice(0, 3).map((item, index) => ({
+    id: `opportunity-decision:${item.recommendationId}`,
+    title: index === 0 ? "Decide the top opportunity" : "Decide whether to work this opportunity",
+    company: item.company,
+    role: item.role,
+    category: "Opportunity review" as const,
+    status: `${item.recommendation} / ${item.operatorDecision}`,
+    detail: item.recommendedNextAction,
+    action: "Decide" as const,
+    urgency: item.recommendation === "APPLY NOW" || item.recommendation === "REVIEW" ? "today" as const : "next" as const,
+    externalActionAvailable: false as const,
+    limitations: [...item.limitations],
+  })) satisfies CareerOsDailyPriority[];
+}
+
 function resumeExportPriorities(records: readonly CareerOsDailyResumeExportItem[]) {
   return records
     .filter((item) => item.submissionStatus !== "SUBMITTED" && (item.docxCreated || item.validationIssueCount > 0))
@@ -768,19 +986,34 @@ function todaysPriorities(
   input: CareerOsDailyJobSearchExperienceInput,
   topOpportunityRecords: readonly CareerOsDailyTopOpportunity[],
   resumeExportRecords: readonly CareerOsDailyResumeExportItem[],
+  opportunityDecisionRecords: readonly CareerOsDailyOpportunityDecisionItem[],
 ) {
   const priorities = [
     ...engagementPriorities(engagementItems(input)),
     ...reviewPriorities(reviewItems(input)),
     ...packagePriorities(packageItems(input)),
     ...resumeExportPriorities(resumeExportRecords),
-    ...opportunityPriorities(topOpportunityRecords),
+    ...(opportunityDecisionRecords.length
+      ? opportunityDecisionPriorities(opportunityDecisionRecords)
+      : opportunityPriorities(topOpportunityRecords)),
   ].sort((left, right) => prioritySortKey(left).localeCompare(prioritySortKey(right)));
 
   return priorities.slice(0, 8);
 }
 
 function applicationWork(input: CareerOsDailyJobSearchExperienceInput): CareerOsDailyApplicationWorkItem[] {
+  const fromReadyWorkflow: CareerOsDailyApplicationWorkItem[] = readyWorkflowItems(input).map((item) => ({
+    id: `workflow-ready:${item.recommendationId}`,
+    company: item.company,
+    role: item.role,
+    task: "Prepare Resume Draft",
+    status: item.workflowState || "READY_TO_APPLY",
+    detail: "Ross chose Apply. Prepare the existing Application Intelligence and truth-bound resume draft workflow before any external action.",
+    applicationDate: null,
+    humanReviewRequired: true,
+    externalActionAvailable: false as const,
+    limitations: [...item.limitations],
+  }));
   const fromReviews: CareerOsDailyApplicationWorkItem[] = reviewItems(input).map((item) => ({
     id: `review:${item.packageId}`,
     company: item.company,
@@ -824,7 +1057,7 @@ function applicationWork(input: CareerOsDailyJobSearchExperienceInput): CareerOs
     limitations: [...item.limitations],
   }));
 
-  return [...fromEngagement, ...fromReviews, ...fromSubmissions].sort(
+  return [...fromEngagement, ...fromReadyWorkflow, ...fromReviews, ...fromSubmissions].sort(
     (left, right) =>
       left.company.localeCompare(right.company) ||
       left.role.localeCompare(right.role) ||
@@ -897,14 +1130,16 @@ export function buildCareerOsDailyJobSearchExperience(
   input: CareerOsDailyJobSearchExperienceInput = {},
 ): CareerOsDailyJobSearchExperience {
   const commandCenter = input.commandCenter || buildCareerOsCommandCenterPresentation(input);
-  const top = topOpportunities(commandCenter);
+  const top = topOpportunities(input, commandCenter);
   const intelligence = applicationIntelligence(input);
   const drafts = resumeDrafts(input);
   const exports = resumeExports(input);
-  const priorities = todaysPriorities(input, top, exports);
+  const decisions = opportunityDecisions(input, top);
+  const priorities = todaysPriorities(input, top, exports, decisions);
   const work = applicationWork(input);
   const hasConnectedWork =
     priorities.length > 0 ||
+    decisions.length > 0 ||
     top.length > 0 ||
     intelligence.length > 0 ||
     drafts.length > 0 ||
@@ -923,6 +1158,7 @@ export function buildCareerOsDailyJobSearchExperience(
     greeting: "Good morning",
     dailyBriefing: buildBriefing(input, commandCenter),
     todaysPriorities: priorities,
+    opportunityDecisions: decisions,
     topOpportunities: top,
     applicationWork: work,
     applicationIntelligence: intelligence,

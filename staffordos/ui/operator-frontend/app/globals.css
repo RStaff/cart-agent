@@ -2793,7 +2793,7 @@ textarea {
 }
 
 .staffordCareerCommandBriefGrid {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .staffordCareerCommandPipelineGrid {
@@ -2877,6 +2877,11 @@ textarea {
   font-size: 12px;
   line-height: 1.35;
   text-align: right;
+}
+
+.staffordCareerOpportunityDecision {
+  border-color: #b7c7d6;
+  background: #ffffff;
 }
 
 .staffordCareerCommandDetails {
@@ -3021,6 +3026,35 @@ textarea {
   flex-wrap: wrap;
   gap: 10px;
   justify-content: flex-end;
+}
+
+.staffordOpportunityDecisionFooter,
+.staffordOpportunityDecisionActionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.staffordOpportunityDecisionFooter {
+  justify-content: space-between;
+  padding-top: 2px;
+}
+
+.staffordOpportunityDecisionFooter > span {
+  color: #66717e;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.staffordOpportunityDecisionActionRow {
+  justify-content: flex-end;
+}
+
+.staffordOpportunityDecisionActionRow form,
+.staffordOpportunityDecisionActionRow button {
+  margin: 0;
 }
 
 .staffordJobCommandHealthGrid {
@@ -3375,6 +3409,7 @@ textarea {
   .staffordCareerCommandPipelineGrid,
   .staffordCareerCommandDetails,
   .staffordManualSubmissionForm,
+  .staffordOpportunityDecisionFooter,
   .staffordCareerCommandRecommendation header,
   .staffordNextActionGrid,
   .staffordWorkspaceGrid,
