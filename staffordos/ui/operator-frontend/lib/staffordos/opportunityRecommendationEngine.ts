@@ -17,6 +17,7 @@ import type {
   PrivateResumeVersionRecord,
   ResumeFactSafetyStatus,
 } from "./resumeVersionApplicationLinkage";
+import { qualifyOpportunity, shortlistOpportunity, type OpportunityQualification } from "./opportunityQualification";
 
 export const OPPORTUNITY_RECOMMENDATION_ENGINE_VERSION = "J003.01";
 export const OPPORTUNITY_RECOMMENDATION_SCHEMA_VERSION =
@@ -135,6 +136,8 @@ export type OpportunityRecommendationRecord = {
   company: string;
   role: string;
   recommendation: OpportunityApplicationRecommendation;
+  qualification: OpportunityQualification;
+  shortlistedForDecision: boolean;
   explainableFit: {
     available: boolean;
     fitAssessment: PrivateJobFitAssessment | null;
@@ -173,6 +176,8 @@ export type OpportunityRecommendationReadModelRecord = {
   company: string;
   role: string;
   recommendation: OpportunityApplicationRecommendation;
+  qualification: OpportunityQualification;
+  shortlistedForDecision: boolean;
   applicationReadiness: ApplicationReadinessState;
   recommendedResumeVersion: {
     status: ResumeReuseStatus;
@@ -698,6 +703,20 @@ function recommendationRecord(input: {
     resume,
     gaps: missing,
   });
+  const qualification = qualifyOpportunity({
+    role: input.queueItem.role,
+    laneDisposition: null,
+    totalScore: input.queueItem.rankingSummary.totalScore,
+    requirements: input.fit?.requirements || [],
+    mappings: input.fit?.mappings || [],
+  });
+  const shortlistedForDecision = shortlistOpportunity({
+    recommendation: decision.recommendation,
+    qualification,
+    totalScore: input.queueItem.rankingSummary.totalScore,
+    supportingEvidenceCount: supporting.length,
+    role: input.queueItem.role,
+  });
   const opportunityId = queueOpportunityId(input.queueItem);
 
   return {
@@ -715,6 +734,8 @@ function recommendationRecord(input: {
     company: input.queueItem.company,
     role: input.queueItem.role,
     recommendation: decision.recommendation,
+    qualification,
+    shortlistedForDecision,
     explainableFit: {
       available: Boolean(input.fit),
       fitAssessment: input.fit?.fitAssessment || null,
@@ -764,6 +785,8 @@ function readModel(record: OpportunityRecommendationRecord, generatedAt: string)
     company: record.company,
     role: record.role,
     recommendation: record.recommendation,
+    qualification: record.qualification,
+    shortlistedForDecision: record.shortlistedForDecision,
     applicationReadiness: record.applicationReadiness,
     recommendedResumeVersion: {
       status: record.recommendedResumeVersion.status,

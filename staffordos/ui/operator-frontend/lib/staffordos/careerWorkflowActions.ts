@@ -125,6 +125,8 @@ export type CareerWorkflowStateItem = {
   company: string;
   role: string;
   recommendation: OpportunityApplicationRecommendation;
+  qualification: OpportunityRecommendationReadModelRecord["qualification"];
+  shortlistedForDecision: boolean;
   applicationReadiness: ApplicationReadinessState;
   recommendedResumeVersion: {
     status: ResumeReuseStatus;
@@ -582,6 +584,8 @@ function stateItem(input: {
     company: input.record.company,
     role: input.record.role,
     recommendation: input.record.recommendation,
+    qualification: input.record.qualification,
+    shortlistedForDecision: input.record.shortlistedForDecision,
     applicationReadiness: input.record.applicationReadiness,
     recommendedResumeVersion: input.record.recommendedResumeVersion,
     missingSkillCount: input.record.missingSkillCount,
@@ -594,7 +598,7 @@ function stateItem(input: {
     queueEffect: transition?.queueEffect || "NO_WORKFLOW_ACTION_RECORDED",
     currentWorkflowNextAction:
       transition?.currentWorkflowNextAction || "Choose APPLY, REVIEW_LATER, SKIP, or NOT_INTERESTED.",
-    inTodaysQueue: transition ? transition.visibleToday : true,
+    inTodaysQueue: transition ? transition.visibleToday : input.record.shortlistedForDecision ?? true,
     inFutureWorkQueue: Boolean(transition?.futureReview),
     readyToApply: Boolean(transition?.readyToApply),
     skippedToday: Boolean(transition?.skippedToday),
