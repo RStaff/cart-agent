@@ -48,6 +48,19 @@ const {
   buildCareerOsCommandCenterPresentation,
 } = presentation;
 
+function qualificationFixture(state = "PLAUSIBLE_TARGET") {
+  return {
+    state,
+    reasons: [
+      state === "HARD_MISMATCH"
+        ? "The role family is outside the confirmed target lanes and has no meaningful transferable support."
+        : "The target lane is supported by confirmed or transferable experience; exact title history is not required.",
+    ],
+    hardMismatchCategories: state === "HARD_MISMATCH" ? ["incompatible role family"] : [],
+    limitations: ["Synthetic qualification fixture."],
+  };
+}
+
 const recommendationResult = {
   generatedAt: "2026-08-08T12:00:00.000Z",
   readModel: [
@@ -57,6 +70,8 @@ const recommendationResult = {
       company: "Example Automation Co",
       role: "AI Automation Product Manager",
       recommendation: "APPLY_NOW",
+      qualification: qualificationFixture("PLAUSIBLE_TARGET"),
+      shortlistedForDecision: true,
       applicationReadiness: "READY_FOR_OPERATOR_APPROVED_APPLICATION",
       recommendedResumeVersion: {
         status: "SELECTED_EXISTING_RESUMEVERSION",
@@ -82,6 +97,8 @@ const recommendationResult = {
       company: "Example Systems",
       role: "Business Technology Analyst",
       recommendation: "REVIEW",
+      qualification: qualificationFixture("TRANSFERABLE_BUT_NOT_DIRECT"),
+      shortlistedForDecision: true,
       applicationReadiness: "NEEDS_EVIDENCE_REVIEW",
       recommendedResumeVersion: {
         status: "REVIEW_BEFORE_REUSE",
@@ -107,6 +124,8 @@ const recommendationResult = {
       company: "Example Platform",
       role: "Platform Operations Manager",
       recommendation: "WAIT",
+      qualification: qualificationFixture("INSUFFICIENT_EVIDENCE"),
+      shortlistedForDecision: false,
       applicationReadiness: "WAITING_FOR_SOURCE_OR_DUPLICATE_REVIEW",
       recommendedResumeVersion: {
         status: "NO_RESUMEVERSION_AVAILABLE",
@@ -132,6 +151,8 @@ const recommendationResult = {
       company: "Example Duplicate",
       role: "Marketing Specialist",
       recommendation: "SKIP",
+      qualification: qualificationFixture("HARD_MISMATCH"),
+      shortlistedForDecision: false,
       applicationReadiness: "SKIP_RECOMMENDED",
       recommendedResumeVersion: {
         status: "NO_SAFE_EXISTING_RESUMEVERSION",
@@ -155,6 +176,7 @@ const recommendationResult = {
   recommendations: [
     {
       recommendationId: "rec_apply",
+      sourceRecordId: "source_rec_apply",
       explainableFit: {
         available: true,
         fitRecommendation: "Existing fit: apply with positioning",
@@ -162,6 +184,7 @@ const recommendationResult = {
     },
     {
       recommendationId: "rec_review",
+      sourceRecordId: "source_rec_review",
       explainableFit: {
         available: false,
         fitRecommendation: null,
@@ -172,6 +195,11 @@ const recommendationResult = {
     queueItemsReviewed: 4,
   },
 };
+
+const sourceRecords = [
+  { jobSourceRecordId: "source_rec_apply", location: "New York, NY", remoteState: "Hybrid" },
+  { jobSourceRecordId: "source_rec_review", location: "Boston, MA", remoteState: "Remote" },
+];
 
 const greenhouseDiscoveryResult = {
   generatedAt: "2026-08-08T11:45:00.000Z",
@@ -244,18 +272,49 @@ test("recommendation freshness takes precedence over older discovery timestamps"
 });
 
 test("Top Recommendations display required fields without recomputing the recommendation", () => {
-  const commandCenter = buildCareerOsCommandCenterPresentation({ recommendationResult });
+  const commandCenter = buildCareerOsCommandCenterPresentation({ recommendationResult, sourceRecords });
   const first = commandCenter.topRecommendations[0];
 
   assert.equal(first.position, "AI Automation Product Manager");
   assert.equal(first.company, "Example Automation Co");
   assert.equal(first.recommendation, "APPLY_NOW");
+  assert.equal(first.qualification.state, "PLAUSIBLE_TARGET");
+  assert.equal(first.shortlistedForDecision, true);
+  assert.equal(first.location, "New York, NY");
+  assert.equal(first.workArrangement, "Hybrid");
   assert.equal(first.explainableFit, "Existing fit: apply with positioning");
   assert.match(first.resumeVersion, /ROLE_TARGETED_RESUME/);
   assert.equal(first.nextAction, "Confirm the selected ResumeVersion before applying manually.");
   assert.equal(first.applicationActionAvailable, false);
   assert.equal(first.messageActionAvailable, false);
   assert.equal(first.resumeMutationAvailable, false);
+});
+
+test("Top Recommendations exclude WAIT, SKIP, and hard mismatch records using existing authority", () => {
+  const hardMismatch = {
+    ...recommendationResult.readModel[1],
+    recommendationId: "rec_hard",
+    queueItemId: "queue_hard",
+    company: "Example Treasury",
+    role: "Cash Manager, Treasury",
+    recommendation: "REVIEW",
+    qualification: qualificationFixture("HARD_MISMATCH"),
+    shortlistedForDecision: true,
+  };
+  const commandCenter = buildCareerOsCommandCenterPresentation({
+    recommendationResult: {
+      ...recommendationResult,
+      readModel: [hardMismatch, ...recommendationResult.readModel],
+      recommendations: [{ recommendationId: "rec_hard", sourceRecordId: "source_rec_hard", explainableFit: { available: true, fitRecommendation: "Synthetic mismatch." } }, ...recommendationResult.recommendations],
+    },
+    sourceRecords,
+  });
+  const ids = commandCenter.topRecommendations.map((item) => item.id);
+
+  assert.equal(ids.includes("rec_hard"), false);
+  assert.equal(ids.includes("rec_wait"), false);
+  assert.equal(ids.includes("rec_skip"), false);
+  assert.deepEqual(ids, ["rec_apply", "rec_review"]);
 });
 
 test("Pipeline section uses the existing application pipeline read model", () => {

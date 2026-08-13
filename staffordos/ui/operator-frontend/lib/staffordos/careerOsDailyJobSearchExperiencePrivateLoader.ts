@@ -460,9 +460,11 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
     recommendationResult: recommendation,
     applicationPipelineResult: pipeline,
     greenhouseDiscoveryResult: greenhouseDiscovery,
+    sourceRecords: greenhouseDiscovery?.jobSourceImportQueue.normalizedSourceRecords || [],
   });
   const experienceInput: CareerOsDailyJobSearchExperienceInput = {
     commandCenter,
+    sourceRecords: greenhouseDiscovery?.jobSourceImportQueue.normalizedSourceRecords || [],
     applicationPipelineResult: pipeline,
     applicationEngagementReadModel: engagementReadModel || [],
     applicationPackageReadModel: applicationPackageReadModel || [],

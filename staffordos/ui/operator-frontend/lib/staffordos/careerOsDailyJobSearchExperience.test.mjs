@@ -79,6 +79,24 @@ const {
 
 const generatedAt = "2026-08-09T12:00:00.000Z";
 
+function qualificationFixture(state = "PLAUSIBLE_TARGET", overrides = {}) {
+  const defaultReason =
+    state === "PLAUSIBLE_TARGET"
+      ? "The target lane is supported by confirmed or transferable experience; exact title history is not required."
+      : state === "TRANSFERABLE_BUT_NOT_DIRECT"
+        ? "The target lane has transferable support, but direct title history is not established."
+        : state === "HARD_MISMATCH"
+          ? "The role family is outside the confirmed target lanes and has no meaningful transferable support."
+          : "The available job requirements and career evidence do not establish a sufficiently qualified target match.";
+  return {
+    state,
+    reasons: [defaultReason],
+    hardMismatchCategories: state === "HARD_MISMATCH" ? ["incompatible role family"] : [],
+    limitations: ["Synthetic qualification fixture."],
+    ...overrides,
+  };
+}
+
 function commandCenterFixture() {
   return {
     capturedAsOf: "2026-08-09T12:00:00.000Z",
@@ -95,6 +113,8 @@ function commandCenterFixture() {
         position: "AI Automation Product Manager",
         company: "Example Automation",
         recommendation: "APPLY_NOW",
+        qualification: qualificationFixture("PLAUSIBLE_TARGET"),
+        shortlistedForDecision: true,
         explainableFit: "Strong evidence alignment from existing fit output.",
         resumeVersion: "ROLE_TARGETED_RESUME / PDF / SAFE",
         nextAction: "Review the package before manual application.",
@@ -102,6 +122,9 @@ function commandCenterFixture() {
         supportingEvidenceCount: 4,
         missingSkillCount: 0,
         estimatedResumeUpdateEffort: "NONE",
+        location: "New York, NY",
+        workArrangement: "Hybrid",
+        capturedAsOf: generatedAt,
         limitations: ["Synthetic recommendation fixture."],
         applicationActionAvailable: false,
         messageActionAvailable: false,
@@ -112,6 +135,8 @@ function commandCenterFixture() {
         position: "Business Technology Analyst",
         company: "Example Systems",
         recommendation: "REVIEW",
+        qualification: qualificationFixture("TRANSFERABLE_BUT_NOT_DIRECT"),
+        shortlistedForDecision: true,
         explainableFit: "Evidence review needed.",
         resumeVersion: "REVIEW_BEFORE_REUSE",
         nextAction: "Review evidence before deciding.",
@@ -119,6 +144,9 @@ function commandCenterFixture() {
         supportingEvidenceCount: 1,
         missingSkillCount: 2,
         estimatedResumeUpdateEffort: "MODERATE",
+        location: "Boston, MA",
+        workArrangement: "Remote",
+        capturedAsOf: generatedAt,
         limitations: ["Synthetic recommendation fixture."],
         applicationActionAvailable: false,
         messageActionAvailable: false,
@@ -157,10 +185,13 @@ function recommendationReadModelRecord(id, recommendation, applicationReadiness,
   return {
     schemaVersion: "staffordos.job_search.private_opportunity_recommendation_read_model.v1",
     recommendationId: id,
+    canonicalOpportunityId: overrides.canonicalOpportunityId || `canonical_${id}`,
     queueItemId: overrides.queueItemId || `queue_${id}`,
     company: overrides.company || `Example ${id}`,
     role: overrides.role || "AI Automation Product Manager",
     recommendation,
+    qualification: overrides.qualification || qualificationFixture("PLAUSIBLE_TARGET"),
+    shortlistedForDecision: overrides.shortlistedForDecision ?? !["WAIT", "SKIP"].includes(recommendation),
     applicationReadiness,
     recommendedResumeVersion: {
       status: overrides.resumeStatus ?? "SELECTED_EXISTING_RESUMEVERSION",
@@ -245,6 +276,7 @@ function recommendationResultFixture() {
     recommendationReadModelRecord("rec_review", "REVIEW", "NEEDS_EVIDENCE_REVIEW", {
       company: "Example Systems",
       role: "Business Technology Analyst",
+      qualification: qualificationFixture("TRANSFERABLE_BUT_NOT_DIRECT"),
       missingSkillCount: 2,
       estimatedResumeUpdateEffort: "MODERATE",
       recommendedNextAction: "Review evidence before deciding whether to prepare this application.",
@@ -252,10 +284,14 @@ function recommendationResultFixture() {
     recommendationReadModelRecord("rec_wait", "WAIT", "WAITING_FOR_SOURCE_OR_DUPLICATE_REVIEW", {
       company: "Example Platform",
       role: "AI Platform Operations Lead",
+      qualification: qualificationFixture("INSUFFICIENT_EVIDENCE"),
+      shortlistedForDecision: false,
     }),
     recommendationReadModelRecord("rec_skip", "SKIP", "SKIP_RECOMMENDED", {
       company: "Example Duplicate",
       role: "Traditional Marketing Specialist",
+      qualification: qualificationFixture("HARD_MISMATCH"),
+      shortlistedForDecision: false,
       resumeStatus: "NO_SAFE_EXISTING_RESUMEVERSION",
       safeLabel: null,
       factSafetyStatus: null,
@@ -312,6 +348,15 @@ function recommendationResultFixture() {
       noCareerEvidenceMutated: true,
       privatePathVisible: false,
     },
+  };
+}
+
+function sourceRecordFixture(id, overrides = {}) {
+  return {
+    jobSourceRecordId: `source_${id}`,
+    location: overrides.location || "New York, NY",
+    remoteState: overrides.remoteState || "Hybrid",
+    ...overrides,
   };
 }
 
@@ -854,6 +899,121 @@ test("top opportunities expose only user-facing recommendations", () => {
   assert.doesNotMatch(JSON.stringify(experience.topOpportunities), /APPLY_NOW|READY_TO_APPLY|workflowState/);
 });
 
+test("fit band presentation maps existing qualification authority without scores", () => {
+  assert.equal(daily.careerOsDailyFitBandForQualification(qualificationFixture("PLAUSIBLE_TARGET")).label, "Plausible target");
+  assert.equal(daily.careerOsDailyFitBandForQualification(qualificationFixture("TRANSFERABLE_BUT_NOT_DIRECT")).label, "Transferable fit");
+  assert.equal(daily.careerOsDailyFitBandForQualification(qualificationFixture("INSUFFICIENT_EVIDENCE")).label, "Insufficient evidence");
+  assert.equal(daily.careerOsDailyFitBandForQualification(qualificationFixture("HARD_MISMATCH")).label, "Hard mismatch");
+  assert.doesNotMatch(JSON.stringify(daily.careerOsDailyFitBandForQualification(qualificationFixture("PLAUSIBLE_TARGET"))), /%|score|probability/i);
+});
+
+test("hard mismatches and WAIT items cannot masquerade as shortlisted opportunities", () => {
+  const base = recommendationResultFixture();
+  const hardMismatch = recommendationReadModelRecord("rec_hard", "REVIEW", "NEEDS_EVIDENCE_REVIEW", {
+    company: "Example Treasury",
+    role: "Cash Manager, Treasury",
+    qualification: qualificationFixture("HARD_MISMATCH"),
+    shortlistedForDecision: true,
+    supportingEvidenceCount: 5,
+  });
+  const result = {
+    ...base,
+    readModel: [hardMismatch, ...base.readModel],
+    recommendations: [recommendationRecord(hardMismatch), ...base.recommendations],
+  };
+  const experience = buildCareerOsDailyJobSearchExperience({
+    recommendationResult: result,
+    sourceRecords: [
+      sourceRecordFixture("rec_hard", { location: "San Francisco, CA", remoteState: "On-site" }),
+      sourceRecordFixture("rec_apply"),
+      sourceRecordFixture("rec_review", { location: "Boston, MA", remoteState: "Remote" }),
+    ],
+  });
+
+  assert.equal(experience.topOpportunities.some((item) => item.id === "rec_hard"), false);
+  assert.equal(experience.topOpportunities.some((item) => item.id === "rec_wait"), false);
+  assert.equal(experience.topOpportunities.every((item) => item.fitBand.authority !== "HARD_MISMATCH"), true);
+  assert.equal(experience.topOpportunities.every((item) => item.recommendation !== "WAIT"), true);
+});
+
+test("WAIT decision status remains visible truthfully when the item is still awaiting Ross", () => {
+  const waitItem = workflowStateFixture().stateItems.find((item) => item.recommendationId === "rec_wait");
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    careerWorkflowStateItems: [{ ...waitItem, inTodaysQueue: true }],
+  });
+  const wait = experience.opportunityDecisions.find((item) => item.recommendationId === "rec_wait");
+
+  assert.ok(wait);
+  assert.equal(wait.recommendation, "WAIT");
+  assert.equal(wait.operatorDecision, "No Ross decision yet");
+  assert.equal(wait.fitBand.authority, "INSUFFICIENT_EVIDENCE");
+});
+
+test("daily decision surfaces show authoritative location when source location exists", () => {
+  const experience = buildCareerOsDailyJobSearchExperience({
+    recommendationResult: recommendationResultFixture(),
+    careerWorkflowStateResult: workflowStateFixture(),
+    sourceRecords: [
+      sourceRecordFixture("rec_apply", { location: "New York, NY", remoteState: "Hybrid" }),
+      sourceRecordFixture("rec_review", { location: "Boston, MA", remoteState: "Remote" }),
+    ],
+  });
+  const decision = experience.opportunityDecisions.find((item) => item.recommendationId === "rec_apply");
+  const top = experience.topOpportunities.find((item) => item.id === "rec_apply");
+
+  assert.equal(decision.location.label, "New York, NY / Hybrid");
+  assert.equal(top.location.label, "New York, NY / Hybrid");
+  assert.match(decision.location.detail, /not filtered/i);
+});
+
+test("malformed gap headings are suppressed while legitimate gaps remain visible", () => {
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    applicationIntelligenceReadModel: [
+      intelligenceItem({
+        humanReview: {
+          ...intelligenceItem().humanReview,
+          gapsAndRisks: [
+            {
+              kind: "Clear gap",
+              requirement: "You Will",
+              detail: "Section heading from a source listing.",
+            },
+            {
+              kind: "Needs verification",
+              requirement: "Direct ownership of enterprise rollout at the same scale.",
+              detail: "This legitimate requirement still needs evidence review.",
+            },
+          ],
+        },
+      }),
+    ],
+  });
+  const gaps = experience.applicationIntelligence[0].humanReview.gapsAndRisks.map((gap) => gap.requirement);
+
+  assert.deepEqual(gaps, ["Direct ownership of enterprise rollout at the same scale."]);
+});
+
+test("Today's Priority decision navigation targets the exact opportunity without mutating workflow authority", () => {
+  const workflowState = workflowStateFixture();
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    careerWorkflowStateResult: workflowState,
+  });
+  const priority = experience.todaysPriorities.find((item) => item.id === "opportunity-decision:rec_apply");
+  const decision = experience.opportunityDecisions.find((item) => item.recommendationId === "rec_apply");
+
+  assert.ok(priority);
+  assert.ok(decision);
+  assert.equal(priority.action, "Decide");
+  assert.equal(priority.targetHref, `#${decision.targetId}`);
+  assert.equal(priority.targetLabel, "Go to decision");
+  assert.equal(workflowState.summary.workflowActionsRecorded, 0);
+  assert.equal(decision.availableActions.find((action) => action.actionType === "APPLY").enabled, true);
+  assert.equal(decision.availableActions.find((action) => action.actionType === "REVIEW_LATER").enabled, true);
+});
+
 test("opportunity decisions distinguish CareerOS recommendation from Ross operator decision", () => {
   const experience = buildCareerOsDailyJobSearchExperience({
     commandCenter: commandCenterFixture(),
@@ -862,7 +1022,7 @@ test("opportunity decisions distinguish CareerOS recommendation from Ross operat
   const item = experience.opportunityDecisions[0];
   const metrics = Object.fromEntries(experience.dailyBriefing.metrics.map((metricItem) => [metricItem.label, metricItem.value]));
 
-  assert.equal(metrics["Needs Decision"], 4);
+  assert.equal(metrics["Needs Decision"], 2);
   assert.equal(item.company, "Example Automation");
   assert.equal(item.role, "AI Automation Product Manager");
   assert.equal(item.recommendation, "APPLY NOW");
@@ -882,7 +1042,7 @@ test("opportunity decisions distinguish CareerOS recommendation from Ross operat
   assert.doesNotMatch(JSON.stringify(item), /sourceUrl|raw job|raw resume|\/Users\//i);
 });
 
-test("opportunity decisions prioritize actionable recommendations before WAIT and SKIP diagnostics", () => {
+test("opportunity decisions prioritize active actionable recommendations without surfacing WAIT or SKIP as decisions", () => {
   const experience = buildCareerOsDailyJobSearchExperience({
     commandCenter: commandCenterFixture(),
     careerWorkflowStateResult: workflowStateFixture(),
@@ -890,7 +1050,7 @@ test("opportunity decisions prioritize actionable recommendations before WAIT an
 
   assert.deepEqual(
     experience.opportunityDecisions.map((item) => item.recommendation),
-    ["APPLY NOW", "REVIEW", "WAIT", "SKIP"],
+    ["APPLY NOW", "REVIEW"],
   );
 });
 
@@ -916,15 +1076,15 @@ test("all shortlisted decision items remain reachable while priority ordering st
     }),
   });
 
-  assert.equal(experience.dailyBriefing.metrics.find((item) => item.label === "Needs Decision").value, 16);
-  assert.equal(experience.opportunityDecisions.length, 16);
+  assert.equal(experience.dailyBriefing.metrics.find((item) => item.label === "Needs Decision").value, 14);
+  assert.equal(experience.opportunityDecisions.length, 14);
   assert.deepEqual(
     experience.opportunityDecisions.slice(0, 4).map((item) => item.recommendation),
     ["APPLY NOW", "REVIEW", "REVIEW", "REVIEW"],
   );
-  assert.equal(experience.opportunityDecisions.some((item) => item.recommendation === "WAIT"), true);
-  assert.equal(experience.opportunityDecisions.some((item) => item.recommendation === "SKIP"), true);
-  assert.equal(experience.opportunityDecisions.at(-1).recommendationId, "rec_skip");
+  assert.equal(experience.opportunityDecisions.some((item) => item.recommendation === "WAIT"), false);
+  assert.equal(experience.opportunityDecisions.some((item) => item.recommendation === "SKIP"), false);
+  assert.equal(experience.opportunityDecisions.at(-1).recommendationId, "rec_extra_12");
   assert.equal(experience.opportunityDecisions.some((item) => item.recommendationId === "rec_extra_12"), true);
 });
 
@@ -1446,7 +1606,7 @@ test("private loader projects persisted Career workflow actions into today's com
   assert.equal(loaded.loadedArtifacts.careerWorkflowState, true);
   assert.equal(loaded.experience.opportunityDecisions.some((item) => item.recommendationId === "rec_review"), false);
   assert.equal(loaded.experience.opportunityDecisions.some((item) => item.recommendationId === "rec_apply"), true);
-  assert.equal(loaded.experience.dailyBriefing.metrics.find((item) => item.label === "Needs Decision").value, 3);
+  assert.equal(loaded.experience.dailyBriefing.metrics.find((item) => item.label === "Needs Decision").value, 1);
   assert.equal(loaded.auditSummary.noProviderCalled, true);
   assert.equal(loaded.auditSummary.noApplicationCreated, true);
   assert.equal(loaded.auditSummary.noApplicationSubmitted, true);

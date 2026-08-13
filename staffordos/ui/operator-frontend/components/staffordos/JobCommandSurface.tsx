@@ -37,9 +37,15 @@ function PriorityItem({ item }: { item: CareerOsDailyPriority }) {
       <p>{item.detail}</p>
       <footer>
         <span>{item.status}</span>
-        <button type="button" className="staffordJobCommandDisabledAction" disabled>
-          {item.action}
-        </button>
+        {item.targetHref ? (
+          <a className="staffordJobCommandSecondaryAction" href={item.targetHref}>
+            {item.targetLabel || item.action}
+          </a>
+        ) : (
+          <button type="button" className="staffordJobCommandDisabledAction" disabled>
+            {item.action}
+          </button>
+        )}
       </footer>
     </article>
   );
@@ -47,19 +53,27 @@ function PriorityItem({ item }: { item: CareerOsDailyPriority }) {
 
 function OpportunityItem({ item }: { item: CareerOsDailyTopOpportunity }) {
   return (
-    <article className="staffordCareerCommandRecommendation">
+    <article id={item.targetId} className="staffordCareerCommandRecommendation">
       <header>
         <div>
-          <span>{item.recommendation}</span>
+          <span>{item.fitBand.label}</span>
           <h3>{item.position}</h3>
           <p>{item.company}</p>
         </div>
-        <strong>{item.nextAction}</strong>
+        <strong>{item.recommendation}</strong>
       </header>
       <dl className="staffordCareerCommandDetails">
         <div>
-          <dt>Explainable Fit</dt>
-          <dd>{item.explainableFit}</dd>
+          <dt>Location</dt>
+          <dd>{item.location.label}</dd>
+        </div>
+        <div>
+          <dt>Fit Authority</dt>
+          <dd>{item.fitBand.authority}</dd>
+        </div>
+        <div>
+          <dt>Why</dt>
+          <dd>{item.fitBand.detail}</dd>
         </div>
         <div>
           <dt>Resume</dt>
@@ -68,6 +82,10 @@ function OpportunityItem({ item }: { item: CareerOsDailyTopOpportunity }) {
         <div>
           <dt>Next Action</dt>
           <dd>{item.detail}</dd>
+        </div>
+        <div>
+          <dt>Source</dt>
+          <dd>{item.sourceFreshness}</dd>
         </div>
       </dl>
     </article>
@@ -155,23 +173,49 @@ function OpportunityDecisionItem({
   opportunityDecisionAction?: (formData: FormData) => void | Promise<void>;
 }) {
   return (
-    <article className="staffordCareerCommandRecommendation staffordCareerOpportunityDecision">
+    <article id={item.targetId} className="staffordCareerCommandRecommendation staffordCareerOpportunityDecision">
       <header>
         <div>
-          <span>{item.recommendation}</span>
+          <span>{item.fitBand.label}</span>
           <h3>{item.role}</h3>
           <p>{item.company}</p>
         </div>
-        <strong>{item.operatorDecision}</strong>
+        <strong>{item.recommendation}</strong>
       </header>
+      <section className="staffordCareerDecisionSummary" aria-label="Decision summary">
+        <div>
+          <span>Location</span>
+          <strong>{item.location.label}</strong>
+        </div>
+        <div>
+          <span>Why</span>
+          <strong>{item.primaryReason}</strong>
+        </div>
+        <div>
+          <span>Gap</span>
+          <strong>{item.primaryGap}</strong>
+        </div>
+        <div>
+          <span>Next</span>
+          <strong>{item.humanReview?.nextAction || item.recommendedNextAction}</strong>
+        </div>
+      </section>
       <dl className="staffordCareerCommandDetails">
         <div>
           <dt>CareerOS Recommendation</dt>
           <dd>{item.recommendation}</dd>
         </div>
         <div>
+          <dt>Fit Authority</dt>
+          <dd>{item.fitBand.authority}</dd>
+        </div>
+        <div>
           <dt>Ross Decision</dt>
           <dd>{item.operatorDecision}</dd>
+        </div>
+        <div>
+          <dt>Location</dt>
+          <dd>{item.location.label}</dd>
         </div>
         <div>
           <dt>Readiness</dt>
@@ -206,6 +250,10 @@ function OpportunityDecisionItem({
         <div>
           <dt>After Decision</dt>
           <dd>{item.currentWorkflowNextAction}</dd>
+        </div>
+        <div>
+          <dt>Source</dt>
+          <dd>{item.sourceFreshness}</dd>
         </div>
       </dl>
       {item.humanReview ? <HumanReviewPanel review={item.humanReview} /> : null}
@@ -631,7 +679,7 @@ function ResumeExportItem({
     item.downloadPath &&
     item.validationIssueCount === 0;
   return (
-    <article className="staffordCareerCommandRecommendation">
+    <article id={`resume-export-${item.id}`} className="staffordCareerCommandRecommendation">
       <header>
         <div>
           <span>{item.exportState}</span>
@@ -822,11 +870,11 @@ export function JobCommandSurface({
         )}
       </section>
 
-      <section className="staffordHomeSupport" aria-label="Today's Top Opportunities">
+      <section className="staffordHomeSupport" aria-label="Shortlisted Opportunities">
         <div className="staffordHomeSectionHeader">
-          <span className="staffordEyebrow">Today's Top Opportunities</span>
-          <h2>Best opportunities to inspect</h2>
-          <p>Shown from existing opportunity recommendations.</p>
+          <span className="staffordEyebrow">Shortlisted Opportunities</span>
+          <h2>Worth inspecting from current authority</h2>
+          <p>Shown only when existing recommendation and qualification authority keep the role in Ross's shortlist.</p>
         </div>
         {hasOpportunities ? (
           <div className="staffordCareerCommandRecommendationList">

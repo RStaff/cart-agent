@@ -13,6 +13,7 @@ import type {
   OpportunityRecommendationRecord,
   OpportunityRecommendationResult,
 } from "./opportunityRecommendationEngine";
+import type { NormalizedJobSourceRecord } from "./privateJobSourceImportQueue";
 
 export const CAREEROS_COMMAND_CENTER_VERSION = "J003.02";
 export const CAREEROS_COMMAND_CENTER_SCHEMA_VERSION =
@@ -33,6 +34,8 @@ export type CareerOsTopRecommendation = {
   position: string;
   company: string;
   recommendation: OpportunityApplicationRecommendation;
+  qualification: OpportunityRecommendationReadModelRecord["qualification"];
+  shortlistedForDecision: boolean;
   explainableFit: string;
   resumeVersion: string;
   nextAction: string;
@@ -40,6 +43,9 @@ export type CareerOsTopRecommendation = {
   supportingEvidenceCount: number;
   missingSkillCount: number;
   estimatedResumeUpdateEffort: string;
+  location: string | null;
+  workArrangement: string | null;
+  capturedAsOf: string;
   limitations: string[];
   applicationActionAvailable: false;
   messageActionAvailable: false;
@@ -116,6 +122,7 @@ export type CareerOsCommandCenterInput = {
   importQueueResult?: PrivateJobSourceImportQueueResult | null;
   greenhouseDiscoveryResult?: GreenhouseDiscoveryResult | null;
   applicationPipelineResult?: PrivateApplicationPipelineReviewResult | null;
+  sourceRecords?: readonly Pick<NormalizedJobSourceRecord, "jobSourceRecordId" | "location" | "remoteState">[];
   topRecommendationLimit?: number;
 };
 
@@ -193,18 +200,38 @@ function resumeVersionLabel(record: OpportunityRecommendationReadModelRecord) {
   return record.recommendedResumeVersion.safeLabel || record.recommendedResumeVersion.status;
 }
 
+function sourceRecordById(input: CareerOsCommandCenterInput) {
+  const records =
+    input.sourceRecords ||
+    input.importQueueResult?.normalizedSourceRecords ||
+    input.greenhouseDiscoveryResult?.jobSourceImportQueue?.normalizedSourceRecords ||
+    [];
+  return new Map(records.map((record) => [record.jobSourceRecordId, record]));
+}
+
 function topRecommendations(input: CareerOsCommandCenterInput): CareerOsTopRecommendation[] {
   const readModel = input.recommendationResult?.readModel || [];
   const fullRecordById = recommendationRecordById(input.recommendationResult);
+  const sourceRecords = sourceRecordById(input);
   const limit = input.topRecommendationLimit ?? 5;
 
-  return readModel.slice(0, limit).map((record) => {
+  return readModel
+    .filter((record) =>
+      record.shortlistedForDecision &&
+      record.recommendation !== "WAIT" &&
+      record.recommendation !== "SKIP" &&
+      record.qualification?.state !== "HARD_MISMATCH")
+    .slice(0, limit)
+    .map((record) => {
     const fullRecord = fullRecordById.get(record.recommendationId) || null;
+    const sourceRecord = fullRecord?.sourceRecordId ? sourceRecords.get(fullRecord.sourceRecordId) || null : null;
     return {
       id: record.recommendationId,
       position: record.role,
       company: record.company,
       recommendation: record.recommendation,
+      qualification: record.qualification,
+      shortlistedForDecision: record.shortlistedForDecision,
       explainableFit: explainableFitLabel(fullRecord),
       resumeVersion: resumeVersionLabel(record),
       nextAction: record.recommendedNextAction,
@@ -212,8 +239,12 @@ function topRecommendations(input: CareerOsCommandCenterInput): CareerOsTopRecom
       supportingEvidenceCount: record.supportingEvidenceCount,
       missingSkillCount: record.missingSkillCount,
       estimatedResumeUpdateEffort: record.estimatedResumeUpdateEffort,
+      location: sourceRecord?.location || null,
+      workArrangement: sourceRecord?.remoteState || null,
+      capturedAsOf: record.capturedAsOf,
       limitations: [
-        "Recommendation ordering is inherited from the J003.01 recommendation read model.",
+        "Shortlisted opportunity ordering is inherited from the J003.01 recommendation read model.",
+        "This projection shows only records already marked shortlisted by existing recommendation authority.",
         ...record.limitations,
       ],
       applicationActionAvailable: false,

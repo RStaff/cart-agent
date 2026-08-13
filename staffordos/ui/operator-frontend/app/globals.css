@@ -2842,6 +2842,12 @@ textarea {
   border: 1px solid #d9dee5;
   border-radius: 8px;
   background: #f9fafb;
+  scroll-margin-top: 92px;
+}
+
+.staffordCareerCommandRecommendation:target {
+  border-color: #2f6f9f;
+  box-shadow: 0 0 0 3px rgba(47, 111, 159, 0.16);
 }
 
 .staffordCareerCommandRecommendation header {
@@ -2887,6 +2893,36 @@ textarea {
 .staffordApplicationOutcomeCard {
   border-color: #bfd5c8;
   background: #ffffff;
+}
+
+.staffordCareerDecisionSummary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #d9dee5;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.staffordCareerDecisionSummary div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.staffordCareerDecisionSummary span {
+  color: #66717e;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.staffordCareerDecisionSummary strong {
+  color: #15181d;
+  font-size: 13px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .staffordCareerCommandDetails {
@@ -3549,6 +3585,7 @@ textarea {
   .staffordCareerCommandBriefGrid,
   .staffordCareerCommandPipelineGrid,
   .staffordCareerCommandDetails,
+  .staffordCareerDecisionSummary,
   .staffordManualSubmissionForm,
   .staffordApplicationOutcomeActions form,
   .staffordOpportunityDecisionFooter,

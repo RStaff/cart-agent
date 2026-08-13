@@ -38,6 +38,8 @@ import type {
   CareerWorkflowStateItem,
   CareerWorkflowStateResult,
 } from "./careerWorkflowActions";
+import type { OpportunityQualification, OpportunityQualificationState } from "./opportunityQualification";
+import type { NormalizedJobSourceRecord } from "./privateJobSourceImportQueue";
 import type {
   PipelineReviewDecisionType,
   PrivatePipelineReviewAction,
@@ -48,6 +50,17 @@ export const CAREEROS_DAILY_JOB_SEARCH_EXPERIENCE_SCHEMA_VERSION =
   "staffordos.job_search.careeros_daily_job_search_experience.v1";
 
 export type CareerOsDailyRecommendation = "APPLY NOW" | "REVIEW" | "WAIT" | "SKIP";
+export type CareerOsDailyFitBand = {
+  authority: OpportunityQualificationState | "UNKNOWN";
+  label: "Plausible target" | "Transferable fit" | "Insufficient evidence" | "Hard mismatch" | "Fit unknown";
+  detail: string;
+};
+export type CareerOsDailyLocation = {
+  label: string;
+  detail: string;
+  location: string | null;
+  workArrangement: string | null;
+};
 export type CareerOsDailyActionKind =
   | "Review Package"
   | "Open Opportunity"
@@ -94,6 +107,8 @@ export type CareerOsDailyPriority = {
   detail: string;
   action: CareerOsDailyActionKind;
   urgency: "today" | "next" | "later";
+  targetHref: string | null;
+  targetLabel: string | null;
   externalActionAvailable: false;
   limitations: string[];
 };
@@ -102,11 +117,15 @@ export type CareerOsDailyTopOpportunity = {
   id: string;
   company: string;
   position: string;
+  targetId: string;
+  fitBand: CareerOsDailyFitBand;
+  location: CareerOsDailyLocation;
   explainableFit: string;
   recommendation: CareerOsDailyRecommendation;
   resumeVersion: string;
   nextAction: CareerOsDailyActionKind;
   detail: string;
+  sourceFreshness: string;
   externalActionAvailable: false;
   limitations: string[];
 };
@@ -118,6 +137,12 @@ export type CareerOsDailyOpportunityDecisionItem = {
   company: string;
   role: string;
   recommendation: CareerOsDailyRecommendation;
+  fitBand: CareerOsDailyFitBand;
+  location: CareerOsDailyLocation;
+  primaryReason: string;
+  primaryGap: string;
+  targetId: string;
+  sourceFreshness: string;
   operatorDecision: "No Ross decision yet" | "Apply" | "Review later" | "Skipped" | "Not interested";
   workflowState: string;
   decisionAuthority: "Ross decision" | "Awaiting Ross decision";
@@ -369,6 +394,7 @@ export type CareerOsDailyJobSearchExperience = {
 
 export type CareerOsDailyJobSearchExperienceInput = CareerOsCommandCenterInput & {
   commandCenter?: CareerOsCommandCenterPresentation;
+  sourceRecords?: readonly Pick<NormalizedJobSourceRecord, "jobSourceRecordId" | "location" | "remoteState">[];
   applicationEngagementResult?: ApplicationEngagementQueueResult | null;
   applicationEngagementReadModel?: readonly ApplicationEngagementReadModelRecord[];
   applicationPackageResult?: ReadyToApplyApplicationPackageResult | null;
@@ -391,6 +417,129 @@ function userRecommendation(value: string): CareerOsDailyRecommendation {
   if (value === "APPLY_NOW") return "APPLY NOW";
   if (value === "REVIEW" || value === "WAIT" || value === "SKIP") return value;
   return "REVIEW";
+}
+
+export function careerOsDailyFitBandForQualification(
+  qualification: OpportunityQualification | null | undefined,
+): CareerOsDailyFitBand {
+  const reason = qualification?.reasons?.[0] || "";
+  if (qualification?.state === "PLAUSIBLE_TARGET") {
+    return {
+      authority: "PLAUSIBLE_TARGET",
+      label: "Plausible target",
+      detail: reason || "Existing qualification authority found a plausible target match.",
+    };
+  }
+  if (qualification?.state === "TRANSFERABLE_BUT_NOT_DIRECT") {
+    return {
+      authority: "TRANSFERABLE_BUT_NOT_DIRECT",
+      label: "Transferable fit",
+      detail: reason || "Existing qualification authority found transferable support, not direct title-match proof.",
+    };
+  }
+  if (qualification?.state === "INSUFFICIENT_EVIDENCE") {
+    return {
+      authority: "INSUFFICIENT_EVIDENCE",
+      label: "Insufficient evidence",
+      detail: reason || "Existing qualification authority did not find enough evidence to establish fit.",
+    };
+  }
+  if (qualification?.state === "HARD_MISMATCH") {
+    return {
+      authority: "HARD_MISMATCH",
+      label: "Hard mismatch",
+      detail: reason || "Existing qualification authority found a hard mismatch.",
+    };
+  }
+  return {
+    authority: "UNKNOWN",
+    label: "Fit unknown",
+    detail: "No existing qualification authority is connected to this display item.",
+  };
+}
+
+function sourceRecords(input: CareerOsDailyJobSearchExperienceInput) {
+  return (
+    input.sourceRecords ||
+    input.importQueueResult?.normalizedSourceRecords ||
+    input.greenhouseDiscoveryResult?.jobSourceImportQueue?.normalizedSourceRecords ||
+    []
+  );
+}
+
+function sourceRecordById(input: CareerOsDailyJobSearchExperienceInput) {
+  return new Map(sourceRecords(input).map((record) => [record.jobSourceRecordId, record]));
+}
+
+function locationDisplay(input: {
+  location?: string | null;
+  workArrangement?: string | null;
+}): CareerOsDailyLocation {
+  const location = input.location || null;
+  const workArrangement = input.workArrangement || null;
+  const label = [location, workArrangement].filter(Boolean).join(" / ") || "Location not provided";
+  return {
+    label,
+    detail: location || workArrangement
+      ? "Shown from existing source-location authority; not filtered against Ross's geography preferences."
+      : "No authoritative location is connected to this display item.",
+    location,
+    workArrangement,
+  };
+}
+
+function recommendationFreshness(capturedAsOf: string | null | undefined) {
+  if (!capturedAsOf || capturedAsOf === "NO_PRIVATE_ARTIFACT_TIMESTAMP_AVAILABLE") {
+    return "Recommendation freshness unknown";
+  }
+  return `Recommendation captured ${capturedAsOf.slice(0, 10)}`;
+}
+
+function stableTargetId(prefix: string, value: string) {
+  const suffix = value.replace(/[^a-zA-Z0-9_-]+/g, "-").replace(/^-+|-+$/g, "") || "item";
+  return `${prefix}-${suffix}`;
+}
+
+function normalizeGapText(value: string) {
+  return value
+    .trim()
+    .replace(/[’]/g, "'")
+    .replace(/\s+/g, " ")
+    .replace(/[:.;]+$/g, "")
+    .toLowerCase();
+}
+
+function malformedGapRequirement(value: string) {
+  const normalized = normalizeGapText(value);
+  if (!normalized) return true;
+  if (
+    new Set([
+      "you will",
+      "you'll",
+      "what you will do",
+      "what you'll do",
+      "ideally you'd have",
+      "ideally you would have",
+      "who you are",
+      "responsibilities",
+      "requirements",
+      "qualifications",
+      "preferred qualifications",
+    ]).has(normalized)
+  ) {
+    return true;
+  }
+  if (/united states department of labor.*pay transparency|pay transparency provision/.test(normalized)) return true;
+  return false;
+}
+
+function safeHumanReview(
+  review: ApplicationIntelligenceHumanReviewProjection,
+): ApplicationIntelligenceHumanReviewProjection {
+  return {
+    ...review,
+    gapsAndRisks: review.gapsAndRisks.filter((gap) => !malformedGapRequirement(gap.requirement)),
+  };
 }
 
 function metric(
@@ -608,7 +757,7 @@ function fallbackHumanReview(item: ApplicationIntelligencePacketReadModelRecord)
 }
 
 function humanReviewFor(item: ApplicationIntelligencePacketReadModelRecord) {
-  return item.humanReview || fallbackHumanReview(item);
+  return safeHumanReview(item.humanReview || fallbackHumanReview(item));
 }
 
 function decisionStatus(item: CareerWorkflowStateItem): CareerOsDailyOpportunityDecisionItem["status"] {
@@ -668,8 +817,10 @@ function availableOpportunityActions(item: CareerWorkflowStateItem): CareerOsDai
 function opportunityDecisions(
   input: CareerOsDailyJobSearchExperienceInput,
   topOpportunityRecords: readonly CareerOsDailyTopOpportunity[],
+  commandCenter: CareerOsCommandCenterPresentation,
 ): CareerOsDailyOpportunityDecisionItem[] {
   const topById = new Map(topOpportunityRecords.map((item) => [item.id, item]));
+  const sourceById = sourceRecordById(input);
   const intelligenceByRecommendationId = new Map(
     intelligenceItems(input)
       .map((item) => [item.recommendationId, humanReviewFor(item)] as const)
@@ -685,6 +836,15 @@ function opportunityDecisions(
       intelligenceByRecommendationId.get(item.recommendationId) ||
       intelligenceByCompanyRole.get(`${item.company}\n${item.role}`) ||
       null;
+    const sourceRecord = item.sourceRecordId ? sourceById.get(item.sourceRecordId) || null : null;
+    const fitBand = careerOsDailyFitBandForQualification(item.qualification);
+    const primaryReason =
+      item.qualification?.reasons?.[0] ||
+      humanReview?.whyThisFits[0] ||
+      (item.supportingEvidenceCount > 0
+        ? `${item.supportingEvidenceCount} supporting evidence references are attached to this recommendation.`
+        : "No supporting evidence references are attached in the safe read model.");
+    const primaryGap = humanReview?.gapsAndRisks[0]?.requirement || `${item.missingSkillCount} missing skills / resume effort ${item.estimatedResumeUpdateEffort}`;
     return {
       id: `decision:${item.recommendationId}`,
       recommendationId: item.recommendationId,
@@ -692,17 +852,23 @@ function opportunityDecisions(
       company: item.company,
       role: item.role,
       recommendation,
+      fitBand,
+      location: locationDisplay({
+        location: sourceRecord?.location || null,
+        workArrangement: sourceRecord?.remoteState || null,
+      }),
+      primaryReason,
+      primaryGap,
+      targetId: stableTargetId("opportunity-decision", item.recommendationId),
+      sourceFreshness: recommendationFreshness(commandCenter.capturedAsOf),
       operatorDecision: opportunityDecisionLabel(item.workflowActionType),
       workflowState: item.workflowState || "NEEDS_DECISION",
       decisionAuthority: item.stateAuthority === "ROSS_OPERATOR_DECISION" ? "Ross decision" : "Awaiting Ross decision",
       applicationReadiness: item.applicationReadiness,
       resumeReadiness: item.recommendedResumeVersion.safeLabel || item.recommendedResumeVersion.status,
       explainableFit: top?.explainableFit || "Explainable Fit details are available from the existing recommendation output.",
-      whyItFits:
-        item.supportingEvidenceCount > 0
-          ? `${item.supportingEvidenceCount} supporting evidence references are attached to this recommendation.`
-          : "No supporting evidence references are attached in the safe read model.",
-      gaps: `${item.missingSkillCount} missing skills / resume effort ${item.estimatedResumeUpdateEffort}`,
+      whyItFits: primaryReason,
+      gaps: primaryGap,
       evidence: `${item.supportingEvidenceCount} supporting evidence references`,
       humanReview,
       recommendedNextAction: item.recommendedNextAction,
@@ -921,14 +1087,22 @@ function topOpportunities(
       id: record.id,
       company: record.company,
       position: record.position,
+      targetId: stableTargetId("shortlisted-opportunity", record.id),
+      fitBand: careerOsDailyFitBandForQualification(record.qualification),
+      location: locationDisplay({
+        location: record.location,
+        workArrangement: record.workArrangement,
+      }),
       explainableFit: record.explainableFit,
       recommendation,
       resumeVersion: record.resumeVersion,
       nextAction: actionForRecommendation(recommendation),
       detail: record.nextAction,
+      sourceFreshness: recommendationFreshness(record.capturedAsOf),
       externalActionAvailable: false,
       limitations: [
-        "Shown from the existing recommendation output.",
+        "Shown from the existing shortlisted recommendation output.",
+        "WAIT, SKIP, and hard-mismatch records are not presented as shortlisted opportunities.",
         "No application, message, resume change, browser action, provider call, or external AI action is available here.",
         ...record.limitations,
       ],
@@ -1091,6 +1265,8 @@ function engagementPriorities(items: readonly ApplicationEngagementReadModelReco
           : "This application needs attention, but the exact follow-up date is not available in the safe display.",
         action,
         urgency: action === "Prepare Interview" || item.followUpState === "DUE" || item.followUpState === "OVERDUE" ? "today" : "next",
+        targetHref: null,
+        targetLabel: null,
         externalActionAvailable: false,
         limitations: [...item.limitations],
       };
@@ -1127,6 +1303,8 @@ function packagePriorities(items: readonly ReadyToApplyApplicationPackageReadMod
         detail: item.recommendedNextAction,
         action,
         urgency: "next",
+        targetHref: null,
+        targetLabel: null,
         externalActionAvailable: false,
         limitations: [...item.limitations],
       };
@@ -1146,6 +1324,8 @@ function reviewPriorities(items: readonly ApplicationReviewWorkspaceReadModelRec
       detail: item.recommendedNextAction,
       action: item.reviewState === "MANUAL_APPLICATION_READY" ? "Ready for Manual Application" : "Review Package",
       urgency: item.reviewState === "MANUAL_APPLICATION_READY" ? "today" : "next",
+      targetHref: null,
+      targetLabel: null,
       externalActionAvailable: false,
       limitations: [...item.limitations],
     }));
@@ -1165,6 +1345,8 @@ function opportunityPriorities(records: readonly CareerOsDailyTopOpportunity[]) 
       detail: item.detail,
       action: item.nextAction,
       urgency: "later" as const,
+      targetHref: `#${item.targetId}`,
+      targetLabel: "Go to opportunity",
       externalActionAvailable: false as const,
       limitations: [...item.limitations],
     }));
@@ -1181,6 +1363,8 @@ function opportunityDecisionPriorities(records: readonly CareerOsDailyOpportunit
     detail: item.humanReview?.nextAction || item.recommendedNextAction,
     action: "Decide" as const,
     urgency: item.recommendation === "APPLY NOW" || item.recommendation === "REVIEW" ? "today" as const : "next" as const,
+    targetHref: `#${item.targetId}`,
+    targetLabel: "Go to decision",
     externalActionAvailable: false as const,
     limitations: [...item.limitations],
   })) satisfies CareerOsDailyPriority[];
@@ -1200,6 +1384,8 @@ function resumeExportPriorities(records: readonly CareerOsDailyResumeExportItem[
       detail: item.detail,
       action: item.nextAction,
       urgency: item.docxCreated ? "today" : "next",
+      targetHref: `#resume-export-${item.id}`,
+      targetLabel: item.docxCreated ? "Go to download" : "Go to export",
       externalActionAvailable: false,
       limitations: [...item.limitations],
     })) satisfies CareerOsDailyPriority[];
@@ -1226,6 +1412,8 @@ function applicationOutcomePriorities(records: readonly CareerOsDailyApplication
         : `Follow-up state: ${item.followUpState}.`,
       action: item.nextAction,
       urgency: item.nextAction === "Prepare Interview" || item.nextAction === "Follow Up" ? "today" as const : "next" as const,
+      targetHref: null,
+      targetLabel: null,
       externalActionAvailable: false as const,
       limitations: [...item.limitations],
     })) satisfies CareerOsDailyPriority[];
@@ -1402,7 +1590,7 @@ export function buildCareerOsDailyJobSearchExperience(
   const intelligence = applicationIntelligence(input);
   const drafts = resumeDrafts(input);
   const exports = resumeExports(input);
-  const decisions = opportunityDecisions(input, top);
+  const decisions = opportunityDecisions(input, top, commandCenter);
   const outcomes = applicationOutcomes(input);
   const priorities = todaysPriorities(input, top, exports, decisions, outcomes);
   const work = applicationWork(input);
