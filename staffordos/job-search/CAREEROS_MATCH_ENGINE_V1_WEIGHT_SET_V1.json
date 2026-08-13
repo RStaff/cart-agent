@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "staffordos.careeros.match_engine_weight_set.v1",
+  "weightSet": "EXPERIMENTAL_WEIGHT_SET_V1",
+  "status": "OFFLINE_ONLY_NOT_PRODUCTION_APPROVED",
+  "normalization": "Available component weights are renormalized when a component is NOT_APPLICABLE or UNKNOWN; missing information reduces confidence and does not silently become zero.",
+  "weights": {
+    "requiredSkillsFit": 35,
+    "relevantExperienceFit": 20,
+    "roleFunctionFit": 15,
+    "responsibilitySimilarity": 10,
+    "seniorityFit": 8,
+    "domainFit": 7,
+    "geographyWorkArrangementFit": 5,
+    "compensationFit": 0
+  },
+  "evidenceValues": {
+    "PROVEN": 100,
+    "PARTIAL": 70,
+    "TRANSFERABLE": 55,
+    "MISSING": 0,
+    "UNKNOWN": null
+  },
+  "blockerRule": "J010 HARD_MISMATCH produces INELIGIBLE and cannot be rescued by fit score.",
+  "rationale": [
+    "Mandatory requirement coverage is the largest component because unsupported blockers must dominate ordinary similarity.",
+    "Relevant experience and role/function reuse existing qualification and evidence authorities.",
+    "Seniority, domain, and compensation remain unknown or not applicable unless an existing authority supplies them.",
+    "Geography/work arrangement is deliberately low-weight and never resolves unresolved preference authority."
+  ],
+  "promotionStatus": "Requires Ross human labels and offline acceptance evidence before any production use."
+}
