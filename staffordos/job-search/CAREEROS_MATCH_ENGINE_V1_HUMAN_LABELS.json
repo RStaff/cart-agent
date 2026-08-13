@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "staffordos.careeros.match_engine_v1.human_labels.v1",
+  "status": "BLOCKED_PENDING_ROSS_REVIEW",
+  "datasetArtifact": "CAREEROS_MATCH_ENGINE_V1_EVALUATION_DATA.json",
+  "sampleCount": 40,
+  "labelsCaptured": 0,
+  "labelsRemaining": 40,
+  "workflowDecisionsUsedAsGroundTruth": false,
+  "requiredFields": {
+    "fit": ["STRONG_MATCH", "GOOD_MATCH", "TRANSFERABLE", "STRETCH", "POOR_MATCH", "HARD_NO"],
+    "interest": ["HIGH", "MEDIUM", "LOW", "NONE"],
+    "geography": ["ACCEPTABLE", "NOT_ACCEPTABLE", "UNKNOWN"],
+    "wouldPursue": ["YES", "MAYBE", "NO"],
+    "reason": "Optional short operator explanation"
+  },
+  "records": [],
+  "blockingReason": "Ross human judgment is required; no labels were inferred from workflow actions."
+}
