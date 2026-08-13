@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "staffordos.careeros.matching_defect_register.v1",
+  "mission": "CAREEROS_V1_20_MATCHING_TRUTH_AUDIT_AND_MATCH_ENGINE_V1_CONTRACT",
+  "productionBehaviorChanged": false,
+  "defects": [
+    {
+      "id": "M20-P1-001",
+      "severity": "P1",
+      "title": "No canonical numeric fit score",
+      "status": "PROVEN",
+      "authority": "opportunityRecommendationEngine.ts and private J003.01 read model",
+      "finding": "The system has a J002 ranking totalScore and categorical qualification, but no canonical fit percentage or fit score formula.",
+      "operatorImpact": "A numeric match impression cannot be truthfully displayed or compared.",
+      "repairBoundary": "Future offline contract validation and operator-approved scoring implementation; do not infer weights from totalScore."
+    },
+    {
+      "id": "M20-P1-002",
+      "severity": "P1",
+      "title": "Recommendation and qualification are not one matching result",
+      "status": "PROVEN",
+      "authority": "opportunityRecommendationEngine.ts, opportunityQualification.ts",
+      "finding": "Qualification is attached to each recommendation, while recommendation state is also driven by source review, fit artifact, resume readiness, and J002 priority. There is no single eligibility/fit/confidence result.",
+      "operatorImpact": "Ordering, shortlist state, qualification, evidence coverage, and preference compatibility must be reconstructed across artifacts.",
+      "repairBoundary": "Future contract-driven projection; preserve existing authorities until validated."
+    },
+    {
+      "id": "M20-P1-003",
+      "severity": "P1",
+      "title": "Current recommendation universe contains hard mismatches",
+      "status": "PROVEN_BUT_PRESENTATION_FILTERED",
+      "authority": "latest private J003.01 recommendation artifact",
+      "finding": "The current 253-record artifact contains HARD_MISMATCH records such as Cash Manager, Treasury and AI Infrastructure Engineer, but these records are not shortlisted for decision. The canonical opportunity record is preserved.",
+      "operatorImpact": "Any projection that uses the first N recommendations without qualification/shortlist filtering can mislabel specialist or unrelated roles as top opportunities.",
+      "repairBoundary": "Future matching read model must make eligibility and qualification blocking explicit."
+    },
+    {
+      "id": "M20-P1-004",
+      "severity": "P1",
+      "title": "Preference authority is unresolved in current private runtime",
+      "status": "PROVEN",
+      "authority": "jobSearchPreferencesAuthority.ts loader result",
+      "finding": "No explicit Ross preference record is loaded in the inspected private runtime; compatibility therefore remains UNKNOWN and preference filtering cannot activate.",
+      "operatorImpact": "Geography cannot yet be used as an explicit exclusion rule in current runtime truth.",
+      "repairBoundary": "Operator preference control is a prerequisite; this audit does not invent values."
+    },
+    {
+      "id": "M20-P1-005",
+      "severity": "P1",
+      "title": "Submitted read model does not surface opportunity linkage",
+      "status": "PROVEN",
+      "authority": "manualSubmissionRecordAndArtifactLinkage.ts and current submission read model",
+      "finding": "The current submitted Business Systems Analyst record exposes application artifact linkage and source URL knowledge flags, but the read model does not expose the opportunity ID even though the private result contract carries it.",
+      "operatorImpact": "Lifecycle continuity cannot be verified from the browser read model without joining private artifacts.",
+      "repairBoundary": "Separate bounded linkage/read-model mission; do not rewrite historical records in this audit."
+    },
+    {
+      "id": "M20-P2-001",
+      "severity": "P2",
+      "title": "Location and work arrangement are not part of recommendation read-model records",
+      "status": "PROVEN",
+      "authority": "OpportunityRecommendationReadModelRecord and current J003.01 read model",
+      "finding": "Location and work arrangement are authoritative on normalized source records, but are not carried into the compact recommendation read-model record.",
+      "operatorImpact": "Decision surfaces must perform a second source-record join and cannot treat the recommendation record as self-contained.",
+      "repairBoundary": "Future canonical match result should carry opportunity facts with provenance."
+    },
+    {
+      "id": "M20-P2-002",
+      "severity": "P2",
+      "title": "Historical and current linkage require explicit lineage checks",
+      "status": "PARTIALLY_PROVEN",
+      "authority": "private loader and application pipeline modules",
+      "finding": "Current modules carry sourceRecordId, opportunityId/canonicalOpportunityId, applicationId, packet IDs, resume version IDs, and artifact version IDs, but historical records can contain UNKNOWN linkage states.",
+      "operatorImpact": "A single human-facing lifecycle identity is not guaranteed across all historical records.",
+      "repairBoundary": "Run a non-mutating reconciliation report before any migration."
+    },
+    {
+      "id": "M20-P2-003",
+      "severity": "P2",
+      "title": "Provider coverage is narrower than general job-search expectations",
+      "status": "PROVEN",
+      "authority": "greenhouseDiscoveryProvider.ts and provider manifest",
+      "finding": "Current live discovery authority is Greenhouse public-board ingestion. LinkedIn/Built In are not current provider authorities.",
+      "operatorImpact": "The matching universe is source-limited; absence from the universe is not evidence of poor fit.",
+      "repairBoundary": "Provider expansion is explicitly out of scope."
+    },
+    {
+      "id": "M20-P2-004",
+      "severity": "P2",
+      "title": "Requirement extraction can preserve ambiguity",
+      "status": "PROVEN",
+      "authority": "jobRequirementExtractor.ts",
+      "finding": "Extraction uses cue/section/noise rules, stable IDs from normalized text plus source excerpt reference, extraction confidence, ambiguity, and explicit limitations. It does not by itself prove a requirement is mandatory or that Ross satisfies it.",
+      "operatorImpact": "Requirement-level fit must retain extraction provenance and uncertainty rather than collapsing every extracted sentence into a blocker.",
+      "repairBoundary": "Contract requires requirement provenance, level, ambiguity, and evidence classification."
+    }
+  ]
+}
