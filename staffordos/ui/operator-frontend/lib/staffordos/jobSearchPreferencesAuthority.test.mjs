@@ -107,3 +107,43 @@ test("Professional Job Search exposes human controls without private authority d
   assert.match(surfaceSource, /Save job-search preferences/);
   assert.doesNotMatch(surfaceSource, /privatePath|sourceDigest|authorityId|job_search_preferences\.json/);
 });
+
+test("server-form style multi-value serialization preserves explicit selections", () => {
+  const jobSearchRoot = mkdtempSync(path.join(tmpdir(), "careeros-preferences-"));
+  const formData = new FormData();
+  formData.append("preferredRegionIds", "boston_eastern_massachusetts");
+  formData.append("preferredRegionIds", "northern_new_jersey");
+  formData.append("acceptableRegionIds", "new_york_city_metro");
+  const result = authority.saveJobSearchPreferences({
+    preferredRegionIds: formData.getAll("preferredRegionIds").map(String),
+    acceptableRegionIds: formData.getAll("acceptableRegionIds").map(String),
+    remote: "ACCEPT",
+    hybrid: "ACCEPT",
+    onsite: "DECLINE",
+    relocation: "UNKNOWN",
+    jobSearchRoot,
+  });
+  assert.equal(result.ok, true);
+  assert.deepEqual(authority.loadJobSearchPreferences({ jobSearchRoot }).geography.preferredRegions.map((region) => region.regionId), [
+    "boston_eastern_massachusetts",
+    "northern_new_jersey",
+  ]);
+});
+
+test("explicit saved authority feeds compatibility without changing qualification", () => {
+  const jobSearchRoot = mkdtempSync(path.join(tmpdir(), "careeros-preferences-"));
+  const saved = authority.saveJobSearchPreferences({ ...validInput(), jobSearchRoot });
+  const loaded = authority.loadJobSearchPreferences({ jobSearchRoot });
+  const match = preferences.projectJobSearchCompatibility({
+    preferences: loaded,
+    location: "Boston, MA",
+    workArrangement: "Hybrid",
+    relocationRequired: false,
+    qualification: { state: "TRANSFERABLE_BUT_NOT_DIRECT", reasons: [], hardMismatchCategories: [] },
+  });
+  assert.equal(saved.ok, true);
+  assert.equal(loaded.authority, "ROSS_OPERATOR_EXPLICIT");
+  assert.equal(match.state, "MATCH");
+  assert.equal(match.qualificationState, "TRANSFERABLE_BUT_NOT_DIRECT");
+  assert.equal(match.qualificationBlocks, false);
+});

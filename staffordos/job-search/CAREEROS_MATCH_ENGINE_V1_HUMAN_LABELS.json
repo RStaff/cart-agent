@@ -11,8 +11,16 @@
     "interest": ["HIGH", "MEDIUM", "LOW", "NONE"],
     "geography": ["ACCEPTABLE", "NOT_ACCEPTABLE", "UNKNOWN"],
     "wouldPursue": ["YES", "MAYBE", "NO"],
+    "humanSelfConfidence": "Optional diagnostic context only; never CareerEvidence, fit input, qualification input, or ranking input",
     "reason": "Optional short operator explanation"
   },
   "records": [],
-  "blockingReason": "Ross human judgment is required; no labels were inferred from workflow actions."
+  "blockingReason": "Ross human judgment is required; no labels were inferred from workflow actions.",
+  "governance": {
+    "humanSelfConfidenceDoesNotChangeFit": true,
+    "humanSelfConfidenceDoesNotChangeQualification": true,
+    "humanSelfConfidenceDoesNotCreateHardMismatch": true,
+    "humanSelfConfidenceDoesNotChangeWeights": true,
+    "operatorInterestIsSeparateFromEvidenceBasedFit": true
+  }
 }
