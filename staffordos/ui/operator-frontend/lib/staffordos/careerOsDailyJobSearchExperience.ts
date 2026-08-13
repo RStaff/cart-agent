@@ -40,6 +40,12 @@ import type {
 } from "./careerWorkflowActions";
 import type { OpportunityQualification, OpportunityQualificationState } from "./opportunityQualification";
 import type { NormalizedJobSourceRecord } from "./privateJobSourceImportQueue";
+import {
+  EMPTY_JOB_SEARCH_PREFERENCES,
+  projectJobSearchCompatibility,
+  type JobSearchCompatibilityProjection,
+  type JobSearchPreferenceAuthorityRecord,
+} from "./jobSearchPreferences";
 import type {
   PipelineReviewDecisionType,
   PrivatePipelineReviewAction,
@@ -120,6 +126,7 @@ export type CareerOsDailyTopOpportunity = {
   targetId: string;
   fitBand: CareerOsDailyFitBand;
   location: CareerOsDailyLocation;
+  preferenceCompatibility: JobSearchCompatibilityProjection;
   explainableFit: string;
   recommendation: CareerOsDailyRecommendation;
   resumeVersion: string;
@@ -139,6 +146,7 @@ export type CareerOsDailyOpportunityDecisionItem = {
   recommendation: CareerOsDailyRecommendation;
   fitBand: CareerOsDailyFitBand;
   location: CareerOsDailyLocation;
+  preferenceCompatibility: JobSearchCompatibilityProjection;
   primaryReason: string;
   primaryGap: string;
   targetId: string;
@@ -350,6 +358,7 @@ export type CareerOsDailyJobSearchExperience = {
     capturedAsOf: string;
     metrics: CareerOsDailyBriefMetric[];
   };
+  jobSearchPreferences: JobSearchPreferenceAuthorityRecord;
   todaysPriorities: CareerOsDailyPriority[];
   opportunityDecisions: CareerOsDailyOpportunityDecisionItem[];
   topOpportunities: CareerOsDailyTopOpportunity[];
@@ -395,6 +404,7 @@ export type CareerOsDailyJobSearchExperience = {
 export type CareerOsDailyJobSearchExperienceInput = CareerOsCommandCenterInput & {
   commandCenter?: CareerOsCommandCenterPresentation;
   sourceRecords?: readonly Pick<NormalizedJobSourceRecord, "jobSourceRecordId" | "location" | "remoteState">[];
+  jobSearchPreferences?: JobSearchPreferenceAuthorityRecord | null;
   applicationEngagementResult?: ApplicationEngagementQueueResult | null;
   applicationEngagementReadModel?: readonly ApplicationEngagementReadModelRecord[];
   applicationPackageResult?: ReadyToApplyApplicationPackageResult | null;
@@ -469,6 +479,10 @@ function sourceRecords(input: CareerOsDailyJobSearchExperienceInput) {
 
 function sourceRecordById(input: CareerOsDailyJobSearchExperienceInput) {
   return new Map(sourceRecords(input).map((record) => [record.jobSourceRecordId, record]));
+}
+
+function preferenceAuthority(input: CareerOsDailyJobSearchExperienceInput) {
+  return input.jobSearchPreferences || EMPTY_JOB_SEARCH_PREFERENCES;
 }
 
 function locationDisplay(input: {
@@ -829,7 +843,7 @@ function opportunityDecisions(
   const intelligenceByCompanyRole = new Map(
     intelligenceItems(input).map((item) => [`${item.company}\n${item.role}`, humanReviewFor(item)] as const),
   );
-  return activeWorkflowDecisionItems(input).map((item) => {
+  return activeWorkflowDecisionItems(input).map((item): CareerOsDailyOpportunityDecisionItem => {
     const top = topById.get(item.recommendationId) || null;
     const recommendation = userRecommendation(item.recommendation);
     const humanReview =
@@ -845,6 +859,12 @@ function opportunityDecisions(
         ? `${item.supportingEvidenceCount} supporting evidence references are attached to this recommendation.`
         : "No supporting evidence references are attached in the safe read model.");
     const primaryGap = humanReview?.gapsAndRisks[0]?.requirement || `${item.missingSkillCount} missing skills / resume effort ${item.estimatedResumeUpdateEffort}`;
+    const preferenceCompatibility = projectJobSearchCompatibility({
+      preferences: preferenceAuthority(input),
+      location: sourceRecord?.location || null,
+      workArrangement: sourceRecord?.remoteState || null,
+      qualification: item.qualification,
+    });
     return {
       id: `decision:${item.recommendationId}`,
       recommendationId: item.recommendationId,
@@ -857,13 +877,14 @@ function opportunityDecisions(
         location: sourceRecord?.location || null,
         workArrangement: sourceRecord?.remoteState || null,
       }),
+      preferenceCompatibility,
       primaryReason,
       primaryGap,
       targetId: stableTargetId("opportunity-decision", item.recommendationId),
       sourceFreshness: recommendationFreshness(commandCenter.capturedAsOf),
       operatorDecision: opportunityDecisionLabel(item.workflowActionType),
       workflowState: item.workflowState || "NEEDS_DECISION",
-      decisionAuthority: item.stateAuthority === "ROSS_OPERATOR_DECISION" ? "Ross decision" : "Awaiting Ross decision",
+      decisionAuthority: (item.stateAuthority === "ROSS_OPERATOR_DECISION" ? "Ross decision" : "Awaiting Ross decision") as CareerOsDailyOpportunityDecisionItem["decisionAuthority"],
       applicationReadiness: item.applicationReadiness,
       resumeReadiness: item.recommendedResumeVersion.safeLabel || item.recommendedResumeVersion.status,
       explainableFit: top?.explainableFit || "Explainable Fit details are available from the existing recommendation output.",
@@ -890,7 +911,10 @@ function opportunityDecisions(
         ...item.limitations,
       ],
     };
-  });
+  }).filter((item) =>
+    item.preferenceCompatibility.state !== "OUTSIDE_PREFERENCE" ||
+    preferenceAuthority(input).geography.resolution !== "EXPLICIT",
+  );
 }
 
 function actionForDraft(item: TruthBoundResumeDraftReadModelRecord | TruthBoundResumeDraftReviewReadModelRecord): CareerOsDailyActionKind {
@@ -1081,8 +1105,14 @@ function topOpportunities(
   commandCenter: CareerOsCommandCenterPresentation,
 ): CareerOsDailyTopOpportunity[] {
   return commandCenter.topRecommendations
-    .map((record: CareerOsTopRecommendation) => {
+    .map((record: CareerOsTopRecommendation): CareerOsDailyTopOpportunity => {
     const recommendation = userRecommendation(record.recommendation);
+    const preferenceCompatibility = projectJobSearchCompatibility({
+      preferences: preferenceAuthority(input),
+      location: record.location,
+      workArrangement: record.workArrangement,
+      qualification: record.qualification,
+    });
     return {
       id: record.id,
       company: record.company,
@@ -1093,6 +1123,7 @@ function topOpportunities(
         location: record.location,
         workArrangement: record.workArrangement,
       }),
+      preferenceCompatibility,
       explainableFit: record.explainableFit,
       recommendation,
       resumeVersion: record.resumeVersion,
@@ -1107,7 +1138,11 @@ function topOpportunities(
         ...record.limitations,
       ],
     };
-  });
+  })
+    .filter((item) =>
+      item.preferenceCompatibility.state !== "OUTSIDE_PREFERENCE" ||
+      preferenceAuthority(input).geography.resolution !== "EXPLICIT",
+    );
 }
 
 function actionForEngagement(item: ApplicationEngagementReadModelRecord): CareerOsDailyActionKind {
@@ -1615,6 +1650,7 @@ export function buildCareerOsDailyJobSearchExperience(
     primaryQuestion: JOB_COMMAND_PRIMARY_QUESTION,
     greeting: "Good morning",
     dailyBriefing: buildBriefing(input, commandCenter),
+    jobSearchPreferences: preferenceAuthority(input),
     todaysPriorities: priorities,
     opportunityDecisions: decisions,
     topOpportunities: top,

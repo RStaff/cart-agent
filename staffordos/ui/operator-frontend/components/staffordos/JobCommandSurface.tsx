@@ -76,6 +76,10 @@ function OpportunityItem({ item }: { item: CareerOsDailyTopOpportunity }) {
           <dd>{item.fitBand.detail}</dd>
         </div>
         <div>
+          <dt>Job-search preference</dt>
+          <dd>{item.preferenceCompatibility.label}: {item.preferenceCompatibility.reason}</dd>
+        </div>
+        <div>
           <dt>Resume</dt>
           <dd>{item.resumeVersion}</dd>
         </div>
@@ -216,6 +220,10 @@ function OpportunityDecisionItem({
         <div>
           <dt>Location</dt>
           <dd>{item.location.label}</dd>
+        </div>
+        <div>
+          <dt>Job-search preference</dt>
+          <dd>{item.preferenceCompatibility.label}: {item.preferenceCompatibility.reason}</dd>
         </div>
         <div>
           <dt>Readiness</dt>
@@ -844,6 +852,21 @@ export function JobCommandSurface({
             <strong>{experience.emptyState || "No current action is due from connected artifacts."}</strong>
           </article>
         )}
+      </section>
+
+      <section className="staffordHomeSupport" aria-label="Job-search preference authority">
+        <div className="staffordHomeSectionHeader">
+          <span className="staffordEyebrow">Job-search preference authority</span>
+          <h2>{experience.jobSearchPreferences.authority === "ROSS_OPERATOR_EXPLICIT" ? "Explicit preferences" : "Preferences need Ross's confirmation"}</h2>
+          <p>{experience.jobSearchPreferences.provenance}</p>
+        </div>
+        <article className="staffordHomeStatusNote">
+          <span>{experience.jobSearchPreferences.geography.resolution}</span>
+          <strong>{experience.jobSearchPreferences.limitations[1] || "Preference compatibility is shown on each opportunity."}</strong>
+          {experience.jobSearchPreferences.unresolvedQuestions.length ? (
+            <p>{experience.jobSearchPreferences.unresolvedQuestions.join(" ")}</p>
+          ) : null}
+        </article>
       </section>
 
       <section className="staffordHomeSupport" aria-label="Opportunity Decisions">

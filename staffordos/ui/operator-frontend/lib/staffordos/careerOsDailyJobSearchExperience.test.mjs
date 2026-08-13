@@ -69,6 +69,7 @@ function registerTypeScriptRequire() {
 const restoreTypeScriptRequire = registerTypeScriptRequire();
 const daily = requireFromFrontend(dailyPath);
 const loader = requireFromFrontend(loaderPath);
+const preferenceAuthority = requireFromFrontend(path.join(root, "staffordos/ui/operator-frontend/lib/staffordos/jobSearchPreferences.ts"));
 const workflow = requireFromFrontend(workflowPath);
 restoreTypeScriptRequire();
 
@@ -897,6 +898,29 @@ test("top opportunities expose only user-facing recommendations", () => {
   assert.equal(experience.topOpportunities[0].recommendation, "APPLY NOW");
   assert.equal(experience.topOpportunities[1].recommendation, "REVIEW");
   assert.doesNotMatch(JSON.stringify(experience.topOpportunities), /APPLY_NOW|READY_TO_APPLY|workflowState/);
+});
+
+test("explicit preference exclusion changes presentation only and preserves source recommendation truth", () => {
+  const preferences = {
+    ...preferenceAuthority.EMPTY_JOB_SEARCH_PREFERENCES,
+    authority: "ROSS_OPERATOR_EXPLICIT",
+    geography: {
+      ...preferenceAuthority.EMPTY_JOB_SEARCH_PREFERENCES.geography,
+      resolution: "EXPLICIT",
+      preferredRegions: [{ regionId: "boston", label: "Boston", aliases: ["Boston, MA"], preference: "PREFERRED" }],
+      acceptableRegions: [],
+      remote: "ACCEPT",
+      hybrid: "ACCEPT",
+      onsite: "DECLINE",
+    },
+  };
+  const experience = buildCareerOsDailyJobSearchExperience({
+    commandCenter: commandCenterFixture(),
+    jobSearchPreferences: preferences,
+  });
+  assert.equal(experience.topOpportunities.some((item) => item.company === "Example Automation"), false);
+  assert.equal(commandCenterFixture().topRecommendations.some((item) => item.company === "Example Automation"), true);
+  assert.equal(experience.topOpportunities.some((item) => item.company === "Example Systems"), true);
 });
 
 test("fit band presentation maps existing qualification authority without scores", () => {
