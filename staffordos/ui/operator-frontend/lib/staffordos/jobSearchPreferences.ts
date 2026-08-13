@@ -15,6 +15,29 @@ export type JobSearchRegionPreference = {
   preference: "PREFERRED" | "ACCEPTABLE";
 };
 
+export const JOB_SEARCH_REGION_OPTIONS = [
+  {
+    regionId: "boston_eastern_massachusetts",
+    label: "Boston / Eastern Massachusetts",
+    aliases: ["Boston", "Braintree", "Eastern Massachusetts", "Boston, Massachusetts"],
+  },
+  {
+    regionId: "new_york_city_metro",
+    label: "New York City metro",
+    aliases: ["New York", "New York City", "NYC", "New York, New York"],
+  },
+  {
+    regionId: "northern_new_jersey",
+    label: "Northern New Jersey",
+    aliases: ["Short Hills", "Northern New Jersey", "New Jersey"],
+  },
+  {
+    regionId: "remote_united_states",
+    label: "Remote within the United States",
+    aliases: ["Remote-Friendly, United States", "Remote, United States", "Remote within the United States"],
+  },
+] as const;
+
 export type JobSearchGeographyPreference = {
   resolution: JobSearchPreferenceResolution;
   preferredRegions: JobSearchRegionPreference[];
@@ -103,6 +126,7 @@ export function projectJobSearchCompatibility(input: {
   preferences?: JobSearchPreferenceAuthorityRecord | null;
   location?: string | null;
   workArrangement?: string | null;
+  relocationRequired?: boolean | null;
   qualification?: OpportunityQualification | null;
 }): JobSearchCompatibilityProjection {
   const preferences = input.preferences || EMPTY_JOB_SEARCH_PREFERENCES;
@@ -136,7 +160,7 @@ export function projectJobSearchCompatibility(input: {
     return {
       state: "UNKNOWN",
       label: "Preference compatibility unknown",
-      reason: "The opportunity has no authoritative location; work arrangement alone is insufficient to establish geography compatibility.",
+      reason: "CareerOS cannot determine whether this opportunity fits your geography because its location is unknown.",
       preferenceAuthority: preferences.authority,
       qualificationState,
       qualificationBlocks: false,
@@ -157,7 +181,29 @@ export function projectJobSearchCompatibility(input: {
     return {
       state: "UNKNOWN",
       label: "Preference compatibility unknown",
-      reason: "The opportunity's location or work arrangement cannot be compared to an explicit preference.",
+      reason: "CareerOS cannot determine whether this opportunity fits your preferences because its work arrangement is unclear.",
+      preferenceAuthority: preferences.authority,
+      qualificationState,
+      qualificationBlocks: false,
+      inspectable: true,
+    };
+  }
+  if (input.relocationRequired === true && preferences.geography.relocation === "NOT_REQUIRED") {
+    return {
+      state: "OUTSIDE_PREFERENCE",
+      label: "Outside explicit preference",
+      reason: "This role requires relocation, which is excluded by your selected preferences.",
+      preferenceAuthority: preferences.authority,
+      qualificationState,
+      qualificationBlocks: false,
+      inspectable: true,
+    };
+  }
+  if (input.relocationRequired == null && preferences.geography.relocation !== "UNKNOWN") {
+    return {
+      state: "UNKNOWN",
+      label: "Preference compatibility unknown",
+      reason: "CareerOS cannot determine whether this role requires relocation.",
       preferenceAuthority: preferences.authority,
       qualificationState,
       qualificationBlocks: false,
@@ -169,8 +215,8 @@ export function projectJobSearchCompatibility(input: {
       state: "OUTSIDE_PREFERENCE",
       label: "Outside explicit preference",
       reason: arrangementPreference === "DECLINE"
-        ? "The explicit work-arrangement preference declines this arrangement."
-        : "The authoritative opportunity location does not match a preferred or acceptable region.",
+        ? "This work arrangement is outside your selected preferences."
+        : "This location is outside your selected working regions.",
       preferenceAuthority: preferences.authority,
       qualificationState,
       qualificationBlocks: false,
@@ -181,8 +227,8 @@ export function projectJobSearchCompatibility(input: {
     state: preferredRegion ? "MATCH" : "PARTIAL_MATCH",
     label: preferredRegion ? "Matches explicit preference" : "Partially matches explicit preference",
     reason: preferredRegion
-      ? "The opportunity matches an explicitly preferred region and accepted work arrangement."
-      : "The opportunity matches an explicitly acceptable region and accepted work arrangement.",
+      ? `Matches your ${preferredRegion.label} preference and accepted work arrangement.`
+      : `Matches an acceptable selected region and accepted work arrangement.`,
     preferenceAuthority: preferences.authority,
     qualificationState,
     qualificationBlocks: false,

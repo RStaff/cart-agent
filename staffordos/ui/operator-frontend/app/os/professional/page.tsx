@@ -47,9 +47,16 @@ export default function ProfessionalCareerHomePage() {
                 <p>{mode.operatorQuestion}</p>
               </div>
               {mode.route ? (
-                <Link href={mode.route} className="staffordHomeActionLink">
-                  {mode.modeId === "JOB_SEARCH" ? "Open Job Command" : "Open Career Home"}
-                </Link>
+                <div>
+                  <Link href={mode.route} className="staffordHomeActionLink">
+                    {mode.modeId === "JOB_SEARCH" ? "Open Job Command" : "Open Career Home"}
+                  </Link>
+                  {mode.modeId === "JOB_SEARCH" ? (
+                    <Link href="/os/professional/jobs#job-search-preferences" className="staffordHomeActionLink">
+                      Job Search Preferences
+                    </Link>
+                  ) : null}
+                </div>
               ) : null}
             </article>
           ))}

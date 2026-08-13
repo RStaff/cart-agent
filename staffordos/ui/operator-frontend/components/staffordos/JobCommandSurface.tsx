@@ -12,6 +12,7 @@ import {
   type CareerOsDailyResumeDraftItem,
   type CareerOsDailyTopOpportunity,
 } from "../../lib/staffordos/careerOsDailyJobSearchExperience";
+import { JOB_SEARCH_REGION_OPTIONS } from "../../lib/staffordos/jobSearchPreferences";
 
 function BriefMetric({ item }: { item: CareerOsDailyBriefMetric }) {
   return (
@@ -783,6 +784,8 @@ export function JobCommandSurface({
   applicationOutcomeAction,
   resumeDraftFocusId,
   resumeDraftError = false,
+  preferenceSaveAction,
+  preferenceSaveState = null,
 }: {
   experience?: CareerOsDailyJobSearchExperience;
   jobIntakeAction?: (formData: FormData) => void | Promise<void>;
@@ -793,6 +796,8 @@ export function JobCommandSurface({
   applicationOutcomeAction?: (formData: FormData) => void | Promise<void>;
   resumeDraftFocusId?: string | null;
   resumeDraftError?: boolean;
+  preferenceSaveAction?: (formData: FormData) => void | Promise<void>;
+  preferenceSaveState?: "saved" | "error" | null;
 }) {
   const hasPriorities = experience.todaysPriorities.length > 0;
   const hasOpportunityDecisions = experience.opportunityDecisions.length > 0;
@@ -854,19 +859,87 @@ export function JobCommandSurface({
         )}
       </section>
 
-      <section className="staffordHomeSupport" aria-label="Job-search preference authority">
+      <section id="job-search-preferences" className="staffordHomeSupport" aria-label="Job-search preferences">
         <div className="staffordHomeSectionHeader">
-          <span className="staffordEyebrow">Job-search preference authority</span>
-          <h2>{experience.jobSearchPreferences.authority === "ROSS_OPERATOR_EXPLICIT" ? "Explicit preferences" : "Preferences need Ross's confirmation"}</h2>
+          <span className="staffordEyebrow">Your job-search preferences</span>
+          <h2>{experience.jobSearchPreferences.authority === "ROSS_OPERATOR_EXPLICIT" ? "What CareerOS uses when finding jobs" : "Tell CareerOS what jobs you want"}</h2>
           <p>{experience.jobSearchPreferences.provenance}</p>
         </div>
-        <article className="staffordHomeStatusNote">
-          <span>{experience.jobSearchPreferences.geography.resolution}</span>
-          <strong>{experience.jobSearchPreferences.limitations[1] || "Preference compatibility is shown on each opportunity."}</strong>
-          {experience.jobSearchPreferences.unresolvedQuestions.length ? (
-            <p>{experience.jobSearchPreferences.unresolvedQuestions.join(" ")}</p>
-          ) : null}
-        </article>
+        {preferenceSaveState === "saved" ? (
+          <article className="staffordHomeStatusNote" role="status">
+            <span>Saved</span>
+            <strong>Your job-search preferences were saved.</strong>
+          </article>
+        ) : null}
+        {preferenceSaveState === "error" ? (
+          <article className="staffordHomeStatusNote" role="alert">
+            <span>Not saved</span>
+            <strong>CareerOS could not save those preferences. Check the selections and try again.</strong>
+          </article>
+        ) : null}
+        <form action={preferenceSaveAction} className="staffordCareerPreferenceForm">
+          <fieldset>
+            <legend>Preferred working regions</legend>
+            <p>Select the regions you would prefer for your next role.</p>
+            <div className="staffordCareerPreferenceOptions">
+              {JOB_SEARCH_REGION_OPTIONS.map((option) => (
+                <label key={`preferred-${option.regionId}`}>
+                  <input
+                    type="checkbox"
+                    name="preferredRegionIds"
+                    value={option.regionId}
+                    defaultChecked={experience.jobSearchPreferences.geography.preferredRegions.some((region) => region.regionId === option.regionId)}
+                  />
+                  <span>{option.label}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Additional acceptable regions</legend>
+            <p>Select regions you would consider in addition to your preferred regions.</p>
+            <div className="staffordCareerPreferenceOptions">
+              {JOB_SEARCH_REGION_OPTIONS.map((option) => (
+                <label key={`acceptable-${option.regionId}`}>
+                  <input
+                    type="checkbox"
+                    name="acceptableRegionIds"
+                    value={option.regionId}
+                    defaultChecked={experience.jobSearchPreferences.geography.acceptableRegions.some((region) => region.regionId === option.regionId)}
+                  />
+                  <span>{option.label}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <div className="staffordCareerPreferenceChoiceGrid">
+            {[
+              ["remote", "Fully remote", experience.jobSearchPreferences.geography.remote],
+              ["hybrid", "Hybrid", experience.jobSearchPreferences.geography.hybrid],
+              ["onsite", "On-site", experience.jobSearchPreferences.geography.onsite],
+            ].map(([name, label, current]) => (
+              <fieldset key={name}>
+                <legend>{label}</legend>
+                {[["ACCEPT", "Yes"], ["DECLINE", "No"], ["UNKNOWN", "Not decided"]].map(([value, choice]) => (
+                  <label key={value}>
+                    <input type="radio" name={name} value={value} defaultChecked={current === value} />
+                    <span>{choice}</span>
+                  </label>
+                ))}
+              </fieldset>
+            ))}
+          </div>
+          <fieldset>
+            <legend>Roles requiring relocation</legend>
+            {[['REQUIRED', 'Consider'], ['NOT_REQUIRED', 'Exclude'], ['UNKNOWN', 'Not decided']].map(([value, label]) => (
+              <label key={value}>
+                <input type="radio" name="relocation" value={value} defaultChecked={experience.jobSearchPreferences.geography.relocation === value} />
+                <span>{label}</span>
+              </label>
+            ))}
+          </fieldset>
+          <button type="submit" className="staffordHomeActionLink">Save job-search preferences</button>
+        </form>
       </section>
 
       <section className="staffordHomeSupport" aria-label="Opportunity Decisions">

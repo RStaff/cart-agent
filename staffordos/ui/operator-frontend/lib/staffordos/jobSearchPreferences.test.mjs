@@ -81,6 +81,7 @@ test("compatible Boston hybrid location projects as MATCH", () => {
     preferences: explicitPreferences,
     location: "Boston, MA",
     workArrangement: "Hybrid",
+    relocationRequired: false,
     qualification,
   });
   assert.equal(result.state, "MATCH");
@@ -92,10 +93,23 @@ test("clearly incompatible on-site location projects as OUTSIDE_PREFERENCE", () 
     preferences: explicitPreferences,
     location: "San Francisco, CA",
     workArrangement: "On-site",
+    relocationRequired: false,
     qualification,
   });
   assert.equal(result.state, "OUTSIDE_PREFERENCE");
   assert.match(result.reason, /arrangement|region/i);
+});
+
+test("relocation exclusion projects a role requiring relocation as OUTSIDE_PREFERENCE", () => {
+  const result = preferences.projectJobSearchCompatibility({
+    preferences: explicitPreferences,
+    location: "Boston, MA",
+    workArrangement: "Hybrid",
+    relocationRequired: true,
+    qualification,
+  });
+  assert.equal(result.state, "OUTSIDE_PREFERENCE");
+  assert.match(result.reason, /relocation/i);
 });
 
 test("hard qualification mismatch cannot be rescued by geography match", () => {

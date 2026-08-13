@@ -66,6 +66,7 @@ import {
   projectCareerWorkflowStateFromPrivateArtifacts,
   type CareerWorkflowStateResult,
 } from "./careerWorkflowActions";
+import { loadJobSearchPreferences } from "./jobSearchPreferencesAuthority";
 
 export const CAREEROS_DAILY_PRIVATE_ARTIFACT_LOADER_VERSION = "CAREEROS_V1.01";
 
@@ -456,6 +457,7 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
     applicationPipelineResult(dailyCommand, pipelineNextActions);
   if (!pipeline) missingArtifacts.push("application pipeline daily command");
   const greenhouseDiscovery = latestGreenhouseDiscoveryResult(root);
+  const jobSearchPreferences = loadJobSearchPreferences({ jobSearchRoot: root });
   const commandCenter = buildCareerOsCommandCenterPresentation({
     recommendationResult: recommendation,
     applicationPipelineResult: pipeline,
@@ -464,6 +466,7 @@ export function loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts(options
   });
   const experienceInput: CareerOsDailyJobSearchExperienceInput = {
     commandCenter,
+    jobSearchPreferences,
     sourceRecords: greenhouseDiscovery?.jobSourceImportQueue.normalizedSourceRecords || [],
     applicationPipelineResult: pipeline,
     applicationEngagementReadModel: engagementReadModel || [],

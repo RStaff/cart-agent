@@ -2254,6 +2254,10 @@ textarea {
   background: #195248;
 }
 
+.staffordHomeActionLink + .staffordHomeActionLink {
+  margin-left: 8px;
+}
+
 .staffordWorkspaceGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2622,6 +2626,63 @@ textarea {
   color: #15181d;
   font-size: 14px;
   line-height: 1.45;
+}
+
+.staffordCareerPreferenceForm {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #d9dee5;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.staffordCareerPreferenceForm fieldset {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.staffordCareerPreferenceForm legend {
+  margin-bottom: 2px;
+  color: #15181d;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.staffordCareerPreferenceForm fieldset p {
+  margin: 0;
+  color: #4f5a66;
+  line-height: 1.45;
+}
+
+.staffordCareerPreferenceOptions,
+.staffordCareerPreferenceChoiceGrid {
+  display: grid;
+  gap: 8px;
+}
+
+.staffordCareerPreferenceChoiceGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.staffordCareerPreferenceForm label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: #2f3944;
+  line-height: 1.35;
+}
+
+.staffordCareerPreferenceForm input {
+  margin-top: 3px;
+  accent-color: #23695d;
+}
+
+.staffordCareerPreferenceForm button {
+  cursor: pointer;
 }
 
 .staffordJobCommand {
@@ -3586,6 +3647,7 @@ textarea {
   .staffordCareerCommandPipelineGrid,
   .staffordCareerCommandDetails,
   .staffordCareerDecisionSummary,
+  .staffordCareerPreferenceChoiceGrid,
   .staffordManualSubmissionForm,
   .staffordApplicationOutcomeActions form,
   .staffordOpportunityDecisionFooter,

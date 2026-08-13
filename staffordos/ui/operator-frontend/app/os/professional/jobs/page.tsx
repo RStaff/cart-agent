@@ -30,6 +30,7 @@ import {
   runApplicationOutcomeDecisionFromPrivateArtifacts,
   type PipelineReviewDecisionType,
 } from "../../../../lib/staffordos/privateApplicationPipelineReview";
+import { saveJobSearchPreferences } from "../../../../lib/staffordos/jobSearchPreferencesAuthority";
 
 export const dynamic = "force-dynamic";
 
@@ -170,10 +171,35 @@ async function recordApplicationOutcomeAction(formData: FormData) {
   redirect("/os/professional/jobs");
 }
 
+function formValues(formData: FormData, name: string) {
+  return formData.getAll(name).map((value) => String(value || "").trim()).filter(Boolean);
+}
+
+async function saveJobSearchPreferencesAction(formData: FormData) {
+  "use server";
+  const result = saveJobSearchPreferences({
+    preferredRegionIds: formValues(formData, "preferredRegionIds"),
+    acceptableRegionIds: formValues(formData, "acceptableRegionIds"),
+    remote: String(formData.get("remote") || "UNKNOWN"),
+    hybrid: String(formData.get("hybrid") || "UNKNOWN"),
+    onsite: String(formData.get("onsite") || "UNKNOWN"),
+    relocation: String(formData.get("relocation") || "UNKNOWN"),
+    operatorId: "ROSS",
+  });
+  redirect(result.ok
+    ? "/os/professional/jobs?preferencesSaved=1#job-search-preferences"
+    : "/os/professional/jobs?preferencesError=1#job-search-preferences");
+}
+
 export default async function ProfessionalJobCommandPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ resumeDraft?: string; resumeDraftError?: string }>;
+  searchParams?: Promise<{
+    resumeDraft?: string;
+    resumeDraftError?: string;
+    preferencesSaved?: string;
+    preferencesError?: string;
+  }>;
 }) {
   const params = (await searchParams) || {};
   const { experience } = loadCareerOsDailyJobSearchExperienceFromPrivateArtifacts();
@@ -188,6 +214,8 @@ export default async function ProfessionalJobCommandPage({
       manualSubmissionAction={markSubmittedAction}
       opportunityDecisionAction={decideOpportunityAction}
       applicationOutcomeAction={recordApplicationOutcomeAction}
+      preferenceSaveAction={saveJobSearchPreferencesAction}
+      preferenceSaveState={params.preferencesSaved === "1" ? "saved" : params.preferencesError === "1" ? "error" : null}
     />
   );
 }
