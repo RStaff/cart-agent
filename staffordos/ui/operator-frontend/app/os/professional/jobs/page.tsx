@@ -188,7 +188,7 @@ async function saveJobSearchPreferencesAction(formData: FormData) {
   });
   redirect(result.ok
     ? "/os/professional/jobs?preferencesSaved=1#job-search-preferences"
-    : "/os/professional/jobs?preferencesError=1#job-search-preferences");
+    : `/os/professional/jobs?preferencesError=1&preferencesErrorMessage=${encodeURIComponent(result.errors[0] || "Check the selections and try again.")}#job-search-preferences`);
 }
 
 export default async function ProfessionalJobCommandPage({
@@ -199,6 +199,7 @@ export default async function ProfessionalJobCommandPage({
     resumeDraftError?: string;
     preferencesSaved?: string;
     preferencesError?: string;
+    preferencesErrorMessage?: string;
   }>;
 }) {
   const params = (await searchParams) || {};
@@ -216,6 +217,7 @@ export default async function ProfessionalJobCommandPage({
       applicationOutcomeAction={recordApplicationOutcomeAction}
       preferenceSaveAction={saveJobSearchPreferencesAction}
       preferenceSaveState={params.preferencesSaved === "1" ? "saved" : params.preferencesError === "1" ? "error" : null}
+      preferenceSaveErrorMessage={params.preferencesErrorMessage || null}
     />
   );
 }

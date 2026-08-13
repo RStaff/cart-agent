@@ -103,8 +103,10 @@ test("Professional Job Search exposes human controls without private authority d
   const routeSource = readFileSync(routePath, "utf8");
   const surfaceSource = readFileSync(surfacePath, "utf8");
   assert.match(routeSource, /saveJobSearchPreferencesAction/);
+  assert.match(routeSource, /preferencesErrorMessage/);
   assert.match(surfaceSource, /Preferred working regions/);
   assert.match(surfaceSource, /Save job-search preferences/);
+  assert.match(surfaceSource, /preferenceSaveErrorMessage/);
   assert.doesNotMatch(surfaceSource, /privatePath|sourceDigest|authorityId|job_search_preferences\.json/);
 });
 
@@ -128,6 +130,35 @@ test("server-form style multi-value serialization preserves explicit selections"
     "boston_eastern_massachusetts",
     "northern_new_jersey",
   ]);
+});
+
+test("multiple regions, remote, and all work arrangements are valid selections", () => {
+  const jobSearchRoot = mkdtempSync(path.join(tmpdir(), "careeros-preferences-"));
+  const result = authority.saveJobSearchPreferences({
+    ...validInput({
+      preferredRegionIds: ["boston_eastern_massachusetts", "new_york_city_metro", "northern_new_jersey"],
+      acceptableRegionIds: ["remote_united_states"],
+      remote: "ACCEPT",
+      hybrid: "ACCEPT",
+      onsite: "ACCEPT",
+    }),
+    jobSearchRoot,
+  });
+  assert.equal(result.ok, true);
+  const loaded = authority.loadJobSearchPreferences({ jobSearchRoot });
+  assert.equal(loaded.geography.preferredRegions.length, 3);
+  assert.equal(loaded.geography.acceptableRegions[0].regionId, "remote_united_states");
+});
+
+test("duplicate preferred and acceptable region is rejected with a useful safe error", () => {
+  const jobSearchRoot = mkdtempSync(path.join(tmpdir(), "careeros-preferences-"));
+  const result = authority.saveJobSearchPreferences({
+    ...validInput({ acceptableRegionIds: ["boston_eastern_massachusetts"] }),
+    jobSearchRoot,
+  });
+  assert.equal(result.ok, false);
+  assert.deepEqual(result.errors, ["A region cannot be both preferred and additionally acceptable."]);
+  assert.equal(authority.loadJobSearchPreferences({ jobSearchRoot }).authority, "AWAITING_ROSS_CONFIRMATION");
 });
 
 test("explicit saved authority feeds compatibility without changing qualification", () => {

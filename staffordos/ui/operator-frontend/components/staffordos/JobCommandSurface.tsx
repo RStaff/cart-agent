@@ -786,6 +786,7 @@ export function JobCommandSurface({
   resumeDraftError = false,
   preferenceSaveAction,
   preferenceSaveState = null,
+  preferenceSaveErrorMessage = null,
 }: {
   experience?: CareerOsDailyJobSearchExperience;
   jobIntakeAction?: (formData: FormData) => void | Promise<void>;
@@ -798,6 +799,7 @@ export function JobCommandSurface({
   resumeDraftError?: boolean;
   preferenceSaveAction?: (formData: FormData) => void | Promise<void>;
   preferenceSaveState?: "saved" | "error" | null;
+  preferenceSaveErrorMessage?: string | null;
 }) {
   const hasPriorities = experience.todaysPriorities.length > 0;
   const hasOpportunityDecisions = experience.opportunityDecisions.length > 0;
@@ -874,7 +876,7 @@ export function JobCommandSurface({
         {preferenceSaveState === "error" ? (
           <article className="staffordHomeStatusNote" role="alert">
             <span>Not saved</span>
-            <strong>CareerOS could not save those preferences. Check the selections and try again.</strong>
+            <strong>{preferenceSaveErrorMessage || "CareerOS could not save those preferences. Check the selections and try again."}</strong>
           </article>
         ) : null}
         <form action={preferenceSaveAction} className="staffordCareerPreferenceForm">
