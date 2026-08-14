@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "staffordos.careeros.v1_24a.holdout_review_acceptance.v1",
+  "mission": "CAREEROS_V1_24A_HOLDOUT_HUMAN_REVIEW_UI_AND_COMPLETION",
+  "evaluationManifest": {
+    "opportunityUniverseCount": 253,
+    "calibrationSetCount": 40,
+    "holdoutSetCount": 40,
+    "calibrationReviewsComplete": 40,
+    "holdoutReviewsComplete": 0
+  },
+  "authoritySeparation": {
+    "calibrationStorage": "existing calibration authority",
+    "holdoutStorage": "separate set-scoped owner-private authority",
+    "identity": "opportunity sample ID",
+    "workflowDecisionsUsedAsGroundTruth": false,
+    "selfConfidenceIsDiagnosticOnly": true
+  },
+  "verifiedBehavior": [
+    "holdout route is selected by set=holdout",
+    "holdout records use H24 identity validation",
+    "unreviewed holdout records render neutral controls",
+    "holdout progress derives from persisted authority",
+    "saved holdout reviews update one exact identity",
+    "calibration authority remains unchanged when holdout authority is written",
+    "next-unreviewed navigation derives from the holdout missing set",
+    "frozen V2D values are not fabricated before holdout evaluation"
+  ],
+  "validation": {
+    "focusedTests": "PASS",
+    "typescript": "PASS",
+    "httpRuntimeAcceptance": "LIMITED: local Next process was not reachable from the managed HTTP probe",
+    "realRossHoldoutAuthorityMutated": false
+  },
+  "prohibitionsConfirmed": [
+    "no holdout labels created",
+    "no V2D evaluation run",
+    "no weight or formula change",
+    "no production ranking or UI behavior change",
+    "no CareerFact or CareerEvidence mutation",
+    "no workflow mutation",
+    "no push or deploy"
+  ]
+}

@@ -80,3 +80,40 @@ test("review labels do not expose mutation paths to career or workflow authoriti
   assert.doesNotMatch(route, /<Link className="staffordHomeActionLink" href={`\/os\/professional\/jobs\/calibration\?index=\$\{index \+ 1\}`}/);
   assert.doesNotMatch(route, /CareerFact|CareerEvidence|runCareerWorkflowAction|saveJobSearchPreferences/);
 });
+
+test("holdout reviews use a separate H24 authority and do not change calibration progress", () => {
+  const rootPath = mkdtempSync(path.join(tmpdir(), "careeros-holdout-"));
+  const saved = authority.saveCalibrationReview(valid(rootPath, {
+    sampleId: "H24-001",
+    evaluationSet: "holdout",
+  }));
+  assert.equal(saved.ok, true);
+  assert.equal(authority.loadCalibrationReviewAuthority({ jobSearchRoot: rootPath }).labelsCaptured, 0);
+  const holdout = authority.loadReviewAuthority("holdout", { jobSearchRoot: rootPath });
+  assert.equal(holdout.labelsCaptured, 1);
+  assert.equal(holdout.records["H24-001"].selfConfidence, "LOW");
+  assert.deepEqual(authority.deriveCalibrationReviewProgress(["H24-001", "H24-002"], holdout), {
+    total: 2,
+    completed: 1,
+    remaining: 1,
+    nextUnreviewedIndex: 1,
+  });
+});
+
+test("holdout identity validation rejects calibration IDs and out-of-set values", () => {
+  const rootPath = mkdtempSync(path.join(tmpdir(), "careeros-holdout-"));
+  const wrongPrefix = authority.saveCalibrationReview(valid(rootPath, { evaluationSet: "holdout" }));
+  const wrongRange = authority.saveCalibrationReview(valid(rootPath, { sampleId: "H24-041", evaluationSet: "holdout" }));
+  assert.equal(wrongPrefix.ok, false);
+  assert.equal(wrongRange.ok, false);
+  assert.equal(authority.loadReviewAuthority("holdout", { jobSearchRoot: rootPath }).labelsCaptured, 0);
+});
+
+test("holdout route is explicitly separated from calibration and keeps frozen V2D pending", () => {
+  const route = readFileSync(routePath, "utf8");
+  assert.match(route, /set=holdout/);
+  assert.match(route, /MATCH ENGINE HOLDOUT REVIEW/i);
+  assert.match(route, /PENDING_HOLDOUT_PROJECTION/);
+  assert.match(route, /HOLDOUT_SET/);
+  assert.match(route, /evaluationSet/);
+});

@@ -5,6 +5,10 @@ import * as path from "node:path";
 export const CALIBRATION_LABELS_DIRECTORY = "match-engine-calibration";
 export const CALIBRATION_LABELS_FILENAME = "human_labels.json";
 export const CALIBRATION_EVENTS_FILENAME = "human_label_events.jsonl";
+export const HOLDOUT_LABELS_FILENAME = "holdout_human_labels.json";
+export const HOLDOUT_EVENTS_FILENAME = "holdout_human_label_events.jsonl";
+
+export type CalibrationEvaluationSet = "calibration" | "holdout";
 
 export const FIT_LABELS = ["STRONG_MATCH", "GOOD_MATCH", "TRANSFERABLE", "STRETCH", "POOR_MATCH", "HARD_NO"] as const;
 export const INTEREST_LABELS = ["HIGH", "MEDIUM", "LOW", "NONE"] as const;
@@ -22,9 +26,10 @@ export type CalibrationReviewInput = {
   reason?: string;
   operatorId?: string;
   jobSearchRoot?: string;
+  evaluationSet?: CalibrationEvaluationSet;
 };
 
-export type CalibrationReviewRecord = Omit<CalibrationReviewInput, "jobSearchRoot" | "operatorId"> & {
+export type CalibrationReviewRecord = Omit<CalibrationReviewInput, "jobSearchRoot" | "operatorId" | "evaluationSet"> & {
   capturedAt: string;
   operatorAuthority: "ROSS_OPERATOR_EXPLICIT";
 };
@@ -42,12 +47,12 @@ function storageDirectory(jobSearchRoot = path.join(homedir(), ".staffordos/priv
   return path.join(jobSearchRoot, CALIBRATION_LABELS_DIRECTORY);
 }
 
-function labelsPath(jobSearchRoot?: string) {
-  return path.join(storageDirectory(jobSearchRoot), CALIBRATION_LABELS_FILENAME);
+function labelsPath(jobSearchRoot?: string, evaluationSet: CalibrationEvaluationSet = "calibration") {
+  return path.join(storageDirectory(jobSearchRoot), evaluationSet === "holdout" ? HOLDOUT_LABELS_FILENAME : CALIBRATION_LABELS_FILENAME);
 }
 
-function eventsPath(jobSearchRoot?: string) {
-  return path.join(storageDirectory(jobSearchRoot), CALIBRATION_EVENTS_FILENAME);
+function eventsPath(jobSearchRoot?: string, evaluationSet: CalibrationEvaluationSet = "calibration") {
+  return path.join(storageDirectory(jobSearchRoot), evaluationSet === "holdout" ? HOLDOUT_EVENTS_FILENAME : CALIBRATION_EVENTS_FILENAME);
 }
 
 function readAuthority(filePath: string): CalibrationReviewAuthority {
@@ -80,7 +85,11 @@ function writePrivateJson(filePath: string, value: unknown) {
 }
 
 export function loadCalibrationReviewAuthority(options: { jobSearchRoot?: string } = {}) {
-  return readAuthority(labelsPath(options.jobSearchRoot));
+  return readAuthority(labelsPath(options.jobSearchRoot, "calibration"));
+}
+
+export function loadReviewAuthority(evaluationSet: CalibrationEvaluationSet, options: { jobSearchRoot?: string } = {}) {
+  return readAuthority(labelsPath(options.jobSearchRoot, evaluationSet));
 }
 
 export function isCompleteCalibrationReview(value: unknown): value is CalibrationReviewRecord {
@@ -106,9 +115,11 @@ export function deriveCalibrationReviewProgress(sampleIds: readonly string[], au
 }
 
 export function saveCalibrationReview(input: CalibrationReviewInput) {
+  const evaluationSet = input.evaluationSet || "calibration";
   const errors: string[] = [];
-  const sampleNumber = Number(input.sampleId.replace(/^M21-/, ""));
-  if (!/^M21-\d{3}$/.test(input.sampleId) || sampleNumber < 1 || sampleNumber > 40) errors.push("This calibration record is invalid.");
+  const prefix = evaluationSet === "holdout" ? "H24" : "M21";
+  const sampleNumber = Number(input.sampleId.replace(new RegExp(`^${prefix}-`), ""));
+  if (!new RegExp(`^${prefix}-\\d{3}$`).test(input.sampleId) || sampleNumber < 1 || sampleNumber > 40) errors.push(`This ${evaluationSet} review record is invalid.`);
   if (!FIT_LABELS.includes(input.evidenceFit as typeof FIT_LABELS[number])) errors.push("Choose an evidence fit label.");
   if (!INTEREST_LABELS.includes(input.interest as typeof INTEREST_LABELS[number])) errors.push("Choose an interest level.");
   if (!GEOGRAPHY_LABELS.includes(input.geography as typeof GEOGRAPHY_LABELS[number])) errors.push("Choose a geography assessment.");
@@ -116,7 +127,7 @@ export function saveCalibrationReview(input: CalibrationReviewInput) {
   if (!SELF_CONFIDENCE_LABELS.includes(input.selfConfidence as typeof SELF_CONFIDENCE_LABELS[number])) errors.push("Choose a self-confidence level.");
   if (errors.length) return { ok: false, errors };
 
-  const authority = loadCalibrationReviewAuthority({ jobSearchRoot: input.jobSearchRoot });
+  const authority = loadReviewAuthority(evaluationSet, { jobSearchRoot: input.jobSearchRoot });
   const capturedAt = new Date().toISOString();
   const nextRecord: CalibrationReviewRecord = {
     sampleId: input.sampleId,
@@ -141,6 +152,7 @@ export function saveCalibrationReview(input: CalibrationReviewInput) {
     operatorAuthority: "ROSS_OPERATOR_EXPLICIT",
     operatorId: input.operatorId || "ROSS",
     sampleId: input.sampleId,
+    evaluationSet,
     careerFactMutated: false,
     careerEvidenceMutated: false,
     workflowDecisionMutated: false,
@@ -148,13 +160,17 @@ export function saveCalibrationReview(input: CalibrationReviewInput) {
     preferenceAuthorityMutated: false,
     selfConfidenceUsedAsFit: false,
   };
-  writePrivateJson(labelsPath(input.jobSearchRoot), nextAuthority);
-  mkdirSync(path.dirname(eventsPath(input.jobSearchRoot)), { recursive: true, mode: 0o700 });
-  appendFileSync(eventsPath(input.jobSearchRoot), `${JSON.stringify(event)}\n`, { encoding: "utf8", mode: 0o600 });
-  chmodSync(eventsPath(input.jobSearchRoot), 0o600);
+  writePrivateJson(labelsPath(input.jobSearchRoot, evaluationSet), nextAuthority);
+  mkdirSync(path.dirname(eventsPath(input.jobSearchRoot, evaluationSet)), { recursive: true, mode: 0o700 });
+  appendFileSync(eventsPath(input.jobSearchRoot, evaluationSet), `${JSON.stringify(event)}\n`, { encoding: "utf8", mode: 0o600 });
+  chmodSync(eventsPath(input.jobSearchRoot, evaluationSet), 0o600);
   return { ok: true, record: nextRecord, errors: [] };
 }
 
 export function calibrationStoragePaths(options: { jobSearchRoot?: string } = {}) {
-  return { labels: labelsPath(options.jobSearchRoot), events: eventsPath(options.jobSearchRoot) };
+  return { labels: labelsPath(options.jobSearchRoot, "calibration"), events: eventsPath(options.jobSearchRoot, "calibration") };
+}
+
+export function reviewStoragePaths(evaluationSet: CalibrationEvaluationSet, options: { jobSearchRoot?: string } = {}) {
+  return { labels: labelsPath(options.jobSearchRoot, evaluationSet), events: eventsPath(options.jobSearchRoot, evaluationSet) };
 }
