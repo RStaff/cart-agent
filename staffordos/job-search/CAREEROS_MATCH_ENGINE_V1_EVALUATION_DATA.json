@@ -2,19 +2,20 @@
   "schemaVersion": "staffordos.careeros.match_engine_v1.offline_evaluation.v1",
   "engineVersion": "CAREEROS_V1.21_OFFLINE",
   "weightSet": "EXPERIMENTAL_WEIGHT_SET_V1",
-  "generatedAt": "2026-08-13T23:10:36.340Z",
+  "generatedAt": "2026-08-14T00:08:20.055Z",
   "runtimeSource": {
     "provider": "Greenhouse public board",
     "recommendationRun": "latest available private J003.01 artifact",
     "opportunityCount": 253,
     "sampleCount": 40,
-    "preferenceAuthority": "AWAITING_ROSS_CONFIRMATION",
-    "preferenceCompatibilityActive": false
+    "preferenceAuthority": "ROSS_OPERATOR_EXPLICIT",
+    "preferenceResolution": "EXPLICIT",
+    "preferenceCompatibilityActive": true
   },
   "deterministicRerun": true,
   "metrics": {
     "hardMismatchLeakageTop10": 0,
-    "geographyMismatchLeakage": null,
+    "geographyMismatchLeakage": 18,
     "falsePositiveRate": null,
     "falseNegativeRate": null,
     "top5HumanAgreement": null,
@@ -22,8 +23,391 @@
     "rankCorrelation": null,
     "confidenceCalibration": null,
     "unsupportedEvidenceRate": 0,
-    "unknownPreferencePreservationRate": 1
+    "unknownPreferencePreservationRate": 0.55
   },
+  "preferenceCompatibilityDistribution": {
+    "MATCH": 0,
+    "PARTIAL_MATCH": 0,
+    "OUTSIDE_PREFERENCE": 18,
+    "UNKNOWN": 22
+  },
+  "unknownReasonDistribution": {
+    "QUALIFICATION_BLOCKED": 15,
+    "WORK_ARRANGEMENT_UNKNOWN": 7
+  },
+  "controlCases": [
+    {
+      "caseId": "CONTROL_CASE_DATADOG_TPM",
+      "company": "Datadog",
+      "role": "Director, Technical Program Management - Technical Solutions Operations",
+      "location": "Boston, Massachusetts, USA; New York, New York, USA; San Francisco, California, USA",
+      "eligibility": {
+        "state": "ELIGIBLE",
+        "blockingReasons": []
+      },
+      "qualification": {
+        "state": "TRANSFERABLE_BUT_NOT_DIRECT",
+        "reasons": [
+          "The target lane is supported by confirmed or transferable experience; exact title history is not required."
+        ],
+        "hardMismatchCategories": []
+      },
+      "recommendation": {
+        "state": "REVIEW",
+        "reasons": [
+          "Explainable Fit has missing or unresolved requirement evidence.",
+          "The best existing ResumeVersion still requires review before reuse."
+        ]
+      },
+      "experimentalFit": {
+        "score": 30.63,
+        "scoreStatus": "PARTIAL",
+        "components": [
+          {
+            "name": "requiredSkillsFit",
+            "value": 0,
+            "status": "UNKNOWN",
+            "evidence": [
+              "privev_0da63084cffedbdc",
+              "privev_0da63084cffedbdc",
+              "privev_a27750900e1e04e4",
+              "privev_0da63084cffedbdc",
+              "privev_a27750900e1e04e4",
+              "privev_3e75eeefc40c84ae"
+            ]
+          },
+          {
+            "name": "relevantExperienceFit",
+            "value": 70,
+            "status": "PARTIAL",
+            "evidence": [
+              "privev_0da63084cffedbdc",
+              "privev_0da63084cffedbdc",
+              "privev_a27750900e1e04e4",
+              "privev_0da63084cffedbdc",
+              "privev_a27750900e1e04e4",
+              "privev_0da63084cffedbdc",
+              "privev_a27750900e1e04e4",
+              "privev_0da63084cffedbdc",
+              "privev_a27750900e1e04e4",
+              "privev_3e75eeefc40c84ae",
+              "privev_0da63084cffedbdc",
+              "privev_0da63084cffedbdc",
+              "privev_0da63084cffedbdc",
+              "privev_0da63084cffedbdc",
+              "privev_0da63084cffedbdc",
+              "privev_a27750900e1e04e4",
+              "privev_3e75eeefc40c84ae",
+              "privev_0da63084cffedbdc",
+              "privev_a27750900e1e04e4",
+              "privev_0da63084cffedbdc",
+              "privev_0da63084cffedbdc",
+              "privev_a27750900e1e04e4",
+              "privev_0da63084cffedbdc",
+              "privev_0da63084cffedbdc",
+              "privev_a27750900e1e04e4",
+              "privev_0da63084cffedbdc",
+              "privev_a27750900e1e04e4",
+              "privev_0da63084cffedbdc",
+              "privev_a27750900e1e04e4",
+              "privev_3e75eeefc40c84ae",
+              "privev_0da63084cffedbdc",
+              "privev_a27750900e1e04e4",
+              "privev_0da63084cffedbdc",
+              "privev_a27750900e1e04e4",
+              "privev_0da63084cffedbdc",
+              "privev_a27750900e1e04e4",
+              "privev_3e75eeefc40c84ae",
+              "privev_0da63084cffedbdc",
+              "privev_a27750900e1e04e4"
+            ]
+          },
+          {
+            "name": "roleFunctionFit",
+            "value": 70,
+            "status": "CALCULATED",
+            "evidence": [
+              "program management",
+              "technical program"
+            ]
+          },
+          {
+            "name": "responsibilitySimilarity",
+            "value": 0,
+            "status": "UNKNOWN",
+            "evidence": [
+              "privev_0da63084cffedbdc",
+              "privev_0da63084cffedbdc",
+              "privev_a27750900e1e04e4",
+              "privev_3e75eeefc40c84ae",
+              "privev_0da63084cffedbdc",
+              "privev_0da63084cffedbdc",
+              "privev_0da63084cffedbdc",
+              "privev_0da63084cffedbdc",
+              "privev_a27750900e1e04e4",
+              "privev_0da63084cffedbdc",
+              "privev_a27750900e1e04e4",
+              "privev_3e75eeefc40c84ae"
+            ]
+          },
+          {
+            "name": "seniorityFit",
+            "value": null,
+            "status": "UNKNOWN",
+            "evidence": []
+          },
+          {
+            "name": "domainFit",
+            "value": null,
+            "status": "UNKNOWN",
+            "evidence": []
+          },
+          {
+            "name": "geographyWorkArrangementFit",
+            "value": null,
+            "status": "UNKNOWN",
+            "evidence": []
+          },
+          {
+            "name": "compensationFit",
+            "value": null,
+            "status": "UNKNOWN",
+            "evidence": []
+          }
+        ],
+        "explanation": [
+          "3 mandatory requirements were evaluated from requirement-level evidence mappings.",
+          "Qualification state TRANSFERABLE_BUT_NOT_DIRECT is reused as a categorical input; no new career fact is inferred.",
+          "Role/function fit reuses J010 qualification and existing J002 matched terms for traceability.",
+          "Responsibility similarity uses only requirement-level mappings; transferable support remains distinct from exact support.",
+          "No approved seniority comparison authority is available in the current input.",
+          "No independent domain-fit authority is available; role-family evidence remains separate.",
+          "CareerOS cannot determine whether this opportunity fits your preferences because its work arrangement is unclear.",
+          "Compensation fit is not calculated without an explicit operator compensation preference."
+        ]
+      },
+      "experimentalConfidence": {
+        "score": 71.48,
+        "scoreStatus": "PARTIAL",
+        "missingInputs": [
+          "workArrangement",
+          "freshnessState",
+          "conflicting evidence"
+        ],
+        "explanation": [
+          "Confidence is separate from fit and reflects input reliability, completeness, and unresolved authority state."
+        ],
+        "components": [
+          {
+            "name": "jobDescriptionCompleteness",
+            "score": 100,
+            "status": "CALCULATED",
+            "missingInputs": [],
+            "explanation": "Source description is present."
+          },
+          {
+            "name": "requirementExtractionConfidence",
+            "score": 73.91,
+            "status": "CALCULATED",
+            "missingInputs": [],
+            "explanation": "Uses extractor-provided confidence values."
+          },
+          {
+            "name": "evidenceCoverage",
+            "score": 43.48,
+            "status": "CALCULATED",
+            "missingInputs": [],
+            "explanation": "Unknown mappings reduce confidence but are not treated as unsupported evidence."
+          },
+          {
+            "name": "locationCertainty",
+            "score": 100,
+            "status": "CALCULATED",
+            "missingInputs": [],
+            "explanation": "Normalized source location is present."
+          },
+          {
+            "name": "workArrangementCertainty",
+            "score": null,
+            "status": "UNKNOWN",
+            "missingInputs": [
+              "workArrangement"
+            ],
+            "explanation": "Work arrangement is unknown."
+          },
+          {
+            "name": "freshnessCertainty",
+            "score": null,
+            "status": "UNKNOWN",
+            "missingInputs": [
+              "freshnessState"
+            ],
+            "explanation": "Source freshness is UNKNOWN."
+          },
+          {
+            "name": "authorityQuality",
+            "score": 40,
+            "status": "CALCULATED",
+            "missingInputs": [
+              "conflicting evidence"
+            ],
+            "explanation": "Uses existing CareerEvidence mapping conflict/provenance state."
+          }
+        ]
+      },
+      "preferenceCompatibility": {
+        "compatibility": "UNKNOWN",
+        "reasons": [
+          "CareerOS cannot determine whether this opportunity fits your preferences because its work arrangement is unclear."
+        ],
+        "authorityState": "ROSS_OPERATOR_EXPLICIT"
+      },
+      "requirements": [
+        {
+          "text": "Deploy AI to create operational leverage. Identify and build AI-enabled workflows that reduce friction across how programs are planned, communicated, and executed — for your team and for the TS functions you support. This is a core expectation, not a future initiative. You bring a clear point of view on where AI creates a genuine capability shift and you build toward it.",
+          "level": "RESPONSIBILITY",
+          "evidenceState": "UNKNOWN",
+          "safeEvidence": "Existing CareerEvidence mapping"
+        },
+        {
+          "text": "Develop the TPM team and raise the bar. Lead a team of senior Technical Program Managers delivering complex, concurrent initiatives across TS. Raise the bar for execution quality, stakeholder management, and accountability — and develop a team that operates independently and owns outcomes.",
+          "level": "RESPONSIBILITY",
+          "evidenceState": "TRANSFERABLE",
+          "safeEvidence": "Existing CareerEvidence mapping"
+        },
+        {
+          "text": "Build cross-functional relationships before you need them. Build cross-functional relationships across TS and adjacent functions before programs require it. Use influence, credibility, and direct engagement to drive alignment, resolve tension, and expand the reach and impact of TSO well beyond its own boundaries.",
+          "level": "RESPONSIBILITY",
+          "evidenceState": "TRANSFERABLE",
+          "safeEvidence": "Existing CareerEvidence mapping"
+        },
+        {
+          "text": "10+ years running complex, cross-functional programs at a senior level, with VPs and senior Directors as your primary stakeholders — ideally within a high-growth B2B SaaS go-to-market, customer-facing, or revenue operations organization",
+          "level": "RESPONSIBILITY",
+          "evidenceState": "TRANSFERABLE",
+          "safeEvidence": "Existing CareerEvidence mapping"
+        },
+        {
+          "text": "A systems builder with a track record of designing operating models, playbooks, and frameworks that other teams adopted as a reference standard",
+          "level": "RESPONSIBILITY",
+          "evidenceState": "UNKNOWN",
+          "safeEvidence": "Existing CareerEvidence mapping"
+        },
+        {
+          "text": "Autonomously executive-ready — decisive under ambiguity, composed under pressure, and capable of leading VP-level conversations without preparation coaching",
+          "level": "RESPONSIBILITY",
+          "evidenceState": "TRANSFERABLE",
+          "safeEvidence": "Existing CareerEvidence mapping"
+        },
+        {
+          "text": "Experienced applying AI as an operational tool, with a practical point of view on where it creates capability shifts — not just productivity gains",
+          "level": "RESPONSIBILITY",
+          "evidenceState": "UNKNOWN",
+          "safeEvidence": "Existing CareerEvidence mapping"
+        },
+        {
+          "text": "A developer of senior talent who raises the bar on what great program management looks like and builds teams that operate independently at a high standard",
+          "level": "RESPONSIBILITY",
+          "evidenceState": "UNKNOWN",
+          "safeEvidence": "Existing CareerEvidence mapping"
+        },
+        {
+          "text": "Outcome-oriented and metric-driven — you define success before work begins and hold yourself and your team accountable to delivering against it",
+          "level": "RESPONSIBILITY",
+          "evidenceState": "UNKNOWN",
+          "safeEvidence": "Existing CareerEvidence mapping"
+        },
+        {
+          "text": "Preferred Experience",
+          "level": "PREFERRED",
+          "evidenceState": "MISSING",
+          "safeEvidence": "No mapped CareerEvidence"
+        },
+        {
+          "text": "Experience supporting large-scale go-to-market or customer-facing technical organizations spanning sales engineering, post-sales, technical support, or solutions architecture",
+          "level": "PREFERRED",
+          "evidenceState": "UNKNOWN",
+          "safeEvidence": "Existing CareerEvidence mapping"
+        },
+        {
+          "text": "Familiarity with support operations platforms and the workflows they enable across technical teams",
+          "level": "PREFERRED",
+          "evidenceState": "UNKNOWN",
+          "safeEvidence": "Existing CareerEvidence mapping"
+        },
+        {
+          "text": "Experience designing org-wide AI-enabled capabilities in an operational context",
+          "level": "PREFERRED",
+          "evidenceState": "MISSING",
+          "safeEvidence": "No mapped CareerEvidence"
+        },
+        {
+          "text": "Background in tooling strategy, workforce planning, or operational transformation at scale in a SaaS environment",
+          "level": "PREFERRED",
+          "evidenceState": "UNKNOWN",
+          "safeEvidence": "Existing CareerEvidence mapping"
+        },
+        {
+          "text": "We're looking for a Director of Technical Program Management to lead the TSO Program Management team. This role sits at the intersection of strategy and execution: you'll own the programs that shape how TS operates at scale, lead a team of technical program managers, and serve as a peer to the Directors and VPs who run the teams you support. Your counterparts are leaders overseeing hundreds of customer-facing technical professionals, and your role is to successfully interface with each organization with proactive solutions on how your team can help them be more effective. This is a rare opportunity to lead a function where the output isn't a deliverable, it's organizational capability. If you want to build something that compounds across an entire organization, this is the role.",
+          "level": "RESPONSIBILITY",
+          "evidenceState": "TRANSFERABLE",
+          "safeEvidence": "Existing CareerEvidence mapping"
+        },
+        {
+          "text": "To conform to US export control regulations, candidates should be eligible for any required authorizations from the US government. This job is available in various departments within our company",
+          "level": "REQUIRED",
+          "evidenceState": "UNKNOWN",
+          "safeEvidence": "Existing CareerEvidence mapping"
+        },
+        {
+          "text": "to conform to US export control regulations, some of these roles may require candidates to be eligible for any required authorizations from the US government.",
+          "level": "REQUIRED",
+          "evidenceState": "UNKNOWN",
+          "safeEvidence": "Existing CareerEvidence mapping"
+        },
+        {
+          "text": "Datadog is the leading observability and security platform for the AI era, providing businesses with unified visibility across the technology stack to manage complexity at scale. It brings applications, infrastructure, data, models, and security into one place, using AI to detect and resolve issues before they impact customers. Trusted globally by Fortune 500 companies and high-growth AI leaders, Datadog enables businesses to move faster with clarity and confidence. Learn more about #DatadogLife on Instagram, LinkedIn, and Datadog Learning Center.",
+          "level": "RESPONSIBILITY",
+          "evidenceState": "TRANSFERABLE",
+          "safeEvidence": "Existing CareerEvidence mapping"
+        },
+        {
+          "text": "Datadog endeavors to make our Careers Page accessible to all users. If you would like to contact us regarding the accessibility of our website or need assistance completing the application process, please complete this form. This form is for accommodation requests only and cannot be used to inquire about the status of applications.",
+          "level": "REQUIRED",
+          "evidenceState": "UNKNOWN",
+          "safeEvidence": "Existing CareerEvidence mapping"
+        },
+        {
+          "text": "Run the PMO as a business impact function. Own the PMO operating model end-to-end, including intake, prioritization, scoping, execution, and impact measurement — with every program directly linked to measurable business outcomes such as productivity gains, revenue influence, cost efficiency, or customer experience improvements. Establish a PMO operating standard that other TS leaders adopt as the benchmark.",
+          "level": "RESPONSIBILITY",
+          "evidenceState": "UNKNOWN",
+          "safeEvidence": "Existing CareerEvidence mapping"
+        },
+        {
+          "text": "Build capabilities that scale across TS, not point solutions. Build durable, cross-functional capabilities that drive business outcomes across every function in TS. Solve systemic problems with scalable solutions and operating models — not one-off fixes — and hold your team to the same standard.",
+          "level": "RESPONSIBILITY",
+          "evidenceState": "TRANSFERABLE",
+          "safeEvidence": "Existing CareerEvidence mapping"
+        },
+        {
+          "text": "Drive programs from alignment to impact. Establish clear scope, sequencing, ownership, and success metrics before execution begins. Hold your team to rigorous delivery standards and close every program with post-launch reporting that connects leverage created directly to business outcomes for partner teams.",
+          "level": "RESPONSIBILITY",
+          "evidenceState": "UNKNOWN",
+          "safeEvidence": "Existing CareerEvidence mapping"
+        },
+        {
+          "text": "Represent TSO in executive forums. Represent TSO in executive forums with Director and VP-level counterparts across TS. Come prepared with clear recommendations, framed trade-offs, and the ability to drive decisions — not surface issues. Own stakeholder relationships and outcomes and drive alignment across disparate teams.",
+          "level": "RESPONSIBILITY",
+          "evidenceState": "TRANSFERABLE",
+          "safeEvidence": "Existing CareerEvidence mapping"
+        }
+      ],
+      "limitations": [
+        "Control case only; not part of the 40-role human-label sample.",
+        "Title, domain, evidence, and confidence gaps remain separate from capability gaps."
+      ]
+    }
+  ],
   "humanLabels": {
     "status": "PENDING_ROSS_REVIEW",
     "labelsCaptured": 0,
@@ -32,9 +416,18 @@
   },
   "records": [
     {
+      "sampleId": "M21-001",
+      "opportunityId": "privjobimport_40c98926a084af5708",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_a0fb651907c0254950",
+        "sourceRecordId": "privjobsource_db2ca0fc8e9cf5cb95",
+        "providerJobId": "4716453005",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Scale AI",
       "role": "AI Infrastructure Engineer, Sandbox Platform",
       "location": "San Francisco, CA; Seattle, WA; New York, NY",
+      "workArrangement": "Unknown",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "HARD_MISMATCH",
       "existingJ003Recommendation": "WAIT",
@@ -45,7 +438,22 @@
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "INELIGIBLE",
       "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceReason": "Geography preference values are unresolved; qualification authority independently blocks this opportunity as a hard mismatch.",
+      "preferenceUnknownReasonCategory": "QUALIFICATION_BLOCKED",
+      "requirementSummary": {
+        "mandatoryCount": 0,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 0,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 1,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 0
+      },
       "topFitReasons": [
         "No explicitly classified requirements were available.",
         "Qualification state HARD_MISMATCH is reused as a categorical input; no new career fact is inferred.",
@@ -163,9 +571,18 @@
       ]
     },
     {
+      "sampleId": "M21-002",
+      "opportunityId": "privjobimport_1f658ec30c91ab4777",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_40d76b60ee866420f5",
+        "sourceRecordId": "privjobsource_bf0bbb7d95210c85e6",
+        "providerJobId": "5358112008",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Anthropic",
       "role": "Cash Manager, Treasury",
       "location": "San Francisco, CA",
+      "workArrangement": "On-site",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "HARD_MISMATCH",
       "existingJ003Recommendation": "WAIT",
@@ -176,7 +593,22 @@
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "INELIGIBLE",
       "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceReason": "Geography preference values are unresolved; qualification authority independently blocks this opportunity as a hard mismatch.",
+      "preferenceUnknownReasonCategory": "QUALIFICATION_BLOCKED",
+      "requirementSummary": {
+        "mandatoryCount": 11,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 2,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 4,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 2
+      },
       "topFitReasons": [
         "11 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state HARD_MISMATCH is reused as a categorical input; no new career fact is inferred.",
@@ -296,9 +728,18 @@
       ]
     },
     {
+      "sampleId": "M21-003",
+      "opportunityId": "privjobimport_9e78a62f704e3f758a",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_ad5f44f083d6eba13f",
+        "sourceRecordId": "privjobsource_f4ebb4afbcfec4dbec",
+        "providerJobId": "8098939",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Datadog",
       "role": "Engineering Manager I, Commercial Audit",
       "location": "New York, New York, USA",
+      "workArrangement": "Unknown",
       "locationClass": "EAST_COAST_OR_REMOTE_SCENARIO",
       "existingJ010State": "HARD_MISMATCH",
       "existingJ003Recommendation": "WAIT",
@@ -309,7 +750,22 @@
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "INELIGIBLE",
       "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceReason": "Geography preference values are unresolved; qualification authority independently blocks this opportunity as a hard mismatch.",
+      "preferenceUnknownReasonCategory": "QUALIFICATION_BLOCKED",
+      "requirementSummary": {
+        "mandatoryCount": 9,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 1,
+        "unsupportedMandatoryCount": 2,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 7,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 2
+      },
       "topFitReasons": [
         "9 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state HARD_MISMATCH is reused as a categorical input; no new career fact is inferred.",
@@ -428,9 +884,18 @@
       ]
     },
     {
+      "sampleId": "M21-004",
+      "opportunityId": "privjobdisc_49bdc8b941c249f01a",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_dca242264309a1a13c",
+        "sourceRecordId": "privjobsource_4ba6350d55eecf1d19",
+        "providerJobId": "4602177005",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Scale AI",
       "role": "Frontier Agent Engineering Manager, Enterprise",
       "location": "San Francisco, CA; New York, NY",
+      "workArrangement": "Unknown",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "HARD_MISMATCH",
       "existingJ003Recommendation": "REVIEW",
@@ -441,7 +906,22 @@
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "INELIGIBLE",
       "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceReason": "Geography preference values are unresolved; qualification authority independently blocks this opportunity as a hard mismatch.",
+      "preferenceUnknownReasonCategory": "QUALIFICATION_BLOCKED",
+      "requirementSummary": {
+        "mandatoryCount": 39,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 2,
+        "unsupportedMandatoryCount": 5,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 4,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 5
+      },
       "topFitReasons": [
         "39 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state HARD_MISMATCH is reused as a categorical input; no new career fact is inferred.",
@@ -559,9 +1039,18 @@
       ]
     },
     {
+      "sampleId": "M21-005",
+      "opportunityId": "privjobimport_5a81ea5524444e2cd5",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_030449ba0dbc84dac8",
+        "sourceRecordId": "privjobsource_9d2ea5f7921285bdaa",
+        "providerJobId": "5208289008",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Anthropic",
       "role": "Commercial Counsel, Platform & Marketplace",
       "location": "San Francisco, CA | Seattle, WA | New York City, NY | Washington, DC",
+      "workArrangement": "On-site",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "HARD_MISMATCH",
       "existingJ003Recommendation": "WAIT",
@@ -572,7 +1061,22 @@
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "INELIGIBLE",
       "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceReason": "Geography preference values are unresolved; qualification authority independently blocks this opportunity as a hard mismatch.",
+      "preferenceUnknownReasonCategory": "QUALIFICATION_BLOCKED",
+      "requirementSummary": {
+        "mandatoryCount": 10,
+        "preferredCount": 11,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 0,
+        "supportedPreferredCount": 3,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 4,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 0
+      },
       "topFitReasons": [
         "10 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state HARD_MISMATCH is reused as a categorical input; no new career fact is inferred.",
@@ -690,9 +1194,18 @@
       ]
     },
     {
+      "sampleId": "M21-006",
+      "opportunityId": "privjobdisc_fc203582f3a62f1da7",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_2758edfa4a53790a3f",
+        "sourceRecordId": "privjobsource_73448ee01a1afe569a",
+        "providerJobId": "5205735008",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Anthropic",
       "role": "Director, Global Order-to-Cash Transformation",
       "location": "San Francisco, CA | New York City, NY | Seattle, WA",
+      "workArrangement": "On-site",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "HARD_MISMATCH",
       "existingJ003Recommendation": "REVIEW",
@@ -703,7 +1216,22 @@
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "INELIGIBLE",
       "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceReason": "Geography preference values are unresolved; qualification authority independently blocks this opportunity as a hard mismatch.",
+      "preferenceUnknownReasonCategory": "QUALIFICATION_BLOCKED",
+      "requirementSummary": {
+        "mandatoryCount": 24,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 5,
+        "unsupportedMandatoryCount": 0,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 8,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 0
+      },
       "topFitReasons": [
         "24 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state HARD_MISMATCH is reused as a categorical input; no new career fact is inferred.",
@@ -820,9 +1348,18 @@
       ]
     },
     {
+      "sampleId": "M21-007",
+      "opportunityId": "privjobimport_169530fe9c40d1d6ce",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_037a0c8fe6fb56dddb",
+        "sourceRecordId": "privjobsource_3d028f829397bf556d",
+        "providerJobId": "8586863002",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Airtable",
       "role": "Program Manager, Professional Services - East",
       "location": "New York, NY; Remote - US",
+      "workArrangement": "Remote or remote-friendly",
       "locationClass": "EAST_COAST_OR_REMOTE_SCENARIO",
       "existingJ010State": "HARD_MISMATCH",
       "existingJ003Recommendation": "WAIT",
@@ -833,7 +1370,22 @@
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "INELIGIBLE",
       "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceReason": "Geography preference values are unresolved; qualification authority independently blocks this opportunity as a hard mismatch.",
+      "preferenceUnknownReasonCategory": "QUALIFICATION_BLOCKED",
+      "requirementSummary": {
+        "mandatoryCount": 20,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 2,
+        "unsupportedMandatoryCount": 2,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 8,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 2
+      },
       "topFitReasons": [
         "20 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state HARD_MISMATCH is reused as a categorical input; no new career fact is inferred.",
@@ -952,9 +1504,18 @@
       ]
     },
     {
+      "sampleId": "M21-008",
+      "opportunityId": "privjobimport_c12fc1fb5b5975a29c",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_8f1cfdb3e4bdb54a03",
+        "sourceRecordId": "privjobsource_2ccd6be7d052c760ca",
+        "providerJobId": "8586865002",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Airtable",
       "role": "Program Manager, Professional Services - West",
       "location": "San Francisco, CA; Remote - US",
+      "workArrangement": "Remote or remote-friendly",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "HARD_MISMATCH",
       "existingJ003Recommendation": "WAIT",
@@ -965,7 +1526,22 @@
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "INELIGIBLE",
       "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceReason": "Geography preference values are unresolved; qualification authority independently blocks this opportunity as a hard mismatch.",
+      "preferenceUnknownReasonCategory": "QUALIFICATION_BLOCKED",
+      "requirementSummary": {
+        "mandatoryCount": 20,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 2,
+        "unsupportedMandatoryCount": 2,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 8,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 2
+      },
       "topFitReasons": [
         "20 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state HARD_MISMATCH is reused as a categorical input; no new career fact is inferred.",
@@ -1084,9 +1660,18 @@
       ]
     },
     {
+      "sampleId": "M21-009",
+      "opportunityId": "privjobimport_bdb986efa0becc3f15",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_2efbb1b15ea26990ea",
+        "sourceRecordId": "privjobsource_d4db67d8d051b60880",
+        "providerJobId": "4703343005",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Scale AI",
       "role": "AI Builder Intern",
       "location": "San Francisco, CA",
+      "workArrangement": "Unknown",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "INSUFFICIENT_EVIDENCE",
       "existingJ003Recommendation": "WAIT",
@@ -1097,7 +1682,22 @@
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "REVIEW_REQUIRED",
       "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceReason": "CareerOS cannot determine whether this opportunity fits your preferences because its work arrangement is unclear.",
+      "preferenceUnknownReasonCategory": "WORK_ARRANGEMENT_UNKNOWN",
+      "requirementSummary": {
+        "mandatoryCount": 0,
+        "preferredCount": 9,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 0,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 3
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 0,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 3
+      },
       "topFitReasons": [
         "No explicitly classified requirements were available.",
         "Qualification state INSUFFICIENT_EVIDENCE is reused as a categorical input; no new career fact is inferred.",
@@ -1215,9 +1815,18 @@
       ]
     },
     {
+      "sampleId": "M21-010",
+      "opportunityId": "privjobimport_f081c72cdfcc521e38",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_0f7c8a3892a9b2a138",
+        "sourceRecordId": "privjobsource_4fcd307b8e5b985bdd",
+        "providerJobId": "5192805008",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Anthropic",
       "role": "Applied AI Architect, Commercial",
       "location": "San Francisco, CA | New York City, NY",
+      "workArrangement": "On-site",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "INSUFFICIENT_EVIDENCE",
       "existingJ003Recommendation": "WAIT",
@@ -1227,8 +1836,23 @@
       "experimentalConfidenceScore": 63.52,
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "REVIEW_REQUIRED",
-      "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "preferenceReason": "This location is outside your selected working regions.",
+      "preferenceUnknownReasonCategory": null,
+      "requirementSummary": {
+        "mandatoryCount": 25,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 1,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 0,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 1
+      },
       "topFitReasons": [
         "25 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state INSUFFICIENT_EVIDENCE is reused as a categorical input; no new career fact is inferred.",
@@ -1285,8 +1909,8 @@
         },
         {
           "name": "geographyWorkArrangementFit",
-          "value": null,
-          "status": "UNKNOWN"
+          "value": 0,
+          "status": "CALCULATED"
         },
         {
           "name": "compensationFit",
@@ -1346,9 +1970,18 @@
       ]
     },
     {
+      "sampleId": "M21-011",
+      "opportunityId": "privjobimport_5d6a040c1bbced784d",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_dfde6d8a8c3032d311",
+        "sourceRecordId": "privjobsource_bfc00204ae77a8192a",
+        "providerJobId": "5383335008",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Anthropic",
       "role": "Applied AI Architect, Enterprise Tech",
       "location": "San Francisco, CA | New York City, NY | Seattle, WA",
+      "workArrangement": "On-site",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "INSUFFICIENT_EVIDENCE",
       "existingJ003Recommendation": "WAIT",
@@ -1358,8 +1991,23 @@
       "experimentalConfidenceScore": 64.45,
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "REVIEW_REQUIRED",
-      "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "preferenceReason": "This location is outside your selected working regions.",
+      "preferenceUnknownReasonCategory": null,
+      "requirementSummary": {
+        "mandatoryCount": 22,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 2,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 0,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 2
+      },
       "topFitReasons": [
         "22 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state INSUFFICIENT_EVIDENCE is reused as a categorical input; no new career fact is inferred.",
@@ -1416,8 +2064,8 @@
         },
         {
           "name": "geographyWorkArrangementFit",
-          "value": null,
-          "status": "UNKNOWN"
+          "value": 0,
+          "status": "CALCULATED"
         },
         {
           "name": "compensationFit",
@@ -1477,9 +2125,18 @@
       ]
     },
     {
+      "sampleId": "M21-012",
+      "opportunityId": "privjobimport_a5227e59b366000a6d",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_5cec810e20c0ff4194",
+        "sourceRecordId": "privjobsource_de957b1cbfc103ae95",
+        "providerJobId": "4461444008",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Anthropic",
       "role": "Applied AI Architect, Industries",
       "location": "New York City, NY; San Francisco, CA | New York City, NY | Seattle, WA",
+      "workArrangement": "Hybrid",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "INSUFFICIENT_EVIDENCE",
       "existingJ003Recommendation": "WAIT",
@@ -1489,8 +2146,23 @@
       "experimentalConfidenceScore": 64.53,
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "REVIEW_REQUIRED",
-      "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "preferenceReason": "This location is outside your selected working regions.",
+      "preferenceUnknownReasonCategory": null,
+      "requirementSummary": {
+        "mandatoryCount": 22,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 2,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 0,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 2
+      },
       "topFitReasons": [
         "22 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state INSUFFICIENT_EVIDENCE is reused as a categorical input; no new career fact is inferred.",
@@ -1547,8 +2219,8 @@
         },
         {
           "name": "geographyWorkArrangementFit",
-          "value": null,
-          "status": "UNKNOWN"
+          "value": 0,
+          "status": "CALCULATED"
         },
         {
           "name": "compensationFit",
@@ -1608,9 +2280,18 @@
       ]
     },
     {
+      "sampleId": "M21-013",
+      "opportunityId": "privjobimport_6440498f19a6e376b7",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_0cf71ffe46759497ff",
+        "sourceRecordId": "privjobsource_701973b04cd09bc50b",
+        "providerJobId": "5240422008",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Anthropic",
       "role": "Data Engineer, Safeguards",
       "location": "San Francisco, CA | New York City, NY",
+      "workArrangement": "On-site",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "INSUFFICIENT_EVIDENCE",
       "existingJ003Recommendation": "WAIT",
@@ -1620,8 +2301,23 @@
       "experimentalConfidenceScore": 62.97,
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "REVIEW_REQUIRED",
-      "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "preferenceReason": "This location is outside your selected working regions.",
+      "preferenceUnknownReasonCategory": null,
+      "requirementSummary": {
+        "mandatoryCount": 9,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 0,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 0,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 0
+      },
       "topFitReasons": [
         "9 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state INSUFFICIENT_EVIDENCE is reused as a categorical input; no new career fact is inferred.",
@@ -1677,8 +2373,8 @@
         },
         {
           "name": "geographyWorkArrangementFit",
-          "value": null,
-          "status": "UNKNOWN"
+          "value": 0,
+          "status": "CALCULATED"
         },
         {
           "name": "compensationFit",
@@ -1738,9 +2434,18 @@
       ]
     },
     {
+      "sampleId": "M21-014",
+      "opportunityId": "privjobimport_265cc524758e89a2a5",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_6e40a8cf686b1ab477",
+        "sourceRecordId": "privjobsource_e9788b3059a0e25d12",
+        "providerJobId": "4688021005",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Scale AI",
       "role": "Finance Systems & Automations Manager",
       "location": "San Francisco, CA",
+      "workArrangement": "Unknown",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
       "existingJ003Recommendation": "WAIT",
@@ -1751,7 +2456,22 @@
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "REVIEW_REQUIRED",
       "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceReason": "CareerOS cannot determine whether this opportunity fits your preferences because its work arrangement is unclear.",
+      "preferenceUnknownReasonCategory": "WORK_ARRANGEMENT_UNKNOWN",
+      "requirementSummary": {
+        "mandatoryCount": 9,
+        "preferredCount": 10,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 3,
+        "supportedPreferredCount": 1,
+        "unsupportedPreferredCount": 1
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 2,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 4
+      },
       "topFitReasons": [
         "9 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state TRANSFERABLE_BUT_NOT_DIRECT is reused as a categorical input; no new career fact is inferred.",
@@ -1869,9 +2589,18 @@
       ]
     },
     {
+      "sampleId": "M21-015",
+      "opportunityId": "privjobdisc_9cf59cce0a410c4017",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_107d01418655c2ef2b",
+        "sourceRecordId": "privjobsource_ef7c1b2d9105cc4d23",
+        "providerJobId": "4655240005",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Scale AI",
       "role": "[Annotations] Operations Program Manager",
       "location": "Mexico City, MX",
+      "workArrangement": "Unknown",
       "locationClass": "OTHER_KNOWN_LOCATION",
       "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
       "existingJ003Recommendation": "REVIEW",
@@ -1882,7 +2611,22 @@
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "ELIGIBLE",
       "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceReason": "CareerOS cannot determine whether this opportunity fits your preferences because its work arrangement is unclear.",
+      "preferenceUnknownReasonCategory": "WORK_ARRANGEMENT_UNKNOWN",
+      "requirementSummary": {
+        "mandatoryCount": 0,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 0,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 1,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 0
+      },
       "topFitReasons": [
         "No explicitly classified requirements were available.",
         "Qualification state TRANSFERABLE_BUT_NOT_DIRECT is reused as a categorical input; no new career fact is inferred.",
@@ -1997,9 +2741,18 @@
       ]
     },
     {
+      "sampleId": "M21-016",
+      "opportunityId": "privjobdisc_0621fbb869260a97fb",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_ea942f1f7172c47e85",
+        "sourceRecordId": "privjobsource_50426496e6416d64cb",
+        "providerJobId": "4687050005",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Scale AI",
       "role": "Engagement Manager",
       "location": "San Francisco, CA; New York, NY",
+      "workArrangement": "Unknown",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
       "existingJ003Recommendation": "REVIEW",
@@ -2010,7 +2763,22 @@
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "ELIGIBLE",
       "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceReason": "CareerOS cannot determine whether this opportunity fits your preferences because its work arrangement is unclear.",
+      "preferenceUnknownReasonCategory": "WORK_ARRANGEMENT_UNKNOWN",
+      "requirementSummary": {
+        "mandatoryCount": 10,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 2,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 1,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 2
+      },
       "topFitReasons": [
         "10 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state TRANSFERABLE_BUT_NOT_DIRECT is reused as a categorical input; no new career fact is inferred.",
@@ -2126,9 +2894,18 @@
       ]
     },
     {
+      "sampleId": "M21-017",
+      "opportunityId": "privjobimport_d21697bd7d5b08b518",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_e46d19d870404e2d78",
+        "sourceRecordId": "privjobsource_cf0db7d435cbcf2c26",
+        "providerJobId": "5385653008",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Anthropic",
       "role": "Commercial Operations Program Manager",
       "location": "San Francisco, CA | New York City, NY",
+      "workArrangement": "On-site",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
       "existingJ003Recommendation": "WAIT",
@@ -2138,8 +2915,23 @@
       "experimentalConfidenceScore": 65.23,
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "REVIEW_REQUIRED",
-      "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "preferenceReason": "This location is outside your selected working regions.",
+      "preferenceUnknownReasonCategory": null,
+      "requirementSummary": {
+        "mandatoryCount": 11,
+        "preferredCount": 9,
+        "supportedMandatoryCount": 1,
+        "unsupportedMandatoryCount": 0,
+        "supportedPreferredCount": 1,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 3,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 0
+      },
       "topFitReasons": [
         "11 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state TRANSFERABLE_BUT_NOT_DIRECT is reused as a categorical input; no new career fact is inferred.",
@@ -2195,8 +2987,8 @@
         },
         {
           "name": "geographyWorkArrangementFit",
-          "value": null,
-          "status": "UNKNOWN"
+          "value": 0,
+          "status": "CALCULATED"
         },
         {
           "name": "compensationFit",
@@ -2256,9 +3048,18 @@
       ]
     },
     {
+      "sampleId": "M21-018",
+      "opportunityId": "privjobimport_7d3474de0697f5ad4b",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_1e86040c87822f9f89",
+        "sourceRecordId": "privjobsource_400d992e7e300a79b3",
+        "providerJobId": "5207565008",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Anthropic",
       "role": "Community & Executive Escalations Program Manager",
       "location": "San Francisco, CA | New York City, NY",
+      "workArrangement": "On-site",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
       "existingJ003Recommendation": "WAIT",
@@ -2268,8 +3069,23 @@
       "experimentalConfidenceScore": 64.32,
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "REVIEW_REQUIRED",
-      "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "preferenceReason": "This location is outside your selected working regions.",
+      "preferenceUnknownReasonCategory": null,
+      "requirementSummary": {
+        "mandatoryCount": 4,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 0,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 2,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 0
+      },
       "topFitReasons": [
         "4 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state TRANSFERABLE_BUT_NOT_DIRECT is reused as a categorical input; no new career fact is inferred.",
@@ -2325,8 +3141,8 @@
         },
         {
           "name": "geographyWorkArrangementFit",
-          "value": null,
-          "status": "UNKNOWN"
+          "value": 0,
+          "status": "CALCULATED"
         },
         {
           "name": "compensationFit",
@@ -2386,9 +3202,18 @@
       ]
     },
     {
+      "sampleId": "M21-019",
+      "opportunityId": "privjobimport_cd6c863fc0fd7cfed9",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_7eb7939d5d1a0065aa",
+        "sourceRecordId": "privjobsource_c4d56f10730fbe94a5",
+        "providerJobId": "5251699008",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Anthropic",
       "role": "Customer Program Manager, Executive Briefing Center",
       "location": "San Francisco, CA",
+      "workArrangement": "On-site",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
       "existingJ003Recommendation": "WAIT",
@@ -2398,8 +3223,23 @@
       "experimentalConfidenceScore": 73.29,
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "REVIEW_REQUIRED",
-      "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "preferenceReason": "This location is outside your selected working regions.",
+      "preferenceUnknownReasonCategory": null,
+      "requirementSummary": {
+        "mandatoryCount": 19,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 9,
+        "unsupportedMandatoryCount": 3,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 13,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 3
+      },
       "topFitReasons": [
         "19 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state TRANSFERABLE_BUT_NOT_DIRECT is reused as a categorical input; no new career fact is inferred.",
@@ -2456,8 +3296,8 @@
         },
         {
           "name": "geographyWorkArrangementFit",
-          "value": null,
-          "status": "UNKNOWN"
+          "value": 0,
+          "status": "CALCULATED"
         },
         {
           "name": "compensationFit",
@@ -2517,9 +3357,18 @@
       ]
     },
     {
+      "sampleId": "M21-020",
+      "opportunityId": "privjobdisc_6210550f2813f86c6b",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_39a28293a0472ccb8c",
+        "sourceRecordId": "privjobsource_53867a30d3c350ac9a",
+        "providerJobId": "7798672",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Datadog",
       "role": "Director, Product Management - AI Observability",
       "location": "New York, New York, USA",
+      "workArrangement": "Unknown",
       "locationClass": "EAST_COAST_OR_REMOTE_SCENARIO",
       "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
       "existingJ003Recommendation": "REVIEW",
@@ -2530,7 +3379,22 @@
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "ELIGIBLE",
       "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceReason": "CareerOS cannot determine whether this opportunity fits your preferences because its work arrangement is unclear.",
+      "preferenceUnknownReasonCategory": "WORK_ARRANGEMENT_UNKNOWN",
+      "requirementSummary": {
+        "mandatoryCount": 2,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 0,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 10,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 0
+      },
       "topFitReasons": [
         "2 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state TRANSFERABLE_BUT_NOT_DIRECT is reused as a categorical input; no new career fact is inferred.",
@@ -2645,9 +3509,18 @@
       ]
     },
     {
+      "sampleId": "M21-021",
+      "opportunityId": "privjobimport_e5d431fa6f3836d87b",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_9229fe27381522e02a",
+        "sourceRecordId": "privjobsource_49c9fb59801ad5f757",
+        "providerJobId": "4669229005",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Scale AI",
       "role": "Director of Product Management, Forward Deployed & Strategy",
       "location": "New York, NY",
+      "workArrangement": "Unknown",
       "locationClass": "EAST_COAST_OR_REMOTE_SCENARIO",
       "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
       "existingJ003Recommendation": "WAIT",
@@ -2658,7 +3531,22 @@
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "REVIEW_REQUIRED",
       "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceReason": "CareerOS cannot determine whether this opportunity fits your preferences because its work arrangement is unclear.",
+      "preferenceUnknownReasonCategory": "WORK_ARRANGEMENT_UNKNOWN",
+      "requirementSummary": {
+        "mandatoryCount": 0,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 0,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 5,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 0
+      },
       "topFitReasons": [
         "No explicitly classified requirements were available.",
         "Qualification state TRANSFERABLE_BUT_NOT_DIRECT is reused as a categorical input; no new career fact is inferred.",
@@ -2775,9 +3663,18 @@
       ]
     },
     {
+      "sampleId": "M21-022",
+      "opportunityId": "privjobdisc_8e805bc77406015bad",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_28b975caf760ed83c3",
+        "sourceRecordId": "privjobsource_bdbcd5b93ba9285c05",
+        "providerJobId": "5366149008",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Anthropic",
       "role": "Business Systems Analyst",
       "location": "San Francisco, CA",
+      "workArrangement": "On-site",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
       "existingJ003Recommendation": "REVIEW",
@@ -2787,8 +3684,23 @@
       "experimentalConfidenceScore": 65.73,
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "ELIGIBLE",
-      "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "preferenceReason": "This location is outside your selected working regions.",
+      "preferenceUnknownReasonCategory": null,
+      "requirementSummary": {
+        "mandatoryCount": 22,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 1,
+        "unsupportedMandatoryCount": 2,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 5,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 2
+      },
       "topFitReasons": [
         "22 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state TRANSFERABLE_BUT_NOT_DIRECT is reused as a categorical input; no new career fact is inferred.",
@@ -2843,8 +3755,8 @@
         },
         {
           "name": "geographyWorkArrangementFit",
-          "value": null,
-          "status": "UNKNOWN"
+          "value": 0,
+          "status": "CALCULATED"
         },
         {
           "name": "compensationFit",
@@ -2904,9 +3816,18 @@
       ]
     },
     {
+      "sampleId": "M21-023",
+      "opportunityId": "privjobdisc_3443c0340ae2d6cd0a",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_34a190a40b65373b6f",
+        "sourceRecordId": "privjobsource_d096f13486c3af81b9",
+        "providerJobId": "5369181008",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Anthropic",
       "role": "Cloud Partner Enablement Lead",
       "location": "San Francisco, CA | New York City, NY",
+      "workArrangement": "On-site",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
       "existingJ003Recommendation": "REVIEW",
@@ -2916,8 +3837,23 @@
       "experimentalConfidenceScore": 64.76,
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "ELIGIBLE",
-      "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "preferenceReason": "This location is outside your selected working regions.",
+      "preferenceUnknownReasonCategory": null,
+      "requirementSummary": {
+        "mandatoryCount": 4,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 0,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 1,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 0
+      },
       "topFitReasons": [
         "4 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state TRANSFERABLE_BUT_NOT_DIRECT is reused as a categorical input; no new career fact is inferred.",
@@ -2971,8 +3907,8 @@
         },
         {
           "name": "geographyWorkArrangementFit",
-          "value": null,
-          "status": "UNKNOWN"
+          "value": 0,
+          "status": "CALCULATED"
         },
         {
           "name": "compensationFit",
@@ -3032,9 +3968,18 @@
       ]
     },
     {
+      "sampleId": "M21-024",
+      "opportunityId": "privjobimport_03116650610bcbb8f0",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_618f4288a2f6154bdd",
+        "sourceRecordId": "privjobsource_d6cb267b0f6df553fa",
+        "providerJobId": "5240487008",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Anthropic",
       "role": "Communications Lead, Platform",
       "location": "New York City, NY; San Francisco, CA; Seattle, WA",
+      "workArrangement": "On-site",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
       "existingJ003Recommendation": "WAIT",
@@ -3044,8 +3989,23 @@
       "experimentalConfidenceScore": 63.52,
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "REVIEW_REQUIRED",
-      "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "preferenceReason": "This location is outside your selected working regions.",
+      "preferenceUnknownReasonCategory": null,
+      "requirementSummary": {
+        "mandatoryCount": 13,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 0,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 1,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 0
+      },
       "topFitReasons": [
         "13 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state TRANSFERABLE_BUT_NOT_DIRECT is reused as a categorical input; no new career fact is inferred.",
@@ -3101,8 +4061,8 @@
         },
         {
           "name": "geographyWorkArrangementFit",
-          "value": null,
-          "status": "UNKNOWN"
+          "value": 0,
+          "status": "CALCULATED"
         },
         {
           "name": "compensationFit",
@@ -3162,9 +4122,18 @@
       ]
     },
     {
+      "sampleId": "M21-025",
+      "opportunityId": "privjobimport_a364cbb715e41ff2bb",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_f1e33dbdb20b2b7e86",
+        "sourceRecordId": "privjobsource_b1ae64c4a429eba057",
+        "providerJobId": "6015630004",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Figma",
       "role": "Governance Risk and Compliance",
       "location": "San Francisco, CA • New York, NY • United States",
+      "workArrangement": "Unknown",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
       "existingJ003Recommendation": "WAIT",
@@ -3175,7 +4144,22 @@
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "REVIEW_REQUIRED",
       "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceReason": "CareerOS cannot determine whether this opportunity fits your preferences because its work arrangement is unclear.",
+      "preferenceUnknownReasonCategory": "WORK_ARRANGEMENT_UNKNOWN",
+      "requirementSummary": {
+        "mandatoryCount": 15,
+        "preferredCount": 1,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 1,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 1
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 5,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 2
+      },
       "topFitReasons": [
         "15 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state TRANSFERABLE_BUT_NOT_DIRECT is reused as a categorical input; no new career fact is inferred.",
@@ -3293,9 +4277,18 @@
       ]
     },
     {
+      "sampleId": "M21-026",
+      "opportunityId": "privjobimport_42d861aa5e70b15a96",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_a1857712bbd1c6144a",
+        "sourceRecordId": "privjobsource_deb9f1696a28215dba",
+        "providerJobId": "8654173002",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Airtable",
       "role": "Delivery Consultant",
       "location": "New York, NY; Remote - US",
+      "workArrangement": "Remote or remote-friendly",
       "locationClass": "EAST_COAST_OR_REMOTE_SCENARIO",
       "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
       "existingJ003Recommendation": "WAIT",
@@ -3305,8 +4298,23 @@
       "experimentalConfidenceScore": 62.87,
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "REVIEW_REQUIRED",
-      "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "preferenceReason": "This location is outside your selected working regions.",
+      "preferenceUnknownReasonCategory": null,
+      "requirementSummary": {
+        "mandatoryCount": 0,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 0,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 1,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 0
+      },
       "topFitReasons": [
         "No explicitly classified requirements were available.",
         "Qualification state TRANSFERABLE_BUT_NOT_DIRECT is reused as a categorical input; no new career fact is inferred.",
@@ -3362,8 +4370,8 @@
         },
         {
           "name": "geographyWorkArrangementFit",
-          "value": null,
-          "status": "UNKNOWN"
+          "value": 0,
+          "status": "CALCULATED"
         },
         {
           "name": "compensationFit",
@@ -3423,9 +4431,18 @@
       ]
     },
     {
+      "sampleId": "M21-027",
+      "opportunityId": "privjobimport_705697c2e18dae21de",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_d0baee29863d20f20e",
+        "sourceRecordId": "privjobsource_8501dd4735392eaf32",
+        "providerJobId": "8582568002",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Airtable",
       "role": "Senior Delivery Consultant",
       "location": "New York, NY; Remote - US",
+      "workArrangement": "Remote or remote-friendly",
       "locationClass": "EAST_COAST_OR_REMOTE_SCENARIO",
       "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
       "existingJ003Recommendation": "WAIT",
@@ -3435,8 +4452,23 @@
       "experimentalConfidenceScore": 62.87,
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "REVIEW_REQUIRED",
-      "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "preferenceReason": "This location is outside your selected working regions.",
+      "preferenceUnknownReasonCategory": null,
+      "requirementSummary": {
+        "mandatoryCount": 0,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 0,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 1,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 0
+      },
       "topFitReasons": [
         "No explicitly classified requirements were available.",
         "Qualification state TRANSFERABLE_BUT_NOT_DIRECT is reused as a categorical input; no new career fact is inferred.",
@@ -3492,8 +4524,8 @@
         },
         {
           "name": "geographyWorkArrangementFit",
-          "value": null,
-          "status": "UNKNOWN"
+          "value": 0,
+          "status": "CALCULATED"
         },
         {
           "name": "compensationFit",
@@ -3553,9 +4585,18 @@
       ]
     },
     {
+      "sampleId": "M21-028",
+      "opportunityId": "privjobimport_2d43b4e5f65c3d4939",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_d29b2a366efe8d3240",
+        "sourceRecordId": "privjobsource_00c41c2e43a2b1190b",
+        "providerJobId": "8597950002",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Airtable",
       "role": "Senior Delivery Consultant- West Coast",
       "location": "San Francisco, CA; Austin, TX; Remote - US",
+      "workArrangement": "Remote or remote-friendly",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
       "existingJ003Recommendation": "WAIT",
@@ -3565,8 +4606,23 @@
       "experimentalConfidenceScore": 62.87,
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "REVIEW_REQUIRED",
-      "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "preferenceReason": "This location is outside your selected working regions.",
+      "preferenceUnknownReasonCategory": null,
+      "requirementSummary": {
+        "mandatoryCount": 0,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 0,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 1,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 0
+      },
       "topFitReasons": [
         "No explicitly classified requirements were available.",
         "Qualification state TRANSFERABLE_BUT_NOT_DIRECT is reused as a categorical input; no new career fact is inferred.",
@@ -3622,8 +4678,8 @@
         },
         {
           "name": "geographyWorkArrangementFit",
-          "value": null,
-          "status": "UNKNOWN"
+          "value": 0,
+          "status": "CALCULATED"
         },
         {
           "name": "compensationFit",
@@ -3683,9 +4739,18 @@
       ]
     },
     {
+      "sampleId": "M21-029",
+      "opportunityId": "privjobimport_786928658610c8384c",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_d82c0124dc7a1ac039",
+        "sourceRecordId": "privjobsource_a796f3a1ff6f4ff9f9",
+        "providerJobId": "8602201002",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Airtable",
       "role": "Director, AI Transformation & Customer Success",
       "location": "Remote - US",
+      "workArrangement": "Remote or remote-friendly",
       "locationClass": "EAST_COAST_OR_REMOTE_SCENARIO",
       "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
       "existingJ003Recommendation": "WAIT",
@@ -3695,8 +4760,23 @@
       "experimentalConfidenceScore": 65.37,
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "REVIEW_REQUIRED",
-      "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "preferenceReason": "This location is outside your selected working regions.",
+      "preferenceUnknownReasonCategory": null,
+      "requirementSummary": {
+        "mandatoryCount": 0,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 0,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 6,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 0
+      },
       "topFitReasons": [
         "No explicitly classified requirements were available.",
         "Qualification state TRANSFERABLE_BUT_NOT_DIRECT is reused as a categorical input; no new career fact is inferred.",
@@ -3752,8 +4832,8 @@
         },
         {
           "name": "geographyWorkArrangementFit",
-          "value": null,
-          "status": "UNKNOWN"
+          "value": 0,
+          "status": "CALCULATED"
         },
         {
           "name": "compensationFit",
@@ -3813,9 +4893,18 @@
       ]
     },
     {
+      "sampleId": "M21-030",
+      "opportunityId": "privjobimport_6023349a26543102d5",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_eafa8eeca32e3ad86e",
+        "sourceRecordId": "privjobsource_d1de22f81fb01735ea",
+        "providerJobId": "5383242008",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Anthropic",
       "role": "AI Fluency Education Lead",
       "location": "San Francisco, CA | New York City, NY",
+      "workArrangement": "On-site",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
       "existingJ003Recommendation": "WAIT",
@@ -3825,8 +4914,23 @@
       "experimentalConfidenceScore": 63.43,
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "REVIEW_REQUIRED",
-      "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "preferenceReason": "This location is outside your selected working regions.",
+      "preferenceUnknownReasonCategory": null,
+      "requirementSummary": {
+        "mandatoryCount": 4,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 0,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 1,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 0
+      },
       "topFitReasons": [
         "4 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state TRANSFERABLE_BUT_NOT_DIRECT is reused as a categorical input; no new career fact is inferred.",
@@ -3882,8 +4986,8 @@
         },
         {
           "name": "geographyWorkArrangementFit",
-          "value": null,
-          "status": "UNKNOWN"
+          "value": 0,
+          "status": "CALCULATED"
         },
         {
           "name": "compensationFit",
@@ -3943,9 +5047,18 @@
       ]
     },
     {
+      "sampleId": "M21-031",
+      "opportunityId": "privjobimport_c4aed2d63dd25af70e",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_5027ab44300b5b2bb9",
+        "sourceRecordId": "privjobsource_8f4f5d1ff69f159113",
+        "providerJobId": "5382750008",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Anthropic",
       "role": "AI Infrastructure Operations, Demand Planning",
       "location": "San Francisco, CA | New York City, NY",
+      "workArrangement": "On-site",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
       "existingJ003Recommendation": "WAIT",
@@ -3955,8 +5068,23 @@
       "experimentalConfidenceScore": 65.72,
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "REVIEW_REQUIRED",
-      "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "preferenceReason": "This location is outside your selected working regions.",
+      "preferenceUnknownReasonCategory": null,
+      "requirementSummary": {
+        "mandatoryCount": 20,
+        "preferredCount": 1,
+        "supportedMandatoryCount": 1,
+        "unsupportedMandatoryCount": 3,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 1,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 3
+      },
       "topFitReasons": [
         "20 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state TRANSFERABLE_BUT_NOT_DIRECT is reused as a categorical input; no new career fact is inferred.",
@@ -4013,8 +5141,8 @@
         },
         {
           "name": "geographyWorkArrangementFit",
-          "value": null,
-          "status": "UNKNOWN"
+          "value": 0,
+          "status": "CALCULATED"
         },
         {
           "name": "compensationFit",
@@ -4074,9 +5202,18 @@
       ]
     },
     {
+      "sampleId": "M21-032",
+      "opportunityId": "privjobimport_a3eea397c06d04944c",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_afc46464fff6dae51c",
+        "sourceRecordId": "privjobsource_e68fb4f6660b172f2e",
+        "providerJobId": "5215052008",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Anthropic",
       "role": "Amazon GTM Partnership, Startups",
       "location": "San Francisco, CA | New York City, NY | Seattle, WA",
+      "workArrangement": "On-site",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
       "existingJ003Recommendation": "WAIT",
@@ -4086,8 +5223,23 @@
       "experimentalConfidenceScore": 66,
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "REVIEW_REQUIRED",
-      "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "preferenceReason": "This location is outside your selected working regions.",
+      "preferenceUnknownReasonCategory": null,
+      "requirementSummary": {
+        "mandatoryCount": 16,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 1,
+        "unsupportedMandatoryCount": 2,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 3,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 2
+      },
       "topFitReasons": [
         "16 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state TRANSFERABLE_BUT_NOT_DIRECT is reused as a categorical input; no new career fact is inferred.",
@@ -4144,8 +5296,8 @@
         },
         {
           "name": "geographyWorkArrangementFit",
-          "value": null,
-          "status": "UNKNOWN"
+          "value": 0,
+          "status": "CALCULATED"
         },
         {
           "name": "compensationFit",
@@ -4205,9 +5357,18 @@
       ]
     },
     {
+      "sampleId": "M21-033",
+      "opportunityId": "privjobimport_05dfcefd892f12be90",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_10e7871c1ed9319699",
+        "sourceRecordId": "privjobsource_0c4f2f1a613a4a7a1a",
+        "providerJobId": "5300430008",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Anthropic",
       "role": "Applied AI Architect, Partnerships",
       "location": "San Francisco, CA | New York City, NY",
+      "workArrangement": "On-site",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
       "existingJ003Recommendation": "WAIT",
@@ -4217,8 +5378,23 @@
       "experimentalConfidenceScore": 64.91,
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "REVIEW_REQUIRED",
-      "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "preferenceReason": "This location is outside your selected working regions.",
+      "preferenceUnknownReasonCategory": null,
+      "requirementSummary": {
+        "mandatoryCount": 10,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 1,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 1,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 1
+      },
       "topFitReasons": [
         "10 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state TRANSFERABLE_BUT_NOT_DIRECT is reused as a categorical input; no new career fact is inferred.",
@@ -4275,8 +5451,8 @@
         },
         {
           "name": "geographyWorkArrangementFit",
-          "value": null,
-          "status": "UNKNOWN"
+          "value": 0,
+          "status": "CALCULATED"
         },
         {
           "name": "compensationFit",
@@ -4336,9 +5512,18 @@
       ]
     },
     {
+      "sampleId": "M21-034",
+      "opportunityId": "privjobimport_68bfd9c3f642e520ac",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_dc8650805ad3dc7bf2",
+        "sourceRecordId": "privjobsource_8838671babc79bee4b",
+        "providerJobId": "4625271005",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Scale AI",
       "role": "Engineering Manager, Agent Oversight",
       "location": "San Francisco, CA; New York, NY",
+      "workArrangement": "Unknown",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "HARD_MISMATCH",
       "existingJ003Recommendation": "WAIT",
@@ -4349,7 +5534,22 @@
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "INELIGIBLE",
       "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceReason": "Geography preference values are unresolved; qualification authority independently blocks this opportunity as a hard mismatch.",
+      "preferenceUnknownReasonCategory": "QUALIFICATION_BLOCKED",
+      "requirementSummary": {
+        "mandatoryCount": 16,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 1,
+        "unsupportedMandatoryCount": 2,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 3,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 2
+      },
       "topFitReasons": [
         "16 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state HARD_MISMATCH is reused as a categorical input; no new career fact is inferred.",
@@ -4468,9 +5668,18 @@
       ]
     },
     {
+      "sampleId": "M21-035",
+      "opportunityId": "privjobimport_b8b311333e335854eb",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_8fd7eda692957716ff",
+        "sourceRecordId": "privjobsource_1d88b0de66f86baad3",
+        "providerJobId": "4651614005",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Scale AI",
       "role": "Lead Counsel, Product and IP",
       "location": "San Francisco, CA",
+      "workArrangement": "Unknown",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "HARD_MISMATCH",
       "existingJ003Recommendation": "WAIT",
@@ -4481,7 +5690,22 @@
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "INELIGIBLE",
       "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceReason": "Geography preference values are unresolved; qualification authority independently blocks this opportunity as a hard mismatch.",
+      "preferenceUnknownReasonCategory": "QUALIFICATION_BLOCKED",
+      "requirementSummary": {
+        "mandatoryCount": 6,
+        "preferredCount": 7,
+        "supportedMandatoryCount": 1,
+        "unsupportedMandatoryCount": 1,
+        "supportedPreferredCount": 2,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 5,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 1
+      },
       "topFitReasons": [
         "6 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state HARD_MISMATCH is reused as a categorical input; no new career fact is inferred.",
@@ -4600,9 +5824,18 @@
       ]
     },
     {
+      "sampleId": "M21-036",
+      "opportunityId": "privjobimport_68dcc8a16578fbd3cb",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_a32146421caf607377",
+        "sourceRecordId": "privjobsource_9c7bee1441f02ad53e",
+        "providerJobId": "5023394008",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Anthropic",
       "role": "Anthropic Fellows Program",
       "location": "London, UK; Ontario, CAN; Remote-Friendly, United States; San Francisco, CA",
+      "workArrangement": "Remote or remote-friendly",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "HARD_MISMATCH",
       "existingJ003Recommendation": "WAIT",
@@ -4613,7 +5846,22 @@
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "INELIGIBLE",
       "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceReason": "Geography preference values are unresolved; qualification authority independently blocks this opportunity as a hard mismatch.",
+      "preferenceUnknownReasonCategory": "QUALIFICATION_BLOCKED",
+      "requirementSummary": {
+        "mandatoryCount": 5,
+        "preferredCount": 6,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 0,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 4
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 6,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 4
+      },
       "topFitReasons": [
         "5 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state HARD_MISMATCH is reused as a categorical input; no new career fact is inferred.",
@@ -4732,9 +5980,18 @@
       ]
     },
     {
+      "sampleId": "M21-037",
+      "opportunityId": "privjobimport_aeb25d8ce19a4121dc",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_2eff06d84a5d37c795",
+        "sourceRecordId": "privjobsource_9246f7038a8be7000c",
+        "providerJobId": "5183044008",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Anthropic",
       "role": "Anthropic Fellows Program, AI Safety & Security",
       "location": "London, UK; Ontario, CAN; Remote-Friendly, United States; San Francisco, CA",
+      "workArrangement": "Remote or remote-friendly",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "HARD_MISMATCH",
       "existingJ003Recommendation": "WAIT",
@@ -4745,7 +6002,22 @@
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "INELIGIBLE",
       "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceReason": "Geography preference values are unresolved; qualification authority independently blocks this opportunity as a hard mismatch.",
+      "preferenceUnknownReasonCategory": "QUALIFICATION_BLOCKED",
+      "requirementSummary": {
+        "mandatoryCount": 5,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 0,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 3,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 0
+      },
       "topFitReasons": [
         "5 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state HARD_MISMATCH is reused as a categorical input; no new career fact is inferred.",
@@ -4863,9 +6135,18 @@
       ]
     },
     {
+      "sampleId": "M21-038",
+      "opportunityId": "privjobimport_dfaa0e49695c7b6756",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_5681dcf3d8f6054768",
+        "sourceRecordId": "privjobsource_60e656dcb3e2b6e3f8",
+        "providerJobId": "5183051008",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Anthropic",
       "role": "Anthropic Fellows Program, ML Systems & Reinforcement Learning",
       "location": "London, UK; Ontario, CAN; Remote-Friendly, United States; San Francisco, CA",
+      "workArrangement": "Remote or remote-friendly",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "HARD_MISMATCH",
       "existingJ003Recommendation": "WAIT",
@@ -4876,7 +6157,22 @@
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "INELIGIBLE",
       "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceReason": "Geography preference values are unresolved; qualification authority independently blocks this opportunity as a hard mismatch.",
+      "preferenceUnknownReasonCategory": "QUALIFICATION_BLOCKED",
+      "requirementSummary": {
+        "mandatoryCount": 5,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 0,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 2,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 0
+      },
       "topFitReasons": [
         "5 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state HARD_MISMATCH is reused as a categorical input; no new career fact is inferred.",
@@ -4995,9 +6291,18 @@
       ]
     },
     {
+      "sampleId": "M21-039",
+      "opportunityId": "privjobimport_33f5980f588c1ee23e",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_2aee1586c8102abb62",
+        "sourceRecordId": "privjobsource_30483748f3b1690818",
+        "providerJobId": "5183053008",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Anthropic",
       "role": "Anthropic Fellows Program, The Anthropic Institute (Economics & Policy)",
       "location": "London, UK; Ontario, CAN; Remote-Friendly, United States; San Francisco, CA",
+      "workArrangement": "Remote or remote-friendly",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "HARD_MISMATCH",
       "existingJ003Recommendation": "WAIT",
@@ -5008,7 +6313,22 @@
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "INELIGIBLE",
       "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceReason": "Geography preference values are unresolved; qualification authority independently blocks this opportunity as a hard mismatch.",
+      "preferenceUnknownReasonCategory": "QUALIFICATION_BLOCKED",
+      "requirementSummary": {
+        "mandatoryCount": 5,
+        "preferredCount": 6,
+        "supportedMandatoryCount": 0,
+        "unsupportedMandatoryCount": 0,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 4
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 1,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 4
+      },
       "topFitReasons": [
         "5 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state HARD_MISMATCH is reused as a categorical input; no new career fact is inferred.",
@@ -5127,9 +6447,18 @@
       ]
     },
     {
+      "sampleId": "M21-040",
+      "opportunityId": "privjobdisc_07731007e02ba6a1f5",
+      "sourceIdentity": {
+        "canonicalOpportunityId": "privcanonicalopp_0e5e7d27bfa21b94d8",
+        "sourceRecordId": "privjobsource_f40341cb111d85709f",
+        "providerJobId": "5057647008",
+        "provenance": "PUBLIC_READ_ONLY_PROVIDER"
+      },
       "company": "Anthropic",
       "role": "Applied AI Engineer, Enterprise Tech",
       "location": "San Francisco, CA | New York City, NY | Seattle, WA",
+      "workArrangement": "Unknown",
       "locationClass": "OUTSIDE_COMMON_EAST_COAST_SCENARIO",
       "existingJ010State": "HARD_MISMATCH",
       "existingJ003Recommendation": "REVIEW",
@@ -5140,7 +6469,22 @@
       "experimentalConfidenceStatus": "PARTIAL",
       "eligibility": "INELIGIBLE",
       "preferenceCompatibility": "UNKNOWN",
-      "preferenceReason": "Ross's explicit preference authority is unresolved in the current runtime.",
+      "preferenceReason": "Geography preference values are unresolved; qualification authority independently blocks this opportunity as a hard mismatch.",
+      "preferenceUnknownReasonCategory": "QUALIFICATION_BLOCKED",
+      "requirementSummary": {
+        "mandatoryCount": 17,
+        "preferredCount": 0,
+        "supportedMandatoryCount": 1,
+        "unsupportedMandatoryCount": 0,
+        "supportedPreferredCount": 0,
+        "unsupportedPreferredCount": 0
+      },
+      "evidenceSummary": {
+        "exactEvidenceCount": 0,
+        "transferableEvidenceCount": 3,
+        "weakEvidenceCount": 0,
+        "unsupportedCount": 0
+      },
       "topFitReasons": [
         "17 mandatory requirements were evaluated from requirement-level evidence mappings.",
         "Qualification state HARD_MISMATCH is reused as a categorical input; no new career fact is inferred.",

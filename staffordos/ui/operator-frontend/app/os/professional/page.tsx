@@ -52,9 +52,14 @@ export default function ProfessionalCareerHomePage() {
                     {mode.modeId === "JOB_SEARCH" ? "Open Job Command" : "Open Career Home"}
                   </Link>
                   {mode.modeId === "JOB_SEARCH" ? (
-                    <Link href="/os/professional/jobs#job-search-preferences" className="staffordHomeActionLink">
-                      Job Search Preferences
-                    </Link>
+                    <>
+                      <Link href="/os/professional/jobs#job-search-preferences" className="staffordHomeActionLink">
+                        Job Search Preferences
+                      </Link>
+                      <Link href="/os/professional/jobs/calibration" className="staffordHomeActionLink">
+                        Match Engine Calibration
+                      </Link>
+                    </>
                   ) : null}
                 </div>
               ) : null}
