@@ -35,6 +35,47 @@
       "MEDIUM": 9
     }
   },
+  "diagnosticSelfConfidenceExclusion": {
+    "excludedCount": 28,
+    "weightsChanged": false,
+    "groundTruthChanged": false,
+    "metrics": {
+      "weightSet": {
+        "requiredSkillsFit": 35,
+        "relevantExperienceFit": 20,
+        "roleFunctionFit": 15,
+        "responsibilitySimilarity": 10,
+        "seniorityFit": 8,
+        "domainFit": 7,
+        "geographyWorkArrangementFit": 5,
+        "compensationFit": 0
+      },
+      "top5Precision": 0.8,
+      "top10Precision": 0.7,
+      "top5Agreement": 0.4,
+      "top10Agreement": 0.8,
+      "strongRecall": 1,
+      "strongGoodRecall": 0.78,
+      "viableRecall": 0.83,
+      "falsePositiveRate": 0.17,
+      "falseNegativeRate": 0.29,
+      "viableFalsePositiveRate": 0,
+      "rankCorrelation": -0.39,
+      "hardMismatchLeakageTop10": 0,
+      "actionableHardMismatchLeakage": 0,
+      "poorMatchLeakageTop10": 0,
+      "underRankedPrimary": 0,
+      "underRankedViable": 0,
+      "highConfidencePrimaryRate": null,
+      "lowConfidencePrimaryRate": 0.71,
+      "threshold": {
+        "cutoff": 30.63,
+        "falsePositiveRate": 0.17,
+        "falseNegativeRate": 0.29,
+        "predictedCount": 6
+      }
+    }
+  },
   "weightResults": {
     "EXPERIMENTAL_WEIGHT_SET_V1": {
       "weightSet": {
