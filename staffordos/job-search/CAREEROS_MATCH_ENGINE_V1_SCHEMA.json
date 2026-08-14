@@ -27,7 +27,8 @@
     "preferences": {"$ref": "#/$defs/preferences"},
     "recommendation": {"$ref": "#/$defs/recommendation"},
     "workflow": {"$ref": "#/$defs/workflow"},
-    "application": {"$ref": "#/$defs/application"}
+    "application": {"$ref": "#/$defs/application"},
+    "authorityDiagnostics": {"$ref": "#/$defs/authorityDiagnostics"}
   },
   "$defs": {
     "opportunityIdentity": {"type": "object", "required": ["canonicalOpportunityId", "sourceRecordId"], "properties": {"canonicalOpportunityId": {"type": ["string", "null"]}, "sourceRecordId": {"type": ["string", "null"]}, "providerJobId": {"type": ["string", "null"]}, "provenance": {"type": "string"}}, "additionalProperties": false},
@@ -40,7 +41,8 @@
     "preferences": {"type": "object", "required": ["compatibility", "reasons"], "properties": {"compatibility": {"enum": ["MATCH", "PARTIAL_MATCH", "OUTSIDE_PREFERENCE", "UNKNOWN"]}, "reasons": {"type": "array", "items": {"type": "string"}}, "authorityState": {"type": "string"}}, "additionalProperties": false},
     "recommendation": {"type": "object", "required": ["state", "reasons"], "properties": {"state": {"enum": ["APPLY_NOW", "REVIEW", "WAIT", "SKIP", "NOT_RECOMMENDED", "UNKNOWN"]}, "reasons": {"type": "array", "items": {"type": "string"}}}, "additionalProperties": false},
     "workflow": {"type": "object", "required": ["rossDecision", "decidedAt"], "properties": {"rossDecision": {"enum": ["APPLY", "REVIEW_LATER", "SKIP", "NOT_INTERESTED", "UNDECIDED", "UNKNOWN"]}, "decidedAt": {"type": ["string", "null"], "format": "date-time"}}, "additionalProperties": false},
-    "application": {"type": "object", "required": ["state", "resumeStatus", "submissionStatus"], "properties": {"state": {"type": "string"}, "resumeStatus": {"type": "string"}, "submissionStatus": {"type": "string"}}, "additionalProperties": false}
+    "application": {"type": "object", "required": ["state", "resumeStatus", "submissionStatus"], "properties": {"state": {"type": "string"}, "resumeStatus": {"type": "string"}, "submissionStatus": {"type": "string"}}, "additionalProperties": false},
+    "authorityDiagnostics": {"type": "object", "required": ["responsibilitySimilarity", "seniorityCompatibility", "domainCompatibility", "evidenceCoverage", "capabilityConclusion", "evidenceGapReason"], "properties": {"responsibilitySimilarity": {"type": "object"}, "seniorityCompatibility": {"type": "object"}, "domainCompatibility": {"type": "object"}, "evidenceCoverage": {"type": "object"}, "capabilityConclusion": {"type": "object"}, "evidenceGapReason": {"type": "array"}}, "additionalProperties": true}
   },
   "additionalProperties": false
 }

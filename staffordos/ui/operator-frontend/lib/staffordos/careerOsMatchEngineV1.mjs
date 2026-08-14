@@ -179,6 +179,7 @@ export function buildOpportunityMatchResult(input) {
     recommendation: { state: recommendation, reasons: [...(input.recommendationReasons || [])] },
     workflow: { rossDecision: workflow.rossDecision || "UNDECIDED", decidedAt: workflow.decidedAt || null },
     application: { state: application.state || "NOT_APPLIED", resumeStatus: application.resumeStatus || "UNKNOWN", submissionStatus: application.submissionStatus || "NOT_SUBMITTED" },
+    authorityDiagnostics: input.authorityDiagnostics || null,
   };
 }
 

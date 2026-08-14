@@ -131,17 +131,6 @@ export function projectJobSearchCompatibility(input: {
 }): JobSearchCompatibilityProjection {
   const preferences = input.preferences || EMPTY_JOB_SEARCH_PREFERENCES;
   const qualificationState = input.qualification?.state || "UNKNOWN";
-  if (qualificationState === "HARD_MISMATCH") {
-    return {
-      state: "UNKNOWN",
-      label: "Preference compatibility unknown",
-      reason: "Geography preference values are unresolved; qualification authority independently blocks this opportunity as a hard mismatch.",
-      preferenceAuthority: preferences.authority,
-      qualificationState,
-      qualificationBlocks: true,
-      inspectable: true,
-    };
-  }
   if (preferences.geography.resolution !== "EXPLICIT") {
     return {
       state: "UNKNOWN",

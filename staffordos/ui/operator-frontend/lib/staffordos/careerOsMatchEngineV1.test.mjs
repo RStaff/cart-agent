@@ -58,6 +58,25 @@ test("outside preference does not rescue qualification and remains explainable",
   assert.equal(result.eligibility.state, "ELIGIBLE");
 });
 
+test("authority diagnostics keep transferable responsibility separate from capability failure", async () => {
+  const { projectMatchAuthorityDiagnostics } = await import("./careerOsMatchAuthorityProjections.mjs");
+  const diagnostics = projectMatchAuthorityDiagnostics({ title: "Director, Technical Program Management", requirements: [{ id: "r1", requirementCategory: "Leadership", requirementLevel: "RESPONSIBILITY", requirementText: "Lead complex cross-functional programs." }], mappings: [{ requirementId: "r1", classification: "TRANSFERABLE", careerEvidenceIds: ["e1"] }] });
+  assert.equal(diagnostics.responsibilitySimilarity.counts.STRONG_TRANSFERABLE_SUPPORT, 1);
+  assert.equal(diagnostics.responsibilitySimilarity.comparisons[0].capabilityConclusion, "TRANSFERABLE_CAPABILITY");
+  assert.equal(diagnostics.seniorityCompatibility.state, "UPWARD_STRETCH_WITH_SUPPORTED_SCOPE");
+  assert.equal(diagnostics.seniorityCompatibility.capabilityConclusion, "NO_PROOF_OF_LEVEL_CAPABILITY_GAP");
+  assert.equal(diagnostics.domainCompatibility.capabilityConclusion, "TRANSFERABLE_CAPABILITY");
+});
+
+test("unknown and missing evidence do not become capability failures", async () => {
+  const { projectMatchAuthorityDiagnostics } = await import("./careerOsMatchAuthorityProjections.mjs");
+  const diagnostics = projectMatchAuthorityDiagnostics({ title: "AI Operations Lead", requirements: [{ id: "r1", requirementCategory: "Responsibility", requirementText: "Build an operating model." }, { id: "r2", requirementCategory: "Responsibility", requirementText: "Lead transformation." }], mappings: [{ requirementId: "r1", classification: "UNKNOWN" }, { requirementId: "r2", classification: "MISSING" }] });
+  assert.equal(diagnostics.responsibilitySimilarity.counts.UNKNOWN, 1);
+  assert.equal(diagnostics.responsibilitySimilarity.counts.NO_SUPPORTED_EVIDENCE, 1);
+  assert.equal(diagnostics.responsibilitySimilarity.comparisons[0].capabilityConclusion, "UNRESOLVED_CAPABILITY");
+  assert.equal(diagnostics.responsibilitySimilarity.comparisons[1].capabilityConclusion, "NO_PROOF_OF_CAPABILITY_GAP");
+});
+
 test("result exposes every V1 contract section", () => {
   const result = buildOpportunityMatchResult(base);
   for (const field of ["opportunityId", "opportunityIdentity", "eligibility", "qualification", "requirementSummary", "evidenceSummary", "fit", "confidence", "preferences", "recommendation", "workflow", "application"]) {

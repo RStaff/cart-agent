@@ -112,16 +112,29 @@ test("relocation exclusion projects a role requiring relocation as OUTSIDE_PREFE
   assert.match(result.reason, /relocation/i);
 });
 
-test("hard qualification mismatch cannot be rescued by geography match", () => {
+test("hard qualification mismatch does not erase independent geography truth", () => {
   const result = preferences.projectJobSearchCompatibility({
     preferences: explicitPreferences,
     location: "Boston, MA",
     workArrangement: "Hybrid",
+    relocationRequired: false,
     qualification: { ...qualification, state: "HARD_MISMATCH" },
   });
-  assert.equal(result.qualificationBlocks, true);
+  assert.equal(result.qualificationBlocks, false);
   assert.equal(result.qualificationState, "HARD_MISMATCH");
-  assert.equal(result.state, "UNKNOWN");
+  assert.equal(result.state, "MATCH");
+});
+
+test("hard qualification mismatch does not erase independent outside-preference truth", () => {
+  const result = preferences.projectJobSearchCompatibility({
+    preferences: explicitPreferences,
+    location: "San Francisco, CA",
+    workArrangement: "On-site",
+    relocationRequired: false,
+    qualification: { ...qualification, state: "HARD_MISMATCH" },
+  });
+  assert.equal(result.state, "OUTSIDE_PREFERENCE");
+  assert.equal(result.qualificationState, "HARD_MISMATCH");
 });
 
 test("workflow actions do not contain a durable preference mutation path", () => {

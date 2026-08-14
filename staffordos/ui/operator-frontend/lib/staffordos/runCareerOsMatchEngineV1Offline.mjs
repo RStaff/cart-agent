@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import os from "node:os";
 import { buildOpportunityMatchResult, MATCH_ENGINE_VERSION, EXPERIMENTAL_WEIGHT_SET, MATCH_ENGINE_WEIGHTS } from "./careerOsMatchEngineV1.mjs";
+import { projectMatchAuthorityDiagnostics } from "./careerOsMatchAuthorityProjections.mjs";
 
 const privateRoot = path.join(os.homedir(), ".staffordos/private/professional/job-search");
 const outputRoot = path.resolve(process.cwd(), "staffordos/job-search");
@@ -100,7 +101,7 @@ function unknownReasonCategory(reason, qualificationState) {
   if (reason.includes("relocation")) return "RELOCATION_REQUIRED_UNKNOWN";
   return "SOURCE_TRUTH_INCOMPLETE";
 }
-function publicRow(record, source, fit, sampleIndex, currentRank, experimentalRank, workflow, application) {
+function publicRow(record, source, fit, sampleIndex, currentRank, experimentalRank, workflow, application, authorityDiagnostics) {
   const unsupported = fit.requirementSummary.unsupportedMandatoryCount + fit.requirementSummary.unsupportedPreferredCount;
   const unknownEvidence = fit.confidence.missingInputs.includes("evidenceMappings") ? "Evidence mappings unavailable" : "Unresolved evidence remains visible where present";
   const gaps = [
@@ -146,6 +147,7 @@ function publicRow(record, source, fit, sampleIndex, currentRank, experimentalRa
     lifecycleLinkage: application ? (application.exactResumeArtifactKnown ? "APPLICATION_AND_ARTIFACT_SURFACED" : "APPLICATION_RECORDED_ARTIFACT_LINKAGE_UNKNOWN") : "NO_APPLICATION_RECORD",
     components: fit.fit.components.map((item) => ({ name: item.name, value: item.value, status: item.status })),
     confidenceComponents: fit.confidence.components.map((item) => ({ name: item.name, score: item.score, status: item.status, missingInputs: item.missingInputs })),
+    authorityDiagnostics,
   };
 }
 export function buildEvaluation() {
@@ -165,6 +167,7 @@ export function buildEvaluation() {
       const source = sourceById.get(record.sourceRecordId) || {};
       const fitArtifact = fitByQueue.get(record.queueItemId);
       const queueItem = queueById.get(record.queueItemId) || {};
+      const authorityDiagnostics = projectMatchAuthorityDiagnostics({ title: source.title || record.role, requirements: fitArtifact?.requirements || [], mappings: fitArtifact?.mappings || [] });
       const result = buildOpportunityMatchResult({
         opportunity: { opportunityId: record.opportunityId, canonicalOpportunityId: record.canonicalOpportunityId, sourceRecordId: record.sourceRecordId, providerJobId: source.providerJobId, providerName: source.providerName, sourceUrl: source.sourceUrl, company: source.company || record.company, title: source.title || record.role, role: record.role, location: source.location, remoteState: source.remoteState, employmentType: source.employmentType, compensationText: source.compensationText, descriptionText: source.descriptionText, observedAt: source.observedAt, freshness: source.freshness, sourceAuthority: source.sourceAuthority },
         requirements: fitArtifact?.requirements || [],
@@ -182,13 +185,14 @@ export function buildEvaluation() {
         queueItem,
         workflow: { rossDecision: workflowFor(workflows, record)?.actionType || "UNDECIDED", decidedAt: workflowFor(workflows, record)?.createdAt || null },
         application: (() => { const app = applications.get(`${record.company}|${record.role}`); return app ? { state: app.currentStage, resumeStatus: app.exactResumeArtifactKnown ? "KNOWN" : "UNKNOWN", submissionStatus: app.submissionStatus || "UNKNOWN" } : {}; })(),
+        authorityDiagnostics,
       });
-      return { record, source, result, workflow: workflowFor(workflows, record) };
+      return { record, source, result, workflow: workflowFor(workflows, record), authorityDiagnostics };
     });
     const eligibilityOrder = { ELIGIBLE: 0, REVIEW_REQUIRED: 1, UNKNOWN: 2, INELIGIBLE: 3 };
     const ranked = [...unsorted].sort((left, right) => eligibilityOrder[left.result.eligibility.state] - eligibilityOrder[right.result.eligibility.state] || (right.result.fit.score ?? -1) - (left.result.fit.score ?? -1) || left.record.company.localeCompare(right.record.company) || left.record.role.localeCompare(right.record.role));
     const experimentalRank = new Map(ranked.map((item, index) => [item.record.recommendationId, index + 1]));
-    return unsorted.map((item, sampleIndex) => publicRow(item.record, item.source, item.result, sampleIndex, currentRank.get(item.record.recommendationId) || null, experimentalRank.get(item.record.recommendationId), item.workflow, applications.get(`${item.record.company}|${item.record.role}`)));
+    return unsorted.map((item, sampleIndex) => publicRow(item.record, item.source, item.result, sampleIndex, currentRank.get(item.record.recommendationId) || null, experimentalRank.get(item.record.recommendationId), item.workflow, applications.get(`${item.record.company}|${item.record.role}`), item.authorityDiagnostics));
   };
   const first = evaluate();
   const second = evaluate();
@@ -221,6 +225,7 @@ function buildControlCases({ recommendations, sourceById, queueById, fitByQueue,
     relocationRequired: typeof source.relocationRequired === "boolean" ? source.relocationRequired : null,
     qualification: controlRecord.qualification,
   });
+  const authorityDiagnostics = projectMatchAuthorityDiagnostics({ title: source.title || controlRecord.role, requirements: fitArtifact?.requirements || [], mappings: fitArtifact?.mappings || [] });
   const result = buildOpportunityMatchResult({
     opportunity: { opportunityId: controlRecord.opportunityId, canonicalOpportunityId: controlRecord.canonicalOpportunityId, sourceRecordId: controlRecord.sourceRecordId, providerJobId: source.providerJobId, providerName: source.providerName, sourceUrl: source.sourceUrl, company: source.company || controlRecord.company, title: source.title || controlRecord.role, role: controlRecord.role, location: source.location, remoteState: source.remoteState, employmentType: source.employmentType, compensationText: source.compensationText, descriptionText: source.descriptionText, observedAt: source.observedAt, freshness: source.freshness, sourceAuthority: source.sourceAuthority },
     requirements: fitArtifact?.requirements || [],
@@ -232,6 +237,7 @@ function buildControlCases({ recommendations, sourceById, queueById, fitByQueue,
     queueItem,
     workflow: { rossDecision: workflowFor(workflows, controlRecord)?.actionType || "UNDECIDED", decidedAt: workflowFor(workflows, controlRecord)?.createdAt || null },
     application: (() => { const app = applications.get(`${controlRecord.company}|${controlRecord.role}`); return app ? { state: app.currentStage, resumeStatus: app.exactResumeArtifactKnown ? "KNOWN" : "UNKNOWN", submissionStatus: app.submissionStatus || "UNKNOWN" } : {}; })(),
+    authorityDiagnostics,
   });
   const mappingByRequirement = new Map((fitArtifact?.mappings || []).map((mapping) => [mapping.requirementId, mapping]));
   return [{
@@ -245,6 +251,7 @@ function buildControlCases({ recommendations, sourceById, queueById, fitByQueue,
     experimentalFit: result.fit,
     experimentalConfidence: result.confidence,
     preferenceCompatibility: result.preferences,
+    authorityDiagnostics,
     requirements: (fitArtifact?.requirements || []).map((requirement) => ({
       text: requirement.requirementText || requirement.text || "Unknown requirement",
       level: requirement.requirementLevel || requirement.importanceClassification || "UNKNOWN",
