@@ -6,6 +6,8 @@ import {
   PURSUIT_LABELS,
   SELF_CONFIDENCE_LABELS,
   loadCalibrationReviewAuthority,
+  deriveCalibrationReviewProgress,
+  isCompleteCalibrationReview,
   saveCalibrationReview,
 } from "../../../../../lib/staffordos/careerOsMatchCalibrationAuthority";
 import { readFileSync } from "node:fs";
@@ -76,7 +78,12 @@ export default async function MatchCalibrationPage({ searchParams }: { searchPar
   const index = Math.min(Math.max(Number(params.index || 0), 0), Math.max(0, evaluation.records.length - 1));
   const record = evaluation.records[index];
   const review = authority.records[record.sampleId];
-  const reviewed = Object.keys(authority.records).length;
+  const progress = deriveCalibrationReviewProgress(evaluation.records.map((item) => item.sampleId), authority);
+  const savedReview = isCompleteCalibrationReview(review) ? review : null;
+  const saveConfirmed = params.saved === "1" && savedReview?.sampleId === record.sampleId;
+  const nextUnreviewedHref = progress.nextUnreviewedIndex === null
+    ? null
+    : `/os/professional/jobs/calibration?index=${progress.nextUnreviewedIndex}`;
   const labels = { ACCEPTABLE: "Acceptable", NOT_ACCEPTABLE: "Not acceptable", UNKNOWN: "Unknown" };
   return (
     <main className="staffordUnifiedHome">
@@ -86,11 +93,11 @@ export default async function MatchCalibrationPage({ searchParams }: { searchPar
           <h1>Offline evaluation review</h1>
           <p>Does not affect production recommendations, ranking, or workflow decisions.</p>
         </div>
-        <div className="staffordWorkspaceStatus"><span>{reviewed} / {evaluation.records.length} reviewed</span><strong>Ross review required</strong></div>
+        <div className="staffordWorkspaceStatus"><span>{progress.completed} / {progress.total} reviewed</span><strong>Ross review required</strong></div>
       </section>
       <section className="staffordHomeSupport" aria-label="Calibration opportunity">
         <div className="staffordHomeSectionHeader">
-          <span className="staffordEyebrow">Opportunity {index + 1} of {evaluation.records.length}</span>
+          <span className="staffordEyebrow">Viewing opportunity {index + 1} of {evaluation.records.length}</span>
           <h2>{record.role}</h2>
           <p>{record.company} · {record.location}</p>
         </div>
@@ -119,10 +126,22 @@ export default async function MatchCalibrationPage({ searchParams }: { searchPar
           <ul>{record.components.map((component) => <li key={component.name}>{component.name}: {component.value ?? "Unknown"} ({component.status})</li>)}</ul>
         </details>
       </section>
-      {params.saved === "1" ? <p role="status">Review saved.</p> : null}
+      <section className="staffordHomeSupport" aria-label="Review progress">
+        <strong>Review progress</strong>
+        <p>{progress.completed} of {progress.total} completed · {progress.remaining} remaining</p>
+        {nextUnreviewedHref ? <a className="staffordHomeActionLink" href={nextUnreviewedHref}>Next unreviewed</a> : null}
+      </section>
+      {saveConfirmed ? (
+        <article className="staffordHomeStatusNote" role="status">
+          <span>SAVED</span>
+          <strong>Review saved for {record.company} — {record.role}</strong>
+        </article>
+      ) : null}
+      {params.saved === "1" && !saveConfirmed ? <p role="alert">NOT SAVED: CareerOS could not confirm the saved review after readback.</p> : null}
       {params.error ? <p role="alert">{params.error}</p> : null}
       <section className="staffordHomeSupport" aria-label="Ross review">
-        <form action={saveCalibrationReviewAction}>
+        <p>Changing opportunity discards unsaved edits and loads the destination review.</p>
+        <form key={record.sampleId} action={saveCalibrationReviewAction} autoComplete="off">
           <input type="hidden" name="sampleId" value={record.sampleId} />
           <input type="hidden" name="index" value={index} />
           <fieldset><legend>Evidence fit</legend><select name="evidenceFit" defaultValue={review?.evidenceFit || ""} required><option value="" disabled>Select one</option>{optionList(FIT_LABELS)}</select></fieldset>
@@ -134,8 +153,8 @@ export default async function MatchCalibrationPage({ searchParams }: { searchPar
           <button type="submit" className="staffordHomeActionLink">Save review</button>
         </form>
         <nav aria-label="Calibration review navigation">
-          {index > 0 ? <Link className="staffordHomeActionLink" href={`/os/professional/jobs/calibration?index=${index - 1}`}>Previous</Link> : null}
-          {index < evaluation.records.length - 1 ? <Link className="staffordHomeActionLink" href={`/os/professional/jobs/calibration?index=${index + 1}`}>Next</Link> : null}
+          {index > 0 ? <a className="staffordHomeActionLink" href={`/os/professional/jobs/calibration?index=${index - 1}`}>Previous</a> : null}
+          {index < evaluation.records.length - 1 ? <a className="staffordHomeActionLink" href={`/os/professional/jobs/calibration?index=${index + 1}`}>Next</a> : null}
         </nav>
       </section>
       <Link href="/os/professional/jobs">Return to Job Search</Link>

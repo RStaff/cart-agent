@@ -83,6 +83,28 @@ export function loadCalibrationReviewAuthority(options: { jobSearchRoot?: string
   return readAuthority(labelsPath(options.jobSearchRoot));
 }
 
+export function isCompleteCalibrationReview(value: unknown): value is CalibrationReviewRecord {
+  if (!value || typeof value !== "object") return false;
+  const record = value as Partial<CalibrationReviewRecord>;
+  return typeof record.sampleId === "string"
+    && FIT_LABELS.includes(record.evidenceFit as typeof FIT_LABELS[number])
+    && INTEREST_LABELS.includes(record.interest as typeof INTEREST_LABELS[number])
+    && GEOGRAPHY_LABELS.includes(record.geography as typeof GEOGRAPHY_LABELS[number])
+    && PURSUIT_LABELS.includes(record.wouldPursue as typeof PURSUIT_LABELS[number])
+    && SELF_CONFIDENCE_LABELS.includes(record.selfConfidence as typeof SELF_CONFIDENCE_LABELS[number]);
+}
+
+export function deriveCalibrationReviewProgress(sampleIds: readonly string[], authority: CalibrationReviewAuthority) {
+  const completedIds = sampleIds.filter((sampleId) => isCompleteCalibrationReview(authority.records[sampleId]));
+  const nextUnreviewedIndex = sampleIds.findIndex((sampleId) => !completedIds.includes(sampleId));
+  return {
+    total: sampleIds.length,
+    completed: completedIds.length,
+    remaining: sampleIds.length - completedIds.length,
+    nextUnreviewedIndex: nextUnreviewedIndex < 0 ? null : nextUnreviewedIndex,
+  };
+}
+
 export function saveCalibrationReview(input: CalibrationReviewInput) {
   const errors: string[] = [];
   const sampleNumber = Number(input.sampleId.replace(/^M21-/, ""));
