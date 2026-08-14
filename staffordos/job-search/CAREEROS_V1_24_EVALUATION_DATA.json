@@ -1,0 +1,2378 @@
+{
+  "schemaVersion": "staffordos.careeros.v1_24.expanded_evaluation.v1",
+  "generatedFrom": "J003_01_20260812120000",
+  "opportunityUniverseCount": 253,
+  "calibrationSetCount": 40,
+  "holdoutSetCount": 40,
+  "holdoutHumanReviewComplete": 0,
+  "modelSelectionFrozen": {
+    "model": "MODEL_V2D_ROBUSTNESS_CONTROL",
+    "source": "V1.23",
+    "weightsUnchanged": true,
+    "formulaUnchanged": true
+  },
+  "calibrationSet": [
+    {
+      "sampleId": "M21-015",
+      "set": "CALIBRATION_SET",
+      "company": "Scale AI",
+      "role": "[Annotations] Operations Program Manager",
+      "opportunityId": "privjobdisc_9cf59cce0a410c4017",
+      "location": "Mexico City, MX",
+      "workArrangement": "Unknown",
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "REVIEW",
+      "v2dFit": 54.44,
+      "v2dConfidence": 64.11,
+      "preferenceCompatibility": "UNKNOWN",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "HARD_NO",
+        "interest": "NONE",
+        "wouldPursue": "NO",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-022",
+      "set": "CALIBRATION_SET",
+      "company": "Anthropic",
+      "role": "Business Systems Analyst",
+      "opportunityId": "privjobdisc_8e805bc77406015bad",
+      "location": "San Francisco, CA",
+      "workArrangement": "On-site",
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "REVIEW",
+      "v2dFit": 31.72,
+      "v2dConfidence": 65.73,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "TRANSFERABLE",
+        "interest": "MEDIUM",
+        "wouldPursue": "YES",
+        "selfConfidence": "HIGH",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-023",
+      "set": "CALIBRATION_SET",
+      "company": "Anthropic",
+      "role": "Cloud Partner Enablement Lead",
+      "opportunityId": "privjobdisc_3443c0340ae2d6cd0a",
+      "location": "San Francisco, CA | New York City, NY",
+      "workArrangement": "On-site",
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "REVIEW",
+      "v2dFit": 30.63,
+      "v2dConfidence": 64.76,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "POOR_MATCH",
+        "interest": "NONE",
+        "wouldPursue": "NO",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-020",
+      "set": "CALIBRATION_SET",
+      "company": "Datadog",
+      "role": "Director, Product Management - AI Observability",
+      "opportunityId": "privjobdisc_6210550f2813f86c6b",
+      "location": "New York, New York, USA",
+      "workArrangement": "Unknown",
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "REVIEW",
+      "v2dFit": 30.63,
+      "v2dConfidence": 71.22,
+      "preferenceCompatibility": "UNKNOWN",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "STRETCH",
+        "interest": "MEDIUM",
+        "wouldPursue": "MAYBE",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-016",
+      "set": "CALIBRATION_SET",
+      "company": "Scale AI",
+      "role": "Engagement Manager",
+      "opportunityId": "privjobdisc_0621fbb869260a97fb",
+      "location": "San Francisco, CA; New York, NY",
+      "workArrangement": "Unknown",
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "REVIEW",
+      "v2dFit": 30.63,
+      "v2dConfidence": 66.62,
+      "preferenceCompatibility": "UNKNOWN",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "TRANSFERABLE",
+        "interest": "MEDIUM",
+        "wouldPursue": "MAYBE",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-026",
+      "set": "CALIBRATION_SET",
+      "company": "Airtable",
+      "role": "Delivery Consultant",
+      "opportunityId": "privjobimport_42d861aa5e70b15a96",
+      "location": "New York, NY; Remote - US",
+      "workArrangement": "Remote or remote-friendly",
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "v2dFit": 54.44,
+      "v2dConfidence": 62.87,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "POOR_MATCH",
+        "interest": "NONE",
+        "wouldPursue": "NO",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-029",
+      "set": "CALIBRATION_SET",
+      "company": "Airtable",
+      "role": "Director, AI Transformation & Customer Success",
+      "opportunityId": "privjobimport_786928658610c8384c",
+      "location": "Remote - US",
+      "workArrangement": "Remote or remote-friendly",
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "v2dFit": 54.44,
+      "v2dConfidence": 65.37,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "GOOD_MATCH",
+        "interest": "HIGH",
+        "wouldPursue": "YES",
+        "selfConfidence": "MEDIUM",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-027",
+      "set": "CALIBRATION_SET",
+      "company": "Airtable",
+      "role": "Senior Delivery Consultant",
+      "opportunityId": "privjobimport_705697c2e18dae21de",
+      "location": "New York, NY; Remote - US",
+      "workArrangement": "Remote or remote-friendly",
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "v2dFit": 54.44,
+      "v2dConfidence": 62.87,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "GOOD_MATCH",
+        "interest": "MEDIUM",
+        "wouldPursue": "MAYBE",
+        "selfConfidence": "MEDIUM",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-028",
+      "set": "CALIBRATION_SET",
+      "company": "Airtable",
+      "role": "Senior Delivery Consultant- West Coast",
+      "opportunityId": "privjobimport_2d43b4e5f65c3d4939",
+      "location": "San Francisco, CA; Austin, TX; Remote - US",
+      "workArrangement": "Remote or remote-friendly",
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "v2dFit": 54.44,
+      "v2dConfidence": 62.87,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "STRETCH",
+        "interest": "NONE",
+        "wouldPursue": "NO",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-021",
+      "set": "CALIBRATION_SET",
+      "company": "Scale AI",
+      "role": "Director of Product Management, Forward Deployed & Strategy",
+      "opportunityId": "privjobimport_e5d431fa6f3836d87b",
+      "location": "New York, NY",
+      "workArrangement": "Unknown",
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "v2dFit": 54.44,
+      "v2dConfidence": 65.63,
+      "preferenceCompatibility": "UNKNOWN",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "TRANSFERABLE",
+        "interest": "MEDIUM",
+        "wouldPursue": "MAYBE",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-019",
+      "set": "CALIBRATION_SET",
+      "company": "Anthropic",
+      "role": "Customer Program Manager, Executive Briefing Center",
+      "opportunityId": "privjobimport_cd6c863fc0fd7cfed9",
+      "location": "San Francisco, CA",
+      "workArrangement": "On-site",
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "v2dFit": 42.02,
+      "v2dConfidence": 73.29,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "POOR_MATCH",
+        "interest": "LOW",
+        "wouldPursue": "NO",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-017",
+      "set": "CALIBRATION_SET",
+      "company": "Anthropic",
+      "role": "Commercial Operations Program Manager",
+      "opportunityId": "privjobimport_d21697bd7d5b08b518",
+      "location": "San Francisco, CA | New York City, NY",
+      "workArrangement": "On-site",
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "v2dFit": 32.81,
+      "v2dConfidence": 65.23,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "STRETCH",
+        "interest": "LOW",
+        "wouldPursue": "MAYBE",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-032",
+      "set": "CALIBRATION_SET",
+      "company": "Anthropic",
+      "role": "Amazon GTM Partnership, Startups",
+      "opportunityId": "privjobimport_a3eea397c06d04944c",
+      "location": "San Francisco, CA | New York City, NY | Seattle, WA",
+      "workArrangement": "On-site",
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "v2dFit": 32.13,
+      "v2dConfidence": 66,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "STRONG_MATCH",
+        "interest": "HIGH",
+        "wouldPursue": "YES",
+        "selfConfidence": "MEDIUM",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-031",
+      "set": "CALIBRATION_SET",
+      "company": "Anthropic",
+      "role": "AI Infrastructure Operations, Demand Planning",
+      "opportunityId": "privjobimport_c4aed2d63dd25af70e",
+      "location": "San Francisco, CA | New York City, NY",
+      "workArrangement": "On-site",
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "v2dFit": 31.83,
+      "v2dConfidence": 65.72,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "TRANSFERABLE",
+        "interest": "LOW",
+        "wouldPursue": "MAYBE",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-030",
+      "set": "CALIBRATION_SET",
+      "company": "Anthropic",
+      "role": "AI Fluency Education Lead",
+      "opportunityId": "privjobimport_6023349a26543102d5",
+      "location": "San Francisco, CA | New York City, NY",
+      "workArrangement": "On-site",
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "v2dFit": 30.63,
+      "v2dConfidence": 63.43,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "STRONG_MATCH",
+        "interest": "HIGH",
+        "wouldPursue": "YES",
+        "selfConfidence": "HIGH",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-033",
+      "set": "CALIBRATION_SET",
+      "company": "Anthropic",
+      "role": "Applied AI Architect, Partnerships",
+      "opportunityId": "privjobimport_05dfcefd892f12be90",
+      "location": "San Francisco, CA | New York City, NY",
+      "workArrangement": "On-site",
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "v2dFit": 30.63,
+      "v2dConfidence": 64.91,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "GOOD_MATCH",
+        "interest": "HIGH",
+        "wouldPursue": "YES",
+        "selfConfidence": "MEDIUM",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-024",
+      "set": "CALIBRATION_SET",
+      "company": "Anthropic",
+      "role": "Communications Lead, Platform",
+      "opportunityId": "privjobimport_03116650610bcbb8f0",
+      "location": "New York City, NY; San Francisco, CA; Seattle, WA",
+      "workArrangement": "On-site",
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "v2dFit": 30.63,
+      "v2dConfidence": 63.52,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "POOR_MATCH",
+        "interest": "NONE",
+        "wouldPursue": "NO",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-018",
+      "set": "CALIBRATION_SET",
+      "company": "Anthropic",
+      "role": "Community & Executive Escalations Program Manager",
+      "opportunityId": "privjobimport_7d3474de0697f5ad4b",
+      "location": "San Francisco, CA | New York City, NY",
+      "workArrangement": "On-site",
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "v2dFit": 30.63,
+      "v2dConfidence": 64.32,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "TRANSFERABLE",
+        "interest": "LOW",
+        "wouldPursue": "NO",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-025",
+      "set": "CALIBRATION_SET",
+      "company": "Figma",
+      "role": "Governance Risk and Compliance",
+      "opportunityId": "privjobimport_a364cbb715e41ff2bb",
+      "location": "San Francisco, CA • New York, NY • United States",
+      "workArrangement": "Unknown",
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "v2dFit": 30.63,
+      "v2dConfidence": 66.79,
+      "preferenceCompatibility": "UNKNOWN",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "STRETCH",
+        "interest": "LOW",
+        "wouldPursue": "NO",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-014",
+      "set": "CALIBRATION_SET",
+      "company": "Scale AI",
+      "role": "Finance Systems & Automations Manager",
+      "opportunityId": "privjobimport_265cc524758e89a2a5",
+      "location": "San Francisco, CA",
+      "workArrangement": "Unknown",
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "v2dFit": 30.63,
+      "v2dConfidence": 67.11,
+      "preferenceCompatibility": "UNKNOWN",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "TRANSFERABLE",
+        "interest": "MEDIUM",
+        "wouldPursue": "YES",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-009",
+      "set": "CALIBRATION_SET",
+      "company": "Scale AI",
+      "role": "AI Builder Intern",
+      "opportunityId": "privjobimport_bdb986efa0becc3f15",
+      "location": "San Francisco, CA",
+      "workArrangement": "Unknown",
+      "existingJ010": "INSUFFICIENT_EVIDENCE",
+      "existingJ003": "WAIT",
+      "v2dFit": 27.22,
+      "v2dConfidence": 63.54,
+      "preferenceCompatibility": "UNKNOWN",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "TRANSFERABLE",
+        "interest": "MEDIUM",
+        "wouldPursue": "YES",
+        "selfConfidence": "MEDIUM",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-010",
+      "set": "CALIBRATION_SET",
+      "company": "Anthropic",
+      "role": "Applied AI Architect, Commercial",
+      "opportunityId": "privjobimport_f081c72cdfcc521e38",
+      "location": "San Francisco, CA | New York City, NY",
+      "workArrangement": "On-site",
+      "existingJ010": "INSUFFICIENT_EVIDENCE",
+      "existingJ003": "WAIT",
+      "v2dFit": 15.31,
+      "v2dConfidence": 63.52,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "TRANSFERABLE",
+        "interest": "HIGH",
+        "wouldPursue": "YES",
+        "selfConfidence": "MEDIUM",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-011",
+      "set": "CALIBRATION_SET",
+      "company": "Anthropic",
+      "role": "Applied AI Architect, Enterprise Tech",
+      "opportunityId": "privjobimport_5d6a040c1bbced784d",
+      "location": "San Francisco, CA | New York City, NY | Seattle, WA",
+      "workArrangement": "On-site",
+      "existingJ010": "INSUFFICIENT_EVIDENCE",
+      "existingJ003": "WAIT",
+      "v2dFit": 15.31,
+      "v2dConfidence": 64.45,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "GOOD_MATCH",
+        "interest": "HIGH",
+        "wouldPursue": "YES",
+        "selfConfidence": "MEDIUM",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-012",
+      "set": "CALIBRATION_SET",
+      "company": "Anthropic",
+      "role": "Applied AI Architect, Industries",
+      "opportunityId": "privjobimport_a5227e59b366000a6d",
+      "location": "New York City, NY; San Francisco, CA | New York City, NY | Seattle, WA",
+      "workArrangement": "Hybrid",
+      "existingJ010": "INSUFFICIENT_EVIDENCE",
+      "existingJ003": "WAIT",
+      "v2dFit": 15.31,
+      "v2dConfidence": 64.53,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "STRONG_MATCH",
+        "interest": "HIGH",
+        "wouldPursue": "YES",
+        "selfConfidence": "HIGH",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-013",
+      "set": "CALIBRATION_SET",
+      "company": "Anthropic",
+      "role": "Data Engineer, Safeguards",
+      "opportunityId": "privjobimport_6440498f19a6e376b7",
+      "location": "San Francisco, CA | New York City, NY",
+      "workArrangement": "On-site",
+      "existingJ010": "INSUFFICIENT_EVIDENCE",
+      "existingJ003": "WAIT",
+      "v2dFit": 15.31,
+      "v2dConfidence": 62.97,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "STRETCH",
+        "interest": "MEDIUM",
+        "wouldPursue": "YES",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-006",
+      "set": "CALIBRATION_SET",
+      "company": "Anthropic",
+      "role": "Director, Global Order-to-Cash Transformation",
+      "opportunityId": "privjobdisc_fc203582f3a62f1da7",
+      "location": "San Francisco, CA | New York City, NY | Seattle, WA",
+      "workArrangement": "On-site",
+      "existingJ010": "HARD_MISMATCH",
+      "existingJ003": "REVIEW",
+      "v2dFit": 5.01,
+      "v2dConfidence": 66.32,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "STRETCH",
+        "interest": "MEDIUM",
+        "wouldPursue": "NO",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-035",
+      "set": "CALIBRATION_SET",
+      "company": "Scale AI",
+      "role": "Lead Counsel, Product and IP",
+      "opportunityId": "privjobimport_b8b311333e335854eb",
+      "location": "San Francisco, CA",
+      "workArrangement": "Unknown",
+      "existingJ010": "HARD_MISMATCH",
+      "existingJ003": "WAIT",
+      "v2dFit": 4.01,
+      "v2dConfidence": 68.9,
+      "preferenceCompatibility": "UNKNOWN",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "HARD_NO",
+        "interest": "NONE",
+        "wouldPursue": "NO",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-003",
+      "set": "CALIBRATION_SET",
+      "company": "Datadog",
+      "role": "Engineering Manager I, Commercial Audit",
+      "opportunityId": "privjobimport_9e78a62f704e3f758a",
+      "location": "New York, New York, USA",
+      "workArrangement": "Unknown",
+      "existingJ010": "HARD_MISMATCH",
+      "existingJ003": "WAIT",
+      "v2dFit": 2.67,
+      "v2dConfidence": 70.87,
+      "preferenceCompatibility": "UNKNOWN",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "HARD_NO",
+        "interest": "NONE",
+        "wouldPursue": "NO",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-007",
+      "set": "CALIBRATION_SET",
+      "company": "Airtable",
+      "role": "Program Manager, Professional Services - East",
+      "opportunityId": "privjobimport_169530fe9c40d1d6ce",
+      "location": "New York, NY; Remote - US",
+      "workArrangement": "Remote or remote-friendly",
+      "existingJ010": "HARD_MISMATCH",
+      "existingJ003": "WAIT",
+      "v2dFit": 2.41,
+      "v2dConfidence": 68.84,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "GOOD_MATCH",
+        "interest": "HIGH",
+        "wouldPursue": "YES",
+        "selfConfidence": "MEDIUM",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-008",
+      "set": "CALIBRATION_SET",
+      "company": "Airtable",
+      "role": "Program Manager, Professional Services - West",
+      "opportunityId": "privjobimport_c12fc1fb5b5975a29c",
+      "location": "San Francisco, CA; Remote - US",
+      "workArrangement": "Remote or remote-friendly",
+      "existingJ010": "HARD_MISMATCH",
+      "existingJ003": "WAIT",
+      "v2dFit": 2.41,
+      "v2dConfidence": 68.84,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "GOOD_MATCH",
+        "interest": "HIGH",
+        "wouldPursue": "YES",
+        "selfConfidence": "MEDIUM",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-034",
+      "set": "CALIBRATION_SET",
+      "company": "Scale AI",
+      "role": "Engineering Manager, Agent Oversight",
+      "opportunityId": "privjobimport_68bfd9c3f642e520ac",
+      "location": "San Francisco, CA; New York, NY",
+      "workArrangement": "Unknown",
+      "existingJ010": "HARD_MISMATCH",
+      "existingJ003": "WAIT",
+      "v2dFit": 1.51,
+      "v2dConfidence": 67.33,
+      "preferenceCompatibility": "UNKNOWN",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "STRETCH",
+        "interest": "LOW",
+        "wouldPursue": "NO",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-040",
+      "set": "CALIBRATION_SET",
+      "company": "Anthropic",
+      "role": "Applied AI Engineer, Enterprise Tech",
+      "opportunityId": "privjobdisc_07731007e02ba6a1f5",
+      "location": "San Francisco, CA | New York City, NY | Seattle, WA",
+      "workArrangement": "Unknown",
+      "existingJ010": "HARD_MISMATCH",
+      "existingJ003": "REVIEW",
+      "v2dFit": 1.42,
+      "v2dConfidence": 65.11,
+      "preferenceCompatibility": "UNKNOWN",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "STRETCH",
+        "interest": "LOW",
+        "wouldPursue": "NO",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-004",
+      "set": "CALIBRATION_SET",
+      "company": "Scale AI",
+      "role": "Frontier Agent Engineering Manager, Enterprise",
+      "opportunityId": "privjobdisc_49bdc8b941c249f01a",
+      "location": "San Francisco, CA; New York, NY",
+      "workArrangement": "Unknown",
+      "existingJ010": "HARD_MISMATCH",
+      "existingJ003": "REVIEW",
+      "v2dFit": 1.23,
+      "v2dConfidence": 65.45,
+      "preferenceCompatibility": "UNKNOWN",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "TRANSFERABLE",
+        "interest": "HIGH",
+        "wouldPursue": "YES",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-036",
+      "set": "CALIBRATION_SET",
+      "company": "Anthropic",
+      "role": "Anthropic Fellows Program",
+      "opportunityId": "privjobimport_68dcc8a16578fbd3cb",
+      "location": "London, UK; Ontario, CAN; Remote-Friendly, United States; San Francisco, CA",
+      "workArrangement": "Remote or remote-friendly",
+      "existingJ010": "HARD_MISMATCH",
+      "existingJ003": "WAIT",
+      "v2dFit": 0,
+      "v2dConfidence": 63.48,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "TRANSFERABLE",
+        "interest": "MEDIUM",
+        "wouldPursue": "NO",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-037",
+      "set": "CALIBRATION_SET",
+      "company": "Anthropic",
+      "role": "Anthropic Fellows Program, AI Safety & Security",
+      "opportunityId": "privjobimport_aeb25d8ce19a4121dc",
+      "location": "London, UK; Ontario, CAN; Remote-Friendly, United States; San Francisco, CA",
+      "workArrangement": "Remote or remote-friendly",
+      "existingJ010": "HARD_MISMATCH",
+      "existingJ003": "WAIT",
+      "v2dFit": 0,
+      "v2dConfidence": 62.92,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "TRANSFERABLE",
+        "interest": "MEDIUM",
+        "wouldPursue": "NO",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-038",
+      "set": "CALIBRATION_SET",
+      "company": "Anthropic",
+      "role": "Anthropic Fellows Program, ML Systems & Reinforcement Learning",
+      "opportunityId": "privjobimport_dfaa0e49695c7b6756",
+      "location": "London, UK; Ontario, CAN; Remote-Friendly, United States; San Francisco, CA",
+      "workArrangement": "Remote or remote-friendly",
+      "existingJ010": "HARD_MISMATCH",
+      "existingJ003": "WAIT",
+      "v2dFit": 0,
+      "v2dConfidence": 62.85,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "STRETCH",
+        "interest": "LOW",
+        "wouldPursue": "NO",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-039",
+      "set": "CALIBRATION_SET",
+      "company": "Anthropic",
+      "role": "Anthropic Fellows Program, The Anthropic Institute (Economics & Policy)",
+      "opportunityId": "privjobimport_33f5980f588c1ee23e",
+      "location": "London, UK; Ontario, CAN; Remote-Friendly, United States; San Francisco, CA",
+      "workArrangement": "Remote or remote-friendly",
+      "existingJ010": "HARD_MISMATCH",
+      "existingJ003": "WAIT",
+      "v2dFit": 0,
+      "v2dConfidence": 64.13,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "STRETCH",
+        "interest": "LOW",
+        "wouldPursue": "NO",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-002",
+      "set": "CALIBRATION_SET",
+      "company": "Anthropic",
+      "role": "Cash Manager, Treasury",
+      "opportunityId": "privjobimport_1f658ec30c91ab4777",
+      "location": "San Francisco, CA",
+      "workArrangement": "On-site",
+      "existingJ010": "HARD_MISMATCH",
+      "existingJ003": "WAIT",
+      "v2dFit": 0,
+      "v2dConfidence": 65.2,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "HARD_NO",
+        "interest": "NONE",
+        "wouldPursue": "NO",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-005",
+      "set": "CALIBRATION_SET",
+      "company": "Anthropic",
+      "role": "Commercial Counsel, Platform & Marketplace",
+      "opportunityId": "privjobimport_5a81ea5524444e2cd5",
+      "location": "San Francisco, CA | Seattle, WA | New York City, NY | Washington, DC",
+      "workArrangement": "On-site",
+      "existingJ010": "HARD_MISMATCH",
+      "existingJ003": "WAIT",
+      "v2dFit": 0,
+      "v2dConfidence": 65.44,
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "HARD_NO",
+        "interest": "LOW",
+        "wouldPursue": "NO",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "M21-001",
+      "set": "CALIBRATION_SET",
+      "company": "Scale AI",
+      "role": "AI Infrastructure Engineer, Sandbox Platform",
+      "opportunityId": "privjobimport_40c98926a084af5708",
+      "location": "San Francisco, CA; Seattle, WA; New York, NY",
+      "workArrangement": "Unknown",
+      "existingJ010": "HARD_MISMATCH",
+      "existingJ003": "WAIT",
+      "v2dFit": 0,
+      "v2dConfidence": 63.13,
+      "preferenceCompatibility": "UNKNOWN",
+      "humanReview": {
+        "status": "COMPLETE",
+        "evidenceFit": "TRANSFERABLE",
+        "interest": "LOW",
+        "wouldPursue": "NO",
+        "selfConfidence": "LOW",
+        "reason": null
+      }
+    }
+  ],
+  "holdoutSet": [
+    {
+      "sampleId": "H24-001",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "AI_AUTOMATION_AGENT",
+      "company": "Anthropic",
+      "role": "Applied AI Technical Evangelist, Startup Ecosystem",
+      "opportunityId": "privjobimport_be5b179df0dc856398",
+      "sourceRecordId": "privjobsource_c87cc5a78c2a352fbc",
+      "queueItemId": "privjobimport_be5b179df0dc856398",
+      "sourceOrder": 40,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 2,
+        "MISSING": 1,
+        "UNKNOWN": 38
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-002",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "AI_AUTOMATION_AGENT",
+      "company": "Braze",
+      "role": "Applied AI Architect, G&A",
+      "opportunityId": "privjobimport_0a6cf1acc9cf1a9184",
+      "sourceRecordId": "privjobsource_f8deada644ef027787",
+      "queueItemId": "privjobimport_0a6cf1acc9cf1a9184",
+      "sourceOrder": 181,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 6,
+        "MISSING": 1,
+        "UNKNOWN": 41
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-003",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "AI_AUTOMATION_AGENT",
+      "company": "Braze",
+      "role": "Applied AI Architect, G&A",
+      "opportunityId": "privjobimport_5f3842c65a01de8197",
+      "sourceRecordId": "privjobsource_3ffa2ae350c7e49644",
+      "queueItemId": "privjobimport_5f3842c65a01de8197",
+      "sourceOrder": 182,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 6,
+        "MISSING": 1,
+        "UNKNOWN": 41
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-004",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "AI_AUTOMATION_AGENT",
+      "company": "Braze",
+      "role": "Applied AI Architect, G&A",
+      "opportunityId": "privjobimport_6016f09878f183ffcf",
+      "sourceRecordId": "privjobsource_397c8f962bb5d2ca39",
+      "queueItemId": "privjobimport_6016f09878f183ffcf",
+      "sourceOrder": 183,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 6,
+        "MISSING": 1,
+        "UNKNOWN": 41
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-005",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "AI_AUTOMATION_AGENT",
+      "company": "Braze",
+      "role": "Applied AI Architect, GTM",
+      "opportunityId": "privjobimport_3927f3bcbcb39fc3f5",
+      "sourceRecordId": "privjobsource_c69913e2fa8a2aa662",
+      "queueItemId": "privjobimport_3927f3bcbcb39fc3f5",
+      "sourceOrder": 184,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 7,
+        "MISSING": 1,
+        "UNKNOWN": 35
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-006",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "TECHNICAL_PROGRAM_PROJECT_PRODUCT",
+      "company": "Datadog",
+      "role": "Director, Technical Program Management - Technical Solutions Operations",
+      "opportunityId": "privjobdisc_05aa5e4b0d932dace2",
+      "sourceRecordId": "privjobsource_49938e4bbac9ff1f8c",
+      "queueItemId": "privjobimport_6f075c726a68623fb5",
+      "sourceOrder": 90,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "REVIEW",
+      "shortlisted": true,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 8,
+        "MISSING": 4,
+        "UNKNOWN": 17
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-007",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "TECHNICAL_PROGRAM_PROJECT_PRODUCT",
+      "company": "Klaviyo",
+      "role": "AI Enablement Program Manager",
+      "opportunityId": "privjobimport_f5c17d19bca6f590fe",
+      "sourceRecordId": "privjobsource_f7a538450bbfe35d43",
+      "queueItemId": "privjobimport_f5c17d19bca6f590fe",
+      "sourceOrder": 95,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 6,
+        "MISSING": 2,
+        "UNKNOWN": 30
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-008",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "TECHNICAL_PROGRAM_PROJECT_PRODUCT",
+      "company": "Klaviyo",
+      "role": "Lead Project Manager",
+      "opportunityId": "privjobdisc_41b0f399b3609ff8a2",
+      "sourceRecordId": "privjobsource_8c3f9407743a4f1420",
+      "queueItemId": "privjobimport_2e17512664743f7e56",
+      "sourceOrder": 233,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "REVIEW",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 3,
+        "MISSING": 2,
+        "UNKNOWN": 20
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-009",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "PRODUCT",
+      "company": "Airtable",
+      "role": "Product Designer (8+ YOE)",
+      "opportunityId": "privjobimport_9ffbdac74e6ec43be6",
+      "sourceRecordId": "privjobsource_693c49e8259a909bc6",
+      "queueItemId": "privjobimport_9ffbdac74e6ec43be6",
+      "sourceOrder": 85,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 1,
+        "MISSING": 7,
+        "UNKNOWN": 21
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-010",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "PRODUCT",
+      "company": "Anthropic",
+      "role": "AV Production Specialist",
+      "opportunityId": "privjobimport_16c2ab42d88d230242",
+      "sourceRecordId": "privjobsource_1433247cfb7f981dd0",
+      "queueItemId": "privjobimport_16c2ab42d88d230242",
+      "sourceOrder": 43,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 5,
+        "MISSING": 5,
+        "UNKNOWN": 27
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-011",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "PRODUCT",
+      "company": "Anthropic",
+      "role": "Data Engineering Manager, Product",
+      "opportunityId": "privjobimport_6e3072800f7fbeb8b4",
+      "sourceRecordId": "privjobsource_1509a1888ede560ced",
+      "queueItemId": "privjobimport_6e3072800f7fbeb8b4",
+      "sourceOrder": 55,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 4,
+        "MISSING": 1,
+        "UNKNOWN": 27
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-012",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "PRODUCT",
+      "company": "Anthropic",
+      "role": "Data Scientist, Developer Productivity",
+      "opportunityId": "privjobimport_0a3acb05c2c51927f1",
+      "sourceRecordId": "privjobsource_2b8d59f7e753cb4dd1",
+      "queueItemId": "privjobimport_0a3acb05c2c51927f1",
+      "sourceOrder": 57,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 5,
+        "MISSING": 0,
+        "UNKNOWN": 24
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-013",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "PRODUCT",
+      "company": "Datadog",
+      "role": "Director, Product Management - Core Platforms",
+      "opportunityId": "privjobimport_191c0596d07700efc4",
+      "sourceRecordId": "privjobsource_be7102357e6a15ad24",
+      "queueItemId": "privjobimport_191c0596d07700efc4",
+      "sourceOrder": 79,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 6,
+        "MISSING": 2,
+        "UNKNOWN": 15
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-014",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "MARTECH_MARKETING_OPERATIONS",
+      "company": "Anthropic",
+      "role": "Brand Marketing Lead, Enterprise",
+      "opportunityId": "privjobdisc_5df71f5479a77e089d",
+      "sourceRecordId": "privjobsource_6db260ac1cdc63e319",
+      "queueItemId": "privjobimport_91c91ec09bfbe84a91",
+      "sourceOrder": 44,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "REVIEW",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 5,
+        "MISSING": 1,
+        "UNKNOWN": 25
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-015",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "MARTECH_MARKETING_OPERATIONS",
+      "company": "Anthropic",
+      "role": "Data Scientist, Marketing",
+      "opportunityId": "privjobimport_d0983bf9cc7a6f76e1",
+      "sourceRecordId": "privjobsource_4a9e169dd61380a82b",
+      "queueItemId": "privjobimport_d0983bf9cc7a6f76e1",
+      "sourceOrder": 59,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 2,
+        "MISSING": 0,
+        "UNKNOWN": 27
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-016",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "MARTECH_MARKETING_OPERATIONS",
+      "company": "Datadog",
+      "role": "Associate Growth Marketing Manager",
+      "opportunityId": "privjobimport_1fcd7179c9d48f9fdd",
+      "sourceRecordId": "privjobsource_08493d3f4c53bd009b",
+      "queueItemId": "privjobimport_1fcd7179c9d48f9fdd",
+      "sourceOrder": 190,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 2,
+        "MISSING": 2,
+        "UNKNOWN": 15
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-017",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "MARTECH_MARKETING_OPERATIONS",
+      "company": "Datadog",
+      "role": "Customer Marketing Manager",
+      "opportunityId": "privjobdisc_19da5f1472f5815bcd",
+      "sourceRecordId": "privjobsource_1634b1c0fba9b18334",
+      "queueItemId": "privjobimport_112b0cd2d841c8b193",
+      "sourceOrder": 196,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "REVIEW",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 4,
+        "MISSING": 2,
+        "UNKNOWN": 15
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-018",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "MARTECH_MARKETING_OPERATIONS",
+      "company": "Klaviyo",
+      "role": "Inbound Growth Specialist",
+      "opportunityId": "privjobimport_58a28ef9f7772369d0",
+      "sourceRecordId": "privjobsource_d5d951d1a3f2e4fd59",
+      "queueItemId": "privjobimport_58a28ef9f7772369d0",
+      "sourceOrder": 222,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 2,
+        "MISSING": 6,
+        "UNKNOWN": 30
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-019",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "BUSINESS_SYSTEMS_ANALYST",
+      "company": "Figma",
+      "role": "Director, Business Systems",
+      "opportunityId": "privjobimport_28d3932015d59a7ddd",
+      "sourceRecordId": "privjobsource_cc517791a24af894a7",
+      "queueItemId": "privjobimport_28d3932015d59a7ddd",
+      "sourceOrder": 118,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 4,
+        "MISSING": 2,
+        "UNKNOWN": 19
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-020",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "TRANSFORMATION_SOLUTIONS",
+      "company": "Airtable",
+      "role": "Senior Solutions Architect",
+      "opportunityId": "privjobimport_90369a35054f3c17e7",
+      "sourceRecordId": "privjobsource_b9e28255e7e1945fcd",
+      "queueItemId": "privjobimport_90369a35054f3c17e7",
+      "sourceOrder": 87,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 3,
+        "MISSING": 2,
+        "UNKNOWN": 17
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-021",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "TRANSFORMATION_SOLUTIONS",
+      "company": "Airtable",
+      "role": "Senior Solutions Architect- West Coast",
+      "opportunityId": "privjobimport_a30fc3841695851730",
+      "sourceRecordId": "privjobsource_32e32f816c60c28dea",
+      "queueItemId": "privjobimport_a30fc3841695851730",
+      "sourceOrder": 88,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 3,
+        "MISSING": 2,
+        "UNKNOWN": 17
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-022",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "TRANSFORMATION_SOLUTIONS",
+      "company": "Figma",
+      "role": "Director, Solutions Consulting (United States)",
+      "opportunityId": "privjobimport_b941fc060e2fba83fb",
+      "sourceRecordId": "privjobsource_01b3870e17f5040c04",
+      "queueItemId": "privjobimport_b941fc060e2fba83fb",
+      "sourceOrder": 127,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 7,
+        "MISSING": 4,
+        "UNKNOWN": 18
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-023",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "TRANSFORMATION_SOLUTIONS",
+      "company": "Scale AI",
+      "role": "AI Advisory Consultant",
+      "opportunityId": "privjobimport_637f694954a06d6cca",
+      "sourceRecordId": "privjobsource_a5037fb5cc354d8287",
+      "queueItemId": "privjobimport_637f694954a06d6cca",
+      "sourceOrder": 236,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 2,
+        "MISSING": 3,
+        "UNKNOWN": 21
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-024",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "TRANSFORMATION_SOLUTIONS",
+      "company": "Scale AI",
+      "role": "AI Strategy Consultant, Frontier Tech",
+      "opportunityId": "privjobimport_91723b1fd7aa7a29fb",
+      "sourceRecordId": "privjobsource_06479926a37b487e53",
+      "queueItemId": "privjobimport_91723b1fd7aa7a29fb",
+      "sourceOrder": 239,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "INSUFFICIENT_EVIDENCE",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 0,
+        "MISSING": 0,
+        "UNKNOWN": 21
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-025",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "SENIOR_LEADERSHIP_STRETCH",
+      "company": "Airtable",
+      "role": "Global Payroll Manager",
+      "opportunityId": "privjobimport_fb5a1f7827d75de09c",
+      "sourceRecordId": "privjobsource_8ca86202f7261c2045",
+      "queueItemId": "privjobimport_fb5a1f7827d75de09c",
+      "sourceOrder": 82,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 4,
+        "MISSING": 1,
+        "UNKNOWN": 20
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-026",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "SENIOR_LEADERSHIP_STRETCH",
+      "company": "Airtable",
+      "role": "Manager, Business Development Representatives",
+      "opportunityId": "privjobimport_6bbf56923591e549e7",
+      "sourceRecordId": "privjobsource_9087e1fe1978607b25",
+      "queueItemId": "privjobimport_6bbf56923591e549e7",
+      "sourceOrder": 83,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 3,
+        "MISSING": 0,
+        "UNKNOWN": 23
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-027",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "SENIOR_LEADERSHIP_STRETCH",
+      "company": "Airtable",
+      "role": "Procurement Operations Manager",
+      "opportunityId": "privjobimport_ded0c8495e3733b091",
+      "sourceRecordId": "privjobsource_e7919af4bff394d0fb",
+      "queueItemId": "privjobimport_ded0c8495e3733b091",
+      "sourceOrder": 84,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 4,
+        "MISSING": 2,
+        "UNKNOWN": 28
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-028",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "SENIOR_LEADERSHIP_STRETCH",
+      "company": "Airtable",
+      "role": "Senior Manager, Procurement",
+      "opportunityId": "privjobimport_d0335fe357c279b3b4",
+      "sourceRecordId": "privjobsource_4a2ff0a3e9fead3a2e",
+      "queueItemId": "privjobimport_d0335fe357c279b3b4",
+      "sourceOrder": 86,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 5,
+        "MISSING": 1,
+        "UNKNOWN": 12
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-029",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "SENIOR_LEADERSHIP_STRETCH",
+      "company": "Anthropic",
+      "role": "Director of Payroll",
+      "opportunityId": "privjobimport_57ce9f965360d6d422",
+      "sourceRecordId": "privjobsource_d0359772446580bebb",
+      "queueItemId": "privjobimport_57ce9f965360d6d422",
+      "sourceOrder": 63,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 1,
+        "MISSING": 2,
+        "UNKNOWN": 18
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-030",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "OBVIOUS_POOR_FIT_CONTROL",
+      "company": "Anthropic",
+      "role": "Data Science, Finance & Strategy",
+      "opportunityId": "privjobimport_fd2d2a5cf32d82d178",
+      "sourceRecordId": "privjobsource_336cfdf7687bdf3a30",
+      "queueItemId": "privjobimport_fd2d2a5cf32d82d178",
+      "sourceOrder": 56,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 3,
+        "MISSING": 1,
+        "UNKNOWN": 24
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-031",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "OBVIOUS_POOR_FIT_CONTROL",
+      "company": "Anthropic",
+      "role": "Director, Infrastructure & Energy Accounting",
+      "opportunityId": "privjobimport_62f2b10bf90741c58f",
+      "sourceRecordId": "privjobsource_b8bbcac9aab91149e2",
+      "queueItemId": "privjobimport_62f2b10bf90741c58f",
+      "sourceOrder": 65,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "HARD_MISMATCH",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 5,
+        "MISSING": 0,
+        "UNKNOWN": 37
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-032",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "OBVIOUS_POOR_FIT_CONTROL",
+      "company": "Anthropic",
+      "role": "Director, Revenue Accounting",
+      "opportunityId": "privjobimport_69f49700f9e0b38015",
+      "sourceRecordId": "privjobsource_c24df740a389b0d998",
+      "queueItemId": "privjobimport_69f49700f9e0b38015",
+      "sourceOrder": 67,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "HARD_MISMATCH",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 6,
+        "MISSING": 0,
+        "UNKNOWN": 30
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-033",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "OBVIOUS_POOR_FIT_CONTROL",
+      "company": "Anthropic",
+      "role": "Director, US International Tax",
+      "opportunityId": "privjobimport_53c09819375f117deb",
+      "sourceRecordId": "privjobsource_7191a3407a327fe009",
+      "queueItemId": "privjobimport_53c09819375f117deb",
+      "sourceOrder": 68,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 5,
+        "MISSING": 1,
+        "UNKNOWN": 25
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-034",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "OBVIOUS_POOR_FIT_CONTROL",
+      "company": "Anthropic",
+      "role": "Engineering Manager, Cybersecurity Products",
+      "opportunityId": "privjobimport_cf18b64b715d3f0d62",
+      "sourceRecordId": "privjobsource_729d8e4bb3bb237bd8",
+      "queueItemId": "privjobimport_cf18b64b715d3f0d62",
+      "sourceOrder": 70,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 4,
+        "MISSING": 0,
+        "UNKNOWN": 28
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-035",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "OTHER_CONTROL",
+      "company": "Airtable",
+      "role": "Software Engineer, Data",
+      "opportunityId": "privjobimport_763d1f43f5b6c03f4c",
+      "sourceRecordId": "privjobsource_369e70d6f9e1a6b92b",
+      "queueItemId": "privjobimport_763d1f43f5b6c03f4c",
+      "sourceOrder": 89,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 1,
+        "MISSING": 0,
+        "UNKNOWN": 23
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-036",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "OTHER_CONTROL",
+      "company": "Anthropic",
+      "role": "AV Engineer",
+      "opportunityId": "privjobimport_055f2868d446326a9b",
+      "sourceRecordId": "privjobsource_c5da11d93029dd9aea",
+      "queueItemId": "privjobimport_055f2868d446326a9b",
+      "sourceOrder": 41,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 6,
+        "MISSING": 3,
+        "UNKNOWN": 37
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-037",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "OTHER_CONTROL",
+      "company": "Anthropic",
+      "role": "AV Operations Specialist",
+      "opportunityId": "privjobimport_6a3098b95e8d93965b",
+      "sourceRecordId": "privjobsource_4189b48e113ecda217",
+      "queueItemId": "privjobimport_6a3098b95e8d93965b",
+      "sourceOrder": 42,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 1,
+        "MISSING": 1,
+        "UNKNOWN": 28
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-038",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "OTHER_CONTROL",
+      "company": "Anthropic",
+      "role": "Capital Markets - Infrastructure Financing",
+      "opportunityId": "privjobimport_685dc93eeb49b7c855",
+      "sourceRecordId": "privjobsource_fbea33ddf66231dcb8",
+      "queueItemId": "privjobimport_685dc93eeb49b7c855",
+      "sourceOrder": 45,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003": "WAIT",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 6,
+        "MISSING": 1,
+        "UNKNOWN": 21
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-039",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "OTHER_CONTROL",
+      "company": "Anthropic",
+      "role": "Commercial Counsel, GTM",
+      "opportunityId": "privjobdisc_72007d5ddd8cd120a0",
+      "sourceRecordId": "privjobsource_57d9df0d6f09110b00",
+      "queueItemId": "privjobimport_921ad870c5bc81b717",
+      "sourceOrder": 46,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "HARD_MISMATCH",
+      "existingJ003": "REVIEW",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 2,
+        "MISSING": 3,
+        "UNKNOWN": 20
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    },
+    {
+      "sampleId": "H24-040",
+      "set": "HOLDOUT_SET",
+      "roleFamily": "OTHER_CONTROL",
+      "company": "Anthropic",
+      "role": "Commercial Counsel, SPARC",
+      "opportunityId": "privjobdisc_631e494118ff4a3973",
+      "sourceRecordId": "privjobsource_a5173424af88a48e18",
+      "queueItemId": "privjobimport_07fc2f6b2758f7a760",
+      "sourceOrder": 47,
+      "location": null,
+      "workArrangement": null,
+      "existingJ010": "HARD_MISMATCH",
+      "existingJ003": "REVIEW",
+      "shortlisted": false,
+      "explainableFitCoverage": {
+        "PROVEN": 0,
+        "PARTIAL": 0,
+        "TRANSFERABLE": 2,
+        "MISSING": 7,
+        "UNKNOWN": 20
+      },
+      "v2d": {
+        "status": "PENDING_HUMAN_REVIEW_AND_OFFLINE_PROJECTION",
+        "formula": "FROZEN_V1_23_V2D",
+        "score": null,
+        "rank": null
+      },
+      "humanReview": {
+        "status": "PENDING_OPERATOR_REVIEW",
+        "evidenceFit": null,
+        "interest": null,
+        "wouldPursue": null,
+        "selfConfidence": null,
+        "reason": null
+      }
+    }
+  ]
+}
