@@ -1,0 +1,3391 @@
+{
+  "schemaVersion": "staffordos.careeros.match_engine_v1.calibration.v1",
+  "datasetCount": 40,
+  "reviewCount": 40,
+  "baselineName": "EXPERIMENTAL_WEIGHT_SET_V1",
+  "originalWeightsUnchanged": true,
+  "distributions": {
+    "evidenceFit": {
+      "GOOD_MATCH": 6,
+      "HARD_NO": 5,
+      "POOR_MATCH": 4,
+      "STRETCH": 10,
+      "STRONG_MATCH": 3,
+      "TRANSFERABLE": 12
+    },
+    "interest": {
+      "HIGH": 10,
+      "LOW": 11,
+      "MEDIUM": 11,
+      "NONE": 8
+    },
+    "wouldPursue": {
+      "MAYBE": 6,
+      "NO": 20,
+      "YES": 14
+    },
+    "geography": {
+      "ACCEPTABLE": 32,
+      "NOT_ACCEPTABLE": 5,
+      "UNKNOWN": 3
+    },
+    "selfConfidence": {
+      "HIGH": 3,
+      "LOW": 28,
+      "MEDIUM": 9
+    }
+  },
+  "weightResults": {
+    "EXPERIMENTAL_WEIGHT_SET_V1": {
+      "weightSet": {
+        "requiredSkillsFit": 35,
+        "relevantExperienceFit": 20,
+        "roleFunctionFit": 15,
+        "responsibilitySimilarity": 10,
+        "seniorityFit": 8,
+        "domainFit": 7,
+        "geographyWorkArrangementFit": 5,
+        "compensationFit": 0
+      },
+      "top5Precision": 0,
+      "top10Precision": 0.2,
+      "top5Agreement": 0,
+      "top10Agreement": 0.2,
+      "strongRecall": 0,
+      "strongGoodRecall": 0.22,
+      "viableRecall": 0.23,
+      "falsePositiveRate": 0.75,
+      "falseNegativeRate": 0.29,
+      "viableFalsePositiveRate": 0.25,
+      "rankCorrelation": 0.06,
+      "hardMismatchLeakageTop10": 0,
+      "actionableHardMismatchLeakage": 0,
+      "poorMatchLeakageTop10": 3,
+      "underRankedPrimary": 4,
+      "underRankedViable": 16,
+      "highConfidencePrimaryRate": 0,
+      "lowConfidencePrimaryRate": 0.26,
+      "threshold": {
+        "cutoff": 30.63,
+        "falsePositiveRate": 0.75,
+        "falseNegativeRate": 0.29,
+        "predictedCount": 20
+      }
+    },
+    "EXPERIMENTAL_WEIGHT_SET_V1B": {
+      "weightSet": {
+        "requiredSkillsFit": 32,
+        "relevantExperienceFit": 20,
+        "roleFunctionFit": 18,
+        "responsibilitySimilarity": 13,
+        "seniorityFit": 8,
+        "domainFit": 6,
+        "geographyWorkArrangementFit": 3,
+        "compensationFit": 0
+      },
+      "top5Precision": 0,
+      "top10Precision": 0.2,
+      "top5Agreement": 0,
+      "top10Agreement": 0.2,
+      "strongRecall": 0,
+      "strongGoodRecall": 0.22,
+      "viableRecall": 0.23,
+      "falsePositiveRate": 0.77,
+      "falseNegativeRate": 0.57,
+      "viableFalsePositiveRate": 0.23,
+      "rankCorrelation": 0.06,
+      "hardMismatchLeakageTop10": 0,
+      "actionableHardMismatchLeakage": 0,
+      "poorMatchLeakageTop10": 3,
+      "underRankedPrimary": 4,
+      "underRankedViable": 16,
+      "highConfidencePrimaryRate": 0,
+      "lowConfidencePrimaryRate": 0.26,
+      "threshold": {
+        "cutoff": 32.05,
+        "falsePositiveRate": 0.77,
+        "falseNegativeRate": 0.57,
+        "predictedCount": 13
+      }
+    },
+    "EXPERIMENTAL_WEIGHT_SET_V1C": {
+      "weightSet": {
+        "requiredSkillsFit": 32,
+        "relevantExperienceFit": 26,
+        "roleFunctionFit": 15,
+        "responsibilitySimilarity": 11,
+        "seniorityFit": 8,
+        "domainFit": 5,
+        "geographyWorkArrangementFit": 3,
+        "compensationFit": 0
+      },
+      "top5Precision": 0,
+      "top10Precision": 0.2,
+      "top5Agreement": 0,
+      "top10Agreement": 0.2,
+      "strongRecall": 0,
+      "strongGoodRecall": 0.22,
+      "viableRecall": 0.23,
+      "falsePositiveRate": 0.77,
+      "falseNegativeRate": 0.57,
+      "viableFalsePositiveRate": 0.23,
+      "rankCorrelation": 0.06,
+      "hardMismatchLeakageTop10": 0,
+      "actionableHardMismatchLeakage": 0,
+      "poorMatchLeakageTop10": 3,
+      "underRankedPrimary": 4,
+      "underRankedViable": 16,
+      "highConfidencePrimaryRate": 0,
+      "lowConfidencePrimaryRate": 0.26,
+      "threshold": {
+        "cutoff": 34.17,
+        "falsePositiveRate": 0.77,
+        "falseNegativeRate": 0.57,
+        "predictedCount": 13
+      }
+    },
+    "EXPERIMENTAL_WEIGHT_SET_V1D": {
+      "weightSet": {
+        "requiredSkillsFit": 29,
+        "relevantExperienceFit": 22,
+        "roleFunctionFit": 18,
+        "responsibilitySimilarity": 15,
+        "seniorityFit": 8,
+        "domainFit": 5,
+        "geographyWorkArrangementFit": 3,
+        "compensationFit": 0
+      },
+      "top5Precision": 0,
+      "top10Precision": 0.2,
+      "top5Agreement": 0,
+      "top10Agreement": 0.2,
+      "strongRecall": 0,
+      "strongGoodRecall": 0.22,
+      "viableRecall": 0.23,
+      "falsePositiveRate": 0.77,
+      "falseNegativeRate": 0.57,
+      "viableFalsePositiveRate": 0.23,
+      "rankCorrelation": 0.06,
+      "hardMismatchLeakageTop10": 0,
+      "actionableHardMismatchLeakage": 0,
+      "poorMatchLeakageTop10": 3,
+      "underRankedPrimary": 4,
+      "underRankedViable": 16,
+      "highConfidencePrimaryRate": 0,
+      "lowConfidencePrimaryRate": 0.26,
+      "threshold": {
+        "cutoff": 33.33,
+        "falsePositiveRate": 0.77,
+        "falseNegativeRate": 0.57,
+        "predictedCount": 13
+      }
+    }
+  },
+  "diagnostics": {
+    "under": [
+      {
+        "sampleId": "M21-040",
+        "company": "Anthropic",
+        "role": "Applied AI Engineer, Enterprise Tech",
+        "evidenceFit": "STRETCH",
+        "engineRank": 32,
+        "score": 1.42,
+        "j010": "HARD_MISMATCH",
+        "j003": "REVIEW",
+        "preference": "UNKNOWN",
+        "cause": "AUTHORITY_CONFLICT"
+      },
+      {
+        "sampleId": "M21-039",
+        "company": "Anthropic",
+        "role": "Anthropic Fellows Program, The Anthropic Institute (Economics & Policy)",
+        "evidenceFit": "STRETCH",
+        "engineRank": 37,
+        "score": 0,
+        "j010": "HARD_MISMATCH",
+        "j003": "WAIT",
+        "preference": "UNKNOWN",
+        "cause": "AUTHORITY_CONFLICT"
+      },
+      {
+        "sampleId": "M21-038",
+        "company": "Anthropic",
+        "role": "Anthropic Fellows Program, ML Systems & Reinforcement Learning",
+        "evidenceFit": "STRETCH",
+        "engineRank": 36,
+        "score": 0,
+        "j010": "HARD_MISMATCH",
+        "j003": "WAIT",
+        "preference": "UNKNOWN",
+        "cause": "AUTHORITY_CONFLICT"
+      },
+      {
+        "sampleId": "M21-034",
+        "company": "Scale AI",
+        "role": "Engineering Manager, Agent Oversight",
+        "evidenceFit": "STRETCH",
+        "engineRank": 31,
+        "score": 1.51,
+        "j010": "HARD_MISMATCH",
+        "j003": "WAIT",
+        "preference": "UNKNOWN",
+        "cause": "AUTHORITY_CONFLICT"
+      },
+      {
+        "sampleId": "M21-013",
+        "company": "Anthropic",
+        "role": "Data Engineer, Safeguards",
+        "evidenceFit": "STRETCH",
+        "engineRank": 25,
+        "score": 15.31,
+        "j010": "INSUFFICIENT_EVIDENCE",
+        "j003": "WAIT",
+        "preference": "OUTSIDE_PREFERENCE",
+        "cause": "GEOGRAPHY_GAP"
+      },
+      {
+        "sampleId": "M21-006",
+        "company": "Anthropic",
+        "role": "Director, Global Order-to-Cash Transformation",
+        "evidenceFit": "STRETCH",
+        "engineRank": 26,
+        "score": 5.01,
+        "j010": "HARD_MISMATCH",
+        "j003": "REVIEW",
+        "preference": "UNKNOWN",
+        "cause": "AUTHORITY_CONFLICT"
+      },
+      {
+        "sampleId": "M21-037",
+        "company": "Anthropic",
+        "role": "Anthropic Fellows Program, AI Safety & Security",
+        "evidenceFit": "TRANSFERABLE",
+        "engineRank": 35,
+        "score": 0,
+        "j010": "HARD_MISMATCH",
+        "j003": "WAIT",
+        "preference": "UNKNOWN",
+        "cause": "AUTHORITY_CONFLICT"
+      },
+      {
+        "sampleId": "M21-036",
+        "company": "Anthropic",
+        "role": "Anthropic Fellows Program",
+        "evidenceFit": "TRANSFERABLE",
+        "engineRank": 34,
+        "score": 0,
+        "j010": "HARD_MISMATCH",
+        "j003": "WAIT",
+        "preference": "UNKNOWN",
+        "cause": "AUTHORITY_CONFLICT"
+      },
+      {
+        "sampleId": "M21-010",
+        "company": "Anthropic",
+        "role": "Applied AI Architect, Commercial",
+        "evidenceFit": "TRANSFERABLE",
+        "engineRank": 22,
+        "score": 15.31,
+        "j010": "INSUFFICIENT_EVIDENCE",
+        "j003": "WAIT",
+        "preference": "OUTSIDE_PREFERENCE",
+        "cause": "GEOGRAPHY_GAP"
+      },
+      {
+        "sampleId": "M21-009",
+        "company": "Scale AI",
+        "role": "AI Builder Intern",
+        "evidenceFit": "TRANSFERABLE",
+        "engineRank": 21,
+        "score": 27.22,
+        "j010": "INSUFFICIENT_EVIDENCE",
+        "j003": "WAIT",
+        "preference": "UNKNOWN",
+        "cause": "EVIDENCE_GAP"
+      },
+      {
+        "sampleId": "M21-004",
+        "company": "Scale AI",
+        "role": "Frontier Agent Engineering Manager, Enterprise",
+        "evidenceFit": "TRANSFERABLE",
+        "engineRank": 33,
+        "score": 1.23,
+        "j010": "HARD_MISMATCH",
+        "j003": "REVIEW",
+        "preference": "UNKNOWN",
+        "cause": "AUTHORITY_CONFLICT"
+      },
+      {
+        "sampleId": "M21-001",
+        "company": "Scale AI",
+        "role": "AI Infrastructure Engineer, Sandbox Platform",
+        "evidenceFit": "TRANSFERABLE",
+        "engineRank": 40,
+        "score": 0,
+        "j010": "HARD_MISMATCH",
+        "j003": "WAIT",
+        "preference": "UNKNOWN",
+        "cause": "AUTHORITY_CONFLICT"
+      },
+      {
+        "sampleId": "M21-011",
+        "company": "Anthropic",
+        "role": "Applied AI Architect, Enterprise Tech",
+        "evidenceFit": "GOOD_MATCH",
+        "engineRank": 23,
+        "score": 15.31,
+        "j010": "INSUFFICIENT_EVIDENCE",
+        "j003": "WAIT",
+        "preference": "OUTSIDE_PREFERENCE",
+        "cause": "GEOGRAPHY_GAP"
+      },
+      {
+        "sampleId": "M21-008",
+        "company": "Airtable",
+        "role": "Program Manager, Professional Services - West",
+        "evidenceFit": "GOOD_MATCH",
+        "engineRank": 30,
+        "score": 2.41,
+        "j010": "HARD_MISMATCH",
+        "j003": "WAIT",
+        "preference": "UNKNOWN",
+        "cause": "AUTHORITY_CONFLICT"
+      },
+      {
+        "sampleId": "M21-007",
+        "company": "Airtable",
+        "role": "Program Manager, Professional Services - East",
+        "evidenceFit": "GOOD_MATCH",
+        "engineRank": 29,
+        "score": 2.41,
+        "j010": "HARD_MISMATCH",
+        "j003": "WAIT",
+        "preference": "UNKNOWN",
+        "cause": "AUTHORITY_CONFLICT"
+      },
+      {
+        "sampleId": "M21-012",
+        "company": "Anthropic",
+        "role": "Applied AI Architect, Industries",
+        "evidenceFit": "STRONG_MATCH",
+        "engineRank": 24,
+        "score": 15.31,
+        "j010": "INSUFFICIENT_EVIDENCE",
+        "j003": "WAIT",
+        "preference": "OUTSIDE_PREFERENCE",
+        "cause": "GEOGRAPHY_GAP"
+      }
+    ],
+    "over": [
+      {
+        "sampleId": "M21-015",
+        "company": "Scale AI",
+        "role": "[Annotations] Operations Program Manager",
+        "evidenceFit": "HARD_NO",
+        "engineRank": 1,
+        "score": 54.44,
+        "cause": "TRANSFERABILITY_UNDERVALUE"
+      },
+      {
+        "sampleId": "M21-023",
+        "company": "Anthropic",
+        "role": "Cloud Partner Enablement Lead",
+        "evidenceFit": "POOR_MATCH",
+        "engineRank": 3,
+        "score": 30.63,
+        "cause": "GEOGRAPHY_GAP"
+      },
+      {
+        "sampleId": "M21-026",
+        "company": "Airtable",
+        "role": "Delivery Consultant",
+        "evidenceFit": "POOR_MATCH",
+        "engineRank": 6,
+        "score": 54.44,
+        "cause": "GEOGRAPHY_GAP"
+      }
+    ],
+    "categoryCounts": {
+      "AUTHORITY_CONFLICT": 11,
+      "EVIDENCE_GAP": 1,
+      "GEOGRAPHY_GAP": 6,
+      "TRANSFERABILITY_UNDERVALUE": 1
+    }
+  },
+  "componentFindings": {
+    "requiredSkillsFit": {
+      "count": 32,
+      "correlation": -0.25,
+      "meanByLabel": {
+        "HARD_NO": 3.82,
+        "POOR_MATCH": 8.68,
+        "STRETCH": 2.57,
+        "TRANSFERABLE": 0.9,
+        "GOOD_MATCH": 2.75,
+        "STRONG_MATCH": 1.15
+      }
+    },
+    "relevantExperienceFit": {
+      "count": 40,
+      "correlation": 0.19,
+      "meanByLabel": {
+        "HARD_NO": 14,
+        "POOR_MATCH": 70,
+        "STRETCH": 31.5,
+        "TRANSFERABLE": 40.83,
+        "GOOD_MATCH": 40.83,
+        "STRONG_MATCH": 58.33
+      }
+    },
+    "roleFunctionFit": {
+      "count": 40,
+      "correlation": 0.19,
+      "meanByLabel": {
+        "HARD_NO": 14,
+        "POOR_MATCH": 70,
+        "STRETCH": 31.5,
+        "TRANSFERABLE": 40.83,
+        "GOOD_MATCH": 40.83,
+        "STRONG_MATCH": 58.33
+      }
+    },
+    "responsibilitySimilarity": {
+      "count": 40,
+      "correlation": null,
+      "meanByLabel": {
+        "HARD_NO": 0,
+        "POOR_MATCH": 0,
+        "STRETCH": 0,
+        "TRANSFERABLE": 0,
+        "GOOD_MATCH": 0,
+        "STRONG_MATCH": 0
+      }
+    },
+    "seniorityFit": {
+      "count": 0,
+      "correlation": null,
+      "meanByLabel": {
+        "HARD_NO": null,
+        "POOR_MATCH": null,
+        "STRETCH": null,
+        "TRANSFERABLE": null,
+        "GOOD_MATCH": null,
+        "STRONG_MATCH": null
+      }
+    },
+    "domainFit": {
+      "count": 0,
+      "correlation": null,
+      "meanByLabel": {
+        "HARD_NO": null,
+        "POOR_MATCH": null,
+        "STRETCH": null,
+        "TRANSFERABLE": null,
+        "GOOD_MATCH": null,
+        "STRONG_MATCH": null
+      }
+    },
+    "geographyWorkArrangementFit": {
+      "count": 18,
+      "correlation": null,
+      "meanByLabel": {
+        "HARD_NO": null,
+        "POOR_MATCH": 0,
+        "STRETCH": 0,
+        "TRANSFERABLE": 0,
+        "GOOD_MATCH": 0,
+        "STRONG_MATCH": 0
+      }
+    },
+    "compensationFit": {
+      "count": 0,
+      "correlation": null,
+      "meanByLabel": {
+        "HARD_NO": null,
+        "POOR_MATCH": null,
+        "STRETCH": null,
+        "TRANSFERABLE": null,
+        "GOOD_MATCH": null,
+        "STRONG_MATCH": null
+      }
+    }
+  },
+  "confidenceFindings": {
+    "highConfidenceCount": 3,
+    "lowConfidenceCount": 19,
+    "primaryRateHigh": 0,
+    "primaryRateLow": 0.26,
+    "selfConfidenceNotUsed": true
+  },
+  "preferenceFindings": {
+    "distribution": {
+      "OUTSIDE_PREFERENCE": 18,
+      "UNKNOWN": 22
+    },
+    "geographyJudgment": {
+      "ACCEPTABLE": 32,
+      "NOT_ACCEPTABLE": 5,
+      "UNKNOWN": 3
+    },
+    "mismatches": 20
+  },
+  "hardMismatchPreferenceContamination": {
+    "count": 15,
+    "recommendation": "Repair independent preference compatibility contamination in a separate bounded mission; do not repair during calibration."
+  },
+  "controlCase": {
+    "caseId": "CONTROL_CASE_DATADOG_TPM",
+    "company": "Datadog",
+    "role": "Director, Technical Program Management - Technical Solutions Operations",
+    "location": "Boston, Massachusetts, USA; New York, New York, USA; San Francisco, California, USA",
+    "eligibility": {
+      "state": "ELIGIBLE",
+      "blockingReasons": []
+    },
+    "qualification": {
+      "state": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "reasons": [
+        "The target lane is supported by confirmed or transferable experience; exact title history is not required."
+      ],
+      "hardMismatchCategories": []
+    },
+    "recommendation": {
+      "state": "REVIEW",
+      "reasons": [
+        "Explainable Fit has missing or unresolved requirement evidence.",
+        "The best existing ResumeVersion still requires review before reuse."
+      ]
+    },
+    "experimentalFit": {
+      "score": 30.63,
+      "scoreStatus": "PARTIAL",
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 0,
+          "status": "UNKNOWN",
+          "evidence": [
+            "privev_0da63084cffedbdc",
+            "privev_0da63084cffedbdc",
+            "privev_a27750900e1e04e4",
+            "privev_0da63084cffedbdc",
+            "privev_a27750900e1e04e4",
+            "privev_3e75eeefc40c84ae"
+          ]
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 70,
+          "status": "PARTIAL",
+          "evidence": [
+            "privev_0da63084cffedbdc",
+            "privev_0da63084cffedbdc",
+            "privev_a27750900e1e04e4",
+            "privev_0da63084cffedbdc",
+            "privev_a27750900e1e04e4",
+            "privev_0da63084cffedbdc",
+            "privev_a27750900e1e04e4",
+            "privev_0da63084cffedbdc",
+            "privev_a27750900e1e04e4",
+            "privev_3e75eeefc40c84ae",
+            "privev_0da63084cffedbdc",
+            "privev_0da63084cffedbdc",
+            "privev_0da63084cffedbdc",
+            "privev_0da63084cffedbdc",
+            "privev_0da63084cffedbdc",
+            "privev_a27750900e1e04e4",
+            "privev_3e75eeefc40c84ae",
+            "privev_0da63084cffedbdc",
+            "privev_a27750900e1e04e4",
+            "privev_0da63084cffedbdc",
+            "privev_0da63084cffedbdc",
+            "privev_a27750900e1e04e4",
+            "privev_0da63084cffedbdc",
+            "privev_0da63084cffedbdc",
+            "privev_a27750900e1e04e4",
+            "privev_0da63084cffedbdc",
+            "privev_a27750900e1e04e4",
+            "privev_0da63084cffedbdc",
+            "privev_a27750900e1e04e4",
+            "privev_3e75eeefc40c84ae",
+            "privev_0da63084cffedbdc",
+            "privev_a27750900e1e04e4",
+            "privev_0da63084cffedbdc",
+            "privev_a27750900e1e04e4",
+            "privev_0da63084cffedbdc",
+            "privev_a27750900e1e04e4",
+            "privev_3e75eeefc40c84ae",
+            "privev_0da63084cffedbdc",
+            "privev_a27750900e1e04e4"
+          ]
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 70,
+          "status": "CALCULATED",
+          "evidence": [
+            "program management",
+            "technical program"
+          ]
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN",
+          "evidence": [
+            "privev_0da63084cffedbdc",
+            "privev_0da63084cffedbdc",
+            "privev_a27750900e1e04e4",
+            "privev_3e75eeefc40c84ae",
+            "privev_0da63084cffedbdc",
+            "privev_0da63084cffedbdc",
+            "privev_0da63084cffedbdc",
+            "privev_0da63084cffedbdc",
+            "privev_a27750900e1e04e4",
+            "privev_0da63084cffedbdc",
+            "privev_a27750900e1e04e4",
+            "privev_3e75eeefc40c84ae"
+          ]
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN",
+          "evidence": []
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN",
+          "evidence": []
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN",
+          "evidence": []
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN",
+          "evidence": []
+        }
+      ],
+      "explanation": [
+        "3 mandatory requirements were evaluated from requirement-level evidence mappings.",
+        "Qualification state TRANSFERABLE_BUT_NOT_DIRECT is reused as a categorical input; no new career fact is inferred.",
+        "Role/function fit reuses J010 qualification and existing J002 matched terms for traceability.",
+        "Responsibility similarity uses only requirement-level mappings; transferable support remains distinct from exact support.",
+        "No approved seniority comparison authority is available in the current input.",
+        "No independent domain-fit authority is available; role-family evidence remains separate.",
+        "CareerOS cannot determine whether this opportunity fits your preferences because its work arrangement is unclear.",
+        "Compensation fit is not calculated without an explicit operator compensation preference."
+      ]
+    },
+    "experimentalConfidence": {
+      "score": 71.48,
+      "scoreStatus": "PARTIAL",
+      "missingInputs": [
+        "workArrangement",
+        "freshnessState",
+        "conflicting evidence"
+      ],
+      "explanation": [
+        "Confidence is separate from fit and reflects input reliability, completeness, and unresolved authority state."
+      ],
+      "components": [
+        {
+          "name": "jobDescriptionCompleteness",
+          "score": 100,
+          "status": "CALCULATED",
+          "missingInputs": [],
+          "explanation": "Source description is present."
+        },
+        {
+          "name": "requirementExtractionConfidence",
+          "score": 73.91,
+          "status": "CALCULATED",
+          "missingInputs": [],
+          "explanation": "Uses extractor-provided confidence values."
+        },
+        {
+          "name": "evidenceCoverage",
+          "score": 43.48,
+          "status": "CALCULATED",
+          "missingInputs": [],
+          "explanation": "Unknown mappings reduce confidence but are not treated as unsupported evidence."
+        },
+        {
+          "name": "locationCertainty",
+          "score": 100,
+          "status": "CALCULATED",
+          "missingInputs": [],
+          "explanation": "Normalized source location is present."
+        },
+        {
+          "name": "workArrangementCertainty",
+          "score": null,
+          "status": "UNKNOWN",
+          "missingInputs": [
+            "workArrangement"
+          ],
+          "explanation": "Work arrangement is unknown."
+        },
+        {
+          "name": "freshnessCertainty",
+          "score": null,
+          "status": "UNKNOWN",
+          "missingInputs": [
+            "freshnessState"
+          ],
+          "explanation": "Source freshness is UNKNOWN."
+        },
+        {
+          "name": "authorityQuality",
+          "score": 40,
+          "status": "CALCULATED",
+          "missingInputs": [
+            "conflicting evidence"
+          ],
+          "explanation": "Uses existing CareerEvidence mapping conflict/provenance state."
+        }
+      ]
+    },
+    "preferenceCompatibility": {
+      "compatibility": "UNKNOWN",
+      "reasons": [
+        "CareerOS cannot determine whether this opportunity fits your preferences because its work arrangement is unclear."
+      ],
+      "authorityState": "ROSS_OPERATOR_EXPLICIT"
+    },
+    "requirements": [
+      {
+        "text": "Deploy AI to create operational leverage. Identify and build AI-enabled workflows that reduce friction across how programs are planned, communicated, and executed — for your team and for the TS functions you support. This is a core expectation, not a future initiative. You bring a clear point of view on where AI creates a genuine capability shift and you build toward it.",
+        "level": "RESPONSIBILITY",
+        "evidenceState": "UNKNOWN",
+        "safeEvidence": "Existing CareerEvidence mapping"
+      },
+      {
+        "text": "Develop the TPM team and raise the bar. Lead a team of senior Technical Program Managers delivering complex, concurrent initiatives across TS. Raise the bar for execution quality, stakeholder management, and accountability — and develop a team that operates independently and owns outcomes.",
+        "level": "RESPONSIBILITY",
+        "evidenceState": "TRANSFERABLE",
+        "safeEvidence": "Existing CareerEvidence mapping"
+      },
+      {
+        "text": "Build cross-functional relationships before you need them. Build cross-functional relationships across TS and adjacent functions before programs require it. Use influence, credibility, and direct engagement to drive alignment, resolve tension, and expand the reach and impact of TSO well beyond its own boundaries.",
+        "level": "RESPONSIBILITY",
+        "evidenceState": "TRANSFERABLE",
+        "safeEvidence": "Existing CareerEvidence mapping"
+      },
+      {
+        "text": "10+ years running complex, cross-functional programs at a senior level, with VPs and senior Directors as your primary stakeholders — ideally within a high-growth B2B SaaS go-to-market, customer-facing, or revenue operations organization",
+        "level": "RESPONSIBILITY",
+        "evidenceState": "TRANSFERABLE",
+        "safeEvidence": "Existing CareerEvidence mapping"
+      },
+      {
+        "text": "A systems builder with a track record of designing operating models, playbooks, and frameworks that other teams adopted as a reference standard",
+        "level": "RESPONSIBILITY",
+        "evidenceState": "UNKNOWN",
+        "safeEvidence": "Existing CareerEvidence mapping"
+      },
+      {
+        "text": "Autonomously executive-ready — decisive under ambiguity, composed under pressure, and capable of leading VP-level conversations without preparation coaching",
+        "level": "RESPONSIBILITY",
+        "evidenceState": "TRANSFERABLE",
+        "safeEvidence": "Existing CareerEvidence mapping"
+      },
+      {
+        "text": "Experienced applying AI as an operational tool, with a practical point of view on where it creates capability shifts — not just productivity gains",
+        "level": "RESPONSIBILITY",
+        "evidenceState": "UNKNOWN",
+        "safeEvidence": "Existing CareerEvidence mapping"
+      },
+      {
+        "text": "A developer of senior talent who raises the bar on what great program management looks like and builds teams that operate independently at a high standard",
+        "level": "RESPONSIBILITY",
+        "evidenceState": "UNKNOWN",
+        "safeEvidence": "Existing CareerEvidence mapping"
+      },
+      {
+        "text": "Outcome-oriented and metric-driven — you define success before work begins and hold yourself and your team accountable to delivering against it",
+        "level": "RESPONSIBILITY",
+        "evidenceState": "UNKNOWN",
+        "safeEvidence": "Existing CareerEvidence mapping"
+      },
+      {
+        "text": "Preferred Experience",
+        "level": "PREFERRED",
+        "evidenceState": "MISSING",
+        "safeEvidence": "No mapped CareerEvidence"
+      },
+      {
+        "text": "Experience supporting large-scale go-to-market or customer-facing technical organizations spanning sales engineering, post-sales, technical support, or solutions architecture",
+        "level": "PREFERRED",
+        "evidenceState": "UNKNOWN",
+        "safeEvidence": "Existing CareerEvidence mapping"
+      },
+      {
+        "text": "Familiarity with support operations platforms and the workflows they enable across technical teams",
+        "level": "PREFERRED",
+        "evidenceState": "UNKNOWN",
+        "safeEvidence": "Existing CareerEvidence mapping"
+      },
+      {
+        "text": "Experience designing org-wide AI-enabled capabilities in an operational context",
+        "level": "PREFERRED",
+        "evidenceState": "MISSING",
+        "safeEvidence": "No mapped CareerEvidence"
+      },
+      {
+        "text": "Background in tooling strategy, workforce planning, or operational transformation at scale in a SaaS environment",
+        "level": "PREFERRED",
+        "evidenceState": "UNKNOWN",
+        "safeEvidence": "Existing CareerEvidence mapping"
+      },
+      {
+        "text": "We're looking for a Director of Technical Program Management to lead the TSO Program Management team. This role sits at the intersection of strategy and execution: you'll own the programs that shape how TS operates at scale, lead a team of technical program managers, and serve as a peer to the Directors and VPs who run the teams you support. Your counterparts are leaders overseeing hundreds of customer-facing technical professionals, and your role is to successfully interface with each organization with proactive solutions on how your team can help them be more effective. This is a rare opportunity to lead a function where the output isn't a deliverable, it's organizational capability. If you want to build something that compounds across an entire organization, this is the role.",
+        "level": "RESPONSIBILITY",
+        "evidenceState": "TRANSFERABLE",
+        "safeEvidence": "Existing CareerEvidence mapping"
+      },
+      {
+        "text": "To conform to US export control regulations, candidates should be eligible for any required authorizations from the US government. This job is available in various departments within our company",
+        "level": "REQUIRED",
+        "evidenceState": "UNKNOWN",
+        "safeEvidence": "Existing CareerEvidence mapping"
+      },
+      {
+        "text": "to conform to US export control regulations, some of these roles may require candidates to be eligible for any required authorizations from the US government.",
+        "level": "REQUIRED",
+        "evidenceState": "UNKNOWN",
+        "safeEvidence": "Existing CareerEvidence mapping"
+      },
+      {
+        "text": "Datadog is the leading observability and security platform for the AI era, providing businesses with unified visibility across the technology stack to manage complexity at scale. It brings applications, infrastructure, data, models, and security into one place, using AI to detect and resolve issues before they impact customers. Trusted globally by Fortune 500 companies and high-growth AI leaders, Datadog enables businesses to move faster with clarity and confidence. Learn more about #DatadogLife on Instagram, LinkedIn, and Datadog Learning Center.",
+        "level": "RESPONSIBILITY",
+        "evidenceState": "TRANSFERABLE",
+        "safeEvidence": "Existing CareerEvidence mapping"
+      },
+      {
+        "text": "Datadog endeavors to make our Careers Page accessible to all users. If you would like to contact us regarding the accessibility of our website or need assistance completing the application process, please complete this form. This form is for accommodation requests only and cannot be used to inquire about the status of applications.",
+        "level": "REQUIRED",
+        "evidenceState": "UNKNOWN",
+        "safeEvidence": "Existing CareerEvidence mapping"
+      },
+      {
+        "text": "Run the PMO as a business impact function. Own the PMO operating model end-to-end, including intake, prioritization, scoping, execution, and impact measurement — with every program directly linked to measurable business outcomes such as productivity gains, revenue influence, cost efficiency, or customer experience improvements. Establish a PMO operating standard that other TS leaders adopt as the benchmark.",
+        "level": "RESPONSIBILITY",
+        "evidenceState": "UNKNOWN",
+        "safeEvidence": "Existing CareerEvidence mapping"
+      },
+      {
+        "text": "Build capabilities that scale across TS, not point solutions. Build durable, cross-functional capabilities that drive business outcomes across every function in TS. Solve systemic problems with scalable solutions and operating models — not one-off fixes — and hold your team to the same standard.",
+        "level": "RESPONSIBILITY",
+        "evidenceState": "TRANSFERABLE",
+        "safeEvidence": "Existing CareerEvidence mapping"
+      },
+      {
+        "text": "Drive programs from alignment to impact. Establish clear scope, sequencing, ownership, and success metrics before execution begins. Hold your team to rigorous delivery standards and close every program with post-launch reporting that connects leverage created directly to business outcomes for partner teams.",
+        "level": "RESPONSIBILITY",
+        "evidenceState": "UNKNOWN",
+        "safeEvidence": "Existing CareerEvidence mapping"
+      },
+      {
+        "text": "Represent TSO in executive forums. Represent TSO in executive forums with Director and VP-level counterparts across TS. Come prepared with clear recommendations, framed trade-offs, and the ability to drive decisions — not surface issues. Own stakeholder relationships and outcomes and drive alignment across disparate teams.",
+        "level": "RESPONSIBILITY",
+        "evidenceState": "TRANSFERABLE",
+        "safeEvidence": "Existing CareerEvidence mapping"
+      }
+    ],
+    "limitations": [
+      "Control case only; not part of the 40-role human-label sample.",
+      "Title, domain, evidence, and confidence gaps remain separate from capability gaps."
+    ]
+  },
+  "robustness": {
+    "EXPERIMENTAL_WEIGHT_SET_V1": {
+      "leaveOneOutTop5PrecisionRange": [
+        0,
+        0
+      ],
+      "leaveOneOutStrongGoodRecallRange": [
+        0.13,
+        0.25
+      ]
+    },
+    "EXPERIMENTAL_WEIGHT_SET_V1B": {
+      "leaveOneOutTop5PrecisionRange": [
+        0,
+        0
+      ],
+      "leaveOneOutStrongGoodRecallRange": [
+        0.13,
+        0.25
+      ]
+    },
+    "EXPERIMENTAL_WEIGHT_SET_V1C": {
+      "leaveOneOutTop5PrecisionRange": [
+        0,
+        0
+      ],
+      "leaveOneOutStrongGoodRecallRange": [
+        0.13,
+        0.25
+      ]
+    },
+    "EXPERIMENTAL_WEIGHT_SET_V1D": {
+      "leaveOneOutTop5PrecisionRange": [
+        0,
+        0
+      ],
+      "leaveOneOutStrongGoodRecallRange": [
+        0.13,
+        0.25
+      ]
+    }
+  },
+  "rows": [
+    {
+      "sampleId": "M21-015",
+      "company": "Scale AI",
+      "role": "[Annotations] Operations Program Manager",
+      "location": "Mexico City, MX",
+      "evidenceFit": "HARD_NO",
+      "interest": "NONE",
+      "geography": "NOT_ACCEPTABLE",
+      "wouldPursue": "NO",
+      "selfConfidence": "LOW",
+      "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003Recommendation": "REVIEW",
+      "eligibility": "ELIGIBLE",
+      "preferenceCompatibility": "UNKNOWN",
+      "experimentalFitScore": 54.44,
+      "experimentalConfidenceScore": 64.11,
+      "engineRank": 1,
+      "humanRank": 39,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": null,
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 70,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 70,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-022",
+      "company": "Anthropic",
+      "role": "Business Systems Analyst",
+      "location": "San Francisco, CA",
+      "evidenceFit": "TRANSFERABLE",
+      "interest": "MEDIUM",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "YES",
+      "selfConfidence": "HIGH",
+      "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003Recommendation": "REVIEW",
+      "eligibility": "ELIGIBLE",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "experimentalFitScore": 31.72,
+      "experimentalConfidenceScore": 65.73,
+      "engineRank": 2,
+      "humanRank": 18,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 2.5,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 70,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 70,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-023",
+      "company": "Anthropic",
+      "role": "Cloud Partner Enablement Lead",
+      "location": "San Francisco, CA | New York City, NY",
+      "evidenceFit": "POOR_MATCH",
+      "interest": "NONE",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "NO",
+      "selfConfidence": "LOW",
+      "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003Recommendation": "REVIEW",
+      "eligibility": "ELIGIBLE",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "experimentalFitScore": 30.63,
+      "experimentalConfidenceScore": 64.76,
+      "engineRank": 3,
+      "humanRank": 33,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 70,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 70,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-020",
+      "company": "Datadog",
+      "role": "Director, Product Management - AI Observability",
+      "location": "New York, New York, USA",
+      "evidenceFit": "STRETCH",
+      "interest": "MEDIUM",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "MAYBE",
+      "selfConfidence": "LOW",
+      "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003Recommendation": "REVIEW",
+      "eligibility": "ELIGIBLE",
+      "preferenceCompatibility": "UNKNOWN",
+      "experimentalFitScore": 30.63,
+      "experimentalConfidenceScore": 71.22,
+      "engineRank": 4,
+      "humanRank": 25,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 70,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 70,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-016",
+      "company": "Scale AI",
+      "role": "Engagement Manager",
+      "location": "San Francisco, CA; New York, NY",
+      "evidenceFit": "TRANSFERABLE",
+      "interest": "MEDIUM",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "MAYBE",
+      "selfConfidence": "LOW",
+      "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003Recommendation": "REVIEW",
+      "eligibility": "ELIGIBLE",
+      "preferenceCompatibility": "UNKNOWN",
+      "experimentalFitScore": 30.63,
+      "experimentalConfidenceScore": 66.62,
+      "engineRank": 5,
+      "humanRank": 15,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 70,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 70,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-026",
+      "company": "Airtable",
+      "role": "Delivery Consultant",
+      "location": "New York, NY; Remote - US",
+      "evidenceFit": "POOR_MATCH",
+      "interest": "NONE",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "NO",
+      "selfConfidence": "LOW",
+      "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "REVIEW_REQUIRED",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "experimentalFitScore": 54.44,
+      "experimentalConfidenceScore": 62.87,
+      "engineRank": 6,
+      "humanRank": 35,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": null,
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 70,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 70,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-029",
+      "company": "Airtable",
+      "role": "Director, AI Transformation & Customer Success",
+      "location": "Remote - US",
+      "evidenceFit": "GOOD_MATCH",
+      "interest": "HIGH",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "YES",
+      "selfConfidence": "MEDIUM",
+      "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "REVIEW_REQUIRED",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "experimentalFitScore": 54.44,
+      "experimentalConfidenceScore": 65.37,
+      "engineRank": 7,
+      "humanRank": 8,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": null,
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 70,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 70,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-027",
+      "company": "Airtable",
+      "role": "Senior Delivery Consultant",
+      "location": "New York, NY; Remote - US",
+      "evidenceFit": "GOOD_MATCH",
+      "interest": "MEDIUM",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "MAYBE",
+      "selfConfidence": "MEDIUM",
+      "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "REVIEW_REQUIRED",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "experimentalFitScore": 54.44,
+      "experimentalConfidenceScore": 62.87,
+      "engineRank": 8,
+      "humanRank": 7,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": null,
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 70,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 70,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-028",
+      "company": "Airtable",
+      "role": "Senior Delivery Consultant- West Coast",
+      "location": "San Francisco, CA; Austin, TX; Remote - US",
+      "evidenceFit": "STRETCH",
+      "interest": "NONE",
+      "geography": "NOT_ACCEPTABLE",
+      "wouldPursue": "NO",
+      "selfConfidence": "LOW",
+      "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "REVIEW_REQUIRED",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "experimentalFitScore": 54.44,
+      "experimentalConfidenceScore": 62.87,
+      "engineRank": 9,
+      "humanRank": 27,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": null,
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 70,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 70,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-021",
+      "company": "Scale AI",
+      "role": "Director of Product Management, Forward Deployed & Strategy",
+      "location": "New York, NY",
+      "evidenceFit": "TRANSFERABLE",
+      "interest": "MEDIUM",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "MAYBE",
+      "selfConfidence": "LOW",
+      "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "REVIEW_REQUIRED",
+      "preferenceCompatibility": "UNKNOWN",
+      "experimentalFitScore": 54.44,
+      "experimentalConfidenceScore": 65.63,
+      "engineRank": 10,
+      "humanRank": 17,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": null,
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 70,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 70,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-019",
+      "company": "Anthropic",
+      "role": "Customer Program Manager, Executive Briefing Center",
+      "location": "San Francisco, CA",
+      "evidenceFit": "POOR_MATCH",
+      "interest": "LOW",
+      "geography": "NOT_ACCEPTABLE",
+      "wouldPursue": "NO",
+      "selfConfidence": "LOW",
+      "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "REVIEW_REQUIRED",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "experimentalFitScore": 42.02,
+      "experimentalConfidenceScore": 73.29,
+      "engineRank": 11,
+      "humanRank": 32,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 26.05,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 70,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 70,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-017",
+      "company": "Anthropic",
+      "role": "Commercial Operations Program Manager",
+      "location": "San Francisco, CA | New York City, NY",
+      "evidenceFit": "STRETCH",
+      "interest": "LOW",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "MAYBE",
+      "selfConfidence": "LOW",
+      "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "REVIEW_REQUIRED",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "experimentalFitScore": 32.81,
+      "experimentalConfidenceScore": 65.23,
+      "engineRank": 12,
+      "humanRank": 24,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 5,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 70,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 70,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-032",
+      "company": "Anthropic",
+      "role": "Amazon GTM Partnership, Startups",
+      "location": "San Francisco, CA | New York City, NY | Seattle, WA",
+      "evidenceFit": "STRONG_MATCH",
+      "interest": "HIGH",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "YES",
+      "selfConfidence": "MEDIUM",
+      "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "REVIEW_REQUIRED",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "experimentalFitScore": 32.13,
+      "experimentalConfidenceScore": 66,
+      "engineRank": 13,
+      "humanRank": 3,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 3.44,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 70,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 70,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-031",
+      "company": "Anthropic",
+      "role": "AI Infrastructure Operations, Demand Planning",
+      "location": "San Francisco, CA | New York City, NY",
+      "evidenceFit": "TRANSFERABLE",
+      "interest": "LOW",
+      "geography": "UNKNOWN",
+      "wouldPursue": "MAYBE",
+      "selfConfidence": "LOW",
+      "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "REVIEW_REQUIRED",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "experimentalFitScore": 31.83,
+      "experimentalConfidenceScore": 65.72,
+      "engineRank": 14,
+      "humanRank": 19,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 2.75,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 70,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 70,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-030",
+      "company": "Anthropic",
+      "role": "AI Fluency Education Lead",
+      "location": "San Francisco, CA | New York City, NY",
+      "evidenceFit": "STRONG_MATCH",
+      "interest": "HIGH",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "YES",
+      "selfConfidence": "HIGH",
+      "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "REVIEW_REQUIRED",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "experimentalFitScore": 30.63,
+      "experimentalConfidenceScore": 63.43,
+      "engineRank": 15,
+      "humanRank": 2,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 70,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 70,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-033",
+      "company": "Anthropic",
+      "role": "Applied AI Architect, Partnerships",
+      "location": "San Francisco, CA | New York City, NY",
+      "evidenceFit": "GOOD_MATCH",
+      "interest": "HIGH",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "YES",
+      "selfConfidence": "MEDIUM",
+      "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "REVIEW_REQUIRED",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "experimentalFitScore": 30.63,
+      "experimentalConfidenceScore": 64.91,
+      "engineRank": 16,
+      "humanRank": 9,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 70,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 70,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-024",
+      "company": "Anthropic",
+      "role": "Communications Lead, Platform",
+      "location": "New York City, NY; San Francisco, CA; Seattle, WA",
+      "evidenceFit": "POOR_MATCH",
+      "interest": "NONE",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "NO",
+      "selfConfidence": "LOW",
+      "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "REVIEW_REQUIRED",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "experimentalFitScore": 30.63,
+      "experimentalConfidenceScore": 63.52,
+      "engineRank": 17,
+      "humanRank": 34,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 70,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 70,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-018",
+      "company": "Anthropic",
+      "role": "Community & Executive Escalations Program Manager",
+      "location": "San Francisco, CA | New York City, NY",
+      "evidenceFit": "TRANSFERABLE",
+      "interest": "LOW",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "NO",
+      "selfConfidence": "LOW",
+      "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "REVIEW_REQUIRED",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "experimentalFitScore": 30.63,
+      "experimentalConfidenceScore": 64.32,
+      "engineRank": 18,
+      "humanRank": 16,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 70,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 70,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-025",
+      "company": "Figma",
+      "role": "Governance Risk and Compliance",
+      "location": "San Francisco, CA • New York, NY • United States",
+      "evidenceFit": "STRETCH",
+      "interest": "LOW",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "NO",
+      "selfConfidence": "LOW",
+      "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "REVIEW_REQUIRED",
+      "preferenceCompatibility": "UNKNOWN",
+      "experimentalFitScore": 30.63,
+      "experimentalConfidenceScore": 66.79,
+      "engineRank": 19,
+      "humanRank": 26,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 70,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 70,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-014",
+      "company": "Scale AI",
+      "role": "Finance Systems & Automations Manager",
+      "location": "San Francisco, CA",
+      "evidenceFit": "TRANSFERABLE",
+      "interest": "MEDIUM",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "YES",
+      "selfConfidence": "LOW",
+      "existingJ010State": "TRANSFERABLE_BUT_NOT_DIRECT",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "REVIEW_REQUIRED",
+      "preferenceCompatibility": "UNKNOWN",
+      "experimentalFitScore": 30.63,
+      "experimentalConfidenceScore": 67.11,
+      "engineRank": 20,
+      "humanRank": 14,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 70,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 70,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-009",
+      "company": "Scale AI",
+      "role": "AI Builder Intern",
+      "location": "San Francisco, CA",
+      "evidenceFit": "TRANSFERABLE",
+      "interest": "MEDIUM",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "YES",
+      "selfConfidence": "MEDIUM",
+      "existingJ010State": "INSUFFICIENT_EVIDENCE",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "REVIEW_REQUIRED",
+      "preferenceCompatibility": "UNKNOWN",
+      "experimentalFitScore": 27.22,
+      "experimentalConfidenceScore": 63.54,
+      "engineRank": 21,
+      "humanRank": 12,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": null,
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 35,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 35,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-010",
+      "company": "Anthropic",
+      "role": "Applied AI Architect, Commercial",
+      "location": "San Francisco, CA | New York City, NY",
+      "evidenceFit": "TRANSFERABLE",
+      "interest": "HIGH",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "YES",
+      "selfConfidence": "MEDIUM",
+      "existingJ010State": "INSUFFICIENT_EVIDENCE",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "REVIEW_REQUIRED",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "experimentalFitScore": 15.31,
+      "experimentalConfidenceScore": 63.52,
+      "engineRank": 22,
+      "humanRank": 13,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 35,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 35,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-011",
+      "company": "Anthropic",
+      "role": "Applied AI Architect, Enterprise Tech",
+      "location": "San Francisco, CA | New York City, NY | Seattle, WA",
+      "evidenceFit": "GOOD_MATCH",
+      "interest": "HIGH",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "YES",
+      "selfConfidence": "MEDIUM",
+      "existingJ010State": "INSUFFICIENT_EVIDENCE",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "REVIEW_REQUIRED",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "experimentalFitScore": 15.31,
+      "experimentalConfidenceScore": 64.45,
+      "engineRank": 23,
+      "humanRank": 6,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 35,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 35,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-012",
+      "company": "Anthropic",
+      "role": "Applied AI Architect, Industries",
+      "location": "New York City, NY; San Francisco, CA | New York City, NY | Seattle, WA",
+      "evidenceFit": "STRONG_MATCH",
+      "interest": "HIGH",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "YES",
+      "selfConfidence": "HIGH",
+      "existingJ010State": "INSUFFICIENT_EVIDENCE",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "REVIEW_REQUIRED",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "experimentalFitScore": 15.31,
+      "experimentalConfidenceScore": 64.53,
+      "engineRank": 24,
+      "humanRank": 1,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 35,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 35,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-013",
+      "company": "Anthropic",
+      "role": "Data Engineer, Safeguards",
+      "location": "San Francisco, CA | New York City, NY",
+      "evidenceFit": "STRETCH",
+      "interest": "MEDIUM",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "YES",
+      "selfConfidence": "LOW",
+      "existingJ010State": "INSUFFICIENT_EVIDENCE",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "REVIEW_REQUIRED",
+      "preferenceCompatibility": "OUTSIDE_PREFERENCE",
+      "experimentalFitScore": 15.31,
+      "experimentalConfidenceScore": 62.97,
+      "engineRank": 25,
+      "humanRank": 23,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 35,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 35,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-006",
+      "company": "Anthropic",
+      "role": "Director, Global Order-to-Cash Transformation",
+      "location": "San Francisco, CA | New York City, NY | Seattle, WA",
+      "evidenceFit": "STRETCH",
+      "interest": "MEDIUM",
+      "geography": "UNKNOWN",
+      "wouldPursue": "NO",
+      "selfConfidence": "LOW",
+      "existingJ010State": "HARD_MISMATCH",
+      "existingJ003Recommendation": "REVIEW",
+      "eligibility": "INELIGIBLE",
+      "preferenceCompatibility": "UNKNOWN",
+      "experimentalFitScore": 5.01,
+      "experimentalConfidenceScore": 66.32,
+      "engineRank": 26,
+      "humanRank": 22,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 11.46,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-035",
+      "company": "Scale AI",
+      "role": "Lead Counsel, Product and IP",
+      "location": "San Francisco, CA",
+      "evidenceFit": "HARD_NO",
+      "interest": "NONE",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "NO",
+      "selfConfidence": "LOW",
+      "existingJ010State": "HARD_MISMATCH",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "INELIGIBLE",
+      "preferenceCompatibility": "UNKNOWN",
+      "experimentalFitScore": 4.01,
+      "experimentalConfidenceScore": 68.9,
+      "engineRank": 27,
+      "humanRank": 40,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 9.17,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-003",
+      "company": "Datadog",
+      "role": "Engineering Manager I, Commercial Audit",
+      "location": "New York, New York, USA",
+      "evidenceFit": "HARD_NO",
+      "interest": "NONE",
+      "geography": "NOT_ACCEPTABLE",
+      "wouldPursue": "NO",
+      "selfConfidence": "LOW",
+      "existingJ010State": "HARD_MISMATCH",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "INELIGIBLE",
+      "preferenceCompatibility": "UNKNOWN",
+      "experimentalFitScore": 2.67,
+      "experimentalConfidenceScore": 70.87,
+      "engineRank": 28,
+      "humanRank": 37,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 6.11,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-007",
+      "company": "Airtable",
+      "role": "Program Manager, Professional Services - East",
+      "location": "New York, NY; Remote - US",
+      "evidenceFit": "GOOD_MATCH",
+      "interest": "HIGH",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "YES",
+      "selfConfidence": "MEDIUM",
+      "existingJ010State": "HARD_MISMATCH",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "INELIGIBLE",
+      "preferenceCompatibility": "UNKNOWN",
+      "experimentalFitScore": 2.41,
+      "experimentalConfidenceScore": 68.84,
+      "engineRank": 29,
+      "humanRank": 4,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 5.5,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-008",
+      "company": "Airtable",
+      "role": "Program Manager, Professional Services - West",
+      "location": "San Francisco, CA; Remote - US",
+      "evidenceFit": "GOOD_MATCH",
+      "interest": "HIGH",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "YES",
+      "selfConfidence": "MEDIUM",
+      "existingJ010State": "HARD_MISMATCH",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "INELIGIBLE",
+      "preferenceCompatibility": "UNKNOWN",
+      "experimentalFitScore": 2.41,
+      "experimentalConfidenceScore": 68.84,
+      "engineRank": 30,
+      "humanRank": 5,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 5.5,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-034",
+      "company": "Scale AI",
+      "role": "Engineering Manager, Agent Oversight",
+      "location": "San Francisco, CA; New York, NY",
+      "evidenceFit": "STRETCH",
+      "interest": "LOW",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "NO",
+      "selfConfidence": "LOW",
+      "existingJ010State": "HARD_MISMATCH",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "INELIGIBLE",
+      "preferenceCompatibility": "UNKNOWN",
+      "experimentalFitScore": 1.51,
+      "experimentalConfidenceScore": 67.33,
+      "engineRank": 31,
+      "humanRank": 28,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 3.44,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-040",
+      "company": "Anthropic",
+      "role": "Applied AI Engineer, Enterprise Tech",
+      "location": "San Francisco, CA | New York City, NY | Seattle, WA",
+      "evidenceFit": "STRETCH",
+      "interest": "LOW",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "NO",
+      "selfConfidence": "LOW",
+      "existingJ010State": "HARD_MISMATCH",
+      "existingJ003Recommendation": "REVIEW",
+      "eligibility": "INELIGIBLE",
+      "preferenceCompatibility": "UNKNOWN",
+      "experimentalFitScore": 1.42,
+      "experimentalConfidenceScore": 65.11,
+      "engineRank": 32,
+      "humanRank": 31,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 3.24,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-004",
+      "company": "Scale AI",
+      "role": "Frontier Agent Engineering Manager, Enterprise",
+      "location": "San Francisco, CA; New York, NY",
+      "evidenceFit": "TRANSFERABLE",
+      "interest": "HIGH",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "YES",
+      "selfConfidence": "LOW",
+      "existingJ010State": "HARD_MISMATCH",
+      "existingJ003Recommendation": "REVIEW",
+      "eligibility": "INELIGIBLE",
+      "preferenceCompatibility": "UNKNOWN",
+      "experimentalFitScore": 1.23,
+      "experimentalConfidenceScore": 65.45,
+      "engineRank": 33,
+      "humanRank": 11,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 2.82,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-036",
+      "company": "Anthropic",
+      "role": "Anthropic Fellows Program",
+      "location": "London, UK; Ontario, CAN; Remote-Friendly, United States; San Francisco, CA",
+      "evidenceFit": "TRANSFERABLE",
+      "interest": "MEDIUM",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "NO",
+      "selfConfidence": "LOW",
+      "existingJ010State": "HARD_MISMATCH",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "INELIGIBLE",
+      "preferenceCompatibility": "UNKNOWN",
+      "experimentalFitScore": 0,
+      "experimentalConfidenceScore": 63.48,
+      "engineRank": 34,
+      "humanRank": 20,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-037",
+      "company": "Anthropic",
+      "role": "Anthropic Fellows Program, AI Safety & Security",
+      "location": "London, UK; Ontario, CAN; Remote-Friendly, United States; San Francisco, CA",
+      "evidenceFit": "TRANSFERABLE",
+      "interest": "MEDIUM",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "NO",
+      "selfConfidence": "LOW",
+      "existingJ010State": "HARD_MISMATCH",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "INELIGIBLE",
+      "preferenceCompatibility": "UNKNOWN",
+      "experimentalFitScore": 0,
+      "experimentalConfidenceScore": 62.92,
+      "engineRank": 35,
+      "humanRank": 21,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-038",
+      "company": "Anthropic",
+      "role": "Anthropic Fellows Program, ML Systems & Reinforcement Learning",
+      "location": "London, UK; Ontario, CAN; Remote-Friendly, United States; San Francisco, CA",
+      "evidenceFit": "STRETCH",
+      "interest": "LOW",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "NO",
+      "selfConfidence": "LOW",
+      "existingJ010State": "HARD_MISMATCH",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "INELIGIBLE",
+      "preferenceCompatibility": "UNKNOWN",
+      "experimentalFitScore": 0,
+      "experimentalConfidenceScore": 62.85,
+      "engineRank": 36,
+      "humanRank": 29,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-039",
+      "company": "Anthropic",
+      "role": "Anthropic Fellows Program, The Anthropic Institute (Economics & Policy)",
+      "location": "London, UK; Ontario, CAN; Remote-Friendly, United States; San Francisco, CA",
+      "evidenceFit": "STRETCH",
+      "interest": "LOW",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "NO",
+      "selfConfidence": "LOW",
+      "existingJ010State": "HARD_MISMATCH",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "INELIGIBLE",
+      "preferenceCompatibility": "UNKNOWN",
+      "experimentalFitScore": 0,
+      "experimentalConfidenceScore": 64.13,
+      "engineRank": 37,
+      "humanRank": 30,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-002",
+      "company": "Anthropic",
+      "role": "Cash Manager, Treasury",
+      "location": "San Francisco, CA",
+      "evidenceFit": "HARD_NO",
+      "interest": "NONE",
+      "geography": "NOT_ACCEPTABLE",
+      "wouldPursue": "NO",
+      "selfConfidence": "LOW",
+      "existingJ010State": "HARD_MISMATCH",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "INELIGIBLE",
+      "preferenceCompatibility": "UNKNOWN",
+      "experimentalFitScore": 0,
+      "experimentalConfidenceScore": 65.2,
+      "engineRank": 38,
+      "humanRank": 36,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-005",
+      "company": "Anthropic",
+      "role": "Commercial Counsel, Platform & Marketplace",
+      "location": "San Francisco, CA | Seattle, WA | New York City, NY | Washington, DC",
+      "evidenceFit": "HARD_NO",
+      "interest": "LOW",
+      "geography": "UNKNOWN",
+      "wouldPursue": "NO",
+      "selfConfidence": "LOW",
+      "existingJ010State": "HARD_MISMATCH",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "INELIGIBLE",
+      "preferenceCompatibility": "UNKNOWN",
+      "experimentalFitScore": 0,
+      "experimentalConfidenceScore": 65.44,
+      "engineRank": 39,
+      "humanRank": 38,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "sampleId": "M21-001",
+      "company": "Scale AI",
+      "role": "AI Infrastructure Engineer, Sandbox Platform",
+      "location": "San Francisco, CA; Seattle, WA; New York, NY",
+      "evidenceFit": "TRANSFERABLE",
+      "interest": "LOW",
+      "geography": "ACCEPTABLE",
+      "wouldPursue": "NO",
+      "selfConfidence": "LOW",
+      "existingJ010State": "HARD_MISMATCH",
+      "existingJ003Recommendation": "WAIT",
+      "eligibility": "INELIGIBLE",
+      "preferenceCompatibility": "UNKNOWN",
+      "experimentalFitScore": 0,
+      "experimentalConfidenceScore": 63.13,
+      "engineRank": 40,
+      "humanRank": 10,
+      "components": [
+        {
+          "name": "requiredSkillsFit",
+          "value": null,
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "name": "relevantExperienceFit",
+          "value": 0,
+          "status": "PARTIAL"
+        },
+        {
+          "name": "roleFunctionFit",
+          "value": 0,
+          "status": "CALCULATED"
+        },
+        {
+          "name": "responsibilitySimilarity",
+          "value": 0,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "seniorityFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "domainFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "geographyWorkArrangementFit",
+          "value": null,
+          "status": "UNKNOWN"
+        },
+        {
+          "name": "compensationFit",
+          "value": null,
+          "status": "UNKNOWN"
+        }
+      ]
+    }
+  ]
+}
