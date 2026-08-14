@@ -1,0 +1,894 @@
+{
+  "schemaVersion": "staffordos.careeros.v1_23.offline_model_evaluation.v1",
+  "selectedModel": "MODEL_V2D_ROBUSTNESS_CONTROL",
+  "models": {
+    "MODEL_V1": {
+      "weights": {
+        "requiredSkills": 35,
+        "relevantExperience": 20,
+        "roleFunction": 15,
+        "responsibility": 10,
+        "seniority": 8,
+        "domain": 7,
+        "geographyWorkArrangement": 5,
+        "compensation": 0,
+        "baseline": true
+      },
+      "metrics": {
+        "top5Precision": 0,
+        "top10Precision": 0.2,
+        "strongRecall": 0,
+        "strongGoodRecall": 0.22,
+        "viableRecall": 0.23,
+        "falsePositiveRate": 0.75,
+        "falseNegativeRate": 0.29,
+        "rankCorrelation": 0.06,
+        "negativeLeakageTop5": 2,
+        "negativeLeakageTop10": 3,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 16,
+        "strongGoodBelow20": 4,
+        "threshold": {
+          "cutoff": 30.63,
+          "predictedCount": 20,
+          "falsePositiveRate": 0.75,
+          "falseNegativeRate": 0.29
+        }
+      },
+      "robustness": {
+        "top5Precision": [
+          0,
+          0
+        ],
+        "top10Precision": [
+          0.1,
+          0.2
+        ],
+        "viableRecall": [
+          0.2,
+          0.23
+        ],
+        "classification": "ROBUST",
+        "top5Membership": [
+          "M21-015",
+          "M21-022",
+          "M21-023",
+          "M21-020",
+          "M21-016"
+        ],
+        "top10Membership": [
+          "M21-015",
+          "M21-022",
+          "M21-023",
+          "M21-020",
+          "M21-016",
+          "M21-026",
+          "M21-029",
+          "M21-027",
+          "M21-028",
+          "M21-021"
+        ]
+      },
+      "companyHoldout": {
+        "groups": [
+          {
+            "group": "Scale AI",
+            "count": 9,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "Anthropic",
+            "count": 22,
+            "top10Precision": 0.3,
+            "viableRecall": 0.41
+          },
+          {
+            "group": "Datadog",
+            "count": 2,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "Airtable",
+            "count": 6,
+            "top10Precision": 0.67,
+            "viableRecall": 1
+          },
+          {
+            "group": "Figma",
+            "count": 1,
+            "top10Precision": 0,
+            "viableRecall": 1
+          }
+        ],
+        "groupCount": 5
+      },
+      "roleFamilyHoldout": {
+        "groups": [
+          {
+            "group": "operations",
+            "count": 3,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "analyst",
+            "count": 1,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "enablement",
+            "count": 1,
+            "top10Precision": 0,
+            "viableRecall": null
+          },
+          {
+            "group": "other",
+            "count": 11,
+            "top10Precision": 0.3,
+            "viableRecall": 1
+          },
+          {
+            "group": "manager",
+            "count": 3,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "consultant",
+            "count": 3,
+            "top10Precision": 0.33,
+            "viableRecall": 1
+          },
+          {
+            "group": "program",
+            "count": 4,
+            "top10Precision": 0.5,
+            "viableRecall": 1
+          },
+          {
+            "group": "architect",
+            "count": 4,
+            "top10Precision": 0.75,
+            "viableRecall": 1
+          },
+          {
+            "group": "data",
+            "count": 1,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "engineer",
+            "count": 5,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "fellow",
+            "count": 4,
+            "top10Precision": 0,
+            "viableRecall": 1
+          }
+        ],
+        "groupCount": 11
+      }
+    },
+    "MODEL_V2A_TRANSFERABILITY_AWARE": {
+      "weights": {
+        "requiredSkills": 10,
+        "relevantExperience": 30,
+        "roleFunction": 15,
+        "responsibility": 25,
+        "seniority": 10,
+        "domain": 10,
+        "evidenceCoverage": 0
+      },
+      "metrics": {
+        "top5Precision": 0,
+        "top10Precision": 0.2,
+        "strongRecall": 0,
+        "strongGoodRecall": 0.22,
+        "viableRecall": 0.23,
+        "falsePositiveRate": 0.75,
+        "falseNegativeRate": 0.43,
+        "rankCorrelation": 0.09,
+        "negativeLeakageTop5": 2,
+        "negativeLeakageTop10": 3,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 16,
+        "strongGoodBelow20": 4,
+        "threshold": {
+          "cutoff": 65.75,
+          "predictedCount": 16,
+          "falsePositiveRate": 0.75,
+          "falseNegativeRate": 0.43
+        }
+      },
+      "robustness": {
+        "top5Precision": [
+          0,
+          0.2
+        ],
+        "top10Precision": [
+          0.1,
+          0.2
+        ],
+        "viableRecall": [
+          0.2,
+          0.23
+        ],
+        "classification": "ROBUST",
+        "top5Membership": [
+          "M21-015",
+          "M21-022",
+          "M21-023",
+          "M21-020",
+          "M21-016"
+        ],
+        "top10Membership": [
+          "M21-015",
+          "M21-022",
+          "M21-023",
+          "M21-020",
+          "M21-016",
+          "M21-029",
+          "M21-021",
+          "M21-026",
+          "M21-027",
+          "M21-028"
+        ]
+      },
+      "companyHoldout": {
+        "groups": [
+          {
+            "group": "Scale AI",
+            "count": 9,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "Anthropic",
+            "count": 22,
+            "top10Precision": 0.3,
+            "viableRecall": 0.41
+          },
+          {
+            "group": "Datadog",
+            "count": 2,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "Airtable",
+            "count": 6,
+            "top10Precision": 0.67,
+            "viableRecall": 1
+          },
+          {
+            "group": "Figma",
+            "count": 1,
+            "top10Precision": 0,
+            "viableRecall": 1
+          }
+        ],
+        "groupCount": 5
+      },
+      "roleFamilyHoldout": {
+        "groups": [
+          {
+            "group": "operations",
+            "count": 3,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "analyst",
+            "count": 1,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "enablement",
+            "count": 1,
+            "top10Precision": 0,
+            "viableRecall": null
+          },
+          {
+            "group": "other",
+            "count": 11,
+            "top10Precision": 0.3,
+            "viableRecall": 1
+          },
+          {
+            "group": "manager",
+            "count": 3,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "consultant",
+            "count": 3,
+            "top10Precision": 0.33,
+            "viableRecall": 1
+          },
+          {
+            "group": "program",
+            "count": 4,
+            "top10Precision": 0.5,
+            "viableRecall": 1
+          },
+          {
+            "group": "architect",
+            "count": 4,
+            "top10Precision": 0.75,
+            "viableRecall": 1
+          },
+          {
+            "group": "data",
+            "count": 1,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "engineer",
+            "count": 5,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "fellow",
+            "count": 4,
+            "top10Precision": 0,
+            "viableRecall": 1
+          }
+        ],
+        "groupCount": 11
+      }
+    },
+    "MODEL_V2B_CAPABILITY_SCOPE": {
+      "weights": {
+        "requiredSkills": 5,
+        "relevantExperience": 30,
+        "roleFunction": 15,
+        "responsibility": 30,
+        "seniority": 15,
+        "domain": 5,
+        "evidenceCoverage": 0
+      },
+      "metrics": {
+        "top5Precision": 0,
+        "top10Precision": 0.2,
+        "strongRecall": 0,
+        "strongGoodRecall": 0.22,
+        "viableRecall": 0.23,
+        "falsePositiveRate": 0.75,
+        "falseNegativeRate": 0.43,
+        "rankCorrelation": 0.09,
+        "negativeLeakageTop5": 2,
+        "negativeLeakageTop10": 3,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 16,
+        "strongGoodBelow20": 4,
+        "threshold": {
+          "cutoff": 69.75,
+          "predictedCount": 16,
+          "falsePositiveRate": 0.75,
+          "falseNegativeRate": 0.43
+        }
+      },
+      "robustness": {
+        "top5Precision": [
+          0,
+          0.2
+        ],
+        "top10Precision": [
+          0.1,
+          0.2
+        ],
+        "viableRecall": [
+          0.2,
+          0.23
+        ],
+        "classification": "ROBUST",
+        "top5Membership": [
+          "M21-015",
+          "M21-022",
+          "M21-023",
+          "M21-020",
+          "M21-016"
+        ],
+        "top10Membership": [
+          "M21-015",
+          "M21-022",
+          "M21-023",
+          "M21-020",
+          "M21-016",
+          "M21-029",
+          "M21-021",
+          "M21-026",
+          "M21-027",
+          "M21-028"
+        ]
+      },
+      "companyHoldout": {
+        "groups": [
+          {
+            "group": "Scale AI",
+            "count": 9,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "Anthropic",
+            "count": 22,
+            "top10Precision": 0.3,
+            "viableRecall": 0.41
+          },
+          {
+            "group": "Datadog",
+            "count": 2,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "Airtable",
+            "count": 6,
+            "top10Precision": 0.67,
+            "viableRecall": 1
+          },
+          {
+            "group": "Figma",
+            "count": 1,
+            "top10Precision": 0,
+            "viableRecall": 1
+          }
+        ],
+        "groupCount": 5
+      },
+      "roleFamilyHoldout": {
+        "groups": [
+          {
+            "group": "operations",
+            "count": 3,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "analyst",
+            "count": 1,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "enablement",
+            "count": 1,
+            "top10Precision": 0,
+            "viableRecall": null
+          },
+          {
+            "group": "other",
+            "count": 11,
+            "top10Precision": 0.3,
+            "viableRecall": 1
+          },
+          {
+            "group": "manager",
+            "count": 3,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "consultant",
+            "count": 3,
+            "top10Precision": 0.33,
+            "viableRecall": 1
+          },
+          {
+            "group": "program",
+            "count": 4,
+            "top10Precision": 0.5,
+            "viableRecall": 1
+          },
+          {
+            "group": "architect",
+            "count": 4,
+            "top10Precision": 0.75,
+            "viableRecall": 1
+          },
+          {
+            "group": "data",
+            "count": 1,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "engineer",
+            "count": 5,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "fellow",
+            "count": 4,
+            "top10Precision": 0,
+            "viableRecall": 1
+          }
+        ],
+        "groupCount": 11
+      }
+    },
+    "MODEL_V2C_BALANCED_MATCH": {
+      "weights": {
+        "requiredSkills": 10,
+        "relevantExperience": 25,
+        "roleFunction": 15,
+        "responsibility": 20,
+        "seniority": 10,
+        "domain": 10,
+        "evidenceCoverage": 10
+      },
+      "metrics": {
+        "top5Precision": 0,
+        "top10Precision": 0.2,
+        "strongRecall": 0,
+        "strongGoodRecall": 0.22,
+        "viableRecall": 0.19,
+        "falsePositiveRate": 0.85,
+        "falseNegativeRate": 0.71,
+        "rankCorrelation": 0.07,
+        "negativeLeakageTop5": 2,
+        "negativeLeakageTop10": 4,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 16,
+        "strongGoodBelow20": 4,
+        "threshold": {
+          "cutoff": 60.57,
+          "predictedCount": 13,
+          "falsePositiveRate": 0.85,
+          "falseNegativeRate": 0.71
+        }
+      },
+      "robustness": {
+        "top5Precision": [
+          0,
+          0
+        ],
+        "top10Precision": [
+          0.1,
+          0.2
+        ],
+        "viableRecall": [
+          0.19,
+          0.23
+        ],
+        "classification": "ROBUST",
+        "top5Membership": [
+          "M21-015",
+          "M21-020",
+          "M21-016",
+          "M21-022",
+          "M21-023"
+        ],
+        "top10Membership": [
+          "M21-015",
+          "M21-020",
+          "M21-016",
+          "M21-022",
+          "M21-023",
+          "M21-021",
+          "M21-019",
+          "M21-029",
+          "M21-026",
+          "M21-027"
+        ]
+      },
+      "companyHoldout": {
+        "groups": [
+          {
+            "group": "Scale AI",
+            "count": 9,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "Datadog",
+            "count": 2,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "Anthropic",
+            "count": 22,
+            "top10Precision": 0.3,
+            "viableRecall": 0.41
+          },
+          {
+            "group": "Airtable",
+            "count": 6,
+            "top10Precision": 0.67,
+            "viableRecall": 1
+          },
+          {
+            "group": "Figma",
+            "count": 1,
+            "top10Precision": 0,
+            "viableRecall": 1
+          }
+        ],
+        "groupCount": 5
+      },
+      "roleFamilyHoldout": {
+        "groups": [
+          {
+            "group": "operations",
+            "count": 3,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "other",
+            "count": 11,
+            "top10Precision": 0.3,
+            "viableRecall": 1
+          },
+          {
+            "group": "manager",
+            "count": 3,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "analyst",
+            "count": 1,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "enablement",
+            "count": 1,
+            "top10Precision": 0,
+            "viableRecall": null
+          },
+          {
+            "group": "program",
+            "count": 4,
+            "top10Precision": 0.5,
+            "viableRecall": 1
+          },
+          {
+            "group": "consultant",
+            "count": 3,
+            "top10Precision": 0.33,
+            "viableRecall": 1
+          },
+          {
+            "group": "architect",
+            "count": 4,
+            "top10Precision": 0.75,
+            "viableRecall": 1
+          },
+          {
+            "group": "data",
+            "count": 1,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "engineer",
+            "count": 5,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "fellow",
+            "count": 4,
+            "top10Precision": 0,
+            "viableRecall": 1
+          }
+        ],
+        "groupCount": 11
+      }
+    },
+    "MODEL_V2D_ROBUSTNESS_CONTROL": {
+      "weights": {
+        "requiredSkills": 0,
+        "relevantExperience": 40,
+        "roleFunction": 25,
+        "responsibility": 25,
+        "seniority": 10,
+        "domain": 0,
+        "evidenceCoverage": 0
+      },
+      "metrics": {
+        "top5Precision": 0,
+        "top10Precision": 0.3,
+        "strongRecall": 0.33,
+        "strongGoodRecall": 0.33,
+        "viableRecall": 0.23,
+        "falsePositiveRate": 0.75,
+        "falseNegativeRate": 0.29,
+        "rankCorrelation": 0.13,
+        "negativeLeakageTop5": 2,
+        "negativeLeakageTop10": 3,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 16,
+        "strongGoodBelow20": 4,
+        "threshold": {
+          "cutoff": 71.25,
+          "predictedCount": 20,
+          "falsePositiveRate": 0.75,
+          "falseNegativeRate": 0.29
+        }
+      },
+      "robustness": {
+        "top5Precision": [
+          0,
+          0.2
+        ],
+        "top10Precision": [
+          0.2,
+          0.3
+        ],
+        "viableRecall": [
+          0.2,
+          0.23
+        ],
+        "classification": "ROBUST",
+        "top5Membership": [
+          "M21-022",
+          "M21-023",
+          "M21-020",
+          "M21-015",
+          "M21-016"
+        ],
+        "top10Membership": [
+          "M21-022",
+          "M21-023",
+          "M21-020",
+          "M21-015",
+          "M21-016",
+          "M21-029",
+          "M21-030",
+          "M21-033",
+          "M21-017",
+          "M21-024"
+        ]
+      },
+      "companyHoldout": {
+        "groups": [
+          {
+            "group": "Anthropic",
+            "count": 22,
+            "top10Precision": 0.3,
+            "viableRecall": 0.41
+          },
+          {
+            "group": "Datadog",
+            "count": 2,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "Scale AI",
+            "count": 9,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "Airtable",
+            "count": 6,
+            "top10Precision": 0.67,
+            "viableRecall": 1
+          },
+          {
+            "group": "Figma",
+            "count": 1,
+            "top10Precision": 0,
+            "viableRecall": 1
+          }
+        ],
+        "groupCount": 5
+      },
+      "roleFamilyHoldout": {
+        "groups": [
+          {
+            "group": "analyst",
+            "count": 1,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "enablement",
+            "count": 1,
+            "top10Precision": 0,
+            "viableRecall": null
+          },
+          {
+            "group": "other",
+            "count": 11,
+            "top10Precision": 0.3,
+            "viableRecall": 1
+          },
+          {
+            "group": "operations",
+            "count": 3,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "manager",
+            "count": 3,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "architect",
+            "count": 4,
+            "top10Precision": 0.75,
+            "viableRecall": 1
+          },
+          {
+            "group": "program",
+            "count": 4,
+            "top10Precision": 0.5,
+            "viableRecall": 1
+          },
+          {
+            "group": "consultant",
+            "count": 3,
+            "top10Precision": 0.33,
+            "viableRecall": 1
+          },
+          {
+            "group": "data",
+            "count": 1,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "fellow",
+            "count": 4,
+            "top10Precision": 0,
+            "viableRecall": 1
+          },
+          {
+            "group": "engineer",
+            "count": 5,
+            "top10Precision": 0,
+            "viableRecall": 1
+          }
+        ],
+        "groupCount": 11
+      }
+    }
+  },
+  "selfConfidenceSafety": {
+    "checks": {
+      "MODEL_V1": {
+        "scoreChanges": 0,
+        "rankChanges": 0
+      },
+      "MODEL_V2A_TRANSFERABILITY_AWARE": {
+        "scoreChanges": 0,
+        "rankChanges": 0
+      },
+      "MODEL_V2B_CAPABILITY_SCOPE": {
+        "scoreChanges": 0,
+        "rankChanges": 0
+      },
+      "MODEL_V2C_BALANCED_MATCH": {
+        "scoreChanges": 0,
+        "rankChanges": 0
+      },
+      "MODEL_V2D_ROBUSTNESS_CONTROL": {
+        "scoreChanges": 0,
+        "rankChanges": 0
+      }
+    },
+    "lowVsHighScoreChanges": 0,
+    "usedInScore": false
+  }
+}

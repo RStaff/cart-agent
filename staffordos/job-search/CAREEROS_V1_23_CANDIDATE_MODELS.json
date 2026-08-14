@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "staffordos.careeros.v1_23.candidate_models.v1",
+  "models": {
+    "MODEL_V1": {
+      "weights": {
+        "requiredSkills": 35,
+        "relevantExperience": 20,
+        "roleFunction": 15,
+        "responsibility": 10,
+        "seniority": 8,
+        "domain": 7,
+        "geographyWorkArrangement": 5,
+        "compensation": 0,
+        "baseline": true
+      },
+      "rationale": "Frozen existing model."
+    },
+    "MODEL_V2A_TRANSFERABILITY_AWARE": {
+      "weights": {
+        "requiredSkills": 10,
+        "relevantExperience": 30,
+        "roleFunction": 15,
+        "responsibility": 25,
+        "seniority": 10,
+        "domain": 10,
+        "evidenceCoverage": 0
+      },
+      "rationale": "Bounded offline hypothesis; unknown features are omitted from the denominator rather than treated as negative capability evidence."
+    },
+    "MODEL_V2B_CAPABILITY_SCOPE": {
+      "weights": {
+        "requiredSkills": 5,
+        "relevantExperience": 30,
+        "roleFunction": 15,
+        "responsibility": 30,
+        "seniority": 15,
+        "domain": 5,
+        "evidenceCoverage": 0
+      },
+      "rationale": "Bounded offline hypothesis; unknown features are omitted from the denominator rather than treated as negative capability evidence."
+    },
+    "MODEL_V2C_BALANCED_MATCH": {
+      "weights": {
+        "requiredSkills": 10,
+        "relevantExperience": 25,
+        "roleFunction": 15,
+        "responsibility": 20,
+        "seniority": 10,
+        "domain": 10,
+        "evidenceCoverage": 10
+      },
+      "rationale": "Bounded offline hypothesis; unknown features are omitted from the denominator rather than treated as negative capability evidence."
+    },
+    "MODEL_V2D_ROBUSTNESS_CONTROL": {
+      "weights": {
+        "requiredSkills": 0,
+        "relevantExperience": 40,
+        "roleFunction": 25,
+        "responsibility": 25,
+        "seniority": 10,
+        "domain": 0,
+        "evidenceCoverage": 0
+      },
+      "rationale": "Bounded offline hypothesis; unknown features are omitted from the denominator rather than treated as negative capability evidence."
+    }
+  }
+}
