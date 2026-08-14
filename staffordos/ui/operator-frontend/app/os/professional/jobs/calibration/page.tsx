@@ -68,6 +68,15 @@ function evaluationData(evaluationSet: "calibration" | "holdout"): { records: Ev
         eligibility: "PENDING_HOLDOUT_PROJECTION",
         preferenceCompatibility: "PENDING_HOLDOUT_PROJECTION",
         preferenceReason: "Frozen V2D projection is completed after independent holdout review; no score is shown here.",
+        evidenceSummary: (() => {
+          const coverage = (row.explainableFitCoverage || {}) as Record<string, unknown>;
+          return {
+            exactEvidenceCount: Number(coverage.PROVEN || 0),
+            transferableEvidenceCount: Number(coverage.TRANSFERABLE || 0),
+            weakEvidenceCount: Number(coverage.PARTIAL || 0),
+            unsupportedCount: Number(coverage.MISSING || 0) + Number(coverage.UNKNOWN || 0),
+          };
+        })(),
         topFitReasons: [],
         topGaps: [],
         hardBlockers: [],
@@ -149,8 +158,8 @@ export default async function MatchCalibrationPage({ searchParams }: { searchPar
           <div><dt>J003 recommendation</dt><dd>{record.existingJ003Recommendation}</dd></div>
           <div><dt>Shortlist</dt><dd>{record.existingShortlisted ? "Shortlisted" : "Not shortlisted"}</dd></div>
           <div><dt>Eligibility</dt><dd>{record.eligibility}</dd></div>
-          <div><dt>Experimental fit</dt><dd>{record.experimentalFitScore ?? "Unknown"}</dd></div>
-          <div><dt>Experimental confidence</dt><dd>{record.experimentalConfidenceScore ?? "Unknown"}</dd></div>
+          <div><dt>{isHoldout ? "Frozen V2D capability fit" : "Experimental fit"}</dt><dd>{record.experimentalFitScore ?? (isHoldout ? "Pending independent review" : "Unknown")}</dd></div>
+          <div><dt>{isHoldout ? "Frozen V2D confidence" : "Experimental confidence"}</dt><dd>{record.experimentalConfidenceScore ?? (isHoldout ? "Pending independent review" : "Unknown")}</dd></div>
           <div><dt>Preference compatibility</dt><dd>{record.preferenceCompatibility}: {record.preferenceReason}</dd></div>
         </dl>
       </section>
