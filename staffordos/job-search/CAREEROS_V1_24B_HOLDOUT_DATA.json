@@ -96,8 +96,11 @@
     "UNRESOLVED_DOMAIN": 2
   },
   "evidenceDistribution": {
-    "STRONG_TRANSFERABLE_SUPPORT": 2,
-    "UNKNOWN": 38
+    "EXACT_OR_DIRECT_SUPPORT": 0,
+    "NO_SUPPORTED_EVIDENCE": 4,
+    "PARTIAL_SUPPORT": 0,
+    "STRONG_TRANSFERABLE_SUPPORT": 135,
+    "UNKNOWN": 577
   },
   "roleFamilies": [
     {
