@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "careeros.v1_26a.evidence_gap_coverage.v1",
+  "status": "DIAGNOSTIC_ONLY",
+  "privateCareerFacts": 898,
+  "privateCareerEvidence": 21,
+  "gaps": [
+    {"gapId":"gap-employment-history","category":"MISSING_PROVENANCE","status":"EXISTING_UNVERIFIED_AUTHORITY_AVAILABLE","basis":"Employment facts exist in aggregate, but verification/conflict state is not sufficient for automatic direct use.","operatorConfirmationRequired":true},
+    {"gapId":"gap-program-scope","category":"MISSING_SCOPE_EVIDENCE","status":"EXISTING_AUTHORITY_REQUIRES_PROJECTION","basis":"Leadership/project/product authority exists, but scope and evidence eligibility are not uniformly projected.","operatorConfirmationRequired":true},
+    {"gapId":"gap-technical-depth","category":"MISSING_TECHNICAL_DEPTH_EVIDENCE","status":"EXISTING_AUTHORITY_REQUIRES_PROJECTION","basis":"Technology and project facts exist, but most support is unknown or needs verification.","operatorConfirmationRequired":true},
+    {"gapId":"gap-outcomes","category":"MISSING_PROJECT_EVIDENCE","status":"EXISTING_UNVERIFIED_AUTHORITY_AVAILABLE","basis":"Achievement facts exist, but outcome/metric authority is not generally verified.","operatorConfirmationRequired":true},
+    {"gapId":"gap-leadership","category":"MISSING_SCOPE_EVIDENCE","status":"EXISTING_UNVERIFIED_AUTHORITY_AVAILABLE","basis":"Leadership facts exist, but people-management and organizational scope cannot be assumed.","operatorConfirmationRequired":true},
+    {"gapId":"gap-source-linkage","category":"MISSING_STRUCTURED_EXTRACTION","status":"EXISTING_AUTHORITY_REQUIRES_PROJECTION","basis":"The loader sees reverse evidence links, while direct fact links are sparse; a sanitized projection is needed.","operatorConfirmationRequired":false},
+    {"gapId":"gap-portfolio","category":"MISSING_DOCUMENTATION","status":"NO_EXISTING_AUTHORITY_FOUND","basis":"No portfolio-specific authority was found in the aggregate inventory.","operatorConfirmationRequired":true},
+    {"gapId":"gap-education-certification","category":"GENUINE_UNKNOWN","status":"EXISTING_VERIFIED_AUTHORITY_AVAILABLE","basis":"Some official/verified education or certification authority exists, but it must remain credential-specific.","operatorConfirmationRequired":false}
+  ],
+  "aggregate": {
+    "existingVerifiedAuthorityAvailable": 1,
+    "existingUnverifiedAuthorityAvailable": 3,
+    "existingAuthorityRequiresProjection": 3,
+    "existingAuthorityRequiresOperatorConfirmation": 0,
+    "noExistingAuthorityFound": 1,
+    "unresolved": 0
+  },
+  "prohibition": "No gap is closed by this artifact; no CareerFact or CareerEvidence is created or mutated."
+}
