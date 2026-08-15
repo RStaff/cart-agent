@@ -1,0 +1,326 @@
+{
+  "calibration": [
+    {
+      "roleFamily": "LEGACY_CALIBRATION",
+      "count": 40,
+      "humanFit": {
+        "GOOD_MATCH": 6,
+        "HARD_NO": 5,
+        "POOR_MATCH": 4,
+        "STRETCH": 10,
+        "STRONG_MATCH": 3,
+        "TRANSFERABLE": 12
+      },
+      "afterMedianScore": 52.5,
+      "after": {
+        "top5Precision": 0,
+        "top10Precision": 0.3,
+        "strongRecall": 0.33,
+        "strongGoodRecall": 0.33,
+        "viableRecall": 0.23,
+        "falsePositiveRate": 0.72,
+        "falseNegativeRate": 0.29,
+        "rankCorrelation": 0.14,
+        "negativeLeakageTop5": 2,
+        "negativeLeakageTop10": 3,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 16,
+        "strongGoodBelow20": 4,
+        "threshold": {
+          "cutoff": 71.25,
+          "predictedCount": 18,
+          "falsePositiveRate": 0.72,
+          "falseNegativeRate": 0.29
+        }
+      },
+      "suppressedNoise": 27
+    }
+  ],
+  "holdout": [
+    {
+      "roleFamily": "AI_AUTOMATION_AGENT",
+      "count": 5,
+      "humanFit": {
+        "GOOD_MATCH": 3,
+        "STRONG_MATCH": 1,
+        "TRANSFERABLE": 1
+      },
+      "afterMedianScore": 72.25,
+      "after": {
+        "top5Precision": 0.8,
+        "top10Precision": 0.4,
+        "strongRecall": 1,
+        "strongGoodRecall": 1,
+        "viableRecall": 1,
+        "falsePositiveRate": 0.25,
+        "falseNegativeRate": 0.25,
+        "rankCorrelation": 0.38,
+        "negativeLeakageTop5": 0,
+        "negativeLeakageTop10": 0,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 0,
+        "strongGoodBelow20": 0,
+        "threshold": {
+          "cutoff": 72.25,
+          "predictedCount": 4,
+          "falsePositiveRate": 0.25,
+          "falseNegativeRate": 0.25
+        }
+      },
+      "suppressedNoise": 9
+    },
+    {
+      "roleFamily": "BUSINESS_SYSTEMS_ANALYST",
+      "count": 1,
+      "humanFit": {
+        "TRANSFERABLE": 1
+      },
+      "afterMedianScore": 72.25,
+      "after": {
+        "top5Precision": 0,
+        "top10Precision": 0,
+        "strongRecall": null,
+        "strongGoodRecall": null,
+        "viableRecall": 1,
+        "falsePositiveRate": 1,
+        "falseNegativeRate": null,
+        "rankCorrelation": null,
+        "negativeLeakageTop5": 0,
+        "negativeLeakageTop10": 0,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 0,
+        "strongGoodBelow20": 0,
+        "threshold": {
+          "cutoff": 72.25,
+          "predictedCount": 1,
+          "falsePositiveRate": 1,
+          "falseNegativeRate": null
+        }
+      },
+      "suppressedNoise": 2
+    },
+    {
+      "roleFamily": "MARTECH_MARKETING_OPERATIONS",
+      "count": 5,
+      "humanFit": {
+        "GOOD_MATCH": 2,
+        "HARD_NO": 1,
+        "TRANSFERABLE": 2
+      },
+      "afterMedianScore": 71.25,
+      "after": {
+        "top5Precision": 0.4,
+        "top10Precision": 0.2,
+        "strongRecall": null,
+        "strongGoodRecall": 1,
+        "viableRecall": 1,
+        "falsePositiveRate": 0.33,
+        "falseNegativeRate": 0,
+        "rankCorrelation": 0.41,
+        "negativeLeakageTop5": 1,
+        "negativeLeakageTop10": 1,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 0,
+        "strongGoodBelow20": 0,
+        "threshold": {
+          "cutoff": 71.25,
+          "predictedCount": 3,
+          "falsePositiveRate": 0.33,
+          "falseNegativeRate": 0
+        }
+      },
+      "suppressedNoise": 3
+    },
+    {
+      "roleFamily": "OBVIOUS_POOR_FIT_CONTROL",
+      "count": 5,
+      "humanFit": {
+        "HARD_NO": 4,
+        "STRETCH": 1
+      },
+      "afterMedianScore": 26.75,
+      "after": {
+        "top5Precision": 0,
+        "top10Precision": 0,
+        "strongRecall": null,
+        "strongGoodRecall": null,
+        "viableRecall": 1,
+        "falsePositiveRate": 1,
+        "falseNegativeRate": null,
+        "rankCorrelation": -0.62,
+        "negativeLeakageTop5": 4,
+        "negativeLeakageTop10": 4,
+        "hardMismatchLeakageTop10": 3,
+        "underRankedViable": 0,
+        "strongGoodBelow20": 0,
+        "threshold": {
+          "cutoff": 72.25,
+          "predictedCount": 2,
+          "falsePositiveRate": 1,
+          "falseNegativeRate": null
+        }
+      },
+      "suppressedNoise": 4
+    },
+    {
+      "roleFamily": "OTHER_CONTROL",
+      "count": 6,
+      "humanFit": {
+        "HARD_NO": 5,
+        "TRANSFERABLE": 1
+      },
+      "afterMedianScore": 48.5,
+      "after": {
+        "top5Precision": 0,
+        "top10Precision": 0,
+        "strongRecall": null,
+        "strongGoodRecall": null,
+        "viableRecall": 1,
+        "falsePositiveRate": 1,
+        "falseNegativeRate": null,
+        "rankCorrelation": 0.04,
+        "negativeLeakageTop5": 4,
+        "negativeLeakageTop10": 5,
+        "hardMismatchLeakageTop10": 3,
+        "underRankedViable": 0,
+        "strongGoodBelow20": 0,
+        "threshold": {
+          "cutoff": 72.25,
+          "predictedCount": 2,
+          "falsePositiveRate": 1,
+          "falseNegativeRate": null
+        }
+      },
+      "suppressedNoise": 5
+    },
+    {
+      "roleFamily": "PRODUCT",
+      "count": 5,
+      "humanFit": {
+        "HARD_NO": 2,
+        "POOR_MATCH": 2,
+        "TRANSFERABLE": 1
+      },
+      "afterMedianScore": 72.25,
+      "after": {
+        "top5Precision": 0,
+        "top10Precision": 0,
+        "strongRecall": null,
+        "strongGoodRecall": null,
+        "viableRecall": 1,
+        "falsePositiveRate": 1,
+        "falseNegativeRate": null,
+        "rankCorrelation": -0.17,
+        "negativeLeakageTop5": 4,
+        "negativeLeakageTop10": 4,
+        "hardMismatchLeakageTop10": 1,
+        "underRankedViable": 0,
+        "strongGoodBelow20": 0,
+        "threshold": {
+          "cutoff": 72.25,
+          "predictedCount": 3,
+          "falsePositiveRate": 1,
+          "falseNegativeRate": null
+        }
+      },
+      "suppressedNoise": 6
+    },
+    {
+      "roleFamily": "SENIOR_LEADERSHIP_STRETCH",
+      "count": 5,
+      "humanFit": {
+        "HARD_NO": 2,
+        "POOR_MATCH": 1,
+        "STRETCH": 1,
+        "TRANSFERABLE": 1
+      },
+      "afterMedianScore": 72.25,
+      "after": {
+        "top5Precision": 0,
+        "top10Precision": 0,
+        "strongRecall": null,
+        "strongGoodRecall": null,
+        "viableRecall": 1,
+        "falsePositiveRate": 1,
+        "falseNegativeRate": null,
+        "rankCorrelation": -0.55,
+        "negativeLeakageTop5": 3,
+        "negativeLeakageTop10": 3,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 0,
+        "strongGoodBelow20": 0,
+        "threshold": {
+          "cutoff": 72.25,
+          "predictedCount": 3,
+          "falsePositiveRate": 1,
+          "falseNegativeRate": null
+        }
+      },
+      "suppressedNoise": 5
+    },
+    {
+      "roleFamily": "TECHNICAL_PROGRAM_PROJECT_PRODUCT",
+      "count": 3,
+      "humanFit": {
+        "GOOD_MATCH": 1,
+        "TRANSFERABLE": 2
+      },
+      "afterMedianScore": 72.25,
+      "after": {
+        "top5Precision": 0.2,
+        "top10Precision": 0.1,
+        "strongRecall": null,
+        "strongGoodRecall": 1,
+        "viableRecall": 1,
+        "falsePositiveRate": 0.67,
+        "falseNegativeRate": 0,
+        "rankCorrelation": 0.13,
+        "negativeLeakageTop5": 0,
+        "negativeLeakageTop10": 0,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 0,
+        "strongGoodBelow20": 0,
+        "threshold": {
+          "cutoff": 72.25,
+          "predictedCount": 3,
+          "falsePositiveRate": 0.67,
+          "falseNegativeRate": 0
+        }
+      },
+      "suppressedNoise": 2
+    },
+    {
+      "roleFamily": "TRANSFORMATION_SOLUTIONS",
+      "count": 5,
+      "humanFit": {
+        "GOOD_MATCH": 2,
+        "STRETCH": 1,
+        "STRONG_MATCH": 1,
+        "TRANSFERABLE": 1
+      },
+      "afterMedianScore": 72.25,
+      "after": {
+        "top5Precision": 0.6,
+        "top10Precision": 0.3,
+        "strongRecall": 1,
+        "strongGoodRecall": 1,
+        "viableRecall": 1,
+        "falsePositiveRate": 0.67,
+        "falseNegativeRate": 0.67,
+        "rankCorrelation": -0.73,
+        "negativeLeakageTop5": 0,
+        "negativeLeakageTop10": 0,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 0,
+        "strongGoodBelow20": 0,
+        "threshold": {
+          "cutoff": 72.25,
+          "predictedCount": 3,
+          "falsePositiveRate": 0.67,
+          "falseNegativeRate": 0.67
+        }
+      },
+      "suppressedNoise": 3
+    }
+  ]
+}

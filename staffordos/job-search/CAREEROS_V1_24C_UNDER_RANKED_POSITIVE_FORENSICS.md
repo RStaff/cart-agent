@@ -1,0 +1,29 @@
+# Under-Ranked Positive Forensics
+
+- M21-010 Anthropic — Applied AI Architect, Commercial: TRANSFERABLE; before 21/35, after 21/35; family AI_AUTOMATION; responsibility PARTIAL; unknown remains unresolved.
+- M21-011 Anthropic — Applied AI Architect, Enterprise Tech: GOOD_MATCH; before 22/35, after 22/35; family AI_AUTOMATION; responsibility PARTIAL; unknown remains unresolved.
+- M21-012 Anthropic — Applied AI Architect, Industries: STRONG_MATCH; before 23/35, after 23/35; family AI_AUTOMATION; responsibility PARTIAL; unknown remains unresolved.
+- M21-013 Anthropic — Data Engineer, Safeguards: STRETCH; before 24/35, after 24/35; family SOFTWARE_ENGINEERING; responsibility PARTIAL; unknown remains unresolved.
+- M21-009 Scale AI — AI Builder Intern: TRANSFERABLE; before 25/35, after 25/35; family AI_AUTOMATION; responsibility PARTIAL; unknown remains unresolved.
+- M21-007 Airtable — Program Manager, Professional Services - East: GOOD_MATCH; before 26/26.75, after 26/26.75; family TECHNICAL_PROGRAM; responsibility PARTIAL; unknown remains unresolved.
+- M21-008 Airtable — Program Manager, Professional Services - West: GOOD_MATCH; before 27/26.75, after 27/26.75; family TECHNICAL_PROGRAM; responsibility PARTIAL; unknown remains unresolved.
+- M21-036 Anthropic — Anthropic Fellows Program: TRANSFERABLE; before 28/26.75, after 28/26.75; family AI_AUTOMATION; responsibility PARTIAL; unknown remains unresolved.
+- M21-037 Anthropic — Anthropic Fellows Program, AI Safety & Security: TRANSFERABLE; before 29/26.75, after 29/26.75; family AI_AUTOMATION; responsibility PARTIAL; unknown remains unresolved.
+- M21-040 Anthropic — Applied AI Engineer, Enterprise Tech: STRETCH; before 30/26.75, after 30/26.75; family AI_AUTOMATION; responsibility PARTIAL; unknown remains unresolved.
+- M21-006 Anthropic — Director, Global Order-to-Cash Transformation: STRETCH; before 33/26.75, after 33/26.75; family TECHNICAL_PROGRAM; responsibility PARTIAL; unknown remains unresolved.
+- M21-001 Scale AI — AI Infrastructure Engineer, Sandbox Platform: TRANSFERABLE; before 35/26.75, after 35/26.75; family AI_AUTOMATION; responsibility PARTIAL; unknown remains unresolved.
+- M21-034 Scale AI — Engineering Manager, Agent Oversight: STRETCH; before 36/26.75, after 36/26.75; family SOFTWARE_ENGINEERING; responsibility PARTIAL; unknown remains unresolved.
+- M21-004 Scale AI — Frontier Agent Engineering Manager, Enterprise: TRANSFERABLE; before 37/26.75, after 37/26.75; family SOFTWARE_ENGINEERING; responsibility PARTIAL; unknown remains unresolved.
+- M21-038 Anthropic — Anthropic Fellows Program, ML Systems & Reinforcement Learning: STRETCH; before 39/25.75, after 39/25.75; family AI_AUTOMATION; responsibility PARTIAL; unknown remains unresolved.
+- M21-039 Anthropic — Anthropic Fellows Program, The Anthropic Institute (Economics & Policy): STRETCH; before 40/25.75, after 40/25.75; family AI_AUTOMATION; responsibility PARTIAL; unknown remains unresolved.
+- H24-019 Figma — Director, Business Systems: TRANSFERABLE; before 20/72.25, after 21/72.25; family BUSINESS_SYSTEMS; responsibility PARTIAL; unknown remains unresolved.
+- H24-022 Figma — Director, Solutions Consulting (United States): GOOD_MATCH; before 21/72.25, after 22/72.25; family SOLUTIONS; responsibility PARTIAL; unknown remains unresolved.
+- H24-007 Klaviyo — AI Enablement Program Manager: TRANSFERABLE; before 22/72.25, after 23/72.25; family AI_AUTOMATION; responsibility PARTIAL; unknown remains unresolved.
+- H24-026 Airtable — Manager, Business Development Representatives: TRANSFERABLE; before 23/71.25, after 25/71.25; family DATA_SCIENCE; responsibility PARTIAL; unknown remains unresolved.
+- H24-005 Braze — Applied AI Architect, GTM: GOOD_MATCH; before 25/71.25, after 28/71.25; family AI_AUTOMATION; responsibility PARTIAL; unknown remains unresolved.
+- H24-016 Datadog — Associate Growth Marketing Manager: GOOD_MATCH; before 26/71.25, after 29/71.25; family MARKETING_TECHNOLOGY; responsibility PARTIAL; unknown remains unresolved.
+- H24-023 Scale AI — AI Advisory Consultant: STRONG_MATCH; before 28/71.25, after 30/71.25; family AI_AUTOMATION; responsibility PARTIAL; unknown remains unresolved.
+- H24-018 Klaviyo — Inbound Growth Specialist: TRANSFERABLE; before 27/71.25, after 32/70; family SALES_CUSTOMER_SUCCESS; responsibility PARTIAL; unknown remains unresolved.
+- H24-024 Scale AI — AI Strategy Consultant, Frontier Tech: GOOD_MATCH; before 33/35, after 33/35; family AI_AUTOMATION; responsibility PARTIAL; unknown remains unresolved.
+- H24-034 Anthropic — Engineering Manager, Cybersecurity Products: STRETCH; before 37/26.75, after 37/26.75; family SOFTWARE_ENGINEERING; responsibility PARTIAL; unknown remains unresolved.
+- H24-035 Airtable — Software Engineer, Data: TRANSFERABLE; before 38/25.75, after 38/25.75; family SOFTWARE_ENGINEERING; responsibility PARTIAL; unknown remains unresolved.
