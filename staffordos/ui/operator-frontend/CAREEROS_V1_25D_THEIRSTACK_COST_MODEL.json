@@ -1,0 +1,54 @@
+{
+  "status": "OFFLINE_ESTIMATE_ONLY",
+  "source": "https://theirstack.com/en/pricing?tab=api",
+  "known_pricing": {
+    "free_api_credits_per_month": 200,
+    "paid_entry_api_credits_per_month": 1500,
+    "paid_entry_monthly_usd": 59,
+    "paid_api_credit_price_usd": 0.0393333333,
+    "job_search_credits_per_returned_job": 1,
+    "company_search_credits_per_company": 3,
+    "paid_rate_limit_requests_per_second": 4,
+    "paid_credit_rollover_months": 12,
+    "dataset_pricing": "PRICING_REQUIRES_QUOTE"
+  },
+  "assumptions": {
+    "jobs_evaluated_per_user_per_day": 10,
+    "active_days_per_month": 20,
+    "deduplication_ratio": 0.7,
+    "one_job_search_credit_per_returned_job": true,
+    "cache_reuse": "No repeated API request for an unchanged active observation"
+  },
+  "scenarios": [
+    {
+      "users": 10,
+      "gross_jobs_per_month": 2000,
+      "assumed_unique_job_observations_after_dedup": 600,
+      "api_credits_if_each_unique_observation_fetched_once": 600,
+      "minimum_known_plan": "Free tier covers 200 only; paid entry tier required",
+      "minimum_known_monthly_cost_usd": 59
+    },
+    {
+      "users": 100,
+      "gross_jobs_per_month": 20000,
+      "assumed_unique_job_observations_after_dedup": 6000,
+      "api_credits_if_each_unique_observation_fetched_once": 6000,
+      "minimum_known_plan": "5,000 credits for $100 is insufficient under these assumptions; 10,000 credits for $169 is the first listed sufficient tier",
+      "minimum_known_monthly_cost_usd": 169
+    },
+    {
+      "users": 1000,
+      "gross_jobs_per_month": 200000,
+      "assumed_unique_job_observations_after_dedup": 60000,
+      "api_credits_if_each_unique_observation_fetched_once": 60000,
+      "minimum_known_plan": "100,000 credits for $600 is the first listed sufficient tier",
+      "minimum_known_monthly_cost_usd": 600
+    }
+  ],
+  "limitations": [
+    "Scenarios are planning assumptions, not measured CareerOS usage.",
+    "They do not include direct ATS enrichment, storage, parsing, model inference, or user-specific recomputation.",
+    "Enterprise/dataset pricing requires quote.",
+    "No live credits were consumed."
+  ]
+}
