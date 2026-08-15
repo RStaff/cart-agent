@@ -43,7 +43,7 @@ test("all persisted holdout reviews resolve to one current manifest identity", (
   const reviews = JSON.parse(fs.readFileSync(reviewsPath, "utf8"));
   const ids = new Set(manifest.holdoutSet.map((row) => row.sampleId));
   const reviewIds = Object.keys(reviews.records);
-  assert.equal(reviewIds.length, 29);
+  assert.equal(reviewIds.length, 40);
   assert.equal(reviewIds.every((id) => ids.has(id)), true);
   assert.equal(new Set(reviewIds).size, reviewIds.length);
 });
