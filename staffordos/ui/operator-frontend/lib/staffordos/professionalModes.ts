@@ -275,9 +275,9 @@ export const PROFESSIONAL_NAVIGATION: readonly ProfessionalNavigationItem[] = [
   {
     id: "career-evidence",
     label: "Career Evidence",
-    status: "not_connected_yet",
-    href: null,
-    description: "Private career evidence exists outside Git and is not connected to UI yet.",
+    status: "available_now",
+    href: "/os/professional/evidence",
+    description: "Review private evidence candidates without changing canonical career authority.",
   },
   {
     id: "achievements",

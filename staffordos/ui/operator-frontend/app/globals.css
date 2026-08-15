@@ -2499,6 +2499,70 @@ textarea {
   line-height: 1.5;
 }
 
+.careerEvidenceAdjudicationPage {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+}
+
+.careerEvidenceAdjudicationHeader,
+.careerEvidenceAdjudicationNotice,
+.careerEvidenceProgress,
+.careerEvidenceReviewCard,
+.careerEvidenceDatadogNote {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.82);
+  padding: 22px;
+}
+
+.careerEvidenceAdjudicationHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.careerEvidenceAdjudicationHeader h1 { margin: 6px 0 0; color: #f8fafc; }
+.careerEvidenceAdjudicationHeader p,
+.careerEvidenceAdjudicationNotice p,
+.careerEvidenceDatadogNote p { color: #cbd5e1; line-height: 1.6; }
+.careerEvidenceAdjudicationStatus { min-width: 220px; display: grid; gap: 8px; align-content: start; color: #67e8f9; }
+.careerEvidenceAdjudicationStatus span { color: #cbd5e1; font-size: 13px; }
+.careerEvidenceAdjudicationNotice { margin-top: 16px; border-color: rgba(251, 191, 36, 0.35); }
+.careerEvidenceAdjudicationNotice strong { color: #fbbf24; }
+.careerEvidenceProgress { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }
+.careerEvidenceProgress div { display: grid; gap: 5px; }
+.careerEvidenceProgress span, .careerEvidenceReviewFacts dt { color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+.careerEvidenceProgress strong { color: #f8fafc; font-size: 20px; }
+.careerEvidenceFeedback { margin: 16px 0 0; padding: 12px 14px; border-radius: 10px; background: rgba(34, 197, 94, 0.12); color: #86efac; }
+.careerEvidenceFeedback.is-error { background: rgba(239, 68, 68, 0.14); color: #fca5a5; }
+.careerEvidenceNavigation { display: flex; justify-content: space-between; align-items: center; margin: 20px 0 12px; color: #cbd5e1; }
+.careerEvidenceFocus { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 16px; color: #94a3b8; font-size: 13px; }
+.careerEvidenceFocus a { color: #a5f3fc; }
+.careerEvidenceNavigation a, .careerEvidenceDecisionActions button { color: #020617; background: #67e8f9; border: 0; border-radius: 8px; padding: 10px 14px; font-weight: 700; text-decoration: none; cursor: pointer; }
+.careerEvidenceNavigation span { color: #64748b; }
+.careerEvidenceReviewMeta { display: flex; flex-wrap: wrap; gap: 8px; }
+.careerEvidenceReviewMeta span { border: 1px solid rgba(103, 232, 249, .28); border-radius: 999px; padding: 5px 9px; color: #a5f3fc; font-size: 12px; }
+.careerEvidenceReviewCard h2 { margin: 18px 0; color: #f8fafc; line-height: 1.35; }
+.careerEvidenceReviewFacts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.careerEvidenceReviewFacts div { padding: 12px; border-radius: 9px; background: rgba(2, 6, 23, .45); }
+.careerEvidenceReviewFacts dd { margin: 5px 0 0; color: #e2e8f0; line-height: 1.5; }
+.careerEvidenceDecisionForm { margin-top: 18px; }
+.careerEvidenceDecisionForm label { display: block; margin-bottom: 7px; color: #e2e8f0; font-weight: 700; }
+.careerEvidenceDecisionForm textarea { width: 100%; min-height: 100px; resize: vertical; border: 1px solid rgba(148, 163, 184, .3); border-radius: 9px; background: #020617; color: #f8fafc; padding: 12px; }
+.careerEvidenceDecisionActions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.careerEvidenceDecisionActions button { background: #e2e8f0; }
+.careerEvidenceDecisionActions button[value="REJECT"] { background: #fecaca; }
+.careerEvidenceDecisionActions button[value="KEEP_UNRESOLVED"] { background: #fde68a; }
+.careerEvidenceDatadogNote { margin-top: 18px; }
+.careerEvidenceEmpty { margin-top: 20px; color: #cbd5e1; }
+
+@media (max-width: 700px) {
+  .careerEvidenceAdjudicationHeader, .careerEvidenceProgress, .careerEvidenceReviewFacts { grid-template-columns: 1fr; display: grid; }
+  .careerEvidenceAdjudicationStatus { min-width: 0; }
+  .careerEvidenceNavigation { gap: 10px; }
+}
+
 .staffordUnifiedHome {
   display: grid;
   gap: 18px;

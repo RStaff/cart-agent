@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "careerOS.v1.26b.runtime_acceptance.v1",
+  "route": "/os/professional/evidence",
+  "status": "ROUTE_RUNTIME_ACCEPTED",
+  "candidateIdentity": "deterministic hash of source fact identity and projection version",
+  "decisionActions": ["CONFIRM", "CORRECT", "REJECT", "KEEP_UNRESOLVED"],
+  "readbackRequired": true,
+  "canonicalCareerFactMutation": false,
+  "canonicalCareerEvidenceCreation": false,
+  "autoProjection": "fixture-only; no broad execution",
+  "browserAutomation": "unavailable in this environment",
+  "serverActionAcceptance": "isolated private temporary-root acceptance passed",
+  "httpAcceptance": {
+    "route": 200,
+    "initialProgress": "0 / 890",
+    "datadogFocus": 200,
+    "datadogFocusQueue": 835
+  }
+}

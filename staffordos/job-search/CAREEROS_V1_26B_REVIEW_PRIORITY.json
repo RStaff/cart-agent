@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "careerOS.v1.26b.review_priority.v1",
+  "privateRuntimeOnly": true,
+  "factsLoaded": 898,
+  "evidenceLoaded": 21,
+  "candidateCount": 898,
+  "reviewQueueCount": 890,
+  "firstReviewBatchCount": 15,
+  "eligibilityDistribution": {
+    "ALREADY_PROJECTED": 8,
+    "CONFLICT_BLOCKED": 822,
+    "INSUFFICIENT_PROVENANCE": 68,
+    "AUTO_PROJECTABLE": 0,
+    "OPERATOR_REVIEW_REQUIRED": 0,
+    "UNSUPPORTED": 0
+  },
+  "priorityInputs": [
+    "reusable capability family",
+    "existing source-evidence linkage",
+    "conflict/provenance state",
+    "evidence semantics"
+  ],
+  "excludedInputs": ["self-confidence", "interest", "workflow", "aspiration", "title similarity"],
+  "firstReviewBatchContainsPrivateIds": false
+}
