@@ -382,7 +382,7 @@ export function greenhouseSourceStructureFromHtml(input: {
   const content = input.content || "";
   if (!content.trim()) return null;
   const safeContent = decodeHtmlEntities(content).replace(/<script[\s\S]*?<\/script>/gi, " ").replace(/<style[\s\S]*?<\/style>/gi, " ");
-  const headings = [...safeContent.matchAll(/<h[1-6][^>]*>([\s\S]*?)<\/h[1-6]>/gi)];
+  const headings = [...safeContent.matchAll(/(?:<h[1-6][^>]*>([\s\S]*?)<\/h[1-6]>|<p[^>]*>\s*<strong[^>]*>([\s\S]*?)<\/strong>\s*<\/p>)/gi)];
   if (!headings.length) {
     return {
       format: "HTML",
@@ -401,7 +401,7 @@ export function greenhouseSourceStructureFromHtml(input: {
   headings.forEach((heading, index) => {
     const start = heading.index ?? 0;
     const end = index + 1 < headings.length ? (headings[index + 1].index ?? safeContent.length) : safeContent.length;
-    const rawHeading = stripHtml(heading[1]);
+    const rawHeading = stripHtml(heading[1] || heading[2]);
     const segment = safeContent.slice(start + heading[0].length, end);
     const items = [...segment.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)].map((item) => stripHtml(item[1])).filter(Boolean);
     blocks.push({ blockId: `${input.providerJobId}::block-${blocks.length + 1}`, blockOrder: blocks.length + 1, rawHeading, normalizedSection: normalizedGreenhouseSection(rawHeading), text: stripHtml(segment), items, detectionMethod: "PROVIDER_STRUCTURED_HTML" });

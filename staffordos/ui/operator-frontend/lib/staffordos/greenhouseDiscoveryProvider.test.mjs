@@ -204,6 +204,18 @@ test("Greenhouse normalization preserves raw HTML and deterministic source block
   assert.equal(raw.providerJobId, "12345");
 });
 
+test("semantically marked provider labels preserve section identity", () => {
+  const raw = greenhouse.normalizeGreenhouseJobToRawInput({
+    source: manifest().sources[0],
+    job: job({ content: "<p><strong>What You’ll Do:</strong></p><ul><li>Lead delivery</li></ul><p><strong>Preferred Qualifications:</strong></p><p>AI experience</p>" }),
+    boardToken: "example",
+    retrievedAt: "2026-08-08T12:00:00Z",
+  });
+  assert.equal(raw.sourceStructure.blocks[0].normalizedSection, "RESPONSIBILITIES");
+  assert.equal(raw.sourceStructure.blocks[1].normalizedSection, "PREFERRED_QUALIFICATIONS");
+  assert.deepEqual(raw.sourceStructure.blocks[0].items, ["Lead delivery"]);
+});
+
 test("structured parsing is non-executing and excludes script content from blocks", () => {
   const raw = greenhouse.normalizeGreenhouseJobToRawInput({
     source: manifest().sources[0],
@@ -436,6 +448,10 @@ test("private output writer stores a full queue result for downstream recommenda
   assert.equal(statSync(fullQueueResultPath).mode & 0o777, 0o600);
   assert.equal(Array.isArray(fullQueueResult.importQueue), true);
   assert.equal(fullQueueResult.prioritization.workflowVersion, "J002.01");
+  assert.match(fullQueueResult.normalizedSourceRecords[0].rawSourceDigest, /^sha256:/);
+  assert.equal(fullQueueResult.normalizedSourceRecords[0].sourceStructure.parserVersion, greenhouse.GREENHOUSE_SOURCE_STRUCTURE_PARSER_VERSION);
+  const retrievals = JSON.parse(readFileSync(path.join(runDirectory, "greenhouse_retrievals.json"), "utf8"));
+  assert.match(retrievals[0].jobs[0].content, /<p>/);
 });
 
 test("source and CLI contain no forbidden execution surfaces", () => {

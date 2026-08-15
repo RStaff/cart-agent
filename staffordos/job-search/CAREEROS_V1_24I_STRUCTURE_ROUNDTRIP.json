@@ -1,0 +1,67 @@
+[
+  {
+    "providerJobId": "5382750008",
+    "company": "Anthropic",
+    "title": "AI Infrastructure Operations, Demand Planning",
+    "providerIdentityEqual": true,
+    "urlEqual": true,
+    "normalizedDescriptionEqual": true,
+    "rawDigestEqual": true,
+    "structureEqual": true,
+    "blockOrderEqual": true,
+    "parserVersionEqual": true,
+    "persistedRawHtml": true
+  },
+  {
+    "providerJobId": "5391151008",
+    "company": "Anthropic",
+    "title": "AI Operations Engineer, Partnerships",
+    "providerIdentityEqual": true,
+    "urlEqual": true,
+    "normalizedDescriptionEqual": true,
+    "rawDigestEqual": true,
+    "structureEqual": true,
+    "blockOrderEqual": true,
+    "parserVersionEqual": true,
+    "persistedRawHtml": true
+  },
+  {
+    "providerJobId": "5192805008",
+    "company": "Anthropic",
+    "title": "Applied AI Architect, Commercial",
+    "providerIdentityEqual": true,
+    "urlEqual": true,
+    "normalizedDescriptionEqual": true,
+    "rawDigestEqual": true,
+    "structureEqual": true,
+    "blockOrderEqual": true,
+    "parserVersionEqual": true,
+    "persistedRawHtml": true
+  },
+  {
+    "providerJobId": "6572669",
+    "company": "Datadog",
+    "title": "AI Research Scientist - Datadog AI Research (DAIR)",
+    "providerIdentityEqual": true,
+    "urlEqual": true,
+    "normalizedDescriptionEqual": true,
+    "rawDigestEqual": true,
+    "structureEqual": true,
+    "blockOrderEqual": true,
+    "parserVersionEqual": true,
+    "persistedRawHtml": true
+  },
+  {
+    "providerJobId": "8059723",
+    "company": "Datadog",
+    "title": "Associate Growth Marketing Manager",
+    "providerIdentityEqual": true,
+    "urlEqual": true,
+    "normalizedDescriptionEqual": true,
+    "rawDigestEqual": true,
+    "structureEqual": true,
+    "blockOrderEqual": true,
+    "parserVersionEqual": true,
+    "persistedRawHtml": true
+  }
+]

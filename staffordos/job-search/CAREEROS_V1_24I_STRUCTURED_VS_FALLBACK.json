@@ -1,0 +1,276 @@
+[
+  {
+    "providerJobId": "5382750008",
+    "company": "Anthropic",
+    "title": "AI Infrastructure Operations, Demand Planning",
+    "structured": {
+      "requirementCount": 29,
+      "sections": {
+        "requirements": 26,
+        "responsibilities": 3
+      },
+      "importance": {
+        "hard": 21,
+        "core": 0,
+        "preferred": 1,
+        "nonCapability": 0,
+        "unresolved": 7
+      },
+      "specialistRequirements": 0,
+      "responsibilityRequirements": 0,
+      "provenanceCoverage": 29,
+      "linkage": {
+        "exact": 0,
+        "transferable": 1,
+        "partial": 0,
+        "unresolved": 24,
+        "noSupportedEquivalent": 4
+      }
+    },
+    "fallback": {
+      "requirementCount": 28,
+      "sections": {
+        "requirements": 24,
+        "compensation": 1,
+        "responsibilities": 3
+      },
+      "importance": {
+        "hard": 20,
+        "core": 0,
+        "preferred": 1,
+        "nonCapability": 0,
+        "unresolved": 7
+      },
+      "specialistRequirements": 0,
+      "responsibilityRequirements": 0,
+      "provenanceCoverage": 28,
+      "linkage": {
+        "exact": 0,
+        "transferable": 1,
+        "partial": 0,
+        "unresolved": 24,
+        "noSupportedEquivalent": 3
+      }
+    }
+  },
+  {
+    "providerJobId": "5391151008",
+    "company": "Anthropic",
+    "title": "AI Operations Engineer, Partnerships",
+    "structured": {
+      "requirementCount": 28,
+      "sections": {
+        "responsibilities": 14,
+        "requirements": 10,
+        "preferred": 4
+      },
+      "importance": {
+        "hard": 8,
+        "core": 0,
+        "preferred": 4,
+        "nonCapability": 0,
+        "unresolved": 16
+      },
+      "specialistRequirements": 2,
+      "responsibilityRequirements": 0,
+      "provenanceCoverage": 28,
+      "linkage": {
+        "exact": 0,
+        "transferable": 3,
+        "partial": 0,
+        "unresolved": 22,
+        "noSupportedEquivalent": 3
+      }
+    },
+    "fallback": {
+      "requirementCount": 27,
+      "sections": {
+        "responsibilities": 14,
+        "requirements": 10,
+        "preferred": 2,
+        "compensation": 1
+      },
+      "importance": {
+        "hard": 9,
+        "core": 0,
+        "preferred": 2,
+        "nonCapability": 0,
+        "unresolved": 16
+      },
+      "specialistRequirements": 2,
+      "responsibilityRequirements": 0,
+      "provenanceCoverage": 27,
+      "linkage": {
+        "exact": 0,
+        "transferable": 3,
+        "partial": 0,
+        "unresolved": 22,
+        "noSupportedEquivalent": 2
+      }
+    }
+  },
+  {
+    "providerJobId": "5192805008",
+    "company": "Anthropic",
+    "title": "Applied AI Architect, Commercial",
+    "structured": {
+      "requirementCount": 34,
+      "sections": {
+        "requirements": 29,
+        "responsibilities": 5
+      },
+      "importance": {
+        "hard": 26,
+        "core": 0,
+        "preferred": 0,
+        "nonCapability": 0,
+        "unresolved": 8
+      },
+      "specialistRequirements": 4,
+      "responsibilityRequirements": 0,
+      "provenanceCoverage": 34,
+      "linkage": {
+        "exact": 0,
+        "transferable": 0,
+        "partial": 0,
+        "unresolved": 32,
+        "noSupportedEquivalent": 2
+      }
+    },
+    "fallback": {
+      "requirementCount": 33,
+      "sections": {
+        "requirements": 27,
+        "compensation": 1,
+        "responsibilities": 5
+      },
+      "importance": {
+        "hard": 25,
+        "core": 0,
+        "preferred": 0,
+        "nonCapability": 0,
+        "unresolved": 8
+      },
+      "specialistRequirements": 4,
+      "responsibilityRequirements": 0,
+      "provenanceCoverage": 33,
+      "linkage": {
+        "exact": 0,
+        "transferable": 0,
+        "partial": 0,
+        "unresolved": 32,
+        "noSupportedEquivalent": 1
+      }
+    }
+  },
+  {
+    "providerJobId": "6572669",
+    "company": "Datadog",
+    "title": "AI Research Scientist - Datadog AI Research (DAIR)",
+    "structured": {
+      "requirementCount": 18,
+      "sections": {
+        "responsibilities": 12,
+        "UNKNOWN_SECTION": 1,
+        "preferred": 4,
+        "requirements": 1
+      },
+      "importance": {
+        "hard": 1,
+        "core": 0,
+        "preferred": 4,
+        "nonCapability": 0,
+        "unresolved": 13
+      },
+      "specialistRequirements": 4,
+      "responsibilityRequirements": 0,
+      "provenanceCoverage": 18,
+      "linkage": {
+        "exact": 0,
+        "transferable": 2,
+        "partial": 0,
+        "unresolved": 16,
+        "noSupportedEquivalent": 0
+      }
+    },
+    "fallback": {
+      "requirementCount": 18,
+      "sections": {
+        "UNKNOWN_SECTION": 1,
+        "responsibilities": 12,
+        "preferred": 4,
+        "requirements": 1
+      },
+      "importance": {
+        "hard": 1,
+        "core": 0,
+        "preferred": 4,
+        "nonCapability": 0,
+        "unresolved": 13
+      },
+      "specialistRequirements": 4,
+      "responsibilityRequirements": 0,
+      "provenanceCoverage": 18,
+      "linkage": {
+        "exact": 0,
+        "transferable": 2,
+        "partial": 0,
+        "unresolved": 16,
+        "noSupportedEquivalent": 0
+      }
+    }
+  },
+  {
+    "providerJobId": "8059723",
+    "company": "Datadog",
+    "title": "Associate Growth Marketing Manager",
+    "structured": {
+      "requirementCount": 12,
+      "sections": {
+        "responsibilities": 11,
+        "requirements": 1
+      },
+      "importance": {
+        "hard": 1,
+        "core": 0,
+        "preferred": 0,
+        "nonCapability": 0,
+        "unresolved": 11
+      },
+      "specialistRequirements": 1,
+      "responsibilityRequirements": 0,
+      "provenanceCoverage": 12,
+      "linkage": {
+        "exact": 0,
+        "transferable": 1,
+        "partial": 0,
+        "unresolved": 11,
+        "noSupportedEquivalent": 0
+      }
+    },
+    "fallback": {
+      "requirementCount": 13,
+      "sections": {
+        "responsibilities": 12,
+        "requirements": 1
+      },
+      "importance": {
+        "hard": 1,
+        "core": 0,
+        "preferred": 0,
+        "nonCapability": 0,
+        "unresolved": 12
+      },
+      "specialistRequirements": 1,
+      "responsibilityRequirements": 0,
+      "provenanceCoverage": 13,
+      "linkage": {
+        "exact": 0,
+        "transferable": 2,
+        "partial": 0,
+        "unresolved": 11,
+        "noSupportedEquivalent": 0
+      }
+    }
+  }
+]

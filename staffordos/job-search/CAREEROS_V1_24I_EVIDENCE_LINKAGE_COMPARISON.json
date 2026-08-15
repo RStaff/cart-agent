@@ -1,0 +1,97 @@
+[
+  {
+    "providerJobId": "5382750008",
+    "company": "Anthropic",
+    "title": "AI Infrastructure Operations, Demand Planning",
+    "structured": {
+      "exact": 0,
+      "transferable": 1,
+      "partial": 0,
+      "unresolved": 24,
+      "noSupportedEquivalent": 4
+    },
+    "fallback": {
+      "exact": 0,
+      "transferable": 1,
+      "partial": 0,
+      "unresolved": 24,
+      "noSupportedEquivalent": 3
+    }
+  },
+  {
+    "providerJobId": "5391151008",
+    "company": "Anthropic",
+    "title": "AI Operations Engineer, Partnerships",
+    "structured": {
+      "exact": 0,
+      "transferable": 3,
+      "partial": 0,
+      "unresolved": 22,
+      "noSupportedEquivalent": 3
+    },
+    "fallback": {
+      "exact": 0,
+      "transferable": 3,
+      "partial": 0,
+      "unresolved": 22,
+      "noSupportedEquivalent": 2
+    }
+  },
+  {
+    "providerJobId": "5192805008",
+    "company": "Anthropic",
+    "title": "Applied AI Architect, Commercial",
+    "structured": {
+      "exact": 0,
+      "transferable": 0,
+      "partial": 0,
+      "unresolved": 32,
+      "noSupportedEquivalent": 2
+    },
+    "fallback": {
+      "exact": 0,
+      "transferable": 0,
+      "partial": 0,
+      "unresolved": 32,
+      "noSupportedEquivalent": 1
+    }
+  },
+  {
+    "providerJobId": "6572669",
+    "company": "Datadog",
+    "title": "AI Research Scientist - Datadog AI Research (DAIR)",
+    "structured": {
+      "exact": 0,
+      "transferable": 2,
+      "partial": 0,
+      "unresolved": 16,
+      "noSupportedEquivalent": 0
+    },
+    "fallback": {
+      "exact": 0,
+      "transferable": 2,
+      "partial": 0,
+      "unresolved": 16,
+      "noSupportedEquivalent": 0
+    }
+  },
+  {
+    "providerJobId": "8059723",
+    "company": "Datadog",
+    "title": "Associate Growth Marketing Manager",
+    "structured": {
+      "exact": 0,
+      "transferable": 1,
+      "partial": 0,
+      "unresolved": 11,
+      "noSupportedEquivalent": 0
+    },
+    "fallback": {
+      "exact": 0,
+      "transferable": 2,
+      "partial": 0,
+      "unresolved": 11,
+      "noSupportedEquivalent": 0
+    }
+  }
+]
