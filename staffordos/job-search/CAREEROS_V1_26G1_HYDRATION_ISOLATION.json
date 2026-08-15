@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "careeros.v1_26g1.hydration_isolation.v1",
+  "attributeChecked": "data-scribe-recorder-ready",
+  "careerOsSourceEmitsAttribute": false,
+  "careerOsServerMarkupEmitsAttribute": false,
+  "suppressHydrationWarningAdded": false,
+  "classification": "EXTERNAL_DOM_MUTATION",
+  "authorityDefectRelated": false
+}

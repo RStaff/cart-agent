@@ -1,4 +1,7 @@
-import type { ReviewCluster } from "./evidenceReviewCompression";
+import { createHash } from "node:crypto";
+import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
+import * as path from "node:path";
+import type { ReviewCluster, ReviewClusterAnswer } from "./evidenceReviewCompression";
 
 export const CONFLICT_TYPES = [
   "TEMPORAL_CONFLICT",
@@ -23,6 +26,79 @@ export const CONFLICT_OUTCOMES = [
 ] as const;
 export type ConflictOutcome = (typeof CONFLICT_OUTCOMES)[number];
 
+export const CONFLICT_DECISION_SCHEMA_VERSION = "staffordos.professional.conflict_resolution.v1";
+
+export type ConflictResolutionDecision = {
+  schemaVersion: typeof CONFLICT_DECISION_SCHEMA_VERSION;
+  decisionId: string;
+  questionId: string;
+  answer: ReviewClusterAnswer;
+  underlyingCandidateIds: string[];
+  propagationEligibleCandidateIds: string[];
+  createdAt: string;
+  operatorId: "ROSS";
+  sourceAuthority: "PRIVATE_CAREER_AUTHORITY_CONFLICT_RESOLUTION";
+  canonicalCareerFactMutated: false;
+  canonicalCareerEvidenceCreated: false;
+  supersedesDecisionId: string | null;
+};
+
+export type ConflictReviewItem = ReviewCluster & {
+  historicalHighValueAnswer: ReviewClusterAnswer | null;
+  conflictDecision: ConflictResolutionDecision | null;
+  conflictType: ConflictType;
+  currentOutcome: ConflictOutcome;
+  authorityEffect: string;
+  excludedEffects: string;
+};
+
+function conflictDecisionPath(root: string) { return path.join(root, "conflict-decisions.ndjson"); }
+
+function latestConflictDecisions(decisions: readonly ConflictResolutionDecision[]) {
+  const latest = new Map<string, ConflictResolutionDecision>();
+  for (const decision of decisions) latest.set(decision.questionId, decision);
+  return latest;
+}
+
+export function loadConflictResolutionDecisions(options: { decisionRoot: string; repositoryRoot: string }) {
+  const file = conflictDecisionPath(options.decisionRoot);
+  if (!existsSync(file)) return [] as ConflictResolutionDecision[];
+  if (path.resolve(options.decisionRoot).startsWith(path.resolve(options.repositoryRoot) + path.sep)) throw new Error("PRIVATE_DECISION_ROOT_REQUIRED");
+  return readFileSync(file, "utf8").split(/\r?\n/).filter(Boolean).map((line) => JSON.parse(line) as ConflictResolutionDecision);
+}
+
+export function appendConflictResolutionDecision(options: {
+  decisionRoot: string;
+  repositoryRoot: string;
+  questionId: string;
+  answer: ReviewClusterAnswer;
+  underlyingCandidateIds: string[];
+  propagationEligibleCandidateIds: string[];
+  priorDecisionId?: string | null;
+  createdAt?: string;
+}) {
+  const createdAt = options.createdAt || new Date().toISOString();
+  const seed = `${options.questionId}|${createdAt}|${options.answer}`;
+  const decision: ConflictResolutionDecision = {
+    schemaVersion: CONFLICT_DECISION_SCHEMA_VERSION,
+    decisionId: `conflict_resolution_decision_${createHash("sha256").update(seed).digest("hex").slice(0, 24)}`,
+    questionId: options.questionId,
+    answer: options.answer,
+    underlyingCandidateIds: [...options.underlyingCandidateIds],
+    propagationEligibleCandidateIds: [...options.propagationEligibleCandidateIds],
+    createdAt,
+    operatorId: "ROSS",
+    sourceAuthority: "PRIVATE_CAREER_AUTHORITY_CONFLICT_RESOLUTION",
+    canonicalCareerFactMutated: false,
+    canonicalCareerEvidenceCreated: false,
+    supersedesDecisionId: options.priorDecisionId || null,
+  };
+  if (path.resolve(options.decisionRoot).startsWith(path.resolve(options.repositoryRoot) + path.sep)) throw new Error("PRIVATE_DECISION_ROOT_REQUIRED");
+  mkdirSync(options.decisionRoot, { recursive: true, mode: 0o700 });
+  appendFileSync(conflictDecisionPath(options.decisionRoot), `${JSON.stringify(decision)}\n`, { encoding: "utf8", mode: 0o600 });
+  return decision;
+}
+
 function text(value: unknown) { return typeof value === "string" ? value.toLowerCase() : ""; }
 
 export function classifyConflictType(cluster: Pick<ReviewCluster, "operatorQuestion" | "whyAsked" | "conflictStates" | "sourceProvenanceStates">): ConflictType {
@@ -45,16 +121,23 @@ export function outcomeForAnswer(answer: string | null): ConflictOutcome {
   return "KEEP_UNRESOLVED";
 }
 
-export function buildConflictReviewQueue(clusters: readonly ReviewCluster[]) {
+export function buildConflictReviewQueue(clusters: readonly ReviewCluster[], decisions: readonly ConflictResolutionDecision[] = []): ConflictReviewItem[] {
+  const latest = latestConflictDecisions(decisions);
   return clusters
     .filter((cluster) => cluster.conflictStates.includes("CONFLICTING") || cluster.sourceProvenanceStates.includes("NO_LINKED_SOURCE"))
     .map((cluster) => ({
       ...cluster,
       conflictType: classifyConflictType(cluster),
-      currentOutcome: outcomeForAnswer(cluster.operatorAnswer),
+      historicalHighValueAnswer: cluster.operatorAnswer,
+      conflictDecision: latest.get(cluster.clusterId) || null,
+      currentOutcome: outcomeForAnswer(latest.get(cluster.clusterId)?.answer || null),
       authorityEffect: "Affects only the bounded evidence authority represented by this question and its compatible candidates.",
       excludedEffects: "Does not change ranking, J002, J003, J010, application status, workflow, preferences, CareerFact, or CareerEvidence.",
     }));
+}
+
+export function conflictProgress(queue: ReturnType<typeof buildConflictReviewQueue>, total = queue.length) {
+  return { completed: queue.filter((item) => Boolean(item.conflictDecision)).length, total };
 }
 
 export function conflictTypeDistribution(queue: ReturnType<typeof buildConflictReviewQueue>) {

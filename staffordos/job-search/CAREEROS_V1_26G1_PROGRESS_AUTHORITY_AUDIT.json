@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "careeros.v1_26g1.progress_authority_audit.v1",
+  "historicalHighValueReview": { "completed": 16, "total": 16, "authority": "V1.26C_CLUSTER_DECISIONS" },
+  "conflictResolution": { "completed": 0, "total": 16, "authority": "V1.26G_CONFLICT_DECISIONS" },
+  "rawCandidates": 898,
+  "underlyingCandidatesAddressed": 203,
+  "historicalAnswersCountAsConflictAnswers": false,
+  "stableIdentity": "questionId",
+  "supersededDecisionsCountAsActive": false,
+  "privateAuthorityChanged": false
+}

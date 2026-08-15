@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "careeros.v1_26g1.navigation_acceptance.v1",
+  "conflictViewPreservedAcrossLinks": true,
+  "stableQuestionIdentity": true,
+  "nextUnreviewedUsesConflictAuthority": true,
+  "previousNextIsolation": "PASS_BY_STABLE_ID_AND_ROUTE_CONTRACT",
+  "unansweredState": "NEUTRAL",
+  "savedAnswerCarryover": false,
+  "fullBrowserAutomation": false,
+  "limitation": "Acceptance used route/source assertions and isolated persistence probes; no real Ross answer was submitted."
+}

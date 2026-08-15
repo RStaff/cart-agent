@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "careeros.v1_26g1.persistence_acceptance.v1",
+  "mode": "reversible_fixture_only",
+  "questionCount": 16,
+  "testQuestionCount": 1,
+  "saveReadback": "PASS",
+  "exactQuestionIdentity": "PASS",
+  "refreshRehydration": "PASS_IN_UNIT_AUTHORITY_PROBE",
+  "editSupersession": "PASS",
+  "activeDecisionUniqueness": "PASS",
+  "progressIncrement": "PASS_ONE_QUESTION_ONLY",
+  "cleanup": "PASS",
+  "rossRealConflictAuthorityMutated": false,
+  "careerFactMutated": false,
+  "careerEvidenceCreated": false,
+  "note": "The fixture used an isolated temporary authority root and was removed after the probe. No production/private answer was created."
+}

@@ -7,7 +7,13 @@ import {
   privateAdjudicationRoot,
   type ReviewClusterAnswer,
 } from "../../../../lib/staffordos/evidenceReviewCompression";
-import { buildConflictReviewQueue } from "../../../../lib/staffordos/conflictResolution";
+import {
+  appendConflictResolutionDecision,
+  buildConflictReviewQueue,
+  conflictProgress,
+  loadConflictResolutionDecisions,
+  type ConflictReviewItem,
+} from "../../../../lib/staffordos/conflictResolution";
 
 export const dynamic = "force-dynamic";
 
@@ -19,24 +25,39 @@ function answerFromForm(value: FormDataEntryValue | null): ReviewClusterAnswer |
 async function adjudicateReviewClusterAction(formData: FormData) {
   "use server";
   const clusterId = String(formData.get("clusterId") || "").trim();
+  const conflictMode = formData.get("conflictMode") === "true";
   const answer = answerFromForm(formData.get("answer"));
   const correction = String(formData.get("operatorCorrection") || "").trim() || null;
   const runtime = loadCompressedReviewRuntime({ repositoryRoot: process.cwd() });
   const cluster = runtime.allClusters.find((item) => item.clusterId === clusterId);
   if (!cluster || !answer) redirect("/os/professional/evidence?status=NOT_SAVED");
   try {
-    appendReviewClusterDecision({
-      decisionRoot: privateAdjudicationRoot(),
-      repositoryRoot: process.cwd(),
-      cluster,
-      answer,
-      operatorCorrection: correction,
-    });
+    if (conflictMode) {
+      const conflictDecisions = loadConflictResolutionDecisions({ decisionRoot: privateAdjudicationRoot(), repositoryRoot: process.cwd() });
+      const prior = [...conflictDecisions].reverse().find((decision) => decision.questionId === clusterId) || null;
+      appendConflictResolutionDecision({
+        decisionRoot: privateAdjudicationRoot(),
+        repositoryRoot: process.cwd(),
+        questionId: clusterId,
+        answer,
+        underlyingCandidateIds: cluster.underlyingCandidateIds,
+        propagationEligibleCandidateIds: cluster.propagationEligibleCandidateIds,
+        priorDecisionId: prior?.decisionId || null,
+      });
+    } else {
+      appendReviewClusterDecision({
+        decisionRoot: privateAdjudicationRoot(),
+        repositoryRoot: process.cwd(),
+        cluster,
+        answer,
+        operatorCorrection: correction,
+      });
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : "SAVE_FAILED";
-    redirect(`/os/professional/evidence?cluster=${encodeURIComponent(clusterId)}&status=NOT_SAVED&reason=${encodeURIComponent(message)}`);
+    redirect(`/os/professional/evidence?view=${conflictMode ? "conflicts&" : ""}cluster=${encodeURIComponent(clusterId)}&status=NOT_SAVED&reason=${encodeURIComponent(message)}`);
   }
-  redirect(`/os/professional/evidence?cluster=${encodeURIComponent(clusterId)}&status=${answer}`);
+  redirect(`/os/professional/evidence?view=${conflictMode ? "conflicts&" : ""}cluster=${encodeURIComponent(clusterId)}&status=SAVED`);
 }
 
 function displayLabel(value: string) { return value.replaceAll("_", " "); }
@@ -52,14 +73,16 @@ export default async function ProfessionalEvidencePage({
   const requested = typeof params.cluster === "string" ? params.cluster : null;
   const showAll = params.view === "all";
   const conflictMode = params.view === "conflicts";
-  const conflictQueue = buildConflictReviewQueue(runtime.highValueClusters);
-  const queue = conflictMode ? conflictQueue : showAll ? runtime.allClusters : runtime.highValueClusters;
+  const conflictDecisions = loadConflictResolutionDecisions({ decisionRoot: privateAdjudicationRoot(), repositoryRoot: process.cwd() });
+  const conflictQueueWithDecisions = buildConflictReviewQueue(runtime.highValueClusters, conflictDecisions);
+  const queue = (conflictMode ? conflictQueueWithDecisions : showAll ? runtime.allClusters : runtime.highValueClusters) as ConflictReviewItem[];
   const cluster = queue.find((item) => item.clusterId === requested) || queue.find((item) => !item.operatorAnswer) || queue[0] || null;
   const index = cluster ? queue.findIndex((item) => item.clusterId === cluster.clusterId) : -1;
   const previous = index > 0 ? queue[index - 1] : null;
   const next = index >= 0 && index < queue.length - 1 ? queue[index + 1] : null;
-  const nextUnreviewed = queue.find((item) => !item.operatorAnswer) || null;
-  const clusterHref = (clusterId: string) => `/os/professional/evidence?cluster=${encodeURIComponent(clusterId)}`;
+  const nextUnreviewed = queue.find((item) => conflictMode ? !item.conflictDecision : !item.operatorAnswer) || null;
+  const conflictCompletion = conflictProgress(conflictQueueWithDecisions, conflictQueueWithDecisions.length);
+  const clusterHref = (clusterId: string) => `/os/professional/evidence?${conflictMode ? "view=conflicts&" : ""}cluster=${encodeURIComponent(clusterId)}`;
   const status = typeof params.status === "string" ? params.status : null;
   const reason = typeof params.reason === "string" ? params.reason : null;
   return (
@@ -80,7 +103,8 @@ export default async function ProfessionalEvidencePage({
         <p>{conflictMode ? "This changes evidence authority only. It does not change ranking, application status, or workflow decisions by itself." : "Each answer is a bounded operator decision over compatible candidates. It does not automatically create CareerEvidence."}</p>
       </section>
       <section className="careerEvidenceProgress" aria-label="Compressed adjudication progress">
-        <div><span>Operator decisions</span><strong>{progress.operatorDecisions} / {progress.operatorDecisionTotal}</strong></div>
+        {conflictMode ? <div><span>Conflict resolution</span><strong>{conflictCompletion.completed} / {conflictCompletion.total}</strong></div> : <div><span>High-value review</span><strong>{progress.operatorDecisions} / {progress.operatorDecisionTotal}</strong></div>}
+        {conflictMode ? <div><span>High-value review</span><strong>{progress.operatorDecisions} / {progress.operatorDecisionTotal}</strong></div> : null}
         <div><span>Underlying candidates addressed</span><strong>{progress.underlyingCandidatesAddressed} / {progress.underlyingCandidateTotal}</strong></div>
         <div><span>Raw candidates</span><strong>{runtime.candidates.length}</strong></div>
       </section>
@@ -112,8 +136,10 @@ export default async function ProfessionalEvidencePage({
             </dl>
             <form action={adjudicateReviewClusterAction} className="careerEvidenceDecisionForm">
               <input type="hidden" name="clusterId" value={cluster.clusterId} />
+              <input type="hidden" name="conflictMode" value={conflictMode ? "true" : "false"} />
               <label htmlFor="operatorCorrection">Operator note, if needed</label>
               <textarea id="operatorCorrection" name="operatorCorrection" defaultValue={cluster.operatorCorrection || ""} placeholder="Record scope or context without rewriting the source fact." />
+              {conflictMode && cluster.historicalHighValueAnswer ? <p className="careerEvidenceHistoricalContext">Earlier high-value review answer: {displayLabel(cluster.historicalHighValueAnswer)}</p> : null}
               <div className="careerEvidenceDecisionActions">
                 <button type="submit" name="answer" value="DIRECT" disabled={!cluster.allowedAnswers.includes("DIRECT")}>Direct</button>
                 <button type="submit" name="answer" value="TRANSFERABLE" disabled={!cluster.allowedAnswers.includes("TRANSFERABLE")}>Transferable</button>
