@@ -1,0 +1,29 @@
+# Under-Ranked Positive Repair
+
+- Anthropic — Applied AI Architect, Commercial: TRANSFERABLE; 35 -> 46.11; rank 21 -> 21; transferable conversions 6.
+- Anthropic — Applied AI Architect, Enterprise Tech: GOOD_MATCH; 35 -> 46.11; rank 22 -> 22; transferable conversions 6.
+- Anthropic — Applied AI Architect, Industries: STRONG_MATCH; 35 -> 46.11; rank 23 -> 23; transferable conversions 6.
+- Anthropic — Data Engineer, Safeguards: STRETCH; 35 -> 46.11; rank 24 -> 24; transferable conversions 5.
+- Scale AI — AI Builder Intern: TRANSFERABLE; 35 -> 46.11; rank 25 -> 25; transferable conversions 4.
+- Airtable — Program Manager, Professional Services - East: GOOD_MATCH; 26.75 -> 26.75; rank 26 -> 26; transferable conversions 2.
+- Airtable — Program Manager, Professional Services - West: GOOD_MATCH; 26.75 -> 26.75; rank 27 -> 27; transferable conversions 2.
+- Anthropic — Anthropic Fellows Program: TRANSFERABLE; 26.75 -> 26.75; rank 28 -> 28; transferable conversions 16.
+- Anthropic — Anthropic Fellows Program, AI Safety & Security: TRANSFERABLE; 26.75 -> 26.75; rank 29 -> 29; transferable conversions 7.
+- Anthropic — Applied AI Engineer, Enterprise Tech: STRETCH; 26.75 -> 26.75; rank 30 -> 30; transferable conversions 4.
+- Anthropic — Director, Global Order-to-Cash Transformation: STRETCH; 26.75 -> 26.75; rank 33 -> 33; transferable conversions 5.
+- Scale AI — AI Infrastructure Engineer, Sandbox Platform: TRANSFERABLE; 26.75 -> 26.75; rank 35 -> 35; transferable conversions 7.
+- Scale AI — Engineering Manager, Agent Oversight: STRETCH; 26.75 -> 26.75; rank 36 -> 36; transferable conversions 1.
+- Scale AI — Frontier Agent Engineering Manager, Enterprise: TRANSFERABLE; 26.75 -> 26.75; rank 37 -> 37; transferable conversions 5.
+- Anthropic — Anthropic Fellows Program, ML Systems & Reinforcement Learning: STRETCH; 25.75 -> 25.75; rank 39 -> 39; transferable conversions 5.
+- Anthropic — Anthropic Fellows Program, The Anthropic Institute (Economics & Policy): STRETCH; 25.75 -> 25.75; rank 40 -> 40; transferable conversions 6.
+- Figma — Director, Business Systems: TRANSFERABLE; 72.25 -> 72.25; rank 21 -> 20; transferable conversions 6.
+- Figma — Director, Solutions Consulting (United States): GOOD_MATCH; 72.25 -> 72.25; rank 22 -> 21; transferable conversions 0.
+- Klaviyo — AI Enablement Program Manager: TRANSFERABLE; 72.25 -> 72.25; rank 23 -> 22; transferable conversions 2.
+- Airtable — Manager, Business Development Representatives: TRANSFERABLE; 71.25 -> 71.25; rank 25 -> 24; transferable conversions 3.
+- Braze — Applied AI Architect, GTM: GOOD_MATCH; 71.25 -> 71.25; rank 28 -> 26; transferable conversions 15.
+- Datadog — Associate Growth Marketing Manager: GOOD_MATCH; 71.25 -> 71.25; rank 29 -> 27; transferable conversions 3.
+- Klaviyo — Inbound Growth Specialist: TRANSFERABLE; 70 -> 71.25; rank 32 -> 28; transferable conversions 5.
+- Scale AI — AI Advisory Consultant: STRONG_MATCH; 71.25 -> 71.25; rank 30 -> 29; transferable conversions 3.
+- Scale AI — AI Strategy Consultant, Frontier Tech: GOOD_MATCH; 35 -> 46.11; rank 33 -> 33; transferable conversions 2.
+- Anthropic — Engineering Manager, Cybersecurity Products: STRETCH; 26.75 -> 26.75; rank 37 -> 37; transferable conversions 4.
+- Airtable — Software Engineer, Data: TRANSFERABLE; 25.75 -> 25.75; rank 38 -> 38; transferable conversions 3.

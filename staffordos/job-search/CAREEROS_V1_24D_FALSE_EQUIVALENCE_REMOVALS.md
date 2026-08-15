@@ -1,0 +1,40 @@
+# False Equivalence Removals
+
+- Anthropic — Commercial Operations Program Manager: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — Cash Manager, Treasury: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — Cash Manager, Treasury: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — Commercial Counsel, Platform & Marketplace: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — Director, Global Order-to-Cash Transformation: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Datadog — Engineering Manager I, Commercial Audit: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Datadog — Engineering Manager I, Commercial Audit: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Scale AI — Frontier Agent Engineering Manager, Enterprise: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Scale AI — Lead Counsel, Product and IP: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Scale AI — Lead Counsel, Product and IP: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Airtable — Global Payroll Manager: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Airtable — Global Payroll Manager: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Airtable — Senior Manager, Procurement: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — AV Engineer: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — AV Engineer: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — Capital Markets - Infrastructure Financing: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — Capital Markets - Infrastructure Financing: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — Director of Payroll: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — Director, US International Tax: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — Director, US International Tax: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — Director, US International Tax: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — Director, US International Tax: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — Director, US International Tax: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Braze — Applied AI Architect, G&A: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Braze — Applied AI Architect, G&A: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Braze — Applied AI Architect, G&A: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Figma — Director, Business Systems: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — AV Production Specialist: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — AV Operations Specialist: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — Data Engineering Manager, Product: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — Director, Infrastructure & Energy Accounting: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — Director, Infrastructure & Energy Accounting: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — Director, Infrastructure & Energy Accounting: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — Director, Infrastructure & Energy Accounting: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — Director, Revenue Accounting: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — Director, Revenue Accounting: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — Director, Revenue Accounting: specialist requirement preserved unresolved; generic evidence was not accepted.
+- Anthropic — Director, Revenue Accounting: specialist requirement preserved unresolved; generic evidence was not accepted.
