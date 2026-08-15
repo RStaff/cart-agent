@@ -1,0 +1,80 @@
+{
+  "before": {
+    "calibration": {
+      "top5Precision": 0,
+      "top10Precision": 0.3,
+      "strongRecall": 0.33,
+      "strongGoodRecall": 0.33,
+      "viableRecall": 0.23,
+      "falsePositiveRate": 0.75,
+      "falseNegativeRate": 0.29,
+      "rankCorrelation": 0.13,
+      "negativeLeakageTop5": 2,
+      "negativeLeakageTop10": 3,
+      "hardMismatchLeakageTop10": 0,
+      "underRankedViable": 16,
+      "strongGoodBelow20": 4,
+      "threshold": 71.25
+    },
+    "holdout": {
+      "top5Precision": 0.4,
+      "top10Precision": 0.3,
+      "strongRecall": 0.5,
+      "strongGoodRecall": 0.3,
+      "viableRecall": 0.35,
+      "falsePositiveRate": 0.73,
+      "falseNegativeRate": 0.4,
+      "rankCorrelation": 0.26,
+      "negativeLeakageTop5": 1,
+      "negativeLeakageTop10": 2,
+      "hardMismatchLeakageTop10": 0,
+      "underRankedViable": 10,
+      "strongGoodBelow20": 5,
+      "threshold": 72.25
+    }
+  },
+  "after": {
+    "ABOUT_ROLE": {
+      "count": 102,
+      "capabilityBearing": 99,
+      "transferable": 44,
+      "unresolved": 58
+    },
+    "LOCATION_WORK_ARRANGEMENT": {
+      "count": 12,
+      "capabilityBearing": 0,
+      "transferable": 4,
+      "unresolved": 8
+    },
+    "MINIMUM_QUALIFICATIONS": {
+      "count": 30,
+      "capabilityBearing": 30,
+      "transferable": 18,
+      "unresolved": 12
+    },
+    "PREFERRED_QUALIFICATIONS": {
+      "count": 94,
+      "capabilityBearing": 94,
+      "transferable": 29,
+      "unresolved": 65
+    },
+    "REQUIREMENTS": {
+      "count": 75,
+      "capabilityBearing": 73,
+      "transferable": 22,
+      "unresolved": 53
+    },
+    "RESPONSIBILITIES": {
+      "count": 788,
+      "capabilityBearing": 788,
+      "transferable": 360,
+      "unresolved": 428
+    },
+    "UNKNOWN_SECTION": {
+      "count": 531,
+      "capabilityBearing": 483,
+      "transferable": 131,
+      "unresolved": 400
+    }
+  }
+}

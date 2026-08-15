@@ -1,0 +1,27 @@
+# Under-Ranked Positive Forensics
+
+- Anthropic — Applied AI Architect, Commercial: TRANSFERABLE; rank 21 -> 21; unknown sections 0.
+- Anthropic — Applied AI Architect, Enterprise Tech: GOOD_MATCH; rank 22 -> 22; unknown sections 0.
+- Anthropic — Applied AI Architect, Industries: STRONG_MATCH; rank 23 -> 23; unknown sections 0.
+- Anthropic — Data Engineer, Safeguards: STRETCH; rank 24 -> 24; unknown sections 1.
+- Scale AI — AI Builder Intern: TRANSFERABLE; rank 25 -> 25; unknown sections 1.
+- Airtable — Program Manager, Professional Services - East: GOOD_MATCH; rank 26 -> 26; unknown sections 1.
+- Airtable — Program Manager, Professional Services - West: GOOD_MATCH; rank 27 -> 27; unknown sections 1.
+- Anthropic — Anthropic Fellows Program: TRANSFERABLE; rank 28 -> 28; unknown sections 113.
+- Anthropic — Anthropic Fellows Program, AI Safety & Security: TRANSFERABLE; rank 29 -> 29; unknown sections 70.
+- Anthropic — Applied AI Engineer, Enterprise Tech: STRETCH; rank 30 -> 30; unknown sections 0.
+- Anthropic — Director, Global Order-to-Cash Transformation: STRETCH; rank 33 -> 33; unknown sections 0.
+- Scale AI — AI Infrastructure Engineer, Sandbox Platform: TRANSFERABLE; rank 35 -> 35; unknown sections 23.
+- Scale AI — Engineering Manager, Agent Oversight: STRETCH; rank 36 -> 36; unknown sections 0.
+- Scale AI — Frontier Agent Engineering Manager, Enterprise: TRANSFERABLE; rank 37 -> 37; unknown sections 3.
+- Anthropic — Anthropic Fellows Program, ML Systems & Reinforcement Learning: STRETCH; rank 39 -> 39; unknown sections 58.
+- Anthropic — Anthropic Fellows Program, The Anthropic Institute (Economics & Policy): STRETCH; rank 40 -> 40; unknown sections 44.
+- Klaviyo — AI Enablement Program Manager: TRANSFERABLE; rank 22 -> 21; unknown sections 19.
+- Airtable — Manager, Business Development Representatives: TRANSFERABLE; rank 24 -> 25; unknown sections 1.
+- Braze — Applied AI Architect, GTM: GOOD_MATCH; rank 26 -> 27; unknown sections 1.
+- Datadog — Associate Growth Marketing Manager: GOOD_MATCH; rank 27 -> 28; unknown sections 1.
+- Klaviyo — Inbound Growth Specialist: TRANSFERABLE; rank 28 -> 29; unknown sections 15.
+- Scale AI — AI Advisory Consultant: STRONG_MATCH; rank 29 -> 30; unknown sections 9.
+- Scale AI — AI Strategy Consultant, Frontier Tech: GOOD_MATCH; rank 33 -> 33; unknown sections 15.
+- Anthropic — Engineering Manager, Cybersecurity Products: STRETCH; rank 37 -> 37; unknown sections 0.
+- Airtable — Software Engineer, Data: TRANSFERABLE; rank 38 -> 38; unknown sections 5.

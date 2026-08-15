@@ -1,0 +1,34 @@
+{
+  "before": {
+    "top5Precision": 0.4,
+    "top10Precision": 0.3,
+    "strongRecall": 0.5,
+    "strongGoodRecall": 0.3,
+    "viableRecall": 0.35,
+    "falsePositiveRate": 0.73,
+    "falseNegativeRate": 0.4,
+    "rankCorrelation": 0.26,
+    "negativeLeakageTop5": 1,
+    "negativeLeakageTop10": 2,
+    "hardMismatchLeakageTop10": 0,
+    "underRankedViable": 10,
+    "strongGoodBelow20": 5,
+    "threshold": 72.25
+  },
+  "after": {
+    "top5Precision": 0.4,
+    "top10Precision": 0.3,
+    "strongRecall": 0.5,
+    "strongGoodRecall": 0.3,
+    "viableRecall": 0.35,
+    "falsePositiveRate": 0.71,
+    "falseNegativeRate": 0.4,
+    "rankCorrelation": 0.29,
+    "negativeLeakageTop5": 1,
+    "negativeLeakageTop10": 2,
+    "hardMismatchLeakageTop10": 0,
+    "viableBelow20": 9,
+    "strongGoodBelow20": 4,
+    "cutoff": 72.25
+  }
+}
