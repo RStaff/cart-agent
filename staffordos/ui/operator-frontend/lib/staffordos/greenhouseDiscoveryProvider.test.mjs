@@ -187,6 +187,47 @@ test("Greenhouse normalization captures provider job metadata", () => {
   assert.equal(raw.sourceUrl, "https://job-boards.greenhouse.io/example/jobs/12345");
 });
 
+test("Greenhouse normalization preserves raw HTML and deterministic source blocks", () => {
+  const raw = greenhouse.normalizeGreenhouseJobToRawInput({
+    source: manifest().sources[0],
+    job: job({ content: "<h2>Responsibilities</h2><ul><li>Lead programs</li><li>Coordinate stakeholders</li></ul><h2>Preferred qualifications</h2><p>AI experience</p>" }),
+    boardToken: "example",
+    retrievedAt: "2026-08-08T12:00:00Z",
+  });
+  assert.equal(raw.rawSourceContentType, "text/html");
+  assert.match(raw.rawSourceContent, /<h2>Responsibilities<\/h2>/);
+  assert.equal(raw.sourceStructure.format, "HTML");
+  assert.equal(raw.sourceStructure.blocks[0].normalizedSection, "RESPONSIBILITIES");
+  assert.deepEqual(raw.sourceStructure.blocks[0].items, ["Lead programs", "Coordinate stakeholders"]);
+  assert.equal(raw.sourceStructure.blocks[1].normalizedSection, "PREFERRED_QUALIFICATIONS");
+  assert.equal(raw.title, "AI Automation Platform Product Manager");
+  assert.equal(raw.providerJobId, "12345");
+});
+
+test("structured parsing is non-executing and excludes script content from blocks", () => {
+  const raw = greenhouse.normalizeGreenhouseJobToRawInput({
+    source: manifest().sources[0],
+    job: job({ content: "<h2>Requirements</h2><p onclick=alert(1)>Lead programs</p><script>alert(2)</script>" }),
+    boardToken: "example",
+    retrievedAt: "2026-08-08T12:00:00Z",
+  });
+  assert.match(raw.rawSourceContent, /onclick=alert/);
+  assert.doesNotMatch(raw.sourceStructure.blocks[0].text, /alert\(2\)|<script|onclick=/i);
+  assert.equal(raw.sourceStructure.blocks[0].detectionMethod, "PROVIDER_STRUCTURED_HTML");
+});
+
+test("structured source fallback is explicit when provider content is absent", () => {
+  const raw = greenhouse.normalizeGreenhouseJobToRawInput({
+    source: manifest().sources[0],
+    job: job({ content: "" }),
+    boardToken: "example",
+    retrievedAt: "2026-08-08T12:00:00Z",
+  });
+  assert.equal(raw.rawSourceContent, null);
+  assert.equal(raw.sourceStructure, null);
+  assert.match(raw.descriptionText, /Department: Product/);
+});
+
 test("eligibility filtering rejects obvious non-target opportunities", () => {
   const sourceRecord = manifest().sources[0];
   const rejected = [
@@ -223,6 +264,7 @@ test("discovery builds a ranked Opportunity Queue through J002.02 and J002.01", 
   assert.equal(result.summary.readyForOpportunityImport, 1);
   assert.equal(result.opportunityQueue[0].state, "READY_FOR_OPPORTUNITY_IMPORT");
   assert.equal(record.sourceAuthority, "PUBLIC_READ_ONLY_PROVIDER");
+  assert.match(record.rawSourceDigest, /^sha256:/);
   assert.equal(snapshot.sourceType, "PROVIDER_CONFIRMED");
   assert.equal(snapshot.authorizationStatus, "AUTHORIZED_BY_PROVIDER");
   assert.ok(result.opportunityQueue[0].rankingSummary.totalScore > 0);

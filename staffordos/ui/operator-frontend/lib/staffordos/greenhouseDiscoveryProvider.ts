@@ -18,6 +18,7 @@ import {
   type NormalizedJobSourceRecord,
   type PrivateJobSourceImportQueueResult,
   type RawJobSourceInput,
+  type SourceStructure,
 } from "./privateJobSourceImportQueue";
 
 export const GREENHOUSE_DISCOVERY_VERSION = "J002.02B";
@@ -29,6 +30,7 @@ export const GREENHOUSE_ELIGIBILITY_REVIEW_SCHEMA_VERSION =
   "staffordos.job_search.greenhouse_eligibility_review.v1";
 export const GREENHOUSE_EXPLAINABLE_FIT_ARTIFACT_SCHEMA_VERSION =
   "staffordos.job_search.greenhouse_explainable_fit_artifact.v1";
+export const GREENHOUSE_SOURCE_STRUCTURE_PARSER_VERSION = "GREENHOUSE_HTML_BLOCKS_V1";
 
 export type GreenhouseManifestSource = {
   company: string;
@@ -353,6 +355,60 @@ function stripHtml(value: string | null | undefined) {
     .trim();
 }
 
+function normalizedGreenhouseSection(heading: string) {
+  const value = heading.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+  if (/responsibil|what you (will|ll) do|your responsibilities/.test(value)) return "RESPONSIBILITIES";
+  if (/minimum qualification|basic qualification|minimum requirement|what you bring/.test(value)) return "MINIMUM_QUALIFICATIONS";
+  if (/preferred qualification|desired qualification|nice to have|bonus point|strong candidates/.test(value)) return "PREFERRED_QUALIFICATIONS";
+  if (/requirement|qualification/.test(value)) return "REQUIREMENTS";
+  if (/skill|tool|technolog/.test(value)) return "SKILLS";
+  if (/experience/.test(value)) return "EXPERIENCE";
+  if (/education|certification/.test(value)) return "EDUCATION_CERTIFICATION";
+  if (/about (the )?role|opportunity/.test(value)) return "ABOUT_ROLE";
+  if (/about (the )?team/.test(value)) return "ABOUT_TEAM";
+  if (/about (the )?company|about us|our mission/.test(value)) return "ABOUT_COMPANY";
+  if (/compensation|salary|pay/.test(value)) return "COMPENSATION";
+  if (/benefit|perk/.test(value)) return "BENEFITS";
+  if (/legal|visa|equal opportunity/.test(value)) return "LEGAL_COMPLIANCE";
+  if (/location|logistic|remote|hybrid/.test(value)) return "LOCATION_WORK_ARRANGEMENT";
+  if (/application|how to apply/.test(value)) return "APPLICATION_INSTRUCTIONS";
+  return "UNKNOWN_SECTION";
+}
+
+export function greenhouseSourceStructureFromHtml(input: {
+  providerJobId: string;
+  content: string | null | undefined;
+}): SourceStructure | null {
+  const content = input.content || "";
+  if (!content.trim()) return null;
+  const safeContent = decodeHtmlEntities(content).replace(/<script[\s\S]*?<\/script>/gi, " ").replace(/<style[\s\S]*?<\/style>/gi, " ");
+  const headings = [...safeContent.matchAll(/<h[1-6][^>]*>([\s\S]*?)<\/h[1-6]>/gi)];
+  if (!headings.length) {
+    return {
+      format: "HTML",
+      contentType: "text/html",
+      parserVersion: GREENHOUSE_SOURCE_STRUCTURE_PARSER_VERSION,
+      blocks: [{
+        blockId: `${input.providerJobId}::block-1`, blockOrder: 1, rawHeading: null,
+        normalizedSection: "UNKNOWN_SECTION", text: stripHtml(safeContent), items: [], detectionMethod: "UNKNOWN_SECTION",
+      }],
+    };
+  }
+  const blocks: SourceStructure["blocks"] = [];
+  const firstStart = headings[0].index ?? 0;
+  const prefix = stripHtml(safeContent.slice(0, firstStart));
+  if (prefix) blocks.push({ blockId: `${input.providerJobId}::block-${blocks.length + 1}`, blockOrder: blocks.length + 1, rawHeading: null, normalizedSection: "UNKNOWN_SECTION", text: prefix, items: [], detectionMethod: "UNKNOWN_SECTION" });
+  headings.forEach((heading, index) => {
+    const start = heading.index ?? 0;
+    const end = index + 1 < headings.length ? (headings[index + 1].index ?? safeContent.length) : safeContent.length;
+    const rawHeading = stripHtml(heading[1]);
+    const segment = safeContent.slice(start + heading[0].length, end);
+    const items = [...segment.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)].map((item) => stripHtml(item[1])).filter(Boolean);
+    blocks.push({ blockId: `${input.providerJobId}::block-${blocks.length + 1}`, blockOrder: blocks.length + 1, rawHeading, normalizedSection: normalizedGreenhouseSection(rawHeading), text: stripHtml(segment), items, detectionMethod: "PROVIDER_STRUCTURED_HTML" });
+  });
+  return { format: "HTML", contentType: "text/html", parserVersion: GREENHOUSE_SOURCE_STRUCTURE_PARSER_VERSION, blocks };
+}
+
 function normalizeCompanyToken(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
@@ -618,6 +674,7 @@ export function normalizeGreenhouseJobToRawInput(input: {
   ]
     .filter(Boolean)
     .join("\n\n");
+  const rawSourceContent = optionalText(input.job.content);
 
   return {
     accessMode: "PUBLIC_API",
@@ -627,6 +684,9 @@ export function normalizeGreenhouseJobToRawInput(input: {
     providerJobId,
     sourceUrl: canonicalUrl(input.job, input.boardToken),
     sourceText: description,
+    rawSourceContent,
+    rawSourceContentType: rawSourceContent ? "text/html" : null,
+    sourceStructure: greenhouseSourceStructureFromHtml({ providerJobId, content: rawSourceContent }),
     observedAt: input.retrievedAt,
     publicationDate: optionalText(input.job.first_published),
     title: optionalText(input.job.title),
@@ -919,6 +979,7 @@ export function writeGreenhouseDiscoveryOutputs(input: {
         updated_at: job.updated_at,
         requisition_id: job.requisition_id,
         absolute_url: job.absolute_url,
+        content: job.content,
       })),
     })),
     "eligibility_reviews.json": input.result.eligibilityReviews,

@@ -1,0 +1,12 @@
+{
+  "before": {
+    "sectioned": 1101,
+    "unknownSection": 531
+  },
+  "after": {
+    "sectioned": 1101,
+    "unknownSection": 531
+  },
+  "structuredRecordsInLockedArtifacts": 0,
+  "fallbackRecords": 80
+}

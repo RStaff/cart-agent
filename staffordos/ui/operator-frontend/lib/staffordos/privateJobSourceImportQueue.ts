@@ -223,9 +223,29 @@ export type RawJobSourceInput = {
   employmentType?: string | null;
   compensationText?: string | null;
   descriptionText?: string | null;
+  rawSourceContent?: string | null;
+  rawSourceContentType?: "text/html" | "text/plain" | null;
+  sourceStructure?: SourceStructure | null;
   requisitionId?: string | null;
   sourceAuthority?: "OPERATOR_SUPPLIED_READ_ONLY" | "PUBLIC_READ_ONLY_PROVIDER";
   limitations?: string[];
+};
+
+export type SourceStructureBlock = {
+  blockId: string;
+  blockOrder: number;
+  rawHeading: string | null;
+  normalizedSection: string;
+  text: string;
+  items: string[];
+  detectionMethod: "PROVIDER_STRUCTURED_HTML" | "UNKNOWN_SECTION";
+};
+
+export type SourceStructure = {
+  format: "HTML" | "PLAIN_TEXT" | "UNKNOWN";
+  contentType: "text/html" | "text/plain" | "UNKNOWN";
+  blocks: SourceStructureBlock[];
+  parserVersion: string;
 };
 
 export type NormalizedJobSourceRecord = {
@@ -252,6 +272,10 @@ export type NormalizedJobSourceRecord = {
   descriptionText: string | null;
   descriptionTextReference: string;
   descriptionDigest: string;
+  rawSourceContent: string | null;
+  rawSourceContentType: "text/html" | "text/plain" | "UNKNOWN";
+  rawSourceDigest: string | null;
+  sourceStructure: SourceStructure | null;
   requisitionId: string | null;
   sourceAuthority: "OPERATOR_SUPPLIED_READ_ONLY" | "PUBLIC_READ_ONLY_PROVIDER";
   freshness: "RECENT" | "UNKNOWN" | "STALE";
@@ -687,6 +711,8 @@ export function normalizeJobSourceInput(input: RawJobSourceInput, generatedAt: s
   const title = optionalText(input.title) || jsonField(imported, ["title", "roleTitle", "jobTitle"]) || "UNKNOWN";
   const company = optionalText(input.company) || jsonField(imported, ["company", "companyName", "employer"]) || "UNKNOWN";
   const descriptionText = descriptionFor(input);
+  const rawSourceContent = optionalText(input.rawSourceContent) || jsonField(imported, ["rawSourceContent", "contentHtml", "content"]) || null;
+  const rawSourceContentType = input.rawSourceContentType || (rawSourceContent ? "text/html" : "UNKNOWN");
   const sourceDigest = `sha256:${sha256Text(sourcePayloadForDigest(input))}`;
   const descriptionDigest = `sha256:${sha256Text(descriptionText)}`;
   const providerJobId = optionalText(input.providerJobId) || jsonField(imported, ["providerJobId", "jobId", "id"]);
@@ -732,6 +758,10 @@ export function normalizeJobSourceInput(input: RawJobSourceInput, generatedAt: s
     descriptionText: descriptionText || null,
     descriptionTextReference: `private-job-source://${recordId}#raw-description`,
     descriptionDigest,
+    rawSourceContent,
+    rawSourceContentType,
+    rawSourceDigest: rawSourceContent ? `sha256:${sha256Text(rawSourceContent)}` : null,
+    sourceStructure: input.sourceStructure || null,
     requisitionId,
     sourceAuthority,
     freshness: isStale(input, generatedAt) ? "STALE" : publicationDate ? "RECENT" : "UNKNOWN",
