@@ -13,7 +13,7 @@
     "MANDATORY_GENERAL": {
       "recordCoverage": 13,
       "requirementCount": 13,
-      "evidenceSupported": 0,
+      "evidenceSupported": 6,
       "transferable": 6,
       "unresolved": 7,
       "positiveRoleCount": 2,
@@ -23,7 +23,7 @@
     "CORE_RESPONSIBILITY": {
       "recordCoverage": 80,
       "requirementCount": 798,
-      "evidenceSupported": 0,
+      "evidenceSupported": 566,
       "transferable": 566,
       "unresolved": 232,
       "positiveRoleCount": 19,
@@ -33,7 +33,7 @@
     "PREFERRED_QUALIFICATION": {
       "recordCoverage": 5,
       "requirementCount": 5,
-      "evidenceSupported": 0,
+      "evidenceSupported": 3,
       "transferable": 3,
       "unresolved": 2,
       "positiveRoleCount": 2,
@@ -43,7 +43,7 @@
     "TOOL_OR_TECHNOLOGY": {
       "recordCoverage": 29,
       "requirementCount": 60,
-      "evidenceSupported": 0,
+      "evidenceSupported": 2,
       "transferable": 2,
       "unresolved": 58,
       "positiveRoleCount": 10,
@@ -53,7 +53,7 @@
     "DOMAIN_KNOWLEDGE": {
       "recordCoverage": 32,
       "requirementCount": 86,
-      "evidenceSupported": 0,
+      "evidenceSupported": 3,
       "transferable": 3,
       "unresolved": 83,
       "positiveRoleCount": 5,
@@ -63,7 +63,7 @@
     "SENIORITY_OR_SCOPE": {
       "recordCoverage": 29,
       "requirementCount": 38,
-      "evidenceSupported": 0,
+      "evidenceSupported": 18,
       "transferable": 18,
       "unresolved": 20,
       "positiveRoleCount": 7,
@@ -73,7 +73,7 @@
     "EDUCATION_OR_CERTIFICATION": {
       "recordCoverage": 7,
       "requirementCount": 12,
-      "evidenceSupported": 0,
+      "evidenceSupported": 6,
       "transferable": 6,
       "unresolved": 6,
       "positiveRoleCount": 3,
@@ -93,7 +93,7 @@
     "COMPENSATION": {
       "recordCoverage": 5,
       "requirementCount": 6,
-      "evidenceSupported": 0,
+      "evidenceSupported": 2,
       "transferable": 2,
       "unresolved": 4,
       "positiveRoleCount": 1,
@@ -133,7 +133,7 @@
     "BENEFITS_OR_EMPLOYER_MARKETING": {
       "recordCoverage": 1,
       "requirementCount": 1,
-      "evidenceSupported": 0,
+      "evidenceSupported": 1,
       "transferable": 1,
       "unresolved": 0,
       "positiveRoleCount": 0,
@@ -153,7 +153,7 @@
     "UNRESOLVED": {
       "recordCoverage": 75,
       "requirementCount": 440,
-      "evidenceSupported": 0,
+      "evidenceSupported": 11,
       "transferable": 11,
       "unresolved": 429,
       "positiveRoleCount": 19,
