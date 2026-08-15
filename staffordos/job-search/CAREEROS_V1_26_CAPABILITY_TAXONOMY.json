@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "careeros.v1_26.capability_taxonomy.v1",
+  "status": "DIAGNOSTIC_ONLY",
+  "sourceRule": "Existing authority only; no capability is created by this artifact.",
+  "families": [
+    {"id":"PROGRAM_PROJECT_LEADERSHIP","label":"Program/project leadership","authorityState":"PROVEN_TRANSFERABLE_CAPABILITY","basis":"Existing private mapping workflow reports transferable responsibility support; underlying private records are not reproduced.","limits":["Does not prove exact title, people management, or domain specialization."]},
+    {"id":"CROSS_FUNCTIONAL_COORDINATION","label":"Cross-functional coordination","authorityState":"PROVEN_TRANSFERABLE_CAPABILITY","basis":"Existing private job-analysis mappings classify related responsibility support as TRANSFERABLE/PARTIAL.","limits":["Scope, stakeholder level, and outcomes require source inspection."]},
+    {"id":"ARCHITECTURE_AND_SYSTEMS","label":"Architecture and systems work","authorityState":"EVIDENCE_GAP","basis":"S010.02A identifies repository architecture artifacts as possible future evidence, not current certified career facts.","limits":["Repository artifacts alone do not prove professional, production, customer, or employer use."]},
+    {"id":"AI_AUTOMATION","label":"AI and automation","authorityState":"EVIDENCE_GAP","basis":"V1.24 role analyses show transferable mappings, but the repository does not contain inspectable Ross source evidence for exact AI responsibilities.","limits":["Do not infer software engineering, data science, or production AI capability."]},
+    {"id":"MARKETING_TECHNOLOGY","label":"Marketing technology and operations","authorityState":"EVIDENCE_GAP","basis":"V1.24 diagnostics classify MarTech-adjacent roles as transferable/partial; direct evidence is private or unavailable to this audit.","limits":["Tool names and job labels are not sufficient proof."]},
+    {"id":"DATA_ANALYTICS","label":"Data and analytics","authorityState":"UNKNOWN","basis":"No repository-visible Ross-specific authoritative evidence was found.","limits":["Do not infer data-science/statistical-modeling capability from generic analytics language."]},
+    {"id":"TECHNOLOGY_USE","label":"Technology/tool use","authorityState":"UNKNOWN","basis":"Checked-in technology fixtures are synthetic test-only records; real private technology evidence is not inspectable here.","limits":["No proficiency, years, production, or customer-use claim without source authority."]},
+    {"id":"PMP_CERTIFICATION","label":"Project-management certification","authorityState":"PROVEN_DIRECT_CAPABILITY","basis":"S010.02E reports one owner-private official credential verification; credential details intentionally remain private.","limits":["Credential proves only the credential requirement, not employment, scope, years, or program outcomes."]},
+    {"id":"PEOPLE_MANAGEMENT","label":"People management","authorityState":"EVIDENCE_GAP","basis":"The only repository fixture limits coordination evidence and explicitly does not prove people-management authority.","limits":["Do not infer team size, hiring, performance management, or executive scope."]},
+    {"id":"BUSINESS_TRANSFORMATION","label":"Business transformation","authorityState":"PROVEN_TRANSFERABLE_CAPABILITY","basis":"Existing V1.24 diagnostics identify transferable transformation/program responsibility support.","limits":["Outcomes, employer context, and domain depth require evidence review."]}
+  ]
+}

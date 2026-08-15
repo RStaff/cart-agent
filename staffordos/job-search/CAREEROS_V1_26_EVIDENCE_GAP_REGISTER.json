@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "careeros.v1_26.evidence_gap_register.v1",
+  "status": "DIAGNOSTIC_ONLY",
+  "gaps": [
+    {"id":"gap-employment-history","area":"Employment history, titles, dates, scope","classification":"MISSING_PROVENANCE","requiredSource":"Employer record, verified resume source, or other authoritative employment document","impact":"Cannot prove exact title, tenure, employer responsibility, or seniority level."},
+    {"id":"gap-program-scope","area":"Program/project scope and stakeholder level","classification":"MISSING_SCOPE_EVIDENCE","requiredSource":"Project artifact, employment evidence, or operator-confirmed bounded project record","impact":"Transferable program support remains non-exact."},
+    {"id":"gap-technical-depth","area":"AI, automation, systems, analytics, and software depth","classification":"MISSING_TECHNICAL_DEPTH_EVIDENCE","requiredSource":"Repository/project artifact, work sample, certification, or verified employment evidence","impact":"Cannot distinguish adjacent capability from specialist engineering/data-science capability."},
+    {"id":"gap-outcomes","area":"Metrics, business outcomes, customer use, production status","classification":"MISSING_PROJECT_EVIDENCE","requiredSource":"Measurement record, deployment proof, customer/third-party evidence, or bounded operator confirmation","impact":"No unsupported impact or scale claims may be used."},
+    {"id":"gap-leadership","area":"People management and organizational leadership","classification":"MISSING_SCOPE_EVIDENCE","requiredSource":"Employment record, org/team evidence, or explicit operator-confirmed bounded leadership record","impact":"Coordination cannot be promoted to people management."},
+    {"id":"gap-source-linkage","area":"Private CareerFact/CareerEvidence linkage available to offline audit","classification":"MISSING_STRUCTURED_EXTRACTION","requiredSource":"Governed read-only export or approved mapping snapshot with stable IDs and provenance","impact":"Repository audit cannot independently inspect the 895/16 private runtime summary."},
+    {"id":"gap-portfolio","area":"Portfolio and public work samples","classification":"MISSING_DOCUMENTATION","requiredSource":"Ross-supplied portfolio URL/artifact with review status","impact":"Architecture and AI-adjacent work remains evidence gap rather than capability gap."},
+    {"id":"gap-education-certification","area":"Education and certifications beyond the privately reported credential","classification":"GENUINE_UNKNOWN","requiredSource":"Official certificate, transcript, issuer record, or Ross confirmation","impact":"No additional credential or education claim is inferred."}
+  ],
+  "prohibition": "This register does not create, promote, or mutate CareerFact or CareerEvidence."
+}

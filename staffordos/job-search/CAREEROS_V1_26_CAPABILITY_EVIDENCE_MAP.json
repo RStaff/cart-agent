@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "careeros.v1_26.capability_evidence_map.v1",
+  "status": "DIAGNOSTIC_ONLY",
+  "careerFactsCreated": 0,
+  "careerEvidenceCreated": 0,
+  "records": [
+    {"capabilityFamily":"PROGRAM_PROJECT_LEADERSHIP","classification":"PROVEN_TRANSFERABLE_CAPABILITY","evidenceAuthority":"PRIVATE_RUNTIME_MAPPING_SUMMARY","evidenceIdsExposed":false,"sourceArtifacts":["staffordos/job-search/J001_03A_PRIVATE_JOB_REQUIREMENT_EXTRACTION_AND_EVIDENCE_MAPPING_WORKFLOW.md","staffordos/job-search/CAREEROS_V1_24D_DATADOG_TPM_CONTROL_CASE.md"],"limits":["Exact private source records are not committed; direct title/scope/outcome claims remain unresolved."]},
+    {"capabilityFamily":"CROSS_FUNCTIONAL_COORDINATION","classification":"PROVEN_TRANSFERABLE_CAPABILITY","evidenceAuthority":"PRIVATE_RUNTIME_MAPPING_SUMMARY","evidenceIdsExposed":false,"sourceArtifacts":["staffordos/job-search/CAREEROS_V1_24D_RESPONSIBILITY_EQUIVALENCE_REPORT.md"],"limits":["Transferable responsibility support is not exact domain or title proof."]},
+    {"capabilityFamily":"PMP_CERTIFICATION","classification":"PROVEN_DIRECT_CAPABILITY","evidenceAuthority":"PRIVATE_OFFICIAL_CREDENTIAL_VERIFICATION","evidenceIdsExposed":false,"sourceArtifacts":["staffordos/architecture/S010_02E_HIGH_VALUE_CAREER_FACT_VERIFICATION.md"],"limits":["No credential number, dates, or identity details are exposed; credential does not prove unrelated capability."]},
+    {"capabilityFamily":"ARCHITECTURE_AND_SYSTEMS","classification":"EVIDENCE_GAP","evidenceAuthority":"REPOSITORY_ARTIFACTS_ONLY","evidenceIdsExposed":false,"sourceArtifacts":["staffordos/architecture/S010_02A_CAREER_EVIDENCE_DISCOVERY_AND_CANONICAL_AUTHORITY.md"],"limits":["Repository architecture is not yet a certified Ross career fact."]},
+    {"capabilityFamily":"AI_AUTOMATION","classification":"EVIDENCE_GAP","evidenceAuthority":"ROLE_MAPPING_DIAGNOSTICS_ONLY","evidenceIdsExposed":false,"sourceArtifacts":["staffordos/job-search/CAREEROS_V1_24C_UNDER_RANKED_POSITIVE_FORENSICS.md"],"limits":["Human labels and transferable role mappings do not create candidate evidence."]},
+    {"capabilityFamily":"PEOPLE_MANAGEMENT","classification":"UNKNOWN","evidenceAuthority":"NO_REPOSITORY_VISIBLE_AUTHORITATIVE_SOURCE","evidenceIdsExposed":false,"sourceArtifacts":["staffordos/ui/operator-frontend/lib/staffordos/careerEvidenceContracts.ts"],"limits":["The synthetic coordination fixture explicitly excludes formal management proof."]}
+  ],
+  "authorityRules": [
+    "Resume wording is not primary authority.",
+    "Self-confidence, interest, workflow, title similarity, and aspiration are excluded.",
+    "Missing evidence is never a capability gap by itself.",
+    "Operator confirmation remains distinct from independent source evidence."
+  ]
+}
