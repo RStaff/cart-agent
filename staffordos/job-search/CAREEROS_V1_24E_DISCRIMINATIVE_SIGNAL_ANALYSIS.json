@@ -1,0 +1,170 @@
+{
+  "classStats": {
+    "MANDATORY_SPECIALIST": {
+      "recordCoverage": 29,
+      "requirementCount": 127,
+      "evidenceSupported": 0,
+      "transferable": 0,
+      "unresolved": 127,
+      "positiveRoleCount": 2,
+      "negativeRoleCount": 17,
+      "positiveRateAmongCoveredRoles": 0.07
+    },
+    "MANDATORY_GENERAL": {
+      "recordCoverage": 13,
+      "requirementCount": 13,
+      "evidenceSupported": 0,
+      "transferable": 6,
+      "unresolved": 7,
+      "positiveRoleCount": 2,
+      "negativeRoleCount": 2,
+      "positiveRateAmongCoveredRoles": 0.15
+    },
+    "CORE_RESPONSIBILITY": {
+      "recordCoverage": 80,
+      "requirementCount": 798,
+      "evidenceSupported": 0,
+      "transferable": 566,
+      "unresolved": 232,
+      "positiveRoleCount": 19,
+      "negativeRoleCount": 26,
+      "positiveRateAmongCoveredRoles": 0.24
+    },
+    "PREFERRED_QUALIFICATION": {
+      "recordCoverage": 5,
+      "requirementCount": 5,
+      "evidenceSupported": 0,
+      "transferable": 3,
+      "unresolved": 2,
+      "positiveRoleCount": 2,
+      "negativeRoleCount": 1,
+      "positiveRateAmongCoveredRoles": 0.4
+    },
+    "TOOL_OR_TECHNOLOGY": {
+      "recordCoverage": 29,
+      "requirementCount": 60,
+      "evidenceSupported": 0,
+      "transferable": 2,
+      "unresolved": 58,
+      "positiveRoleCount": 10,
+      "negativeRoleCount": 4,
+      "positiveRateAmongCoveredRoles": 0.34
+    },
+    "DOMAIN_KNOWLEDGE": {
+      "recordCoverage": 32,
+      "requirementCount": 86,
+      "evidenceSupported": 0,
+      "transferable": 3,
+      "unresolved": 83,
+      "positiveRoleCount": 5,
+      "negativeRoleCount": 8,
+      "positiveRateAmongCoveredRoles": 0.16
+    },
+    "SENIORITY_OR_SCOPE": {
+      "recordCoverage": 29,
+      "requirementCount": 38,
+      "evidenceSupported": 0,
+      "transferable": 18,
+      "unresolved": 20,
+      "positiveRoleCount": 7,
+      "negativeRoleCount": 6,
+      "positiveRateAmongCoveredRoles": 0.24
+    },
+    "EDUCATION_OR_CERTIFICATION": {
+      "recordCoverage": 7,
+      "requirementCount": 12,
+      "evidenceSupported": 0,
+      "transferable": 6,
+      "unresolved": 6,
+      "positiveRoleCount": 3,
+      "negativeRoleCount": 3,
+      "positiveRateAmongCoveredRoles": 0.43
+    },
+    "LOCATION_OR_WORK_ARRANGEMENT": {
+      "recordCoverage": 7,
+      "requirementCount": 9,
+      "evidenceSupported": 0,
+      "transferable": 0,
+      "unresolved": 9,
+      "positiveRoleCount": 1,
+      "negativeRoleCount": 3,
+      "positiveRateAmongCoveredRoles": 0.14
+    },
+    "COMPENSATION": {
+      "recordCoverage": 5,
+      "requirementCount": 6,
+      "evidenceSupported": 0,
+      "transferable": 2,
+      "unresolved": 4,
+      "positiveRoleCount": 1,
+      "negativeRoleCount": 1,
+      "positiveRateAmongCoveredRoles": 0.2
+    },
+    "SOFT_SKILL": {
+      "recordCoverage": 25,
+      "requirementCount": 37,
+      "evidenceSupported": 0,
+      "transferable": 0,
+      "unresolved": 37,
+      "positiveRoleCount": 9,
+      "negativeRoleCount": 5,
+      "positiveRateAmongCoveredRoles": 0.36
+    },
+    "CORPORATE_BOILERPLATE": {
+      "recordCoverage": 0,
+      "requirementCount": 0,
+      "evidenceSupported": 0,
+      "transferable": 0,
+      "unresolved": 0,
+      "positiveRoleCount": 0,
+      "negativeRoleCount": 0,
+      "positiveRateAmongCoveredRoles": null
+    },
+    "LEGAL_OR_COMPLIANCE_BOILERPLATE": {
+      "recordCoverage": 16,
+      "requirementCount": 17,
+      "evidenceSupported": 0,
+      "transferable": 0,
+      "unresolved": 17,
+      "positiveRoleCount": 5,
+      "negativeRoleCount": 4,
+      "positiveRateAmongCoveredRoles": 0.31
+    },
+    "BENEFITS_OR_EMPLOYER_MARKETING": {
+      "recordCoverage": 1,
+      "requirementCount": 1,
+      "evidenceSupported": 0,
+      "transferable": 1,
+      "unresolved": 0,
+      "positiveRoleCount": 0,
+      "negativeRoleCount": 0,
+      "positiveRateAmongCoveredRoles": 0
+    },
+    "STRUCTURAL_OR_HEADING": {
+      "recordCoverage": 17,
+      "requirementCount": 34,
+      "evidenceSupported": 0,
+      "transferable": 0,
+      "unresolved": 34,
+      "positiveRoleCount": 3,
+      "negativeRoleCount": 5,
+      "positiveRateAmongCoveredRoles": 0.18
+    },
+    "UNRESOLVED": {
+      "recordCoverage": 75,
+      "requirementCount": 440,
+      "evidenceSupported": 0,
+      "transferable": 11,
+      "unresolved": 429,
+      "positiveRoleCount": 19,
+      "negativeRoleCount": 25,
+      "positiveRateAmongCoveredRoles": 0.25
+    }
+  },
+  "inventory": {
+    "opportunities": 80,
+    "requirements": 1683,
+    "calibration": 40,
+    "holdout": 40
+  }
+}
