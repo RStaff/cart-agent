@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "careerOS.v1.26c.high_value_review_queue.v1",
+  "privateRuntimeOnly": true,
+  "rawCandidates": 898,
+  "operatorQueueSize": 16,
+  "underlyingCandidatesCovered": 306,
+  "propagationEligibleCandidates": 246,
+  "datadogMinimumQuestions": 4,
+  "questionFamilies": [
+    "PROGRAM_ACCOUNTABILITY",
+    "CROSS_FUNCTIONAL_LEADERSHIP",
+    "PEOPLE_LEADERSHIP",
+    "TECHNICAL_DEPTH",
+    "AI_AUTOMATION_OWNERSHIP",
+    "MARKETING_SYSTEMS",
+    "PRODUCT_REQUIREMENTS",
+    "TRANSFORMATION_GOVERNANCE"
+  ],
+  "excludedSignals": ["self-confidence", "interest", "would-pursue", "workflow", "aspiration", "title prestige"],
+  "privateIdentifiersIncluded": false
+}

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "careerOS.v1.26c.review_cluster_summary.v1",
+  "privateRuntimeOnly": true,
+  "rawCandidates": 898,
+  "reviewableCandidates": 890,
+  "reviewClusters": 16,
+  "highValueClusters": 16,
+  "lowValueOrRedundantClusters": 0,
+  "underlyingCandidatesCoveredByClusters": 306,
+  "highValueUnderlyingCandidates": 306,
+  "propagationEligibleCandidates": 246,
+  "individualReviewCandidates": 584,
+  "conflictRequiringIndividualReview": 574,
+  "insufficientProvenance": 68,
+  "alreadyProjected": 8,
+  "initialOperatorQueue": 16,
+  "queueSelection": "all deterministic clusters fit within the bounded high-value capacity of 18",
+  "privateIdentifiersIncluded": false
+}

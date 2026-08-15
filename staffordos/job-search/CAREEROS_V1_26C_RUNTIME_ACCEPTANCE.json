@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "careerOS.v1.26c.runtime_acceptance.v1",
+  "route": "/os/professional/evidence",
+  "defaultView": "HIGH_VALUE_REVIEW",
+  "rawCandidates": 898,
+  "operatorDecisions": "0 / 16",
+  "underlyingCandidatesAddressed": "0 / 890",
+  "clusterIdentity": "deterministic hash of question template, capability family, and direct/transferable state",
+  "persistence": "private append-only cluster decision log with latest-by-cluster readback",
+  "rollback": "superseding decision restores prior state by reloading latest decision",
+  "careerFactMutation": false,
+  "careerEvidenceCreation": false,
+  "browserAutomation": "unavailable in this environment",
+  "serverRouteAcceptance": {
+    "status": 200,
+    "defaultView": "HIGH_VALUE_REVIEW",
+    "operatorQueue": 16,
+    "progressRendered": true,
+    "nextUnreviewedRendered": true,
+    "answerControlsRendered": true
+  }
+}

@@ -1,49 +1,44 @@
 import { redirect } from "next/navigation";
 import {
-  EVIDENCE_ADJUDICATION_ACTIONS,
-  appendEvidenceAdjudicationDecision,
-  adjudicationProgress,
-  loadEvidenceAdjudicationRuntime,
+  REVIEW_CLUSTER_ANSWERS,
+  appendReviewClusterDecision,
+  compressionProgress,
+  loadCompressedReviewRuntime,
   privateAdjudicationRoot,
-  reviewQueueCandidates,
-  type EvidenceAdjudicationAction,
-} from "../../../../lib/staffordos/evidenceAdjudication";
+  type ReviewClusterAnswer,
+} from "../../../../lib/staffordos/evidenceReviewCompression";
 
 export const dynamic = "force-dynamic";
 
-function actionFromForm(value: FormDataEntryValue | null): EvidenceAdjudicationAction | null {
-  const action = String(value || "").trim();
-  return EVIDENCE_ADJUDICATION_ACTIONS.includes(action as EvidenceAdjudicationAction)
-    ? action as EvidenceAdjudicationAction
-    : null;
+function answerFromForm(value: FormDataEntryValue | null): ReviewClusterAnswer | null {
+  const answer = String(value || "").trim();
+  return REVIEW_CLUSTER_ANSWERS.includes(answer as ReviewClusterAnswer) ? answer as ReviewClusterAnswer : null;
 }
 
-async function adjudicateEvidenceAction(formData: FormData) {
+async function adjudicateReviewClusterAction(formData: FormData) {
   "use server";
-  const candidateId = String(formData.get("candidateId") || "").trim();
-  const action = actionFromForm(formData.get("action"));
+  const clusterId = String(formData.get("clusterId") || "").trim();
+  const answer = answerFromForm(formData.get("answer"));
   const correction = String(formData.get("operatorCorrection") || "").trim() || null;
-  const runtime = loadEvidenceAdjudicationRuntime({ repositoryRoot: process.cwd() });
-  const candidate = runtime.candidates.find((item) => item.candidateId === candidateId);
-  if (!candidate || !action) redirect("/os/professional/evidence?status=NOT_SAVED");
+  const runtime = loadCompressedReviewRuntime({ repositoryRoot: process.cwd() });
+  const cluster = runtime.allClusters.find((item) => item.clusterId === clusterId);
+  if (!cluster || !answer) redirect("/os/professional/evidence?status=NOT_SAVED");
   try {
-    appendEvidenceAdjudicationDecision({
+    appendReviewClusterDecision({
       decisionRoot: privateAdjudicationRoot(),
       repositoryRoot: process.cwd(),
-      candidate,
-      action,
+      cluster,
+      answer,
       operatorCorrection: correction,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "SAVE_FAILED";
-    redirect(`/os/professional/evidence?candidate=${encodeURIComponent(candidateId)}&status=NOT_SAVED&reason=${encodeURIComponent(message)}`);
+    redirect(`/os/professional/evidence?cluster=${encodeURIComponent(clusterId)}&status=NOT_SAVED&reason=${encodeURIComponent(message)}`);
   }
-  redirect(`/os/professional/evidence?candidate=${encodeURIComponent(candidateId)}&status=${action === "KEEP_UNRESOLVED" ? "UNRESOLVED" : action === "CORRECT" ? "CORRECTED" : action === "CONFIRM" ? "CONFIRMED" : "REJECTED"}`);
+  redirect(`/os/professional/evidence?cluster=${encodeURIComponent(clusterId)}&status=${answer}`);
 }
 
-function displayLabel(value: string) {
-  return value.replaceAll("_", " ");
-}
+function displayLabel(value: string) { return value.replaceAll("_", " "); }
 
 export default async function ProfessionalEvidencePage({
   searchParams,
@@ -51,30 +46,26 @@ export default async function ProfessionalEvidencePage({
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const params = (await searchParams) || {};
-  const allCandidates = loadEvidenceAdjudicationRuntime({ repositoryRoot: process.cwd() }).candidates;
-  const queue = reviewQueueCandidates(allCandidates);
-  const progress = adjudicationProgress(allCandidates);
-  const focus = params.focus === "datadog" ? "datadog" : null;
-  const focusedQueue = focus === "datadog"
-    ? queue.filter((candidate) => ["PROGRAM_AND_LEADERSHIP", "DELIVERY_AND_PRODUCT", "TECHNOLOGY_AND_AUTOMATION"].includes(candidate.capabilityFamily))
-    : queue;
-  const batch = focusedQueue.filter((candidate) => !candidate.operatorDecision).slice(0, 15);
-  const requested = typeof params.candidate === "string" ? params.candidate : null;
-  const candidate = focusedQueue.find((item) => item.candidateId === requested) || batch[0] || focusedQueue[0] || null;
-  const index = candidate ? focusedQueue.findIndex((item) => item.candidateId === candidate.candidateId) : -1;
-  const previous = index > 0 ? focusedQueue[index - 1] : null;
-  const next = index >= 0 && index < focusedQueue.length - 1 ? focusedQueue[index + 1] : null;
-  const nextUnreviewed = focusedQueue.find((item) => !item.operatorDecision) || null;
-  const candidateHref = (candidateId: string) => `/os/professional/evidence?candidate=${encodeURIComponent(candidateId)}${focus ? "&focus=datadog" : ""}`;
+  const runtime = loadCompressedReviewRuntime({ repositoryRoot: process.cwd(), maxHighValue: 18 });
+  const progress = compressionProgress(runtime);
+  const requested = typeof params.cluster === "string" ? params.cluster : null;
+  const showAll = params.view === "all";
+  const queue = showAll ? runtime.allClusters : runtime.highValueClusters;
+  const cluster = queue.find((item) => item.clusterId === requested) || queue.find((item) => !item.operatorAnswer) || queue[0] || null;
+  const index = cluster ? queue.findIndex((item) => item.clusterId === cluster.clusterId) : -1;
+  const previous = index > 0 ? queue[index - 1] : null;
+  const next = index >= 0 && index < queue.length - 1 ? queue[index + 1] : null;
+  const nextUnreviewed = queue.find((item) => !item.operatorAnswer) || null;
+  const clusterHref = (clusterId: string) => `/os/professional/evidence?cluster=${encodeURIComponent(clusterId)}`;
   const status = typeof params.status === "string" ? params.status : null;
   const reason = typeof params.reason === "string" ? params.reason : null;
   return (
-    <main className="careerEvidenceAdjudicationPage">
+    <div className="careerEvidenceAdjudicationPage">
       <section className="careerEvidenceAdjudicationHeader">
         <div>
-          <span className="staffordEyebrow">Professional / Private authority</span>
+          <span className="staffordEyebrow">Professional / High-value review</span>
           <h1>Career Evidence Adjudication</h1>
-          <p>Review what CareerOS thinks Ross has evidence for before anything becomes canonical matching evidence.</p>
+          <p>CareerOS found {progress.underlyingCandidateTotal} underlying evidence candidates. You do not need to review them individually.</p>
         </div>
         <div className="careerEvidenceAdjudicationStatus">
           <strong>Owner-private review</strong>
@@ -82,62 +73,56 @@ export default async function ProfessionalEvidencePage({
         </div>
       </section>
       <section className="careerEvidenceAdjudicationNotice">
-        <strong>Projection is gated</strong>
-        <p>Confirming a candidate records an operator decision. It does not create CareerEvidence in this mission.</p>
+        <strong>High-value review</strong>
+        <p>Each answer is a bounded operator decision over compatible candidates. It does not automatically create CareerEvidence.</p>
       </section>
-      <section className="careerEvidenceProgress" aria-label="Adjudication progress">
-        <div><span>Valid adjudications</span><strong>{progress.reviewed} / {progress.total}</strong></div>
-        <div><span>Remaining</span><strong>{progress.remaining}</strong></div>
-        <div><span>First review batch</span><strong>{Math.min(15, progress.remaining)}</strong></div>
+      <section className="careerEvidenceProgress" aria-label="Compressed adjudication progress">
+        <div><span>Operator decisions</span><strong>{progress.operatorDecisions} / {progress.operatorDecisionTotal}</strong></div>
+        <div><span>Underlying candidates addressed</span><strong>{progress.underlyingCandidatesAddressed} / {progress.underlyingCandidateTotal}</strong></div>
+        <div><span>Raw candidates</span><strong>{runtime.candidates.length}</strong></div>
       </section>
       <nav className="careerEvidenceFocus" aria-label="Evidence review focus">
-        <span>Review focus:</span>
-        <a href="/os/professional/evidence">All candidates</a>
-        <a href="/os/professional/evidence?focus=datadog">Datadog TPM capability families</a>
+        <span>Review focus:</span><a href="/os/professional/evidence">High-value review</a><a href="/os/professional/evidence?view=all">All clusters</a>
       </nav>
       {status ? <p className={`careerEvidenceFeedback ${status === "NOT_SAVED" ? "is-error" : "is-success"}`} role="status">{status === "NOT_SAVED" ? `NOT SAVED${reason ? `: ${reason}` : ""}` : status}</p> : null}
-      {candidate ? (
+      {cluster ? (
         <>
-          <nav className="careerEvidenceNavigation" aria-label="Candidate navigation">
-            {previous ? <a href={candidateHref(previous.candidateId)}>Previous</a> : <span>Previous</span>}
-            <span>Candidate {index + 1} of {focusedQueue.length}{focus ? " in Datadog focus" : ""}</span>
-            {next ? <a href={candidateHref(next.candidateId)}>Next</a> : <span>Next</span>}
+          <nav className="careerEvidenceNavigation" aria-label="Cluster navigation">
+            {previous ? <a href={clusterHref(previous.clusterId)}>Previous</a> : <span>Previous</span>}
+            <span>Question {index + 1} of {queue.length}</span>
+            {next ? <a href={clusterHref(next.clusterId)}>Next</a> : <span>Next</span>}
           </nav>
-          {nextUnreviewed ? <p className="careerEvidenceNextUnreviewed"><a href={candidateHref(nextUnreviewed.candidateId)}>Next unreviewed</a></p> : null}
+          {nextUnreviewed ? <p className="careerEvidenceNextUnreviewed"><a href={clusterHref(nextUnreviewed.clusterId)}>Next unreviewed</a></p> : null}
           <article className="careerEvidenceReviewCard">
-            <div className="careerEvidenceReviewMeta">
-              <span>{displayLabel(candidate.eligibilityState)}</span>
-              <span>{displayLabel(candidate.directOrTransferable)}</span>
-              <span>{candidate.factType}</span>
-            </div>
-            <h2>{candidate.statement}</h2>
+            <div className="careerEvidenceReviewMeta"><span>{displayLabel(cluster.clusterType)}</span><span>{displayLabel(cluster.directOrTransferable)}</span><span>{cluster.capabilityFamily}</span></div>
+            <h2>{cluster.operatorQuestion}</h2>
+            <p>{cluster.whyAsked}</p>
             <dl className="careerEvidenceReviewFacts">
-              <div><dt>Capability family</dt><dd>{candidate.capabilityFamily}</dd></div>
-              <div><dt>Context</dt><dd>{candidate.organization || candidate.roleOrTitle || "Not stated in source fact"}</dd></div>
-              <div><dt>Verification</dt><dd>{candidate.verificationStatus} / {candidate.supportLevel}</dd></div>
-              <div><dt>Authority</dt><dd>{candidate.authorityClassification}</dd></div>
-              <div><dt>Source support</dt><dd>{candidate.sourceEvidenceCount ? `${candidate.sourceEvidenceCount} linked source record(s): ${candidate.sourceEvidenceTypes.join(", ")}` : "No linked source evidence"}</dd></div>
-              <div><dt>Why review is needed</dt><dd>{candidate.eligibilityReasons.join(" ")}</dd></div>
-              <div><dt>Projection consequence</dt><dd>{candidate.eligibilityState === "AUTO_PROJECTABLE" ? "Eligible for a separate reversible projection test; no canonical write occurs here." : "This decision remains a private adjudication candidate; canonical CareerEvidence is unchanged."}</dd></div>
+              <div><dt>Underlying candidates</dt><dd>{cluster.underlyingCandidateCount}</dd></div>
+              <div><dt>Affected opportunities</dt><dd>{cluster.affectedOpportunityCount === null ? "Not linked in evidence authority" : cluster.affectedOpportunityCount}</dd></div>
+              <div><dt>Provenance</dt><dd>{cluster.sourceProvenanceStates.join(", ")}</dd></div>
+              <div><dt>Conflict state</dt><dd>{cluster.conflictStates.join(", ")}</dd></div>
+              <div><dt>Propagation boundary</dt><dd>{cluster.propagationEligibleCandidateIds.length} candidates with operator-resolvable verification state; direct and transferable semantics remain separate.</dd></div>
+              <div><dt>Priority reason</dt><dd>{cluster.priorityReason}</dd></div>
+              <div><dt>Consequence</dt><dd>Answer remains an auditable private decision. No CareerFact rewrite and no CareerEvidence creation occur here.</dd></div>
             </dl>
-            <form action={adjudicateEvidenceAction} className="careerEvidenceDecisionForm">
-              <input type="hidden" name="candidateId" value={candidate.candidateId} />
-              <label htmlFor="operatorCorrection">Correction, if needed</label>
-              <textarea id="operatorCorrection" name="operatorCorrection" defaultValue={candidate.operatorCorrection || ""} placeholder="Describe only what should be corrected; the source fact is never rewritten." />
+            <form action={adjudicateReviewClusterAction} className="careerEvidenceDecisionForm">
+              <input type="hidden" name="clusterId" value={cluster.clusterId} />
+              <label htmlFor="operatorCorrection">Operator note, if needed</label>
+              <textarea id="operatorCorrection" name="operatorCorrection" defaultValue={cluster.operatorCorrection || ""} placeholder="Record scope or context without rewriting the source fact." />
               <div className="careerEvidenceDecisionActions">
-                <button type="submit" name="action" value="CONFIRM">Confirm</button>
-                <button type="submit" name="action" value="CORRECT">Correct</button>
-                <button type="submit" name="action" value="REJECT">Reject</button>
-                <button type="submit" name="action" value="KEEP_UNRESOLVED">Keep unresolved</button>
+                <button type="submit" name="answer" value="DIRECT" disabled={!cluster.allowedAnswers.includes("DIRECT")}>Direct</button>
+                <button type="submit" name="answer" value="TRANSFERABLE" disabled={!cluster.allowedAnswers.includes("TRANSFERABLE")}>Transferable</button>
+                <button type="submit" name="answer" value="ADJACENT" disabled={!cluster.allowedAnswers.includes("ADJACENT")}>Adjacent</button>
+                <button type="submit" name="answer" value="NO" disabled={!cluster.allowedAnswers.includes("NO")}>No</button>
+                <button type="submit" name="answer" value="NEEDS_EVIDENCE" disabled={!cluster.allowedAnswers.includes("NEEDS_EVIDENCE")}>Needs evidence</button>
+                <button type="submit" name="answer" value="KEEP_UNRESOLVED" disabled={!cluster.allowedAnswers.includes("KEEP_UNRESOLVED")}>Keep unresolved</button>
               </div>
             </form>
           </article>
         </>
-      ) : <p className="careerEvidenceEmpty">No private career authority candidates are available.</p>}
-      <section className="careerEvidenceDatadogNote">
-        <strong>Datadog TPM control</strong>
-        <p>The existing Datadog TPM review remains diagnostic only. This surface cannot boost its score or rank.</p>
-      </section>
-    </main>
+      ) : <p className="careerEvidenceEmpty">No high-value review clusters are available.</p>}
+      <section className="careerEvidenceDatadogNote"><strong>Datadog TPM control</strong><p>Use the same compressed questions for program delivery, leadership scope, technical depth, and domain context. This surface cannot boost Datadog's score or rank.</p></section>
+    </div>
   );
 }
