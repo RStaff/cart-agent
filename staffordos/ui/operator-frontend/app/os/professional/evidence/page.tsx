@@ -64,6 +64,7 @@ export default async function ProfessionalEvidencePage({
   const index = candidate ? focusedQueue.findIndex((item) => item.candidateId === candidate.candidateId) : -1;
   const previous = index > 0 ? focusedQueue[index - 1] : null;
   const next = index >= 0 && index < focusedQueue.length - 1 ? focusedQueue[index + 1] : null;
+  const nextUnreviewed = focusedQueue.find((item) => !item.operatorDecision) || null;
   const candidateHref = (candidateId: string) => `/os/professional/evidence?candidate=${encodeURIComponent(candidateId)}${focus ? "&focus=datadog" : ""}`;
   const status = typeof params.status === "string" ? params.status : null;
   const reason = typeof params.reason === "string" ? params.reason : null;
@@ -102,6 +103,7 @@ export default async function ProfessionalEvidencePage({
             <span>Candidate {index + 1} of {focusedQueue.length}{focus ? " in Datadog focus" : ""}</span>
             {next ? <a href={candidateHref(next.candidateId)}>Next</a> : <span>Next</span>}
           </nav>
+          {nextUnreviewed ? <p className="careerEvidenceNextUnreviewed"><a href={candidateHref(nextUnreviewed.candidateId)}>Next unreviewed</a></p> : null}
           <article className="careerEvidenceReviewCard">
             <div className="careerEvidenceReviewMeta">
               <span>{displayLabel(candidate.eligibilityState)}</span>
@@ -116,6 +118,7 @@ export default async function ProfessionalEvidencePage({
               <div><dt>Authority</dt><dd>{candidate.authorityClassification}</dd></div>
               <div><dt>Source support</dt><dd>{candidate.sourceEvidenceCount ? `${candidate.sourceEvidenceCount} linked source record(s): ${candidate.sourceEvidenceTypes.join(", ")}` : "No linked source evidence"}</dd></div>
               <div><dt>Why review is needed</dt><dd>{candidate.eligibilityReasons.join(" ")}</dd></div>
+              <div><dt>Projection consequence</dt><dd>{candidate.eligibilityState === "AUTO_PROJECTABLE" ? "Eligible for a separate reversible projection test; no canonical write occurs here." : "This decision remains a private adjudication candidate; canonical CareerEvidence is unchanged."}</dd></div>
             </dl>
             <form action={adjudicateEvidenceAction} className="careerEvidenceDecisionForm">
               <input type="hidden" name="candidateId" value={candidate.candidateId} />
