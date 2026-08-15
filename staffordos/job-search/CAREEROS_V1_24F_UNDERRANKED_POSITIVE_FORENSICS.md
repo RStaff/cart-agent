@@ -1,0 +1,29 @@
+# Under-Ranked Positive Forensics
+
+- Anthropic — Applied AI Architect, Commercial: TRANSFERABLE; rank 21 -> 21; score 46.11 -> 46.11; core responsibilities 6; specialist requirements 0.
+- Anthropic — Applied AI Architect, Enterprise Tech: GOOD_MATCH; rank 22 -> 22; score 46.11 -> 46.11; core responsibilities 6; specialist requirements 0.
+- Anthropic — Applied AI Architect, Industries: STRONG_MATCH; rank 23 -> 23; score 46.11 -> 46.11; core responsibilities 6; specialist requirements 0.
+- Anthropic — Data Engineer, Safeguards: STRETCH; rank 24 -> 24; score 46.11 -> 46.11; core responsibilities 10; specialist requirements 1.
+- Scale AI — AI Builder Intern: TRANSFERABLE; rank 25 -> 25; score 46.11 -> 46.11; core responsibilities 10; specialist requirements 0.
+- Airtable — Program Manager, Professional Services - East: GOOD_MATCH; rank 26 -> 26; score 26.75 -> 26.75; core responsibilities 9; specialist requirements 0.
+- Airtable — Program Manager, Professional Services - West: GOOD_MATCH; rank 27 -> 27; score 26.75 -> 26.75; core responsibilities 9; specialist requirements 0.
+- Anthropic — Anthropic Fellows Program: TRANSFERABLE; rank 28 -> 28; score 26.75 -> 26.75; core responsibilities 26; specialist requirements 0.
+- Anthropic — Anthropic Fellows Program, AI Safety & Security: TRANSFERABLE; rank 29 -> 29; score 26.75 -> 26.75; core responsibilities 12; specialist requirements 0.
+- Anthropic — Applied AI Engineer, Enterprise Tech: STRETCH; rank 30 -> 30; score 26.75 -> 26.75; core responsibilities 7; specialist requirements 0.
+- Anthropic — Director, Global Order-to-Cash Transformation: STRETCH; rank 33 -> 33; score 26.75 -> 26.75; core responsibilities 14; specialist requirements 2.
+- Scale AI — AI Infrastructure Engineer, Sandbox Platform: TRANSFERABLE; rank 35 -> 35; score 26.75 -> 26.75; core responsibilities 12; specialist requirements 2.
+- Scale AI — Engineering Manager, Agent Oversight: STRETCH; rank 36 -> 36; score 26.75 -> 26.75; core responsibilities 4; specialist requirements 0.
+- Scale AI — Frontier Agent Engineering Manager, Enterprise: TRANSFERABLE; rank 37 -> 37; score 26.75 -> 26.75; core responsibilities 8; specialist requirements 0.
+- Anthropic — Anthropic Fellows Program, ML Systems & Reinforcement Learning: STRETCH; rank 39 -> 39; score 25.75 -> 25.75; core responsibilities 14; specialist requirements 0.
+- Anthropic — Anthropic Fellows Program, The Anthropic Institute (Economics & Policy): STRETCH; rank 40 -> 40; score 25.75 -> 25.75; core responsibilities 8; specialist requirements 0.
+- Figma — Director, Business Systems: TRANSFERABLE; rank 20 -> 21; score 72.25 -> 72.25; core responsibilities 9; specialist requirements 2.
+- Figma — Director, Solutions Consulting (United States): GOOD_MATCH; rank 21 -> 22; score 72.25 -> 72.25; core responsibilities 7; specialist requirements 0.
+- Klaviyo — AI Enablement Program Manager: TRANSFERABLE; rank 22 -> 23; score 72.25 -> 72.25; core responsibilities 10; specialist requirements 0.
+- Airtable — Manager, Business Development Representatives: TRANSFERABLE; rank 24 -> 25; score 71.25 -> 71.25; core responsibilities 9; specialist requirements 0.
+- Braze — Applied AI Architect, GTM: GOOD_MATCH; rank 26 -> 28; score 71.25 -> 71.25; core responsibilities 26; specialist requirements 0.
+- Datadog — Associate Growth Marketing Manager: GOOD_MATCH; rank 27 -> 29; score 71.25 -> 71.25; core responsibilities 5; specialist requirements 0.
+- Klaviyo — Inbound Growth Specialist: TRANSFERABLE; rank 28 -> 30; score 71.25 -> 71.25; core responsibilities 6; specialist requirements 0.
+- Scale AI — AI Advisory Consultant: STRONG_MATCH; rank 29 -> 31; score 71.25 -> 71.25; core responsibilities 8; specialist requirements 0.
+- Scale AI — AI Strategy Consultant, Frontier Tech: GOOD_MATCH; rank 33 -> 33; score 46.11 -> 46.11; core responsibilities 5; specialist requirements 0.
+- Anthropic — Engineering Manager, Cybersecurity Products: STRETCH; rank 37 -> 37; score 26.75 -> 26.75; core responsibilities 19; specialist requirements 1.
+- Airtable — Software Engineer, Data: TRANSFERABLE; rank 38 -> 38; score 25.75 -> 25.75; core responsibilities 8; specialist requirements 2.

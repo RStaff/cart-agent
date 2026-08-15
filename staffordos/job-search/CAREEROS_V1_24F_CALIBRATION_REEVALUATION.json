@@ -1,0 +1,39 @@
+{
+  "before": {
+    "top5Precision": 0,
+    "top10Precision": 0.3,
+    "strongRecall": 0.33,
+    "strongGoodRecall": 0.33,
+    "viableRecall": 0.23,
+    "falsePositiveRate": 0.72,
+    "falseNegativeRate": 0.29,
+    "rankCorrelation": 0.14,
+    "negativeLeakageTop5": 2,
+    "negativeLeakageTop10": 3,
+    "hardMismatchLeakageTop10": 0,
+    "underRankedViable": 16,
+    "strongGoodBelow20": 4,
+    "threshold": {
+      "cutoff": 71.25,
+      "predictedCount": 18,
+      "falsePositiveRate": 0.72,
+      "falseNegativeRate": 0.29
+    }
+  },
+  "after": {
+    "top5Precision": 0,
+    "top10Precision": 0.3,
+    "strongRecall": 0.33,
+    "strongGoodRecall": 0.33,
+    "viableRecall": 0.23,
+    "falsePositiveRate": 0.75,
+    "falseNegativeRate": 0.29,
+    "rankCorrelation": 0.13,
+    "negativeLeakageTop5": 2,
+    "negativeLeakageTop10": 3,
+    "hardMismatchLeakageTop10": 0,
+    "viableBelow20": 16,
+    "strongGoodBelow20": 4,
+    "threshold": 71.25
+  }
+}
