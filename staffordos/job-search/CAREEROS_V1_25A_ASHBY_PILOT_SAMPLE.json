@@ -1,0 +1,13 @@
+{
+  "status": "BLOCKED_BEFORE_RETRIEVAL",
+  "authorizationClassification": "PARTNER_PERMISSION_REQUIRED",
+  "recordsRetrieved": 0,
+  "externalCalls": 0,
+  "selectionMethod": null,
+  "reason": "The public endpoint is documented for an organization's own careers page; cross-employer commercial CareerOS discovery authorization was not established.",
+  "plannedSample": {
+    "targetRecords": "10-20",
+    "selection": "Deterministic listed jobs across several authorized Ashby boards, with role-family and specialist variation.",
+    "requiredEvidence": ["provider job ID", "job URL", "descriptionHtml", "descriptionPlain", "listed state", "publishedAt", "location", "workplaceType"]
+  }
+}

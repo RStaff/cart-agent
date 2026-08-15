@@ -1,0 +1,13 @@
+{
+  "status": "NOT_RUN_AUTHORIZATION_BLOCKED",
+  "greenhouseObservations": "unchanged",
+  "ashbyObservations": 0,
+  "results": {
+    "EXACT_SAME_JOB": 0,
+    "LIKELY_SAME_JOB": 0,
+    "DISTINCT_JOB": 0,
+    "UNKNOWN": 0
+  },
+  "plannedEvidence": ["providerJobId", "employer", "title", "location", "canonical URL", "requisition ID", "publication dates", "description fingerprint", "source digest"],
+  "rule": "Title similarity alone cannot merge records; all observations remain attached to one canonical opportunity when a duplicate is confirmed."
+}
