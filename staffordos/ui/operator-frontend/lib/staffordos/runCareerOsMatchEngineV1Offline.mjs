@@ -150,7 +150,7 @@ function publicRow(record, source, fit, sampleIndex, currentRank, experimentalRa
     authorityDiagnostics,
   };
 }
-export function buildEvaluation() {
+export function buildEvaluation(options = {}) {
   const queue = newestFile(path.join(privateRoot, "greenhouse-discovery"), "job_source_import_queue_result.json");
   const fits = newestFile(path.join(privateRoot, "greenhouse-discovery"), "explainable_fit_artifacts.json") || [];
   const recommendations = newestFile(path.join(privateRoot, "opportunity-recommendations"), "opportunity_recommendations.json") || [];
@@ -167,11 +167,13 @@ export function buildEvaluation() {
       const source = sourceById.get(record.sourceRecordId) || {};
       const fitArtifact = fitByQueue.get(record.queueItemId);
       const queueItem = queueById.get(record.queueItemId) || {};
-      const authorityDiagnostics = projectMatchAuthorityDiagnostics({ title: source.title || record.role, requirements: fitArtifact?.requirements || [], mappings: fitArtifact?.mappings || [] });
+      const requirements = fitArtifact?.requirements || [];
+      const projected = options.mappingProjection ? options.mappingProjection({ record, requirements, mappings: fitArtifact?.mappings || [] }) : { mappings: fitArtifact?.mappings || [] };
+      const authorityDiagnostics = projectMatchAuthorityDiagnostics({ title: source.title || record.role, requirements, mappings: projected.mappings });
       const result = buildOpportunityMatchResult({
         opportunity: { opportunityId: record.opportunityId, canonicalOpportunityId: record.canonicalOpportunityId, sourceRecordId: record.sourceRecordId, providerJobId: source.providerJobId, providerName: source.providerName, sourceUrl: source.sourceUrl, company: source.company || record.company, title: source.title || record.role, role: record.role, location: source.location, remoteState: source.remoteState, employmentType: source.employmentType, compensationText: source.compensationText, descriptionText: source.descriptionText, observedAt: source.observedAt, freshness: source.freshness, sourceAuthority: source.sourceAuthority },
-        requirements: fitArtifact?.requirements || [],
-        mappings: fitArtifact?.mappings || [],
+        requirements,
+        mappings: projected.mappings,
         qualification: record.qualification,
         recommendation: record.recommendation,
         recommendationReasons: record.recommendationReasons,

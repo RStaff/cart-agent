@@ -174,4 +174,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   console.log(JSON.stringify({ selectedModel: result.selectedModel, models: Object.fromEntries(Object.entries(result.modelResults).map(([name, value]) => [name, value.metrics])) }, null, 2));
 }
 
-export { run };
+export { run, featureRow, rankRows, metrics, humanRank };

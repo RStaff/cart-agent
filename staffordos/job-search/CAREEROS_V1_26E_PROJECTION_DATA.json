@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "staffordos.careeros.v1_26e.adjudicated_projection.v1",
+  "offlineOnly": true,
+  "authorityFreeze": {
+    "calibrationLabelHash": "18023e8a944331b3c938f62174f4ce60881c1c114298c73049bea6f26b135b85",
+    "holdoutLabelHash": "0d77e5b1ec98285c42cb0115ae9ec4be8bde2077d15740a58cbd0509314593e0",
+    "careerFactCount": 898,
+    "careerEvidenceCount": 21,
+    "v2dFormula": "FROZEN_V1_23_V2D",
+    "v2dWeights": {
+      "relevantExperience": 40,
+      "roleFunction": 25,
+      "responsibility": 25,
+      "seniority": 10
+    }
+  },
+  "operatorAuthority": {
+    "decisions": 16,
+    "decisionCounts": {
+      "DIRECT": 11,
+      "TRANSFERABLE": 3,
+      "ADJACENT": 0,
+      "NO": 0,
+      "NEEDS_EVIDENCE": 0,
+      "KEEP_UNRESOLVED": 2
+    },
+    "addressedDistinctCandidates": 203,
+    "theoreticalPropagationReferences": 246,
+    "unsafePropagationDetected": false
+  },
+  "calibrationProjection": {
+    "comparisonsConsidered": 1433,
+    "comparisonsAffected": 0,
+    "directConsumed": 0,
+    "transferableConsumed": 0,
+    "unresolvedPreserved": 1302,
+    "blockedPropagations": 1599,
+    "conflictBlocked": 700,
+    "specialistBlocked": 0,
+    "temporalBlocked": 0,
+    "scopeBlocked": 0
+  },
+  "holdoutProjection": {
+    "comparisonsConsidered": 1140,
+    "comparisonsAffected": 0,
+    "directConsumed": 0,
+    "transferableConsumed": 0,
+    "unresolvedPreserved": 988,
+    "blockedPropagations": 1013,
+    "conflictBlocked": 407,
+    "specialistBlocked": 0,
+    "temporalBlocked": 0,
+    "scopeBlocked": 0
+  },
+  "semantics": {
+    "direct": "PROVEN requirement mapping in diagnostic input only",
+    "transferable": "TRANSFERABLE requirement mapping in diagnostic input only",
+    "keepUnresolved": "unchanged UNKNOWN/MISSING mapping",
+    "unknownNotNegative": true,
+    "missingNotNegative": true,
+    "hardMismatchUnchanged": true
+  },
+  "accounting": {
+    "blockedPropagationUnit": "REQUIREMENT_MAPPING_INTERSECTION",
+    "blockedPropagationCountsAreNotCandidateCounts": true
+  },
+  "mutationGuards": {
+    "careerFactMutated": false,
+    "careerEvidenceCreated": false,
+    "qualificationChanged": 0,
+    "eligibilityChanged": 0
+  }
+}
