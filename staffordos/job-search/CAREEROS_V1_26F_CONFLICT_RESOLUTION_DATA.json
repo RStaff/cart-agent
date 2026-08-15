@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "staffordos.careeros.v1_26f.conflict_resolution_data.v1",
+  "offlineOnly": true,
+  "operatorReviewQueue": {"questions":16,"completed":16,"newQuestionsCompleted":0,"nextUnreviewedAvailable":false},
+  "proposedOutcomeDistributionFromExistingAnswers": {"VERIFIED_DIRECT":11,"VERIFIED_TRANSFERABLE":3,"PARTIALLY_SUPPORTED":0,"REJECTED":0,"KEEP_UNRESOLVED":2},
+  "safelyClearedAuthorityDistribution": {"VERIFIED_DIRECT":0,"VERIFIED_TRANSFERABLE":0,"PARTIALLY_SUPPORTED":0,"REJECTED":0,"KEEP_UNRESOLVED":2},
+  "remainingConflictBlocked": 822,
+  "newEvidenceRequired": "Operator-controlled bounded source evidence or explicit conflict resolution is required; no new evidence was captured in this mission.",
+  "privateIdentifiersIncluded": false
+}

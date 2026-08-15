@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "staffordos.careeros.v1_26f.review_question_set.v1",
+  "questionCount": 16,
+  "uniqueQuestionTemplates": 8,
+  "questions": [
+    {"question":"Have you been accountable for planning, dependencies, risk, and delivery across a program or complex initiative?","boundedAnswers":["I owned it directly","I shared ownership","I supported another owner","I did not perform this","I need more evidence / keep unresolved"],"instances":2,"conflictType":"RESPONSIBILITY_SCOPE_CONFLICT"},
+    {"question":"Have you directly led cross-functional work involving business and technical stakeholders?","boundedAnswers":["I owned it directly","I shared ownership","I supported another owner","I did not perform this","I need more evidence / keep unresolved"],"instances":2,"conflictType":"RESPONSIBILITY_SCOPE_CONFLICT"},
+    {"question":"Did you directly manage people, or primarily lead through influence?","boundedAnswers":["I owned it directly","I shared ownership","I supported another owner","I did not perform this","I need more evidence / keep unresolved"],"instances":2,"conflictType":"LEADERSHIP_SCOPE_CONFLICT"},
+    {"question":"Have you designed or implemented software, infrastructure, automation, or technical systems directly?","boundedAnswers":["I owned it directly","I shared ownership","I supported another owner","I did not perform this","I need more evidence / keep unresolved"],"instances":2,"conflictType":"TECHNICAL_DEPTH_CONFLICT"},
+    {"question":"Have you directly owned or operated AI or automation workflows beyond exposure or study?","boundedAnswers":["I owned it directly","I shared ownership","I supported another owner","I did not perform this","I need more evidence / keep unresolved"],"instances":2,"conflictType":"TECHNICAL_DEPTH_CONFLICT"},
+    {"question":"Have you designed, operated, or led marketing technology and automation systems?","boundedAnswers":["I owned it directly","I shared ownership","I supported another owner","I did not perform this","I need more evidence / keep unresolved"],"instances":2,"conflictType":"TECHNICAL_DEPTH_CONFLICT"},
+    {"question":"Have you defined product requirements, priorities, backlog, or operating decisions with accountable ownership?","boundedAnswers":["I owned it directly","I shared ownership","I supported another owner","I did not perform this","I need more evidence / keep unresolved"],"instances":1,"conflictType":"RESPONSIBILITY_SCOPE_CONFLICT"},
+    {"question":"Have you led business-process improvement, transformation, governance, or operating-model work?","boundedAnswers":["I owned it directly","I shared ownership","I supported another owner","I did not perform this","I need more evidence / keep unresolved"],"instances":3,"conflictType":"RESPONSIBILITY_SCOPE_CONFLICT"}
+  ],
+  "noPrivateIdentifiers": true,
+  "noAutomaticAnswers": true
+}

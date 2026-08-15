@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "staffordos.careeros.v1_26f.conflict_register.v1",
+  "offlineOnly": true,
+  "candidateCounts": {
+    "careerFacts": 898,
+    "careerEvidence": 21,
+    "conflictBlocked": 822,
+    "insufficientProvenance": 68,
+    "addressedByV1_26C": 203,
+    "positiveAddressedStillBlocked": 199
+  },
+  "currentConflictReasonDistribution": {
+    "UNRESOLVED_VERIFICATION": 705,
+    "INFERENCE_VS_SOURCE_CONFLICT": 75,
+    "TEMPORAL_VERSION_CONFLICT": 42
+  },
+  "boundedTaxonomy": [
+    "TEMPORAL_CONFLICT",
+    "EMPLOYMENT_SCOPE_CONFLICT",
+    "RESPONSIBILITY_SCOPE_CONFLICT",
+    "TECHNICAL_DEPTH_CONFLICT",
+    "LEADERSHIP_SCOPE_CONFLICT",
+    "DOMAIN_CONTEXT_CONFLICT",
+    "SOURCE_PROVENANCE_CONFLICT",
+    "METRIC_OR_SCALE_CONFLICT",
+    "DUPLICATE_OR_NEAR_DUPLICATE_CONFLICT",
+    "OTHER_UNRESOLVED"
+  ],
+  "authorityRule": "Do not resolve a conflict without existing authoritative support or a bounded operator answer. Unknown, missing, and unresolved remain non-negative capability states.",
+  "privateIdentifiersIncluded": false
+}

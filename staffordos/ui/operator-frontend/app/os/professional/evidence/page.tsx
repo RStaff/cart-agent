@@ -7,6 +7,7 @@ import {
   privateAdjudicationRoot,
   type ReviewClusterAnswer,
 } from "../../../../lib/staffordos/evidenceReviewCompression";
+import { buildConflictReviewQueue } from "../../../../lib/staffordos/conflictResolution";
 
 export const dynamic = "force-dynamic";
 
@@ -50,7 +51,9 @@ export default async function ProfessionalEvidencePage({
   const progress = compressionProgress(runtime);
   const requested = typeof params.cluster === "string" ? params.cluster : null;
   const showAll = params.view === "all";
-  const queue = showAll ? runtime.allClusters : runtime.highValueClusters;
+  const conflictMode = params.view === "conflicts";
+  const conflictQueue = buildConflictReviewQueue(runtime.highValueClusters);
+  const queue = conflictMode ? conflictQueue : showAll ? runtime.allClusters : runtime.highValueClusters;
   const cluster = queue.find((item) => item.clusterId === requested) || queue.find((item) => !item.operatorAnswer) || queue[0] || null;
   const index = cluster ? queue.findIndex((item) => item.clusterId === cluster.clusterId) : -1;
   const previous = index > 0 ? queue[index - 1] : null;
@@ -73,8 +76,8 @@ export default async function ProfessionalEvidencePage({
         </div>
       </section>
       <section className="careerEvidenceAdjudicationNotice">
-        <strong>High-value review</strong>
-        <p>Each answer is a bounded operator decision over compatible candidates. It does not automatically create CareerEvidence.</p>
+        <strong>{conflictMode ? "Conflict resolution" : "High-value review"}</strong>
+        <p>{conflictMode ? "This changes evidence authority only. It does not change ranking, application status, or workflow decisions by itself." : "Each answer is a bounded operator decision over compatible candidates. It does not automatically create CareerEvidence."}</p>
       </section>
       <section className="careerEvidenceProgress" aria-label="Compressed adjudication progress">
         <div><span>Operator decisions</span><strong>{progress.operatorDecisions} / {progress.operatorDecisionTotal}</strong></div>
@@ -82,7 +85,7 @@ export default async function ProfessionalEvidencePage({
         <div><span>Raw candidates</span><strong>{runtime.candidates.length}</strong></div>
       </section>
       <nav className="careerEvidenceFocus" aria-label="Evidence review focus">
-        <span>Review focus:</span><a href="/os/professional/evidence">High-value review</a><a href="/os/professional/evidence?view=all">All clusters</a>
+        <span>Review focus:</span><a href="/os/professional/evidence">High-value review</a><a href="/os/professional/evidence?view=conflicts">Conflict resolution</a><a href="/os/professional/evidence?view=all">All clusters</a>
       </nav>
       {status ? <p className={`careerEvidenceFeedback ${status === "NOT_SAVED" ? "is-error" : "is-success"}`} role="status">{status === "NOT_SAVED" ? `NOT SAVED${reason ? `: ${reason}` : ""}` : status}</p> : null}
       {cluster ? (
@@ -94,7 +97,7 @@ export default async function ProfessionalEvidencePage({
           </nav>
           {nextUnreviewed ? <p className="careerEvidenceNextUnreviewed"><a href={clusterHref(nextUnreviewed.clusterId)}>Next unreviewed</a></p> : null}
           <article className="careerEvidenceReviewCard">
-            <div className="careerEvidenceReviewMeta"><span>{displayLabel(cluster.clusterType)}</span><span>{displayLabel(cluster.directOrTransferable)}</span><span>{cluster.capabilityFamily}</span></div>
+            <div className="careerEvidenceReviewMeta"><span>{displayLabel(cluster.clusterType)}</span><span>{displayLabel(cluster.directOrTransferable)}</span><span>{cluster.capabilityFamily}</span>{conflictMode ? <span>{displayLabel(cluster.conflictType)}</span> : null}</div>
             <h2>{cluster.operatorQuestion}</h2>
             <p>{cluster.whyAsked}</p>
             <dl className="careerEvidenceReviewFacts">
@@ -105,6 +108,7 @@ export default async function ProfessionalEvidencePage({
               <div><dt>Propagation boundary</dt><dd>{cluster.propagationEligibleCandidateIds.length} candidates with operator-resolvable verification state; direct and transferable semantics remain separate.</dd></div>
               <div><dt>Priority reason</dt><dd>{cluster.priorityReason}</dd></div>
               <div><dt>Consequence</dt><dd>Answer remains an auditable private decision. No CareerFact rewrite and no CareerEvidence creation occur here.</dd></div>
+              {conflictMode ? <><div><dt>Current authority outcome</dt><dd>{displayLabel(cluster.currentOutcome)}</dd></div><div><dt>What this affects</dt><dd>{cluster.authorityEffect}</dd></div><div><dt>What this does not affect</dt><dd>{cluster.excludedEffects}</dd></div></> : null}
             </dl>
             <form action={adjudicateReviewClusterAction} className="careerEvidenceDecisionForm">
               <input type="hidden" name="clusterId" value={cluster.clusterId} />
