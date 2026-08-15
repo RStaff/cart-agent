@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "careerOS.v1.26d.pre_post_evidence_projection.v1",
+  "baseline": "authority immediately before V1.26C decisions",
+  "adjudicated": "latest V1.26C cluster decisions, diagnostic only",
+  "v2dConsumption": "NOT_SUPPORTED_BY_CURRENT_ENGINE",
+  "authoritySemanticsPreserved": ["UNKNOWN != NO", "MISSING != NO", "ADJACENT != DIRECT", "TRANSFERABLE != DIRECT", "NEEDS_EVIDENCE != CAPABILITY_GAP", "KEEP_UNRESOLVED != CAPABILITY_GAP"],
+  "canonicalMutation": false,
+  "rankingInputChanged": false,
+  "diagnosticAuthorityChanges": {
+    "operatorDecisions": 16,
+    "distinctCandidatesAddressed": 203,
+    "directAnswers": 11,
+    "transferableAnswers": 3,
+    "keepUnresolvedAnswers": 2,
+    "newCareerEvidence": 0
+  },
+  "metricsAreUnchangedBecause": "V2D has no input bridge from private cluster adjudications to its frozen feature rows. No counterfactual score was presented as model behavior."
+}

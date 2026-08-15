@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "careerOS.v1.26d.productization_signal.v1",
+  "operatorDecisions": 16,
+  "distinctCandidatesAddressed": 203,
+  "candidatesAddressedPerDecision": 12.69,
+  "underlyingQueuePercentage": 22.81,
+  "individualReviewPercentage": 65.62,
+  "remainingUnresolvedPercentage": 77.19,
+  "capabilityFamilyCoverage": 3,
+  "unsafePropagationRate": 0,
+  "classification": "PRODUCT_ONBOARDING_SIGNAL_PROMISING",
+  "interpretation": "A bounded question set can establish useful authority signal, but the residual queue and lack of opportunity links prevent calling onboarding complete."
+}

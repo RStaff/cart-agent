@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "careerOS.v1.26d.evaluation_results.v1",
+  "model": "MODEL_V2D_ROBUSTNESS_CONTROL",
+  "formula": "FROZEN_V1_23_V2D",
+  "weights": {"relevantExperience": 40, "roleFunction": 25, "responsibility": 25, "seniority": 10},
+  "calibration": {
+    "before": {"top5Precision": 0, "top10Precision": 0.3, "strongRecall": 0.33, "strongGoodRecall": 0.33, "viableRecall": 0.23, "falsePositiveRate": 0.72, "falseNegativeRate": 0.29, "rankCorrelation": 0.14, "negativeLeakageTop5": 2, "negativeLeakageTop10": 3, "hardMismatchLeakageTop10": 0, "viableBelow20": 16, "strongGoodBelow20": 4},
+    "after": {"top5Precision": 0, "top10Precision": 0.3, "strongRecall": 0.33, "strongGoodRecall": 0.33, "viableRecall": 0.23, "falsePositiveRate": 0.72, "falseNegativeRate": 0.29, "rankCorrelation": 0.14, "negativeLeakageTop5": 2, "negativeLeakageTop10": 3, "hardMismatchLeakageTop10": 0, "viableBelow20": 16, "strongGoodBelow20": 4},
+    "delta": "UNCHANGED_NOT_CONSUMED"
+  },
+  "holdout": {
+    "before": {"top5Precision": 0.4, "top10Precision": 0.3, "strongRecall": 0.5, "strongGoodRecall": 0.3, "viableRecall": 0.35, "falsePositiveRate": 0.74, "falseNegativeRate": 0.4, "rankCorrelation": 0.21, "negativeLeakageTop5": 1, "negativeLeakageTop10": 2, "hardMismatchLeakageTop10": 0, "viableBelow20": 11, "strongGoodBelow20": 5},
+    "after": {"top5Precision": 0.4, "top10Precision": 0.3, "strongRecall": 0.5, "strongGoodRecall": 0.3, "viableRecall": 0.35, "falsePositiveRate": 0.74, "falseNegativeRate": 0.4, "rankCorrelation": 0.21, "negativeLeakageTop5": 1, "negativeLeakageTop10": 2, "hardMismatchLeakageTop10": 0, "viableBelow20": 11, "strongGoodBelow20": 5},
+    "delta": "UNCHANGED_NOT_CONSUMED"
+  },
+  "rankingMovement": {"calibration": {"positiveUp": 0, "positiveDown": 0, "negativeUp": 0, "negativeDown": 0, "unchanged": 40}, "holdout": {"positiveUp": 0, "positiveDown": 0, "negativeUp": 0, "negativeDown": 0, "unchanged": 40}},
+  "counterfactualNotProductionBehavior": true
+}

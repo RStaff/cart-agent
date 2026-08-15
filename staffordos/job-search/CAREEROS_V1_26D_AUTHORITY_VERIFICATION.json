@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "careerOS.v1.26d.authority_verification.v1",
+  "branch": "main",
+  "startingHead": "a3c50ecf2d3d7425d374bfb50d74b87551fd0c7d",
+  "careerFacts": 898,
+  "careerEvidence": 21,
+  "rawCandidates": 898,
+  "reviewableCandidates": 890,
+  "reviewClusters": 16,
+  "persistedAdjudicationEvents": 29,
+  "latestCompletedClusters": 16,
+  "underlyingCandidatesAddressed": 203,
+  "adjudicationDigest": "5f83d8406c6d2d23ebe7e45d24bd53b4f086297dadba1a6e125d8d08a9c55a8a",
+  "digestScope": "sanitized latest cluster family, semantic bucket, answer, candidate-count, and propagation-count tuples; no private identifiers",
+  "canonicalFactMutation": false,
+  "canonicalEvidenceCreation": false
+}

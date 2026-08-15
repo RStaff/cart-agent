@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "careerOS.v1.26d.false_positive_forensics.v1",
+  "modelImpact": "UNCHANGED_NOT_CONSUMED",
+  "cases": {
+    "finance_payroll_tax_legal_av_data_science": "unchanged; no generic adjudication was propagated across specialist boundaries",
+    "Scale AI Annotations Operations": "unchanged; responsibility and specialist scope remain requirement-authority work",
+    "Anthropic Cloud Partner Enablement": "unchanged; no individual-role penalty or broad negative inference",
+    "Airtable Delivery Consultant": "unchanged; transferable delivery questions do not establish unrelated specialist capability"
+  },
+  "unsafeIndividualPenalties": 0,
+  "specialistBoundaryCrossings": 0
+}

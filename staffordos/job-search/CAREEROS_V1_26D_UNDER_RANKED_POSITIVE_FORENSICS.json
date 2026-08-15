@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "careerOS.v1.26d.under_ranked_positive_forensics.v1",
+  "modelImpact": "UNCHANGED_NOT_CONSUMED",
+  "cases": {
+    "Figma Solutions Consulting": "transferable solutions and stakeholder questions remain available; no score movement",
+    "Klaviyo AI Enablement": "AI/automation ownership question remains diagnostic; no score movement",
+    "Braze Applied AI Architect": "technical depth and AI adjacency remain separated; no score movement",
+    "Scale AI AI Strategy Consultant": "transformation and strategy wording is not treated as direct capability automatically; no score movement",
+    "Datadog Associate Growth Marketing Manager": "marketing systems question remains diagnostic; no score movement",
+    "program_product_transformation_roles": "operator authority is available for future projection; no score movement"
+  },
+  "transferableToDirectConversions": 0
+}

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "careerOS.v1.26d.remaining_authority_gaps.v1",
+  "remainingReviewableCandidates": 687,
+  "categories": {
+    "additional_operator_adjudication": 584,
+    "stronger_source_evidence": 68,
+    "evidence_linkage_repair": 0,
+    "requirement_authority_repair": 0,
+    "genuinely_new_career_evidence": 0,
+    "correctly_unresolved": 35
+  },
+  "interpretation": "Categories are diagnostic routing recommendations, not automatic decisions. No missing evidence was created.",
+  "privateIdentifiersIncluded": false
+}

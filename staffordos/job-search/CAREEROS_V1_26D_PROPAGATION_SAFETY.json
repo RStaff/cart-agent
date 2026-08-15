@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "careerOS.v1.26d.propagation_safety.v1",
+  "unsafePropagationDetected": false,
+  "specialistBoundaryCrossings": 0,
+  "genericLeadershipToSpecialist": 0,
+  "genericOperationsToFinancePayrollTax": 0,
+  "technicalFamiliarityToSoftwareEngineering": 0,
+  "dataExposureToDataScience": 0,
+  "marketingTechnologyToUnrelatedEngineering": 0,
+  "projectCoordinationToFullProgramAccountability": 0,
+  "stakeholderManagementToPeopleManagement": 0,
+  "adjacentAIToDirectAIEngineering": 0,
+  "authorityRisk": "11 DIRECT latest answers reference 203 distinct candidates through bounded operator authority, but no canonical evidence was created; projection requires a separate scope review."
+}

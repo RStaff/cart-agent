@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "careerOS.v1.26d.operator_decision_audit.v1",
+  "latestDecisionCount": 16,
+  "persistedEventCount": 29,
+  "distribution": {
+    "DIRECT": 11,
+    "TRANSFERABLE": 3,
+    "ADJACENT": 0,
+    "NO": 0,
+    "NEEDS_EVIDENCE": 0,
+    "KEEP_UNRESOLVED": 2
+  },
+  "underlyingCandidateReferences": 246,
+  "distinctCandidatesAddressed": 203,
+  "propagationBoundaries": {
+    "specialistCrossings": 0,
+    "directTransferableCrossings": 0,
+    "inferenceSourceCrossings": 0,
+    "temporalConflictCrossings": 0,
+    "otherConflictCrossings": 0
+  },
+  "canonicalMutation": false,
+  "privateIdentifiersIncluded": false
+}

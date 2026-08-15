@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "careerOS.v1.26d.datadog_tpm_control.v1",
+  "control": "Datadog Director, Technical Program Management - Technical Solutions Operations",
+  "beforeAfter": "UNCHANGED_NOT_CONSUMED",
+  "frozenV2DScore": 72.25,
+  "frozenV2DRank": 3,
+  "qualification": "TRANSFERABLE_BUT_NOT_DIRECT",
+  "eligibility": "ELIGIBLE",
+  "responsibility": "PARTIAL",
+  "seniority": "UPWARD_STRETCH_WITH_SUPPORTED_SCOPE",
+  "domain": "TRANSFERABLE_DOMAIN",
+  "fourAuthorityAreas": {
+    "programAccountability": "questioned by adjudication; not consumed by V2D",
+    "leadershipScope": "questioned by adjudication; not consumed by V2D",
+    "technicalDepth": "questioned by adjudication; not consumed by V2D",
+    "domainContext": "questioned by adjudication; not consumed by V2D"
+  },
+  "manualBoost": false,
+  "titleOnlyPenalty": false
+}

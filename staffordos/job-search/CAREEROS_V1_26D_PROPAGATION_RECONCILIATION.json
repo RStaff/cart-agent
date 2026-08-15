@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "careerOS.v1.26d.propagation_reconciliation.v1",
+  "previousTheoreticalEligibleReferences": 246,
+  "runtimeAddressedDistinctCandidates": 203,
+  "difference": 43,
+  "differenceReason": "DUPLICATE_OVERLAP_SUPPRESSION",
+  "referenceCountIsNotDistinctCandidateCount": true,
+  "clusterUnderlyingCandidates": 306,
+  "clusterCoveredButNotPropagated": 103,
+  "nonPropagatedCategories": {
+    "duplicate_overlap_suppression": 43,
+    "cluster_covered_but_not_propagated": 103,
+    "remaining_queue_outside_cluster_coverage": 584,
+    "insufficient_provenance_in_remaining_queue": 68,
+    "already_projected_in_remaining_queue": 8,
+    "intentionally_unresolved_in_latest_decisions": 2
+  },
+  "categoryCountsAreOverlappingDiagnostics": true,
+  "exactPartitionAvailable": false,
+  "partitionLimitation": "The persisted authority exposes the distinct addressed union and cluster/reference counts, but does not expose a lossless per-candidate reason code for every non-propagated candidate. Overlapping diagnostic counts are retained with explicit scope rather than treated as a partition.",
+  "privateIdentifiersIncluded": false
+}

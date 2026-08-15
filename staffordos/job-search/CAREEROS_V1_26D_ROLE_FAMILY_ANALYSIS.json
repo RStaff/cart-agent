@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "careerOS.v1.26d.role_family_analysis.v1",
+  "modelImpact": "UNCHANGED_NOT_CONSUMED",
+  "families": {
+    "AI_AUTOMATION_AGENT": "authority questions cover automation ownership and technical depth; no V2D movement",
+    "TECHNICAL_PROGRAM_PROJECT_PRODUCT": "program accountability and cross-functional leadership covered; no V2D movement",
+    "PRODUCT": "product requirements question covered; no V2D movement",
+    "MARKETING_TECHNOLOGY_OPERATIONS": "marketing systems question covered; no V2D movement",
+    "BUSINESS_SYSTEMS_ANALYST": "transformation and systems questions partially cover; no V2D movement",
+    "TRANSFORMATION_SOLUTIONS": "transformation/governance question covered; no V2D movement",
+    "SENIOR_LEADERSHIP_STRETCH": "leadership scope and accountability questions preserve stretch; no V2D movement",
+    "SPECIALIST_POOR_FIT_CONTROLS": "no generic cluster crosses specialist boundaries; no V2D movement",
+    "OTHER_CONTROLS": "no V2D movement"
+  },
+  "interpretation": "The authority signal is useful for future projection but the frozen model cannot consume it today."
+}

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "careerOS.v1.26d.ambition_protection_audit.v1",
+  "upwardStretchPreserved": true,
+  "transferablePositiveTreatmentPreserved": true,
+  "adjacentIsNotFailure": true,
+  "unknownIsNotNegative": true,
+  "seniorTitleOnlyBlocker": false,
+  "domainOnlyBlocker": false,
+  "selfConfidenceAffectsCapability": false,
+  "interestAffectsCapability": false,
+  "workflowAffectsCapability": false,
+  "modelImpact": "unchanged because V2D cannot consume cluster authority"
+}
