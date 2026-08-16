@@ -20,6 +20,7 @@ export type CapabilityReviewQuestion = {
   capabilityId: string | null;
   allowedAnswers: string[];
   scopeBoundary: string;
+  scopeBeingResolved?: string;
   specialistBoundary: string;
   affectedConceptIds: string[];
   affectedRequirementCount: number;

@@ -1,5 +1,5 @@
 # V1.27A1 Decision
 
-**CAPABILITY_REVIEW_RUNTIME_READY_FOR_ROSS**
+**CAPABILITY_QUESTION_SET_REPAIRED**
 
-The ten-question capability review route, neutral state, private append-only persistence, exact readback, supersession, progress, navigation, scope protection, specialist protection, and privacy checks are ready. No capability answers were present or fabricated.
+The persisted V1.27A question artifact had ten over-generic prompts. It was regenerated from the existing capability graph with stable IDs, distinct capability-specific wording, distinct scope uncertainties, unchanged information-value ordering, and no answers. The runtime binding remains exact and ready for a later capability-review runtime acceptance.

@@ -18,6 +18,18 @@ test("loads exactly ten stable capability questions with capability identities",
   assert.equal(graph.capabilities.length, 32);
 });
 
+test("questions resolve distinct capability uncertainties without duplicate wording", () => {
+  const exact = new Set(questionSet.questions.map((item) => item.question));
+  const normalized = new Set(questionSet.questions.map((item) => item.question.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim()));
+  const capabilities = new Set(questionSet.questions.map((item) => item.canonicalCapability));
+  const scopes = new Set(questionSet.questions.map((item) => item.scopeBeingResolved));
+  assert.equal(exact.size, 10);
+  assert.equal(normalized.size, 10);
+  assert.equal(capabilities.size, 10);
+  assert.equal(scopes.size, 10);
+  assert.ok(questionSet.questions.every((item) => item.question.length > 60));
+});
+
 test("unanswered capability state is neutral and answer vocabularies remain question-specific", () => {
   assert.ok(questionSet.questions.every((item) => !item.answer && !item.decision));
   const vocabularies = new Set(questionSet.questions.map((item) => item.allowedAnswers.join("|")));

@@ -4,11 +4,12 @@
     {
       "questionId": "capability_question_cd2e74128897bcaf8ac1",
       "order": 1,
-      "question": "What bounded scope and directness does your existing authority support for product governance?",
+      "question": "Have you personally owned product priorities, backlogs, or roadmap decisions rather than only supporting delivery?",
       "capabilityId": "capability_2f561dae5fbb3c63b8cb",
       "canonicalCapability": "PRODUCT_GOVERNANCE",
       "allowedAnswers": [
         "DIRECT_OWNER",
+        "SHARED_OWNER",
         "TRANSFERABLE_ANALOG",
         "PARTIAL",
         "NO_SUPPORTED_CAPABILITY",
@@ -16,6 +17,7 @@
         "KEEP_UNRESOLVED"
       ],
       "scopeBoundary": "UNRESOLVED_SCOPE",
+      "scopeBeingResolved": "PRODUCT_OWNERSHIP",
       "specialistBoundary": "GENERAL",
       "affectedConceptIds": [
         "requirement_concept_01605558759dc01a6426",
@@ -36,11 +38,13 @@
     {
       "questionId": "capability_question_84e1312f5cf13412586c",
       "order": 2,
-      "question": "What bounded scope and directness does your existing authority support for project delivery?",
+      "question": "Have you directly planned and delivered projects from scope and sequencing through outcomes?",
       "capabilityId": "capability_6435d7115bc081ee062d",
       "canonicalCapability": "PROJECT_DELIVERY",
       "allowedAnswers": [
         "DIRECT_OWNER",
+        "SHARED_OWNER",
+        "CONTRIBUTOR",
         "TRANSFERABLE_ANALOG",
         "PARTIAL",
         "NO_SUPPORTED_CAPABILITY",
@@ -48,6 +52,7 @@
         "KEEP_UNRESOLVED"
       ],
       "scopeBoundary": "UNRESOLVED_SCOPE",
+      "scopeBeingResolved": "PROJECT_DELIVERY_OWNERSHIP",
       "specialistBoundary": "GENERAL",
       "affectedConceptIds": [
         "requirement_concept_88ae57175b9f45fd3e52",
@@ -66,11 +71,14 @@
     {
       "questionId": "capability_question_6c563fd7e77c33d37a08",
       "order": 3,
-      "question": "What bounded scope and directness does your existing authority support for general operations?",
+      "question": "Have you owned recurring operating processes or operating-model improvements, beyond coordinating individual tasks?",
       "capabilityId": "capability_ae7cfc7089870567ced8",
       "canonicalCapability": "GENERAL_OPERATIONS",
       "allowedAnswers": [
         "DIRECT_OWNER",
+        "SHARED_OWNER",
+        "LED_WITHOUT_FULL_OWNERSHIP",
+        "CONTRIBUTOR",
         "TRANSFERABLE_ANALOG",
         "PARTIAL",
         "NO_SUPPORTED_CAPABILITY",
@@ -78,6 +86,7 @@
         "KEEP_UNRESOLVED"
       ],
       "scopeBoundary": "UNRESOLVED_SCOPE",
+      "scopeBeingResolved": "OPERATING_MODEL_OWNERSHIP",
       "specialistBoundary": "GENERAL",
       "affectedConceptIds": [
         "requirement_concept_0c8ac1c70dcf8cda9a5f",
@@ -97,11 +106,13 @@
     {
       "questionId": "capability_question_9d88b97130cdefe4bf70",
       "order": 4,
-      "question": "What bounded scope and directness does your existing authority support for marketing technology?",
+      "question": "Have you designed or operated marketing technology, CRM, or marketing-automation systems in practice?",
       "capabilityId": "capability_556562bde7f5493177f0",
       "canonicalCapability": "MARKETING_TECHNOLOGY",
       "allowedAnswers": [
         "DIRECT_OWNER",
+        "HANDS_ON_IMPLEMENTATION",
+        "TECHNICAL_REQUIREMENTS",
         "TRANSFERABLE_ANALOG",
         "PARTIAL",
         "NO_SUPPORTED_CAPABILITY",
@@ -109,6 +120,7 @@
         "KEEP_UNRESOLVED"
       ],
       "scopeBoundary": "UNRESOLVED_SCOPE",
+      "scopeBeingResolved": "MARKETING_SYSTEMS_OPERATION",
       "specialistBoundary": "GENERAL",
       "affectedConceptIds": [
         "requirement_concept_1c6039f9815573770925",
@@ -127,11 +139,14 @@
     {
       "questionId": "capability_question_034746936222273a4569",
       "order": 5,
-      "question": "What bounded scope and directness does your existing authority support for stakeholder leadership?",
+      "question": "Have you led executive or cross-functional stakeholder alignment through decisions, tradeoffs, and delivery?",
       "capabilityId": "capability_a2deb5a9d4be53cb157f",
       "canonicalCapability": "STAKEHOLDER_LEADERSHIP",
       "allowedAnswers": [
         "DIRECT_OWNER",
+        "SHARED_LEADERSHIP",
+        "PROGRAM_LEADER_WITHOUT_REPORTS",
+        "CONTRIBUTOR",
         "TRANSFERABLE_ANALOG",
         "PARTIAL",
         "NO_SUPPORTED_CAPABILITY",
@@ -139,6 +154,7 @@
         "KEEP_UNRESOLVED"
       ],
       "scopeBoundary": "UNRESOLVED_SCOPE",
+      "scopeBeingResolved": "STAKEHOLDER_LEADERSHIP",
       "specialistBoundary": "GENERAL",
       "affectedConceptIds": [
         "requirement_concept_0c8ac1c70dcf8cda9a5f",
@@ -158,18 +174,20 @@
     {
       "questionId": "capability_question_4a6092bf65051b1b2adb",
       "order": 6,
-      "question": "What bounded scope and directness does your existing authority support for data analysis?",
+      "question": "Have you personally performed data analysis or reporting that informed a business or delivery decision?",
       "capabilityId": "capability_f4d7570a098a40cfef91",
       "canonicalCapability": "DATA_ANALYSIS",
       "allowedAnswers": [
-        "DIRECT_OWNER",
-        "TRANSFERABLE_ANALOG",
+        "HANDS_ON_IMPLEMENTATION",
+        "TECHNICAL_REQUIREMENTS",
+        "ADJACENT_EXPOSURE",
         "PARTIAL",
-        "NO_SUPPORTED_CAPABILITY",
-        "NEEDS_MORE_EVIDENCE",
+        "NO_SUPPORTED_DEPTH",
+        "NEEDS_EVIDENCE",
         "KEEP_UNRESOLVED"
       ],
       "scopeBoundary": "UNRESOLVED_SCOPE",
+      "scopeBeingResolved": "INDIVIDUAL_DATA_ANALYSIS",
       "specialistBoundary": "GENERAL",
       "affectedConceptIds": [],
       "affectedRequirementCount": 0,
@@ -180,11 +198,13 @@
     {
       "questionId": "capability_question_b4280df4c8701ec6fc52",
       "order": 7,
-      "question": "What bounded scope and directness does your existing authority support for customer solutions?",
+      "question": "Have you led customer-facing solution work through discovery, requirements, recommendation, or delivery?",
       "capabilityId": "capability_cc1bcdb9ab03f1a0298f",
       "canonicalCapability": "CUSTOMER_SOLUTIONS",
       "allowedAnswers": [
         "DIRECT_OWNER",
+        "SHARED_OWNER",
+        "CONTRIBUTOR",
         "TRANSFERABLE_ANALOG",
         "PARTIAL",
         "NO_SUPPORTED_CAPABILITY",
@@ -192,6 +212,7 @@
         "KEEP_UNRESOLVED"
       ],
       "scopeBoundary": "UNRESOLVED_SCOPE",
+      "scopeBeingResolved": "CUSTOMER_SOLUTIONS_OWNERSHIP",
       "specialistBoundary": "GENERAL",
       "affectedConceptIds": [
         "requirement_concept_0c8ac1c70dcf8cda9a5f",
@@ -211,11 +232,14 @@
     {
       "questionId": "capability_question_4e9c7d9d6a4e5bd08afb",
       "order": 8,
-      "question": "What bounded scope and directness does your existing authority support for technical program leadership?",
+      "question": "Have you owned cross-functional technical programs from planning through delivery, including scope, sequencing, stakeholders, and outcomes?",
       "capabilityId": "capability_adb2c99e96c0164c4099",
       "canonicalCapability": "TECHNICAL_PROGRAM_LEADERSHIP",
       "allowedAnswers": [
         "DIRECT_OWNER",
+        "SHARED_OWNER",
+        "PROGRAM_LEADER_WITHOUT_REPORTS",
+        "CONTRIBUTOR",
         "TRANSFERABLE_ANALOG",
         "PARTIAL",
         "NO_SUPPORTED_CAPABILITY",
@@ -223,6 +247,7 @@
         "KEEP_UNRESOLVED"
       ],
       "scopeBoundary": "UNRESOLVED_SCOPE",
+      "scopeBeingResolved": "TECHNICAL_PROGRAM_OWNERSHIP",
       "specialistBoundary": "GENERAL",
       "affectedConceptIds": [
         "requirement_concept_88ae57175b9f45fd3e52",
@@ -241,18 +266,22 @@
     {
       "questionId": "capability_question_2a6291c17570f200e859",
       "order": 9,
-      "question": "What bounded scope and directness does your existing authority support for ai automation workflows?",
+      "question": "Have you directly owned or operated AI or automation workflows beyond exposure, study, or vocabulary familiarity?",
       "capabilityId": "capability_d406583e90947beab668",
       "canonicalCapability": "AI_AUTOMATION_WORKFLOWS",
       "allowedAnswers": [
         "DIRECT_OWNER",
+        "HANDS_ON_IMPLEMENTATION",
+        "TECHNICAL_OVERSIGHT",
+        "ADJACENT_EXPOSURE",
         "TRANSFERABLE_ANALOG",
         "PARTIAL",
         "NO_SUPPORTED_CAPABILITY",
-        "NEEDS_MORE_EVIDENCE",
+        "NEEDS_EVIDENCE",
         "KEEP_UNRESOLVED"
       ],
       "scopeBoundary": "UNRESOLVED_SCOPE",
+      "scopeBeingResolved": "AI_AUTOMATION_OPERATION",
       "specialistBoundary": "GENERAL",
       "affectedConceptIds": [
         "requirement_concept_1c6039f9815573770925",
@@ -271,11 +300,14 @@
     {
       "questionId": "capability_question_ce32aa6c7ee0e264517e",
       "order": 10,
-      "question": "What bounded scope and directness does your existing authority support for governance risk?",
+      "question": "Have you owned governance, risk, controls, or compliance processes with defined accountability?",
       "capabilityId": "capability_3aad0fad1d60ac8462a1",
       "canonicalCapability": "GOVERNANCE_RISK",
       "allowedAnswers": [
         "DIRECT_OWNER",
+        "SHARED_OWNER",
+        "LED_WITHOUT_FULL_OWNERSHIP",
+        "CONTRIBUTOR",
         "TRANSFERABLE_ANALOG",
         "PARTIAL",
         "NO_SUPPORTED_CAPABILITY",
@@ -283,6 +315,7 @@
         "KEEP_UNRESOLVED"
       ],
       "scopeBoundary": "UNRESOLVED_SCOPE",
+      "scopeBeingResolved": "GOVERNANCE_ACCOUNTABILITY",
       "specialistBoundary": "GENERAL",
       "affectedConceptIds": [
         "requirement_concept_eb7d0e99180c76bb8186",

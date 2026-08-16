@@ -2,14 +2,24 @@
   "routeStatus": 200,
   "route": "/os/professional/evidence?view=capabilities",
   "initialProgress": "0 / 10",
-  "initialQuestion": "1 of 10",
   "canonicalCapabilities": 32,
   "requirementConcepts": 41,
   "neutralDefault": "PASS",
-  "exactCapabilityIdentity": "PASS",
-  "saveReadback": "PASS_IN_RESTING_AUTHORITY_TEST",
-  "savedFeedback": "SAVED/NOT SAVED_PATH_PRESENT",
-  "editSupersession": "PASS_IN_RESTING_AUTHORITY_TEST",
   "browserAutomation": "UNAVAILABLE",
-  "limitation": "HTTP rendering was verified against the built local server; save/navigation browser interaction was covered by reversible authority tests and source-level server-action checks."
+  "questionAcceptance": [
+    {"order": 1, "questionId": "capability_question_cd2e74128897bcaf8ac1", "contentBinding": "PRODUCT_GOVERNANCE", "scope": "PRODUCT_OWNERSHIP", "navigation": "PASS"},
+    {"order": 2, "questionId": "capability_question_84e1312f5cf13412586c", "contentBinding": "PROJECT_DELIVERY", "scope": "PROJECT_DELIVERY_OWNERSHIP", "navigation": "PASS"},
+    {"order": 3, "questionId": "capability_question_6c563fd7e77c33d37a08", "contentBinding": "GENERAL_OPERATIONS", "scope": "OPERATING_MODEL_OWNERSHIP", "navigation": "PASS"},
+    {"order": 4, "questionId": "capability_question_9d88b97130cdefe4bf70", "contentBinding": "MARKETING_TECHNOLOGY", "scope": "MARKETING_SYSTEMS_OPERATION", "navigation": "PASS"},
+    {"order": 5, "questionId": "capability_question_034746936222273a4569", "contentBinding": "STAKEHOLDER_LEADERSHIP", "scope": "STAKEHOLDER_LEADERSHIP", "navigation": "PASS"},
+    {"order": 6, "questionId": "capability_question_4a6092bf65051b1b2adb", "contentBinding": "DATA_ANALYSIS", "scope": "INDIVIDUAL_DATA_ANALYSIS", "navigation": "PASS"},
+    {"order": 7, "questionId": "capability_question_b4280df4c8701ec6fc52", "contentBinding": "CUSTOMER_SOLUTIONS", "scope": "CUSTOMER_SOLUTIONS_OWNERSHIP", "navigation": "PASS"},
+    {"order": 8, "questionId": "capability_question_4e9c7d9d6a4e5bd08afb", "contentBinding": "TECHNICAL_PROGRAM_LEADERSHIP", "scope": "TECHNICAL_PROGRAM_OWNERSHIP", "navigation": "PASS"},
+    {"order": 9, "questionId": "capability_question_2a6291c17570f200e859", "contentBinding": "AI_AUTOMATION_WORKFLOWS", "scope": "AI_AUTOMATION_OPERATION", "navigation": "PASS"},
+    {"order": 10, "questionId": "capability_question_ce32aa6c7ee0e264517e", "contentBinding": "GOVERNANCE_RISK", "scope": "GOVERNANCE_ACCOUNTABILITY", "navigation": "PASS"}
+  ],
+  "saveReadback": "PASS_IN_REVERSIBLE_AUTHORITY_TEST",
+  "editSupersession": "PASS_IN_REVERSIBLE_AUTHORITY_TEST",
+  "privateResponseScan": "PASS",
+  "limitation": "HTTP rendering was verified against the built local server; browser interaction was covered by reversible authority tests and source-level server-action checks."
 }

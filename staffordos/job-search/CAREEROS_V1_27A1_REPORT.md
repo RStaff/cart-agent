@@ -6,6 +6,12 @@
 - Route: `/os/professional/evidence?view=capabilities`
 - Current completion: 0 / 10
 - Question identity: PASS
+- Defect root cause: the V1.27A artifact used one generic scope/directness template for all ten capabilities; route binding was stable.
+- Exact duplicate question text: 0
+- Normalized duplicate question text: 0
+- Near-duplicate capability questions: 0
+- Unique capabilities: 10
+- Unique scope uncertainties: 10
 - Capability identity: PASS
 - Neutral unanswered state: PASS
 - Persistence/readback/supersession: PASS in reversible authority tests
@@ -14,5 +20,6 @@
 - Scope inflation: 0
 - Route HTTP status: 200
 - Private response scan: PASS
+- Repair: regenerated the question artifact with capability-specific wording, answer sets, and scope uncertainties while preserving question IDs and information-value ordering.
 - Match Engine/V2D replay: not run by mission scope
-- Decision: `CAPABILITY_REVIEW_RUNTIME_READY_FOR_ROSS`
+- Decision: `CAPABILITY_QUESTION_SET_REPAIRED`

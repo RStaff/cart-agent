@@ -1,12 +1,23 @@
 {
   "questionCount": 10,
   "stableQuestionIds": true,
-  "capabilityIdsPresent": true,
-  "allowedAnswersPresent": true,
-  "scopeBoundariesPresent": true,
-  "specialistBoundariesPresent": true,
-  "downstreamConceptReferencesPresent": true,
-  "informationValuePresent": true,
+  "exactDuplicateQuestionTextCount": 0,
+  "normalizedDuplicateQuestionTextCount": 0,
+  "nearDuplicateQuestionCount": 0,
+  "uniqueCapabilityCoverage": 10,
+  "uniqueScopeCoverage": 10,
   "labelsUsed": false,
-  "regenerated": false
+  "questions": [
+    {"order": 1, "questionId": "capability_question_cd2e74128897bcaf8ac1", "capability": "PRODUCT_GOVERNANCE", "scope": "PRODUCT_OWNERSHIP"},
+    {"order": 2, "questionId": "capability_question_84e1312f5cf13412586c", "capability": "PROJECT_DELIVERY", "scope": "PROJECT_DELIVERY_OWNERSHIP"},
+    {"order": 3, "questionId": "capability_question_6c563fd7e77c33d37a08", "capability": "GENERAL_OPERATIONS", "scope": "OPERATING_MODEL_OWNERSHIP"},
+    {"order": 4, "questionId": "capability_question_9d88b97130cdefe4bf70", "capability": "MARKETING_TECHNOLOGY", "scope": "MARKETING_SYSTEMS_OPERATION"},
+    {"order": 5, "questionId": "capability_question_034746936222273a4569", "capability": "STAKEHOLDER_LEADERSHIP", "scope": "STAKEHOLDER_LEADERSHIP"},
+    {"order": 6, "questionId": "capability_question_4a6092bf65051b1b2adb", "capability": "DATA_ANALYSIS", "scope": "INDIVIDUAL_DATA_ANALYSIS"},
+    {"order": 7, "questionId": "capability_question_b4280df4c8701ec6fc52", "capability": "CUSTOMER_SOLUTIONS", "scope": "CUSTOMER_SOLUTIONS_OWNERSHIP"},
+    {"order": 8, "questionId": "capability_question_4e9c7d9d6a4e5bd08afb", "capability": "TECHNICAL_PROGRAM_LEADERSHIP", "scope": "TECHNICAL_PROGRAM_OWNERSHIP"},
+    {"order": 9, "questionId": "capability_question_2a6291c17570f200e859", "capability": "AI_AUTOMATION_WORKFLOWS", "scope": "AI_AUTOMATION_OPERATION"},
+    {"order": 10, "questionId": "capability_question_ce32aa6c7ee0e264517e", "capability": "GOVERNANCE_RISK", "scope": "GOVERNANCE_ACCOUNTABILITY"}
+  ],
+  "artifactResult": "REPAIRED_DISTINCT_CAPABILITY_QUESTIONS"
 }
