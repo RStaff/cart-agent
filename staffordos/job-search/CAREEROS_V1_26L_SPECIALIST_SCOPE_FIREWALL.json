@@ -1,0 +1,14 @@
+{
+  "specialistReuseAccepted": 0,
+  "specialistReuseBlocked": 0,
+  "scopeReuseBlocked": 0,
+  "falseEquivalenceAccepted": 0,
+  "careerFactMutated": false,
+  "careerEvidenceMutated": false,
+  "requirementAuthorityMutated": false,
+  "operatorDecisionMutated": false,
+  "labelsUsedForAuthority": false,
+  "selfConfidenceUsed": false,
+  "interestUsed": false,
+  "workflowUsed": false
+}

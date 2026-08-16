@@ -1,0 +1,27 @@
+{
+  "before": {
+    "direct": 14,
+    "transferable": 2,
+    "partial": 2,
+    "evaluatorComparisons": {
+      "direct": 2148,
+      "transferable": 0,
+      "partial": 0
+    }
+  },
+  "after": {
+    "direct": 14,
+    "transferable": 2,
+    "partial": 2,
+    "evaluatorComparisons": {
+      "direct": 2148,
+      "transferable": 0,
+      "partial": 0
+    },
+    "newlyReusedRequirements": 0
+  },
+  "uniqueRequirementsNewlyCovered": 0,
+  "uniqueOpportunitiesNewlyCovered": 0,
+  "uniqueFamiliesNewlyCovered": 0,
+  "increasePercent": 0
+}

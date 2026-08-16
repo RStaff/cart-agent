@@ -1,0 +1,518 @@
+{
+  "queueSize": 30,
+  "maximum": 40,
+  "questions": [
+    {
+      "questionId": "review_gap_01",
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "specialistClass": "GENERAL",
+      "importance": "Unclear",
+      "candidateRequirementCount": 820,
+      "question": "Which bounded general responsibility capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_02",
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "specialistClass": "GENERAL",
+      "importance": "Required",
+      "candidateRequirementCount": 498,
+      "question": "Which bounded general responsibility capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_03",
+      "capabilityFamily": "PRODUCT",
+      "specialistClass": "GENERAL",
+      "importance": "Unclear",
+      "candidateRequirementCount": 122,
+      "question": "Which bounded product capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_04",
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "specialistClass": "SPECIALIST",
+      "importance": "Unclear",
+      "candidateRequirementCount": 86,
+      "question": "Which bounded general responsibility capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_05",
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "specialistClass": "GENERAL",
+      "importance": "Preferred",
+      "candidateRequirementCount": 83,
+      "question": "Which bounded general responsibility capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_06",
+      "capabilityFamily": "AI_AUTOMATION",
+      "specialistClass": "GENERAL",
+      "importance": "Unclear",
+      "candidateRequirementCount": 74,
+      "question": "Which bounded ai automation capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_07",
+      "capabilityFamily": "PRODUCT",
+      "specialistClass": "GENERAL",
+      "importance": "Required",
+      "candidateRequirementCount": 57,
+      "question": "Which bounded product capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_08",
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "specialistClass": "GENERAL",
+      "importance": "Unclear",
+      "candidateRequirementCount": 36,
+      "question": "Which bounded program delivery capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_09",
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "specialistClass": "SPECIALIST",
+      "importance": "Required",
+      "candidateRequirementCount": 29,
+      "question": "Which bounded general responsibility capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_10",
+      "capabilityFamily": "AI_AUTOMATION",
+      "specialistClass": "GENERAL",
+      "importance": "Required",
+      "candidateRequirementCount": 27,
+      "question": "Which bounded ai automation capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_11",
+      "capabilityFamily": "GOVERNANCE",
+      "specialistClass": "GENERAL",
+      "importance": "Unclear",
+      "candidateRequirementCount": 26,
+      "question": "Which bounded governance capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_12",
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "specialistClass": "GENERAL",
+      "importance": "Required",
+      "candidateRequirementCount": 17,
+      "question": "Which bounded program delivery capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_13",
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "specialistClass": "SPECIALIST",
+      "importance": "Preferred",
+      "candidateRequirementCount": 16,
+      "question": "Which bounded general responsibility capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_14",
+      "capabilityFamily": "AI_AUTOMATION",
+      "specialistClass": "SPECIALIST",
+      "importance": "Unclear",
+      "candidateRequirementCount": 14,
+      "question": "Which bounded ai automation capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_15",
+      "capabilityFamily": "PRODUCT",
+      "specialistClass": "SPECIALIST",
+      "importance": "Unclear",
+      "candidateRequirementCount": 14,
+      "question": "Which bounded product capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_16",
+      "capabilityFamily": "GOVERNANCE",
+      "specialistClass": "GENERAL",
+      "importance": "Required",
+      "candidateRequirementCount": 13,
+      "question": "Which bounded governance capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_17",
+      "capabilityFamily": "GOVERNANCE",
+      "specialistClass": "SPECIALIST",
+      "importance": "Required",
+      "candidateRequirementCount": 13,
+      "question": "Which bounded governance capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_18",
+      "capabilityFamily": "GOVERNANCE",
+      "specialistClass": "SPECIALIST",
+      "importance": "Unclear",
+      "candidateRequirementCount": 13,
+      "question": "Which bounded governance capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_19",
+      "capabilityFamily": "PRODUCT",
+      "specialistClass": "GENERAL",
+      "importance": "Preferred",
+      "candidateRequirementCount": 9,
+      "question": "Which bounded product capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_20",
+      "capabilityFamily": "AI_AUTOMATION",
+      "specialistClass": "GENERAL",
+      "importance": "Preferred",
+      "candidateRequirementCount": 8,
+      "question": "Which bounded ai automation capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_21",
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "specialistClass": "SPECIALIST",
+      "importance": "Unclear",
+      "candidateRequirementCount": 5,
+      "question": "Which bounded program delivery capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_22",
+      "capabilityFamily": "AI_AUTOMATION",
+      "specialistClass": "SPECIALIST",
+      "importance": "Required",
+      "candidateRequirementCount": 4,
+      "question": "Which bounded ai automation capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_23",
+      "capabilityFamily": "BUSINESS_SYSTEMS",
+      "specialistClass": "GENERAL",
+      "importance": "Unclear",
+      "candidateRequirementCount": 4,
+      "question": "Which bounded business systems capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_24",
+      "capabilityFamily": "PRODUCT",
+      "specialistClass": "SPECIALIST",
+      "importance": "Required",
+      "candidateRequirementCount": 4,
+      "question": "Which bounded product capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_25",
+      "capabilityFamily": "BUSINESS_SYSTEMS",
+      "specialistClass": "GENERAL",
+      "importance": "Required",
+      "candidateRequirementCount": 3,
+      "question": "Which bounded business systems capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_26",
+      "capabilityFamily": "AI_AUTOMATION",
+      "specialistClass": "SPECIALIST",
+      "importance": "Preferred",
+      "candidateRequirementCount": 2,
+      "question": "Which bounded ai automation capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_27",
+      "capabilityFamily": "PRODUCT",
+      "specialistClass": "SPECIALIST",
+      "importance": "Preferred",
+      "candidateRequirementCount": 2,
+      "question": "Which bounded product capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_28",
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "specialistClass": "GENERAL",
+      "importance": "Preferred",
+      "candidateRequirementCount": 2,
+      "question": "Which bounded program delivery capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_29",
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "specialistClass": "SPECIALIST",
+      "importance": "Required",
+      "candidateRequirementCount": 2,
+      "question": "Which bounded program delivery capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    },
+    {
+      "questionId": "review_gap_30",
+      "capabilityFamily": "GOVERNANCE",
+      "specialistClass": "GENERAL",
+      "importance": "Preferred",
+      "candidateRequirementCount": 1,
+      "question": "Which bounded governance capability, responsibility, and scope does your existing authority support for this requirement family?",
+      "allowedOutcomes": [
+        "DIRECT",
+        "TRANSFERABLE",
+        "PARTIAL",
+        "NO_SUPPORTED_EQUIVALENT",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "selectionReason": "Deterministic recurrence and authority-family coverage; no human labels used."
+    }
+  ],
+  "noAnswersCreated": true,
+  "selectionUsesLabels": false
+}
