@@ -1,0 +1,16 @@
+{
+  "specialistFamilies": [
+    "finance",
+    "tax",
+    "payroll",
+    "legal",
+    "AV/media",
+    "software engineering",
+    "data science",
+    "specialist AI/ML"
+  ],
+  "specialistLeakage": 0,
+  "genericAuthorityPromoted": false,
+  "unknownAsNegative": false,
+  "result": "PASS_FAIL_CLOSED"
+}

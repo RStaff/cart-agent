@@ -67,14 +67,18 @@ function candidateFromFact(fact) {
   const specialist = SPECIALIST.test([fact.statement, fact.normalizedStatement, fact.classification, fact.technologyOrSkill].filter(Boolean).join(" "));
   const scope = scopeLevel(fact);
   const domain = domainContext(fact);
-  return { canonicalName, capabilityFamily: canonicalName, specialist, scopeLevel: scope, domainContext: domain, authorityState: authorityState(fact), sourceEvidenceCount: Array.isArray(fact.sourceEvidenceIds) ? fact.sourceEvidenceIds.length : 0, conflictState: authorityState(fact) === "CONFLICT_BLOCKED" ? "CONFLICT_BLOCKED" : "NO_CONFLICT" };
+  return { canonicalName, capabilityFamily: canonicalName, specialist, scopeLevel: scope, domainContext: domain, authorityState: authorityState(fact), sourceFactId: fact.id || null, sourceEvidenceIds: Array.isArray(fact.sourceEvidenceIds) ? fact.sourceEvidenceIds : [], sourceDecisionIds: Array.isArray(fact.sourceDecisionIds) ? fact.sourceDecisionIds : [], sourceEvidenceCount: Array.isArray(fact.sourceEvidenceIds) ? fact.sourceEvidenceIds.length : 0, conflictState: authorityState(fact) === "CONFLICT_BLOCKED" ? "CONFLICT_BLOCKED" : "NO_CONFLICT" };
+}
+
+function capabilityIdentityKey(candidate) {
+  return [candidate.canonicalName, candidate.scopeLevel, candidate.specialist ? "SPECIALIST" : "GENERAL", candidate.domainContext].join("|");
 }
 
 export function buildCapabilityInventory(facts) {
   const candidates = facts.map(candidateFromFact).filter(Boolean);
   const groups = new Map();
   for (const candidate of candidates) {
-    const key = [candidate.canonicalName, candidate.scopeLevel, candidate.specialist ? "SPECIALIST" : "GENERAL", candidate.domainContext].join("|");
+    const key = capabilityIdentityKey(candidate);
     const group = groups.get(key) || { ...candidate, candidateFactCount: 0, authorityStates: {}, sourceEvidenceCount: 0, conflicts: 0 };
     group.candidateFactCount += 1;
     group.authorityStates[candidate.authorityState] = (group.authorityStates[candidate.authorityState] || 0) + 1;
@@ -127,4 +131,4 @@ export function buildOfflineCapabilityGraphDesign({ facts, evidence, manifest })
   return { careerEvidenceEvaluated: evidence.length, capabilityInventory, requirementConcepts: concepts, mappingCoverage: coverage, activeLearningQuestions: questions, rawRequirementCount: manifest.questions.flatMap((question) => question.targets).length, canonicalRequirementConceptCount: concepts.length, requirementCompressionRatio: concepts.length ? manifest.questions.flatMap((question) => question.targets).length / concepts.length : 0, prototypeOnly: true, labelsUsed: false, privatePayloadsOmitted: true };
 }
 
-export { authorityState, capabilityName, scopeLevel, domainContext, requirementConcepts, mappingCoverage, activeLearningQuestions };
+export { authorityState, capabilityName, scopeLevel, domainContext, capabilityIdentityKey, candidateFromFact, hash, requirementConcepts, mappingCoverage, activeLearningQuestions };

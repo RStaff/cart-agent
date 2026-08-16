@@ -1,0 +1,12 @@
+{
+  "graphVersion": "CAREEROS_V1_27A_GRAPH_V1",
+  "distribution": {
+    "UNRESOLVED_SCOPE": 18,
+    "LED_PROGRAM": 7,
+    "COORDINATED_OR_CONTRIBUTED": 6,
+    "ENTERPRISE_GLOBAL_SCOPE": 1
+  },
+  "scopeIsFirstClass": true,
+  "titleUsedAsScopeAuthority": false,
+  "scopeViolations": 0
+}

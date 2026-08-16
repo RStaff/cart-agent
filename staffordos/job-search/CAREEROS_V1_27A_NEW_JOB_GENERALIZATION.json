@@ -1,0 +1,7 @@
+{
+  "heldOutSetAvailable": false,
+  "result": "NOT_EVALUATED",
+  "reason": "No clean governed held-out requirement set was available in current authority; no external requirements were introduced.",
+  "knownConceptProjectionMechanism": "deterministic proposal only",
+  "newJobOperatorReviewRequired": "UNKNOWN"
+}

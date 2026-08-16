@@ -1,0 +1,12 @@
+{
+  "graphVersion": "CAREEROS_V1_27A_GRAPH_V1",
+  "distribution": {
+    "AI_AUTOMATION": 5,
+    "UNKNOWN_DOMAIN": 17,
+    "MARKETING_TECHNOLOGY": 6,
+    "ENTERPRISE_SYSTEMS": 3,
+    "HEALTHCARE": 1
+  },
+  "domainSeparateFromCapability": true,
+  "domainOnlyAuthority": false
+}

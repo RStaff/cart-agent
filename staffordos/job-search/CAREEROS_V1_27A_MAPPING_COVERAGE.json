@@ -1,0 +1,21 @@
+{
+  "rawRequirements": 2003,
+  "concepts": 41,
+  "capabilityNodes": 32,
+  "relationships": {
+    "DIRECT": 0,
+    "TRANSFERABLE": 0,
+    "PARTIAL": 0,
+    "UNRESOLVED": 336,
+    "SPECIALIST_BLOCKED": 204,
+    "SCOPE_BLOCKED": 1463
+  },
+  "exactRequirementsCovered": 0,
+  "opportunitiesCovered": 0,
+  "capabilitiesUtilized": 0,
+  "conceptsUtilized": 0,
+  "specialistLeakage": 0,
+  "scopeViolations": 0,
+  "operatorDecisions": 0,
+  "status": "AWAITING_CAPABILITY_ADJUDICATION"
+}

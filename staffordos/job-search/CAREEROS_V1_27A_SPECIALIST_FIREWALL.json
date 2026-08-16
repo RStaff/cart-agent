@@ -1,0 +1,8 @@
+{
+  "graphVersion": "CAREEROS_V1_27A_GRAPH_V1",
+  "specialistCapabilityCount": 0,
+  "specialistLeakage": 0,
+  "genericToSpecialistMappings": 0,
+  "genericAuthoritySatisfiesSpecialist": false,
+  "specialistState": "FAIL_CLOSED_WITHOUT_EXACT_AUTHORITY"
+}

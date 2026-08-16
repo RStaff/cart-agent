@@ -1,0 +1,307 @@
+{
+  "questionCount": 10,
+  "questions": [
+    {
+      "questionId": "capability_question_cd2e74128897bcaf8ac1",
+      "order": 1,
+      "question": "What bounded scope and directness does your existing authority support for product governance?",
+      "capabilityId": "capability_2f561dae5fbb3c63b8cb",
+      "canonicalCapability": "PRODUCT_GOVERNANCE",
+      "allowedAnswers": [
+        "DIRECT_OWNER",
+        "TRANSFERABLE_ANALOG",
+        "PARTIAL",
+        "NO_SUPPORTED_CAPABILITY",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "scopeBoundary": "UNRESOLVED_SCOPE",
+      "specialistBoundary": "GENERAL",
+      "affectedConceptIds": [
+        "requirement_concept_01605558759dc01a6426",
+        "requirement_concept_097bf19b72ea33dc9b81",
+        "requirement_concept_d5ce8caaad92120c2df1",
+        "requirement_concept_0f2d2b1af2593aaaeb61",
+        "requirement_concept_08cb25707e352443aff1",
+        "requirement_concept_87cb93ac045fdf626e03",
+        "requirement_concept_865758bf85fa2d27cb1b",
+        "requirement_concept_20fb7ae3c7c37cb7b649",
+        "requirement_concept_10f2508826da82362546"
+      ],
+      "affectedRequirementCount": 208,
+      "informationValue": 607,
+      "labelsExcluded": true,
+      "authorityEffect": "Updates only the named capability; downstream relationships remain derived and fail closed."
+    },
+    {
+      "questionId": "capability_question_84e1312f5cf13412586c",
+      "order": 2,
+      "question": "What bounded scope and directness does your existing authority support for project delivery?",
+      "capabilityId": "capability_6435d7115bc081ee062d",
+      "canonicalCapability": "PROJECT_DELIVERY",
+      "allowedAnswers": [
+        "DIRECT_OWNER",
+        "TRANSFERABLE_ANALOG",
+        "PARTIAL",
+        "NO_SUPPORTED_CAPABILITY",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "scopeBoundary": "UNRESOLVED_SCOPE",
+      "specialistBoundary": "GENERAL",
+      "affectedConceptIds": [
+        "requirement_concept_88ae57175b9f45fd3e52",
+        "requirement_concept_2e85ad19127477ff9905",
+        "requirement_concept_c047baa98c11bb4b05ed",
+        "requirement_concept_f8bd5537062eb48e4257",
+        "requirement_concept_da7036dbc84435731c01",
+        "requirement_concept_e4345e5e939e8972e64a",
+        "requirement_concept_e35ce3ad428baa9c7882"
+      ],
+      "affectedRequirementCount": 62,
+      "informationValue": 61,
+      "labelsExcluded": true,
+      "authorityEffect": "Updates only the named capability; downstream relationships remain derived and fail closed."
+    },
+    {
+      "questionId": "capability_question_6c563fd7e77c33d37a08",
+      "order": 3,
+      "question": "What bounded scope and directness does your existing authority support for general operations?",
+      "capabilityId": "capability_ae7cfc7089870567ced8",
+      "canonicalCapability": "GENERAL_OPERATIONS",
+      "allowedAnswers": [
+        "DIRECT_OWNER",
+        "TRANSFERABLE_ANALOG",
+        "PARTIAL",
+        "NO_SUPPORTED_CAPABILITY",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "scopeBoundary": "UNRESOLVED_SCOPE",
+      "specialistBoundary": "GENERAL",
+      "affectedConceptIds": [
+        "requirement_concept_0c8ac1c70dcf8cda9a5f",
+        "requirement_concept_d4ea39dffd3e9c2ef1ec",
+        "requirement_concept_7b77f5b8e61c89eb357d",
+        "requirement_concept_aef6acc3b3216a83c13c",
+        "requirement_concept_e2d3a2b37996043c9ea2",
+        "requirement_concept_34b1c57ca3ac7b1dc3fb",
+        "requirement_concept_99824161d6086ab8f316",
+        "requirement_concept_949b1588562b8bccce64"
+      ],
+      "affectedRequirementCount": 1532,
+      "informationValue": 25,
+      "labelsExcluded": true,
+      "authorityEffect": "Updates only the named capability; downstream relationships remain derived and fail closed."
+    },
+    {
+      "questionId": "capability_question_9d88b97130cdefe4bf70",
+      "order": 4,
+      "question": "What bounded scope and directness does your existing authority support for marketing technology?",
+      "capabilityId": "capability_556562bde7f5493177f0",
+      "canonicalCapability": "MARKETING_TECHNOLOGY",
+      "allowedAnswers": [
+        "DIRECT_OWNER",
+        "TRANSFERABLE_ANALOG",
+        "PARTIAL",
+        "NO_SUPPORTED_CAPABILITY",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "scopeBoundary": "UNRESOLVED_SCOPE",
+      "specialistBoundary": "GENERAL",
+      "affectedConceptIds": [
+        "requirement_concept_1c6039f9815573770925",
+        "requirement_concept_b5397d3071f69ea4628b",
+        "requirement_concept_ef695f382209789d06ce",
+        "requirement_concept_ff204b3c641371da130a",
+        "requirement_concept_826dbbc61f3de8e6623e",
+        "requirement_concept_dddae45a80ae7323b00d",
+        "requirement_concept_60e7011ccc4cee336375"
+      ],
+      "affectedRequirementCount": 129,
+      "informationValue": 23,
+      "labelsExcluded": true,
+      "authorityEffect": "Updates only the named capability; downstream relationships remain derived and fail closed."
+    },
+    {
+      "questionId": "capability_question_034746936222273a4569",
+      "order": 5,
+      "question": "What bounded scope and directness does your existing authority support for stakeholder leadership?",
+      "capabilityId": "capability_a2deb5a9d4be53cb157f",
+      "canonicalCapability": "STAKEHOLDER_LEADERSHIP",
+      "allowedAnswers": [
+        "DIRECT_OWNER",
+        "TRANSFERABLE_ANALOG",
+        "PARTIAL",
+        "NO_SUPPORTED_CAPABILITY",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "scopeBoundary": "UNRESOLVED_SCOPE",
+      "specialistBoundary": "GENERAL",
+      "affectedConceptIds": [
+        "requirement_concept_0c8ac1c70dcf8cda9a5f",
+        "requirement_concept_d4ea39dffd3e9c2ef1ec",
+        "requirement_concept_7b77f5b8e61c89eb357d",
+        "requirement_concept_aef6acc3b3216a83c13c",
+        "requirement_concept_e2d3a2b37996043c9ea2",
+        "requirement_concept_34b1c57ca3ac7b1dc3fb",
+        "requirement_concept_99824161d6086ab8f316",
+        "requirement_concept_949b1588562b8bccce64"
+      ],
+      "affectedRequirementCount": 1532,
+      "informationValue": 19,
+      "labelsExcluded": true,
+      "authorityEffect": "Updates only the named capability; downstream relationships remain derived and fail closed."
+    },
+    {
+      "questionId": "capability_question_4a6092bf65051b1b2adb",
+      "order": 6,
+      "question": "What bounded scope and directness does your existing authority support for data analysis?",
+      "capabilityId": "capability_f4d7570a098a40cfef91",
+      "canonicalCapability": "DATA_ANALYSIS",
+      "allowedAnswers": [
+        "DIRECT_OWNER",
+        "TRANSFERABLE_ANALOG",
+        "PARTIAL",
+        "NO_SUPPORTED_CAPABILITY",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "scopeBoundary": "UNRESOLVED_SCOPE",
+      "specialistBoundary": "GENERAL",
+      "affectedConceptIds": [],
+      "affectedRequirementCount": 0,
+      "informationValue": 18,
+      "labelsExcluded": true,
+      "authorityEffect": "Updates only the named capability; downstream relationships remain derived and fail closed."
+    },
+    {
+      "questionId": "capability_question_b4280df4c8701ec6fc52",
+      "order": 7,
+      "question": "What bounded scope and directness does your existing authority support for customer solutions?",
+      "capabilityId": "capability_cc1bcdb9ab03f1a0298f",
+      "canonicalCapability": "CUSTOMER_SOLUTIONS",
+      "allowedAnswers": [
+        "DIRECT_OWNER",
+        "TRANSFERABLE_ANALOG",
+        "PARTIAL",
+        "NO_SUPPORTED_CAPABILITY",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "scopeBoundary": "UNRESOLVED_SCOPE",
+      "specialistBoundary": "GENERAL",
+      "affectedConceptIds": [
+        "requirement_concept_0c8ac1c70dcf8cda9a5f",
+        "requirement_concept_d4ea39dffd3e9c2ef1ec",
+        "requirement_concept_7b77f5b8e61c89eb357d",
+        "requirement_concept_aef6acc3b3216a83c13c",
+        "requirement_concept_e2d3a2b37996043c9ea2",
+        "requirement_concept_34b1c57ca3ac7b1dc3fb",
+        "requirement_concept_99824161d6086ab8f316",
+        "requirement_concept_949b1588562b8bccce64"
+      ],
+      "affectedRequirementCount": 1532,
+      "informationValue": 6,
+      "labelsExcluded": true,
+      "authorityEffect": "Updates only the named capability; downstream relationships remain derived and fail closed."
+    },
+    {
+      "questionId": "capability_question_4e9c7d9d6a4e5bd08afb",
+      "order": 8,
+      "question": "What bounded scope and directness does your existing authority support for technical program leadership?",
+      "capabilityId": "capability_adb2c99e96c0164c4099",
+      "canonicalCapability": "TECHNICAL_PROGRAM_LEADERSHIP",
+      "allowedAnswers": [
+        "DIRECT_OWNER",
+        "TRANSFERABLE_ANALOG",
+        "PARTIAL",
+        "NO_SUPPORTED_CAPABILITY",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "scopeBoundary": "UNRESOLVED_SCOPE",
+      "specialistBoundary": "GENERAL",
+      "affectedConceptIds": [
+        "requirement_concept_88ae57175b9f45fd3e52",
+        "requirement_concept_2e85ad19127477ff9905",
+        "requirement_concept_c047baa98c11bb4b05ed",
+        "requirement_concept_f8bd5537062eb48e4257",
+        "requirement_concept_da7036dbc84435731c01",
+        "requirement_concept_e4345e5e939e8972e64a",
+        "requirement_concept_e35ce3ad428baa9c7882"
+      ],
+      "affectedRequirementCount": 62,
+      "informationValue": 5,
+      "labelsExcluded": true,
+      "authorityEffect": "Updates only the named capability; downstream relationships remain derived and fail closed."
+    },
+    {
+      "questionId": "capability_question_2a6291c17570f200e859",
+      "order": 9,
+      "question": "What bounded scope and directness does your existing authority support for ai automation workflows?",
+      "capabilityId": "capability_d406583e90947beab668",
+      "canonicalCapability": "AI_AUTOMATION_WORKFLOWS",
+      "allowedAnswers": [
+        "DIRECT_OWNER",
+        "TRANSFERABLE_ANALOG",
+        "PARTIAL",
+        "NO_SUPPORTED_CAPABILITY",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "scopeBoundary": "UNRESOLVED_SCOPE",
+      "specialistBoundary": "GENERAL",
+      "affectedConceptIds": [
+        "requirement_concept_1c6039f9815573770925",
+        "requirement_concept_b5397d3071f69ea4628b",
+        "requirement_concept_ef695f382209789d06ce",
+        "requirement_concept_ff204b3c641371da130a",
+        "requirement_concept_826dbbc61f3de8e6623e",
+        "requirement_concept_dddae45a80ae7323b00d",
+        "requirement_concept_60e7011ccc4cee336375"
+      ],
+      "affectedRequirementCount": 129,
+      "informationValue": 2,
+      "labelsExcluded": true,
+      "authorityEffect": "Updates only the named capability; downstream relationships remain derived and fail closed."
+    },
+    {
+      "questionId": "capability_question_ce32aa6c7ee0e264517e",
+      "order": 10,
+      "question": "What bounded scope and directness does your existing authority support for governance risk?",
+      "capabilityId": "capability_3aad0fad1d60ac8462a1",
+      "canonicalCapability": "GOVERNANCE_RISK",
+      "allowedAnswers": [
+        "DIRECT_OWNER",
+        "TRANSFERABLE_ANALOG",
+        "PARTIAL",
+        "NO_SUPPORTED_CAPABILITY",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "scopeBoundary": "UNRESOLVED_SCOPE",
+      "specialistBoundary": "GENERAL",
+      "affectedConceptIds": [
+        "requirement_concept_eb7d0e99180c76bb8186",
+        "requirement_concept_a6a56312fe003a475c89",
+        "requirement_concept_f0dc73ad8e03c50bb0e0",
+        "requirement_concept_55fbd5d835d66e216e0e",
+        "requirement_concept_206dfd99d02d15f098d5",
+        "requirement_concept_fd6ec5d691cda3d828fb",
+        "requirement_concept_c279cfcd94d3bc3d76f0"
+      ],
+      "affectedRequirementCount": 65,
+      "informationValue": 2,
+      "labelsExcluded": true,
+      "authorityEffect": "Updates only the named capability; downstream relationships remain derived and fail closed."
+    }
+  ],
+  "labelsUsed": false,
+  "scoresUsed": false,
+  "workflowUsed": false,
+  "jobSpecific": false,
+  "auditResult": "READY_FOR_OPERATOR_AUTHORITY_REVIEW"
+}

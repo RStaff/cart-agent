@@ -1,0 +1,11 @@
+{
+  "graphVersion": "CAREEROS_V1_27A_GRAPH_V1",
+  "edgeCounts": {
+    "establishesCapability": 771,
+    "supportsCapability": 6,
+    "adjudicatesCapability": 0
+  },
+  "authorityBearingEdges": [],
+  "sourceRefsOmitted": true,
+  "sourceAuthorityMutated": false
+}
