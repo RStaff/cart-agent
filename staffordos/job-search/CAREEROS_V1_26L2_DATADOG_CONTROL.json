@@ -1,0 +1,24 @@
+{
+  "targetCount": 66,
+  "questionIds": [
+    "compressed_01",
+    "compressed_02",
+    "compressed_03",
+    "compressed_04",
+    "compressed_06",
+    "compressed_08",
+    "compressed_09",
+    "compressed_10",
+    "compressed_13",
+    "compressed_14",
+    "compressed_16",
+    "compressed_18",
+    "compressed_20",
+    "compressed_24",
+    "compressed_27",
+    "compressed_29",
+    "compressed_31"
+  ],
+  "scopeSafe": true,
+  "manuallyInserted": false
+}

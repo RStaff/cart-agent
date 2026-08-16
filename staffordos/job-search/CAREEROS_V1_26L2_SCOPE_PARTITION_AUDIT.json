@@ -1,0 +1,171 @@
+{
+  "scopePartitionsPreserved": true,
+  "scopeSensitiveQuestions": 30,
+  "crossScopeMerges": 0,
+  "boundaries": [
+    {
+      "id": "compressed_01",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR"
+    },
+    {
+      "id": "compressed_02",
+      "scope": "OWNERSHIP"
+    },
+    {
+      "id": "compressed_03",
+      "scope": "PORTFOLIO_ENTERPRISE"
+    },
+    {
+      "id": "compressed_04",
+      "scope": "UNSPECIFIED"
+    },
+    {
+      "id": "compressed_05",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR"
+    },
+    {
+      "id": "compressed_06",
+      "scope": "OWNERSHIP"
+    },
+    {
+      "id": "compressed_07",
+      "scope": "PORTFOLIO_ENTERPRISE"
+    },
+    {
+      "id": "compressed_08",
+      "scope": "TEAM_LEADERSHIP"
+    },
+    {
+      "id": "compressed_09",
+      "scope": "UNSPECIFIED"
+    },
+    {
+      "id": "compressed_10",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR"
+    },
+    {
+      "id": "compressed_11",
+      "scope": "OWNERSHIP"
+    },
+    {
+      "id": "compressed_12",
+      "scope": "PORTFOLIO_ENTERPRISE"
+    },
+    {
+      "id": "compressed_13",
+      "scope": "UNSPECIFIED"
+    },
+    {
+      "id": "compressed_14",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR"
+    },
+    {
+      "id": "compressed_15",
+      "scope": "OWNERSHIP"
+    },
+    {
+      "id": "compressed_16",
+      "scope": "UNSPECIFIED"
+    },
+    {
+      "id": "compressed_17",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR"
+    },
+    {
+      "id": "compressed_18",
+      "scope": "OWNERSHIP"
+    },
+    {
+      "id": "compressed_19",
+      "scope": "PORTFOLIO_ENTERPRISE"
+    },
+    {
+      "id": "compressed_20",
+      "scope": "UNSPECIFIED"
+    },
+    {
+      "id": "compressed_21",
+      "scope": "PORTFOLIO_ENTERPRISE"
+    },
+    {
+      "id": "compressed_22",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR"
+    },
+    {
+      "id": "compressed_23",
+      "scope": "OWNERSHIP"
+    },
+    {
+      "id": "compressed_24",
+      "scope": "UNSPECIFIED"
+    },
+    {
+      "id": "compressed_25",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR"
+    },
+    {
+      "id": "compressed_26",
+      "scope": "OWNERSHIP"
+    },
+    {
+      "id": "compressed_27",
+      "scope": "UNSPECIFIED"
+    },
+    {
+      "id": "compressed_28",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR"
+    },
+    {
+      "id": "compressed_29",
+      "scope": "OWNERSHIP"
+    },
+    {
+      "id": "compressed_30",
+      "scope": "PORTFOLIO_ENTERPRISE"
+    },
+    {
+      "id": "compressed_31",
+      "scope": "UNSPECIFIED"
+    },
+    {
+      "id": "compressed_32",
+      "scope": "OWNERSHIP"
+    },
+    {
+      "id": "compressed_33",
+      "scope": "PORTFOLIO_ENTERPRISE"
+    },
+    {
+      "id": "compressed_34",
+      "scope": "UNSPECIFIED"
+    },
+    {
+      "id": "compressed_35",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR"
+    },
+    {
+      "id": "compressed_36",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR"
+    },
+    {
+      "id": "compressed_37",
+      "scope": "PORTFOLIO_ENTERPRISE"
+    },
+    {
+      "id": "compressed_38",
+      "scope": "UNSPECIFIED"
+    },
+    {
+      "id": "compressed_39",
+      "scope": "PORTFOLIO_ENTERPRISE"
+    },
+    {
+      "id": "compressed_40",
+      "scope": "UNSPECIFIED"
+    },
+    {
+      "id": "compressed_41",
+      "scope": "OWNERSHIP"
+    }
+  ]
+}

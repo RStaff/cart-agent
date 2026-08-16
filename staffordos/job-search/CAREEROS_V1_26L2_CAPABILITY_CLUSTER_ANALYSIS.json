@@ -1,0 +1,464 @@
+{
+  "compressedQuestionCount": 41,
+  "groups": [
+    {
+      "id": "compressed_01",
+      "family": "GENERAL_RESPONSIBILITY",
+      "specialist": "GENERAL",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "sourceQuestionIds": [
+        "review_gap_01",
+        "review_gap_05",
+        "review_gap_18"
+      ],
+      "targetCount": 154
+    },
+    {
+      "id": "compressed_02",
+      "family": "GENERAL_RESPONSIBILITY",
+      "specialist": "GENERAL",
+      "scope": "OWNERSHIP",
+      "sourceQuestionIds": [
+        "review_gap_02",
+        "review_gap_06",
+        "review_gap_19"
+      ],
+      "targetCount": 96
+    },
+    {
+      "id": "compressed_03",
+      "family": "GENERAL_RESPONSIBILITY",
+      "specialist": "GENERAL",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "sourceQuestionIds": [
+        "review_gap_03",
+        "review_gap_07",
+        "review_gap_20"
+      ],
+      "targetCount": 64
+    },
+    {
+      "id": "compressed_04",
+      "family": "GENERAL_RESPONSIBILITY",
+      "specialist": "GENERAL",
+      "scope": "UNSPECIFIED",
+      "sourceQuestionIds": [
+        "review_gap_04",
+        "review_gap_08",
+        "review_gap_21"
+      ],
+      "targetCount": 1087
+    },
+    {
+      "id": "compressed_05",
+      "family": "PRODUCT",
+      "specialist": "GENERAL",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "sourceQuestionIds": [
+        "review_gap_09",
+        "review_gap_25",
+        "review_gap_66"
+      ],
+      "targetCount": 34
+    },
+    {
+      "id": "compressed_06",
+      "family": "PRODUCT",
+      "specialist": "GENERAL",
+      "scope": "OWNERSHIP",
+      "sourceQuestionIds": [
+        "review_gap_10",
+        "review_gap_26"
+      ],
+      "targetCount": 32
+    },
+    {
+      "id": "compressed_07",
+      "family": "PRODUCT",
+      "specialist": "GENERAL",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "sourceQuestionIds": [
+        "review_gap_11",
+        "review_gap_27",
+        "review_gap_67"
+      ],
+      "targetCount": 8
+    },
+    {
+      "id": "compressed_08",
+      "family": "PRODUCT",
+      "specialist": "GENERAL",
+      "scope": "TEAM_LEADERSHIP",
+      "sourceQuestionIds": [
+        "review_gap_12"
+      ],
+      "targetCount": 1
+    },
+    {
+      "id": "compressed_09",
+      "family": "PRODUCT",
+      "specialist": "GENERAL",
+      "scope": "UNSPECIFIED",
+      "sourceQuestionIds": [
+        "review_gap_13",
+        "review_gap_28",
+        "review_gap_68"
+      ],
+      "targetCount": 113
+    },
+    {
+      "id": "compressed_10",
+      "family": "GENERAL_RESPONSIBILITY",
+      "specialist": "SPECIALIST",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "sourceQuestionIds": [
+        "review_gap_14",
+        "review_gap_33",
+        "review_gap_47"
+      ],
+      "targetCount": 23
+    },
+    {
+      "id": "compressed_11",
+      "family": "GENERAL_RESPONSIBILITY",
+      "specialist": "SPECIALIST",
+      "scope": "OWNERSHIP",
+      "sourceQuestionIds": [
+        "review_gap_15",
+        "review_gap_34",
+        "review_gap_48"
+      ],
+      "targetCount": 17
+    },
+    {
+      "id": "compressed_12",
+      "family": "GENERAL_RESPONSIBILITY",
+      "specialist": "SPECIALIST",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "sourceQuestionIds": [
+        "review_gap_16",
+        "review_gap_49"
+      ],
+      "targetCount": 5
+    },
+    {
+      "id": "compressed_13",
+      "family": "GENERAL_RESPONSIBILITY",
+      "specialist": "SPECIALIST",
+      "scope": "UNSPECIFIED",
+      "sourceQuestionIds": [
+        "review_gap_17",
+        "review_gap_35",
+        "review_gap_50"
+      ],
+      "targetCount": 86
+    },
+    {
+      "id": "compressed_14",
+      "family": "AI_AUTOMATION",
+      "specialist": "GENERAL",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "sourceQuestionIds": [
+        "review_gap_22",
+        "review_gap_36",
+        "review_gap_69"
+      ],
+      "targetCount": 24
+    },
+    {
+      "id": "compressed_15",
+      "family": "AI_AUTOMATION",
+      "specialist": "GENERAL",
+      "scope": "OWNERSHIP",
+      "sourceQuestionIds": [
+        "review_gap_23",
+        "review_gap_37",
+        "review_gap_70"
+      ],
+      "targetCount": 14
+    },
+    {
+      "id": "compressed_16",
+      "family": "AI_AUTOMATION",
+      "specialist": "GENERAL",
+      "scope": "UNSPECIFIED",
+      "sourceQuestionIds": [
+        "review_gap_24",
+        "review_gap_39",
+        "review_gap_72"
+      ],
+      "targetCount": 68
+    },
+    {
+      "id": "compressed_17",
+      "family": "PROGRAM_DELIVERY",
+      "specialist": "GENERAL",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "sourceQuestionIds": [
+        "review_gap_29",
+        "review_gap_43"
+      ],
+      "targetCount": 7
+    },
+    {
+      "id": "compressed_18",
+      "family": "PROGRAM_DELIVERY",
+      "specialist": "GENERAL",
+      "scope": "OWNERSHIP",
+      "sourceQuestionIds": [
+        "review_gap_30",
+        "review_gap_44"
+      ],
+      "targetCount": 9
+    },
+    {
+      "id": "compressed_19",
+      "family": "PROGRAM_DELIVERY",
+      "specialist": "GENERAL",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "sourceQuestionIds": [
+        "review_gap_31",
+        "review_gap_45"
+      ],
+      "targetCount": 6
+    },
+    {
+      "id": "compressed_20",
+      "family": "PROGRAM_DELIVERY",
+      "specialist": "GENERAL",
+      "scope": "UNSPECIFIED",
+      "sourceQuestionIds": [
+        "review_gap_32",
+        "review_gap_46",
+        "review_gap_88"
+      ],
+      "targetCount": 33
+    },
+    {
+      "id": "compressed_21",
+      "family": "AI_AUTOMATION",
+      "specialist": "GENERAL",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "sourceQuestionIds": [
+        "review_gap_38",
+        "review_gap_71"
+      ],
+      "targetCount": 3
+    },
+    {
+      "id": "compressed_22",
+      "family": "GOVERNANCE",
+      "specialist": "GENERAL",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "sourceQuestionIds": [
+        "review_gap_40",
+        "review_gap_64",
+        "review_gap_90"
+      ],
+      "targetCount": 12
+    },
+    {
+      "id": "compressed_23",
+      "family": "GOVERNANCE",
+      "specialist": "GENERAL",
+      "scope": "OWNERSHIP",
+      "sourceQuestionIds": [
+        "review_gap_41"
+      ],
+      "targetCount": 5
+    },
+    {
+      "id": "compressed_24",
+      "family": "GOVERNANCE",
+      "specialist": "GENERAL",
+      "scope": "UNSPECIFIED",
+      "sourceQuestionIds": [
+        "review_gap_42",
+        "review_gap_65"
+      ],
+      "targetCount": 22
+    },
+    {
+      "id": "compressed_25",
+      "family": "AI_AUTOMATION",
+      "specialist": "SPECIALIST",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "sourceQuestionIds": [
+        "review_gap_51",
+        "review_gap_76"
+      ],
+      "targetCount": 3
+    },
+    {
+      "id": "compressed_26",
+      "family": "AI_AUTOMATION",
+      "specialist": "SPECIALIST",
+      "scope": "OWNERSHIP",
+      "sourceQuestionIds": [
+        "review_gap_52"
+      ],
+      "targetCount": 8
+    },
+    {
+      "id": "compressed_27",
+      "family": "AI_AUTOMATION",
+      "specialist": "SPECIALIST",
+      "scope": "UNSPECIFIED",
+      "sourceQuestionIds": [
+        "review_gap_53",
+        "review_gap_77",
+        "review_gap_86"
+      ],
+      "targetCount": 9
+    },
+    {
+      "id": "compressed_28",
+      "family": "PRODUCT",
+      "specialist": "SPECIALIST",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "sourceQuestionIds": [
+        "review_gap_54",
+        "review_gap_80"
+      ],
+      "targetCount": 3
+    },
+    {
+      "id": "compressed_29",
+      "family": "PRODUCT",
+      "specialist": "SPECIALIST",
+      "scope": "OWNERSHIP",
+      "sourceQuestionIds": [
+        "review_gap_55",
+        "review_gap_81"
+      ],
+      "targetCount": 4
+    },
+    {
+      "id": "compressed_30",
+      "family": "PRODUCT",
+      "specialist": "SPECIALIST",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "sourceQuestionIds": [
+        "review_gap_56"
+      ],
+      "targetCount": 2
+    },
+    {
+      "id": "compressed_31",
+      "family": "PRODUCT",
+      "specialist": "SPECIALIST",
+      "scope": "UNSPECIFIED",
+      "sourceQuestionIds": [
+        "review_gap_57",
+        "review_gap_82",
+        "review_gap_87"
+      ],
+      "targetCount": 11
+    },
+    {
+      "id": "compressed_32",
+      "family": "GOVERNANCE",
+      "specialist": "SPECIALIST",
+      "scope": "OWNERSHIP",
+      "sourceQuestionIds": [
+        "review_gap_58"
+      ],
+      "targetCount": 2
+    },
+    {
+      "id": "compressed_33",
+      "family": "GOVERNANCE",
+      "specialist": "SPECIALIST",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "sourceQuestionIds": [
+        "review_gap_59",
+        "review_gap_62"
+      ],
+      "targetCount": 6
+    },
+    {
+      "id": "compressed_34",
+      "family": "GOVERNANCE",
+      "specialist": "SPECIALIST",
+      "scope": "UNSPECIFIED",
+      "sourceQuestionIds": [
+        "review_gap_60",
+        "review_gap_63"
+      ],
+      "targetCount": 11
+    },
+    {
+      "id": "compressed_35",
+      "family": "GOVERNANCE",
+      "specialist": "SPECIALIST",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "sourceQuestionIds": [
+        "review_gap_61"
+      ],
+      "targetCount": 7
+    },
+    {
+      "id": "compressed_36",
+      "family": "PROGRAM_DELIVERY",
+      "specialist": "SPECIALIST",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "sourceQuestionIds": [
+        "review_gap_73"
+      ],
+      "targetCount": 2
+    },
+    {
+      "id": "compressed_37",
+      "family": "PROGRAM_DELIVERY",
+      "specialist": "SPECIALIST",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "sourceQuestionIds": [
+        "review_gap_74"
+      ],
+      "targetCount": 2
+    },
+    {
+      "id": "compressed_38",
+      "family": "PROGRAM_DELIVERY",
+      "specialist": "SPECIALIST",
+      "scope": "UNSPECIFIED",
+      "sourceQuestionIds": [
+        "review_gap_75",
+        "review_gap_89"
+      ],
+      "targetCount": 3
+    },
+    {
+      "id": "compressed_39",
+      "family": "BUSINESS_SYSTEMS",
+      "specialist": "GENERAL",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "sourceQuestionIds": [
+        "review_gap_78",
+        "review_gap_84"
+      ],
+      "targetCount": 3
+    },
+    {
+      "id": "compressed_40",
+      "family": "BUSINESS_SYSTEMS",
+      "specialist": "GENERAL",
+      "scope": "UNSPECIFIED",
+      "sourceQuestionIds": [
+        "review_gap_79",
+        "review_gap_85"
+      ],
+      "targetCount": 3
+    },
+    {
+      "id": "compressed_41",
+      "family": "BUSINESS_SYSTEMS",
+      "specialist": "GENERAL",
+      "scope": "OWNERSHIP",
+      "sourceQuestionIds": [
+        "review_gap_83"
+      ],
+      "targetCount": 1
+    }
+  ]
+}

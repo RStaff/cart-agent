@@ -1,0 +1,6 @@
+{
+  "specialistPartitionsPreserved": true,
+  "specialistQuestions": 18,
+  "crossSpecialistMerges": 0,
+  "genericToSpecialistPropagation": false
+}
