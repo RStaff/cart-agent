@@ -1,0 +1,18 @@
+{
+  "role": "Director, Technical Program Management - Technical Solutions Operations",
+  "changed": true,
+  "changes": [
+    {
+      "company": "Datadog",
+      "role": "Director, Technical Program Management - Technical Solutions Operations",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 3,
+      "afterRank": 4,
+      "beforeScore": 72.25,
+      "afterScore": 74.66
+    }
+  ],
+  "manualBoost": false,
+  "qualificationOrEligibilityChanged": false,
+  "remainingAuthority": "Only exact mapped requirement comparisons are eligible; no domain or title inference."
+}

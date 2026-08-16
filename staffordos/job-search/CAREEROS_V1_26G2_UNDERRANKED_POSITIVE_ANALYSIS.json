@@ -1,0 +1,493 @@
+{
+  "changedCalibration": [
+    {
+      "company": "Anthropic",
+      "role": "Business Systems Analyst",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 1,
+      "afterRank": 3,
+      "beforeScore": 72.25,
+      "afterScore": 77.03
+    },
+    {
+      "company": "Datadog",
+      "role": "Director, Product Management - AI Observability",
+      "evidenceFit": "STRETCH",
+      "beforeRank": 3,
+      "afterRank": 4,
+      "beforeScore": 72.25,
+      "afterScore": 74.82
+    },
+    {
+      "company": "Scale AI",
+      "role": "Engagement Manager",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 5,
+      "afterRank": 5,
+      "beforeScore": 71.25,
+      "afterScore": 74.38
+    },
+    {
+      "company": "Airtable",
+      "role": "Director, AI Transformation & Customer Success",
+      "evidenceFit": "GOOD_MATCH",
+      "beforeRank": 6,
+      "afterRank": 8,
+      "beforeScore": 72.25,
+      "afterScore": 77.43
+    },
+    {
+      "company": "Anthropic",
+      "role": "AI Fluency Education Lead",
+      "evidenceFit": "STRONG_MATCH",
+      "beforeRank": 7,
+      "afterRank": 6,
+      "beforeScore": 72.25,
+      "afterScore": 78.28
+    },
+    {
+      "company": "Anthropic",
+      "role": "Applied AI Architect, Partnerships",
+      "evidenceFit": "GOOD_MATCH",
+      "beforeRank": 8,
+      "afterRank": 9,
+      "beforeScore": 72.25,
+      "afterScore": 77.25
+    },
+    {
+      "company": "Anthropic",
+      "role": "Commercial Operations Program Manager",
+      "evidenceFit": "STRETCH",
+      "beforeRank": 9,
+      "afterRank": 17,
+      "beforeScore": 72.25,
+      "afterScore": 76
+    },
+    {
+      "company": "Figma",
+      "role": "Governance Risk and Compliance",
+      "evidenceFit": "STRETCH",
+      "beforeRank": 12,
+      "afterRank": 18,
+      "beforeScore": 72.25,
+      "afterScore": 75.9
+    },
+    {
+      "company": "Scale AI",
+      "role": "Director of Product Management, Forward Deployed & Strategy",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 13,
+      "afterRank": 14,
+      "beforeScore": 72.25,
+      "afterScore": 76.66
+    },
+    {
+      "company": "Scale AI",
+      "role": "Finance Systems & Automations Manager",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 14,
+      "afterRank": 15,
+      "beforeScore": 72.25,
+      "afterScore": 76.42
+    },
+    {
+      "company": "Airtable",
+      "role": "Senior Delivery Consultant",
+      "evidenceFit": "GOOD_MATCH",
+      "beforeRank": 16,
+      "afterRank": 11,
+      "beforeScore": 71.25,
+      "afterScore": 77.2
+    },
+    {
+      "company": "Airtable",
+      "role": "Senior Delivery Consultant- West Coast",
+      "evidenceFit": "STRETCH",
+      "beforeRank": 17,
+      "afterRank": 12,
+      "beforeScore": 71.25,
+      "afterScore": 77.2
+    },
+    {
+      "company": "Anthropic",
+      "role": "AI Infrastructure Operations, Demand Planning",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 18,
+      "afterRank": 16,
+      "beforeScore": 71.25,
+      "afterScore": 76.25
+    },
+    {
+      "company": "Anthropic",
+      "role": "Amazon GTM Partnership, Startups",
+      "evidenceFit": "STRONG_MATCH",
+      "beforeRank": 19,
+      "afterRank": 19,
+      "beforeScore": 71.25,
+      "afterScore": 75.42
+    },
+    {
+      "company": "Anthropic",
+      "role": "Community & Executive Escalations Program Manager",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 20,
+      "afterRank": 13,
+      "beforeScore": 71.25,
+      "afterScore": 76.81
+    },
+    {
+      "company": "Anthropic",
+      "role": "Applied AI Architect, Commercial",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 21,
+      "afterRank": 21,
+      "beforeScore": 35,
+      "afterScore": 54.75
+    },
+    {
+      "company": "Anthropic",
+      "role": "Applied AI Architect, Enterprise Tech",
+      "evidenceFit": "GOOD_MATCH",
+      "beforeRank": 22,
+      "afterRank": 22,
+      "beforeScore": 35,
+      "afterScore": 54.75
+    },
+    {
+      "company": "Anthropic",
+      "role": "Applied AI Architect, Industries",
+      "evidenceFit": "STRONG_MATCH",
+      "beforeRank": 23,
+      "afterRank": 23,
+      "beforeScore": 35,
+      "afterScore": 54.75
+    },
+    {
+      "company": "Anthropic",
+      "role": "Data Engineer, Safeguards",
+      "evidenceFit": "STRETCH",
+      "beforeRank": 24,
+      "afterRank": 24,
+      "beforeScore": 35,
+      "afterScore": 54.75
+    },
+    {
+      "company": "Scale AI",
+      "role": "AI Builder Intern",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 25,
+      "afterRank": 25,
+      "beforeScore": 35,
+      "afterScore": 54.75
+    },
+    {
+      "company": "Airtable",
+      "role": "Program Manager, Professional Services - East",
+      "evidenceFit": "GOOD_MATCH",
+      "beforeRank": 26,
+      "afterRank": 39,
+      "beforeScore": 26.75,
+      "afterScore": 29.16
+    },
+    {
+      "company": "Airtable",
+      "role": "Program Manager, Professional Services - West",
+      "evidenceFit": "GOOD_MATCH",
+      "beforeRank": 27,
+      "afterRank": 40,
+      "beforeScore": 26.75,
+      "afterScore": 29.16
+    },
+    {
+      "company": "Anthropic",
+      "role": "Anthropic Fellows Program",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 28,
+      "afterRank": 27,
+      "beforeScore": 26.75,
+      "afterScore": 32.73
+    },
+    {
+      "company": "Anthropic",
+      "role": "Anthropic Fellows Program, AI Safety & Security",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 29,
+      "afterRank": 26,
+      "beforeScore": 26.75,
+      "afterScore": 32.76
+    },
+    {
+      "company": "Anthropic",
+      "role": "Applied AI Engineer, Enterprise Tech",
+      "evidenceFit": "STRETCH",
+      "beforeRank": 30,
+      "afterRank": 35,
+      "beforeScore": 26.75,
+      "afterScore": 30.5
+    },
+    {
+      "company": "Anthropic",
+      "role": "Director, Global Order-to-Cash Transformation",
+      "evidenceFit": "STRETCH",
+      "beforeRank": 33,
+      "afterRank": 34,
+      "beforeScore": 26.75,
+      "afterScore": 30.92
+    },
+    {
+      "company": "Scale AI",
+      "role": "AI Infrastructure Engineer, Sandbox Platform",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 35,
+      "afterRank": 28,
+      "beforeScore": 26.75,
+      "afterScore": 32.61
+    },
+    {
+      "company": "Scale AI",
+      "role": "Engineering Manager, Agent Oversight",
+      "evidenceFit": "STRETCH",
+      "beforeRank": 36,
+      "afterRank": 37,
+      "beforeScore": 26.75,
+      "afterScore": 29.25
+    },
+    {
+      "company": "Scale AI",
+      "role": "Frontier Agent Engineering Manager, Enterprise",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 37,
+      "afterRank": 32,
+      "beforeScore": 26.75,
+      "afterScore": 31.56
+    },
+    {
+      "company": "Anthropic",
+      "role": "Anthropic Fellows Program, ML Systems & Reinforcement Learning",
+      "evidenceFit": "STRETCH",
+      "beforeRank": 39,
+      "afterRank": 31,
+      "beforeScore": 25.75,
+      "afterScore": 31.82
+    },
+    {
+      "company": "Anthropic",
+      "role": "Anthropic Fellows Program, The Anthropic Institute (Economics & Policy)",
+      "evidenceFit": "STRETCH",
+      "beforeRank": 40,
+      "afterRank": 29,
+      "beforeScore": 25.75,
+      "afterScore": 31.87
+    }
+  ],
+  "changedHoldout": [
+    {
+      "company": "Anthropic",
+      "role": "Brand Marketing Lead, Enterprise",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 1,
+      "afterRank": 2,
+      "beforeScore": 72.25,
+      "afterScore": 75.66
+    },
+    {
+      "company": "Datadog",
+      "role": "Customer Marketing Manager",
+      "evidenceFit": "GOOD_MATCH",
+      "beforeRank": 2,
+      "afterRank": 3,
+      "beforeScore": 72.25,
+      "afterScore": 75.38
+    },
+    {
+      "company": "Datadog",
+      "role": "Director, Technical Program Management - Technical Solutions Operations",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 3,
+      "afterRank": 4,
+      "beforeScore": 72.25,
+      "afterScore": 74.66
+    },
+    {
+      "company": "Klaviyo",
+      "role": "Lead Project Manager",
+      "evidenceFit": "GOOD_MATCH",
+      "beforeRank": 4,
+      "afterRank": 1,
+      "beforeScore": 72.25,
+      "afterScore": 75.82
+    },
+    {
+      "company": "Airtable",
+      "role": "Senior Manager, Procurement",
+      "evidenceFit": "STRETCH",
+      "beforeRank": 6,
+      "afterRank": 25,
+      "beforeScore": 72.25,
+      "afterScore": 75.66
+    },
+    {
+      "company": "Airtable",
+      "role": "Senior Solutions Architect",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 7,
+      "afterRank": 19,
+      "beforeScore": 72.25,
+      "afterScore": 76
+    },
+    {
+      "company": "Airtable",
+      "role": "Senior Solutions Architect- West Coast",
+      "evidenceFit": "STRETCH",
+      "beforeRank": 8,
+      "afterRank": 20,
+      "beforeScore": 72.25,
+      "afterScore": 76
+    },
+    {
+      "company": "Anthropic",
+      "role": "Applied AI Technical Evangelist, Startup Ecosystem",
+      "evidenceFit": "STRONG_MATCH",
+      "beforeRank": 9,
+      "afterRank": 5,
+      "beforeScore": 72.25,
+      "afterScore": 77.98
+    },
+    {
+      "company": "Braze",
+      "role": "Applied AI Architect, G&A",
+      "evidenceFit": "GOOD_MATCH",
+      "beforeRank": 16,
+      "afterRank": 7,
+      "beforeScore": 72.25,
+      "afterScore": 77.39
+    },
+    {
+      "company": "Braze",
+      "role": "Applied AI Architect, G&A",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 17,
+      "afterRank": 8,
+      "beforeScore": 72.25,
+      "afterScore": 77.39
+    },
+    {
+      "company": "Braze",
+      "role": "Applied AI Architect, G&A",
+      "evidenceFit": "GOOD_MATCH",
+      "beforeRank": 18,
+      "afterRank": 9,
+      "beforeScore": 72.25,
+      "afterScore": 77.39
+    },
+    {
+      "company": "Datadog",
+      "role": "Director, Product Management - Core Platforms",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 19,
+      "afterRank": 30,
+      "beforeScore": 72.25,
+      "afterScore": 73.81
+    },
+    {
+      "company": "Figma",
+      "role": "Director, Business Systems",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 20,
+      "afterRank": 24,
+      "beforeScore": 72.25,
+      "afterScore": 75.72
+    },
+    {
+      "company": "Figma",
+      "role": "Director, Solutions Consulting (United States)",
+      "evidenceFit": "GOOD_MATCH",
+      "beforeRank": 21,
+      "afterRank": 31,
+      "beforeScore": 72.25,
+      "afterScore": 73.64
+    },
+    {
+      "company": "Klaviyo",
+      "role": "AI Enablement Program Manager",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 22,
+      "afterRank": 13,
+      "beforeScore": 72.25,
+      "afterScore": 76.86
+    },
+    {
+      "company": "Airtable",
+      "role": "Manager, Business Development Representatives",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 23,
+      "afterRank": 17,
+      "beforeScore": 71.25,
+      "afterScore": 76.25
+    },
+    {
+      "company": "Braze",
+      "role": "Applied AI Architect, GTM",
+      "evidenceFit": "GOOD_MATCH",
+      "beforeRank": 25,
+      "afterRank": 18,
+      "beforeScore": 71.25,
+      "afterScore": 76.16
+    },
+    {
+      "company": "Datadog",
+      "role": "Associate Growth Marketing Manager",
+      "evidenceFit": "GOOD_MATCH",
+      "beforeRank": 26,
+      "afterRank": 21,
+      "beforeScore": 71.25,
+      "afterScore": 75.94
+    },
+    {
+      "company": "Klaviyo",
+      "role": "Inbound Growth Specialist",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 27,
+      "afterRank": 11,
+      "beforeScore": 71.25,
+      "afterScore": 76.93
+    },
+    {
+      "company": "Scale AI",
+      "role": "AI Advisory Consultant",
+      "evidenceFit": "STRONG_MATCH",
+      "beforeRank": 28,
+      "afterRank": 14,
+      "beforeScore": 71.25,
+      "afterScore": 76.72
+    },
+    {
+      "company": "Scale AI",
+      "role": "AI Strategy Consultant, Frontier Tech",
+      "evidenceFit": "GOOD_MATCH",
+      "beforeRank": 33,
+      "afterRank": 33,
+      "beforeScore": 35,
+      "afterScore": 54.75
+    },
+    {
+      "company": "Anthropic",
+      "role": "Engineering Manager, Cybersecurity Products",
+      "evidenceFit": "STRETCH",
+      "beforeRank": 37,
+      "afterRank": 34,
+      "beforeScore": 26.75,
+      "afterScore": 31.96
+    },
+    {
+      "company": "Airtable",
+      "role": "Software Engineer, Data",
+      "evidenceFit": "TRANSFERABLE",
+      "beforeRank": 38,
+      "afterRank": 35,
+      "beforeScore": 25.75,
+      "afterScore": 31.55
+    }
+  ],
+  "manualBoost": false
+}

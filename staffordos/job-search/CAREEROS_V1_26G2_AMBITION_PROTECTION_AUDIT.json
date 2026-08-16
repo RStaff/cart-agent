@@ -1,0 +1,11 @@
+{
+  "transferableRemainsDistinct": true,
+  "unknownNotNegative": true,
+  "missingNotNegative": true,
+  "titleOnlyPenalty": false,
+  "domainOnlyPenalty": false,
+  "selfConfidenceConsumed": false,
+  "interestConsumed": false,
+  "workflowConsumed": false,
+  "upwardStretchPreserved": true
+}

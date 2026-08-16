@@ -1,0 +1,86 @@
+{
+  "frozenModel": {
+    "identity": "MODEL_V2D_ROBUSTNESS_CONTROL",
+    "formula": "FROZEN_V1_23_V2D",
+    "weights": {
+      "relevantExperience": 40,
+      "roleFunction": 25,
+      "responsibility": 25,
+      "seniority": 10
+    }
+  },
+  "baseline": {
+    "top5Precision": 0.4,
+    "top10Precision": 0.3,
+    "strongRecall": 0.5,
+    "strongGoodRecall": 0.3,
+    "viableRecall": 0.35,
+    "falsePositiveRate": 0.73,
+    "falseNegativeRate": 0.4,
+    "rankCorrelation": 0.28,
+    "negativeLeakageTop5": 1,
+    "negativeLeakageTop10": 2,
+    "hardMismatchLeakageTop10": 0,
+    "underRankedViable": 10,
+    "strongGoodBelow20": 5,
+    "threshold": {
+      "cutoff": 72.25,
+      "predictedCount": 22,
+      "falsePositiveRate": 0.73,
+      "falseNegativeRate": 0.4
+    }
+  },
+  "adjudicated": {
+    "top5Precision": 0.6,
+    "top10Precision": 0.5,
+    "strongRecall": 0.5,
+    "strongGoodRecall": 0.5,
+    "viableRecall": 0.35,
+    "falsePositiveRate": 0.65,
+    "falseNegativeRate": 0.4,
+    "rankCorrelation": 0.54,
+    "negativeLeakageTop5": 0,
+    "negativeLeakageTop10": 2,
+    "hardMismatchLeakageTop10": 0,
+    "underRankedViable": 8,
+    "strongGoodBelow20": 3,
+    "threshold": {
+      "cutoff": 75.94,
+      "predictedCount": 17,
+      "falsePositiveRate": 0.65,
+      "falseNegativeRate": 0.4
+    }
+  },
+  "delta": {
+    "top5Precision": 0.2,
+    "top10Precision": 0.2,
+    "strongRecall": 0,
+    "strongGoodRecall": 0.2,
+    "viableRecall": 0,
+    "falsePositiveRate": -0.08,
+    "falseNegativeRate": 0,
+    "rankCorrelation": 0.26,
+    "negativeLeakageTop5": -1,
+    "negativeLeakageTop10": 0,
+    "hardMismatchLeakageTop10": 0,
+    "underRankedViable": -2,
+    "strongGoodBelow20": -2,
+    "threshold": null
+  },
+  "comparison": {
+    "scoreChanges": 40,
+    "rankChanges": 39,
+    "eligibilityChanges": 0,
+    "qualificationChanges": 0,
+    "movement": {
+      "positiveUp": 13,
+      "positiveDown": 9,
+      "negativeUp": 7,
+      "negativeDown": 10,
+      "unchanged": 1
+    }
+  },
+  "baselineHash": "a8f5a6243266ebdda8f02c7e6f8f6b83b572c3ba1f532177dc38e47b8b29f373",
+  "adjudicatedHash": "d70299137fcadfa159a21289e2d94f3d26bb2cf6ae00ffe7c12bccb3f1d00f44",
+  "deterministic": true
+}

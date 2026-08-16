@@ -1,0 +1,13 @@
+{
+  "decisionDistribution": {
+    "DIRECT": 14,
+    "TRANSFERABLE": 1,
+    "ADJACENT": 1,
+    "NO": 0,
+    "NEEDS_EVIDENCE": 0,
+    "KEEP_UNRESOLVED": 0
+  },
+  "activeQuestions": 16,
+  "records": 18,
+  "superseded": 2
+}

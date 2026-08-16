@@ -1,0 +1,28 @@
+{
+  "offlineOnly": true,
+  "projectionStats": {
+    "comparisonsConsidered": 5146,
+    "comparisonsAffected": 2148,
+    "directConsumed": 2148,
+    "transferableConsumed": 0,
+    "partialConsumed": 0,
+    "unresolvedPreserved": 2250,
+    "rejectedPreserved": 0,
+    "blocked": 182,
+    "specialistBlocked": 182
+  },
+  "semantics": {
+    "direct": "PROVEN",
+    "transferable": "TRANSFERABLE",
+    "adjacent": "PARTIAL",
+    "unresolved": "unchanged non-positive state",
+    "unknownNotNegative": true,
+    "missingNotNegative": true
+  },
+  "mutationGuards": {
+    "careerFactMutated": false,
+    "careerEvidenceMutated": false,
+    "eligibilityChanges": 0,
+    "qualificationChanges": 0
+  }
+}

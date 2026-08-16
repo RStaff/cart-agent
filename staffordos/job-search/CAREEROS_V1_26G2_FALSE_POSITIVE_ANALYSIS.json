@@ -1,0 +1,244 @@
+{
+  "changedCalibration": [
+    {
+      "company": "Anthropic",
+      "role": "Cloud Partner Enablement Lead",
+      "evidenceFit": "POOR_MATCH",
+      "beforeRank": 2,
+      "afterRank": 1,
+      "beforeScore": 72.25,
+      "afterScore": 77.88
+    },
+    {
+      "company": "Scale AI",
+      "role": "[Annotations] Operations Program Manager",
+      "evidenceFit": "HARD_NO",
+      "beforeRank": 4,
+      "afterRank": 2,
+      "beforeScore": 71.25,
+      "afterScore": 77.08
+    },
+    {
+      "company": "Anthropic",
+      "role": "Communications Lead, Platform",
+      "evidenceFit": "POOR_MATCH",
+      "beforeRank": 10,
+      "afterRank": 7,
+      "beforeScore": 72.25,
+      "afterScore": 77.88
+    },
+    {
+      "company": "Anthropic",
+      "role": "Customer Program Manager, Executive Briefing Center",
+      "evidenceFit": "POOR_MATCH",
+      "beforeRank": 11,
+      "afterRank": 20,
+      "beforeScore": 72.25,
+      "afterScore": 74.09
+    },
+    {
+      "company": "Airtable",
+      "role": "Delivery Consultant",
+      "evidenceFit": "POOR_MATCH",
+      "beforeRank": 15,
+      "afterRank": 10,
+      "beforeScore": 71.25,
+      "afterScore": 77.2
+    },
+    {
+      "company": "Anthropic",
+      "role": "Cash Manager, Treasury",
+      "evidenceFit": "HARD_NO",
+      "beforeRank": 31,
+      "afterRank": 30,
+      "beforeScore": 26.75,
+      "afterScore": 31.86
+    },
+    {
+      "company": "Anthropic",
+      "role": "Commercial Counsel, Platform & Marketplace",
+      "evidenceFit": "HARD_NO",
+      "beforeRank": 32,
+      "afterRank": 33,
+      "beforeScore": 26.75,
+      "afterScore": 30.92
+    },
+    {
+      "company": "Datadog",
+      "role": "Engineering Manager I, Commercial Audit",
+      "evidenceFit": "HARD_NO",
+      "beforeRank": 34,
+      "afterRank": 36,
+      "beforeScore": 26.75,
+      "afterScore": 29.64
+    },
+    {
+      "company": "Scale AI",
+      "role": "Lead Counsel, Product and IP",
+      "evidenceFit": "HARD_NO",
+      "beforeRank": 38,
+      "afterRank": 38,
+      "beforeScore": 26.75,
+      "afterScore": 29.25
+    }
+  ],
+  "changedHoldout": [
+    {
+      "company": "Airtable",
+      "role": "Global Payroll Manager",
+      "evidenceFit": "HARD_NO",
+      "beforeRank": 5,
+      "afterRank": 27,
+      "beforeScore": 72.25,
+      "afterScore": 75.38
+    },
+    {
+      "company": "Anthropic",
+      "role": "AV Engineer",
+      "evidenceFit": "HARD_NO",
+      "beforeRank": 10,
+      "afterRank": 28,
+      "beforeScore": 72.25,
+      "afterScore": 75.38
+    },
+    {
+      "company": "Anthropic",
+      "role": "Capital Markets - Infrastructure Financing",
+      "evidenceFit": "HARD_NO",
+      "beforeRank": 11,
+      "afterRank": 29,
+      "beforeScore": 72.25,
+      "afterScore": 75.03
+    },
+    {
+      "company": "Anthropic",
+      "role": "Data Science, Finance & Strategy",
+      "evidenceFit": "HARD_NO",
+      "beforeRank": 12,
+      "afterRank": 10,
+      "beforeScore": 72.25,
+      "afterScore": 77.11
+    },
+    {
+      "company": "Anthropic",
+      "role": "Data Scientist, Developer Productivity",
+      "evidenceFit": "POOR_MATCH",
+      "beforeRank": 13,
+      "afterRank": 16,
+      "beforeScore": 72.25,
+      "afterScore": 76.27
+    },
+    {
+      "company": "Anthropic",
+      "role": "Director of Payroll",
+      "evidenceFit": "HARD_NO",
+      "beforeRank": 14,
+      "afterRank": 15,
+      "beforeScore": 72.25,
+      "afterScore": 76.42
+    },
+    {
+      "company": "Anthropic",
+      "role": "Director, US International Tax",
+      "evidenceFit": "HARD_NO",
+      "beforeRank": 15,
+      "afterRank": 23,
+      "beforeScore": 72.25,
+      "afterScore": 75.9
+    },
+    {
+      "company": "Airtable",
+      "role": "Product Designer (8+ YOE)",
+      "evidenceFit": "HARD_NO",
+      "beforeRank": 24,
+      "afterRank": 12,
+      "beforeScore": 71.25,
+      "afterScore": 76.88
+    },
+    {
+      "company": "Anthropic",
+      "role": "Data Scientist, Marketing",
+      "evidenceFit": "HARD_NO",
+      "beforeRank": 29,
+      "afterRank": 6,
+      "beforeScore": 70,
+      "afterScore": 77.5
+    },
+    {
+      "company": "Airtable",
+      "role": "Procurement Operations Manager",
+      "evidenceFit": "POOR_MATCH",
+      "beforeRank": 30,
+      "afterRank": 22,
+      "beforeScore": 67.56,
+      "afterScore": 75.93
+    },
+    {
+      "company": "Anthropic",
+      "role": "AV Production Specialist",
+      "evidenceFit": "HARD_NO",
+      "beforeRank": 31,
+      "afterRank": 32,
+      "beforeScore": 64.75,
+      "afterScore": 73.21
+    },
+    {
+      "company": "Anthropic",
+      "role": "AV Operations Specialist",
+      "evidenceFit": "HARD_NO",
+      "beforeRank": 32,
+      "afterRank": 26,
+      "beforeScore": 61.88,
+      "afterScore": 75.66
+    },
+    {
+      "company": "Anthropic",
+      "role": "Data Engineering Manager, Product",
+      "evidenceFit": "POOR_MATCH",
+      "beforeRank": 34,
+      "afterRank": 40,
+      "beforeScore": 26.75,
+      "afterScore": 29.88
+    },
+    {
+      "company": "Anthropic",
+      "role": "Director, Infrastructure & Energy Accounting",
+      "evidenceFit": "HARD_NO",
+      "beforeRank": 35,
+      "afterRank": 36,
+      "beforeScore": 26.75,
+      "afterScore": 31.36
+    },
+    {
+      "company": "Anthropic",
+      "role": "Director, Revenue Accounting",
+      "evidenceFit": "HARD_NO",
+      "beforeRank": 36,
+      "afterRank": 39,
+      "beforeScore": 26.75,
+      "afterScore": 30.8
+    },
+    {
+      "company": "Anthropic",
+      "role": "Commercial Counsel, GTM",
+      "evidenceFit": "HARD_NO",
+      "beforeRank": 39,
+      "afterRank": 37,
+      "beforeScore": 25.75,
+      "afterScore": 31.31
+    },
+    {
+      "company": "Anthropic",
+      "role": "Commercial Counsel, SPARC",
+      "evidenceFit": "HARD_NO",
+      "beforeRank": 40,
+      "afterRank": 38,
+      "beforeScore": 25.75,
+      "afterScore": 31.31
+    }
+  ],
+  "specialistRequirementRowsBlocked": 182,
+  "genericSignalStillRaisesSomeSpecialistRoleScores": true,
+  "specialistFalsePositiveStatus": "REMAINING_MODEL_INPUT_LIMITATION",
+  "roleSpecificPenalty": false
+}

@@ -1,0 +1,20 @@
+{
+  "previousPositiveBlocked": 199,
+  "distinctCandidatesAddressed": 203,
+  "currentDistinctDecisionReferences": 203,
+  "referenceCount": 246,
+  "clearanceCounts": {
+    "SAFELY_CLEARED_DIRECT": 192,
+    "SAFELY_CLEARED_TRANSFERABLE": 0,
+    "SAFELY_CLEARED_PARTIAL": 11,
+    "REJECTED_BY_OPERATOR": 0,
+    "STILL_CONFLICT_BLOCKED": 0,
+    "INSUFFICIENT_PROVENANCE": 0,
+    "KEEP_UNRESOLVED": 0,
+    "NOT_APPLICABLE_TO_DECISION": 0
+  },
+  "clearancePercentageOfCurrentReferences": 100,
+  "overlapCollapse": 43,
+  "totalCandidates": 898,
+  "rawCareerFacts": 898
+}
