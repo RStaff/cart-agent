@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "careeros.v1.p0.intake-runtime.v1",
+  "syntheticOnly": true,
+  "checks": {
+    "sourceCreation": "passed",
+    "deterministicParsing": "passed",
+    "candidateReview": "passed",
+    "confirm": "passed",
+    "correct": "passed",
+    "reject": "passed by store test",
+    "keepForLater": "passed by store test",
+    "idempotentParse": "passed",
+    "sourceProvenance": "passed",
+    "crossTenantIsolation": "passed",
+    "rawSourceMutationOnCorrection": false,
+    "capabilityProjection": false,
+    "matchingRun": false
+  },
+  "browserAcceptance": "not run; server/store tests, TypeScript, and build used"
+}

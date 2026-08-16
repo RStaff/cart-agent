@@ -33,6 +33,12 @@ function safeProfile(profile) {
   };
 }
 
+function safeSource(source) {
+  if (!source) return null;
+  const { textContent, ...metadata } = source;
+  return metadata;
+}
+
 async function derivePassword(password, salt = crypto.randomBytes(16).toString("hex")) {
   const derived = await new Promise((resolve, reject) => {
     crypto.scrypt(String(password), salt, 64, (error, key) => error ? reject(error) : resolve(key));
@@ -52,10 +58,14 @@ export function createCareerP0Store({ filePath = process.env.CAREEROS_P0_STORE_P
 
   async function read() {
     try {
-      return JSON.parse(await fs.readFile(filePath, "utf8"));
+      const data = JSON.parse(await fs.readFile(filePath, "utf8"));
+      data.candidateFacts ||= [];
+      data.reviewDecisions ||= [];
+      data.careerFacts ||= [];
+      return data;
     } catch (error) {
       if (error?.code === "ENOENT") {
-        return { users: [], tenants: [], memberships: [], profiles: [], sources: [], sessions: [] };
+        return { users: [], tenants: [], memberships: [], profiles: [], sources: [], sessions: [], candidateFacts: [], reviewDecisions: [], careerFacts: [] };
       }
       throw error;
     }
@@ -170,16 +180,98 @@ export function createCareerP0Store({ filePath = process.env.CAREEROS_P0_STORE_P
     const data = await read();
     const profile = data.profiles.find((candidate) => candidate.tenantId === context.tenant.id && candidate.userId === context.user.id);
     if (!profile) throw Object.assign(new Error("profile_required"), { code: "PROFILE_REQUIRED" });
-    const sourceTypes = new Set(["RESUME", "MANUAL_WORK_HISTORY", "PORTFOLIO", "CERTIFICATION", "PROJECT", "OTHER_USER_SUPPLIED_SOURCE"]);
+    const sourceTypes = new Set(["RESUME", "MANUAL_WORK_HISTORY", "PORTFOLIO", "CERTIFICATION", "PROJECT", "OTHER_USER_SUPPLIED_SOURCE", "RESUME_TEXT", "PORTFOLIO_DESCRIPTION", "OTHER_USER_PROVIDED_TEXT"]);
     if (!sourceTypes.has(input?.sourceType)) throw Object.assign(new Error("invalid_source_type"), { code: "INVALID_SOURCE_TYPE" });
     const timestamp = now();
-    const source = { id: id("source"), tenantId: context.tenant.id, userId: context.user.id, profileId: profile.id, sourceType: input.sourceType, sourceStatus: "PENDING_STORAGE", originalFilename: input.originalFilename ? String(input.originalFilename).trim().slice(0, 240) : null, contentReference: null, createdAt: timestamp, updatedAt: timestamp };
+    const textContent = input.textContent == null ? null : String(input.textContent).trim().slice(0, 50000);
+    const source = { id: id("source"), tenantId: context.tenant.id, userId: context.user.id, profileId: profile.id, sourceType: input.sourceType, sourceStatus: textContent ? "STORED" : "PENDING_STORAGE", originalFilename: input.originalFilename ? String(input.originalFilename).trim().slice(0, 240) : null, contentReference: null, textContent, sourceDigest: input.sourceDigest || null, createdAt: timestamp, updatedAt: timestamp };
     data.sources.push(source);
     await write(data);
-    return source;
+    return safeSource(source);
   }
 
-  return { createAccount, login, resolveSession, destroySession, getProfile, saveProfile, listSources, createSource, _read: read };
+  async function getSource(sessionId, sourceId) {
+    const context = await resolveSession(sessionId);
+    if (!context) throw Object.assign(new Error("unauthorized"), { code: "UNAUTHORIZED" });
+    const data = await read();
+    const source = data.sources.find((candidate) => candidate.id === sourceId && candidate.tenantId === context.tenant.id && candidate.userId === context.user.id);
+    return source ? { ...safeSource(source), textContent: source.textContent || null } : null;
+  }
+
+  async function saveCandidates(sessionId, sourceId, extraction) {
+    const context = await resolveSession(sessionId);
+    if (!context) throw Object.assign(new Error("unauthorized"), { code: "UNAUTHORIZED" });
+    const data = await read();
+    const source = data.sources.find((candidate) => candidate.id === sourceId && candidate.tenantId === context.tenant.id && candidate.userId === context.user.id);
+    if (!source) throw Object.assign(new Error("source_not_found"), { code: "SOURCE_NOT_FOUND" });
+    source.sourceDigest = extraction.sourceDigest;
+    source.extractorVersion = extraction.extractorVersion;
+    source.sourceStatus = "READY";
+    source.updatedAt = now();
+    data.candidateFacts ||= [];
+    const existing = data.candidateFacts.filter((candidate) => candidate.sourceId === sourceId && candidate.extractionVersion === extraction.extractorVersion);
+    if (existing.length === 0) data.candidateFacts.push(...extraction.candidates.map((candidate) => ({ ...candidate, tenantId: context.tenant.id, userId: context.user.id, profileId: source.profileId })));
+    await write(data);
+    return data.candidateFacts.filter((candidate) => candidate.sourceId === sourceId && candidate.tenantId === context.tenant.id && candidate.userId === context.user.id);
+  }
+
+  async function listCandidateFacts(sessionId) {
+    const context = await resolveSession(sessionId);
+    if (!context) throw Object.assign(new Error("unauthorized"), { code: "UNAUTHORIZED" });
+    const data = await read();
+    return (data.candidateFacts || []).filter((candidate) => candidate.tenantId === context.tenant.id && candidate.userId === context.user.id).map(({ tenantId, userId, profileId, ...candidate }) => candidate);
+  }
+
+  async function reviewCandidate(sessionId, candidateId, decision, correction = null) {
+    const context = await resolveSession(sessionId);
+    if (!context) throw Object.assign(new Error("unauthorized"), { code: "UNAUTHORIZED" });
+    const data = await read();
+    const candidate = (data.candidateFacts || []).find((item) => item.candidateFactId === candidateId && item.tenantId === context.tenant.id && item.userId === context.user.id);
+    if (!candidate) throw Object.assign(new Error("candidate_not_found"), { code: "CANDIDATE_NOT_FOUND" });
+    const allowed = new Set(["CONFIRM", "CORRECT", "REJECT", "KEEP_FOR_LATER"]);
+    if (!allowed.has(decision)) throw Object.assign(new Error("invalid_review_decision"), { code: "INVALID_REVIEW_DECISION" });
+    data.reviewDecisions ||= [];
+    data.careerFacts ||= [];
+    const timestamp = now();
+    const previousStatement = candidate.statement;
+    if (decision === "CORRECT") {
+      const nextStatement = String(correction || "").trim().slice(0, 500);
+      if (!nextStatement) throw Object.assign(new Error("correction_required"), { code: "CORRECTION_REQUIRED" });
+      candidate.statement = nextStatement;
+      candidate.status = "CORRECTED";
+    } else if (decision === "CONFIRM") candidate.status = "CONFIRMED";
+    else if (decision === "REJECT") candidate.status = "REJECTED";
+    else candidate.status = "NEEDS_REVIEW";
+    candidate.updatedAt = timestamp;
+    data.reviewDecisions.push({ id: id("review"), candidateFactId: candidateId, tenantId: context.tenant.id, userId: context.user.id, decision, previousStatement, activeStatement: candidate.statement, createdAt: timestamp });
+    if (decision === "CONFIRM" || decision === "CORRECT") {
+      const existing = data.careerFacts.find((fact) => fact.candidateFactId === candidateId && fact.tenantId === context.tenant.id);
+      const fact = { ...(existing || {}), id: existing?.id || id("fact"), candidateFactId: candidateId, tenantId: context.tenant.id, userId: context.user.id, profileId: candidate.profileId, sourceId: candidate.sourceId, factType: candidate.factType, statement: candidate.statement, sourceExcerpt: candidate.sourceExcerpt, sourceOrder: candidate.sourceOrder, scopeStatement: candidate.scopeStatement, status: "CUSTOMER_CONFIRMED", authorityState: "CUSTOMER_CONFIRMED_SOURCE_BACKED", createdAt: existing?.createdAt || timestamp, updatedAt: timestamp };
+      if (!existing) data.careerFacts.push(fact);
+      else Object.assign(existing, fact);
+    }
+    await write(data);
+    return { candidate: { ...candidate }, careerFact: data.careerFacts.find((fact) => fact.candidateFactId === candidateId && fact.tenantId === context.tenant.id) || null };
+  }
+
+  async function listCareerFacts(sessionId) {
+    const context = await resolveSession(sessionId);
+    if (!context) throw Object.assign(new Error("unauthorized"), { code: "UNAUTHORIZED" });
+    const data = await read();
+    return data.careerFacts.filter((fact) => fact.tenantId === context.tenant.id && fact.userId === context.user.id).map(({ tenantId, userId, profileId, ...fact }) => fact);
+  }
+
+  async function getOnboardingState(sessionId) {
+    const context = await resolveSession(sessionId);
+    if (!context) throw Object.assign(new Error("unauthorized"), { code: "UNAUTHORIZED" });
+    const data = await read();
+    const profile = data.profiles.find((item) => item.tenantId === context.tenant.id && item.userId === context.user.id);
+    const sources = data.sources.filter((item) => item.tenantId === context.tenant.id && item.userId === context.user.id);
+    const candidates = (data.candidateFacts || []).filter((item) => item.tenantId === context.tenant.id && item.userId === context.user.id);
+    return { stage: !profile ? "PROFILE" : sources.length === 0 ? "CAREER_SOURCE" : candidates.some((item) => ["PROPOSED", "NEEDS_REVIEW"].includes(item.status)) ? "FACT_REVIEW" : "READY_FOR_CAPABILITIES", sourceCount: sources.length, candidateCount: candidates.length, confirmedFactCount: data.careerFacts.filter((item) => item.tenantId === context.tenant.id && item.userId === context.user.id).length };
+  }
+
+  return { createAccount, login, resolveSession, destroySession, getProfile, saveProfile, listSources, createSource, getSource, saveCandidates, listCandidateFacts, reviewCandidate, listCareerFacts, getOnboardingState, _read: read };
 }
 
 export const CAREEROS_P0_COOKIE = "careeros_p0_session";

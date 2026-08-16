@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "careeros.v1.p0.candidate-fact.v1",
+  "entity": "CandidateCareerFact",
+  "ownership": ["tenantId", "userId", "profileId", "sourceId"],
+  "fields": ["candidateFactId", "factType", "statement", "sourceExcerpt", "sourceOrder", "scopeStatement", "extractionMethod", "extractionVersion", "confidence", "ambiguity", "status", "createdAt", "updatedAt"],
+  "statuses": ["PROPOSED", "CONFIRMED", "CORRECTED", "REJECTED", "NEEDS_REVIEW"],
+  "authorityRule": "parser output is never authoritative without explicit customer review"
+}

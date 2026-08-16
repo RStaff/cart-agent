@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "careeros.v1.p0.intake-gap-update.v1",
+  "closedWithRuntimeProof": ["career_source_metadata", "bounded_pasted_text_intake", "candidate_fact_extraction", "customer_fact_review", "tenant_scoped_candidate_and_confirmed_fact_access"],
+  "partial": ["tenant_career_fact_authority", "career_source_persistence"],
+  "remaining": ["production_database", "production_identity_hardening", "secure_binary_storage", "deletion_export", "audit_observability", "capability_onboarding", "job_ingestion", "match_explanation"],
+  "nextMission": "CAREEROS_V1_PRODUCTIZATION_P0_PRODUCTION_PERSISTENCE_AND_IDENTITY_HARDENING",
+  "privatePayloadsIncluded": false
+}

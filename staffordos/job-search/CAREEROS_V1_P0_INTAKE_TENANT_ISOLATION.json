@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "careeros.v1.p0.intake-tenant-isolation.v1",
+  "operations": ["createSource", "getSource", "parseSource", "listCandidateFacts", "reviewCandidate", "listCareerFacts"],
+  "authorization": "server-resolved session user plus tenant membership plus profile ownership",
+  "clientTenantIdAccepted": false,
+  "syntheticCrossTenantRead": "denied",
+  "syntheticCrossTenantReview": "denied",
+  "syntheticCrossTenantCareerFactRead": "denied"
+}

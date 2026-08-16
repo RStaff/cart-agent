@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "careeros.v1.p0.intake-provenance.v1",
+  "requiredChain": "tenant -> profile -> source -> candidateFact -> reviewDecision -> confirmedCareerFact",
+  "preservedFields": ["sourceId", "sourceType", "sourceExcerpt", "sourceOrder", "sourceDigest", "extractorVersion"],
+  "untraceableCandidates": 0,
+  "rawSourceMutationOnCorrection": false,
+  "capabilityCreation": false,
+  "evidenceCreation": false
+}

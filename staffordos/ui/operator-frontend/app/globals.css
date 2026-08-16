@@ -3791,6 +3791,8 @@ textarea {
 .careerForm label span { color: #6b7683; font-weight: 400; }
 .careerForm input { width: 100%; padding: 12px 13px; border: 1px solid #bfc8d2; border-radius: 6px; background: #fff; color: #17202a; }
 .careerForm input:focus { outline: 3px solid rgba(23, 107, 135, .18); border-color: #176b87; }
+.careerForm select, .careerForm textarea { width: 100%; padding: 12px 13px; border: 1px solid #bfc8d2; border-radius: 6px; background: #fff; color: #17202a; }
+.careerForm textarea { min-height: 180px; resize: vertical; }
 .careerPrimaryButton, .careerLinkButton { min-height: 42px; padding: 10px 16px; border: 1px solid #176b87; border-radius: 6px; cursor: pointer; font-weight: 800; }
 .careerPrimaryButton { background: #176b87; color: #fff; }
 .careerPrimaryButton:disabled { opacity: .6; cursor: wait; }
@@ -3799,3 +3801,8 @@ textarea {
 .careerSaved { color: #176b57; font-weight: 800; }
 .careerNav { margin-top: 24px; display: flex; gap: 16px; }
 .careerNav a, .careerAuthPanel a { color: #176b87; font-weight: 700; }
+.careerCandidateList { display: grid; gap: 14px; margin-top: 28px; }
+.careerCandidate { display: grid; gap: 16px; padding: 18px; border: 1px solid #d9dee5; border-radius: 8px; background: #fbfcfd; }
+.careerCandidate h3 { margin: 0; color: #17202a; font-size: 18px; line-height: 1.4; }
+.careerCandidateActions { display: flex; flex-wrap: wrap; gap: 8px; }
+.careerSmallButton { padding: 8px 11px; border: 1px solid #9eabb8; border-radius: 6px; background: #fff; color: #176b87; cursor: pointer; font-weight: 700; }

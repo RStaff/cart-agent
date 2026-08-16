@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "careeros.v1.p0.intake-source.v1",
+  "sourceTypes": ["RESUME_TEXT", "MANUAL_WORK_HISTORY", "PROJECT", "CERTIFICATION", "PORTFOLIO_DESCRIPTION", "OTHER_USER_PROVIDED_TEXT"],
+  "statuses": ["STORED", "READY", "PENDING_STORAGE"],
+  "requiredOwnership": ["tenantId", "userId", "profileId"],
+  "textLimit": 50000,
+  "binaryStorage": "FAIL_CLOSED_UNTIL_SECURE_OBJECT_STORAGE",
+  "provenance": ["sourceId", "sourceType", "sourceDigest", "extractorVersion"]
+}
