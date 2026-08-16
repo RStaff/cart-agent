@@ -1,0 +1,5 @@
+{
+  "specialistTargetCount": 204,
+  "specialistTargetsRequireExplicitCompatibility": true,
+  "genericToSpecialistPropagation": false
+}

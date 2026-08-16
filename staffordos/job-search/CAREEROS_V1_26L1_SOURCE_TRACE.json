@@ -1,0 +1,9 @@
+{
+  "lockedUniverse": "CAREEROS_V1_24_EVALUATION_DATA.json",
+  "fitAuthority": "explainable_fit_artifacts.json",
+  "sourceAuthority": "job_source_import_queue_result.json",
+  "mappingAuthority": "private RequirementMappingDecision authority",
+  "selection": "capability-bearing + UNKNOWN/MISSING + no current positive mapping; family/specialist/importance recurrence ordering; top 30 groups",
+  "compression": "deterministic scope partition within selected groups",
+  "labelsUsed": false
+}

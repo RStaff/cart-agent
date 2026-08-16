@@ -1,0 +1,727 @@
+{
+  "questionCount": 90,
+  "targetCounts": [
+    {
+      "questionId": "review_gap_01",
+      "order": 1,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "GENERAL",
+      "targetCount": 113
+    },
+    {
+      "questionId": "review_gap_02",
+      "order": 2,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "OWNERSHIP",
+      "specialist": "GENERAL",
+      "targetCount": 77
+    },
+    {
+      "questionId": "review_gap_03",
+      "order": 3,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "specialist": "GENERAL",
+      "targetCount": 30
+    },
+    {
+      "questionId": "review_gap_04",
+      "order": 4,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "UNSPECIFIED",
+      "specialist": "GENERAL",
+      "targetCount": 600
+    },
+    {
+      "questionId": "review_gap_05",
+      "order": 5,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "GENERAL",
+      "targetCount": 35
+    },
+    {
+      "questionId": "review_gap_06",
+      "order": 6,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "OWNERSHIP",
+      "specialist": "GENERAL",
+      "targetCount": 16
+    },
+    {
+      "questionId": "review_gap_07",
+      "order": 7,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "specialist": "GENERAL",
+      "targetCount": 30
+    },
+    {
+      "questionId": "review_gap_08",
+      "order": 8,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "UNSPECIFIED",
+      "specialist": "GENERAL",
+      "targetCount": 417
+    },
+    {
+      "questionId": "review_gap_09",
+      "order": 9,
+      "capabilityFamily": "PRODUCT",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "GENERAL",
+      "targetCount": 23
+    },
+    {
+      "questionId": "review_gap_10",
+      "order": 10,
+      "capabilityFamily": "PRODUCT",
+      "scope": "OWNERSHIP",
+      "specialist": "GENERAL",
+      "targetCount": 29
+    },
+    {
+      "questionId": "review_gap_11",
+      "order": 11,
+      "capabilityFamily": "PRODUCT",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "specialist": "GENERAL",
+      "targetCount": 3
+    },
+    {
+      "questionId": "review_gap_12",
+      "order": 12,
+      "capabilityFamily": "PRODUCT",
+      "scope": "TEAM_LEADERSHIP",
+      "specialist": "GENERAL",
+      "targetCount": 1
+    },
+    {
+      "questionId": "review_gap_13",
+      "order": 13,
+      "capabilityFamily": "PRODUCT",
+      "scope": "UNSPECIFIED",
+      "specialist": "GENERAL",
+      "targetCount": 66
+    },
+    {
+      "questionId": "review_gap_14",
+      "order": 14,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "SPECIALIST",
+      "targetCount": 17
+    },
+    {
+      "questionId": "review_gap_15",
+      "order": 15,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "OWNERSHIP",
+      "specialist": "SPECIALIST",
+      "targetCount": 14
+    },
+    {
+      "questionId": "review_gap_16",
+      "order": 16,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "specialist": "SPECIALIST",
+      "targetCount": 4
+    },
+    {
+      "questionId": "review_gap_17",
+      "order": 17,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "UNSPECIFIED",
+      "specialist": "SPECIALIST",
+      "targetCount": 51
+    },
+    {
+      "questionId": "review_gap_18",
+      "order": 18,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "GENERAL",
+      "targetCount": 6
+    },
+    {
+      "questionId": "review_gap_19",
+      "order": 19,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "OWNERSHIP",
+      "specialist": "GENERAL",
+      "targetCount": 3
+    },
+    {
+      "questionId": "review_gap_20",
+      "order": 20,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "specialist": "GENERAL",
+      "targetCount": 4
+    },
+    {
+      "questionId": "review_gap_21",
+      "order": 21,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "UNSPECIFIED",
+      "specialist": "GENERAL",
+      "targetCount": 70
+    },
+    {
+      "questionId": "review_gap_22",
+      "order": 22,
+      "capabilityFamily": "AI_AUTOMATION",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "GENERAL",
+      "targetCount": 16
+    },
+    {
+      "questionId": "review_gap_23",
+      "order": 23,
+      "capabilityFamily": "AI_AUTOMATION",
+      "scope": "OWNERSHIP",
+      "specialist": "GENERAL",
+      "targetCount": 8
+    },
+    {
+      "questionId": "review_gap_24",
+      "order": 24,
+      "capabilityFamily": "AI_AUTOMATION",
+      "scope": "UNSPECIFIED",
+      "specialist": "GENERAL",
+      "targetCount": 50
+    },
+    {
+      "questionId": "review_gap_25",
+      "order": 25,
+      "capabilityFamily": "PRODUCT",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "GENERAL",
+      "targetCount": 7
+    },
+    {
+      "questionId": "review_gap_26",
+      "order": 26,
+      "capabilityFamily": "PRODUCT",
+      "scope": "OWNERSHIP",
+      "specialist": "GENERAL",
+      "targetCount": 3
+    },
+    {
+      "questionId": "review_gap_27",
+      "order": 27,
+      "capabilityFamily": "PRODUCT",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "specialist": "GENERAL",
+      "targetCount": 4
+    },
+    {
+      "questionId": "review_gap_28",
+      "order": 28,
+      "capabilityFamily": "PRODUCT",
+      "scope": "UNSPECIFIED",
+      "specialist": "GENERAL",
+      "targetCount": 43
+    },
+    {
+      "questionId": "review_gap_29",
+      "order": 29,
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "GENERAL",
+      "targetCount": 4
+    },
+    {
+      "questionId": "review_gap_30",
+      "order": 30,
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "scope": "OWNERSHIP",
+      "specialist": "GENERAL",
+      "targetCount": 6
+    },
+    {
+      "questionId": "review_gap_31",
+      "order": 31,
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "specialist": "GENERAL",
+      "targetCount": 3
+    },
+    {
+      "questionId": "review_gap_32",
+      "order": 32,
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "scope": "UNSPECIFIED",
+      "specialist": "GENERAL",
+      "targetCount": 23
+    },
+    {
+      "questionId": "review_gap_33",
+      "order": 33,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "SPECIALIST",
+      "targetCount": 5
+    },
+    {
+      "questionId": "review_gap_34",
+      "order": 34,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "OWNERSHIP",
+      "specialist": "SPECIALIST",
+      "targetCount": 1
+    },
+    {
+      "questionId": "review_gap_35",
+      "order": 35,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "UNSPECIFIED",
+      "specialist": "SPECIALIST",
+      "targetCount": 23
+    },
+    {
+      "questionId": "review_gap_36",
+      "order": 36,
+      "capabilityFamily": "AI_AUTOMATION",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "GENERAL",
+      "targetCount": 7
+    },
+    {
+      "questionId": "review_gap_37",
+      "order": 37,
+      "capabilityFamily": "AI_AUTOMATION",
+      "scope": "OWNERSHIP",
+      "specialist": "GENERAL",
+      "targetCount": 5
+    },
+    {
+      "questionId": "review_gap_38",
+      "order": 38,
+      "capabilityFamily": "AI_AUTOMATION",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "specialist": "GENERAL",
+      "targetCount": 2
+    },
+    {
+      "questionId": "review_gap_39",
+      "order": 39,
+      "capabilityFamily": "AI_AUTOMATION",
+      "scope": "UNSPECIFIED",
+      "specialist": "GENERAL",
+      "targetCount": 13
+    },
+    {
+      "questionId": "review_gap_40",
+      "order": 40,
+      "capabilityFamily": "GOVERNANCE",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "GENERAL",
+      "targetCount": 9
+    },
+    {
+      "questionId": "review_gap_41",
+      "order": 41,
+      "capabilityFamily": "GOVERNANCE",
+      "scope": "OWNERSHIP",
+      "specialist": "GENERAL",
+      "targetCount": 5
+    },
+    {
+      "questionId": "review_gap_42",
+      "order": 42,
+      "capabilityFamily": "GOVERNANCE",
+      "scope": "UNSPECIFIED",
+      "specialist": "GENERAL",
+      "targetCount": 12
+    },
+    {
+      "questionId": "review_gap_43",
+      "order": 43,
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "GENERAL",
+      "targetCount": 3
+    },
+    {
+      "questionId": "review_gap_44",
+      "order": 44,
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "scope": "OWNERSHIP",
+      "specialist": "GENERAL",
+      "targetCount": 3
+    },
+    {
+      "questionId": "review_gap_45",
+      "order": 45,
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "specialist": "GENERAL",
+      "targetCount": 3
+    },
+    {
+      "questionId": "review_gap_46",
+      "order": 46,
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "scope": "UNSPECIFIED",
+      "specialist": "GENERAL",
+      "targetCount": 8
+    },
+    {
+      "questionId": "review_gap_47",
+      "order": 47,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "SPECIALIST",
+      "targetCount": 1
+    },
+    {
+      "questionId": "review_gap_48",
+      "order": 48,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "OWNERSHIP",
+      "specialist": "SPECIALIST",
+      "targetCount": 2
+    },
+    {
+      "questionId": "review_gap_49",
+      "order": 49,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "specialist": "SPECIALIST",
+      "targetCount": 1
+    },
+    {
+      "questionId": "review_gap_50",
+      "order": 50,
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "scope": "UNSPECIFIED",
+      "specialist": "SPECIALIST",
+      "targetCount": 12
+    },
+    {
+      "questionId": "review_gap_51",
+      "order": 51,
+      "capabilityFamily": "AI_AUTOMATION",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "SPECIALIST",
+      "targetCount": 1
+    },
+    {
+      "questionId": "review_gap_52",
+      "order": 52,
+      "capabilityFamily": "AI_AUTOMATION",
+      "scope": "OWNERSHIP",
+      "specialist": "SPECIALIST",
+      "targetCount": 8
+    },
+    {
+      "questionId": "review_gap_53",
+      "order": 53,
+      "capabilityFamily": "AI_AUTOMATION",
+      "scope": "UNSPECIFIED",
+      "specialist": "SPECIALIST",
+      "targetCount": 5
+    },
+    {
+      "questionId": "review_gap_54",
+      "order": 54,
+      "capabilityFamily": "PRODUCT",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "SPECIALIST",
+      "targetCount": 2
+    },
+    {
+      "questionId": "review_gap_55",
+      "order": 55,
+      "capabilityFamily": "PRODUCT",
+      "scope": "OWNERSHIP",
+      "specialist": "SPECIALIST",
+      "targetCount": 3
+    },
+    {
+      "questionId": "review_gap_56",
+      "order": 56,
+      "capabilityFamily": "PRODUCT",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "specialist": "SPECIALIST",
+      "targetCount": 2
+    },
+    {
+      "questionId": "review_gap_57",
+      "order": 57,
+      "capabilityFamily": "PRODUCT",
+      "scope": "UNSPECIFIED",
+      "specialist": "SPECIALIST",
+      "targetCount": 7
+    },
+    {
+      "questionId": "review_gap_58",
+      "order": 58,
+      "capabilityFamily": "GOVERNANCE",
+      "scope": "OWNERSHIP",
+      "specialist": "SPECIALIST",
+      "targetCount": 2
+    },
+    {
+      "questionId": "review_gap_59",
+      "order": 59,
+      "capabilityFamily": "GOVERNANCE",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "specialist": "SPECIALIST",
+      "targetCount": 4
+    },
+    {
+      "questionId": "review_gap_60",
+      "order": 60,
+      "capabilityFamily": "GOVERNANCE",
+      "scope": "UNSPECIFIED",
+      "specialist": "SPECIALIST",
+      "targetCount": 7
+    },
+    {
+      "questionId": "review_gap_61",
+      "order": 61,
+      "capabilityFamily": "GOVERNANCE",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "SPECIALIST",
+      "targetCount": 7
+    },
+    {
+      "questionId": "review_gap_62",
+      "order": 62,
+      "capabilityFamily": "GOVERNANCE",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "specialist": "SPECIALIST",
+      "targetCount": 2
+    },
+    {
+      "questionId": "review_gap_63",
+      "order": 63,
+      "capabilityFamily": "GOVERNANCE",
+      "scope": "UNSPECIFIED",
+      "specialist": "SPECIALIST",
+      "targetCount": 4
+    },
+    {
+      "questionId": "review_gap_64",
+      "order": 64,
+      "capabilityFamily": "GOVERNANCE",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "GENERAL",
+      "targetCount": 2
+    },
+    {
+      "questionId": "review_gap_65",
+      "order": 65,
+      "capabilityFamily": "GOVERNANCE",
+      "scope": "UNSPECIFIED",
+      "specialist": "GENERAL",
+      "targetCount": 10
+    },
+    {
+      "questionId": "review_gap_66",
+      "order": 66,
+      "capabilityFamily": "PRODUCT",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "GENERAL",
+      "targetCount": 4
+    },
+    {
+      "questionId": "review_gap_67",
+      "order": 67,
+      "capabilityFamily": "PRODUCT",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "specialist": "GENERAL",
+      "targetCount": 1
+    },
+    {
+      "questionId": "review_gap_68",
+      "order": 68,
+      "capabilityFamily": "PRODUCT",
+      "scope": "UNSPECIFIED",
+      "specialist": "GENERAL",
+      "targetCount": 4
+    },
+    {
+      "questionId": "review_gap_69",
+      "order": 69,
+      "capabilityFamily": "AI_AUTOMATION",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "GENERAL",
+      "targetCount": 1
+    },
+    {
+      "questionId": "review_gap_70",
+      "order": 70,
+      "capabilityFamily": "AI_AUTOMATION",
+      "scope": "OWNERSHIP",
+      "specialist": "GENERAL",
+      "targetCount": 1
+    },
+    {
+      "questionId": "review_gap_71",
+      "order": 71,
+      "capabilityFamily": "AI_AUTOMATION",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "specialist": "GENERAL",
+      "targetCount": 1
+    },
+    {
+      "questionId": "review_gap_72",
+      "order": 72,
+      "capabilityFamily": "AI_AUTOMATION",
+      "scope": "UNSPECIFIED",
+      "specialist": "GENERAL",
+      "targetCount": 5
+    },
+    {
+      "questionId": "review_gap_73",
+      "order": 73,
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "SPECIALIST",
+      "targetCount": 2
+    },
+    {
+      "questionId": "review_gap_74",
+      "order": 74,
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "specialist": "SPECIALIST",
+      "targetCount": 2
+    },
+    {
+      "questionId": "review_gap_75",
+      "order": 75,
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "scope": "UNSPECIFIED",
+      "specialist": "SPECIALIST",
+      "targetCount": 1
+    },
+    {
+      "questionId": "review_gap_76",
+      "order": 76,
+      "capabilityFamily": "AI_AUTOMATION",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "SPECIALIST",
+      "targetCount": 2
+    },
+    {
+      "questionId": "review_gap_77",
+      "order": 77,
+      "capabilityFamily": "AI_AUTOMATION",
+      "scope": "UNSPECIFIED",
+      "specialist": "SPECIALIST",
+      "targetCount": 2
+    },
+    {
+      "questionId": "review_gap_78",
+      "order": 78,
+      "capabilityFamily": "BUSINESS_SYSTEMS",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "specialist": "GENERAL",
+      "targetCount": 2
+    },
+    {
+      "questionId": "review_gap_79",
+      "order": 79,
+      "capabilityFamily": "BUSINESS_SYSTEMS",
+      "scope": "UNSPECIFIED",
+      "specialist": "GENERAL",
+      "targetCount": 2
+    },
+    {
+      "questionId": "review_gap_80",
+      "order": 80,
+      "capabilityFamily": "PRODUCT",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "SPECIALIST",
+      "targetCount": 1
+    },
+    {
+      "questionId": "review_gap_81",
+      "order": 81,
+      "capabilityFamily": "PRODUCT",
+      "scope": "OWNERSHIP",
+      "specialist": "SPECIALIST",
+      "targetCount": 1
+    },
+    {
+      "questionId": "review_gap_82",
+      "order": 82,
+      "capabilityFamily": "PRODUCT",
+      "scope": "UNSPECIFIED",
+      "specialist": "SPECIALIST",
+      "targetCount": 2
+    },
+    {
+      "questionId": "review_gap_83",
+      "order": 83,
+      "capabilityFamily": "BUSINESS_SYSTEMS",
+      "scope": "OWNERSHIP",
+      "specialist": "GENERAL",
+      "targetCount": 1
+    },
+    {
+      "questionId": "review_gap_84",
+      "order": 84,
+      "capabilityFamily": "BUSINESS_SYSTEMS",
+      "scope": "PORTFOLIO_ENTERPRISE",
+      "specialist": "GENERAL",
+      "targetCount": 1
+    },
+    {
+      "questionId": "review_gap_85",
+      "order": 85,
+      "capabilityFamily": "BUSINESS_SYSTEMS",
+      "scope": "UNSPECIFIED",
+      "specialist": "GENERAL",
+      "targetCount": 1
+    },
+    {
+      "questionId": "review_gap_86",
+      "order": 86,
+      "capabilityFamily": "AI_AUTOMATION",
+      "scope": "UNSPECIFIED",
+      "specialist": "SPECIALIST",
+      "targetCount": 2
+    },
+    {
+      "questionId": "review_gap_87",
+      "order": 87,
+      "capabilityFamily": "PRODUCT",
+      "scope": "UNSPECIFIED",
+      "specialist": "SPECIALIST",
+      "targetCount": 2
+    },
+    {
+      "questionId": "review_gap_88",
+      "order": 88,
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "scope": "UNSPECIFIED",
+      "specialist": "GENERAL",
+      "targetCount": 2
+    },
+    {
+      "questionId": "review_gap_89",
+      "order": 89,
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "scope": "UNSPECIFIED",
+      "specialist": "SPECIALIST",
+      "targetCount": 2
+    },
+    {
+      "questionId": "review_gap_90",
+      "order": 90,
+      "capabilityFamily": "GOVERNANCE",
+      "scope": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "specialist": "GENERAL",
+      "targetCount": 1
+    }
+  ],
+  "duplicateTargetCount": 0,
+  "targetsFailedClosed": 1
+}

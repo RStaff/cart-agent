@@ -1,0 +1,17 @@
+{
+  "remainingUnmappedBefore": 2004,
+  "representedByReviewSet": 2003,
+  "percentageAddressed": 0.9995009980039921,
+  "capabilityFamiliesCovered": [
+    "AI_AUTOMATION",
+    "BUSINESS_SYSTEMS",
+    "GENERAL_RESPONSIBILITY",
+    "GOVERNANCE",
+    "PRODUCT",
+    "PROGRAM_DELIVERY"
+  ],
+  "opportunitiesCovered": 80,
+  "companiesCovered": 7,
+  "specialistTargets": 204,
+  "scopeSensitiveTargets": 557
+}

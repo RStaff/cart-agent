@@ -1,0 +1,7 @@
+{
+  "expectedFromV1_26L": 2011,
+  "reconstructed": 2004,
+  "delta": -7,
+  "lockedRequirementCount": 2573,
+  "selectionUsesLabels": false
+}
