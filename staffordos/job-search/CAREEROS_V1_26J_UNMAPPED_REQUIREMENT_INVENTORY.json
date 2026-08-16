@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "staffordos.careeros.v1_26j.unmapped_requirement_inventory.v1",
+  "lockedEvaluationUniverse": 80,
+  "unmappedRequirementCount": 2011,
+  "highInformationCount": 24,
+  "specialistCount": 168,
+  "currentMappingStates": {
+    "UNKNOWN": 1932,
+    "MISSING": 79
+  },
+  "decisionStateDistribution": {
+    "DIRECT": 0,
+    "TRANSFERABLE": 0,
+    "PARTIAL": 0,
+    "NO_SUPPORTED_EQUIVALENT": 0,
+    "NEEDS_MORE_EVIDENCE": 0,
+    "KEEP_UNRESOLVED": 0
+  },
+  "privacy": "Requirement IDs, source IDs, CareerFact IDs, CareerEvidence IDs, private paths, and raw private authority are omitted."
+}

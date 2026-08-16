@@ -1,0 +1,8 @@
+{
+  "route": "/os/professional/evidence?view=requirement-mapping",
+  "neutralDefault": true,
+  "exactRequirementIdentity": true,
+  "appendOnlySupersession": true,
+  "privatePersistence": true,
+  "postReviewReplay": "AWAITING_OPERATOR_REVIEW"
+}

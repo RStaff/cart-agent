@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "staffordos.careeros.v1_26j.review_plan.v1",
+  "proposedDecisionCount": 24,
+  "queueCap": 24,
+  "compression": "One decision per exact requirement; no semantic-family propagation is performed.",
+  "priorityRules": [
+    "recurrence",
+    "Datadog control relevance",
+    "capability-bearing responsibility family",
+    "specialist firewall remains explicit"
+  ],
+  "states": [
+    "DIRECT",
+    "TRANSFERABLE",
+    "PARTIAL",
+    "NO_SUPPORTED_EQUIVALENT",
+    "NEEDS_MORE_EVIDENCE",
+    "KEEP_UNRESOLVED"
+  ],
+  "operatorReviewRequired": true,
+  "postReviewReplayAuthorized": false,
+  "selectedByFamily": {
+    "AI_AUTOMATION": 5,
+    "GOVERNANCE": 1,
+    "PRODUCT": 14,
+    "PROGRAM_DELIVERY": 4
+  }
+}

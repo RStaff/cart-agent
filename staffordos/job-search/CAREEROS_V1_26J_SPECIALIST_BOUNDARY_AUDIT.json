@@ -1,0 +1,16 @@
+{
+  "specialistRequirements": 168,
+  "positiveSpecialistRequiresExplicitCompatibility": true,
+  "genericAuthorityToSpecialistPropagation": false,
+  "protectedFamilies": [
+    "accounting",
+    "tax",
+    "finance",
+    "payroll",
+    "legal",
+    "AV_MEDIA",
+    "software_engineering",
+    "data_science",
+    "specialist_AI_ML"
+  ]
+}

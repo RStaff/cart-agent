@@ -14,12 +14,25 @@ import {
   loadConflictResolutionDecisions,
   type ConflictReviewItem,
 } from "../../../../lib/staffordos/conflictResolution";
+import {
+  appendRequirementMappingDecision,
+  loadRequirementMappingQueue,
+  privateRequirementMappingRoot,
+  requirementMappingProgress,
+  REQUIREMENT_MAPPING_STATES,
+  type RequirementMappingState,
+} from "../../../../lib/staffordos/requirementMapping";
 
 export const dynamic = "force-dynamic";
 
 function answerFromForm(value: FormDataEntryValue | null): ReviewClusterAnswer | null {
   const answer = String(value || "").trim();
   return REVIEW_CLUSTER_ANSWERS.includes(answer as ReviewClusterAnswer) ? answer as ReviewClusterAnswer : null;
+}
+
+function mappingStateFromForm(value: FormDataEntryValue | null): RequirementMappingState | null {
+  const answer = String(value || "").trim();
+  return REQUIREMENT_MAPPING_STATES.includes(answer as RequirementMappingState) ? answer as RequirementMappingState : null;
 }
 
 async function adjudicateReviewClusterAction(formData: FormData) {
@@ -60,6 +73,31 @@ async function adjudicateReviewClusterAction(formData: FormData) {
   redirect(`/os/professional/evidence?view=${conflictMode ? "conflicts&" : ""}cluster=${encodeURIComponent(clusterId)}&status=SAVED`);
 }
 
+async function adjudicateRequirementMappingAction(formData: FormData) {
+  "use server";
+  const requirementId = String(formData.get("requirementId") || "").trim();
+  const state = mappingStateFromForm(formData.get("state"));
+  const queue = loadRequirementMappingQueue({ repositoryRoot: process.cwd(), decisionRoot: privateRequirementMappingRoot(), limit: 24 });
+  const item = queue.find((entry) => entry.requirementId === requirementId);
+  if (!item || !state) redirect("/os/professional/evidence?view=requirement-mapping&status=NOT_SAVED");
+  try {
+    appendRequirementMappingDecision({
+      decisionRoot: privateRequirementMappingRoot(),
+      repositoryRoot: process.cwd(),
+      item,
+      state,
+      supportedPortion: String(formData.get("supportedPortion") || "").trim() || null,
+      unresolvedPortion: String(formData.get("unresolvedPortion") || "").trim() || null,
+      operatorNote: String(formData.get("operatorNote") || "").trim() || null,
+      specialistCompatible: formData.get("specialistCompatible") === "true",
+    });
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : "SAVE_FAILED";
+    redirect(`/os/professional/evidence?view=requirement-mapping&requirement=${encodeURIComponent(requirementId)}&status=NOT_SAVED&reason=${encodeURIComponent(reason)}`);
+  }
+  redirect(`/os/professional/evidence?view=requirement-mapping&requirement=${encodeURIComponent(requirementId)}&status=SAVED`);
+}
+
 function displayLabel(value: string) { return value.replaceAll("_", " "); }
 
 export default async function ProfessionalEvidencePage({
@@ -70,6 +108,34 @@ export default async function ProfessionalEvidencePage({
   const params = (await searchParams) || {};
   const runtime = loadCompressedReviewRuntime({ repositoryRoot: process.cwd(), maxHighValue: 18 });
   const progress = compressionProgress(runtime);
+  const requirementMappingMode = params.view === "requirement-mapping";
+  if (requirementMappingMode) {
+    const mappingQueue = loadRequirementMappingQueue({ repositoryRoot: process.cwd(), decisionRoot: privateRequirementMappingRoot(), limit: 24 });
+    const mappingProgress = requirementMappingProgress(mappingQueue);
+    const requestedRequirement = typeof params.requirement === "string" ? params.requirement : null;
+    const item = mappingQueue.find((entry) => entry.requirementId === requestedRequirement) || mappingQueue.find((entry) => !entry.decision) || mappingQueue[0] || null;
+    const index = item ? mappingQueue.findIndex((entry) => entry.requirementId === item.requirementId) : -1;
+    const previous = index > 0 ? mappingQueue[index - 1] : null;
+    const next = index >= 0 && index < mappingQueue.length - 1 ? mappingQueue[index + 1] : null;
+    const nextUnreviewed = mappingQueue.find((entry) => !entry.decision) || null;
+    const href = (requirementId: string) => `/os/professional/evidence?view=requirement-mapping&requirement=${encodeURIComponent(requirementId)}`;
+    const status = typeof params.status === "string" ? params.status : null;
+    const reason = typeof params.reason === "string" ? params.reason : null;
+    return (
+      <div className="careerEvidenceAdjudicationPage">
+        <section className="careerEvidenceAdjudicationHeader"><div><span className="staffordEyebrow">Professional / Requirement mapping</span><h1>Requirement-Level Evidence Mapping</h1><p>CareerOS asks a bounded question about one exact job requirement. This does not create or rewrite career evidence.</p></div><div className="careerEvidenceAdjudicationStatus"><strong>Owner-private review</strong><span>CareerFact and CareerEvidence remain unchanged.</span></div></section>
+        <section className="careerEvidenceAdjudicationNotice"><strong>Requirement mapping</strong><p>This changes evidence authority only. It does not change ranking, application status, workflow decisions, preferences, or source truth.</p></section>
+        <section className="careerEvidenceProgress" aria-label="Requirement mapping progress"><div><span>Requirement mapping decisions</span><strong>{mappingProgress.decisionsCompleted} / {mappingProgress.decisionTotal}</strong></div><div><span>Requirements addressed</span><strong>{mappingProgress.requirementsAddressed} / {mappingProgress.requirementTotal}</strong></div><div><span>High-value review</span><strong>{progress.operatorDecisions} / {progress.operatorDecisionTotal}</strong></div></section>
+        <nav className="careerEvidenceFocus" aria-label="Evidence review focus"><span>Review focus:</span><a href="/os/professional/evidence">High-value review</a><a href="/os/professional/evidence?view=conflicts">Conflict resolution</a><a href="/os/professional/evidence?view=requirement-mapping">Requirement mapping</a></nav>
+        {status ? <p className={`careerEvidenceFeedback ${status === "NOT_SAVED" ? "is-error" : "is-success"}`} role="status">{status === "NOT_SAVED" ? `NOT SAVED${reason ? `: ${reason}` : ""}` : status}</p> : null}
+        {item ? <>
+          <nav className="careerEvidenceNavigation" aria-label="Requirement mapping navigation">{previous ? <a href={href(previous.requirementId)}>Previous</a> : <span>Previous</span>}<span>Requirement {index + 1} of {mappingQueue.length}</span>{next ? <a href={href(next.requirementId)}>Next</a> : <span>Next</span>}</nav>
+          {nextUnreviewed ? <p className="careerEvidenceNextUnreviewed"><a href={href(nextUnreviewed.requirementId)}>Next unreviewed</a></p> : null}
+          <article className="careerEvidenceReviewCard"><div className="careerEvidenceReviewMeta"><span>{item.company}</span><span>{item.title}</span><span>{item.capabilityFamily}</span>{item.specialist ? <span>Specialist boundary</span> : null}</div><h2>{item.requirementText}</h2><p>{item.question}</p><dl className="careerEvidenceReviewFacts"><div><dt>Why CareerOS is asking</dt><dd>{item.whyAsked} {item.priorityReason}</dd></div><div><dt>Existing Ross authority</dt><dd>{item.authoritySummary}</dd></div><div><dt>Current system interpretation</dt><dd>{displayLabel(item.currentMappingState)}; no positive requirement relationship is currently authorized.</dd></div><div><dt>Requirement</dt><dd>{displayLabel(item.requirementType)} · {displayLabel(item.importance)}{item.section ? ` · ${item.section}` : ""}</dd></div><div><dt>What this affects</dt><dd>Only this exact requirement relationship and the cited existing authority references.</dd></div><div><dt>What this does not affect</dt><dd>CareerFact, CareerEvidence, ranking, J002, J003, J010, workflow, preferences, or applications.</dd></div></dl><form action={adjudicateRequirementMappingAction} className="careerEvidenceDecisionForm"><input type="hidden" name="requirementId" value={item.requirementId} /><label htmlFor="supportedPortion">Supported portion, if applicable</label><textarea id="supportedPortion" name="supportedPortion" defaultValue={item.decision?.supportedPortion || ""} placeholder="Keep this bounded to the requirement." /><label htmlFor="unresolvedPortion">Unresolved portion, if applicable</label><textarea id="unresolvedPortion" name="unresolvedPortion" defaultValue={item.decision?.unresolvedPortion || ""} placeholder="Record what remains unproven." /><label htmlFor="operatorNote">Operator note</label><textarea id="operatorNote" name="operatorNote" defaultValue={item.decision?.operatorNote || ""} placeholder="Optional bounded context." />{item.specialist ? <label><input type="checkbox" name="specialistCompatible" value="true" /> I confirm the cited authority is specialist-compatible with this requirement.</label> : null}<div className="careerEvidenceDecisionActions">{item.allowedStates.map((state) => <button key={state} type="submit" name="state" value={state}>{displayLabel(state)}</button>)}</div></form></article>
+        </> : <p className="careerEvidenceEmpty">No bounded unmapped requirements are available.</p>}
+      </div>
+    );
+  }
   const requested = typeof params.cluster === "string" ? params.cluster : null;
   const showAll = params.view === "all";
   const conflictMode = params.view === "conflicts";

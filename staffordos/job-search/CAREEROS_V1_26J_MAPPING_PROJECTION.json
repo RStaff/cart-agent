@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "staffordos.careeros.v1_26j.mapping_projection.v1",
+  "operatorReviewComplete": false,
+  "projectionAuthorized": false,
+  "direct": 0,
+  "transferable": 0,
+  "partial": 0,
+  "noSupportedEquivalent": 0,
+  "needsMoreEvidence": 0,
+  "keepUnresolved": 0,
+  "note": "No operator answers are fabricated before review."
+}
