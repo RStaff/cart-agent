@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "careeros.v1.p0.tenant-isolation-audit.v1",
+  "rules": [
+    "authenticate before customer data access",
+    "resolve tenant from server-side session",
+    "require active user membership",
+    "scope profile reads and writes by tenantId and userId",
+    "never authorize from a client-supplied tenantId",
+    "return unauthorized rather than reveal record existence"
+  ],
+  "syntheticAcceptance": {
+    "tenantAReadOwnProfile": "allowed",
+    "tenantBReadTenantAProfile": "denied",
+    "tenantBUpdateTenantAProfile": "denied",
+    "revokedSessionAccess": "denied"
+  },
+  "operatorRoutesExposed": false,
+  "privatePayloadsIncluded": false
+}

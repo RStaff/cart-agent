@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "careeros.v1.p0.auth-audit.v1",
+  "existingAuth": {
+    "webEmailLookup": "DO_NOT_USE",
+    "shopApiKey": "DO_NOT_USE",
+    "staffordosOperatorSession": "OPERATOR_ONLY",
+    "customerSession": "NEW_REQUIRED"
+  },
+  "implemented": ["account_creation", "password_login", "logout", "opaque_http_only_session_cookie", "current_user", "current_tenant"],
+  "failClosed": ["missing_session", "expired_session", "missing_membership", "invalid_credentials", "duplicate_account"],
+  "deferred": ["email_verification", "password_recovery", "oauth", "rate_limiting", "csrf_token_strategy", "production_identity_provider"],
+  "privatePayloadsIncluded": false
+}

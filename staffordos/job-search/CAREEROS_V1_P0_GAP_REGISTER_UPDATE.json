@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "careeros.v1.p0.gap-update.v1",
+  "closedWithRuntimeProof": ["profile_creation_and_bounded_update", "synthetic_session_resolution", "synthetic_cross_tenant_denial", "customer_route_namespace"],
+  "partial": ["customer_authentication", "tenant_isolation", "career_source_persistence"],
+  "remainingP0": ["production_database_adapter", "production_identity_and_recovery", "secure_document_storage", "deletion_export", "customer_error_audit"],
+  "nextMission": "CAREEROS_V1_PRODUCTIZATION_P0_CAREER_INTAKE_FOUNDATION",
+  "privatePayloadsIncluded": false
+}

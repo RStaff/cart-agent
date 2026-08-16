@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "careeros.v1.p0.profile.v1",
+  "entity": "CareerProfile",
+  "ownership": {"tenantId": "required", "userId": "required", "unique": ["tenantId", "userId"]},
+  "fields": {
+    "id": "opaque server identifier",
+    "displayName": "required bounded string",
+    "headline": "optional bounded string",
+    "location": "optional bounded string",
+    "careerStage": "optional bounded string",
+    "status": "ACTIVE|ARCHIVED",
+    "version": "positive integer",
+    "createdAt": "timestamp",
+    "updatedAt": "timestamp"
+  },
+  "excluded": ["CareerFact blobs", "CareerEvidence payloads", "capability graph blobs", "matching scores"]
+}

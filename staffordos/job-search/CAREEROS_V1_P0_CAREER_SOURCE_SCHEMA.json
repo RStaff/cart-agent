@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "careeros.v1.p0.source.v1",
+  "entity": "CareerSource",
+  "ownership": {"tenantId": "required", "userId": "required", "careerProfileId": "required"},
+  "sourceTypes": ["RESUME", "MANUAL_WORK_HISTORY", "PORTFOLIO", "CERTIFICATION", "PROJECT", "OTHER_USER_SUPPLIED_SOURCE"],
+  "statuses": ["PENDING_STORAGE", "STORED", "PROCESSING", "READY", "FAILED"],
+  "fields": ["id", "tenantId", "userId", "careerProfileId", "sourceType", "sourceStatus", "originalFilename", "contentReference", "createdAt", "updatedAt"],
+  "safety": "raw documents are not accepted by the current P0 adapter; secure object storage is required before upload persistence"
+}

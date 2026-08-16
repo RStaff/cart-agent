@@ -3759,3 +3759,43 @@ textarea {
     grid-template-columns: 1fr;
   }
 }
+
+.careerPublicShell,
+.careerShell {
+  min-height: 100vh;
+  padding: 48px 20px;
+  background: #f7f8fa;
+  color: #17202a;
+}
+
+.careerAuthPanel,
+.careerProfilePanel {
+  width: min(100%, 720px);
+  margin: 0 auto;
+  padding: 32px;
+  border: 1px solid #d9dee5;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 12px 32px rgba(23, 32, 42, 0.08);
+}
+
+.careerAuthPanel { max-width: 480px; }
+.careerHeader { width: min(100%, 960px); margin: 0 auto 24px; display: flex; justify-content: space-between; gap: 24px; align-items: flex-start; }
+.careerEyebrow { margin: 0 0 8px; color: #176b87; font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.careerAuthPanel h1, .careerHeader h1, .careerProfilePanel h2 { margin: 0; color: #17202a; }
+.careerAuthPanel h1, .careerHeader h1 { font-size: clamp(30px, 5vw, 44px); line-height: 1.08; }
+.careerProfilePanel h2 { font-size: 24px; }
+.careerMuted { color: #596575; line-height: 1.6; }
+.careerForm { display: grid; gap: 16px; margin-top: 24px; }
+.careerForm label { display: grid; gap: 7px; color: #283443; font-size: 14px; font-weight: 700; }
+.careerForm label span { color: #6b7683; font-weight: 400; }
+.careerForm input { width: 100%; padding: 12px 13px; border: 1px solid #bfc8d2; border-radius: 6px; background: #fff; color: #17202a; }
+.careerForm input:focus { outline: 3px solid rgba(23, 107, 135, .18); border-color: #176b87; }
+.careerPrimaryButton, .careerLinkButton { min-height: 42px; padding: 10px 16px; border: 1px solid #176b87; border-radius: 6px; cursor: pointer; font-weight: 800; }
+.careerPrimaryButton { background: #176b87; color: #fff; }
+.careerPrimaryButton:disabled { opacity: .6; cursor: wait; }
+.careerLinkButton { background: transparent; color: #176b87; }
+.careerError { color: #a92d2d; font-weight: 700; }
+.careerSaved { color: #176b57; font-weight: 800; }
+.careerNav { margin-top: 24px; display: flex; gap: 16px; }
+.careerNav a, .careerAuthPanel a { color: #176b87; font-weight: 700; }

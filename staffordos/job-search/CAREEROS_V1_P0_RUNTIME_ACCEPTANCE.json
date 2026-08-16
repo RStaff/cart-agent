@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "careeros.v1.p0.runtime-acceptance.v1",
+  "syntheticOnly": true,
+  "checks": {
+    "accountCreation": "passed by store test",
+    "authenticatedSession": "passed by store test",
+    "profileCreation": "passed by store test",
+    "profilePersistence": "passed by store test",
+    "sessionRevocation": "passed by store test",
+    "crossTenantRead": "denied by store test",
+    "crossTenantUpdate": "denied by store test",
+    "operatorRouteIsolation": "customer routes contain no operator imports",
+    "rossDataVisible": false,
+    "matchingChanged": false
+  },
+  "browserAcceptance": "not run in this local acceptance; server/store and TypeScript validation were used",
+  "productionDatabaseAcceptance": "deferred until Prisma-backed CareerOS persistence is authorized"
+}
