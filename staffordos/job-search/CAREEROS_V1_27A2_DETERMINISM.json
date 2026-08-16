@@ -1,0 +1,9 @@
+{
+  "capabilityAuthorityHash": "ff0122590c2eebebc3bf21d4e8a723ff84c6c127876fdafc378269ac052edd92",
+  "requirementProjectionHash": "fb55939f25a5d66fe4159c8776097fadb9694de9ad5b26bde4210fdc42d317f5",
+  "conceptProjectionHash": "60858268e6c28c06bc199d45d5e25b16603f2401ed14605df8b0e72169522b56",
+  "repeatCapabilityAuthorityHash": "ff0122590c2eebebc3bf21d4e8a723ff84c6c127876fdafc378269ac052edd92",
+  "repeatRequirementProjectionHash": "fb55939f25a5d66fe4159c8776097fadb9694de9ad5b26bde4210fdc42d317f5",
+  "repeatConceptProjectionHash": "60858268e6c28c06bc199d45d5e25b16603f2401ed14605df8b0e72169522b56",
+  "identical": true
+}

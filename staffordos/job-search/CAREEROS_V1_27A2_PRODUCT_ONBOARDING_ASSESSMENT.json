@@ -1,0 +1,8 @@
+{
+  "initialQuestions": 10,
+  "activeDecisions": 10,
+  "canonicalCapabilities": 32,
+  "exactRequirementsInformed": 0,
+  "assessment": "PRODUCT_ONBOARDING_TOO_MANUAL",
+  "reason": "Ten decisions did not yet clear safe capability-to-requirement relationships."
+}

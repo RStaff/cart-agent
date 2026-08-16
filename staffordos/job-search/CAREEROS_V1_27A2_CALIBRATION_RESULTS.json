@@ -1,0 +1,5 @@
+{
+  "replay": "NOT_RUN",
+  "reason": "Safe positive graph coverage was zero; frozen replay was not authorized.",
+  "baselineUnchanged": true
+}

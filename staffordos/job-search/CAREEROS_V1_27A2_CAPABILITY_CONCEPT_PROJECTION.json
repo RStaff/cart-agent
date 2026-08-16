@@ -1,0 +1,467 @@
+{
+  "conceptCount": 41,
+  "before": {
+    "DIRECT": 0,
+    "TRANSFERABLE": 0,
+    "PARTIAL": 0,
+    "UNRESOLVED": 336,
+    "SPECIALIST_BLOCKED": 204,
+    "SCOPE_BLOCKED": 1463
+  },
+  "after": {
+    "DIRECT": 0,
+    "TRANSFERABLE": 0,
+    "PARTIAL": 0,
+    "UNRESOLVED": 0,
+    "SPECIALIST_BLOCKED": 204,
+    "SCOPE_BLOCKED": 1799
+  },
+  "relationships": [
+    {
+      "conceptId": "requirement_concept_1c6039f9815573770925",
+      "capabilityIds": [
+        "capability_d406583e90947beab668",
+        "capability_556562bde7f5493177f0"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 24,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_b5397d3071f69ea4628b",
+      "capabilityIds": [
+        "capability_d406583e90947beab668",
+        "capability_556562bde7f5493177f0"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 14,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_ef695f382209789d06ce",
+      "capabilityIds": [
+        "capability_d406583e90947beab668",
+        "capability_556562bde7f5493177f0"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 3,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_ff204b3c641371da130a",
+      "capabilityIds": [
+        "capability_d406583e90947beab668",
+        "capability_556562bde7f5493177f0"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 68,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_826dbbc61f3de8e6623e",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 3,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_dddae45a80ae7323b00d",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 8,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_60e7011ccc4cee336375",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 9,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_dd95593da997b30aff14",
+      "capabilityIds": [
+        "capability_5a51acdebae695a18224"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 1,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_e146df4423459251ecc8",
+      "capabilityIds": [
+        "capability_5a51acdebae695a18224"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 3,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_270b99340f83b87de589",
+      "capabilityIds": [
+        "capability_5a51acdebae695a18224"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 3,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_0c8ac1c70dcf8cda9a5f",
+      "capabilityIds": [
+        "capability_cc1bcdb9ab03f1a0298f",
+        "capability_ae7cfc7089870567ced8",
+        "capability_5a51acdebae695a18224",
+        "capability_1d767e26b60c93010d9a",
+        "capability_a2deb5a9d4be53cb157f"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 154,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_d4ea39dffd3e9c2ef1ec",
+      "capabilityIds": [
+        "capability_cc1bcdb9ab03f1a0298f",
+        "capability_ae7cfc7089870567ced8",
+        "capability_5a51acdebae695a18224",
+        "capability_1d767e26b60c93010d9a",
+        "capability_a2deb5a9d4be53cb157f"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 96,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_7b77f5b8e61c89eb357d",
+      "capabilityIds": [
+        "capability_cc1bcdb9ab03f1a0298f",
+        "capability_ae7cfc7089870567ced8",
+        "capability_5a51acdebae695a18224",
+        "capability_1d767e26b60c93010d9a",
+        "capability_a2deb5a9d4be53cb157f"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 64,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_aef6acc3b3216a83c13c",
+      "capabilityIds": [
+        "capability_cc1bcdb9ab03f1a0298f",
+        "capability_ae7cfc7089870567ced8",
+        "capability_5a51acdebae695a18224",
+        "capability_1d767e26b60c93010d9a",
+        "capability_a2deb5a9d4be53cb157f"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 1087,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_e2d3a2b37996043c9ea2",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 23,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_34b1c57ca3ac7b1dc3fb",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 17,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_99824161d6086ab8f316",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 5,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_949b1588562b8bccce64",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 86,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_eb7d0e99180c76bb8186",
+      "capabilityIds": [
+        "capability_3aad0fad1d60ac8462a1"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 12,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_a6a56312fe003a475c89",
+      "capabilityIds": [
+        "capability_3aad0fad1d60ac8462a1"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 5,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_f0dc73ad8e03c50bb0e0",
+      "capabilityIds": [
+        "capability_3aad0fad1d60ac8462a1"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 22,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_55fbd5d835d66e216e0e",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 7,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_206dfd99d02d15f098d5",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 2,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_fd6ec5d691cda3d828fb",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 6,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_c279cfcd94d3bc3d76f0",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 11,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_01605558759dc01a6426",
+      "capabilityIds": [
+        "capability_2f561dae5fbb3c63b8cb"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 34,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_097bf19b72ea33dc9b81",
+      "capabilityIds": [
+        "capability_2f561dae5fbb3c63b8cb"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 32,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_d5ce8caaad92120c2df1",
+      "capabilityIds": [
+        "capability_2f561dae5fbb3c63b8cb"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 8,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_0f2d2b1af2593aaaeb61",
+      "capabilityIds": [
+        "capability_2f561dae5fbb3c63b8cb"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 1,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_08cb25707e352443aff1",
+      "capabilityIds": [
+        "capability_2f561dae5fbb3c63b8cb"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 113,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_87cb93ac045fdf626e03",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 3,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_865758bf85fa2d27cb1b",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 4,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_20fb7ae3c7c37cb7b649",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 2,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_10f2508826da82362546",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 11,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_88ae57175b9f45fd3e52",
+      "capabilityIds": [
+        "capability_6435d7115bc081ee062d",
+        "capability_ed3d81974e030517c670",
+        "capability_adb2c99e96c0164c4099"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 7,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_2e85ad19127477ff9905",
+      "capabilityIds": [
+        "capability_6435d7115bc081ee062d",
+        "capability_ed3d81974e030517c670",
+        "capability_adb2c99e96c0164c4099"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 9,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_c047baa98c11bb4b05ed",
+      "capabilityIds": [
+        "capability_6435d7115bc081ee062d",
+        "capability_ed3d81974e030517c670",
+        "capability_adb2c99e96c0164c4099"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 6,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_f8bd5537062eb48e4257",
+      "capabilityIds": [
+        "capability_6435d7115bc081ee062d",
+        "capability_ed3d81974e030517c670",
+        "capability_adb2c99e96c0164c4099"
+      ],
+      "state": "SCOPE_BLOCKED",
+      "exactRequirementCount": 33,
+      "specialistSafe": true,
+      "scopeSafe": false,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_da7036dbc84435731c01",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 2,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_e4345e5e939e8972e64a",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 2,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "proposalOnly": false
+    },
+    {
+      "conceptId": "requirement_concept_e35ce3ad428baa9c7882",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 3,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "proposalOnly": false
+    }
+  ],
+  "specialistLeakage": 0,
+  "scopeViolations": 0,
+  "provenancePreserved": true
+}

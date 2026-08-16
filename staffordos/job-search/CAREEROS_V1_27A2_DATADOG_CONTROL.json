@@ -1,0 +1,19 @@
+{
+  "role": "Director, Technical Program Management - Technical Solutions Operations",
+  "before": {
+    "direct": 0,
+    "transferable": 0,
+    "partial": 0,
+    "unresolved": "CONTROL_NOT_REPLAYED"
+  },
+  "after": {
+    "direct": 0,
+    "transferable": 0,
+    "partial": 0,
+    "unresolved": "SCOPE_OR_REQUIREMENT_RELATIONSHIP_NOT_CLEARED"
+  },
+  "manualBoost": false,
+  "titlePenalty": false,
+  "domainPenalty": false,
+  "replay": "NOT_RUN"
+}

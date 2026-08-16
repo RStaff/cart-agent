@@ -1,0 +1,12 @@
+{
+  "specialistLeakage": 0,
+  "scopeViolations": 0,
+  "directnessViolations": 0,
+  "unknownAsNegative": false,
+  "missingAsNegative": false,
+  "titleAuthority": false,
+  "domainOnlyAuthority": false,
+  "ambitionProtection": "PASS",
+  "specialistTarget": 0,
+  "scopeTarget": 0
+}

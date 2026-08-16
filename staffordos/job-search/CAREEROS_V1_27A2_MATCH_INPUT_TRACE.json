@@ -1,0 +1,10 @@
+{
+  "graphDerivedDirectComparisons": 0,
+  "graphDerivedTransferableComparisons": 0,
+  "graphDerivedPartialComparisons": 0,
+  "unresolvedComparisons": 0,
+  "specialistBlocked": 204,
+  "scopeBlocked": 1799,
+  "frozenEvaluatorReplayAuthorized": false,
+  "blockingLayer": "NO_SAFE_POSITIVE_GRAPH_RELATIONSHIPS"
+}
