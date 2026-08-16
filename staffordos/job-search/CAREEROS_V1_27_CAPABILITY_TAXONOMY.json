@@ -1,0 +1,17 @@
+{
+  "version": "v1-proposal",
+  "values": [
+    "AI_AUTOMATION_WORKFLOWS",
+    "CUSTOMER_SOLUTIONS",
+    "DATA_ANALYSIS",
+    "GENERAL_OPERATIONS",
+    "GOVERNANCE_RISK",
+    "MARKETING_TECHNOLOGY",
+    "PRODUCT_GOVERNANCE",
+    "PROJECT_DELIVERY",
+    "REQUIREMENTS_TRANSLATION",
+    "STAKEHOLDER_LEADERSHIP",
+    "TECHNICAL_PROGRAM_LEADERSHIP"
+  ],
+  "note": "Candidate taxonomy from existing authority; not production authority."
+}

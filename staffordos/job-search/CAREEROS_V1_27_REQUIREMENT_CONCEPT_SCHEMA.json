@@ -1,0 +1,16 @@
+{
+  "entity": "CanonicalRequirementConcept",
+  "fields": {
+    "conceptId": "stable derived ID",
+    "capabilityFamily": "normalized family",
+    "specialistClassification": "specialist boundary",
+    "scopeClassification": "scope boundary",
+    "rawRequirementRefs": "exact IDs, private or controlled",
+    "mappingMethod": "deterministic proposal",
+    "confidence": "proposal confidence",
+    "ambiguity": "review state",
+    "version": "taxonomy version"
+  },
+  "authority": "raw JobRequirement remains opportunity truth",
+  "proposalIsAuthority": false
+}

@@ -1,0 +1,375 @@
+{
+  "rawRequirements": 2003,
+  "canonicalRequirementConcepts": [
+    {
+      "conceptId": "requirement_concept_1c6039f9815573770925",
+      "capabilityFamily": "AI_AUTOMATION",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "targetCount": 24,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_b5397d3071f69ea4628b",
+      "capabilityFamily": "AI_AUTOMATION",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "OWNERSHIP",
+      "targetCount": 14,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_ef695f382209789d06ce",
+      "capabilityFamily": "AI_AUTOMATION",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "PORTFOLIO_ENTERPRISE",
+      "targetCount": 3,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_ff204b3c641371da130a",
+      "capabilityFamily": "AI_AUTOMATION",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "UNSPECIFIED",
+      "targetCount": 68,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_826dbbc61f3de8e6623e",
+      "capabilityFamily": "AI_AUTOMATION",
+      "specialistClassification": "SPECIALIST",
+      "scopeClassification": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "targetCount": 3,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_dddae45a80ae7323b00d",
+      "capabilityFamily": "AI_AUTOMATION",
+      "specialistClassification": "SPECIALIST",
+      "scopeClassification": "OWNERSHIP",
+      "targetCount": 8,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_60e7011ccc4cee336375",
+      "capabilityFamily": "AI_AUTOMATION",
+      "specialistClassification": "SPECIALIST",
+      "scopeClassification": "UNSPECIFIED",
+      "targetCount": 9,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_dd95593da997b30aff14",
+      "capabilityFamily": "BUSINESS_SYSTEMS",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "OWNERSHIP",
+      "targetCount": 1,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_e146df4423459251ecc8",
+      "capabilityFamily": "BUSINESS_SYSTEMS",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "PORTFOLIO_ENTERPRISE",
+      "targetCount": 3,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_270b99340f83b87de589",
+      "capabilityFamily": "BUSINESS_SYSTEMS",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "UNSPECIFIED",
+      "targetCount": 3,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_0c8ac1c70dcf8cda9a5f",
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "targetCount": 154,
+      "ambiguity": "HIGH_LOAD_REQUIRES_TARGET_REVIEW",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_d4ea39dffd3e9c2ef1ec",
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "OWNERSHIP",
+      "targetCount": 96,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_7b77f5b8e61c89eb357d",
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "PORTFOLIO_ENTERPRISE",
+      "targetCount": 64,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_aef6acc3b3216a83c13c",
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "UNSPECIFIED",
+      "targetCount": 1087,
+      "ambiguity": "HIGH_LOAD_REQUIRES_TARGET_REVIEW",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_e2d3a2b37996043c9ea2",
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "specialistClassification": "SPECIALIST",
+      "scopeClassification": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "targetCount": 23,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_34b1c57ca3ac7b1dc3fb",
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "specialistClassification": "SPECIALIST",
+      "scopeClassification": "OWNERSHIP",
+      "targetCount": 17,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_99824161d6086ab8f316",
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "specialistClassification": "SPECIALIST",
+      "scopeClassification": "PORTFOLIO_ENTERPRISE",
+      "targetCount": 5,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_949b1588562b8bccce64",
+      "capabilityFamily": "GENERAL_RESPONSIBILITY",
+      "specialistClassification": "SPECIALIST",
+      "scopeClassification": "UNSPECIFIED",
+      "targetCount": 86,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_eb7d0e99180c76bb8186",
+      "capabilityFamily": "GOVERNANCE",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "targetCount": 12,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_a6a56312fe003a475c89",
+      "capabilityFamily": "GOVERNANCE",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "OWNERSHIP",
+      "targetCount": 5,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_f0dc73ad8e03c50bb0e0",
+      "capabilityFamily": "GOVERNANCE",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "UNSPECIFIED",
+      "targetCount": 22,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_55fbd5d835d66e216e0e",
+      "capabilityFamily": "GOVERNANCE",
+      "specialistClassification": "SPECIALIST",
+      "scopeClassification": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "targetCount": 7,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_206dfd99d02d15f098d5",
+      "capabilityFamily": "GOVERNANCE",
+      "specialistClassification": "SPECIALIST",
+      "scopeClassification": "OWNERSHIP",
+      "targetCount": 2,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_fd6ec5d691cda3d828fb",
+      "capabilityFamily": "GOVERNANCE",
+      "specialistClassification": "SPECIALIST",
+      "scopeClassification": "PORTFOLIO_ENTERPRISE",
+      "targetCount": 6,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_c279cfcd94d3bc3d76f0",
+      "capabilityFamily": "GOVERNANCE",
+      "specialistClassification": "SPECIALIST",
+      "scopeClassification": "UNSPECIFIED",
+      "targetCount": 11,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_01605558759dc01a6426",
+      "capabilityFamily": "PRODUCT",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "targetCount": 34,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_097bf19b72ea33dc9b81",
+      "capabilityFamily": "PRODUCT",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "OWNERSHIP",
+      "targetCount": 32,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_d5ce8caaad92120c2df1",
+      "capabilityFamily": "PRODUCT",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "PORTFOLIO_ENTERPRISE",
+      "targetCount": 8,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_0f2d2b1af2593aaaeb61",
+      "capabilityFamily": "PRODUCT",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "TEAM_LEADERSHIP",
+      "targetCount": 1,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_08cb25707e352443aff1",
+      "capabilityFamily": "PRODUCT",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "UNSPECIFIED",
+      "targetCount": 113,
+      "ambiguity": "HIGH_LOAD_REQUIRES_TARGET_REVIEW",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_87cb93ac045fdf626e03",
+      "capabilityFamily": "PRODUCT",
+      "specialistClassification": "SPECIALIST",
+      "scopeClassification": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "targetCount": 3,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_865758bf85fa2d27cb1b",
+      "capabilityFamily": "PRODUCT",
+      "specialistClassification": "SPECIALIST",
+      "scopeClassification": "OWNERSHIP",
+      "targetCount": 4,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_20fb7ae3c7c37cb7b649",
+      "capabilityFamily": "PRODUCT",
+      "specialistClassification": "SPECIALIST",
+      "scopeClassification": "PORTFOLIO_ENTERPRISE",
+      "targetCount": 2,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_10f2508826da82362546",
+      "capabilityFamily": "PRODUCT",
+      "specialistClassification": "SPECIALIST",
+      "scopeClassification": "UNSPECIFIED",
+      "targetCount": 11,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_88ae57175b9f45fd3e52",
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "targetCount": 7,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_2e85ad19127477ff9905",
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "OWNERSHIP",
+      "targetCount": 9,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_c047baa98c11bb4b05ed",
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "PORTFOLIO_ENTERPRISE",
+      "targetCount": 6,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_f8bd5537062eb48e4257",
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "specialistClassification": "GENERAL",
+      "scopeClassification": "UNSPECIFIED",
+      "targetCount": 33,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_da7036dbc84435731c01",
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "specialistClassification": "SPECIALIST",
+      "scopeClassification": "INDIVIDUAL_OR_CONTRIBUTOR",
+      "targetCount": 2,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_e4345e5e939e8972e64a",
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "specialistClassification": "SPECIALIST",
+      "scopeClassification": "PORTFOLIO_ENTERPRISE",
+      "targetCount": 2,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    },
+    {
+      "conceptId": "requirement_concept_e35ce3ad428baa9c7882",
+      "capabilityFamily": "PROGRAM_DELIVERY",
+      "specialistClassification": "SPECIALIST",
+      "scopeClassification": "UNSPECIFIED",
+      "targetCount": 3,
+      "ambiguity": "PROPOSAL_REQUIRES_VALIDATION",
+      "rawRequirementIdsOmitted": true
+    }
+  ],
+  "privatePayloadsOmitted": true
+}

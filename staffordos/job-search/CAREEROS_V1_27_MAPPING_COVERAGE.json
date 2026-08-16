@@ -1,0 +1,18 @@
+{
+  "rawRequirements": 2003,
+  "canonicalRequirementConcepts": 41,
+  "requirementCompressionRatio": 48.853658536585364,
+  "capabilityToRequirement": {
+    "DIRECT": 0,
+    "TRANSFERABLE": 0,
+    "PARTIAL": 0,
+    "UNRESOLVED": 2003,
+    "SPECIALIST_BLOCKED": 0,
+    "accepted": 0,
+    "specialistLeakage": 0,
+    "scopeViolations": 0
+  },
+  "specialistLeakage": 0,
+  "scopeViolations": 0,
+  "proposalOnly": true
+}

@@ -1,0 +1,177 @@
+{
+  "questionCount": 10,
+  "questions": [
+    {
+      "questionId": "capability_question_cd2e74128897bcaf8ac1",
+      "canonicalCapability": "PRODUCT_GOVERNANCE",
+      "affectedRequirementTargets": 0,
+      "uncertainFactCount": 607,
+      "informationValue": 607,
+      "question": "What bounded scope and directness does your existing authority support for product governance?",
+      "allowedAnswers": [
+        "DIRECT_OWNER",
+        "TRANSFERABLE_ANALOG",
+        "PARTIAL",
+        "NO_SUPPORTED_CAPABILITY",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "labelsExcluded": true
+    },
+    {
+      "questionId": "capability_question_84e1312f5cf13412586c",
+      "canonicalCapability": "PROJECT_DELIVERY",
+      "affectedRequirementTargets": 0,
+      "uncertainFactCount": 61,
+      "informationValue": 61,
+      "question": "What bounded scope and directness does your existing authority support for project delivery?",
+      "allowedAnswers": [
+        "DIRECT_OWNER",
+        "TRANSFERABLE_ANALOG",
+        "PARTIAL",
+        "NO_SUPPORTED_CAPABILITY",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "labelsExcluded": true
+    },
+    {
+      "questionId": "capability_question_6c563fd7e77c33d37a08",
+      "canonicalCapability": "GENERAL_OPERATIONS",
+      "affectedRequirementTargets": 0,
+      "uncertainFactCount": 25,
+      "informationValue": 25,
+      "question": "What bounded scope and directness does your existing authority support for general operations?",
+      "allowedAnswers": [
+        "DIRECT_OWNER",
+        "TRANSFERABLE_ANALOG",
+        "PARTIAL",
+        "NO_SUPPORTED_CAPABILITY",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "labelsExcluded": true
+    },
+    {
+      "questionId": "capability_question_9d88b97130cdefe4bf70",
+      "canonicalCapability": "MARKETING_TECHNOLOGY",
+      "affectedRequirementTargets": 0,
+      "uncertainFactCount": 23,
+      "informationValue": 23,
+      "question": "What bounded scope and directness does your existing authority support for marketing technology?",
+      "allowedAnswers": [
+        "DIRECT_OWNER",
+        "TRANSFERABLE_ANALOG",
+        "PARTIAL",
+        "NO_SUPPORTED_CAPABILITY",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "labelsExcluded": true
+    },
+    {
+      "questionId": "capability_question_034746936222273a4569",
+      "canonicalCapability": "STAKEHOLDER_LEADERSHIP",
+      "affectedRequirementTargets": 0,
+      "uncertainFactCount": 19,
+      "informationValue": 19,
+      "question": "What bounded scope and directness does your existing authority support for stakeholder leadership?",
+      "allowedAnswers": [
+        "DIRECT_OWNER",
+        "TRANSFERABLE_ANALOG",
+        "PARTIAL",
+        "NO_SUPPORTED_CAPABILITY",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "labelsExcluded": true
+    },
+    {
+      "questionId": "capability_question_4a6092bf65051b1b2adb",
+      "canonicalCapability": "DATA_ANALYSIS",
+      "affectedRequirementTargets": 0,
+      "uncertainFactCount": 18,
+      "informationValue": 18,
+      "question": "What bounded scope and directness does your existing authority support for data analysis?",
+      "allowedAnswers": [
+        "DIRECT_OWNER",
+        "TRANSFERABLE_ANALOG",
+        "PARTIAL",
+        "NO_SUPPORTED_CAPABILITY",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "labelsExcluded": true
+    },
+    {
+      "questionId": "capability_question_b4280df4c8701ec6fc52",
+      "canonicalCapability": "CUSTOMER_SOLUTIONS",
+      "affectedRequirementTargets": 0,
+      "uncertainFactCount": 6,
+      "informationValue": 6,
+      "question": "What bounded scope and directness does your existing authority support for customer solutions?",
+      "allowedAnswers": [
+        "DIRECT_OWNER",
+        "TRANSFERABLE_ANALOG",
+        "PARTIAL",
+        "NO_SUPPORTED_CAPABILITY",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "labelsExcluded": true
+    },
+    {
+      "questionId": "capability_question_4e9c7d9d6a4e5bd08afb",
+      "canonicalCapability": "TECHNICAL_PROGRAM_LEADERSHIP",
+      "affectedRequirementTargets": 0,
+      "uncertainFactCount": 5,
+      "informationValue": 5,
+      "question": "What bounded scope and directness does your existing authority support for technical program leadership?",
+      "allowedAnswers": [
+        "DIRECT_OWNER",
+        "TRANSFERABLE_ANALOG",
+        "PARTIAL",
+        "NO_SUPPORTED_CAPABILITY",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "labelsExcluded": true
+    },
+    {
+      "questionId": "capability_question_2a6291c17570f200e859",
+      "canonicalCapability": "AI_AUTOMATION_WORKFLOWS",
+      "affectedRequirementTargets": 0,
+      "uncertainFactCount": 2,
+      "informationValue": 2,
+      "question": "What bounded scope and directness does your existing authority support for ai automation workflows?",
+      "allowedAnswers": [
+        "DIRECT_OWNER",
+        "TRANSFERABLE_ANALOG",
+        "PARTIAL",
+        "NO_SUPPORTED_CAPABILITY",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "labelsExcluded": true
+    },
+    {
+      "questionId": "capability_question_ce32aa6c7ee0e264517e",
+      "canonicalCapability": "GOVERNANCE_RISK",
+      "affectedRequirementTargets": 0,
+      "uncertainFactCount": 2,
+      "informationValue": 2,
+      "question": "What bounded scope and directness does your existing authority support for governance risk?",
+      "allowedAnswers": [
+        "DIRECT_OWNER",
+        "TRANSFERABLE_ANALOG",
+        "PARTIAL",
+        "NO_SUPPORTED_CAPABILITY",
+        "NEEDS_MORE_EVIDENCE",
+        "KEEP_UNRESOLVED"
+      ],
+      "labelsExcluded": true
+    }
+  ],
+  "labelsUsed": false,
+  "jobSpecificQuestions": false
+}

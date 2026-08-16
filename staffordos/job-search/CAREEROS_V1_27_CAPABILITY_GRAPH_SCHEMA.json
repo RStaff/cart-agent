@@ -1,0 +1,20 @@
+{
+  "entity": "CareerCapability",
+  "fields": {
+    "capabilityId": "stable derived ID",
+    "canonicalName": "taxonomy value",
+    "capabilityFamily": "generic family",
+    "specialistClassification": "GENERAL|SPECIALIST",
+    "authorityState": "multi-state authority",
+    "scopeLevel": "first-class scope",
+    "domainContext": "separate domain",
+    "sourceFactRefs": "private references, omitted from Git",
+    "sourceEvidenceRefs": "private references, omitted from Git",
+    "operatorAdjudicationRefs": "private references, omitted from Git",
+    "conflictState": "bounded conflict state",
+    "provenance": "source lineage",
+    "version": "taxonomy/graph version"
+  },
+  "sourceAuthority": "CareerFact, CareerEvidence, adjudication",
+  "derivedOnly": true
+}
