@@ -1,0 +1,41 @@
+{
+  "careerFacts": 898,
+  "careerEvidence": 21,
+  "evidenceCandidates": 898,
+  "conflictDecisionCount": 16,
+  "requirementMappingRecords": 29,
+  "activeRequirementMappings": 24,
+  "lockedRequirements": 2573,
+  "lockedMappings": 2573,
+  "decisionDistribution": {
+    "DIRECT": 15,
+    "TRANSFERABLE": 5,
+    "PARTIAL": 2,
+    "NO_SUPPORTED_EQUIVALENT": 2,
+    "NEEDS_MORE_EVIDENCE": 0,
+    "KEEP_UNRESOLVED": 0
+  },
+  "frozenModel": {
+    "identity": "MODEL_V2D_ROBUSTNESS_CONTROL",
+    "formula": "FROZEN_V1_23_V2D",
+    "weights": {
+      "relevantExperience": 40,
+      "roleFunction": 25,
+      "responsibility": 25,
+      "seniority": 10
+    }
+  },
+  "integrity": {
+    "careerFactMutated": false,
+    "careerEvidenceMutated": false,
+    "requirementMutated": false,
+    "labelsMutated": false,
+    "v2dMutated": false,
+    "selfConfidenceUsed": false,
+    "interestUsed": false,
+    "workflowUsed": false,
+    "titleOnlyMapping": false,
+    "domainOnlyMapping": false,
+    "keywordOnlyMapping": false
+  }
+}

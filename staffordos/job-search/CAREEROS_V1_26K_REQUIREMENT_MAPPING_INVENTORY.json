@@ -1,0 +1,14 @@
+{
+  "lockedUniverse": 80,
+  "lockedRequirements": 2573,
+  "activeDecisions": 24,
+  "decisionDistribution": {
+    "DIRECT": 15,
+    "TRANSFERABLE": 5,
+    "PARTIAL": 2,
+    "NO_SUPPORTED_EQUIVALENT": 2,
+    "NEEDS_MORE_EVIDENCE": 0,
+    "KEEP_UNRESOLVED": 0
+  },
+  "mappingRecords": 29
+}

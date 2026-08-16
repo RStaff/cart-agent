@@ -1,0 +1,205 @@
+{
+  "baselineModel": "MODEL_A_PRE_REQUIREMENT_MAPPING_CONTROL",
+  "models": {
+    "MODEL_A_PRE_REQUIREMENT_MAPPING_CONTROL": {
+      "metrics": {
+        "top5Precision": 0.6,
+        "top10Precision": 0.5,
+        "strongRecall": 0.5,
+        "strongGoodRecall": 0.5,
+        "viableRecall": 0.35,
+        "falsePositiveRate": 0.65,
+        "falseNegativeRate": 0.4,
+        "rankCorrelation": 0.54,
+        "negativeLeakageTop5": 0,
+        "negativeLeakageTop10": 2,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 8,
+        "strongGoodBelow20": 3,
+        "threshold": {
+          "cutoff": 75.94,
+          "predictedCount": 17,
+          "falsePositiveRate": 0.65,
+          "falseNegativeRate": 0.4
+        }
+      },
+      "hash": "d70299137fcadfa159a21289e2d94f3d26bb2cf6ae00ffe7c12bccb3f1d00f44",
+      "comparison": {
+        "scoreChanges": 0,
+        "rankChanges": 0,
+        "eligibilityChanges": 0,
+        "qualificationChanges": 0,
+        "upwardPositive": 0,
+        "downwardPositive": 0,
+        "upwardNegative": 0,
+        "downwardNegative": 0
+      },
+      "delta": {
+        "top5Precision": 0,
+        "top10Precision": 0,
+        "strongRecall": 0,
+        "strongGoodRecall": 0,
+        "viableRecall": 0,
+        "falsePositiveRate": 0,
+        "falseNegativeRate": 0,
+        "rankCorrelation": 0,
+        "negativeLeakageTop5": 0,
+        "negativeLeakageTop10": 0,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 0,
+        "strongGoodBelow20": 0,
+        "threshold": null
+      }
+    },
+    "MODEL_B_DIRECT_ONLY": {
+      "metrics": {
+        "top5Precision": 0.6,
+        "top10Precision": 0.5,
+        "strongRecall": 0.5,
+        "strongGoodRecall": 0.5,
+        "viableRecall": 0.35,
+        "falsePositiveRate": 0.65,
+        "falseNegativeRate": 0.4,
+        "rankCorrelation": 0.55,
+        "negativeLeakageTop5": 0,
+        "negativeLeakageTop10": 2,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 8,
+        "strongGoodBelow20": 3,
+        "threshold": {
+          "cutoff": 75.94,
+          "predictedCount": 17,
+          "falsePositiveRate": 0.65,
+          "falseNegativeRate": 0.4
+        }
+      },
+      "hash": "e086c7d20c42d04fb212ce6d6165942804c57f589946378e8724c20eeae5443a",
+      "comparison": {
+        "scoreChanges": 1,
+        "rankChanges": 2,
+        "eligibilityChanges": 0,
+        "qualificationChanges": 0,
+        "upwardPositive": 1,
+        "downwardPositive": 0,
+        "upwardNegative": 0,
+        "downwardNegative": 1
+      },
+      "delta": {
+        "top5Precision": 0,
+        "top10Precision": 0,
+        "strongRecall": 0,
+        "strongGoodRecall": 0,
+        "viableRecall": 0,
+        "falsePositiveRate": 0,
+        "falseNegativeRate": 0,
+        "rankCorrelation": 0.01,
+        "negativeLeakageTop5": 0,
+        "negativeLeakageTop10": 0,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 0,
+        "strongGoodBelow20": 0,
+        "threshold": null
+      }
+    },
+    "MODEL_C_DIRECT_TRANSFERABLE": {
+      "metrics": {
+        "top5Precision": 0.6,
+        "top10Precision": 0.5,
+        "strongRecall": 0.5,
+        "strongGoodRecall": 0.5,
+        "viableRecall": 0.35,
+        "falsePositiveRate": 0.65,
+        "falseNegativeRate": 0.4,
+        "rankCorrelation": 0.55,
+        "negativeLeakageTop5": 0,
+        "negativeLeakageTop10": 2,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 8,
+        "strongGoodBelow20": 3,
+        "threshold": {
+          "cutoff": 75.94,
+          "predictedCount": 17,
+          "falsePositiveRate": 0.65,
+          "falseNegativeRate": 0.4
+        }
+      },
+      "hash": "e086c7d20c42d04fb212ce6d6165942804c57f589946378e8724c20eeae5443a",
+      "comparison": {
+        "scoreChanges": 1,
+        "rankChanges": 2,
+        "eligibilityChanges": 0,
+        "qualificationChanges": 0,
+        "upwardPositive": 1,
+        "downwardPositive": 0,
+        "upwardNegative": 0,
+        "downwardNegative": 1
+      },
+      "delta": {
+        "top5Precision": 0,
+        "top10Precision": 0,
+        "strongRecall": 0,
+        "strongGoodRecall": 0,
+        "viableRecall": 0,
+        "falsePositiveRate": 0,
+        "falseNegativeRate": 0,
+        "rankCorrelation": 0.01,
+        "negativeLeakageTop5": 0,
+        "negativeLeakageTop10": 0,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 0,
+        "strongGoodBelow20": 0,
+        "threshold": null
+      }
+    },
+    "MODEL_D_DIRECT_TRANSFERABLE_PARTIAL": {
+      "metrics": {
+        "top5Precision": 0.6,
+        "top10Precision": 0.5,
+        "strongRecall": 0.5,
+        "strongGoodRecall": 0.5,
+        "viableRecall": 0.35,
+        "falsePositiveRate": 0.65,
+        "falseNegativeRate": 0.4,
+        "rankCorrelation": 0.55,
+        "negativeLeakageTop5": 0,
+        "negativeLeakageTop10": 2,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 8,
+        "strongGoodBelow20": 3,
+        "threshold": {
+          "cutoff": 75.94,
+          "predictedCount": 17,
+          "falsePositiveRate": 0.65,
+          "falseNegativeRate": 0.4
+        }
+      },
+      "hash": "e2f7c78201f74179b0b90646e9d126d22b7430d947e4964488e78ee79630eefb",
+      "comparison": {
+        "scoreChanges": 1,
+        "rankChanges": 2,
+        "eligibilityChanges": 0,
+        "qualificationChanges": 0,
+        "upwardPositive": 1,
+        "downwardPositive": 0,
+        "upwardNegative": 0,
+        "downwardNegative": 1
+      },
+      "delta": {
+        "top5Precision": 0,
+        "top10Precision": 0,
+        "strongRecall": 0,
+        "strongGoodRecall": 0,
+        "viableRecall": 0,
+        "falsePositiveRate": 0,
+        "falseNegativeRate": 0,
+        "rankCorrelation": 0.01,
+        "negativeLeakageTop5": 0,
+        "negativeLeakageTop10": 0,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 0,
+        "strongGoodBelow20": 0,
+        "threshold": null
+      }
+    }
+  }
+}

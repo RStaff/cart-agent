@@ -1,0 +1,144 @@
+{
+  "models": {
+    "MODEL_A_PRE_REQUIREMENT_MAPPING_CONTROL": {
+      "calibration": {
+        "top5Precision": 0,
+        "top10Precision": 0,
+        "strongRecall": 0,
+        "strongGoodRecall": 0,
+        "viableRecall": 0,
+        "falsePositiveRate": 0,
+        "falseNegativeRate": 0,
+        "rankCorrelation": 0,
+        "negativeLeakageTop5": 0,
+        "negativeLeakageTop10": 0,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 0,
+        "strongGoodBelow20": 0,
+        "threshold": null
+      },
+      "holdout": {
+        "top5Precision": 0,
+        "top10Precision": 0,
+        "strongRecall": 0,
+        "strongGoodRecall": 0,
+        "viableRecall": 0,
+        "falsePositiveRate": 0,
+        "falseNegativeRate": 0,
+        "rankCorrelation": 0,
+        "negativeLeakageTop5": 0,
+        "negativeLeakageTop10": 0,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 0,
+        "strongGoodBelow20": 0,
+        "threshold": null
+      },
+      "crossSet": "NO_MOVEMENT"
+    },
+    "MODEL_B_DIRECT_ONLY": {
+      "calibration": {
+        "top5Precision": 0,
+        "top10Precision": 0,
+        "strongRecall": 0,
+        "strongGoodRecall": 0,
+        "viableRecall": 0,
+        "falsePositiveRate": 0,
+        "falseNegativeRate": 0,
+        "rankCorrelation": 0,
+        "negativeLeakageTop5": 0,
+        "negativeLeakageTop10": 0,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 0,
+        "strongGoodBelow20": 0,
+        "threshold": null
+      },
+      "holdout": {
+        "top5Precision": 0,
+        "top10Precision": 0,
+        "strongRecall": 0,
+        "strongGoodRecall": 0,
+        "viableRecall": 0,
+        "falsePositiveRate": 0,
+        "falseNegativeRate": 0,
+        "rankCorrelation": 0.01,
+        "negativeLeakageTop5": 0,
+        "negativeLeakageTop10": 0,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 0,
+        "strongGoodBelow20": 0,
+        "threshold": null
+      },
+      "crossSet": "COMPARE_BOTH_SETS"
+    },
+    "MODEL_C_DIRECT_TRANSFERABLE": {
+      "calibration": {
+        "top5Precision": 0,
+        "top10Precision": 0,
+        "strongRecall": 0,
+        "strongGoodRecall": 0,
+        "viableRecall": 0,
+        "falsePositiveRate": 0,
+        "falseNegativeRate": 0,
+        "rankCorrelation": 0,
+        "negativeLeakageTop5": 0,
+        "negativeLeakageTop10": 0,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 0,
+        "strongGoodBelow20": 0,
+        "threshold": null
+      },
+      "holdout": {
+        "top5Precision": 0,
+        "top10Precision": 0,
+        "strongRecall": 0,
+        "strongGoodRecall": 0,
+        "viableRecall": 0,
+        "falsePositiveRate": 0,
+        "falseNegativeRate": 0,
+        "rankCorrelation": 0.01,
+        "negativeLeakageTop5": 0,
+        "negativeLeakageTop10": 0,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 0,
+        "strongGoodBelow20": 0,
+        "threshold": null
+      },
+      "crossSet": "COMPARE_BOTH_SETS"
+    },
+    "MODEL_D_DIRECT_TRANSFERABLE_PARTIAL": {
+      "calibration": {
+        "top5Precision": 0,
+        "top10Precision": 0,
+        "strongRecall": 0,
+        "strongGoodRecall": 0,
+        "viableRecall": 0,
+        "falsePositiveRate": 0,
+        "falseNegativeRate": 0,
+        "rankCorrelation": 0,
+        "negativeLeakageTop5": 0,
+        "negativeLeakageTop10": 0,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 0,
+        "strongGoodBelow20": 0,
+        "threshold": null
+      },
+      "holdout": {
+        "top5Precision": 0,
+        "top10Precision": 0,
+        "strongRecall": 0,
+        "strongGoodRecall": 0,
+        "viableRecall": 0,
+        "falsePositiveRate": 0,
+        "falseNegativeRate": 0,
+        "rankCorrelation": 0.01,
+        "negativeLeakageTop5": 0,
+        "negativeLeakageTop10": 0,
+        "hardMismatchLeakageTop10": 0,
+        "underRankedViable": 0,
+        "strongGoodBelow20": 0,
+        "threshold": null
+      },
+      "crossSet": "COMPARE_BOTH_SETS"
+    }
+  }
+}

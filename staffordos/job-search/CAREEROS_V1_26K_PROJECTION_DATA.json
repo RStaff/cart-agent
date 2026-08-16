@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "staffordos.careeros.v1_26k.requirement_mapped_evaluation.v1",
+  "models": {
+    "MODEL_A_PRE_REQUIREMENT_MAPPING_CONTROL": {
+      "utilization": {
+        "comparisonsConsidered": 5146,
+        "comparisonsAffected": 2148,
+        "directConsumed": 2148,
+        "transferableConsumed": 0,
+        "partialConsumed": 0,
+        "unresolvedPreserved": 2250,
+        "rejectedPreserved": 0,
+        "blocked": 182,
+        "specialistBlocked": 182
+      },
+      "projectionIsDerived": true,
+      "privatePayloadsOmitted": true
+    },
+    "MODEL_B_DIRECT_ONLY": {
+      "utilization": {
+        "direct": 14,
+        "transferable": 2,
+        "partial": 2,
+        "directConsumed": 26,
+        "transferableConsumed": 0,
+        "partialConsumed": 0,
+        "unknown": 2198,
+        "missing": 222,
+        "specialistBlocked": 0,
+        "conflictBlocked": 0,
+        "provenanceBlocked": 0,
+        "noSupportedEquivalent": 2,
+        "neutralUnresolved": 0,
+        "exactRequirementMappings": 20,
+        "authorityValid": 18,
+        "evaluatorConsumable": 14
+      },
+      "projectionIsDerived": true,
+      "privatePayloadsOmitted": true
+    },
+    "MODEL_C_DIRECT_TRANSFERABLE": {
+      "utilization": {
+        "direct": 14,
+        "transferable": 2,
+        "partial": 2,
+        "directConsumed": 26,
+        "transferableConsumed": 2,
+        "partialConsumed": 0,
+        "unknown": 2198,
+        "missing": 222,
+        "specialistBlocked": 0,
+        "conflictBlocked": 0,
+        "provenanceBlocked": 0,
+        "noSupportedEquivalent": 2,
+        "neutralUnresolved": 0,
+        "exactRequirementMappings": 20,
+        "authorityValid": 18,
+        "evaluatorConsumable": 16
+      },
+      "projectionIsDerived": true,
+      "privatePayloadsOmitted": true
+    },
+    "MODEL_D_DIRECT_TRANSFERABLE_PARTIAL": {
+      "utilization": {
+        "direct": 14,
+        "transferable": 2,
+        "partial": 2,
+        "directConsumed": 26,
+        "transferableConsumed": 2,
+        "partialConsumed": 4,
+        "unknown": 2196,
+        "missing": 222,
+        "specialistBlocked": 0,
+        "conflictBlocked": 0,
+        "provenanceBlocked": 0,
+        "noSupportedEquivalent": 2,
+        "neutralUnresolved": 0,
+        "exactRequirementMappings": 20,
+        "authorityValid": 18,
+        "evaluatorConsumable": 18
+      },
+      "projectionIsDerived": true,
+      "privatePayloadsOmitted": true
+    }
+  }
+}

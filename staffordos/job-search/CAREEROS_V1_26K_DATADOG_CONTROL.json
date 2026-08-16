@@ -1,0 +1,81 @@
+{
+  "role": "Director, Technical Program Management - Technical Solutions Operations",
+  "models": {
+    "MODEL_A_PRE_REQUIREMENT_MAPPING_CONTROL": [
+      {
+        "score": 74.66,
+        "rank": 4,
+        "eligibility": "ELIGIBLE",
+        "qualification": "TRANSFERABLE_BUT_NOT_DIRECT",
+        "j003": "REVIEW",
+        "responsibility": "PARTIAL",
+        "seniority": "UPWARD_STRETCH_WITH_SUPPORTED_SCOPE",
+        "domain": "TRANSFERABLE_DOMAIN",
+        "evidenceStateDistribution": {
+          "EXACT_OR_DIRECT_SUPPORT": 5,
+          "STRONG_TRANSFERABLE_SUPPORT": 8,
+          "PARTIAL_SUPPORT": 0,
+          "NO_SUPPORTED_EVIDENCE": 0,
+          "UNKNOWN": 2
+        }
+      }
+    ],
+    "MODEL_B_DIRECT_ONLY": [
+      {
+        "score": 74.66,
+        "rank": 4,
+        "eligibility": "ELIGIBLE",
+        "qualification": "TRANSFERABLE_BUT_NOT_DIRECT",
+        "j003": "REVIEW",
+        "responsibility": "PARTIAL",
+        "seniority": "UPWARD_STRETCH_WITH_SUPPORTED_SCOPE",
+        "domain": "TRANSFERABLE_DOMAIN",
+        "evidenceStateDistribution": {
+          "EXACT_OR_DIRECT_SUPPORT": 5,
+          "STRONG_TRANSFERABLE_SUPPORT": 8,
+          "PARTIAL_SUPPORT": 0,
+          "NO_SUPPORTED_EVIDENCE": 0,
+          "UNKNOWN": 2
+        }
+      }
+    ],
+    "MODEL_C_DIRECT_TRANSFERABLE": [
+      {
+        "score": 74.66,
+        "rank": 4,
+        "eligibility": "ELIGIBLE",
+        "qualification": "TRANSFERABLE_BUT_NOT_DIRECT",
+        "j003": "REVIEW",
+        "responsibility": "PARTIAL",
+        "seniority": "UPWARD_STRETCH_WITH_SUPPORTED_SCOPE",
+        "domain": "TRANSFERABLE_DOMAIN",
+        "evidenceStateDistribution": {
+          "EXACT_OR_DIRECT_SUPPORT": 5,
+          "STRONG_TRANSFERABLE_SUPPORT": 8,
+          "PARTIAL_SUPPORT": 0,
+          "NO_SUPPORTED_EVIDENCE": 0,
+          "UNKNOWN": 2
+        }
+      }
+    ],
+    "MODEL_D_DIRECT_TRANSFERABLE_PARTIAL": [
+      {
+        "score": 74.66,
+        "rank": 4,
+        "eligibility": "ELIGIBLE",
+        "qualification": "TRANSFERABLE_BUT_NOT_DIRECT",
+        "j003": "REVIEW",
+        "responsibility": "PARTIAL",
+        "seniority": "UPWARD_STRETCH_WITH_SUPPORTED_SCOPE",
+        "domain": "TRANSFERABLE_DOMAIN",
+        "evidenceStateDistribution": {
+          "EXACT_OR_DIRECT_SUPPORT": 5,
+          "STRONG_TRANSFERABLE_SUPPORT": 8,
+          "PARTIAL_SUPPORT": 0,
+          "NO_SUPPORTED_EVIDENCE": 0,
+          "UNKNOWN": 2
+        }
+      }
+    ]
+  }
+}
