@@ -1,0 +1,11 @@
+{
+  "selfConfidence": false,
+  "interest": false,
+  "wouldPursue": false,
+  "workflow": false,
+  "titleOnlyPenalty": false,
+  "domainOnlyPenalty": false,
+  "missingEvidencePenalty": false,
+  "careerFactMutated": false,
+  "careerEvidenceMutated": false
+}

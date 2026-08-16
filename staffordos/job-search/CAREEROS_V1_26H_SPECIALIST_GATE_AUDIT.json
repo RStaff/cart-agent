@@ -1,0 +1,15 @@
+{
+  "specialistMappingsBlocked": 182,
+  "genericAuthoritySatisfiesSpecialist": false,
+  "specialistFamiliesProtected": [
+    "finance",
+    "tax",
+    "payroll",
+    "accounting",
+    "legal",
+    "AV_MEDIA",
+    "software_engineering",
+    "data_science",
+    "specialist_AI_ML"
+  ]
+}

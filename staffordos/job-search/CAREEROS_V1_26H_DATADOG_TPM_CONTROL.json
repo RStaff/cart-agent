@@ -1,0 +1,77 @@
+{
+  "role": "Director, Technical Program Management - Technical Solutions Operations",
+  "baseline": {
+    "score": 72.25,
+    "rank": 3,
+    "eligibility": "ELIGIBLE",
+    "j010": "TRANSFERABLE_BUT_NOT_DIRECT",
+    "j003": "REVIEW"
+  },
+  "models": {
+    "MODEL_INPUT_A_CURRENT_DIRECT_DOMINANT": {
+      "result": [
+        {
+          "score": 74.66,
+          "rank": 4,
+          "eligibility": "ELIGIBLE",
+          "j010": "TRANSFERABLE_BUT_NOT_DIRECT",
+          "j003": "REVIEW",
+          "responsibility": "PARTIAL",
+          "seniority": "UPWARD_STRETCH_WITH_SUPPORTED_SCOPE",
+          "domain": "TRANSFERABLE_DOMAIN"
+        }
+      ],
+      "note": "Exact frozen replay output; no manual boost."
+    },
+    "MODEL_INPUT_B_STATE_PRESERVING": {
+      "result": [
+        {
+          "score": 74.66,
+          "rank": 4,
+          "eligibility": "ELIGIBLE",
+          "j010": "TRANSFERABLE_BUT_NOT_DIRECT",
+          "j003": "REVIEW",
+          "responsibility": "PARTIAL",
+          "seniority": "UPWARD_STRETCH_WITH_SUPPORTED_SCOPE",
+          "domain": "TRANSFERABLE_DOMAIN"
+        }
+      ],
+      "note": "Exact frozen replay output; no manual boost."
+    },
+    "MODEL_INPUT_C_BOUNDED_TRANSFERABILITY": {
+      "result": [
+        {
+          "score": 72.25,
+          "rank": 3,
+          "eligibility": "ELIGIBLE",
+          "j010": "TRANSFERABLE_BUT_NOT_DIRECT",
+          "j003": "REVIEW",
+          "responsibility": "PARTIAL",
+          "seniority": "UPWARD_STRETCH_WITH_SUPPORTED_SCOPE",
+          "domain": "TRANSFERABLE_DOMAIN"
+        }
+      ],
+      "note": "Exact frozen replay output; no manual boost."
+    },
+    "MODEL_INPUT_D_BOUNDED_PARTIAL_SUPPORT": {
+      "result": [
+        {
+          "score": 72.25,
+          "rank": 3,
+          "eligibility": "ELIGIBLE",
+          "j010": "TRANSFERABLE_BUT_NOT_DIRECT",
+          "j003": "REVIEW",
+          "responsibility": "PARTIAL",
+          "seniority": "UPWARD_STRETCH_WITH_SUPPORTED_SCOPE",
+          "domain": "TRANSFERABLE_DOMAIN"
+        }
+      ],
+      "note": "Exact frozen replay output; no manual boost."
+    }
+  },
+  "directUsed": 2148,
+  "transferableUsed": 0,
+  "partialUsed": 0,
+  "specialistBlockers": 182,
+  "preferenceCompatibility": "EXPLICIT_AUTHORITY_SEPARATE_FROM_CAPABILITY_FIT"
+}

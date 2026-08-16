@@ -1,0 +1,80 @@
+{
+  "models": {
+    "MODEL_INPUT_A_CURRENT_DIRECT_DOMINANT": {
+      "calibration": {
+        "companies": 5,
+        "top10PrecisionRange": [
+          0.2,
+          0.4
+        ]
+      },
+      "holdout": {
+        "companies": 7,
+        "top10PrecisionRange": [
+          0.3,
+          0.5
+        ]
+      }
+    },
+    "MODEL_INPUT_B_STATE_PRESERVING": {
+      "calibration": {
+        "companies": 5,
+        "top10PrecisionRange": [
+          0.2,
+          0.4
+        ]
+      },
+      "holdout": {
+        "companies": 7,
+        "top10PrecisionRange": [
+          0.3,
+          0.5
+        ]
+      }
+    },
+    "MODEL_INPUT_C_BOUNDED_TRANSFERABILITY": {
+      "calibration": {
+        "companies": 5,
+        "top10PrecisionRange": [
+          0.2,
+          0.3
+        ]
+      },
+      "holdout": {
+        "companies": 7,
+        "top10PrecisionRange": [
+          0.2,
+          0.4
+        ]
+      }
+    },
+    "MODEL_INPUT_D_BOUNDED_PARTIAL_SUPPORT": {
+      "calibration": {
+        "companies": 5,
+        "top10PrecisionRange": [
+          0.2,
+          0.3
+        ]
+      },
+      "holdout": {
+        "companies": 7,
+        "top10PrecisionRange": [
+          0.2,
+          0.4
+        ]
+      }
+    }
+  },
+  "deterministic": {
+    "pureProjection": true,
+    "stableModelOrder": [
+      "MODEL_INPUT_A_CURRENT_DIRECT_DOMINANT",
+      "MODEL_INPUT_B_STATE_PRESERVING",
+      "MODEL_INPUT_C_BOUNDED_TRANSFERABILITY",
+      "MODEL_INPUT_D_BOUNDED_PARTIAL_SUPPORT"
+    ],
+    "comparisonMethod": "Run the evaluator twice with unchanged authority and compare emitted model hashes and metrics",
+    "requiresIndependentRerun": true
+  },
+  "noHyperparameterSearch": true
+}

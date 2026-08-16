@@ -1,0 +1,27 @@
+{
+  "models": [
+    "MODEL_INPUT_A_CURRENT_DIRECT_DOMINANT",
+    "MODEL_INPUT_B_STATE_PRESERVING",
+    "MODEL_INPUT_C_BOUNDED_TRANSFERABILITY",
+    "MODEL_INPUT_D_BOUNDED_PARTIAL_SUPPORT"
+  ],
+  "frozenModel": {
+    "identity": "MODEL_V2D_ROBUSTNESS_CONTROL",
+    "formula": "FROZEN_V1_23_V2D",
+    "weights": {
+      "relevantExperience": 40,
+      "roleFunction": 25,
+      "responsibility": 25,
+      "seniority": 10
+    }
+  },
+  "stateSemantics": {
+    "direct": "PROVEN",
+    "transferable": "TRANSFERABLE",
+    "partial": "PARTIAL",
+    "unknown": "UNKNOWN",
+    "missing": "non-positive but not negative"
+  },
+  "specialistGate": "generic authority cannot satisfy specialist requirements",
+  "noWeightTuning": true
+}
