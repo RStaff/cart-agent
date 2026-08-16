@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "staffordos.careeros.v1_26m.authority_integrity.v1",
+  "careerFactCount": 898,
+  "careerEvidenceCount": 21,
+  "round1MappingAuthorityPreserved": true,
+  "round2AuthorityCreated": false,
+  "labelsUnchanged": true,
+  "v2dUnchanged": true,
+  "workflowUnchanged": true,
+  "preferencesUnchanged": true,
+  "careerFactMutated": false,
+  "careerEvidenceMutated": false,
+  "existingDecisionMutated": false
+}

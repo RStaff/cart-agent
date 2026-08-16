@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "staffordos.careeros.v1_26m.review_set_manifest.v1",
+  "reviewSetId": "V1_26M_SECOND_BOUNDED_REQUIREMENT_REVIEW",
+  "storedQueueSize": 30,
+  "storedQueueEntries": 30,
+  "exactRequirementIdsPresent": false,
+  "exactOpportunityIdsPresent": false,
+  "targetRequirementSetsPresent": false,
+  "round1ActiveMappings": 24,
+  "round2Decisions": 0,
+  "reconstructable": false,
+  "stopClassification": "V1_26L_REVIEW_PLAN_AUTHORITY_MISSING",
+  "privacy": "No private identifiers or source payloads are included."
+}

@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "staffordos.careeros.v1_26m.specialist_scope_audit.v1",
+  "specialistBoundaryMetadataPresent": true,
+  "exactSpecialistTargetRequirementsPresent": false,
+  "scopeBoundaryUsable": false,
+  "genericToSpecialistPropagationAllowed": false,
+  "result": "BLOCKED_PENDING_EXACT_TARGET_AUTHORITY"
+}

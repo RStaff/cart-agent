@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "staffordos.careeros.v1_26m.compression_boundary_audit.v1",
+  "storedQuestions": 30,
+  "compressedFamilyPrompts": 30,
+  "exactTargetBoundariesAvailable": false,
+  "safePropagation": false,
+  "reason": "A family-level prompt cannot authorize multiple exact requirements without a governed target set and compatible scope metadata.",
+  "requiredRepair": "Persist exact target requirement IDs and opportunity/source identity for every compressed question before operator input."
+}

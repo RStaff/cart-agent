@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "staffordos.careeros.v1_26m.progress_model.v1",
+  "reviewSetId": "V1_26M_SECOND_BOUNDED_REQUIREMENT_REVIEW",
+  "round1RequirementMappings": { "completed": 24, "total": 24 },
+  "round2OperatorDecisions": { "completed": 0, "total": 30 },
+  "round2RequirementsAddressed": { "completed": 0, "total": "UNKNOWN_UNTIL_EXACT_TARGETS_EXIST" },
+  "totalActiveRequirementMappings": 24,
+  "appendOnlyRecordsAreNotProgress": true,
+  "usable": false
+}

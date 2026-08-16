@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "staffordos.careeros.v1_26m.question_identity_audit.v1",
+  "reviewSetId": "V1_26M_SECOND_BOUNDED_REQUIREMENT_REVIEW",
+  "questionCount": 30,
+  "stableQuestionIdsPresent": true,
+  "stableRequirementIdsPresent": false,
+  "stableOpportunityIdsPresent": false,
+  "targetSetsPresent": false,
+  "identityKeyUsableForPersistence": false,
+  "failureReason": "Stored questions are aggregate capability-family prompts, not exact requirement-level review records."
+}

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "staffordos.careeros.v1_26m.runtime_acceptance.v1",
+  "route": "/os/professional/evidence?view=requirement-mapping&set=v1_26m",
+  "runtimeImplemented": false,
+  "acceptanceStatus": "NOT_STARTED_STOPPED_ON_AUTHORITY_DEFECT",
+  "neutralDefault": "NOT_TESTED",
+  "exactReadback": "NOT_TESTED",
+  "navigation": "NOT_TESTED",
+  "supersession": "NOT_TESTED",
+  "reason": "The stored review plan cannot identify an exact requirement to persist."
+}
