@@ -1,0 +1,21 @@
+{
+  "route": "/os/professional/evidence?view=requirement-mapping&set=v1_26m2",
+  "routeStatus": 200,
+  "neutralUnanswered": true,
+  "exactQuestionIdentity": true,
+  "exactTargetSetIdentity": true,
+  "savedReadback": true,
+  "savedFeedback": true,
+  "previousNext": true,
+  "nextUnreviewed": true,
+  "editSupersession": true,
+  "activeDecisionUniqueness": true,
+  "largeTargetQuestion": 1087,
+  "targetPageSize": 25,
+  "targetListCollapsedByDefault": true,
+  "targetAuthorityNotTruncated": true,
+  "privatePathsExposed": false,
+  "privateIdsExposed": false,
+  "externalHydrationAttributeEmitted": false,
+  "hydrationClassification": "EXTERNAL_DOM_MUTATION_NOT_EMITTED_BY_CAREEROS"
+}

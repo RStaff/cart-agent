@@ -33,6 +33,11 @@ export type RequirementMappingDecision = {
   canonicalCareerFactMutated: false;
   canonicalCareerEvidenceCreated: false;
   workflowMutated: false;
+  reviewSetId?: string;
+  compressedQuestionId?: string;
+  targetRequirementIds?: string[];
+  targetOpportunityIds?: string[];
+  projectionRulesVersion?: string;
 };
 
 export type RequirementMappingReviewItem = {
@@ -57,6 +62,16 @@ export type RequirementMappingReviewItem = {
   authoritySummary: string;
   decision: RequirementMappingDecision | null;
   allowedStates: readonly RequirementMappingState[];
+  reviewSetId?: string;
+  compressedQuestionId?: string;
+  targetRequirementIds?: string[];
+  targetOpportunityIds?: string[];
+  targetProjectionRules?: unknown[];
+  explanation?: string;
+  scopeClassification?: string;
+  specialistClass?: string;
+  representativeTargets?: Array<{ company: string | null; title: string | null; requirementText: string; requirementId: string }>;
+  targetSummaries?: Array<{ company: string | null; title: string | null; requirementText: string }>;
 };
 
 function decisionPath(root: string) { return path.join(root, "requirement-mapping-decisions.ndjson"); }
@@ -106,6 +121,11 @@ export function appendRequirementMappingDecision(options: {
   operatorNote?: string | null;
   specialistCompatible?: boolean;
   createdAt?: string;
+  reviewSetId?: string;
+  compressedQuestionId?: string;
+  targetRequirementIds?: string[];
+  targetOpportunityIds?: string[];
+  projectionRulesVersion?: string;
 }) {
   if (!REQUIREMENT_MAPPING_STATES.includes(options.state)) throw new Error("INVALID_MAPPING_STATE");
   if (options.item.specialist && ["DIRECT", "TRANSFERABLE", "PARTIAL"].includes(options.state) && options.specialistCompatible !== true) throw new Error("SPECIALIST_COMPATIBILITY_REQUIRED");
@@ -113,7 +133,7 @@ export function appendRequirementMappingDecision(options: {
   if (decisionRoot === repositoryRoot || decisionRoot.startsWith(repositoryRoot + path.sep)) throw new Error("PRIVATE_DECISION_ROOT_REQUIRED");
   const prior = options.item.decision;
   const createdAt = options.createdAt || new Date().toISOString();
-  const seed = `${options.item.requirementId}|${createdAt}|${options.state}`;
+  const seed = `${options.reviewSetId || "ROUND_1"}|${options.compressedQuestionId || options.item.requirementId}|${createdAt}|${options.state}`;
   const decision: RequirementMappingDecision = {
     schemaVersion: REQUIREMENT_MAPPING_SCHEMA_VERSION,
     decisionId: `requirement_mapping_decision_${createHash("sha256").update(seed).digest("hex").slice(0, 24)}`,
@@ -134,6 +154,11 @@ export function appendRequirementMappingDecision(options: {
     canonicalCareerFactMutated: false,
     canonicalCareerEvidenceCreated: false,
     workflowMutated: false,
+    ...(options.reviewSetId ? { reviewSetId: options.reviewSetId } : {}),
+    ...(options.compressedQuestionId ? { compressedQuestionId: options.compressedQuestionId } : {}),
+    ...(options.targetRequirementIds ? { targetRequirementIds: [...options.targetRequirementIds] } : {}),
+    ...(options.targetOpportunityIds ? { targetOpportunityIds: [...options.targetOpportunityIds] } : {}),
+    ...(options.projectionRulesVersion ? { projectionRulesVersion: options.projectionRulesVersion } : {}),
   };
   mkdirSync(options.decisionRoot, { recursive: true, mode: 0o700 });
   appendFileSync(decisionPath(options.decisionRoot), `${JSON.stringify(decision)}\n`, { encoding: "utf8", mode: 0o600 });
@@ -177,5 +202,62 @@ export function loadRequirementMappingQueue(options: { repositoryRoot: string; d
 }
 
 export function requirementMappingProgress(queue: readonly RequirementMappingReviewItem[]) { return { decisionsCompleted: queue.filter((item) => Boolean(item.decision)).length, decisionTotal: queue.length, requirementsAddressed: queue.filter((item) => Boolean(item.decision)).length, requirementTotal: queue.length }; }
+
+export function loadScopeSafeRequirementMappingQueue(options: { repositoryRoot: string; decisionRoot: string; reviewSetId: string }): RequirementMappingReviewItem[] {
+  const repositoryRoot = existsSync(path.join(options.repositoryRoot, "staffordos")) ? options.repositoryRoot : path.resolve(options.repositoryRoot, "../../..");
+  const manifestFile = path.join(repositoryRoot, "staffordos/job-search/CAREEROS_V1_26L2_COMPRESSED_REVIEW_MANIFEST.json");
+  if (!existsSync(manifestFile)) return [];
+  const manifest = JSON.parse(readFileSync(manifestFile, "utf8"));
+  if (manifest.reviewSetId !== "V1_26L2_SCOPE_SAFE_COMPRESSED_REVIEW") throw new Error("L2_MANIFEST_REVIEW_SET_MISMATCH");
+  const decisions = loadRequirementMappingDecisions({ decisionRoot: options.decisionRoot, repositoryRoot });
+  const active = new Map<string, RequirementMappingDecision>();
+  for (const decision of decisions) {
+    if (decision.reviewSetId === options.reviewSetId && decision.compressedQuestionId) active.set(decision.compressedQuestionId, decision);
+  }
+  return (manifest.questions || []).map((question: any) => {
+    const targets = Array.isArray(question.targets) ? question.targets : [];
+    const first = targets[0] || {};
+    const decision = active.get(question.compressedQuestionId) || null;
+    return {
+      requirementId: first.requirementId,
+      opportunityId: first.opportunityId,
+      sourceRecordId: first.sourceRecordId || null,
+      company: first.company || "Multiple opportunities",
+      title: first.role || "Multiple roles",
+      requirementText: question.operatorQuestion,
+      requirementType: "COMPRESSED_REQUIREMENT_SET",
+      importance: question.mergedImportanceClasses.join(", "),
+      section: null,
+      specialist: question.specialistClass === "SPECIALIST",
+      capabilityFamily: question.capabilityFamily,
+      careerFactIds: [],
+      careerEvidenceIds: [],
+      currentMappingState: "UNKNOWN",
+      priority: 0,
+      priorityReason: question.compressionReason,
+      question: question.operatorQuestion,
+      whyAsked: question.explanation,
+      authoritySummary: `${question.targetCount} exact requirement targets are governed by this question.`,
+      decision,
+      allowedStates: REQUIREMENT_MAPPING_STATES,
+      reviewSetId: options.reviewSetId,
+      compressedQuestionId: question.compressedQuestionId,
+      targetRequirementIds: question.targetRequirementIds,
+      targetOpportunityIds: question.targetOpportunityIds,
+      targetProjectionRules: question.targetProjectionRules,
+      explanation: question.explanation,
+      scopeClassification: question.scopeClassification,
+      specialistClass: question.specialistClass,
+      representativeTargets: targets.slice(0, 5).map((target: any) => ({ company: target.company || null, title: target.role || null, requirementText: target.exactRequirementText, requirementId: target.requirementId })),
+      targetSummaries: targets.map((target: any) => ({ company: target.company || null, title: target.role || null, requirementText: target.exactRequirementText })),
+    } as RequirementMappingReviewItem;
+  });
+}
+
+export function scopeSafeRequirementMappingProgress(queue: readonly RequirementMappingReviewItem[]) {
+  const completed = queue.filter((item) => Boolean(item.decision));
+  const targetIds = new Set(completed.flatMap((item) => item.targetRequirementIds || []));
+  return { decisionsCompleted: completed.length, decisionTotal: queue.length, requirementsAddressed: targetIds.size, requirementTotal: new Set(queue.flatMap((item) => item.targetRequirementIds || [])).size };
+}
 
 export function privateRequirementMappingRoot() { return path.join(process.env.HOME || "", ".staffordos/private/professional/job-search/adjudication"); }

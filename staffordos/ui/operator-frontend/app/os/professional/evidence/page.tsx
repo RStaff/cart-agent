@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import L2TargetInspector from "../../../../components/staffordos/L2TargetInspector";
 import {
   REVIEW_CLUSTER_ANSWERS,
   appendReviewClusterDecision,
@@ -19,6 +20,8 @@ import {
   loadRequirementMappingQueue,
   privateRequirementMappingRoot,
   requirementMappingProgress,
+  loadScopeSafeRequirementMappingQueue,
+  scopeSafeRequirementMappingProgress,
   REQUIREMENT_MAPPING_STATES,
   type RequirementMappingState,
 } from "../../../../lib/staffordos/requirementMapping";
@@ -75,10 +78,16 @@ async function adjudicateReviewClusterAction(formData: FormData) {
 
 async function adjudicateRequirementMappingAction(formData: FormData) {
   "use server";
+  const reviewSetId = String(formData.get("reviewSetId") || "").trim() || null;
+  const compressedQuestionId = String(formData.get("compressedQuestionId") || "").trim() || null;
   const requirementId = String(formData.get("requirementId") || "").trim();
   const state = mappingStateFromForm(formData.get("state"));
-  const queue = loadRequirementMappingQueue({ repositoryRoot: process.cwd(), decisionRoot: privateRequirementMappingRoot(), limit: 24 });
-  const item = queue.find((entry) => entry.requirementId === requirementId);
+  const queue = reviewSetId === "V1_26M2_SCOPE_SAFE_ROUND2_REVIEW"
+    ? loadScopeSafeRequirementMappingQueue({ repositoryRoot: process.cwd(), decisionRoot: privateRequirementMappingRoot(), reviewSetId })
+    : loadRequirementMappingQueue({ repositoryRoot: process.cwd(), decisionRoot: privateRequirementMappingRoot(), limit: 24 });
+  const item = compressedQuestionId
+    ? queue.find((entry) => entry.compressedQuestionId === compressedQuestionId)
+    : queue.find((entry) => entry.requirementId === requirementId);
   if (!item || !state) redirect("/os/professional/evidence?view=requirement-mapping&status=NOT_SAVED");
   try {
     appendRequirementMappingDecision({
@@ -90,12 +99,22 @@ async function adjudicateRequirementMappingAction(formData: FormData) {
       unresolvedPortion: String(formData.get("unresolvedPortion") || "").trim() || null,
       operatorNote: String(formData.get("operatorNote") || "").trim() || null,
       specialistCompatible: formData.get("specialistCompatible") === "true",
+      reviewSetId: reviewSetId || undefined,
+      compressedQuestionId: compressedQuestionId || undefined,
+      targetRequirementIds: item.targetRequirementIds,
+      targetOpportunityIds: item.targetOpportunityIds,
+      projectionRulesVersion: reviewSetId ? "CAREEROS_V1_26L2_TARGET_PROJECTION_RULES" : undefined,
     });
+    const readbackQueue = reviewSetId === "V1_26M2_SCOPE_SAFE_ROUND2_REVIEW"
+      ? loadScopeSafeRequirementMappingQueue({ repositoryRoot: process.cwd(), decisionRoot: privateRequirementMappingRoot(), reviewSetId })
+      : loadRequirementMappingQueue({ repositoryRoot: process.cwd(), decisionRoot: privateRequirementMappingRoot(), limit: 24 });
+    const readback = compressedQuestionId ? readbackQueue.find((entry) => entry.compressedQuestionId === compressedQuestionId) : readbackQueue.find((entry) => entry.requirementId === requirementId);
+    if (!readback?.decision || readback.decision.state !== state || (reviewSetId && JSON.stringify(readback.decision.targetRequirementIds || []) !== JSON.stringify(item.targetRequirementIds || []))) throw new Error("EXACT_READBACK_FAILED");
   } catch (error) {
     const reason = error instanceof Error ? error.message : "SAVE_FAILED";
-    redirect(`/os/professional/evidence?view=requirement-mapping&requirement=${encodeURIComponent(requirementId)}&status=NOT_SAVED&reason=${encodeURIComponent(reason)}`);
+    redirect(`/os/professional/evidence?view=requirement-mapping${reviewSetId ? `&set=v1_26m2&question=${encodeURIComponent(compressedQuestionId || "")}` : `&requirement=${encodeURIComponent(requirementId)}`}&status=NOT_SAVED&reason=${encodeURIComponent(reason)}`);
   }
-  redirect(`/os/professional/evidence?view=requirement-mapping&requirement=${encodeURIComponent(requirementId)}&status=SAVED`);
+  redirect(`/os/professional/evidence?view=requirement-mapping${reviewSetId ? `&set=v1_26m2&question=${encodeURIComponent(compressedQuestionId || "")}` : `&requirement=${encodeURIComponent(requirementId)}`}&status=SAVED`);
 }
 
 function displayLabel(value: string) { return value.replaceAll("_", " "); }
@@ -110,28 +129,32 @@ export default async function ProfessionalEvidencePage({
   const progress = compressionProgress(runtime);
   const requirementMappingMode = params.view === "requirement-mapping";
   if (requirementMappingMode) {
-    const mappingQueue = loadRequirementMappingQueue({ repositoryRoot: process.cwd(), decisionRoot: privateRequirementMappingRoot(), limit: 24 });
-    const mappingProgress = requirementMappingProgress(mappingQueue);
+    const scopeSafeMode = params.set === "v1_26m2";
+    const mappingQueue = scopeSafeMode
+      ? loadScopeSafeRequirementMappingQueue({ repositoryRoot: process.cwd(), decisionRoot: privateRequirementMappingRoot(), reviewSetId: "V1_26M2_SCOPE_SAFE_ROUND2_REVIEW" })
+      : loadRequirementMappingQueue({ repositoryRoot: process.cwd(), decisionRoot: privateRequirementMappingRoot(), limit: 24 });
+    const mappingProgress = scopeSafeMode ? scopeSafeRequirementMappingProgress(mappingQueue) : requirementMappingProgress(mappingQueue);
     const requestedRequirement = typeof params.requirement === "string" ? params.requirement : null;
-    const item = mappingQueue.find((entry) => entry.requirementId === requestedRequirement) || mappingQueue.find((entry) => !entry.decision) || mappingQueue[0] || null;
-    const index = item ? mappingQueue.findIndex((entry) => entry.requirementId === item.requirementId) : -1;
+    const requestedQuestion = typeof params.question === "string" ? params.question : null;
+    const item = (scopeSafeMode ? mappingQueue.find((entry) => entry.compressedQuestionId === requestedQuestion) : mappingQueue.find((entry) => entry.requirementId === requestedRequirement)) || mappingQueue.find((entry) => !entry.decision) || mappingQueue[0] || null;
+    const index = item ? mappingQueue.findIndex((entry) => scopeSafeMode ? entry.compressedQuestionId === item.compressedQuestionId : entry.requirementId === item.requirementId) : -1;
     const previous = index > 0 ? mappingQueue[index - 1] : null;
     const next = index >= 0 && index < mappingQueue.length - 1 ? mappingQueue[index + 1] : null;
     const nextUnreviewed = mappingQueue.find((entry) => !entry.decision) || null;
-    const href = (requirementId: string) => `/os/professional/evidence?view=requirement-mapping&requirement=${encodeURIComponent(requirementId)}`;
+    const href = (entry: typeof item) => scopeSafeMode ? `/os/professional/evidence?view=requirement-mapping&set=v1_26m2&question=${encodeURIComponent(entry?.compressedQuestionId || "")}` : `/os/professional/evidence?view=requirement-mapping&requirement=${encodeURIComponent(entry?.requirementId || "")}`;
     const status = typeof params.status === "string" ? params.status : null;
     const reason = typeof params.reason === "string" ? params.reason : null;
     return (
       <div className="careerEvidenceAdjudicationPage">
-        <section className="careerEvidenceAdjudicationHeader"><div><span className="staffordEyebrow">Professional / Requirement mapping</span><h1>Requirement-Level Evidence Mapping</h1><p>CareerOS asks a bounded question about one exact job requirement. This does not create or rewrite career evidence.</p></div><div className="careerEvidenceAdjudicationStatus"><strong>Owner-private review</strong><span>CareerFact and CareerEvidence remain unchanged.</span></div></section>
+        <section className="careerEvidenceAdjudicationHeader"><div><span className="staffordEyebrow">Professional / {scopeSafeMode ? "Round 2 scope-safe review" : "Requirement mapping"}</span><h1>{scopeSafeMode ? "Scope-Safe Requirement Review" : "Requirement-Level Evidence Mapping"}</h1><p>{scopeSafeMode ? "CareerOS groups only compatible exact requirements. Your answer is applied only through each target's approved projection rules." : "CareerOS asks a bounded question about one exact job requirement. This does not create or rewrite career evidence."}</p></div><div className="careerEvidenceAdjudicationStatus"><strong>Owner-private review</strong><span>CareerFact and CareerEvidence remain unchanged.</span></div></section>
         <section className="careerEvidenceAdjudicationNotice"><strong>Requirement mapping</strong><p>This changes evidence authority only. It does not change ranking, application status, workflow decisions, preferences, or source truth.</p></section>
-        <section className="careerEvidenceProgress" aria-label="Requirement mapping progress"><div><span>Requirement mapping decisions</span><strong>{mappingProgress.decisionsCompleted} / {mappingProgress.decisionTotal}</strong></div><div><span>Requirements addressed</span><strong>{mappingProgress.requirementsAddressed} / {mappingProgress.requirementTotal}</strong></div><div><span>High-value review</span><strong>{progress.operatorDecisions} / {progress.operatorDecisionTotal}</strong></div></section>
-        <nav className="careerEvidenceFocus" aria-label="Evidence review focus"><span>Review focus:</span><a href="/os/professional/evidence">High-value review</a><a href="/os/professional/evidence?view=conflicts">Conflict resolution</a><a href="/os/professional/evidence?view=requirement-mapping">Requirement mapping</a></nav>
+        <section className="careerEvidenceProgress" aria-label="Requirement mapping progress">{scopeSafeMode ? <><div><span>Round 1 requirement mapping</span><strong>24 / 24</strong></div><div><span>Round 2 scope-safe review</span><strong>{mappingProgress.decisionsCompleted} / {mappingProgress.decisionTotal}</strong></div><div><span>Round 2 exact targets addressed</span><strong>{mappingProgress.requirementsAddressed} / {mappingProgress.requirementTotal}</strong></div><div><span>Total active requirement authority</span><strong>{24 + mappingProgress.decisionsCompleted}</strong></div></> : <><div><span>Requirement mapping decisions</span><strong>{mappingProgress.decisionsCompleted} / {mappingProgress.decisionTotal}</strong></div><div><span>Requirements addressed</span><strong>{mappingProgress.requirementsAddressed} / {mappingProgress.requirementTotal}</strong></div><div><span>High-value review</span><strong>{progress.operatorDecisions} / {progress.operatorDecisionTotal}</strong></div></>}</section>
+        <nav className="careerEvidenceFocus" aria-label="Evidence review focus"><span>Review focus:</span><a href="/os/professional/evidence">High-value review</a><a href="/os/professional/evidence?view=conflicts">Conflict resolution</a><a href="/os/professional/evidence?view=requirement-mapping">Requirement mapping</a>{scopeSafeMode ? <a href="/os/professional/evidence?view=requirement-mapping&set=v1_26m2">Round 2</a> : null}</nav>
         {status ? <p className={`careerEvidenceFeedback ${status === "NOT_SAVED" ? "is-error" : "is-success"}`} role="status">{status === "NOT_SAVED" ? `NOT SAVED${reason ? `: ${reason}` : ""}` : status}</p> : null}
         {item ? <>
-          <nav className="careerEvidenceNavigation" aria-label="Requirement mapping navigation">{previous ? <a href={href(previous.requirementId)}>Previous</a> : <span>Previous</span>}<span>Requirement {index + 1} of {mappingQueue.length}</span>{next ? <a href={href(next.requirementId)}>Next</a> : <span>Next</span>}</nav>
-          {nextUnreviewed ? <p className="careerEvidenceNextUnreviewed"><a href={href(nextUnreviewed.requirementId)}>Next unreviewed</a></p> : null}
-          <article className="careerEvidenceReviewCard"><div className="careerEvidenceReviewMeta"><span>{item.company}</span><span>{item.title}</span><span>{item.capabilityFamily}</span>{item.specialist ? <span>Specialist boundary</span> : null}</div><h2>{item.requirementText}</h2><p>{item.question}</p><dl className="careerEvidenceReviewFacts"><div><dt>Why CareerOS is asking</dt><dd>{item.whyAsked} {item.priorityReason}</dd></div><div><dt>Existing Ross authority</dt><dd>{item.authoritySummary}</dd></div><div><dt>Current system interpretation</dt><dd>{displayLabel(item.currentMappingState)}; no positive requirement relationship is currently authorized.</dd></div><div><dt>Requirement</dt><dd>{displayLabel(item.requirementType)} · {displayLabel(item.importance)}{item.section ? ` · ${item.section}` : ""}</dd></div><div><dt>What this affects</dt><dd>Only this exact requirement relationship and the cited existing authority references.</dd></div><div><dt>What this does not affect</dt><dd>CareerFact, CareerEvidence, ranking, J002, J003, J010, workflow, preferences, or applications.</dd></div></dl><form action={adjudicateRequirementMappingAction} className="careerEvidenceDecisionForm"><input type="hidden" name="requirementId" value={item.requirementId} /><label htmlFor="supportedPortion">Supported portion, if applicable</label><textarea id="supportedPortion" name="supportedPortion" defaultValue={item.decision?.supportedPortion || ""} placeholder="Keep this bounded to the requirement." /><label htmlFor="unresolvedPortion">Unresolved portion, if applicable</label><textarea id="unresolvedPortion" name="unresolvedPortion" defaultValue={item.decision?.unresolvedPortion || ""} placeholder="Record what remains unproven." /><label htmlFor="operatorNote">Operator note</label><textarea id="operatorNote" name="operatorNote" defaultValue={item.decision?.operatorNote || ""} placeholder="Optional bounded context." />{item.specialist ? <label><input type="checkbox" name="specialistCompatible" value="true" /> I confirm the cited authority is specialist-compatible with this requirement.</label> : null}<div className="careerEvidenceDecisionActions">{item.allowedStates.map((state) => <button key={state} type="submit" name="state" value={state}>{displayLabel(state)}</button>)}</div></form></article>
+          <nav className="careerEvidenceNavigation" aria-label="Requirement mapping navigation">{previous ? <a href={href(previous)}>Previous</a> : <span>Previous</span>}<span>Question {index + 1} of {mappingQueue.length}</span>{next ? <a href={href(next)}>Next</a> : <span>Next</span>}</nav>
+          {nextUnreviewed ? <p className="careerEvidenceNextUnreviewed"><a href={href(nextUnreviewed)}>Next unreviewed</a></p> : null}
+          <article className="careerEvidenceReviewCard"><div className="careerEvidenceReviewMeta"><span>{item.company}</span><span>{item.title}</span><span>{item.capabilityFamily}</span>{item.scopeClassification ? <span>{displayLabel(item.scopeClassification)}</span> : null}{item.specialist ? <span>Specialist boundary</span> : null}<span>{item.targetRequirementIds?.length || 1} exact targets</span></div><h2>{item.question}</h2><p>{item.explanation || item.whyAsked}</p>{scopeSafeMode ? <p>CareerOS applies your answer only according to the approved scope and projection rules for each exact requirement.</p> : null}<dl className="careerEvidenceReviewFacts"><div><dt>Why CareerOS is asking</dt><dd>{item.whyAsked} {item.priorityReason}</dd></div><div><dt>Representative targets</dt><dd>{item.representativeTargets?.map((target) => `${target.company || "Unknown company"} / ${target.title || "Unknown role"}: ${target.requirementText}`).join(" · ")}</dd></div><div><dt>Exact target requirements</dt><dd>{item.targetSummaries ? <L2TargetInspector targets={item.targetSummaries} /> : null}</dd></div><div><dt>Existing Ross authority</dt><dd>{item.authoritySummary}</dd></div><div><dt>Current system interpretation</dt><dd>{displayLabel(item.currentMappingState)}; no positive requirement relationship is currently authorized.</dd></div><div><dt>What this affects</dt><dd>Only the exact target set and target-specific projection rules for this compressed question.</dd></div><div><dt>What this does not affect</dt><dd>CareerFact, CareerEvidence, ranking, J002, J003, J010, workflow, preferences, or applications.</dd></div></dl><form action={adjudicateRequirementMappingAction} className="careerEvidenceDecisionForm"><input type="hidden" name="requirementId" value={scopeSafeMode ? "" : item.requirementId} />{scopeSafeMode ? <><input type="hidden" name="reviewSetId" value="V1_26M2_SCOPE_SAFE_ROUND2_REVIEW" /><input type="hidden" name="compressedQuestionId" value={item.compressedQuestionId || ""} /></> : null}<label htmlFor="supportedPortion">Supported portion, if applicable</label><textarea id="supportedPortion" name="supportedPortion" defaultValue={item.decision?.supportedPortion || ""} placeholder="Keep this bounded to the requirement." /><label htmlFor="unresolvedPortion">Unresolved portion, if applicable</label><textarea id="unresolvedPortion" name="unresolvedPortion" defaultValue={item.decision?.unresolvedPortion || ""} placeholder="Record what remains unproven." /><label htmlFor="operatorNote">Operator note</label><textarea id="operatorNote" name="operatorNote" defaultValue={item.decision?.operatorNote || ""} placeholder="Optional bounded context." />{item.specialist ? <label><input type="checkbox" name="specialistCompatible" value="true" /> I confirm the cited authority is specialist-compatible with this requirement.</label> : null}<div className="careerEvidenceDecisionActions">{item.allowedStates.map((state) => <button key={state} type="submit" name="state" value={state}>{displayLabel(state)}</button>)}</div></form></article>
         </> : <p className="careerEvidenceEmpty">No bounded unmapped requirements are available.</p>}
       </div>
     );

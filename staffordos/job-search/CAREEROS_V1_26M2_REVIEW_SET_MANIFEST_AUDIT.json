@@ -1,0 +1,9 @@
+{
+  "reviewSetId": "V1_26L2_SCOPE_SAFE_COMPRESSED_REVIEW",
+  "questions": 41,
+  "exactTargets": 2003,
+  "duplicateTargets": 0,
+  "specialistQuestions": 18,
+  "scopeSensitiveQuestions": 30,
+  "targetRulesPresent": true
+}
