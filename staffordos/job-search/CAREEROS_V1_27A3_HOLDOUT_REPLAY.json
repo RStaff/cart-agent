@@ -1,0 +1,66 @@
+{
+  "frozenModel": {
+    "identity": "MODEL_V2D_ROBUSTNESS_CONTROL",
+    "formula": "FROZEN_V1_23_V2D",
+    "weights": {
+      "relevantExperience": 40,
+      "roleFunction": 25,
+      "responsibility": 25,
+      "seniority": 10
+    }
+  },
+  "baseline": {
+    "top5Precision": 0.4,
+    "top10Precision": 0.3,
+    "strongRecall": 0.5,
+    "strongGoodRecall": 0.3,
+    "viableRecall": 0.35,
+    "falsePositiveRate": 0.73,
+    "falseNegativeRate": 0.4,
+    "rankCorrelation": 0.28,
+    "negativeLeakageTop5": 1,
+    "negativeLeakageTop10": 2,
+    "hardMismatchLeakageTop10": 0,
+    "underRankedViable": 10,
+    "strongGoodBelow20": 5,
+    "threshold": {
+      "cutoff": 72.25,
+      "predictedCount": 22,
+      "falsePositiveRate": 0.73,
+      "falseNegativeRate": 0.4
+    }
+  },
+  "repaired": {
+    "top5Precision": 0.6,
+    "top10Precision": 0.5,
+    "strongRecall": 0.5,
+    "strongGoodRecall": 0.5,
+    "viableRecall": 0.35,
+    "falsePositiveRate": 0.71,
+    "falseNegativeRate": 0.5,
+    "rankCorrelation": 0.43,
+    "negativeLeakageTop5": 0,
+    "negativeLeakageTop10": 2,
+    "hardMismatchLeakageTop10": 0,
+    "underRankedViable": 10,
+    "strongGoodBelow20": 4,
+    "threshold": {
+      "cutoff": 76,
+      "predictedCount": 17,
+      "falsePositiveRate": 0.71,
+      "falseNegativeRate": 0.5
+    }
+  },
+  "consumption": {
+    "direct": 1531,
+    "transferable": 73,
+    "partial": 0
+  },
+  "comparison": {
+    "scoreChanges": 40,
+    "rankChanges": 34,
+    "eligibilityChanges": 0,
+    "qualificationChanges": 0
+  },
+  "deterministic": true
+}

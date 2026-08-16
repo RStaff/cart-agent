@@ -1,0 +1,6 @@
+{
+  "baselineSpecialistBlocked": 204,
+  "repairedSpecialistBlocked": 204,
+  "specialistLeakage": 0,
+  "genericToSpecialistAccepted": 0
+}

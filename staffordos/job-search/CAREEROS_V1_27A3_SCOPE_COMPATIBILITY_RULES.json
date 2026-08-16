@@ -1,0 +1,61 @@
+{
+  "latticeVersion": "CAREEROS_V1_27A3_SCOPE_LATTICE_V1",
+  "capabilityScopes": [
+    "CONTRIBUTED",
+    "COORDINATED",
+    "OWNERSHIP",
+    "TEAM_LEADERSHIP",
+    "PORTFOLIO_ENTERPRISE",
+    "ENTERPRISE_GLOBAL",
+    "UNRESOLVED"
+  ],
+  "requirementScopes": [
+    "CONTRIBUTED",
+    "OWNERSHIP",
+    "TEAM_LEADERSHIP",
+    "PORTFOLIO_ENTERPRISE",
+    "UNSPECIFIED"
+  ],
+  "examples": [
+    {
+      "capability": "OWNERSHIP",
+      "requirement": "CONTRIBUTED",
+      "result": {
+        "state": "SUPPORTED_LOWER_OR_EQUAL_SCOPE",
+        "capabilityScope": "OWNERSHIP",
+        "requirementScope": "CONTRIBUTED",
+        "reason": "Ownership or coordination safely covers contribution."
+      }
+    },
+    {
+      "capability": "OWNERSHIP",
+      "requirement": "TEAM_LEADERSHIP",
+      "result": {
+        "state": "INCOMPATIBLE_SCOPE",
+        "capabilityScope": "OWNERSHIP",
+        "requirementScope": "TEAM_LEADERSHIP",
+        "reason": "Delivery ownership does not establish people management."
+      }
+    },
+    {
+      "capability": "OWNERSHIP",
+      "requirement": "PORTFOLIO_ENTERPRISE",
+      "result": {
+        "state": "TRANSFERABLE_SCOPE",
+        "capabilityScope": "OWNERSHIP",
+        "requirementScope": "PORTFOLIO_ENTERPRISE",
+        "reason": "Program/operating ownership is adjacent to portfolio/enterprise scope."
+      }
+    },
+    {
+      "capability": "CONTRIBUTED",
+      "requirement": "OWNERSHIP",
+      "result": {
+        "state": "INCOMPATIBLE_SCOPE",
+        "capabilityScope": "CONTRIBUTED",
+        "requirementScope": "OWNERSHIP",
+        "reason": "The scope dimensions are not safely subsuming."
+      }
+    }
+  ]
+}

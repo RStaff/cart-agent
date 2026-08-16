@@ -1,0 +1,15 @@
+{
+  "specialistLeakage": 0,
+  "unsupportedPeopleManagement": 0,
+  "protectedFamilies": [
+    "finance",
+    "accounting",
+    "payroll",
+    "tax",
+    "legal",
+    "AV/media",
+    "software engineering",
+    "data science",
+    "specialist AI/ML"
+  ]
+}

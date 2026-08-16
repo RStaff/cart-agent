@@ -1,0 +1,13 @@
+{
+  "specialistLeakage": 0,
+  "scopeViolations": 0,
+  "directnessViolations": 0,
+  "peopleManagementInflation": 0,
+  "portfolioInflation": 0,
+  "enterpriseGlobalInflation": 0,
+  "contributionInflation": 0,
+  "unknownAsNegative": false,
+  "missingAsNegative": false,
+  "titleOnlyAuthority": false,
+  "domainOnlyAuthority": false
+}

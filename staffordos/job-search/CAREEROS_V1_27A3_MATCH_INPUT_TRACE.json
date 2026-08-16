@@ -1,0 +1,27 @@
+{
+  "direct": 1531,
+  "transferable": 73,
+  "partial": 0,
+  "unresolved": 195,
+  "specialistBlocked": 204,
+  "scopeBlocked": 0,
+  "frozenEvaluatorReplayAuthorized": true,
+  "projectionHash": "1716e94392cf75535537597310d780112edb9d749b5d346de82afc754f8af730",
+  "evaluatorConsumption": {
+    "calibration": {
+      "direct": 1531,
+      "transferable": 73,
+      "partial": 0
+    },
+    "holdout": {
+      "direct": 1531,
+      "transferable": 73,
+      "partial": 0
+    }
+  },
+  "replayDeterministic": {
+    "calibration": true,
+    "repairedCalibration": true,
+    "holdout": true
+  }
+}

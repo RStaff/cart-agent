@@ -1,0 +1,17 @@
+{
+  "role": "Director, Technical Program Management - Technical Solutions Operations",
+  "replay": "FROZEN_V2D_DIAGNOSTIC",
+  "mappings": [],
+  "reason": "Control requires frozen evaluator replay artifact.",
+  "frozenReplay": {
+    "score": 74.66,
+    "rank": 3,
+    "eligibility": "ELIGIBLE",
+    "j010": "TRANSFERABLE_BUT_NOT_DIRECT",
+    "j003": "REVIEW",
+    "direct": 5,
+    "transferable": 8,
+    "partial": 0,
+    "unresolved": 2
+  }
+}

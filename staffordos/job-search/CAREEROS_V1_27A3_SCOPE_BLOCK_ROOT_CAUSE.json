@@ -1,0 +1,18 @@
+{
+  "currentRule": "A relationship is positive only when capability.scope === concept.scope; otherwise a resolved candidate falls through to SCOPE_BLOCKED.",
+  "scopeBlockedConcepts": 23,
+  "scopeBlockedRequirements": 1799,
+  "pairDistribution": {
+    "UNRESOLVED_SCOPE->INDIVIDUAL_OR_CONTRIBUTOR": 724,
+    "UNRESOLVED_SCOPE->OWNERSHIP": 468,
+    "UNRESOLVED_SCOPE->PORTFOLIO_ENTERPRISE": 285,
+    "UNRESOLVED_SCOPE->UNSPECIFIED": 4688,
+    "COORDINATED_OR_CONTRIBUTED->INDIVIDUAL_OR_CONTRIBUTOR": 161,
+    "COORDINATED_OR_CONTRIBUTED->OWNERSHIP": 105,
+    "COORDINATED_OR_CONTRIBUTED->PORTFOLIO_ENTERPRISE": 70,
+    "COORDINATED_OR_CONTRIBUTED->UNSPECIFIED": 1120,
+    "UNRESOLVED_SCOPE->TEAM_LEADERSHIP": 1
+  },
+  "exactEqualityObserved": true,
+  "upstreamAuthorityMutated": false
+}

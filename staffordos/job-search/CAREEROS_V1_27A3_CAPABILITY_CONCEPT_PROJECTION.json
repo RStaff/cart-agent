@@ -1,0 +1,723 @@
+{
+  "latticeVersion": "CAREEROS_V1_27A3_SCOPE_LATTICE_V1",
+  "before": {
+    "DIRECT": 0,
+    "TRANSFERABLE": 0,
+    "PARTIAL": 0,
+    "UNRESOLVED": 0,
+    "SPECIALIST_BLOCKED": 204,
+    "SCOPE_BLOCKED": 1799
+  },
+  "after": {
+    "DIRECT": 1531,
+    "TRANSFERABLE": 73,
+    "PARTIAL": 0,
+    "UNRESOLVED": 195,
+    "SPECIALIST_BLOCKED": 204,
+    "SCOPE_BLOCKED": 0,
+    "NO_SUPPORTED_RELATIONSHIP": 0
+  },
+  "relationships": [
+    {
+      "conceptId": "requirement_concept_1c6039f9815573770925",
+      "capabilityIds": [
+        "capability_d406583e90947beab668"
+      ],
+      "state": "DIRECT",
+      "exactRequirementCount": 24,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": {
+        "state": "SUPPORTED_LOWER_OR_EQUAL_SCOPE",
+        "capabilityScope": "OWNERSHIP",
+        "requirementScope": "CONTRIBUTED",
+        "reason": "Ownership or coordination safely covers contribution."
+      },
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_b5397d3071f69ea4628b",
+      "capabilityIds": [
+        "capability_d406583e90947beab668"
+      ],
+      "state": "DIRECT",
+      "exactRequirementCount": 14,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": {
+        "state": "EXACT_SCOPE",
+        "capabilityScope": "OWNERSHIP",
+        "requirementScope": "OWNERSHIP",
+        "reason": "Capability and requirement scopes are the same governed dimension."
+      },
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_ef695f382209789d06ce",
+      "capabilityIds": [
+        "capability_d406583e90947beab668"
+      ],
+      "state": "TRANSFERABLE",
+      "exactRequirementCount": 3,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": {
+        "state": "TRANSFERABLE_SCOPE",
+        "capabilityScope": "OWNERSHIP",
+        "requirementScope": "PORTFOLIO_ENTERPRISE",
+        "reason": "Program/operating ownership is adjacent to portfolio/enterprise scope."
+      },
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_ff204b3c641371da130a",
+      "capabilityIds": [
+        "capability_d406583e90947beab668"
+      ],
+      "state": "DIRECT",
+      "exactRequirementCount": 68,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": {
+        "state": "SUPPORTED_LOWER_OR_EQUAL_SCOPE",
+        "capabilityScope": "OWNERSHIP",
+        "requirementScope": "UNSPECIFIED",
+        "reason": "Requirement does not impose a narrower explicit scope."
+      },
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_826dbbc61f3de8e6623e",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 3,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_dddae45a80ae7323b00d",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 8,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_60e7011ccc4cee336375",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 9,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_dd95593da997b30aff14",
+      "capabilityIds": [
+        "capability_5a51acdebae695a18224"
+      ],
+      "state": "UNRESOLVED",
+      "exactRequirementCount": 1,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": {
+        "state": "UNRESOLVED_SCOPE",
+        "capabilityScope": "UNRESOLVED",
+        "requirementScope": "OWNERSHIP",
+        "reason": "Capability scope is unresolved."
+      },
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_e146df4423459251ecc8",
+      "capabilityIds": [
+        "capability_5a51acdebae695a18224"
+      ],
+      "state": "UNRESOLVED",
+      "exactRequirementCount": 3,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": {
+        "state": "UNRESOLVED_SCOPE",
+        "capabilityScope": "UNRESOLVED",
+        "requirementScope": "PORTFOLIO_ENTERPRISE",
+        "reason": "Capability scope is unresolved."
+      },
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_270b99340f83b87de589",
+      "capabilityIds": [
+        "capability_5a51acdebae695a18224"
+      ],
+      "state": "UNRESOLVED",
+      "exactRequirementCount": 3,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": {
+        "state": "UNRESOLVED_SCOPE",
+        "capabilityScope": "UNRESOLVED",
+        "requirementScope": "UNSPECIFIED",
+        "reason": "Capability scope is unresolved."
+      },
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_0c8ac1c70dcf8cda9a5f",
+      "capabilityIds": [
+        "capability_cc1bcdb9ab03f1a0298f"
+      ],
+      "state": "DIRECT",
+      "exactRequirementCount": 154,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": {
+        "state": "SUPPORTED_LOWER_OR_EQUAL_SCOPE",
+        "capabilityScope": "OWNERSHIP",
+        "requirementScope": "CONTRIBUTED",
+        "reason": "Ownership or coordination safely covers contribution."
+      },
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_d4ea39dffd3e9c2ef1ec",
+      "capabilityIds": [
+        "capability_cc1bcdb9ab03f1a0298f"
+      ],
+      "state": "DIRECT",
+      "exactRequirementCount": 96,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": {
+        "state": "EXACT_SCOPE",
+        "capabilityScope": "OWNERSHIP",
+        "requirementScope": "OWNERSHIP",
+        "reason": "Capability and requirement scopes are the same governed dimension."
+      },
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_7b77f5b8e61c89eb357d",
+      "capabilityIds": [
+        "capability_cc1bcdb9ab03f1a0298f"
+      ],
+      "state": "TRANSFERABLE",
+      "exactRequirementCount": 64,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": {
+        "state": "TRANSFERABLE_SCOPE",
+        "capabilityScope": "OWNERSHIP",
+        "requirementScope": "PORTFOLIO_ENTERPRISE",
+        "reason": "Program/operating ownership is adjacent to portfolio/enterprise scope."
+      },
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_aef6acc3b3216a83c13c",
+      "capabilityIds": [
+        "capability_cc1bcdb9ab03f1a0298f"
+      ],
+      "state": "DIRECT",
+      "exactRequirementCount": 1087,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": {
+        "state": "SUPPORTED_LOWER_OR_EQUAL_SCOPE",
+        "capabilityScope": "OWNERSHIP",
+        "requirementScope": "UNSPECIFIED",
+        "reason": "Requirement does not impose a narrower explicit scope."
+      },
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_e2d3a2b37996043c9ea2",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 23,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_34b1c57ca3ac7b1dc3fb",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 17,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_99824161d6086ab8f316",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 5,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_949b1588562b8bccce64",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 86,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_eb7d0e99180c76bb8186",
+      "capabilityIds": [
+        "capability_3aad0fad1d60ac8462a1"
+      ],
+      "state": "DIRECT",
+      "exactRequirementCount": 12,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": {
+        "state": "SUPPORTED_LOWER_OR_EQUAL_SCOPE",
+        "capabilityScope": "OWNERSHIP",
+        "requirementScope": "CONTRIBUTED",
+        "reason": "Ownership or coordination safely covers contribution."
+      },
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_a6a56312fe003a475c89",
+      "capabilityIds": [
+        "capability_3aad0fad1d60ac8462a1"
+      ],
+      "state": "DIRECT",
+      "exactRequirementCount": 5,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": {
+        "state": "EXACT_SCOPE",
+        "capabilityScope": "OWNERSHIP",
+        "requirementScope": "OWNERSHIP",
+        "reason": "Capability and requirement scopes are the same governed dimension."
+      },
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_f0dc73ad8e03c50bb0e0",
+      "capabilityIds": [
+        "capability_3aad0fad1d60ac8462a1"
+      ],
+      "state": "DIRECT",
+      "exactRequirementCount": 22,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": {
+        "state": "SUPPORTED_LOWER_OR_EQUAL_SCOPE",
+        "capabilityScope": "OWNERSHIP",
+        "requirementScope": "UNSPECIFIED",
+        "reason": "Requirement does not impose a narrower explicit scope."
+      },
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_55fbd5d835d66e216e0e",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 7,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_206dfd99d02d15f098d5",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 2,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_fd6ec5d691cda3d828fb",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 6,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_c279cfcd94d3bc3d76f0",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 11,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_01605558759dc01a6426",
+      "capabilityIds": [],
+      "state": "UNRESOLVED",
+      "exactRequirementCount": 34,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_097bf19b72ea33dc9b81",
+      "capabilityIds": [],
+      "state": "UNRESOLVED",
+      "exactRequirementCount": 32,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_d5ce8caaad92120c2df1",
+      "capabilityIds": [],
+      "state": "UNRESOLVED",
+      "exactRequirementCount": 8,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_0f2d2b1af2593aaaeb61",
+      "capabilityIds": [],
+      "state": "UNRESOLVED",
+      "exactRequirementCount": 1,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_08cb25707e352443aff1",
+      "capabilityIds": [],
+      "state": "UNRESOLVED",
+      "exactRequirementCount": 113,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_87cb93ac045fdf626e03",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 3,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_865758bf85fa2d27cb1b",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 4,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_20fb7ae3c7c37cb7b649",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 2,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_10f2508826da82362546",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 11,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_88ae57175b9f45fd3e52",
+      "capabilityIds": [
+        "capability_6435d7115bc081ee062d"
+      ],
+      "state": "DIRECT",
+      "exactRequirementCount": 7,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": {
+        "state": "SUPPORTED_LOWER_OR_EQUAL_SCOPE",
+        "capabilityScope": "OWNERSHIP",
+        "requirementScope": "CONTRIBUTED",
+        "reason": "Ownership or coordination safely covers contribution."
+      },
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_2e85ad19127477ff9905",
+      "capabilityIds": [
+        "capability_6435d7115bc081ee062d"
+      ],
+      "state": "DIRECT",
+      "exactRequirementCount": 9,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": {
+        "state": "EXACT_SCOPE",
+        "capabilityScope": "OWNERSHIP",
+        "requirementScope": "OWNERSHIP",
+        "reason": "Capability and requirement scopes are the same governed dimension."
+      },
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_c047baa98c11bb4b05ed",
+      "capabilityIds": [
+        "capability_6435d7115bc081ee062d"
+      ],
+      "state": "TRANSFERABLE",
+      "exactRequirementCount": 6,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": {
+        "state": "TRANSFERABLE_SCOPE",
+        "capabilityScope": "OWNERSHIP",
+        "requirementScope": "PORTFOLIO_ENTERPRISE",
+        "reason": "Program/operating ownership is adjacent to portfolio/enterprise scope."
+      },
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_f8bd5537062eb48e4257",
+      "capabilityIds": [
+        "capability_6435d7115bc081ee062d"
+      ],
+      "state": "DIRECT",
+      "exactRequirementCount": 33,
+      "specialistSafe": true,
+      "scopeSafe": true,
+      "scopeCompatibility": {
+        "state": "SUPPORTED_LOWER_OR_EQUAL_SCOPE",
+        "capabilityScope": "OWNERSHIP",
+        "requirementScope": "UNSPECIFIED",
+        "reason": "Requirement does not impose a narrower explicit scope."
+      },
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_da7036dbc84435731c01",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 2,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_e4345e5e939e8972e64a",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 2,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    },
+    {
+      "conceptId": "requirement_concept_e35ce3ad428baa9c7882",
+      "capabilityIds": [],
+      "state": "SPECIALIST_BLOCKED",
+      "exactRequirementCount": 3,
+      "specialistSafe": false,
+      "scopeSafe": true,
+      "scopeCompatibility": null,
+      "provenancePreserved": true
+    }
+  ],
+  "scopeProfiles": {
+    "capability_d406583e90947beab668": {
+      "scope": "OWNERSHIP",
+      "source": "operator_question_scope",
+      "questionId": "capability_question_2a6291c17570f200e859"
+    },
+    "capability_cc1bcdb9ab03f1a0298f": {
+      "scope": "OWNERSHIP",
+      "source": "operator_question_scope",
+      "questionId": "capability_question_b4280df4c8701ec6fc52"
+    },
+    "capability_f4d7570a098a40cfef91": {
+      "scope": "CONTRIBUTED",
+      "source": "operator_question_scope",
+      "questionId": "capability_question_4a6092bf65051b1b2adb"
+    },
+    "capability_ae7cfc7089870567ced8": {
+      "scope": "OWNERSHIP",
+      "source": "operator_question_scope",
+      "questionId": "capability_question_6c563fd7e77c33d37a08"
+    },
+    "capability_00426398fcb14fb2ab83": {
+      "scope": "OWNERSHIP",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_3aad0fad1d60ac8462a1": {
+      "scope": "OWNERSHIP",
+      "source": "operator_question_scope",
+      "questionId": "capability_question_ce32aa6c7ee0e264517e"
+    },
+    "capability_57386c245ad2e93d1392": {
+      "scope": "COORDINATED",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_e72ac928527fcbbf83fd": {
+      "scope": "OWNERSHIP",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_3f43d31843cd46ed9f7f": {
+      "scope": "OWNERSHIP",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_6abd47d6a42e4207335b": {
+      "scope": "UNRESOLVED",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_556562bde7f5493177f0": {
+      "scope": "OWNERSHIP",
+      "source": "operator_question_scope",
+      "questionId": "capability_question_9d88b97130cdefe4bf70"
+    },
+    "capability_44af87b315f3ec80a6b5": {
+      "scope": "COORDINATED",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_d0d252115cd22db3a13d": {
+      "scope": "COORDINATED",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_7dace1d022a7878cfac2": {
+      "scope": "ENTERPRISE_GLOBAL",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_5d3333b4a428384c57f5": {
+      "scope": "OWNERSHIP",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_c569a5622d7ccf0d6c6f": {
+      "scope": "OWNERSHIP",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_af834aed819e0a12c7f7": {
+      "scope": "UNRESOLVED",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_77842d71be233ae1ee9d": {
+      "scope": "UNRESOLVED",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_2f561dae5fbb3c63b8cb": {
+      "scope": "UNRESOLVED",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_f7ba41d6e4807b9795d3": {
+      "scope": "COORDINATED",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_db92893286e8e977767d": {
+      "scope": "OWNERSHIP",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_02e44df41ccb45035b02": {
+      "scope": "UNRESOLVED",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_56c64330be6e5ba4ec61": {
+      "scope": "UNRESOLVED",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_b4ed543e0dce624521d1": {
+      "scope": "UNRESOLVED",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_6435d7115bc081ee062d": {
+      "scope": "OWNERSHIP",
+      "source": "operator_question_scope",
+      "questionId": "capability_question_84e1312f5cf13412586c"
+    },
+    "capability_5a51acdebae695a18224": {
+      "scope": "UNRESOLVED",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_1d767e26b60c93010d9a": {
+      "scope": "COORDINATED",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_f23f8b53f38d8d37cc01": {
+      "scope": "UNRESOLVED",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_a2deb5a9d4be53cb157f": {
+      "scope": "COORDINATED",
+      "source": "operator_question_scope",
+      "questionId": "capability_question_034746936222273a4569"
+    },
+    "capability_ed3d81974e030517c670": {
+      "scope": "COORDINATED",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_6822777258203037addf": {
+      "scope": "OWNERSHIP",
+      "source": "capability_source_scope",
+      "questionId": null
+    },
+    "capability_adb2c99e96c0164c4099": {
+      "scope": "OWNERSHIP",
+      "source": "operator_question_scope",
+      "questionId": "capability_question_4e9c7d9d6a4e5bd08afb"
+    }
+  },
+  "specialistLeakage": 0,
+  "scopeViolations": 0,
+  "provenancePreserved": true
+}
