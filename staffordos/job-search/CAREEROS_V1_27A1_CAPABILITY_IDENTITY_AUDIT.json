@@ -1,0 +1,9 @@
+{
+  "graphVersion": "CAREEROS_V1_27A_GRAPH_V1",
+  "canonicalCapabilityCount": 32,
+  "stableCapabilityIds": true,
+  "questionCapabilityReferencesValid": true,
+  "identitySource": "governed V1.27A graph artifact",
+  "titleOnlyIdentity": false,
+  "requirementDerivedIdentity": false
+}

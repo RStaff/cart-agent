@@ -1,0 +1,14 @@
+{
+  "authority": "CapabilityAdjudicationDecision",
+  "temporaryRootUsed": true,
+  "initialActiveDecisions": 0,
+  "fixtureSave": "PASS",
+  "exactReadback": "PASS",
+  "edit": "PASS",
+  "supersession": "PASS",
+  "oneActiveDecisionPerQuestion": "PASS",
+  "progressIncrement": "exactly_one",
+  "sourceCareerFactMutation": false,
+  "sourceCareerEvidenceMutation": false,
+  "temporaryAuthorityRestored": true
+}

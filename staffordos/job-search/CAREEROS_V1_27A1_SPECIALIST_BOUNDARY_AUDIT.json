@@ -1,0 +1,20 @@
+{
+  "specialistClassificationPreserved": true,
+  "specialistQuestions": 0,
+  "genericToSpecialistPropagation": 0,
+  "specialistConfirmationPath": true,
+  "specialistLeakage": 0,
+  "failClosedFamilies": [
+    "software engineering",
+    "data science",
+    "ML engineering",
+    "accounting",
+    "finance",
+    "tax",
+    "payroll",
+    "legal",
+    "AV/media",
+    "security",
+    "specialist AI/ML"
+  ]
+}

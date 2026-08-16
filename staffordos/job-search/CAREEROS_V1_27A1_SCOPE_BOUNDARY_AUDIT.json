@@ -1,0 +1,13 @@
+{
+  "scopeIsFirstClass": true,
+  "scopeValuesObserved": [
+    "COORDINATED_OR_CONTRIBUTED",
+    "LED_PROGRAM",
+    "ENTERPRISE_GLOBAL_SCOPE",
+    "UNRESOLVED_SCOPE"
+  ],
+  "titleUsedAsScopeAuthority": false,
+  "programAnswerCreatesPeopleManagement": false,
+  "programAnswerCreatesPortfolioOwnership": false,
+  "scopeInflation": 0
+}

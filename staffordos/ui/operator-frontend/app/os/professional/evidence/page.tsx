@@ -25,6 +25,15 @@ import {
   REQUIREMENT_MAPPING_STATES,
   type RequirementMappingState,
 } from "../../../../lib/staffordos/requirementMapping";
+import {
+  appendCapabilityReviewDecision,
+  capabilityReviewGraphSummary,
+  capabilityReviewProgress,
+  capabilityReviewSafeSummary,
+  loadCapabilityReviewQueue,
+  privateCapabilityAdjudicationRoot,
+  type CapabilityReviewQuestion,
+} from "../../../../lib/staffordos/capabilityReviewRuntime";
 
 export const dynamic = "force-dynamic";
 
@@ -117,6 +126,26 @@ async function adjudicateRequirementMappingAction(formData: FormData) {
   redirect(`/os/professional/evidence?view=requirement-mapping${reviewSetId ? `&set=v1_26m2&question=${encodeURIComponent(compressedQuestionId || "")}` : `&requirement=${encodeURIComponent(requirementId)}`}&status=SAVED`);
 }
 
+async function adjudicateCapabilityAction(formData: FormData) {
+  "use server";
+  const questionId = String(formData.get("questionId") || "").trim();
+  const answer = String(formData.get("answer") || "").trim();
+  const note = String(formData.get("operatorNote") || "").trim() || null;
+  const queue = loadCapabilityReviewQueue({ decisionRoot: privateCapabilityAdjudicationRoot() });
+  const question = queue.find((item) => item.questionId === questionId) as CapabilityReviewQuestion | undefined;
+  if (!question || !answer || !question.allowedAnswers.includes(answer)) redirect(`/os/professional/evidence?view=capabilities&question=${encodeURIComponent(questionId)}&status=NOT_SAVED`);
+  if (question.specialistBoundary === "SPECIALIST" && formData.get("specialistCompatible") !== "true" && !["NO", "NO_SUPPORTED_CAPABILITY", "NEEDS_EVIDENCE", "KEEP_UNRESOLVED"].includes(answer)) redirect(`/os/professional/evidence?view=capabilities&question=${encodeURIComponent(questionId)}&status=NOT_SAVED&reason=SPECIALIST_CONFIRMATION_REQUIRED`);
+  try {
+    const saved = appendCapabilityReviewDecision({ decisionRoot: privateCapabilityAdjudicationRoot(), question, answer, note });
+    const readback = loadCapabilityReviewQueue({ decisionRoot: privateCapabilityAdjudicationRoot() }).find((item) => item.questionId === questionId)?.decision;
+    if (!readback || readback.questionId !== questionId || readback.answer !== saved.answer || JSON.stringify(readback.capabilityIds) !== JSON.stringify(saved.capabilityIds) || readback.graphVersion !== saved.graphVersion || readback.superseded) throw new Error("EXACT_READBACK_FAILED");
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : "SAVE_FAILED";
+    redirect(`/os/professional/evidence?view=capabilities&question=${encodeURIComponent(questionId)}&status=NOT_SAVED&reason=${encodeURIComponent(reason)}`);
+  }
+  redirect(`/os/professional/evidence?view=capabilities&question=${encodeURIComponent(questionId)}&status=SAVED`);
+}
+
 function displayLabel(value: string) { return value.replaceAll("_", " "); }
 
 export default async function ProfessionalEvidencePage({
@@ -127,6 +156,35 @@ export default async function ProfessionalEvidencePage({
   const params = (await searchParams) || {};
   const runtime = loadCompressedReviewRuntime({ repositoryRoot: process.cwd(), maxHighValue: 18 });
   const progress = compressionProgress(runtime);
+  const capabilityMode = params.view === "capabilities";
+  if (capabilityMode) {
+    const capabilityQueue = loadCapabilityReviewQueue({ decisionRoot: privateCapabilityAdjudicationRoot() });
+    const capabilityProgress = capabilityReviewProgress(capabilityQueue);
+    const graphSummary = capabilityReviewGraphSummary();
+    const requestedQuestion = typeof params.question === "string" ? params.question : null;
+    const capabilityQuestion = capabilityQueue.find((item) => item.questionId === requestedQuestion) || capabilityQueue.find((item) => !item.decision) || capabilityQueue[0] || null;
+    const capabilityIndex = capabilityQuestion ? capabilityQueue.findIndex((item) => item.questionId === capabilityQuestion.questionId) : -1;
+    const previous = capabilityIndex > 0 ? capabilityQueue[capabilityIndex - 1] : null;
+    const next = capabilityIndex >= 0 && capabilityIndex < capabilityQueue.length - 1 ? capabilityQueue[capabilityIndex + 1] : null;
+    const nextUnreviewed = capabilityQueue.find((item) => !item.decision) || null;
+    const href = (item: typeof capabilityQuestion) => `/os/professional/evidence?view=capabilities&question=${encodeURIComponent(item?.questionId || "")}`;
+    const status = typeof params.status === "string" ? params.status : null;
+    const reason = typeof params.reason === "string" ? params.reason : null;
+    return (
+      <div className="careerEvidenceAdjudicationPage">
+        <section className="careerEvidenceAdjudicationHeader"><div><span className="staffordEyebrow">Professional / Capability authority</span><h1>Career Capability Review</h1><p>These questions help CareerOS understand reusable career capabilities. They are not job-specific fit questions.</p></div><div className="careerEvidenceAdjudicationStatus"><strong>Owner-private review</strong><span>CareerFact and CareerEvidence remain unchanged.</span></div></section>
+        <section className="careerEvidenceAdjudicationNotice"><strong>Capability authority only</strong><p>Answers update only the named capability interpretation. They do not change ranking, application status, workflow decisions, preferences, or source truth.</p></section>
+        <section className="careerEvidenceProgress" aria-label="Capability review progress"><div><span>Capability review</span><strong>{capabilityProgress.completed} / {capabilityProgress.total}</strong></div><div><span>Canonical capabilities</span><strong>{graphSummary.capabilityCount}</strong></div><div><span>Requirement concepts potentially informed</span><strong>{graphSummary.conceptCount}</strong></div></section>
+        <nav className="careerEvidenceFocus" aria-label="Evidence review focus"><span>Review focus:</span><a href="/os/professional/evidence">High-value review</a><a href="/os/professional/evidence?view=conflicts">Conflict resolution</a><a href="/os/professional/evidence?view=capabilities">Career capabilities</a></nav>
+        {status ? <p className={`careerEvidenceFeedback ${status === "NOT_SAVED" ? "is-error" : "is-success"}`} role="status">{status === "NOT_SAVED" ? `NOT SAVED${reason ? `: ${reason}` : ""}` : status}</p> : null}
+        {capabilityQuestion ? <>
+          <nav className="careerEvidenceNavigation" aria-label="Capability question navigation">{previous ? <a href={href(previous)}>Previous</a> : <span>Previous</span>}<span>Question {capabilityIndex + 1} of {capabilityQueue.length}</span>{next ? <a href={href(next)}>Next</a> : <span>Next</span>}</nav>
+          {nextUnreviewed ? <p className="careerEvidenceNextUnreviewed"><a href={href(nextUnreviewed)}>Next unreviewed</a></p> : null}
+          <article className="careerEvidenceReviewCard"><div className="careerEvidenceReviewMeta"><span>{displayLabel(capabilityQuestion.canonicalCapability)}</span><span>{displayLabel(capabilityQuestion.scopeBoundary)}</span>{capabilityQuestion.specialistBoundary === "SPECIALIST" ? <span>Specialist boundary</span> : null}<span>{capabilityQuestion.affectedRequirementCount} proposed requirement targets</span></div><h2>{capabilityQuestion.question}</h2><p>{capabilityReviewSafeSummary(capabilityQuestion)}</p><dl className="careerEvidenceReviewFacts"><div><dt>Why CareerOS is asking</dt><dd>This capability recurs across proposed requirement concepts and needs bounded operator authority before reuse.</dd></div><div><dt>Scope being evaluated</dt><dd>{displayLabel(capabilityQuestion.scopeBoundary)}</dd></div><div><dt>Potential downstream concepts</dt><dd>{capabilityQuestion.affectedConceptIds.length}</dd></div><div><dt>What this affects</dt><dd>Only this capability and derived, provenance-preserving offline relationships.</dd></div><div><dt>What this does not affect</dt><dd>CareerFact, CareerEvidence, job ranking, V2D, J002, J003, J010, workflow, preferences, or applications.</dd></div></dl><form action={adjudicateCapabilityAction} className="careerEvidenceDecisionForm"><input type="hidden" name="questionId" value={capabilityQuestion.questionId} /><label htmlFor="operatorNote">Optional note</label><textarea id="operatorNote" name="operatorNote" defaultValue={capabilityQuestion.decision?.note || ""} placeholder="Keep the answer bounded to this capability and scope." />{capabilityQuestion.specialistBoundary === "SPECIALIST" ? <label><input type="checkbox" name="specialistCompatible" value="true" /> I confirm the authority is specialist-compatible.</label> : null}<p>Select one. CareerOS will preserve the answer as capability authority and will not infer beyond the stated scope.</p><div className="careerEvidenceDecisionActions">{capabilityQuestion.allowedAnswers.map((answer) => <button key={answer} type="submit" name="answer" value={answer}>{displayLabel(answer)}</button>)}</div></form>{capabilityQuestion.decision ? <p className="careerEvidenceHistoricalContext" role="status">Current saved answer: {displayLabel(capabilityQuestion.decision.answer)}</p> : null}</article>
+        </> : <p className="careerEvidenceEmpty">No capability questions are available.</p>}
+      </div>
+    );
+  }
   const requirementMappingMode = params.view === "requirement-mapping";
   if (requirementMappingMode) {
     const scopeSafeMode = params.set === "v1_26m2";

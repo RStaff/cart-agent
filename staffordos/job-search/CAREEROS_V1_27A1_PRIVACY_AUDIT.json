@@ -1,0 +1,9 @@
+{
+  "privatePayloadsRendered": false,
+  "privateIdsRendered": false,
+  "privatePathsRendered": false,
+  "digestsRendered": false,
+  "rawSourceDocumentsRendered": false,
+  "routeResponsePrivatePatternScan": "PASS",
+  "sourceTruthMutation": false
+}

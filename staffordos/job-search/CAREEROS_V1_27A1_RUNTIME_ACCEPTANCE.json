@@ -1,0 +1,15 @@
+{
+  "routeStatus": 200,
+  "route": "/os/professional/evidence?view=capabilities",
+  "initialProgress": "0 / 10",
+  "initialQuestion": "1 of 10",
+  "canonicalCapabilities": 32,
+  "requirementConcepts": 41,
+  "neutralDefault": "PASS",
+  "exactCapabilityIdentity": "PASS",
+  "saveReadback": "PASS_IN_RESTING_AUTHORITY_TEST",
+  "savedFeedback": "SAVED/NOT SAVED_PATH_PRESENT",
+  "editSupersession": "PASS_IN_RESTING_AUTHORITY_TEST",
+  "browserAutomation": "UNAVAILABLE",
+  "limitation": "HTTP rendering was verified against the built local server; save/navigation browser interaction was covered by reversible authority tests and source-level server-action checks."
+}

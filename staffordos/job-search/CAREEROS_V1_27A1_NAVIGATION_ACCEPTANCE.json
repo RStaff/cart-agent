@@ -1,0 +1,11 @@
+{
+  "route": "/os/professional/evidence?view=capabilities",
+  "questionIdentity": "stable_question_id",
+  "previous": "PASS",
+  "next": "PASS",
+  "nextUnreviewed": "PASS",
+  "savedAnswerRehydrates": "PASS",
+  "unansweredStateNeutral": "PASS",
+  "staleAnswerCarryover": false,
+  "questionCount": 10
+}

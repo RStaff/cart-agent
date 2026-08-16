@@ -1,0 +1,12 @@
+{
+  "questionCount": 10,
+  "stableQuestionIds": true,
+  "capabilityIdsPresent": true,
+  "allowedAnswersPresent": true,
+  "scopeBoundariesPresent": true,
+  "specialistBoundariesPresent": true,
+  "downstreamConceptReferencesPresent": true,
+  "informationValuePresent": true,
+  "labelsUsed": false,
+  "regenerated": false
+}
