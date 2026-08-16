@@ -1,0 +1,51 @@
+{
+  "baseline": {
+    "top5Precision": 0.6,
+    "top10Precision": 0.5,
+    "strongRecall": 0.5,
+    "strongGoodRecall": 0.5,
+    "viableRecall": 0.35,
+    "falsePositiveRate": 0.65,
+    "falseNegativeRate": 0.4,
+    "rankCorrelation": 0.54,
+    "negativeLeakageTop5": 0,
+    "negativeLeakageTop10": 2,
+    "hardMismatchLeakageTop10": 0,
+    "underRankedViable": 8,
+    "strongGoodBelow20": 3,
+    "threshold": {
+      "cutoff": 75.94,
+      "predictedCount": 17,
+      "falsePositiveRate": 0.65,
+      "falseNegativeRate": 0.4
+    }
+  },
+  "bridged": {
+    "top5Precision": 0.6,
+    "top10Precision": 0.5,
+    "strongRecall": 0.5,
+    "strongGoodRecall": 0.5,
+    "viableRecall": 0.35,
+    "falsePositiveRate": 0.65,
+    "falseNegativeRate": 0.4,
+    "rankCorrelation": 0.54,
+    "negativeLeakageTop5": 0,
+    "negativeLeakageTop10": 2,
+    "hardMismatchLeakageTop10": 0,
+    "underRankedViable": 8,
+    "strongGoodBelow20": 3,
+    "threshold": {
+      "cutoff": 75.94,
+      "predictedCount": 17,
+      "falsePositiveRate": 0.65,
+      "falseNegativeRate": 0.4
+    }
+  },
+  "comparison": {
+    "scoreChanges": 0,
+    "rankChanges": 0,
+    "eligibilityChanges": 0,
+    "qualificationChanges": 0
+  },
+  "deterministicHash": "d70299137fcadfa159a21289e2d94f3d26bb2cf6ae00ffe7c12bccb3f1d00f44"
+}

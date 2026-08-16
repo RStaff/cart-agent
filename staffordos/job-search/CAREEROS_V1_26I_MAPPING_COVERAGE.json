@@ -1,0 +1,50 @@
+{
+  "clearedCandidates": {
+    "direct": 192,
+    "transferable": 0,
+    "partial": 11
+  },
+  "intersections": {
+    "direct": {
+      "candidateFacts": 192,
+      "mappingIntersections": 2796,
+      "uniqueRequirements": 2796,
+      "uniqueCareerEvidence": 3
+    },
+    "transferable": {
+      "candidateFacts": 0,
+      "mappingIntersections": 0,
+      "uniqueRequirements": 0,
+      "uniqueCareerEvidence": 0
+    },
+    "partial": {
+      "candidateFacts": 11,
+      "mappingIntersections": 0,
+      "uniqueRequirements": 0,
+      "uniqueCareerEvidence": 0
+    },
+    "mappingBoundary": "existing mapping careerFactIds; no candidate-to-requirement relationship exists for non-direct authority"
+  },
+  "rawExistingRequirementRows": {
+    "direct": 2796,
+    "transferable": 0,
+    "partial": 0
+  },
+  "v2dConsumedAfterBridge": {
+    "direct": 2148,
+    "transferable": 0,
+    "partial": 0
+  },
+  "newBridgeRecords": 0,
+  "requirementsReceiving": {
+    "directRaw": 2796,
+    "transferableNew": 0,
+    "partialNew": 0
+  },
+  "remaining": {
+    "unknown": "preserved",
+    "missing": "preserved",
+    "unresolved": "preserved",
+    "specialistBlocked": 182
+  }
+}

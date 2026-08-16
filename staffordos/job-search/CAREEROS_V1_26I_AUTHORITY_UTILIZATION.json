@@ -1,0 +1,22 @@
+{
+  "beforeV1_26H": {
+    "direct": 2148,
+    "transferable": 0,
+    "partial": 0
+  },
+  "afterBridge": {
+    "direct": 2148,
+    "transferable": 0,
+    "partial": 0
+  },
+  "rawExistingIntersections": {
+    "direct": 2796,
+    "transferable": 0,
+    "partial": 0
+  },
+  "unknown": "preserved",
+  "missing": "preserved",
+  "specialistBlocked": 182,
+  "newBridgeRecords": 0,
+  "rejectedBridgeRecords": 0
+}

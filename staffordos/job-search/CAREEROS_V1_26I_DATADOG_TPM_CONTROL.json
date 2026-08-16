@@ -1,0 +1,14 @@
+{
+  "score": 74.66,
+  "rank": 4,
+  "eligibility": "ELIGIBLE",
+  "j010": "TRANSFERABLE_BUT_NOT_DIRECT",
+  "j003": "REVIEW",
+  "responsibility": "PARTIAL",
+  "seniority": "UPWARD_STRETCH_WITH_SUPPORTED_SCOPE",
+  "domain": "TRANSFERABLE_DOMAIN",
+  "direct": 5,
+  "transferable": 8,
+  "partial": 0,
+  "unresolved": 2
+}

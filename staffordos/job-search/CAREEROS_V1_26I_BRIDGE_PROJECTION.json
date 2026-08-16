@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "staffordos.careeros.v1_26i.authority_requirement_bridge.v1",
+  "derivedOnly": true,
+  "recordsAccepted": 0,
+  "recordsRejected": 0,
+  "relationshipCounts": {
+    "accepted": 0,
+    "rejected": 0,
+    "direct": 0,
+    "transferable": 0,
+    "partial": 0
+  },
+  "mutationGuards": {
+    "careerFact": false,
+    "careerEvidence": false,
+    "requirements": false,
+    "adjudication": false
+  }
+}

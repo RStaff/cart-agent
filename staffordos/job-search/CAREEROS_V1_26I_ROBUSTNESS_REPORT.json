@@ -1,0 +1,10 @@
+{
+  "deterministic": {
+    "projectionHash": "7bd33746816a2078ed66e80d03993a4a1a3811bdd3d4fb3b072df34fb7d4faec",
+    "calibrationHash": "2d77a0248e4fc225d1f12ceb0709bdb74b23eb9c0f6f343560d2b2c8dc7e1714",
+    "holdoutHash": "d70299137fcadfa159a21289e2d94f3d26bb2cf6ae00ffe7c12bccb3f1d00f44"
+  },
+  "companyHeldOut": "same frozen bridge authority; no new accepted mappings",
+  "roleFamilySensitivity": "same frozen bridge authority; no new accepted mappings",
+  "noHyperparameterSearch": true
+}
