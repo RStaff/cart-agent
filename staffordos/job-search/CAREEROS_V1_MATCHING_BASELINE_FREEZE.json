@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "careeros.v1.productization.matching-freeze.v1",
+  "baselineCommit": "97841021de300e559e3e80cb77cc25dfa3ff67d4",
+  "model": {"identity": "MODEL_V2D_ROBUSTNESS_CONTROL", "formula": "FROZEN_V1_23_V2D", "weights": {"relevantExperience": 40, "roleFunction": 25, "responsibility": 25, "seniority": 10}},
+  "a3": {"exactRequirements": 2003, "positiveCoverage": 1604, "direct": 1531, "transferable": 73, "partial": 0, "unresolved": 195, "specialistBlocked": 204, "scopeViolations": 0, "specialistLeakage": 0, "operatorDecisions": 10, "operatorLeverage": 160.4, "holdoutTop5Precision": 0.6, "holdoutRankCorrelation": 0.43},
+  "freeze": {"careerFact": "PRODUCT_CORE_FROZEN", "careerEvidence": "PRODUCT_CORE_FROZEN", "capabilityScopeProjection": "PRODUCT_CORE_FROZEN", "specialistFirewall": "PRODUCT_CORE_FROZEN", "v2d": "PRODUCT_CORE_FROZEN", "j002": "PRODUCT_CORE_FROZEN", "j003": "PRODUCT_CORE_FROZEN", "j010": "PRODUCT_CORE_FROZEN", "labels": "PRODUCT_CORE_FROZEN", "productionRanking": "UNCHANGED"},
+  "privatePayloadsIncluded": false
+}

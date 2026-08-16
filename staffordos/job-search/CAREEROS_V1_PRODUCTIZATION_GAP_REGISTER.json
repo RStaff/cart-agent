@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "careeros.v1.productization.gap-register.v1",
+  "gaps": [
+    {"area":"matching","current":"A3 frozen offline projection and evaluator replay","target":"versioned internal Match Evaluation service","gap":"service boundary and tenant input adapter","risk":"high","priority":"P0","complexity":"M","dependency":"tenant/profile persistence"},
+    {"area":"onboarding","current":"Ross-specific operator authority and 10-question capability review","target":"customer-owned intake plus 5-15 generated questions","gap":"tenant-neutral intake pipeline","risk":"high","priority":"P0","complexity":"L","dependency":"auth and persistence"},
+    {"area":"authentication","current":"Email lookup and shop API-key middleware exist outside CareerOS","target":"customer account, session, recovery, authorization","gap":"product auth boundary","risk":"critical","priority":"P0","complexity":"M","dependency":"identity decision"},
+    {"area":"tenant isolation","current":"No CareerOS tenant/profile model","target":"fail-closed tenant-scoped storage and queries","gap":"tenant-aware schema and authorization","risk":"critical","priority":"P0","complexity":"L","dependency":"authentication"},
+    {"area":"persistence","current":"CareerOS authority is private filesystem/NDJSON","target":"production system of record with versioned authority","gap":"CareerOS persistence models and migrations","risk":"critical","priority":"P0","complexity":"L","dependency":"tenant isolation"},
+    {"area":"job ingestion","current":"Local/user bridge and authorized Greenhouse artifacts","target":"URL, pasted description, saved posting; discovery optional","gap":"customer-owned opportunity intake","risk":"medium","priority":"P0","complexity":"M","dependency":"profile and match service"},
+    {"area":"customer UI","current":"/os/professional is operator-oriented","target":"customer career, capability, jobs, match, settings surfaces","gap":"new customer routes and access boundary","risk":"high","priority":"P0","complexity":"L","dependency":"auth and API"},
+    {"area":"privacy","current":"Private local authority conventions","target":"export, deletion, retention, document access controls","gap":"customer privacy lifecycle","risk":"critical","priority":"P0","complexity":"M","dependency":"persistence"},
+    {"area":"observability","current":"StaffordOS operator outputs","target":"tenant-safe product audit and error telemetry","gap":"product event/error model","risk":"high","priority":"P1","complexity":"M","dependency":"service boundary"},
+    {"area":"error handling","current":"Operator/runtime fail-closed behavior","target":"customer-safe recoverable errors and queued work","gap":"product workflow states","risk":"medium","priority":"P1","complexity":"M","dependency":"persistence"},
+    {"area":"deployment","current":"Operator frontend and separate web service","target":"isolated customer runtime and secrets","gap":"deployment topology and environment contract","risk":"high","priority":"P1","complexity":"M","dependency":"auth/persistence"},
+    {"area":"billing readiness","current":"Abando User/Usage/Stripe models","target":"CareerOS entitlements isolated from Abando","gap":"product entitlement namespace","risk":"medium","priority":"P1","complexity":"S","dependency":"tenant model"},
+    {"area":"provider coverage","current":"Greenhouse authority plus user-supplied paths","target":"provider-neutral user input first","gap":"commercial provider licensing and adapters","risk":"medium","priority":"P2","complexity":"L","dependency":"source authority policy"},
+    {"area":"beta validation","current":"One deeply adjudicated profile","target":"5-10 diverse private beta users","gap":"customer-neutral validation harness","risk":"high","priority":"P0","complexity":"M","dependency":"P0 product path"}
+  ],
+  "privatePayloadsIncluded": false
+}
