@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "careeros.v1.p0.production-gap-update.v1",
+  "closed": ["contained production schema", "database adapter boundary", "tenant foreign-key model", "token-digest session design", "export contract", "delete contract", "audit-event contract"],
+  "partial": ["production persistence runtime", "identity hardening", "tenant isolation runtime", "observability"],
+  "remainingP0": ["test-database migration execution", "external rate limiting", "account verification/recovery", "deployment env validation", "secure binary storage"],
+  "nextMission": "CAREEROS_V1_PRODUCTIZATION_P0_CAPABILITY_ONBOARDING",
+  "externalDataReady": false
+}

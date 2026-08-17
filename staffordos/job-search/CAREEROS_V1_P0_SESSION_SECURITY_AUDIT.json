@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "careeros.v1.p0.session-security.v1",
+  "cookie": {"httpOnly": true, "sameSite": "lax", "secureInProduction": true, "path": "/"},
+  "database": {"rawTokenStored": false, "tokenDigestStored": true, "expiry": true, "revocation": true, "lastUsedAt": true},
+  "tampering": "digest lookup fails closed",
+  "sessionFixation": "new random token on login/signup",
+  "remaining": ["external rate limiting", "recovery", "verification", "secret rotation runbook"]
+}

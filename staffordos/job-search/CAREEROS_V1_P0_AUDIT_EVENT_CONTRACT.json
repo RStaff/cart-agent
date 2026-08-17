@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "careeros.v1.p0.audit-event.v1",
+  "events": ["ACCOUNT_CREATED", "LOGIN", "LOGOUT", "PROFILE_UPDATED", "SOURCE_CREATED", "FACT_CONFIRM", "FACT_CORRECT", "FACT_REJECT", "FACT_KEEP_FOR_LATER", "DATA_EXPORT_REQUESTED", "ACCOUNT_DELETED"],
+  "fields": ["tenantId","userId","eventType","requestId","entityType","entityId","metadata","createdAt"],
+  "rawCareerTextLogged": false,
+  "passwordLogged": false,
+  "sessionSecretLogged": false,
+  "authorityEffect": "audit events never become CareerFact authority"
+}

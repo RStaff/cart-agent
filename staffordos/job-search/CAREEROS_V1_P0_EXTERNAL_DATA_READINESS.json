@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "careeros.v1.p0.external-data-readiness.v1",
+  "decision": "NOT_READY",
+  "overall": "NOT_READY",
+  "reason": ["production deployment migration not applied", "external rate limiter not configured", "account recovery and verification not implemented", "secure binary storage deferred", "deployment environment validation pending"],
+  "safeMode": "synthetic/local text only",
+  "inviteOnlyTextBeta": false
+}

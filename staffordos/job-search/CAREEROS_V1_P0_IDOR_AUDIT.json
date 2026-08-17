@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "careeros.v1.p0.idor-audit.v1",
+  "customerRoutes": [
+    {"route":"/api/career/profile","access":"session-scoped"},
+    {"route":"/api/career/sources","access":"session-scoped"},
+    {"route":"/api/career/intake/source","access":"session-scoped"},
+    {"route":"/api/career/intake/candidates","access":"session-scoped"},
+    {"route":"/api/career/intake/candidates/[candidateId]","access":"session plus tenant/user predicate"},
+    {"route":"/api/career/account/export","access":"session-scoped"},
+    {"route":"/api/career/account/delete","access":"session-scoped"}
+  ],
+  "rawIdOnlyQueries": 0,
+  "clientTenantIdTrusted": false
+}

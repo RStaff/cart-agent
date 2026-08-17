@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
-import { careerP0Store, CAREEROS_P0_COOKIE, sessionCookieOptions } from "../../../../../lib/career/careerP0Auth";
+import { careerP0Store, CAREEROS_P0_COOKIE, sessionCookieOptions, customerMutationAllowed } from "../../../../../lib/career/careerP0Auth";
+import { allowDevelopmentRequest } from "../../../../../lib/career/careerP0RateLimit.mjs";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
+  if (!customerMutationAllowed(request) || !allowDevelopmentRequest("signup")) return NextResponse.json({ ok: false, error: "REQUEST_NOT_ALLOWED" }, { status: 403 });
   try {
     const body = await request.json();
     const session = await careerP0Store.createAccount({ email: body?.email, password: body?.password, displayName: body?.displayName });

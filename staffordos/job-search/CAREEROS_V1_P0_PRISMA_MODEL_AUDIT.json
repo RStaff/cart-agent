@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "careeros.v1.p0.prisma-model-audit.v1",
+  "schema": "staffordos/ui/operator-frontend/prisma/careeros.prisma",
+  "models": ["CareerUser", "CareerTenant", "CareerTenantMembership", "CareerProfile", "CareerSource", "CareerFactCandidate", "CareerFactReviewDecision", "CareerFact", "CareerSession", "CareerOnboardingState", "CareerAuditEvent"],
+  "sharedSchemaModified": false,
+  "tenantOwnership": "explicit foreign keys and tenant/user indexes",
+  "researchArtifactsPersisted": false,
+  "validation": "passed"
+}

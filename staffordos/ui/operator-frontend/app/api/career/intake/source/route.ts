@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { currentCareerContext, careerP0Store } from "../../../../../lib/career/careerP0Auth";
+import { currentCareerContext, careerP0Store, customerMutationAllowed } from "../../../../../lib/career/careerP0Auth";
 import { parseCareerText, CAREEROS_INTAKE_EXTRACTOR_VERSION } from "../../../../../lib/career/careerP0Intake.mjs";
 
 export const runtime = "nodejs";
@@ -7,6 +7,7 @@ export const runtime = "nodejs";
 const SOURCE_TYPES = new Set(["RESUME_TEXT", "MANUAL_WORK_HISTORY", "PROJECT", "CERTIFICATION", "PORTFOLIO_DESCRIPTION", "OTHER_USER_PROVIDED_TEXT"]);
 
 export async function POST(request: Request) {
+  if (!customerMutationAllowed(request)) return NextResponse.json({ ok: false, error: "REQUEST_NOT_ALLOWED" }, { status: 403 });
   const context = await currentCareerContext();
   if (!context) return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
   try {

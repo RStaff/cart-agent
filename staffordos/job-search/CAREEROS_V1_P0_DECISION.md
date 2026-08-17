@@ -1,7 +1,5 @@
-# CareerOS P0 Decision
+# CareerOS P0 Production Persistence Decision
 
-Decision: `P0_ACCOUNT_PROFILE_FOUNDATION_READY_WITH_LIMITATIONS`
+Decision: `P0_PRODUCTION_PERSISTENCE_BLOCKED` for real external data; the implementation is ready for the next controlled deployment-validation step.
 
-The local customer account, tenant ownership, session boundary, and persistent profile flow are implemented and covered by synthetic cross-tenant tests. The foundation is not yet ready to accept external customer data because the current adapter is local JSON and production identity, recovery, secure document storage, deletion/export, and operational controls remain.
-
-Next mission: `CAREEROS_V1_PRODUCTIZATION_P0_CAREER_INTAKE_FOUNDATION`, after the production persistence/auth boundary is approved or explicitly kept in local-beta mode.
+The contained Prisma model, additive migration, production PostgreSQL adapter, token-digest sessions, tenant predicates, transactions, export/delete contracts, audit events, and fail-closed production configuration are implemented. External data remains blocked until migration execution, identity recovery/verification, shared rate limiting, deployment validation, and privacy lifecycle acceptance are completed.

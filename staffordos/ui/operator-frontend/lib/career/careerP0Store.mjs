@@ -39,6 +39,11 @@ function safeSource(source) {
   return metadata;
 }
 
+function audit(data, tenantId, userId, eventType, entityType = null, entityId = null) {
+  data.auditEvents ||= [];
+  data.auditEvents.push({ id: id("audit"), tenantId, userId, eventType, entityType, entityId, createdAt: now() });
+}
+
 async function derivePassword(password, salt = crypto.randomBytes(16).toString("hex")) {
   const derived = await new Promise((resolve, reject) => {
     crypto.scrypt(String(password), salt, 64, (error, key) => error ? reject(error) : resolve(key));
@@ -62,10 +67,11 @@ export function createCareerP0Store({ filePath = process.env.CAREEROS_P0_STORE_P
       data.candidateFacts ||= [];
       data.reviewDecisions ||= [];
       data.careerFacts ||= [];
+      data.auditEvents ||= [];
       return data;
     } catch (error) {
       if (error?.code === "ENOENT") {
-        return { users: [], tenants: [], memberships: [], profiles: [], sources: [], sessions: [], candidateFacts: [], reviewDecisions: [], careerFacts: [] };
+        return { users: [], tenants: [], memberships: [], profiles: [], sources: [], sessions: [], candidateFacts: [], reviewDecisions: [], careerFacts: [], auditEvents: [] };
       }
       throw error;
     }
@@ -97,7 +103,9 @@ export function createCareerP0Store({ filePath = process.env.CAREEROS_P0_STORE_P
     data.users.push(user);
     data.tenants.push(tenant);
     data.memberships.push(membership);
+    audit(data, tenant.id, user.id, "ACCOUNT_CREATED");
     await write(data);
+    audit(data, tenant.id, user.id, "LOGIN");
     return createSessionFor(data, user, tenant);
   }
 
@@ -134,7 +142,9 @@ export function createCareerP0Store({ filePath = process.env.CAREEROS_P0_STORE_P
 
   async function destroySession(sessionId) {
     const data = await read();
+    const current = data.sessions.find((session) => session.id === sessionId);
     data.sessions = data.sessions.filter((session) => session.id !== sessionId);
+    if (current) audit(data, current.tenantId, current.userId, "LOGOUT");
     await write(data);
   }
 
@@ -163,6 +173,7 @@ export function createCareerP0Store({ filePath = process.env.CAREEROS_P0_STORE_P
       profile.version += 1;
       profile.updatedAt = timestamp;
     }
+    audit(data, context.tenant.id, context.user.id, "PROFILE_UPDATED", "CareerProfile", profile.id);
     await write(data);
     return safeProfile(profile);
   }
@@ -186,6 +197,7 @@ export function createCareerP0Store({ filePath = process.env.CAREEROS_P0_STORE_P
     const textContent = input.textContent == null ? null : String(input.textContent).trim().slice(0, 50000);
     const source = { id: id("source"), tenantId: context.tenant.id, userId: context.user.id, profileId: profile.id, sourceType: input.sourceType, sourceStatus: textContent ? "STORED" : "PENDING_STORAGE", originalFilename: input.originalFilename ? String(input.originalFilename).trim().slice(0, 240) : null, contentReference: null, textContent, sourceDigest: input.sourceDigest || null, createdAt: timestamp, updatedAt: timestamp };
     data.sources.push(source);
+    audit(data, context.tenant.id, context.user.id, "SOURCE_CREATED", "CareerSource", source.id);
     await write(data);
     return safeSource(source);
   }
@@ -244,6 +256,7 @@ export function createCareerP0Store({ filePath = process.env.CAREEROS_P0_STORE_P
     else candidate.status = "NEEDS_REVIEW";
     candidate.updatedAt = timestamp;
     data.reviewDecisions.push({ id: id("review"), candidateFactId: candidateId, tenantId: context.tenant.id, userId: context.user.id, decision, previousStatement, activeStatement: candidate.statement, createdAt: timestamp });
+    audit(data, context.tenant.id, context.user.id, `FACT_${decision}`, "CareerFactCandidate", candidateId);
     if (decision === "CONFIRM" || decision === "CORRECT") {
       const existing = data.careerFacts.find((fact) => fact.candidateFactId === candidateId && fact.tenantId === context.tenant.id);
       const fact = { ...(existing || {}), id: existing?.id || id("fact"), candidateFactId: candidateId, tenantId: context.tenant.id, userId: context.user.id, profileId: candidate.profileId, sourceId: candidate.sourceId, factType: candidate.factType, statement: candidate.statement, sourceExcerpt: candidate.sourceExcerpt, sourceOrder: candidate.sourceOrder, scopeStatement: candidate.scopeStatement, status: "CUSTOMER_CONFIRMED", authorityState: "CUSTOMER_CONFIRMED_SOURCE_BACKED", createdAt: existing?.createdAt || timestamp, updatedAt: timestamp };
@@ -271,7 +284,46 @@ export function createCareerP0Store({ filePath = process.env.CAREEROS_P0_STORE_P
     return { stage: !profile ? "PROFILE" : sources.length === 0 ? "CAREER_SOURCE" : candidates.some((item) => ["PROPOSED", "NEEDS_REVIEW"].includes(item.status)) ? "FACT_REVIEW" : "READY_FOR_CAPABILITIES", sourceCount: sources.length, candidateCount: candidates.length, confirmedFactCount: data.careerFacts.filter((item) => item.tenantId === context.tenant.id && item.userId === context.user.id).length };
   }
 
-  return { createAccount, login, resolveSession, destroySession, getProfile, saveProfile, listSources, createSource, getSource, saveCandidates, listCandidateFacts, reviewCandidate, listCareerFacts, getOnboardingState, _read: read };
+  async function exportAccount(sessionId) {
+    const context = await resolveSession(sessionId);
+    if (!context) throw Object.assign(new Error("unauthorized"), { code: "UNAUTHORIZED" });
+    const data = await read();
+    return {
+      profile: data.profiles.filter((item) => item.tenantId === context.tenant.id && item.userId === context.user.id).map(safeProfile),
+      sources: data.sources.filter((item) => item.tenantId === context.tenant.id && item.userId === context.user.id).map(safeSource),
+      candidates: (data.candidateFacts || []).filter((item) => item.tenantId === context.tenant.id && item.userId === context.user.id),
+      reviews: (data.reviewDecisions || []).filter((item) => item.tenantId === context.tenant.id && item.userId === context.user.id),
+      careerFacts: data.careerFacts.filter((item) => item.tenantId === context.tenant.id && item.userId === context.user.id),
+      onboarding: await getOnboardingState(sessionId),
+    };
+  }
+
+  async function deleteAccount(sessionId) {
+    const context = await resolveSession(sessionId);
+    if (!context) throw Object.assign(new Error("unauthorized"), { code: "UNAUTHORIZED" });
+    const data = await read();
+    audit(data, context.tenant.id, context.user.id, "ACCOUNT_DELETED");
+    data.sessions = data.sessions.filter((item) => item.tenantId !== context.tenant.id);
+    data.sources = data.sources.filter((item) => item.tenantId !== context.tenant.id);
+    data.candidateFacts = (data.candidateFacts || []).filter((item) => item.tenantId !== context.tenant.id);
+    data.reviewDecisions = (data.reviewDecisions || []).filter((item) => item.tenantId !== context.tenant.id);
+    data.careerFacts = data.careerFacts.filter((item) => item.tenantId !== context.tenant.id);
+    data.profiles = data.profiles.filter((item) => item.tenantId !== context.tenant.id);
+    data.memberships = data.memberships.filter((item) => item.tenantId !== context.tenant.id);
+    data.auditEvents = data.auditEvents.filter((item) => item.tenantId !== context.tenant.id);
+    data.tenants = data.tenants.filter((item) => item.id !== context.tenant.id);
+    data.users = data.users.filter((item) => item.id !== context.user.id);
+    await write(data);
+  }
+
+  async function auditEvents(sessionId) {
+    const context = await resolveSession(sessionId);
+    if (!context) throw Object.assign(new Error("unauthorized"), { code: "UNAUTHORIZED" });
+    const data = await read();
+    return data.auditEvents.filter((item) => item.tenantId === context.tenant.id && item.userId === context.user.id);
+  }
+
+  return { createAccount, login, resolveSession, destroySession, getProfile, saveProfile, listSources, createSource, getSource, saveCandidates, listCandidateFacts, reviewCandidate, listCareerFacts, getOnboardingState, exportAccount, deleteAccount, auditEvents, _read: read };
 }
 
 export const CAREEROS_P0_COOKIE = "careeros_p0_session";

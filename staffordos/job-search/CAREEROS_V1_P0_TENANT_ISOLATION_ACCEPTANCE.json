@@ -1,0 +1,7 @@
+{
+  "schemaVersion": "careeros.v1.p0.tenant-acceptance.v1",
+  "serviceRule": "session -> membership -> tenant -> tenant-scoped query",
+  "clientTenantIdAuthority": false,
+  "syntheticServiceTests": {"ownRead": "passed", "crossTenantRead": "passed denied", "crossTenantMutation": "passed denied", "sessionMisuse": "passed denied"},
+  "databaseConstraints": ["membership uniqueness", "profile tenant/user uniqueness", "tenant foreign keys", "tenant/user indexes"]
+}

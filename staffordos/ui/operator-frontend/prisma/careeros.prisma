@@ -1,0 +1,209 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model CareerUser {
+  id           String                   @id @default(cuid())
+  email        String                   @unique
+  passwordHash String
+  passwordSalt String
+  createdAt    DateTime                 @default(now())
+  updatedAt    DateTime                 @updatedAt
+  memberships  CareerTenantMembership[]
+  sessions     CareerSession[]
+  profiles     CareerProfile[]
+  auditEvents  CareerAuditEvent[]
+}
+
+model CareerTenant {
+  id          String                     @id @default(cuid())
+  name        String
+  createdAt   DateTime                   @default(now())
+  updatedAt   DateTime                   @updatedAt
+  memberships CareerTenantMembership[]
+  profiles    CareerProfile[]
+  sources     CareerSource[]
+  candidates  CareerFactCandidate[]
+  reviews     CareerFactReviewDecision[]
+  facts       CareerFact[]
+  onboarding  CareerOnboardingState[]
+  auditEvents CareerAuditEvent[]
+  sessions    CareerSession[]
+}
+
+model CareerTenantMembership {
+  id        String       @id @default(cuid())
+  tenantId  String
+  userId    String
+  role      String       @default("OWNER")
+  createdAt DateTime     @default(now())
+  tenant    CareerTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user      CareerUser   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId])
+  @@index([userId, role])
+}
+
+model CareerProfile {
+  id          String                 @id @default(cuid())
+  tenantId    String
+  userId      String
+  displayName String
+  headline    String?
+  location    String?
+  careerStage String?
+  status      String                 @default("ACTIVE")
+  version     Int                    @default(1)
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+  tenant      CareerTenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user        CareerUser             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sources     CareerSource[]
+  candidates  CareerFactCandidate[]
+  facts       CareerFact[]
+  onboarding  CareerOnboardingState?
+
+  @@unique([tenantId, userId])
+  @@index([userId, updatedAt])
+}
+
+model CareerSource {
+  id               String                @id @default(cuid())
+  tenantId         String
+  userId           String
+  profileId        String
+  sourceType       String
+  sourceStatus     String
+  originalFilename String?
+  contentReference String?
+  sourceDigest     String?
+  extractorVersion String?
+  textContent      String?
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  tenant           CareerTenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  profile          CareerProfile         @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  candidates       CareerFactCandidate[]
+
+  @@index([tenantId, userId, updatedAt])
+  @@index([profileId, createdAt])
+  @@index([tenantId, sourceDigest, extractorVersion])
+}
+
+model CareerFactCandidate {
+  id                String                     @id @default(cuid())
+  candidateFactId   String                     @unique
+  tenantId          String
+  userId            String
+  profileId         String
+  sourceId          String
+  factType          String
+  statement         String
+  sourceExcerpt     String
+  sourceOrder       Int
+  scopeStatement    String?
+  extractionMethod  String
+  extractionVersion String
+  confidence        String
+  ambiguity         Json
+  status            String                     @default("PROPOSED")
+  createdAt         DateTime                   @default(now())
+  updatedAt         DateTime                   @updatedAt
+  tenant            CareerTenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  profile           CareerProfile              @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  source            CareerSource               @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  reviews           CareerFactReviewDecision[]
+  facts             CareerFact[]
+
+  @@unique([sourceId, extractionVersion, sourceOrder])
+  @@index([tenantId, userId, status])
+}
+
+model CareerFactReviewDecision {
+  id                String              @id @default(cuid())
+  tenantId          String
+  userId            String
+  candidateFactId   String
+  decision          String
+  previousStatement String?
+  activeStatement   String?
+  createdAt         DateTime            @default(now())
+  tenant            CareerTenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  candidate         CareerFactCandidate @relation(fields: [candidateFactId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, candidateFactId, createdAt])
+}
+
+model CareerFact {
+  id              String              @id @default(cuid())
+  candidateFactId String              @unique
+  tenantId        String
+  userId          String
+  profileId       String
+  sourceId        String
+  factType        String
+  statement       String
+  sourceExcerpt   String
+  sourceOrder     Int
+  scopeStatement  String?
+  authorityState  String
+  status          String              @default("CUSTOMER_CONFIRMED")
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  tenant          CareerTenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  profile         CareerProfile       @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  candidate       CareerFactCandidate @relation(fields: [candidateFactId], references: [candidateFactId], onDelete: Cascade)
+
+  @@index([tenantId, userId, updatedAt])
+  @@index([profileId, createdAt])
+}
+
+model CareerSession {
+  id          String       @id @default(cuid())
+  tokenDigest String       @unique
+  userId      String
+  tenantId    String
+  expiresAt   DateTime
+  createdAt   DateTime     @default(now())
+  lastUsedAt  DateTime?
+  revokedAt   DateTime?
+  user        CareerUser   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant      CareerTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@index([tenantId, revokedAt])
+}
+
+model CareerOnboardingState {
+  id        String        @id @default(cuid())
+  tenantId  String
+  profileId String        @unique
+  stage     String        @default("PROFILE")
+  updatedAt DateTime      @updatedAt
+  tenant    CareerTenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  profile   CareerProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, stage])
+}
+
+model CareerAuditEvent {
+  id         String       @id @default(cuid())
+  tenantId   String
+  userId     String
+  eventType  String
+  requestId  String?
+  entityType String?
+  entityId   String?
+  metadata   Json?
+  createdAt  DateTime     @default(now())
+  tenant     CareerTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user       CareerUser   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, eventType, createdAt])
+}
