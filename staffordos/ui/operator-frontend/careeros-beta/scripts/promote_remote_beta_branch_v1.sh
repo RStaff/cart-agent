@@ -22,8 +22,10 @@ git show --format= --name-only "$SOURCE_SHA" | grep -q '^staffordos/ui/operator-
 ORIGIN_MAIN_BEFORE="$(git ls-remote origin refs/heads/main | awk '{print $1}')"
 REMOTE_BETA_BEFORE="$(git ls-remote origin "refs/heads/${DESTINATION_BRANCH}" | awk '{print $1}')"
 if [ -n "$REMOTE_BETA_BEFORE" ] && [ "$REMOTE_BETA_BEFORE" != "$SOURCE_SHA" ]; then
-  echo "PROMOTION BLOCKED: destination branch already points elsewhere" >&2
-  exit 1
+  if ! git merge-base --is-ancestor "$REMOTE_BETA_BEFORE" "$SOURCE_SHA"; then
+    echo "PROMOTION BLOCKED: destination branch is not an ancestor of source SHA" >&2
+    exit 1
+  fi
 fi
 
 git push origin "${SOURCE_SHA}:refs/heads/${DESTINATION_BRANCH}"
