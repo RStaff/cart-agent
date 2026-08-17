@@ -194,7 +194,7 @@ export function createCareerP0Store({ filePath = process.env.CAREEROS_P0_STORE_P
     const data = await read();
     const profile = data.profiles.find((candidate) => candidate.tenantId === context.tenant.id && candidate.userId === context.user.id);
     if (!profile) throw Object.assign(new Error("profile_required"), { code: "PROFILE_REQUIRED" });
-    const sourceTypes = new Set(["RESUME", "MANUAL_WORK_HISTORY", "PORTFOLIO", "CERTIFICATION", "PROJECT", "OTHER_USER_SUPPLIED_SOURCE", "RESUME_TEXT", "PORTFOLIO_DESCRIPTION", "OTHER_USER_PROVIDED_TEXT"]);
+    const sourceTypes = new Set(["RESUME", "MANUAL_WORK_HISTORY", "PORTFOLIO", "CERTIFICATION", "PROJECT", "OTHER_USER_SUPPLIED_SOURCE", "RESUME_TEXT", "PORTFOLIO_DESCRIPTION", "OTHER_USER_PROVIDED_TEXT", "VOICE_TRANSCRIPT"]);
     if (!sourceTypes.has(input?.sourceType)) throw Object.assign(new Error("invalid_source_type"), { code: "INVALID_SOURCE_TYPE" });
     const timestamp = now();
     const textContent = input.textContent == null ? null : String(input.textContent).trim().slice(0, 50000);

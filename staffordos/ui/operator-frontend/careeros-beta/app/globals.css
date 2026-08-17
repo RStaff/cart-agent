@@ -28,4 +28,6 @@ textarea { min-height: 180px; resize: vertical; }
 .careerHomeStatus { margin-bottom: 0; }
 .careerHomeNav { margin-top: 20px; }
 .careerHomeLinks { display: flex; flex-wrap: wrap; gap: 12px 20px; }
+.careerVoiceStatus { display: flex; align-items: center; gap: 14px; margin: 16px 0; color: #fda4af; }
+.careerTranscriptReview { display: grid; gap: 12px; margin: 16px 0; }
 a { color: #67e8f9; }
