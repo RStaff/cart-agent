@@ -1,0 +1,16 @@
+{
+  "mission": "CAREEROS_V1_PRODUCTIZATION_P0_GOVERNED_REMOTE_BETA_PROMOTION",
+  "repository": "RStaff/cart-agent",
+  "deploymentRoot": "staffordos/ui/operator-frontend/careeros-beta",
+  "sourceAuthority": "committed governed source SHA",
+  "remoteBranch": "careeros/private-beta",
+  "originMainMutation": false,
+  "forcePush": false,
+  "renderProvisioned": false,
+  "databaseCreated": false,
+  "deploymentPerformed": false,
+  "customerDataUsed": false,
+  "operatorRoutesInDeploymentRoot": false,
+  "matchingSemanticsChanged": false,
+  "promotionGate": "careeros-beta/scripts/promote_remote_beta_branch_v1.sh"
+}
