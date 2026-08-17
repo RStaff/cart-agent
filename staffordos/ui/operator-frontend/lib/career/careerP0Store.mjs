@@ -68,10 +68,11 @@ export function createCareerP0Store({ filePath = process.env.CAREEROS_P0_STORE_P
       data.reviewDecisions ||= [];
       data.careerFacts ||= [];
       data.auditEvents ||= [];
+      data.rateLimitBuckets ||= {};
       return data;
     } catch (error) {
       if (error?.code === "ENOENT") {
-        return { users: [], tenants: [], memberships: [], profiles: [], sources: [], sessions: [], candidateFacts: [], reviewDecisions: [], careerFacts: [], auditEvents: [] };
+        return { users: [], tenants: [], memberships: [], profiles: [], sources: [], sessions: [], candidateFacts: [], reviewDecisions: [], careerFacts: [], auditEvents: [], rateLimitBuckets: {} };
       }
       throw error;
     }
@@ -284,6 +285,22 @@ export function createCareerP0Store({ filePath = process.env.CAREEROS_P0_STORE_P
     return { stage: !profile ? "PROFILE" : sources.length === 0 ? "CAREER_SOURCE" : candidates.some((item) => ["PROPOSED", "NEEDS_REVIEW"].includes(item.status)) ? "FACT_REVIEW" : "READY_FOR_CAPABILITIES", sourceCount: sources.length, candidateCount: candidates.length, confirmedFactCount: data.careerFacts.filter((item) => item.tenantId === context.tenant.id && item.userId === context.user.id).length };
   }
 
+  async function consumeRateLimit(key, { limit = 10, windowMs = 60_000 } = {}) {
+    const data = await read();
+    data.rateLimitBuckets ||= {};
+    const current = data.rateLimitBuckets[key];
+    const timestamp = Date.now();
+    if (!current || current.expiresAt <= timestamp) {
+      data.rateLimitBuckets[key] = { count: 1, expiresAt: timestamp + windowMs };
+      await write(data);
+      return { allowed: true, remaining: Math.max(0, limit - 1) };
+    }
+    if (current.count >= limit) return { allowed: false, remaining: 0 };
+    current.count += 1;
+    await write(data);
+    return { allowed: true, remaining: Math.max(0, limit - current.count) };
+  }
+
   async function exportAccount(sessionId) {
     const context = await resolveSession(sessionId);
     if (!context) throw Object.assign(new Error("unauthorized"), { code: "UNAUTHORIZED" });
@@ -323,7 +340,7 @@ export function createCareerP0Store({ filePath = process.env.CAREEROS_P0_STORE_P
     return data.auditEvents.filter((item) => item.tenantId === context.tenant.id && item.userId === context.user.id);
   }
 
-  return { createAccount, login, resolveSession, destroySession, getProfile, saveProfile, listSources, createSource, getSource, saveCandidates, listCandidateFacts, reviewCandidate, listCareerFacts, getOnboardingState, exportAccount, deleteAccount, auditEvents, _read: read };
+  return { createAccount, login, resolveSession, destroySession, consumeRateLimit, getProfile, saveProfile, listSources, createSource, getSource, saveCandidates, listCandidateFacts, reviewCandidate, listCareerFacts, getOnboardingState, exportAccount, deleteAccount, auditEvents, _read: read };
 }
 
 export const CAREEROS_P0_COOKIE = "careeros_p0_session";

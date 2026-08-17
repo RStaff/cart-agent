@@ -207,3 +207,23 @@ model CareerAuditEvent {
   @@index([tenantId, createdAt])
   @@index([tenantId, eventType, createdAt])
 }
+
+model CareerInvite {
+  id          String    @id
+  email       String
+  tokenDigest String    @unique
+  expiresAt   DateTime
+  consumedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([email, expiresAt])
+}
+
+model CareerRateLimitBucket {
+  key             String   @id
+  windowStartedAt DateTime
+  count           Int      @default(0)
+  updatedAt       DateTime @updatedAt
+
+  @@index([updatedAt])
+}

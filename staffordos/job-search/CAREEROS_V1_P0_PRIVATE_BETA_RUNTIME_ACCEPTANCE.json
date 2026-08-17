@@ -1,0 +1,7 @@
+{
+  "schemaVersion": "careeros.v1.p0.private-beta-runtime-acceptance.v1",
+  "result": "PASS_SYNTHETIC_ONLY",
+  "flow": ["invite", "signup", "login", "profile", "pasted text", "candidate extraction", "fact confirmation", "logout", "login state recovery", "export", "deletion"],
+  "security": ["invite reuse rejected", "database limiter exhausted at threshold", "revoked session rejected", "cross-tenant read denied"],
+  "realCustomerData": false
+}

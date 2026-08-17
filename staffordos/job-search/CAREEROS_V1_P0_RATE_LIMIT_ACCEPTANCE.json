@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "careeros.v1.p0.rate-limit-acceptance.v1",
+  "backend": "CareerRateLimitBucket in PostgreSQL",
+  "protected": ["signup", "login"],
+  "syntheticResult": [true, true, true, false],
+  "concurrency": "row-locked transaction path",
+  "failureMode": "database-backed authentication path fails closed",
+  "inMemoryProductionUse": false,
+  "result": "PASS"
+}

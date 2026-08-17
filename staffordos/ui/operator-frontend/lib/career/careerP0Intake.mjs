@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 
 export const CAREEROS_INTAKE_EXTRACTOR_VERSION = "P0_TEXT_EXTRACTOR_V1";
+export const CAREEROS_MAX_TEXT_LENGTH = 50_000;
 
 function digest(value) {
   return crypto.createHash("sha256").update(String(value)).digest("hex");
@@ -29,6 +30,7 @@ function scopeStatement(statement) {
 export function parseCareerText({ sourceId, sourceType, text, extractorVersion = CAREEROS_INTAKE_EXTRACTOR_VERSION }) {
   const sourceText = String(text || "").trim();
   if (!sourceText) throw Object.assign(new Error("source_text_required"), { code: "SOURCE_TEXT_REQUIRED" });
+  if (sourceText.length > CAREEROS_MAX_TEXT_LENGTH) throw Object.assign(new Error("source_text_too_large"), { code: "SOURCE_TEXT_TOO_LARGE" });
   const segments = sourceText
     .split(/\n+/)
     .flatMap((line) => line.split(/(?<=[.!?])\s+/))

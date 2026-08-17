@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "careeros.v1.p0.auth-hardening-acceptance.v1",
+  "passwords": "scrypt with per-account salt; plaintext absent",
+  "sessions": ["opaque random token", "SHA-256 digest plus production pepper", "expiry", "revocation", "logout", "active membership check"],
+  "cookies": ["HttpOnly", "Secure in production", "SameSite=Lax", "Path=/", "30-day max age"],
+  "accountEnumeration": "login returns one generic INVALID_CREDENTIALS response; signup does not expose ACCOUNT_EXISTS",
+  "result": "PASS_WITH_RECOVERY_DEFERRED"
+}

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "careeros.v1.p0.production-migration-acceptance.v2",
+  "database": "isolated temporary PostgreSQL",
+  "migration": "20260816000000_careeros_p0_foundation",
+  "result": "PASS",
+  "checks": ["clean database", "migration applied", "CareerOS tables and indexes created", "synthetic lifecycle completed", "tenant isolation verified", "deletion verified"],
+  "remoteProductionApplied": false,
+  "rollback": "restore provider snapshot or replace isolated database; no remote rollback performed"
+}

@@ -2,5 +2,6 @@
   "schemaVersion": "careeros.v1.p0.export-delete.v1",
   "export": {"scope":"current authenticated tenant", "includes":["profile","source metadata","candidate facts","review decisions","confirmed CareerFacts","onboarding"], "otherTenantData":false, "operatorArtifacts":false},
   "delete": {"scope":"current authenticated tenant and user", "cascade":"database foreign keys plus explicit local adapter cleanup", "globalTaxonomyDeleted":false},
-  "syntheticAcceptance": "service contract implemented; local deletion/export test coverage remains to be expanded before external beta"
+  "excluded": ["password hashes", "session tokens/digests", "other tenants", "operator artifacts"],
+  "syntheticAcceptance": "isolated PostgreSQL export and deletion lifecycle passed; remote provider acceptance remains pending"
 }

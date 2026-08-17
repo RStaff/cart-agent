@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "careeros.v1.p0.text-input-security.v1",
+  "accepted": ["RESUME_TEXT", "MANUAL_WORK_HISTORY", "PROJECT", "CERTIFICATION", "PORTFOLIO_DESCRIPTION", "OTHER_USER_PROVIDED_TEXT"],
+  "maximumCharacters": 50000,
+  "parserMaximumCharacters": 50000,
+  "storage": "tenant-scoped text only; no binary upload",
+  "rendering": "React text rendering; supplied HTML is not executed",
+  "logging": "raw career text excluded",
+  "result": "PASS"
+}

@@ -9,5 +9,7 @@ Implemented/defined:
 - session resolution joined to active tenant membership
 - production mode fails closed without `DATABASE_URL`
 - production mutating routes require configured same-origin checks
+- production mode requires invite-only signup, app origin, and a session pepper
+- signup consumes a single-use, email-bound invitation
 
-Remaining before invite-only external beta: email verification/recovery, external rate limiting, production secret rotation, account enumeration review, and deployment environment validation.
+Remaining before invite-only external beta: authorized deployment migration/smoke testing, email verification/recovery, backup/restore proof, production secret/TLS validation, and deployment environment validation.

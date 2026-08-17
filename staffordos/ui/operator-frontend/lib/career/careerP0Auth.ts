@@ -1,5 +1,7 @@
 import { cookies } from "next/headers";
 import { createCareerP0Store, CAREEROS_P0_COOKIE } from "./careerP0Store.mjs";
+import { allowDevelopmentRequest } from "./careerP0RateLimit.mjs";
+import { assertCareerP0Environment, validateCareerP0Environment } from "./careerP0Environment.mjs";
 
 export { CAREEROS_P0_COOKIE } from "./careerP0Store.mjs";
 
@@ -9,7 +11,7 @@ let productionStorePromise: Promise<Record<string, (...args: any[]) => Promise<a
 async function resolvedStore() {
   const production = process.env.CAREEROS_PERSISTENCE === "postgres" || process.env.NODE_ENV === "production";
   if (!production) return localCareerP0Store as unknown as Record<string, (...args: any[]) => Promise<any>>;
-  if (!process.env.DATABASE_URL) throw new Error("CAREEROS_DATABASE_URL_REQUIRED");
+  assertCareerP0Environment();
   productionStorePromise ||= import("./careerP0Postgres.mjs").then(({ createCareerP0PostgresStore }) => createCareerP0PostgresStore());
   return productionStorePromise;
 }
@@ -47,6 +49,13 @@ export function customerMutationAllowed(request: Request) {
 }
 
 export function productionEnvStatus() {
+  const status = validateCareerP0Environment();
+  return { ...status, databaseConfigured: Boolean(process.env.DATABASE_URL), appOriginConfigured: Boolean(process.env.CAREEROS_APP_ORIGIN), rateLimitConfigured: status.production };
+}
+
+export async function allowCustomerAuthRequest(key: string, options: { limit?: number; windowMs?: number } = {}) {
   const production = process.env.CAREEROS_PERSISTENCE === "postgres" || process.env.NODE_ENV === "production";
-  return { production, databaseConfigured: Boolean(process.env.DATABASE_URL), appOriginConfigured: Boolean(process.env.CAREEROS_APP_ORIGIN), rateLimitConfigured: Boolean(process.env.CAREEROS_RATE_LIMIT_BACKEND) };
+  if (!production) return allowDevelopmentRequest(key, options);
+  const result = await careerP0Store.consumeRateLimit(key, options);
+  return result.allowed;
 }

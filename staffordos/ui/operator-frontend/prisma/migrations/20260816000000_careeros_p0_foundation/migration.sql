@@ -185,3 +185,24 @@ CREATE TABLE "CareerAuditEvent" (
 );
 CREATE INDEX "CareerAuditEvent_tenantId_createdAt_idx" ON "CareerAuditEvent"("tenantId", "createdAt");
 CREATE INDEX "CareerAuditEvent_tenantId_eventType_createdAt_idx" ON "CareerAuditEvent"("tenantId", "eventType", "createdAt");
+
+CREATE TABLE "CareerInvite" (
+  "id" TEXT NOT NULL,
+  "email" TEXT NOT NULL,
+  "tokenDigest" TEXT NOT NULL,
+  "expiresAt" TIMESTAMP(3) NOT NULL,
+  "consumedAt" TIMESTAMP(3),
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "CareerInvite_pkey" PRIMARY KEY ("id"),
+  CONSTRAINT "CareerInvite_tokenDigest_key" UNIQUE ("tokenDigest")
+);
+CREATE INDEX "CareerInvite_email_expiresAt_idx" ON "CareerInvite"("email", "expiresAt");
+
+CREATE TABLE "CareerRateLimitBucket" (
+  "key" TEXT NOT NULL,
+  "windowStartedAt" TIMESTAMP(3) NOT NULL,
+  "count" INTEGER NOT NULL DEFAULT 0,
+  "updatedAt" TIMESTAMP(3) NOT NULL,
+  CONSTRAINT "CareerRateLimitBucket_pkey" PRIMARY KEY ("key")
+);
+CREATE INDEX "CareerRateLimitBucket_updatedAt_idx" ON "CareerRateLimitBucket"("updatedAt");

@@ -1,7 +1,7 @@
 const buckets = new Map();
 
 export function rateLimitStatus() {
-  return { backend: process.env.CAREEROS_RATE_LIMIT_BACKEND || null, developmentOnlyMemory: !process.env.CAREEROS_RATE_LIMIT_BACKEND };
+  return { backend: process.env.CAREEROS_RATE_LIMIT_BACKEND || "postgresql", developmentOnlyMemory: true };
 }
 
 export function allowDevelopmentRequest(key, { limit = 10, windowMs = 60_000 } = {}) {

@@ -1,8 +1,8 @@
 {
   "schemaVersion": "careeros.v1.p0.external-data-readiness.v1",
-  "decision": "NOT_READY",
+  "decision": "NO_PRODUCTION_MIGRATION_BLOCKER",
   "overall": "NOT_READY",
-  "reason": ["production deployment migration not applied", "external rate limiter not configured", "account recovery and verification not implemented", "secure binary storage deferred", "deployment environment validation pending"],
+  "reason": ["remote production migration and smoke test are not authorized/applied", "backup/restore provider authority is not established", "recovery and verification are deferred for controlled invite-only beta", "secure binary storage is intentionally deferred", "deployment secrets and TLS environment are not validated here"],
   "safeMode": "synthetic/local text only",
   "inviteOnlyTextBeta": false
 }

@@ -1,0 +1,7 @@
+{
+  "schemaVersion": "careeros.v1.p0.audit-privacy-acceptance.v1",
+  "events": ["ACCOUNT_CREATED", "LOGIN", "LOGOUT", "PROFILE_UPDATED", "SOURCE_CREATED", "FACT_CONFIRMED", "FACT_CORRECTED", "FACT_REJECTED", "EXPORT_REQUESTED"],
+  "excluded": ["passwords", "session tokens", "session digests", "raw career text", "database URLs", "private source files"],
+  "deletionPolicy": "tenant-owned audit rows cascade on account deletion; pre-deletion deletion evidence is not retained in the customer database",
+  "result": "PASS_WITH_FULL_DELETION_POLICY"
+}
