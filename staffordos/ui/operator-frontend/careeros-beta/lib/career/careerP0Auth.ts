@@ -1,16 +1,18 @@
 import { cookies } from "next/headers";
-import { createCareerP0Store, CAREEROS_P0_COOKIE } from "./careerP0Store.mjs";
 import { allowDevelopmentRequest } from "./careerP0RateLimit.mjs";
 import { assertCareerP0Environment, validateCareerP0Environment } from "./careerP0Environment.mjs";
 
-export { CAREEROS_P0_COOKIE } from "./careerP0Store.mjs";
+export const CAREEROS_P0_COOKIE = "careeros_p0_session";
 
-const localCareerP0Store = createCareerP0Store();
+let localStorePromise: Promise<Record<string, (...args: any[]) => Promise<any>>> | null = null;
 let productionStorePromise: Promise<Record<string, (...args: any[]) => Promise<any>>> | null = null;
 
 async function resolvedStore() {
   const production = process.env.CAREEROS_PERSISTENCE === "postgres" || process.env.NODE_ENV === "production";
-  if (!production) return localCareerP0Store as unknown as Record<string, (...args: any[]) => Promise<any>>;
+  if (!production) {
+    localStorePromise ||= import("./careerP0Store.mjs").then(({ createCareerP0Store }) => createCareerP0Store());
+    return localStorePromise;
+  }
   assertCareerP0Environment();
   productionStorePromise ||= import("./careerP0Postgres.mjs").then(({ createCareerP0PostgresStore }) => createCareerP0PostgresStore());
   return productionStorePromise;
