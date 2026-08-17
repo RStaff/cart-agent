@@ -1,0 +1,7 @@
+{
+  "runtime": "deterministic bounded text draft",
+  "opening": "Tell me about a role, project, accomplishment, or experience that is not represented in your profile yet.",
+  "followUpTopics": ["personal contribution", "ownership and support", "responsibilities and stakeholders", "scope and context", "outcomes", "evidence and provenance"],
+  "authorityBoundary": "Answers become a source draft and require the existing customer review flow.",
+  "llmRuntime": "not authorized in this mission"
+}

@@ -1,0 +1,10 @@
+{
+  "modes": {
+    "PASTE_OR_TYPE": { "enabled": true, "authority": "existing_bounded_text_intake", "maxCharacters": 50000 },
+    "TALK": { "enabled": true, "authority": "text_draft_only", "writesCareerFactDirectly": false, "followUpsBounded": true },
+    "DOCUMENT": { "enabled": false, "status": "BINARY_UPLOAD_DISABLED", "requiredBeforeEnable": ["secure object storage", "malware/content inspection", "tenant access control", "retention and deletion proof", "backup and restore proof"] }
+  },
+  "storyStatuses": ["CURRENT_FACTS_REVIEWED", "CAREER_STORY_COMPLETE_FOR_NOW"],
+  "reversible": true,
+  "sourceAuthority": "CareerSource -> CareerFactCandidate -> reviewed CareerFact"
+}

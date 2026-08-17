@@ -22,4 +22,6 @@ textarea { min-height: 180px; resize: vertical; }
 .careerSaved { color: #86efac; }
 .careerError { color: #fca5a5; }
 .careerNav { margin-top: 20px; }
+.careerModeTabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
+.careerStoryDisabled { border: 1px solid #475569; border-radius: 8px; padding: 16px; margin-top: 16px; }
 a { color: #67e8f9; }

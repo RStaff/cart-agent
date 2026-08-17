@@ -1,0 +1,5 @@
+{
+  "source": "sanitized first-user observation",
+  "findings": ["Account and technical intake/review completed.", "Presented information could be confirmed.", "Substantial additional professional experience remained unrepresented.", "The UI did not clearly communicate that experience could be added later.", "A conversational discovery path was absent.", "Copy was technically accurate but system-centric."],
+  "classification": "product evidence, not matching labels"
+}
