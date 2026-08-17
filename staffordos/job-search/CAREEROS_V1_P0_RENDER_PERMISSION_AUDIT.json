@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "careeros.v1.p0.render-permission-audit.v1",
+  "result": "UNKNOWN_PENDING_AUTHENTICATION",
+  "createWebService": "UNKNOWN",
+  "createPostgreSQL": "UNKNOWN",
+  "configureEnvironment": "UNKNOWN",
+  "configureCustomDomain": "UNKNOWN",
+  "inspectBackups": "UNKNOWN",
+  "inspectPlans": "UNKNOWN",
+  "existingAbandoResources": "READ_NOT_ATTEMPTED_AFTER_AUTH_FAILURE",
+  "mutationsPerformed": false,
+  "reason": "Provider rejected the configured Render CLI session."
+}

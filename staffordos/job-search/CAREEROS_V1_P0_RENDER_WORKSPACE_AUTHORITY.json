@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "careeros.v1.p0.render-workspace-authority.v1",
+  "result": "UNRESOLVED_PENDING_INTERACTIVE_LOGIN",
+  "expectedProductBoundary": "Stafford Media CareerOS",
+  "existingRepositoryResources": ["cart-agent-api", "cart-agent-db", "frontend-dev", "frontend-stage", "frontend-prod"],
+  "existingResourceMutation": false,
+  "correctAccount": "UNKNOWN",
+  "correctWorkspace": "UNKNOWN",
+  "careerosWorkspace": "NOT_VERIFIED",
+  "fallbackUsed": false,
+  "nextReadOnlyChecks": ["whoami", "workspace/account", "existing services", "existing databases", "CareerOS create permissions", "plan visibility"]
+}

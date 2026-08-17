@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "careeros.v1.p0.render-auth-state.v1",
+  "cliVersion": "2.5.0",
+  "authenticationMechanism": "Render CLI local session/configuration",
+  "apiKey": "CONFIGURED_BUT_REJECTED",
+  "refreshToken": "CONFIGURED_BUT_REJECTED",
+  "expiryMetadata": "PRESENT",
+  "renderEnvironmentCredential": "MISSING",
+  "whoami": "UNAUTHORIZED",
+  "accountResolution": "UNRESOLVED",
+  "workspaceResolution": "UNRESOLVED",
+  "primaryClassification": "RENDER_TOKEN_EXPIRED_OR_REVOKED",
+  "secretValuesExposed": false
+}
