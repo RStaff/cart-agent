@@ -1,0 +1,21 @@
+{
+  "schema": "careeros.v1.p0.guided_interview_context_acceptance.v1",
+  "contextRequiredBeforeQuestionOne": true,
+  "contextModes": ["VOICE", "TEXT"],
+  "contextPersistence": "SESSION_DRAFT_UNTIL_EXISTING_FINAL_SUBMISSION",
+  "inferencePolicy": "DISPLAY_ONLY_USER_SUPPLIED_CONTEXT; NO_EMPLOYER_TITLE_DATE_OR_RELATIONSHIP_INFERENCE",
+  "questions": [
+    "What did you personally do in this experience?",
+    "What did you own, and what did you support in this experience?",
+    "What responsibilities, stakeholders, or systems were involved in this experience?",
+    "What was the scope, scale, timing, or context of this experience?",
+    "What changed or was accomplished through this experience?",
+    "What evidence or source could help you confirm this experience later?"
+  ],
+  "submissionPath": "talkDraft -> /api/career/intake/source -> CareerSource -> deterministic candidates -> customer review",
+  "directFactCreation": false,
+  "matchingChanged": false,
+  "scopeChanged": false,
+  "specialistSemanticsChanged": false,
+  "manualRossRetestRequired": true
+}

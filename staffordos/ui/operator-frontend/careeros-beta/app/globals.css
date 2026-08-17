@@ -33,6 +33,7 @@ textarea { min-height: 180px; resize: vertical; }
 .careerInterview { display: grid; gap: 16px; margin-top: 20px; }
 .careerInterviewHeader { display: grid; gap: 10px; }
 .careerInterviewHeader h3, .careerInterviewQuestion { margin: 0; }
+.careerContextAnchor { border-left: 3px solid #67e8f9; padding: 10px 12px; color: #e2e8f0; background: rgba(8,47,73,.35); }
 .careerInterviewQuestion { font-size: 20px; line-height: 1.45; color: #f8fafc; }
 .careerProgress { height: 6px; overflow: hidden; border-radius: 999px; background: #334155; }
 .careerProgress span { display: block; height: 100%; background: #67e8f9; transition: width .2s ease; }
