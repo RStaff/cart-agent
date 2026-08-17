@@ -192,7 +192,6 @@ model CareerOnboardingState {
   tenantId  String
   profileId String        @unique
   stage     String        @default("PROFILE")
-  storyStatus String      @default("CURRENT_FACTS_REVIEWED")
   updatedAt DateTime      @updatedAt
   tenant    CareerTenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   profile   CareerProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
