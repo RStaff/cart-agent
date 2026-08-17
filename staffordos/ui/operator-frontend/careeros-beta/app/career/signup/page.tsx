@@ -1,5 +1,6 @@
 import { AuthForm } from "../components/AuthForm";
+import { PrivacyDisclosure } from "../components/PrivacyDisclosure";
 
 export default function CareerSignupPage() {
-  return <AuthForm mode="signup" />;
+  return <><PrivacyDisclosure /><AuthForm mode="signup" /></>;
 }
