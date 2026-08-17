@@ -1,0 +1,23 @@
+{
+  "mission": "CAREEROS_V1_P0_REPEATABLE_JOB_LOOP_DECISION_AND_RETURN",
+  "scope": "CareerOpportunity decision state, optional source URL presentation, saved-job return workflow, and stale match visibility",
+  "authority": {
+    "matching_changed": false,
+    "career_fact_changed": false,
+    "capability_changed": false,
+    "tenant_boundary_preserved": true,
+    "source_url_is_metadata_only": true
+  },
+  "decision_states": ["CONSIDERING", "PURSUE", "PASS"],
+  "default_decision": "CONSIDERING",
+  "reanalysis": {
+    "historical_evaluations_preserved": true,
+    "latest_stale_state_visible": true,
+    "reanalysis_uses_existing_evaluation_path": true
+  },
+  "validation": {
+    "synthetic_fixtures_only": true,
+    "real_customer_data_accessed": false,
+    "origin_main_mutated": false
+  }
+}

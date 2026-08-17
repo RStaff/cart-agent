@@ -20,6 +20,7 @@ textarea { min-height: 180px; resize: vertical; }
 .careerCandidate { border-top: 1px solid #334155; padding-top: 16px; }
 .careerCandidateActions { display: flex; flex-wrap: wrap; gap: 8px; }
 .careerSaved { color: #86efac; }
+.careerWarning { border-left: 3px solid #fbbf24; padding-left: 12px; color: #fde68a; line-height: 1.6; }
 .careerError { color: #fca5a5; }
 .careerNav { margin-top: 20px; }
 .careerModeTabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }

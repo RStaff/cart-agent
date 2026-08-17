@@ -1,0 +1,1 @@
+ALTER TABLE "CareerOpportunity" ADD COLUMN "decisionState" TEXT NOT NULL DEFAULT 'CONSIDERING';
