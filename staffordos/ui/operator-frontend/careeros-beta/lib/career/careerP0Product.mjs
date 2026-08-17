@@ -136,7 +136,7 @@ export async function exportProductAccount(context) {
     pool.query('SELECT id,"capabilityKey",label,domain,scope,"authorityState",provenance,"taxonomyVersion",version,"createdAt","updatedAt" FROM "CareerCapabilityAuthority" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
     pool.query('SELECT "capabilityId","questionKey",answer,"decisionState",rationale,"taxonomyVersion", "createdAt", "supersededAt" FROM "CareerCapabilityDecision" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
     pool.query('SELECT id,"sourceType",title,company,location,description,"sourceUrl","createdAt","updatedAt" FROM "CareerOpportunity" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
-    pool.query('SELECT r.id,"opportunityId","sourceOrder",text,"conceptKey",importance,scope,specialist,"createdAt" FROM "CareerOpportunityRequirement" r JOIN "CareerOpportunity" o ON o.id=r."opportunityId" WHERE r."tenantId"=$1 AND o."userId"=$2', [context.tenant.id, context.user.id]),
+    pool.query('SELECT r.id,r."opportunityId",r."sourceOrder",r.text,r."conceptKey",r.importance,r.scope,r.specialist,r."createdAt" FROM "CareerOpportunityRequirement" r JOIN "CareerOpportunity" o ON o.id=r."opportunityId" WHERE r."tenantId"=$1 AND o."userId"=$2', [context.tenant.id, context.user.id]),
     pool.query('SELECT id,"opportunityId","taxonomyVersion","evaluationVersion",summary,relationships,stale,"createdAt" FROM "CareerMatchEvaluation" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
   ]);
   return { capabilities: capabilities.rows, capabilityDecisions: decisions.rows, opportunities: opportunities.rows, requirements: requirements.rows, matchEvaluations: matches.rows };
