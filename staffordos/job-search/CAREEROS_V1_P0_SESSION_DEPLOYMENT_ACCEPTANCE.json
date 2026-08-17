@@ -1,0 +1,7 @@
+{
+  "schemaVersion": "careeros.v1.p0.session-deployment-acceptance.v1",
+  "localSyntheticAcceptance": ["expiry", "revocation", "logout", "tampering", "membership"],
+  "deployedAcceptance": "NOT_RUN",
+  "cookieOverHttps": "NOT_PROVEN",
+  "result": "BLOCKED_BY_NO_DEPLOYMENT_TARGET"
+}

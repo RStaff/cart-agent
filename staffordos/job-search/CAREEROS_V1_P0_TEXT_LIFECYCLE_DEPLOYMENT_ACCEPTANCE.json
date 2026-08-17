@@ -1,0 +1,7 @@
+{
+  "schemaVersion": "careeros.v1.p0.text-lifecycle-deployment-acceptance.v1",
+  "localSyntheticAcceptance": "invite through deletion passed against isolated PostgreSQL",
+  "deployedAcceptance": "NOT_RUN",
+  "binaryUpload": "DISABLED",
+  "result": "BLOCKED_BY_NO_DEPLOYMENT_TARGET"
+}

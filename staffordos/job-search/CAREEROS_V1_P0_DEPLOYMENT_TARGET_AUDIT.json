@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "careeros.v1.p0.deployment-target-audit.v1",
+  "branch": "main",
+  "startingHead": "f90d83c4140e06af65c08ee710211e50bb34c363",
+  "candidates": [
+    {"target":"Render cart-agent-api","authority":"AUTHORIZED_EXISTING_TARGET","careerOSCustomerApp":false,"result":"NOT_SUITABLE"},
+    {"target":"Render frontend-dev/stage/prod static web","authority":"AUTHORIZED_EXISTING_TARGET","careerOSCustomerApp":false,"result":"NOT_SUITABLE"},
+    {"target":"CareerOS operator frontend private beta","authority":"NO_DEPLOYMENT_TARGET_AUTHORITY","result":"BLOCKED"}
+  ],
+  "classification": "NO_DEPLOYMENT_TARGET_AUTHORITY"
+}

@@ -1,0 +1,6 @@
+{
+  "schemaVersion": "careeros.v1.p0.privacy-logging-proof.v1",
+  "localContract": "raw career text, passwords, session secrets, DB URLs, and private paths excluded",
+  "deployedLogsInspected": false,
+  "result": "BLOCKED_BY_NO_DEPLOYMENT_TARGET"
+}

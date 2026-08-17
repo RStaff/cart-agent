@@ -1,0 +1,6 @@
+{
+  "schemaVersion": "careeros.v1.p0.export-delete-deployment-acceptance.v1",
+  "localSyntheticAcceptance": {"exportIsolation":true,"deleteCascade":true},
+  "deployedAcceptance": "NOT_RUN",
+  "result": "BLOCKED_BY_NO_DEPLOYMENT_TARGET"
+}

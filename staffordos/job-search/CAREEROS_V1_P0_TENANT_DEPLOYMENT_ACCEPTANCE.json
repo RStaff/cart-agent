@@ -1,0 +1,6 @@
+{
+  "schemaVersion": "careeros.v1.p0.tenant-deployment-acceptance.v1",
+  "localSyntheticAcceptance": {"crossTenantReads":0,"crossTenantWrites":0},
+  "deployedAcceptance": "NOT_RUN",
+  "result": "BLOCKED_BY_NO_DEPLOYMENT_TARGET"
+}

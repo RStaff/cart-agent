@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "careeros.v1.p0.tls-origin-proof.v1",
+  "customerOrigin": "not assigned",
+  "https": "NOT_PROVEN",
+  "secureCookieOverHttps": "NOT_PROVEN",
+  "sameOriginMutation": "locally implemented; deployed proof unavailable",
+  "result": "BLOCKED_BY_NO_CAREEROS_DEPLOYMENT_TARGET"
+}

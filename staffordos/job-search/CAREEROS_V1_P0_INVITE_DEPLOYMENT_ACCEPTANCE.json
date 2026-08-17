@@ -1,0 +1,7 @@
+{
+  "schemaVersion": "careeros.v1.p0.invite-deployment-acceptance.v1",
+  "localSyntheticAcceptance": "invite consumption and reuse rejection passed against isolated PostgreSQL",
+  "deployedAcceptance": "NOT_RUN",
+  "requiredCases": ["valid", "expired", "used", "wrong email", "invalid token", "missing token"],
+  "result": "BLOCKED_BY_NO_DEPLOYMENT_TARGET"
+}

@@ -1,0 +1,7 @@
+{
+  "schemaVersion": "careeros.v1.p0.rate-limit-deployment-acceptance.v1",
+  "localSyntheticAcceptance": "PostgreSQL shared threshold passed",
+  "deployedAcceptance": "NOT_RUN",
+  "productionFallback": "no in-memory fallback",
+  "result": "BLOCKED_BY_NO_DEPLOYMENT_TARGET"
+}

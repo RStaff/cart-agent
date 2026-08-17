@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "careeros.v1.p0.production-migration-proof.v1",
+  "migration": "20260816000000_careeros_p0_foundation",
+  "localSyntheticMigration": "previously passed",
+  "productionTargetIdentity": "ambiguous for CareerOS; existing cart_agent_db is shared service authority",
+  "preflight": "BLOCKED",
+  "migrationExecuted": false,
+  "reason": "No CareerOS deployment target or explicit authorization to mutate the shared production database",
+  "destructiveOperation": false
+}
