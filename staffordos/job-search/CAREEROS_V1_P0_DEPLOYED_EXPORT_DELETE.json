@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "careeros.v1.p0.deployed-export-delete.v1",
+  "result": "NOT_RUN",
+  "exportIsolation": "NOT_PROVEN",
+  "deleteCascade": "NOT_PROVEN",
+  "orphanCheck": "NOT_PROVEN",
+  "reason": "No deployed CareerOS database was available."
+}

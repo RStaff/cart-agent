@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "careeros.v1.p0.deployed-rate-limit-acceptance.v1",
+  "result": "NOT_RUN",
+  "backend": "NOT_PROVEN",
+  "sharedAcrossInstances": "NOT_PROVEN",
+  "failureBehavior": "NOT_PROVEN",
+  "inMemoryProductionFallback": false,
+  "reason": "No deployed CareerOS database or runtime exists."
+}

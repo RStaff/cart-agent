@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "careeros.v1.p0.deployment-readiness.v1",
+  "classification": "RENDER_PROVISIONING_ACCESS_BLOCKED",
+  "externalDataReadiness": "NO",
+  "inviteOnlyTextBetaReady": false,
+  "careerOSApp": "NOT_PROVISIONED",
+  "careerOSDatabase": "NOT_PROVISIONED",
+  "migration": "NOT_APPLIED",
+  "tlsOrigin": "NOT_PROVEN",
+  "secrets": "NOT_BOUND",
+  "backupRestore": "NOT_PROVEN",
+  "tenantDeploymentProof": "NOT_RUN",
+  "matchingRegression": "LOCAL_FROZEN_REGRESSIONS_PASS",
+  "nextMission": "RESTORE_RENDER_PROVISIONING_ACCESS_AND_RERUN_GOVERNED_PROOF"
+}

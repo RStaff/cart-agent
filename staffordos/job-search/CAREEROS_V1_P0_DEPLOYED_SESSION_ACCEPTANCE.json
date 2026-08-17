@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "careeros.v1.p0.deployed-session-acceptance.v1",
+  "result": "NOT_RUN",
+  "valid": "NOT_RUN",
+  "expired": "NOT_RUN",
+  "revoked": "NOT_RUN",
+  "tampered": "NOT_RUN",
+  "logout": "NOT_RUN",
+  "rawTokensLogged": false,
+  "reason": "No deployed CareerOS runtime."
+}

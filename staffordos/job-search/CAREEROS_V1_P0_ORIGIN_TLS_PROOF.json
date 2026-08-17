@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "careeros.v1.p0.origin-tls-proof.v1",
+  "result": "NOT_PROVEN",
+  "candidateOrigin": "careos.staffordmediaconsulting.com",
+  "dnsChanged": false,
+  "certificateVerified": false,
+  "httpsVerified": false,
+  "secureCookieVerified": false,
+  "reason": "No authorized Render/domain access was available."
+}

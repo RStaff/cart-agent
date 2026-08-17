@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "careeros.v1.p0.deployed-invite-acceptance.v1",
+  "result": "NOT_RUN",
+  "validInvite": "NOT_RUN",
+  "invalidInvite": "NOT_RUN",
+  "expiredInvite": "NOT_RUN",
+  "usedInvite": "NOT_RUN",
+  "wrongEmail": "NOT_RUN",
+  "reason": "Application was not deployed."
+}

@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "careeros.v1.p0.remote-promotion-proof.v1",
+  "result": "NOT_ATTEMPTED",
+  "reason": "Render provisioning access failed before deployment authorization could be exercised.",
+  "pushPerformed": false,
+  "unrelatedDirtyWorkPromoted": false,
+  "requiredNextProof": "Restore approved governed remote promotion authority before deployment."
+}

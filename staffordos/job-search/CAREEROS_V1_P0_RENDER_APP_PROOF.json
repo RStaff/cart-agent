@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "careeros.v1.p0.render-app-proof.v1",
+  "result": "NOT_DEPLOYED",
+  "logicalName": "careos-private-beta",
+  "repository": "RStaff/cart-agent",
+  "runtime": "Next.js Node customer runtime; exact provider binding not applied",
+  "build": "NOT_RUN AGAINST RENDER",
+  "health": "NOT_PROVEN",
+  "operatorRoutesExposed": "NOT_PROVEN",
+  "blocker": "RENDER_PROVISIONING_ACCESS_BLOCKED"
+}

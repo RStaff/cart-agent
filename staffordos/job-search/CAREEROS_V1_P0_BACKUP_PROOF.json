@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "careeros.v1.p0.backup-proof.v1",
+  "result": "BACKUP_AUTHORITY_NOT_PROVEN",
+  "automatedBackup": "NOT_PROVEN",
+  "retention": "NOT_PROVEN",
+  "restoreMechanism": "NOT_PROVEN",
+  "restoreTest": "NOT_RUN",
+  "reason": "Dedicated CareerOS Render PostgreSQL was not provisioned."
+}

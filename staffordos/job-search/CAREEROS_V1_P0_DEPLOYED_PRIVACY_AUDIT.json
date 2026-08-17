@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "careeros.v1.p0.deployed-privacy-audit.v1",
+  "result": "NOT_RUN",
+  "rawCareerTextLeak": "NOT_TESTED",
+  "passwordLeak": "NOT_TESTED",
+  "tokenLeak": "NOT_TESTED",
+  "databaseSecretLeak": "NOT_TESTED",
+  "customerErrorStackLeak": "NOT_TESTED",
+  "repositoryArtifactsContainSecrets": false
+}

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "careeros.v1.p0.deployed-tenant-isolation.v1",
+  "result": "NOT_RUN",
+  "tenantA": "synthetic-only; not created remotely",
+  "tenantB": "synthetic-only; not created remotely",
+  "crossTenantReads": "NOT_RUN",
+  "crossTenantWrites": "NOT_RUN",
+  "reason": "Deployment did not proceed."
+}

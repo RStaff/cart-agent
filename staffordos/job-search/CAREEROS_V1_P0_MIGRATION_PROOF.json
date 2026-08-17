@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "careeros.v1.p0.migration-proof.v1",
+  "result": "NOT_APPLIED",
+  "targetIdentityVerified": false,
+  "preMigrationSchemaCaptured": false,
+  "careerOSMigrationApplied": false,
+  "destructiveSqlRun": false,
+  "reason": "No isolated CareerOS database was available after Render authentication failure."
+}

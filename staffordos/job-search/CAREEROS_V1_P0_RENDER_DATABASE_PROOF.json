@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "careeros.v1.p0.render-database-proof.v1",
+  "result": "NOT_PROVEN",
+  "logicalName": "careos-private-beta-db",
+  "created": false,
+  "databaseIdentity": null,
+  "tls": "NOT_PROVEN",
+  "backup": "NOT_PROVEN",
+  "restore": "NOT_PROVEN",
+  "cartAgentDbReused": false,
+  "blocker": "RENDER_PROVISIONING_ACCESS_BLOCKED"
+}

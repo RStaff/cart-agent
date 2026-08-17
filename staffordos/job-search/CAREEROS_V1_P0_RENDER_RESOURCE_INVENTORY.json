@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "careeros.v1.p0.render-resource-inventory.v1",
+  "provider": "Render",
+  "accessResult": "RENDER_PROVISIONING_ACCESS_BLOCKED",
+  "whoamiResult": "unauthorized",
+  "existingRepositoryEvidence": ["cart-agent-api", "frontend-dev", "frontend-stage", "frontend-prod"],
+  "existingResourcesMutated": false,
+  "CareerOSApplicationCreated": false,
+  "CareerOSDatabaseCreated": false,
+  "secretsConfigured": false,
+  "domainConfigured": false,
+  "backupVerified": false
+}

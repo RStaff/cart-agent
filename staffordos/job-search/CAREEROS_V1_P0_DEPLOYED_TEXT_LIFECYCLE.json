@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "careeros.v1.p0.deployed-text-lifecycle.v1",
+  "result": "NOT_RUN",
+  "mode": "TEXT_ONLY",
+  "binaryUpload": "DISABLED_BY_DESIGN; DEPLOYMENT_NOT_PROVEN",
+  "syntheticDataUsed": false,
+  "reason": "No external deployment occurred."
+}
