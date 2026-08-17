@@ -274,7 +274,7 @@ export function createCareerP0Store({ filePath = process.env.CAREEROS_P0_STORE_P
     const context = await resolveSession(sessionId);
     if (!context) throw Object.assign(new Error("unauthorized"), { code: "UNAUTHORIZED" });
     const data = await read();
-    return data.careerFacts.filter((fact) => fact.tenantId === context.tenant.id && fact.userId === context.user.id).map(({ tenantId, userId, profileId, ...fact }) => fact);
+    return data.careerFacts.filter((fact) => fact.tenantId === context.tenant.id && fact.userId === context.user.id).map(({ tenantId, userId, profileId, ...fact }) => ({ ...fact, sourceType: data.sources.find((source) => source.id === fact.sourceId)?.sourceType || null }));
   }
 
   async function getOnboardingState(sessionId) {
