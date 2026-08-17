@@ -14,6 +14,7 @@ export async function transcribeAudio({ bytes, mimeType, filename, apiKey = proc
     const body = await response.json();
     const transcript = String(body?.text || "").trim();
     if (!transcript) throw Object.assign(new Error("VOICE_TRANSCRIPTION_EMPTY"), { code: "VOICE_TRANSCRIPTION_EMPTY" });
+    if (!/[\p{L}\p{N}]/u.test(transcript)) throw Object.assign(new Error("VOICE_TRANSCRIPTION_UNUSABLE"), { code: "VOICE_TRANSCRIPTION_UNUSABLE" });
     return { transcript, provider: "openai", model: VOICE_TRANSCRIPTION_MODEL };
   } catch (error) {
     if (error?.name === "AbortError") throw Object.assign(new Error("VOICE_TRANSCRIPTION_TIMEOUT"), { code: "VOICE_TRANSCRIPTION_TIMEOUT" });

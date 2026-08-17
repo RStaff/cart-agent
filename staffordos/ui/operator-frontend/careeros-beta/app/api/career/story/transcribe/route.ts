@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, transcript: result.transcript, provider: result.provider, model: result.model });
   } catch (error) {
     const code = error instanceof Error ? (error as Error & { code?: string }).code : "VOICE_TRANSCRIPTION_FAILED";
-    const status = code === "VOICE_PROVIDER_CREDENTIAL_REQUIRED" ? 503 : code === "VOICE_TRANSCRIPTION_TIMEOUT" ? 504 : 502;
+    const status = code === "VOICE_PROVIDER_CREDENTIAL_REQUIRED" ? 503 : code === "VOICE_TRANSCRIPTION_TIMEOUT" ? 504 : code === "VOICE_TRANSCRIPTION_UNUSABLE" ? 422 : 502;
     return NextResponse.json({ ok: false, error: code || "VOICE_TRANSCRIPTION_FAILED" }, { status });
   }
 }

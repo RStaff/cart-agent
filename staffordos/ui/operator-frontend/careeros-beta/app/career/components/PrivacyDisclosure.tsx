@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 export function PrivacyDisclosure({ compact = false }: { compact?: boolean }) {
+  if (compact) return <aside className="careerPrivacyDisclosure careerPrivacyDisclosureCompact" aria-label="CareerOS data privacy"><p className="careerMuted">Your career information is private to your account. <Link href="/career/privacy">Data &amp; privacy</Link></p></aside>;
   return <aside className={compact ? "careerPrivacyDisclosure careerPrivacyDisclosureCompact" : "careerPrivacyDisclosure"} aria-label="CareerOS beta data notice">
     <p className="careerEyebrow">Private beta data notice</p>
     <h2>How CareerOS uses your career information</h2>
