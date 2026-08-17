@@ -1,11 +1,13 @@
-# CareerOS Provision Decision
+# CareerOS Provisioning Decision
 
-## Decision
+`CAREEROS_RENDER_SPEND_APPROVAL_REQUIRED`
 
-`RENDER_PROVISIONING_ACCESS_BLOCKED`.
+Render account/workspace authority is verified. The selected isolated resources are not yet created because the minimum safe configuration introduces a new paid commitment. The minimum proposed configuration is:
 
-Render CLI authentication returned `unauthorized` during the required pre-write authority check. No resource creation, database operation, secret binding, DNS/TLS change, remote promotion, or deployment was attempted.
+- web: Render Starter Node service
+- database: Render Basic-256mb PostgreSQL
+- estimated combined minimum: approximately `$13/month` before bandwidth/storage and provider billing variation
 
-## Bounded repair
+The free database option is rejected because it does not provide the required backup/PITR authority. No CareerOS resource, secret, domain, migration, or deployment was created.
 
-Restore approved Render workspace/API access, verify the account and target scope, then rerun this same mission. Do not switch to GCP, AWS, or another provider without separate authorization.
+Required next action: approve the stated minimum monthly commitment, then rerun the authorized provisioning mission.

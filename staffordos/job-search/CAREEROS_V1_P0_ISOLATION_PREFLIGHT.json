@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "careeros.v1.p0.isolation-preflight.v1",
+  "rows": [
+    {"resource":"careos-private-beta","owner":"CareerOS","action":"CREATE_NEW","status":"NOT_CREATED"},
+    {"resource":"careos-private-beta-db","owner":"CareerOS","action":"CREATE_NEW","status":"NOT_CREATED"},
+    {"resource":"cart-agent-api","owner":"Abando","action":"DO_NOT_TOUCH","status":"UNCHANGED"},
+    {"resource":"cart_agent_db","owner":"Abando","action":"DO_NOT_TOUCH","status":"UNCHANGED"},
+    {"resource":"StaffordOS resources","owner":"StaffordOS","action":"DO_NOT_TOUCH","status":"UNCHANGED"}
+  ],
+  "isolationDecision": "PASS_PENDING_CREATION",
+  "cartAgentDbReused": false
+}

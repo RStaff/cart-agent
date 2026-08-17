@@ -1,22 +1,25 @@
-# CareerOS Deployment Provision and Proof Report
+# CareerOS Provision and Proof Report
 
-## Result
+## Status
 
-The mission stopped at external authority verification with `RENDER_PROVISIONING_ACCESS_BLOCKED`.
+The mission stopped at the paid-resource preflight with `CAREEROS_RENDER_SPEND_APPROVAL_REQUIRED`.
 
-Verified locally:
+### Verified
 
-- branch `main`
-- starting HEAD `5c996a9d5a18839ca2796723a42335e13dcf7748`
-- selected architecture `CAREEROS_RENDER_ISOLATED_STACK`
-- fallback `CAREEROS_GCP_CLOUD_RUN_CLOUD_SQL` not used
-- no staged unrelated files
-- no real customer data
-- no Abando/ShopiFixer mutation
-- no `cart_agent_db` reuse
+- branch: `main`
+- starting HEAD: `80c5b38548706c25a36cce18e502f20f9929fa0a`
+- all requested ancestry commits are ancestors
+- Render identity: Ross Stafford
+- Render workspace: My Workspace
+- existing Abando/cart-agent resources visible
+- CareerOS isolation plan accepted
+- no existing resource mutated
+- no CareerOS resource created
 
-Render CLI was available, but `render whoami` returned `unauthorized`. Because the provider workspace could not be verified, all external proof sections remain not run. Local frozen matching regressions passed 57/57; no matching source changed.
+### Not performed
 
-## Next action
+Database creation, web-service creation, secret binding, migration, deployment, DNS, domain binding, synthetic acceptance, and customer invitation were not performed.
 
-Restore governed Render provisioning access and rerun the mission. Do not provision or invite users until database identity, backups, TLS, secrets, deployment, and synthetic acceptance are proven.
+### Next action
+
+Approve the minimum new paid commitment, approximately `$13/month` before bandwidth/storage, then rerun `CAREEROS_V1_PRODUCTIZATION_P0_DEPLOYMENT_PROVISION_AND_PROOF`.

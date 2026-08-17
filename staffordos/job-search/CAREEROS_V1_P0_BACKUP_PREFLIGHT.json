@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "careeros.v1.p0.backup-preflight.v1",
+  "capabilityAvailable": "PAID_POSTGRESQL_BACKUP_AND_PITR_DOCUMENTED",
+  "restoreTested": false,
+  "freeDatabaseAccepted": false,
+  "selectedDatabasePlan": "basic-256mb",
+  "backupConfiguration": "NOT_CREATED",
+  "restoreTarget": "NOT_CREATED",
+  "readiness": "BLOCKED_PENDING_PAID_RESOURCE_APPROVAL"
+}

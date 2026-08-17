@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "careeros.v1.p0.render-plan-cost-preflight.v1",
+  "webPlan": "starter",
+  "databasePlan": "basic-256mb",
+  "webPlanCost": "provider billing confirmation required",
+  "databasePlanCost": "provider billing confirmation required",
+  "minimumCostEvidence": "approximately $13/month combined before bandwidth/storage, based on current Render cost evidence",
+  "databaseBackup": "paid PostgreSQL backup/PITR capability available; exact account configuration not created",
+  "freeDatabaseAcceptable": false,
+  "newPaidCommitment": true,
+  "operatorApproval": "REQUIRED_BEFORE_RESOURCE_CREATION",
+  "resourceCreation": false
+}

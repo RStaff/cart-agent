@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "careeros.v1.p0.render-account-verification.v1",
+  "identity": "Ross Stafford",
+  "email": "rossstafford1@gmail.com",
+  "workspace": "My Workspace",
+  "workspaceIdRecorded": true,
+  "existingStaffordMediaResourcesVisible": true,
+  "existingAbandoResourcesVisible": true,
+  "accountAuthority": "VERIFIED",
+  "workspaceAuthority": "VERIFIED",
+  "careerOSResourceCreated": false,
+  "mutationsPerformed": false
+}
