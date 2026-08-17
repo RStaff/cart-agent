@@ -1,5 +1,7 @@
 {
-  "classification": "PENDING_DEPLOYED_SYNTHETIC_ACCEPTANCE",
+  "classification": "CAREEROS_FIRST_USER_JOURNEY_READY",
+  "syntheticAcceptance": "passed",
   "realCustomerInvitation": false,
+  "realUserCountAuthorized": 1,
   "nextMission": "CAREEROS_V1_PRIVATE_BETA_FIRST_EXTERNAL_USER"
 }
