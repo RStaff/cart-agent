@@ -1,0 +1,6 @@
+{
+  "journey": ["invite", "signup", "profile", "career text", "fact review", "capability questions", "capability profile", "pasted job", "match explanation", "logout", "relogin"],
+  "syntheticOnly": true,
+  "operatorRoutes": "404/not served",
+  "persistence": "required across requests and relogin"
+}

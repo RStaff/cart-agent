@@ -1,0 +1,8 @@
+{
+  "taxonomyVersion": "CAREEROS_CAPABILITY_TAXONOMY_V1",
+  "tenantModels": ["CareerCapabilityAuthority", "CareerCapabilityDecision"],
+  "ownership": "tenantId + userId + profileId",
+  "provenance": "confirmed CareerFact ids and source ids",
+  "history": "decisions are append-only and superseded by timestamp",
+  "globalTaxonomyIsDuplicated": false
+}

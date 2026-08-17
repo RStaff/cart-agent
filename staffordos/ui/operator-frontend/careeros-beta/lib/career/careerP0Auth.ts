@@ -18,6 +18,12 @@ async function resolvedStore() {
   return productionStorePromise;
 }
 
+export async function careerP0Pool() {
+  const store = await resolvedStore();
+  if (!store._pool) throw new Error("CAREEROS_POSTGRES_POOL_REQUIRED");
+  return store._pool;
+}
+
 export const careerP0Store = new Proxy({} as Record<string, (...args: any[]) => Promise<any>>, {
   get(_target, property: string) {
     return (...args: any[]) => resolvedStore().then((store) => {

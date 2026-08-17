@@ -1,0 +1,6 @@
+{
+  "categories": ["direct", "transferable", "partial", "unresolved"],
+  "numericPrecision": false,
+  "unknownMeansInability": false,
+  "provenanceExplanation": "concise confirmed-fact and source counts"
+}

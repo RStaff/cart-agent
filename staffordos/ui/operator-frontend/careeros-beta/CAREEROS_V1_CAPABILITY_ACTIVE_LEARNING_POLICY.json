@@ -1,0 +1,6 @@
+{
+  "questionBasis": ["unresolved capability authority", "scope uncertainty", "directness uncertainty", "provenance availability", "specialist boundary"],
+  "excludedSignals": ["interest", "desired rank", "workflow", "self-confidence", "title similarity"],
+  "targetQuestionCount": "5-15",
+  "answerStates": ["DIRECT", "TRANSFERABLE", "PARTIAL", "KEEP_UNRESOLVED"]
+}

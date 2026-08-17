@@ -1,0 +1,6 @@
+{
+  "scope": ["capabilities", "decisions", "opportunities", "requirements", "matches", "explanations"],
+  "requiredUnauthorizedReads": 0,
+  "requiredUnauthorizedWrites": 0,
+  "queryRule": "tenant and authenticated user scope every customer query"
+}
