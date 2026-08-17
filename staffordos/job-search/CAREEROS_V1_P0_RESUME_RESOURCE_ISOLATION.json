@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "careeros.v1.p0.resume-resource-isolation.v1",
+  "account": "Ross Stafford",
+  "workspace": "My Workspace",
+  "approvedWebPlan": "starter",
+  "approvedDatabasePlan": "basic-256mb",
+  "approvedSpend": "approximately $13/month combined minimum estimate",
+  "careerOSWebCreated": false,
+  "careerOSDatabaseCreated": false,
+  "cartAgentDbReused": false,
+  "abandoMutated": false,
+  "shopifixerMutated": false,
+  "provisioningStoppedBeforeWrite": true
+}

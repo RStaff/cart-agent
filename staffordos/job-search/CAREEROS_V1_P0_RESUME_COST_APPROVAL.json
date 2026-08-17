@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "careeros.v1.p0.resume-cost-approval.v1",
+  "approvalState": "VERIFIED",
+  "webPlan": "starter",
+  "databasePlan": "basic-256mb",
+  "minimumEstimate": "approximately $13/month before bandwidth/storage/billing variation",
+  "planExceeded": false,
+  "additionalApprovalRequired": false,
+  "resourceCreation": "BLOCKED_BY_REMOTE_PROMOTION"
+}

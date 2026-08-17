@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "careeros.v1.p0.resume-remote-promotion-audit.v1",
+  "localBranch": "main",
+  "localHead": "3d81378a6c9ce3857fa48f42bf969843d817b9d1",
+  "remoteBranch": "origin/main",
+  "remoteHead": "d872d2c106ad62476795a8cfb2d8e37a7a3a230b",
+  "localAheadOfRemote": 159,
+  "careerosSourceOnRemote": false,
+  "existingGovernedPushPath": "pushes current branch; unsafe because existing cart-agent-api auto-deploys from main",
+  "unrelatedDirtyWorkPromoted": false,
+  "pushAttempted": false,
+  "result": "REMOTE_PROMOTION_AUTHORITY_BLOCKED"
+}
