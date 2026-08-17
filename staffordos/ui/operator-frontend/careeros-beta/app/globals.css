@@ -30,4 +30,18 @@ textarea { min-height: 180px; resize: vertical; }
 .careerHomeLinks { display: flex; flex-wrap: wrap; gap: 12px 20px; }
 .careerVoiceStatus { display: flex; align-items: center; gap: 14px; margin: 16px 0; color: #fda4af; }
 .careerTranscriptReview { display: grid; gap: 12px; margin: 16px 0; }
+.careerInterview { display: grid; gap: 16px; margin-top: 20px; }
+.careerInterviewHeader { display: grid; gap: 10px; }
+.careerInterviewHeader h3, .careerInterviewQuestion { margin: 0; }
+.careerInterviewQuestion { font-size: 20px; line-height: 1.45; color: #f8fafc; }
+.careerProgress { height: 6px; overflow: hidden; border-radius: 999px; background: #334155; }
+.careerProgress span { display: block; height: 100%; background: #67e8f9; transition: width .2s ease; }
+.careerInterviewVoice, .careerInterviewText { display: grid; gap: 12px; }
+.careerInterviewActions, .careerInterviewFooter { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.careerInterviewFooter { border-top: 1px solid #334155; padding-top: 14px; }
+.careerDraftState { color: #94a3b8; font-size: 14px; }
+.careerInterviewReview { display: grid; gap: 14px; margin-top: 20px; }
+.careerReviewAnswer { display: flex; justify-content: space-between; gap: 16px; border-top: 1px solid #334155; padding-top: 14px; }
+.careerReviewAnswer p { margin: 5px 0; }
+button:disabled { cursor: not-allowed; opacity: .5; }
 a { color: #67e8f9; }

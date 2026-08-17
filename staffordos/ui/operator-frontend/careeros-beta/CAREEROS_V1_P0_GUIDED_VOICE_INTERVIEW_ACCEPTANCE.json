@@ -1,0 +1,27 @@
+{
+  "schema": "careeros.v1.p0.guided_voice_interview_acceptance.v1",
+  "questionCount": 6,
+  "rendering": "ONE_ACTIVE_QUESTION",
+  "inputModes": ["VOICE", "TEXT"],
+  "voiceInfrastructure": "PRESERVED",
+  "transcriptionBoundary": "EXISTING_API_CAREER_STORY_TRANSCRIBE",
+  "submissionBoundary": "EXISTING_API_CAREER_INTAKE_SOURCE",
+  "authorityChanges": false,
+  "matchingChanges": false,
+  "skipSemantics": "UNANSWERED_NOT_NEGATIVE",
+  "reviewBeforeSubmission": true,
+  "binaryUploadEnabled": false,
+  "manualRossAcceptanceRequired": true,
+  "testsPassed": [
+    "guided interview state contract",
+    "voice transcription boundary",
+    "career story regression",
+    "privacy notice regression",
+    "scope and specialist regression",
+    "production build and TypeScript"
+  ],
+  "knownLimitations": [
+    "Browser microphone interaction requires manual acceptance after deployment.",
+    "Prisma CLI is unavailable in the isolated package; no schema changes were made."
+  ]
+}
