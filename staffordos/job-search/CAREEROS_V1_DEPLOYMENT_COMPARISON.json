@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "careeros.v1.deployment-comparison.v1",
+  "criteria": ["isolation","security","deploymentEase","operationalBurden","backupRestore","secretManagement","tls","logging","migration","scale10","scale100","scale1000","scaleDown","automation","rollback","existingKnowledge","timeToBeta","productIndependence"],
+  "options": {
+    "CAREEROS_RENDER_ISOLATED_STACK": {"isolation":"HIGH","security":"MEDIUM","deploymentEase":"HIGH","operationalBurden":"LOW","backupRestore":"MEDIUM","secretManagement":"MEDIUM","tls":"HIGH","logging":"MEDIUM","migration":"HIGH","scale10":"HIGH","scale100":"MEDIUM","scale1000":"MEDIUM","scaleDown":"HIGH","automation":"MEDIUM","rollback":"MEDIUM","existingKnowledge":"HIGH","timeToBeta":"LOW","productIndependence":"HIGH"},
+    "CAREEROS_GCP_CLOUD_RUN_CLOUD_SQL": {"isolation":"HIGH","security":"HIGH","deploymentEase":"MEDIUM","operationalBurden":"LOW","backupRestore":"HIGH","secretManagement":"HIGH","tls":"HIGH","logging":"HIGH","migration":"MEDIUM","scale10":"MEDIUM","scale100":"HIGH","scale1000":"HIGH","scaleDown":"MEDIUM","automation":"HIGH","rollback":"HIGH","existingKnowledge":"UNKNOWN","timeToBeta":"MEDIUM","productIndependence":"HIGH"},
+    "CAREEROS_EXISTING_GKE_ISOLATED_NAMESPACE": {"isolation":"HIGH","security":"HIGH","deploymentEase":"LOW","operationalBurden":"HIGH","backupRestore":"UNKNOWN","secretManagement":"HIGH","tls":"MEDIUM","logging":"HIGH","migration":"MEDIUM","scale10":"HIGH","scale100":"HIGH","scale1000":"HIGH","scaleDown":"LOW","automation":"MEDIUM","rollback":"MEDIUM","existingKnowledge":"MEDIUM","timeToBeta":"HIGH","productIndependence":"HIGH"},
+    "ABANDO_SHARED_RENDER_DATABASE": {"isolation":"LOW","security":"MEDIUM","deploymentEase":"HIGH","operationalBurden":"LOW","backupRestore":"UNKNOWN","secretManagement":"MEDIUM","tls":"HIGH","logging":"MEDIUM","migration":"LOW","scale10":"HIGH","scale100":"MEDIUM","scale1000":"LOW","scaleDown":"HIGH","automation":"HIGH","rollback":"MEDIUM","existingKnowledge":"HIGH","timeToBeta":"LOW","productIndependence":"LOW"}
+  },
+  "preferred": "CAREEROS_RENDER_ISOLATED_STACK",
+  "secondary": "CAREEROS_GCP_CLOUD_RUN_CLOUD_SQL",
+  "qualification": "Ratings describe architecture fit only; neither target is provisioned or approved."
+}

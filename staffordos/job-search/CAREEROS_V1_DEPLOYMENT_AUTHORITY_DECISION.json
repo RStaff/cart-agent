@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "careeros.v1.deployment-authority-decision.v1",
+  "decision": "DEPLOYMENT_TARGET_AUTHORITY_READY_PENDING_OPERATOR_APPROVAL",
+  "preferredArchitecture": "CAREEROS_RENDER_ISOLATED_STACK",
+  "secondaryArchitecture": "CAREEROS_GCP_CLOUD_RUN_CLOUD_SQL",
+  "currentAuthority": "No exact CareerOS target is provisioned or authorized.",
+  "recommendationBasis": ["existing Render operational familiarity", "smallest runtime for five users", "product isolation can be explicit", "low operational burden"],
+  "notApproved": ["provider provisioning", "database creation", "DNS/TLS changes", "secret creation", "remote push", "deployment", "spend"],
+  "requiresOperatorApproval": ["provider and plan", "dedicated database", "origin/DNS", "secret authority", "backup/restore policy", "deployment pipeline", "remote push and migration"],
+  "externalProvisioningAuthorized": false,
+  "realCustomerDataAuthorized": false,
+  "nextMission": "CAREEROS_V1_PRODUCTIZATION_P0_DEPLOYMENT_PROVISION_AND_PROOF"
+}

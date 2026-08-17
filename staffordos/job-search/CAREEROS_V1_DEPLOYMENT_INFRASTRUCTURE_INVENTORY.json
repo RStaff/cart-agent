@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "careeros.v1.deployment-infrastructure-inventory.v1",
+  "authority": "repository-local only; no provider API or account mutation used",
+  "branch": "main",
+  "startingHead": "3bdcb7907dc671d30f7c491f3b42cb01dbb96f4e",
+  "targets": [
+    {"provider":"Render","resource":"cart-agent-api","owner":"Stafford/Abando","status":"production","careerOSCompatibility":"not suitable; existing product boundary","database":"cart_agent_db","secretAuthority":"Render environment, product-specific evidence only","backupAuthority":"not CareerOS-proven","deploymentAuthority":"existing Abando path"},
+    {"provider":"Render","resource":"frontend-dev/frontend-stage/frontend-prod","owner":"Stafford/Abando","status":"static web","careerOSCompatibility":"not suitable; Vite/Abando surface","database":"none","secretAuthority":"not CareerOS-proven","backupAuthority":"none","deploymentAuthority":"existing static-web path"},
+    {"provider":"GCP","resource":"CareerOS target","owner":"not established","status":"not evidenced","careerOSCompatibility":"possible fallback only","database":"not established","secretAuthority":"not established","backupAuthority":"not established","deploymentAuthority":"not established"},
+    {"provider":"AWS","resource":"CareerOS target","owner":"not established","status":"not evidenced","careerOSCompatibility":"comparison only","database":"not established","secretAuthority":"not established","backupAuthority":"not established","deploymentAuthority":"not established"},
+    {"provider":"Kubernetes/ArgoCD","resource":"cart-agent namespace/manifests","owner":"Stafford/Abando","status":"repository manifests only","careerOSCompatibility":"not suitable for five-user beta without separate authority","database":"not established","secretAuthority":"namespace secret references for cart-agent","backupAuthority":"not established","deploymentAuthority":"not evidenced for CareerOS"},
+    {"provider":"Hostinger","resource":"CareerOS target","owner":"not established","status":"not evidenced","careerOSCompatibility":"DNS/static role only if separately confirmed","database":"none evidenced","secretAuthority":"not evidenced","backupAuthority":"none evidenced","deploymentAuthority":"not evidenced"}
+  ],
+  "repositoryWorkflows": ["GitHub CI/build checks", "existing Abando Render manifests", "existing Abando Docker/GHCR workflow"],
+  "careerosTargetFound": false,
+  "provisioningPerformed": false,
+  "externalActionsPerformed": false
+}
