@@ -8,6 +8,7 @@ import { buildApplicationEvidencePacket } from "./applicationEvidence.mjs";
 import { buildResumeDraft, normalizeDraftText } from "./resumeTailoring.mjs";
 import { buildApplicationAnswerDraft, buildCoverLetterDraft, classifyApplicationQuestion } from "./applicationMaterials.mjs";
 import { improveApplicationMaterial, writingEvidence } from "./applicationWriting.mjs";
+import { classifyInboxDuplicate, normalizeInboxInput, publicInboxItem } from "./opportunityInbox.mjs";
 
 const EVALUATION_VERSION = "CAREEROS_MATCH_EVALUATION_V1";
 const id = (prefix) => `${prefix}_${crypto.randomUUID()}`;
@@ -109,6 +110,64 @@ export async function createOpportunity(context, input) {
   });
   const match = await evaluateOpportunity(context, opportunity.id);
   return { opportunity: { id: opportunity.id, title: opportunity.title, company: opportunity.company, location: opportunity.location, sourceType: opportunity.sourceType, sourceUrl: opportunity.sourceUrl, decisionState: opportunity.decisionState, createdAt: opportunity.createdAt }, requirements: parsed.requirements, match };
+}
+
+async function inboxProfile(pool, context) {
+  const row = (await pool.query('SELECT id FROM "CareerProfile" WHERE "tenantId"=$1 AND "userId"=$2 LIMIT 1', [context.tenant.id, context.user.id])).rows[0];
+  if (!row) throw Object.assign(new Error("PROFILE_REQUIRED"), { code: "PROFILE_REQUIRED" });
+  return row.id;
+}
+
+async function inboxAudit(pool, context, eventType, itemId) {
+  await pool.query('INSERT INTO "CareerAuditEvent" ("id","tenantId","userId","eventType","entityType","entityId","metadata") VALUES ($1,$2,$3,$4,$5,$6,$7)', [id("audit"), context.tenant.id, context.user.id, eventType, "CareerOpportunityInboxItem", itemId, JSON.stringify({ sourceContentStored: true })]);
+}
+
+export async function importOpportunityToInbox(context, input) {
+  requireContext(context);
+  const pool = await careerP0Pool();
+  const profile = await inboxProfile(pool, context);
+  const candidate = normalizeInboxInput(input);
+  const existingRows = (await pool.query('SELECT id,"sourceName","externalOpportunityId",title,company,"normalizedDigest","normalizedUrl",status,"opportunityId" FROM "CareerOpportunityInboxItem" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id])).rows;
+  const existingOpportunities = (await pool.query('SELECT id,title,company,"sourceUrl" AS "normalizedUrl" FROM "CareerOpportunity" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id])).rows;
+  const duplicate = classifyInboxDuplicate(candidate, [...existingRows, ...existingOpportunities]);
+  const status = duplicate.duplicateStatus === "DUPLICATE" ? "DUPLICATE" : duplicate.duplicateStatus === "POSSIBLE_DUPLICATE" ? "NEEDS_REVIEW" : candidate.initialStatus;
+  const row = (await pool.query('INSERT INTO "CareerOpportunityInboxItem" ("id","tenantId","userId","profileId","sourceType","sourceName","sourceUrl","externalOpportunityId","discoveredAt","title",company,location,description,provenance,"normalizedDigest","normalizedUrl","normalizationStatus","duplicateStatus",status,"duplicateOfInboxItemId","opportunityId","updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,NOW()) RETURNING *', [id("inbox"), context.tenant.id, context.user.id, profile, candidate.sourceType, candidate.sourceName, candidate.sourceUrl, candidate.externalOpportunityId, candidate.discoveredAt, candidate.title, candidate.company, candidate.location, candidate.description, JSON.stringify(candidate.provenance), candidate.normalizedDigest, candidate.normalizedUrl, candidate.normalizationStatus, duplicate.duplicateStatus, status, duplicate.duplicateOf?.id || null, duplicate.duplicateOf?.opportunityId || null])).rows[0];
+  await inboxAudit(pool, context, duplicate.duplicateStatus === "NEW" ? "OPPORTUNITY_IMPORTED" : "OPPORTUNITY_DUPLICATE_DETECTED", row.id);
+  return { item: publicInboxItem(row), duplicate: duplicate.duplicateStatus, duplicateOf: duplicate.duplicateOf ? publicInboxItem(duplicate.duplicateOf) : null };
+}
+
+export async function importOpportunityBatchToInbox(context, inputs) {
+  requireContext(context);
+  const values = Array.isArray(inputs) ? inputs.slice(0, 20) : [];
+  return { items: await Promise.all(values.map((input) => importOpportunityToInbox(context, input))) };
+}
+
+export async function listOpportunityInbox(context) {
+  requireContext(context); const pool = await careerP0Pool();
+  return (await pool.query('SELECT id,"sourceType","sourceName","sourceUrl",title,company,location,"discoveredAt","importedAt","normalizationStatus","duplicateStatus",status,"opportunityId" FROM "CareerOpportunityInboxItem" WHERE "tenantId"=$1 AND "userId"=$2 ORDER BY "updatedAt" DESC', [context.tenant.id, context.user.id])).rows.map(publicInboxItem);
+}
+
+export async function updateOpportunityInboxItem(context, itemId, action) {
+  requireContext(context);
+  const pool = await careerP0Pool();
+  const row = (await pool.query('SELECT * FROM "CareerOpportunityInboxItem" WHERE id=$1 AND "tenantId"=$2 AND "userId"=$3', [itemId, context.tenant.id, context.user.id])).rows[0];
+  if (!row) throw Object.assign(new Error("INBOX_ITEM_NOT_FOUND"), { code: "INBOX_ITEM_NOT_FOUND" });
+  if (action === "dismiss") {
+    const updated = (await pool.query('UPDATE "CareerOpportunityInboxItem" SET status=$1,"updatedAt"=NOW() WHERE id=$2 AND "tenantId"=$3 AND "userId"=$4 RETURNING *', ["DISMISSED", itemId, context.tenant.id, context.user.id])).rows[0];
+    await inboxAudit(pool, context, "OPPORTUNITY_DISMISSED", itemId); return { item: publicInboxItem(updated) };
+  }
+  if (action === "review" || action === "resolve") {
+    const updated = (await pool.query('UPDATE "CareerOpportunityInboxItem" SET status=$1,"duplicateStatus"=CASE WHEN "duplicateStatus"=\'POSSIBLE_DUPLICATE\' THEN \'REVIEWED\' ELSE "duplicateStatus" END,"updatedAt"=NOW() WHERE id=$2 AND "tenantId"=$3 AND "userId"=$4 RETURNING *', ["READY_TO_ANALYZE", itemId, context.tenant.id, context.user.id])).rows[0];
+    await inboxAudit(pool, context, "OPPORTUNITY_INBOX_REVIEWED", itemId); return { item: publicInboxItem(updated) };
+  }
+  if (action === "analyze") {
+    if (row.status === "DISMISSED" || row.status === "DUPLICATE" || (row.status === "NEEDS_REVIEW" && row.duplicateStatus === "POSSIBLE_DUPLICATE")) throw Object.assign(new Error("INBOX_ITEM_REQUIRES_REVIEW"), { code: "INBOX_ITEM_REQUIRES_REVIEW" });
+    if (!row.description) throw Object.assign(new Error("JOB_DESCRIPTION_REQUIRED"), { code: "JOB_DESCRIPTION_REQUIRED" });
+    const created = await createOpportunity(context, { sourceType: row.sourceType, title: row.title, company: row.company, location: row.location, sourceUrl: row.sourceUrl, description: row.description });
+    const updated = (await pool.query('UPDATE "CareerOpportunityInboxItem" SET status=$1,"opportunityId"=$2,"updatedAt"=NOW() WHERE id=$3 AND "tenantId"=$4 AND "userId"=$5 RETURNING *', ["IMPORTED", created.opportunity.id, itemId, context.tenant.id, context.user.id])).rows[0];
+    await inboxAudit(pool, context, "OPPORTUNITY_ANALYZED", itemId); return { item: publicInboxItem(updated), opportunity: created.opportunity, match: created.match };
+  }
+  throw Object.assign(new Error("INVALID_INBOX_ACTION"), { code: "INVALID_INBOX_ACTION" });
 }
 
 export async function listOpportunities(context) {
@@ -286,13 +345,14 @@ export async function getCapabilityProfile(context) {
 
 export async function exportProductAccount(context) {
   requireContext(context); const pool = await careerP0Pool();
-  const [capabilities, decisions, opportunities, requirements, matches, resumeDrafts] = await Promise.all([
+  const [capabilities, decisions, opportunities, requirements, matches, resumeDrafts, inboxItems] = await Promise.all([
     pool.query('SELECT id,"capabilityKey",label,domain,scope,"authorityState",provenance,"taxonomyVersion",version,"createdAt","updatedAt" FROM "CareerCapabilityAuthority" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
     pool.query('SELECT "capabilityId","questionKey",answer,"decisionState",rationale,"taxonomyVersion", "createdAt", "supersededAt" FROM "CareerCapabilityDecision" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
     pool.query('SELECT id,"sourceType",title,company,location,description,"sourceUrl","decisionState","createdAt","updatedAt" FROM "CareerOpportunity" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
     pool.query('SELECT r.id,r."opportunityId",r."sourceOrder",r.text,r."conceptKey",r.importance,r.scope,r.specialist,r."createdAt" FROM "CareerOpportunityRequirement" r JOIN "CareerOpportunity" o ON o.id=r."opportunityId" WHERE r."tenantId"=$1 AND o."userId"=$2', [context.tenant.id, context.user.id]),
     pool.query('SELECT id,"opportunityId","taxonomyVersion","evaluationVersion",summary,relationships,stale,"createdAt" FROM "CareerMatchEvaluation" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
     pool.query('SELECT id,"opportunityId","materialType","generationMethod",provider,model,"evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt" FROM "CareerResumeDraft" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
+    pool.query('SELECT id,"sourceType","sourceName","sourceUrl","externalOpportunityId","discoveredAt","importedAt",title,company,location,description,provenance,"normalizationStatus","duplicateStatus",status,"opportunityId","createdAt","updatedAt" FROM "CareerOpportunityInboxItem" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
   ]);
-  return { capabilities: capabilities.rows, capabilityDecisions: decisions.rows, opportunities: opportunities.rows, requirements: requirements.rows, matchEvaluations: matches.rows, resumeDrafts: resumeDrafts.rows };
+  return { capabilities: capabilities.rows, capabilityDecisions: decisions.rows, opportunities: opportunities.rows, requirements: requirements.rows, matchEvaluations: matches.rows, resumeDrafts: resumeDrafts.rows, inboxItems: inboxItems.rows };
 }

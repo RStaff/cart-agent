@@ -30,3 +30,45 @@ ALTER TABLE "CareerResumeDraft" ADD COLUMN IF NOT EXISTS "materialType" TEXT NOT
 ALTER TABLE "CareerResumeDraft" ADD COLUMN IF NOT EXISTS "generationMethod" TEXT NOT NULL DEFAULT 'DETERMINISTIC';
 ALTER TABLE "CareerResumeDraft" ADD COLUMN IF NOT EXISTS "provider" TEXT;
 ALTER TABLE "CareerResumeDraft" ADD COLUMN IF NOT EXISTS "model" TEXT;
+
+CREATE TABLE IF NOT EXISTS "CareerOpportunityInboxItem" (
+  "id" TEXT NOT NULL,
+  "tenantId" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "profileId" TEXT NOT NULL,
+  "sourceType" TEXT NOT NULL,
+  "sourceName" TEXT,
+  "sourceUrl" TEXT,
+  "externalOpportunityId" TEXT,
+  "discoveredAt" TIMESTAMP(3),
+  "importedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "title" TEXT NOT NULL,
+  "company" TEXT,
+  "location" TEXT,
+  "description" TEXT,
+  "provenance" JSONB,
+  "normalizedDigest" TEXT,
+  "normalizedUrl" TEXT,
+  "normalizationStatus" TEXT NOT NULL DEFAULT 'NORMALIZED',
+  "duplicateStatus" TEXT NOT NULL DEFAULT 'NEW',
+  "status" TEXT NOT NULL DEFAULT 'READY_TO_ANALYZE',
+  "duplicateOfInboxItemId" TEXT,
+  "opportunityId" TEXT,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "CareerOpportunityInboxItem_pkey" PRIMARY KEY ("id")
+);
+CREATE INDEX IF NOT EXISTS "CareerOpportunityInboxItem_tenantId_userId_status_updatedAt_idx" ON "CareerOpportunityInboxItem"("tenantId","userId","status","updatedAt");
+CREATE INDEX IF NOT EXISTS "CareerOpportunityInboxItem_tenantId_normalizedDigest_idx" ON "CareerOpportunityInboxItem"("tenantId","normalizedDigest");
+CREATE INDEX IF NOT EXISTS "CareerOpportunityInboxItem_tenantId_normalizedUrl_idx" ON "CareerOpportunityInboxItem"("tenantId","normalizedUrl");
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'CareerOpportunityInboxItem_tenantId_fkey') THEN
+    ALTER TABLE "CareerOpportunityInboxItem" ADD CONSTRAINT "CareerOpportunityInboxItem_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "CareerTenant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'CareerOpportunityInboxItem_profileId_fkey') THEN
+    ALTER TABLE "CareerOpportunityInboxItem" ADD CONSTRAINT "CareerOpportunityInboxItem_profileId_fkey" FOREIGN KEY ("profileId") REFERENCES "CareerProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'CareerOpportunityInboxItem_opportunityId_fkey') THEN
+    ALTER TABLE "CareerOpportunityInboxItem" ADD CONSTRAINT "CareerOpportunityInboxItem_opportunityId_fkey" FOREIGN KEY ("opportunityId") REFERENCES "CareerOpportunity"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+  END IF;
+END $$;

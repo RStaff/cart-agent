@@ -14,12 +14,12 @@ function classify(text) {
   return { conceptKey: "UNRESOLVED_REQUIREMENT", scope: "unspecified", specialist: false };
 }
 
-export function parseJobDescription({ title, company, location, description, sourceUrl = null }) {
+export function parseJobDescription({ title, company, location, description, sourceUrl = null, sourceType = "USER_SUPPLIED_SOURCE" }) {
   const text = String(description || "").trim();
   if (!text) throw Object.assign(new Error("JOB_DESCRIPTION_REQUIRED"), { code: "JOB_DESCRIPTION_REQUIRED" });
   if (text.length > CAREEROS_MAX_TEXT_LENGTH) throw Object.assign(new Error("JOB_DESCRIPTION_TOO_LARGE"), { code: "JOB_DESCRIPTION_TOO_LARGE" });
   const segments = text.split(/\n+/).flatMap((line) => line.split(/(?<=[.!?])\s+/)).map(clean).filter((item) => item.length >= 12).slice(0, 200);
   const unique = [...new Set(segments.map((item) => item.slice(0, 500)))];
   const requirements = unique.map((item, index) => ({ sourceOrder: index, text: item, ...classify(item), importance: /required|must|minimum|essential/i.test(item) ? "REQUIRED" : "PREFERRED" }));
-  return { sourceType: "USER_SUPPLIED_SOURCE", title: clean(title).slice(0, 240) || "Untitled opportunity", company: clean(company).slice(0, 240) || null, location: clean(location).slice(0, 240) || null, description: text, sourceUrl: clean(sourceUrl).slice(0, 1000) || null, parserVersion: CAREEROS_JOB_PARSER_VERSION, requirements };
+  return { sourceType: clean(sourceType).slice(0, 80) || "USER_SUPPLIED_SOURCE", title: clean(title).slice(0, 240) || "Untitled opportunity", company: clean(company).slice(0, 240) || null, location: clean(location).slice(0, 240) || null, description: text, sourceUrl: clean(sourceUrl).slice(0, 1000) || null, parserVersion: CAREEROS_JOB_PARSER_VERSION, requirements };
 }
