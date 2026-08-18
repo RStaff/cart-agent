@@ -347,6 +347,7 @@ model CareerResumeDraft {
   userId            String
   profileId         String
   opportunityId     String
+  materialType      String   @default("RESUME")
   evaluationVersion String
   authorityVersion  Int      @default(1)
   draftVersion      Int      @default(1)

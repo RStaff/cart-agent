@@ -24,6 +24,7 @@ export function buildResumeDraft({ profile, packet }) {
   return {
     status: "CURRENT",
     content: {
+      materialType: "RESUME",
       text: lines.join("\n"),
       targetRole: title,
       blocks: evidence.map((item) => ({ text: item.statement, relationship: item.relationship, requirement: item.requirement, grounding: "SUPPORTED" })),

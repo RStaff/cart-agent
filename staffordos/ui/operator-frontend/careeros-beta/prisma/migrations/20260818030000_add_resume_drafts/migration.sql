@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS "CareerResumeDraft" (
   "userId" TEXT NOT NULL,
   "profileId" TEXT NOT NULL,
   "opportunityId" TEXT NOT NULL,
+  "materialType" TEXT NOT NULL DEFAULT 'RESUME',
   "evaluationVersion" TEXT NOT NULL,
   "authorityVersion" INTEGER NOT NULL DEFAULT 1,
   "draftVersion" INTEGER NOT NULL DEFAULT 1,
@@ -25,3 +26,4 @@ DO $$ BEGIN
     ALTER TABLE "CareerResumeDraft" ADD CONSTRAINT "CareerResumeDraft_opportunityId_fkey" FOREIGN KEY ("opportunityId") REFERENCES "CareerOpportunity"("id") ON DELETE CASCADE ON UPDATE CASCADE;
   END IF;
 END $$;
+ALTER TABLE "CareerResumeDraft" ADD COLUMN IF NOT EXISTS "materialType" TEXT NOT NULL DEFAULT 'RESUME';
