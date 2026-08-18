@@ -1,0 +1,9 @@
+{
+  "artifact": "CAREEROS_V1_P1_APPLICATION_EVIDENCE_ACCEPTANCE",
+  "mode": "computed_read_side",
+  "source_of_truth": "CareerFact -> capability authority -> current CareerMatchEvaluation",
+  "stale_policy": "APPLICATION_EVIDENCE_STALE blocks current preparation and requests re-analysis",
+  "raw_audio_or_customer_data": false,
+  "final_material_generation": false,
+  "schema_change": false
+}

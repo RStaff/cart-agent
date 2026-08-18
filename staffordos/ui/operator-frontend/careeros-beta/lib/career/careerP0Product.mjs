@@ -4,6 +4,7 @@ import { CAREEROS_CAPABILITY_TAXONOMY_VERSION, capabilityForKey, decisionStateFo
 import { parseJobDescription } from "./jobProduct.mjs";
 import { CAREEROS_OPPORTUNITY_DECISION_LABELS, normalizeOpportunityDecision } from "./jobDecision.mjs";
 import { normalizeComparisonIds, summarizeOpportunityForComparison } from "./jobComparison.mjs";
+import { buildApplicationEvidencePacket } from "./applicationEvidence.mjs";
 
 const EVALUATION_VERSION = "CAREEROS_MATCH_EVALUATION_V1";
 const id = (prefix) => `${prefix}_${crypto.randomUUID()}`;
@@ -135,6 +136,26 @@ export async function compareOpportunities(context, values) {
     return { opportunity, comparison: summarizeOpportunityForComparison(opportunity) };
   });
   return { opportunities };
+}
+
+export async function getApplicationEvidencePacket(context, opportunityId) {
+  requireContext(context);
+  const pool = await careerP0Pool();
+  const opportunity = (await pool.query('SELECT id,title,company,location,"sourceUrl","decisionState","profileId" FROM "CareerOpportunity" WHERE id=$1 AND "tenantId"=$2 AND "userId"=$3', [opportunityId, context.tenant.id, context.user.id])).rows[0];
+  if (!opportunity) throw Object.assign(new Error("OPPORTUNITY_NOT_FOUND"), { code: "OPPORTUNITY_NOT_FOUND" });
+  const [requirements, evaluation, capabilities] = await Promise.all([
+    pool.query('SELECT id,text,"conceptKey",importance,scope,specialist,"sourceOrder" FROM "CareerOpportunityRequirement" WHERE "opportunityId"=$1 AND "tenantId"=$2 ORDER BY "sourceOrder"', [opportunityId, context.tenant.id]),
+    pool.query('SELECT id,"evaluationVersion",summary,relationships,stale,"createdAt" FROM "CareerMatchEvaluation" WHERE "opportunityId"=$1 AND "tenantId"=$2 AND "userId"=$3 ORDER BY "createdAt" DESC LIMIT 1', [opportunityId, context.tenant.id, context.user.id]),
+    pool.query('SELECT "capabilityKey",label,provenance FROM "CareerCapabilityAuthority" WHERE "tenantId"=$1 AND "userId"=$2 AND "profileId"=$3', [context.tenant.id, context.user.id, opportunity.profileId]),
+  ]);
+  const factIds = [...new Set(capabilities.rows.flatMap((item) => Array.isArray(item.provenance?.factIds) ? item.provenance.factIds : []))];
+  const sourceIds = [...new Set(capabilities.rows.flatMap((item) => Array.isArray(item.provenance?.sourceIds) ? item.provenance.sourceIds : []))];
+  const [facts, sources] = await Promise.all([
+    factIds.length ? pool.query('SELECT id,"sourceId",statement,"sourceExcerpt","scopeStatement" FROM "CareerFact" WHERE id=ANY($1::text[]) AND "tenantId"=$2 AND "userId"=$3 AND "profileId"=$4 AND "authorityState"=$5', [factIds, context.tenant.id, context.user.id, opportunity.profileId, "CUSTOMER_CONFIRMED_SOURCE_BACKED"]) : { rows: [] },
+    sourceIds.length ? pool.query('SELECT id,"sourceType" FROM "CareerSource" WHERE id=ANY($1::text[]) AND "tenantId"=$2 AND "userId"=$3 AND "profileId"=$4', [sourceIds, context.tenant.id, context.user.id, opportunity.profileId]) : { rows: [] },
+  ]);
+  const latest = evaluation.rows[0];
+  return buildApplicationEvidencePacket({ opportunity, requirements: requirements.rows, capabilities: capabilities.rows, facts: facts.rows, sources: sources.rows, match: latest ? { ...latest, summary: latest.summary, relationships: latest.relationships } : null });
 }
 
 export async function updateOpportunityDecision(context, opportunityId, value) {
