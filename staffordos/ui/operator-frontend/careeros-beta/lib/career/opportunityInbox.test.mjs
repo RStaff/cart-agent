@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { classifyInboxDuplicate, normalizeInboxInput, normalizeInboxUrl } from "./opportunityInbox.mjs";
+import { classifyInboxDuplicate, normalizeInboxInput, normalizeInboxUrl, urlOnlyOpportunityGuidance } from "./opportunityInbox.mjs";
 
 test("manual text and job-alert imports normalize into the provider-neutral contract", () => {
   const manual = normalizeInboxInput({ sourceType: "MANUAL_TEXT", title: "Program Manager", company: "Example", description: "Lead cross-functional delivery." });
@@ -29,4 +29,11 @@ test("exact and possible duplicates are classified without deleting either item"
 test("bounded imported inputs remain provider-neutral", () => {
   const values = Array.from({ length: 30 }, (_, index) => normalizeInboxInput({ sourceType: "FEED_IMPORT", title: "Role " + index, description: "A bounded imported description." }));
   assert.equal(values[0].sourceType, "FEED_IMPORT");
+});
+
+test("URL-only opportunities request job content without fetching", () => {
+  const item = normalizeInboxInput({ sourceType: "JOB_URL", sourceUrl: "https://example.com/jobs/1" });
+  assert.equal(item.normalizationStatus, "NEEDS_USER_DESCRIPTION");
+  assert.match(urlOnlyOpportunityGuidance({ ...item, status: "NEEDS_REVIEW" }), /does not fetch the job description/);
+  assert.equal(urlOnlyOpportunityGuidance({ ...item, normalizationStatus: "NORMALIZED" }), null);
 });

@@ -1,0 +1,9 @@
+{
+  "mission": "CAREEROS_V1_CUSTOMER_WORKFLOW_NAVIGATION_AND_CAPABILITY_COMPLETION_REPAIR",
+  "status": "READY_FOR_GOVERNED_DEPLOYMENT",
+  "schema_change": false,
+  "capability_completion": "zero_unreviewed_questions_shows_completion_and_opportunity_inbox_action",
+  "canonical_routes": ["/career/profile", "/career/capabilities", "/career/inbox", "/career/jobs", "/career/privacy"],
+  "url_policy": "metadata_only_no_fetch_or_scrape",
+  "real_customer_data_accessed": false
+}

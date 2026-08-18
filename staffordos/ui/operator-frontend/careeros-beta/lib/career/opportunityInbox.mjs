@@ -54,3 +54,8 @@ export function classifyInboxDuplicate(candidate, existing = []) {
 export function publicInboxItem(row) {
   return { id: row.id, sourceType: row.sourceType, sourceName: row.sourceName, sourceUrl: row.sourceUrl, title: row.title, company: row.company, location: row.location, discoveredAt: row.discoveredAt, importedAt: row.importedAt, normalizationStatus: row.normalizationStatus, duplicateStatus: row.duplicateStatus, status: row.status, opportunityId: row.opportunityId };
 }
+
+export function urlOnlyOpportunityGuidance(item) {
+  if (item?.sourceType !== "JOB_URL" || item?.normalizationStatus !== "NEEDS_USER_DESCRIPTION") return null;
+  return "We saved this source link, but CareerOS does not fetch the job description from the website. Add or paste the job description so CareerOS can analyze the opportunity.";
+}
