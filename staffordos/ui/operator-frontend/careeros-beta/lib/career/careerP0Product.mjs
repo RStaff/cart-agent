@@ -9,6 +9,7 @@ import { buildResumeDraft, normalizeDraftText } from "./resumeTailoring.mjs";
 import { buildApplicationAnswerDraft, buildCoverLetterDraft, classifyApplicationQuestion } from "./applicationMaterials.mjs";
 import { improveApplicationMaterial, writingEvidence } from "./applicationWriting.mjs";
 import { classifyInboxDuplicate, normalizeInboxInput, publicInboxItem } from "./opportunityInbox.mjs";
+import { canTransition, lifecycleEventFor, nextOpportunityAction, normalizeLifecycleState } from "./opportunityLifecycle.mjs";
 
 const EVALUATION_VERSION = "CAREEROS_MATCH_EVALUATION_V1";
 const id = (prefix) => `${prefix}_${crypto.randomUUID()}`;
@@ -104,11 +105,13 @@ export async function createOpportunity(context, input) {
   const profile = await profileId(pool, context);
   const parsed = parseJobDescription(input || {});
   const opportunity = await transaction(pool, async (client) => {
-    const row = (await client.query('INSERT INTO "CareerOpportunity" ("id","tenantId","userId","profileId","sourceType",title,company,location,description,"sourceUrl","decisionState","updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,NOW()) RETURNING *', [id("opportunity"), context.tenant.id, context.user.id, profile, parsed.sourceType, parsed.title, parsed.company, parsed.location, parsed.description, parsed.sourceUrl, "CONSIDERING"])).rows[0];
+    const row = (await client.query('INSERT INTO "CareerOpportunity" ("id","tenantId","userId","profileId","sourceType",title,company,location,description,"sourceUrl","decisionState","lifecycleState","updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,NOW()) RETURNING *', [id("opportunity"), context.tenant.id, context.user.id, profile, parsed.sourceType, parsed.title, parsed.company, parsed.location, parsed.description, parsed.sourceUrl, "CONSIDERING", "NEW"])).rows[0];
     for (const item of parsed.requirements) await client.query('INSERT INTO "CareerOpportunityRequirement" ("id","tenantId","opportunityId","sourceOrder",text,"conceptKey",importance,scope,specialist) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)', [id("requirement"), context.tenant.id, row.id, item.sourceOrder, item.text, item.conceptKey, item.importance, item.scope, item.specialist]);
     return row;
   });
+  await recordOpportunityEvent(context, opportunity.id, "OPPORTUNITY_IMPORTED", { sourceType: parsed.sourceType });
   const match = await evaluateOpportunity(context, opportunity.id);
+  await recordOpportunityEvent(context, opportunity.id, "OPPORTUNITY_ANALYZED", { evaluationCreated: true });
   return { opportunity: { id: opportunity.id, title: opportunity.title, company: opportunity.company, location: opportunity.location, sourceType: opportunity.sourceType, sourceUrl: opportunity.sourceUrl, decisionState: opportunity.decisionState, createdAt: opportunity.createdAt }, requirements: parsed.requirements, match };
 }
 
@@ -172,29 +175,33 @@ export async function updateOpportunityInboxItem(context, itemId, action) {
 
 export async function listOpportunities(context) {
   requireContext(context); const pool = await careerP0Pool();
-  return (await pool.query('SELECT o.id,o.title,o.company,o.location,o."sourceType",o."sourceUrl",o."decisionState",o."createdAt",o."updatedAt",m.summary AS "matchSummary",m.stale AS "matchStale" FROM "CareerOpportunity" o LEFT JOIN LATERAL (SELECT summary,stale FROM "CareerMatchEvaluation" WHERE "opportunityId"=o.id AND "tenantId"=$1 AND "userId"=$2 ORDER BY "createdAt" DESC LIMIT 1) m ON true WHERE o."tenantId"=$1 AND o."userId"=$2 ORDER BY o."updatedAt" DESC', [context.tenant.id, context.user.id])).rows;
+  return (await pool.query('SELECT o.id,o.title,o.company,o.location,o."sourceType",o."sourceUrl",o."decisionState",o."lifecycleState",o."createdAt",o."updatedAt",m.summary AS "matchSummary",m.stale AS "matchStale" FROM "CareerOpportunity" o LEFT JOIN LATERAL (SELECT summary,stale FROM "CareerMatchEvaluation" WHERE "opportunityId"=o.id AND "tenantId"=$1 AND "userId"=$2 ORDER BY "createdAt" DESC LIMIT 1) m ON true WHERE o."tenantId"=$1 AND o."userId"=$2 ORDER BY o."updatedAt" DESC', [context.tenant.id, context.user.id])).rows.map((row) => ({ ...row, nextAction: nextOpportunityAction(row) }));
 }
 
 export async function getOpportunity(context, opportunityId) {
   requireContext(context); const pool = await careerP0Pool();
-  const row = (await pool.query('SELECT id,title,company,location,"sourceType",description,"sourceUrl","decisionState","createdAt","updatedAt" FROM "CareerOpportunity" WHERE id=$1 AND "tenantId"=$2 AND "userId"=$3', [opportunityId, context.tenant.id, context.user.id])).rows[0];
+  const row = (await pool.query('SELECT id,title,company,location,"sourceType",description,"sourceUrl","decisionState","lifecycleState","createdAt","updatedAt" FROM "CareerOpportunity" WHERE id=$1 AND "tenantId"=$2 AND "userId"=$3', [opportunityId, context.tenant.id, context.user.id])).rows[0];
   if (!row) throw Object.assign(new Error("OPPORTUNITY_NOT_FOUND"), { code: "OPPORTUNITY_NOT_FOUND" });
   const requirements = (await pool.query('SELECT id,text,"conceptKey",importance,scope,specialist,"sourceOrder" FROM "CareerOpportunityRequirement" WHERE "opportunityId"=$1 AND "tenantId"=$2 ORDER BY "sourceOrder"', [opportunityId, context.tenant.id])).rows;
   const latest = (await pool.query('SELECT * FROM "CareerMatchEvaluation" WHERE "opportunityId"=$1 AND "tenantId"=$2 AND "userId"=$3 ORDER BY "createdAt" DESC LIMIT 1', [opportunityId, context.tenant.id, context.user.id])).rows[0];
-  return { opportunity: row, requirements, match: latest ? { id: latest.id, stale: latest.stale, summary: latest.summary, relationships: latest.relationships } : await evaluateOpportunity(context, opportunityId) };
+  const [events, notes] = await Promise.all([
+    pool.query('SELECT id,"eventType","metadata","createdAt" FROM "CareerOpportunityEvent" WHERE "opportunityId"=$1 AND "tenantId"=$2 AND "userId"=$3 ORDER BY "createdAt" DESC', [opportunityId, context.tenant.id, context.user.id]),
+    pool.query('SELECT id,content,"createdAt","updatedAt" FROM "CareerOpportunityNote" WHERE "opportunityId"=$1 AND "tenantId"=$2 AND "userId"=$3 ORDER BY "createdAt" DESC', [opportunityId, context.tenant.id, context.user.id]),
+  ]);
+  return { opportunity: { ...row, nextAction: nextOpportunityAction(row) }, requirements, activity: { events: events.rows, notes: notes.rows }, match: latest ? { id: latest.id, stale: latest.stale, summary: latest.summary, relationships: latest.relationships } : await evaluateOpportunity(context, opportunityId) };
 }
 
 export async function compareOpportunities(context, values) {
   requireContext(context);
   const opportunityIds = normalizeComparisonIds(values);
   const pool = await careerP0Pool();
-  const rows = (await pool.query('SELECT o.id,o.title,o.company,o.location,o."sourceType",o."sourceUrl",o."decisionState",o."createdAt",o."updatedAt",m.id AS "matchId",m.stale AS "matchStale",m.summary AS "matchSummary",m.relationships AS "matchRelationships" FROM "CareerOpportunity" o LEFT JOIN LATERAL (SELECT id,stale,summary,relationships FROM "CareerMatchEvaluation" WHERE "opportunityId"=o.id AND "tenantId"=$2 AND "userId"=$3 ORDER BY "createdAt" DESC LIMIT 1) m ON true WHERE o."tenantId"=$2 AND o."userId"=$3 AND o.id=ANY($1::text[])', [opportunityIds, context.tenant.id, context.user.id])).rows;
+  const rows = (await pool.query('SELECT o.id,o.title,o.company,o.location,o."sourceType",o."sourceUrl",o."decisionState",o."lifecycleState",o."createdAt",o."updatedAt",m.id AS "matchId",m.stale AS "matchStale",m.summary AS "matchSummary",m.relationships AS "matchRelationships" FROM "CareerOpportunity" o LEFT JOIN LATERAL (SELECT id,stale,summary,relationships FROM "CareerMatchEvaluation" WHERE "opportunityId"=o.id AND "tenantId"=$2 AND "userId"=$3 ORDER BY "createdAt" DESC LIMIT 1) m ON true WHERE o."tenantId"=$2 AND o."userId"=$3 AND o.id=ANY($1::text[])', [opportunityIds, context.tenant.id, context.user.id])).rows;
   if (rows.length !== opportunityIds.length) throw Object.assign(new Error("OPPORTUNITY_NOT_FOUND"), { code: "OPPORTUNITY_NOT_FOUND" });
   const byId = new Map(rows.map((row) => [row.id, row]));
   const opportunities = opportunityIds.map((id) => {
     const row = byId.get(id);
     const match = row.matchId ? { id: row.matchId, stale: row.matchStale, summary: row.matchSummary, relationships: row.matchRelationships } : null;
-    const opportunity = { id: row.id, title: row.title, company: row.company, location: row.location, sourceType: row.sourceType, sourceUrl: row.sourceUrl, decisionState: row.decisionState, createdAt: row.createdAt, updatedAt: row.updatedAt, match };
+    const opportunity = { id: row.id, title: row.title, company: row.company, location: row.location, sourceType: row.sourceType, sourceUrl: row.sourceUrl, decisionState: row.decisionState, lifecycleState: row.lifecycleState, createdAt: row.createdAt, updatedAt: row.updatedAt, match };
     return { opportunity, comparison: summarizeOpportunityForComparison(opportunity) };
   });
   return { opportunities };
@@ -245,6 +252,7 @@ export async function createResumeDraft(context, opportunityId) {
   const pool = await careerP0Pool();
   const nextVersion = Number((await pool.query('SELECT COALESCE(MAX("draftVersion"),0)+1 AS version FROM "CareerResumeDraft" WHERE "opportunityId"=$1 AND "tenantId"=$2 AND "userId"=$3', [opportunityId, context.tenant.id, context.user.id])).rows[0].version);
   const row = (await pool.query('INSERT INTO "CareerResumeDraft" ("id","tenantId","userId","profileId","opportunityId","materialType","generationMethod","evaluationVersion","authorityVersion","draftVersion",content,"updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,NOW()) RETURNING id,"materialType","generationMethod",provider,model,"evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt"', [id("resume"), context.tenant.id, context.user.id, data.opportunity.profileId, opportunityId, "RESUME", "DETERMINISTIC", data.packet.analysis.evaluationVersion, data.profile.version, nextVersion, JSON.stringify(generated.content)])).rows[0];
+  await recordOpportunityEvent(context, opportunityId, "APPLICATION_MATERIAL_CREATED", { materialType: "RESUME" });
   return { ...data, draft: row };
 }
 
@@ -279,6 +287,7 @@ async function createMaterial(context, opportunityId, materialType, generated) {
   const pool = await careerP0Pool();
   const nextVersion = Number((await pool.query('SELECT COALESCE(MAX("draftVersion"),0)+1 AS version FROM "CareerResumeDraft" WHERE "opportunityId"=$1 AND "tenantId"=$2 AND "userId"=$3 AND "materialType"=$4', [opportunityId, context.tenant.id, context.user.id, materialType])).rows[0].version);
   const row = (await pool.query('INSERT INTO "CareerResumeDraft" ("id","tenantId","userId","profileId","opportunityId","materialType","generationMethod","evaluationVersion","authorityVersion","draftVersion",content,"updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,NOW()) RETURNING id,"materialType","generationMethod",provider,model,"evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt"', [id("material"), context.tenant.id, context.user.id, data.opportunity.profileId, opportunityId, materialType, "DETERMINISTIC", data.packet.analysis.evaluationVersion, data.profile.version, nextVersion, JSON.stringify(generated.content)])).rows[0];
+  await recordOpportunityEvent(context, opportunityId, "APPLICATION_MATERIAL_CREATED", { materialType });
   return { ...data, draft: row };
 }
 
@@ -323,12 +332,45 @@ export async function restoreDeterministicMaterial(context, opportunityId, mater
   return { ...data, draft: row, generated: { status: "DETERMINISTIC_RESTORED" } };
 }
 
+async function recordOpportunityEvent(context, opportunityId, eventType, metadata = {}) {
+  requireContext(context);
+  const pool = await careerP0Pool();
+  const safeMetadata = Object.fromEntries(Object.entries(metadata).filter(([key, value]) => typeof key === "string" && value !== undefined && typeof value !== "object"));
+  const result = await pool.query('INSERT INTO "CareerOpportunityEvent" ("id","tenantId","userId","opportunityId","eventType",metadata) SELECT $1,$2,$3,id,$4,$5 FROM "CareerOpportunity" WHERE id=$6 AND "tenantId"=$2 AND "userId"=$3 RETURNING id,"eventType","metadata","createdAt"', [id("opportunity-event"), context.tenant.id, context.user.id, eventType, JSON.stringify(safeMetadata), opportunityId]);
+  if (!result.rowCount) throw Object.assign(new Error("OPPORTUNITY_NOT_FOUND"), { code: "OPPORTUNITY_NOT_FOUND" });
+  return result.rows[0];
+}
+
+export async function updateOpportunityLifecycle(context, opportunityId, value) {
+  requireContext(context);
+  const next = normalizeLifecycleState(value);
+  const pool = await careerP0Pool();
+  const current = (await pool.query('SELECT id,"lifecycleState" FROM "CareerOpportunity" WHERE id=$1 AND "tenantId"=$2 AND "userId"=$3', [opportunityId, context.tenant.id, context.user.id])).rows[0];
+  if (!current) throw Object.assign(new Error("OPPORTUNITY_NOT_FOUND"), { code: "OPPORTUNITY_NOT_FOUND" });
+  if (!canTransition(current.lifecycleState, next)) throw Object.assign(new Error("INVALID_LIFECYCLE_TRANSITION"), { code: "INVALID_LIFECYCLE_TRANSITION" });
+  const row = (await pool.query('UPDATE "CareerOpportunity" SET "lifecycleState"=$1,"updatedAt"=NOW() WHERE id=$2 AND "tenantId"=$3 AND "userId"=$4 RETURNING id,"decisionState","lifecycleState"', [next, opportunityId, context.tenant.id, context.user.id])).rows[0];
+  if (current.lifecycleState !== next) await recordOpportunityEvent(context, opportunityId, lifecycleEventFor(next), { lifecycleState: next });
+  return { ...row, nextAction: nextOpportunityAction(row) };
+}
+
+export async function addOpportunityNote(context, opportunityId, content) {
+  requireContext(context);
+  const normalized = String(content || "").trim();
+  if (!normalized || normalized.length > 2000) throw Object.assign(new Error("NOTE_INVALID"), { code: "NOTE_INVALID" });
+  const pool = await careerP0Pool();
+  const row = (await pool.query('INSERT INTO "CareerOpportunityNote" ("id","tenantId","userId","opportunityId",content) SELECT $1,$2,$3,id,$4 FROM "CareerOpportunity" WHERE id=$5 AND "tenantId"=$2 AND "userId"=$3 RETURNING id,content,"createdAt","updatedAt"', [id("opportunity-note"), context.tenant.id, context.user.id, normalized, opportunityId])).rows[0];
+  if (!row) throw Object.assign(new Error("OPPORTUNITY_NOT_FOUND"), { code: "OPPORTUNITY_NOT_FOUND" });
+  await recordOpportunityEvent(context, opportunityId, "OPPORTUNITY_NOTE_ADDED", { noteAdded: true });
+  return row;
+}
+
 export async function updateOpportunityDecision(context, opportunityId, value) {
   requireContext(context);
   const decision = normalizeOpportunityDecision(value);
   const pool = await careerP0Pool();
   const row = (await pool.query('UPDATE "CareerOpportunity" SET "decisionState"=$1,"updatedAt"=NOW() WHERE id=$2 AND "tenantId"=$3 AND "userId"=$4 RETURNING id,"decisionState"', [decision, opportunityId, context.tenant.id, context.user.id])).rows[0];
   if (!row) throw Object.assign(new Error("OPPORTUNITY_NOT_FOUND"), { code: "OPPORTUNITY_NOT_FOUND" });
+  await recordOpportunityEvent(context, opportunityId, "OPPORTUNITY_DECISION_CHANGED", { decisionState: decision });
   return { id: row.id, decisionState: row.decisionState, decisionLabel: CAREEROS_OPPORTUNITY_DECISION_LABELS[row.decisionState] };
 }
 
@@ -345,14 +387,16 @@ export async function getCapabilityProfile(context) {
 
 export async function exportProductAccount(context) {
   requireContext(context); const pool = await careerP0Pool();
-  const [capabilities, decisions, opportunities, requirements, matches, resumeDrafts, inboxItems] = await Promise.all([
+  const [capabilities, decisions, opportunities, requirements, matches, resumeDrafts, inboxItems, opportunityEvents, opportunityNotes] = await Promise.all([
     pool.query('SELECT id,"capabilityKey",label,domain,scope,"authorityState",provenance,"taxonomyVersion",version,"createdAt","updatedAt" FROM "CareerCapabilityAuthority" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
     pool.query('SELECT "capabilityId","questionKey",answer,"decisionState",rationale,"taxonomyVersion", "createdAt", "supersededAt" FROM "CareerCapabilityDecision" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
-    pool.query('SELECT id,"sourceType",title,company,location,description,"sourceUrl","decisionState","createdAt","updatedAt" FROM "CareerOpportunity" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
+    pool.query('SELECT id,"sourceType",title,company,location,description,"sourceUrl","decisionState","lifecycleState","createdAt","updatedAt" FROM "CareerOpportunity" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
     pool.query('SELECT r.id,r."opportunityId",r."sourceOrder",r.text,r."conceptKey",r.importance,r.scope,r.specialist,r."createdAt" FROM "CareerOpportunityRequirement" r JOIN "CareerOpportunity" o ON o.id=r."opportunityId" WHERE r."tenantId"=$1 AND o."userId"=$2', [context.tenant.id, context.user.id]),
     pool.query('SELECT id,"opportunityId","taxonomyVersion","evaluationVersion",summary,relationships,stale,"createdAt" FROM "CareerMatchEvaluation" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
     pool.query('SELECT id,"opportunityId","materialType","generationMethod",provider,model,"evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt" FROM "CareerResumeDraft" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
     pool.query('SELECT id,"sourceType","sourceName","sourceUrl","externalOpportunityId","discoveredAt","importedAt",title,company,location,description,provenance,"normalizationStatus","duplicateStatus",status,"opportunityId","createdAt","updatedAt" FROM "CareerOpportunityInboxItem" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
+    pool.query('SELECT id,"opportunityId","eventType",metadata,"createdAt" FROM "CareerOpportunityEvent" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
+    pool.query('SELECT id,"opportunityId",content,"createdAt","updatedAt" FROM "CareerOpportunityNote" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
   ]);
-  return { capabilities: capabilities.rows, capabilityDecisions: decisions.rows, opportunities: opportunities.rows, requirements: requirements.rows, matchEvaluations: matches.rows, resumeDrafts: resumeDrafts.rows, inboxItems: inboxItems.rows };
+  return { capabilities: capabilities.rows, capabilityDecisions: decisions.rows, opportunities: opportunities.rows, requirements: requirements.rows, matchEvaluations: matches.rows, resumeDrafts: resumeDrafts.rows, inboxItems: inboxItems.rows, opportunityEvents: opportunityEvents.rows, opportunityNotes: opportunityNotes.rows };
 }

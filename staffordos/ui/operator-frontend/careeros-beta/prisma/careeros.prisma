@@ -18,6 +18,8 @@ model CareerUser {
   sessions     CareerSession[]
   profiles     CareerProfile[]
   auditEvents  CareerAuditEvent[]
+  opportunityEvents CareerOpportunityEvent[]
+  opportunityNotes CareerOpportunityNote[]
 }
 
 model CareerTenant {
@@ -33,6 +35,8 @@ model CareerTenant {
   facts       CareerFact[]
   onboarding  CareerOnboardingState[]
   auditEvents CareerAuditEvent[]
+  opportunityEvents CareerOpportunityEvent[]
+  opportunityNotes CareerOpportunityNote[]
   sessions    CareerSession[]
   capabilities CareerCapabilityAuthority[]
   capabilityDecisions CareerCapabilityDecision[]
@@ -294,6 +298,7 @@ model CareerOpportunity {
   description     String
   sourceUrl       String?
   decisionState   String   @default("CONSIDERING")
+  lifecycleState  String   @default("NEW")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   tenant          CareerTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
@@ -302,8 +307,41 @@ model CareerOpportunity {
   evaluations     CareerMatchEvaluation[]
   resumeDrafts    CareerResumeDraft[]
   inboxItems      CareerOpportunityInboxItem[]
+  events          CareerOpportunityEvent[]
+  notes           CareerOpportunityNote[]
 
   @@index([tenantId, userId, updatedAt])
+}
+
+model CareerOpportunityEvent {
+  id            String   @id @default(cuid())
+  tenantId      String
+  userId        String
+  opportunityId String
+  eventType     String
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  tenant        CareerTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user          CareerUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opportunity   CareerOpportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, opportunityId, createdAt])
+  @@index([tenantId, userId, createdAt])
+}
+
+model CareerOpportunityNote {
+  id            String   @id @default(cuid())
+  tenantId      String
+  userId        String
+  opportunityId String
+  content       String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  tenant        CareerTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user          CareerUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opportunity   CareerOpportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, opportunityId, createdAt])
 }
 
 model CareerOpportunityInboxItem {

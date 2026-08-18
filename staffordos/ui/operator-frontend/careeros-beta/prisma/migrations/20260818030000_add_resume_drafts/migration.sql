@@ -26,6 +26,55 @@ DO $$ BEGIN
     ALTER TABLE "CareerResumeDraft" ADD CONSTRAINT "CareerResumeDraft_opportunityId_fkey" FOREIGN KEY ("opportunityId") REFERENCES "CareerOpportunity"("id") ON DELETE CASCADE ON UPDATE CASCADE;
   END IF;
 END $$;
+
+ALTER TABLE "CareerOpportunity" ADD COLUMN IF NOT EXISTS "lifecycleState" TEXT NOT NULL DEFAULT 'NEW';
+
+CREATE TABLE IF NOT EXISTS "CareerOpportunityEvent" (
+  "id" TEXT NOT NULL,
+  "tenantId" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "opportunityId" TEXT NOT NULL,
+  "eventType" TEXT NOT NULL,
+  "metadata" JSONB,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "CareerOpportunityEvent_pkey" PRIMARY KEY ("id")
+);
+CREATE INDEX IF NOT EXISTS "CareerOpportunityEvent_tenantId_opportunityId_createdAt_idx" ON "CareerOpportunityEvent"("tenantId","opportunityId","createdAt");
+CREATE INDEX IF NOT EXISTS "CareerOpportunityEvent_tenantId_userId_createdAt_idx" ON "CareerOpportunityEvent"("tenantId","userId","createdAt");
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'CareerOpportunityEvent_tenantId_fkey') THEN
+    ALTER TABLE "CareerOpportunityEvent" ADD CONSTRAINT "CareerOpportunityEvent_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "CareerTenant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'CareerOpportunityEvent_userId_fkey') THEN
+    ALTER TABLE "CareerOpportunityEvent" ADD CONSTRAINT "CareerOpportunityEvent_userId_fkey" FOREIGN KEY ("userId") REFERENCES "CareerUser"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'CareerOpportunityEvent_opportunityId_fkey') THEN
+    ALTER TABLE "CareerOpportunityEvent" ADD CONSTRAINT "CareerOpportunityEvent_opportunityId_fkey" FOREIGN KEY ("opportunityId") REFERENCES "CareerOpportunity"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+END $$;
+
+CREATE TABLE IF NOT EXISTS "CareerOpportunityNote" (
+  "id" TEXT NOT NULL,
+  "tenantId" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "opportunityId" TEXT NOT NULL,
+  "content" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "CareerOpportunityNote_pkey" PRIMARY KEY ("id")
+);
+CREATE INDEX IF NOT EXISTS "CareerOpportunityNote_tenantId_opportunityId_createdAt_idx" ON "CareerOpportunityNote"("tenantId","opportunityId","createdAt");
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'CareerOpportunityNote_tenantId_fkey') THEN
+    ALTER TABLE "CareerOpportunityNote" ADD CONSTRAINT "CareerOpportunityNote_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "CareerTenant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'CareerOpportunityNote_userId_fkey') THEN
+    ALTER TABLE "CareerOpportunityNote" ADD CONSTRAINT "CareerOpportunityNote_userId_fkey" FOREIGN KEY ("userId") REFERENCES "CareerUser"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'CareerOpportunityNote_opportunityId_fkey') THEN
+    ALTER TABLE "CareerOpportunityNote" ADD CONSTRAINT "CareerOpportunityNote_opportunityId_fkey" FOREIGN KEY ("opportunityId") REFERENCES "CareerOpportunity"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+END $$;
 ALTER TABLE "CareerResumeDraft" ADD COLUMN IF NOT EXISTS "materialType" TEXT NOT NULL DEFAULT 'RESUME';
 ALTER TABLE "CareerResumeDraft" ADD COLUMN IF NOT EXISTS "generationMethod" TEXT NOT NULL DEFAULT 'DETERMINISTIC';
 ALTER TABLE "CareerResumeDraft" ADD COLUMN IF NOT EXISTS "provider" TEXT;

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { currentCareerContext, customerMutationAllowed } from "../../../../../lib/career/careerP0Auth";
-import { evaluateOpportunity, getOpportunity, updateOpportunityDecision } from "../../../../../lib/career/careerP0Product.mjs";
+import { addOpportunityNote, evaluateOpportunity, getOpportunity, updateOpportunityDecision, updateOpportunityLifecycle } from "../../../../../lib/career/careerP0Product.mjs";
 
 export const runtime = "nodejs";
 
@@ -19,6 +19,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ opp
     const { opportunityId } = await params;
     const body = await request.json().catch(() => ({}));
     if (body.decisionState !== undefined) return NextResponse.json({ ok: true, opportunity: await updateOpportunityDecision(context, opportunityId, body.decisionState) });
+    if (body.lifecycleState !== undefined) return NextResponse.json({ ok: true, opportunity: await updateOpportunityLifecycle(context, opportunityId, body.lifecycleState) });
+    if (body.note !== undefined) return NextResponse.json({ ok: true, note: await addOpportunityNote(context, opportunityId, body.note) });
     return NextResponse.json({ ok: true, match: await evaluateOpportunity(context, opportunityId) });
   }
   catch (error) { return NextResponse.json({ ok: false, error: error instanceof Error ? error.message : "MATCH_FAILED" }, { status: 400 }); }
