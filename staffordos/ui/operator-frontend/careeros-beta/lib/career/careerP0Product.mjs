@@ -5,6 +5,7 @@ import { parseJobDescription } from "./jobProduct.mjs";
 import { CAREEROS_OPPORTUNITY_DECISION_LABELS, normalizeOpportunityDecision } from "./jobDecision.mjs";
 import { normalizeComparisonIds, summarizeOpportunityForComparison } from "./jobComparison.mjs";
 import { buildApplicationEvidencePacket } from "./applicationEvidence.mjs";
+import { buildResumeDraft, normalizeDraftText } from "./resumeTailoring.mjs";
 
 const EVALUATION_VERSION = "CAREEROS_MATCH_EVALUATION_V1";
 const id = (prefix) => `${prefix}_${crypto.randomUUID()}`;
@@ -158,6 +159,45 @@ export async function getApplicationEvidencePacket(context, opportunityId) {
   return buildApplicationEvidencePacket({ opportunity, requirements: requirements.rows, capabilities: capabilities.rows, facts: facts.rows, sources: sources.rows, match: latest ? { ...latest, summary: latest.summary, relationships: latest.relationships } : null });
 }
 
+export async function getResumeDraft(context, opportunityId) {
+  requireContext(context);
+  const pool = await careerP0Pool();
+  const opportunity = (await pool.query('SELECT id,title,company,location,"sourceUrl","decisionState","profileId" FROM "CareerOpportunity" WHERE id=$1 AND "tenantId"=$2 AND "userId"=$3', [opportunityId, context.tenant.id, context.user.id])).rows[0];
+  if (!opportunity) throw Object.assign(new Error("OPPORTUNITY_NOT_FOUND"), { code: "OPPORTUNITY_NOT_FOUND" });
+  const [profile, packet, drafts] = await Promise.all([
+    pool.query('SELECT "displayName",headline,location,"careerStage",version FROM "CareerProfile" WHERE id=$1 AND "tenantId"=$2 AND "userId"=$3', [opportunity.profileId, context.tenant.id, context.user.id]),
+    getApplicationEvidencePacket(context, opportunityId),
+    pool.query('SELECT id,"evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt" FROM "CareerResumeDraft" WHERE "opportunityId"=$1 AND "tenantId"=$2 AND "userId"=$3 ORDER BY "createdAt" DESC LIMIT 1', [opportunityId, context.tenant.id, context.user.id]),
+  ]);
+  if (!profile.rows[0]) throw Object.assign(new Error("PROFILE_REQUIRED"), { code: "PROFILE_REQUIRED" });
+  const draft = drafts.rows[0] || null;
+  if (draft && packet.status === "APPLICATION_EVIDENCE_STALE") draft.stale = true;
+  return { opportunity, profile: profile.rows[0], packet, draft };
+}
+
+export async function createResumeDraft(context, opportunityId) {
+  requireContext(context);
+  const data = await getResumeDraft(context, opportunityId);
+  if (data.opportunity.decisionState !== "PURSUE") throw Object.assign(new Error("OPPORTUNITY_MUST_BE_PURSUED"), { code: "OPPORTUNITY_MUST_BE_PURSUED" });
+  if (data.packet.status !== "CURRENT") throw Object.assign(new Error("RESUME_TAILORING_STALE"), { code: "RESUME_TAILORING_STALE" });
+  const generated = buildResumeDraft({ profile: data.profile, packet: data.packet });
+  const pool = await careerP0Pool();
+  const nextVersion = Number((await pool.query('SELECT COALESCE(MAX("draftVersion"),0)+1 AS version FROM "CareerResumeDraft" WHERE "opportunityId"=$1 AND "tenantId"=$2 AND "userId"=$3', [opportunityId, context.tenant.id, context.user.id])).rows[0].version);
+  const row = (await pool.query('INSERT INTO "CareerResumeDraft" ("id","tenantId","userId","profileId","opportunityId","evaluationVersion","authorityVersion","draftVersion",content,"updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,NOW()) RETURNING id,"evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt"', [id("resume"), context.tenant.id, context.user.id, data.opportunity.profileId, opportunityId, data.packet.analysis.evaluationVersion, data.profile.version, nextVersion, JSON.stringify(generated.content)])).rows[0];
+  return { ...data, draft: row };
+}
+
+export async function saveResumeDraft(context, opportunityId, draftId, text) {
+  requireContext(context);
+  const normalized = normalizeDraftText(text);
+  const pool = await careerP0Pool();
+  const row = (await pool.query('SELECT id,content FROM "CareerResumeDraft" WHERE id=$1 AND "opportunityId"=$2 AND "tenantId"=$3 AND "userId"=$4', [draftId, opportunityId, context.tenant.id, context.user.id])).rows[0];
+  if (!row) throw Object.assign(new Error("DRAFT_NOT_FOUND"), { code: "DRAFT_NOT_FOUND" });
+  const content = { ...(row.content || {}), text: normalized, editedByUser: true };
+  const updated = (await pool.query('UPDATE "CareerResumeDraft" SET content=$1,"updatedAt"=NOW() WHERE id=$2 AND "opportunityId"=$3 AND "tenantId"=$4 AND "userId"=$5 RETURNING id,"evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt"', [JSON.stringify(content), draftId, opportunityId, context.tenant.id, context.user.id])).rows[0];
+  return updated;
+}
+
 export async function updateOpportunityDecision(context, opportunityId, value) {
   requireContext(context);
   const decision = normalizeOpportunityDecision(value);
@@ -180,12 +220,13 @@ export async function getCapabilityProfile(context) {
 
 export async function exportProductAccount(context) {
   requireContext(context); const pool = await careerP0Pool();
-  const [capabilities, decisions, opportunities, requirements, matches] = await Promise.all([
+  const [capabilities, decisions, opportunities, requirements, matches, resumeDrafts] = await Promise.all([
     pool.query('SELECT id,"capabilityKey",label,domain,scope,"authorityState",provenance,"taxonomyVersion",version,"createdAt","updatedAt" FROM "CareerCapabilityAuthority" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
     pool.query('SELECT "capabilityId","questionKey",answer,"decisionState",rationale,"taxonomyVersion", "createdAt", "supersededAt" FROM "CareerCapabilityDecision" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
     pool.query('SELECT id,"sourceType",title,company,location,description,"sourceUrl","decisionState","createdAt","updatedAt" FROM "CareerOpportunity" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
     pool.query('SELECT r.id,r."opportunityId",r."sourceOrder",r.text,r."conceptKey",r.importance,r.scope,r.specialist,r."createdAt" FROM "CareerOpportunityRequirement" r JOIN "CareerOpportunity" o ON o.id=r."opportunityId" WHERE r."tenantId"=$1 AND o."userId"=$2', [context.tenant.id, context.user.id]),
     pool.query('SELECT id,"opportunityId","taxonomyVersion","evaluationVersion",summary,relationships,stale,"createdAt" FROM "CareerMatchEvaluation" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
+    pool.query('SELECT id,"opportunityId","evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt" FROM "CareerResumeDraft" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
   ]);
-  return { capabilities: capabilities.rows, capabilityDecisions: decisions.rows, opportunities: opportunities.rows, requirements: requirements.rows, matchEvaluations: matches.rows };
+  return { capabilities: capabilities.rows, capabilityDecisions: decisions.rows, opportunities: opportunities.rows, requirements: requirements.rows, matchEvaluations: matches.rows, resumeDrafts: resumeDrafts.rows };
 }

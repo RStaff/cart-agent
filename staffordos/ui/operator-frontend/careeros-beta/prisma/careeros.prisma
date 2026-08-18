@@ -39,6 +39,7 @@ model CareerTenant {
   opportunities CareerOpportunity[]
   requirements CareerOpportunityRequirement[]
   matchEvaluations CareerMatchEvaluation[]
+  resumeDrafts CareerResumeDraft[]
 }
 
 model CareerTenantMembership {
@@ -75,6 +76,7 @@ model CareerProfile {
   capabilities CareerCapabilityAuthority[]
   opportunities CareerOpportunity[]
   matchEvaluations CareerMatchEvaluation[]
+  resumeDrafts CareerResumeDraft[]
 
   @@unique([tenantId, userId])
   @@index([userId, updatedAt])
@@ -296,6 +298,7 @@ model CareerOpportunity {
   profile         CareerProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
   requirements    CareerOpportunityRequirement[]
   evaluations     CareerMatchEvaluation[]
+  resumeDrafts    CareerResumeDraft[]
 
   @@index([tenantId, userId, updatedAt])
 }
@@ -336,4 +339,24 @@ model CareerMatchEvaluation {
 
   @@index([tenantId, opportunityId, createdAt])
   @@index([tenantId, profileId, stale])
+}
+
+model CareerResumeDraft {
+  id                String   @id @default(cuid())
+  tenantId          String
+  userId            String
+  profileId         String
+  opportunityId     String
+  evaluationVersion String
+  authorityVersion  Int      @default(1)
+  draftVersion      Int      @default(1)
+  content           Json
+  stale             Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  tenant            CareerTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  profile           CareerProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  opportunity       CareerOpportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, userId, opportunityId, createdAt])
 }

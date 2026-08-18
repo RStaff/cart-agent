@@ -1,0 +1,12 @@
+{
+  "artifact": "CAREEROS_V1_P1_TRUTHFUL_RESUME_TAILORING_ACCEPTANCE",
+  "generation": "deterministic_server_side",
+  "provider": null,
+  "authority_chain": "CareerFact -> capability authority -> Application Evidence Packet -> CareerResumeDraft",
+  "draft_is_career_authority": false,
+  "unsupported_claim_policy": "blocked_from_generated_blocks_and_flagged_for_review",
+  "raw_customer_data": false,
+  "final_application_materials": false,
+  "schema_change": true,
+  "prisma_cli_validation": "UNAVAILABLE_NO_LOCAL_PRISMA_BINARY"
+}
