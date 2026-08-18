@@ -7,6 +7,7 @@ import { normalizeComparisonIds, summarizeOpportunityForComparison } from "./job
 import { buildApplicationEvidencePacket } from "./applicationEvidence.mjs";
 import { buildResumeDraft, normalizeDraftText } from "./resumeTailoring.mjs";
 import { buildApplicationAnswerDraft, buildCoverLetterDraft, classifyApplicationQuestion } from "./applicationMaterials.mjs";
+import { improveApplicationMaterial, writingEvidence } from "./applicationWriting.mjs";
 
 const EVALUATION_VERSION = "CAREEROS_MATCH_EVALUATION_V1";
 const id = (prefix) => `${prefix}_${crypto.randomUUID()}`;
@@ -168,7 +169,7 @@ export async function getResumeDraft(context, opportunityId) {
   const [profile, packet, drafts] = await Promise.all([
     pool.query('SELECT "displayName",headline,location,"careerStage",version FROM "CareerProfile" WHERE id=$1 AND "tenantId"=$2 AND "userId"=$3', [opportunity.profileId, context.tenant.id, context.user.id]),
     getApplicationEvidencePacket(context, opportunityId),
-    pool.query('SELECT id,"materialType","evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt" FROM "CareerResumeDraft" WHERE "opportunityId"=$1 AND "tenantId"=$2 AND "userId"=$3 AND COALESCE(content->>\'materialType\',"materialType")=\'RESUME\' ORDER BY "createdAt" DESC LIMIT 1', [opportunityId, context.tenant.id, context.user.id]),
+    pool.query('SELECT id,"materialType","generationMethod",provider,model,"evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt" FROM "CareerResumeDraft" WHERE "opportunityId"=$1 AND "tenantId"=$2 AND "userId"=$3 AND COALESCE(content->>\'materialType\',"materialType")=\'RESUME\' ORDER BY "createdAt" DESC LIMIT 1', [opportunityId, context.tenant.id, context.user.id]),
   ]);
   if (!profile.rows[0]) throw Object.assign(new Error("PROFILE_REQUIRED"), { code: "PROFILE_REQUIRED" });
   const draft = drafts.rows[0] || null;
@@ -184,7 +185,7 @@ export async function createResumeDraft(context, opportunityId) {
   const generated = buildResumeDraft({ profile: data.profile, packet: data.packet });
   const pool = await careerP0Pool();
   const nextVersion = Number((await pool.query('SELECT COALESCE(MAX("draftVersion"),0)+1 AS version FROM "CareerResumeDraft" WHERE "opportunityId"=$1 AND "tenantId"=$2 AND "userId"=$3', [opportunityId, context.tenant.id, context.user.id])).rows[0].version);
-  const row = (await pool.query('INSERT INTO "CareerResumeDraft" ("id","tenantId","userId","profileId","opportunityId","materialType","evaluationVersion","authorityVersion","draftVersion",content,"updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,NOW()) RETURNING id,"materialType","evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt"', [id("resume"), context.tenant.id, context.user.id, data.opportunity.profileId, opportunityId, "RESUME", data.packet.analysis.evaluationVersion, data.profile.version, nextVersion, JSON.stringify(generated.content)])).rows[0];
+  const row = (await pool.query('INSERT INTO "CareerResumeDraft" ("id","tenantId","userId","profileId","opportunityId","materialType","generationMethod","evaluationVersion","authorityVersion","draftVersion",content,"updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,NOW()) RETURNING id,"materialType","generationMethod",provider,model,"evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt"', [id("resume"), context.tenant.id, context.user.id, data.opportunity.profileId, opportunityId, "RESUME", "DETERMINISTIC", data.packet.analysis.evaluationVersion, data.profile.version, nextVersion, JSON.stringify(generated.content)])).rows[0];
   return { ...data, draft: row };
 }
 
@@ -208,7 +209,7 @@ async function materialContext(context, opportunityId, materialType, question = 
     pool.query('SELECT "displayName",headline,location,"careerStage",version FROM "CareerProfile" WHERE id=$1 AND "tenantId"=$2 AND "userId"=$3', [opportunity.profileId, context.tenant.id, context.user.id]),
     getApplicationEvidencePacket(context, opportunityId),
   ]);
-  const drafts = await pool.query('SELECT id,"materialType","evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt" FROM "CareerResumeDraft" WHERE "opportunityId"=$1 AND "tenantId"=$2 AND "userId"=$3 AND "materialType"=$4 AND ($5::text IS NULL OR content->>\'question\'=$5) ORDER BY "createdAt" DESC LIMIT 1', [opportunityId, context.tenant.id, context.user.id, materialType, question]);
+  const drafts = await pool.query('SELECT id,"materialType","generationMethod",provider,model,"evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt" FROM "CareerResumeDraft" WHERE "opportunityId"=$1 AND "tenantId"=$2 AND "userId"=$3 AND "materialType"=$4 AND ($5::text IS NULL OR content->>\'question\'=$5) ORDER BY "createdAt" DESC LIMIT 1', [opportunityId, context.tenant.id, context.user.id, materialType, question]);
   return { opportunity, profile: profile.rows[0], packet, draft: drafts.rows[0] || null };
 }
 
@@ -218,15 +219,50 @@ async function createMaterial(context, opportunityId, materialType, generated) {
   if (data.packet.status !== "CURRENT") throw Object.assign(new Error("APPLICATION_MATERIAL_STALE"), { code: "APPLICATION_MATERIAL_STALE" });
   const pool = await careerP0Pool();
   const nextVersion = Number((await pool.query('SELECT COALESCE(MAX("draftVersion"),0)+1 AS version FROM "CareerResumeDraft" WHERE "opportunityId"=$1 AND "tenantId"=$2 AND "userId"=$3 AND "materialType"=$4', [opportunityId, context.tenant.id, context.user.id, materialType])).rows[0].version);
-  const row = (await pool.query('INSERT INTO "CareerResumeDraft" ("id","tenantId","userId","profileId","opportunityId","materialType","evaluationVersion","authorityVersion","draftVersion",content,"updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,NOW()) RETURNING id,"materialType","evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt"', [id("material"), context.tenant.id, context.user.id, data.opportunity.profileId, opportunityId, materialType, data.packet.analysis.evaluationVersion, data.profile.version, nextVersion, JSON.stringify(generated.content)])).rows[0];
+  const row = (await pool.query('INSERT INTO "CareerResumeDraft" ("id","tenantId","userId","profileId","opportunityId","materialType","generationMethod","evaluationVersion","authorityVersion","draftVersion",content,"updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,NOW()) RETURNING id,"materialType","generationMethod",provider,model,"evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt"', [id("material"), context.tenant.id, context.user.id, data.opportunity.profileId, opportunityId, materialType, "DETERMINISTIC", data.packet.analysis.evaluationVersion, data.profile.version, nextVersion, JSON.stringify(generated.content)])).rows[0];
   return { ...data, draft: row };
 }
 
 export async function getCoverLetterDraft(context, opportunityId) { return materialContext(context, opportunityId, "COVER_LETTER"); }
 export async function createCoverLetterDraft(context, opportunityId) { const data = await materialContext(context, opportunityId, "COVER_LETTER"); return createMaterial(context, opportunityId, "COVER_LETTER", buildCoverLetterDraft({ profile: data.profile, packet: data.packet })); }
-export async function listApplicationAnswerDrafts(context, opportunityId) { requireContext(context); const pool = await careerP0Pool(); return (await pool.query('SELECT id,"materialType","evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt" FROM "CareerResumeDraft" WHERE "opportunityId"=$1 AND "tenantId"=$2 AND "userId"=$3 AND "materialType"=\'APPLICATION_ANSWER\' ORDER BY "createdAt" DESC', [opportunityId, context.tenant.id, context.user.id])).rows; }
+export async function listApplicationAnswerDrafts(context, opportunityId) { requireContext(context); const pool = await careerP0Pool(); return (await pool.query('SELECT id,"materialType","generationMethod",provider,model,"evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt" FROM "CareerResumeDraft" WHERE "opportunityId"=$1 AND "tenantId"=$2 AND "userId"=$3 AND "materialType"=\'APPLICATION_ANSWER\' ORDER BY "createdAt" DESC', [opportunityId, context.tenant.id, context.user.id])).rows; }
 export async function createApplicationAnswerDraft(context, opportunityId, question, userIntent = "") { const data = await materialContext(context, opportunityId, "APPLICATION_ANSWER", question); const generated = buildApplicationAnswerDraft({ profile: data.profile, packet: data.packet, question, userIntent }); if (generated.status !== "CURRENT") return { ...data, draft: null, generated, questionType: classifyApplicationQuestion(question) }; return createMaterial(context, opportunityId, "APPLICATION_ANSWER", generated); }
 export async function saveApplicationMaterialDraft(context, opportunityId, draftId, text) { return saveResumeDraft(context, opportunityId, draftId, text); }
+
+function materialEvidence(data) { return writingEvidence(data.packet); }
+
+export async function improveApplicationMaterialDraft(context, opportunityId, materialType, draftId, style = "PROFESSIONAL", userIntent = "") {
+  requireContext(context);
+  const data = await materialContext(context, opportunityId, materialType);
+  if (!data.draft || data.draft.id !== draftId) throw Object.assign(new Error("DRAFT_NOT_FOUND"), { code: "DRAFT_NOT_FOUND" });
+  if (data.packet.status !== "CURRENT") return { ...data, generated: { status: "APPLICATION_MATERIAL_STALE", message: "Your career information changed since this draft was prepared. Refresh the grounded draft before using AI wording assistance." } };
+  const originalText = String(data.draft.content?.originalText || data.draft.content?.text || "");
+  try {
+    const generated = await improveApplicationMaterial({ materialType, target: { title: data.opportunity.title, company: data.opportunity.company, location: data.opportunity.location }, deterministicDraft: originalText, evidence: materialEvidence(data), question: data.draft.content?.question || "", userIntent: userIntent || data.draft.content?.userIntent || "", style });
+    const pool = await careerP0Pool();
+    const nextVersion = Number((await pool.query('SELECT COALESCE(MAX("draftVersion"),0)+1 AS version FROM "CareerResumeDraft" WHERE "opportunityId"=$1 AND "tenantId"=$2 AND "userId"=$3 AND "materialType"=$4', [opportunityId, context.tenant.id, context.user.id, materialType])).rows[0].version);
+    const content = { ...(data.draft.content || {}), text: generated.text, originalText, claims: generated.claims, groundingStatus: generated.groundingStatus, style: generated.style, editedByUser: false };
+    const row = (await pool.query('INSERT INTO "CareerResumeDraft" ("id","tenantId","userId","profileId","opportunityId","materialType","generationMethod",provider,model,"evaluationVersion","authorityVersion","draftVersion",content,"updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,NOW()) RETURNING id,"materialType","generationMethod",provider,model,"evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt"', [id("material-ai"), context.tenant.id, context.user.id, data.opportunity.profileId, opportunityId, materialType, "AI_ASSISTED", generated.provider, generated.model, data.packet.analysis.evaluationVersion, data.profile.version, nextVersion, JSON.stringify(content)])).rows[0];
+    return { ...data, draft: row, generated: { status: "AI_ASSISTED", groundingStatus: generated.groundingStatus } };
+  } catch (error) {
+    const code = error?.code || "APPLICATION_WRITING_FAILED";
+    return { ...data, generated: { status: code, message: "AI wording improvement isn't available right now. Your grounded CareerOS draft is still available." } };
+  }
+}
+
+export async function restoreDeterministicMaterial(context, opportunityId, materialType, draftId) {
+  requireContext(context);
+  const data = await materialContext(context, opportunityId, materialType);
+  if (!data.draft || data.draft.id !== draftId) throw Object.assign(new Error("DRAFT_NOT_FOUND"), { code: "DRAFT_NOT_FOUND" });
+  if (data.packet.status !== "CURRENT") return { ...data, generated: { status: "APPLICATION_MATERIAL_STALE", message: "Your career information changed since this draft was prepared. Re-analyze the job before restoring a grounded draft." } };
+  const originalText = data.draft.content?.originalText;
+  if (!originalText) return { ...data, generated: { status: "NO_GROUNDED_VERSION" } };
+  const pool = await careerP0Pool();
+  const nextVersion = Number((await pool.query('SELECT COALESCE(MAX("draftVersion"),0)+1 AS version FROM "CareerResumeDraft" WHERE "opportunityId"=$1 AND "tenantId"=$2 AND "userId"=$3 AND "materialType"=$4', [opportunityId, context.tenant.id, context.user.id, materialType])).rows[0].version);
+  const content = { ...(data.draft.content || {}), text: originalText, originalText: undefined, claims: undefined, style: undefined, editedByUser: false, groundingStatus: "SUPPORTED" };
+  const row = (await pool.query('INSERT INTO "CareerResumeDraft" ("id","tenantId","userId","profileId","opportunityId","materialType","generationMethod","evaluationVersion","authorityVersion","draftVersion",content,"updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,NOW()) RETURNING id,"materialType","generationMethod",provider,model,"evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt"', [id("material-grounded"), context.tenant.id, context.user.id, data.opportunity.profileId, opportunityId, materialType, "DETERMINISTIC", data.packet.analysis.evaluationVersion, data.profile.version, nextVersion, JSON.stringify(content)])).rows[0];
+  return { ...data, draft: row, generated: { status: "DETERMINISTIC_RESTORED" } };
+}
 
 export async function updateOpportunityDecision(context, opportunityId, value) {
   requireContext(context);
@@ -256,7 +292,7 @@ export async function exportProductAccount(context) {
     pool.query('SELECT id,"sourceType",title,company,location,description,"sourceUrl","decisionState","createdAt","updatedAt" FROM "CareerOpportunity" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
     pool.query('SELECT r.id,r."opportunityId",r."sourceOrder",r.text,r."conceptKey",r.importance,r.scope,r.specialist,r."createdAt" FROM "CareerOpportunityRequirement" r JOIN "CareerOpportunity" o ON o.id=r."opportunityId" WHERE r."tenantId"=$1 AND o."userId"=$2', [context.tenant.id, context.user.id]),
     pool.query('SELECT id,"opportunityId","taxonomyVersion","evaluationVersion",summary,relationships,stale,"createdAt" FROM "CareerMatchEvaluation" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
-    pool.query('SELECT id,"opportunityId","materialType","evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt" FROM "CareerResumeDraft" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
+    pool.query('SELECT id,"opportunityId","materialType","generationMethod",provider,model,"evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt" FROM "CareerResumeDraft" WHERE "tenantId"=$1 AND "userId"=$2', [context.tenant.id, context.user.id]),
   ]);
   return { capabilities: capabilities.rows, capabilityDecisions: decisions.rows, opportunities: opportunities.rows, requirements: requirements.rows, matchEvaluations: matches.rows, resumeDrafts: resumeDrafts.rows };
 }
