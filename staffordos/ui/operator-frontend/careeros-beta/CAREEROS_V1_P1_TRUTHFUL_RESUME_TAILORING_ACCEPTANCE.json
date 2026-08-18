@@ -8,5 +8,6 @@
   "raw_customer_data": false,
   "final_application_materials": false,
   "schema_change": true,
-  "prisma_cli_validation": "UNAVAILABLE_NO_LOCAL_PRISMA_BINARY"
+  "prisma_cli_validation": "UNAVAILABLE_NO_LOCAL_PRISMA_BINARY",
+  "migration_execution": "idempotent_private_database_startup_gate"
 }

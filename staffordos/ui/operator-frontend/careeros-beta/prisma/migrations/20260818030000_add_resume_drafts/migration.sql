@@ -1,4 +1,4 @@
-CREATE TABLE "CareerResumeDraft" (
+CREATE TABLE IF NOT EXISTS "CareerResumeDraft" (
   "id" TEXT NOT NULL,
   "tenantId" TEXT NOT NULL,
   "userId" TEXT NOT NULL,
@@ -13,7 +13,15 @@ CREATE TABLE "CareerResumeDraft" (
   "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT "CareerResumeDraft_pkey" PRIMARY KEY ("id")
 );
-CREATE INDEX "CareerResumeDraft_tenantId_userId_opportunityId_createdAt_idx" ON "CareerResumeDraft"("tenantId", "userId", "opportunityId", "createdAt");
-ALTER TABLE "CareerResumeDraft" ADD CONSTRAINT "CareerResumeDraft_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "CareerTenant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "CareerResumeDraft" ADD CONSTRAINT "CareerResumeDraft_profileId_fkey" FOREIGN KEY ("profileId") REFERENCES "CareerProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "CareerResumeDraft" ADD CONSTRAINT "CareerResumeDraft_opportunityId_fkey" FOREIGN KEY ("opportunityId") REFERENCES "CareerOpportunity"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+CREATE INDEX IF NOT EXISTS "CareerResumeDraft_tenantId_userId_opportunityId_createdAt_idx" ON "CareerResumeDraft"("tenantId", "userId", "opportunityId", "createdAt");
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'CareerResumeDraft_tenantId_fkey') THEN
+    ALTER TABLE "CareerResumeDraft" ADD CONSTRAINT "CareerResumeDraft_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "CareerTenant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'CareerResumeDraft_profileId_fkey') THEN
+    ALTER TABLE "CareerResumeDraft" ADD CONSTRAINT "CareerResumeDraft_profileId_fkey" FOREIGN KEY ("profileId") REFERENCES "CareerProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'CareerResumeDraft_opportunityId_fkey') THEN
+    ALTER TABLE "CareerResumeDraft" ADD CONSTRAINT "CareerResumeDraft_opportunityId_fkey" FOREIGN KEY ("opportunityId") REFERENCES "CareerOpportunity"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+END $$;
