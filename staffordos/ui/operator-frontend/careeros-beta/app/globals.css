@@ -21,6 +21,14 @@ textarea { min-height: 180px; resize: vertical; }
 .careerCandidateActions { display: flex; flex-wrap: wrap; gap: 8px; }
 .careerSaved { color: #86efac; }
 .careerWarning { border-left: 3px solid #fbbf24; padding-left: 12px; color: #fde68a; line-height: 1.6; }
+.careerCompareToolbar { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+.careerJobSelect { display: flex; grid-template-columns: auto 1fr; align-items: flex-start; gap: 12px; }
+.careerJobSelect input { width: auto; margin-top: 5px; }
+.careerCompareGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.careerCompareCard { border: 1px solid #334155; border-radius: 8px; padding: 16px; }
+.careerCompareCard h2, .careerCompareCard h3 { margin-top: 0; }
+.careerCompareDecision { margin: 16px 0; }
+@media (max-width: 640px) { .careerCompareToolbar { display: grid; } }
 .careerError { color: #fca5a5; }
 .careerNav { margin-top: 20px; }
 .careerModeTabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }

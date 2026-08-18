@@ -3,6 +3,7 @@ import { careerP0Pool } from "./careerP0Auth";
 import { CAREEROS_CAPABILITY_TAXONOMY_VERSION, capabilityForKey, decisionStateForAnswer, deriveCapabilityCandidates, listCapabilities } from "./capabilityCatalog.mjs";
 import { parseJobDescription } from "./jobProduct.mjs";
 import { CAREEROS_OPPORTUNITY_DECISION_LABELS, normalizeOpportunityDecision } from "./jobDecision.mjs";
+import { normalizeComparisonIds, summarizeOpportunityForComparison } from "./jobComparison.mjs";
 
 const EVALUATION_VERSION = "CAREEROS_MATCH_EVALUATION_V1";
 const id = (prefix) => `${prefix}_${crypto.randomUUID()}`;
@@ -118,6 +119,22 @@ export async function getOpportunity(context, opportunityId) {
   const requirements = (await pool.query('SELECT id,text,"conceptKey",importance,scope,specialist,"sourceOrder" FROM "CareerOpportunityRequirement" WHERE "opportunityId"=$1 AND "tenantId"=$2 ORDER BY "sourceOrder"', [opportunityId, context.tenant.id])).rows;
   const latest = (await pool.query('SELECT * FROM "CareerMatchEvaluation" WHERE "opportunityId"=$1 AND "tenantId"=$2 AND "userId"=$3 ORDER BY "createdAt" DESC LIMIT 1', [opportunityId, context.tenant.id, context.user.id])).rows[0];
   return { opportunity: row, requirements, match: latest ? { id: latest.id, stale: latest.stale, summary: latest.summary, relationships: latest.relationships } : await evaluateOpportunity(context, opportunityId) };
+}
+
+export async function compareOpportunities(context, values) {
+  requireContext(context);
+  const opportunityIds = normalizeComparisonIds(values);
+  const pool = await careerP0Pool();
+  const rows = (await pool.query('SELECT o.id,o.title,o.company,o.location,o."sourceType",o."sourceUrl",o."decisionState",o."createdAt",o."updatedAt",m.id AS "matchId",m.stale AS "matchStale",m.summary AS "matchSummary",m.relationships AS "matchRelationships" FROM "CareerOpportunity" o LEFT JOIN LATERAL (SELECT id,stale,summary,relationships FROM "CareerMatchEvaluation" WHERE "opportunityId"=o.id AND "tenantId"=$2 AND "userId"=$3 ORDER BY "createdAt" DESC LIMIT 1) m ON true WHERE o."tenantId"=$2 AND o."userId"=$3 AND o.id=ANY($1::text[])', [opportunityIds, context.tenant.id, context.user.id])).rows;
+  if (rows.length !== opportunityIds.length) throw Object.assign(new Error("OPPORTUNITY_NOT_FOUND"), { code: "OPPORTUNITY_NOT_FOUND" });
+  const byId = new Map(rows.map((row) => [row.id, row]));
+  const opportunities = opportunityIds.map((id) => {
+    const row = byId.get(id);
+    const match = row.matchId ? { id: row.matchId, stale: row.matchStale, summary: row.matchSummary, relationships: row.matchRelationships } : null;
+    const opportunity = { id: row.id, title: row.title, company: row.company, location: row.location, sourceType: row.sourceType, sourceUrl: row.sourceUrl, decisionState: row.decisionState, createdAt: row.createdAt, updatedAt: row.updatedAt, match };
+    return { opportunity, comparison: summarizeOpportunityForComparison(opportunity) };
+  });
+  return { opportunities };
 }
 
 export async function updateOpportunityDecision(context, opportunityId, value) {
