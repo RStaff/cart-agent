@@ -54,6 +54,32 @@ test("common client-relationship and process-improvement wording stays in the ex
   ]);
 });
 
+test("change and product operations language uses bounded existing ownership", () => {
+  const requirements = parseJobDescription({ title: "Synthetic role", description: [
+    "Facilitate user adoption.",
+    "Establish product operating rhythms.",
+    "Manage product intake processes.",
+  ].join("\n") }).requirements;
+  assert.deepEqual(requirements.map((item) => item.conceptKey), [
+    "TEACHING_TRAINING",
+    "BUSINESS_PROCESS_OPERATIONS",
+    "BUSINESS_PROCESS_OPERATIONS",
+  ]);
+});
+
+test("planning and product-strategy wording does not become unsupported capability authority", () => {
+  const requirements = parseJobDescription({ title: "Synthetic role", description: [
+    "Facilitate planning and prioritization.",
+    "Own product strategy and roadmap.",
+    "Responsible for pricing and portfolio strategy.",
+  ].join("\n") }).requirements;
+  assert.deepEqual(requirements.map((item) => item.conceptKey), [
+    "UNRESOLVED_REQUIREMENT",
+    "UNRESOLVED_REQUIREMENT",
+    "UNRESOLVED_REQUIREMENT",
+  ]);
+});
+
 test("entrepreneurship remains an operations signal rather than a new authority concept", () => {
   const derived = deriveCapabilityCandidates([{ id: "fact-business", sourceId: "source-business", factType: "PROJECT", statement: "Built and operated a small business, managing vendors and revenue planning." }]);
   assert.ok(derived.some((item) => item.capabilityKey === "BUSINESS_PROCESS_OPERATIONS"));
