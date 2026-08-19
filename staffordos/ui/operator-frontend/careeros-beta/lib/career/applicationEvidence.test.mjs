@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildApplicationEvidencePacket } from "./applicationEvidence.mjs";
+import { buildApplicationEvidencePacket, buildMatchEvidenceRelationships } from "./applicationEvidence.mjs";
 
 const opportunity = { title: "Program Lead", company: "Example Co", decisionState: "PURSUE" };
 const requirements = ["direct", "transfer", "partial", "unknown", "specialist"].map((id, index) => ({ id, text: `${id} requirement`, importance: index === 0 ? "MUST_HAVE" : "PREFERRED" }));
@@ -34,4 +34,18 @@ test("stale evaluations are explicitly blocked from current preparation", () => 
 test("missing evaluation is not silently generated or treated as evidence", () => {
   const packet = buildApplicationEvidencePacket({ opportunity, requirements, match: null });
   assert.equal(packet.status, "APPLICATION_EVIDENCE_UNAVAILABLE");
+});
+
+test("match evidence is attached from tenant-safe authority without exposing internal identifiers", () => {
+  const [item] = buildMatchEvidenceRelationships({
+    relationships: [{ id: "requirement-1", state: "TRANSFERABLE", capabilityKey: "PROGRAM_DELIVERY", text: "Coordinate delivery", explanation: "Related support." }],
+    capabilities: [{ capabilityKey: "PROGRAM_DELIVERY", label: "Program delivery", provenance: { factIds: ["fact-1"], sourceIds: ["source-1"] } }],
+    facts: [{ id: "fact-1", sourceId: "source-1", statement: "Led a confirmed delivery program.", sourceExcerpt: "Delivery program excerpt", scopeStatement: "Cross-functional" }],
+    sources: [{ id: "source-1", sourceType: "Resume" }],
+  });
+  assert.equal(item.evidence[0].statement, "Led a confirmed delivery program.");
+  assert.equal(item.evidence[0].sourceType, "Resume");
+  assert.equal(item.evidence[0].scopeStatement, "Cross-functional");
+  assert.equal("id" in item.evidence[0], false);
+  assert.equal("sourceId" in item.evidence[0], false);
 });

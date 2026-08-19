@@ -1,4 +1,4 @@
-function evidenceForRelationship(relationship, capabilities, factsById, sourcesById) {
+export function evidenceForRelationship(relationship, capabilities, factsById, sourcesById) {
   const capability = relationship.capabilityKey ? capabilities.get(relationship.capabilityKey) : null;
   const provenance = capability?.provenance || {};
   const factIds = Array.isArray(provenance.factIds) ? provenance.factIds : [];
@@ -9,6 +9,16 @@ function evidenceForRelationship(relationship, capabilities, factsById, sourcesB
     scopeStatement: fact.scopeStatement || null,
   }));
   return { requirement: relationship.text, importance: relationship.importance, relationship: relationship.state, explanation: relationship.explanation, capability: capability?.label || relationship.capabilityLabel || null, evidence: facts };
+}
+
+export function buildMatchEvidenceRelationships({ relationships = [], capabilities = [], facts = [], sources = [] }) {
+  const capabilitiesByKey = new Map(capabilities.map((item) => [item.capabilityKey, item]));
+  const factsById = new Map(facts.map((item) => [item.id, item]));
+  const sourcesById = new Map(sources.map((item) => [item.id, item]));
+  return relationships.map((relationship) => ({
+    ...relationship,
+    evidence: evidenceForRelationship(relationship, capabilitiesByKey, factsById, sourcesById).evidence,
+  }));
 }
 
 export function buildApplicationEvidencePacket({ opportunity, requirements = [], match, capabilities = [], facts = [], sources = [] }) {
