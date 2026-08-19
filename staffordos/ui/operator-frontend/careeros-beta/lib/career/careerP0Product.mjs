@@ -5,6 +5,7 @@ import { parseJobDescription } from "./jobProduct.mjs";
 import { CAREEROS_OPPORTUNITY_DECISION_LABELS, normalizeOpportunityDecision } from "./jobDecision.mjs";
 import { normalizeComparisonIds, summarizeOpportunityForComparison } from "./jobComparison.mjs";
 import { buildApplicationEvidencePacket, buildMatchEvidenceRelationships } from "./applicationEvidence.mjs";
+import { buildDecisionFirstMatchSummary } from "./decisionFirstMatchSummary.mjs";
 import { buildResumeDraft, normalizeDraftText } from "./resumeTailoring.mjs";
 import { buildApplicationAnswerDraft, buildCoverLetterDraft, classifyApplicationQuestion } from "./applicationMaterials.mjs";
 import { improveApplicationMaterial, writingEvidence } from "./applicationWriting.mjs";
@@ -200,7 +201,8 @@ export async function getOpportunity(context, opportunityId) {
     match = { ...match, relationships: buildMatchEvidenceRelationships({ relationships: match.relationships, capabilities, facts: facts.rows, sources: sources.rows }) };
   }
   const { profileId: _profileId, ...publicOpportunity } = row;
-  return { opportunity: { ...publicOpportunity, nextAction: nextOpportunityAction(row) }, requirements, activity: { events: events.rows, notes: notes.rows }, match };
+  const decisionSummary = buildDecisionFirstMatchSummary({ ...match, decisionState: row.decisionState });
+  return { opportunity: { ...publicOpportunity, nextAction: nextOpportunityAction(row) }, requirements, activity: { events: events.rows, notes: notes.rows }, match: { ...match, decisionSummary } };
 }
 
 export async function compareOpportunities(context, values) {
