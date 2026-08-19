@@ -43,6 +43,17 @@ test("new requirement wording maps to the corresponding capability concepts", ()
   ]);
 });
 
+test("common client-relationship and process-improvement wording stays in the existing concepts", () => {
+  const requirements = parseJobDescription({ title: "Synthetic role", description: [
+    "Manage account relationships.",
+    "Design process improvements.",
+  ].join("\n") }).requirements;
+  assert.deepEqual(requirements.map((item) => item.conceptKey), [
+    "CONSULTING_CLIENT_DELIVERY",
+    "BUSINESS_PROCESS_OPERATIONS",
+  ]);
+});
+
 test("entrepreneurship remains an operations signal rather than a new authority concept", () => {
   const derived = deriveCapabilityCandidates([{ id: "fact-business", sourceId: "source-business", factType: "PROJECT", statement: "Built and operated a small business, managing vendors and revenue planning." }]);
   assert.ok(derived.some((item) => item.capabilityKey === "BUSINESS_PROCESS_OPERATIONS"));
