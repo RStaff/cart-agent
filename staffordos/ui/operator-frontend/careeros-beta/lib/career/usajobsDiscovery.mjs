@@ -16,9 +16,29 @@ export function boundUsajobsSearch(input = {}) {
   return { keywords: clean(input.keywords, 240), location: clean(input.location, 240), remotePreference, postedWithinDays, salaryMin, resultLimit };
 }
 
-function descriptionFor(item) {
+function textValue(value) {
+  if (Array.isArray(value)) return value.map(textValue).filter(Boolean).join("; ");
+  if (value && typeof value === "object") return value.Content || value.Description || value.Name || "";
+  return value;
+}
+
+export function buildUsajobsDescription(item) {
   const details = item?.MatchedObjectDescriptor?.UserArea?.Details || {};
-  return clean(details.JobSummary || details.MajorDuties || item?.MatchedObjectDescriptor?.QualificationSummary, 50000) || null;
+  const descriptor = item?.MatchedObjectDescriptor || {};
+  const sections = [
+    ["Job summary", details.JobSummary],
+    ["Major duties and responsibilities", details.MajorDuties],
+    ["Key requirements", details.KeyRequirements],
+    ["Qualifications", descriptor.QualificationSummary],
+    ["Requirements", details.Requirements],
+    ["Evaluations", details.Evaluations],
+    ["Education", details.Education],
+    ["Conditions and other information", details.OtherInformation],
+  ].map(([label, value]) => {
+    const text = clean(textValue(value), 12000);
+    return text ? `${label}: ${text}` : null;
+  }).filter(Boolean);
+  return clean(sections.join("\n"), 50000) || null;
 }
 
 function normalizeResult(item, retrievedAt) {
@@ -33,7 +53,7 @@ function normalizeResult(item, retrievedAt) {
     company: clean(descriptor.OrganizationName, 240) || null,
     location: clean(descriptor.PositionLocationDisplay || firstValue(descriptor.PositionLocation)?.LocationName, 240) || null,
     sourceUrl: clean(descriptor.PositionURI || firstValue(descriptor.ApplyURI), 1000) || null,
-    description: descriptionFor(item),
+    description: buildUsajobsDescription(item),
     postedAt: descriptor.PublicationStartDate || null,
     closingAt: descriptor.ApplicationCloseDate || descriptor.PositionEndDate || null,
     salaryMin: remuneration.MinimumRange ? Number(remuneration.MinimumRange) : null,
