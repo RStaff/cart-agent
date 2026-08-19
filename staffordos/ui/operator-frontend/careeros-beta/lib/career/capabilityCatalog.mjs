@@ -61,6 +61,66 @@ const CATALOG = [
       choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "KEEP_UNRESOLVED"],
     },
   },
+  {
+    key: "TEACHING_TRAINING",
+    label: "Teaching and training",
+    domain: "enablement",
+    scope: "training",
+    question: {
+      key: "TEACHING_TRAINING_AUTHORITY",
+      prompt: "Have you personally taught, trained, coached, facilitated, or enabled people to use a skill, process, or system?",
+      uncertainty: "teaching, training, and enablement scope",
+      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "KEEP_UNRESOLVED"],
+    },
+  },
+  {
+    key: "ANALYTICS_REPORTING",
+    label: "Analytics and reporting",
+    domain: "analytics",
+    scope: "reporting",
+    question: {
+      key: "ANALYTICS_REPORTING_AUTHORITY",
+      prompt: "Have you created analysis, dashboards, reporting, or measurements that helped people understand performance or make decisions?",
+      uncertainty: "analytics, reporting, and measurement scope",
+      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "KEEP_UNRESOLVED"],
+    },
+  },
+  {
+    key: "CONSULTING_CLIENT_DELIVERY",
+    label: "Consulting and client delivery",
+    domain: "client_delivery",
+    scope: "client",
+    question: {
+      key: "CONSULTING_CLIENT_DELIVERY_AUTHORITY",
+      prompt: "Have you advised clients or customers and delivered work, implementations, or outcomes for them?",
+      uncertainty: "consulting, advisory, and client-delivery scope",
+      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "KEEP_UNRESOLVED"],
+    },
+  },
+  {
+    key: "BUSINESS_PROCESS_OPERATIONS",
+    label: "Business and process operations",
+    domain: "operations",
+    scope: "process",
+    question: {
+      key: "BUSINESS_PROCESS_OPERATIONS_AUTHORITY",
+      prompt: "Have you managed or improved business operations, workflows, processes, vendors, or operational systems?",
+      uncertainty: "business and process operations scope",
+      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "KEEP_UNRESOLVED"],
+    },
+  },
+  {
+    key: "MARKETING_DIGITAL",
+    label: "Marketing and digital work",
+    domain: "marketing",
+    scope: "digital",
+    question: {
+      key: "MARKETING_DIGITAL_AUTHORITY",
+      prompt: "Have you led or delivered digital marketing, campaigns, marketing technology, CRM marketing, content, SEO, or paid media work?",
+      uncertainty: "marketing and digital-work scope",
+      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "KEEP_UNRESOLVED"],
+    },
+  },
 ];
 
 export function listCapabilities() {
@@ -96,6 +156,21 @@ export function deriveCapabilityCandidates(facts) {
     }
     if ((type === "LEADERSHIP" || /managed|led|directed/i.test(statement)) && hasPeopleAuthority(statement)) {
       candidates.push("PEOPLE_MANAGEMENT");
+    }
+    if (/teach|train|workshop|instruction|facilitat|coach|curriculum|enablement|demonstrat/i.test(statement)) {
+      candidates.push("TEACHING_TRAINING");
+    }
+    if (/analytics|dashboard|reporting|kpi|data analysis|performance reporting|measurement|insights/i.test(statement)) {
+      candidates.push("ANALYTICS_REPORTING");
+    }
+    if (/consult|client|customer delivery|advisory|advised clients|account engagement|implementation for clients|stakeholder-facing delivery/i.test(statement)) {
+      candidates.push("CONSULTING_CLIENT_DELIVERY");
+    }
+    if (/operations|workflow|process design|operational improvement|operational process|vendor coordination|business operations|process management|operational system|operated a business|operate a business|small business/i.test(statement)) {
+      candidates.push("BUSINESS_PROCESS_OPERATIONS");
+    }
+    if (/digital marketing|campaign|seo|paid media|marketing technology|marketing operations|crm marketing|content strategy/i.test(statement)) {
+      candidates.push("MARKETING_DIGITAL");
     }
     for (const capabilityKey of [...new Set(candidates)]) {
       const item = capabilityForKey(capabilityKey);
