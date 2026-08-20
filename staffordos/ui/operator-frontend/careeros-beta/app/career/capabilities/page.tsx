@@ -6,7 +6,7 @@ type Capability = { id: string; label: string; authorityState: string; supportin
 const labels: Record<string, string> = { DIRECT: "Yes, directly", TRANSFERABLE: "Related experience", PARTIAL: "Part of this", NOT_SUPPORTED: "No, this does not describe my experience", KEEP_UNRESOLVED: "I need more context" };
 export default function CapabilitiesPage() {
   const [items, setItems] = useState<Capability[]>([]); const [index, setIndex] = useState(0); const [saveNotice, setSaveNotice] = useState<{ capabilityId: string; text: string } | null>(null);
-  useEffect(() => { fetch("/api/career/capabilities").then((r) => r.json()).then((body) => setItems(body.profile?.capabilities || [])); }, []);
+  useEffect(() => { fetch("/api/career/capabilities", { cache: "no-store" }).then((r) => r.json()).then((body) => setItems(body.profile?.capabilities || [])); }, []);
   const current = items[index]; const complete = capabilityReviewComplete(items); const unreviewed = unreviewedCapabilityCount(items);
   async function answer(answer: string) {
     if (!current?.question) return;

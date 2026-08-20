@@ -21,4 +21,5 @@ test("capability review completes without looping when all questions are answere
 test("new confirmed evidence reopens an already-decided capability proposition", () => {
   assert.equal(unreviewedCapabilityCount([reviewed, reopened]), 1);
   assert.equal(capabilityReviewComplete([reviewed, reopened]), false);
+  assert.equal(nextUnreviewedCapabilityIndex([reviewed, reopened], 0), 1);
 });

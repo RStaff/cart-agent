@@ -8,6 +8,7 @@ const page = read("app/career/capabilities/page.tsx");
 const product = read("lib/career/careerP0Product.mjs");
 const catalog = read("lib/career/capabilityCatalog.mjs");
 const authority = read("lib/career/customerSemanticAuthority.json");
+const route = read("app/api/career/capabilities/route.ts");
 
 test("capability review exposes bounded supporting evidence and decision choices", () => {
   assert.match(page, /Why CareerOS is asking/);
@@ -26,4 +27,11 @@ test("capability review remains separate from career fact truth", () => {
   assert.match(product, /CareerCapabilityAuthority/);
   assert.match(authority, /DERIVED_CAPABILITY_PROPOSITION/);
   assert.match(authority, /CUSTOMER_AUTHORIZED_CAPABILITY/);
+});
+
+test("capability read model cannot serve cached lifecycle state", () => {
+  assert.match(route, /dynamic = "force-dynamic"/);
+  assert.match(route, /revalidate = 0/);
+  assert.match(route, /Cache-Control.*no-store/);
+  assert.match(page, /fetch\("\/api\/career\/capabilities", \{ cache: "no-store" \}\)/);
 });
