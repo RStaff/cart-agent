@@ -84,12 +84,21 @@ function relationship(requirement, capability) {
   return { state, capabilityKey: capability.capabilityKey, capabilityLabel: capability.label, explanation };
 }
 
+async function refreshOpportunityRequirements(pool, context, opportunity) {
+  const parsed = parseJobDescription({ title: opportunity.title, company: opportunity.company, location: opportunity.location, description: opportunity.description, sourceUrl: opportunity.sourceUrl, sourceType: opportunity.sourceType });
+  await transaction(pool, async (client) => {
+    await client.query('DELETE FROM "CareerOpportunityRequirement" WHERE "opportunityId"=$1 AND "tenantId"=$2', [opportunity.id, context.tenant.id]);
+    for (const item of parsed.requirements) await client.query('INSERT INTO "CareerOpportunityRequirement" ("id","tenantId","opportunityId","sourceOrder",text,"conceptKey",importance,scope,specialist) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)', [id("requirement"), context.tenant.id, opportunity.id, item.sourceOrder, item.text, item.conceptKey, item.importance, item.scope, item.specialist]);
+  });
+  return parsed.requirements;
+}
+
 export async function evaluateOpportunity(context, opportunityId) {
   requireContext(context);
   const pool = await careerP0Pool();
   const opportunity = (await pool.query('SELECT * FROM "CareerOpportunity" WHERE id=$1 AND "tenantId"=$2 AND "userId"=$3', [opportunityId, context.tenant.id, context.user.id])).rows[0];
   if (!opportunity) throw Object.assign(new Error("OPPORTUNITY_NOT_FOUND"), { code: "OPPORTUNITY_NOT_FOUND" });
-  const requirements = (await pool.query('SELECT * FROM "CareerOpportunityRequirement" WHERE "opportunityId"=$1 AND "tenantId"=$2 ORDER BY "sourceOrder"', [opportunityId, context.tenant.id])).rows;
+  const requirements = await refreshOpportunityRequirements(pool, context, opportunity);
   const capabilities = (await pool.query('SELECT * FROM "CareerCapabilityAuthority" WHERE "tenantId"=$1 AND "userId"=$2 AND "profileId"=$3', [context.tenant.id, context.user.id, opportunity.profileId])).rows;
   const byKey = new Map(capabilities.map((item) => [item.capabilityKey, item]));
   const relationships = requirements.map((item) => ({ id: item.id, text: item.text, conceptKey: item.conceptKey, importance: item.importance, ...relationship(item, byKey.get(item.conceptKey)) }));
