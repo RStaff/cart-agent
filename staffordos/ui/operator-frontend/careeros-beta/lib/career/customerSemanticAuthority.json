@@ -55,7 +55,11 @@
     "customerFacingAllowed": true,
     "authoritativeSource": "CareerCapabilityAuthority and CareerCapabilityDecision",
     "allowedSurface": "/career/capabilities",
-    "notes": "Capability review remains separate from profile identity and raw story intake."
+    "notes": "Capability review remains separate from profile identity and raw story intake.",
+    "invariants": [
+      "NEW_CONFIRMED_FACT_PROVENANCE_REOPENS_CAPABILITY_REVIEW",
+      "PRIOR_CAPABILITY_DECISIONS_REMAIN_PERSISTED"
+    ]
   },
   "DERIVED_CAPABILITY_PROPOSITION": {
     "semanticKey": "DERIVED_CAPABILITY_PROPOSITION",

@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { careerP0Pool } from "./careerP0Auth";
-import { CAREEROS_CAPABILITY_TAXONOMY_VERSION, capabilityForKey, capabilityQuestionForEvidence, decisionStateForAnswer, deriveCapabilityCandidates, listCapabilities } from "./capabilityCatalog.mjs";
+import { CAREEROS_CAPABILITY_TAXONOMY_VERSION, capabilityForKey, capabilityQuestionForEvidence, decisionStateForAnswer, deriveCapabilityCandidates, listCapabilities, refreshCapabilityAuthorityState } from "./capabilityCatalog.mjs";
+import { capabilityNeedsReview } from "./capabilityReview.mjs";
 import { parseJobDescription } from "./jobProduct.mjs";
 import { CAREEROS_OPPORTUNITY_DECISION_LABELS, normalizeOpportunityDecision } from "./jobDecision.mjs";
 import { normalizeComparisonIds, summarizeOpportunityForComparison } from "./jobComparison.mjs";
@@ -51,8 +52,11 @@ export async function deriveCapabilities(context) {
   const facts = (await pool.query('SELECT f.id,f."sourceId",f.statement,f."sourceExcerpt",f."scopeStatement",f."factType",s."sourceType" FROM "CareerFact" f JOIN "CareerSource" s ON s.id=f."sourceId" AND s."tenantId"=f."tenantId" WHERE f."tenantId"=$1 AND f."userId"=$2 AND f."profileId"=$3 AND f."authorityState"=$4 ORDER BY f."createdAt"', [context.tenant.id, context.user.id, profile, "CUSTOMER_CONFIRMED_SOURCE_BACKED"])).rows;
   const candidates = deriveCapabilityCandidates(facts);
   const factsById = new Map(facts.map((fact) => [fact.id, fact]));
+  const existingAuthorities = new Map((await pool.query('SELECT "capabilityKey","authorityState",provenance FROM "CareerCapabilityAuthority" WHERE "tenantId"=$1 AND "userId"=$2 AND "profileId"=$3', [context.tenant.id, context.user.id, profile])).rows.map((row) => [row.capabilityKey, row]));
   for (const candidate of candidates) {
-    await pool.query('INSERT INTO "CareerCapabilityAuthority" ("id","tenantId","userId","profileId","capabilityKey",label,domain,scope,"authorityState",provenance,"taxonomyVersion","updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,NOW()) ON CONFLICT ("tenantId","profileId","capabilityKey") DO UPDATE SET provenance=EXCLUDED.provenance,"taxonomyVersion"=EXCLUDED."taxonomyVersion","updatedAt"=NOW()', [id("capability"), context.tenant.id, context.user.id, profile, candidate.capabilityKey, candidate.label, candidate.domain, candidate.scope, candidate.authorityState, JSON.stringify(candidate.provenance), candidate.taxonomyVersion]);
+    const existing = existingAuthorities.get(candidate.capabilityKey);
+    const authorityState = refreshCapabilityAuthorityState(existing, candidate);
+    await pool.query('INSERT INTO "CareerCapabilityAuthority" ("id","tenantId","userId","profileId","capabilityKey",label,domain,scope,"authorityState",provenance,"taxonomyVersion","updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,NOW()) ON CONFLICT ("tenantId","profileId","capabilityKey") DO UPDATE SET "authorityState"=EXCLUDED."authorityState",provenance=EXCLUDED.provenance,"taxonomyVersion"=EXCLUDED."taxonomyVersion","updatedAt"=NOW()', [id("capability"), context.tenant.id, context.user.id, profile, candidate.capabilityKey, candidate.label, candidate.domain, candidate.scope, authorityState, JSON.stringify(candidate.provenance), candidate.taxonomyVersion]);
   }
   const rows = (await pool.query('SELECT * FROM "CareerCapabilityAuthority" WHERE "tenantId"=$1 AND "userId"=$2 AND "profileId"=$3 ORDER BY "label"', [context.tenant.id, context.user.id, profile])).rows;
   const decisions = await activeDecisions(pool, context, rows.map((row) => row.id));
@@ -442,7 +446,7 @@ export async function getCapabilityProfile(context) {
     const key = capability.authorityState === "VERIFIED_DIRECT" ? "direct" : capability.authorityState === "VERIFIED_TRANSFERABLE" ? "transferable" : capability.authorityState === "PARTIALLY_SUPPORTED" ? "partial" : "unresolved";
     categories[key].push(capability);
   }
-  const reviewed = data.capabilities.filter((item) => item.decision).length;
+  const reviewed = data.capabilities.filter((item) => !capabilityNeedsReview(item)).length;
   return { ...data, categories, progress: { reviewed, total: data.capabilities.length }, leverage: { decisionsAsked: reviewed, capabilitiesResolved: reviewed, requirementsInformed: null, note: "Opportunity-specific requirements are measured after a job is supplied." } };
 }
 

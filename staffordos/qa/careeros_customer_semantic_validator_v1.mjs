@@ -14,6 +14,7 @@ const intakeSourcePath = `${root}/app/api/career/intake/source/route.ts`;
 const productPath = `${root}/lib/career/careerP0Product.mjs`;
 const storyDraftPersistencePath = `${root}/lib/career/storyDraftPersistence.mjs`;
 const capabilitiesPath = `${root}/app/career/capabilities/page.tsx`;
+const capabilityReviewPath = `${root}/lib/career/capabilityReview.mjs`;
 const homePath = `${root}/app/career/page.tsx`;
 const discoverPath = `${root}/app/career/discover/DiscoverClient.tsx`;
 const discoverApiPath = `${root}/app/api/career/discover/route.ts`;
@@ -37,6 +38,7 @@ const intakeSource = read(intakeSourcePath);
 const product = read(productPath);
 const storyDraftPersistence = read(storyDraftPersistencePath);
 const capabilities = read(capabilitiesPath);
+const capabilityReview = read(capabilityReviewPath);
 const home = read(homePath);
 const discover = read(discoverPath);
 const discoverApi = read(discoverApiPath);
@@ -62,6 +64,7 @@ const checks = {
   career_story_authority_exists: /CAREER_STORY/.test(authority) && /CareerFactCandidate/.test(authority),
   evidence_authority_exists: /CAREER_EVIDENCE/.test(authority) && /CareerFact and source provenance/.test(authority),
   capability_authority_separate: /CAPABILITY_AUTHORITY/.test(authority) && /CareerCapabilityAuthority/.test(authority),
+  capability_refresh_reopens_new_confirmed_evidence: /NEW_CONFIRMED_FACT_PROVENANCE_REOPENS_CAPABILITY_REVIEW/.test(authority) && /refreshCapabilityAuthorityState/.test(product) && /capabilityNeedsReview/.test(capabilityReview) && /NEEDS_MORE_EVIDENCE/.test(capabilityReview),
   derived_capability_proposition_is_restricted: /DERIVED_CAPABILITY_PROPOSITION/.test(authority) && /confirmed CareerFacts/.test(authority),
   customer_authorized_capability_is_decision_bound: /CUSTOMER_AUTHORIZED_CAPABILITY/.test(authority) && /CareerCapabilityDecision/.test(authority),
   application_artifact_authority_separate: /APPLICATION_ARTIFACTS/.test(authority) && /CareerResumeDraft/.test(authority),

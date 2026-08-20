@@ -201,6 +201,13 @@ export function decisionStateForAnswer(answer) {
   return ({ DIRECT: "VERIFIED_DIRECT", TRANSFERABLE: "VERIFIED_TRANSFERABLE", PARTIAL: "PARTIALLY_SUPPORTED", NOT_SUPPORTED: "NOT_SUPPORTED", KEEP_UNRESOLVED: "KEEP_UNRESOLVED" })[answer] || null;
 }
 
+export function refreshCapabilityAuthorityState(existing, candidate) {
+  if (!existing) return candidate.authorityState;
+  const existingFactIds = new Set(Array.isArray(existing.provenance?.factIds) ? existing.provenance.factIds : []);
+  const addedEvidence = (Array.isArray(candidate.provenance?.factIds) ? candidate.provenance.factIds : []).some((factId) => !existingFactIds.has(factId));
+  return addedEvidence ? "NEEDS_MORE_EVIDENCE" : existing.authorityState;
+}
+
 export function choiceLabel(answer) {
   return ({ DIRECT: "Yes, this is directly demonstrated", TRANSFERABLE: "I have closely related experience", PARTIAL: "I have experience with part of this", NOT_SUPPORTED: "No, this does not describe my experience", KEEP_UNRESOLVED: "I need more context" })[answer] || answer;
 }

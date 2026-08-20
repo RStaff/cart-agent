@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { capabilityQuestionForEvidence, deriveCapabilityCandidates, decisionStateForAnswer, listCapabilities } from "./capabilityCatalog.mjs";
+import { capabilityQuestionForEvidence, deriveCapabilityCandidates, decisionStateForAnswer, listCapabilities, refreshCapabilityAuthorityState } from "./capabilityCatalog.mjs";
 import { parseJobDescription } from "./jobProduct.mjs";
 
 const evidenceFixtures = [
@@ -105,6 +105,12 @@ test("unconfirmed evidence cannot derive capability propositions", () => {
   assert.deepEqual(derived, []);
 });
 
+test("rejected and deferred candidates cannot derive capability propositions", () => {
+  for (const status of ["REJECTED", "NEEDS_REVIEW"]) {
+    assert.deepEqual(deriveCapabilityCandidates([{ id: `candidate-${status}`, sourceId: "source-1", factType: "PROJECT", statement: "Managed a cross-functional migration.", status }]), []);
+  }
+});
+
 test("interviewer questions cannot derive capability propositions", () => {
   const derived = deriveCapabilityCandidates([{ id: "prompt-1", sourceId: "source-1", factType: "PROJECT", statement: "What did you personally do in this experience?", authorityState: "CUSTOMER_CONFIRMED_SOURCE_BACKED" }]);
   assert.deepEqual(derived, []);
@@ -115,4 +121,10 @@ test("capability questions explain themselves from confirmed evidence", () => {
   assert.match(prompt, /confirmed evidence/i);
   assert.match(prompt, /Coordinated developers, marketing, and senior team/);
   assert.match(prompt, /Have you coordinated work/);
+});
+
+test("new confirmed fact provenance reopens prior capability authority without changing its decision", () => {
+  const existing = { authorityState: "VERIFIED_DIRECT", provenance: { factIds: ["old-fact"] } };
+  const candidate = { authorityState: "NEEDS_MORE_EVIDENCE", provenance: { factIds: ["old-fact", "new-fact"] } };
+  assert.equal(refreshCapabilityAuthorityState(existing, candidate), "NEEDS_MORE_EVIDENCE");
 });

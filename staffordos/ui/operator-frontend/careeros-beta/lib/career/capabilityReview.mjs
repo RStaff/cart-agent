@@ -1,5 +1,9 @@
+export function capabilityNeedsReview(item) {
+  return !item?.decision?.answer || item.authorityState === "NEEDS_MORE_EVIDENCE";
+}
+
 export function unreviewedCapabilityCount(items = []) {
-  return items.filter((item) => !item?.decision?.answer).length;
+  return items.filter(capabilityNeedsReview).length;
 }
 
 export function capabilityReviewComplete(items = []) {
