@@ -1,11 +1,11 @@
 {
   "schema": "staffordos.operator_observation.v1",
-  "generated_at": "2026-08-20T19:24:00.146Z",
+  "generated_at": "2026-08-20T19:27:09.674Z",
   "system": "staffordos",
   "mode": "safe_observation",
   "status": "observed",
   "purpose": "Persistent operator safe execution proof",
-  "loops_observed": 20,
+  "loops_observed": 21,
   "proof": {
     "command_was_real": true,
     "command_was_safe": true,
