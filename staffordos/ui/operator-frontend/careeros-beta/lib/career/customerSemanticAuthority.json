@@ -71,6 +71,19 @@
     "authoritativeSource": "CareerFactCandidate status",
     "notes": "Candidate facts must be visibly proposed and reviewed before appearing as confirmed profile truth."
   },
+  "TESTIMONY_REVIEW_CONTINUITY": {
+    "semanticKey": "TESTIMONY_REVIEW_CONTINUITY",
+    "status": "REQUIRED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerStoryBuilder -> CareerSource -> CareerFactCandidate -> customer review",
+    "allowedLabels": ["Here’s what CareerOS understood", "Review proposed experience", "Review strengths"],
+    "invariants": [
+      "SUBMITTED_TESTIMONY_EXPOSES_CANDIDATE_REVIEW",
+      "CANDIDATES_REMAIN_UNCONFIRMED_UNTIL_CUSTOMER_REVIEW",
+      "REVIEW_STRENGTHS_DOES_NOT_BYPASS_PENDING_CANDIDATE_REVIEW",
+      "CAPABILITIES_USE_CONFIRMED_CAREER_FACTS_ONLY"
+    ]
+  },
   "SURFACE_SEPARATION": {
     "semanticKey": "SURFACE_SEPARATION",
     "status": "REQUIRED",

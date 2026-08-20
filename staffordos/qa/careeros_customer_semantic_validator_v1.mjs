@@ -8,6 +8,10 @@ const jobsPath = `${root}/app/career/jobs/page.tsx`;
 const comparePath = `${root}/app/career/jobs/compare/page.tsx`;
 const profilePath = `${root}/app/career/profile/page.tsx`;
 const storyPath = `${root}/app/career/onboarding/page.tsx`;
+const storyBuilderPath = `${root}/app/career/components/CareerStoryBuilder.tsx`;
+const intakeReviewPath = `${root}/app/career/components/IntakeReview.tsx`;
+const intakeSourcePath = `${root}/app/api/career/intake/source/route.ts`;
+const productPath = `${root}/lib/career/careerP0Product.mjs`;
 const homePath = `${root}/app/career/page.tsx`;
 const discoverPath = `${root}/app/career/discover/DiscoverClient.tsx`;
 const discoverApiPath = `${root}/app/api/career/discover/route.ts`;
@@ -25,6 +29,10 @@ const jobs = read(jobsPath);
 const compare = read(comparePath);
 const profile = read(profilePath);
 const story = read(storyPath);
+const storyBuilder = read(storyBuilderPath);
+const intakeReview = read(intakeReviewPath);
+const intakeSource = read(intakeSourcePath);
+const product = read(productPath);
 const home = read(homePath);
 const discover = read(discoverPath);
 const discoverApi = read(discoverApiPath);
@@ -55,6 +63,12 @@ const checks = {
   profile_has_story_destination: /href="\/career\/onboarding"/.test(profile) && /Career Story/.test(profile),
   story_renders_story_builder: /CareerStoryBuilder/.test(story) && /Career Story/.test(story),
   story_has_profile_and_home_destinations: /href="\/career\/profile"/.test(story) && /href="\/career"/.test(story),
+  testimony_continuity_authority_exists: /TESTIMONY_REVIEW_CONTINUITY/.test(authority),
+  submitted_testimony_exposes_review: /Review what CareerOS understands/.test(storyBuilder + intakeReview) && /setMode\("PASTE_OR_TYPE"\)/.test(storyBuilder) && /focusReview/.test(storyBuilder),
+  candidates_are_explicitly_unconfirmed: /not confirmed yet/.test(intakeReview) && /Review proposed experience/.test(intakeReview),
+  strengths_does_not_bypass_pending_review: /hasReviewableCandidates/.test(storyBuilder) && /Review proposed experience/.test(storyBuilder) && /href="\/career\/capabilities"/.test(storyBuilder),
+  testimony_uses_existing_source_candidate_path: /careerP0Store\.createSource/.test(intakeSource) && /careerP0Store\.saveCandidates/.test(intakeSource),
+  capabilities_remain_confirmed_fact_only: /CUSTOMER_CONFIRMED_SOURCE_BACKED/.test(product) && /deriveCapabilityCandidates\(facts\)/.test(product),
   home_has_distinct_profile_and_story_destinations: /href="\/career\/profile"/.test(home) && /storyHref\s*=\s*"\/career\/onboarding"/.test(home) && /href=\{storyHref\}/.test(home),
   discovery_authority_exists: /SEARCH_PREFERENCE/.test(authority) && /PROVIDER_RESULT/.test(authority) && /TRIAGE_STATUS/.test(authority),
   auto_import_prohibited: /AUTO_IMPORT/.test(authority) && /PROHIBITED/.test(authority) && /BACKGROUND_SEARCH/.test(authority) && /NOT_AUTHORIZED/.test(authority),
