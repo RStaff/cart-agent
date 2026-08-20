@@ -3,11 +3,10 @@
 import { useEffect, useState } from "react";
 import { IntakeReview } from "./IntakeReview";
 import { VoiceRecorder } from "./VoiceRecorder";
+import { assembleStoryDraft, draftStorageKey, restoreStoryDraft, serializeStoryDraft, skipStoryQuestion } from "../../../lib/career/storyDraftPersistence.mjs";
 
 type Mode = "PASTE_OR_TYPE" | "DOCUMENT" | "TALK";
 type InputMode = "VOICE" | "TEXT";
-type PersistedStoryDraft = { experienceContext: string; talkAnswers: Array<string | null>; inputModes: Array<InputMode | null>; questionIndex: number; interviewReview: boolean; updatedAt: string };
-const draftStoragePrefix = "careeros.story-draft.v1:";
 const followUps = [
   "What did you personally do in this experience?",
   "What did you own, and what did you support in this experience?",
@@ -42,10 +41,9 @@ export function CareerStoryBuilder() {
   const [draftLoaded, setDraftLoaded] = useState(false);
   const [draftSaveState, setDraftSaveState] = useState<"UNKNOWN" | "SAVED_ON_DEVICE" | "UNAVAILABLE">("UNKNOWN");
 
-  function draftSnapshot(): PersistedStoryDraft { return { experienceContext, talkAnswers, inputModes, questionIndex, interviewReview, updatedAt: new Date().toISOString() }; }
   function persistDraft() {
     if (!draftKey) return false;
-    try { localStorage.setItem(draftKey, JSON.stringify(draftSnapshot())); setDraftSaveState("SAVED_ON_DEVICE"); return true; } catch { setDraftSaveState("UNAVAILABLE"); return false; }
+    try { localStorage.setItem(draftKey, serializeStoryDraft({ experienceContext, talkAnswers, inputModes, questionIndex, interviewReview })); setDraftSaveState("SAVED_ON_DEVICE"); return true; } catch { setDraftSaveState("UNAVAILABLE"); return false; }
   }
   function saveAndReturnHome() { if (persistDraft()) window.location.assign("/career"); else setFeedback("This draft could not be saved on this device."); }
 
@@ -54,17 +52,17 @@ export function CareerStoryBuilder() {
     if (storyResponse.ok) setStatus((await storyResponse.json()).story?.storyStatus || "CURRENT_FACTS_REVIEWED");
     if (profileResponse.ok) {
       const profile = (await profileResponse.json()).profile;
-      const key = profile?.id ? `${draftStoragePrefix}${profile.id}` : null;
+      const key = profile?.id ? draftStorageKey(profile.id) : null;
       setDraftKey(key);
       if (key) {
         try {
-          const saved = JSON.parse(localStorage.getItem(key) || "null") as Partial<PersistedStoryDraft> | null;
-          if (saved?.experienceContext && Array.isArray(saved.talkAnswers) && Array.isArray(saved.inputModes)) {
+          const saved = restoreStoryDraft(localStorage.getItem(key), followUps.length);
+          if (saved.experienceContext) {
             setExperienceContext(saved.experienceContext);
-            setTalkAnswers(saved.talkAnswers.slice(0, followUps.length));
-            setInputModes(saved.inputModes.slice(0, followUps.length));
-            setQuestionIndex(Math.min(Math.max(Number(saved.questionIndex) || 0, 0), followUps.length - 1));
-            setInterviewReview(Boolean(saved.interviewReview));
+            setTalkAnswers(saved.talkAnswers);
+            setInputModes(saved.inputModes);
+            setQuestionIndex(saved.questionIndex);
+            setInterviewReview(saved.interviewReview);
             setMode("TALK");
             setDraftSaveState("SAVED_ON_DEVICE");
           }
@@ -76,7 +74,7 @@ export function CareerStoryBuilder() {
   useEffect(() => { refresh(); }, []);
   useEffect(() => {
     if (!draftKey || !draftLoaded) return;
-    try { localStorage.setItem(draftKey, JSON.stringify(draftSnapshot())); } catch { setDraftSaveState("UNAVAILABLE"); }
+    try { localStorage.setItem(draftKey, serializeStoryDraft({ experienceContext, talkAnswers, inputModes, questionIndex, interviewReview })); } catch { setDraftSaveState("UNAVAILABLE"); }
   }, [draftKey, draftLoaded, experienceContext, talkAnswers, inputModes, questionIndex, interviewReview]);
 
   async function setStoryStatus(action: "COMPLETE_FOR_NOW" | "REOPEN") {
@@ -84,11 +82,7 @@ export function CareerStoryBuilder() {
     if (response.ok) { setStatus((await response.json()).story?.storyStatus); setMessage(action === "COMPLETE_FOR_NOW" ? "Your story is marked complete for now. You can add more experience whenever you want." : "Your story is open for more experience."); }
   }
 
-  function talkDraft() {
-    const context = experienceContext.trim() ? `Experience context\n${experienceContext.trim()}` : "";
-    const answers = followUps.map((prompt, index) => talkAnswers[index]?.trim() ? `${prompt}\n${talkAnswers[index]?.trim()}` : "").filter(Boolean);
-    return [context, ...answers].filter(Boolean).join("\n\n");
-  }
+  function talkDraft() { return assembleStoryDraft({ experienceContext, talkAnswers, followUps }); }
   function loadQuestion(index: number, nextInputMode: InputMode = "VOICE") { setQuestionIndex(index); setInputMode(nextInputMode); setDraftAnswer(talkAnswers[index] || ""); setTranscriptDraft(""); setFeedback(""); }
   function keepContext() {
     const context = (contextTranscript || contextDraft).trim();
@@ -104,7 +98,7 @@ export function CareerStoryBuilder() {
     setTranscriptDraft(""); setFeedback("Answer kept. This story is still a draft.");
     if (questionIndex < followUps.length - 1) loadQuestion(questionIndex + 1); else setInterviewReview(true);
   }
-  function skipQuestion() { setTalkAnswers((current) => current.map((value, index) => index === questionIndex ? null : value)); setInputModes((current) => current.map((value, index) => index === questionIndex ? null : value)); setFeedback("Skipped for now. Skipping is not treated as a negative answer."); if (questionIndex < followUps.length - 1) loadQuestion(questionIndex + 1); else setInterviewReview(true); }
+  function skipQuestion() { setTalkAnswers((current) => skipStoryQuestion(current, questionIndex)); setInputModes((current) => current.map((value, index) => index === questionIndex && !talkAnswers[index] ? null : value)); setFeedback(talkAnswers[questionIndex] ? "Your kept answer is retained. Moving on." : "Skipped for now. Skipping is not treated as a negative answer."); if (questionIndex < followUps.length - 1) loadQuestion(questionIndex + 1); else setInterviewReview(true); }
   function previousQuestion() { if (questionIndex > 0) loadQuestion(questionIndex - 1); }
   function editAnswer(index: number) { setInterviewReview(false); loadQuestion(index, "TEXT"); }
 

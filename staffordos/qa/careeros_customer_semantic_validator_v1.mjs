@@ -12,6 +12,7 @@ const storyBuilderPath = `${root}/app/career/components/CareerStoryBuilder.tsx`;
 const intakeReviewPath = `${root}/app/career/components/IntakeReview.tsx`;
 const intakeSourcePath = `${root}/app/api/career/intake/source/route.ts`;
 const productPath = `${root}/lib/career/careerP0Product.mjs`;
+const storyDraftPersistencePath = `${root}/lib/career/storyDraftPersistence.mjs`;
 const capabilitiesPath = `${root}/app/career/capabilities/page.tsx`;
 const homePath = `${root}/app/career/page.tsx`;
 const discoverPath = `${root}/app/career/discover/DiscoverClient.tsx`;
@@ -34,6 +35,7 @@ const storyBuilder = read(storyBuilderPath);
 const intakeReview = read(intakeReviewPath);
 const intakeSource = read(intakeSourcePath);
 const product = read(productPath);
+const storyDraftPersistence = read(storyDraftPersistencePath);
 const capabilities = read(capabilitiesPath);
 const home = read(homePath);
 const discover = read(discoverPath);
@@ -70,6 +72,7 @@ const checks = {
   candidates_are_explicitly_unconfirmed: /not confirmed yet/.test(intakeReview) && /Review proposed experience/.test(intakeReview),
   active_interview_blocks_strengths: /ACTIVE_INTERVIEW_DOES_NOT_EXPOSE_CAPABILITY_REVIEW/.test(authority) && /const interviewActive = mode === "TALK"/.test(storyBuilder) && /interviewActive\s*\?\s*<[\s\S]*Finish &amp; submit story/.test(storyBuilder),
   active_interview_has_submission_and_safe_exit: /Finish &amp; submit story/.test(storyBuilder) && /Save draft and return Home/.test(storyBuilder) && /submitTalk/.test(storyBuilder),
+  kept_answer_round_trip_uses_canonical_helpers: /serializeStoryDraft/.test(storyBuilder) && /restoreStoryDraft/.test(storyBuilder) && /assembleStoryDraft/.test(storyBuilder) && /skipStoryQuestion/.test(storyBuilder) && /export function restoreStoryDraft/.test(storyDraftPersistence),
   strengths_does_not_bypass_pending_review: /hasReviewableCandidates/.test(storyBuilder) && /Review proposed experience/.test(storyBuilder) && /href="\/career\/capabilities"/.test(storyBuilder),
   testimony_uses_existing_source_candidate_path: /careerP0Store\.createSource/.test(intakeSource) && /careerP0Store\.saveCandidates/.test(intakeSource),
   capabilities_remain_confirmed_fact_only: /CUSTOMER_CONFIRMED_SOURCE_BACKED/.test(product) && /deriveCapabilityCandidates\(facts\)/.test(product),
