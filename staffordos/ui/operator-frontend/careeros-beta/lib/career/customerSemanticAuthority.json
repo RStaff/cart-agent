@@ -57,6 +57,20 @@
     "allowedSurface": "/career/capabilities",
     "notes": "Capability review remains separate from profile identity and raw story intake."
   },
+  "DERIVED_CAPABILITY_PROPOSITION": {
+    "semanticKey": "DERIVED_CAPABILITY_PROPOSITION",
+    "status": "RESTRICTED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerCapabilityAuthority provenance from confirmed CareerFacts",
+    "notes": "A derived proposition is not customer-authorized until an explicit CareerCapabilityDecision exists."
+  },
+  "CUSTOMER_AUTHORIZED_CAPABILITY": {
+    "semanticKey": "CUSTOMER_AUTHORIZED_CAPABILITY",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerCapabilityDecision and CareerCapabilityAuthority.authorityState",
+    "notes": "Only an explicit customer decision authorizes a capability; NOT_SUPPORTED and KEEP_UNRESOLVED remain unresolved for matching."
+  },
   "APPLICATION_ARTIFACTS": {
     "semanticKey": "APPLICATION_ARTIFACTS",
     "status": "AUTHORIZED",

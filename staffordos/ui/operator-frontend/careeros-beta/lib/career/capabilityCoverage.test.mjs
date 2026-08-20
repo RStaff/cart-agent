@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { deriveCapabilityCandidates, decisionStateForAnswer, listCapabilities } from "./capabilityCatalog.mjs";
+import { capabilityQuestionForEvidence, deriveCapabilityCandidates, decisionStateForAnswer, listCapabilities } from "./capabilityCatalog.mjs";
 import { parseJobDescription } from "./jobProduct.mjs";
 
 const evidenceFixtures = [
@@ -12,7 +12,7 @@ const evidenceFixtures = [
 ];
 
 test("new capability concepts derive only from confirmed fact-shaped evidence and retain provenance", () => {
-  const facts = evidenceFixtures.map(([expectedKey, statement], index) => ({ id: `fact-${index}`, sourceId: `source-${index}`, factType: "OTHER", statement, expectedKey }));
+  const facts = evidenceFixtures.map(([expectedKey, statement], index) => ({ id: `fact-${index}`, sourceId: `source-${index}`, factType: "OTHER", statement, expectedKey, authorityState: "CUSTOMER_CONFIRMED_SOURCE_BACKED" }));
   const derived = deriveCapabilityCandidates(facts);
   for (const [expectedKey, statement] of evidenceFixtures) {
     const capability = derived.find((item) => item.capabilityKey === expectedKey);
@@ -81,7 +81,7 @@ test("planning and product-strategy wording does not become unsupported capabili
 });
 
 test("entrepreneurship remains an operations signal rather than a new authority concept", () => {
-  const derived = deriveCapabilityCandidates([{ id: "fact-business", sourceId: "source-business", factType: "PROJECT", statement: "Built and operated a small business, managing vendors and revenue planning." }]);
+  const derived = deriveCapabilityCandidates([{ id: "fact-business", sourceId: "source-business", factType: "PROJECT", statement: "Built and operated a small business, managing vendors and revenue planning.", authorityState: "CUSTOMER_CONFIRMED_SOURCE_BACKED" }]);
   assert.ok(derived.some((item) => item.capabilityKey === "BUSINESS_PROCESS_OPERATIONS"));
   assert.ok(derived.some((item) => item.capabilityKey === "OUTCOME_DELIVERY"));
   assert.equal(derived.some((item) => item.capabilityKey === "ENTREPRENEURSHIP_BUSINESS_OWNERSHIP"), false);
@@ -97,5 +97,22 @@ test("specialist requirements remain specialist and unsupported evidence stays u
 test("existing capability concepts and customer review states remain available", () => {
   const keys = listCapabilities().map((item) => item.key);
   for (const key of ["PROGRAM_DELIVERY", "CROSS_FUNCTIONAL_COORDINATION", "TECHNOLOGY_IMPLEMENTATION", "OUTCOME_DELIVERY", "PEOPLE_MANAGEMENT"]) assert.ok(keys.includes(key));
-  for (const answer of ["DIRECT", "TRANSFERABLE", "PARTIAL", "KEEP_UNRESOLVED"]) assert.ok(decisionStateForAnswer(answer));
+  for (const answer of ["DIRECT", "TRANSFERABLE", "PARTIAL", "NOT_SUPPORTED", "KEEP_UNRESOLVED"]) assert.ok(decisionStateForAnswer(answer));
+});
+
+test("unconfirmed evidence cannot derive capability propositions", () => {
+  const derived = deriveCapabilityCandidates([{ id: "candidate-1", sourceId: "source-1", factType: "PROJECT", statement: "Managed a cross-functional migration.", status: "PROPOSED" }]);
+  assert.deepEqual(derived, []);
+});
+
+test("interviewer questions cannot derive capability propositions", () => {
+  const derived = deriveCapabilityCandidates([{ id: "prompt-1", sourceId: "source-1", factType: "PROJECT", statement: "What did you personally do in this experience?", authorityState: "CUSTOMER_CONFIRMED_SOURCE_BACKED" }]);
+  assert.deepEqual(derived, []);
+});
+
+test("capability questions explain themselves from confirmed evidence", () => {
+  const prompt = capabilityQuestionForEvidence({ label: "Cross-functional coordination", question: { prompt: "Have you coordinated work?" } }, ["Coordinated developers, marketing, and senior team."]);
+  assert.match(prompt, /confirmed evidence/i);
+  assert.match(prompt, /Coordinated developers, marketing, and senior team/);
+  assert.match(prompt, /Have you coordinated work/);
 });

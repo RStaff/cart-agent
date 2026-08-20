@@ -10,7 +10,7 @@ const CATALOG = [
       key: "PROGRAM_DELIVERY_SCOPE",
       prompt: "Have you personally owned cross-functional programs from planning through delivery, including sequencing, stakeholders, and outcomes?",
       uncertainty: "program-level ownership and delivery scope",
-      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "KEEP_UNRESOLVED"],
+      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "NOT_SUPPORTED", "KEEP_UNRESOLVED"],
     },
   },
   {
@@ -22,7 +22,7 @@ const CATALOG = [
       key: "CROSS_FUNCTIONAL_SCOPE",
       prompt: "Have you coordinated work across different teams or stakeholder groups to deliver a shared outcome?",
       uncertainty: "cross-functional coordination and stakeholder scope",
-      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "KEEP_UNRESOLVED"],
+      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "NOT_SUPPORTED", "KEEP_UNRESOLVED"],
     },
   },
   {
@@ -34,7 +34,7 @@ const CATALOG = [
       key: "TECHNOLOGY_IMPLEMENTATION_AUTHORITY",
       prompt: "Have you personally implemented or improved a technology, platform, automation, or technical workflow in a real operating environment?",
       uncertainty: "hands-on implementation authority and operating context",
-      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "KEEP_UNRESOLVED"],
+      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "NOT_SUPPORTED", "KEEP_UNRESOLVED"],
     },
   },
   {
@@ -46,7 +46,7 @@ const CATALOG = [
       key: "OUTCOME_DELIVERY_EVIDENCE",
       prompt: "Have you delivered a measurable improvement, launch, saving, growth result, or other outcome that you can describe?",
       uncertainty: "measurable outcome ownership",
-      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "KEEP_UNRESOLVED"],
+      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "NOT_SUPPORTED", "KEEP_UNRESOLVED"],
     },
   },
   {
@@ -58,7 +58,7 @@ const CATALOG = [
       key: "PEOPLE_MANAGEMENT_AUTHORITY",
       prompt: "Have you directly managed people, including responsibility for hiring, performance, coaching, or team development?",
       uncertainty: "formal people-management authority",
-      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "KEEP_UNRESOLVED"],
+      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "NOT_SUPPORTED", "KEEP_UNRESOLVED"],
     },
   },
   {
@@ -70,7 +70,7 @@ const CATALOG = [
       key: "TEACHING_TRAINING_AUTHORITY",
       prompt: "Have you personally taught, trained, coached, facilitated, or enabled people to use a skill, process, or system?",
       uncertainty: "teaching, training, and enablement scope",
-      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "KEEP_UNRESOLVED"],
+      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "NOT_SUPPORTED", "KEEP_UNRESOLVED"],
     },
   },
   {
@@ -82,7 +82,7 @@ const CATALOG = [
       key: "ANALYTICS_REPORTING_AUTHORITY",
       prompt: "Have you created analysis, dashboards, reporting, or measurements that helped people understand performance or make decisions?",
       uncertainty: "analytics, reporting, and measurement scope",
-      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "KEEP_UNRESOLVED"],
+      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "NOT_SUPPORTED", "KEEP_UNRESOLVED"],
     },
   },
   {
@@ -94,7 +94,7 @@ const CATALOG = [
       key: "CONSULTING_CLIENT_DELIVERY_AUTHORITY",
       prompt: "Have you advised clients or customers and delivered work, implementations, or outcomes for them?",
       uncertainty: "consulting, advisory, and client-delivery scope",
-      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "KEEP_UNRESOLVED"],
+      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "NOT_SUPPORTED", "KEEP_UNRESOLVED"],
     },
   },
   {
@@ -106,7 +106,7 @@ const CATALOG = [
       key: "BUSINESS_PROCESS_OPERATIONS_AUTHORITY",
       prompt: "Have you managed or improved business operations, workflows, processes, vendors, or operational systems?",
       uncertainty: "business and process operations scope",
-      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "KEEP_UNRESOLVED"],
+      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "NOT_SUPPORTED", "KEEP_UNRESOLVED"],
     },
   },
   {
@@ -118,7 +118,7 @@ const CATALOG = [
       key: "MARKETING_DIGITAL_AUTHORITY",
       prompt: "Have you led or delivered digital marketing, campaigns, marketing technology, CRM marketing, content, SEO, or paid media work?",
       uncertainty: "marketing and digital-work scope",
-      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "KEEP_UNRESOLVED"],
+      choices: ["DIRECT", "TRANSFERABLE", "PARTIAL", "NOT_SUPPORTED", "KEEP_UNRESOLVED"],
     },
   },
 ];
@@ -139,9 +139,16 @@ function hasPeopleAuthority(statement) {
   return /direct reports|people manager|managed people|hiring|performance review|performance management|team development/i.test(statement);
 }
 
+function isConfirmedCustomerEvidence(fact) {
+  if (String(fact.authorityState || "").toUpperCase() !== "CUSTOMER_CONFIRMED_SOURCE_BACKED") return false;
+  const statement = statementText(fact);
+  return Boolean(statement) && !/[?]\s*$/.test(statement) && !/^(what|how|why|have you|tell me|describe)\b/i.test(statement);
+}
+
 export function deriveCapabilityCandidates(facts) {
   const byKey = new Map();
   for (const fact of facts || []) {
+    if (!isConfirmedCustomerEvidence(fact)) continue;
     const statement = statementText(fact);
     const type = String(fact.factType || "").toUpperCase();
     const candidates = [];
@@ -191,9 +198,16 @@ export function deriveCapabilityCandidates(facts) {
 }
 
 export function decisionStateForAnswer(answer) {
-  return ({ DIRECT: "VERIFIED_DIRECT", TRANSFERABLE: "VERIFIED_TRANSFERABLE", PARTIAL: "PARTIALLY_SUPPORTED", KEEP_UNRESOLVED: "KEEP_UNRESOLVED" })[answer] || null;
+  return ({ DIRECT: "VERIFIED_DIRECT", TRANSFERABLE: "VERIFIED_TRANSFERABLE", PARTIAL: "PARTIALLY_SUPPORTED", NOT_SUPPORTED: "NOT_SUPPORTED", KEEP_UNRESOLVED: "KEEP_UNRESOLVED" })[answer] || null;
 }
 
 export function choiceLabel(answer) {
-  return ({ DIRECT: "Yes, this is directly demonstrated", TRANSFERABLE: "I have closely related experience", PARTIAL: "I have experience with part of this", KEEP_UNRESOLVED: "Keep this unresolved for now" })[answer] || answer;
+  return ({ DIRECT: "Yes, this is directly demonstrated", TRANSFERABLE: "I have closely related experience", PARTIAL: "I have experience with part of this", NOT_SUPPORTED: "No, this does not describe my experience", KEEP_UNRESOLVED: "I need more context" })[answer] || answer;
+}
+
+export function capabilityQuestionForEvidence(capability, evidenceStatements = []) {
+  const context = [...new Set(evidenceStatements.map((item) => String(item || "").replace(/\s+/g, " ").trim()).filter(Boolean))].slice(0, 2).map((item) => item.slice(0, 240)).join(" ");
+  return context
+    ? `CareerOS sees confirmed evidence: “${context}” ${capability.question.prompt}`
+    : `CareerOS is asking because this capability is not yet established from confirmed evidence. ${capability.question.prompt}`;
 }

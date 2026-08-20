@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import { careerP0Pool } from "./careerP0Auth";
-import { CAREEROS_CAPABILITY_TAXONOMY_VERSION, capabilityForKey, decisionStateForAnswer, deriveCapabilityCandidates, listCapabilities } from "./capabilityCatalog.mjs";
+import { CAREEROS_CAPABILITY_TAXONOMY_VERSION, capabilityForKey, capabilityQuestionForEvidence, decisionStateForAnswer, deriveCapabilityCandidates, listCapabilities } from "./capabilityCatalog.mjs";
 import { parseJobDescription } from "./jobProduct.mjs";
 import { CAREEROS_OPPORTUNITY_DECISION_LABELS, normalizeOpportunityDecision } from "./jobDecision.mjs";
 import { normalizeComparisonIds, summarizeOpportunityForComparison } from "./jobComparison.mjs";
@@ -32,9 +32,10 @@ async function transaction(pool, work) {
   try { await client.query("BEGIN"); const value = await work(client); await client.query("COMMIT"); return value; } catch (error) { await client.query("ROLLBACK"); throw error; } finally { client.release(); }
 }
 
-function publicCapability(row, decision = null) {
+function publicCapability(row, decision = null, supportingEvidence = []) {
   const catalog = capabilityForKey(row.capabilityKey);
-  return { id: row.id, key: row.capabilityKey, label: row.label, domain: row.domain, scope: row.scope, authorityState: row.authorityState, version: row.version, provenance: { factCount: row.provenance?.factIds?.length || 0, sourceCount: row.provenance?.sourceIds?.length || 0 }, question: catalog?.question || null, decision: decision ? { answer: decision.answer, decisionState: decision.decisionState, createdAt: decision.createdAt } : null };
+  const question = catalog?.question ? { ...catalog.question, prompt: capabilityQuestionForEvidence(catalog, supportingEvidence.map((item) => item.statement)) } : null;
+  return { id: row.id, key: row.capabilityKey, label: row.label, domain: row.domain, scope: row.scope, authorityState: row.authorityState, version: row.version, provenance: { factCount: row.provenance?.factIds?.length || 0, sourceCount: row.provenance?.sourceIds?.length || 0 }, supportingEvidence, question, decision: decision ? { answer: decision.answer, decisionState: decision.decisionState, createdAt: decision.createdAt } : null };
 }
 
 async function activeDecisions(pool, context, capabilityIds = []) {
@@ -47,14 +48,18 @@ export async function deriveCapabilities(context) {
   requireContext(context);
   const pool = await careerP0Pool();
   const profile = await profileId(pool, context);
-  const facts = (await pool.query('SELECT id,"sourceId",statement,"factType" FROM "CareerFact" WHERE "tenantId"=$1 AND "userId"=$2 AND "profileId"=$3 AND "authorityState"=$4 ORDER BY "createdAt"', [context.tenant.id, context.user.id, profile, "CUSTOMER_CONFIRMED_SOURCE_BACKED"])).rows;
+  const facts = (await pool.query('SELECT f.id,f."sourceId",f.statement,f."sourceExcerpt",f."scopeStatement",f."factType",s."sourceType" FROM "CareerFact" f JOIN "CareerSource" s ON s.id=f."sourceId" AND s."tenantId"=f."tenantId" WHERE f."tenantId"=$1 AND f."userId"=$2 AND f."profileId"=$3 AND f."authorityState"=$4 ORDER BY f."createdAt"', [context.tenant.id, context.user.id, profile, "CUSTOMER_CONFIRMED_SOURCE_BACKED"])).rows;
   const candidates = deriveCapabilityCandidates(facts);
+  const factsById = new Map(facts.map((fact) => [fact.id, fact]));
   for (const candidate of candidates) {
     await pool.query('INSERT INTO "CareerCapabilityAuthority" ("id","tenantId","userId","profileId","capabilityKey",label,domain,scope,"authorityState",provenance,"taxonomyVersion","updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,NOW()) ON CONFLICT ("tenantId","profileId","capabilityKey") DO UPDATE SET provenance=EXCLUDED.provenance,"taxonomyVersion"=EXCLUDED."taxonomyVersion","updatedAt"=NOW()', [id("capability"), context.tenant.id, context.user.id, profile, candidate.capabilityKey, candidate.label, candidate.domain, candidate.scope, candidate.authorityState, JSON.stringify(candidate.provenance), candidate.taxonomyVersion]);
   }
   const rows = (await pool.query('SELECT * FROM "CareerCapabilityAuthority" WHERE "tenantId"=$1 AND "userId"=$2 AND "profileId"=$3 ORDER BY "label"', [context.tenant.id, context.user.id, profile])).rows;
   const decisions = await activeDecisions(pool, context, rows.map((row) => row.id));
-  return { profileId: profile, capabilities: rows.map((row) => publicCapability(row, decisions.get(row.id))), factsConsidered: facts.length };
+  return { profileId: profile, capabilities: rows.map((row) => {
+    const evidence = (Array.isArray(row.provenance?.factIds) ? row.provenance.factIds : []).map((factId) => factsById.get(factId)).filter(Boolean).map((fact) => ({ statement: fact.statement, sourceType: fact.sourceType || null, sourceExcerpt: fact.sourceExcerpt || null, scopeStatement: fact.scopeStatement || null }));
+    return publicCapability(row, decisions.get(row.id), evidence);
+  }), factsConsidered: facts.length };
 }
 
 export async function getCapabilities(context) { return deriveCapabilities(context); }
