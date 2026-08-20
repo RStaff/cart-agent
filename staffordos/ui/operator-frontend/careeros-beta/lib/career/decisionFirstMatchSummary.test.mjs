@@ -44,3 +44,22 @@ test("stale analysis blocks a current assessment without changing the customer d
   assert.match(result.bottomLine, /re-analyze/i);
   assert.equal(result.decisionState, "PURSUE");
 });
+
+test("substantial unresolved coverage is mixed evidence, not promising alignment", () => {
+  const result = buildDecisionFirstMatchSummary({ stale: false, relationships: [
+    ...Array.from({ length: 12 }, (_, index) => relationship("DIRECT", `Direct ${index + 1}`)),
+    ...Array.from({ length: 4 }, (_, index) => relationship("TRANSFERABLE", `Transferable ${index + 1}`)),
+    ...Array.from({ length: 35 }, (_, index) => relationship("UNKNOWN", null, `Unknown ${index + 1}`)),
+  ] });
+  assert.equal(result.assessment, "MIXED_ALIGNMENT");
+  assert.match(result.bottomLine, /meaningful alignment/i);
+  assert.match(result.bottomLine, /limited/i);
+});
+
+test("promising alignment requires complete meaningful coverage", () => {
+  const result = buildDecisionFirstMatchSummary({ stale: false, relationships: [
+    relationship("DIRECT", "Program delivery"),
+    relationship("TRANSFERABLE", "Training and enablement"),
+  ] });
+  assert.equal(result.assessment, "PROMISING_ALIGNMENT");
+});

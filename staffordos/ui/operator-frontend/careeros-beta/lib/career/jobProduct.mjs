@@ -4,6 +4,52 @@ export const CAREEROS_JOB_PARSER_VERSION = "CAREEROS_JOB_PARSER_V1";
 
 function clean(value) { return String(value || "").replace(/\s+/g, " ").trim(); }
 
+const CONTEXT_HEADINGS = new Set([
+  "about the role", "job summary", "overview", "position overview", "role overview", "summary"
+]);
+const REQUIREMENT_HEADINGS = new Set([
+  "competencies", "conditions of employment", "conditions and other information", "education", "evaluations",
+  "key requirements", "key responsibilities", "major duties", "major duties and responsibilities", "qualifications",
+  "required experience", "required qualifications", "requirements", "responsibilities", "specialized experience",
+  "what you will do", "who may apply"
+]);
+
+function headingParts(line) {
+  const match = String(line).trim().match(/^([A-Za-z][A-Za-z0-9 /&'()\-]{1,90}):(?:\s*(.*))?$/);
+  if (!match) return null;
+  const label = clean(match[1]).toLowerCase();
+  return { label, content: clean(match[2] || "") };
+}
+
+function requirementSegments(text) {
+  const lines = String(text || "").split(/\r?\n/);
+  const segments = [];
+  let section = "REQUIREMENTS";
+  let sawSection = false;
+  const add = (value) => {
+    const normalized = clean(value);
+    if (normalized.length >= 12) segments.push(normalized);
+  };
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line) continue;
+    const heading = headingParts(line);
+    if (heading) {
+      const nextSection = CONTEXT_HEADINGS.has(heading.label) ? "CONTEXT" : REQUIREMENT_HEADINGS.has(heading.label) ? "REQUIREMENTS" : null;
+      if (nextSection) {
+        section = nextSection;
+        sawSection = true;
+        if (heading.content && nextSection === "REQUIREMENTS") add(heading.content);
+      }
+      continue;
+    }
+    if (sawSection && section === "CONTEXT") continue;
+    line.split(/(?<=[.!?])\s+/).forEach(add);
+  }
+  return segments;
+}
+
 function classify(text) {
   const value = text.toLowerCase();
   if (/product strategy|pricing and portfolio strategy|portfolio strategy/.test(value)) return { conceptKey: "UNRESOLVED_REQUIREMENT", scope: "unspecified", specialist: false };
@@ -24,7 +70,7 @@ export function parseJobDescription({ title, company, location, description, sou
   const text = String(description || "").trim();
   if (!text) throw Object.assign(new Error("JOB_DESCRIPTION_REQUIRED"), { code: "JOB_DESCRIPTION_REQUIRED" });
   if (text.length > CAREEROS_MAX_TEXT_LENGTH) throw Object.assign(new Error("JOB_DESCRIPTION_TOO_LARGE"), { code: "JOB_DESCRIPTION_TOO_LARGE" });
-  const segments = text.split(/\n+/).flatMap((line) => line.split(/(?<=[.!?])\s+/)).map(clean).filter((item) => item.length >= 12).slice(0, 200);
+  const segments = requirementSegments(text).slice(0, 200);
   const unique = [...new Set(segments.map((item) => item.slice(0, 500)))];
   const requirements = unique.map((item, index) => ({ sourceOrder: index, text: item, ...classify(item), importance: /required|must|minimum|essential/i.test(item) ? "REQUIRED" : "PREFERRED" }));
   return { sourceType: clean(sourceType).slice(0, 80) || "USER_SUPPLIED_SOURCE", title: clean(title).slice(0, 240) || "Untitled opportunity", company: clean(company).slice(0, 240) || null, location: clean(location).slice(0, 240) || null, description: text, sourceUrl: clean(sourceUrl).slice(0, 1000) || null, parserVersion: CAREEROS_JOB_PARSER_VERSION, requirements };

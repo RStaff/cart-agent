@@ -38,7 +38,7 @@ export function buildUsajobsDescription(item) {
     const text = clean(textValue(value), 12000);
     return text ? `${label}: ${text}` : null;
   }).filter(Boolean);
-  return clean(sections.join("\n"), 50000) || null;
+  return sections.join("\n").slice(0, 50000).trim() || null;
 }
 
 function normalizeResult(item, retrievedAt) {

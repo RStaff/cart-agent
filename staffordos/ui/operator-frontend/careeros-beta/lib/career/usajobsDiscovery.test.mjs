@@ -38,6 +38,36 @@ test("rich USAJOBS announcement sections reach the existing requirement parser",
   assert.ok(parsed.requirements.some((item) => item.text.includes("Occasional travel")));
 });
 
+test("structural headings and role-overview context do not become requirements", async () => {
+  const parsed = parseJobDescription({ title: "Program Manager", description: [
+    "Role Overview:\nThis role is focused on helping employees understand and apply approved AI assistants in their day-to-day work.",
+    "Key Responsibilities:",
+    "AI Assistants Management & Governance Support:",
+    "Coordinate stakeholders across technical and business teams.",
+    "Qualifications:",
+    "Experience leading cross-functional programs."
+  ].join("\n") });
+  assert.deepEqual(parsed.requirements.map((item) => item.text), [
+    "Coordinate stakeholders across technical and business teams.",
+    "Experience leading cross-functional programs."
+  ]);
+});
+
+test("genuine responsibility, qualification, and experience language remains parseable", async () => {
+  const parsed = parseJobDescription({ title: "Program Manager", description: [
+    "Responsibilities:",
+    "Lead delivery planning and coordinate implementation partners.",
+    "Qualifications:",
+    "Bachelor's degree and experience managing complex programs.",
+    "Required experience:",
+    "Must demonstrate stakeholder management in a technology environment."
+  ].join("\n") });
+  assert.ok(parsed.requirements.some((item) => /Lead delivery planning/.test(item.text)));
+  assert.ok(parsed.requirements.some((item) => /Bachelor's degree/.test(item.text)));
+  assert.ok(parsed.requirements.some((item) => /Must demonstrate stakeholder/.test(item.text)));
+  assert.equal(parsed.requirements.some((item) => /^(Responsibilities|Qualifications|Required experience):?$/.test(item.text)), false);
+});
+
 for (const [status, code] of [[401, "USAJOBS_AUTH_FAILED"], [403, "USAJOBS_AUTH_FAILED"], [429, "USAJOBS_RATE_LIMITED"], [500, "USAJOBS_UNAVAILABLE"]]) test("provider " + status + " is sanitized", async () => { await assert.rejects(() => searchUsajobs({ env: { USAJOBS_API_KEY: "secret", USAJOBS_USER_AGENT_EMAIL: "registered@example.com" }, fetchImpl: async () => response(status, { secret: "not returned" }) }), { code }); });
 
 test("malformed and timeout responses fail closed", async () => {
