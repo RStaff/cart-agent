@@ -196,9 +196,12 @@ export function createCareerP0Store({ filePath = process.env.CAREEROS_P0_STORE_P
     if (!profile) throw Object.assign(new Error("profile_required"), { code: "PROFILE_REQUIRED" });
     const sourceTypes = new Set(["RESUME", "MANUAL_WORK_HISTORY", "PORTFOLIO", "CERTIFICATION", "PROJECT", "OTHER_USER_SUPPLIED_SOURCE", "RESUME_TEXT", "PORTFOLIO_DESCRIPTION", "OTHER_USER_PROVIDED_TEXT", "VOICE_TRANSCRIPT"]);
     if (!sourceTypes.has(input?.sourceType)) throw Object.assign(new Error("invalid_source_type"), { code: "INVALID_SOURCE_TYPE" });
+    const sourceDigest = input.sourceDigest ? String(input.sourceDigest) : null;
+    const existing = sourceDigest && data.sources.find((candidate) => candidate.tenantId === context.tenant.id && candidate.userId === context.user.id && candidate.profileId === profile.id && candidate.sourceType === input.sourceType && candidate.sourceDigest === sourceDigest);
+    if (existing) return safeSource(existing);
     const timestamp = now();
     const textContent = input.textContent == null ? null : String(input.textContent).trim().slice(0, 50000);
-    const source = { id: id("source"), tenantId: context.tenant.id, userId: context.user.id, profileId: profile.id, sourceType: input.sourceType, sourceStatus: textContent ? "STORED" : "PENDING_STORAGE", originalFilename: input.originalFilename ? String(input.originalFilename).trim().slice(0, 240) : null, contentReference: null, textContent, sourceDigest: input.sourceDigest || null, createdAt: timestamp, updatedAt: timestamp };
+    const source = { id: id("source"), tenantId: context.tenant.id, userId: context.user.id, profileId: profile.id, sourceType: input.sourceType, sourceStatus: textContent ? "STORED" : "PENDING_STORAGE", originalFilename: input.originalFilename ? String(input.originalFilename).trim().slice(0, 240) : null, contentReference: null, textContent, sourceDigest, createdAt: timestamp, updatedAt: timestamp };
     data.sources.push(source);
     audit(data, context.tenant.id, context.user.id, "SOURCE_CREATED", "CareerSource", source.id);
     await write(data);

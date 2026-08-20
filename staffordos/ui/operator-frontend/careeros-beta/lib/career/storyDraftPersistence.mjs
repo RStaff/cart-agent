@@ -38,8 +38,8 @@ export function skipStoryQuestion(answers, questionIndex) {
   return answers.map((answer, index) => index === questionIndex ? null : answer);
 }
 
-export function assembleStoryDraft({ experienceContext, talkAnswers, followUps }) {
-  const context = experienceContext?.trim() ? `Experience context\n${experienceContext.trim()}` : "";
-  const answers = followUps.map((prompt, index) => talkAnswers[index]?.trim() ? `${prompt}\n${talkAnswers[index].trim()}` : "").filter(Boolean);
+export function assembleStoryDraft({ experienceContext, talkAnswers }) {
+  const context = experienceContext?.trim() || "";
+  const answers = talkAnswers.map((answer) => answer?.trim() || "").filter(Boolean);
   return [context, ...answers].filter(Boolean).join("\n\n");
 }

@@ -1,0 +1,18 @@
+{
+  "schema": "careeros.v1.testimony_pipeline_repair.v1",
+  "status": "validated",
+  "scope": "Career Story source-backed proposal intake",
+  "invariants": [
+    "user testimony only reaches extraction",
+    "identical source submissions are idempotent per profile and source type",
+    "scope metadata is emitted only for bounded contextual phrases",
+    "proposals remain separate from confirmed CareerFacts"
+  ],
+  "validation": {
+    "focused_tests": "PASS",
+    "full_career_suite": "PASS",
+    "typescript_build": "PASS",
+    "semantic_validator": "PASS",
+    "preflight": "PASS"
+  }
+}

@@ -82,7 +82,7 @@ export function CareerStoryBuilder() {
     if (response.ok) { setStatus((await response.json()).story?.storyStatus); setMessage(action === "COMPLETE_FOR_NOW" ? "Your story is marked complete for now. You can add more experience whenever you want." : "Your story is open for more experience."); }
   }
 
-  function talkDraft() { return assembleStoryDraft({ experienceContext, talkAnswers, followUps }); }
+  function talkDraft() { return assembleStoryDraft({ experienceContext, talkAnswers }); }
   function loadQuestion(index: number, nextInputMode: InputMode = "VOICE") { setQuestionIndex(index); setInputMode(nextInputMode); setDraftAnswer(talkAnswers[index] || ""); setTranscriptDraft(""); setFeedback(""); }
   function keepContext() {
     const context = (contextTranscript || contextDraft).trim();

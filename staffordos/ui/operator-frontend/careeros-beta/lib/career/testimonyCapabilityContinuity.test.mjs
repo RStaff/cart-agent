@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { mkdtemp, rm } from "node:fs/promises";
 import { readFileSync } from "node:fs";
+import os from "node:os";
+import path from "node:path";
 import { assembleStoryDraft, draftStorageKey, restoreStoryDraft, serializeStoryDraft, skipStoryQuestion } from "./storyDraftPersistence.mjs";
+import { parseCareerText, sourceDigest } from "./careerP0Intake.mjs";
+import { createCareerP0Store } from "./careerP0Store.mjs";
 
 const root = new URL("../../", import.meta.url).pathname;
 const read = (relative) => readFileSync(`${root}${relative}`, "utf8");
@@ -67,11 +72,57 @@ test("kept answers round-trip with question association and final assembly", () 
   assert.equal(restored.interviewReview, true);
   assert.equal(restored.talkAnswers[0], "UNIQUE_Q1_MIGRATION_SCOPE");
   assert.equal(restored.talkAnswers[1], "UNIQUE_Q2_JIRA_DECISIONS");
-  const assembled = assembleStoryDraft({ ...restored, followUps: ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6"] });
-  assert.match(assembled, /Q1\nUNIQUE_Q1_MIGRATION_SCOPE/);
-  assert.match(assembled, /Q2\nUNIQUE_Q2_JIRA_DECISIONS/);
+  const assembled = assembleStoryDraft({ ...restored, followUps: ["What did you personally do?", "What did you own?", "Q3", "Q4", "Q5", "Q6"] });
+  assert.doesNotMatch(assembled, /What did you personally do|What did you own/);
+  assert.match(assembled, /UNIQUE_Q1_MIGRATION_SCOPE/);
+  assert.match(assembled, /UNIQUE_Q2_JIRA_DECISIONS/);
   assert.ok(assembled.indexOf("UNIQUE_Q1_MIGRATION_SCOPE") < assembled.indexOf("UNIQUE_Q2_JIRA_DECISIONS"));
   assert.match(storyBuilder, /Your career story draft/);
+});
+
+test("interviewer prompts and skipped questions never enter source-backed proposals", () => {
+  const sourceText = assembleStoryDraft({
+    experienceContext: "Cross-functional website migration",
+    talkAnswers: ["I coordinated developers and marketing using Jira.", null, "We launched on schedule.", null, null, null],
+    followUps: ["What did you personally do in this experience?", "What did you own?", "What changed?", "What was the scope?", "What was accomplished?", "What evidence exists?"]
+  });
+  assert.doesNotMatch(sourceText, /Experience context|What did you personally do|What did you own|What changed/);
+  const parsed = parseCareerText({ sourceId: "synthetic-source", sourceType: "VOICE_TRANSCRIPT", text: sourceText });
+  assert.ok(parsed.candidates.length > 0);
+  assert.ok(parsed.candidates.every((candidate) => !/Experience context|What did you personally do|What did you own|What changed/.test(candidate.statement)));
+  assert.ok(parsed.candidates.every((candidate) => candidate.statement !== "Skipped for now"));
+});
+
+test("scope metadata does not promote a responsibility object into scope", () => {
+  const parsed = parseCareerText({ sourceId: "synthetic-scope", sourceType: "VOICE_TRANSCRIPT", text: "I was responsible for project schedule, stakeholder communication, and resolving blockers." });
+  assert.equal(parsed.candidates[0]?.scopeStatement, null);
+});
+
+test("identical source submissions expose an idempotency input to the intake boundary", () => {
+  assert.match(intakeRoute, /sourceDigest/);
+  assert.match(intakeRoute, /sourceIdentity|CAREEROS_INTAKE_EXTRACTOR_VERSION/);
+  assert.match(intakeRoute, /sourceDigest/);
+});
+
+test("identical source submissions reuse the existing source and candidate queue", async () => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), "careeros-intake-"));
+  try {
+    const store = createCareerP0Store({ filePath: path.join(directory, "store.json") });
+    const account = await store.createAccount({ email: "synthetic@example.test", password: "not-a-real-password", displayName: "Synthetic" });
+    await store.saveProfile(account.sessionId, { displayName: "Synthetic", headline: "Test profile" });
+    const text = "I coordinated a synthetic website migration using Jira.";
+    const input = { sourceType: "VOICE_TRANSCRIPT", textContent: text, sourceDigest: sourceDigest(text) };
+    const first = await store.createSource(account.sessionId, input);
+    const parsed = parseCareerText({ sourceId: first.id, sourceType: first.sourceType, text });
+    const firstCandidates = await store.saveCandidates(account.sessionId, first.id, parsed);
+    const second = await store.createSource(account.sessionId, input);
+    const secondCandidates = await store.saveCandidates(account.sessionId, second.id, parsed);
+    assert.equal(second.id, first.id);
+    assert.equal(secondCandidates.length, firstCandidates.length);
+    assert.equal((await store.listCandidateFacts(account.sessionId)).length, firstCandidates.length);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
 });
 
 test("skipping a previously kept answer does not erase it", () => {

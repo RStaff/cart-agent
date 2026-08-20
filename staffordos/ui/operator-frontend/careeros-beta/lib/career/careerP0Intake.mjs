@@ -23,8 +23,12 @@ function factTypeFor(statement) {
 }
 
 function scopeStatement(statement) {
-  const match = statement.match(/\b(across|within|for|with)\s+[^,.!?;]{2,80}/i);
+  const match = statement.match(/\b(across|within|with)\s+[^,.!?;]{2,80}/i);
   return match ? clean(match[0]) : null;
+}
+
+export function sourceDigest(text) {
+  return digest(String(text || "").trim());
 }
 
 export function parseCareerText({ sourceId, sourceType, text, extractorVersion = CAREEROS_INTAKE_EXTRACTOR_VERSION }) {
@@ -63,7 +67,7 @@ export function parseCareerText({ sourceId, sourceType, text, extractorVersion =
       updatedAt: new Date().toISOString(),
     });
   }
-  return { sourceDigest: digest(sourceText), extractorVersion, candidates };
+  return { sourceDigest: sourceDigest(sourceText), extractorVersion, candidates };
 }
 
 export function sourceIdentity({ sourceType, text }) {
