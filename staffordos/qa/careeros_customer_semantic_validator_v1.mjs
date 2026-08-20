@@ -12,6 +12,7 @@ const storyBuilderPath = `${root}/app/career/components/CareerStoryBuilder.tsx`;
 const intakeReviewPath = `${root}/app/career/components/IntakeReview.tsx`;
 const intakeSourcePath = `${root}/app/api/career/intake/source/route.ts`;
 const productPath = `${root}/lib/career/careerP0Product.mjs`;
+const capabilitiesPath = `${root}/app/career/capabilities/page.tsx`;
 const homePath = `${root}/app/career/page.tsx`;
 const discoverPath = `${root}/app/career/discover/DiscoverClient.tsx`;
 const discoverApiPath = `${root}/app/api/career/discover/route.ts`;
@@ -33,6 +34,7 @@ const storyBuilder = read(storyBuilderPath);
 const intakeReview = read(intakeReviewPath);
 const intakeSource = read(intakeSourcePath);
 const product = read(productPath);
+const capabilities = read(capabilitiesPath);
 const home = read(homePath);
 const discover = read(discoverPath);
 const discoverApi = read(discoverApiPath);
@@ -66,6 +68,7 @@ const checks = {
   testimony_continuity_authority_exists: /TESTIMONY_REVIEW_CONTINUITY/.test(authority),
   submitted_testimony_exposes_review: /Review what CareerOS understands/.test(storyBuilder + intakeReview) && /setMode\("PASTE_OR_TYPE"\)/.test(storyBuilder) && /focusReview/.test(storyBuilder),
   candidates_are_explicitly_unconfirmed: /not confirmed yet/.test(intakeReview) && /Review proposed experience/.test(intakeReview),
+  active_interview_blocks_strengths: /ACTIVE_INTERVIEW_DOES_NOT_EXPOSE_CAPABILITY_REVIEW/.test(authority) && /const interviewActive = mode === "TALK"/.test(storyBuilder) && /interviewActive\s*\?\s*<span[\s\S]*Finish and submit your story before reviewing strengths/.test(storyBuilder),
   strengths_does_not_bypass_pending_review: /hasReviewableCandidates/.test(storyBuilder) && /Review proposed experience/.test(storyBuilder) && /href="\/career\/capabilities"/.test(storyBuilder),
   testimony_uses_existing_source_candidate_path: /careerP0Store\.createSource/.test(intakeSource) && /careerP0Store\.saveCandidates/.test(intakeSource),
   capabilities_remain_confirmed_fact_only: /CUSTOMER_CONFIRMED_SOURCE_BACKED/.test(product) && /deriveCapabilityCandidates\(facts\)/.test(product),
@@ -77,6 +80,7 @@ const checks = {
   provider_results_are_not_match_claims: /not CareerOS match assessments/.test(discover),
   discovery_has_home_navigation: /href="\/career"/.test(discoverPath ? discover : "") || /href="\/career"/.test(read(`${root}/app/career/discover/page.tsx`)),
   jobs_has_needs_attention_view: /Needs attention/.test(jobsPage),
+  capabilities_has_story_navigation: /href="\/career\/onboarding"/.test(capabilities) && /Career Story/.test(capabilities),
 };
 
 const failures = Object.entries(checks).filter(([, value]) => !value).map(([key]) => key);

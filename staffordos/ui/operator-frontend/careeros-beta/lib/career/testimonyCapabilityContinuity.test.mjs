@@ -8,6 +8,7 @@ const storyBuilder = read("app/career/components/CareerStoryBuilder.tsx");
 const intakeReview = read("app/career/components/IntakeReview.tsx");
 const intakeRoute = read("app/api/career/intake/source/route.ts");
 const product = read("lib/career/careerP0Product.mjs");
+const capabilitiesPage = read("app/career/capabilities/page.tsx");
 
 test("story submission enters the existing proposed-experience review", () => {
   assert.match(storyBuilder + intakeReview, /Review what CareerOS understands/);
@@ -21,6 +22,16 @@ test("new testimony does not bypass candidate review for capabilities", () => {
   assert.match(storyBuilder, /hasReviewableCandidates/);
   assert.match(storyBuilder, /Review proposed experience/);
   assert.match(intakeReview, /onReviewStateChange/);
+});
+
+test("an active interview draft cannot expose Review strengths", () => {
+  assert.match(storyBuilder, /mode === "TALK"/);
+  assert.match(storyBuilder, /Finish and submit your story before reviewing strengths/);
+});
+
+test("capability review provides a direct path back to Career Story", () => {
+  assert.match(capabilitiesPage, /href="\/career\/onboarding"/);
+  assert.match(capabilitiesPage, /Career Story/);
 });
 
 test("submission remains candidate-only and capability derivation remains fact-only", () => {
