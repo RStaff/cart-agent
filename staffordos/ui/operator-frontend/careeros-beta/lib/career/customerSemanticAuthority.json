@@ -1,0 +1,29 @@
+{
+  "MATCH_SCORE": {
+    "semanticKey": "MATCH_SCORE",
+    "status": "NOT_READY",
+    "customerFacingAllowed": false,
+    "authoritativeSource": "governed_product_policy",
+    "allowedLabels": [],
+    "calculationAuthority": null,
+    "staleBehavior": "NEVER_RENDER_AS_CURRENT"
+  },
+  "EVIDENCE_COVERAGE_PERCENTAGE": {
+    "semanticKey": "EVIDENCE_COVERAGE_PERCENTAGE",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "buildEvidenceFit",
+    "allowedLabels": ["Evidence fit"],
+    "calculationAuthority": "floor((DIRECT + TRANSFERABLE) / canonical parsed relationships * 100)",
+    "staleBehavior": "RENDER_NO_VALUE"
+  },
+  "QUALITATIVE_ASSESSMENT": {
+    "semanticKey": "QUALITATIVE_ASSESSMENT",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "buildDecisionFirstMatchSummary",
+    "allowedLabels": ["Strong evidence alignment", "Promising alignment", "Mixed evidence", "Limited confirmed evidence", "More analysis needed", "Analysis needs to be refreshed"],
+    "calculationAuthority": "existing relationship states and coverage guard",
+    "staleBehavior": "RENDER_STALE_WARNING"
+  }
+}

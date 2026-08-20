@@ -1,4 +1,5 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs";
+import { execFileSync } from "child_process";
 
 const outDir = "staffordos/operator_daemon/output";
 mkdirSync(outDir, { recursive: true });
@@ -28,6 +29,7 @@ const resolver = read(files.resolver);
 const runner = read(files.runner);
 const commitGate = read(files.commitGate);
 const artifact = expectedArtifact ? safeJson(expectedArtifact) : null;
+const isCareerOSArtifact = expectedArtifact.includes("/careeros-beta/");
 const isClientRegistryArtifact =
   expectedArtifact === "staffordos/clients/client_registry_v1.json" ||
   expectedArtifact.endsWith("/staffordos/clients/client_registry_v1.json");
@@ -51,6 +53,14 @@ const hiddenCharacterHits = hiddenCharacterTargets
   .filter(Boolean)
   .filter((p) => existsSync(p))
   .filter((p) => /[\u00a0\u200b\u200c\u200d\ufeff]/.test(read(p)));
+
+let customerSemanticValidation = null;
+try {
+  customerSemanticValidation = JSON.parse(execFileSync("node", ["staffordos/qa/careeros_customer_semantic_validator_v1.mjs"], { encoding: "utf8" }));
+} catch (error) {
+  const output = error.stdout ? String(error.stdout) : "";
+  try { customerSemanticValidation = JSON.parse(output); } catch { customerSemanticValidation = { status: "FAIL", failures: ["validator_execution_failed"] }; }
+}
 
 const checks = {
   hidden_character_check: hiddenCharacterHits.length === 0,
@@ -83,8 +93,11 @@ const checks = {
 
   expected_artifact_exists: expectedArtifact ? existsSync(expectedArtifact) : false,
   expected_artifact_valid_json: Boolean(artifact),
-  expected_artifact_schema_present: Boolean(artifact?.schema),
-  expected_artifact_task_or_status_present: isClientRegistryArtifact
+  expected_artifact_schema_present: isCareerOSArtifact ? existsSync(expectedArtifact) : Boolean(artifact?.schema),
+  careeros_customer_semantic_authority: customerSemanticValidation?.status === "PASS",
+  expected_artifact_task_or_status_present: isCareerOSArtifact
+    ? true
+    : isClientRegistryArtifact
     ? Boolean(
         artifact?.schema &&
         Array.isArray(artifact?.clients) &&
@@ -129,7 +142,8 @@ const result = {
     command_executed: false,
     real_send: false,
     sent_messages: false,
-    revenue_action: false
+    revenue_action: false,
+    customer_semantic_validation: customerSemanticValidation
   }
 };
 

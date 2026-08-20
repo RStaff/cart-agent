@@ -73,12 +73,12 @@ test("evidence fit counts direct and transferable support without inventing weig
     relationship("UNKNOWN", null, "Clearance"),
     relationship("SPECIALIST_BLOCKED", null, "License"),
   ] });
-  assert.deepEqual(result.evidenceFit, { status: "CURRENT", percentage: 50, numerator: 3, denominator: 6 });
+  assert.deepEqual(result.evidenceFit, { semanticKey: "EVIDENCE_COVERAGE_PERCENTAGE", status: "CURRENT", percentage: 50, numerator: 3, denominator: 6 });
 });
 
 test("evidence fit does not produce a percentage for insufficient or stale analysis", () => {
   const insufficient = buildDecisionFirstMatchSummary({ stale: false, relationships: [relationship("DIRECT", "One requirement")] });
-  assert.deepEqual(insufficient.evidenceFit, { status: "INSUFFICIENT", percentage: null, numerator: 1, denominator: 1 });
+  assert.deepEqual(insufficient.evidenceFit, { semanticKey: "EVIDENCE_COVERAGE_PERCENTAGE", status: "INSUFFICIENT", percentage: null, numerator: 1, denominator: 1 });
   const stale = buildDecisionFirstMatchSummary({ stale: true, relationships: [relationship("DIRECT", "d1"), relationship("DIRECT", "d2")] });
-  assert.deepEqual(stale.evidenceFit, { status: "STALE", percentage: null, numerator: 2, denominator: 2 });
+  assert.deepEqual(stale.evidenceFit, { semanticKey: "EVIDENCE_COVERAGE_PERCENTAGE", status: "STALE", percentage: null, numerator: 2, denominator: 2 });
 });

@@ -23,9 +23,10 @@ function uniqueLabels(relationships, states) {
 function buildEvidenceFit({ relationships, counts, coverage, stale }) {
   const numerator = counts.DIRECT + counts.TRANSFERABLE;
   const denominator = relationships.length;
-  if (stale) return { status: "STALE", percentage: null, numerator, denominator };
-  if (coverage === "INSUFFICIENT") return { status: "INSUFFICIENT", percentage: null, numerator, denominator };
-  return { status: "CURRENT", percentage: Math.floor((numerator / denominator) * 100), numerator, denominator };
+  const semanticKey = "EVIDENCE_COVERAGE_PERCENTAGE";
+  if (stale) return { semanticKey, status: "STALE", percentage: null, numerator, denominator };
+  if (coverage === "INSUFFICIENT") return { semanticKey, status: "INSUFFICIENT", percentage: null, numerator, denominator };
+  return { semanticKey, status: "CURRENT", percentage: Math.floor((numerator / denominator) * 100), numerator, denominator };
 }
 
 export function buildDecisionFirstMatchSummary(match = {}) {

@@ -30,7 +30,7 @@ test("transferable, partial, unknown, and specialist relationships stay distinct
 test("comparison consumes the canonical decision summary and coverage guard", () => {
   const result = summarizeOpportunityForComparison({ match: { stale: false, relationships: [relationship("DIRECT"), relationship("UNKNOWN")] } });
   assert.equal(result.priorityLabel, "Mixed evidence");
-  assert.deepEqual(result.evidenceFit, { status: "CURRENT", percentage: 50, numerator: 1, denominator: 2 });
+  assert.deepEqual(result.evidenceFit, { semanticKey: "EVIDENCE_COVERAGE_PERCENTAGE", status: "CURRENT", percentage: 50, numerator: 1, denominator: 2 });
 });
 
 test("comparison shows no evidence percentage when analysis is insufficient or stale", () => {
