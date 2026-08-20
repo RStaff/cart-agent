@@ -1,6 +1,6 @@
 import { CAREEROS_MAX_TEXT_LENGTH } from "./careerP0Intake.mjs";
 
-export const CAREEROS_JOB_PARSER_VERSION = "CAREEROS_JOB_PARSER_V1";
+export const CAREEROS_JOB_PARSER_VERSION = "CAREEROS_JOB_PARSER_V2";
 
 function clean(value) { return String(value || "").replace(/\s+/g, " ").trim(); }
 
