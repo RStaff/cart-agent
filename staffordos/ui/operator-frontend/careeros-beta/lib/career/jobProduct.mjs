@@ -21,32 +21,62 @@ function headingParts(line) {
   return { label, content: clean(match[2] || "") };
 }
 
+function bulletContent(line) {
+  const match = String(line).trim().match(/^(?:[-*•]|\d+[.)])\s+(.+)$/);
+  return match ? clean(match[1]) : null;
+}
+
+function startsContinuation(line) {
+  return /^[a-z,;:)\]]/.test(String(line).trim());
+}
+
 function requirementSegments(text) {
   const lines = String(text || "").split(/\r?\n/);
   const segments = [];
   let section = "REQUIREMENTS";
   let sawSection = false;
-  const add = (value) => {
-    const normalized = clean(value);
-    if (normalized.length >= 12) segments.push(normalized);
+  let current = null;
+  const flush = () => {
+    if (!current) return;
+    const normalized = clean(current.text);
+    if (current.section !== "CONTEXT" && normalized.length >= 12) segments.push(normalized);
+    current = null;
   };
 
   for (const rawLine of lines) {
     const line = rawLine.trim();
-    if (!line) continue;
+    if (!line) {
+      flush();
+      continue;
+    }
     const heading = headingParts(line);
     if (heading) {
+      flush();
       const nextSection = CONTEXT_HEADINGS.has(heading.label) ? "CONTEXT" : REQUIREMENT_HEADINGS.has(heading.label) ? "REQUIREMENTS" : null;
       if (nextSection) {
         section = nextSection;
         sawSection = true;
-        if (heading.content && nextSection === "REQUIREMENTS") add(heading.content);
+        if (heading.content && nextSection === "REQUIREMENTS") current = { text: heading.content, section: nextSection, bullet: false };
       }
       continue;
     }
     if (sawSection && section === "CONTEXT") continue;
-    line.split(/(?<=[.!?])\s+/).forEach(add);
+    const bullet = bulletContent(line);
+    if (bullet) {
+      flush();
+      current = { text: bullet, section, bullet: true };
+      continue;
+    }
+    if (!current) {
+      current = { text: line, section, bullet: false };
+    } else if (current.bullet || startsContinuation(line)) {
+      current.text += ` ${line}`;
+    } else {
+      flush();
+      current = { text: line, section, bullet: false };
+    }
   }
+  flush();
   return segments;
 }
 

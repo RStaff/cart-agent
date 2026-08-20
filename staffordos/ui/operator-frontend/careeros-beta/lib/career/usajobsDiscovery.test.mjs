@@ -68,6 +68,38 @@ test("genuine responsibility, qualification, and experience language remains par
   assert.equal(parsed.requirements.some((item) => /^(Responsibilities|Qualifications|Required experience):?$/.test(item.text)), false);
 });
 
+test("visual wraps and bullet continuations remain atomic requirements", () => {
+  const parsed = parseJobDescription({ title: "AI Enablement Program Manager", description: [
+    "Responsibilities:",
+    "- Experience supporting enterprise technology",
+    "  tools or business applications, including safe enablement practices.",
+    "- Coordinate stakeholder",
+    "  discussions across frontier AI assistants.",
+    "Qualifications:",
+    "Experience leading cross-functional programs."
+  ].join("\n") });
+  assert.equal(parsed.requirements.length, 3);
+  assert.match(parsed.requirements[0].text, /enterprise technology tools or business applications/);
+  assert.match(parsed.requirements[1].text, /Coordinate stakeholder discussions across frontier AI assistants/);
+  assert.equal(parsed.requirements.some((item) => /^(tools|coordination|patterns|across frontier)/i.test(item.text)), false);
+});
+
+test("unbulleted wrapped prose joins lowercase continuation lines without hiding genuine lines", () => {
+  const parsed = parseJobDescription({ title: "Operations Manager", description: [
+    "Responsibilities:",
+    "Improve workflows across technology tools",
+    "or business applications.",
+    "Coordinate stakeholder discussions.",
+    "Qualifications:",
+    "Experience managing operational programs."
+  ].join("\n") });
+  assert.deepEqual(parsed.requirements.map((item) => item.text), [
+    "Improve workflows across technology tools or business applications.",
+    "Coordinate stakeholder discussions.",
+    "Experience managing operational programs."
+  ]);
+});
+
 for (const [status, code] of [[401, "USAJOBS_AUTH_FAILED"], [403, "USAJOBS_AUTH_FAILED"], [429, "USAJOBS_RATE_LIMITED"], [500, "USAJOBS_UNAVAILABLE"]]) test("provider " + status + " is sanitized", async () => { await assert.rejects(() => searchUsajobs({ env: { USAJOBS_API_KEY: "secret", USAJOBS_USER_AGENT_EMAIL: "registered@example.com" }, fetchImpl: async () => response(status, { secret: "not returned" }) }), { code }); });
 
 test("malformed and timeout responses fail closed", async () => {
