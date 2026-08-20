@@ -68,7 +68,8 @@ const checks = {
   testimony_continuity_authority_exists: /TESTIMONY_REVIEW_CONTINUITY/.test(authority),
   submitted_testimony_exposes_review: /Review what CareerOS understands/.test(storyBuilder + intakeReview) && /setMode\("PASTE_OR_TYPE"\)/.test(storyBuilder) && /focusReview/.test(storyBuilder),
   candidates_are_explicitly_unconfirmed: /not confirmed yet/.test(intakeReview) && /Review proposed experience/.test(intakeReview),
-  active_interview_blocks_strengths: /ACTIVE_INTERVIEW_DOES_NOT_EXPOSE_CAPABILITY_REVIEW/.test(authority) && /const interviewActive = mode === "TALK"/.test(storyBuilder) && /interviewActive\s*\?\s*<span[\s\S]*Finish and submit your story before reviewing strengths/.test(storyBuilder),
+  active_interview_blocks_strengths: /ACTIVE_INTERVIEW_DOES_NOT_EXPOSE_CAPABILITY_REVIEW/.test(authority) && /const interviewActive = mode === "TALK"/.test(storyBuilder) && /interviewActive\s*\?\s*<[\s\S]*Finish &amp; submit story/.test(storyBuilder),
+  active_interview_has_submission_and_safe_exit: /Finish &amp; submit story/.test(storyBuilder) && /Save draft and return Home/.test(storyBuilder) && /submitTalk/.test(storyBuilder),
   strengths_does_not_bypass_pending_review: /hasReviewableCandidates/.test(storyBuilder) && /Review proposed experience/.test(storyBuilder) && /href="\/career\/capabilities"/.test(storyBuilder),
   testimony_uses_existing_source_candidate_path: /careerP0Store\.createSource/.test(intakeSource) && /careerP0Store\.saveCandidates/.test(intakeSource),
   capabilities_remain_confirmed_fact_only: /CUSTOMER_CONFIRMED_SOURCE_BACKED/.test(product) && /deriveCapabilityCandidates\(facts\)/.test(product),
@@ -81,6 +82,7 @@ const checks = {
   discovery_has_home_navigation: /href="\/career"/.test(discoverPath ? discover : "") || /href="\/career"/.test(read(`${root}/app/career/discover/page.tsx`)),
   jobs_has_needs_attention_view: /Needs attention/.test(jobsPage),
   capabilities_has_story_navigation: /href="\/career\/onboarding"/.test(capabilities) && /Career Story/.test(capabilities),
+  future_slice_boundaries_recorded: /FUTURE_CONTEXTUAL_QUESTIONING[\s\S]*FUTURE_NOT_IMPLEMENTED/.test(authority) && /SLICE_2_TIMELINE_PRESERVATION[\s\S]*FUTURE_NOT_IMPLEMENTED/.test(authority),
 };
 
 const failures = Object.entries(checks).filter(([, value]) => !value).map(([key]) => key);

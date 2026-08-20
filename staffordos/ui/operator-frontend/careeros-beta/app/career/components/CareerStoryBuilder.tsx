@@ -6,6 +6,8 @@ import { VoiceRecorder } from "./VoiceRecorder";
 
 type Mode = "PASTE_OR_TYPE" | "DOCUMENT" | "TALK";
 type InputMode = "VOICE" | "TEXT";
+type PersistedStoryDraft = { experienceContext: string; talkAnswers: Array<string | null>; inputModes: Array<InputMode | null>; questionIndex: number; interviewReview: boolean; updatedAt: string };
+const draftStoragePrefix = "careeros.story-draft.v1:";
 const followUps = [
   "What did you personally do in this experience?",
   "What did you own, and what did you support in this experience?",
@@ -36,9 +38,46 @@ export function CareerStoryBuilder() {
   const [reviewStateKnown, setReviewStateKnown] = useState(false);
   const [hasReviewableCandidates, setHasReviewableCandidates] = useState(false);
   const [focusReview, setFocusReview] = useState(false);
+  const [draftKey, setDraftKey] = useState<string | null>(null);
+  const [draftLoaded, setDraftLoaded] = useState(false);
+  const [draftSaveState, setDraftSaveState] = useState<"UNKNOWN" | "SAVED_ON_DEVICE" | "UNAVAILABLE">("UNKNOWN");
 
-  async function refresh() { const response = await fetch("/api/career/story", { cache: "no-store" }); if (response.ok) setStatus((await response.json()).story?.storyStatus || "CURRENT_FACTS_REVIEWED"); }
+  function draftSnapshot(): PersistedStoryDraft { return { experienceContext, talkAnswers, inputModes, questionIndex, interviewReview, updatedAt: new Date().toISOString() }; }
+  function persistDraft() {
+    if (!draftKey) return false;
+    try { localStorage.setItem(draftKey, JSON.stringify(draftSnapshot())); setDraftSaveState("SAVED_ON_DEVICE"); return true; } catch { setDraftSaveState("UNAVAILABLE"); return false; }
+  }
+  function saveAndReturnHome() { if (persistDraft()) window.location.assign("/career"); else setFeedback("This draft could not be saved on this device."); }
+
+  async function refresh() {
+    const [storyResponse, profileResponse] = await Promise.all([fetch("/api/career/story", { cache: "no-store" }), fetch("/api/career/profile", { cache: "no-store" })]);
+    if (storyResponse.ok) setStatus((await storyResponse.json()).story?.storyStatus || "CURRENT_FACTS_REVIEWED");
+    if (profileResponse.ok) {
+      const profile = (await profileResponse.json()).profile;
+      const key = profile?.id ? `${draftStoragePrefix}${profile.id}` : null;
+      setDraftKey(key);
+      if (key) {
+        try {
+          const saved = JSON.parse(localStorage.getItem(key) || "null") as Partial<PersistedStoryDraft> | null;
+          if (saved?.experienceContext && Array.isArray(saved.talkAnswers) && Array.isArray(saved.inputModes)) {
+            setExperienceContext(saved.experienceContext);
+            setTalkAnswers(saved.talkAnswers.slice(0, followUps.length));
+            setInputModes(saved.inputModes.slice(0, followUps.length));
+            setQuestionIndex(Math.min(Math.max(Number(saved.questionIndex) || 0, 0), followUps.length - 1));
+            setInterviewReview(Boolean(saved.interviewReview));
+            setMode("TALK");
+            setDraftSaveState("SAVED_ON_DEVICE");
+          }
+        } catch { setDraftSaveState("UNAVAILABLE"); }
+      }
+    }
+    setDraftLoaded(true);
+  }
   useEffect(() => { refresh(); }, []);
+  useEffect(() => {
+    if (!draftKey || !draftLoaded) return;
+    try { localStorage.setItem(draftKey, JSON.stringify(draftSnapshot())); } catch { setDraftSaveState("UNAVAILABLE"); }
+  }, [draftKey, draftLoaded, experienceContext, talkAnswers, inputModes, questionIndex, interviewReview]);
 
   async function setStoryStatus(action: "COMPLETE_FOR_NOW" | "REOPEN") {
     const response = await fetch("/api/career/story", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action }) });
@@ -88,6 +127,8 @@ export function CareerStoryBuilder() {
     const result = await response.json().catch(() => ({}));
     setSubmitting(false);
     if (!response.ok) { setMessage("The story draft could not be added."); return; }
+    if (draftKey) { try { localStorage.removeItem(draftKey); } catch { /* best-effort cleanup; submitted authority is server-side */ } }
+    setDraftSaveState("UNKNOWN");
     setMode("PASTE_OR_TYPE");
     setFocusReview(true);
     setReviewStateKnown(false);
@@ -106,5 +147,5 @@ export function CareerStoryBuilder() {
   function finalReview() { return <div className="careerInterviewReview"><div className="careerContextAnchor"><strong>Talking about:</strong> <span>{experienceContext}</span></div><p className="careerEyebrow">Review your draft</p><h3>Your career story draft</h3><p className="careerMuted">Review what you want CareerOS to organize. Submitting creates proposed information for the normal review flow; it does not confirm facts automatically.</p>{followUps.map((question, index) => <div className="careerReviewAnswer" key={question}><div><strong>Question {index + 1}</strong><p>{question}</p><p className="careerMuted">{talkAnswers[index] || "Skipped for now"}</p></div><button type="button" className="careerSmallButton" onClick={() => editAnswer(index)}>Edit answer</button></div>)}<div className="careerInterviewActions"><button type="button" className="careerPrimaryButton" onClick={submitTalk} disabled={submitting}>Submit story for review</button><button type="button" className="careerSmallButton" onClick={() => loadQuestion(followUps.length - 1, "TEXT")}>Back</button></div>{feedback ? <p className="careerSaved" role="status">{feedback}</p> : null}</div>; }
 
   const interviewActive = mode === "TALK";
-  return <section className="careerProfilePanel"><p className="careerEyebrow">Career story</p><h2>Add experience whenever you remember it</h2><p className="careerMuted">Your confirmed facts are a starting point, not a finished profile. Add employment, consulting, projects, accomplishments, builds, certifications, education, teaching, leadership, community work, or anything else professionally relevant.</p><p className="careerMuted"><strong>{status === "CAREER_STORY_COMPLETE_FOR_NOW" ? "Complete for now" : "Open for more experience"}</strong> · This status is reversible.</p><div className="careerModeTabs" role="tablist"><button className="careerSmallButton" onClick={() => setMode("PASTE_OR_TYPE")} aria-selected={mode === "PASTE_OR_TYPE"}>Paste or type</button><button className="careerSmallButton" onClick={() => { setMode("TALK"); setInterviewReview(false); setReviewStateKnown(false); setHasReviewableCandidates(false); setFeedback(""); }} aria-selected={mode === "TALK"}>Talk with CareerOS</button><button className="careerSmallButton" onClick={() => setMode("DOCUMENT")} aria-selected={mode === "DOCUMENT"}>Add document</button></div>{mode === "PASTE_OR_TYPE" ? <><p className="careerMuted">Tell CareerOS about your experience. Paste a resume, describe a role, or write about a project or accomplishment. Do not worry about formatting; we will organize what we understand and let you review it.</p><IntakeReview focusReview={focusReview} onReviewStateChange={(hasPending) => { setHasReviewableCandidates(hasPending); setReviewStateKnown(true); }} /></> : mode === "DOCUMENT" ? <div className="careerStoryDisabled"><h3>Document upload is not supported yet</h3><p className="careerMuted">Binary resume and document uploads are intentionally disabled. Paste or type the content instead. Secure file storage, scanning, access control, retention, and deletion proof are required before this mode can accept files.</p></div> : !experienceContext.trim() ? contextStep() : interviewReview ? finalReview() : guidedInterview()}{message ? <p className="careerSaved" role="status">{message}</p> : null}<div className="careerNav"><button className="careerSmallButton" onClick={() => setStoryStatus(status === "CAREER_STORY_COMPLETE_FOR_NOW" ? "REOPEN" : "COMPLETE_FOR_NOW")}>{status === "CAREER_STORY_COMPLETE_FOR_NOW" ? "Add more experience" : "Complete my story for now"}</button>{interviewActive ? <span className="careerMuted">Finish and submit your story before reviewing strengths.</span> : !reviewStateKnown ? <span className="careerMuted">Checking experience review status…</span> : hasReviewableCandidates ? <a className="careerLinkButton" href="#career-story-review">Review proposed experience</a> : <a className="careerLinkButton" href="/career/capabilities">Review strengths</a>}<a className="careerLinkButton" href="/career/privacy">Data notice</a></div></section>;
+  return <section className="careerProfilePanel"><p className="careerEyebrow">Career story</p><h2>Add experience whenever you remember it</h2><p className="careerMuted">Your confirmed facts are a starting point, not a finished profile. Add employment, consulting, projects, accomplishments, builds, certifications, education, teaching, leadership, community work, or anything else professionally relevant.</p><p className="careerMuted"><strong>{status === "CAREER_STORY_COMPLETE_FOR_NOW" ? "Complete for now" : "Open for more experience"}</strong> · This status is reversible.</p><div className="careerModeTabs" role="tablist"><button className="careerSmallButton" onClick={() => setMode("PASTE_OR_TYPE")} aria-selected={mode === "PASTE_OR_TYPE"}>Paste or type</button><button className="careerSmallButton" onClick={() => { setMode("TALK"); setInterviewReview(false); setReviewStateKnown(false); setHasReviewableCandidates(false); setFeedback(""); }} aria-selected={mode === "TALK"}>Talk with CareerOS</button><button className="careerSmallButton" onClick={() => setMode("DOCUMENT")} aria-selected={mode === "DOCUMENT"}>Add document</button></div>{mode === "PASTE_OR_TYPE" ? <><p className="careerMuted">Tell CareerOS about your experience. Paste a resume, describe a role, or write about a project or accomplishment. Do not worry about formatting; we will organize what we understand and let you review it.</p><IntakeReview focusReview={focusReview} onReviewStateChange={(hasPending) => { setHasReviewableCandidates(hasPending); setReviewStateKnown(true); }} /></> : mode === "DOCUMENT" ? <div className="careerStoryDisabled"><h3>Document upload is not supported yet</h3><p className="careerMuted">Binary resume and document uploads are intentionally disabled. Paste or type the content instead. Secure file storage, scanning, access control, retention, and deletion proof are required before this mode can accept files.</p></div> : !experienceContext.trim() ? contextStep() : interviewReview ? finalReview() : guidedInterview()}{message ? <p className="careerSaved" role="status">{message}</p> : null}<div className="careerNav"><button className="careerSmallButton" onClick={() => setStoryStatus(status === "CAREER_STORY_COMPLETE_FOR_NOW" ? "REOPEN" : "COMPLETE_FOR_NOW")}>{status === "CAREER_STORY_COMPLETE_FOR_NOW" ? "Add more experience" : "Complete my story for now"}</button>{interviewActive ? <><span className="careerMuted">{draftSaveState === "SAVED_ON_DEVICE" ? "Draft saved on this device." : "Draft stays here until you submit it."}</span><button type="button" className="careerSmallButton" onClick={() => setInterviewReview(true)}>Finish &amp; submit story</button><button type="button" className="careerSmallButton" onClick={saveAndReturnHome}>Save draft and return Home</button></> : !reviewStateKnown ? <span className="careerMuted">Checking experience review status…</span> : hasReviewableCandidates ? <a className="careerLinkButton" href="#career-story-review">Review proposed experience</a> : <a className="careerLinkButton" href="/career/capabilities">Review strengths</a>}<a className="careerLinkButton" href="/career/privacy">Data notice</a></div></section>;
 }

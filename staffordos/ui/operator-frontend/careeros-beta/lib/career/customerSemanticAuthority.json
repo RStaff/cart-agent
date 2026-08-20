@@ -136,6 +136,28 @@
     "customerFacingAllowed": false,
     "authoritativeSource": "governed_product_policy"
   },
+  "FUTURE_CONTEXTUAL_QUESTIONING": {
+    "semanticKey": "FUTURE_CONTEXTUAL_QUESTIONING",
+    "status": "FUTURE_NOT_IMPLEMENTED",
+    "customerFacingAllowed": false,
+    "authoritativeSource": "Slice 3 implementation plan",
+    "invariants": [
+      "QUESTIONS_MUST_USE_CONFIRMED_SOURCE_BACKED_EVIDENCE",
+      "QUESTIONS_MUST_NOT_INVENT_FACTS",
+      "QUESTIONS_MUST_RETAIN_UNKNOWN_AND_UNCONFIRMED_STATES"
+    ]
+  },
+  "SLICE_2_TIMELINE_PRESERVATION": {
+    "semanticKey": "SLICE_2_TIMELINE_PRESERVATION",
+    "status": "FUTURE_NOT_IMPLEMENTED",
+    "customerFacingAllowed": false,
+    "authoritativeSource": "Slice 2 implementation plan",
+    "invariants": [
+      "EXPLICIT_DATE_WORDING_REMAINS_SOURCE_BACKED",
+      "APPROXIMATE_DATES_ARE_NOT_RESOLVED",
+      "RELATIVE_SEQUENCE_IS_NOT_INFERRED"
+    ]
+  },
   "NAVIGATION_DESTINATION": {
     "semanticKey": "NAVIGATION_DESTINATION",
     "status": "AUTHORIZED",
