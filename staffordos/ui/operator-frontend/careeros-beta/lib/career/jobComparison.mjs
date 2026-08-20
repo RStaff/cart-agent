@@ -1,7 +1,6 @@
 export const CAREEROS_COMPARISON_MIN = 2;
 export const CAREEROS_COMPARISON_MAX = 4;
-
-const STATES = ["DIRECT", "TRANSFERABLE", "PARTIAL", "UNKNOWN", "SPECIALIST_BLOCKED", "SCOPE_BLOCKED"];
+import { buildDecisionFirstMatchSummary } from "./decisionFirstMatchSummary.mjs";
 
 export function normalizeComparisonIds(values) {
   const ids = [...new Set((Array.isArray(values) ? values : []).map((value) => String(value || "").trim()).filter(Boolean))];
@@ -14,14 +13,10 @@ function relationshipsFor(match) { return Array.isArray(match?.relationships) ? 
 
 export function summarizeOpportunityForComparison(opportunity) {
   const relationships = relationshipsFor(opportunity.match);
-  const counts = Object.fromEntries(STATES.map((state) => [state, relationships.filter((item) => item.state === state).length]));
   const analyzed = Boolean(opportunity.match);
-  let priorityLabel = "Analysis needed";
-  if (analyzed && opportunity.match.stale) priorityLabel = "Needs updated analysis";
-  else if (analyzed && counts.DIRECT >= Math.max(1, Math.ceil(relationships.length / 2)) && counts.UNKNOWN === 0 && counts.PARTIAL === 0 && counts.SPECIALIST_BLOCKED === 0) priorityLabel = "Strong evidence alignment";
-  else if (analyzed && counts.DIRECT > 0 && counts.TRANSFERABLE > 0) priorityLabel = "Promising, with transferable experience";
-  else if (analyzed && (counts.DIRECT > 0 || counts.TRANSFERABLE > 0 || counts.PARTIAL > 0)) priorityLabel = "Worth reviewing - some evidence gaps";
-  else if (analyzed) priorityLabel = "More information needed";
+  const decisionSummary = buildDecisionFirstMatchSummary(opportunity.match || {});
+  const counts = decisionSummary.counts;
+  const priorityLabel = decisionSummary.assessmentLabel;
 
   const sentences = [];
   if (!analyzed) sentences.push("This opportunity has not been analyzed yet.");
@@ -35,6 +30,8 @@ export function summarizeOpportunityForComparison(opportunity) {
   }
   return {
     counts,
+    evidenceFit: decisionSummary.evidenceFit,
+    decisionSummary,
     priorityLabel,
     priorityExplanation: sentences.join(" ") || "CareerOS does not yet have enough confirmed evidence to explain this opportunity.",
     groups: {

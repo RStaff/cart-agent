@@ -20,11 +20,20 @@ function uniqueLabels(relationships, states) {
   return [...new Set(relationships.filter((item) => states.includes(item.state)).map(labelFor))].slice(0, 4);
 }
 
+function buildEvidenceFit({ relationships, counts, coverage, stale }) {
+  const numerator = counts.DIRECT + counts.TRANSFERABLE;
+  const denominator = relationships.length;
+  if (stale) return { status: "STALE", percentage: null, numerator, denominator };
+  if (coverage === "INSUFFICIENT") return { status: "INSUFFICIENT", percentage: null, numerator, denominator };
+  return { status: "CURRENT", percentage: Math.floor((numerator / denominator) * 100), numerator, denominator };
+}
+
 export function buildDecisionFirstMatchSummary(match = {}) {
   const relationships = relationshipsFor(match);
   const counts = Object.fromEntries(["DIRECT", "TRANSFERABLE", "PARTIAL", "UNKNOWN", "SPECIALIST_BLOCKED", "SCOPE_BLOCKED"].map((state) => [state, relationships.filter((item) => item.state === state).length]));
   const coverage = relationships.length >= MIN_MEANINGFUL_REQUIREMENTS ? "MEANINGFUL" : "INSUFFICIENT";
   const decisionState = match.decisionState || null;
+  const evidenceFit = buildEvidenceFit({ relationships, counts, coverage, stale: Boolean(match.stale) });
   let assessment = "INSUFFICIENT_ANALYSIS";
 
   if (match.stale) assessment = "STALE_ANALYSIS";
@@ -61,6 +70,7 @@ export function buildDecisionFirstMatchSummary(match = {}) {
     strongAreas,
     gaps,
     specialistConstraints,
+    evidenceFit,
     reasons,
     explanation: reasons.join(" "),
     bottomLine,
