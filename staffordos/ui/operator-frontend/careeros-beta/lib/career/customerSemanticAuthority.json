@@ -26,6 +26,62 @@
     "calculationAuthority": "existing relationship states and coverage guard",
     "staleBehavior": "RENDER_STALE_WARNING"
   },
+  "PROFILE_IDENTITY": {
+    "semanticKey": "PROFILE_IDENTITY",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerProfile",
+    "allowedSurface": "/career/profile",
+    "notes": "Profile identity and positioning only; confirmed career evidence is reviewed through Career Story and Evidence surfaces."
+  },
+  "CAREER_STORY": {
+    "semanticKey": "CAREER_STORY",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerSource -> CareerFactCandidate -> customer review -> CareerFact",
+    "allowedSurface": "/career/onboarding",
+    "notes": "Story intake may propose facts but may not silently confirm them."
+  },
+  "CAREER_EVIDENCE": {
+    "semanticKey": "CAREER_EVIDENCE",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerFact and source provenance",
+    "notes": "Confirmed facts and provenance remain inspectable without creating a second evidence store."
+  },
+  "CAPABILITY_AUTHORITY": {
+    "semanticKey": "CAPABILITY_AUTHORITY",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerCapabilityAuthority and CareerCapabilityDecision",
+    "allowedSurface": "/career/capabilities",
+    "notes": "Capability review remains separate from profile identity and raw story intake."
+  },
+  "APPLICATION_ARTIFACTS": {
+    "semanticKey": "APPLICATION_ARTIFACTS",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerResumeDraft and application evidence packet",
+    "notes": "Job-specific drafts are presentation artifacts and cannot become CareerFact or Profile authority."
+  },
+  "UNCONFIRMED_DATA": {
+    "semanticKey": "UNCONFIRMED_DATA",
+    "status": "RESTRICTED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerFactCandidate status",
+    "notes": "Candidate facts must be visibly proposed and reviewed before appearing as confirmed profile truth."
+  },
+  "SURFACE_SEPARATION": {
+    "semanticKey": "SURFACE_SEPARATION",
+    "status": "REQUIRED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerOS information architecture contract",
+    "invariants": [
+      "PROFILE_DOES_NOT_RENDER_FULL_CAREER_STORY_BUILDER",
+      "CAREER_STORY_SURFACE_RETAINS_EXISTING_REVIEW_FLOW",
+      "APPLICATION_ARTIFACTS_REMAIN_OPPORTUNITY_SPECIFIC"
+    ]
+  },
   "NAVIGATION_DESTINATION": {
     "semanticKey": "NAVIGATION_DESTINATION",
     "status": "AUTHORIZED",

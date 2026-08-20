@@ -6,6 +6,9 @@ const authorityJsonPath = `${root}/lib/career/customerSemanticAuthority.json`;
 const detailPath = `${root}/app/career/jobs/[opportunityId]/page.tsx`;
 const jobsPath = `${root}/app/career/jobs/page.tsx`;
 const comparePath = `${root}/app/career/jobs/compare/page.tsx`;
+const profilePath = `${root}/app/career/profile/page.tsx`;
+const storyPath = `${root}/app/career/onboarding/page.tsx`;
+const homePath = `${root}/app/career/page.tsx`;
 
 function read(path) {
   return existsSync(path) ? readFileSync(path, "utf8") : "";
@@ -17,6 +20,9 @@ try { navigationAuthority = JSON.parse(read(authorityJsonPath)).NAVIGATION_DESTI
 const detail = read(detailPath);
 const jobs = read(jobsPath);
 const compare = read(comparePath);
+const profile = read(profilePath);
+const story = read(storyPath);
+const home = read(homePath);
 const checks = {
   authority_exists: Boolean(authority),
   match_score_is_not_ready: /MATCH_SCORE[\s\S]*["']?status["']?\s*:\s*"NOT_READY"/.test(authority),
@@ -34,6 +40,16 @@ const checks = {
   jobs_has_single_internal_destination: !/Open opportunity/.test(jobs),
   jobs_has_home_destination: /href="\/career"/.test(jobs) && /CareerOS Home/.test(jobs),
   jobs_preserves_source_destination: /Open source link/.test(jobs),
+  profile_identity_authority_exists: /PROFILE_IDENTITY/.test(authority) && /CareerProfile/.test(authority),
+  career_story_authority_exists: /CAREER_STORY/.test(authority) && /CareerFactCandidate/.test(authority),
+  evidence_authority_exists: /CAREER_EVIDENCE/.test(authority) && /CareerFact and source provenance/.test(authority),
+  capability_authority_separate: /CAPABILITY_AUTHORITY/.test(authority) && /CareerCapabilityAuthority/.test(authority),
+  application_artifact_authority_separate: /APPLICATION_ARTIFACTS/.test(authority) && /CareerResumeDraft/.test(authority),
+  profile_does_not_render_story_builder: !/CareerStoryBuilder/.test(profile),
+  profile_has_story_destination: /href="\/career\/onboarding"/.test(profile) && /Career Story/.test(profile),
+  story_renders_story_builder: /CareerStoryBuilder/.test(story) && /Career Story/.test(story),
+  story_has_profile_and_home_destinations: /href="\/career\/profile"/.test(story) && /href="\/career"/.test(story),
+  home_has_distinct_profile_and_story_destinations: /href="\/career\/profile"/.test(home) && /storyHref\s*=\s*"\/career\/onboarding"/.test(home) && /href=\{storyHref\}/.test(home),
 };
 
 const failures = Object.entries(checks).filter(([, value]) => !value).map(([key]) => key);
