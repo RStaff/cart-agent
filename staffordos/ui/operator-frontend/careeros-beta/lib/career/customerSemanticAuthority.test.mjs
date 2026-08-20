@@ -36,3 +36,16 @@ test("saved jobs has one internal opportunity destination and preserves source p
   assert.match(jobsPage, /Open source link/);
   assert.match(jobsPage, /href=\{"\/career\/jobs\/" \+ job\.id\}/);
 });
+
+test("navigation authority keeps canonical destinations distinct", () => {
+  const navigation = CUSTOMER_SEMANTIC_AUTHORITY.NAVIGATION_DESTINATION;
+  assert.equal(navigation.destinations.CAREEROS_HOME, "/career");
+  assert.equal(navigation.destinations.JOB_SEARCH_WORKSPACE, "/career/jobs");
+  assert.equal(navigation.destinations.OPPORTUNITY_DETAIL, "/career/jobs/[opportunityId]");
+  assert.equal(new Set(Object.values(navigation.destinations)).size, Object.keys(navigation.destinations).length);
+});
+
+test("primary workspace has a direct CareerOS Home escape", () => {
+  assert.match(jobsPage, /CareerOS Home/);
+  assert.match(jobsPage, /href="\/career"/);
+});

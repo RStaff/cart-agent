@@ -25,5 +25,28 @@
     "allowedLabels": ["Strong evidence alignment", "Promising alignment", "Mixed evidence", "Limited confirmed evidence", "More analysis needed", "Analysis needs to be refreshed"],
     "calculationAuthority": "existing relationship states and coverage guard",
     "staleBehavior": "RENDER_STALE_WARNING"
+  },
+  "NAVIGATION_DESTINATION": {
+    "semanticKey": "NAVIGATION_DESTINATION",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerOS customer route inventory",
+    "destinations": {
+      "CAREEROS_HOME": "/career",
+      "JOB_SEARCH_WORKSPACE": "/career/jobs",
+      "OPPORTUNITY_DETAIL": "/career/jobs/[opportunityId]",
+      "DISCOVER_OPPORTUNITIES": "/career/discover",
+      "OPPORTUNITY_INBOX": "/career/inbox",
+      "PROFILE": "/career/profile",
+      "CAPABILITIES": "/career/capabilities",
+      "COMPARISON": "/career/jobs/compare",
+      "APPLICATION_EVIDENCE": "/career/jobs/[opportunityId]/application-evidence"
+    },
+    "invariants": [
+      "OPPORTUNITY_DETAIL_REACHES_HOME_AND_WORKSPACE",
+      "JOB_SEARCH_WORKSPACE_REACHES_HOME",
+      "DISTINCT_LABELS_DO_NOT_ALIAS_UNAUTHORIZED_DESTINATIONS",
+      "SOURCE_LINK_REMAINS_EXTERNAL_PROVENANCE"
+    ]
   }
 }

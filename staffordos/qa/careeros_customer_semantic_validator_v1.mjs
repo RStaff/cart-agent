@@ -12,6 +12,8 @@ function read(path) {
 }
 
 const authority = read(authorityPath) + read(authorityJsonPath);
+let navigationAuthority = null;
+try { navigationAuthority = JSON.parse(read(authorityJsonPath)).NAVIGATION_DESTINATION; } catch { navigationAuthority = null; }
 const detail = read(detailPath);
 const jobs = read(jobsPath);
 const compare = read(comparePath);
@@ -20,6 +22,8 @@ const checks = {
   match_score_is_not_ready: /MATCH_SCORE[\s\S]*["']?status["']?\s*:\s*"NOT_READY"/.test(authority),
   match_score_is_not_customer_facing: /MATCH_SCORE[\s\S]*["']?customerFacingAllowed["']?\s*:\s*false/.test(authority),
   evidence_fit_has_explicit_authority: /EVIDENCE_COVERAGE_PERCENTAGE[\s\S]*["']?authoritativeSource["']?\s*:\s*"buildEvidenceFit"/.test(authority),
+  navigation_contract_exists: Boolean(navigationAuthority?.destinations?.CAREEROS_HOME && navigationAuthority?.destinations?.JOB_SEARCH_WORKSPACE),
+  navigation_destinations_are_distinct: Boolean(navigationAuthority && new Set(Object.values(navigationAuthority.destinations)).size === Object.keys(navigationAuthority.destinations).length),
   detail_uses_semantic_presentation: /customerEvidenceFitPresentation/.test(detail),
   comparison_uses_semantic_presentation: /customerEvidenceFitPresentation/.test(compare),
   detail_does_not_render_raw_percentage: !/fit\.percentage/.test(detail),
@@ -28,6 +32,7 @@ const checks = {
   detail_has_home_breadcrumb: /CareerOS Home/.test(detail) && /href="\/career"/.test(detail),
   detail_has_workspace_breadcrumb: /Job Search Workspace/.test(detail) && /href="\/career\/jobs"/.test(detail),
   jobs_has_single_internal_destination: !/Open opportunity/.test(jobs),
+  jobs_has_home_destination: /href="\/career"/.test(jobs) && /CareerOS Home/.test(jobs),
   jobs_preserves_source_destination: /Open source link/.test(jobs),
 };
 
