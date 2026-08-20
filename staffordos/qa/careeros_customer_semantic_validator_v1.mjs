@@ -9,6 +9,9 @@ const comparePath = `${root}/app/career/jobs/compare/page.tsx`;
 const profilePath = `${root}/app/career/profile/page.tsx`;
 const storyPath = `${root}/app/career/onboarding/page.tsx`;
 const homePath = `${root}/app/career/page.tsx`;
+const discoverPath = `${root}/app/career/discover/DiscoverClient.tsx`;
+const discoverApiPath = `${root}/app/api/career/discover/route.ts`;
+const jobsPagePath = `${root}/app/career/jobs/page.tsx`;
 
 function read(path) {
   return existsSync(path) ? readFileSync(path, "utf8") : "";
@@ -23,6 +26,9 @@ const compare = read(comparePath);
 const profile = read(profilePath);
 const story = read(storyPath);
 const home = read(homePath);
+const discover = read(discoverPath);
+const discoverApi = read(discoverApiPath);
+const jobsPage = read(jobsPagePath);
 const checks = {
   authority_exists: Boolean(authority),
   match_score_is_not_ready: /MATCH_SCORE[\s\S]*["']?status["']?\s*:\s*"NOT_READY"/.test(authority),
@@ -50,6 +56,13 @@ const checks = {
   story_renders_story_builder: /CareerStoryBuilder/.test(story) && /Career Story/.test(story),
   story_has_profile_and_home_destinations: /href="\/career\/profile"/.test(story) && /href="\/career"/.test(story),
   home_has_distinct_profile_and_story_destinations: /href="\/career\/profile"/.test(home) && /storyHref\s*=\s*"\/career\/onboarding"/.test(home) && /href=\{storyHref\}/.test(home),
+  discovery_authority_exists: /SEARCH_PREFERENCE/.test(authority) && /PROVIDER_RESULT/.test(authority) && /TRIAGE_STATUS/.test(authority),
+  auto_import_prohibited: /AUTO_IMPORT/.test(authority) && /PROHIBITED/.test(authority) && /BACKGROUND_SEARCH/.test(authority) && /NOT_AUTHORIZED/.test(authority),
+  discovery_saves_without_provider_call: /Save search preferences/.test(discover) && /method: "PUT"/.test(discover),
+  discovery_requires_explicit_search: /Search now/.test(discover) && /export async function POST/.test(discoverApi),
+  provider_results_are_not_match_claims: /not CareerOS match assessments/.test(discover),
+  discovery_has_home_navigation: /href="\/career"/.test(discoverPath ? discover : "") || /href="\/career"/.test(read(`${root}/app/career/discover/page.tsx`)),
+  jobs_has_needs_attention_view: /Needs attention/.test(jobsPage),
 };
 
 const failures = Object.entries(checks).filter(([, value]) => !value).map(([key]) => key);

@@ -82,6 +82,46 @@
       "APPLICATION_ARTIFACTS_REMAIN_OPPORTUNITY_SPECIFIC"
     ]
   },
+  "SEARCH_PREFERENCE": {
+    "semanticKey": "SEARCH_PREFERENCE",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerSearchPreference",
+    "notes": "Customer-entered discovery criteria only; never derived from CareerFacts or capabilities."
+  },
+  "SEARCH_PRESET": {
+    "semanticKey": "SEARCH_PRESET",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "Discover UI preset criteria",
+    "notes": "Convenience criteria only; presets do not authorize capability or qualification claims."
+  },
+  "PROVIDER_RESULT": {
+    "semanticKey": "PROVIDER_RESULT",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "USAJOBS adapter response",
+    "notes": "Transient provider data may be displayed with attribution but is not CareerOS analysis until explicitly imported and analyzed."
+  },
+  "TRIAGE_STATUS": {
+    "semanticKey": "TRIAGE_STATUS",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerOpportunity decision/lifecycle and provider closing date",
+    "notes": "Triage labels must derive from existing persisted states or actual provider dates."
+  },
+  "AUTO_IMPORT": {
+    "semanticKey": "AUTO_IMPORT",
+    "status": "PROHIBITED",
+    "customerFacingAllowed": false,
+    "authoritativeSource": "governed_product_policy"
+  },
+  "BACKGROUND_SEARCH": {
+    "semanticKey": "BACKGROUND_SEARCH",
+    "status": "NOT_AUTHORIZED",
+    "customerFacingAllowed": false,
+    "authoritativeSource": "governed_product_policy"
+  },
   "NAVIGATION_DESTINATION": {
     "semanticKey": "NAVIGATION_DESTINATION",
     "status": "AUTHORIZED",

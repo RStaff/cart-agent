@@ -10,6 +10,7 @@ import { buildResumeDraft, normalizeDraftText } from "./resumeTailoring.mjs";
 import { buildApplicationAnswerDraft, buildCoverLetterDraft, classifyApplicationQuestion } from "./applicationMaterials.mjs";
 import { improveApplicationMaterial, writingEvidence } from "./applicationWriting.mjs";
 import { classifyInboxDuplicate, normalizeInboxInput, publicInboxItem } from "./opportunityInbox.mjs";
+import { boundUsajobsSearch } from "./usajobsDiscovery.mjs";
 import { canTransition, lifecycleEventFor, nextOpportunityAction, normalizeLifecycleState } from "./opportunityLifecycle.mjs";
 
 const EVALUATION_VERSION = "CAREEROS_MATCH_EVALUATION_V1";
@@ -186,6 +187,38 @@ export async function updateOpportunityInboxItem(context, itemId, action) {
 export async function listOpportunities(context) {
   requireContext(context); const pool = await careerP0Pool();
   return (await pool.query('SELECT o.id,o.title,o.company,o.location,o."sourceType",o."sourceUrl",o."decisionState",o."lifecycleState",o."createdAt",o."updatedAt",m.summary AS "matchSummary",m.stale AS "matchStale" FROM "CareerOpportunity" o LEFT JOIN LATERAL (SELECT summary,stale FROM "CareerMatchEvaluation" WHERE "opportunityId"=o.id AND "tenantId"=$1 AND "userId"=$2 ORDER BY "createdAt" DESC LIMIT 1) m ON true WHERE o."tenantId"=$1 AND o."userId"=$2 ORDER BY o."updatedAt" DESC', [context.tenant.id, context.user.id])).rows.map((row) => ({ ...row, nextAction: nextOpportunityAction(row) }));
+}
+
+export async function getSearchPreferences(context) {
+  requireContext(context);
+  const pool = await careerP0Pool();
+  const row = (await pool.query('SELECT id,keywords,location,"remotePreference","postedWithinDays","salaryMin","resultLimit",active,"updatedAt" FROM "CareerSearchPreference" WHERE "tenantId"=$1 AND "userId"=$2 LIMIT 1', [context.tenant.id, context.user.id])).rows[0];
+  return row || { id: null, keywords: "", location: "", remotePreference: "any", postedWithinDays: null, salaryMin: null, resultLimit: 10, active: true, updatedAt: null };
+}
+
+export async function saveSearchPreferences(context, input = {}) {
+  requireContext(context);
+  const pool = await careerP0Pool();
+  const criteria = boundUsajobsSearch(input);
+  const row = (await pool.query('INSERT INTO "CareerSearchPreference" ("id","tenantId","userId",keywords,location,"remotePreference","postedWithinDays","salaryMin","resultLimit",active,"updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,NOW()) ON CONFLICT ("tenantId","userId") DO UPDATE SET keywords=EXCLUDED.keywords,location=EXCLUDED.location,"remotePreference"=EXCLUDED."remotePreference","postedWithinDays"=EXCLUDED."postedWithinDays","salaryMin"=EXCLUDED."salaryMin","resultLimit"=EXCLUDED."resultLimit",active=EXCLUDED.active,"updatedAt"=NOW() RETURNING id,keywords,location,"remotePreference","postedWithinDays","salaryMin","resultLimit",active,"updatedAt"', [id("search-preference"), context.tenant.id, context.user.id, criteria.keywords, criteria.location, criteria.remotePreference, criteria.postedWithinDays, criteria.salaryMin, criteria.resultLimit, input.active !== false])).rows[0];
+  return row;
+}
+
+export async function getExistingDiscoveryStatuses(context, results = []) {
+  requireContext(context);
+  const pool = await careerP0Pool();
+  const ids = results.map((item) => item.externalOpportunityId).filter(Boolean);
+  const urls = results.map((item) => item.sourceUrl).filter(Boolean);
+  if (!ids.length && !urls.length) return {};
+  const rows = (await pool.query('SELECT "externalOpportunityId","sourceUrl",status,"duplicateStatus","opportunityId" FROM "CareerOpportunityInboxItem" WHERE "tenantId"=$1 AND "userId"=$2 AND (("externalOpportunityId" = ANY($3::text[])) OR ("sourceUrl" = ANY($4::text[])))', [context.tenant.id, context.user.id, ids, urls])).rows;
+  const opportunities = (await pool.query('SELECT id,"sourceUrl","decisionState","lifecycleState" FROM "CareerOpportunity" WHERE "tenantId"=$1 AND "userId"=$2 AND "sourceUrl" = ANY($3::text[])', [context.tenant.id, context.user.id, urls])).rows;
+  const status = {};
+  for (const row of rows) {
+    const key = row.externalOpportunityId || row.sourceUrl;
+    status[key] = row.opportunityId ? (row.status === "IMPORTED" ? "Already analyzed" : "Already in Inbox") : row.duplicateStatus === "DUPLICATE" ? "Already in Inbox" : "Needs review";
+  }
+  for (const row of opportunities) status[row.sourceUrl] = row.decisionState === "PURSUE" ? "Pursuing" : row.decisionState === "PASS" ? "Passed" : "Already analyzed";
+  return status;
 }
 
 export async function getOpportunity(context, opportunityId) {

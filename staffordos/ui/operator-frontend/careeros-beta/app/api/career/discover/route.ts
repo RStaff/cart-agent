@@ -1,16 +1,32 @@
 import { NextResponse } from "next/server";
 import { currentCareerContext, customerMutationAllowed } from "../../../../lib/career/careerP0Auth";
 import { searchUsajobs } from "../../../../lib/career/usajobsDiscovery.mjs";
+import { getExistingDiscoveryStatuses, getSearchPreferences, saveSearchPreferences } from "../../../../lib/career/careerP0Product.mjs";
 
 export const runtime = "nodejs";
 
+export async function GET() {
+  const context = await currentCareerContext();
+  if (!context) return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
+  return NextResponse.json({ ok: true, preferences: await getSearchPreferences(context) });
+}
+
+export async function PUT(request: Request) {
+  if (!customerMutationAllowed(request)) return NextResponse.json({ ok: false, error: "REQUEST_NOT_ALLOWED" }, { status: 403 });
+  const context = await currentCareerContext();
+  if (!context) return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
+  try { return NextResponse.json({ ok: true, preferences: await saveSearchPreferences(context, await request.json()) }); }
+  catch (error) { return NextResponse.json({ ok: false, error: error instanceof Error ? error.message : "SEARCH_PREFERENCES_FAILED" }, { status: 400 }); }
+}
+
 export async function POST(request: Request) {
   if (!customerMutationAllowed(request)) return NextResponse.json({ ok: false, error: "REQUEST_NOT_ALLOWED" }, { status: 403 });
-  if (!await currentCareerContext()) return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
+  const context = await currentCareerContext();
+  if (!context) return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
   try {
     const body = await request.json();
     const result = await searchUsajobs(body || {});
-    return NextResponse.json({ ok: true, provider: result.provider, retrievedAt: result.retrievedAt, results: result.results, criteria: result.criteria });
+    return NextResponse.json({ ok: true, provider: result.provider, retrievedAt: result.retrievedAt, results: result.results.map((item) => ({ ...item, existingState: null })), existingStatuses: await getExistingDiscoveryStatuses(context, result.results), criteria: result.criteria });
   } catch (error) {
     const code = error instanceof Error ? (error as Error & { code?: string }).code || error.message : "USAJOBS_SEARCH_FAILED";
     const status = code === "USAJOBS_PROVIDER_NOT_CONFIGURED" ? 503 : code === "USAJOBS_AUTH_FAILED" ? 502 : code === "USAJOBS_RATE_LIMITED" ? 429 : code === "USAJOBS_TIMEOUT" ? 504 : 502;

@@ -45,6 +45,7 @@ model CareerTenant {
   matchEvaluations CareerMatchEvaluation[]
   resumeDrafts CareerResumeDraft[]
   inboxItems CareerOpportunityInboxItem[]
+  searchPreferences CareerSearchPreference[]
 }
 
 model CareerTenantMembership {
@@ -83,6 +84,7 @@ model CareerProfile {
   matchEvaluations CareerMatchEvaluation[]
   resumeDrafts CareerResumeDraft[]
   inboxItems CareerOpportunityInboxItem[]
+  searchPreferences CareerSearchPreference[]
 
   @@unique([tenantId, userId])
   @@index([userId, updatedAt])
@@ -376,6 +378,26 @@ model CareerOpportunityInboxItem {
   @@index([tenantId, userId, status, updatedAt])
   @@index([tenantId, normalizedDigest])
   @@index([tenantId, normalizedUrl])
+}
+
+model CareerSearchPreference {
+  id               String   @id @default(cuid())
+  tenantId         String
+  userId           String
+  keywords         String   @default("")
+  location         String   @default("")
+  remotePreference String   @default("any")
+  postedWithinDays Int?
+  salaryMin        Int?
+  resultLimit      Int      @default(10)
+  active           Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  tenant           CareerTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user             CareerUser   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId])
+  @@index([tenantId, userId, active])
 }
 
 model CareerOpportunityRequirement {
