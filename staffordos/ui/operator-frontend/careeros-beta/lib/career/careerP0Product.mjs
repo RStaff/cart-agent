@@ -56,11 +56,15 @@ export async function deriveCapabilities(context, { includeTrace = false } = {})
   const factsById = new Map(facts.map((fact) => [fact.id, fact]));
   const existingAuthorities = new Map((await pool.query('SELECT "capabilityKey","authorityState",provenance FROM "CareerCapabilityAuthority" WHERE "tenantId"=$1 AND "userId"=$2 AND "profileId"=$3', [context.tenant.id, context.user.id, profile])).rows.map((row) => [row.capabilityKey, row]));
   const reconciliationTrace = includeTrace ? [] : null;
+  const derivationTrace = includeTrace ? { candidateKeys: candidates.map((candidate) => candidate.capabilityKey), refreshInvokedKeys: [], reconciliationEnteredKeys: [], reconciliationReturnedKeys: [] } : null;
   for (const candidate of candidates) {
     const existing = existingAuthorities.get(candidate.capabilityKey);
     const authorityState = refreshCapabilityAuthorityState(existing, candidate);
+    if (derivationTrace) derivationTrace.refreshInvokedKeys.push(candidate.capabilityKey);
     if (reconciliationTrace) {
+      derivationTrace.reconciliationEnteredKeys.push(candidate.capabilityKey);
       await reconcileCapabilityAuthority(pool, context, profile, candidate, authorityState, reconciliationTrace, { authorityState: existing?.authorityState, exists: Boolean(existing) });
+      derivationTrace.reconciliationReturnedKeys.push(candidate.capabilityKey);
     } else await reconcileCapabilityAuthority(pool, context, profile, candidate, authorityState);
   }
   const rows = (await pool.query('SELECT * FROM "CareerCapabilityAuthority" WHERE "tenantId"=$1 AND "userId"=$2 AND "profileId"=$3 ORDER BY "label"', [context.tenant.id, context.user.id, profile])).rows;
@@ -68,7 +72,7 @@ export async function deriveCapabilities(context, { includeTrace = false } = {})
   return { profileId: profile, capabilities: rows.map((row) => {
     const evidence = (Array.isArray(row.provenance?.factIds) ? row.provenance.factIds : []).map((factId) => factsById.get(factId)).filter(Boolean).map((fact) => ({ statement: fact.statement, sourceType: fact.sourceType || null, sourceExcerpt: fact.sourceExcerpt || null, scopeStatement: fact.scopeStatement || null }));
     return publicCapability(row, decisions.get(row.id), evidence);
-  }), factsConsidered: facts.length, ...(reconciliationTrace ? { reconciliationTrace } : {}) };
+  }), factsConsidered: facts.length, ...(reconciliationTrace ? { reconciliationTrace, derivationTrace } : {}) };
 }
 
 

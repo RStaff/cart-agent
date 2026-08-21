@@ -32,3 +32,14 @@ export function sanitizeCapabilityReconciliationTrace(trace = []) {
 
   return { capabilities, request };
 }
+
+/** @param {unknown} trace */
+export function sanitizeCapabilityDerivationTrace(trace = null) {
+  if (!trace || typeof trace !== "object") return {};
+  return {
+    candidateKeys: Array.isArray(trace.candidateKeys) ? trace.candidateKeys : [],
+    refreshInvokedKeys: Array.isArray(trace.refreshInvokedKeys) ? trace.refreshInvokedKeys : [],
+    reconciliationEnteredKeys: Array.isArray(trace.reconciliationEnteredKeys) ? trace.reconciliationEnteredKeys : [],
+    reconciliationReturnedKeys: Array.isArray(trace.reconciliationReturnedKeys) ? trace.reconciliationReturnedKeys : [],
+  };
+}

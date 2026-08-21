@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { sanitizeCapabilityReconciliationTrace } from "./capabilityTrace.mjs";
+import { sanitizeCapabilityDerivationTrace, sanitizeCapabilityReconciliationTrace } from "./capabilityTrace.mjs";
 import { compareCapabilityDerivationInputs } from "./capabilityDiagnostic.mjs";
 
 const routePath = new URL("../../app/api/career/internal/capability-reconciliation-trace/route.ts", import.meta.url);
@@ -49,6 +49,24 @@ test("trace sanitization exposes lifecycle states but no evidence or identifiers
   });
   assert.equal(JSON.stringify(output).includes("private"), false);
   assert.equal(JSON.stringify(output).includes("profile-secret"), false);
+});
+
+test("derivation trace exposes candidate and lifecycle entry keys without identifiers", () => {
+  const output = sanitizeCapabilityDerivationTrace({
+    candidateKeys: ["PROGRAM_DELIVERY"],
+    refreshInvokedKeys: ["PROGRAM_DELIVERY"],
+    reconciliationEnteredKeys: ["PROGRAM_DELIVERY"],
+    reconciliationReturnedKeys: ["PROGRAM_DELIVERY"],
+    profileId: "private-profile",
+    statement: "private evidence",
+  });
+  assert.deepEqual(output, {
+    candidateKeys: ["PROGRAM_DELIVERY"],
+    refreshInvokedKeys: ["PROGRAM_DELIVERY"],
+    reconciliationEnteredKeys: ["PROGRAM_DELIVERY"],
+    reconciliationReturnedKeys: ["PROGRAM_DELIVERY"],
+  });
+  assert.equal(JSON.stringify(output).includes("private"), false);
 });
 
 test("trace route is authenticated, canonical, uncached, and read-only at the customer boundary", () => {

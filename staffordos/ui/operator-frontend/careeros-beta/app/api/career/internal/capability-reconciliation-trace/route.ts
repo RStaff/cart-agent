@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { currentCareerContext } from "../../../../../lib/career/careerP0Auth";
 import { getCapabilityDerivationComparison, getCapabilityProfile } from "../../../../../lib/career/careerP0Product.mjs";
-import { sanitizeCapabilityReconciliationTrace } from "../../../../../lib/career/capabilityTrace.mjs";
+import { sanitizeCapabilityDerivationTrace, sanitizeCapabilityReconciliationTrace } from "../../../../../lib/career/capabilityTrace.mjs";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -26,7 +26,7 @@ export async function GET() {
       getCapabilityProfile(context, { includeTrace: true }),
       getCapabilityDerivationComparison(context),
     ]);
-    return response({ ok: true, comparison, trace: sanitizeCapabilityReconciliationTrace(profile.reconciliationTrace) });
+    return response({ ok: true, comparison, derivation: sanitizeCapabilityDerivationTrace(profile.derivationTrace as unknown), trace: sanitizeCapabilityReconciliationTrace(profile.reconciliationTrace) });
   } catch (error) {
     return response({ ok: false, error: "CAPABILITY_RECONCILIATION_TRACE_FAILED", trace: traceFrom(error) }, 400);
   }
