@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { currentCareerContext } from "../../../../../lib/career/careerP0Auth";
 import { getCapabilityDerivationComparison, getCapabilityProfile } from "../../../../../lib/career/careerP0Product.mjs";
-import { sanitizeCapabilityDerivationTrace, sanitizeCapabilityExecutionTrace, sanitizeCapabilityReconciliationTrace } from "../../../../../lib/career/capabilityTrace.mjs";
+import { sanitizeCapabilityDerivationTrace, sanitizeCapabilityExecutionTrace, sanitizeCapabilityFactShapeComparison, sanitizeCapabilityReconciliationTrace } from "../../../../../lib/career/capabilityTrace.mjs";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -28,7 +28,7 @@ export async function GET() {
       getCapabilityDerivationComparison(context),
     ]);
     const tracedProfile = profile as typeof profile & { executionTrace?: unknown };
-    return response({ ok: true, comparison, canonicalExecution: sanitizeCapabilityExecutionTrace(tracedProfile.executionTrace || executionTrace), derivation: sanitizeCapabilityDerivationTrace(tracedProfile.derivationTrace as unknown), trace: sanitizeCapabilityReconciliationTrace(tracedProfile.reconciliationTrace) });
+    return response({ ok: true, comparison: { ...comparison, factShapeComparison: sanitizeCapabilityFactShapeComparison(comparison) }, canonicalExecution: sanitizeCapabilityExecutionTrace(tracedProfile.executionTrace || executionTrace), derivation: sanitizeCapabilityDerivationTrace(tracedProfile.derivationTrace as unknown), trace: sanitizeCapabilityReconciliationTrace(tracedProfile.reconciliationTrace) });
   } catch (error) {
     return response({ ok: false, error: "CAPABILITY_RECONCILIATION_TRACE_FAILED", trace: traceFrom(error) }, 400);
   }

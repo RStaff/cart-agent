@@ -53,6 +53,7 @@ export function sanitizeCapabilityExecutionTrace(trace = null) {
     deriveCapabilitiesEntered: Boolean(trace.deriveCapabilitiesEntered),
     factQueryExecuted: Boolean(trace.factQueryExecuted),
     factCountInsideDeriveCapabilities: Number(trace.factCountInsideDeriveCapabilities || 0),
+    factShapeInsideDeriveCapabilities: sanitizeFactShape(trace.factShapeInsideDeriveCapabilities),
     deriveCapabilityCandidatesCalled: Boolean(trace.deriveCapabilityCandidatesCalled),
     candidateCountInsideDeriveCapabilities: Number(trace.candidateCountInsideDeriveCapabilities || 0),
     candidateKeysInsideDeriveCapabilities: Array.isArray(trace.candidateKeysInsideDeriveCapabilities) ? trace.candidateKeysInsideDeriveCapabilities : [],
@@ -63,4 +64,20 @@ export function sanitizeCapabilityExecutionTrace(trace = null) {
     includeTraceAtGetCapabilities: Boolean(trace.includeTraceAtGetCapabilities),
     includeTraceAtDeriveCapabilities: Boolean(trace.includeTraceAtDeriveCapabilities),
   };
+}
+
+function sanitizeFactShape(shape) {
+  if (!shape || typeof shape !== "object") return { count: 0, keys: [], presentCounts: {}, typeCounts: {} };
+  return {
+    count: Number(shape.count || 0),
+    keys: Array.isArray(shape.keys) ? shape.keys : [],
+    presentCounts: shape.presentCounts && typeof shape.presentCounts === "object" ? shape.presentCounts : {},
+    typeCounts: shape.typeCounts && typeof shape.typeCounts === "object" ? shape.typeCounts : {},
+  };
+}
+
+/** @param {unknown} comparison */
+export function sanitizeCapabilityFactShapeComparison(comparison = null) {
+  if (!comparison || typeof comparison !== "object") return { comparison: sanitizeFactShape(null), canonical: sanitizeFactShape(null) };
+  return { comparison: sanitizeFactShape(comparison.comparisonShape), canonical: sanitizeFactShape(comparison.canonicalShape) };
 }

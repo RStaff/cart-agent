@@ -14,7 +14,7 @@ import { classifyInboxDuplicate, normalizeInboxInput, publicInboxItem } from "./
 import { boundUsajobsSearch } from "./usajobsDiscovery.mjs";
 import { canTransition, lifecycleEventFor, nextOpportunityAction, normalizeLifecycleState } from "./opportunityLifecycle.mjs";
 import { reconcileCapabilityAuthority } from "./capabilityAuthorityReconciliation.mjs";
-import { compareCapabilityDerivationInputs } from "./capabilityDiagnostic.mjs";
+import { compareCapabilityDerivationInputs, summarizeFactShape } from "./capabilityDiagnostic.mjs";
 
 const EVALUATION_VERSION = "CAREEROS_MATCH_EVALUATION_V1";
 const id = (prefix) => `${prefix}_${crypto.randomUUID()}`;
@@ -53,7 +53,7 @@ export async function deriveCapabilities(context, { includeTrace = false, execut
   const pool = await careerP0Pool();
   const profile = await profileId(pool, context);
   const facts = (await pool.query('SELECT f.id,f."sourceId",f.statement,f."sourceExcerpt",f."scopeStatement",f."factType",s."sourceType" FROM "CareerFact" f JOIN "CareerSource" s ON s.id=f."sourceId" AND s."tenantId"=f."tenantId" WHERE f."tenantId"=$1 AND f."userId"=$2 AND f."profileId"=$3 AND f."authorityState"=$4 ORDER BY f."createdAt"', [context.tenant.id, context.user.id, profile, "CUSTOMER_CONFIRMED_SOURCE_BACKED"])).rows;
-  if (executionTrace) { executionTrace.factQueryExecuted = true; executionTrace.factCountInsideDeriveCapabilities = facts.length; }
+  if (executionTrace) { executionTrace.factQueryExecuted = true; executionTrace.factCountInsideDeriveCapabilities = facts.length; executionTrace.factShapeInsideDeriveCapabilities = summarizeFactShape(facts); }
   const candidates = deriveCapabilityCandidates(facts);
   if (executionTrace) { executionTrace.deriveCapabilityCandidatesCalled = true; executionTrace.candidateCountInsideDeriveCapabilities = candidates.length; executionTrace.candidateKeysInsideDeriveCapabilities = candidates.map((candidate) => candidate.capabilityKey); }
   const factsById = new Map(facts.map((fact) => [fact.id, fact]));

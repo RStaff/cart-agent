@@ -5,6 +5,15 @@ function statusCount(rows, statuses) {
   return rows.filter((row) => statuses.includes(String(row.status || "").toUpperCase())).length;
 }
 
+export function summarizeFactShape(facts = []) {
+  const rows = Array.isArray(facts) ? facts : [];
+  const keys = [...new Set(rows.flatMap((fact) => Object.keys(fact || {})))].sort();
+  const tracked = ["statement", "factType", "authorityState", "sourceType", "scopeStatement", "sourceId"];
+  const presentCounts = Object.fromEntries(tracked.map((key) => [key, rows.filter((fact) => fact?.[key] !== undefined && fact?.[key] !== null).length]));
+  const typeCounts = Object.fromEntries(tracked.map((key) => [key, [...new Set(rows.filter((fact) => fact?.[key] !== undefined && fact?.[key] !== null).map((fact) => typeof fact[key]))].sort()]));
+  return { count: rows.length, keys, presentCounts, typeCounts };
+}
+
 function activeDecisions(rows) {
   return new Map(rows.filter((row) => !row.supersededAt).map((row) => [row.capabilityId, row]));
 }
@@ -100,5 +109,7 @@ export function compareCapabilityDerivationInputs({ diagnosticFacts = [], canoni
     sameEligibleCount: sameFactCount,
     sameCandidateKeys,
     firstDivergence: !sameFactCount ? "CANONICAL_FACT_FILTER" : !sameCandidateKeys ? "CANONICAL_FACT_MAPPING" : null,
+    comparisonShape: summarizeFactShape(diagnosticFacts),
+    canonicalShape: summarizeFactShape(canonicalFacts),
   };
 }

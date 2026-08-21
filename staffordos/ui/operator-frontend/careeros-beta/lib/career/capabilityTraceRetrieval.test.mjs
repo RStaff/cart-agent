@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import { sanitizeCapabilityDerivationTrace, sanitizeCapabilityExecutionTrace, sanitizeCapabilityReconciliationTrace } from "./capabilityTrace.mjs";
-import { compareCapabilityDerivationInputs } from "./capabilityDiagnostic.mjs";
+import { compareCapabilityDerivationInputs, summarizeFactShape } from "./capabilityDiagnostic.mjs";
 
 const routePath = new URL("../../app/api/career/internal/capability-reconciliation-trace/route.ts", import.meta.url);
 const routeSource = fs.readFileSync(routePath, "utf8");
@@ -126,4 +126,13 @@ test("comparison identifies canonical source-join filtering without exposing evi
   assert.deepEqual(result.canonicalCandidateKeys, []);
   assert.equal(JSON.stringify(result).includes("Managed"), false);
   assert.equal(JSON.stringify(result).includes("fact-1"), false);
+});
+
+test("fact shape summary exposes structure without values or identifiers", () => {
+  const shape = summarizeFactShape([{ id: "fact-1", sourceId: "source-1", factType: "PROJECT", statement: "private", authorityState: "CUSTOMER_CONFIRMED_SOURCE_BACKED", scopeStatement: null }]);
+  assert.equal(shape.count, 1);
+  assert.deepEqual(shape.presentCounts, { statement: 1, factType: 1, authorityState: 1, sourceType: 0, scopeStatement: 0, sourceId: 1 });
+  assert.deepEqual(shape.typeCounts.statement, ["string"]);
+  assert.equal(JSON.stringify(shape).includes("private"), false);
+  assert.equal(JSON.stringify(shape).includes("fact-1"), false);
 });
