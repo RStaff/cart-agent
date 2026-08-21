@@ -11,8 +11,13 @@ const authority = read("lib/career/customerSemanticAuthority.json");
 const route = read("app/api/career/capabilities/route.ts");
 
 test("capability review exposes bounded supporting evidence and decision choices", () => {
-  assert.match(page, /Why CareerOS is asking/);
+  assert.match(page, /Why CareerOS thinks this/);
+  assert.match(page, /<details\b/);
+  assert.match(page, /<summary>Why CareerOS thinks this<\/summary>/);
+  assert.match(page, /reviewStatus/);
+  assert.match(page, /current\.rationale/);
   assert.match(page, /supportingEvidence/);
+  assert.ok(page.indexOf("current.question?.prompt") < page.indexOf("<details"));
   assert.match(page, /Source:/);
   assert.match(page, /NOT_SUPPORTED/);
   assert.match(page, /KEEP_UNRESOLVED/);

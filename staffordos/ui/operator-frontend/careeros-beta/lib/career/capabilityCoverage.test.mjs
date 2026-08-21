@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { capabilityQuestionForEvidence, deriveCapabilityCandidates, decisionStateForAnswer, listCapabilities, normalizeCareerFactForCapabilityDerivation, refreshCapabilityAuthorityState } from "./capabilityCatalog.mjs";
+import { capabilityQuestionForEvidence, capabilityRationaleForEvidence, deriveCapabilityCandidates, decisionStateForAnswer, listCapabilities, normalizeCareerFactForCapabilityDerivation, refreshCapabilityAuthorityState } from "./capabilityCatalog.mjs";
 import { reconcileCapabilityAuthority } from "./capabilityAuthorityReconciliation.mjs";
 import { parseJobDescription } from "./jobProduct.mjs";
 import { readFileSync } from "node:fs";
@@ -135,9 +135,9 @@ test("interviewer questions cannot derive capability propositions", () => {
 
 test("capability questions explain themselves from confirmed evidence", () => {
   const prompt = capabilityQuestionForEvidence({ label: "Cross-functional coordination", question: { prompt: "Have you coordinated work?" } }, ["Coordinated developers, marketing, and senior team."]);
-  assert.match(prompt, /confirmed evidence/i);
-  assert.match(prompt, /Coordinated developers, marketing, and senior team/);
-  assert.match(prompt, /Have you coordinated work/);
+  assert.equal(prompt, "Have you coordinated work?");
+  assert.doesNotMatch(prompt, /Coordinated developers/);
+  assert.match(capabilityRationaleForEvidence({ label: "Cross-functional coordination" }, ["Coordinated developers, marketing, and senior team."]), /confirmed experience/i);
 });
 
 test("new confirmed fact provenance reopens prior capability authority without changing its decision", () => {

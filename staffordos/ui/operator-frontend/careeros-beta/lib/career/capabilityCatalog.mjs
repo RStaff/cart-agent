@@ -225,9 +225,12 @@ export function choiceLabel(answer) {
   return ({ DIRECT: "Yes, this is directly demonstrated", TRANSFERABLE: "I have closely related experience", PARTIAL: "I have experience with part of this", NOT_SUPPORTED: "No, this does not describe my experience", KEEP_UNRESOLVED: "I need more context" })[answer] || answer;
 }
 
-export function capabilityQuestionForEvidence(capability, evidenceStatements = []) {
-  const context = [...new Set(evidenceStatements.map((item) => String(item || "").replace(/\s+/g, " ").trim()).filter(Boolean))].slice(0, 2).map((item) => item.slice(0, 240)).join(" ");
-  return context
-    ? `CareerOS sees confirmed evidence: “${context}” ${capability.question.prompt}`
-    : `CareerOS is asking because this capability is not yet established from confirmed evidence. ${capability.question.prompt}`;
+export function capabilityQuestionForEvidence(capability) {
+  return capability?.question?.prompt || "Review whether this capability describes your experience.";
+}
+
+export function capabilityRationaleForEvidence(capability, evidenceStatements = []) {
+  const count = evidenceStatements.filter((item) => String(item || "").trim()).length;
+  if (!count) return "CareerOS is asking because this capability is not yet established from confirmed evidence.";
+  return `CareerOS found ${count === 1 ? "a confirmed experience" : `${count} confirmed experiences`} relevant to ${String(capability?.label || "this capability").toLowerCase()}.`;
 }
