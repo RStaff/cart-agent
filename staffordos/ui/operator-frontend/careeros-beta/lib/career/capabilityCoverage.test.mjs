@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { capabilityQuestionForEvidence, deriveCapabilityCandidates, decisionStateForAnswer, listCapabilities, refreshCapabilityAuthorityState } from "./capabilityCatalog.mjs";
+import { reconcileCapabilityAuthority } from "./capabilityAuthorityReconciliation.mjs";
 import { parseJobDescription } from "./jobProduct.mjs";
 
 const evidenceFixtures = [
@@ -127,4 +128,32 @@ test("new confirmed fact provenance reopens prior capability authority without c
   const existing = { authorityState: "VERIFIED_DIRECT", provenance: { factIds: ["old-fact"] } };
   const candidate = { authorityState: "NEEDS_MORE_EVIDENCE", provenance: { factIds: ["old-fact", "new-fact"] } };
   assert.equal(refreshCapabilityAuthorityState(existing, candidate), "NEEDS_MORE_EVIDENCE");
+});
+
+test("canonical reconciliation persists new evidence without reopening unchanged capability", async () => {
+  const queries = [];
+  const pool = { query: async (sql, params) => {
+    queries.push({ sql, params });
+    if (sql.startsWith("UPDATE")) return { rowCount: 1, rows: [{ authorityState: "NEEDS_MORE_EVIDENCE" }] };
+    if (sql.startsWith("SELECT")) return { rowCount: 1, rows: [{ authorityState: "NEEDS_MORE_EVIDENCE", provenance: { factIds: ["old-fact", "new-fact"] } }] };
+    return { rowCount: 0, rows: [] };
+  } };
+  const candidate = { capabilityKey: "PROGRAM_DELIVERY", label: "Program delivery", domain: "delivery", scope: "project", authorityState: "NEEDS_MORE_EVIDENCE", taxonomyVersion: "test", provenance: { factIds: ["old-fact", "new-fact"] } };
+  const result = await reconcileCapabilityAuthority(pool, { tenant: { id: "tenant-1" }, user: { id: "user-1" } }, "profile-1", candidate);
+  assert.equal(result.authorityState, "NEEDS_MORE_EVIDENCE");
+  assert.equal(queries.filter((item) => item.sql.startsWith("INSERT")).length, 0);
+  assert.match(queries[0].sql, /IS DISTINCT FROM/);
+});
+
+test("canonical reconciliation preserves unchanged authority state", async () => {
+  const queries = [];
+  const pool = { query: async (sql) => {
+    queries.push(sql);
+    if (sql.startsWith("SELECT")) return { rowCount: 1, rows: [{ authorityState: "VERIFIED_DIRECT", provenance: { factIds: ["same-fact"] } }] };
+    return { rowCount: 0, rows: [] };
+  } };
+  const candidate = { capabilityKey: "BUSINESS_PROCESS_OPERATIONS", label: "Business and process operations", domain: "operations", scope: "process", authorityState: "VERIFIED_DIRECT", taxonomyVersion: "test", provenance: { factIds: ["same-fact"] } };
+  const result = await reconcileCapabilityAuthority(pool, { tenant: { id: "tenant-1" }, user: { id: "user-1" } }, "profile-1", candidate);
+  assert.equal(result.authorityState, "VERIFIED_DIRECT");
+  assert.equal(queries.filter((sql) => sql.startsWith("INSERT")).length, 1);
 });

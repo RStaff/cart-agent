@@ -13,6 +13,7 @@ import { improveApplicationMaterial, writingEvidence } from "./applicationWritin
 import { classifyInboxDuplicate, normalizeInboxInput, publicInboxItem } from "./opportunityInbox.mjs";
 import { boundUsajobsSearch } from "./usajobsDiscovery.mjs";
 import { canTransition, lifecycleEventFor, nextOpportunityAction, normalizeLifecycleState } from "./opportunityLifecycle.mjs";
+import { reconcileCapabilityAuthority } from "./capabilityAuthorityReconciliation.mjs";
 
 const EVALUATION_VERSION = "CAREEROS_MATCH_EVALUATION_V1";
 const id = (prefix) => `${prefix}_${crypto.randomUUID()}`;
@@ -56,7 +57,7 @@ export async function deriveCapabilities(context) {
   for (const candidate of candidates) {
     const existing = existingAuthorities.get(candidate.capabilityKey);
     const authorityState = refreshCapabilityAuthorityState(existing, candidate);
-    await pool.query('INSERT INTO "CareerCapabilityAuthority" ("id","tenantId","userId","profileId","capabilityKey",label,domain,scope,"authorityState",provenance,"taxonomyVersion","updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,NOW()) ON CONFLICT ("tenantId","profileId","capabilityKey") DO UPDATE SET "authorityState"=EXCLUDED."authorityState",provenance=EXCLUDED.provenance,"taxonomyVersion"=EXCLUDED."taxonomyVersion","updatedAt"=NOW()', [id("capability"), context.tenant.id, context.user.id, profile, candidate.capabilityKey, candidate.label, candidate.domain, candidate.scope, authorityState, JSON.stringify(candidate.provenance), candidate.taxonomyVersion]);
+    await reconcileCapabilityAuthority(pool, context, profile, candidate, authorityState);
   }
   const rows = (await pool.query('SELECT * FROM "CareerCapabilityAuthority" WHERE "tenantId"=$1 AND "userId"=$2 AND "profileId"=$3 ORDER BY "label"', [context.tenant.id, context.user.id, profile])).rows;
   const decisions = await activeDecisions(pool, context, rows.map((row) => row.id));
@@ -65,6 +66,7 @@ export async function deriveCapabilities(context) {
     return publicCapability(row, decisions.get(row.id), evidence);
   }), factsConsidered: facts.length };
 }
+
 
 export async function getCapabilities(context) { return deriveCapabilities(context); }
 
