@@ -46,7 +46,7 @@ async function activeDecisions(pool, context, capabilityIds = []) {
   return new Map(result.rows.map((row) => [row.capabilityId, row]));
 }
 
-export async function deriveCapabilities(context) {
+export async function deriveCapabilities(context, { includeTrace = false } = {}) {
   requireContext(context);
   const pool = await careerP0Pool();
   const profile = await profileId(pool, context);
@@ -54,21 +54,24 @@ export async function deriveCapabilities(context) {
   const candidates = deriveCapabilityCandidates(facts);
   const factsById = new Map(facts.map((fact) => [fact.id, fact]));
   const existingAuthorities = new Map((await pool.query('SELECT "capabilityKey","authorityState",provenance FROM "CareerCapabilityAuthority" WHERE "tenantId"=$1 AND "userId"=$2 AND "profileId"=$3', [context.tenant.id, context.user.id, profile])).rows.map((row) => [row.capabilityKey, row]));
+  const reconciliationTrace = includeTrace ? [] : null;
   for (const candidate of candidates) {
     const existing = existingAuthorities.get(candidate.capabilityKey);
     const authorityState = refreshCapabilityAuthorityState(existing, candidate);
-    await reconcileCapabilityAuthority(pool, context, profile, candidate, authorityState);
+    if (reconciliationTrace) {
+      await reconcileCapabilityAuthority(pool, context, profile, candidate, authorityState, reconciliationTrace, { authorityState: existing?.authorityState, exists: Boolean(existing) });
+    } else await reconcileCapabilityAuthority(pool, context, profile, candidate, authorityState);
   }
   const rows = (await pool.query('SELECT * FROM "CareerCapabilityAuthority" WHERE "tenantId"=$1 AND "userId"=$2 AND "profileId"=$3 ORDER BY "label"', [context.tenant.id, context.user.id, profile])).rows;
   const decisions = await activeDecisions(pool, context, rows.map((row) => row.id));
   return { profileId: profile, capabilities: rows.map((row) => {
     const evidence = (Array.isArray(row.provenance?.factIds) ? row.provenance.factIds : []).map((factId) => factsById.get(factId)).filter(Boolean).map((fact) => ({ statement: fact.statement, sourceType: fact.sourceType || null, sourceExcerpt: fact.sourceExcerpt || null, scopeStatement: fact.scopeStatement || null }));
     return publicCapability(row, decisions.get(row.id), evidence);
-  }), factsConsidered: facts.length };
+  }), factsConsidered: facts.length, ...(reconciliationTrace ? { reconciliationTrace } : {}) };
 }
 
 
-export async function getCapabilities(context) { return deriveCapabilities(context); }
+export async function getCapabilities(context, options = {}) { return deriveCapabilities(context, options); }
 
 export async function answerCapability(context, { capabilityId, questionKey, answer }) {
   requireContext(context);
@@ -441,14 +444,20 @@ export async function updateOpportunityDecision(context, opportunityId, value) {
   return { id: row.id, decisionState: row.decisionState, decisionLabel: CAREEROS_OPPORTUNITY_DECISION_LABELS[row.decisionState] };
 }
 
-export async function getCapabilityProfile(context) {
-  const data = await getCapabilities(context);
+export async function getCapabilityProfile(context, options = {}) {
+  const data = await getCapabilities(context, options);
   const categories = { direct: [], transferable: [], partial: [], unresolved: [] };
   for (const capability of data.capabilities) {
     const key = capability.authorityState === "VERIFIED_DIRECT" ? "direct" : capability.authorityState === "VERIFIED_TRANSFERABLE" ? "transferable" : capability.authorityState === "PARTIALLY_SUPPORTED" ? "partial" : "unresolved";
     categories[key].push(capability);
   }
   const reviewed = data.capabilities.filter((item) => !capabilityNeedsReview(item)).length;
+  const capabilityTrace = data.reconciliationTrace || [];
+  for (const item of data.capabilities) {
+    const trace = capabilityTrace.find((entry) => entry.capabilityKey === item.key);
+    if (trace) { trace.publicAuthorityState = item.authorityState; trace.capabilityNeedsReview = capabilityNeedsReview(item); }
+  }
+  if (capabilityTrace.length) capabilityTrace.push({ profileId: data.profileId, candidateCount: data.capabilities.length, reviewed, total: data.capabilities.length, completion: data.capabilities.length > 0 && reviewed === data.capabilities.length });
   return { ...data, categories, progress: { reviewed, total: data.capabilities.length }, leverage: { decisionsAsked: reviewed, capabilitiesResolved: reviewed, requirementsInformed: null, note: "Opportunity-specific requirements are measured after a job is supplied." } };
 }
 

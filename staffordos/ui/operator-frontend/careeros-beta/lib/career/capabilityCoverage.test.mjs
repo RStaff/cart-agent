@@ -145,6 +145,33 @@ test("canonical reconciliation persists new evidence without reopening unchanged
   assert.match(queries[0].sql, /IS DISTINCT FROM/);
 });
 
+test("reconciliation trace captures the canonical state transitions without evidence text", async () => {
+  const trace = [];
+  const pool = { query: async (sql) => {
+    if (sql.startsWith("UPDATE")) return { rowCount: 1, rows: [] };
+    if (sql.startsWith("SELECT")) return { rowCount: 1, rows: [{ authorityState: "NEEDS_MORE_EVIDENCE", provenance: { factIds: ["old-fact", "new-fact"] } }] };
+    return { rowCount: 0, rows: [] };
+  } };
+  const candidate = { capabilityKey: "PROGRAM_DELIVERY", label: "Program delivery", domain: "delivery", scope: "project", authorityState: "NEEDS_MORE_EVIDENCE", taxonomyVersion: "test", provenance: { factIds: ["old-fact", "new-fact"], statements: ["private evidence must not be traced"] } };
+  await reconcileCapabilityAuthority(pool, { tenant: { id: "tenant-1" }, user: { id: "user-1" } }, "profile-1", candidate, "NEEDS_MORE_EVIDENCE", trace);
+  assert.deepEqual(trace, [{ capabilityKey: "PROGRAM_DELIVERY", expectedAuthorityState: "NEEDS_MORE_EVIDENCE", profileId: "profile-1", priorAuthorityState: null, existingAuthority: false, updateAttempted: true, updateRowCount: 1, insertAttempted: false, readbackAuthorityState: "NEEDS_MORE_EVIDENCE", returnedAuthorityState: "NEEDS_MORE_EVIDENCE", reconciliationSucceeded: true }]);
+  assert.equal(JSON.stringify(trace).includes("private evidence"), false);
+});
+
+test("reconciliation trace preserves a persisted-state mismatch before failing closed", async () => {
+  const trace = [];
+  const pool = { query: async (sql) => {
+    if (sql.startsWith("UPDATE")) return { rowCount: 1, rows: [] };
+    if (sql.startsWith("SELECT")) return { rowCount: 1, rows: [{ authorityState: "VERIFIED_DIRECT", provenance: { factIds: ["old-fact"] } }] };
+    return { rowCount: 0, rows: [] };
+  } };
+  const candidate = { capabilityKey: "PROGRAM_DELIVERY", label: "Program delivery", domain: "delivery", scope: "project", authorityState: "NEEDS_MORE_EVIDENCE", taxonomyVersion: "test", provenance: { factIds: ["old-fact", "new-fact"] } };
+  await assert.rejects(() => reconcileCapabilityAuthority(pool, { tenant: { id: "tenant-1" }, user: { id: "user-1" } }, "profile-1", candidate, "NEEDS_MORE_EVIDENCE", trace), /CAPABILITY_AUTHORITY_RECONCILIATION_FAILED/);
+  assert.equal(trace[0].updateRowCount, 1);
+  assert.equal(trace[0].readbackAuthorityState, "VERIFIED_DIRECT");
+  assert.equal(trace[0].reconciliationSucceeded, false);
+});
+
 test("canonical reconciliation preserves unchanged authority state", async () => {
   const queries = [];
   const pool = { query: async (sql) => {
