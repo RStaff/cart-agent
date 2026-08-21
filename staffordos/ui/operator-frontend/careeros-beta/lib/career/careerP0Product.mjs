@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import { careerP0Pool } from "./careerP0Auth";
-import { CAREEROS_CAPABILITY_TAXONOMY_VERSION, capabilityForKey, capabilityQuestionForEvidence, decisionStateForAnswer, deriveCapabilityCandidates, listCapabilities, refreshCapabilityAuthorityState } from "./capabilityCatalog.mjs";
+import { CAREEROS_CAPABILITY_TAXONOMY_VERSION, capabilityForKey, capabilityQuestionForEvidence, decisionStateForAnswer, deriveCapabilityCandidates, listCapabilities, normalizeCareerFactForCapabilityDerivation, refreshCapabilityAuthorityState } from "./capabilityCatalog.mjs";
 import { capabilityNeedsReview } from "./capabilityReview.mjs";
 import { parseJobDescription } from "./jobProduct.mjs";
 import { CAREEROS_OPPORTUNITY_DECISION_LABELS, normalizeOpportunityDecision } from "./jobDecision.mjs";
@@ -52,7 +52,7 @@ export async function deriveCapabilities(context, { includeTrace = false, execut
   if (executionTrace) { executionTrace.deriveCapabilitiesEntered = true; executionTrace.includeTraceAtDeriveCapabilities = includeTrace; }
   const pool = await careerP0Pool();
   const profile = await profileId(pool, context);
-  const facts = (await pool.query('SELECT f.id,f."sourceId",f.statement,f."sourceExcerpt",f."scopeStatement",f."factType",s."sourceType" FROM "CareerFact" f JOIN "CareerSource" s ON s.id=f."sourceId" AND s."tenantId"=f."tenantId" WHERE f."tenantId"=$1 AND f."userId"=$2 AND f."profileId"=$3 AND f."authorityState"=$4 ORDER BY f."createdAt"', [context.tenant.id, context.user.id, profile, "CUSTOMER_CONFIRMED_SOURCE_BACKED"])).rows;
+  const facts = (await pool.query('SELECT f.id,f."sourceId",f.statement,f."sourceExcerpt",f."scopeStatement",f."factType",f."authorityState",s."sourceType" FROM "CareerFact" f JOIN "CareerSource" s ON s.id=f."sourceId" AND s."tenantId"=f."tenantId" WHERE f."tenantId"=$1 AND f."userId"=$2 AND f."profileId"=$3 AND f."authorityState"=$4 ORDER BY f."createdAt"', [context.tenant.id, context.user.id, profile, "CUSTOMER_CONFIRMED_SOURCE_BACKED"])).rows.map(normalizeCareerFactForCapabilityDerivation);
   if (executionTrace) { executionTrace.factQueryExecuted = true; executionTrace.factCountInsideDeriveCapabilities = facts.length; executionTrace.factShapeInsideDeriveCapabilities = summarizeFactShape(facts); }
   const candidates = deriveCapabilityCandidates(facts);
   if (executionTrace) { executionTrace.deriveCapabilityCandidatesCalled = true; executionTrace.candidateCountInsideDeriveCapabilities = candidates.length; executionTrace.candidateKeysInsideDeriveCapabilities = candidates.map((candidate) => candidate.capabilityKey); }

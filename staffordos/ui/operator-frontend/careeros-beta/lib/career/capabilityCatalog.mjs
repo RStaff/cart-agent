@@ -145,6 +145,19 @@ function isConfirmedCustomerEvidence(fact) {
   return Boolean(statement) && !/[?]\s*$/.test(statement) && !/^(what|how|why|have you|tell me|describe)\b/i.test(statement);
 }
 
+export function normalizeCareerFactForCapabilityDerivation(row = {}) {
+  return {
+    id: row.id,
+    sourceId: row.sourceId,
+    statement: row.statement,
+    sourceExcerpt: row.sourceExcerpt,
+    scopeStatement: row.scopeStatement,
+    factType: row.factType,
+    authorityState: row.authorityState,
+    sourceType: row.sourceType,
+  };
+}
+
 export function deriveCapabilityCandidates(facts) {
   const byKey = new Map();
   for (const fact of facts || []) {

@@ -1,8 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { capabilityQuestionForEvidence, deriveCapabilityCandidates, decisionStateForAnswer, listCapabilities, refreshCapabilityAuthorityState } from "./capabilityCatalog.mjs";
+import { capabilityQuestionForEvidence, deriveCapabilityCandidates, decisionStateForAnswer, listCapabilities, normalizeCareerFactForCapabilityDerivation, refreshCapabilityAuthorityState } from "./capabilityCatalog.mjs";
 import { reconcileCapabilityAuthority } from "./capabilityAuthorityReconciliation.mjs";
 import { parseJobDescription } from "./jobProduct.mjs";
+import { readFileSync } from "node:fs";
 
 const evidenceFixtures = [
   ["TEACHING_TRAINING", "Designed and delivered training sessions for users adopting a new platform."],
@@ -11,6 +12,21 @@ const evidenceFixtures = [
   ["BUSINESS_PROCESS_OPERATIONS", "Improved intake workflows and coordinated vendors and internal stakeholders."],
   ["MARKETING_DIGITAL", "Managed digital marketing campaigns and marketing technology initiatives."],
 ];
+
+test("canonical CareerFact rows preserve authorityState before capability derivation", () => {
+  assert.match(readFileSync(new URL("./careerP0Product.mjs", import.meta.url), "utf8"), /f\."authorityState"/);
+  const rows = [
+    { id: "fact-project", sourceId: "source-project", statement: "Managed a cross-functional website migration.", factType: "PROJECT", authorityState: "CUSTOMER_CONFIRMED_SOURCE_BACKED" },
+    { id: "fact-technology", sourceId: "source-technology", statement: "Implemented a platform using a technology tool.", factType: "TECHNOLOGY", authorityState: "CUSTOMER_CONFIRMED_SOURCE_BACKED" },
+    { id: "fact-operations", sourceId: "source-operations", statement: "Operated a small business, managing vendors and process operations.", factType: "OTHER", authorityState: "CUSTOMER_CONFIRMED_SOURCE_BACKED" },
+  ];
+  const normalized = rows.map(normalizeCareerFactForCapabilityDerivation);
+  assert.deepEqual(normalized.map((fact) => fact.authorityState), rows.map((fact) => fact.authorityState));
+  assert.deepEqual(
+    deriveCapabilityCandidates(normalized).map((candidate) => candidate.capabilityKey).sort(),
+    ["BUSINESS_PROCESS_OPERATIONS", "CROSS_FUNCTIONAL_COORDINATION", "PROGRAM_DELIVERY", "TECHNOLOGY_IMPLEMENTATION"],
+  );
+});
 
 test("new capability concepts derive only from confirmed fact-shaped evidence and retain provenance", () => {
   const facts = evidenceFixtures.map(([expectedKey, statement], index) => ({ id: `fact-${index}`, sourceId: `source-${index}`, factType: "OTHER", statement, expectedKey, authorityState: "CUSTOMER_CONFIRMED_SOURCE_BACKED" }));
