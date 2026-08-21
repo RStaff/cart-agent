@@ -43,3 +43,24 @@ export function sanitizeCapabilityDerivationTrace(trace = null) {
     reconciliationReturnedKeys: Array.isArray(trace.reconciliationReturnedKeys) ? trace.reconciliationReturnedKeys : [],
   };
 }
+
+/** @param {unknown} trace */
+export function sanitizeCapabilityExecutionTrace(trace = null) {
+  if (!trace || typeof trace !== "object") return {};
+  return {
+    getCapabilityProfileEntered: Boolean(trace.getCapabilityProfileEntered),
+    getCapabilitiesEntered: Boolean(trace.getCapabilitiesEntered),
+    deriveCapabilitiesEntered: Boolean(trace.deriveCapabilitiesEntered),
+    factQueryExecuted: Boolean(trace.factQueryExecuted),
+    factCountInsideDeriveCapabilities: Number(trace.factCountInsideDeriveCapabilities || 0),
+    deriveCapabilityCandidatesCalled: Boolean(trace.deriveCapabilityCandidatesCalled),
+    candidateCountInsideDeriveCapabilities: Number(trace.candidateCountInsideDeriveCapabilities || 0),
+    candidateKeysInsideDeriveCapabilities: Array.isArray(trace.candidateKeysInsideDeriveCapabilities) ? trace.candidateKeysInsideDeriveCapabilities : [],
+    deriveCapabilitiesReturnedCount: Number(trace.deriveCapabilitiesReturnedCount || 0),
+    getCapabilitiesReturnedCount: Number(trace.getCapabilitiesReturnedCount || 0),
+    getCapabilityProfileReturnedCount: Number(trace.getCapabilityProfileReturnedCount || 0),
+    includeTraceAtProfile: Boolean(trace.includeTraceAtProfile),
+    includeTraceAtGetCapabilities: Boolean(trace.includeTraceAtGetCapabilities),
+    includeTraceAtDeriveCapabilities: Boolean(trace.includeTraceAtDeriveCapabilities),
+  };
+}

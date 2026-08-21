@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { sanitizeCapabilityDerivationTrace, sanitizeCapabilityReconciliationTrace } from "./capabilityTrace.mjs";
+import { sanitizeCapabilityDerivationTrace, sanitizeCapabilityExecutionTrace, sanitizeCapabilityReconciliationTrace } from "./capabilityTrace.mjs";
 import { compareCapabilityDerivationInputs } from "./capabilityDiagnostic.mjs";
 
 const routePath = new URL("../../app/api/career/internal/capability-reconciliation-trace/route.ts", import.meta.url);
@@ -69,10 +69,35 @@ test("derivation trace exposes candidate and lifecycle entry keys without identi
   assert.equal(JSON.stringify(output).includes("private"), false);
 });
 
+test("execution trace preserves canonical call-graph stages without private data", () => {
+  const output = sanitizeCapabilityExecutionTrace({
+    getCapabilityProfileEntered: true,
+    getCapabilitiesEntered: true,
+    deriveCapabilitiesEntered: true,
+    factQueryExecuted: true,
+    factCountInsideDeriveCapabilities: 33,
+    deriveCapabilityCandidatesCalled: true,
+    candidateCountInsideDeriveCapabilities: 4,
+    candidateKeysInsideDeriveCapabilities: ["PROGRAM_DELIVERY"],
+    deriveCapabilitiesReturnedCount: 4,
+    getCapabilitiesReturnedCount: 4,
+    getCapabilityProfileReturnedCount: 4,
+    includeTraceAtProfile: true,
+    includeTraceAtGetCapabilities: true,
+    includeTraceAtDeriveCapabilities: true,
+    profileId: "private-profile",
+    statement: "private evidence",
+  });
+  assert.equal(output.factCountInsideDeriveCapabilities, 33);
+  assert.equal(output.candidateCountInsideDeriveCapabilities, 4);
+  assert.deepEqual(output.candidateKeysInsideDeriveCapabilities, ["PROGRAM_DELIVERY"]);
+  assert.equal(JSON.stringify(output).includes("private"), false);
+});
+
 test("trace route is authenticated, canonical, uncached, and read-only at the customer boundary", () => {
   assert.match(routeSource, /currentCareerContext/);
   assert.match(routeSource, /if \(!context\).*401/s);
-  assert.match(routeSource, /getCapabilityProfile\(context, \{ includeTrace: true \}\)/);
+  assert.match(routeSource, /getCapabilityProfile\(context, \{ includeTrace: true, executionTrace \}\)/);
   assert.match(routeSource, /Cache-Control/);
   assert.doesNotMatch(routeSource, /CareerFact|sourceExcerpt|statement|tenantId|profileId/);
 });

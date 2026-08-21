@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { currentCareerContext } from "../../../../../lib/career/careerP0Auth";
 import { getCapabilityDerivationComparison, getCapabilityProfile } from "../../../../../lib/career/careerP0Product.mjs";
-import { sanitizeCapabilityDerivationTrace, sanitizeCapabilityReconciliationTrace } from "../../../../../lib/career/capabilityTrace.mjs";
+import { sanitizeCapabilityDerivationTrace, sanitizeCapabilityExecutionTrace, sanitizeCapabilityReconciliationTrace } from "../../../../../lib/career/capabilityTrace.mjs";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,11 +22,13 @@ export async function GET() {
   if (!context) return response({ ok: false, error: "UNAUTHORIZED" }, 401);
 
   try {
+    const executionTrace = {};
     const [profile, comparison] = await Promise.all([
-      getCapabilityProfile(context, { includeTrace: true }),
+      getCapabilityProfile(context, { includeTrace: true, executionTrace }),
       getCapabilityDerivationComparison(context),
     ]);
-    return response({ ok: true, comparison, derivation: sanitizeCapabilityDerivationTrace(profile.derivationTrace as unknown), trace: sanitizeCapabilityReconciliationTrace(profile.reconciliationTrace) });
+    const tracedProfile = profile as typeof profile & { executionTrace?: unknown };
+    return response({ ok: true, comparison, canonicalExecution: sanitizeCapabilityExecutionTrace(tracedProfile.executionTrace || executionTrace), derivation: sanitizeCapabilityDerivationTrace(tracedProfile.derivationTrace as unknown), trace: sanitizeCapabilityReconciliationTrace(tracedProfile.reconciliationTrace) });
   } catch (error) {
     return response({ ok: false, error: "CAPABILITY_RECONCILIATION_TRACE_FAILED", trace: traceFrom(error) }, 400);
   }

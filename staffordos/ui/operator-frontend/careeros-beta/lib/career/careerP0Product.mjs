@@ -47,12 +47,15 @@ async function activeDecisions(pool, context, capabilityIds = []) {
   return new Map(result.rows.map((row) => [row.capabilityId, row]));
 }
 
-export async function deriveCapabilities(context, { includeTrace = false } = {}) {
+export async function deriveCapabilities(context, { includeTrace = false, executionTrace = null } = {}) {
   requireContext(context);
+  if (executionTrace) { executionTrace.deriveCapabilitiesEntered = true; executionTrace.includeTraceAtDeriveCapabilities = includeTrace; }
   const pool = await careerP0Pool();
   const profile = await profileId(pool, context);
   const facts = (await pool.query('SELECT f.id,f."sourceId",f.statement,f."sourceExcerpt",f."scopeStatement",f."factType",s."sourceType" FROM "CareerFact" f JOIN "CareerSource" s ON s.id=f."sourceId" AND s."tenantId"=f."tenantId" WHERE f."tenantId"=$1 AND f."userId"=$2 AND f."profileId"=$3 AND f."authorityState"=$4 ORDER BY f."createdAt"', [context.tenant.id, context.user.id, profile, "CUSTOMER_CONFIRMED_SOURCE_BACKED"])).rows;
+  if (executionTrace) { executionTrace.factQueryExecuted = true; executionTrace.factCountInsideDeriveCapabilities = facts.length; }
   const candidates = deriveCapabilityCandidates(facts);
+  if (executionTrace) { executionTrace.deriveCapabilityCandidatesCalled = true; executionTrace.candidateCountInsideDeriveCapabilities = candidates.length; executionTrace.candidateKeysInsideDeriveCapabilities = candidates.map((candidate) => candidate.capabilityKey); }
   const factsById = new Map(facts.map((fact) => [fact.id, fact]));
   const existingAuthorities = new Map((await pool.query('SELECT "capabilityKey","authorityState",provenance FROM "CareerCapabilityAuthority" WHERE "tenantId"=$1 AND "userId"=$2 AND "profileId"=$3', [context.tenant.id, context.user.id, profile])).rows.map((row) => [row.capabilityKey, row]));
   const reconciliationTrace = includeTrace ? [] : null;
@@ -76,7 +79,12 @@ export async function deriveCapabilities(context, { includeTrace = false } = {})
 }
 
 
-export async function getCapabilities(context, options = {}) { return deriveCapabilities(context, options); }
+export async function getCapabilities(context, options = {}) {
+  if (options.executionTrace) { options.executionTrace.getCapabilitiesEntered = true; options.executionTrace.includeTraceAtGetCapabilities = Boolean(options.includeTrace); }
+  const result = await deriveCapabilities(context, options);
+  if (options.executionTrace) { options.executionTrace.deriveCapabilitiesReturnedCount = result.capabilities.length; options.executionTrace.getCapabilitiesReturnedCount = result.capabilities.length; }
+  return result;
+}
 
 export async function getCapabilityDerivationComparison(context) {
   requireContext(context);
@@ -462,7 +470,9 @@ export async function updateOpportunityDecision(context, opportunityId, value) {
 }
 
 export async function getCapabilityProfile(context, options = {}) {
-  const data = await getCapabilities(context, options);
+  const executionTrace = options.includeTrace ? (options.executionTrace || {}) : null;
+  if (executionTrace) { executionTrace.getCapabilityProfileEntered = true; executionTrace.includeTraceAtProfile = true; }
+  const data = await getCapabilities(context, { ...options, ...(executionTrace ? { executionTrace } : {}) });
   const categories = { direct: [], transferable: [], partial: [], unresolved: [] };
   for (const capability of data.capabilities) {
     const key = capability.authorityState === "VERIFIED_DIRECT" ? "direct" : capability.authorityState === "VERIFIED_TRANSFERABLE" ? "transferable" : capability.authorityState === "PARTIALLY_SUPPORTED" ? "partial" : "unresolved";
@@ -475,6 +485,7 @@ export async function getCapabilityProfile(context, options = {}) {
     if (trace) { trace.publicAuthorityState = item.authorityState; trace.capabilityNeedsReview = capabilityNeedsReview(item); }
   }
   if (capabilityTrace.length) capabilityTrace.push({ profileId: data.profileId, candidateCount: data.capabilities.length, reviewed, total: data.capabilities.length, completion: data.capabilities.length > 0 && reviewed === data.capabilities.length });
+  if (executionTrace) executionTrace.getCapabilityProfileReturnedCount = data.capabilities.length;
   return { ...data, categories, progress: { reviewed, total: data.capabilities.length }, leverage: { decisionsAsked: reviewed, capabilitiesResolved: reviewed, requirementsInformed: null, note: "Opportunity-specific requirements are measured after a job is supplied." } };
 }
 
