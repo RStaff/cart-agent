@@ -16,6 +16,10 @@ test("capability review exposes bounded supporting evidence and decision choices
   assert.match(page, /<summary>Why CareerOS thinks this<\/summary>/);
   assert.match(page, /reviewStatus/);
   assert.match(page, /current\.rationale/);
+  assert.match(page, /Review my capabilities/);
+  assert.match(page, /reviewingCompletedCapabilities/);
+  assert.match(page, /Done reviewing/);
+  assert.match(page, /Reviewing capability/);
   assert.match(page, /supportingEvidence/);
   assert.ok(page.indexOf("current.question?.prompt") < page.indexOf("<details"));
   assert.match(page, /Source:/);
@@ -24,6 +28,13 @@ test("capability review exposes bounded supporting evidence and decision choices
   assert.match(product, /sourceExcerpt/);
   assert.match(product, /CUSTOMER_CONFIRMED_SOURCE_BACKED/);
   assert.match(catalog, /capabilityQuestionForEvidence/);
+});
+
+test("completed capability review reuses existing decisions without an entry mutation", () => {
+  assert.match(page, /setReviewingCompletedCapabilities\(true\)/);
+  assert.match(page, /decision\?\.answer/);
+  assert.match(page, /aria-pressed=\{current\.decision\?\.answer === choice\}/);
+  assert.equal([...page.matchAll(/method: "POST"/g)].length, 1);
 });
 
 test("capability review remains separate from career fact truth", () => {
