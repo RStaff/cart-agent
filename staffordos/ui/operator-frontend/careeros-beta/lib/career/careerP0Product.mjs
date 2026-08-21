@@ -14,6 +14,7 @@ import { classifyInboxDuplicate, normalizeInboxInput, publicInboxItem } from "./
 import { boundUsajobsSearch } from "./usajobsDiscovery.mjs";
 import { canTransition, lifecycleEventFor, nextOpportunityAction, normalizeLifecycleState } from "./opportunityLifecycle.mjs";
 import { reconcileCapabilityAuthority } from "./capabilityAuthorityReconciliation.mjs";
+import { compareCapabilityDerivationInputs } from "./capabilityDiagnostic.mjs";
 
 const EVALUATION_VERSION = "CAREEROS_MATCH_EVALUATION_V1";
 const id = (prefix) => `${prefix}_${crypto.randomUUID()}`;
@@ -72,6 +73,18 @@ export async function deriveCapabilities(context, { includeTrace = false } = {})
 
 
 export async function getCapabilities(context, options = {}) { return deriveCapabilities(context, options); }
+
+export async function getCapabilityDerivationComparison(context) {
+  requireContext(context);
+  const pool = await careerP0Pool();
+  const profile = await profileId(pool, context);
+  const values = [context.tenant.id, context.user.id, profile, "CUSTOMER_CONFIRMED_SOURCE_BACKED"];
+  const [diagnosticFacts, canonicalFacts] = await Promise.all([
+    pool.query('SELECT id,"sourceId",statement,"factType","authorityState" FROM "CareerFact" WHERE "tenantId"=$1 AND "userId"=$2 AND "profileId"=$3 AND "authorityState"=$4 ORDER BY "createdAt"', values),
+    pool.query('SELECT f.id,f."sourceId",f.statement,f."factType",f."authorityState" FROM "CareerFact" f JOIN "CareerSource" s ON s.id=f."sourceId" AND s."tenantId"=f."tenantId" WHERE f."tenantId"=$1 AND f."userId"=$2 AND f."profileId"=$3 AND f."authorityState"=$4 ORDER BY f."createdAt"', values),
+  ]);
+  return compareCapabilityDerivationInputs({ diagnosticFacts: diagnosticFacts.rows, canonicalFacts: canonicalFacts.rows });
+}
 
 export async function answerCapability(context, { capabilityId, questionKey, answer }) {
   requireContext(context);

@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import { sanitizeCapabilityReconciliationTrace } from "./capabilityTrace.mjs";
+import { compareCapabilityDerivationInputs } from "./capabilityDiagnostic.mjs";
 
 const routePath = new URL("../../app/api/career/internal/capability-reconciliation-trace/route.ts", import.meta.url);
 const routeSource = fs.readFileSync(routePath, "utf8");
@@ -62,4 +63,24 @@ test("normal capability route remains opt-in for its existing trace behavior", (
   const normalRoute = fs.readFileSync(new URL("../../app/api/career/capabilities/route.ts", import.meta.url), "utf8");
   assert.match(normalRoute, /traceEnabled/);
   assert.match(normalRoute, /includeTrace: traceEnabled\(\)/);
+});
+
+test("diagnostic and canonical fact sets produce the same candidate keys when inputs match", () => {
+  const facts = [{ id: "fact-1", sourceId: "source-1", factType: "PROJECT", statement: "Managed a cross-functional migration.", authorityState: "CUSTOMER_CONFIRMED_SOURCE_BACKED" }];
+  const result = compareCapabilityDerivationInputs({ diagnosticFacts: facts, canonicalFacts: facts });
+  assert.equal(result.sameFactCount, true);
+  assert.equal(result.sameCandidateKeys, true);
+  assert.equal(result.firstDivergence, null);
+});
+
+test("comparison identifies canonical source-join filtering without exposing evidence", () => {
+  const diagnosticFacts = [{ id: "fact-1", sourceId: "missing-source", factType: "PROJECT", statement: "Managed a cross-functional migration.", authorityState: "CUSTOMER_CONFIRMED_SOURCE_BACKED" }];
+  const result = compareCapabilityDerivationInputs({ diagnosticFacts, canonicalFacts: [] });
+  assert.equal(result.firstDivergence, "CANONICAL_FACT_FILTER");
+  assert.equal(result.diagnosticFactCount, 1);
+  assert.equal(result.canonicalFactCount, 0);
+  assert.deepEqual(result.diagnosticCandidateKeys, ["CROSS_FUNCTIONAL_COORDINATION", "PROGRAM_DELIVERY"]);
+  assert.deepEqual(result.canonicalCandidateKeys, []);
+  assert.equal(JSON.stringify(result).includes("Managed"), false);
+  assert.equal(JSON.stringify(result).includes("fact-1"), false);
 });

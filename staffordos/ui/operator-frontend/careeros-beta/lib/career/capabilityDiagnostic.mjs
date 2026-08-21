@@ -82,3 +82,23 @@ export function buildCapabilityDiagnostic({ profile, sources, candidates, career
     },
   };
 }
+
+export function compareCapabilityDerivationInputs({ diagnosticFacts = [], canonicalFacts = [] }) {
+  const candidateKeys = (facts) => [...new Set(deriveCapabilityCandidates(facts).map((item) => item.capabilityKey))].sort();
+  const diagnosticCandidateKeys = candidateKeys(diagnosticFacts);
+  const canonicalCandidateKeys = candidateKeys(canonicalFacts);
+  const sameFactCount = diagnosticFacts.length === canonicalFacts.length;
+  const sameCandidateKeys = JSON.stringify(diagnosticCandidateKeys) === JSON.stringify(canonicalCandidateKeys);
+  return {
+    diagnosticFactCount: diagnosticFacts.length,
+    canonicalFactCount: canonicalFacts.length,
+    diagnosticEligibleFactCount: diagnosticFacts.length,
+    canonicalEligibleFactCount: canonicalFacts.length,
+    diagnosticCandidateKeys,
+    canonicalCandidateKeys,
+    sameFactCount,
+    sameEligibleCount: sameFactCount,
+    sameCandidateKeys,
+    firstDivergence: !sameFactCount ? "CANONICAL_FACT_FILTER" : !sameCandidateKeys ? "CANONICAL_FACT_MAPPING" : null,
+  };
+}
