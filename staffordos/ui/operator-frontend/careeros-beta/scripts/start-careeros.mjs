@@ -10,7 +10,11 @@ async function ensureCareerSchema() {
   const client = new Client({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
   await client.connect();
   try {
-    for (const migration of ["20260818030000_add_resume_drafts/migration.sql", "20260820050000_add_career_search_preferences/migration.sql"]) {
+    for (const migration of [
+      "20260818030000_add_resume_drafts/migration.sql",
+      "20260820050000_add_career_search_preferences/migration.sql",
+      "20260822010000_add_career_fact_context_claims/migration.sql",
+    ]) {
       await client.query(await readFile(new URL(`../prisma/migrations/${migration}`, import.meta.url), "utf8"));
     }
   }
