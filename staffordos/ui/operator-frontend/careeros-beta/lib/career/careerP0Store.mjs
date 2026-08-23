@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { contextSummary, extractContextClaims, normalizeContextCorrection } from "./contextClaims.mjs";
 
 const DEFAULT_TTL_MS = 1000 * 60 * 60 * 24 * 30;
 
@@ -39,6 +40,21 @@ function safeSource(source) {
   return metadata;
 }
 
+function publicContextClaim(row, facts = [], sources = []) {
+  const fact = facts.find((item) => item.id === row.careerFactId);
+  const source = sources.find((item) => item.id === row.sourceId);
+  return {
+    claimId: row.id,
+    dimension: row.dimension,
+    displayValue: row.displayValue,
+    authorityState: row.authorityState,
+    status: row.status,
+    sourceOrder: row.sourceAnchor?.sourceOrder ?? null,
+    sourceType: source?.sourceType || null,
+    evidence: fact ? { statement: fact.statement, sourceExcerpt: fact.sourceExcerpt || null } : null,
+  };
+}
+
 function audit(data, tenantId, userId, eventType, entityType = null, entityId = null) {
   data.auditEvents ||= [];
   data.auditEvents.push({ id: id("audit"), tenantId, userId, eventType, entityType, entityId, createdAt: now() });
@@ -67,12 +83,13 @@ export function createCareerP0Store({ filePath = process.env.CAREEROS_P0_STORE_P
       data.candidateFacts ||= [];
       data.reviewDecisions ||= [];
       data.careerFacts ||= [];
+      data.contextClaims ||= [];
       data.auditEvents ||= [];
       data.rateLimitBuckets ||= {};
       return data;
     } catch (error) {
       if (error?.code === "ENOENT") {
-        return { users: [], tenants: [], memberships: [], profiles: [], onboarding: [], sources: [], sessions: [], candidateFacts: [], reviewDecisions: [], careerFacts: [], auditEvents: [], rateLimitBuckets: {} };
+        return { users: [], tenants: [], memberships: [], profiles: [], onboarding: [], sources: [], sessions: [], candidateFacts: [], reviewDecisions: [], careerFacts: [], contextClaims: [], auditEvents: [], rateLimitBuckets: {} };
       }
       throw error;
     }
@@ -240,6 +257,15 @@ export function createCareerP0Store({ filePath = process.env.CAREEROS_P0_STORE_P
     return (data.candidateFacts || []).filter((candidate) => candidate.tenantId === context.tenant.id && candidate.userId === context.user.id).map(({ tenantId, userId, profileId, ...candidate }) => candidate);
   }
 
+  function ensureContextClaims(data, fact) {
+    data.contextClaims ||= [];
+    for (const proposal of extractContextClaims(fact)) {
+      const exists = data.contextClaims.some((claim) => claim.careerFactId === fact.id && claim.dimension === proposal.dimension && claim.normalizedValue === proposal.normalizedValue && claim.extractionVersion === proposal.extractionVersion);
+      if (exists) continue;
+      data.contextClaims.push({ id: id("context-claim"), tenantId: fact.tenantId, userId: fact.userId, profileId: fact.profileId, careerFactId: fact.id, sourceId: fact.sourceId, ...proposal, authorityState: "SYSTEM_PROPOSED", status: "ACTIVE", supersedesClaimId: null, createdAt: now(), updatedAt: now() });
+    }
+  }
+
   async function reviewCandidate(sessionId, candidateId, decision, correction = null) {
     const context = await resolveSession(sessionId);
     if (!context) throw Object.assign(new Error("unauthorized"), { code: "UNAUTHORIZED" });
@@ -263,14 +289,49 @@ export function createCareerP0Store({ filePath = process.env.CAREEROS_P0_STORE_P
     candidate.updatedAt = timestamp;
     data.reviewDecisions.push({ id: id("review"), candidateFactId: candidateId, tenantId: context.tenant.id, userId: context.user.id, decision, previousStatement, activeStatement: candidate.statement, createdAt: timestamp });
     audit(data, context.tenant.id, context.user.id, `FACT_${decision}`, "CareerFactCandidate", candidateId);
+    let fact = null;
     if (decision === "CONFIRM" || decision === "CORRECT") {
       const existing = data.careerFacts.find((fact) => fact.candidateFactId === candidateId && fact.tenantId === context.tenant.id);
-      const fact = { ...(existing || {}), id: existing?.id || id("fact"), candidateFactId: candidateId, tenantId: context.tenant.id, userId: context.user.id, profileId: candidate.profileId, sourceId: candidate.sourceId, factType: candidate.factType, statement: candidate.statement, sourceExcerpt: candidate.sourceExcerpt, sourceOrder: candidate.sourceOrder, scopeStatement: candidate.scopeStatement, status: "CUSTOMER_CONFIRMED", authorityState: "CUSTOMER_CONFIRMED_SOURCE_BACKED", createdAt: existing?.createdAt || timestamp, updatedAt: timestamp };
+      fact = { ...(existing || {}), id: existing?.id || id("fact"), candidateFactId: candidateId, tenantId: context.tenant.id, userId: context.user.id, profileId: candidate.profileId, sourceId: candidate.sourceId, factType: candidate.factType, statement: candidate.statement, sourceExcerpt: candidate.sourceExcerpt, sourceOrder: candidate.sourceOrder, scopeStatement: candidate.scopeStatement, status: "CUSTOMER_CONFIRMED", authorityState: "CUSTOMER_CONFIRMED_SOURCE_BACKED", createdAt: existing?.createdAt || timestamp, updatedAt: timestamp };
       if (!existing) data.careerFacts.push(fact);
       else Object.assign(existing, fact);
+      ensureContextClaims(data, fact);
     }
     await write(data);
-    return { candidate: { ...candidate }, careerFact: data.careerFacts.find((fact) => fact.candidateFactId === candidateId && fact.tenantId === context.tenant.id) || null };
+    return { candidate: { ...candidate }, careerFact: fact || data.careerFacts.find((item) => item.candidateFactId === candidateId && item.tenantId === context.tenant.id) || null };
+  }
+
+  async function listContextClaims(sessionId) {
+    const context = await resolveSession(sessionId);
+    if (!context) throw Object.assign(new Error("unauthorized"), { code: "UNAUTHORIZED" });
+    const data = await read();
+    const profile = data.profiles.find((item) => item.tenantId === context.tenant.id && item.userId === context.user.id);
+    const claims = (data.contextClaims || []).filter((claim) => claim.tenantId === context.tenant.id && claim.userId === context.user.id && claim.profileId === profile?.id);
+    const facts = data.careerFacts.filter((fact) => fact.tenantId === context.tenant.id && fact.userId === context.user.id);
+    const sources = data.sources.filter((source) => source.tenantId === context.tenant.id && source.userId === context.user.id);
+    const publicClaims = claims.map((claim) => publicContextClaim(claim, facts, sources));
+    return { claims: publicClaims, summary: contextSummary(claims) };
+  }
+
+  async function reviewContextClaim(sessionId, claimId, decision, correction = null) {
+    const context = await resolveSession(sessionId);
+    if (!context) throw Object.assign(new Error("unauthorized"), { code: "UNAUTHORIZED" });
+    const data = await read();
+    const profile = data.profiles.find((item) => item.tenantId === context.tenant.id && item.userId === context.user.id);
+    const claim = (data.contextClaims || []).find((item) => item.id === claimId && item.tenantId === context.tenant.id && item.userId === context.user.id && item.profileId === profile?.id && item.status === "ACTIVE");
+    if (!claim) throw Object.assign(new Error("CONTEXT_CLAIM_NOT_FOUND"), { code: "CONTEXT_CLAIM_NOT_FOUND" });
+    if (!["CONFIRM", "CORRECT", "REJECT"].includes(decision)) throw Object.assign(new Error("INVALID_CONTEXT_CLAIM_DECISION"), { code: "INVALID_CONTEXT_CLAIM_DECISION" });
+    if (decision === "REJECT") { claim.authorityState = "CUSTOMER_REJECTED"; claim.status = "REJECTED"; claim.updatedAt = now(); }
+    else if (decision === "CONFIRM") { claim.authorityState = "CUSTOMER_CONFIRMED"; claim.status = "ACTIVE"; claim.updatedAt = now(); }
+    else {
+      const corrected = normalizeContextCorrection(correction);
+      claim.status = "SUPERSEDED";
+      claim.updatedAt = now();
+      data.contextClaims.push({ ...claim, id: id("context-claim"), displayValue: corrected.displayValue, normalizedValue: corrected.normalizedValue, authorityState: "CUSTOMER_CORRECTED", status: "ACTIVE", supersedesClaimId: claim.id, createdAt: now(), updatedAt: now() });
+    }
+    audit(data, context.tenant.id, context.user.id, `CONTEXT_CLAIM_${decision}`, "CareerFactContextClaim", claim.id);
+    await write(data);
+    return listContextClaims(sessionId);
   }
 
   async function listCareerFacts(sessionId) {
@@ -327,6 +388,7 @@ export function createCareerP0Store({ filePath = process.env.CAREEROS_P0_STORE_P
       candidates: (data.candidateFacts || []).filter((item) => item.tenantId === context.tenant.id && item.userId === context.user.id),
       reviews: (data.reviewDecisions || []).filter((item) => item.tenantId === context.tenant.id && item.userId === context.user.id),
       careerFacts: data.careerFacts.filter((item) => item.tenantId === context.tenant.id && item.userId === context.user.id),
+      contextClaims: (data.contextClaims || []).filter((item) => item.tenantId === context.tenant.id && item.userId === context.user.id),
       onboarding: await getOnboardingState(sessionId),
     };
   }
@@ -341,6 +403,7 @@ export function createCareerP0Store({ filePath = process.env.CAREEROS_P0_STORE_P
     data.candidateFacts = (data.candidateFacts || []).filter((item) => item.tenantId !== context.tenant.id);
     data.reviewDecisions = (data.reviewDecisions || []).filter((item) => item.tenantId !== context.tenant.id);
     data.careerFacts = data.careerFacts.filter((item) => item.tenantId !== context.tenant.id);
+    data.contextClaims = (data.contextClaims || []).filter((item) => item.tenantId !== context.tenant.id);
     data.profiles = data.profiles.filter((item) => item.tenantId !== context.tenant.id);
     data.memberships = data.memberships.filter((item) => item.tenantId !== context.tenant.id);
     data.auditEvents = data.auditEvents.filter((item) => item.tenantId !== context.tenant.id);
@@ -356,7 +419,7 @@ export function createCareerP0Store({ filePath = process.env.CAREEROS_P0_STORE_P
     return data.auditEvents.filter((item) => item.tenantId === context.tenant.id && item.userId === context.user.id);
   }
 
-  return { createAccount, login, resolveSession, destroySession, consumeRateLimit, getProfile, saveProfile, listSources, createSource, getSource, saveCandidates, listCandidateFacts, reviewCandidate, listCareerFacts, getOnboardingState, updateStoryStatus, exportAccount, deleteAccount, auditEvents, _read: read };
+  return { createAccount, login, resolveSession, destroySession, consumeRateLimit, getProfile, saveProfile, listSources, createSource, getSource, saveCandidates, listCandidateFacts, reviewCandidate, listCareerFacts, listContextClaims, reviewContextClaim, getOnboardingState, updateStoryStatus, exportAccount, deleteAccount, auditEvents, _read: read };
 }
 
 export const CAREEROS_P0_COOKIE = "careeros_p0_session";

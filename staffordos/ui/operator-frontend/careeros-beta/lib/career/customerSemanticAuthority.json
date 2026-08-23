@@ -49,6 +49,20 @@
     "authoritativeSource": "CareerFact and source provenance",
     "notes": "Confirmed facts and provenance remain inspectable without creating a second evidence store."
   },
+  "CONTEXT_CLAIM_AUTHORITY": {
+    "semanticKey": "CONTEXT_CLAIM_AUTHORITY",
+    "status": "RESTRICTED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerFactContextClaim linked to CUSTOMER_CONFIRMED_SOURCE_BACKED CareerFact",
+    "notes": "Context claims are separately reviewable and cannot authorize capabilities, matching, recommendations, resumes, or applications.",
+    "invariants": [
+      "ONLY_CONFIRMED_CAREER_FACTS_CREATE_CONTEXT_PROPOSALS",
+      "SYSTEM_PROPOSED_CONTEXT_IS_NOT_CUSTOMER_AUTHORITY",
+      "CONTEXT_CORRECTION_SUPERSEDES_WITHOUT_REWRITING_CAREER_FACT",
+      "CONTEXT_CLAIMS_DO_NOT_AFFECT_CAPABILITY_AUTHORITY",
+      "CONTEXT_CLAIMS_DO_NOT_AFFECT_MATCHING"
+    ]
+  },
   "CAPABILITY_AUTHORITY": {
     "semanticKey": "CAPABILITY_AUTHORITY",
     "status": "AUTHORIZED",

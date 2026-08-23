@@ -17,6 +17,7 @@ model CareerUser {
   memberships  CareerTenantMembership[]
   sessions     CareerSession[]
   profiles     CareerProfile[]
+  contextClaims CareerFactContextClaim[]
   auditEvents  CareerAuditEvent[]
   opportunityEvents CareerOpportunityEvent[]
   opportunityNotes CareerOpportunityNote[]
@@ -33,6 +34,7 @@ model CareerTenant {
   candidates  CareerFactCandidate[]
   reviews     CareerFactReviewDecision[]
   facts       CareerFact[]
+  contextClaims CareerFactContextClaim[]
   onboarding  CareerOnboardingState[]
   auditEvents CareerAuditEvent[]
   opportunityEvents CareerOpportunityEvent[]
@@ -78,6 +80,7 @@ model CareerProfile {
   sources     CareerSource[]
   candidates  CareerFactCandidate[]
   facts       CareerFact[]
+  contextClaims CareerFactContextClaim[]
   onboarding  CareerOnboardingState?
   capabilities CareerCapabilityAuthority[]
   opportunities CareerOpportunity[]
@@ -176,9 +179,37 @@ model CareerFact {
   tenant          CareerTenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   profile         CareerProfile       @relation(fields: [profileId], references: [id], onDelete: Cascade)
   candidate       CareerFactCandidate @relation(fields: [candidateFactId], references: [candidateFactId], onDelete: Cascade)
+  contextClaims   CareerFactContextClaim[]
 
   @@index([tenantId, userId, updatedAt])
   @@index([profileId, createdAt])
+}
+
+model CareerFactContextClaim {
+  id                String   @id @default(cuid())
+  tenantId          String
+  userId            String
+  profileId         String
+  careerFactId      String
+  sourceId          String
+  dimension         String
+  displayValue      String
+  normalizedValue   String
+  authorityState    String
+  status            String   @default("ACTIVE")
+  extractionVersion String
+  sourceAnchor      Json
+  supersedesClaimId String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  tenant            CareerTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user              CareerUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile           CareerProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  careerFact        CareerFact @relation(fields: [careerFactId], references: [id], onDelete: Cascade)
+
+  @@unique([careerFactId, dimension, normalizedValue, extractionVersion])
+  @@index([tenantId, userId, profileId, status])
+  @@index([careerFactId, status])
 }
 
 model CareerSession {
