@@ -20,17 +20,19 @@ const detailPage = read("app/career/jobs/[opportunityId]/page.tsx");
 const product = read("lib/career/careerP0Product.mjs");
 const contextClaims = read("lib/career/contextClaims.mjs");
 
-test("Career Home exposes the public feedback next-step journey", () => {
+test("Career Home exposes the search-first customer journey and beta feedback utility", () => {
   for (const text of [
-    "Tell CareerOS about your experience",
-    "Review what CareerOS understood",
-    "Review reusable capabilities",
-    "Evaluate an opportunity",
+    "Build my career profile",
+    "Review what CareerOS learned",
+    "Find jobs for me",
+    "Understand my matches",
+    "Manage my opportunities",
     "Give beta feedback",
     "discovery and evaluation",
     "human-approved applications",
   ]) assert.match(home, new RegExp(text));
-  for (const href of ["/career/onboarding", "/career/context", "/career/capabilities", "/career/jobs", "https://www.staffordmedia.ai/contact"]) assert.match(home, new RegExp(href.replace(/\//g, "\\/")));
+  for (const href of ["/career/onboarding", "/career/context", "/career/capabilities", "/career/discover", "/career/inbox", "/career/jobs", "https://www.staffordmedia.ai/contact"]) assert.match(home, new RegExp(href.replace(/\//g, "\\/")));
+  assert.doesNotMatch(home, /Public feedback beta path/);
 });
 
 test("Career Story, context, capabilities, and pasted-job evaluation remain reachable", () => {

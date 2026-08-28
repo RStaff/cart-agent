@@ -21,42 +21,41 @@ export default async function CareerHomePage() {
 
   const journey = [
     {
-      label: "Tell CareerOS about your experience",
+      label: "Build my career profile",
       body: hasProfile
-        ? "Add roles, projects, accomplishments, or work history when you want CareerOS to understand more of your background."
-        : "Start with a private profile, then add the experience you want CareerOS to organize.",
+        ? "Add roles, projects, and accomplishments when you want CareerOS to learn more about you."
+        : "Create a private profile, then add the experience you want CareerOS to organize.",
       href: hasProfile ? storyHref : "/career/profile",
       action: hasProfile ? "Continue Career Story" : "Create Career Profile",
       status: hasExperience ? "Started" : "Start here",
     },
     {
-      label: "Review what CareerOS understood",
-      body: "Confirm or correct the experience statements and context details CareerOS identified before they shape the rest of the flow.",
+      label: "Review what CareerOS learned",
+      body: "Confirm or fix the experience CareerOS identified before it shapes the rest of your journey.",
       href: hasReviewWaiting ? `${storyHref}#career-story-review` : "/career/context",
       action: hasReviewWaiting ? "Review proposed experience" : "Review context",
       status: hasReviewWaiting ? "Needs review" : hasConfirmedExperience ? "Ready" : "After experience",
     },
     {
-      label: "Review reusable capabilities",
-      body: "Capabilities are broader abilities supported by your confirmed experience. They stay separate from context details.",
-      href: "/career/capabilities",
-      action: "Review capabilities",
-      status: hasConfirmedExperience ? "Ready" : "After confirmed experience",
+      label: "Find jobs for me",
+      body: "Search connected sources for opportunities that may fit your experience.",
+      href: "/career/discover",
+      action: "Find jobs",
+      status: hasConfirmedExperience ? "Ready" : "After review",
     },
     {
-      label: "Evaluate an opportunity",
-      body: "Paste a job description and CareerOS will compare it with your reviewed experience. CareerOS does not apply for you.",
-      href: "/career/jobs",
-      action: "Paste a job description",
-      status: hasConfirmedExperience ? "Ready" : "Works best after review",
+      label: "Understand my matches",
+      body: "See why an opportunity fits, what transfers, and what is missing.",
+      href: "/career/discover",
+      action: "View opportunities",
+      status: hasConfirmedExperience ? "Ready" : "After review",
     },
     {
-      label: "Give beta feedback",
-      body: "Tell Ross what was clear, what was confusing, and what would make this useful in a real job search.",
-      href: betaFeedbackHref,
-      action: "Give feedback",
-      status: "External contact",
-      external: true,
+      label: "Manage my opportunities",
+      body: "Save decisions, prepare, track, and follow up with human approval.",
+      href: "/career/inbox",
+      action: "Opportunity Inbox",
+      status: "Next workspace",
     },
   ];
 
@@ -81,9 +80,9 @@ export default async function CareerHomePage() {
       <p className="careerMuted careerHomeStatus">{story.storyStatus === "CAREER_STORY_COMPLETE_FOR_NOW" ? "Your story is complete for now, and you can reopen it at any time." : "Your story is open for more experience."}</p>
     </section>
 
-    <section className="careerProfilePanel careerHomeJourney" aria-labelledby="career-feedback-journey">
-      <p className="careerEyebrow">Public feedback beta path</p>
-      <h2 id="career-feedback-journey">Use this sequence for the first useful test</h2>
+    <section className="careerProfilePanel careerHomeJourney" aria-labelledby="career-journey-heading">
+      <p className="careerEyebrow">Your CareerOS journey</p>
+      <h2 id="career-journey-heading">From your experience to your next opportunity</h2>
       <div className="careerJourneyList">
         {journey.map((step, index) => <article className="careerJourneyStep" key={step.label}>
           <span className="careerJourneyNumber">{index + 1}</span>
@@ -91,9 +90,15 @@ export default async function CareerHomePage() {
             <p className="careerEyebrow">{step.status}</p>
             <h3>{step.label}</h3>
             <p className="careerMuted">{step.body}</p>
-            {step.external ? <a className="careerLinkButton" href={step.href} target="_blank" rel="noreferrer">{step.action}</a> : <Link className="careerLinkButton" href={step.href}>{step.action}</Link>}
+            <Link className={index === 2 ? "careerPrimaryButton" : "careerLinkButton"} href={step.href}>{step.action}</Link>
+            {index === 3 && <Link className="careerLinkButton" href="/career/jobs">Paste a job</Link>}
           </div>
         </article>)}
+      </div>
+      <div className="careerHomeUtility">
+        <p className="careerEyebrow">Beta utility</p>
+        <p className="careerMuted">Help improve the experience with a quick note.</p>
+        <a className="careerLinkButton" href={betaFeedbackHref} target="_blank" rel="noreferrer">Give beta feedback</a>
       </div>
     </section>
 

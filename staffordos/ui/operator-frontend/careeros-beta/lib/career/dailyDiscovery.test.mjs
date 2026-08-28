@@ -52,6 +52,29 @@ test("search criteria exclude CareerOS authority data", () => {
   assert.doesNotMatch(adapter, /CareerFact|capabilit|resume|tenantId|matchResult/i);
 });
 
+test("Career Home makes search-first journey and separate evaluation visible", () => {
+  const home = read("app/career/page.tsx");
+  assert.match(home, /Build my career profile/);
+  assert.match(home, /Review what CareerOS learned/);
+  assert.match(home, /Find jobs for me/);
+  assert.match(home, /Understand my matches/);
+  assert.match(home, /Manage my opportunities/);
+  assert.match(home, /href: "\/career\/discover"/);
+  assert.match(home, /href: "\/career\/inbox"/);
+  assert.match(home, /href="\/career\/jobs"/);
+  assert.match(home, /Beta utility/);
+  assert.doesNotMatch(home, /Public feedback beta path/);
+  assert.doesNotMatch(home, /provider coverage|private-sector provider/i);
+});
+
+test("Career Home keeps the core journey descriptions concise", () => {
+  const home = read("app/career/page.tsx");
+  const journey = home.slice(home.indexOf("const journey"), home.indexOf("return <main"));
+  const descriptions = [...journey.matchAll(/body: (?:hasProfile\s*\?\s*)?"([^"]+)"/g)].map((match) => match[1]);
+  assert.equal(descriptions.length, 5);
+  for (const description of descriptions) assert.ok(description.split(/\s+/).length <= 16, description);
+});
+
 test("saved preference schema is applied by the existing CareerOS startup path", () => {
   const startup = read("scripts/start-careeros.mjs");
   assert.match(startup, /20260820050000_add_career_search_preferences\/migration\.sql/);
