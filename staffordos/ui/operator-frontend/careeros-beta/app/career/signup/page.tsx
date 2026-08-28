@@ -1,8 +1,10 @@
 import { AuthForm } from "../components/AuthForm";
+import { CareerBrandLogo } from "../components/CareerBrandLogo";
 
 export default function CareerSignupPage() {
   return <>
     <section className="careerPublicShell careerSignupIntro" aria-labelledby="career-signup-intro-heading">
+      <CareerBrandLogo placement="signup" priority />
       <p className="careerEyebrow">Private beta</p>
       <h1 id="career-signup-intro-heading">CareerOS</h1>
       <p className="careerSignupLead">Build a clearer picture of your experience, review what CareerOS understands, and test it against a job description.</p>

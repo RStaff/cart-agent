@@ -54,6 +54,10 @@ textarea { min-height: 180px; resize: vertical; }
 .careerJourneyStep h3 { margin: 0; }
 .careerJourneyNumber { display: grid; width: 32px; height: 32px; place-items: center; border: 1px solid #22d3ee; border-radius: 999px; color: #67e8f9; font-weight: 700; }
 .careerHomeConcepts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.careerBrandLogoWrap { max-width: 100%; margin: 0 0 18px; }
+.careerBrandLogoWrap-signup { width: min(100%, 420px); }
+.careerBrandLogoWrap-auth { width: min(100%, 300px); }
+.careerBrandLogo { display: block; width: 100%; max-width: 100%; height: auto; }
 .careerSignupIntro { min-height: auto; padding-bottom: 0; }
 .careerSignupIntro h1 { margin: 0; }
 .careerSignupLead { max-width: 680px; margin: 8px 0 20px; color: #cbd5e1; font-size: 18px; line-height: 1.5; }
@@ -84,4 +88,4 @@ textarea { min-height: 180px; resize: vertical; }
 button:disabled { cursor: not-allowed; opacity: .5; }
 a { color: #67e8f9; }
 @media (max-width: 760px) { .careerTrustGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 640px) { .careerHeader, .careerHomeConcepts { display: grid; } .careerHeaderActions { justify-content: flex-start; } .careerTrustGrid { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .careerHeader, .careerHomeConcepts { display: grid; } .careerHeaderActions { justify-content: flex-start; } .careerBrandLogoWrap-signup { width: min(100%, 320px); } .careerBrandLogoWrap-auth { width: min(100%, 260px); } .careerTrustGrid { grid-template-columns: 1fr; } }
