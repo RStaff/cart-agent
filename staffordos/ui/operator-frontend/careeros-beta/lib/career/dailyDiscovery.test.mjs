@@ -21,6 +21,25 @@ test("discovery results remain transient and explicitly separate from matching",
   assert.match(client, /USAJOBS/);
 });
 
+test("discovery uses bounded search intent and pre-import ranking", () => {
+  const route = read("app/api/career/discover/route.ts");
+  assert.match(route, /getDiscoveryAuthorityModel/);
+  assert.match(route, /buildPersonalizedSearchIntent/);
+  assert.match(route, /buildProviderCriteriaForIntent/);
+  assert.match(route, /rankDiscoveryResults/);
+  assert.match(route, /searchAuthorizedProvider\(providerCriteria\)/);
+});
+
+test("discovery UI explains ranked previews without importing automatically", () => {
+  const client = read("app/career/discover/DiscoverClient.tsx");
+  assert.match(client, /Why this surfaced/);
+  assert.match(client, /Strong evidence/);
+  assert.match(client, /Transferable evidence/);
+  assert.match(client, /Important gaps/);
+  assert.match(client, /ranked discovery previews/);
+  assert.doesNotMatch(client, /createOpportunity/);
+});
+
 test("discovery preserves home navigation and workspace attention", () => {
   const page = read("app/career/discover/page.tsx");
   const jobs = read("app/career/jobs/page.tsx");

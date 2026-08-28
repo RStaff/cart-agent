@@ -133,7 +133,14 @@
     "status": "AUTHORIZED",
     "customerFacingAllowed": true,
     "authoritativeSource": "CareerSearchPreference",
-    "notes": "Customer-entered discovery criteria only; never derived from CareerFacts or capabilities."
+    "notes": "Customer-entered discovery criteria remain authoritative. Bounded generic search themes may be derived from confirmed CareerFacts, reviewed capability authority, and reviewed context claims, but private evidence text, testimony, resumes, application history, and notes must not be sent to providers."
+  },
+  "SEARCH_INTENT": {
+    "semanticKey": "SEARCH_INTENT",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "Confirmed CareerFacts, reviewed capability authority, reviewed context claims, and CareerSearchPreference",
+    "notes": "Derived search intent may produce only generic role-family terms for provider queries. It must preserve explicit customer targets and must not convert tools or stakeholders into unsupported job titles."
   },
   "SEARCH_PRESET": {
     "semanticKey": "SEARCH_PRESET",
@@ -146,8 +153,8 @@
     "semanticKey": "PROVIDER_RESULT",
     "status": "AUTHORIZED",
     "customerFacingAllowed": true,
-    "authoritativeSource": "USAJOBS adapter response",
-    "notes": "Transient provider data may be displayed with attribution but is not CareerOS analysis until explicitly imported and analyzed."
+    "authoritativeSource": "Authorized provider adapter response",
+    "notes": "Transient provider data may be normalized, filtered, ranked, and displayed with attribution. It is not persisted as a CareerOpportunity and is not a full CareerOS match assessment until explicitly imported and analyzed."
   },
   "TRIAGE_STATUS": {
     "semanticKey": "TRIAGE_STATUS",
