@@ -54,6 +54,17 @@ textarea { min-height: 180px; resize: vertical; }
 .careerJourneyStep h3 { margin: 0; }
 .careerJourneyNumber { display: grid; width: 32px; height: 32px; place-items: center; border: 1px solid #22d3ee; border-radius: 999px; color: #67e8f9; font-weight: 700; }
 .careerHomeConcepts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.careerSignupIntro { min-height: auto; padding-bottom: 0; }
+.careerSignupIntro h1 { margin: 0; }
+.careerSignupLead { max-width: 680px; margin: 8px 0 20px; color: #cbd5e1; font-size: 18px; line-height: 1.5; }
+.careerTrustGrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.careerTrustItem { display: grid; grid-template-columns: 30px 1fr; gap: 10px; border-top: 1px solid #334155; padding-top: 12px; }
+.careerTrustItem h2 { margin: 0; font-size: 15px; }
+.careerTrustItem p { margin: 5px 0 0; color: #cbd5e1; font-size: 14px; line-height: 1.45; }
+.careerTrustMark { display: grid; width: 26px; height: 26px; place-items: center; border: 1px solid #22d3ee; border-radius: 999px; color: #67e8f9; font-size: 11px; font-weight: 700; }
+.careerSignupLinks { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 18px; }
+.careerSignupIntro + .careerPublicShell { padding-top: 16px; }
+.careerSignupIntro + .careerPublicShell .careerAuthPanel { margin-top: 0; }
 .careerVoiceStatus { display: flex; align-items: center; gap: 14px; margin: 16px 0; color: #fda4af; }
 .careerTranscriptReview { display: grid; gap: 12px; margin: 16px 0; }
 .careerInterview { display: grid; gap: 16px; margin-top: 20px; }
@@ -72,4 +83,5 @@ textarea { min-height: 180px; resize: vertical; }
 .careerReviewAnswer p { margin: 5px 0; }
 button:disabled { cursor: not-allowed; opacity: .5; }
 a { color: #67e8f9; }
-@media (max-width: 640px) { .careerHeader, .careerHomeConcepts { display: grid; } .careerHeaderActions { justify-content: flex-start; } }
+@media (max-width: 760px) { .careerTrustGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .careerHeader, .careerHomeConcepts { display: grid; } .careerHeaderActions { justify-content: flex-start; } .careerTrustGrid { grid-template-columns: 1fr; } }

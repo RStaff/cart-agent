@@ -14,7 +14,9 @@ test("privacy notice contains verified beta disclosures", () => {
 test("notice is placed before career text submission and remains discoverable", () => {
   assert.match(read("app/career/onboarding/page.tsx"), /PrivacyDisclosure[\s\S]*CareerStoryBuilder/);
   assert.match(read("app/career/components/CareerStoryBuilder.tsx"), /IntakeReview/);
-  assert.match(read("app/career/signup/page.tsx"), /PrivacyDisclosure[\s\S]*AuthForm/);
+  const signup = read("app/career/signup/page.tsx");
+  assert.match(signup, /careerSignupIntro[\s\S]*Private beta[\s\S]*AuthForm/);
+  assert.match(signup, /Read full privacy notice/);
   assert.match(read("app/career/profile/page.tsx"), /PrivacyDisclosure/);
   assert.match(read("app/career/privacy/page.tsx"), /PrivacyDisclosure/);
   assert.match(read("app/career/components/AuthForm.tsx"), /Invite code/);
