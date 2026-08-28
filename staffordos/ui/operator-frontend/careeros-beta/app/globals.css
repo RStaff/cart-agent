@@ -5,6 +5,7 @@ body { min-height: 100vh; background: linear-gradient(180deg, #020617 0%, #0f172
 button, input, textarea, select { font: inherit; }
 .careerShell, .careerPublicShell { min-height: 100vh; padding: 32px 16px 48px; max-width: 900px; margin: 0 auto; }
 .careerHeader { display: flex; justify-content: space-between; gap: 20px; align-items: flex-start; margin-bottom: 24px; }
+.careerHeaderActions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
 .careerProfilePanel, .careerAuthPanel { border: 1px solid rgba(148,163,184,.22); border-radius: 12px; padding: 24px; background: rgba(15,23,42,.9); }
 .careerAuthPanel { max-width: 560px; margin: 8vh auto; }
 .careerEyebrow { margin: 0 0 8px; color: #67e8f9; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
@@ -47,6 +48,12 @@ textarea { min-height: 180px; resize: vertical; }
 .careerHomeStatus { margin-bottom: 0; }
 .careerHomeNav { margin-top: 20px; }
 .careerHomeLinks { display: flex; flex-wrap: wrap; gap: 12px 20px; }
+.careerHomeJourney, .careerHomeConcepts { margin-top: 20px; }
+.careerJourneyList { display: grid; gap: 14px; margin-top: 18px; }
+.careerJourneyStep { display: grid; grid-template-columns: 40px 1fr; gap: 14px; border-top: 1px solid #334155; padding-top: 16px; }
+.careerJourneyStep h3 { margin: 0; }
+.careerJourneyNumber { display: grid; width: 32px; height: 32px; place-items: center; border: 1px solid #22d3ee; border-radius: 999px; color: #67e8f9; font-weight: 700; }
+.careerHomeConcepts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
 .careerVoiceStatus { display: flex; align-items: center; gap: 14px; margin: 16px 0; color: #fda4af; }
 .careerTranscriptReview { display: grid; gap: 12px; margin: 16px 0; }
 .careerInterview { display: grid; gap: 16px; margin-top: 20px; }
@@ -65,3 +72,4 @@ textarea { min-height: 180px; resize: vertical; }
 .careerReviewAnswer p { margin: 5px 0; }
 button:disabled { cursor: not-allowed; opacity: .5; }
 a { color: #67e8f9; }
+@media (max-width: 640px) { .careerHeader, .careerHomeConcepts { display: grid; } .careerHeaderActions { justify-content: flex-start; } }
