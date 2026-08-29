@@ -4,6 +4,11 @@
 
 RECONCILIATION_READY
 
+The governing UI authority for subsequent StaffordOS work is now
+`staffordos/governance/STAFFORDOS_CANONICAL_UI_AUTHORITY_CONTRACT_V1.md`.
+The read-only route-to-section mapping is maintained in
+`staffordos/governance/STAFFORDOS_CANONICAL_UI_CAPABILITY_MAP_V1.md`.
+
 ## Mission Boundary
 
 This mission inspected the existing StaffordOS operator frontend and the S008.00 `/os` foundation shell. It did not implement application behavior, modify routes, modify components, modify authentication, modify Stripe, modify ShopiFixer production behavior, deploy, commit, or push.
