@@ -1,0 +1,16 @@
+{
+  "name": "staffordos-operator-issuer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Standalone local StaffordOS operator assertion issuer.",
+  "engines": {
+    "node": "20.x"
+  },
+  "scripts": {
+    "check": "node --check src/issuer.mjs && node --check src/server.mjs && node --check src/index.mjs && node --check scripts/local-kms-proof.mjs && node --check test/issuer.test.mjs",
+    "test": "node --test test/*.test.mjs",
+    "proof:kms": "node scripts/local-kms-proof.mjs",
+    "start": "node src/index.mjs"
+  }
+}
