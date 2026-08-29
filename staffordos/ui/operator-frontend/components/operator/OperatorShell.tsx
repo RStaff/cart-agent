@@ -28,6 +28,7 @@ type OperatorShellProps = {
 const SIDEBAR_ITEMS: NavItem[] = [
   { href: "/operator", label: "Operator Home", note: "Daily operating surface" },
   { href: "/operator/command-center", label: "Executive", note: "Company command center" },
+  { href: "/operator/careeros/beta-users", label: "CareerOS", note: "Beta user operations" },
   { href: "/operator/campaigns", label: "Marketing", note: "Campaign visibility", subtle: true },
   { href: "/operator/campaigns", label: "Campaigns", note: "Campaign registry and coverage" },
   { href: "/operator/leads", label: "Sales", note: "Lead command center", subtle: true },
@@ -45,6 +46,7 @@ const SIDEBAR_ITEMS: NavItem[] = [
 const QUICK_ACTIONS = [
   { href: "/operator", label: "Home" },
   { href: "/operator/command-center", label: "Executive" },
+  { href: "/operator/careeros/beta-users", label: "CareerOS Beta" },
   { href: "/operator/campaigns", label: "Campaigns" },
   { href: "/operator/leads", label: "Leads" },
   { href: "/operator/revenue-command", label: "Revenue" },
@@ -66,6 +68,8 @@ function breadcrumbFromPath(pathname: string) {
   const segments = ["Operator"];
   for (const part of parts.slice(1)) {
     if (part === "command-center") segments.push("Executive");
+    else if (part === "careeros") segments.push("CareerOS");
+    else if (part === "beta-users") segments.push("Beta Users");
     else if (part === "campaigns") segments.push("Campaigns");
     else if (part === "leads") segments.push("Leads");
     else if (part === "revenue-command") segments.push("Finance");
