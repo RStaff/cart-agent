@@ -73,6 +73,16 @@ test("explicit targets and standard preferences are preserved", () => {
   assert.equal(buildProviderCriteriaForIntent(intent).keywords, "technical program manager");
 });
 
+for (const requestedTitle of ["AI Product Manager", "Program Manager"]) test("explicit target title remains authoritative with custom search: " + requestedTitle, () => {
+  const intent = buildPersonalizedSearchIntent({ preferences: { requestedTitle, keywords: "", location: "", remotePreference: "any", postedWithinDays: null, salaryMin: null, resultLimit: 10 } });
+  const criteria = buildProviderCriteriaForIntent(intent);
+  assert.equal(criteria.keywords, requestedTitle);
+  assert.equal(criteria.postedWithinDays, null);
+  assert.equal(criteria.salaryMin, null);
+  assert.equal(intent.roleIntent.requestedTitle, requestedTitle);
+  assert.ok(intent.themes.some((theme) => theme.source === "EXPLICIT_TARGET"));
+});
+
 test("provider criteria contain generic terms but not private evidence text", () => {
   const intent = buildPersonalizedSearchIntent({
     preferences: { keywords: "" },

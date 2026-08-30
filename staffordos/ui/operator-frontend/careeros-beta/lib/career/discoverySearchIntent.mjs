@@ -38,11 +38,13 @@ function theme(roleFamily, source, reason, evidence = {}) {
 }
 
 function explicitTargetThemes(preferences) {
+  const target = clean(preferences.requestedTitle, 240);
   const keywords = clean(preferences.keywords, 240);
-  if (!keywords) return [];
-  const families = inferRoleFamiliesFromText(keywords);
-  if (!families.length) return [theme("PROJECT_MANAGEMENT", "EXPLICIT_TARGET", "Customer-entered search keywords are preserved.", { factCount: 0 })].map((item) => ({ ...item, roleFamily: "CUSTOM_TARGET", label: "Customer target", query: keywords }));
-  return families.map((family) => theme(family, "EXPLICIT_TARGET", "Customer-entered search keywords are preserved."));
+  const explicit = target || keywords;
+  if (!explicit) return [];
+  const families = inferRoleFamiliesFromText(explicit);
+  if (!families.length) return [theme("PROJECT_MANAGEMENT", "EXPLICIT_TARGET", "Customer-entered target role is preserved.", { factCount: 0 })].map((item) => ({ ...item, roleFamily: "CUSTOM_TARGET", label: "Customer target", query: explicit }));
+  return families.map((family) => theme(family, "EXPLICIT_TARGET", "Customer-entered target role is preserved."));
 }
 
 function evidenceThemes(facts, capabilities) {
@@ -81,7 +83,7 @@ function contextThemes(contextClaims) {
 export function buildPersonalizedSearchIntent({ preferences = {}, facts = [], capabilities = [], contextClaims = [] } = {}) {
   const criteria = boundUsajobsSearch(preferences);
   const roleIntent = normalizeRoleIntent({ ...preferences, keywords: criteria.keywords, location: criteria.location, remotePreference: criteria.remotePreference });
-  const rawThemes = [...explicitTargetThemes(criteria), ...evidenceThemes(facts, capabilities), ...contextThemes(contextClaims)].filter(Boolean);
+  const rawThemes = [...explicitTargetThemes(preferences), ...evidenceThemes(facts, capabilities), ...contextThemes(contextClaims)].filter(Boolean);
   const themes = [];
   const seen = new Set();
   for (const item of rawThemes) {

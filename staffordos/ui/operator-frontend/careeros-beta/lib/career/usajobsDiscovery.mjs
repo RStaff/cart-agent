@@ -4,7 +4,11 @@ const MAX_RESULT_LIMIT = 25;
 const REQUEST_TIMEOUT_MS = 15000;
 
 function clean(value, limit = 50000) { return String(value || "").replace(/\s+/g, " ").trim().slice(0, limit); }
-function clamp(value, min, max) { const number = Number(value); return Number.isFinite(number) ? Math.min(max, Math.max(min, Math.floor(number))) : null; }
+function clamp(value, min, max) {
+  if (value === null || value === undefined || String(value).trim() === "") return null;
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.min(max, Math.max(min, Math.floor(number))) : null;
+}
 function firstValue(value) { return Array.isArray(value) ? value[0] : value; }
 function providerError(code, status = null) { return Object.assign(new Error(code), { code, providerStatus: status }); }
 

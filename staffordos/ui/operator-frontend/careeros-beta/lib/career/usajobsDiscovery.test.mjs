@@ -10,6 +10,22 @@ test("search bounds result count and supported filters", () => {
   assert.deepEqual(boundUsajobsSearch({ keywords: "program", resultLimit: 100, postedWithinDays: 100, remotePreference: "remote" }), { keywords: "program", location: "", remotePreference: "remote", postedWithinDays: 60, salaryMin: null, resultLimit: 25 });
 });
 
+test("blank optional filters are omitted while explicit zero remains valid", () => {
+  assert.equal(boundUsajobsSearch({ postedWithinDays: null, salaryMin: null }).postedWithinDays, null);
+  assert.equal(boundUsajobsSearch({ postedWithinDays: "", salaryMin: "" }).salaryMin, null);
+  assert.equal(boundUsajobsSearch({ postedWithinDays: 0, salaryMin: 0 }).postedWithinDays, 0);
+  assert.equal(boundUsajobsSearch({ postedWithinDays: 30, salaryMin: 120000 }).postedWithinDays, 30);
+  assert.equal(boundUsajobsSearch({ postedWithinDays: 30, salaryMin: 120000 }).salaryMin, 120000);
+});
+
+test("blank optional filters do not become USAJOBS query parameters", async () => {
+  let requestUrl = "";
+  await searchUsajobs({ keywords: "AI Product Manager", postedWithinDays: null, salaryMin: null, resultLimit: 10, env: { USAJOBS_API_KEY: "secret", USAJOBS_USER_AGENT_EMAIL: "registered@example.com" }, fetchImpl: async (url) => { requestUrl = String(url); return response(200, { SearchResult: { SearchResultItems: [] } }); } });
+  assert.match(requestUrl, /Keyword=AI\+Product\+Manager/);
+  assert.doesNotMatch(requestUrl, /DatePosted=/);
+  assert.doesNotMatch(requestUrl, /RemunerationMinimumAmount=/);
+});
+
 test("missing credentials fail closed", async () => { await assert.rejects(() => searchUsajobs({ env: {} }), { code: "USAJOBS_PROVIDER_NOT_CONFIGURED" }); });
 
 test("normalizes USAJOBS results and preserves source provenance", async () => {

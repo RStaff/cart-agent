@@ -4,7 +4,7 @@ import { searchUsajobs } from "../../../../lib/career/usajobsDiscovery.mjs";
 import { getExistingDiscoveryStatuses, getRelevanceFeedback, getSearchPreferences, saveRelevanceFeedback, saveSearchPreferences } from "../../../../lib/career/careerP0Product.mjs";
 import { getDiscoveryAuthorityModel } from "../../../../lib/career/discoveryAuthorityRead.mjs";
 import { buildPersonalizedSearchIntent, buildProviderCriteriaForIntent, publicSearchIntent } from "../../../../lib/career/discoverySearchIntent.mjs";
-import { rankDiscoveryResults } from "../../../../lib/career/discoveryRanking.mjs";
+import { buildDiscoveryDiagnostics, rankDiscoveryResults } from "../../../../lib/career/discoveryRanking.mjs";
 import { classifyDiscoveryProviders } from "../../../../lib/career/discoveryProviderAuthorization.mjs";
 
 export const runtime = "nodejs";
@@ -40,9 +40,12 @@ export async function POST(request: Request) {
     const feedback = await getRelevanceFeedback(context, searchIntent.roleIntent.normalizedTitle);
     const rejectedTitles = new Set((feedback as Array<{ observedTitleNormalized: string }>).map((item) => item.observedTitleNormalized));
     const ranked = rankProviderResults({ intent: searchIntent, capabilities: searchIntent.authority.capabilities, results: result.results.filter((item: any) => !rejectedTitles.has(String(item.title || "").toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim())), existingStatuses });
+    const diagnostics = buildDiscoveryDiagnostics({ providerCount: result.results.length, rankedResults: ranked.results, explicitTarget: searchIntent.roleIntent.requestedTitle });
     if (searchIntent.roleIntent.requestedTitle) ranked.results = ranked.results.filter((item: any) => item.roleCompatibility.classification !== "INCOMPATIBLE" && item.roleCompatibility.classification !== "ROLE_FAMILY_ONLY");
+    diagnostics.p0RoleGateSurvivors = ranked.results.length;
+    diagnostics.finalRankedResults = ranked.results.length;
     const providerGate = classifyDiscoveryProviders();
-    return NextResponse.json({ ok: true, provider: result.provider, providers: [result.provider], retrievedAt: result.retrievedAt, results: ranked.results, existingStatuses, criteria: result.criteria, providerCriteria, searchIntent: publicSearchIntent(searchIntent), providerGate: { newProviderActivation: providerGate.newProviderActivation, authorizedForBeta: providerGate.authorizedForBeta, blockedByAuthorization: providerGate.blockedByAuthorization } });
+    return NextResponse.json({ ok: true, provider: result.provider, providers: [result.provider], retrievedAt: result.retrievedAt, results: ranked.results, diagnostics, existingStatuses, criteria: result.criteria, providerCriteria, searchIntent: publicSearchIntent(searchIntent), providerGate: { newProviderActivation: providerGate.newProviderActivation, authorizedForBeta: providerGate.authorizedForBeta, blockedByAuthorization: providerGate.blockedByAuthorization } });
   } catch (error) {
     const code = error instanceof Error ? (error as Error & { code?: string }).code || error.message : "USAJOBS_SEARCH_FAILED";
     const status = code === "USAJOBS_PROVIDER_NOT_CONFIGURED" ? 503 : code === "USAJOBS_AUTH_FAILED" ? 502 : code === "USAJOBS_RATE_LIMITED" ? 429 : code === "USAJOBS_TIMEOUT" ? 504 : 502;

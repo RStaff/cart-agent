@@ -236,3 +236,45 @@ export function rankDiscoveryResults({ intent = {}, capabilities = [], results =
   });
   return { results: ranked };
 }
+
+const DIAGNOSTIC_GATE_CODES = [
+  "authorizedSource",
+  "sourceIdentity",
+  "usefulDescription",
+  "duplicateFree",
+  "freshOpen",
+  "locationFit",
+  "workModeFit",
+  "plausibleRoleFamily",
+  "plausibleSeniority",
+  "employmentTypeCompatible",
+  "noUnsupportedSpecialistHardBlocker",
+  "evidenceBackedAlignment",
+];
+
+/** @param {{providerCount?: number, rankedResults?: Array<any>, explicitTarget?: string}} input */
+export function buildDiscoveryDiagnostics({ providerCount = 0, rankedResults = [], explicitTarget = "" } = {}) {
+  const compatibilityCounts = { EXACT_OR_NEAR_TITLE: 0, COMPATIBLE_ADJACENT: 0, ROLE_FAMILY_ONLY: 0, INCOMPATIBLE: 0 };
+  const rejectionCounts = Object.fromEntries(DIAGNOSTIC_GATE_CODES.map((code) => [code, 0]));
+  let baselineEligibleCount = 0;
+  for (const result of rankedResults) {
+    const classification = result.roleCompatibility?.classification || "INCOMPATIBLE";
+    if (Object.hasOwn(compatibilityCounts, classification)) compatibilityCounts[classification] += 1;
+    const gates = result.quality?.gates || {};
+    const baselineEligible = DIAGNOSTIC_GATE_CODES.every((code) => gates[code] !== false);
+    if (baselineEligible) baselineEligibleCount += 1;
+    for (const code of DIAGNOSTIC_GATE_CODES) if (gates[code] === false) rejectionCounts[code] += 1;
+  }
+  const p0RoleGateSurvivors = explicitTarget
+    ? rankedResults.filter((result) => !["INCOMPATIBLE", "ROLE_FAMILY_ONLY"].includes(result.roleCompatibility?.classification)).length
+    : rankedResults.length;
+  return {
+    providerResults: providerCount,
+    normalizedResults: rankedResults.length,
+    baselineEligibleResults: baselineEligibleCount,
+    compatibilityCounts,
+    rejectionCounts,
+    p0RoleGateSurvivors,
+    finalRankedResults: p0RoleGateSurvivors,
+  };
+}

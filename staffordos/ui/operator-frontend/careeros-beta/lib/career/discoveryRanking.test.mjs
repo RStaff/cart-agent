@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { normalizeDiscoveryResult, rankDiscoveryResults } from "./discoveryRanking.mjs";
+import { buildDiscoveryDiagnostics, normalizeDiscoveryResult, rankDiscoveryResults } from "./discoveryRanking.mjs";
 import { buildPersonalizedSearchIntent } from "./discoverySearchIntent.mjs";
 
 const intent = buildPersonalizedSearchIntent({
@@ -113,4 +113,33 @@ test("ranking explanations reference confirmed capability labels only", () => {
   const explanation = JSON.stringify(ranked.discoveryExplanation);
   assert.match(explanation, /Program delivery/);
   assert.doesNotMatch(explanation, /Private marker/);
+});
+
+function diagnosticResult(classification, gates = {}) {
+  return { roleCompatibility: { classification }, quality: { gates: { authorizedSource: true, sourceIdentity: true, usefulDescription: true, duplicateFree: true, freshOpen: true, locationFit: true, workModeFit: true, plausibleRoleFamily: true, plausibleSeniority: true, employmentTypeCompatible: true, noUnsupportedSpecialistHardBlocker: true, evidenceBackedAlignment: true, ...gates } } };
+}
+
+test("diagnostics distinguish provider records from P0-filtered zero", () => {
+  const diagnostics = buildDiscoveryDiagnostics({ providerCount: 2, rankedResults: [diagnosticResult("INCOMPATIBLE"), diagnosticResult("ROLE_FAMILY_ONLY")], explicitTarget: "Program Manager" });
+  assert.equal(diagnostics.providerResults, 2);
+  assert.equal(diagnostics.normalizedResults, 2);
+  assert.equal(diagnostics.p0RoleGateSurvivors, 0);
+  assert.equal(diagnostics.finalRankedResults, 0);
+  assert.equal(diagnostics.compatibilityCounts.INCOMPATIBLE, 1);
+  assert.equal(diagnostics.compatibilityCounts.ROLE_FAMILY_ONLY, 1);
+});
+
+test("diagnostics distinguish provider zero", () => {
+  const diagnostics = buildDiscoveryDiagnostics({ providerCount: 0, rankedResults: [], explicitTarget: "Program Manager" });
+  assert.equal(diagnostics.providerResults, 0);
+  assert.equal(diagnostics.normalizedResults, 0);
+  assert.equal(diagnostics.finalRankedResults, 0);
+});
+
+test("diagnostics retain exact and adjacent results", () => {
+  const diagnostics = buildDiscoveryDiagnostics({ providerCount: 2, rankedResults: [diagnosticResult("EXACT_OR_NEAR_TITLE"), diagnosticResult("COMPATIBLE_ADJACENT")], explicitTarget: "AI Product Manager" });
+  assert.equal(diagnostics.compatibilityCounts.EXACT_OR_NEAR_TITLE, 1);
+  assert.equal(diagnostics.compatibilityCounts.COMPATIBLE_ADJACENT, 1);
+  assert.equal(diagnostics.p0RoleGateSurvivors, 2);
+  assert.equal(diagnostics.finalRankedResults, 2);
 });
