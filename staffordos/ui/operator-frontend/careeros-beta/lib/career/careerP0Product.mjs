@@ -15,6 +15,7 @@ import { boundUsajobsSearch } from "./usajobsDiscovery.mjs";
 import { canTransition, lifecycleEventFor, nextOpportunityAction, normalizeLifecycleState } from "./opportunityLifecycle.mjs";
 import { reconcileCapabilityAuthority } from "./capabilityAuthorityReconciliation.mjs";
 import { compareCapabilityDerivationInputs, summarizeFactShape } from "./capabilityDiagnostic.mjs";
+import { normalizeRoleIntent, publicRoleIntent } from "./roleIntent.mjs";
 
 const EVALUATION_VERSION = "CAREEROS_MATCH_EVALUATION_V1";
 const id = (prefix) => `${prefix}_${crypto.randomUUID()}`;
@@ -231,16 +232,35 @@ export async function listOpportunities(context) {
 export async function getSearchPreferences(context) {
   requireContext(context);
   const pool = await careerP0Pool();
-  const row = (await pool.query('SELECT id,keywords,location,"remotePreference","postedWithinDays","salaryMin","resultLimit",active,"updatedAt" FROM "CareerSearchPreference" WHERE "tenantId"=$1 AND "userId"=$2 LIMIT 1', [context.tenant.id, context.user.id])).rows[0];
-  return row || { id: null, keywords: "", location: "", remotePreference: "any", postedWithinDays: null, salaryMin: null, resultLimit: 10, active: true, updatedAt: null };
+  const row = (await pool.query('SELECT id,keywords,"requestedTitle","normalizedTitle","roleFamily",specialization,seniority,"excludedTitles",location,"remotePreference","postedWithinDays","salaryMin","resultLimit",active,"updatedAt" FROM "CareerSearchPreference" WHERE "tenantId"=$1 AND "userId"=$2 LIMIT 1', [context.tenant.id, context.user.id])).rows[0];
+  return row ? { ...row, roleIntent: publicRoleIntent({ ...row, workMode: row.remotePreference, excludedTitles: row.excludedTitles }) } : { id: null, keywords: "", requestedTitle: "", normalizedTitle: "", roleFamily: "", specialization: [], seniority: "UNSPECIFIED", excludedTitles: [], location: "", remotePreference: "any", postedWithinDays: null, salaryMin: null, resultLimit: 10, active: true, updatedAt: null, roleIntent: publicRoleIntent({}) };
 }
 
 export async function saveSearchPreferences(context, input = {}) {
   requireContext(context);
   const pool = await careerP0Pool();
   const criteria = boundUsajobsSearch(input);
-  const row = (await pool.query('INSERT INTO "CareerSearchPreference" ("id","tenantId","userId",keywords,location,"remotePreference","postedWithinDays","salaryMin","resultLimit",active,"updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,NOW()) ON CONFLICT ("tenantId","userId") DO UPDATE SET keywords=EXCLUDED.keywords,location=EXCLUDED.location,"remotePreference"=EXCLUDED."remotePreference","postedWithinDays"=EXCLUDED."postedWithinDays","salaryMin"=EXCLUDED."salaryMin","resultLimit"=EXCLUDED."resultLimit",active=EXCLUDED.active,"updatedAt"=NOW() RETURNING id,keywords,location,"remotePreference","postedWithinDays","salaryMin","resultLimit",active,"updatedAt"', [id("search-preference"), context.tenant.id, context.user.id, criteria.keywords, criteria.location, criteria.remotePreference, criteria.postedWithinDays, criteria.salaryMin, criteria.resultLimit, input.active !== false])).rows[0];
-  return row;
+  const roleIntent = normalizeRoleIntent({ requestedTitle: input.requestedTitle, keywords: criteria.keywords, location: criteria.location, remotePreference: criteria.remotePreference, excludedTitles: input.excludedTitles });
+  const row = (await pool.query('INSERT INTO "CareerSearchPreference" ("id","tenantId","userId",keywords,"requestedTitle","normalizedTitle","roleFamily",specialization,seniority,"excludedTitles",location,"remotePreference","postedWithinDays","salaryMin","resultLimit",active,"updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,NOW()) ON CONFLICT ("tenantId","userId") DO UPDATE SET keywords=EXCLUDED.keywords,"requestedTitle"=EXCLUDED."requestedTitle","normalizedTitle"=EXCLUDED."normalizedTitle","roleFamily"=EXCLUDED."roleFamily",specialization=EXCLUDED.specialization,seniority=EXCLUDED.seniority,"excludedTitles"=EXCLUDED."excludedTitles",location=EXCLUDED.location,"remotePreference"=EXCLUDED."remotePreference","postedWithinDays"=EXCLUDED."postedWithinDays","salaryMin"=EXCLUDED."salaryMin","resultLimit"=EXCLUDED."resultLimit",active=EXCLUDED.active,"updatedAt"=NOW() RETURNING id,keywords,"requestedTitle","normalizedTitle","roleFamily",specialization,seniority,"excludedTitles",location,"remotePreference","postedWithinDays","salaryMin","resultLimit",active,"updatedAt"', [id("search-preference"), context.tenant.id, context.user.id, criteria.keywords, roleIntent.requestedTitle, roleIntent.normalizedTitle, roleIntent.roleFamily, JSON.stringify(roleIntent.specialization), roleIntent.seniority, JSON.stringify(roleIntent.excludedTitles), criteria.location, criteria.remotePreference, criteria.postedWithinDays, criteria.salaryMin, criteria.resultLimit, input.active !== false])).rows[0];
+  return { ...row, roleIntent: publicRoleIntent({ ...row, workMode: row.remotePreference, excludedTitles: roleIntent.excludedTitles }) };
+}
+
+export async function getRelevanceFeedback(context, targetRoleNormalized) {
+  requireContext(context);
+  const pool = await careerP0Pool();
+  return (await pool.query('SELECT "observedTitleNormalized",reason FROM "CareerRelevanceFeedback" WHERE "tenantId"=$1 AND "userId"=$2 AND "targetRoleNormalized"=$3', [context.tenant.id, context.user.id, targetRoleNormalized])).rows;
+}
+
+export async function saveRelevanceFeedback(context, input = {}) {
+  requireContext(context);
+  const pool = await careerP0Pool();
+  const allowed = new Set(["WRONG_TITLE", "WRONG_ROLE_FAMILY", "WRONG_SENIORITY", "WRONG_SPECIALIZATION", "WRONG_LOCATION", "OTHER_NOT_RELEVANT"]);
+  const reason = String(input.reason || "").trim().toUpperCase();
+  if (!allowed.has(reason)) throw Object.assign(new Error("INVALID_RELEVANCE_FEEDBACK"), { code: "INVALID_RELEVANCE_FEEDBACK" });
+  const roleIntent = normalizeRoleIntent({ requestedTitle: input.requestedTitle, keywords: input.requestedTitle });
+  const observedTitle = String(input.observedTitle || "").trim().slice(0, 240);
+  if (!roleIntent.normalizedTitle || !observedTitle) throw Object.assign(new Error("RELEVANCE_FEEDBACK_REQUIRED"), { code: "RELEVANCE_FEEDBACK_REQUIRED" });
+  return (await pool.query('INSERT INTO "CareerRelevanceFeedback" ("id","tenantId","userId","targetRoleNormalized","requestedTitle","observedTitle","observedTitleNormalized",reason,provider,"externalOpportunityId") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING "observedTitleNormalized",reason', [id("relevance"), context.tenant.id, context.user.id, roleIntent.normalizedTitle, roleIntent.requestedTitle, observedTitle, normalizeRoleIntent({ requestedTitle: observedTitle }).normalizedTitle, reason, input.provider || null, input.externalOpportunityId || null])).rows[0];
 }
 
 export async function getExistingDiscoveryStatuses(context, results = []) {

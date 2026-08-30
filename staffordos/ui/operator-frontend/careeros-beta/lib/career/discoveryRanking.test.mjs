@@ -39,7 +39,7 @@ test("provider results normalize into one transient contract", () => {
   assert.equal(item.persisted, false);
 });
 
-test("evidence-backed adjacent roles outrank weak exact-title matches", () => {
+test("role fidelity prevents an adjacent role from outranking an exact-title result", () => {
   const ranked = rankDiscoveryResults({
     intent,
     capabilities: intent.authority.capabilities,
@@ -50,8 +50,8 @@ test("evidence-backed adjacent roles outrank weak exact-title matches", () => {
     existingStatuses: {},
     now: new Date("2026-08-28T12:00:00Z")
   }).results;
-  assert.equal(ranked[0].providerJobId, "strong");
-  assert.equal(ranked[0].recommendation, "STRONG_CANDIDATE");
+  assert.equal(ranked[0].providerJobId, "weak");
+  assert.equal(ranked[1].roleCompatibility.classification, "INCOMPATIBLE");
 });
 
 test("missing descriptions cannot become high-confidence matches", () => {

@@ -1,6 +1,7 @@
 import { parseJobDescription } from "./jobProduct.mjs";
 import { inferRoleFamiliesFromRequirementConcept, inferRoleFamiliesFromText } from "./discoveryRoleFamilies.mjs";
 import { isDiscoveryProviderAuthorized } from "./discoveryProviderAuthorization.mjs";
+import { classifyRoleCompatibility } from "./roleIntent.mjs";
 
 const DIRECT_STATES = new Set(["VERIFIED_DIRECT"]);
 const TRANSFERABLE_STATES = new Set(["VERIFIED_TRANSFERABLE"]);
@@ -78,7 +79,7 @@ function roleFamiliesForResult(item, requirements) {
   return [...new Map([...fromText, ...fromRequirements].map((family) => [family.key, family])).values()];
 }
 
-function qualityFor({ item, intent, requirements, relationships, existingStatus, now }) {
+function qualityFor({ item, intent, requirements, relationships, existingStatus, now, roleCompatibility }) {
   const posted = dateOrNull(item.postedAt);
   const closing = dateOrNull(item.closingAt);
   const text = [item.title, item.location, item.employmentType, item.description].filter(Boolean).join(" ");
@@ -111,6 +112,8 @@ function qualityFor({ item, intent, requirements, relationships, existingStatus,
     employmentTypeCompatible: !commissionOnly,
     noUnsupportedSpecialistHardBlocker: !specialist,
     evidenceBackedAlignment: evidenceBacked,
+    roleCompatible: roleCompatibility.classification !== "INCOMPATIBLE",
+    primaryRoleMatch: roleCompatibility.classification === "EXACT_OR_NEAR_TITLE" || roleCompatibility.classification === "COMPATIBLE_ADJACENT",
   };
   const penalties = [];
   if (!gates.authorizedSource) penalties.push("Source is not authorized for beta discovery");
@@ -124,6 +127,9 @@ function qualityFor({ item, intent, requirements, relationships, existingStatus,
   if (!gates.employmentTypeCompatible) penalties.push("Employment type appears incompatible");
   if (!gates.noUnsupportedSpecialistHardBlocker) penalties.push("Unsupported specialist hard requirement");
   if (!gates.evidenceBackedAlignment) penalties.push("No reviewed evidence alignment yet");
+  if (roleCompatibility.classification === "COMPATIBLE_ADJACENT") penalties.push("Adjacent to the requested role");
+  if (roleCompatibility.classification === "ROLE_FAMILY_ONLY") penalties.push("Only the role family matches the requested role");
+  if (roleCompatibility.classification === "INCOMPATIBLE") penalties.push("Title does not match the requested role");
   return { gates, penalties, roleFamilies: roleFamilies.map((family) => family.key) };
 }
 
@@ -145,7 +151,8 @@ function scoreResult({ item, intent, relationships, quality, now }) {
     count(required, "UNKNOWN") * 6
   ));
   const intentFamilies = new Set((intent.themes || []).map((theme) => theme.roleFamily));
-  const roleFit = quality.roleFamilies.some((family) => intentFamilies.has(family)) ? 25 : intentFamilies.size ? 0 : 12;
+  const roleCompatibility = quality.roleCompatibility;
+  const roleFit = roleCompatibility === "EXACT_OR_NEAR_TITLE" ? 45 : roleCompatibility === "COMPATIBLE_ADJACENT" ? 22 : roleCompatibility === "ROLE_FAMILY_ONLY" ? 5 : 0;
   const explicitTarget = (intent.themes || []).some((theme) => theme.source === "EXPLICIT_TARGET" && (quality.roleFamilies.includes(theme.roleFamily) || theme.roleFamily === "CUSTOM_TARGET")) ? 15 : 0;
   const salaryFit = !intent.criteria?.salaryMin || !item.salaryMin || item.salaryMin >= intent.criteria.salaryMin ? 10 : 0;
   const posted = dateOrNull(item.postedAt);
@@ -165,13 +172,13 @@ function scoreResult({ item, intent, relationships, quality, now }) {
 }
 
 function recommendationFor(scoring, quality) {
-  if (!quality.gates.authorizedSource || !quality.gates.usefulDescription || !quality.gates.duplicateFree || !quality.gates.noUnsupportedSpecialistHardBlocker) return "LOWER_PRIORITY";
+  if (!quality.gates.authorizedSource || !quality.gates.usefulDescription || !quality.gates.duplicateFree || !quality.gates.noUnsupportedSpecialistHardBlocker || !quality.gates.roleCompatible || !quality.gates.primaryRoleMatch) return "LOWER_PRIORITY";
   if (scoring.directEvidence >= 2 && scoring.unsupportedHardRequirement === 0 && scoring.personalScore >= 45) return "STRONG_CANDIDATE";
   if (scoring.directEvidence + scoring.transferableEvidence >= 2 && scoring.unsupportedHardRequirement <= 1) return "CONSIDER";
   return "LOWER_PRIORITY";
 }
 
-function explanationFor({ item, relationships, scoring, quality, recommendation }) {
+function explanationFor({ item, relationships, scoring, quality, recommendation, roleCompatibility, intent }) {
   const direct = uniqueLabels(relationships.filter((relationship) => relationship.state === "DIRECT"));
   const transferable = uniqueLabels(relationships.filter((relationship) => relationship.state === "TRANSFERABLE"));
   const gaps = uniqueLabels(relationships.filter((relationship) => ["UNKNOWN", "PARTIAL", "SPECIALIST_BLOCKED", "SCOPE_BLOCKED"].includes(relationship.state)));
@@ -182,6 +189,10 @@ function explanationFor({ item, relationships, scoring, quality, recommendation 
     importantGaps: gaps,
     lowerPriorityBecause: quality.penalties,
     recommendation,
+    requestedRole: intent.roleIntent?.requestedTitle || "",
+    roleAlignment: roleCompatibility.classification,
+    seniorityAligned: roleCompatibility.seniorityMatch,
+    specializationAligned: roleCompatibility.specializationMatch,
     summary: `${item.title || "This opportunity"}: ${recommendation.replace(/_/g, " ").toLowerCase()}.`,
   };
 }
@@ -193,7 +204,9 @@ export function rankDiscoveryResults({ intent = {}, capabilities = [], results =
     const requirements = parseRequirements(item);
     const relationships = requirements.map((requirement) => relationshipFor(requirement, capabilitiesByKey));
     const existingStatus = existingStatuses[item.providerJobId] || existingStatuses[item.externalOpportunityId] || existingStatuses[item.sourceUrl] || existingStatuses[resultKey(item)] || null;
-    const quality = qualityFor({ item, intent, requirements, relationships, existingStatus, now });
+    const roleCompatibility = classifyRoleCompatibility(intent.roleIntent || intent.criteria || {}, item.title);
+    const quality = qualityFor({ item, intent, requirements, relationships, existingStatus, now, roleCompatibility });
+    quality.roleCompatibility = roleCompatibility.classification;
     const scoring = scoreResult({ item, intent, relationships, quality, now });
     const recommendation = recommendationFor(scoring, quality);
     return {
@@ -214,8 +227,12 @@ export function rankDiscoveryResults({ intent = {}, capabilities = [], results =
       rankScore: scoring.score,
       recommendation,
       negativeSignals: quality.penalties,
-      discoveryExplanation: explanationFor({ item, relationships, scoring, quality, recommendation }),
+      roleCompatibility,
+      discoveryExplanation: explanationFor({ item, relationships, scoring, quality, recommendation, roleCompatibility, intent }),
     };
-  }).sort((a, b) => b.rankScore - a.rankScore || Number(Boolean(b.qualification.directEvidence)) - Number(Boolean(a.qualification.directEvidence)));
+  }).sort((a, b) => {
+    const priority = { EXACT_OR_NEAR_TITLE: 3, COMPATIBLE_ADJACENT: 2, ROLE_FAMILY_ONLY: 1, INCOMPATIBLE: 0 };
+    return (priority[b.roleCompatibility.classification] || 0) - (priority[a.roleCompatibility.classification] || 0) || b.rankScore - a.rankScore || Number(Boolean(b.qualification.directEvidence)) - Number(Boolean(a.qualification.directEvidence));
+  });
   return { results: ranked };
 }

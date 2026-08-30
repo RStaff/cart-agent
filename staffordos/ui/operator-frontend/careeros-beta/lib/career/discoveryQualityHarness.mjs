@@ -22,3 +22,21 @@ export function evaluateDiscoveryQualityLabels(labels = [], threshold = BROTHER_
     passed: positive >= threshold.minWouldApplyOrConsider && junkRate < threshold.maxJunkRate && duplicateRate < threshold.maxDuplicateRate && explanationTrustRate >= threshold.minExplanationTrustRate,
   };
 }
+
+export function evaluateRoleIntentTopTen({ roleIntent, rankedResults = [] } = {}) {
+  const top = rankedResults.slice(0, 10);
+  const count = (classification) => top.filter((item) => (item.roleCompatibility?.classification || item.classification) === classification).length;
+  const relevant = top.filter((item) => ["EXACT_OR_NEAR_TITLE", "COMPATIBLE_ADJACENT"].includes(item.roleCompatibility?.classification || item.classification));
+  return {
+    requestedRole: roleIntent?.requestedTitle || "",
+    topTen: top.length,
+    exactOrNearCount: count("EXACT_OR_NEAR_TITLE"),
+    compatibleAdjacentCount: count("COMPATIBLE_ADJACENT"),
+    roleFamilyOnlyCount: count("ROLE_FAMILY_ONLY"),
+    incompatibleCount: count("INCOMPATIBLE"),
+    wrongSeniorityCount: top.filter((item) => item.roleCompatibility && !item.roleCompatibility.seniorityMatch).length,
+    wrongSpecializationCount: top.filter((item) => item.roleCompatibility && !item.roleCompatibility.specializationMatch).length,
+    wrongLocationCount: top.filter((item) => item.quality?.gates?.locationFit === false).length,
+    topTenRelevantCount: relevant.length,
+  };
+}

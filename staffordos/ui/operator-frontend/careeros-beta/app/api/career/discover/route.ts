@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { currentCareerContext, customerMutationAllowed } from "../../../../lib/career/careerP0Auth";
 import { searchUsajobs } from "../../../../lib/career/usajobsDiscovery.mjs";
-import { getExistingDiscoveryStatuses, getSearchPreferences, saveSearchPreferences } from "../../../../lib/career/careerP0Product.mjs";
+import { getExistingDiscoveryStatuses, getRelevanceFeedback, getSearchPreferences, saveRelevanceFeedback, saveSearchPreferences } from "../../../../lib/career/careerP0Product.mjs";
 import { getDiscoveryAuthorityModel } from "../../../../lib/career/discoveryAuthorityRead.mjs";
 import { buildPersonalizedSearchIntent, buildProviderCriteriaForIntent, publicSearchIntent } from "../../../../lib/career/discoverySearchIntent.mjs";
 import { rankDiscoveryResults } from "../../../../lib/career/discoveryRanking.mjs";
@@ -37,7 +37,10 @@ export async function POST(request: Request) {
     const providerCriteria = buildProviderCriteriaForIntent(searchIntent);
     const result = await searchAuthorizedProvider(providerCriteria);
     const existingStatuses = await getExistingDiscoveryStatuses(context, result.results);
-    const ranked = rankProviderResults({ intent: searchIntent, capabilities: searchIntent.authority.capabilities, results: result.results, existingStatuses });
+    const feedback = await getRelevanceFeedback(context, searchIntent.roleIntent.normalizedTitle);
+    const rejectedTitles = new Set((feedback as Array<{ observedTitleNormalized: string }>).map((item) => item.observedTitleNormalized));
+    const ranked = rankProviderResults({ intent: searchIntent, capabilities: searchIntent.authority.capabilities, results: result.results.filter((item: any) => !rejectedTitles.has(String(item.title || "").toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim())), existingStatuses });
+    if (searchIntent.roleIntent.requestedTitle) ranked.results = ranked.results.filter((item: any) => item.roleCompatibility.classification !== "INCOMPATIBLE" && item.roleCompatibility.classification !== "ROLE_FAMILY_ONLY");
     const providerGate = classifyDiscoveryProviders();
     return NextResponse.json({ ok: true, provider: result.provider, providers: [result.provider], retrievedAt: result.retrievedAt, results: ranked.results, existingStatuses, criteria: result.criteria, providerCriteria, searchIntent: publicSearchIntent(searchIntent), providerGate: { newProviderActivation: providerGate.newProviderActivation, authorizedForBeta: providerGate.authorizedForBeta, blockedByAuthorization: providerGate.blockedByAuthorization } });
   } catch (error) {
@@ -46,4 +49,12 @@ export async function POST(request: Request) {
     const safeCode = ["USAJOBS_PROVIDER_NOT_CONFIGURED", "USAJOBS_AUTH_FAILED", "USAJOBS_RATE_LIMITED", "USAJOBS_TIMEOUT", "USAJOBS_UNAVAILABLE", "USAJOBS_MALFORMED_RESPONSE"].includes(code) ? code : "USAJOBS_SEARCH_FAILED";
     return NextResponse.json({ ok: false, error: safeCode }, { status });
   }
+}
+
+export async function PATCH(request: Request) {
+  if (!customerMutationAllowed(request)) return NextResponse.json({ ok: false, error: "REQUEST_NOT_ALLOWED" }, { status: 403 });
+  const context = await currentCareerContext();
+  if (!context) return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
+  try { return NextResponse.json({ ok: true, feedback: await saveRelevanceFeedback(context, await request.json()) }, { status: 201 }); }
+  catch (error) { return NextResponse.json({ ok: false, error: error instanceof Error ? error.message : "RELEVANCE_FEEDBACK_FAILED" }, { status: 400 }); }
 }

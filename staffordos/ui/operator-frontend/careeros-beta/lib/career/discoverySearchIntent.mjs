@@ -1,5 +1,6 @@
 import { boundUsajobsSearch } from "./usajobsDiscovery.mjs";
 import { inferRoleFamiliesFromText, roleFamiliesForCapability, roleFamilyForKey } from "./discoveryRoleFamilies.mjs";
+import { normalizeRoleIntent, publicRoleIntent } from "./roleIntent.mjs";
 
 const SAFE_CAPABILITY_STATES = new Set(["VERIFIED_DIRECT", "VERIFIED_TRANSFERABLE", "PARTIALLY_SUPPORTED"]);
 const CONFIRMED_FACT_STATE = "CUSTOMER_CONFIRMED_SOURCE_BACKED";
@@ -79,6 +80,7 @@ function contextThemes(contextClaims) {
 
 export function buildPersonalizedSearchIntent({ preferences = {}, facts = [], capabilities = [], contextClaims = [] } = {}) {
   const criteria = boundUsajobsSearch(preferences);
+  const roleIntent = normalizeRoleIntent({ ...preferences, keywords: criteria.keywords, location: criteria.location, remotePreference: criteria.remotePreference });
   const rawThemes = [...explicitTargetThemes(criteria), ...evidenceThemes(facts, capabilities), ...contextThemes(contextClaims)].filter(Boolean);
   const themes = [];
   const seen = new Set();
@@ -91,6 +93,7 @@ export function buildPersonalizedSearchIntent({ preferences = {}, facts = [], ca
   return {
     version: "CAREEROS_DISCOVERY_SEARCH_INTENT_V1",
     criteria,
+    roleIntent,
     themes: themes.slice(0, 8),
     authority: {
       factsConsidered: (facts || []).filter(safeFact).length,
@@ -110,7 +113,8 @@ export function buildProviderCriteriaForIntent(intent = {}) {
   const criteria = boundUsajobsSearch(intent.criteria || {});
   const explicit = clean(criteria.keywords, 240);
   const derived = (intent.themes || []).filter((theme) => theme.source !== "EXPLICIT_TARGET").map((theme) => clean(theme.query, 120)).filter(Boolean);
-  const keywords = explicit || [...new Set(derived)].slice(0, 3).join(" ");
+  const target = clean(intent.roleIntent?.requestedTitle, 240);
+  const keywords = target ? target === explicit ? target : [target, explicit].filter(Boolean).join(" ") : explicit || [...new Set(derived)].slice(0, 3).join(" ");
   return { ...criteria, keywords: clean(keywords, 240) };
 }
 
@@ -118,6 +122,7 @@ export function publicSearchIntent(intent = {}) {
   return {
     version: intent.version,
     providerRequestBoundary: intent.providerRequestBoundary,
+    roleIntent: publicRoleIntent(intent.roleIntent || {}),
     themes: (intent.themes || []).map(({ roleFamily, label, query, source, reason }) => ({ roleFamily, label, query, source, reason })),
   };
 }

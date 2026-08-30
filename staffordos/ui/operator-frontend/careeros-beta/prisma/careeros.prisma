@@ -21,6 +21,7 @@ model CareerUser {
   auditEvents  CareerAuditEvent[]
   opportunityEvents CareerOpportunityEvent[]
   opportunityNotes CareerOpportunityNote[]
+  relevanceFeedback CareerRelevanceFeedback[]
 }
 
 model CareerTenant {
@@ -48,6 +49,7 @@ model CareerTenant {
   resumeDrafts CareerResumeDraft[]
   inboxItems CareerOpportunityInboxItem[]
   searchPreferences CareerSearchPreference[]
+  relevanceFeedback CareerRelevanceFeedback[]
 }
 
 model CareerTenantMembership {
@@ -416,6 +418,12 @@ model CareerSearchPreference {
   tenantId         String
   userId           String
   keywords         String   @default("")
+  requestedTitle   String   @default("")
+  normalizedTitle  String   @default("")
+  roleFamily       String   @default("")
+  specialization   Json
+  seniority        String   @default("UNSPECIFIED")
+  excludedTitles   Json
   location         String   @default("")
   remotePreference String   @default("any")
   postedWithinDays Int?
@@ -429,6 +437,25 @@ model CareerSearchPreference {
 
   @@unique([tenantId, userId])
   @@index([tenantId, userId, active])
+}
+
+model CareerRelevanceFeedback {
+  id                      String   @id @default(cuid())
+  tenantId                String
+  userId                  String
+  targetRoleNormalized    String
+  requestedTitle          String
+  observedTitle           String
+  observedTitleNormalized String
+  reason                  String
+  provider                String?
+  externalOpportunityId   String?
+  createdAt               DateTime @default(now())
+  tenant                  CareerTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user                    CareerUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, userId, targetRoleNormalized])
+  @@index([tenantId, userId, observedTitleNormalized])
 }
 
 model CareerOpportunityRequirement {
