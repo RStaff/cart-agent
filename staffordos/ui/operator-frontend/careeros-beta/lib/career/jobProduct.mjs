@@ -30,7 +30,7 @@ function startsContinuation(line) {
   return /^[a-z,;:)\]]/.test(String(line).trim());
 }
 
-function requirementSegments(text) {
+function requirementSegments(text, diagnostics = null) {
   const lines = String(text || "").split(/\r?\n/);
   const segments = [];
   let section = "REQUIREMENTS";
@@ -39,20 +39,37 @@ function requirementSegments(text) {
   const flush = () => {
     if (!current) return;
     const normalized = clean(current.text);
-    if (current.section !== "CONTEXT" && normalized.length >= 12) segments.push(normalized);
+    if (current.section === "CONTEXT") {
+      if (normalized && diagnostics) diagnostics.rejectionCounts.contextSuppressed += 1;
+    } else if (!normalized) {
+      if (diagnostics) diagnostics.rejectionCounts.emptySuppressed += 1;
+    } else {
+      if (diagnostics) {
+        diagnostics.rawRequirementSegmentCount += 1;
+        diagnostics.requirementSegmentsAfterJoinCount += 1;
+        if (normalized.length < 12) diagnostics.rejectionCounts.tooShortSuppressed += 1;
+      }
+      if (normalized.length >= 12) segments.push(normalized);
+    }
     current = null;
   };
 
   for (const rawLine of lines) {
     const line = rawLine.trim();
+    if (diagnostics && line) diagnostics.nonEmptyLineCount += 1;
     if (!line) {
       flush();
       continue;
     }
-    const heading = headingParts(line);
-    if (heading) {
-      flush();
-      const nextSection = CONTEXT_HEADINGS.has(heading.label) ? "CONTEXT" : REQUIREMENT_HEADINGS.has(heading.label) ? "REQUIREMENTS" : null;
+      const heading = headingParts(line);
+      if (heading) {
+        flush();
+        const nextSection = CONTEXT_HEADINGS.has(heading.label) ? "CONTEXT" : REQUIREMENT_HEADINGS.has(heading.label) ? "REQUIREMENTS" : null;
+      if (diagnostics) {
+        if (nextSection === "CONTEXT") diagnostics.recognizedContextHeadingCount += 1;
+        else if (nextSection === "REQUIREMENTS") diagnostics.recognizedRequirementHeadingCount += 1;
+        else diagnostics.unrecognizedHeadingLikeLineCount += 1;
+      }
       if (nextSection) {
         section = nextSection;
         sawSection = true;
@@ -60,8 +77,15 @@ function requirementSegments(text) {
       }
       continue;
     }
-    if (sawSection && section === "CONTEXT") continue;
     const bullet = bulletContent(line);
+    if (diagnostics) {
+      if (bullet) diagnostics.bulletLikeLineCount += 1;
+      else diagnostics.proseLikeLineCount += 1;
+    }
+    if (sawSection && section === "CONTEXT") {
+      if (diagnostics) diagnostics.rejectionCounts.contextSuppressed += 1;
+      continue;
+    }
     if (bullet) {
       flush();
       current = { text: bullet, section, bullet: true };
@@ -70,6 +94,7 @@ function requirementSegments(text) {
     if (!current) {
       current = { text: line, section, bullet: false };
     } else if (current.bullet || startsContinuation(line)) {
+      if (diagnostics) diagnostics.continuationLineCount += 1;
       current.text += ` ${line}`;
     } else {
       flush();
@@ -77,6 +102,17 @@ function requirementSegments(text) {
     }
   }
   flush();
+  if (diagnostics) {
+    diagnostics.requirementSegmentsAfterLengthFilteringCount = segments.length;
+    const bounded = segments.slice(0, 200).map((item) => item.slice(0, 500));
+    diagnostics.rejectionCounts.maxSegmentsSuppressed = segments.length - bounded.length;
+    diagnostics.requirementSegmentsAfterDeduplicationCount = [...new Set(bounded)].length;
+    diagnostics.rejectionCounts.duplicateSuppressed = bounded.length - diagnostics.requirementSegmentsAfterDeduplicationCount;
+    diagnostics.finalParsedRequirementCount = diagnostics.requirementSegmentsAfterDeduplicationCount;
+    diagnostics.terminalSection = section;
+    diagnostics.sawRecognizedSection = sawSection;
+    diagnostics.hasPendingSegment = Boolean(current);
+  }
   return segments;
 }
 
@@ -100,8 +136,32 @@ export function parseJobDescription({ title, company, location, description, sou
   const text = String(description || "").trim();
   if (!text) throw Object.assign(new Error("JOB_DESCRIPTION_REQUIRED"), { code: "JOB_DESCRIPTION_REQUIRED" });
   if (text.length > CAREEROS_MAX_TEXT_LENGTH) throw Object.assign(new Error("JOB_DESCRIPTION_TOO_LARGE"), { code: "JOB_DESCRIPTION_TOO_LARGE" });
-  const segments = requirementSegments(text).slice(0, 200);
+  const parserDiagnostics = {
+    inputCharacterCount: text.length,
+    inputLineCount: text.split(/\r?\n/).length,
+    nonEmptyLineCount: 0,
+    boundedLineCount: text.split(/\r?\n/).length,
+    recognizedRequirementHeadingCount: 0,
+    recognizedContextHeadingCount: 0,
+    unrecognizedHeadingLikeLineCount: 0,
+    bulletLikeLineCount: 0,
+    proseLikeLineCount: 0,
+    continuationLineCount: 0,
+    rawRequirementSegmentCount: 0,
+    requirementSegmentsAfterJoinCount: 0,
+    requirementSegmentsAfterDeduplicationCount: 0,
+    requirementSegmentsAfterLengthFilteringCount: 0,
+    finalParsedRequirementCount: 0,
+    terminalSection: "REQUIREMENTS",
+    sawRecognizedSection: false,
+    hasPendingSegment: false,
+    rejectionCounts: { contextSuppressed: 0, emptySuppressed: 0, tooShortSuppressed: 0, duplicateSuppressed: 0, maxSegmentsSuppressed: 0 }
+  };
+  const segments = requirementSegments(text, parserDiagnostics).slice(0, 200);
   const unique = [...new Set(segments.map((item) => item.slice(0, 500)))];
   const requirements = unique.map((item, index) => ({ sourceOrder: index, text: item, ...classify(item), importance: /required|must|minimum|essential/i.test(item) ? "REQUIRED" : "PREFERRED" }));
-  return { sourceType: clean(sourceType).slice(0, 80) || "USER_SUPPLIED_SOURCE", title: clean(title).slice(0, 240) || "Untitled opportunity", company: clean(company).slice(0, 240) || null, location: clean(location).slice(0, 240) || null, description: text, sourceUrl: clean(sourceUrl).slice(0, 1000) || null, parserVersion: CAREEROS_JOB_PARSER_VERSION, requirements };
+  parserDiagnostics.finalParsedRequirementCount = requirements.length;
+  parserDiagnostics.requirementSegmentsAfterDeduplicationCount = unique.length;
+  parserDiagnostics.rejectionCounts.duplicateSuppressed = segments.length - unique.length;
+  return { sourceType: clean(sourceType).slice(0, 80) || "USER_SUPPLIED_SOURCE", title: clean(title).slice(0, 240) || "Untitled opportunity", company: clean(company).slice(0, 240) || null, location: clean(location).slice(0, 240) || null, description: text, sourceUrl: clean(sourceUrl).slice(0, 1000) || null, parserVersion: CAREEROS_JOB_PARSER_VERSION, requirements, diagnostics: parserDiagnostics };
 }
