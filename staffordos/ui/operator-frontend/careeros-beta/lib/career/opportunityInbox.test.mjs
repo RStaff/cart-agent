@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { classifyInboxDuplicate, normalizeInboxInput, normalizeInboxUrl, urlOnlyOpportunityGuidance } from "./opportunityInbox.mjs";
+import { buildUsajobsDescription } from "./usajobsDiscovery.mjs";
+import { parseJobDescription } from "./jobProduct.mjs";
 
 test("manual text and job-alert imports normalize into the provider-neutral contract", () => {
   const manual = normalizeInboxInput({ sourceType: "MANUAL_TEXT", title: "Program Manager", company: "Example", description: "Lead cross-functional delivery." });
@@ -36,4 +38,36 @@ test("URL-only opportunities request job content without fetching", () => {
   assert.equal(item.normalizationStatus, "NEEDS_USER_DESCRIPTION");
   assert.match(urlOnlyOpportunityGuidance({ ...item, status: "NEEDS_REVIEW" }), /does not fetch the job description/);
   assert.equal(urlOnlyOpportunityGuidance({ ...item, normalizationStatus: "NORMALIZED" }), null);
+});
+
+test("description normalization preserves meaningful line boundaries", () => {
+  const item = normalizeInboxInput({ sourceType: "MANUAL_TEXT", title: "Program Manager", description: "Requirements:\n  Lead   delivery.\n\nQualifications:\n  Coordinate   stakeholders.\n\n\n" });
+  assert.equal(item.description, "Requirements:\nLead delivery.\n\nQualifications:\nCoordinate stakeholders.");
+  assert.equal(parseJobDescription(item).requirements.length, 2);
+});
+
+test("description normalization converts CRLF and CR deterministically", () => {
+  const item = normalizeInboxInput({ sourceType: "MANUAL_TEXT", title: "Program Manager", description: "Requirements:\r\nLead delivery.\rQualifications:\r\nCoordinate stakeholders." });
+  assert.equal(item.description, "Requirements:\nLead delivery.\nQualifications:\nCoordinate stakeholders.");
+});
+
+test("description normalization keeps empty input and length bounds fail closed", () => {
+  assert.throws(() => normalizeInboxInput({ sourceType: "MANUAL_TEXT", title: "Program Manager", description: "   \n\r\n " }), { code: "JOB_DESCRIPTION_REQUIRED" });
+  const item = normalizeInboxInput({ sourceType: "MANUAL_TEXT", title: "Program Manager", description: "Requirements:\n" + "x".repeat(50000) });
+  assert.equal(item.description.length, 50000);
+});
+
+test("ordinary metadata remains space-normalized while USAJOBS structure reaches the parser", () => {
+  const apiItem = { MatchedObjectDescriptor: { QualificationSummary: "Experience leading programs.", UserArea: { Details: { JobSummary: "Context prose.", MajorDuties: "Lead delivery.", KeyRequirements: ["Coordinate stakeholders.", "Report outcomes."] } } } };
+  const built = buildUsajobsDescription(apiItem);
+  const item = normalizeInboxInput({ sourceType: "API_IMPORT", title: "  Program   Manager  ", company: "  Example   Agency ", description: built });
+  assert.equal(item.title, "Program Manager");
+  assert.equal(item.company, "Example Agency");
+  assert.equal(item.description.split("\n").length, 4);
+  assert.ok(parseJobDescription(item).requirements.length >= 3);
+});
+
+test("single-line descriptions remain compatible", () => {
+  const item = normalizeInboxInput({ sourceType: "MANUAL_TEXT", title: "Program Manager", description: "Lead   delivery   planning." });
+  assert.equal(item.description, "Lead delivery planning.");
 });

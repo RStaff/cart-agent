@@ -4,6 +4,17 @@ export const INBOX_SOURCE_TYPES = Object.freeze(["MANUAL_TEXT", "JOB_URL", "EMAI
 export const INBOX_STATES = Object.freeze(["NEW", "READY_TO_ANALYZE", "NEEDS_REVIEW", "IMPORTED", "DUPLICATE", "DISMISSED"]);
 
 function clean(value, limit = 50000) { return String(value || "").replace(/\s+/g, " ").trim().slice(0, limit); }
+function cleanDescription(value, limit = 50000) {
+  return String(value || "")
+    .replace(/\r\n?/g, "\n")
+    .split("\n")
+    .map((line) => line.replace(/[^\S\n]+/g, " ").trim())
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim()
+    .slice(0, limit)
+    .trim();
+}
 export function normalizeInboxUrl(value) {
   const raw = clean(value, 1000);
   if (!raw) return null;
@@ -21,7 +32,7 @@ export function normalizeInboxInput(input = {}) {
   const title = clean(input.title, 240) || (sourceType === "JOB_URL" ? "Opportunity from source link" : "Imported opportunity");
   const company = clean(input.company, 240) || null;
   const location = clean(input.location, 240) || null;
-  const description = clean(input.description, 50000) || null;
+  const description = cleanDescription(input.description, 50000) || null;
   if (!description && sourceType !== "JOB_URL") throw Object.assign(new Error("JOB_DESCRIPTION_REQUIRED"), { code: "JOB_DESCRIPTION_REQUIRED" });
   if (sourceType === "JOB_URL" && !sourceUrl) throw Object.assign(new Error("SOURCE_URL_REQUIRED"), { code: "SOURCE_URL_REQUIRED" });
   const normalizedText = [title, company || "", location || "", description || "", sourceUrl || "", clean(input.externalOpportunityId, 300)].join("\n").toLowerCase();
