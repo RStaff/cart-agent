@@ -69,6 +69,20 @@ test("structural headings and role-overview context do not become requirements",
   ]);
 });
 
+test("USAJOBS duties heading exits role-summary context and preserves prose requirements", () => {
+  const parsed = parseJobDescription({ title: "Program Manager", description: [
+    "Job Summary:",
+    "This role coordinates complex public programs and supports agency priorities.",
+    "Duties:",
+    "Lead cross-functional delivery and coordinate stakeholders across the program.",
+    "Manage implementation planning and report progress to leadership."
+  ].join("\n") });
+  assert.deepEqual(parsed.requirements.map((item) => item.text), [
+    "Lead cross-functional delivery and coordinate stakeholders across the program.",
+    "Manage implementation planning and report progress to leadership."
+  ]);
+});
+
 test("genuine responsibility, qualification, and experience language remains parseable", async () => {
   const parsed = parseJobDescription({ title: "Program Manager", description: [
     "Responsibilities:",

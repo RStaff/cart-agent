@@ -9,7 +9,7 @@ const CONTEXT_HEADINGS = new Set([
 ]);
 const REQUIREMENT_HEADINGS = new Set([
   "competencies", "conditions of employment", "conditions and other information", "education", "evaluations",
-  "key requirements", "key responsibilities", "major duties", "major duties and responsibilities", "qualifications",
+  "duties", "essential duties", "job duties", "key requirements", "key responsibilities", "major duties", "major duties and responsibilities", "qualifications",
   "required experience", "required qualifications", "requirements", "responsibilities", "specialized experience",
   "what you will do", "who may apply"
 ]);
