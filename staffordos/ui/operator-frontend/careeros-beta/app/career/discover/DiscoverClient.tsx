@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 type Preferences = { requestedTitle?: string; keywords: string; location: string; remotePreference: string; postedWithinDays: number | null; salaryMin: number | null; resultLimit: number };
 type Explanation = { whyFound?: string; strongEvidence?: string[]; transferableEvidence?: string[]; importantGaps?: string[]; lowerPriorityBecause?: string[]; recommendation?: string };
@@ -9,6 +9,9 @@ function identity(result: Result) { return result.providerJobId || result.extern
 function provider(result: Result) { return result.provider || result.sourceProvider || "Authorized source"; }
 function recommendationLabel(value?: string) { return ({ STRONG_CANDIDATE: "Strong candidate", CONSIDER: "Consider", LOWER_PRIORITY: "Lower priority" } as Record<string, string>)[value || ""] || "Review"; }
 function evidenceList(items?: string[]) { return (items || []).filter(Boolean).slice(0, 3).join(" · "); }
+function searchPayload(form: { requestedTitle: string; keywords: string; location: string; remotePreference: string; postedWithinDays: string; salaryMin: string; resultLimit: string }) {
+  return { ...form, postedWithinDays: form.postedWithinDays || null, salaryMin: form.salaryMin || null, resultLimit: Number(form.resultLimit) };
+}
 
 const PRESETS = { "": "", PROGRAM: "program manager project management", AI_TECHNOLOGY: "AI technology automation", MARTECH: "marketing technology digital", CONSULTING: "consulting client delivery", TRAINING: "education training enablement" };
 
@@ -17,17 +20,29 @@ export default function DiscoverClient({ initialPreferences }: { initialPreferen
   const [results, setResults] = useState<Result[]>([]); const [message, setMessage] = useState(""); const [saving, setSaving] = useState<string | null>(null);
   const [savingPreferences, setSavingPreferences] = useState(false);
   const [preset, setPreset] = useState("");
+  const searchGeneration = useRef(0);
   async function search(event: React.FormEvent) {
-    event.preventDefault(); setMessage("");
-    const response = await fetch("/api/career/discover", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...form, postedWithinDays: form.postedWithinDays || null, salaryMin: form.salaryMin || null, resultLimit: Number(form.resultLimit) }) });
-    const body = await response.json();
-    if (!response.ok) { setMessage(body.error || "USAJOBS search is unavailable right now."); return; }
-    const statuses = body.existingStatuses || {};
-    setResults((body.results || []).map((result: Result) => ({ ...result, existingState: result.existingState || statuses[result.externalOpportunityId || result.sourceUrl || ""] || null }))); setMessage((body.results?.length || 0) + " ranked opportunities found via USAJOBS.");
+    event.preventDefault(); setMessage(""); setSavingPreferences(true);
+    const generation = ++searchGeneration.current;
+    const payload = searchPayload(form);
+    let persisted = false;
+    try {
+      const saved = await fetch("/api/career/discover", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) });
+      const savedBody = await saved.json();
+      if (!saved.ok) { if (generation === searchGeneration.current) setMessage(savedBody.error || "Search preferences could not be saved. Search was not started."); return; }
+      persisted = true;
+      const response = await fetch("/api/career/discover", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) });
+      const body = await response.json();
+      if (generation !== searchGeneration.current) return;
+      if (!response.ok) { setMessage(body.error || "USAJOBS search is unavailable right now."); return; }
+      const statuses = body.existingStatuses || {};
+      setResults((body.results || []).map((result: Result) => ({ ...result, existingState: result.existingState || statuses[result.externalOpportunityId || result.sourceUrl || ""] || null }))); setMessage((body.results?.length || 0) + " ranked opportunities found via USAJOBS.");
+    } catch { if (generation === searchGeneration.current) setMessage(persisted ? "Search could not be completed. Your search preferences were saved." : "Search preferences could not be saved. Search was not started."); }
+    finally { if (generation === searchGeneration.current) setSavingPreferences(false); }
   }
   async function savePreferences() {
     setSavingPreferences(true); setMessage("");
-    const response = await fetch("/api/career/discover", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...form, postedWithinDays: form.postedWithinDays || null, salaryMin: form.salaryMin || null, resultLimit: Number(form.resultLimit) }) });
+    const response = await fetch("/api/career/discover", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify(searchPayload(form)) });
     const body = await response.json(); setSavingPreferences(false); setMessage(response.ok ? "Search preferences saved. Search now when you are ready." : body.error || "Search preferences could not be saved.");
   }
   async function report(result: Result, reason: string) {
