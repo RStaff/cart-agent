@@ -17,7 +17,7 @@ import { reconcileCapabilityAuthority } from "./capabilityAuthorityReconciliatio
 import { compareCapabilityDerivationInputs, summarizeFactShape } from "./capabilityDiagnostic.mjs";
 import { normalizeRoleIntent, publicRoleIntent } from "./roleIntent.mjs";
 import { classifyUserSuppliedRole } from "./userSuppliedRoleCompatibility.mjs";
-import { buildRequirementCoverageDiagnostics } from "./requirementCoverageDiagnostics.mjs";
+import { buildEvidenceRelationshipDiagnostics, buildRequirementCoverageDiagnostics } from "./requirementCoverageDiagnostics.mjs";
 
 const EVALUATION_VERSION = "CAREEROS_MATCH_EVALUATION_V1";
 const id = (prefix) => `${prefix}_${crypto.randomUUID()}`;
@@ -151,6 +151,7 @@ export async function evaluateOpportunity(context, opportunityId) {
   const counts = Object.fromEntries(["DIRECT", "TRANSFERABLE", "PARTIAL", "UNKNOWN", "SPECIALIST_BLOCKED", "SCOPE_BLOCKED"].map((state) => [state.toLowerCase(), relationships.filter((item) => item.state === state).length]));
   const summary = { ...counts, headline: counts.direct > 0 ? "Several requirements are supported by your confirmed experience." : "CareerOS found some relevant signals and areas that remain unresolved.", requirements: relationships.length, informedRequirements: relationships.filter((item) => ["DIRECT", "TRANSFERABLE", "PARTIAL"].includes(item.state)).length, roleAlignment };
   const diagnostics = buildRequirementCoverageDiagnostics({ sourceType: opportunity.sourceType, description: opportunity.description, parsedRequirementCount: requirements.length, evaluationRequirementCount: relationships.length, parserDiagnostics: parsed.diagnostics });
+  diagnostics.evidenceRelationship = buildEvidenceRelationshipDiagnostics({ requirements, capabilities, relationships });
   await pool.query('UPDATE "CareerMatchEvaluation" SET stale=true WHERE "opportunityId"=$1 AND "tenantId"=$2 AND stale=false', [opportunityId, context.tenant.id]);
   const evaluation = (await pool.query('INSERT INTO "CareerMatchEvaluation" ("id","tenantId","userId","profileId","opportunityId","taxonomyVersion","evaluationVersion",summary,relationships) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *', [id("match"), context.tenant.id, context.user.id, opportunity.profileId, opportunityId, CAREEROS_CAPABILITY_TAXONOMY_VERSION, EVALUATION_VERSION, JSON.stringify(summary), JSON.stringify(relationships)])).rows[0];
   return { id: evaluation.id, stale: evaluation.stale, summary, relationships, diagnostics, opportunity: { id: opportunity.id, title: opportunity.title, company: opportunity.company, location: opportunity.location } };
