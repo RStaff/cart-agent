@@ -18,6 +18,7 @@ import { compareCapabilityDerivationInputs, summarizeFactShape } from "./capabil
 import { normalizeRoleIntent, publicRoleIntent } from "./roleIntent.mjs";
 import { classifyUserSuppliedRole } from "./userSuppliedRoleCompatibility.mjs";
 import { buildEvidenceRelationshipDiagnostics, buildRequirementCoverageDiagnostics } from "./requirementCoverageDiagnostics.mjs";
+import { capabilityAuthorityStateChanged, invalidateCurrentMatchEvaluations } from "./careerMatchInvalidation.mjs";
 
 const EVALUATION_VERSION = "CAREEROS_MATCH_EVALUATION_V1";
 const id = (prefix) => `${prefix}_${crypto.randomUUID()}`;
@@ -110,10 +111,12 @@ export async function answerCapability(context, { capabilityId, questionKey, ans
   if (!row) throw Object.assign(new Error("CAPABILITY_NOT_FOUND"), { code: "CAPABILITY_NOT_FOUND" });
   const catalog = capabilityForKey(row.capabilityKey);
   if (!catalog || catalog.question.key !== questionKey) throw Object.assign(new Error("QUESTION_NOT_FOUND"), { code: "QUESTION_NOT_FOUND" });
+  const authorityChanged = capabilityAuthorityStateChanged(row.authorityState, state);
   return transaction(pool, async (client) => {
     await client.query('UPDATE "CareerCapabilityDecision" SET "supersededAt"=NOW() WHERE "tenantId"=$1 AND "userId"=$2 AND "capabilityId"=$3 AND "questionKey"=$4 AND "supersededAt" IS NULL', [context.tenant.id, context.user.id, capabilityId, questionKey]);
     const decision = (await client.query('INSERT INTO "CareerCapabilityDecision" ("id","tenantId","userId","capabilityId","questionKey",answer,"decisionState",rationale,"taxonomyVersion") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *', [id("decision"), context.tenant.id, context.user.id, capabilityId, questionKey, answer, state, catalog.question.uncertainty, CAREEROS_CAPABILITY_TAXONOMY_VERSION])).rows[0];
     const updated = (await client.query('UPDATE "CareerCapabilityAuthority" SET "authorityState"=$1,version=version+1,"updatedAt"=NOW() WHERE id=$2 AND "tenantId"=$3 AND "userId"=$4 RETURNING *', [state, capabilityId, context.tenant.id, context.user.id])).rows[0];
+    if (authorityChanged) await invalidateCurrentMatchEvaluations(client, context, row.profileId);
     await client.query('INSERT INTO "CareerAuditEvent" ("id","tenantId","userId","eventType","entityType","entityId","metadata") VALUES ($1,$2,$3,$4,$5,$6,$7)', [id("audit"), context.tenant.id, context.user.id, "CAPABILITY_DECISION_RECORDED", "CareerCapabilityAuthority", capabilityId, JSON.stringify({ questionKey, answer, decisionState: state })]);
     return { capability: publicCapability(updated, decision), decision: { id: decision.id, answer: decision.answer, decisionState: decision.decisionState, createdAt: decision.createdAt } };
   });
