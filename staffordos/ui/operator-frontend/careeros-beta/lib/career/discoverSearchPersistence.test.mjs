@@ -30,3 +30,22 @@ test("Search preference persistence remains the canonical server authority", () 
   assert.match(put, /saveSearchPreferences/);
   assert.doesNotMatch(put, /searchUsajobs/);
 });
+
+test("a clearly new analyzable discovery result is analyzed through the existing inbox authority", () => {
+  const client = read("app/career/discover/DiscoverClient.tsx");
+  const save = client.slice(client.indexOf("async function save(result"), client.indexOf("return <>", client.indexOf("async function save(result")));
+  assert.match(save, /body\.duplicate !== "NEW"/);
+  assert.match(save, /body\.item\?\.status !== "READY_TO_ANALYZE"/);
+  assert.match(save, /opportunity-inbox\/\$\{body\.item\.id\}/);
+  assert.match(save, /action: "analyze"/);
+  assert.ok(save.indexOf('method: "POST"') < save.lastIndexOf('method: "POST"'));
+  assert.match(save, /analysisBody\.opportunity\?\.id/);
+});
+
+test("review-required and failed analysis paths remain in the inbox", () => {
+  const client = read("app/career/discover/DiscoverClient.tsx");
+  const save = client.slice(client.indexOf("async function save(result"), client.indexOf("return <>", client.indexOf("async function save(result")));
+  assert.match(save, /Review it before analysis/);
+  assert.match(save, /may still be available in your inbox/);
+  assert.match(save, /Opportunity added to your inbox, but analysis could not be completed/);
+});
