@@ -4,6 +4,43 @@ export const INBOX_SOURCE_TYPES = Object.freeze(["MANUAL_TEXT", "JOB_URL", "EMAI
 export const INBOX_STATES = Object.freeze(["NEW", "READY_TO_ANALYZE", "NEEDS_REVIEW", "IMPORTED", "DUPLICATE", "DISMISSED"]);
 
 function clean(value, limit = 50000) { return String(value || "").replace(/\s+/g, " ").trim().slice(0, limit); }
+function cleanUrl(value) {
+  const raw = clean(value, 1000);
+  if (!raw) return null;
+  try {
+    const parsed = new URL(raw);
+    return ["http:", "https:"].includes(parsed.protocol) ? parsed.toString() : null;
+  } catch {
+    return null;
+  }
+}
+function cleanSourceAuthority(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  return {
+    sourceId: clean(value.sourceId, 160) || null,
+    provider: clean(value.provider, 120) || null,
+    employerName: clean(value.employerName, 240) || null,
+    interfaceType: clean(value.interfaceType, 120) || null,
+    authorityStatus: clean(value.authorityStatus, 80) || null,
+    attributionText: clean(value.attributionText, 500) || null,
+    sourceLinkRequired: value.sourceLinkRequired === true,
+    applyRedirectRequired: value.applyRedirectRequired === true,
+    rateLimitPolicy: clean(value.rateLimitPolicy, 240) || null,
+    removalPolicy: clean(value.removalPolicy, 240) || null,
+    lastReviewedAt: clean(value.lastReviewedAt, 80) || null,
+  };
+}
+function cleanInputProvenance(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const sourceAuthority = cleanSourceAuthority(value.sourceAuthority);
+  return {
+    provider: clean(value.provider, 120) || null,
+    authoritySourceId: clean(value.authoritySourceId, 160) || null,
+    applyUrl: cleanUrl(value.applyUrl),
+    retrievedAt: clean(value.retrievedAt, 80) || null,
+    sourceAuthority,
+  };
+}
 function cleanDescription(value, limit = 50000) {
   return String(value || "")
     .replace(/\r\n?/g, "\n")
@@ -29,6 +66,7 @@ export function normalizeInboxUrl(value) {
 export function normalizeInboxInput(input = {}) {
   const sourceType = INBOX_SOURCE_TYPES.includes(String(input.sourceType || "")) ? String(input.sourceType) : "MANUAL_TEXT";
   const sourceUrl = normalizeInboxUrl(input.sourceUrl);
+  const sourceName = clean(input.sourceName, 240) || null;
   const title = clean(input.title, 240) || (sourceType === "JOB_URL" ? "Opportunity from source link" : "Imported opportunity");
   const company = clean(input.company, 240) || null;
   const location = clean(input.location, 240) || null;
@@ -39,7 +77,7 @@ export function normalizeInboxInput(input = {}) {
   const normalizedDigest = crypto.createHash("sha256").update(normalizedText).digest("hex");
   return {
     sourceType,
-    sourceName: clean(input.sourceName, 240) || null,
+    sourceName,
     sourceUrl,
     externalOpportunityId: clean(input.externalOpportunityId, 300) || null,
     discoveredAt: input.discoveredAt ? new Date(input.discoveredAt).toISOString() : null,
@@ -47,7 +85,7 @@ export function normalizeInboxInput(input = {}) {
     company,
     location,
     description,
-    provenance: { inputMode: sourceType, sourceName: clean(input.sourceName, 240) || null },
+    provenance: { ...cleanInputProvenance(input.provenance), inputMode: sourceType, sourceName },
     normalizedDigest,
     normalizedUrl: sourceUrl,
     normalizationStatus: description ? "NORMALIZED" : "NEEDS_USER_DESCRIPTION",

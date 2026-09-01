@@ -15,18 +15,24 @@ const intent = buildPersonalizedSearchIntent({
 
 function result(overrides) {
   return normalizeDiscoveryResult({
-    sourceProvider: "USAJOBS",
+    sourceProvider: overrides.provider || "USAJOBS",
+    provider: overrides.provider,
+    sourceName: overrides.sourceName,
+    sourceAuthority: overrides.sourceAuthority,
+    authoritySourceId: overrides.authoritySourceId,
     externalOpportunityId: overrides.id,
     title: overrides.title,
     company: "Example",
     location: overrides.location || "Remote",
-    sourceUrl: `https://example.com/jobs/${overrides.id}`,
+    sourceUrl: overrides.sourceUrl || `https://example.com/jobs/${overrides.id}`,
     description: overrides.description,
     postedAt: overrides.postedAt || "2026-08-20T00:00:00Z",
     closingAt: overrides.closingAt || "2026-09-20T00:00:00Z",
     salaryMin: overrides.salaryMin ?? 120000,
     employmentType: overrides.employmentType || "Full Time",
-    retrievedAt: "2026-08-28T12:00:00Z"
+    retrievedAt: "2026-08-28T12:00:00Z",
+    applyUrl: overrides.applyUrl,
+    providerMetadata: overrides.providerMetadata,
   });
 }
 
@@ -142,4 +148,54 @@ test("diagnostics retain exact and adjacent results", () => {
   assert.equal(diagnostics.compatibilityCounts.COMPATIBLE_ADJACENT, 1);
   assert.equal(diagnostics.p0RoleGateSurvivors, 2);
   assert.equal(diagnostics.finalRankedResults, 2);
+});
+
+test("Greenhouse provider alone remains unauthorized without source authority", () => {
+  const ranked = rankDiscoveryResults({
+    intent,
+    capabilities: intent.authority.capabilities,
+    results: [result({ provider: "GREENHOUSE", id: "gh-unauthorized", title: "Program Manager", description: "Responsibilities:\nLead cross-functional program delivery and coordinate stakeholders across planning and launch work." })],
+    existingStatuses: {},
+    now: new Date("2026-08-28T12:00:00Z")
+  }).results[0];
+  assert.equal(ranked.quality.gates.authorizedSource, false);
+  assert.ok(ranked.negativeSignals.includes("Source is not authorized for beta discovery"));
+});
+
+test("authorized Greenhouse source reuses the existing ranking and role relevance pipeline", () => {
+  const sourceAuthority = {
+    sourceId: "source-greenhouse-approved",
+    provider: "GREENHOUSE",
+    employerName: "Approved Fixture Employer",
+    interfaceType: "GREENHOUSE_JOB_BOARD_API",
+    authorityStatus: "AUTHORIZED",
+    enabled: true,
+    authorizedForAutomaticRetrieval: true,
+    commercialMultiUserAllowed: true,
+    storageAllowed: true,
+    derivedAnalysisAllowed: true,
+    displayAllowed: true,
+  };
+  const ranked = rankDiscoveryResults({
+    intent,
+    capabilities: intent.authority.capabilities,
+    results: [result({
+      provider: "GREENHOUSE",
+      sourceName: "Greenhouse / Approved Fixture Employer",
+      sourceAuthority,
+      authoritySourceId: sourceAuthority.sourceId,
+      id: "gh-123",
+      title: "Program Manager",
+      sourceUrl: "https://boards.greenhouse.io/approved-fixture/jobs/123",
+      applyUrl: "https://boards.greenhouse.io/approved-fixture/jobs/123",
+      description: "Responsibilities:\nLead cross-functional program delivery.\nCoordinate stakeholders across launch work.\nQualifications:\nExperience managing delivery risks and implementation plans."
+    })],
+    existingStatuses: {},
+    now: new Date("2026-08-28T12:00:00Z")
+  }).results[0];
+  assert.equal(ranked.provider, "GREENHOUSE");
+  assert.equal(ranked.quality.gates.authorizedSource, true);
+  assert.equal(ranked.roleCompatibility.classification, "EXACT_OR_NEAR_TITLE");
+  assert.ok(["STRONG_CANDIDATE", "CONSIDER"].includes(ranked.recommendation));
+  assert.equal(ranked.authoritySourceId, "source-greenhouse-approved");
 });

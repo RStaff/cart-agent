@@ -1,6 +1,7 @@
 import { parseJobDescription } from "./jobProduct.mjs";
 import { inferRoleFamiliesFromRequirementConcept, inferRoleFamiliesFromText } from "./discoveryRoleFamilies.mjs";
 import { isDiscoveryProviderAuthorized } from "./discoveryProviderAuthorization.mjs";
+import { isDiscoveryRecordSourceAuthorized } from "./sourceAuthorityRegistry.mjs";
 import { classifyRoleCompatibility } from "./roleIntent.mjs";
 
 const DIRECT_STATES = new Set(["VERIFIED_DIRECT"]);
@@ -39,6 +40,10 @@ export function normalizeDiscoveryResult(input = {}) {
     closingAt: input.closingAt || null,
     description,
     sourceUrl: clean(input.sourceUrl, 1000) || null,
+    applyUrl: clean(input.applyUrl || input.sourceUrl, 1000) || null,
+    sourceName: clean(input.sourceName, 240) || null,
+    authoritySourceId: clean(input.authoritySourceId || input.sourceAuthority?.sourceId || input.providerMetadata?.sourceAuthority?.sourceId, 160) || null,
+    sourceAuthority: input.sourceAuthority || input.providerMetadata?.sourceAuthority || null,
     providerMetadata: input.providerMetadata || {},
     retrievedAt: input.retrievedAt || new Date().toISOString(),
     persisted: false,
@@ -100,7 +105,7 @@ function qualityFor({ item, intent, requirements, relationships, existingStatus,
   const roleFamilyMatch = !intentFamilies.size || roleFamilies.some((family) => intentFamilies.has(family.key));
   const evidenceBacked = relationships.some((relationship) => ["DIRECT", "TRANSFERABLE", "PARTIAL"].includes(relationship.state));
   const gates = {
-    authorizedSource: isDiscoveryProviderAuthorized(item.providerKey || item.provider),
+    authorizedSource: isDiscoveryProviderAuthorized(item.providerKey || item.provider) || isDiscoveryRecordSourceAuthorized(item),
     sourceIdentity,
     usefulDescription: !lowInformation,
     duplicateFree: !existingStatus,

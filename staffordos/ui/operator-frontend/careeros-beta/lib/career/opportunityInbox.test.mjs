@@ -28,6 +28,54 @@ test("exact and possible duplicates are classified without deleting either item"
   assert.equal(possible.duplicateStatus, "POSSIBLE_DUPLICATE");
 });
 
+test("Greenhouse import provenance and external identity remain available to inbox dedupe", () => {
+  const sourceAuthority = {
+    sourceId: "source-greenhouse-approved",
+    provider: "GREENHOUSE",
+    employerName: "Approved Fixture Employer",
+    interfaceType: "GREENHOUSE_JOB_BOARD_API",
+    authorityStatus: "AUTHORIZED",
+    attributionText: "Source: Greenhouse / Approved Fixture Employer career site",
+    sourceLinkRequired: true,
+    applyRedirectRequired: true,
+    rateLimitPolicy: "CONSERVATIVE_UNKNOWN",
+    removalPolicy: "SOURCE_REMOVAL_REQUIRES_REVIEW",
+    lastReviewedAt: "2026-09-01",
+  };
+  const candidate = normalizeInboxInput({
+    sourceType: "API_IMPORT",
+    sourceName: "Greenhouse / Approved Fixture Employer",
+    sourceUrl: "https://boards.greenhouse.io/approved-fixture/jobs/123",
+    externalOpportunityId: "123",
+    discoveredAt: "2026-09-01T12:00:00Z",
+    title: "Program Manager",
+    company: "Approved Fixture Employer",
+    description: "Responsibilities:\nLead cross-functional delivery and coordinate stakeholders.",
+    provenance: {
+      provider: "GREENHOUSE",
+      authoritySourceId: "source-greenhouse-approved",
+      applyUrl: "https://boards.greenhouse.io/approved-fixture/jobs/123",
+      retrievedAt: "2026-09-01T12:00:00Z",
+      sourceAuthority,
+    },
+  });
+  assert.equal(candidate.sourceName, "Greenhouse / Approved Fixture Employer");
+  assert.equal(candidate.externalOpportunityId, "123");
+  assert.equal(candidate.provenance.provider, "GREENHOUSE");
+  assert.equal(candidate.provenance.authoritySourceId, "source-greenhouse-approved");
+  assert.equal(candidate.provenance.applyUrl, "https://boards.greenhouse.io/approved-fixture/jobs/123");
+  assert.equal(candidate.provenance.sourceAuthority.sourceId, "source-greenhouse-approved");
+  const duplicate = classifyInboxDuplicate(candidate, [{ id: "existing", sourceName: candidate.sourceName, externalOpportunityId: "123", normalizedDigest: "different" }]);
+  assert.equal(duplicate.duplicateStatus, "DUPLICATE");
+});
+
+test("Greenhouse and user-supplied equivalent jobs remain possible duplicates by title and company", () => {
+  const greenhouse = normalizeInboxInput({ sourceType: "API_IMPORT", sourceName: "Greenhouse / Approved Fixture Employer", title: "Program Manager", company: "Approved Fixture Employer", description: "Responsibilities:\nLead cross-functional delivery." });
+  const supplied = normalizeInboxInput({ sourceType: "MANUAL_TEXT", title: "Program Manager", company: "Approved Fixture Employer", description: "Different pasted snapshot." });
+  const duplicate = classifyInboxDuplicate(greenhouse, [{ ...supplied, id: "manual-existing", normalizedDigest: supplied.normalizedDigest }]);
+  assert.equal(duplicate.duplicateStatus, "POSSIBLE_DUPLICATE");
+});
+
 test("bounded imported inputs remain provider-neutral", () => {
   const values = Array.from({ length: 30 }, (_, index) => normalizeInboxInput({ sourceType: "FEED_IMPORT", title: "Role " + index, description: "A bounded imported description." }));
   assert.equal(values[0].sourceType, "FEED_IMPORT");

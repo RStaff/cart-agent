@@ -49,3 +49,22 @@ test("review-required and failed analysis paths remain in the inbox", () => {
   assert.match(save, /may still be available in your inbox/);
   assert.match(save, /Opportunity added to your inbox, but analysis could not be completed/);
 });
+
+test("discovery save preserves provider source provenance through the inbox contract", () => {
+  const client = read("app/career/discover/DiscoverClient.tsx");
+  const save = client.slice(client.indexOf("async function save(result"), client.indexOf("return <>", client.indexOf("async function save(result")));
+  assert.match(save, /sourceName: sourceLabel\(result\)/);
+  assert.match(save, /sourceUrl: sourceHref\(result\)/);
+  assert.match(save, /provenance: inboxProvenance\(result\)/);
+  assert.match(client, /authoritySourceId/);
+  assert.match(client, /sourceAuthority/);
+});
+
+test("Greenhouse source-registry requests cannot fall back to USAJOBS", () => {
+  const route = read("app/api/career/discover/route.ts");
+  assert.match(route, /const searchAuthorizedSources = searchAuthorizedDiscoverySources/);
+  assert.match(route, /requestedProvider === "GREENHOUSE"/);
+  assert.match(route, /SOURCE_ID_REQUIRED/);
+  assert.match(route, /sourceIds\.length > 0 \? await searchAuthorizedSources/);
+  assert.match(route, /: await searchAuthorizedProvider\(providerCriteria\)/);
+});
