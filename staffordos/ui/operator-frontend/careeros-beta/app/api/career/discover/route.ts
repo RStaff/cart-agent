@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { currentCareerContext, customerMutationAllowed } from "../../../../lib/career/careerP0Auth";
 import { searchUsajobs } from "../../../../lib/career/usajobsDiscovery.mjs";
+import { searchAuthorizedUsajobsDiscovery } from "../../../../lib/career/usajobsAuthority.mjs";
 import { searchAuthorizedDiscoverySources } from "../../../../lib/career/discoveryProviderDispatcher.mjs";
 import { getExistingDiscoveryStatuses, getRelevanceFeedback, getSearchPreferences, saveRelevanceFeedback, saveSearchPreferences } from "../../../../lib/career/careerP0Product.mjs";
 import { getDiscoveryAuthorityModel } from "../../../../lib/career/discoveryAuthorityRead.mjs";
@@ -11,6 +12,7 @@ import { classifyDiscoveryProviders } from "../../../../lib/career/discoveryProv
 export const runtime = "nodejs";
 
 const searchAuthorizedProvider = searchUsajobs as (input: Record<string, unknown>) => Promise<Record<string, any>>;
+const searchAuthorizedUsajobs = searchAuthorizedUsajobsDiscovery as unknown as (input: { criteria: Record<string, unknown>; adapter: (input: Record<string, unknown>) => Promise<Record<string, any>> }) => Promise<Record<string, any>>;
 const searchAuthorizedSources = searchAuthorizedDiscoverySources as unknown as (input: { sourceIds: string[]; criteria: Record<string, unknown> }) => Promise<Record<string, any>>;
 const rankProviderResults = rankDiscoveryResults as (input: Record<string, unknown>) => { results: any[] };
 
@@ -54,7 +56,8 @@ export async function POST(request: Request) {
     const requestedProvider = providerKey(body?.provider);
     if (requestedProvider && !["USAJOBS", "GREENHOUSE", "SOURCE_REGISTRY"].includes(requestedProvider)) throw routeError("DISCOVERY_PROVIDER_NOT_AVAILABLE");
     if ((requestedProvider === "GREENHOUSE" || requestedProvider === "SOURCE_REGISTRY") && sourceIds.length === 0) throw routeError("SOURCE_ID_REQUIRED");
-    const result = sourceIds.length > 0 ? await searchAuthorizedSources({ sourceIds, criteria: providerCriteria }) : await searchAuthorizedProvider(providerCriteria);
+    const useSourceRegistry = sourceIds.length > 0 && requestedProvider !== "USAJOBS";
+    const result = useSourceRegistry ? await searchAuthorizedSources({ sourceIds, criteria: providerCriteria }) : await searchAuthorizedUsajobs({ criteria: providerCriteria, adapter: searchAuthorizedProvider });
     const existingStatuses = await getExistingDiscoveryStatuses(context, result.results);
     const feedback = await getRelevanceFeedback(context, searchIntent.roleIntent.normalizedTitle);
     const rejectedTitles = new Set((feedback as Array<{ observedTitleNormalized: string }>).map((item) => item.observedTitleNormalized));
@@ -67,7 +70,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, provider: result.provider, providers: result.providers || [result.provider], sourceIds: result.sourceIds || [], retrievedAt: result.retrievedAt, results: ranked.results, diagnostics, existingStatuses, criteria: result.criteria, providerCriteria, searchIntent: publicSearchIntent(searchIntent), providerGate: { newProviderActivation: providerGate.newProviderActivation, authorizedForBeta: providerGate.authorizedForBeta, blockedByAuthorization: providerGate.blockedByAuthorization } });
   } catch (error) {
     const code = error instanceof Error ? (error as Error & { code?: string }).code || error.message : "USAJOBS_SEARCH_FAILED";
-    const sourceAuthorityCodes = ["SOURCE_ID_REQUIRED", "SOURCE_NOT_FOUND", "SOURCE_DISABLED", "SOURCE_UNVERIFIED", "SOURCE_WRITTEN_APPROVAL_REQUIRED", "SOURCE_PERMISSION_INCOMPLETE", "SOURCE_PROVIDER_UNKNOWN", "SOURCE_BOARD_IDENTIFIER_INVALID", "DISCOVERY_PROVIDER_NOT_AVAILABLE", "GREENHOUSE_SOURCE_NOT_AUTHORIZED", "GREENHOUSE_SOURCE_PROVIDER_MISMATCH", "GREENHOUSE_BOARD_IDENTIFIER_INVALID", "GREENHOUSE_FETCH_UNAVAILABLE", "GREENHOUSE_RATE_LIMITED", "GREENHOUSE_TIMEOUT", "GREENHOUSE_UNAVAILABLE", "GREENHOUSE_MALFORMED_RESPONSE"];
+    const sourceAuthorityCodes = ["USAJOBS_WRITTEN_APPROVAL_REQUIRED", "USAJOBS_AUTHORITY_NOT_PROVEN", "USAJOBS_ADAPTER_NOT_CONFIGURED", "SOURCE_ID_REQUIRED", "SOURCE_NOT_FOUND", "SOURCE_DISABLED", "SOURCE_UNVERIFIED", "SOURCE_WRITTEN_APPROVAL_REQUIRED", "SOURCE_PERMISSION_INCOMPLETE", "SOURCE_PROVIDER_UNKNOWN", "SOURCE_BOARD_IDENTIFIER_INVALID", "DISCOVERY_PROVIDER_NOT_AVAILABLE", "GREENHOUSE_SOURCE_NOT_AUTHORIZED", "GREENHOUSE_SOURCE_PROVIDER_MISMATCH", "GREENHOUSE_BOARD_IDENTIFIER_INVALID", "GREENHOUSE_FETCH_UNAVAILABLE", "GREENHOUSE_RATE_LIMITED", "GREENHOUSE_TIMEOUT", "GREENHOUSE_UNAVAILABLE", "GREENHOUSE_MALFORMED_RESPONSE"];
     const status = code === "USAJOBS_PROVIDER_NOT_CONFIGURED" || code === "DISCOVERY_PROVIDER_NOT_AVAILABLE" || code === "GREENHOUSE_FETCH_UNAVAILABLE" ? 503 : code === "USAJOBS_AUTH_FAILED" || code === "GREENHOUSE_UNAVAILABLE" || code === "GREENHOUSE_MALFORMED_RESPONSE" ? 502 : code === "USAJOBS_RATE_LIMITED" || code === "GREENHOUSE_RATE_LIMITED" ? 429 : code === "USAJOBS_TIMEOUT" || code === "GREENHOUSE_TIMEOUT" ? 504 : sourceAuthorityCodes.includes(code) ? 403 : 502;
     const safeCode = ["USAJOBS_PROVIDER_NOT_CONFIGURED", "USAJOBS_AUTH_FAILED", "USAJOBS_RATE_LIMITED", "USAJOBS_TIMEOUT", "USAJOBS_UNAVAILABLE", "USAJOBS_MALFORMED_RESPONSE", ...sourceAuthorityCodes].includes(code) ? code : "USAJOBS_SEARCH_FAILED";
     return NextResponse.json({ ok: false, error: safeCode }, { status });

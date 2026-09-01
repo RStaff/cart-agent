@@ -15,7 +15,7 @@ const intent = buildPersonalizedSearchIntent({
 
 function result(overrides) {
   return normalizeDiscoveryResult({
-    sourceProvider: overrides.provider || "USAJOBS",
+    sourceProvider: overrides.provider || "USER_SUPPLIED",
     provider: overrides.provider,
     sourceName: overrides.sourceName,
     sourceAuthority: overrides.sourceAuthority,
@@ -37,7 +37,7 @@ function result(overrides) {
 }
 
 test("provider results normalize into one transient contract", () => {
-  const item = result({ id: "1", title: "Program Manager", description: "Responsibilities: Lead program delivery and coordinate stakeholders." });
+  const item = result({ provider: "USAJOBS", id: "1", title: "Program Manager", description: "Responsibilities: Lead program delivery and coordinate stakeholders." });
   assert.equal(item.provider, "USAJOBS");
   assert.equal(item.providerJobId, "1");
   assert.equal(item.externalOpportunityId, "1");

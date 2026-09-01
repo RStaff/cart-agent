@@ -1,8 +1,8 @@
 const PROVIDERS = Object.freeze({
   USAJOBS: {
-    classification: "AUTHORIZED_FOR_BETA",
-    evidence: "Repository authority classifies USAJOBS API use as supported for commercial aggregation subject to API key, terms, attribution, and rate limits.",
-    requiredAuthority: [],
+    classification: "WRITTEN_APPROVAL_REQUIRED",
+    evidence: "Repository authority does not prove written OPM/USAJOBS approval for multi-user CareerOS private-beta automatic discovery.",
+    requiredAuthority: ["written OPM/USAJOBS approval for multi-user CareerOS use", "retention rights", "display and attribution rights", "derived analysis rights"],
   },
   USER_SUPPLIED: {
     classification: "AUTHORIZED_FOR_BETA",

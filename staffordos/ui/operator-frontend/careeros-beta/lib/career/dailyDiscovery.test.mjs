@@ -15,10 +15,11 @@ test("saved search preferences use a separate scoped authority and do not search
 
 test("discovery results remain transient and explicitly separate from matching", () => {
   const client = read("app/career/discover/DiscoverClient.tsx");
-  assert.match(client, /Search now/);
+  assert.match(client, /Search unavailable/);
   assert.match(client, /Add to Opportunity Inbox/);
   assert.match(client, /not CareerOS match assessments/);
-  assert.match(client, /USAJOBS/);
+  assert.match(client, /Automatic job discovery is unavailable pending provider authorization/);
+  assert.doesNotMatch(client, /ACTIVE.*USAJOBS|USAJOBS.*ACTIVE/);
 });
 
 test("discovery uses bounded search intent and pre-import ranking", () => {
@@ -27,7 +28,7 @@ test("discovery uses bounded search intent and pre-import ranking", () => {
   assert.match(route, /buildPersonalizedSearchIntent/);
   assert.match(route, /buildProviderCriteriaForIntent/);
   assert.match(route, /rankDiscoveryResults/);
-  assert.match(route, /searchAuthorizedProvider\(providerCriteria\)/);
+  assert.match(route, /searchAuthorizedUsajobs\(\{ criteria: providerCriteria, adapter: searchAuthorizedProvider \}\)/);
 });
 
 test("discovery UI explains ranked previews without importing automatically", () => {
@@ -44,6 +45,7 @@ test("discovery preserves home navigation and workspace attention", () => {
   const page = read("app/career/discover/page.tsx");
   const jobs = read("app/career/jobs/page.tsx");
   assert.match(page, /href="\/career"/);
+  assert.match(page, /Save criteria for authorized providers/);
   assert.match(jobs, /Needs attention/);
 });
 
@@ -56,10 +58,11 @@ test("Career Home makes search-first journey and separate evaluation visible", (
   const home = read("app/career/page.tsx");
   assert.match(home, /Build my career profile/);
   assert.match(home, /Review what CareerOS learned/);
-  assert.match(home, /Find jobs for me/);
+  assert.match(home, /Evaluate a job I provide/);
   assert.match(home, /Understand my matches/);
   assert.match(home, /Manage my opportunities/);
-  assert.match(home, /href: "\/career\/discover"/);
+  assert.match(home, /href: "\/career\/jobs"/);
+  assert.match(home, /Discovery settings/);
   assert.match(home, /href: "\/career\/inbox"/);
   assert.match(home, /href="\/career\/jobs"/);
   assert.match(home, /Beta utility/);

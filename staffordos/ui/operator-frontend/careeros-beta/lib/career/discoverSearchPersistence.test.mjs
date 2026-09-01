@@ -5,13 +5,16 @@ import test from "node:test";
 const root = new URL("../../", import.meta.url).pathname;
 const read = (relative) => fs.readFileSync(`${root}${relative}`, "utf8");
 
-test("Search now persists the submitted role before discovery", () => {
+test("Search now is disabled while automatic discovery authority is unavailable", () => {
   const client = read("app/career/discover/DiscoverClient.tsx");
   const search = client.slice(client.indexOf("async function search"), client.indexOf("async function savePreferences"));
   assert.match(search, /searchPayload\(form\)/);
-  assert.ok(search.indexOf('method: "PUT"') < search.indexOf('method: "POST"'));
-  assert.match(search, /Search preferences could not be saved\. Search was not started\./);
-  assert.match(search, /setResults\(/);
+  assert.match(client, /const automaticDiscoveryAvailable = false/);
+  assert.match(client, /Automatic discovery is unavailable pending provider authorization/);
+  assert.match(client, /Search unavailable/);
+  assert.ok(search.indexOf("!automaticDiscoveryAvailable") < search.indexOf('method: "PUT"'));
+  assert.ok(search.indexOf("!automaticDiscoveryAvailable") < search.indexOf('method: "POST"'));
+  assert.match(search, /setResults\(\[\]\)/);
 });
 
 test("Search now preserves the complete existing preference payload", () => {
@@ -20,6 +23,7 @@ test("Search now preserves the complete existing preference payload", () => {
   for (const field of ["requestedTitle", "keywords", "location", "remotePreference", "postedWithinDays", "salaryMin", "resultLimit"]) {
     assert.match(payload, new RegExp(field));
   }
+  assert.match(client, /Search preferences saved for future authorized discovery/);
   assert.match(client, /const searchGeneration = useRef\(0\)/);
   assert.match(client, /generation !== searchGeneration\.current/);
 });
@@ -65,6 +69,17 @@ test("Greenhouse source-registry requests cannot fall back to USAJOBS", () => {
   assert.match(route, /const searchAuthorizedSources = searchAuthorizedDiscoverySources/);
   assert.match(route, /requestedProvider === "GREENHOUSE"/);
   assert.match(route, /SOURCE_ID_REQUIRED/);
-  assert.match(route, /sourceIds\.length > 0 \? await searchAuthorizedSources/);
-  assert.match(route, /: await searchAuthorizedProvider\(providerCriteria\)/);
+  assert.match(route, /sourceIds\.length > 0 && requestedProvider !== "USAJOBS"/);
+  assert.match(route, /useSourceRegistry \? await searchAuthorizedSources/);
+  assert.match(route, /: await searchAuthorizedUsajobs/);
+  assert.doesNotMatch(route, /await searchAuthorizedProvider\(providerCriteria\)/);
+});
+
+test("USAJOBS authority-required errors are not presented as zero results", () => {
+  const route = read("app/api/career/discover/route.ts");
+  const client = read("app/career/discover/DiscoverClient.tsx");
+  assert.match(route, /USAJOBS_WRITTEN_APPROVAL_REQUIRED/);
+  assert.match(route, /sourceAuthorityCodes\.includes\(code\) \? 403/);
+  assert.match(client, /body\.error === "USAJOBS_WRITTEN_APPROVAL_REQUIRED"/);
+  assert.doesNotMatch(client, /0 ranked opportunities found via USAJOBS/);
 });

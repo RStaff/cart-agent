@@ -1,10 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { classifyDiscoveryProviders, selectedAuthorizedPrivateSectorProvider } from "./discoveryProviderAuthorization.mjs";
+import { classifyDiscoveryProviders, isDiscoveryProviderAuthorized, selectedAuthorizedPrivateSectorProvider } from "./discoveryProviderAuthorization.mjs";
 
 test("provider authorization gate only activates sources with project authority", () => {
   const gate = classifyDiscoveryProviders();
-  assert.deepEqual(gate.authorizedForBeta, ["USAJOBS", "USER_SUPPLIED"]);
+  assert.deepEqual(gate.authorizedForBeta, ["USER_SUPPLIED"]);
+  assert.equal(gate.providers.USAJOBS.classification, "WRITTEN_APPROVAL_REQUIRED");
+  assert.equal(isDiscoveryProviderAuthorized("USAJOBS"), false);
+  assert.equal(isDiscoveryProviderAuthorized("USER_SUPPLIED"), true);
   assert.equal(gate.newProviderActivation, "BLOCKED_PENDING_AUTHORIZATION");
   assert.equal(selectedAuthorizedPrivateSectorProvider(gate), null);
 });

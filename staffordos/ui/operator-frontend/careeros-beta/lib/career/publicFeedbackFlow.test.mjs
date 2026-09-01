@@ -24,11 +24,11 @@ test("Career Home exposes the search-first customer journey and beta feedback ut
   for (const text of [
     "Build my career profile",
     "Review what CareerOS learned",
-    "Find jobs for me",
+    "Evaluate a job I provide",
     "Understand my matches",
     "Manage my opportunities",
     "Give beta feedback",
-    "discovery and evaluation",
+    "opportunity evaluation",
     "human-approved applications",
   ]) assert.match(home, new RegExp(text));
   for (const href of ["/career/onboarding", "/career/context", "/career/capabilities", "/career/discover", "/career/inbox", "/career/jobs", "https://www.staffordmedia.ai/contact"]) assert.match(home, new RegExp(href.replace(/\//g, "\\/")));

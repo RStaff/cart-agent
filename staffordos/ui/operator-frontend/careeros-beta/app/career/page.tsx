@@ -37,17 +37,17 @@ export default async function CareerHomePage() {
       status: hasReviewWaiting ? "Needs review" : hasConfirmedExperience ? "Ready" : "After experience",
     },
     {
-      label: "Find jobs for me",
-      body: "Search connected sources for opportunities that may fit your experience.",
-      href: "/career/discover",
-      action: "Find jobs",
+      label: "Evaluate a job I provide",
+      body: "Paste a role you are considering and review fit against confirmed experience.",
+      href: "/career/jobs",
+      action: "Paste a job",
       status: hasConfirmedExperience ? "Ready" : "After review",
     },
     {
       label: "Understand my matches",
-      body: "See why an opportunity fits, what transfers, and what is missing.",
-      href: "/career/discover",
-      action: "View opportunities",
+      body: "See why a saved opportunity fits, what transfers, and what is missing.",
+      href: "/career/jobs",
+      action: "Review analyses",
       status: hasConfirmedExperience ? "Ready" : "After review",
     },
     {
@@ -125,12 +125,12 @@ export default async function CareerHomePage() {
         <Link href="/career/context">Review context</Link>
         <Link href="/career/capabilities">Review capabilities</Link>
         <Link href="/career/jobs">Paste a job description</Link>
-        <Link href="/career/discover">Discover opportunities</Link>
+        <Link href="/career/discover">Discovery settings</Link>
         <Link href="/career/inbox">Opportunity Inbox</Link>
         <Link href="/career/privacy">Privacy and data notice</Link>
         <a href={betaFeedbackHref} target="_blank" rel="noreferrer">Beta feedback</a>
       </div>
-      <p className="careerMuted">CareerOS supports a governed path from discovery and evaluation through preparation, human-approved applications, tracking, follow-up, and development. This beta focuses on reviewed experience, capabilities, context, and explainable job evaluation.</p>
+      <p className="careerMuted">CareerOS supports a governed path from opportunity evaluation through preparation, human-approved applications, tracking, follow-up, and development. This beta focuses on reviewed experience, capabilities, context, and explainable job evaluation.</p>
     </nav>
   </main>;
 }
