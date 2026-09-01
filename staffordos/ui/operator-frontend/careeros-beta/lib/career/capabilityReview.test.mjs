@@ -40,6 +40,7 @@ test("retained capability answers use customer-readable labels", () => {
 
 test("capability overview preserves API order and offers direct selection", () => {
   assert.match(capabilitiesPage, /items\.map\(\(item, itemIndex\)/);
+  assert.match(capabilitiesPage, /<strong>\{item\.label\}<\/strong><br \/><span>/);
   assert.match(capabilitiesPage, /onClick=\{\(\) => selectCapability\(itemIndex\)\}/);
   assert.match(capabilitiesPage, /type="button"/);
 });
