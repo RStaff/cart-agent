@@ -75,6 +75,17 @@ test("Greenhouse source-registry requests cannot fall back to USAJOBS", () => {
   assert.doesNotMatch(route, /await searchAuthorizedProvider\(providerCriteria\)/);
 });
 
+test("Lever source-registry requests cannot fall back to USAJOBS", () => {
+  const route = read("app/api/career/discover/route.ts");
+  assert.match(route, /"LEVER"/);
+  assert.match(route, /requestedProvider === "LEVER"/);
+  assert.match(route, /SOURCE_ID_REQUIRED/);
+  assert.match(route, /sourceIds\.length > 0 && requestedProvider !== "USAJOBS"/);
+  assert.match(route, /useSourceRegistry \? await searchAuthorizedSources/);
+  assert.match(route, /: await searchAuthorizedUsajobs/);
+  assert.doesNotMatch(route, /await searchAuthorizedProvider\(providerCriteria\)/);
+});
+
 test("USAJOBS authority-required errors are not presented as zero results", () => {
   const route = read("app/api/career/discover/route.ts");
   const client = read("app/career/discover/DiscoverClient.tsx");

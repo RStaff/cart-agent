@@ -29,16 +29,49 @@ function source(overrides = {}) {
   };
 }
 
+function leverSource(overrides = {}) {
+  return {
+    sourceId: "source-lever-approved",
+    provider: "LEVER",
+    employerName: "Approved Fixture Employer",
+    siteIdentifier: "approved-fixture",
+    leverSite: "approved-fixture",
+    interfaceType: "LEVER_POSTINGS_API",
+    authorityStatus: "AUTHORIZED",
+    authorityEvidenceRef: "TEST_ONLY_LEVER_PUBLIC_POSTINGS_FIXTURE",
+    commercialMultiUserAllowed: true,
+    storageAllowed: true,
+    derivedAnalysisAllowed: true,
+    displayAllowed: true,
+    attributionText: "Source: Lever / Approved Fixture Employer career site",
+    sourceLinkRequired: true,
+    applyRedirectRequired: true,
+    rateLimitPolicy: "CONSERVATIVE_UNKNOWN",
+    removalPolicy: "SOURCE_REMOVAL_REQUIRES_REVIEW",
+    enabled: true,
+    lastReviewedAt: "2026-09-01",
+    ...overrides,
+  };
+}
+
 function adapters(calls) {
   return {
     GREENHOUSE: async ({ source, criteria }) => {
-      calls.greenhouse += 1;
+      calls.greenhouse = (calls.greenhouse || 0) + 1;
       assert.equal(source.retrievalAuthorized, true);
       assert.equal(criteria.keywords, "program manager");
       return { provider: "GREENHOUSE", providers: ["GREENHOUSE"], retrievedAt: "2026-09-01T12:00:00Z", results: [], criteria };
     },
+    LEVER: async ({ source, criteria }) => {
+      calls.lever = (calls.lever || 0) + 1;
+      assert.equal(source.retrievalAuthorized, true);
+      assert.equal(source.siteIdentifier, "approved-fixture");
+      assert.equal(source.boardToken, null);
+      assert.equal(criteria.keywords, "program manager");
+      return { provider: "LEVER", providers: ["LEVER"], retrievedAt: "2026-09-01T12:00:00Z", results: [], criteria };
+    },
     USAJOBS: async () => {
-      calls.usajobs += 1;
+      calls.usajobs = (calls.usajobs || 0) + 1;
       return { provider: "USAJOBS", providers: ["USAJOBS"], results: [] };
     },
   };
@@ -69,6 +102,22 @@ test("authorized enabled source permits adapter invocation", async () => {
   assert.equal(calls.usajobs, 0);
   assert.equal(result.provider, "GREENHOUSE");
   assert.deepEqual(result.sourceIds, ["source-greenhouse-approved"]);
+});
+
+test("authorized enabled Lever source permits adapter invocation", async () => {
+  const calls = { greenhouse: 0, lever: 0, usajobs: 0 };
+  const result = await searchAuthorizedDiscoverySources({
+    sourceIds: ["source-lever-approved"],
+    criteria: { keywords: "program manager" },
+    registry: [leverSource()],
+    adapters: adapters(calls),
+    now: new Date("2026-09-01T12:00:00Z"),
+  });
+  assert.equal(calls.lever, 1);
+  assert.equal(calls.greenhouse, 0);
+  assert.equal(calls.usajobs, 0);
+  assert.equal(result.provider, "LEVER");
+  assert.deepEqual(result.sourceIds, ["source-lever-approved"]);
 });
 
 test("authorized disabled source blocks network invocation", async () => {
@@ -105,6 +154,65 @@ test("unknown provider blocks network invocation", async () => {
   }), { code: "SOURCE_PROVIDER_UNKNOWN" });
   assert.equal(calls.greenhouse, 0);
   assert.equal(calls.usajobs, 0);
+});
+
+test("Lever disabled source blocks before adapter invocation", async () => {
+  const calls = { greenhouse: 0, lever: 0, usajobs: 0 };
+  await assert.rejects(() => searchAuthorizedDiscoverySources({
+    sourceIds: ["source-lever-approved"],
+    criteria: { keywords: "program manager" },
+    registry: [leverSource({ enabled: false })],
+    adapters: adapters(calls),
+  }), { code: "SOURCE_DISABLED" });
+  assert.equal(calls.lever, 0);
+  assert.equal(calls.greenhouse, 0);
+  assert.equal(calls.usajobs, 0);
+});
+
+test("Lever unverified source blocks before adapter invocation", async () => {
+  const calls = { greenhouse: 0, lever: 0, usajobs: 0 };
+  await assert.rejects(() => searchAuthorizedDiscoverySources({
+    sourceIds: ["source-lever-approved"],
+    criteria: { keywords: "program manager" },
+    registry: [leverSource({ authorityStatus: "UNVERIFIED" })],
+    adapters: adapters(calls),
+  }), { code: "SOURCE_UNVERIFIED" });
+  assert.equal(calls.lever, 0);
+  assert.equal(calls.greenhouse, 0);
+  assert.equal(calls.usajobs, 0);
+});
+
+test("Lever unauthorized source blocks before adapter invocation", async () => {
+  const calls = { greenhouse: 0, lever: 0, usajobs: 0 };
+  await assert.rejects(() => searchAuthorizedDiscoverySources({
+    sourceIds: ["source-lever-approved"],
+    criteria: { keywords: "program manager" },
+    registry: [leverSource({ commercialMultiUserAllowed: false })],
+    adapters: adapters(calls),
+  }), { code: "SOURCE_PERMISSION_INCOMPLETE" });
+  assert.equal(calls.lever, 0);
+  assert.equal(calls.greenhouse, 0);
+  assert.equal(calls.usajobs, 0);
+});
+
+test("Lever registry site identity is not taken from request criteria", async () => {
+  const calls = { lever: 0 };
+  const result = await searchAuthorizedDiscoverySources({
+    sourceIds: ["source-lever-approved"],
+    criteria: { keywords: "program manager", siteIdentifier: "attacker-site", sourceUrl: "https://example.com/jobs" },
+    registry: [leverSource()],
+    adapters: {
+      LEVER: async ({ source, criteria }) => {
+        calls.lever += 1;
+        assert.equal(source.siteIdentifier, "approved-fixture");
+        assert.equal(source.sourceIdentifier, "approved-fixture");
+        assert.equal(criteria.siteIdentifier, "attacker-site");
+        return { provider: "LEVER", providers: ["LEVER"], results: [], criteria };
+      },
+    },
+  });
+  assert.equal(calls.lever, 1);
+  assert.deepEqual(result.results, []);
 });
 
 test("missing source id blocks network invocation", async () => {
@@ -150,6 +258,50 @@ test("provider failure does not fabricate dispatcher results", async () => {
   }), { code: "GREENHOUSE_UNAVAILABLE" });
   assert.equal(calls.greenhouse, 1);
   assert.equal(calls.usajobs, 0);
+});
+
+test("Lever provider failure does not fall back to USAJOBS, Greenhouse, or synthetic results", async () => {
+  const calls = { greenhouse: 0, lever: 0, usajobs: 0 };
+  await assert.rejects(() => searchAuthorizedDiscoverySources({
+    sourceIds: ["source-lever-approved"],
+    criteria: { keywords: "program manager" },
+    registry: [leverSource()],
+    adapters: {
+      LEVER: async () => {
+        calls.lever += 1;
+        throw Object.assign(new Error("LEVER_PROVIDER_FAILURE"), { code: "LEVER_PROVIDER_FAILURE" });
+      },
+      GREENHOUSE: async () => {
+        calls.greenhouse += 1;
+        return { provider: "GREENHOUSE", providers: ["GREENHOUSE"], results: [{ title: "Fallback" }] };
+      },
+      USAJOBS: async () => {
+        calls.usajobs += 1;
+        return { provider: "USAJOBS", providers: ["USAJOBS"], results: [{ title: "Fallback" }] };
+      },
+    },
+  }), { code: "LEVER_PROVIDER_FAILURE" });
+  assert.equal(calls.lever, 1);
+  assert.equal(calls.greenhouse, 0);
+  assert.equal(calls.usajobs, 0);
+});
+
+test("Lever zero-result response remains zero through the dispatcher", async () => {
+  const calls = { lever: 0 };
+  const result = await searchAuthorizedDiscoverySources({
+    sourceIds: ["source-lever-approved"],
+    criteria: { keywords: "program manager" },
+    registry: [leverSource()],
+    adapters: {
+      LEVER: async () => {
+        calls.lever += 1;
+        return { provider: "LEVER", providers: ["LEVER"], results: [] };
+      },
+    },
+  });
+  assert.equal(calls.lever, 1);
+  assert.equal(result.provider, "LEVER");
+  assert.deepEqual(result.results, []);
 });
 
 test("dispatcher does not mutate opportunities, lifecycle, customer decisions, or database state", () => {

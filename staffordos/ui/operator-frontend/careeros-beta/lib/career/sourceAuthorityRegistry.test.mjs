@@ -7,6 +7,7 @@ import {
   normalizeSourceAuthorityEntry,
   publicSourceAuthoritySnapshot,
   safeGreenhouseBoardToken,
+  safeLeverSiteIdentifier,
   sourceAuthorityRegistrySummary,
 } from "./sourceAuthorityRegistry.mjs";
 
@@ -36,11 +37,46 @@ function source(overrides = {}) {
   };
 }
 
+function leverSource(overrides = {}) {
+  return {
+    sourceId: "source-lever-approved",
+    provider: "LEVER",
+    employerName: "Approved Fixture Employer",
+    siteIdentifier: "approved-fixture",
+    leverSite: "approved-fixture",
+    interfaceType: "LEVER_POSTINGS_API",
+    authorityStatus: "AUTHORIZED",
+    authorityEvidenceRef: "TEST_ONLY_LEVER_PUBLIC_POSTINGS_FIXTURE",
+    commercialMultiUserAllowed: true,
+    storageAllowed: true,
+    derivedAnalysisAllowed: true,
+    displayAllowed: true,
+    attributionText: "Source: Lever / Approved Fixture Employer career site",
+    sourceLinkRequired: true,
+    applyRedirectRequired: true,
+    rateLimitPolicy: "CONSERVATIVE_UNKNOWN",
+    removalPolicy: "SOURCE_REMOVAL_REQUIRES_REVIEW",
+    enabled: true,
+    lastReviewedAt: "2026-09-01",
+    ...overrides,
+  };
+}
+
 test("authorized enabled Greenhouse source permits retrieval", () => {
   const authorization = authorizeSourceForAutomaticRetrieval("source-greenhouse-approved", { registry: [source()] });
   assert.equal(authorization.authorized, true);
   assert.equal(authorization.source.retrievalAuthorized, true);
   assert.equal(authorization.source.provider, "GREENHOUSE");
+});
+
+test("authorized enabled Lever source permits retrieval with provider-specific site identity", () => {
+  const authorization = authorizeSourceForAutomaticRetrieval("source-lever-approved", { registry: [leverSource()] });
+  assert.equal(authorization.authorized, true);
+  assert.equal(authorization.source.retrievalAuthorized, true);
+  assert.equal(authorization.source.provider, "LEVER");
+  assert.equal(authorization.source.siteIdentifier, "approved-fixture");
+  assert.equal(authorization.source.leverSite, "approved-fixture");
+  assert.equal(authorization.source.boardToken, null);
 });
 
 test("disabled source blocks retrieval", () => {
@@ -73,6 +109,12 @@ test("unknown provider blocks retrieval", () => {
   assert.equal(authorization.code, "SOURCE_PROVIDER_UNKNOWN");
 });
 
+test("Lever source without complete automatic-use authority blocks retrieval", () => {
+  const authorization = authorizeSourceForAutomaticRetrieval("source-lever-approved", { registry: [leverSource({ derivedAnalysisAllowed: false })] });
+  assert.equal(authorization.authorized, false);
+  assert.equal(authorization.code, "SOURCE_PERMISSION_INCOMPLETE");
+});
+
 test("missing storage, display, or derived-analysis authority blocks retrieval", () => {
   for (const flag of ["commercialMultiUserAllowed", "storageAllowed", "derivedAnalysisAllowed", "displayAllowed"]) {
     const authorization = authorizeSourceForAutomaticRetrieval("source-greenhouse-approved", { registry: [source({ [flag]: false })] });
@@ -89,10 +131,45 @@ test("Greenhouse board identifier cannot be converted into arbitrary URL retriev
   assert.equal(normalizeSourceAuthorityEntry(source({ boardToken: "https://example.com/jobs" })).boardToken, null);
 });
 
+test("Lever site identifier cannot be converted into arbitrary URL retrieval", () => {
+  assert.equal(safeLeverSiteIdentifier("approved-fixture"), "approved-fixture");
+  assert.equal(safeLeverSiteIdentifier("https://jobs.lever.co/approved-fixture"), null);
+  assert.equal(safeLeverSiteIdentifier("jobs.lever.co/approved-fixture"), null);
+  assert.equal(safeLeverSiteIdentifier("../approved-fixture"), null);
+  assert.equal(safeLeverSiteIdentifier("approved-fixture?mode=json"), null);
+  assert.equal(normalizeSourceAuthorityEntry(leverSource({ siteIdentifier: "https://jobs.lever.co/approved-fixture" })).siteIdentifier, null);
+});
+
+test("Lever site identity comes from registry fields, not Greenhouse boardToken semantics", () => {
+  const normalized = normalizeSourceAuthorityEntry(leverSource({ siteIdentifier: null, leverSite: null, sourceIdentifier: null, boardToken: "approved-fixture" }));
+  assert.equal(normalized.provider, "LEVER");
+  assert.equal(normalized.boardToken, null);
+  assert.equal(normalized.siteIdentifier, null);
+  assert.equal(normalized.sourceIdentifier, null);
+});
+
+test("invalid Lever site identity blocks an otherwise authorized enabled source", () => {
+  const authorization = authorizeSourceForAutomaticRetrieval("source-lever-approved", { registry: [leverSource({ siteIdentifier: "https://jobs.lever.co/approved-fixture", leverSite: null })] });
+  assert.equal(authorization.authorized, false);
+  assert.equal(authorization.code, "SOURCE_SITE_IDENTIFIER_INVALID");
+});
+
+test("Lever source with Greenhouse interface type blocks before retrieval", () => {
+  const authorization = authorizeSourceForAutomaticRetrieval("source-lever-approved", { registry: [leverSource({ interfaceType: "GREENHOUSE_JOB_BOARD_API" })] });
+  assert.equal(authorization.authorized, false);
+  assert.equal(authorization.code, "SOURCE_INTERFACE_MISMATCH");
+});
+
 test("default registry has no enabled production Greenhouse source", () => {
   const summary = sourceAuthorityRegistrySummary();
   assert.equal(summary.defaultProductionGreenhouseSourcesEnabled, false);
   assert.equal(summary.productionEnabledGreenhouseSourceCount, 0);
+});
+
+test("default registry has no enabled production Lever source", () => {
+  const summary = sourceAuthorityRegistrySummary();
+  assert.equal(summary.defaultProductionLeverSourcesEnabled, false);
+  assert.equal(summary.productionEnabledLeverSourceCount, 0);
 });
 
 test("registry inspection is static config only and performs no network or database mutation", () => {
@@ -106,4 +183,12 @@ test("authorized source snapshot is required for Greenhouse discovery ranking au
   assert.equal(isDiscoveryRecordSourceAuthorized({ provider: "GREENHOUSE", providerMetadata: { sourceAuthority: snapshot } }), true);
   assert.equal(isDiscoveryRecordSourceAuthorized({ provider: "GREENHOUSE" }), false);
   assert.equal(isDiscoveryRecordSourceAuthorized({ provider: "ASHBY", providerMetadata: { sourceAuthority: snapshot } }), false);
+});
+
+test("authorized source snapshot is required for Lever discovery ranking authority", () => {
+  const authorization = authorizeSourceForAutomaticRetrieval("source-lever-approved", { registry: [leverSource()] });
+  const snapshot = publicSourceAuthoritySnapshot(authorization.source);
+  assert.equal(isDiscoveryRecordSourceAuthorized({ provider: "LEVER", providerMetadata: { sourceAuthority: snapshot } }), true);
+  assert.equal(isDiscoveryRecordSourceAuthorized({ provider: "LEVER" }), false);
+  assert.equal(isDiscoveryRecordSourceAuthorized({ provider: "GREENHOUSE", providerMetadata: { sourceAuthority: snapshot } }), false);
 });

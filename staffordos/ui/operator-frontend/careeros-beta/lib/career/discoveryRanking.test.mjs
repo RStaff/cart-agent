@@ -162,6 +162,18 @@ test("Greenhouse provider alone remains unauthorized without source authority", 
   assert.ok(ranked.negativeSignals.includes("Source is not authorized for beta discovery"));
 });
 
+test("Lever provider alone remains unauthorized without source authority", () => {
+  const ranked = rankDiscoveryResults({
+    intent,
+    capabilities: intent.authority.capabilities,
+    results: [result({ provider: "LEVER", id: "lever-unauthorized", title: "Program Manager", description: "Responsibilities:\nLead cross-functional program delivery and coordinate stakeholders across planning and launch work." })],
+    existingStatuses: {},
+    now: new Date("2026-08-28T12:00:00Z")
+  }).results[0];
+  assert.equal(ranked.quality.gates.authorizedSource, false);
+  assert.ok(ranked.negativeSignals.includes("Source is not authorized for beta discovery"));
+});
+
 test("authorized Greenhouse source reuses the existing ranking and role relevance pipeline", () => {
   const sourceAuthority = {
     sourceId: "source-greenhouse-approved",
@@ -198,4 +210,44 @@ test("authorized Greenhouse source reuses the existing ranking and role relevanc
   assert.equal(ranked.roleCompatibility.classification, "EXACT_OR_NEAR_TITLE");
   assert.ok(["STRONG_CANDIDATE", "CONSIDER"].includes(ranked.recommendation));
   assert.equal(ranked.authoritySourceId, "source-greenhouse-approved");
+});
+
+test("authorized Lever source reuses the existing ranking and role relevance pipeline", () => {
+  const sourceAuthority = {
+    sourceId: "source-lever-approved",
+    provider: "LEVER",
+    employerName: "Approved Fixture Employer",
+    sourceIdentifier: "approved-fixture",
+    siteIdentifier: "approved-fixture",
+    interfaceType: "LEVER_POSTINGS_API",
+    authorityStatus: "AUTHORIZED",
+    enabled: true,
+    authorizedForAutomaticRetrieval: true,
+    commercialMultiUserAllowed: true,
+    storageAllowed: true,
+    derivedAnalysisAllowed: true,
+    displayAllowed: true,
+  };
+  const ranked = rankDiscoveryResults({
+    intent,
+    capabilities: intent.authority.capabilities,
+    results: [result({
+      provider: "LEVER",
+      sourceName: "Lever / Approved Fixture Employer",
+      sourceAuthority,
+      authoritySourceId: sourceAuthority.sourceId,
+      id: "lever-123",
+      title: "Program Manager",
+      sourceUrl: "https://jobs.lever.co/approved-fixture/lever-123",
+      applyUrl: "https://jobs.lever.co/approved-fixture/lever-123/apply",
+      description: "Responsibilities:\nLead cross-functional program delivery.\nCoordinate stakeholders across launch work.\nQualifications:\nExperience managing delivery risks and implementation plans."
+    })],
+    existingStatuses: {},
+    now: new Date("2026-08-28T12:00:00Z")
+  }).results[0];
+  assert.equal(ranked.provider, "LEVER");
+  assert.equal(ranked.quality.gates.authorizedSource, true);
+  assert.equal(ranked.roleCompatibility.classification, "EXACT_OR_NEAR_TITLE");
+  assert.ok(["STRONG_CANDIDATE", "CONSIDER"].includes(ranked.recommendation));
+  assert.equal(ranked.authoritySourceId, "source-lever-approved");
 });

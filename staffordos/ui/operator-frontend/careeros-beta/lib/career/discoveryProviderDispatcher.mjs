@@ -3,9 +3,11 @@ import {
   authorizeSourceForAutomaticRetrieval,
 } from "./sourceAuthorityRegistry.mjs";
 import { searchGreenhouseSource } from "./greenhouseDiscovery.mjs";
+import { searchLeverSource } from "./leverDiscovery.mjs";
 
 export const DEFAULT_DISCOVERY_ADAPTERS = Object.freeze({
   GREENHOUSE: searchGreenhouseSource,
+  LEVER: searchLeverSource,
 });
 
 function clean(value, limit = 500) {

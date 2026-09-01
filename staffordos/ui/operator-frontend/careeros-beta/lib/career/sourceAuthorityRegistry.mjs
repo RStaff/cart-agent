@@ -1,9 +1,9 @@
 export const SOURCE_AUTHORITY_REGISTRY_VERSION = "CAREEROS_SOURCE_AUTHORITY_REGISTRY_V1";
 export const SOURCE_AUTHORITY_STATES = Object.freeze(["AUTHORIZED", "DISABLED", "UNVERIFIED", "WRITTEN_APPROVAL_REQUIRED"]);
-export const SOURCE_INTERFACE_TYPES = Object.freeze(["GREENHOUSE_JOB_BOARD_API"]);
+export const SOURCE_INTERFACE_TYPES = Object.freeze(["GREENHOUSE_JOB_BOARD_API", "LEVER_POSTINGS_API"]);
 export const RATE_LIMIT_POLICY_CONSERVATIVE_UNKNOWN = "CONSERVATIVE_UNKNOWN";
 
-const SUPPORTED_AUTOMATIC_PROVIDERS = new Set(["GREENHOUSE"]);
+const SUPPORTED_AUTOMATIC_PROVIDERS = new Set(["GREENHOUSE", "LEVER"]);
 const REQUIRED_AUTOMATIC_USE_FLAGS = ["commercialMultiUserAllowed", "storageAllowed", "derivedAnalysisAllowed", "displayAllowed"];
 
 export const DEFAULT_SOURCE_AUTHORITY_REGISTRY = Object.freeze([
@@ -31,6 +31,31 @@ export const DEFAULT_SOURCE_AUTHORITY_REGISTRY = Object.freeze([
     lastReviewedAt: "2026-09-01",
     authorityVersion: SOURCE_AUTHORITY_REGISTRY_VERSION,
   }),
+  Object.freeze({
+    sourceId: "lever-test-fixture-disabled",
+    provider: "LEVER",
+    employerName: "Test Fixture Employer",
+    siteIdentifier: "test-fixture",
+    leverSite: "test-fixture",
+    canonicalSourceUrl: "https://jobs.lever.co/test-fixture",
+    interfaceType: "LEVER_POSTINGS_API",
+    authorityStatus: "AUTHORIZED",
+    authorityEvidenceRef: "TEST_ONLY_MOCKED_FIXTURE_NOT_FOR_PRODUCTION_NETWORK",
+    commercialMultiUserAllowed: true,
+    storageAllowed: true,
+    derivedAnalysisAllowed: true,
+    displayAllowed: true,
+    attributionText: "Source: Lever / employer career site",
+    sourceLinkRequired: true,
+    applyRedirectRequired: true,
+    rateLimitPolicy: "TEST_ONLY_NO_LIVE_NETWORK",
+    removalPolicy: "TEST_ONLY",
+    enabled: false,
+    testOnly: true,
+    productionNetworkAllowed: false,
+    lastReviewedAt: "2026-09-01",
+    authorityVersion: SOURCE_AUTHORITY_REGISTRY_VERSION,
+  }),
 ]);
 
 function clean(value, limit = 1000) {
@@ -46,26 +71,60 @@ export function safeGreenhouseBoardToken(value) {
   return /^[A-Za-z0-9][A-Za-z0-9_-]{0,159}$/.test(token) ? token : null;
 }
 
+export function safeLeverSiteIdentifier(value) {
+  const site = clean(value, 160);
+  return /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,158}[A-Za-z0-9])?$/.test(site) ? site : null;
+}
+
 function knownAuthorityStatus(value) {
   const status = clean(value, 80).toUpperCase();
   return SOURCE_AUTHORITY_STATES.includes(status) ? status : "UNVERIFIED";
 }
 
-function knownInterfaceType(value) {
+function defaultInterfaceTypeForProvider(provider) {
+  return provider === "LEVER" ? "LEVER_POSTINGS_API" : "GREENHOUSE_JOB_BOARD_API";
+}
+
+function knownInterfaceType(value, provider) {
   const type = clean(value, 120).toUpperCase();
-  return SOURCE_INTERFACE_TYPES.includes(type) ? type : "GREENHOUSE_JOB_BOARD_API";
+  return SOURCE_INTERFACE_TYPES.includes(type) ? type : defaultInterfaceTypeForProvider(provider);
+}
+
+function knownLeverRegion(value) {
+  return clean(value, 20).toUpperCase() === "EU" ? "EU" : "US";
+}
+
+function expectedInterfaceTypeForSource(source) {
+  return source.provider === "LEVER" ? "LEVER_POSTINGS_API" : source.provider === "GREENHOUSE" ? "GREENHOUSE_JOB_BOARD_API" : null;
+}
+
+function sourceInterfaceValid(source) {
+  const expected = expectedInterfaceTypeForSource(source);
+  return Boolean(expected && source.interfaceType === expected);
+}
+
+function providerIdentifierValid(source) {
+  if (source.provider === "GREENHOUSE") return Boolean(safeGreenhouseBoardToken(source.boardToken));
+  if (source.provider === "LEVER") return Boolean(safeLeverSiteIdentifier(source.siteIdentifier));
+  return false;
 }
 
 export function normalizeSourceAuthorityEntry(input = {}) {
   const provider = providerKey(input.provider);
-  const boardToken = provider === "GREENHOUSE" ? safeGreenhouseBoardToken(input.boardToken || input.boardIdentifier) : clean(input.boardToken || input.boardIdentifier, 160) || null;
+  const boardToken = provider === "GREENHOUSE" ? safeGreenhouseBoardToken(input.boardToken || input.boardIdentifier || input.sourceIdentifier) : null;
+  const siteIdentifier = provider === "LEVER" ? safeLeverSiteIdentifier(input.siteIdentifier || input.leverSite || input.sourceIdentifier) : null;
+  const sourceIdentifier = provider === "GREENHOUSE" ? boardToken : provider === "LEVER" ? siteIdentifier : clean(input.sourceIdentifier || input.boardToken || input.boardIdentifier || input.siteIdentifier, 160) || null;
   return {
     sourceId: clean(input.sourceId, 160),
     provider: provider || "UNKNOWN",
     employerName: clean(input.employerName || input.employer, 240),
     boardToken,
+    siteIdentifier,
+    leverSite: siteIdentifier,
+    sourceIdentifier,
+    leverRegion: provider === "LEVER" ? knownLeverRegion(input.leverRegion || input.region) : null,
     canonicalSourceUrl: clean(input.canonicalSourceUrl || input.sourceUrl, 1000) || null,
-    interfaceType: knownInterfaceType(input.interfaceType),
+    interfaceType: knownInterfaceType(input.interfaceType, provider),
     authorityStatus: knownAuthorityStatus(input.authorityStatus),
     authorityEvidenceRef: clean(input.authorityEvidenceRef || input.authorityEvidence, 500) || null,
     commercialMultiUserAllowed: input.commercialMultiUserAllowed === true,
@@ -99,16 +158,19 @@ export function publicSourceAuthoritySnapshot(entry) {
   const normalized = normalizeSourceAuthorityEntry(entry);
   const permissionComplete = REQUIRED_AUTOMATIC_USE_FLAGS.every((flag) => normalized[flag] === true);
   const providerSupported = SUPPORTED_AUTOMATIC_PROVIDERS.has(normalized.provider);
-  const providerIdentifierValid = normalized.provider !== "GREENHOUSE" || Boolean(safeGreenhouseBoardToken(normalized.boardToken));
   return {
     version: SOURCE_AUTHORITY_REGISTRY_VERSION,
     sourceId: normalized.sourceId,
     provider: normalized.provider,
     employerName: normalized.employerName,
+    sourceIdentifier: normalized.sourceIdentifier,
+    siteIdentifier: normalized.siteIdentifier,
+    leverSite: normalized.leverSite,
+    leverRegion: normalized.leverRegion,
     interfaceType: normalized.interfaceType,
     authorityStatus: normalized.authorityStatus,
     enabled: normalized.enabled,
-    authorizedForAutomaticRetrieval: normalized.authorityStatus === "AUTHORIZED" && normalized.enabled && permissionComplete && providerSupported && providerIdentifierValid,
+    authorizedForAutomaticRetrieval: normalized.authorityStatus === "AUTHORIZED" && normalized.enabled && permissionComplete && providerSupported && sourceInterfaceValid(normalized) && providerIdentifierValid(normalized),
     commercialMultiUserAllowed: normalized.commercialMultiUserAllowed,
     storageAllowed: normalized.storageAllowed,
     derivedAnalysisAllowed: normalized.derivedAnalysisAllowed,
@@ -135,7 +197,9 @@ export function authorizeSourceForAutomaticRetrieval(sourceId, { registry = DEFA
   if (source.authorityStatus === "UNVERIFIED") return blocked("SOURCE_UNVERIFIED", source);
   if (source.authorityStatus === "WRITTEN_APPROVAL_REQUIRED") return blocked("SOURCE_WRITTEN_APPROVAL_REQUIRED", source);
   if (source.authorityStatus !== "AUTHORIZED") return blocked("SOURCE_AUTHORITY_NOT_GRANTED", source);
+  if (!sourceInterfaceValid(source)) return blocked("SOURCE_INTERFACE_MISMATCH", source);
   if (source.provider === "GREENHOUSE" && !safeGreenhouseBoardToken(source.boardToken)) return blocked("SOURCE_BOARD_IDENTIFIER_INVALID", source);
+  if (source.provider === "LEVER" && !safeLeverSiteIdentifier(source.siteIdentifier)) return blocked("SOURCE_SITE_IDENTIFIER_INVALID", source);
   if (REQUIRED_AUTOMATIC_USE_FLAGS.some((flag) => source[flag] !== true)) return blocked("SOURCE_PERMISSION_INCOMPLETE", source);
   return {
     authorized: true,
@@ -154,6 +218,8 @@ export function sourceAuthorityRegistrySummary(registry = DEFAULT_SOURCE_AUTHORI
     enabledAuthorizedSourceCount: enabledAuthorized.length,
     productionEnabledGreenhouseSourceCount: enabledAuthorized.filter((entry) => entry.provider === "GREENHOUSE" && !entry.testOnly).length,
     defaultProductionGreenhouseSourcesEnabled: enabledAuthorized.some((entry) => entry.provider === "GREENHOUSE" && !entry.testOnly),
+    productionEnabledLeverSourceCount: enabledAuthorized.filter((entry) => entry.provider === "LEVER" && !entry.testOnly).length,
+    defaultProductionLeverSourcesEnabled: enabledAuthorized.some((entry) => entry.provider === "LEVER" && !entry.testOnly),
   };
 }
 
