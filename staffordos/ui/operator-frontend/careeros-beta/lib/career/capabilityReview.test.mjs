@@ -45,6 +45,13 @@ test("capability overview preserves API order and offers direct selection", () =
   assert.match(capabilitiesPage, /type="button"/);
 });
 
+test("completion actions use a scoped responsive layout", () => {
+  assert.match(capabilitiesPage, /careerCapabilityCompletionActions/);
+  assert.match(capabilitiesPage, /careerPrimaryButton/);
+  assert.match(readFileSync(new URL("../../app/globals.css", import.meta.url), "utf8"), /\.careerCapabilityCompletionActions \{ display: flex; flex-wrap: wrap/);
+  assert.match(readFileSync(new URL("../../app/globals.css", import.meta.url), "utf8"), /\.careerCapabilityCompletionActions > \* \{ width: 100%/);
+});
+
 test("capability overview explains retained answers without submitting them", () => {
   assert.match(capabilitiesPage, /Current answer: \$\{capabilityAnswerLabel\(item\.decision\.answer\)\}/);
   assert.match(capabilitiesPage, /New confirmed experience is available for review/);

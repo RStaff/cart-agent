@@ -32,6 +32,9 @@ textarea { min-height: 180px; resize: vertical; }
 @media (max-width: 640px) { .careerCompareToolbar { display: grid; } }
 .careerError { color: #fca5a5; }
 .careerNav { margin-top: 20px; }
+.careerCapabilityCompletionActions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.careerCapabilityCompletionActions > .careerPrimaryButton { flex: 0 0 100%; width: fit-content; }
+@media (max-width: 640px) { .careerCapabilityCompletionActions { align-items: stretch; flex-direction: column; } .careerCapabilityCompletionActions > * { width: 100%; } }
 .careerModeTabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
 .careerStoryDisabled { border: 1px solid #475569; border-radius: 8px; padding: 16px; margin-top: 16px; }
 .careerHumanProfile { margin-bottom: 20px; }
