@@ -2,6 +2,19 @@ export function capabilityNeedsReview(item) {
   return !item?.decision?.answer || item.authorityState === "NEEDS_MORE_EVIDENCE";
 }
 
+export function capabilityReviewStatus(item) {
+  if (!item?.decision?.answer) return "UNREVIEWED";
+  return item.authorityState === "NEEDS_MORE_EVIDENCE" ? "NEEDS_REVIEW" : "REVIEWED_CURRENT";
+}
+
+export function capabilityReviewStatusLabel(item) {
+  return { NEEDS_REVIEW: "Needs review", REVIEWED_CURRENT: "Reviewed/current", UNREVIEWED: "Unreviewed" }[capabilityReviewStatus(item)];
+}
+
+export function capabilityAnswerLabel(answer) {
+  return { DIRECT: "Yes, directly", TRANSFERABLE: "Related experience", PARTIAL: "Part of this", NOT_SUPPORTED: "No, this does not describe my experience", KEEP_UNRESOLVED: "I need more context" }[answer] || answer;
+}
+
 export function unreviewedCapabilityCount(items = []) {
   return items.filter(capabilityNeedsReview).length;
 }
