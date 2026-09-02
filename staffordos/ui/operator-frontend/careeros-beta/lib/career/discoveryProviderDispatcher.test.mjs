@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { searchAuthorizedDiscoverySources } from "./discoveryProviderDispatcher.mjs";
+import { DEFAULT_SOURCE_AUTHORITY_REGISTRY } from "./sourceAuthorityRegistry.mjs";
 
 const dispatcherSource = readFileSync(new URL("./discoveryProviderDispatcher.mjs", import.meta.url), "utf8");
 
@@ -163,6 +164,38 @@ test("Lever disabled source blocks before adapter invocation", async () => {
     criteria: { keywords: "program manager" },
     registry: [leverSource({ enabled: false })],
     adapters: adapters(calls),
+  }), { code: "SOURCE_DISABLED" });
+  assert.equal(calls.lever, 0);
+  assert.equal(calls.greenhouse, 0);
+  assert.equal(calls.usajobs, 0);
+});
+
+test("registered disabled FreedomPay source blocks before adapter or network invocation", async () => {
+  const calls = { greenhouse: 0, lever: 0, usajobs: 0 };
+  await assert.rejects(() => searchAuthorizedDiscoverySources({
+    sourceIds: ["lever-freedompay"],
+    criteria: {
+      keywords: "site reliability",
+      privateEvidence: "PRIVATE_EVIDENCE_SHOULD_NOT_EGRESS",
+      resume: "RESUME_SHOULD_NOT_EGRESS",
+      userProfile: "PROFILE_SHOULD_NOT_EGRESS",
+      fitResult: "FIT_SHOULD_NOT_EGRESS",
+    },
+    registry: DEFAULT_SOURCE_AUTHORITY_REGISTRY,
+    adapters: {
+      LEVER: async () => {
+        calls.lever += 1;
+        throw new Error("LEVER_ADAPTER_SHOULD_NOT_BE_CALLED");
+      },
+      GREENHOUSE: async () => {
+        calls.greenhouse += 1;
+        throw new Error("GREENHOUSE_ADAPTER_SHOULD_NOT_BE_CALLED");
+      },
+      USAJOBS: async () => {
+        calls.usajobs += 1;
+        throw new Error("USAJOBS_ADAPTER_SHOULD_NOT_BE_CALLED");
+      },
+    },
   }), { code: "SOURCE_DISABLED" });
   assert.equal(calls.lever, 0);
   assert.equal(calls.greenhouse, 0);

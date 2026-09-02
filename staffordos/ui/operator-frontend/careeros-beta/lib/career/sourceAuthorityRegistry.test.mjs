@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import {
   authorizeSourceForAutomaticRetrieval,
   isDiscoveryRecordSourceAuthorized,
+  listSourceAuthorityEntries,
   normalizeSourceAuthorityEntry,
   publicSourceAuthoritySnapshot,
   safeGreenhouseBoardToken,
@@ -170,6 +171,59 @@ test("default registry has no enabled production Lever source", () => {
   const summary = sourceAuthorityRegistrySummary();
   assert.equal(summary.defaultProductionLeverSourcesEnabled, false);
   assert.equal(summary.productionEnabledLeverSourceCount, 0);
+});
+
+test("default registry registers FreedomPay Lever source without production activation", () => {
+  const entries = listSourceAuthorityEntries();
+  const freedomPay = entries.find((entry) => entry.sourceId === "lever-freedompay");
+  assert.ok(freedomPay);
+  assert.equal(freedomPay.provider, "LEVER");
+  assert.equal(freedomPay.interfaceType, "LEVER_POSTINGS_API");
+  assert.equal(freedomPay.employerName, "FreedomPay");
+  assert.equal(freedomPay.siteIdentifier, "freedompay");
+  assert.equal(freedomPay.leverSite, "freedompay");
+  assert.equal(freedomPay.sourceIdentifier, "freedompay");
+  assert.equal(freedomPay.boardToken, null);
+  assert.equal(freedomPay.canonicalSourceUrl, "https://jobs.lever.co/freedompay");
+  assert.equal(freedomPay.authorityStatus, "AUTHORIZED");
+  assert.equal(freedomPay.authorityEvidenceRef, "LEVER_PUBLIC_POSTINGS_THIRD_PARTY_SCRAPING_DOC_AND_FREEDOMPAY_OFFICIAL_CAREERS_LINK_2026-09-02");
+  assert.equal(freedomPay.commercialMultiUserAllowed, true);
+  assert.equal(freedomPay.storageAllowed, true);
+  assert.equal(freedomPay.derivedAnalysisAllowed, true);
+  assert.equal(freedomPay.displayAllowed, true);
+  assert.equal(freedomPay.sourceLinkRequired, true);
+  assert.equal(freedomPay.applyRedirectRequired, true);
+  assert.equal(freedomPay.rateLimitPolicy, "CONSERVATIVE_UNKNOWN");
+  assert.equal(freedomPay.removalPolicy, "REVALIDATE_STOP_PRESENTING_MISSING_OR_CLOSED_NO_RAW_FEED_ARCHIVE");
+  assert.equal(freedomPay.testOnly, false);
+  assert.equal(freedomPay.enabled, false);
+  assert.equal(freedomPay.productionNetworkAllowed, false);
+  assert.equal(freedomPay.lastReviewedAt, "2026-09-02");
+});
+
+test("registered FreedomPay source remains fail-closed before automatic retrieval", () => {
+  const authorization = authorizeSourceForAutomaticRetrieval("lever-freedompay");
+  assert.equal(authorization.authorized, false);
+  assert.equal(authorization.code, "SOURCE_DISABLED");
+  assert.equal(authorization.source.sourceId, "lever-freedompay");
+  assert.equal(authorization.source.provider, "LEVER");
+  assert.equal(authorization.source.enabled, false);
+  assert.equal(authorization.source.productionNetworkAllowed, false);
+  assert.equal(authorization.authority.authorizedForAutomaticRetrieval, false);
+});
+
+test("default registry has exactly one real Lever source and zero enabled production network sources", () => {
+  const entries = listSourceAuthorityEntries();
+  const realLeverSources = entries.filter((entry) => entry.provider === "LEVER" && !entry.testOnly);
+  assert.deepEqual(realLeverSources.map((entry) => entry.sourceId), ["lever-freedompay"]);
+  assert.equal(realLeverSources.filter((entry) => entry.enabled).length, 0);
+  assert.equal(realLeverSources.filter((entry) => entry.productionNetworkAllowed).length, 0);
+  assert.equal(sourceAuthorityRegistrySummary().productionEnabledLeverSourceCount, 0);
+});
+
+test("FreedomPay registration does not add unrelated real Lever employers", () => {
+  const registryText = registrySource.toLowerCase();
+  assert.doesNotMatch(registryText, /dun\s*&\s*bradstreet|fieldai|field-ai|3pillar|3pillarglobal/);
 });
 
 test("registry inspection is static config only and performs no network or database mutation", () => {
