@@ -487,9 +487,36 @@ test("source telemetry preserves earlier completion when a later provider fails"
     assert.equal(error.discoveryTelemetry.sourceTelemetry[1].dispatchAttempted, true);
     assert.equal(error.discoveryTelemetry.sourceTelemetry[1].dispatchCompleted, false);
     assert.equal(error.discoveryTelemetry.sourceTelemetry[1].providerOutcome, "BOUNDED_ERROR");
+    assert.equal(error.discoveryTelemetry.sourceTelemetry[1].providerFailureCategory, "TIMEOUT");
     return true;
   });
   assert.deepEqual(calls, ["lever-freedompay", "lever-dnb"]);
+});
+
+test("dispatcher preserves bounded provider failure category and HTTP status", async () => {
+  const unsafe = "provider body\n\\\"fakeField\\\":true https://evil.example/?token=secret";
+  await assert.rejects(() => searchAuthorizedDiscoverySources({
+    sourceIds: ["source-lever-approved"],
+    criteria: { keywords: "program manager" },
+    registry: [leverSource()],
+    adapters: {
+      LEVER: async () => {
+        throw Object.assign(new Error(unsafe), {
+          code: "LEVER_PROVIDER_FAILURE",
+          providerFailureCategory: "HTTP_STATUS_FAILURE",
+          providerHttpStatus: 502,
+          responseBody: unsafe,
+        });
+      },
+    },
+  }), (error) => {
+    const telemetry = error.discoveryTelemetry.sourceTelemetry[0];
+    assert.equal(error.code, "LEVER_PROVIDER_FAILURE");
+    assert.equal(telemetry.providerFailureCategory, "HTTP_STATUS_FAILURE");
+    assert.equal(telemetry.providerHttpStatus, 502);
+    assert.doesNotMatch(JSON.stringify(telemetry), /fakeField|evil\\.example|token=secret|provider body/);
+    return true;
+  });
 });
 
 test("Dun & Bradstreet rollback disables only D&B and preserves FreedomPay", async () => {

@@ -4,7 +4,7 @@ import {
 } from "./sourceAuthorityRegistry.mjs";
 import { searchGreenhouseSource } from "./greenhouseDiscovery.mjs";
 import { searchLeverSource } from "./leverDiscovery.mjs";
-import { classifyDiscoveryError } from "./discoveryObservability.mjs";
+import { classifyDiscoveryError, classifyProviderFailureCategory } from "./discoveryObservability.mjs";
 
 export const DEFAULT_DISCOVERY_ADAPTERS = Object.freeze({
   GREENHOUSE: searchGreenhouseSource,
@@ -46,6 +46,8 @@ function sourceTelemetryFor(authorization) {
     providerRecordCount: 0,
     normalizedRecordCount: 0,
     errorClass: authorization.authorized ? null : authorization.code || "SOURCE_AUTHORITY_BLOCKED",
+    providerFailureCategory: null,
+    providerHttpStatus: null,
   };
 }
 
@@ -99,7 +101,9 @@ export async function searchAuthorizedDiscoverySources({
     } catch (error) {
       telemetry.providerOutcome = "BOUNDED_ERROR";
       telemetry.errorClass = classifyDiscoveryError(error);
-      const wrapped = providerError(telemetry.errorClass, { discoveryTelemetry: { sourceTelemetry } });
+      telemetry.providerFailureCategory = classifyProviderFailureCategory(error);
+      telemetry.providerHttpStatus = Number.isInteger(error?.providerHttpStatus ?? error?.providerStatus) ? (error.providerHttpStatus ?? error.providerStatus) : null;
+      const wrapped = providerError(telemetry.errorClass, { discoveryTelemetry: { sourceTelemetry }, providerFailureCategory: telemetry.providerFailureCategory, providerHttpStatus: telemetry.providerHttpStatus });
       throw wrapped;
     }
   }

@@ -168,24 +168,51 @@ test("provider failure does not fabricate Lever jobs", async () => {
   await assert.rejects(() => searchLeverSource({
     source: source(),
     fetchImpl: async () => ({ ok: false, status: 500, headers: { get: () => null }, text: async () => "unavailable" }),
-  }), { code: "LEVER_PROVIDER_FAILURE" });
+  }), (error) => {
+    assert.equal(error.code, "LEVER_PROVIDER_FAILURE");
+    assert.equal(error.providerFailureCategory, "HTTP_STATUS_FAILURE");
+    assert.equal(error.providerHttpStatus, 500);
+    return true;
+  });
 });
 
 test("rate limiting, malformed payloads, and oversized responses fail as bounded provider errors", async () => {
   await assert.rejects(() => searchLeverSource({
     source: source(),
     fetchImpl: async () => ({ ok: false, status: 429, headers: { get: () => null }, text: async () => "rate limited" }),
-  }), { code: "LEVER_RATE_LIMITED" });
+  }), (error) => {
+    assert.equal(error.code, "LEVER_RATE_LIMITED");
+    assert.equal(error.providerFailureCategory, "HTTP_STATUS_FAILURE");
+    assert.equal(error.providerHttpStatus, 429);
+    return true;
+  });
 
   await assert.rejects(() => searchLeverSource({
     source: source(),
     fetchImpl: async () => jsonResponse({ postings: [] }),
-  }), { code: "LEVER_MALFORMED_RESPONSE" });
+  }), (error) => {
+    assert.equal(error.code, "LEVER_MALFORMED_RESPONSE");
+    assert.equal(error.providerFailureCategory, "UNEXPECTED_RESPONSE_SHAPE");
+    return true;
+  });
+
+  await assert.rejects(() => searchLeverSource({
+    source: source(),
+    fetchImpl: async () => ({ ok: true, status: 200, headers: { get: () => null }, text: async () => "not-json" }),
+  }), (error) => {
+    assert.equal(error.code, "LEVER_MALFORMED_RESPONSE");
+    assert.equal(error.providerFailureCategory, "INVALID_JSON");
+    return true;
+  });
 
   await assert.rejects(() => searchLeverSource({
     source: source(),
     fetchImpl: async () => jsonResponse([], { headers: { get: (name) => name === "content-length" ? "2000001" : null } }),
-  }), { code: "LEVER_RESPONSE_TOO_LARGE" });
+  }), (error) => {
+    assert.equal(error.code, "LEVER_RESPONSE_TOO_LARGE");
+    assert.equal(error.providerFailureCategory, "RESPONSE_TOO_LARGE");
+    return true;
+  });
 });
 
 test("Lever adapter blocks redirects instead of following them to another host", async () => {
@@ -196,9 +223,50 @@ test("Lever adapter blocks redirects instead of following them to another host",
       request = { url: String(url), redirect: init.redirect };
       return { ok: false, status: 302, headers: { get: () => "https://example.com/jobs" }, text: async () => "" };
     },
-  }), { code: "LEVER_REDIRECT_NOT_ALLOWED" });
+  }), (error) => {
+    assert.equal(error.code, "LEVER_REDIRECT_NOT_ALLOWED");
+    assert.equal(error.providerFailureCategory, "REDIRECT_REJECTED");
+    assert.equal(error.providerHttpStatus, 302);
+    return true;
+  });
   assert.equal(request.url, "https://api.lever.co/v0/postings/approved-fixture?mode=json");
   assert.equal(request.redirect, "manual");
+});
+
+test("Lever adapter classifies timeout and bounded network failures without raw error content", async () => {
+  for (const [category, causeCode] of [["NETWORK_DNS_FAILURE", "ENOTFOUND"], ["NETWORK_CONNECTION_FAILURE", "ECONNREFUSED"], ["TLS_FAILURE", "CERT_HAS_EXPIRED"]]) {
+    await assert.rejects(() => searchLeverSource({
+      source: source(),
+      fetchImpl: async () => { throw Object.assign(new TypeError("private provider details"), { cause: { code: causeCode } }); },
+    }), (error) => {
+      assert.equal(error.code, "LEVER_PROVIDER_FAILURE");
+      assert.equal(error.providerFailureCategory, category);
+      assert.equal(error.providerHttpStatus, null);
+      return true;
+    });
+  }
+  await assert.rejects(() => searchLeverSource({
+    source: source(),
+    fetchImpl: async () => { const error = new Error("private timeout details"); error.name = "AbortError"; throw error; },
+  }), (error) => {
+    assert.equal(error.code, "LEVER_TIMEOUT");
+    assert.equal(error.providerFailureCategory, "TIMEOUT");
+    return true;
+  });
+  await assert.rejects(() => searchLeverSource({
+    source: source(),
+    fetchImpl: async () => { throw new TypeError("private network details"); },
+  }), (error) => {
+    assert.equal(error.providerFailureCategory, "OTHER_NETWORK_FAILURE");
+    return true;
+  });
+  await assert.rejects(() => searchLeverSource({
+    source: source(),
+    fetchImpl: async () => { throw new Error("unexpected private provider details"); },
+  }), (error) => {
+    assert.equal(error.providerFailureCategory, "UNKNOWN_PROVIDER_FAILURE");
+    return true;
+  });
 });
 
 test("Lever adapter refuses a source that did not pass authority gating", async () => {

@@ -1,4 +1,5 @@
 import { publicSourceAuthoritySnapshot, safeLeverSiteIdentifier } from "./sourceAuthorityRegistry.mjs";
+import { classifyProviderFailureCategory } from "./discoveryObservability.mjs";
 
 export const LEVER_POSTINGS_API_HOSTS = Object.freeze({
   US: "api.lever.co",
@@ -35,8 +36,20 @@ function cleanDescription(value, limit = 50000) {
     .trim();
 }
 
-function providerError(code, status = null) {
-  return Object.assign(new Error(code), { code, providerStatus: status });
+function providerFailureCategoryFor(code, status = null) {
+  if (code === "LEVER_REDIRECT_NOT_ALLOWED") return "REDIRECT_REJECTED";
+  if (code === "LEVER_TIMEOUT") return "TIMEOUT";
+  if (code === "LEVER_RESPONSE_TOO_LARGE") return "RESPONSE_TOO_LARGE";
+  if (code === "LEVER_INVALID_JSON") return "INVALID_JSON";
+  if (code === "LEVER_UNEXPECTED_RESPONSE_SHAPE") return "UNEXPECTED_RESPONSE_SHAPE";
+  if (code === "LEVER_RATE_LIMITED" || code === "LEVER_PROVIDER_FAILURE") return status === null ? "UNKNOWN_PROVIDER_FAILURE" : "HTTP_STATUS_FAILURE";
+  return "UNKNOWN_PROVIDER_FAILURE";
+}
+
+function providerError(code, status = null, category = null) {
+  const providerHttpStatus = Number.isInteger(status) && status >= 100 && status <= 599 ? status : null;
+  const providerFailureCategory = classifyProviderFailureCategory(category || providerFailureCategoryFor(code, providerHttpStatus));
+  return Object.assign(new Error(code), { code, providerStatus: providerHttpStatus, providerHttpStatus, providerFailureCategory });
 }
 
 function clamp(value, min, max) {
@@ -281,9 +294,9 @@ export async function searchLeverSource({
     try {
       body = JSON.parse(text);
     } catch {
-      throw providerError("LEVER_MALFORMED_RESPONSE", response.status);
+      throw providerError("LEVER_MALFORMED_RESPONSE", response.status, "INVALID_JSON");
     }
-    if (!Array.isArray(body)) throw providerError("LEVER_MALFORMED_RESPONSE", response.status);
+    if (!Array.isArray(body)) throw providerError("LEVER_MALFORMED_RESPONSE", response.status, "UNEXPECTED_RESPONSE_SHAPE");
     const discoveryTime = clean(retrievedAt, 80) || now.toISOString();
     const results = boundedResults(
       body
@@ -294,7 +307,16 @@ export async function searchLeverSource({
     return { provider: "LEVER", providers: ["LEVER"], sourceIds: [source.sourceId], retrievedAt: discoveryTime, results, criteria };
   } catch (error) {
     if (error?.code) throw error;
-    throw providerError(error?.name === "AbortError" ? "LEVER_TIMEOUT" : "LEVER_PROVIDER_FAILURE");
+    if (error?.name === "AbortError") throw providerError("LEVER_TIMEOUT", null, "TIMEOUT");
+    const networkCode = error?.cause?.code;
+    const category = ["ENOTFOUND", "EAI_AGAIN"].includes(networkCode)
+      ? "NETWORK_DNS_FAILURE"
+      : ["ECONNREFUSED", "ECONNRESET", "EPIPE", "ENETUNREACH", "EHOSTUNREACH"].includes(networkCode)
+        ? "NETWORK_CONNECTION_FAILURE"
+        : ["CERT_HAS_EXPIRED", "CERT_INVALID", "ERR_TLS_CERT_ALTNAME_INVALID", "DEPTH_ZERO_SELF_SIGNED_CERT"].includes(networkCode)
+          ? "TLS_FAILURE"
+          : error?.name === "TypeError" ? "OTHER_NETWORK_FAILURE" : "UNKNOWN_PROVIDER_FAILURE";
+    throw providerError("LEVER_PROVIDER_FAILURE", null, category);
   } finally {
     clearTimeout(timeout);
   }

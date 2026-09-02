@@ -41,13 +41,43 @@ const SAFE_ERROR_CLASSES = new Set([
   "USAJOBS_MALFORMED_RESPONSE",
   "INTERNAL_DISCOVERY_ERROR",
 ]);
+const PROVIDER_FAILURE_CATEGORIES = new Set([
+  "HTTP_STATUS_FAILURE",
+  "REDIRECT_REJECTED",
+  "TIMEOUT",
+  "RESPONSE_TOO_LARGE",
+  "INVALID_JSON",
+  "UNEXPECTED_RESPONSE_SHAPE",
+  "NETWORK_DNS_FAILURE",
+  "NETWORK_CONNECTION_FAILURE",
+  "TLS_FAILURE",
+  "OTHER_NETWORK_FAILURE",
+  "UNKNOWN_PROVIDER_FAILURE",
+]);
 
-/** @typedef {{ sourceId?: unknown, provider?: unknown, authorityResult?: unknown, enabled?: unknown, productionNetworkAllowed?: unknown, dispatchAttempted?: unknown, dispatchCompleted?: unknown, providerOutcome?: unknown, providerRecordCount?: unknown, normalizedRecordCount?: unknown, errorClass?: unknown }} SourceTelemetryInput */
+/** @typedef {{ sourceId?: unknown, provider?: unknown, authorityResult?: unknown, enabled?: unknown, productionNetworkAllowed?: unknown, dispatchAttempted?: unknown, dispatchCompleted?: unknown, providerOutcome?: unknown, providerRecordCount?: unknown, normalizedRecordCount?: unknown, errorClass?: unknown, providerFailureCategory?: unknown, providerHttpStatus?: unknown }} SourceTelemetryInput */
 /** @typedef {{ roleCompatibility?: { classification?: unknown } }} DiscoveryResult */
 
 export function classifyDiscoveryError(errorOrCode) {
   const code = typeof errorOrCode === "string" ? errorOrCode : errorOrCode?.code;
   return SAFE_ERROR_CLASSES.has(code) ? code : "INTERNAL_DISCOVERY_ERROR";
+}
+
+function safeHttpStatus(value) {
+  return Number.isInteger(value) && value >= 100 && value <= 599 ? value : null;
+}
+
+export function classifyProviderFailureCategory(errorOrCategory, status = null) {
+  const requested = typeof errorOrCategory === "string" ? errorOrCategory : errorOrCategory?.providerFailureCategory;
+  if (PROVIDER_FAILURE_CATEGORIES.has(requested)) return requested;
+  const code = typeof errorOrCategory === "string" ? errorOrCategory : errorOrCategory?.code;
+  const providerStatus = safeHttpStatus(status ?? errorOrCategory?.providerHttpStatus ?? errorOrCategory?.providerStatus);
+  if (code === "LEVER_REDIRECT_NOT_ALLOWED") return "REDIRECT_REJECTED";
+  if (code === "LEVER_TIMEOUT") return "TIMEOUT";
+  if (code === "LEVER_RESPONSE_TOO_LARGE") return "RESPONSE_TOO_LARGE";
+  if (code === "LEVER_MALFORMED_RESPONSE") return "UNKNOWN_PROVIDER_FAILURE";
+  if (code === "LEVER_RATE_LIMITED" || code === "LEVER_PROVIDER_FAILURE") return providerStatus === null ? "UNKNOWN_PROVIDER_FAILURE" : "HTTP_STATUS_FAILURE";
+  return "UNKNOWN_PROVIDER_FAILURE";
 }
 
 function safeCount(value) {
@@ -68,6 +98,8 @@ function safeSource(source = {}) {
     providerRecordCount: safeCount(source.providerRecordCount),
     normalizedRecordCount: safeCount(source.normalizedRecordCount),
     errorClass: source.errorClass ? classifyDiscoveryError(source.errorClass) : null,
+    providerFailureCategory: source.providerFailureCategory ? classifyProviderFailureCategory(source.providerFailureCategory) : null,
+    providerHttpStatus: safeHttpStatus(source.providerHttpStatus),
   };
 }
 

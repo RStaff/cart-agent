@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildDiscoveryObservability, classifyDiscoveryError } from "./discoveryObservability.mjs";
+import { buildDiscoveryObservability, classifyDiscoveryError, classifyProviderFailureCategory } from "./discoveryObservability.mjs";
 
 function result(classification) {
   return { roleCompatibility: { classification } };
@@ -83,4 +83,40 @@ test("error telemetry uses bounded classifications instead of exception content"
   assert.match(serialized, /INTERNAL_DISCOVERY_ERROR/);
   assert.doesNotMatch(serialized, /fakeField|evil\.example|token@example\.com|secret/);
   assert.doesNotMatch(serialized, /LEVER_TIMEOUT\\n/);
+});
+
+test("provider failure diagnostics use bounded categories and status only", () => {
+  assert.equal(classifyProviderFailureCategory("HTTP_STATUS_FAILURE"), "HTTP_STATUS_FAILURE");
+  assert.equal(classifyProviderFailureCategory("REDIRECT_REJECTED"), "REDIRECT_REJECTED");
+  assert.equal(classifyProviderFailureCategory("TIMEOUT"), "TIMEOUT");
+  assert.equal(classifyProviderFailureCategory("RESPONSE_TOO_LARGE"), "RESPONSE_TOO_LARGE");
+  assert.equal(classifyProviderFailureCategory("INVALID_JSON"), "INVALID_JSON");
+  assert.equal(classifyProviderFailureCategory("UNEXPECTED_RESPONSE_SHAPE"), "UNEXPECTED_RESPONSE_SHAPE");
+  assert.equal(classifyProviderFailureCategory("NETWORK_DNS_FAILURE"), "NETWORK_DNS_FAILURE");
+  assert.equal(classifyProviderFailureCategory("NETWORK_CONNECTION_FAILURE"), "NETWORK_CONNECTION_FAILURE");
+  assert.equal(classifyProviderFailureCategory("TLS_FAILURE"), "TLS_FAILURE");
+  assert.equal(classifyProviderFailureCategory("OTHER_NETWORK_FAILURE"), "OTHER_NETWORK_FAILURE");
+  assert.equal(classifyProviderFailureCategory({ code: "LEVER_PROVIDER_FAILURE", providerStatus: 502 }), "HTTP_STATUS_FAILURE");
+  assert.equal(classifyProviderFailureCategory({ code: "LEVER_PROVIDER_FAILURE", message: "raw secret" }), "UNKNOWN_PROVIDER_FAILURE");
+
+  const adversarial = "502\\n\\\"fakeField\\\":true https://evil.example/?token=secret token@example.com".repeat(100);
+  const summary = buildDiscoveryObservability({
+    requestId: "request-5",
+    sourceIds: ["lever-frontify"],
+    sourceTelemetry: [{
+      sourceId: "lever-frontify",
+      provider: "LEVER",
+      providerFailureCategory: "HTTP_STATUS_FAILURE",
+      providerHttpStatus: 502,
+      errorClass: "LEVER_PROVIDER_FAILURE",
+      errorMessage: adversarial,
+      responseBody: adversarial,
+    }],
+    outcome: "BOUNDED_ERROR",
+    errorClass: "LEVER_PROVIDER_FAILURE",
+  });
+  assert.equal(summary.sources[0].providerFailureCategory, "HTTP_STATUS_FAILURE");
+  assert.equal(summary.sources[0].providerHttpStatus, 502);
+  const serialized = JSON.stringify(summary);
+  assert.doesNotMatch(serialized, /fakeField|evil\\.example|token@example\\.com|secret|errorMessage|responseBody/);
 });
