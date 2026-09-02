@@ -235,10 +235,10 @@ test("FreedomPay rollback state returns SOURCE_DISABLED", () => {
   assert.equal(authorization.source.productionNetworkAllowed, false);
 });
 
-test("default registry has exactly one real Lever source and one enabled production network source", () => {
+test("default registry has two real Lever sources and one enabled production network source", () => {
   const entries = listSourceAuthorityEntries();
   const realLeverSources = entries.filter((entry) => entry.provider === "LEVER" && !entry.testOnly);
-  assert.deepEqual(realLeverSources.map((entry) => entry.sourceId), ["lever-freedompay"]);
+  assert.deepEqual(realLeverSources.map((entry) => entry.sourceId), ["lever-freedompay", "lever-dnb"]);
   assert.equal(realLeverSources.filter((entry) => entry.enabled).length, 1);
   assert.equal(realLeverSources.filter((entry) => entry.productionNetworkAllowed).length, 1);
   assert.equal(sourceAuthorityRegistrySummary().productionEnabledLeverSourceCount, 1);
@@ -258,9 +258,39 @@ test("available automatic discovery sources expose only active governed producti
   assert.deepEqual(listAvailableAutomaticDiscoverySources(rollback), []);
 });
 
-test("FreedomPay registration does not add unrelated real Lever employers", () => {
+test("Dun & Bradstreet is registered with governed disabled Lever authority", () => {
+  const entries = listSourceAuthorityEntries();
+  const dnb = entries.find((entry) => entry.sourceId === "lever-dnb");
+  assert.ok(dnb);
+  assert.equal(dnb.provider, "LEVER");
+  assert.equal(dnb.interfaceType, "LEVER_POSTINGS_API");
+  assert.equal(dnb.employerName, "Dun & Bradstreet");
+  assert.equal(dnb.siteIdentifier, "dnb");
+  assert.equal(dnb.leverSite, "dnb");
+  assert.equal(dnb.leverRegion, "US");
+  assert.equal(dnb.canonicalSourceUrl, "https://jobs.lever.co/dnb");
+  assert.equal(dnb.authorityStatus, "AUTHORIZED");
+  assert.equal(dnb.authorityEvidenceRef, "LEVER_PUBLIC_POSTINGS_THIRD_PARTY_SCRAPING_DOC_AND_DNB_OFFICIAL_CAREERS_LINK_2026-09-02");
+  assert.equal(dnb.testOnly, false);
+  assert.equal(dnb.enabled, false);
+  assert.equal(dnb.productionNetworkAllowed, false);
+});
+
+test("Dun & Bradstreet remains excluded from active automatic sources", () => {
+  const entries = listSourceAuthorityEntries();
+  const realLeverSources = entries.filter((entry) => entry.provider === "LEVER" && !entry.testOnly);
+  assert.deepEqual(realLeverSources.map((entry) => entry.sourceId), ["lever-freedompay", "lever-dnb"]);
+  assert.equal(realLeverSources.filter((entry) => entry.enabled).length, 1);
+  assert.equal(realLeverSources.filter((entry) => entry.productionNetworkAllowed).length, 1);
+  assert.deepEqual(listAvailableAutomaticDiscoverySources().map((entry) => entry.sourceId), ["lever-freedompay"]);
+  const authorization = authorizeSourceForAutomaticRetrieval("lever-dnb");
+  assert.equal(authorization.authorized, false);
+  assert.equal(authorization.code, "SOURCE_DISABLED");
+});
+
+test("Dun & Bradstreet registration does not add unrelated real Lever employers", () => {
   const registryText = registrySource.toLowerCase();
-  assert.doesNotMatch(registryText, /dun\s*&\s*bradstreet|fieldai|field-ai|3pillar|3pillarglobal/);
+  assert.doesNotMatch(registryText, /fieldai|field-ai|3pillar|3pillarglobal/);
 });
 
 test("registry inspection is static config only and performs no network or database mutation", () => {

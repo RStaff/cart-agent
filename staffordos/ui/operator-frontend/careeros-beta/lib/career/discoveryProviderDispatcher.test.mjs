@@ -395,6 +395,30 @@ test("Lever zero-result response remains zero through the dispatcher", async () 
   assert.deepEqual(result.results, []);
 });
 
+test("disabled Dun & Bradstreet source blocks before adapter invocation", async () => {
+  const calls = { lever: 0, greenhouse: 0, usajobs: 0 };
+  await assert.rejects(() => searchAuthorizedDiscoverySources({
+    sourceIds: ["lever-dnb"],
+    criteria: { keywords: "product manager" },
+    registry: DEFAULT_SOURCE_AUTHORITY_REGISTRY,
+    adapters: {
+      LEVER: async () => {
+        calls.lever += 1;
+        throw new Error("DNB_ADAPTER_SHOULD_NOT_BE_CALLED");
+      },
+      GREENHOUSE: async () => {
+        calls.greenhouse += 1;
+        throw new Error("GREENHOUSE_ADAPTER_SHOULD_NOT_BE_CALLED");
+      },
+      USAJOBS: async () => {
+        calls.usajobs += 1;
+        throw new Error("USAJOBS_ADAPTER_SHOULD_NOT_BE_CALLED");
+      },
+    },
+  }), { code: "SOURCE_DISABLED" });
+  assert.deepEqual(calls, { lever: 0, greenhouse: 0, usajobs: 0 });
+});
+
 test("dispatcher does not mutate opportunities, lifecycle, customer decisions, or database state", () => {
   assert.doesNotMatch(dispatcherSource, /CareerOpportunity|decisionState|lifecycleState|CareerEvidence|CareerFact|ResumeVersion/);
   assert.doesNotMatch(dispatcherSource, /pool\.query|INSERT\s+INTO|UPDATE\s+"|DELETE\s+FROM|CREATE\s+TABLE|ALTER\s+TABLE/i);
