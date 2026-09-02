@@ -397,10 +397,11 @@ test("Lever zero-result response remains zero through the dispatcher", async () 
 
 test("disabled Dun & Bradstreet source blocks before adapter invocation", async () => {
   const calls = { lever: 0, greenhouse: 0, usajobs: 0 };
+  const rollbackRegistry = DEFAULT_SOURCE_AUTHORITY_REGISTRY.map((entry) => entry.sourceId === "lever-dnb" ? { ...entry, enabled: false, productionNetworkAllowed: false } : entry);
   await assert.rejects(() => searchAuthorizedDiscoverySources({
     sourceIds: ["lever-dnb"],
     criteria: { keywords: "product manager" },
-    registry: DEFAULT_SOURCE_AUTHORITY_REGISTRY,
+    registry: rollbackRegistry,
     adapters: {
       LEVER: async () => {
         calls.lever += 1;
@@ -417,6 +418,70 @@ test("disabled Dun & Bradstreet source blocks before adapter invocation", async 
     },
   }), { code: "SOURCE_DISABLED" });
   assert.deepEqual(calls, { lever: 0, greenhouse: 0, usajobs: 0 });
+});
+
+test("authorized Dun & Bradstreet source dispatches through the trusted registry", async () => {
+  const calls = { lever: 0, greenhouse: 0, usajobs: 0 };
+  const result = await searchAuthorizedDiscoverySources({
+    sourceIds: ["lever-dnb"],
+    criteria: { keywords: "product manager" },
+    registry: DEFAULT_SOURCE_AUTHORITY_REGISTRY,
+    adapters: {
+      LEVER: async ({ source }) => {
+        calls.lever += 1;
+        assert.equal(source.sourceId, "lever-dnb");
+        assert.equal(source.siteIdentifier, "dnb");
+        assert.equal(source.leverRegion, "US");
+        assert.equal(source.retrievalAuthorized, true);
+        return { provider: "LEVER", providers: ["LEVER"], sourceIds: [source.sourceId], results: [] };
+      },
+      GREENHOUSE: async () => { calls.greenhouse += 1; throw new Error("GREENHOUSE_SHOULD_NOT_BE_CALLED"); },
+      USAJOBS: async () => { calls.usajobs += 1; throw new Error("USAJOBS_SHOULD_NOT_BE_CALLED"); },
+    },
+  });
+  assert.equal(calls.lever, 1);
+  assert.equal(calls.greenhouse, 0);
+  assert.equal(calls.usajobs, 0);
+  assert.deepEqual(result.sourceIds, ["lever-dnb"]);
+  assert.deepEqual(result.results, []);
+});
+
+test("both active Lever sources dispatch as one governed source-registry request", async () => {
+  const calls = [];
+  const result = await searchAuthorizedDiscoverySources({
+    sourceIds: ["lever-freedompay", "lever-dnb"],
+    criteria: { keywords: "product manager" },
+    registry: DEFAULT_SOURCE_AUTHORITY_REGISTRY,
+    adapters: {
+      LEVER: async ({ source }) => {
+        calls.push({ sourceId: source.sourceId, siteIdentifier: source.siteIdentifier });
+        return { provider: "LEVER", providers: ["LEVER"], sourceIds: [source.sourceId], results: [] };
+      },
+    },
+  });
+  assert.deepEqual(calls, [
+    { sourceId: "lever-freedompay", siteIdentifier: "freedompay" },
+    { sourceId: "lever-dnb", siteIdentifier: "dnb" },
+  ]);
+  assert.deepEqual(result.sourceIds, ["lever-freedompay", "lever-dnb"]);
+  assert.deepEqual(result.results, []);
+});
+
+test("Dun & Bradstreet rollback disables only D&B and preserves FreedomPay", async () => {
+  const calls = { lever: [] };
+  const rollbackRegistry = DEFAULT_SOURCE_AUTHORITY_REGISTRY.map((entry) => entry.sourceId === "lever-dnb" ? { ...entry, enabled: false, productionNetworkAllowed: false } : entry);
+  const freedomPay = await searchAuthorizedDiscoverySources({
+    sourceIds: ["lever-freedompay"],
+    registry: rollbackRegistry,
+    adapters: { LEVER: async ({ source }) => { calls.lever.push(source.sourceId); return { provider: "LEVER", results: [] }; } },
+  });
+  assert.deepEqual(freedomPay.sourceIds, ["lever-freedompay"]);
+  await assert.rejects(() => searchAuthorizedDiscoverySources({
+    sourceIds: ["lever-dnb"],
+    registry: rollbackRegistry,
+    adapters: { LEVER: async () => { calls.lever.push("unexpected"); return { provider: "LEVER", results: [] }; } },
+  }), { code: "SOURCE_DISABLED" });
+  assert.deepEqual(calls.lever, ["lever-freedompay"]);
 });
 
 test("dispatcher does not mutate opportunities, lifecycle, customer decisions, or database state", () => {

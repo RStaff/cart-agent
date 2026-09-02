@@ -6,7 +6,7 @@ test("provider authorization gate only activates sources with project authority"
   const gate = classifyDiscoveryProviders();
   assert.deepEqual(gate.authorizedForBeta, ["USER_SUPPLIED"]);
   assert.deepEqual(gate.sourceSpecificAuthorized, ["LEVER"]);
-  assert.deepEqual(gate.authorizedEmployerSources.map((source) => source.sourceId), ["lever-freedompay"]);
+  assert.deepEqual(gate.authorizedEmployerSources.map((source) => source.sourceId), ["lever-freedompay", "lever-dnb"]);
   assert.equal(gate.providers.USAJOBS.classification, "WRITTEN_APPROVAL_REQUIRED");
   assert.equal(gate.providers.LEVER.classification, "SOURCE_SPECIFIC_AUTHORITY_AVAILABLE");
   assert.match(gate.providers.LEVER.evidence, /source-specific authority/i);
