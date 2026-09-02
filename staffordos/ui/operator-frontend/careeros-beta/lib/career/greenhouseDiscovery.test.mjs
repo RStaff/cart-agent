@@ -22,6 +22,7 @@ function source(overrides = {}) {
     rateLimitPolicy: "CONSERVATIVE_UNKNOWN",
     removalPolicy: "SOURCE_REMOVAL_REQUIRES_REVIEW",
     enabled: true,
+    productionNetworkAllowed: true,
     lastReviewedAt: "2026-09-01",
     ...overrides,
   };

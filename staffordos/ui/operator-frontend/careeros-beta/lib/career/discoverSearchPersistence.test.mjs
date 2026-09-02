@@ -5,16 +5,29 @@ import test from "node:test";
 const root = new URL("../../", import.meta.url).pathname;
 const read = (relative) => fs.readFileSync(`${root}${relative}`, "utf8");
 
-test("Search now is disabled while automatic discovery authority is unavailable", () => {
+test("Search now is enabled when a governed automatic source is available", () => {
   const client = read("app/career/discover/DiscoverClient.tsx");
   const search = client.slice(client.indexOf("async function search"), client.indexOf("async function savePreferences"));
   assert.match(search, /searchPayload\(form\)/);
-  assert.match(client, /const automaticDiscoveryAvailable = false/);
-  assert.match(client, /Automatic discovery is unavailable pending provider authorization/);
-  assert.match(client, /Search unavailable/);
+  assert.doesNotMatch(client, /const automaticDiscoveryAvailable = false/);
+  assert.match(client, /availableSources/);
+  assert.match(client, /const activeSources = availableSources\.filter\(\(source\) => source\.authorizedForAutomaticRetrieval === true\)/);
+  assert.match(client, /const activeSourceIds = sourceIdsFor\(activeSources\)/);
+  assert.match(client, /const automaticDiscoveryAvailable = activeSourceIds\.length > 0/);
+  assert.match(client, /authorizedForAutomaticRetrieval === true/);
+  assert.match(client, /Governed source:/);
+  assert.match(client, /sourceIds: activeSourceIds/);
+  assert.match(client, /provider: "SOURCE_REGISTRY"/);
   assert.ok(search.indexOf("!automaticDiscoveryAvailable") < search.indexOf('method: "PUT"'));
   assert.ok(search.indexOf("!automaticDiscoveryAvailable") < search.indexOf('method: "POST"'));
   assert.match(search, /setResults\(\[\]\)/);
+});
+
+test("Discover page exposes only registry-authorized automatic source options", () => {
+  const page = read("app/career/discover/page.tsx");
+  assert.match(page, /listAvailableAutomaticDiscoverySources/);
+  assert.match(page, /availableSources=\{listAvailableAutomaticDiscoverySources\(\)\}/);
+  assert.doesNotMatch(page, /jobs\.lever\.co|api\.lever\.co|freedompay/);
 });
 
 test("Search now preserves the complete existing preference payload", () => {
@@ -84,6 +97,15 @@ test("Lever source-registry requests cannot fall back to USAJOBS", () => {
   assert.match(route, /useSourceRegistry \? await searchAuthorizedSources/);
   assert.match(route, /: await searchAuthorizedUsajobs/);
   assert.doesNotMatch(route, /await searchAuthorizedProvider\(providerCriteria\)/);
+  assert.match(route, /PRODUCTION_NETWORK_NOT_ALLOWED/);
+});
+
+test("source-registry dispatch receives provider criteria rather than raw request body", () => {
+  const route = read("app/api/career/discover/route.ts");
+  const post = route.slice(route.indexOf("export async function POST"), route.indexOf("export async function PATCH"));
+  assert.match(post, /const providerCriteria = buildProviderCriteriaForIntent\(searchIntent\)/);
+  assert.match(post, /searchAuthorizedSources\(\{ sourceIds, criteria: providerCriteria \}\)/);
+  assert.doesNotMatch(post, /searchAuthorizedSources\(\{ sourceIds, criteria: body/);
 });
 
 test("USAJOBS authority-required errors are not presented as zero results", () => {
@@ -93,4 +115,13 @@ test("USAJOBS authority-required errors are not presented as zero results", () =
   assert.match(route, /sourceAuthorityCodes\.includes\(code\) \? 403/);
   assert.match(client, /body\.error === "USAJOBS_WRITTEN_APPROVAL_REQUIRED"/);
   assert.doesNotMatch(client, /0 ranked opportunities found via USAJOBS/);
+});
+
+test("FreedomPay activation copy remains source-specific", () => {
+  const client = read("app/career/discover/DiscoverClient.tsx");
+  const providerAuthorization = read("lib/career/discoveryProviderAuthorization.mjs");
+  assert.match(client, /public jobs via/);
+  assert.doesNotMatch(client, /all Lever employers|every Lever employer|global Lever/i);
+  assert.match(providerAuthorization, /SOURCE_SPECIFIC_AUTHORITY_AVAILABLE/);
+  assert.match(providerAuthorization, /does not authorize unregistered Lever employers/);
 });

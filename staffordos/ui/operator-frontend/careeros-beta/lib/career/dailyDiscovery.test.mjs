@@ -15,6 +15,8 @@ test("saved search preferences use a separate scoped authority and do not search
 
 test("discovery results remain transient and explicitly separate from matching", () => {
   const client = read("app/career/discover/DiscoverClient.tsx");
+  assert.match(client, /Governed source:/);
+  assert.match(client, /Automatic job discovery is available from/);
   assert.match(client, /Search unavailable/);
   assert.match(client, /Add to Opportunity Inbox/);
   assert.match(client, /not CareerOS match assessments/);

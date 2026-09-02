@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import {
   authorizeSourceForAutomaticRetrieval,
   isDiscoveryRecordSourceAuthorized,
+  listAvailableAutomaticDiscoverySources,
   listSourceAuthorityEntries,
   normalizeSourceAuthorityEntry,
   publicSourceAuthoritySnapshot,
@@ -33,6 +34,7 @@ function source(overrides = {}) {
     rateLimitPolicy: "CONSERVATIVE_UNKNOWN",
     removalPolicy: "SOURCE_REMOVAL_REQUIRES_REVIEW",
     enabled: true,
+    productionNetworkAllowed: true,
     lastReviewedAt: "2026-09-01",
     ...overrides,
   };
@@ -58,6 +60,7 @@ function leverSource(overrides = {}) {
     rateLimitPolicy: "CONSERVATIVE_UNKNOWN",
     removalPolicy: "SOURCE_REMOVAL_REQUIRES_REVIEW",
     enabled: true,
+    productionNetworkAllowed: true,
     lastReviewedAt: "2026-09-01",
     ...overrides,
   };
@@ -84,6 +87,14 @@ test("disabled source blocks retrieval", () => {
   const authorization = authorizeSourceForAutomaticRetrieval("source-greenhouse-approved", { registry: [source({ enabled: false })] });
   assert.equal(authorization.authorized, false);
   assert.equal(authorization.code, "SOURCE_DISABLED");
+});
+
+test("enabled source without production network permission blocks retrieval", () => {
+  const authorization = authorizeSourceForAutomaticRetrieval("source-lever-approved", { registry: [leverSource({ productionNetworkAllowed: false })] });
+  assert.equal(authorization.authorized, false);
+  assert.equal(authorization.code, "PRODUCTION_NETWORK_NOT_ALLOWED");
+  assert.equal(authorization.authority.productionNetworkAllowed, false);
+  assert.equal(authorization.authority.authorizedForAutomaticRetrieval, false);
 });
 
 test("unverified source blocks retrieval", () => {
@@ -167,13 +178,14 @@ test("default registry has no enabled production Greenhouse source", () => {
   assert.equal(summary.productionEnabledGreenhouseSourceCount, 0);
 });
 
-test("default registry has no enabled production Lever source", () => {
+test("default registry has exactly one enabled production Lever source", () => {
   const summary = sourceAuthorityRegistrySummary();
-  assert.equal(summary.defaultProductionLeverSourcesEnabled, false);
-  assert.equal(summary.productionEnabledLeverSourceCount, 0);
+  assert.equal(summary.defaultProductionLeverSourcesEnabled, true);
+  assert.equal(summary.productionEnabledLeverSourceCount, 1);
+  assert.equal(summary.productionNetworkAllowedLeverSourceCount, 1);
 });
 
-test("default registry registers FreedomPay Lever source without production activation", () => {
+test("default registry activates the reviewed FreedomPay Lever source", () => {
   const entries = listSourceAuthorityEntries();
   const freedomPay = entries.find((entry) => entry.sourceId === "lever-freedompay");
   assert.ok(freedomPay);
@@ -196,29 +208,54 @@ test("default registry registers FreedomPay Lever source without production acti
   assert.equal(freedomPay.rateLimitPolicy, "CONSERVATIVE_UNKNOWN");
   assert.equal(freedomPay.removalPolicy, "REVALIDATE_STOP_PRESENTING_MISSING_OR_CLOSED_NO_RAW_FEED_ARCHIVE");
   assert.equal(freedomPay.testOnly, false);
-  assert.equal(freedomPay.enabled, false);
-  assert.equal(freedomPay.productionNetworkAllowed, false);
+  assert.equal(freedomPay.enabled, true);
+  assert.equal(freedomPay.productionNetworkAllowed, true);
   assert.equal(freedomPay.lastReviewedAt, "2026-09-02");
 });
 
-test("registered FreedomPay source remains fail-closed before automatic retrieval", () => {
+test("activated FreedomPay source permits automatic retrieval", () => {
   const authorization = authorizeSourceForAutomaticRetrieval("lever-freedompay");
-  assert.equal(authorization.authorized, false);
-  assert.equal(authorization.code, "SOURCE_DISABLED");
+  assert.equal(authorization.authorized, true);
+  assert.equal(authorization.code, "AUTHORIZED");
   assert.equal(authorization.source.sourceId, "lever-freedompay");
   assert.equal(authorization.source.provider, "LEVER");
-  assert.equal(authorization.source.enabled, false);
-  assert.equal(authorization.source.productionNetworkAllowed, false);
-  assert.equal(authorization.authority.authorizedForAutomaticRetrieval, false);
+  assert.equal(authorization.source.siteIdentifier, "freedompay");
+  assert.equal(authorization.source.enabled, true);
+  assert.equal(authorization.source.productionNetworkAllowed, true);
+  assert.equal(authorization.authority.authorizedForAutomaticRetrieval, true);
 });
 
-test("default registry has exactly one real Lever source and zero enabled production network sources", () => {
+test("FreedomPay rollback state returns SOURCE_DISABLED", () => {
+  const entries = listSourceAuthorityEntries();
+  const rollback = entries.map((entry) => entry.sourceId === "lever-freedompay" ? { ...entry, enabled: false, productionNetworkAllowed: false } : entry);
+  const authorization = authorizeSourceForAutomaticRetrieval("lever-freedompay", { registry: rollback });
+  assert.equal(authorization.authorized, false);
+  assert.equal(authorization.code, "SOURCE_DISABLED");
+  assert.equal(authorization.source.enabled, false);
+  assert.equal(authorization.source.productionNetworkAllowed, false);
+});
+
+test("default registry has exactly one real Lever source and one enabled production network source", () => {
   const entries = listSourceAuthorityEntries();
   const realLeverSources = entries.filter((entry) => entry.provider === "LEVER" && !entry.testOnly);
   assert.deepEqual(realLeverSources.map((entry) => entry.sourceId), ["lever-freedompay"]);
-  assert.equal(realLeverSources.filter((entry) => entry.enabled).length, 0);
-  assert.equal(realLeverSources.filter((entry) => entry.productionNetworkAllowed).length, 0);
-  assert.equal(sourceAuthorityRegistrySummary().productionEnabledLeverSourceCount, 0);
+  assert.equal(realLeverSources.filter((entry) => entry.enabled).length, 1);
+  assert.equal(realLeverSources.filter((entry) => entry.productionNetworkAllowed).length, 1);
+  assert.equal(sourceAuthorityRegistrySummary().productionEnabledLeverSourceCount, 1);
+});
+
+test("available automatic discovery sources expose only active governed production sources", () => {
+  const sources = listAvailableAutomaticDiscoverySources();
+  assert.deepEqual(sources.map((entry) => entry.sourceId), ["lever-freedompay"]);
+  assert.equal(sources[0].provider, "LEVER");
+  assert.equal(sources[0].employerName, "FreedomPay");
+  assert.equal(sources[0].siteIdentifier, "freedompay");
+  assert.equal(sources[0].authorizedForAutomaticRetrieval, true);
+  assert.equal(sources[0].productionNetworkAllowed, true);
+
+  const entries = listSourceAuthorityEntries();
+  const rollback = entries.map((entry) => entry.sourceId === "lever-freedompay" ? { ...entry, enabled: false, productionNetworkAllowed: false } : entry);
+  assert.deepEqual(listAvailableAutomaticDiscoverySources(rollback), []);
 });
 
 test("FreedomPay registration does not add unrelated real Lever employers", () => {

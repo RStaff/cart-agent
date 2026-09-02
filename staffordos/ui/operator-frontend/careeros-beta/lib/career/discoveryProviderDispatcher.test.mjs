@@ -25,6 +25,7 @@ function source(overrides = {}) {
     rateLimitPolicy: "CONSERVATIVE_UNKNOWN",
     removalPolicy: "SOURCE_REMOVAL_REQUIRES_REVIEW",
     enabled: true,
+    productionNetworkAllowed: true,
     lastReviewedAt: "2026-09-01",
     ...overrides,
   };
@@ -50,6 +51,7 @@ function leverSource(overrides = {}) {
     rateLimitPolicy: "CONSERVATIVE_UNKNOWN",
     removalPolicy: "SOURCE_REMOVAL_REQUIRES_REVIEW",
     enabled: true,
+    productionNetworkAllowed: true,
     lastReviewedAt: "2026-09-01",
     ...overrides,
   };
@@ -170,8 +172,64 @@ test("Lever disabled source blocks before adapter invocation", async () => {
   assert.equal(calls.usajobs, 0);
 });
 
-test("registered disabled FreedomPay source blocks before adapter or network invocation", async () => {
+test("enabled source without production network permission blocks before adapter invocation", async () => {
   const calls = { greenhouse: 0, lever: 0, usajobs: 0 };
+  await assert.rejects(() => searchAuthorizedDiscoverySources({
+    sourceIds: ["source-lever-approved"],
+    criteria: { keywords: "program manager" },
+    registry: [leverSource({ productionNetworkAllowed: false })],
+    adapters: adapters(calls),
+  }), { code: "PRODUCTION_NETWORK_NOT_ALLOWED" });
+  assert.equal(calls.lever, 0);
+  assert.equal(calls.greenhouse, 0);
+  assert.equal(calls.usajobs, 0);
+});
+
+test("activated FreedomPay source dispatches through the trusted registry entry", async () => {
+  const calls = { greenhouse: 0, lever: 0, usajobs: 0 };
+  const result = await searchAuthorizedDiscoverySources({
+    sourceIds: ["lever-freedompay"],
+    criteria: {
+      keywords: "site reliability",
+      siteIdentifier: "attacker-site",
+      privateEvidence: "PRIVATE_EVIDENCE_SHOULD_NOT_EGRESS",
+      resume: "RESUME_SHOULD_NOT_EGRESS",
+      userProfile: "PROFILE_SHOULD_NOT_EGRESS",
+      capabilities: "CAPABILITIES_SHOULD_NOT_EGRESS",
+      fitResult: "FIT_SHOULD_NOT_EGRESS",
+      applicationMaterials: "APPLICATION_SHOULD_NOT_EGRESS",
+    },
+    registry: DEFAULT_SOURCE_AUTHORITY_REGISTRY,
+    adapters: {
+      LEVER: async ({ source, criteria }) => {
+        calls.lever += 1;
+        assert.equal(source.sourceId, "lever-freedompay");
+        assert.equal(source.siteIdentifier, "freedompay");
+        assert.equal(source.productionNetworkAllowed, true);
+        assert.equal(criteria.siteIdentifier, "attacker-site");
+        return { provider: "LEVER", providers: ["LEVER"], sourceIds: [source.sourceId], results: [], criteria };
+      },
+      GREENHOUSE: async () => {
+        calls.greenhouse += 1;
+        throw new Error("GREENHOUSE_ADAPTER_SHOULD_NOT_BE_CALLED");
+      },
+      USAJOBS: async () => {
+        calls.usajobs += 1;
+        throw new Error("USAJOBS_ADAPTER_SHOULD_NOT_BE_CALLED");
+      },
+    },
+  });
+  assert.equal(calls.lever, 1);
+  assert.equal(calls.greenhouse, 0);
+  assert.equal(calls.usajobs, 0);
+  assert.equal(result.provider, "LEVER");
+  assert.deepEqual(result.sourceIds, ["lever-freedompay"]);
+  assert.deepEqual(result.results, []);
+});
+
+test("disabled FreedomPay rollback state blocks before adapter or network invocation", async () => {
+  const calls = { greenhouse: 0, lever: 0, usajobs: 0 };
+  const rollbackRegistry = DEFAULT_SOURCE_AUTHORITY_REGISTRY.map((entry) => entry.sourceId === "lever-freedompay" ? { ...entry, enabled: false, productionNetworkAllowed: false } : entry);
   await assert.rejects(() => searchAuthorizedDiscoverySources({
     sourceIds: ["lever-freedompay"],
     criteria: {
@@ -181,7 +239,7 @@ test("registered disabled FreedomPay source blocks before adapter or network inv
       userProfile: "PROFILE_SHOULD_NOT_EGRESS",
       fitResult: "FIT_SHOULD_NOT_EGRESS",
     },
-    registry: DEFAULT_SOURCE_AUTHORITY_REGISTRY,
+    registry: rollbackRegistry,
     adapters: {
       LEVER: async () => {
         calls.lever += 1;

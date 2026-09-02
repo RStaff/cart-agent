@@ -1,3 +1,5 @@
+import { listAvailableAutomaticDiscoverySources } from "./sourceAuthorityRegistry.mjs";
+
 const PROVIDERS = Object.freeze({
   USAJOBS: {
     classification: "WRITTEN_APPROVAL_REQUIRED",
@@ -56,14 +58,37 @@ const PROVIDERS = Object.freeze({
   },
 });
 
-export function classifyDiscoveryProviders() {
-  const entries = Object.entries(PROVIDERS);
+export function classifyDiscoveryProviders({ registry } = {}) {
+  const authorizedEmployerSources = listAvailableAutomaticDiscoverySources(registry);
+  const sourceSpecificProviders = new Set(authorizedEmployerSources.map((source) => source.provider));
+  const providers = Object.fromEntries(Object.entries(PROVIDERS).map(([key, value]) => [key, { ...value, requiredAuthority: [...value.requiredAuthority] }]));
+  if (sourceSpecificProviders.has("LEVER")) {
+    const leverSources = authorizedEmployerSources.filter((source) => source.provider === "LEVER");
+    providers.LEVER = {
+      ...providers.LEVER,
+      classification: "SOURCE_SPECIFIC_AUTHORITY_AVAILABLE",
+      evidence: "CareerOS has source-specific authority for enabled Lever employer source(s). This does not authorize unregistered Lever employers.",
+      requiredAuthority: ["each additional Lever employer source still requires source-specific authority review and explicit registry enablement"],
+      authorizedSources: leverSources.map((source) => ({
+        sourceId: source.sourceId,
+        employerName: source.employerName,
+        interfaceType: source.interfaceType,
+        authorityStatus: source.authorityStatus,
+      })),
+    };
+  }
+
+  const entries = Object.entries(providers);
   const authorizedForBeta = entries.filter(([, value]) => value.classification === "AUTHORIZED_FOR_BETA").map(([key]) => key);
-  const blockedByAuthorization = entries.filter(([, value]) => value.classification !== "AUTHORIZED_FOR_BETA").map(([key]) => key);
-  const privateSectorAuthorized = authorizedForBeta.filter((provider) => !["USAJOBS", "USER_SUPPLIED"].includes(provider));
+  const sourceSpecificAuthorized = entries.filter(([, value]) => value.classification === "SOURCE_SPECIFIC_AUTHORITY_AVAILABLE").map(([key]) => key);
+  const activeClassifications = new Set(["AUTHORIZED_FOR_BETA", "SOURCE_SPECIFIC_AUTHORITY_AVAILABLE"]);
+  const blockedByAuthorization = entries.filter(([, value]) => !activeClassifications.has(value.classification)).map(([key]) => key);
+  const privateSectorAuthorized = [...authorizedForBeta.filter((provider) => !["USAJOBS", "USER_SUPPLIED"].includes(provider)), ...sourceSpecificAuthorized];
   return {
-    providers: Object.fromEntries(entries.map(([key, value]) => [key, { ...value, requiredAuthority: [...value.requiredAuthority] }])),
+    providers,
     authorizedForBeta,
+    sourceSpecificAuthorized,
+    authorizedEmployerSources,
     blockedByAuthorization,
     privateSectorAuthorized,
     newProviderActivation: privateSectorAuthorized.length ? "AUTHORIZED" : "BLOCKED_PENDING_AUTHORIZATION",

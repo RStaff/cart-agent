@@ -75,9 +75,9 @@ export const DEFAULT_SOURCE_AUTHORITY_REGISTRY = Object.freeze([
     applyRedirectRequired: true,
     rateLimitPolicy: RATE_LIMIT_POLICY_CONSERVATIVE_UNKNOWN,
     removalPolicy: "REVALIDATE_STOP_PRESENTING_MISSING_OR_CLOSED_NO_RAW_FEED_ARCHIVE",
-    enabled: false,
+    enabled: true,
     testOnly: false,
-    productionNetworkAllowed: false,
+    productionNetworkAllowed: true,
     lastReviewedAt: "2026-09-02",
     authorityVersion: SOURCE_AUTHORITY_REGISTRY_VERSION,
   }),
@@ -132,6 +132,10 @@ function providerIdentifierValid(source) {
   if (source.provider === "GREENHOUSE") return Boolean(safeGreenhouseBoardToken(source.boardToken));
   if (source.provider === "LEVER") return Boolean(safeLeverSiteIdentifier(source.siteIdentifier));
   return false;
+}
+
+function productionNetworkPermitted(source) {
+  return source.productionNetworkAllowed === true;
 }
 
 export function normalizeSourceAuthorityEntry(input = {}) {
@@ -195,7 +199,8 @@ export function publicSourceAuthoritySnapshot(entry) {
     interfaceType: normalized.interfaceType,
     authorityStatus: normalized.authorityStatus,
     enabled: normalized.enabled,
-    authorizedForAutomaticRetrieval: normalized.authorityStatus === "AUTHORIZED" && normalized.enabled && permissionComplete && providerSupported && sourceInterfaceValid(normalized) && providerIdentifierValid(normalized),
+    productionNetworkAllowed: normalized.productionNetworkAllowed,
+    authorizedForAutomaticRetrieval: normalized.authorityStatus === "AUTHORIZED" && normalized.enabled && productionNetworkPermitted(normalized) && permissionComplete && providerSupported && sourceInterfaceValid(normalized) && providerIdentifierValid(normalized),
     commercialMultiUserAllowed: normalized.commercialMultiUserAllowed,
     storageAllowed: normalized.storageAllowed,
     derivedAnalysisAllowed: normalized.derivedAnalysisAllowed,
@@ -226,6 +231,7 @@ export function authorizeSourceForAutomaticRetrieval(sourceId, { registry = DEFA
   if (source.provider === "GREENHOUSE" && !safeGreenhouseBoardToken(source.boardToken)) return blocked("SOURCE_BOARD_IDENTIFIER_INVALID", source);
   if (source.provider === "LEVER" && !safeLeverSiteIdentifier(source.siteIdentifier)) return blocked("SOURCE_SITE_IDENTIFIER_INVALID", source);
   if (REQUIRED_AUTOMATIC_USE_FLAGS.some((flag) => source[flag] !== true)) return blocked("SOURCE_PERMISSION_INCOMPLETE", source);
+  if (!productionNetworkPermitted(source)) return blocked("PRODUCTION_NETWORK_NOT_ALLOWED", source);
   return {
     authorized: true,
     code: "AUTHORIZED",
@@ -245,7 +251,37 @@ export function sourceAuthorityRegistrySummary(registry = DEFAULT_SOURCE_AUTHORI
     defaultProductionGreenhouseSourcesEnabled: enabledAuthorized.some((entry) => entry.provider === "GREENHOUSE" && !entry.testOnly),
     productionEnabledLeverSourceCount: enabledAuthorized.filter((entry) => entry.provider === "LEVER" && !entry.testOnly).length,
     defaultProductionLeverSourcesEnabled: enabledAuthorized.some((entry) => entry.provider === "LEVER" && !entry.testOnly),
+    productionNetworkAllowedLeverSourceCount: entries.filter((entry) => entry.provider === "LEVER" && !entry.testOnly && entry.productionNetworkAllowed === true).length,
   };
+}
+
+export function listAvailableAutomaticDiscoverySources(registry = DEFAULT_SOURCE_AUTHORITY_REGISTRY) {
+  return listSourceAuthorityEntries(registry)
+    .filter((entry) => !entry.testOnly && publicSourceAuthoritySnapshot(entry).authorizedForAutomaticRetrieval)
+    .map((entry) => {
+      const authority = publicSourceAuthoritySnapshot(entry);
+      return {
+        sourceId: authority.sourceId,
+        provider: authority.provider,
+        employerName: authority.employerName,
+        sourceIdentifier: authority.sourceIdentifier,
+        siteIdentifier: authority.siteIdentifier,
+        leverSite: authority.leverSite,
+        leverRegion: authority.leverRegion,
+        interfaceType: authority.interfaceType,
+        authorityStatus: authority.authorityStatus,
+        enabled: authority.enabled,
+        productionNetworkAllowed: authority.productionNetworkAllowed,
+        authorizedForAutomaticRetrieval: authority.authorizedForAutomaticRetrieval,
+        canonicalSourceUrl: entry.canonicalSourceUrl,
+        attributionText: authority.attributionText,
+        sourceLinkRequired: authority.sourceLinkRequired,
+        applyRedirectRequired: authority.applyRedirectRequired,
+        rateLimitPolicy: authority.rateLimitPolicy,
+        removalPolicy: authority.removalPolicy,
+        lastReviewedAt: authority.lastReviewedAt,
+      };
+    });
 }
 
 export function isDiscoveryRecordSourceAuthorized(record = {}) {
@@ -258,6 +294,7 @@ export function isDiscoveryRecordSourceAuthorized(record = {}) {
     providerKey(authority.provider) === recordProvider &&
     authority.authorityStatus === "AUTHORIZED" &&
     authority.enabled === true &&
+    authority.productionNetworkAllowed === true &&
     authority.authorizedForAutomaticRetrieval === true &&
     REQUIRED_AUTOMATIC_USE_FLAGS.every((flag) => authority[flag] === true),
   );
