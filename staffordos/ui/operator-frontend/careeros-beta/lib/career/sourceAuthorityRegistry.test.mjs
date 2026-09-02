@@ -178,7 +178,7 @@ test("default registry has no enabled production Greenhouse source", () => {
   assert.equal(summary.productionEnabledGreenhouseSourceCount, 0);
 });
 
-test("Frontify is registered as an EU Lever source but remains fail closed", () => {
+test("Frontify is registered as an active EU Lever source", () => {
   const frontify = listSourceAuthorityEntries().find((entry) => entry.sourceId === "lever-frontify");
   assert.ok(frontify);
   assert.equal(frontify.provider, "LEVER");
@@ -189,27 +189,28 @@ test("Frontify is registered as an EU Lever source but remains fail closed", () 
   assert.equal(frontify.leverRegion, "EU");
   assert.equal(frontify.canonicalSourceUrl, "https://jobs.lever.co/frontify");
   assert.equal(frontify.authorityStatus, "AUTHORIZED");
-  assert.equal(frontify.enabled, false);
-  assert.equal(frontify.productionNetworkAllowed, false);
+  assert.equal(frontify.enabled, true);
+  assert.equal(frontify.productionNetworkAllowed, true);
   assert.equal(frontify.testOnly, false);
-  assert.equal(authorizeSourceForAutomaticRetrieval("lever-frontify").authorized, false);
-  assert.equal(authorizeSourceForAutomaticRetrieval("lever-frontify").code, "SOURCE_DISABLED");
-  assert.equal(publicSourceAuthoritySnapshot(frontify).authorizedForAutomaticRetrieval, false);
+  const authorization = authorizeSourceForAutomaticRetrieval("lever-frontify");
+  assert.equal(authorization.authorized, true);
+  assert.equal(authorization.code, "AUTHORIZED");
+  assert.equal(publicSourceAuthoritySnapshot(frontify).authorizedForAutomaticRetrieval, true);
 });
 
-test("Frontify registration preserves the active production source set", () => {
+test("Frontify activation adds only the governed active production source", () => {
   const available = listAvailableAutomaticDiscoverySources();
-  assert.deepEqual(available.map((entry) => entry.sourceId), ["lever-freedompay", "lever-dnb"]);
+  assert.deepEqual(available.map((entry) => entry.sourceId), ["lever-freedompay", "lever-dnb", "lever-frontify"]);
   const summary = sourceAuthorityRegistrySummary();
-  assert.equal(summary.productionEnabledLeverSourceCount, 2);
-  assert.equal(summary.productionNetworkAllowedLeverSourceCount, 2);
+  assert.equal(summary.productionEnabledLeverSourceCount, 3);
+  assert.equal(summary.productionNetworkAllowedLeverSourceCount, 3);
 });
 
-test("default registry has exactly two enabled production Lever sources", () => {
+test("default registry has exactly three enabled production Lever sources", () => {
   const summary = sourceAuthorityRegistrySummary();
   assert.equal(summary.defaultProductionLeverSourcesEnabled, true);
-  assert.equal(summary.productionEnabledLeverSourceCount, 2);
-  assert.equal(summary.productionNetworkAllowedLeverSourceCount, 2);
+  assert.equal(summary.productionEnabledLeverSourceCount, 3);
+  assert.equal(summary.productionNetworkAllowedLeverSourceCount, 3);
 });
 
 test("default registry activates the reviewed FreedomPay Lever source", () => {
@@ -262,18 +263,18 @@ test("FreedomPay rollback state returns SOURCE_DISABLED", () => {
   assert.equal(authorization.source.productionNetworkAllowed, false);
 });
 
-test("default registry has three real Lever sources and two enabled production network sources", () => {
+test("default registry has three real and enabled production Lever sources", () => {
   const entries = listSourceAuthorityEntries();
   const realLeverSources = entries.filter((entry) => entry.provider === "LEVER" && !entry.testOnly);
   assert.deepEqual(realLeverSources.map((entry) => entry.sourceId), ["lever-freedompay", "lever-dnb", "lever-frontify"]);
-  assert.equal(realLeverSources.filter((entry) => entry.enabled).length, 2);
-  assert.equal(realLeverSources.filter((entry) => entry.productionNetworkAllowed).length, 2);
-  assert.equal(sourceAuthorityRegistrySummary().productionEnabledLeverSourceCount, 2);
+  assert.equal(realLeverSources.filter((entry) => entry.enabled).length, 3);
+  assert.equal(realLeverSources.filter((entry) => entry.productionNetworkAllowed).length, 3);
+  assert.equal(sourceAuthorityRegistrySummary().productionEnabledLeverSourceCount, 3);
 });
 
 test("available automatic discovery sources expose only active governed production sources", () => {
   const sources = listAvailableAutomaticDiscoverySources();
-  assert.deepEqual(sources.map((entry) => entry.sourceId), ["lever-freedompay", "lever-dnb"]);
+  assert.deepEqual(sources.map((entry) => entry.sourceId), ["lever-freedompay", "lever-dnb", "lever-frontify"]);
   assert.equal(sources[0].provider, "LEVER");
   assert.equal(sources[0].employerName, "FreedomPay");
   assert.equal(sources[0].siteIdentifier, "freedompay");
@@ -306,10 +307,10 @@ test("Dun & Bradstreet is registered with governed enabled Lever authority", () 
 test("Dun & Bradstreet is included in active automatic sources", () => {
   const entries = listSourceAuthorityEntries();
   const realLeverSources = entries.filter((entry) => entry.provider === "LEVER" && !entry.testOnly && entry.enabled);
-  assert.deepEqual(realLeverSources.map((entry) => entry.sourceId), ["lever-freedompay", "lever-dnb"]);
-  assert.equal(realLeverSources.length, 2);
-  assert.equal(realLeverSources.filter((entry) => entry.productionNetworkAllowed).length, 2);
-  assert.deepEqual(listAvailableAutomaticDiscoverySources().map((entry) => entry.sourceId), ["lever-freedompay", "lever-dnb"]);
+  assert.deepEqual(realLeverSources.map((entry) => entry.sourceId), ["lever-freedompay", "lever-dnb", "lever-frontify"]);
+  assert.equal(realLeverSources.length, 3);
+  assert.equal(realLeverSources.filter((entry) => entry.productionNetworkAllowed).length, 3);
+  assert.deepEqual(listAvailableAutomaticDiscoverySources().map((entry) => entry.sourceId), ["lever-freedompay", "lever-dnb", "lever-frontify"]);
   const authorization = authorizeSourceForAutomaticRetrieval("lever-dnb");
   assert.equal(authorization.authorized, true);
   assert.equal(authorization.code, "AUTHORIZED");
