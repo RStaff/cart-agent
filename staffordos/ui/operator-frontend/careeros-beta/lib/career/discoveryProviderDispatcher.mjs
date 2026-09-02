@@ -22,6 +22,32 @@ function uniqueSourceIds(sourceIds) {
   return [...new Set((sourceIds || []).map((sourceId) => clean(sourceId, 160)).filter(Boolean))];
 }
 
+function providerOutcome(code, recordCount = null) {
+  if (code) {
+    if (code === "SOURCE_DISABLED") return "DISABLED";
+    if (code === "PRODUCTION_NETWORK_NOT_ALLOWED") return "NETWORK_NOT_ALLOWED";
+    if (["SOURCE_UNVERIFIED", "SOURCE_WRITTEN_APPROVAL_REQUIRED", "SOURCE_PERMISSION_INCOMPLETE", "SOURCE_NOT_FOUND", "SOURCE_PROVIDER_UNKNOWN", "SOURCE_INTERFACE_MISMATCH", "SOURCE_SITE_IDENTIFIER_INVALID", "SOURCE_BOARD_IDENTIFIER_INVALID"].includes(code)) return "AUTHORITY_DENIED";
+    return "BOUNDED_ERROR";
+  }
+  return recordCount === 0 ? "ZERO" : "SUCCESS";
+}
+
+function sourceTelemetryFor(authorization) {
+  return {
+    sourceId: authorization.source?.sourceId || authorization.sourceId,
+    provider: authorization.source?.provider || null,
+    authorityResult: authorization.code || (authorization.authorized ? "AUTHORIZED" : "NOT_AUTHORIZED"),
+    enabled: authorization.source?.enabled === true,
+    productionNetworkAllowed: authorization.source?.productionNetworkAllowed === true,
+    dispatchAttempted: false,
+    dispatchCompleted: false,
+    providerOutcome: providerOutcome(authorization.authorized ? null : authorization.code),
+    providerRecordCount: 0,
+    normalizedRecordCount: 0,
+    errorClass: authorization.authorized ? null : authorization.code || "SOURCE_AUTHORITY_BLOCKED",
+  };
+}
+
 export async function searchAuthorizedDiscoverySources({
   sourceIds = [],
   criteria = {},
@@ -33,28 +59,48 @@ export async function searchAuthorizedDiscoverySources({
   if (!ids.length) throw providerError("SOURCE_ID_REQUIRED");
 
   const authorizations = ids.map((sourceId) => authorizeSourceForAutomaticRetrieval(sourceId, { registry }));
+  const sourceTelemetry = authorizations.map(sourceTelemetryFor);
   const blocked = authorizations.find((authorization) => !authorization.authorized);
   if (blocked) {
-    throw providerError(blocked.code || "SOURCE_AUTHORITY_BLOCKED", {
+    const error = providerError(blocked.code || "SOURCE_AUTHORITY_BLOCKED", {
       sourceAuthority: blocked.authority,
     });
+    error.discoveryTelemetry = { sourceTelemetry };
+    throw error;
   }
 
   const missingAdapter = authorizations.find((authorization) => typeof adapters[authorization.source.provider] !== "function");
   if (missingAdapter) {
-    throw providerError("DISCOVERY_PROVIDER_NOT_AVAILABLE", {
+    const error = providerError("DISCOVERY_PROVIDER_NOT_AVAILABLE", {
       sourceAuthority: missingAdapter.authority,
     });
+    error.discoveryTelemetry = { sourceTelemetry };
+    throw error;
   }
 
   const retrievedAt = now.toISOString();
   const providerSet = new Set();
   const results = [];
-  for (const authorization of authorizations) {
+  for (const [index, authorization] of authorizations.entries()) {
     const adapter = adapters[authorization.source.provider];
-    const response = await adapter({ source: authorization.source, criteria, now, retrievedAt });
-    providerSet.add(response.provider || authorization.source.provider);
-    for (const item of response.results || []) results.push(item);
+    const telemetry = sourceTelemetry[index];
+    telemetry.dispatchAttempted = true;
+    try {
+      const response = await adapter({ source: authorization.source, criteria, now, retrievedAt });
+      const responseResults = Array.isArray(response.results) ? response.results : [];
+      telemetry.dispatchCompleted = true;
+      telemetry.providerRecordCount = responseResults.length;
+      telemetry.normalizedRecordCount = responseResults.length;
+      telemetry.providerOutcome = providerOutcome(null, responseResults.length);
+      telemetry.errorClass = null;
+      providerSet.add(response.provider || authorization.source.provider);
+      for (const item of responseResults) results.push(item);
+    } catch (error) {
+      telemetry.providerOutcome = "BOUNDED_ERROR";
+      telemetry.errorClass = error instanceof Error ? error.message.slice(0, 100) : "PROVIDER_ERROR";
+      const wrapped = providerError(telemetry.errorClass, { discoveryTelemetry: { sourceTelemetry } });
+      throw wrapped;
+    }
   }
 
   return {
@@ -64,5 +110,6 @@ export async function searchAuthorizedDiscoverySources({
     retrievedAt,
     results,
     criteria,
+    sourceTelemetry,
   };
 }

@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { currentCareerContext, customerMutationAllowed } from "../../../../lib/career/careerP0Auth";
 import { searchUsajobs } from "../../../../lib/career/usajobsDiscovery.mjs";
@@ -8,6 +9,7 @@ import { getDiscoveryAuthorityModel } from "../../../../lib/career/discoveryAuth
 import { buildPersonalizedSearchIntent, buildProviderCriteriaForIntent, publicSearchIntent } from "../../../../lib/career/discoverySearchIntent.mjs";
 import { buildDiscoveryDiagnostics, rankDiscoveryResults } from "../../../../lib/career/discoveryRanking.mjs";
 import { classifyDiscoveryProviders } from "../../../../lib/career/discoveryProviderAuthorization.mjs";
+import { buildDiscoveryObservability } from "../../../../lib/career/discoveryObservability.mjs";
 
 export const runtime = "nodejs";
 
@@ -47,13 +49,20 @@ export async function POST(request: Request) {
   if (!customerMutationAllowed(request)) return NextResponse.json({ ok: false, error: "REQUEST_NOT_ALLOWED" }, { status: 403 });
   const context = await currentCareerContext();
   if (!context) return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
+  const requestId = randomUUID();
+  let observedSourceIds: string[] = [];
+  let observedProviderMode = "SOURCE_REGISTRY";
+  let observedRoleFamily: string | null = null;
   try {
     const body = await request.json();
     const authorityModel = await getDiscoveryAuthorityModel(context);
     const searchIntent = buildPersonalizedSearchIntent({ preferences: body || {}, ...authorityModel });
+    observedRoleFamily = searchIntent.roleIntent.roleFamily || null;
     const providerCriteria = buildProviderCriteriaForIntent(searchIntent);
     const sourceIds = requestedSourceIds(body || {});
     const requestedProvider = providerKey(body?.provider);
+    observedSourceIds = sourceIds;
+    observedProviderMode = requestedProvider || observedProviderMode;
     if (requestedProvider && !["USAJOBS", "GREENHOUSE", "LEVER", "SOURCE_REGISTRY"].includes(requestedProvider)) throw routeError("DISCOVERY_PROVIDER_NOT_AVAILABLE");
     if ((requestedProvider === "GREENHOUSE" || requestedProvider === "LEVER" || requestedProvider === "SOURCE_REGISTRY") && sourceIds.length === 0) throw routeError("SOURCE_ID_REQUIRED");
     const useSourceRegistry = sourceIds.length > 0 && requestedProvider !== "USAJOBS";
@@ -63,13 +72,37 @@ export async function POST(request: Request) {
     const rejectedTitles = new Set((feedback as Array<{ observedTitleNormalized: string }>).map((item) => item.observedTitleNormalized));
     const ranked = rankProviderResults({ intent: searchIntent, capabilities: searchIntent.authority.capabilities, results: result.results.filter((item: any) => !rejectedTitles.has(String(item.title || "").toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim())), existingStatuses });
     const diagnostics = buildDiscoveryDiagnostics({ providerCount: result.results.length, rankedResults: ranked.results, explicitTarget: searchIntent.roleIntent.requestedTitle });
+    const preGateRankedResults = ranked.results;
     if (searchIntent.roleIntent.requestedTitle) ranked.results = ranked.results.filter((item: any) => item.roleCompatibility.classification !== "INCOMPATIBLE" && item.roleCompatibility.classification !== "ROLE_FAMILY_ONLY");
     diagnostics.p0RoleGateSurvivors = ranked.results.length;
     diagnostics.finalRankedResults = ranked.results.length;
+    console.info("career_discovery_observability", JSON.stringify(buildDiscoveryObservability({
+      requestId,
+      providerMode: observedProviderMode,
+      normalizedRoleFamily: observedRoleFamily,
+      sourceIds,
+      sourceTelemetry: result.sourceTelemetry || [],
+      providerRecordCount: result.results.length,
+      normalizedRecordCount: result.results.length,
+      rankedResults: preGateRankedResults,
+      finalRankedResults: ranked.results,
+      diagnostics,
+      outcome: "SUCCESS",
+    })));
     const providerGate = classifyDiscoveryProviders();
     return NextResponse.json({ ok: true, provider: result.provider, providers: result.providers || [result.provider], sourceIds: result.sourceIds || [], retrievedAt: result.retrievedAt, results: ranked.results, diagnostics, existingStatuses, criteria: result.criteria, providerCriteria, searchIntent: publicSearchIntent(searchIntent), providerGate: { newProviderActivation: providerGate.newProviderActivation, authorizedForBeta: providerGate.authorizedForBeta, sourceSpecificAuthorized: providerGate.sourceSpecificAuthorized, authorizedEmployerSources: providerGate.authorizedEmployerSources, blockedByAuthorization: providerGate.blockedByAuthorization } });
   } catch (error) {
     const code = error instanceof Error ? (error as Error & { code?: string }).code || error.message : "USAJOBS_SEARCH_FAILED";
+    const errorTelemetry = error instanceof Error ? (error as Error & { discoveryTelemetry?: { sourceTelemetry?: any[] } }).discoveryTelemetry : null;
+    console.info("career_discovery_observability", JSON.stringify(buildDiscoveryObservability({
+      requestId,
+      providerMode: observedProviderMode,
+      normalizedRoleFamily: observedRoleFamily,
+      sourceIds: observedSourceIds,
+      sourceTelemetry: errorTelemetry?.sourceTelemetry || [],
+      outcome: "BOUNDED_ERROR",
+      errorClass: code,
+    })));
     const sourceAuthorityCodes = ["USAJOBS_WRITTEN_APPROVAL_REQUIRED", "USAJOBS_AUTHORITY_NOT_PROVEN", "USAJOBS_ADAPTER_NOT_CONFIGURED", "SOURCE_ID_REQUIRED", "SOURCE_NOT_FOUND", "SOURCE_DISABLED", "SOURCE_UNVERIFIED", "SOURCE_WRITTEN_APPROVAL_REQUIRED", "SOURCE_PERMISSION_INCOMPLETE", "SOURCE_PROVIDER_UNKNOWN", "SOURCE_INTERFACE_MISMATCH", "SOURCE_BOARD_IDENTIFIER_INVALID", "SOURCE_SITE_IDENTIFIER_INVALID", "PRODUCTION_NETWORK_NOT_ALLOWED", "DISCOVERY_PROVIDER_NOT_AVAILABLE", "GREENHOUSE_SOURCE_NOT_AUTHORIZED", "GREENHOUSE_SOURCE_PROVIDER_MISMATCH", "GREENHOUSE_BOARD_IDENTIFIER_INVALID", "GREENHOUSE_FETCH_UNAVAILABLE", "GREENHOUSE_RATE_LIMITED", "GREENHOUSE_TIMEOUT", "GREENHOUSE_UNAVAILABLE", "GREENHOUSE_MALFORMED_RESPONSE", "LEVER_SOURCE_NOT_AUTHORIZED", "LEVER_SOURCE_PROVIDER_MISMATCH", "LEVER_SITE_IDENTIFIER_INVALID", "LEVER_FETCH_UNAVAILABLE", "LEVER_RATE_LIMITED", "LEVER_TIMEOUT", "LEVER_PROVIDER_FAILURE", "LEVER_MALFORMED_RESPONSE", "LEVER_RESPONSE_TOO_LARGE", "LEVER_REDIRECT_NOT_ALLOWED"];
     const status = code === "USAJOBS_PROVIDER_NOT_CONFIGURED" || code === "DISCOVERY_PROVIDER_NOT_AVAILABLE" || code === "GREENHOUSE_FETCH_UNAVAILABLE" || code === "LEVER_FETCH_UNAVAILABLE" ? 503 : code === "USAJOBS_AUTH_FAILED" || code === "GREENHOUSE_UNAVAILABLE" || code === "GREENHOUSE_MALFORMED_RESPONSE" || code === "LEVER_PROVIDER_FAILURE" || code === "LEVER_MALFORMED_RESPONSE" || code === "LEVER_RESPONSE_TOO_LARGE" || code === "LEVER_REDIRECT_NOT_ALLOWED" ? 502 : code === "USAJOBS_RATE_LIMITED" || code === "GREENHOUSE_RATE_LIMITED" || code === "LEVER_RATE_LIMITED" ? 429 : code === "USAJOBS_TIMEOUT" || code === "GREENHOUSE_TIMEOUT" || code === "LEVER_TIMEOUT" ? 504 : sourceAuthorityCodes.includes(code) ? 403 : 502;
     const safeCode = ["USAJOBS_PROVIDER_NOT_CONFIGURED", "USAJOBS_AUTH_FAILED", "USAJOBS_RATE_LIMITED", "USAJOBS_TIMEOUT", "USAJOBS_UNAVAILABLE", "USAJOBS_MALFORMED_RESPONSE", ...sourceAuthorityCodes].includes(code) ? code : "USAJOBS_SEARCH_FAILED";

@@ -467,6 +467,31 @@ test("both active Lever sources dispatch as one governed source-registry request
   assert.deepEqual(result.results, []);
 });
 
+test("source telemetry preserves earlier completion when a later provider fails", async () => {
+  const calls = [];
+  await assert.rejects(() => searchAuthorizedDiscoverySources({
+    sourceIds: ["lever-freedompay", "lever-dnb"],
+    criteria: { keywords: "product manager" },
+    registry: DEFAULT_SOURCE_AUTHORITY_REGISTRY,
+    adapters: {
+      LEVER: async ({ source }) => {
+        calls.push(source.sourceId);
+        if (source.sourceId === "lever-dnb") throw new Error("LEVER_TIMEOUT");
+        return { provider: "LEVER", results: [{ sourceId: source.sourceId }] };
+      },
+    },
+  }), (error) => {
+    assert.equal(error.code, "LEVER_TIMEOUT");
+    assert.equal(error.discoveryTelemetry.sourceTelemetry[0].dispatchCompleted, true);
+    assert.equal(error.discoveryTelemetry.sourceTelemetry[0].providerRecordCount, 1);
+    assert.equal(error.discoveryTelemetry.sourceTelemetry[1].dispatchAttempted, true);
+    assert.equal(error.discoveryTelemetry.sourceTelemetry[1].dispatchCompleted, false);
+    assert.equal(error.discoveryTelemetry.sourceTelemetry[1].providerOutcome, "BOUNDED_ERROR");
+    return true;
+  });
+  assert.deepEqual(calls, ["lever-freedompay", "lever-dnb"]);
+});
+
 test("Dun & Bradstreet rollback disables only D&B and preserves FreedomPay", async () => {
   const calls = { lever: [] };
   const rollbackRegistry = DEFAULT_SOURCE_AUTHORITY_REGISTRY.map((entry) => entry.sourceId === "lever-dnb" ? { ...entry, enabled: false, productionNetworkAllowed: false } : entry);

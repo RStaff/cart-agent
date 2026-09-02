@@ -108,6 +108,16 @@ test("source-registry dispatch receives provider criteria rather than raw reques
   assert.doesNotMatch(post, /searchAuthorizedSources\(\{ sourceIds, criteria: body/);
 });
 
+test("discovery route emits aggregate read-side observability for success and failure", () => {
+  const route = read("app/api/career/discover/route.ts");
+  assert.match(route, /randomUUID\(\)/);
+  assert.match(route, /career_discovery_observability/);
+  assert.match(route, /buildDiscoveryObservability\(/);
+  assert.match(route, /sourceTelemetry/);
+  assert.match(route, /providerRecordCount/);
+  assert.match(route, /finalRankedResults/);
+});
+
 test("USAJOBS authority-required errors are not presented as zero results", () => {
   const route = read("app/api/career/discover/route.ts");
   const client = read("app/career/discover/DiscoverClient.tsx");
