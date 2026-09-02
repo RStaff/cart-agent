@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildDiscoveryObservability } from "./discoveryObservability.mjs";
+import { buildDiscoveryObservability, classifyDiscoveryError } from "./discoveryObservability.mjs";
 
 function result(classification) {
   return { roleCompatibility: { classification } };
@@ -66,4 +66,21 @@ test("observability is aggregate-only and excludes private or raw provider field
   for (const forbidden of ["description", "resume", "email", "cookie", "authorization", "token", "password", "apiKey", "sourceUrl"]) assert.doesNotMatch(serialized, new RegExp(forbidden, "i"));
   assert.equal(Object.hasOwn(summary, "requestId"), true);
   assert.equal(Object.hasOwn(summary, "sourceIds"), true);
+});
+
+test("error telemetry uses bounded classifications instead of exception content", () => {
+  const adversarial = "LEVER_TIMEOUT\n\\\"fakeField\\\":true https://evil.example/?token=secret token@example.com".repeat(100);
+  assert.equal(classifyDiscoveryError({ code: "LEVER_TIMEOUT", message: adversarial, stack: adversarial }), "LEVER_TIMEOUT");
+  assert.equal(classifyDiscoveryError({ message: adversarial, stack: adversarial }), "INTERNAL_DISCOVERY_ERROR");
+  const summary = buildDiscoveryObservability({
+    requestId: "request-4",
+    sourceIds: ["lever-freedompay", "lever-dnb"],
+    sourceTelemetry: [{ sourceId: "lever-dnb", provider: "LEVER", errorClass: adversarial }],
+    outcome: "BOUNDED_ERROR",
+    errorClass: adversarial,
+  });
+  const serialized = JSON.stringify(summary);
+  assert.match(serialized, /INTERNAL_DISCOVERY_ERROR/);
+  assert.doesNotMatch(serialized, /fakeField|evil\.example|token@example\.com|secret/);
+  assert.doesNotMatch(serialized, /LEVER_TIMEOUT\\n/);
 });

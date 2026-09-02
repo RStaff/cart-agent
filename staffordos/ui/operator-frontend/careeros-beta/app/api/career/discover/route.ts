@@ -9,7 +9,7 @@ import { getDiscoveryAuthorityModel } from "../../../../lib/career/discoveryAuth
 import { buildPersonalizedSearchIntent, buildProviderCriteriaForIntent, publicSearchIntent } from "../../../../lib/career/discoverySearchIntent.mjs";
 import { buildDiscoveryDiagnostics, rankDiscoveryResults } from "../../../../lib/career/discoveryRanking.mjs";
 import { classifyDiscoveryProviders } from "../../../../lib/career/discoveryProviderAuthorization.mjs";
-import { buildDiscoveryObservability } from "../../../../lib/career/discoveryObservability.mjs";
+import { buildDiscoveryObservability, classifyDiscoveryError } from "../../../../lib/career/discoveryObservability.mjs";
 
 export const runtime = "nodejs";
 
@@ -93,6 +93,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, provider: result.provider, providers: result.providers || [result.provider], sourceIds: result.sourceIds || [], retrievedAt: result.retrievedAt, results: ranked.results, diagnostics, existingStatuses, criteria: result.criteria, providerCriteria, searchIntent: publicSearchIntent(searchIntent), providerGate: { newProviderActivation: providerGate.newProviderActivation, authorizedForBeta: providerGate.authorizedForBeta, sourceSpecificAuthorized: providerGate.sourceSpecificAuthorized, authorizedEmployerSources: providerGate.authorizedEmployerSources, blockedByAuthorization: providerGate.blockedByAuthorization } });
   } catch (error) {
     const code = error instanceof Error ? (error as Error & { code?: string }).code || error.message : "USAJOBS_SEARCH_FAILED";
+    const telemetryErrorClass = classifyDiscoveryError(error);
     const errorTelemetry = error instanceof Error ? (error as Error & { discoveryTelemetry?: { sourceTelemetry?: any[] } }).discoveryTelemetry : null;
     console.info("career_discovery_observability", JSON.stringify(buildDiscoveryObservability({
       requestId,
@@ -101,7 +102,7 @@ export async function POST(request: Request) {
       sourceIds: observedSourceIds,
       sourceTelemetry: errorTelemetry?.sourceTelemetry || [],
       outcome: "BOUNDED_ERROR",
-      errorClass: code,
+      errorClass: telemetryErrorClass,
     })));
     const sourceAuthorityCodes = ["USAJOBS_WRITTEN_APPROVAL_REQUIRED", "USAJOBS_AUTHORITY_NOT_PROVEN", "USAJOBS_ADAPTER_NOT_CONFIGURED", "SOURCE_ID_REQUIRED", "SOURCE_NOT_FOUND", "SOURCE_DISABLED", "SOURCE_UNVERIFIED", "SOURCE_WRITTEN_APPROVAL_REQUIRED", "SOURCE_PERMISSION_INCOMPLETE", "SOURCE_PROVIDER_UNKNOWN", "SOURCE_INTERFACE_MISMATCH", "SOURCE_BOARD_IDENTIFIER_INVALID", "SOURCE_SITE_IDENTIFIER_INVALID", "PRODUCTION_NETWORK_NOT_ALLOWED", "DISCOVERY_PROVIDER_NOT_AVAILABLE", "GREENHOUSE_SOURCE_NOT_AUTHORIZED", "GREENHOUSE_SOURCE_PROVIDER_MISMATCH", "GREENHOUSE_BOARD_IDENTIFIER_INVALID", "GREENHOUSE_FETCH_UNAVAILABLE", "GREENHOUSE_RATE_LIMITED", "GREENHOUSE_TIMEOUT", "GREENHOUSE_UNAVAILABLE", "GREENHOUSE_MALFORMED_RESPONSE", "LEVER_SOURCE_NOT_AUTHORIZED", "LEVER_SOURCE_PROVIDER_MISMATCH", "LEVER_SITE_IDENTIFIER_INVALID", "LEVER_FETCH_UNAVAILABLE", "LEVER_RATE_LIMITED", "LEVER_TIMEOUT", "LEVER_PROVIDER_FAILURE", "LEVER_MALFORMED_RESPONSE", "LEVER_RESPONSE_TOO_LARGE", "LEVER_REDIRECT_NOT_ALLOWED"];
     const status = code === "USAJOBS_PROVIDER_NOT_CONFIGURED" || code === "DISCOVERY_PROVIDER_NOT_AVAILABLE" || code === "GREENHOUSE_FETCH_UNAVAILABLE" || code === "LEVER_FETCH_UNAVAILABLE" ? 503 : code === "USAJOBS_AUTH_FAILED" || code === "GREENHOUSE_UNAVAILABLE" || code === "GREENHOUSE_MALFORMED_RESPONSE" || code === "LEVER_PROVIDER_FAILURE" || code === "LEVER_MALFORMED_RESPONSE" || code === "LEVER_RESPONSE_TOO_LARGE" || code === "LEVER_REDIRECT_NOT_ALLOWED" ? 502 : code === "USAJOBS_RATE_LIMITED" || code === "GREENHOUSE_RATE_LIMITED" || code === "LEVER_RATE_LIMITED" ? 429 : code === "USAJOBS_TIMEOUT" || code === "GREENHOUSE_TIMEOUT" || code === "LEVER_TIMEOUT" ? 504 : sourceAuthorityCodes.includes(code) ? 403 : 502;

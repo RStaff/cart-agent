@@ -4,6 +4,7 @@ import {
 } from "./sourceAuthorityRegistry.mjs";
 import { searchGreenhouseSource } from "./greenhouseDiscovery.mjs";
 import { searchLeverSource } from "./leverDiscovery.mjs";
+import { classifyDiscoveryError } from "./discoveryObservability.mjs";
 
 export const DEFAULT_DISCOVERY_ADAPTERS = Object.freeze({
   GREENHOUSE: searchGreenhouseSource,
@@ -97,7 +98,7 @@ export async function searchAuthorizedDiscoverySources({
       for (const item of responseResults) results.push(item);
     } catch (error) {
       telemetry.providerOutcome = "BOUNDED_ERROR";
-      telemetry.errorClass = error instanceof Error ? error.message.slice(0, 100) : "PROVIDER_ERROR";
+      telemetry.errorClass = classifyDiscoveryError(error);
       const wrapped = providerError(telemetry.errorClass, { discoveryTelemetry: { sourceTelemetry } });
       throw wrapped;
     }

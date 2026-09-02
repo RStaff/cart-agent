@@ -476,7 +476,7 @@ test("source telemetry preserves earlier completion when a later provider fails"
     adapters: {
       LEVER: async ({ source }) => {
         calls.push(source.sourceId);
-        if (source.sourceId === "lever-dnb") throw new Error("LEVER_TIMEOUT");
+        if (source.sourceId === "lever-dnb") throw Object.assign(new Error("provider details must not be logged"), { code: "LEVER_TIMEOUT" });
         return { provider: "LEVER", results: [{ sourceId: source.sourceId }] };
       },
     },

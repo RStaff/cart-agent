@@ -1,7 +1,54 @@
 const COMPATIBILITY_CLASSES = ["EXACT_OR_NEAR_TITLE", "COMPATIBLE_ADJACENT", "ROLE_FAMILY_ONLY", "INCOMPATIBLE"];
+const SAFE_ERROR_CLASSES = new Set([
+  "SOURCE_DISABLED",
+  "SOURCE_UNVERIFIED",
+  "SOURCE_PERMISSION_INCOMPLETE",
+  "SOURCE_WRITTEN_APPROVAL_REQUIRED",
+  "PRODUCTION_NETWORK_NOT_ALLOWED",
+  "SOURCE_NOT_FOUND",
+  "SOURCE_PROVIDER_UNKNOWN",
+  "SOURCE_INTERFACE_MISMATCH",
+  "SOURCE_SITE_IDENTIFIER_INVALID",
+  "SOURCE_BOARD_IDENTIFIER_INVALID",
+  "SOURCE_ID_REQUIRED",
+  "DISCOVERY_PROVIDER_NOT_AVAILABLE",
+  "LEVER_SOURCE_NOT_AUTHORIZED",
+  "LEVER_SOURCE_PROVIDER_MISMATCH",
+  "LEVER_SITE_IDENTIFIER_INVALID",
+  "LEVER_FETCH_UNAVAILABLE",
+  "LEVER_RATE_LIMITED",
+  "LEVER_TIMEOUT",
+  "LEVER_PROVIDER_FAILURE",
+  "LEVER_MALFORMED_RESPONSE",
+  "LEVER_RESPONSE_TOO_LARGE",
+  "LEVER_REDIRECT_NOT_ALLOWED",
+  "GREENHOUSE_SOURCE_NOT_AUTHORIZED",
+  "GREENHOUSE_SOURCE_PROVIDER_MISMATCH",
+  "GREENHOUSE_BOARD_IDENTIFIER_INVALID",
+  "GREENHOUSE_FETCH_UNAVAILABLE",
+  "GREENHOUSE_RATE_LIMITED",
+  "GREENHOUSE_TIMEOUT",
+  "GREENHOUSE_UNAVAILABLE",
+  "GREENHOUSE_MALFORMED_RESPONSE",
+  "USAJOBS_WRITTEN_APPROVAL_REQUIRED",
+  "USAJOBS_AUTHORITY_NOT_PROVEN",
+  "USAJOBS_ADAPTER_NOT_CONFIGURED",
+  "USAJOBS_PROVIDER_NOT_CONFIGURED",
+  "USAJOBS_AUTH_FAILED",
+  "USAJOBS_RATE_LIMITED",
+  "USAJOBS_TIMEOUT",
+  "USAJOBS_UNAVAILABLE",
+  "USAJOBS_MALFORMED_RESPONSE",
+  "INTERNAL_DISCOVERY_ERROR",
+]);
 
 /** @typedef {{ sourceId?: unknown, provider?: unknown, authorityResult?: unknown, enabled?: unknown, productionNetworkAllowed?: unknown, dispatchAttempted?: unknown, dispatchCompleted?: unknown, providerOutcome?: unknown, providerRecordCount?: unknown, normalizedRecordCount?: unknown, errorClass?: unknown }} SourceTelemetryInput */
 /** @typedef {{ roleCompatibility?: { classification?: unknown } }} DiscoveryResult */
+
+export function classifyDiscoveryError(errorOrCode) {
+  const code = typeof errorOrCode === "string" ? errorOrCode : errorOrCode?.code;
+  return SAFE_ERROR_CLASSES.has(code) ? code : "INTERNAL_DISCOVERY_ERROR";
+}
 
 function safeCount(value) {
   return Number.isInteger(value) && value >= 0 ? value : 0;
@@ -20,7 +67,7 @@ function safeSource(source = {}) {
     providerOutcome: String(source.providerOutcome || "NOT_OBSERVABLE").slice(0, 80),
     providerRecordCount: safeCount(source.providerRecordCount),
     normalizedRecordCount: safeCount(source.normalizedRecordCount),
-    errorClass: source.errorClass ? String(source.errorClass).slice(0, 100) : null,
+    errorClass: source.errorClass ? classifyDiscoveryError(source.errorClass) : null,
   };
 }
 
@@ -65,6 +112,6 @@ export function buildDiscoveryObservability({
     syntheticFallback: false,
     fallbackProviders: [],
     outcome: String(outcome || "UNKNOWN").slice(0, 80),
-    errorClass: errorClass ? String(errorClass).slice(0, 100) : null,
+    errorClass: errorClass ? classifyDiscoveryError(errorClass) : null,
   };
 }
