@@ -103,7 +103,7 @@ function safeSource(source = {}) {
   };
 }
 
-/** @param {{ requestId?: unknown, providerMode?: unknown, normalizedRoleFamily?: unknown, sourceIds?: unknown[], sourceTelemetry?: SourceTelemetryInput[], providerRecordCount?: unknown, normalizedRecordCount?: unknown, rankedResults?: DiscoveryResult[], finalRankedResults?: DiscoveryResult[], diagnostics?: { p0RoleGateSurvivors?: unknown }, outcome?: unknown, errorClass?: unknown }} options */
+/** @param {{ requestId?: unknown, providerMode?: unknown, normalizedRoleFamily?: unknown, sourceIds?: unknown[], sourceTelemetry?: SourceTelemetryInput[], providerRecordCount?: unknown, normalizedRecordCount?: unknown, rankedResults?: DiscoveryResult[], finalRankedResults?: DiscoveryResult[], diagnostics?: { p0RoleGateSurvivors?: unknown }, outcome?: unknown, searchOutcome?: unknown, successfulSourceCount?: unknown, failedSourceCount?: unknown, errorClass?: unknown }} options */
 export function buildDiscoveryObservability({
   requestId,
   providerMode = "SOURCE_REGISTRY",
@@ -116,6 +116,9 @@ export function buildDiscoveryObservability({
   finalRankedResults = [],
   diagnostics = {},
   outcome = "SUCCESS",
+  searchOutcome = null,
+  successfulSourceCount = null,
+  failedSourceCount = null,
   errorClass = null,
 } = {}) {
   const compatibilityCounts = Object.fromEntries(COMPATIBILITY_CLASSES.map((classification) => [classification, 0]));
@@ -144,6 +147,9 @@ export function buildDiscoveryObservability({
     syntheticFallback: false,
     fallbackProviders: [],
     outcome: String(outcome || "UNKNOWN").slice(0, 80),
+    searchOutcome: String(searchOutcome || outcome || "UNKNOWN").slice(0, 40),
+    successfulSourceCount: successfulSourceCount === null ? null : safeCount(successfulSourceCount),
+    failedSourceCount: failedSourceCount === null ? null : safeCount(failedSourceCount),
     errorClass: errorClass ? classifyDiscoveryError(errorClass) : null,
   };
 }

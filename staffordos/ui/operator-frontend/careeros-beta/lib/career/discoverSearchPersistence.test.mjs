@@ -116,6 +116,16 @@ test("discovery route emits aggregate read-side observability for success and fa
   assert.match(route, /sourceTelemetry/);
   assert.match(route, /providerRecordCount/);
   assert.match(route, /finalRankedResults/);
+  assert.match(route, /partialFailure: result\.partialFailure === true/);
+  assert.match(route, /failedSourceCount: result\.failedSourceCount/);
+  assert.match(route, /searchOutcome: result\.searchOutcome/);
+});
+
+test("partial discovery results retain a bounded generic customer warning", () => {
+  const client = read("app/career/discover/DiscoverClient.tsx");
+  assert.match(client, /body\.partialFailure === true/);
+  assert.match(client, /Some authorized job sources were temporarily unavailable\. Results from the available sources are shown\./);
+  assert.doesNotMatch(client, /providerHttpStatus.*partialFailure|errorClass.*partialFailure/);
 });
 
 test("USAJOBS authority-required errors are not presented as zero results", () => {

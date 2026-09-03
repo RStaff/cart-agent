@@ -469,7 +469,7 @@ test("both active Lever sources dispatch as one governed source-registry request
 
 test("source telemetry preserves earlier completion when a later provider fails", async () => {
   const calls = [];
-  await assert.rejects(() => searchAuthorizedDiscoverySources({
+  const result = await searchAuthorizedDiscoverySources({
     sourceIds: ["lever-freedompay", "lever-dnb"],
     criteria: { keywords: "product manager" },
     registry: DEFAULT_SOURCE_AUTHORITY_REGISTRY,
@@ -480,17 +480,106 @@ test("source telemetry preserves earlier completion when a later provider fails"
         return { provider: "LEVER", results: [{ sourceId: source.sourceId }] };
       },
     },
+  });
+  assert.equal(result.searchOutcome, "PARTIAL_SUCCESS");
+  assert.equal(result.partialFailure, true);
+  assert.equal(result.successfulSourceCount, 1);
+  assert.equal(result.failedSourceCount, 1);
+  assert.equal(result.results.length, 1);
+  assert.equal(result.sourceTelemetry[0].dispatchCompleted, true);
+  assert.equal(result.sourceTelemetry[0].providerRecordCount, 1);
+  assert.equal(result.sourceTelemetry[1].dispatchAttempted, true);
+  assert.equal(result.sourceTelemetry[1].dispatchCompleted, false);
+  assert.equal(result.sourceTelemetry[1].providerOutcome, "BOUNDED_ERROR");
+  assert.equal(result.sourceTelemetry[1].providerFailureCategory, "TIMEOUT");
+  assert.deepEqual(calls, ["lever-freedompay", "lever-dnb"]);
+});
+
+test("a successful source after a failed source is retained without fallback", async () => {
+  const calls = [];
+  const result = await searchAuthorizedDiscoverySources({
+    sourceIds: ["source-lever-failing", "source-lever-successful"],
+    criteria: { keywords: "program manager" },
+    registry: [leverSource({ sourceId: "source-lever-failing" }), leverSource({ sourceId: "source-lever-successful" })],
+    adapters: {
+      LEVER: async ({ source }) => {
+        calls.push(source.sourceId);
+        if (source.sourceId === "source-lever-failing") throw Object.assign(new Error("private provider detail"), { code: "LEVER_PROVIDER_FAILURE", providerHttpStatus: 404 });
+        return { provider: "LEVER", results: [{ sourceId: source.sourceId }] };
+      },
+      GREENHOUSE: async () => { throw new Error("fallback must not run"); },
+    },
+  });
+  assert.deepEqual(calls, ["source-lever-failing", "source-lever-successful"]);
+  assert.equal(result.searchOutcome, "PARTIAL_SUCCESS");
+  assert.equal(result.successfulSourceCount, 1);
+  assert.equal(result.failedSourceCount, 1);
+  assert.equal(result.results.length, 1);
+  assert.deepEqual(result.failedSources, [{ sourceId: "source-lever-failing", provider: "LEVER", errorClass: "LEVER_PROVIDER_FAILURE", providerFailureCategory: "HTTP_STATUS_FAILURE", providerHttpStatus: 404 }]);
+});
+
+test("all provider failures remain a bounded total failure", async () => {
+  const calls = [];
+  await assert.rejects(() => searchAuthorizedDiscoverySources({
+    sourceIds: ["source-lever-one", "source-lever-two"],
+    registry: [leverSource({ sourceId: "source-lever-one" }), leverSource({ sourceId: "source-lever-two" })],
+    adapters: {
+      LEVER: async ({ source }) => {
+        calls.push(source.sourceId);
+        throw Object.assign(new Error("raw failure must not escape"), { code: "LEVER_TIMEOUT" });
+      },
+    },
   }), (error) => {
     assert.equal(error.code, "LEVER_TIMEOUT");
-    assert.equal(error.discoveryTelemetry.sourceTelemetry[0].dispatchCompleted, true);
-    assert.equal(error.discoveryTelemetry.sourceTelemetry[0].providerRecordCount, 1);
-    assert.equal(error.discoveryTelemetry.sourceTelemetry[1].dispatchAttempted, true);
-    assert.equal(error.discoveryTelemetry.sourceTelemetry[1].dispatchCompleted, false);
-    assert.equal(error.discoveryTelemetry.sourceTelemetry[1].providerOutcome, "BOUNDED_ERROR");
-    assert.equal(error.discoveryTelemetry.sourceTelemetry[1].providerFailureCategory, "TIMEOUT");
+    assert.equal(error.discoveryTelemetry.searchOutcome, "FAILURE");
+    assert.equal(error.discoveryTelemetry.successfulSourceCount, 0);
+    assert.equal(error.discoveryTelemetry.failedSourceCount, 2);
     return true;
   });
-  assert.deepEqual(calls, ["lever-freedompay", "lever-dnb"]);
+  assert.deepEqual(calls, ["source-lever-one", "source-lever-two"]);
+});
+
+test("a successful zero-result source plus a failed source is partial success", async () => {
+  const result = await searchAuthorizedDiscoverySources({
+    sourceIds: ["source-lever-zero", "source-lever-failing"],
+    registry: [leverSource({ sourceId: "source-lever-zero" }), leverSource({ sourceId: "source-lever-failing" })],
+    adapters: {
+      LEVER: async ({ source }) => {
+        if (source.sourceId === "source-lever-failing") throw Object.assign(new Error("provider failure"), { code: "LEVER_PROVIDER_FAILURE", providerHttpStatus: 503 });
+        return { provider: "LEVER", results: [] };
+      },
+    },
+  });
+  assert.equal(result.searchOutcome, "PARTIAL_SUCCESS");
+  assert.equal(result.partialFailure, true);
+  assert.equal(result.results.length, 0);
+  assert.equal(result.sourceTelemetry[0].providerOutcome, "ZERO");
+  assert.equal(result.sourceTelemetry[1].providerFailureCategory, "HTTP_STATUS_FAILURE");
+});
+
+test("the observed two-successes-then-404 scenario preserves all 20 successful records", async () => {
+  const registry = [
+    leverSource({ sourceId: "lever-freedompay" }),
+    leverSource({ sourceId: "lever-dnb" }),
+    leverSource({ sourceId: "lever-frontify" }),
+  ];
+  const result = await searchAuthorizedDiscoverySources({
+    sourceIds: ["lever-freedompay", "lever-dnb", "lever-frontify"],
+    registry,
+    adapters: {
+      LEVER: async ({ source }) => {
+        if (source.sourceId === "lever-frontify") throw Object.assign(new Error("404 body must not escape"), { code: "LEVER_PROVIDER_FAILURE", providerFailureCategory: "HTTP_STATUS_FAILURE", providerHttpStatus: 404, responseBody: "private body" });
+        return { provider: "LEVER", results: Array.from({ length: 10 }, (_, index) => ({ sourceId: source.sourceId, providerJobId: `${source.sourceId}-${index}` })) };
+      },
+    },
+  });
+  assert.equal(result.searchOutcome, "PARTIAL_SUCCESS");
+  assert.equal(result.successfulSourceCount, 2);
+  assert.equal(result.failedSourceCount, 1);
+  assert.equal(result.results.length, 20);
+  assert.equal(result.sourceTelemetry[2].providerFailureCategory, "HTTP_STATUS_FAILURE");
+  assert.equal(result.sourceTelemetry[2].providerHttpStatus, 404);
+  assert.doesNotMatch(JSON.stringify(result), /404 body|private body/);
 });
 
 test("dispatcher preserves bounded provider failure category and HTTP status", async () => {

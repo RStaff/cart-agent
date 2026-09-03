@@ -120,3 +120,25 @@ test("provider failure diagnostics use bounded categories and status only", () =
   const serialized = JSON.stringify(summary);
   assert.doesNotMatch(serialized, /fakeField|evil\\.example|token@example\\.com|secret|errorMessage|responseBody/);
 });
+
+test("aggregate observability distinguishes partial success with bounded counts", () => {
+  const summary = buildDiscoveryObservability({
+    requestId: "request-partial",
+    sourceIds: ["lever-freedompay", "lever-dnb", "lever-frontify"],
+    sourceTelemetry: [
+      { sourceId: "lever-freedompay", provider: "LEVER", dispatchAttempted: true, dispatchCompleted: true, providerOutcome: "SUCCESS", providerRecordCount: 10, normalizedRecordCount: 10 },
+      { sourceId: "lever-dnb", provider: "LEVER", dispatchAttempted: true, dispatchCompleted: true, providerOutcome: "SUCCESS", providerRecordCount: 10, normalizedRecordCount: 10 },
+      { sourceId: "lever-frontify", provider: "LEVER", dispatchAttempted: true, dispatchCompleted: false, providerOutcome: "BOUNDED_ERROR", errorClass: "LEVER_PROVIDER_FAILURE", providerFailureCategory: "HTTP_STATUS_FAILURE", providerHttpStatus: 404 },
+    ],
+    providerRecordCount: 20,
+    normalizedRecordCount: 20,
+    searchOutcome: "PARTIAL_SUCCESS",
+    successfulSourceCount: 2,
+    failedSourceCount: 1,
+  });
+  assert.equal(summary.searchOutcome, "PARTIAL_SUCCESS");
+  assert.equal(summary.successfulSourceCount, 2);
+  assert.equal(summary.failedSourceCount, 1);
+  assert.equal(summary.sources[2].providerHttpStatus, 404);
+  assert.doesNotMatch(JSON.stringify(summary), /raw|body|header|token|cookie/i);
+});

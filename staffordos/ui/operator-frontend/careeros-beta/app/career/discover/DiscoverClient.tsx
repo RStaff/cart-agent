@@ -39,6 +39,7 @@ export default function DiscoverClient({ initialPreferences, availableSources = 
   const [form, setForm] = useState({ requestedTitle: initialPreferences.requestedTitle || "", keywords: initialPreferences.keywords || "", location: initialPreferences.location || "", remotePreference: initialPreferences.remotePreference || "any", postedWithinDays: initialPreferences.postedWithinDays?.toString() || "", salaryMin: initialPreferences.salaryMin?.toString() || "", resultLimit: String(initialPreferences.resultLimit || 10) });
   const [results, setResults] = useState<Result[]>([]);
   const [message, setMessage] = useState("");
+  const [partialFailure, setPartialFailure] = useState(false);
   const [saving, setSaving] = useState<string | null>(null);
   const [savingPreferences, setSavingPreferences] = useState(false);
   const [preset, setPreset] = useState("");
@@ -51,6 +52,7 @@ export default function DiscoverClient({ initialPreferences, availableSources = 
   async function search(event: React.FormEvent) {
     event.preventDefault();
     setMessage("");
+    setPartialFailure(false);
     if (!automaticDiscoveryAvailable) {
       setResults([]);
       setMessage(AUTOMATIC_DISCOVERY_UNAVAILABLE_MESSAGE);
@@ -75,6 +77,7 @@ export default function DiscoverClient({ initialPreferences, availableSources = 
         setMessage(body.error === "USAJOBS_WRITTEN_APPROVAL_REQUIRED" ? AUTOMATIC_DISCOVERY_UNAVAILABLE_MESSAGE : body.error || "Automatic discovery is unavailable right now.");
         return;
       }
+      setPartialFailure(body.partialFailure === true);
       const statuses = body.existingStatuses || {};
       const resultSource = body.provider === "GREENHOUSE" || body.provider === "LEVER" || body.provider === "SOURCE_REGISTRY" ? "authorized employer sources" : "authorized providers";
       setResults((body.results || []).map((result: Result) => ({ ...result, existingState: result.existingState || statuses[result.externalOpportunityId || result.sourceUrl || ""] || null })));
@@ -168,6 +171,7 @@ export default function DiscoverClient({ initialPreferences, availableSources = 
         </div>
         {form.requestedTitle && <p className="careerDraftState" role="status">Target role: {form.requestedTitle}</p>}
         {message && <p className="careerDraftState" role="status">{message}</p>}
+        {partialFailure && <p className="careerDraftState" role="status">Some authorized job sources were temporarily unavailable. Results from the available sources are shown.</p>}
       </div>
     </section>
     {results.length === 0 && form.requestedTitle && message && !message.includes("found via") && message !== AUTOMATIC_DISCOVERY_UNAVAILABLE_MESSAGE && <section className="careerProfilePanel"><h2>No compatible results yet</h2><p className="careerMuted">CareerOS will not fill this search with unrelated roles. Try broadening the target role or adjusting your preferences.</p></section>}

@@ -84,6 +84,8 @@ export async function searchAuthorizedDiscoverySources({
   const retrievedAt = now.toISOString();
   const providerSet = new Set();
   const results = [];
+  const failedSources = [];
+  let successfulSourceCount = 0;
   for (const [index, authorization] of authorizations.entries()) {
     const adapter = adapters[authorization.source.provider];
     const telemetry = sourceTelemetry[index];
@@ -96,6 +98,7 @@ export async function searchAuthorizedDiscoverySources({
       telemetry.normalizedRecordCount = responseResults.length;
       telemetry.providerOutcome = providerOutcome(null, responseResults.length);
       telemetry.errorClass = null;
+      successfulSourceCount += 1;
       providerSet.add(response.provider || authorization.source.provider);
       for (const item of responseResults) results.push(item);
     } catch (error) {
@@ -103,9 +106,32 @@ export async function searchAuthorizedDiscoverySources({
       telemetry.errorClass = classifyDiscoveryError(error);
       telemetry.providerFailureCategory = classifyProviderFailureCategory(error);
       telemetry.providerHttpStatus = Number.isInteger(error?.providerHttpStatus ?? error?.providerStatus) ? (error.providerHttpStatus ?? error.providerStatus) : null;
-      const wrapped = providerError(telemetry.errorClass, { discoveryTelemetry: { sourceTelemetry }, providerFailureCategory: telemetry.providerFailureCategory, providerHttpStatus: telemetry.providerHttpStatus });
-      throw wrapped;
+      failedSources.push({
+        sourceId: telemetry.sourceId,
+        provider: telemetry.provider,
+        errorClass: telemetry.errorClass,
+        providerFailureCategory: telemetry.providerFailureCategory,
+        providerHttpStatus: telemetry.providerHttpStatus,
+      });
     }
+  }
+
+  const failedSourceCount = failedSources.length;
+  const searchOutcome = failedSourceCount === 0 ? "SUCCESS" : successfulSourceCount > 0 ? "PARTIAL_SUCCESS" : "FAILURE";
+  const discoveryTelemetry = {
+    sourceTelemetry,
+    searchOutcome,
+    successfulSourceCount,
+    failedSourceCount,
+    failedSources,
+  };
+  if (successfulSourceCount === 0) {
+    const failure = failedSources[0] || { errorClass: "DISCOVERY_PROVIDER_NOT_AVAILABLE" };
+    throw providerError(failure.errorClass, {
+      discoveryTelemetry,
+      providerFailureCategory: failure.providerFailureCategory,
+      providerHttpStatus: failure.providerHttpStatus,
+    });
   }
 
   return {
@@ -116,5 +142,10 @@ export async function searchAuthorizedDiscoverySources({
     results,
     criteria,
     sourceTelemetry,
+    searchOutcome,
+    partialFailure: failedSourceCount > 0,
+    successfulSourceCount,
+    failedSourceCount,
+    failedSources,
   };
 }
