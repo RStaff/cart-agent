@@ -368,7 +368,7 @@ export async function getResumeDraft(context, opportunityId) {
   return { opportunity, profile: profile.rows[0], packet, draft };
 }
 
-export async function createResumeDraft(context, opportunityId) {
+export async function createResumeDraft(context, opportunityId, options = {}) {
   requireContext(context);
   const data = await getResumeDraft(context, opportunityId);
   if (data.opportunity.decisionState !== "PURSUE") throw Object.assign(new Error("OPPORTUNITY_MUST_BE_PURSUED"), { code: "OPPORTUNITY_MUST_BE_PURSUED" });
@@ -377,7 +377,7 @@ export async function createResumeDraft(context, opportunityId) {
   const pool = await careerP0Pool();
   const nextVersion = Number((await pool.query('SELECT COALESCE(MAX("draftVersion"),0)+1 AS version FROM "CareerResumeDraft" WHERE "opportunityId"=$1 AND "tenantId"=$2 AND "userId"=$3', [opportunityId, context.tenant.id, context.user.id])).rows[0].version);
   const row = (await pool.query('INSERT INTO "CareerResumeDraft" ("id","tenantId","userId","profileId","opportunityId","materialType","generationMethod","evaluationVersion","authorityVersion","draftVersion",content,"updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,NOW()) RETURNING id,"materialType","generationMethod",provider,model,"evaluationVersion","authorityVersion","draftVersion",content,stale,"createdAt","updatedAt"', [id("resume"), context.tenant.id, context.user.id, data.opportunity.profileId, opportunityId, "RESUME", "DETERMINISTIC", data.packet.analysis.evaluationVersion, data.profile.version, nextVersion, JSON.stringify(generated.content)])).rows[0];
-  await recordOpportunityEvent(context, opportunityId, "APPLICATION_MATERIAL_CREATED", { materialType: "RESUME" });
+  await recordOpportunityEvent(context, opportunityId, options.eventType || "APPLICATION_MATERIAL_CREATED", { materialType: "RESUME", ...(options.eventMetadata || {}) });
   return { ...data, draft: row };
 }
 
