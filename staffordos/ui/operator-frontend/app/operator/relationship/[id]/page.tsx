@@ -11,9 +11,7 @@ import path from "node:path";
 type PageProps = {
   params: Promise<{
     id?: string;
-  }> | {
-    id?: string;
-  };
+  }>;
 };
 
 const PATHS = {
@@ -200,7 +198,7 @@ function matchesPacketRelationship(packet: PacketRecord, candidateKeys: string[]
 }
 
 export default async function RelationshipPage({ params }: PageProps) {
-  const resolvedParams = await Promise.resolve(params);
+  const resolvedParams = await params;
   const id = typeof resolvedParams?.id === "string" ? resolvedParams.id.trim() : "";
   if (!id) {
     notFound();

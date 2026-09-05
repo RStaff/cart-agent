@@ -13,14 +13,16 @@ import { writeShopifixerScopedFix } from "../../../lib/operator/writeShopifixerS
 import { writeShopifixerProofPackage } from "../../../lib/operator/writeShopifixerProofPackage";
 import { writeShopifixerCompletion } from "../../../lib/operator/writeShopifixerCompletion";
 
+type RossCommandCenterSearchParams = {
+  shopifixer_before_saved?: string;
+  shopifixer_after_saved?: string;
+  shopifixer_scoped_fix_saved?: string;
+  shopifixer_proof_package_saved?: string;
+  shopifixer_completion_saved?: string;
+};
+
 type RossCommandCenterPageProps = {
-  searchParams?: {
-    shopifixer_before_saved?: string;
-    shopifixer_after_saved?: string;
-    shopifixer_scoped_fix_saved?: string;
-    shopifixer_proof_package_saved?: string;
-    shopifixer_completion_saved?: string;
-  };
+  searchParams?: Promise<RossCommandCenterSearchParams>;
 };
 
 export default async function RossCommandCenterPage({ searchParams }: RossCommandCenterPageProps) {
@@ -29,11 +31,12 @@ export default async function RossCommandCenterPage({ searchParams }: RossComman
   const qaReport = loadCommandCenterQaReport();
   const unitWorkSnapshot = loadUnitWorkSnapshot();
   const shopifixerCommandCenter = await loadShopifixerCommandCenter();
-  const beforeEvidenceSaved = searchParams?.shopifixer_before_saved === "1";
-  const afterEvidenceSaved = searchParams?.shopifixer_after_saved === "1";
-  const scopedFixSaved = searchParams?.shopifixer_scoped_fix_saved === "1";
-  const proofPackageSaved = searchParams?.shopifixer_proof_package_saved === "1";
-  const completionSaved = searchParams?.shopifixer_completion_saved === "1";
+  const resolvedSearchParams = await searchParams;
+  const beforeEvidenceSaved = resolvedSearchParams?.shopifixer_before_saved === "1";
+  const afterEvidenceSaved = resolvedSearchParams?.shopifixer_after_saved === "1";
+  const scopedFixSaved = resolvedSearchParams?.shopifixer_scoped_fix_saved === "1";
+  const proofPackageSaved = resolvedSearchParams?.shopifixer_proof_package_saved === "1";
+  const completionSaved = resolvedSearchParams?.shopifixer_completion_saved === "1";
   const beforeEvidenceDate = new Date().toISOString().slice(0, 10);
   const completionDate = beforeEvidenceDate;
 

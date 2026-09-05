@@ -4,9 +4,9 @@ export const dynamic = "force-dynamic";
 
 export async function GET(
   _request: Request,
-  context: { params: Promise<{ artifactVersionId: string }> | { artifactVersionId: string } },
+  context: { params: Promise<{ artifactVersionId: string }> },
 ) {
-  const params = await Promise.resolve(context.params);
+  const params = await context.params;
   const artifactVersionId = String(params.artifactVersionId || "").trim();
   const exportFile = artifactVersionId
     ? readLatestDocxExport({ artifactVersionId })
