@@ -53,7 +53,7 @@ function testConfig(overrides = {}) {
     kmsProject: "staffordos-identity-prod",
     kmsLocation: "us-east1",
     kmsKeyRing: "staffordos-operator-issuer-prod",
-    kmsKey: "staffordos-operator-ed25519-signing",
+    kmsKey: "test-fixture-kms-key",
     kmsKeyVersion: "1",
     ...overrides,
   };
@@ -148,7 +148,7 @@ test("CareerOS beta operations role grants only the narrow operations read permi
     KMS_PROJECT: "staffordos-identity-prod",
     KMS_LOCATION: "us-east1",
     KMS_KEY_RING: "staffordos-operator-issuer-prod",
-    KMS_KEY: "staffordos-operator-ed25519-signing",
+    KMS_KEY: "test-fixture-kms-key",
     STAFFORDOS_OPERATOR_FRONTEND_HANDOFF_URL: "http://127.0.0.1:3000/api/operator/auth/callback",
   });
 
