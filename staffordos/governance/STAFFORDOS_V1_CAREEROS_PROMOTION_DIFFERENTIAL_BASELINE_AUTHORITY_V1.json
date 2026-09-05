@@ -1,0 +1,70 @@
+{
+  "artifact": "STAFFORDOS_V1_CAREEROS_PROMOTION_DIFFERENTIAL_BASELINE_AUTHORITY_V1",
+  "version": "1",
+  "scope": {
+    "type": "release_specific",
+    "production_sha": "97cca9a8127129ffd422035be755ae5d83ec5dc3",
+    "parent_candidate_sha": "ea75bc7cae9c2565b889b66e85cc7e9ea06e8160",
+    "working_candidate_parent_sha": "ea75bc7cae9c2565b889b66e85cc7e9ea06e8160",
+    "candidate_sha": "the containing local commit created from the stated parent",
+    "rollback_sha": "ea75bc7cae9c2565b889b66e85cc7e9ea06e8160"
+  },
+  "intended_changed_files": [
+    "staffordos/ui/operator-frontend/careeros-beta/scripts/promote_remote_beta_branch_v1.sh",
+    "staffordos/ui/operator-frontend/careeros-beta/scripts/promote_remote_beta_branch_v1.test.mjs",
+    "staffordos/governance/STAFFORDOS_V1_CAREEROS_PROMOTION_DIFFERENTIAL_BASELINE_AUTHORITY_V1.json"
+  ],
+  "validation": {
+    "commands": [
+      "node --test staffordos/ui/operator-frontend/careeros-beta/scripts/promote_remote_beta_branch_v1.test.mjs",
+      "node --test staffordos/reconciliation/careeros_production_reconciliation_v1.test.mjs",
+      "node --test staffordos/ui/operator-frontend/careeros-beta/lib/career/*.test.mjs",
+      "node --test staffordos/ui/operator-frontend/lib/operator/*.test.mjs",
+      "node --test staffordos/ui/operator-frontend/lib/staffordos/*.test.mjs",
+      "./node_modules/.bin/next build --webpack",
+      "./node_modules/.bin/tsc --noEmit --pretty false"
+    ],
+    "directly_affected_suites": {
+      "promotion": "27/27 passed",
+      "reconciliation": "14/14 passed",
+      "careeros": "336/336 passed",
+      "operator": "34/34 passed",
+      "build": "passed",
+      "typecheck": "passed"
+    },
+    "staffordos_baseline": {
+      "total": 1132,
+      "passed": 1121,
+      "failed": 11,
+      "equivalent_at_production_parent_and_current": true,
+      "zero_new_failures": true
+    }
+  },
+  "unchanged_baseline_failures": [
+    {"test_file": "careerOsCapabilityProduct.test.mjs", "test_name": "derives reusable capabilities from confirmed facts with provenance", "classification": "UNCHANGED_PRODUCTION_BASELINE_FAILURE"},
+    {"test_file": "careerOsCapabilityProduct.test.mjs", "test_name": "job parser preserves user supplied plaintext and specialist boundaries", "classification": "STALE_PRESENTATION_EXPECTATION"},
+    {"test_file": "careerOsGuidedVoiceInterview.test.mjs", "test_name": "guided interview preserves accepted answers and uses the existing intake path", "classification": "STALE_PRESENTATION_EXPECTATION"},
+    {"test_file": "careerOsHumanProfile.test.mjs", "test_name": "profile reads confirmed facts and review queue remains presentation-only", "classification": "STALE_PRESENTATION_EXPECTATION"},
+    {"test_file": "careerOsRootEntry.test.mjs", "test_name": "bare origin is session-aware and customer home exposes story continuation", "classification": "STALE_PRESENTATION_EXPECTATION"},
+    {"test_file": "careerOsV1_27A2PostAdjudication.test.mjs", "test_name": "post-adjudication authority is complete, sanitized, and deterministic", "classification": "MISSING_NONPRODUCTION_ARTIFACT"},
+    {"test_file": "careerOsV1_27A2PostAdjudication.test.mjs", "test_name": "exact requirement projection preserves identity and remains fail-closed", "classification": "MISSING_NONPRODUCTION_ARTIFACT"},
+    {"test_file": "jobSearchCommandPresentation.test.mjs", "test_name": "Career Home and Job Command are available now", "classification": "STALE_PRESENTATION_EXPECTATION"},
+    {"test_file": "jobSearchCommandPresentation.test.mjs", "test_name": "Career Evidence is not connected to UI yet", "classification": "STALE_PRESENTATION_EXPECTATION"},
+    {"test_file": "professionalModes.test.mjs", "test_name": "Professional navigation is Professional-only and links only existing routes", "classification": "STALE_PRESENTATION_EXPECTATION"},
+    {"test_file": "readModelEnvelope.test.mjs", "test_name": "Professional static mode records remain accurate", "classification": "STALE_PRESENTATION_EXPECTATION"}
+  ],
+  "safety": {
+    "runtime_safety_failures": 0,
+    "security_failures": 0,
+    "deployment_failures": 0,
+    "promotion_change_caused_failures": 0,
+    "schema_or_migration_change": false,
+    "reconciliation_execution_authorized": false
+  },
+  "decision": {
+    "rule": "Commit is permitted only when directly affected suites pass and the full StaffordOS result contains exactly the recorded unchanged baseline failures.",
+    "unresolved_baseline_debt": "Eleven failures remain unresolved: nine stale expectations and two missing external job-search evidence artifacts.",
+    "global_waiver": false,
+    "release_specific_only": true
+  }
+}
