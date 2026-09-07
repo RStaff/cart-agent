@@ -44,6 +44,9 @@ const NAVIGATION_GROUPS: NavigationGroup[] = [
       { href: "/operator/careeros/beta-users", label: "CareerOS Operations", note: "Beta operations" },
       { href: "/operator/careeros/missions/CAREEROS_V1_P1_OUTCOME_TRACKING_AND_DAILY_TRIAGE", label: "CareerOS Missions", note: "Mission observation" },
       { href: "/operator/command-center", label: "ShopiFixer Command Center", note: "ShopiFixer delivery" },
+      { href: "/operator/campaigns", label: "Marketing", note: "Campaigns" },
+      { href: "/operator/leads", label: "Sales", note: "Leads" },
+      { href: "/operator/revenue-command", label: "Finance", note: "Revenue" },
     ],
   },
   {

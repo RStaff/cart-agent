@@ -5,6 +5,13 @@ import test from "node:test";
 const shell = fs.readFileSync(new URL("./OperatorShell.tsx", import.meta.url), "utf8");
 const nav = fs.readFileSync(new URL("./OperatorNav.tsx", import.meta.url), "utf8");
 
+test("global navigation has exactly the approved ordered groups", () => {
+  const navigationDefinition = shell.match(/const NAVIGATION_GROUPS:[\s\S]*?= \[(\s*[\s\S]*?)\n\];/);
+  assert.ok(navigationDefinition, "NAVIGATION_GROUPS definition must remain explicit");
+  const groupLabels = [...navigationDefinition[1].matchAll(/\{\s*label:\s*"([^"]+)"/g)].map((match) => match[1]);
+  assert.deepEqual(groupLabels, ["Today", "Business", "System"]);
+});
+
 test("primary navigation exposes only the canonical operator groups", () => {
   assert.match(shell, /label: "Today"/);
   assert.match(shell, /label: "Business"/);
@@ -12,9 +19,24 @@ test("primary navigation exposes only the canonical operator groups", () => {
   assert.match(shell, /label: "StaffordOS Cockpit"/);
   assert.match(shell, /label: "Products"/);
   assert.match(shell, /label: "ShopiFixer Command Center"/);
+  assert.match(shell, /href: "\/operator\/campaigns", label: "Marketing", note: "Campaigns"/);
+  assert.match(shell, /href: "\/operator\/leads", label: "Sales", note: "Leads"/);
+  assert.match(shell, /href: "\/operator\/revenue-command", label: "Finance", note: "Revenue"/);
   assert.match(shell, /label: "Health"/);
   assert.match(shell, /label: "Audit"/);
   assert.doesNotMatch(shell, /planned: true/);
+});
+
+test("verified business destinations appear once without legacy quick actions", () => {
+  for (const [label, href, note] of [
+    ["Marketing", "/operator/campaigns", "Campaigns"],
+    ["Sales", "/operator/leads", "Leads"],
+    ["Finance", "/operator/revenue-command", "Revenue"],
+  ]) {
+    const entry = `href: "${href}", label: "${label}", note: "${note}"`;
+    assert.equal((shell.match(new RegExp(entry, "g")) || []).length, 1);
+  }
+  assert.doesNotMatch(shell, /Quick Actions|quick actions|operatorShellQuickActionStack/);
 });
 
 test("global navigation owns CareerOS discoverability without a competing OperatorNav", () => {
