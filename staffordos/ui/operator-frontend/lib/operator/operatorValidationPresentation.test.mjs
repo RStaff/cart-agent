@@ -27,6 +27,17 @@ test("failure statuses require attention case-insensitively", () => {
   assert.equal(validationSummary("BLOCKED"), "1 system check needs attention");
 });
 
+test("Not Yet Implemented is an attention status without broad implemented matching", () => {
+  for (const value of ["Not Yet Implemented", "NOT YET IMPLEMENTED", "not yet implemented", "Not  Yet   Implemented"]) {
+    assert.equal(validationAttentionCount(value), 1, `${value} should require attention`);
+  }
+  assert.equal(validationAttentionCount("PASS / Not Yet Implemented"), 1);
+  assert.equal(validationSummary("Not Yet Implemented / NOT YET IMPLEMENTED"), "2 system checks need attention");
+  assert.equal(validationAttentionCount("IMPLEMENTED"), 0);
+  assert.equal(validationAttentionCount("IMPLEMENTED_PENDING_GOVERNED_DEPLOYMENT"), 0);
+  assert.equal(validationAttentionCount("not implemented"), 0);
+});
+
 test("mixed validation entries require attention and pluralize correctly", () => {
   assert.equal(validationAttentionCount("PASS / BLOCKED"), 1);
   assert.equal(validationAttentionCount("PASS / PARTIAL"), 1);

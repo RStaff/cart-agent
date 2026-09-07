@@ -1,11 +1,12 @@
 const ATTENTION_STATUS_PATTERN = /\b(?:MISSING|FAILED|FAIL|ERROR|BLOCKED|PARTIAL|UNAVAILABLE)\b/i;
+const NOT_YET_IMPLEMENTED_PATTERN = /\bNOT\s+YET\s+IMPLEMENTED\b/i;
 
 export function validationEntries(value) {
   return value.split(" / ").map((entry) => entry.trim()).filter(Boolean);
 }
 
 export function validationAttentionCount(value) {
-  return validationEntries(value).filter((entry) => ATTENTION_STATUS_PATTERN.test(entry)).length;
+  return validationEntries(value).filter((entry) => ATTENTION_STATUS_PATTERN.test(entry) || NOT_YET_IMPLEMENTED_PATTERN.test(entry)).length;
 }
 
 export function validationSummary(value) {
