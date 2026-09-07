@@ -363,6 +363,114 @@ textarea {
   padding: 20px;
 }
 
+.operatorShellMobileNav {
+  display: none;
+}
+
+.operatorShellMobileNavToggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid rgba(34, 211, 238, 0.4);
+  border-radius: 16px;
+  background: rgba(8, 47, 73, 0.72);
+  color: #ecfeff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.operatorShellMobileNavToggle:focus-visible,
+.operatorShellMobileNavPanel a:focus-visible {
+  outline: 3px solid rgba(103, 232, 249, 0.85);
+  outline-offset: 3px;
+}
+
+.operatorShellMobileNavPanel {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.82);
+}
+
+.operatorShellMobileNavPanel[hidden] {
+  display: none;
+}
+
+.operatorShellHeaderPrimary > * {
+  min-width: 0;
+}
+
+.operatorShellHeaderPrimary strong,
+.operatorShellStatusItem strong,
+.operatorShellHeader .statusPill {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.operatorShellValidationDetails {
+  min-width: 0;
+}
+
+.operatorShellValidationDetails summary {
+  display: block;
+  cursor: pointer;
+  list-style: none;
+}
+
+.operatorShellValidationDetails summary::before {
+  content: "[+]";
+  display: inline-block;
+  min-width: 24px;
+  margin-right: 6px;
+  color: #67e8f9;
+  font-weight: 700;
+}
+
+.operatorShellValidationDetails[open] summary::before {
+  content: "[-]";
+}
+
+.operatorShellValidationDetails summary::-webkit-details-marker {
+  display: none;
+}
+
+.operatorShellValidationDetails summary:focus-visible {
+  outline: 3px solid rgba(103, 232, 249, 0.85);
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+
+.operatorShellValidationDetails .statusPill {
+  max-width: 100%;
+}
+
+.operatorShellValidationDetailText {
+  max-width: min(520px, 90vw);
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-left: 2px solid rgba(103, 232, 249, 0.55);
+  color: #cbd5e1;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.operatorShellValidationExplanation {
+  max-width: min(360px, 90vw);
+  margin: 8px 0 0;
+  color: #cbd5e1;
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
 .operatorShellHeader {
   padding: 18px 20px;
   border: 1px solid rgba(148, 163, 184, 0.16);
@@ -462,6 +570,16 @@ textarea {
   .operatorShellHeaderPrimary,
   .operatorShellStatusBar {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .operatorShellSidebar {
+    display: none;
+  }
+
+  .operatorShellMobileNav {
+    display: block;
   }
 }
 
