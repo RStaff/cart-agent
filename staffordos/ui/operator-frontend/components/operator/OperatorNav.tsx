@@ -6,6 +6,7 @@ const CONTROL_PLANE_ROUTES = [
   { href: "/operator/leads", label: "Leads" },
   { href: "/operator/command-center", label: "Command Center" },
   { href: "/operator/execution-log", label: "Execution Log" },
+  { href: "/operator/careeros/missions/CAREEROS_V1_P1_OUTCOME_TRACKING_AND_DAILY_TRIAGE", label: "CareerOS Missions" },
   { href: "/operator/system-map", label: "System Map" },
 ] as const;
 
