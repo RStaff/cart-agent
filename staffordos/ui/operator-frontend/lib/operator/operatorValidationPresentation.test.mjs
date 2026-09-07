@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import test from "node:test";
 import {
   validationAttentionCount,
@@ -18,6 +19,12 @@ test("PASS-only validation input is available without attention", () => {
   assert.equal(validationAttentionCount("PASS"), 0);
   assert.equal(validationSummary("PASS"), "System checks available");
   assert.equal(validationExplanation("PASS"), "Current system checks are available.");
+});
+
+test("attention count drives the shell warning style contract", () => {
+  const shell = fs.readFileSync(new URL("../../components/operator/OperatorShell.tsx", import.meta.url), "utf8");
+  assert.match(shell, /validationAttentionCount/);
+  assert.match(shell, /return validationAttentionCount\(value\) > 0 \? "statusPillMissing" : "statusPill"/);
 });
 
 test("failure statuses require attention case-insensitively", () => {

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import type { ReactNode } from "react";
 import {
+  validationAttentionCount,
   validationExplanation,
   validationSummary,
 } from "../../lib/operator/operatorValidationPresentation.mjs";
@@ -87,16 +88,7 @@ function breadcrumbFromPath(pathname: string) {
 }
 
 function statusClass(value: string) {
-  const normalized = value.toLowerCase();
-  if (normalized.includes("missing") || normalized.includes("not yet")) return "statusPillMissing";
-  if (normalized.includes("partial") || normalized.includes("limited")) return "statusPillPartial";
-  if (normalized.includes("degraded") || normalized.includes("invalid") || normalized.includes("failed")) {
-    return "statusPillDegraded";
-  }
-  if (normalized.includes("ready") || normalized.includes("implemented") || normalized.includes("live")) {
-    return "statusPillReady";
-  }
-  return "statusPill";
+  return validationAttentionCount(value) > 0 ? "statusPillMissing" : "statusPill";
 }
 
 export function OperatorShell({ children, status }: OperatorShellProps) {
