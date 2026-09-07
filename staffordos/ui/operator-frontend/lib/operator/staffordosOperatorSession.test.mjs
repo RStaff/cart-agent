@@ -29,6 +29,7 @@ function compileModule(source, filename) {
 }
 
 const auth = compileModule(readFileSync(modulePath, "utf8"), modulePath);
+const isolatedAuth = compileModule(readFileSync(modulePath, "utf8"), `${modulePath}.isolated`);
 
 const {
   CAREEROS_BETA_OPERATIONS_READ_PERMISSION,
@@ -186,6 +187,29 @@ test("session cookie is HttpOnly, bounded, and never stores assertion material",
   assert.equal(session.expiresAt, nowSeconds + 300);
 });
 
+test("callback-created session validates through an independently loaded module", () => {
+  const { config, cookieValue } = verifiedSession();
+  const result = isolatedAuth.authorizeStaffordOsOperatorRead(
+    cookieValue,
+    CAREEROS_BETA_OPERATIONS_READ_PERMISSION,
+    config,
+    now,
+  );
+
+  assert.equal(result.ok, true);
+  assert.equal(result.status, 200);
+});
+
+test("authenticated session rejects tampering, expiry, and configuration changes", () => {
+  const { config, cookieValue } = verifiedSession();
+  const parts = cookieValue.split(".");
+  parts[3] = `${parts[3][0] === "A" ? "B" : "A"}${parts[3].slice(1)}`;
+  assert.equal(resolveStaffordOsOperatorSession(parts.join("."), config, now).error, "OPERATOR_SESSION_INVALID");
+  assert.equal(resolveStaffordOsOperatorSession(cookieValue, config, new Date(now.getTime() + 301_000)).error, "OPERATOR_SESSION_EXPIRED");
+  assert.equal(resolveStaffordOsOperatorSession(cookieValue, { ...config, issuer: "https://wrong.example" }, now).error, "OPERATOR_SESSION_INVALID");
+  assert.equal(resolveStaffordOsOperatorSession(cookieValue, { ...config, audience: "wrong-audience" }, now).error, "OPERATOR_SESSION_INVALID");
+});
+
 test("guard distinguishes missing, invalid, missing permission, and authorized sessions", () => {
   const config = testConfig();
 
@@ -221,13 +245,13 @@ test("guard distinguishes missing, invalid, missing permission, and authorized s
   assert.equal(allowed.status, 200);
 });
 
-test("logout invalidates only the StaffordOS operator session", () => {
+test("logout clears only the StaffordOS operator session cookie", () => {
   const { config, cookieValue } = verifiedSession();
 
   assert.equal(authorizeStaffordOsOperatorRead(cookieValue, CAREEROS_BETA_OPERATIONS_READ_PERMISSION, config, now).ok, true);
   const destroyed = destroyStaffordOsOperatorSession(cookieValue, config);
   assert.equal(destroyed.cookieOptions.maxAge, 0);
-  assert.equal(authorizeStaffordOsOperatorRead(cookieValue, CAREEROS_BETA_OPERATIONS_READ_PERMISSION, config, now).status, 401);
+  assert.equal(authorizeStaffordOsOperatorRead("", CAREEROS_BETA_OPERATIONS_READ_PERMISSION, config, now).error, "OPERATOR_SESSION_MISSING");
 });
 
 test("customer CareerOS cookie alone cannot authorize StaffordOS operator reads", () => {

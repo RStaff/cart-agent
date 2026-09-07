@@ -40,9 +40,9 @@ function sessionCookie(permissions) {
     subject: "synthetic-operator-subject",
     issuer: config.issuer,
     audience: config.audience,
-    issuedAt: now,
-    expiresAt: new Date(now.getTime() + 300000),
-    jti: `synthetic-${permissions.join("-") || "none"}`,
+    issuedAt: Math.floor(now.getTime() / 1000),
+    expiresAt: Math.floor(now.getTime() / 1000) + 300,
+    jwtId: `synthetic-${permissions.join("-") || "none"}`,
     roles: [],
     permissions,
   };

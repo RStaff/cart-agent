@@ -43,8 +43,6 @@ export type StaffordOsOperatorSession = {
   expiresAt: number;
 };
 
-type StoredSession = StaffordOsOperatorSession;
-
 export type OperatorAuthorizationResult =
   | {
       ok: true;
@@ -68,7 +66,8 @@ type JwtParts = {
   signature: Buffer;
 };
 
-const operatorSessionStore = new Map<string, StoredSession>();
+const SESSION_COOKIE_VERSION = "v1";
+const SESSION_COOKIE_AAD = Buffer.from("staffordos_operator_session.v1", "utf8");
 
 function text(value: unknown) {
   return String(value ?? "").trim();
@@ -106,14 +105,57 @@ function base64Url(input: Buffer) {
   return input.toString("base64").replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
 }
 
-function hmacSha256(value: string, secret: string) {
-  return base64Url(crypto.createHmac("sha256", secret).update(value).digest());
+function sessionKey(secret: string) {
+  return crypto.createHash("sha256").update("staffordos.operator.session.v1\0").update(secret).digest();
 }
 
-function timingSafeEqualText(left: string, right: string) {
-  const leftBuffer = Buffer.from(left);
-  const rightBuffer = Buffer.from(right);
-  return leftBuffer.length === rightBuffer.length && crypto.timingSafeEqual(leftBuffer, rightBuffer);
+function encryptSession(session: StaffordOsOperatorSession, secret: string) {
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv("aes-256-gcm", sessionKey(secret), iv);
+  cipher.setAAD(SESSION_COOKIE_AAD);
+  const ciphertext = Buffer.concat([cipher.update(JSON.stringify(session), "utf8"), cipher.final()]);
+  return [
+    SESSION_COOKIE_VERSION,
+    base64Url(iv),
+    base64Url(cipher.getAuthTag()),
+    base64Url(ciphertext),
+  ].join(".");
+}
+
+function decryptSession(cookieValue: string, secret: string): StaffordOsOperatorSession | null {
+  const parts = text(cookieValue).split(".");
+  if (parts.length !== 4 || parts[0] !== SESSION_COOKIE_VERSION) return null;
+
+  try {
+    const iv = base64UrlDecode(parts[1]);
+    const tag = base64UrlDecode(parts[2]);
+    const ciphertext = base64UrlDecode(parts[3]);
+    if (iv.length !== 12 || tag.length !== 16 || ciphertext.length === 0) return null;
+
+    const decipher = crypto.createDecipheriv("aes-256-gcm", sessionKey(secret), iv);
+    decipher.setAAD(SESSION_COOKIE_AAD);
+    decipher.setAuthTag(tag);
+    const parsed = JSON.parse(Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString("utf8"));
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null;
+    if (
+      typeof parsed.id !== "string" ||
+      typeof parsed.subject !== "string" ||
+      typeof parsed.issuer !== "string" ||
+      typeof parsed.audience !== "string" ||
+      !Array.isArray(parsed.roles) ||
+      !Array.isArray(parsed.permissions) ||
+      typeof parsed.jwtId !== "string" ||
+      typeof parsed.issuedAt !== "number" ||
+      typeof parsed.expiresAt !== "number" ||
+      !Number.isFinite(parsed.issuedAt) ||
+      !Number.isFinite(parsed.expiresAt) ||
+      parsed.roles.some((role: unknown) => typeof role !== "string") ||
+      parsed.permissions.some((permission: unknown) => typeof permission !== "string")
+    ) return null;
+    return parsed as StaffordOsOperatorSession;
+  } catch {
+    return null;
+  }
 }
 
 function stringArray(value: unknown) {
@@ -283,19 +325,11 @@ export function createStaffordOsOperatorSession(
     expiresAt,
   };
 
-  operatorSessionStore.set(id, session);
   return {
     session,
-    cookieValue: `${id}.${hmacSha256(id, config.sessionSecret)}`,
+    cookieValue: encryptSession(session, config.sessionSecret),
     cookieOptions: sessionCookieOptions(config, Math.max(0, expiresAt - nowSeconds)),
   };
-}
-
-function sessionIdFromCookie(cookieValue: string, config: StaffordOsOperatorAuthConfig) {
-  const [id, signature] = text(cookieValue).split(".");
-  if (!id || !signature) return "";
-  const expected = hmacSha256(id, config.sessionSecret);
-  return timingSafeEqualText(signature, expected) ? id : "";
 }
 
 export function resolveStaffordOsOperatorSession(
@@ -306,19 +340,14 @@ export function resolveStaffordOsOperatorSession(
   validateOperatorSessionConfig(config);
   if (!text(cookieValue)) return { ok: false, status: 401, error: "OPERATOR_SESSION_MISSING" };
 
-  const sessionId = sessionIdFromCookie(cookieValue, config);
-  if (!sessionId) return { ok: false, status: 401, error: "OPERATOR_SESSION_INVALID" };
-
-  const session = operatorSessionStore.get(sessionId);
+  const session = decryptSession(cookieValue, config.sessionSecret);
   if (!session) return { ok: false, status: 401, error: "OPERATOR_SESSION_INVALID" };
   if (session.issuer !== config.issuer || session.audience !== config.audience || !config.allowedSubjects.includes(session.subject)) {
-    operatorSessionStore.delete(sessionId);
     return { ok: false, status: 401, error: "OPERATOR_SESSION_INVALID" };
   }
 
   const nowSeconds = Math.floor(now.getTime() / 1000);
   if (session.expiresAt <= nowSeconds) {
-    operatorSessionStore.delete(sessionId);
     return { ok: false, status: 401, error: "OPERATOR_SESSION_EXPIRED" };
   }
 
@@ -327,8 +356,6 @@ export function resolveStaffordOsOperatorSession(
 
 export function destroyStaffordOsOperatorSession(cookieValue: string, config: StaffordOsOperatorAuthConfig) {
   validateOperatorSessionConfig(config);
-  const sessionId = sessionIdFromCookie(cookieValue, config);
-  if (sessionId) operatorSessionStore.delete(sessionId);
   return { ok: true, cookieOptions: clearSessionCookieOptions(config) };
 }
 
