@@ -423,6 +423,19 @@ textarea {
   list-style: none;
 }
 
+.operatorShellValidationDetails summary::before {
+  content: "[+]";
+  display: inline-block;
+  min-width: 24px;
+  margin-right: 6px;
+  color: #67e8f9;
+  font-weight: 700;
+}
+
+.operatorShellValidationDetails[open] summary::before {
+  content: "[-]";
+}
+
 .operatorShellValidationDetails summary::-webkit-details-marker {
   display: none;
 }
