@@ -59,6 +59,20 @@ export function cleanLower(value = "") {
   return cleanString(value).toLowerCase();
 }
 
+export function validateOperatorReturnPath(value = "") {
+  const raw = cleanString(value);
+  if (!raw || raw.length > 2048 || raw.includes("%") || raw.includes("\\") || /[\u0000-\u001f\u007f]/.test(raw)) return "";
+  if (!raw.startsWith("/") || raw.startsWith("//")) return "";
+  try {
+    const parsed = new URL(raw, "http://staffordos.local");
+    if (parsed.origin !== "http://staffordos.local") return "";
+    if (!(parsed.pathname === "/operator" || parsed.pathname.startsWith("/operator/") || parsed.pathname === "/os" || parsed.pathname.startsWith("/os/"))) return "";
+    return raw;
+  } catch {
+    return "";
+  }
+}
+
 export function csv(value = "") {
   return cleanString(value)
     .split(",")
@@ -144,6 +158,7 @@ export function configFromEnv(env = process.env) {
     kmsImpersonateServiceAccount: cleanString(env.KMS_IMPERSONATE_SERVICE_ACCOUNT),
     kmsUseGcloudAuth: boolValue(env.KMS_USE_GCLOUD_AUTH),
     frontendHandoffUrl: cleanString(env.STAFFORDOS_OPERATOR_FRONTEND_HANDOFF_URL),
+    nonInteractiveAssertionMode: boolValue(env.STAFFORDOS_OPERATOR_NONINTERACTIVE_ASSERTION_MODE),
     port: Number(env.PORT || 8787),
   };
 }
@@ -159,13 +174,14 @@ export function validateFrontendHandoffUrl(config) {
     throw new IssuerError("frontend_handoff_url_invalid", 500);
   }
 
-  if (url.protocol !== "http:") {
-    throw new IssuerError("frontend_handoff_url_not_local", 500);
+  if (url.username || url.password || url.search || url.hash || url.pathname !== "/api/operator/auth/callback") {
+    throw new IssuerError("frontend_handoff_url_invalid", 500);
   }
 
   const hostname = cleanLower(url.hostname);
-  if (hostname !== "127.0.0.1" && hostname !== "localhost" && hostname !== "::1") {
-    throw new IssuerError("frontend_handoff_url_not_local", 500);
+  const loopback = ["127.0.0.1", "localhost", "[::1]"].includes(hostname);
+  if (url.protocol !== "https:" && !(url.protocol === "http:" && loopback)) {
+    throw new IssuerError("frontend_handoff_url_not_trusted", 500);
   }
 
   return url.toString();
@@ -191,7 +207,10 @@ export function validateRuntimeConfig(config) {
   if (!config.allowedSubjects.length) {
     throw new IssuerError("operator_subject_allowlist_missing", 500);
   }
-  validateFrontendHandoffUrl(config);
+  const handoffUrl = validateFrontendHandoffUrl(config);
+  if (!handoffUrl && !config.nonInteractiveAssertionMode) {
+    throw new IssuerError("frontend_handoff_required", 500);
+  }
   return config;
 }
 
@@ -247,12 +266,12 @@ export function verifyStateCookie(cookieValue, secret, now = new Date()) {
   return payload;
 }
 
-export function createLoginResponse(config, now = new Date()) {
+export function createLoginResponse(config, now = new Date(), returnTo = "") {
   validateRuntimeConfig(config);
   const state = base64Url(crypto.randomBytes(24));
   const nonce = base64Url(crypto.randomBytes(24));
   const expiresAt = new Date(now.getTime() + config.stateTtlSeconds * 1000).toISOString();
-  const stateCookie = signStateCookie({ state, nonce, issuedAt: now.toISOString(), expiresAt }, config.sessionSecret);
+  const stateCookie = signStateCookie({ state, nonce, issuedAt: now.toISOString(), expiresAt, returnTo: validateOperatorReturnPath(returnTo) }, config.sessionSecret);
   const url = new URL("https://accounts.google.com/o/oauth2/v2/auth");
   url.searchParams.set("client_id", config.googleClientId);
   url.searchParams.set("redirect_uri", config.googleRedirectUri);
@@ -427,7 +446,7 @@ export async function completeOAuthCallback({ code, state, stateCookie, config, 
     jwksProvider: deps.jwksProvider,
     fetchImpl: deps.fetchImpl,
   });
-  return buildAndSignStaffordosJwt(googleClaims, config, signer, now);
+  return { ...(await buildAndSignStaffordosJwt(googleClaims, config, signer, now)), returnTo: validateOperatorReturnPath(statePayload.returnTo) };
 }
 
 async function gcloudAccessToken(config) {

@@ -1,6 +1,7 @@
 import * as crypto from "node:crypto";
 
 export const STAFFORDOS_OPERATOR_SESSION_COOKIE = "staffordos_operator_session";
+export const STAFFORDOS_OPERATOR_DEFAULT_RETURN_PATH = "/operator/cockpit";
 export const STAFFORDOS_OPERATOR_SESSION_TTL_SECONDS = 300;
 export const STAFFORDOS_OPERATOR_SESSION_MAX_TTL_SECONDS = 900;
 export const CAREEROS_BETA_OPERATIONS_READ_PERMISSION = "careeros.beta.operations.read";
@@ -13,6 +14,8 @@ export type StaffordOsOperatorAuthConfig = {
   audience: string;
   allowedSubjects: string[];
   issuerBaseUrl: string;
+  frontendHandoffUrl: string;
+  frontendOrigin: string;
   publicKeyUrl: string;
   publicKeyPem?: string;
   sessionSecret: string;
@@ -71,6 +74,57 @@ const SESSION_COOKIE_AAD = Buffer.from("staffordos_operator_session.v1", "utf8")
 
 function text(value: unknown) {
   return String(value ?? "").trim();
+}
+
+export function validateStaffordOsOperatorReturnPath(value: string | null | undefined) {
+  const raw = text(value);
+  if (!raw || raw.length > 2048 || raw.includes("%") || raw.includes("\\") || /[\u0000-\u001f\u007f]/.test(raw)) return null;
+  if (!raw.startsWith("/") || raw.startsWith("//")) return null;
+  try {
+    const parsed = new URL(raw, "http://staffordos.local");
+    if (parsed.origin !== "http://staffordos.local") return null;
+    if (!(parsed.pathname === "/operator" || parsed.pathname.startsWith("/operator/") || parsed.pathname === "/os" || parsed.pathname.startsWith("/os/"))) return null;
+    return raw;
+  } catch {
+    return null;
+  }
+}
+
+export function validateStaffordOsOperatorFrontendHandoffUrl(value: string | null | undefined) {
+  const raw = text(value);
+  if (!raw) return null;
+
+  try {
+    const url = new URL(raw);
+    const loopback = ["127.0.0.1", "localhost", "[::1]"].includes(url.hostname.toLowerCase());
+    if (url.username || url.password || url.search || url.hash || url.pathname !== "/api/operator/auth/callback") return null;
+    if (url.protocol === "https:") return { url: url.toString(), origin: url.origin };
+    if (url.protocol === "http:" && loopback) return { url: url.toString(), origin: url.origin };
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export function resolveStaffordOsOperatorReturnPath(
+  explicitReturnTo: string | null | undefined,
+  referer: string | null | undefined,
+  trustedOrigin: string,
+) {
+  if (explicitReturnTo !== null && explicitReturnTo !== undefined) {
+    return validateStaffordOsOperatorReturnPath(explicitReturnTo);
+  }
+
+  const rawReferer = text(referer);
+  if (!rawReferer) return null;
+
+  try {
+    const refererUrl = new URL(rawReferer);
+    if (refererUrl.origin !== trustedOrigin) return null;
+    return validateStaffordOsOperatorReturnPath(`${refererUrl.pathname}${refererUrl.search}`);
+  } catch {
+    return null;
+  }
 }
 
 function csv(value: unknown) {
@@ -189,11 +243,15 @@ function publicKeyUrlFromEnv(env: Record<string, string | undefined>) {
 
 export function operatorAuthConfigFromEnv(env: Record<string, string | undefined> = process.env): StaffordOsOperatorAuthConfig {
   const issuerBaseUrl = text(env.STAFFORDOS_OPERATOR_ISSUER_BASE_URL);
+  const frontendHandoffUrl = text(env.STAFFORDOS_OPERATOR_FRONTEND_HANDOFF_URL);
+  const frontend = validateStaffordOsOperatorFrontendHandoffUrl(frontendHandoffUrl);
   return {
     issuer: text(env.STAFFORDOS_OPERATOR_JWT_ISSUER),
     audience: text(env.STAFFORDOS_OPERATOR_JWT_AUDIENCE),
     allowedSubjects: csv(env.STAFFORDOS_OPERATOR_ALLOWED_SUBJECTS),
     issuerBaseUrl,
+    frontendHandoffUrl,
+    frontendOrigin: frontend?.origin || "",
     publicKeyUrl: publicKeyUrlFromEnv(env),
     publicKeyPem: text(env.STAFFORDOS_OPERATOR_JWT_PUBLIC_KEY_PEM) || undefined,
     sessionSecret: text(env.STAFFORDOS_OPERATOR_FRONTEND_SESSION_SECRET),
@@ -206,11 +264,13 @@ export function validateOperatorAuthConfig(config: StaffordOsOperatorAuthConfig)
   validateOperatorSessionConfig(config);
   const missing = [
     ["issuerBaseUrl", config.issuerBaseUrl],
+    ["frontendHandoffUrl", config.frontendHandoffUrl],
   ]
     .filter(([, value]) => !text(value))
     .map(([key]) => key);
 
   if (!config.publicKeyPem && !config.publicKeyUrl) missing.push("publicKeyUrl");
+  if (!validateStaffordOsOperatorFrontendHandoffUrl(config.frontendHandoffUrl)) missing.push("frontendHandoffUrl");
   if (missing.length) throw new Error(`STAFFORDOS_OPERATOR_AUTH_CONFIG_MISSING:${missing.join(",")}`);
   return config;
 }
@@ -397,7 +457,10 @@ export async function redeemStaffordOsIssuerHandoffCode(
   const body = await response.json().catch(() => ({}));
   const assertion = text((body as Record<string, unknown>).assertion);
   if (!response.ok || !assertion) throw new Error("STAFFORDOS_OPERATOR_HANDOFF_REDEEM_FAILED");
-  return assertion;
+  return {
+    assertion,
+    returnTo: text((body as Record<string, unknown>).return_to),
+  };
 }
 
 export function careerOsBetaOperationsProtectedProof(session: StaffordOsOperatorSession) {

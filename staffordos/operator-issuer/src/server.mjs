@@ -52,8 +52,9 @@ function createHandoffGrant(handoffGrants, result, now = new Date()) {
     header: result.header,
     payload: result.payload,
     expiresAt,
+    returnTo: result.returnTo || "",
   });
-  return { code, expiresAt };
+  return { code, expiresAt, returnTo: result.returnTo || "" };
 }
 
 function consumeHandoffGrant(handoffGrants, code, now = new Date()) {
@@ -89,7 +90,7 @@ export function createIssuerServer({ config = configFromEnv(), signer = new Clou
       }
 
       if (req.method === "GET" && url.pathname === "/login") {
-        const login = createLoginResponse(config);
+        const login = createLoginResponse(config, new Date(), url.searchParams.get("returnTo"));
         res.writeHead(login.status, login.headers);
         return res.end();
       }
@@ -113,6 +114,9 @@ export function createIssuerServer({ config = configFromEnv(), signer = new Clou
             "Set-Cookie": "staffordos_oauth_state=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0",
           });
         }
+        if (!config.nonInteractiveAssertionMode) {
+          throw new IssuerError("frontend_handoff_required", 500);
+        }
         return jsonResponse(res, 200, {
           ok: true,
           token_type: "StaffordOS-Operator-Assertion",
@@ -133,6 +137,7 @@ export function createIssuerServer({ config = configFromEnv(), signer = new Clou
           assertion: grant.jwt,
           expires_at: grant.payload.exp,
           kid: grant.header.kid,
+          return_to: grant.returnTo,
         });
       }
 

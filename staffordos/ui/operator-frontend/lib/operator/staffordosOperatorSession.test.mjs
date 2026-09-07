@@ -39,8 +39,11 @@ const {
   createStaffordOsOperatorSession,
   destroyStaffordOsOperatorSession,
   operatorAuthorizationFailureBody,
+  resolveStaffordOsOperatorReturnPath,
   resolveStaffordOsOperatorSession,
   sessionCookieOptions,
+  STAFFORDOS_OPERATOR_DEFAULT_RETURN_PATH,
+  validateStaffordOsOperatorReturnPath,
   verifyStaffordOsOperatorAssertion,
 } = auth;
 
@@ -71,6 +74,8 @@ function testConfig(overrides = {}) {
     audience: "staffordos.operator.frontend.v1",
     allowedSubjects: [operatorSubject],
     issuerBaseUrl: "http://127.0.0.1:8787",
+    frontendHandoffUrl: "http://127.0.0.1:3000/api/operator/auth/callback",
+    frontendOrigin: "http://127.0.0.1:3000",
     publicKeyUrl: "http://127.0.0.1:8787/public-key",
     publicKeyPem,
     sessionSecret: "synthetic-session-secret-with-enough-entropy",
@@ -185,6 +190,53 @@ test("session cookie is HttpOnly, bounded, and never stores assertion material",
   assert.equal(cookieValue.includes("StaffordOS-Operator-Assertion"), false);
   assert.equal(cookieValue.includes("."), true);
   assert.equal(session.expiresAt, nowSeconds + 300);
+});
+
+test("operator return paths accept only internal StaffordOS destinations", () => {
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/careeros/missions/example"), "/operator/careeros/missions/example");
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/careeros/beta-users"), "/operator/careeros/beta-users");
+  assert.equal(validateStaffordOsOperatorReturnPath(""), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("https://evil.example/"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("//evil.example/"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/%2F%2Fevil"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("/career/profile"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("javascript:alert(1)"), null);
+  assert.equal(STAFFORDOS_OPERATOR_DEFAULT_RETURN_PATH, "/operator/cockpit");
+});
+
+test("operator login resolves an absent return path from a same-origin referer", () => {
+  assert.equal(
+    resolveStaffordOsOperatorReturnPath(
+      null,
+      "http://127.0.0.1:3000/operator/careeros/missions/example?view=summary#details",
+      "http://127.0.0.1:3000",
+    ),
+    "/operator/careeros/missions/example?view=summary",
+  );
+  assert.equal(
+    resolveStaffordOsOperatorReturnPath(
+      null,
+      "http://localhost:3000/operator/cockpit",
+      "http://127.0.0.1:3000",
+    ),
+    null,
+  );
+  assert.equal(
+    resolveStaffordOsOperatorReturnPath(
+      "/operator/cockpit",
+      "http://127.0.0.1:3000/operator/careeros/missions/example",
+      "http://127.0.0.1:3000",
+    ),
+    "/operator/cockpit",
+  );
+  assert.equal(
+    resolveStaffordOsOperatorReturnPath(
+      "/career/profile",
+      "http://127.0.0.1:3000/operator/careeros/missions/example",
+      "http://127.0.0.1:3000",
+    ),
+    null,
+  );
 });
 
 test("callback-created session validates through an independently loaded module", () => {

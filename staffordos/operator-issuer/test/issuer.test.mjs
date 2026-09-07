@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import crypto from "node:crypto";
-import test from "node:test";
+import test, { mock } from "node:test";
 import { createIssuerServer } from "../src/server.mjs";
 import {
   IssuerError,
@@ -13,6 +13,7 @@ import {
   createLoginResponse,
   sha256Hex,
   stableStringify,
+  validateOperatorReturnPath,
   validateFrontendHandoffUrl,
   verifyStaffordosJwt,
 } from "../src/issuer.mjs";
@@ -55,6 +56,8 @@ function testConfig(overrides = {}) {
     kmsKeyRing: "staffordos-operator-issuer-prod",
     kmsKey: "test-fixture-kms-key",
     kmsKeyVersion: "1",
+    frontendHandoffUrl: "http://127.0.0.1:3000/api/operator/auth/callback",
+    nonInteractiveAssertionMode: false,
     ...overrides,
   };
 }
@@ -135,6 +138,30 @@ test("login endpoint contract produces Google OAuth redirect with state and nonc
   assert.match(login.headers["Set-Cookie"], /HttpOnly/);
 });
 
+test("return path is restricted to internal StaffordOS routes", () => {
+  assert.equal(validateOperatorReturnPath("/operator/careeros/missions/example"), "/operator/careeros/missions/example");
+  assert.equal(validateOperatorReturnPath("/operator/careeros/beta-users"), "/operator/careeros/beta-users");
+  assert.equal(validateOperatorReturnPath(""), "");
+  assert.equal(validateOperatorReturnPath("https://evil.example/"), "");
+  assert.equal(validateOperatorReturnPath("//evil.example/"), "");
+  assert.equal(validateOperatorReturnPath("/operator/%2F%2Fevil"), "");
+  assert.equal(validateOperatorReturnPath("/%2Foperator"), "");
+  assert.equal(validateOperatorReturnPath("/career/profile"), "");
+  assert.equal(validateOperatorReturnPath("javascript:alert(1)"), "");
+  assert.equal(validateOperatorReturnPath("/operator\\\\evil"), "");
+});
+
+test("signed OAuth state preserves a validated return path and rejects invalid paths", () => {
+  const config = testConfig();
+  const valid = createLoginResponse(config, new Date("2026-07-30T00:00:00.000Z"), "/operator/careeros/missions/example");
+  const validState = new URL(valid.location).searchParams.get("state");
+  assert.equal(JSON.parse(base64UrlDecode(cookieValue(valid.headers["Set-Cookie"]).split(".")[0]).toString("utf8")).returnTo, "/operator/careeros/missions/example");
+  assert.ok(validState);
+
+  const invalid = createLoginResponse(config, new Date("2026-07-30T00:00:00.000Z"), "https://evil.example/");
+  assert.equal(JSON.parse(base64UrlDecode(cookieValue(invalid.headers["Set-Cookie"]).split(".")[0]).toString("utf8")).returnTo, "");
+});
+
 test("CareerOS beta operations role grants only the narrow operations read permission", () => {
   const config = configFromEnv({
     GOOGLE_CLIENT_ID: "google-client-test",
@@ -155,17 +182,40 @@ test("CareerOS beta operations role grants only the narrow operations read permi
   assert.deepEqual(config.operatorRoles, ["careeros_beta_operations_viewer"]);
   assert.deepEqual(config.operatorPermissions, [STAFFORDOS_OPERATOR_PERMISSIONS.CAREEROS_BETA_OPERATIONS_READ]);
   assert.equal(validateFrontendHandoffUrl(config), "http://127.0.0.1:3000/api/operator/auth/callback");
+  assert.equal(
+    validateFrontendHandoffUrl({ frontendHandoffUrl: "http://[::1]:3000/api/operator/auth/callback" }),
+    "http://[::1]:3000/api/operator/auth/callback",
+  );
 });
 
-test("frontend handoff URL remains local-only when configured", () => {
-  assert.throws(
-    () => validateFrontendHandoffUrl({ frontendHandoffUrl: "https://staffordos-operator.staffordmedia.ai/api/operator/auth/callback" }),
-    (error) => error instanceof IssuerError && error.code === "frontend_handoff_url_not_local",
+test("frontend handoff URL accepts production HTTPS and rejects unsafe configuration", () => {
+  assert.equal(
+    validateFrontendHandoffUrl({ frontendHandoffUrl: "https://staffordos-operator.staffordmedia.ai/api/operator/auth/callback" }),
+    "https://staffordos-operator.staffordmedia.ai/api/operator/auth/callback",
   );
   assert.throws(
     () => validateFrontendHandoffUrl({ frontendHandoffUrl: "http://operator.example.invalid/api/operator/auth/callback" }),
-    (error) => error instanceof IssuerError && error.code === "frontend_handoff_url_not_local",
+    (error) => error instanceof IssuerError && error.code === "frontend_handoff_url_not_trusted",
   );
+  for (const value of [
+    "https://user:password@staffordos.example/api/operator/auth/callback",
+    "https://staffordos.example/api/operator/auth/callback?x=1",
+    "https://staffordos.example/api/operator/auth/callback#fragment",
+    "https://staffordos.example/wrong-callback",
+  ]) {
+    assert.throws(
+      () => validateFrontendHandoffUrl({ frontendHandoffUrl: value }),
+      (error) => error instanceof IssuerError && error.code === "frontend_handoff_url_invalid",
+    );
+  }
+});
+
+test("interactive issuer configuration fails closed without a handoff", () => {
+  assert.throws(
+    () => createLoginResponse(testConfig({ frontendHandoffUrl: "" }), new Date("2026-07-30T00:00:00.000Z")),
+    (error) => error instanceof IssuerError && error.code === "frontend_handoff_required",
+  );
+  assert.doesNotThrow(() => createLoginResponse(testConfig({ frontendHandoffUrl: "", nonInteractiveAssertionMode: true }), new Date("2026-07-30T00:00:00.000Z")));
 });
 
 test("callback validates Google identity and issues an EdDSA StaffordOS JWT", async () => {
@@ -223,7 +273,7 @@ test("local frontend handoff returns only an opaque code to the browser and rede
     },
   });
 
-  const login = await invokeServer(server, { path: "/login" });
+  const login = await invokeServer(server, { path: "/login?returnTo=%2Foperator%2Fcareeros%2Fmissions%2Fexample" });
   const loginLocation = new URL(login.headers.Location);
   const tokenIssuedAt = Math.floor(Date.now() / 1000);
   idToken = google.signGoogleIdToken({
@@ -251,12 +301,58 @@ test("local frontend handoff returns only an opaque code to the browser and rede
   assert.equal(body.ok, true);
   assert.equal(body.token_type, "StaffordOS-Operator-Assertion");
   assert.ok(body.assertion);
+  assert.equal(body.return_to, "/operator/careeros/missions/example");
   assert.equal(verifyStaffordosJwt(body.assertion, publicKeyPem, config, new Date()).sub, "google-subject-1");
 
   const secondRedeem = await invokeServer(server, {
     path: `/auth/staffordos/handoff?code=${location.searchParams.get("code")}`,
   });
   assert.equal(secondRedeem.status, 401);
+});
+
+test("expired opaque handoff is rejected by the production redemption path", async () => {
+  const clockStart = new Date("2026-07-30T00:00:00.000Z");
+  mock.timers.enable({ apis: ["Date"], now: clockStart });
+  try {
+    const signer = new LocalEd25519Signer();
+    const google = createGoogleFixture();
+    let idToken = "";
+    const server = createIssuerServer({
+      config: testConfig(),
+      signer,
+      deps: {
+        tokenExchanger: async () => ({ id_token: idToken }),
+        googleJwks: google.jwks,
+      },
+    });
+
+    const login = await invokeServer(server, { path: "/login?returnTo=%2Foperator%2Fcockpit" });
+    const loginLocation = new URL(login.headers.Location);
+    idToken = google.signGoogleIdToken({
+      nonce: loginLocation.searchParams.get("nonce"),
+      iat: Math.floor(clockStart.getTime() / 1000),
+      exp: Math.floor(clockStart.getTime() / 1000) + 61,
+    });
+
+    const callback = await invokeServer(server, {
+      path: `/auth/google/callback?code=google-code&state=${loginLocation.searchParams.get("state")}`,
+      cookie: `staffordos_oauth_state=${cookieValue(login.headers["Set-Cookie"])}`,
+    });
+    assert.equal(callback.status, 302);
+    const handoffCode = new URL(callback.headers.Location).searchParams.get("code");
+    assert.ok(handoffCode);
+
+    mock.timers.setTime(clockStart.getTime() + 62_000);
+    const expired = await invokeServer(server, { path: `/auth/staffordos/handoff?code=${handoffCode}` });
+    assert.equal(expired.status, 401);
+    assert.match(expired.body, /staffordos_handoff_code_expired/);
+
+    const replay = await invokeServer(server, { path: `/auth/staffordos/handoff?code=${handoffCode}` });
+    assert.equal(replay.status, 401);
+    assert.match(replay.body, /staffordos_handoff_code_invalid/);
+  } finally {
+    mock.timers.reset();
+  }
 });
 
 test("issuer rejects invalid Google audience", async () => {
