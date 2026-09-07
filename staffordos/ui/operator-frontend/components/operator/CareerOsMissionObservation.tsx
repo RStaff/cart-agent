@@ -80,7 +80,11 @@ export function CareerOsMissionObservation({ observation }: { observation: Missi
         <article className="panel"><div className="panelInner">
           <h2 className="sectionTitle">Approval</h2>
           <p><Status value={observation.approval.state} /></p>
-          <p>{observation.approval.required ? "Manual acceptance is required." : "No approval is required for this read-only observation."}</p>
+          <p>{observation.approval.required === true
+            ? "Manual acceptance is required."
+            : observation.approval.required === false
+              ? "No approval is required for this read-only observation."
+              : "Approval requirement unavailable."}</p>
           <p className="hint">Reference: {observation.approval.reference || "UNAVAILABLE"}</p>
         </div></article>
       </section>

@@ -27,21 +27,29 @@ test("builds the verified mission as pending deployment and read-only", () => {
   assert.match(result.blockers.join(" "), /governed deployment/i);
 });
 
-test("preserves pending deployment and fails closed for unknown status", () => {
+test("preserves supported, blocked, and unknown status semantics", () => {
   const pending = buildCareerOsMissionObservation({ authorityRecord: authority() });
   assert.equal(pending.authorityStatus, "IMPLEMENTED_PENDING_GOVERNED_DEPLOYMENT");
   assert.equal(pending.status, "PENDING_DEPLOYMENT");
+  const blocked = buildCareerOsMissionObservation({ authorityRecord: authority({ status: "BLOCKED" }) });
+  assert.equal(blocked.authorityStatus, "BLOCKED");
+  assert.equal(blocked.status, "BLOCKED");
+  assert.equal(blocked.steps.find((step) => step.id === "review").state, "BLOCKED");
+  assert.match(blocked.blockers.join(" "), /recorded as blocked/i);
+  assert.equal(buildCareerOsMissionObservation({ authorityRecord: authority({ status: "IMPLEMENTED" }) }).status, "COMPLETE");
   assert.equal(buildCareerOsMissionObservation({ authorityRecord: authority({ status: "future-status" }) }).status, "UNAVAILABLE");
   assert.equal(buildCareerOsMissionObservation({ authorityRecord: authority({ status: null }) }).status, "UNAVAILABLE");
+  assert.equal(buildCareerOsMissionObservation({ authorityRecord: authority({ status: undefined }) }).status, "UNAVAILABLE");
 });
 
-test("fails closed when approval metadata is absent or malformed", () => {
+test("handles explicit approval metadata and fails closed otherwise", () => {
+  assert.equal(buildCareerOsMissionObservation({ authorityRecord: authority({ manual_acceptance_required: true }) }).approval.state, "PENDING");
+  assert.equal(buildCareerOsMissionObservation({ authorityRecord: authority({ manual_acceptance_required: false }) }).approval.state, "NOT_REQUIRED");
   for (const value of [undefined, null, "true", 1, {}]) {
     const result = buildCareerOsMissionObservation({ authorityRecord: authority({ manual_acceptance_required: value }) });
     assert.equal(result.approval.state, "UNAVAILABLE");
     assert.equal(result.approval.required, null);
   }
-  assert.equal(buildCareerOsMissionObservation({ authorityRecord: authority({ manual_acceptance_required: false }) }).approval.state, "NOT_REQUIRED");
 });
 
 test("does not infer repository or worktree identity", () => {

@@ -25,6 +25,7 @@ function text(value) {
 function missionStatus(record) {
   const status = text(record?.status);
   if (status === "IMPLEMENTED_PENDING_GOVERNED_DEPLOYMENT") return "PENDING_DEPLOYMENT";
+  if (status === "BLOCKED") return "BLOCKED";
   if (status === "IMPLEMENTED" || status === "COMPLETE") return "COMPLETE";
   if (status === "IN_PROGRESS" || status === "RUNNING") return "RUNNING";
   return "UNAVAILABLE";
@@ -117,6 +118,7 @@ export function buildCareerOsMissionObservation({ authorityRecord, operationsRea
       },
     ],
     blockers: [
+      ...(status === "BLOCKED" ? ["Mission is recorded as BLOCKED."] : []),
       ...(status === "PENDING_DEPLOYMENT" ? ["Mission is recorded as IMPLEMENTED_PENDING_GOVERNED_DEPLOYMENT.", "Manual acceptance is required before governed deployment."] : []),
       "Roadmap lane, objective, repository, worktree, executor, and validator identity are not recorded by this mission artifact.",
     ],
