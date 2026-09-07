@@ -4,6 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import type { ReactNode } from "react";
+import {
+  validationExplanation,
+  validationSummary,
+} from "../../lib/operator/operatorValidationPresentation.mjs";
 
 type ShellStatus = {
   architectureVersion: string;
@@ -36,7 +40,7 @@ const NAVIGATION_GROUPS: NavigationGroup[] = [
   {
     label: "Business",
     items: [
-      { href: "/operator/products", label: "Products", note: "CareerOS, ShopiFixer, and Abando" },
+      { href: "/operator/products", label: "Products", note: "Product overview" },
       { href: "/operator/careeros/beta-users", label: "CareerOS Operations", note: "Beta operations" },
       { href: "/operator/careeros/missions/CAREEROS_V1_P1_OUTCOME_TRACKING_AND_DAILY_TRIAGE", label: "CareerOS Missions", note: "Mission observation" },
       { href: "/operator/command-center", label: "ShopiFixer Command Center", note: "ShopiFixer delivery" },
@@ -90,26 +94,6 @@ function statusClass(value: string) {
     return "statusPillReady";
   }
   return "statusPill";
-}
-
-function validationEntries(value: string) {
-  return value.split(" / ").map((entry) => entry.trim()).filter(Boolean);
-}
-
-function validationSummary(value: string) {
-  const entries = validationEntries(value);
-  const attentionCount = entries.filter((entry) => /^(Missing:|.*(?:FAILED|FAIL|UNAVAILABLE))/i.test(entry)).length;
-  if (attentionCount > 0) {
-    return `${attentionCount} system check${attentionCount === 1 ? " needs" : "s need"} attention`;
-  }
-  return entries.length > 0 ? "System checks available" : "System checks unavailable";
-}
-
-function validationExplanation(value: string) {
-  const attentionCount = validationEntries(value).filter((entry) => /^(Missing:|.*(?:FAILED|FAIL|UNAVAILABLE))/i.test(entry)).length;
-  return attentionCount > 0
-    ? "Required validation records are currently unavailable."
-    : "Current validation records are available.";
 }
 
 export function OperatorShell({ children, status }: OperatorShellProps) {

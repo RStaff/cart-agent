@@ -17,11 +17,11 @@ test("primary navigation exposes only the canonical operator groups", () => {
   assert.doesNotMatch(shell, /planned: true/);
 });
 
-test("secondary navigation preserves CareerOS mission discoverability", () => {
-  assert.match(nav, /CareerOS Operations/);
-  assert.match(nav, /CareerOS Missions/);
-  assert.match(nav, /if \(!activeHref\.startsWith\("\/operator\/careeros\/"\)\) return null/);
-  assert.doesNotMatch(nav, /Products|ShopiFixer Command Center|Health|Audit/);
+test("global navigation owns CareerOS discoverability without a competing OperatorNav", () => {
+  assert.match(shell, /label: "CareerOS Operations"/);
+  assert.match(shell, /label: "CareerOS Missions"/);
+  assert.doesNotMatch(nav, /CAREEROS_ROUTES|<nav|<Link/);
+  assert.match(nav, /return null/);
 });
 
 test("navigation uses stable links, accessible current-page state, and mobile disclosure", () => {
@@ -38,4 +38,12 @@ test("navigation uses stable links, accessible current-page state, and mobile di
   assert.match(shell, /\{status\.validationStatus\}<\/div>/);
   assert.equal((shell.match(/\{status\.validationStatus\}/g) || []).length, 1);
   assert.doesNotMatch(shell, /<details[^>]*\bopen\b/);
+});
+
+test("navigation preserves the truthful validation language contract", () => {
+  assert.match(shell, /operatorValidationPresentation\.mjs/);
+  assert.match(shell, /validationExplanation/);
+  assert.match(shell, /validationSummary/);
+  assert.match(shell, /Product overview/);
+  assert.doesNotMatch(shell, /CareerOS, ShopiFixer, and Abando/);
 });
