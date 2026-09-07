@@ -235,10 +235,10 @@ export function OperatorShell({ children, status }: OperatorShellProps) {
             <span className="operatorShellStatusLabel">Architecture Version</span>
             <strong>{status.architectureVersion}</strong>
           </div>
-          <div className="operatorShellStatusItem">
-            <span className="operatorShellStatusLabel">Validation Status</span>
-            <strong>{status.validationStatus}</strong>
-          </div>
+              <div className="operatorShellStatusItem">
+                <span className="operatorShellStatusLabel">Validation Status</span>
+                <strong>{validationSummary(status.validationStatus)}</strong>
+              </div>
           <div className="operatorShellStatusItem">
             <span className="operatorShellStatusLabel">Campaign Registry</span>
             <strong>{status.campaignRegistryStatus}</strong>

@@ -34,5 +34,8 @@ test("navigation uses stable links, accessible current-page state, and mobile di
   assert.match(shell, /<details className="operatorShellValidationDetails">/);
   assert.match(shell, /<summary>/);
   assert.match(shell, /validationSummary\(status\.validationStatus\)/);
+  assert.match(shell, /<strong>\{validationSummary\(status\.validationStatus\)\}<\/strong>/);
   assert.match(shell, /\{status\.validationStatus\}<\/div>/);
+  assert.equal((shell.match(/\{status\.validationStatus\}/g) || []).length, 1);
+  assert.doesNotMatch(shell, /<details[^>]*\bopen\b/);
 });
