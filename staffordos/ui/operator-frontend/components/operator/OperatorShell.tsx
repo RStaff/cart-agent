@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import type { ReactNode } from "react";
 
 type ShellStatus = {
@@ -25,34 +26,30 @@ type OperatorShellProps = {
   status: ShellStatus;
 };
 
-const SIDEBAR_ITEMS: NavItem[] = [
-  { href: "/operator", label: "Operator Home", note: "Daily operating surface" },
-  { href: "/operator/command-center", label: "Executive", note: "Company command center" },
-  { href: "/operator/careeros/beta-users", label: "CareerOS", note: "Beta user operations" },
-  { href: "/operator/campaigns", label: "Marketing", note: "Campaign visibility", subtle: true },
-  { href: "/operator/campaigns", label: "Campaigns", note: "Campaign registry and coverage" },
-  { href: "/operator/leads", label: "Sales", note: "Lead command center", subtle: true },
-  { href: "/operator/leads", label: "Leads", note: "Lead queue and readiness" },
-  { label: "Relationships", note: "Planned — Coming Soon", planned: true },
-  { label: "Delivery", note: "Planned — Coming Soon", planned: true },
-  { label: "Customer Success", note: "Planned — Coming Soon", planned: true },
-  { href: "/operator/revenue-command", label: "Finance", note: "Revenue command center" },
-  { label: "Engineering", note: "Planned — Coming Soon", planned: true },
-  { label: "AI Operations", note: "Planned — Coming Soon", planned: true },
-  { label: "Validators", note: "Planned — Coming Soon", planned: true },
-  { label: "Settings", note: "Planned — Coming Soon", planned: true },
-];
+type NavigationGroup = {
+  label: "Today" | "Business" | "System";
+  items: NavItem[];
+};
 
-const QUICK_ACTIONS = [
-  { href: "/operator", label: "Home" },
-  { href: "/operator/command-center", label: "Executive" },
-  { href: "/operator/careeros/beta-users", label: "CareerOS Beta" },
-  { href: "/operator/campaigns", label: "Campaigns" },
-  { href: "/operator/leads", label: "Leads" },
-  { href: "/operator/revenue-command", label: "Revenue" },
-  { href: "/operator/execution-log", label: "Execution Log" },
-  { href: "/operator/system-map", label: "System Map" },
-] as const;
+const NAVIGATION_GROUPS: NavigationGroup[] = [
+  { label: "Today", items: [{ href: "/operator/cockpit", label: "StaffordOS Cockpit", note: "Your daily co-operator" }] },
+  {
+    label: "Business",
+    items: [
+      { href: "/operator/products", label: "Products", note: "CareerOS, ShopiFixer, and Abando" },
+      { href: "/operator/careeros/beta-users", label: "CareerOS Operations", note: "Beta operations" },
+      { href: "/operator/careeros/missions/CAREEROS_V1_P1_OUTCOME_TRACKING_AND_DAILY_TRIAGE", label: "CareerOS Missions", note: "Mission observation" },
+      { href: "/operator/command-center", label: "ShopiFixer Command Center", note: "ShopiFixer delivery" },
+    ],
+  },
+  {
+    label: "System",
+    items: [
+      { href: "/operator/system-map", label: "Health", note: "System map and status" },
+      { href: "/operator/execution-log", label: "Audit", note: "Execution history" },
+    ],
+  },
+];
 
 function isActive(pathname: string, href?: string) {
   if (!href) return false;
@@ -95,8 +92,29 @@ function statusClass(value: string) {
   return "statusPill";
 }
 
+function validationEntries(value: string) {
+  return value.split(" / ").map((entry) => entry.trim()).filter(Boolean);
+}
+
+function validationSummary(value: string) {
+  const entries = validationEntries(value);
+  const attentionCount = entries.filter((entry) => /^(Missing:|.*(?:FAILED|FAIL|UNAVAILABLE))/i.test(entry)).length;
+  if (attentionCount > 0) {
+    return `${attentionCount} system check${attentionCount === 1 ? " needs" : "s need"} attention`;
+  }
+  return entries.length > 0 ? "System checks available" : "System checks unavailable";
+}
+
+function validationExplanation(value: string) {
+  const attentionCount = validationEntries(value).filter((entry) => /^(Missing:|.*(?:FAILED|FAIL|UNAVAILABLE))/i.test(entry)).length;
+  return attentionCount > 0
+    ? "Required validation records are currently unavailable."
+    : "Current validation records are available.";
+}
+
 export function OperatorShell({ children, status }: OperatorShellProps) {
   const pathname = usePathname();
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const breadcrumbs = breadcrumbFromPath(pathname);
 
   return (
@@ -110,40 +128,63 @@ export function OperatorShell({ children, status }: OperatorShellProps) {
           </div>
 
           <nav className="operatorShellNav" aria-label="Operator navigation">
-            {SIDEBAR_ITEMS.map((item) =>
-              item.planned || !item.href ? (
-                <div key={item.label} className="operatorShellNavItem operatorShellNavItemPlanned">
-                  <span className="operatorShellNavLabel">{item.label}</span>
-                  <span className="operatorShellNavNote">{item.note}</span>
-                </div>
-              ) : (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className={`operatorShellNavItem${item.subtle ? " operatorShellNavItemMuted" : ""}${isActive(pathname, item.href) && !item.subtle ? " operatorShellNavItemActive" : ""}`}
-                  aria-current={isActive(pathname, item.href) && !item.subtle ? "page" : undefined}
-                >
-                  <span className="operatorShellNavLabel">{item.label}</span>
-                  <span className="operatorShellNavNote">{item.note}</span>
-                </Link>
-              )
-            )}
+            {NAVIGATION_GROUPS.map((group) => (
+              <div key={group.label} className="operatorShellNavGroup">
+                <span className="operatorShellNavGroupLabel operatorShellNavNote">{group.label}</span>
+                {group.items.map((item) => (
+                  <Link
+                    key={item.label}
+                    href={item.href!}
+                    className={`operatorShellNavItem${isActive(pathname, item.href) ? " operatorShellNavItemActive" : ""}`}
+                    aria-current={isActive(pathname, item.href) ? "page" : undefined}
+                  >
+                    <span className="operatorShellNavLabel">{item.label}</span>
+                    <span className="operatorShellNavNote">{item.note}</span>
+                  </Link>
+                ))}
+              </div>
+            ))}
           </nav>
-
-          <div className="operatorShellSidebarFooter">
-            <span>Quick actions</span>
-            <div className="operatorShellQuickActionStack">
-              {QUICK_ACTIONS.map((action) => (
-                <Link key={action.href} href={action.href} className="operatorShellQuickActionChip">
-                  {action.label}
-                </Link>
-              ))}
-            </div>
-          </div>
         </div>
       </aside>
 
       <div className="operatorShellMain">
+        <div className="operatorShellMobileNav">
+          <button
+            type="button"
+            className="operatorShellMobileNavToggle"
+            aria-expanded={mobileNavOpen}
+            aria-controls="operator-mobile-navigation"
+            onClick={() => setMobileNavOpen((open) => !open)}
+          >
+            <span>Operator navigation</span>
+            <span aria-hidden="true">{mobileNavOpen ? "−" : "+"}</span>
+          </button>
+          <nav
+            id="operator-mobile-navigation"
+            className={`operatorShellMobileNavPanel${mobileNavOpen ? " operatorShellMobileNavPanelOpen" : ""}`}
+            aria-label="Operator navigation"
+            hidden={!mobileNavOpen}
+          >
+            {NAVIGATION_GROUPS.map((group) => (
+              <div key={`mobile-${group.label}`} className="operatorShellNavGroup">
+                <span className="operatorShellNavGroupLabel operatorShellNavNote">{group.label}</span>
+                {group.items.map((item) => (
+                  <Link
+                    key={`mobile-${item.label}`}
+                    href={item.href!}
+                    className={`operatorShellNavItem${isActive(pathname, item.href) ? " operatorShellNavItemActive" : ""}`}
+                    aria-current={isActive(pathname, item.href) ? "page" : undefined}
+                    onClick={() => setMobileNavOpen(false)}
+                  >
+                    <span className="operatorShellNavLabel">{item.label}</span>
+                    <span className="operatorShellNavNote">{item.note}</span>
+                  </Link>
+                ))}
+              </div>
+            ))}
+          </nav>
+        </div>
         <header className="operatorShellHeader">
           <div className="operatorShellHeaderPrimary">
             <div>
@@ -166,7 +207,13 @@ export function OperatorShell({ children, status }: OperatorShellProps) {
             </label>
             <div>
               <p className="operatorShellHeaderLabel">Validation status</p>
-              <span className={`statusPill ${statusClass(status.validationStatus)}`}>{status.validationStatus}</span>
+              <details className="operatorShellValidationDetails">
+                <summary>
+                  <span className={`statusPill ${statusClass(status.validationStatus)}`}>{validationSummary(status.validationStatus)}</span>
+                </summary>
+                <p className="operatorShellValidationExplanation">{validationExplanation(status.validationStatus)}</p>
+                <div className="operatorShellValidationDetailText">{status.validationStatus}</div>
+              </details>
             </div>
             <div>
               <p className="operatorShellHeaderLabel">Notifications</p>
