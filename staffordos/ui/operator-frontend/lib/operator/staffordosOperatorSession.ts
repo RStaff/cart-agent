@@ -6,6 +6,7 @@ export const STAFFORDOS_OPERATOR_DEFAULT_RETURN_PATH = "/operator/cockpit";
 export const STAFFORDOS_OPERATOR_SESSION_TTL_SECONDS = 300;
 export const STAFFORDOS_OPERATOR_BROWSER_BINDING_TTL_SECONDS = 600;
 export const STAFFORDOS_OPERATOR_CANONICAL_ENTRY_TTL_SECONDS = 60;
+export const STAFFORDOS_OPERATOR_CANONICAL_ENTRY_CLOCK_SKEW_SECONDS = 30;
 export const STAFFORDOS_OPERATOR_SESSION_MAX_TTL_SECONDS = 900;
 export const CAREEROS_BETA_OPERATIONS_READ_PERMISSION = "careeros.beta.operations.read";
 export const CAREEROS_BETA_OPERATIONS_ROLE = "careeros_beta_operations_viewer";
@@ -171,7 +172,7 @@ export function verifyStaffordOsOperatorCanonicalEntryToken(token: string | null
   try {
     const payload = JSON.parse(base64UrlDecode(encoded).toString("utf8"));
     const nowSeconds = Math.floor(now.getTime() / 1000);
-    if (payload.v !== 1 || !Number.isInteger(payload.issuedAt) || !Number.isInteger(payload.expiresAt) || payload.issuedAt > nowSeconds || payload.expiresAt <= nowSeconds || payload.expiresAt - payload.issuedAt > STAFFORDOS_OPERATOR_CANONICAL_ENTRY_TTL_SECONDS || typeof payload.nonce !== "string" || !/^[A-Za-z0-9_-]{22}$/.test(payload.nonce)) return null;
+    if (payload.v !== 1 || !Number.isSafeInteger(payload.issuedAt) || !Number.isSafeInteger(payload.expiresAt) || payload.issuedAt < 0 || payload.expiresAt < 0 || payload.issuedAt > nowSeconds + STAFFORDOS_OPERATOR_CANONICAL_ENTRY_CLOCK_SKEW_SECONDS || payload.expiresAt < nowSeconds - STAFFORDOS_OPERATOR_CANONICAL_ENTRY_CLOCK_SKEW_SECONDS || payload.expiresAt <= payload.issuedAt || payload.expiresAt - payload.issuedAt > STAFFORDOS_OPERATOR_CANONICAL_ENTRY_TTL_SECONDS || typeof payload.nonce !== "string" || !/^[A-Za-z0-9_-]{22}$/.test(payload.nonce)) return null;
     const returnTo = validateStaffordOsOperatorReturnPath(payload.returnTo);
     return returnTo === null && payload.returnTo !== "" ? null : { returnTo, expiresAt: payload.expiresAt };
   } catch { return null; }

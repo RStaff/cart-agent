@@ -456,6 +456,82 @@ test("configured HTTPS handoff accepts non-loopback callback traffic but require
   assert.equal(JSON.parse(redeemed.body).return_to, "/operator/careeros/missions/example");
 });
 
+test("successful grant creation invokes bounded opportunistic cleanup", async () => {
+  const signer = new LocalEd25519Signer();
+  const google = createGoogleFixture();
+  let idToken = "";
+  let now = Date.now();
+  const cleanupCalls = [];
+  const handoffStore = {
+    async create(grant) { return { code: grant.code, expiresAt: grant.expiresAt, returnTo: grant.returnTo }; },
+    async cleanupExpired(limit, cleanupNow) { cleanupCalls.push({ limit, now: cleanupNow.getTime() }); return 0; },
+  };
+  const config = testConfig({ frontendHandoffUrl: "https://stafford.example/api/operator/auth/callback" });
+  const server = createIssuerServer({
+    config,
+    signer,
+    deps: { handoffStore, clock: () => now, tokenExchanger: async () => ({ id_token: idToken }), googleJwks: google.jwks },
+  });
+
+  async function completeLogin() {
+    const login = await invokeServer(server, { path: "/login" });
+    const loginLocation = new URL(login.headers.Location);
+    idToken = google.signGoogleIdToken({
+      nonce: loginLocation.searchParams.get("nonce"),
+      iat: Math.floor(now / 1000),
+      exp: Math.floor(now / 1000) + 300,
+    });
+    return invokeServer(server, {
+      remoteAddress: "10.20.30.40",
+      path: `/auth/google/callback?code=google-code&state=${loginLocation.searchParams.get("state")}`,
+      cookie: `staffordos_oauth_state=${cookieValue(login.headers["Set-Cookie"])}`,
+    });
+  }
+
+  assert.equal((await completeLogin()).status, 302);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(cleanupCalls, [{ limit: 100, now }]);
+
+  assert.equal((await completeLogin()).status, 302);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(cleanupCalls.length, 1);
+
+  now += 10_000;
+  assert.equal((await completeLogin()).status, 302);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(cleanupCalls, [{ limit: 100, now: now - 10_000 }, { limit: 100, now }]);
+});
+
+test("cleanup failure is contained after successful grant creation", async () => {
+  const signer = new LocalEd25519Signer();
+  const google = createGoogleFixture();
+  let idToken = "";
+  const config = testConfig({ frontendHandoffUrl: "https://stafford.example/api/operator/auth/callback" });
+  const server = createIssuerServer({
+    config,
+    signer,
+    deps: {
+      handoffStore: {
+        async create(grant) { return { code: grant.code, expiresAt: grant.expiresAt, returnTo: grant.returnTo }; },
+        async cleanupExpired() { throw new Error("synthetic storage failure"); },
+      },
+      tokenExchanger: async () => ({ id_token: idToken }),
+      googleJwks: google.jwks,
+    },
+  });
+  const login = await invokeServer(server, { path: "/login" });
+  const loginLocation = new URL(login.headers.Location);
+  idToken = google.signGoogleIdToken({ nonce: loginLocation.searchParams.get("nonce"), iat: Math.floor(Date.now() / 1000), exp: Math.floor(Date.now() / 1000) + 300 });
+  const callback = await invokeServer(server, {
+    remoteAddress: "10.20.30.40",
+    path: `/auth/google/callback?code=google-code&state=${loginLocation.searchParams.get("state")}`,
+    cookie: `staffordos_oauth_state=${cookieValue(login.headers["Set-Cookie"])}`,
+  });
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(callback.status, 302);
+  assert.equal(new URL(callback.headers.Location).origin, "https://stafford.example");
+});
+
 test("local HTTP handoff transport remains loopback-only", async () => {
   const signer = new LocalEd25519Signer();
   const google = createGoogleFixture();

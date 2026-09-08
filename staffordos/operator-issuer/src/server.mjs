@@ -17,6 +17,8 @@ import {
 import { HandoffStoreError, createPostgresHandoffStore } from "./handoffStore.mjs";
 
 const HANDOFF_GRANT_TTL_SECONDS = 60;
+export const HANDOFF_CLEANUP_MIN_INTERVAL_MS = 10_000;
+export const HANDOFF_CLEANUP_BATCH_SIZE = 100;
 
 function jsonResponse(res, status, body, headers = {}) {
   const payload = JSON.stringify(body);
@@ -92,6 +94,18 @@ function redirectResponse(res, location, headers = {}) {
 export function createIssuerServer({ config = configFromEnv(), signer = new CloudKmsJwtSigner(config), deps = {} } = {}) {
   validateRuntimeConfig(config, { handoffStoreProvided: Boolean(deps.handoffStore) });
   const handoffStore = deps.handoffStore || (config.frontendHandoffUrl ? createPostgresHandoffStore(config) : null);
+  let lastCleanupAt = 0;
+  const clock = deps.clock || (() => Date.now());
+
+  async function maybeCleanup(now = clock()) {
+    if (!handoffStore?.cleanupExpired || now - lastCleanupAt < HANDOFF_CLEANUP_MIN_INTERVAL_MS) return;
+    lastCleanupAt = now;
+    try {
+      await handoffStore.cleanupExpired(HANDOFF_CLEANUP_BATCH_SIZE, new Date(now));
+    } catch {
+      // Cleanup is opportunistic; redemption correctness does not depend on it.
+    }
+  }
 
   return http.createServer(async (req, res) => {
     const url = new URL(req.url || "/", "http://127.0.0.1");
@@ -118,7 +132,8 @@ export function createIssuerServer({ config = configFromEnv(), signer = new Clou
         });
         if (config.frontendHandoffUrl) {
           assertHandoffTransport(req, config);
-          const handoff = await handoffStore.create(createHandoffGrant(result));
+          const handoff = await handoffStore.create(createHandoffGrant(result, new Date(clock())));
+          void maybeCleanup();
           const location = new URL(config.frontendHandoffUrl);
           location.searchParams.set("code", handoff.code);
           return redirectResponse(res, location.toString(), {

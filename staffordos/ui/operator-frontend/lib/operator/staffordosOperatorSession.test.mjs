@@ -51,6 +51,8 @@ const {
   createStaffordOsOperatorBrowserBinding,
   createStaffordOsOperatorCanonicalEntryToken,
   verifyStaffordOsOperatorCanonicalEntryToken,
+  STAFFORDOS_OPERATOR_CANONICAL_ENTRY_CLOCK_SKEW_SECONDS,
+  STAFFORDOS_OPERATOR_CANONICAL_ENTRY_TTL_SECONDS,
 } = auth;
 
 const keyPair = crypto.generateKeyPairSync("ed25519");
@@ -311,7 +313,36 @@ test("canonical login entry tokens preserve only validated return paths and expi
   const verified = verifyStaffordOsOperatorCanonicalEntryToken(token, handoffSharedSecret, issued);
   assert.equal(verified.returnTo, "/operator/careeros/beta-users?search=AI%20automation");
   assert.equal(verifyStaffordOsOperatorCanonicalEntryToken(`${token}x`, handoffSharedSecret, issued), null);
-  assert.equal(verifyStaffordOsOperatorCanonicalEntryToken(token, handoffSharedSecret, new Date(issued.getTime() + 61_000)), null);
+  assert.equal(verifyStaffordOsOperatorCanonicalEntryToken(token, handoffSharedSecret, new Date(issued.getTime() + 91_000)), null);
+});
+
+test("canonical entry validation applies bounded clock skew without extending token lifetime", () => {
+  const issued = new Date("2026-08-29T12:00:00.000Z");
+  const token = createStaffordOsOperatorCanonicalEntryToken("/operator/careeros/beta-users?search=AI%20automation", handoffSharedSecret, issued);
+  const skew = STAFFORDOS_OPERATOR_CANONICAL_ENTRY_CLOCK_SKEW_SECONDS;
+  assert.ok(verifyStaffordOsOperatorCanonicalEntryToken(token, handoffSharedSecret, new Date(issued.getTime() - (skew - 1) * 1000)));
+  assert.ok(verifyStaffordOsOperatorCanonicalEntryToken(token, handoffSharedSecret, new Date(issued.getTime() - skew * 1000)));
+  assert.equal(verifyStaffordOsOperatorCanonicalEntryToken(token, handoffSharedSecret, new Date(issued.getTime() - (skew + 1) * 1000)), null);
+  assert.ok(verifyStaffordOsOperatorCanonicalEntryToken(token, handoffSharedSecret, new Date(issued.getTime() + (60 + skew) * 1000)));
+  assert.equal(verifyStaffordOsOperatorCanonicalEntryToken(token, handoffSharedSecret, new Date(issued.getTime() + (60 + skew + 1) * 1000)), null);
+});
+
+test("canonical entry validation rejects unsafe timestamp claims", () => {
+  const issued = new Date("2026-08-29T12:00:00.000Z");
+  const token = createStaffordOsOperatorCanonicalEntryToken("/operator/cockpit", handoffSharedSecret, issued);
+  const [encoded, signature] = token.split(".");
+  const payload = JSON.parse(Buffer.from(encoded, "base64url").toString("utf8"));
+  for (const changes of [
+    { issuedAt: -1 },
+    { issuedAt: 1.5 },
+    { issuedAt: Number.MAX_SAFE_INTEGER + 1 },
+    { expiresAt: payload.issuedAt },
+    { expiresAt: payload.issuedAt + STAFFORDOS_OPERATOR_CANONICAL_ENTRY_TTL_SECONDS + 1 },
+  ]) {
+    const altered = { ...payload, ...changes };
+    const alteredEncoded = Buffer.from(JSON.stringify(altered), "utf8").toString("base64url");
+    assert.equal(verifyStaffordOsOperatorCanonicalEntryToken(`${alteredEncoded}.${signature}`, handoffSharedSecret, issued), null);
+  }
 });
 
 test("callback-created session validates through an independently loaded module", () => {
