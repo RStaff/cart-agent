@@ -158,6 +158,9 @@ export function configFromEnv(env = process.env) {
     kmsImpersonateServiceAccount: cleanString(env.KMS_IMPERSONATE_SERVICE_ACCOUNT),
     kmsUseGcloudAuth: boolValue(env.KMS_USE_GCLOUD_AUTH),
     frontendHandoffUrl: cleanString(env.STAFFORDOS_OPERATOR_FRONTEND_HANDOFF_URL),
+    handoffSharedSecret: typeof env.STAFFORDOS_OPERATOR_HANDOFF_SHARED_SECRET === "string"
+      ? env.STAFFORDOS_OPERATOR_HANDOFF_SHARED_SECRET
+      : "",
     nonInteractiveAssertionMode: boolValue(env.STAFFORDOS_OPERATOR_NONINTERACTIVE_ASSERTION_MODE),
     port: Number(env.PORT || 8787),
   };
@@ -187,6 +190,16 @@ export function validateFrontendHandoffUrl(config) {
   return url.toString();
 }
 
+export function isCanonicalHandoffSharedSecret(value) {
+  if (typeof value !== "string" || value.length !== 43 || value.trim() !== value || !/^[A-Za-z0-9_-]+$/.test(value)) return false;
+  try {
+    const decoded = Buffer.from(value, "base64url");
+    return decoded.length === 32 && base64Url(decoded) === value;
+  } catch {
+    return false;
+  }
+}
+
 export function validateRuntimeConfig(config) {
   for (const key of [
     "googleClientId",
@@ -210,6 +223,9 @@ export function validateRuntimeConfig(config) {
   const handoffUrl = validateFrontendHandoffUrl(config);
   if (!handoffUrl && !config.nonInteractiveAssertionMode) {
     throw new IssuerError("frontend_handoff_required", 500);
+  }
+  if (handoffUrl && !isCanonicalHandoffSharedSecret(config.handoffSharedSecret)) {
+    throw new IssuerError("handoff_shared_secret_required", 500);
   }
   return config;
 }

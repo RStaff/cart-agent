@@ -8,6 +8,7 @@ import {
   completeOAuthCallback,
   configFromEnv,
   createLoginResponse,
+  isCanonicalHandoffSharedSecret,
   parseCookies,
   validateRuntimeConfig,
 } from "./issuer.mjs";
@@ -40,6 +41,23 @@ function assertLocalHandoffRequest(req) {
   if (!isLoopbackRemoteAddress(req.socket?.remoteAddress || "")) {
     throw new IssuerError("staffordos_handoff_not_local", 403);
   }
+}
+
+function assertAuthenticatedHandoffRequest(req, config) {
+  const provided = req.headers?.["x-staffordos-handoff-secret"];
+  const expected = config.handoffSharedSecret;
+  if (!isCanonicalHandoffSharedSecret(provided) || !isCanonicalHandoffSharedSecret(expected)) {
+    throw new IssuerError("staffordos_handoff_unauthorized", 401);
+  }
+  const providedDigest = crypto.createHash("sha256").update(provided).digest();
+  const expectedDigest = crypto.createHash("sha256").update(expected).digest();
+  if (!crypto.timingSafeEqual(providedDigest, expectedDigest)) {
+    throw new IssuerError("staffordos_handoff_unauthorized", 401);
+  }
+}
+
+function assertHandoffTransport(req, config) {
+  if (new URL(config.frontendHandoffUrl).protocol === "http:") assertLocalHandoffRequest(req);
 }
 
 function createHandoffGrant(handoffGrants, result, now = new Date()) {
@@ -106,7 +124,7 @@ export function createIssuerServer({ config = configFromEnv(), signer = new Clou
           deps,
         });
         if (config.frontendHandoffUrl) {
-          assertLocalHandoffRequest(req);
+          assertHandoffTransport(req, config);
           const handoff = createHandoffGrant(handoffGrants, result);
           const location = new URL(config.frontendHandoffUrl);
           location.searchParams.set("code", handoff.code);
@@ -129,7 +147,8 @@ export function createIssuerServer({ config = configFromEnv(), signer = new Clou
       }
 
       if (req.method === "GET" && url.pathname === "/auth/staffordos/handoff") {
-        assertLocalHandoffRequest(req);
+        assertHandoffTransport(req, config);
+        assertAuthenticatedHandoffRequest(req, config);
         const grant = consumeHandoffGrant(handoffGrants, url.searchParams.get("code"));
         return jsonResponse(res, 200, {
           ok: true,

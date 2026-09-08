@@ -16,6 +16,7 @@ export type StaffordOsOperatorAuthConfig = {
   issuerBaseUrl: string;
   frontendHandoffUrl: string;
   frontendOrigin: string;
+  handoffSharedSecret: string;
   publicKeyUrl: string;
   publicKeyPem?: string;
   sessionSecret: string;
@@ -103,6 +104,29 @@ export function validateStaffordOsOperatorFrontendHandoffUrl(value: string | nul
     return null;
   } catch {
     return null;
+  }
+}
+
+export function isCanonicalStaffordOsOperatorHandoffSecret(value: unknown) {
+  if (typeof value !== "string" || value.length !== 43 || value.trim() !== value || !/^[A-Za-z0-9_-]+$/.test(value)) return false;
+  try {
+    const decoded = Buffer.from(value, "base64url");
+    return decoded.length === 32 && base64Url(decoded) === value;
+  } catch {
+    return false;
+  }
+}
+
+function validateStaffordOsOperatorIssuerBaseUrl(value: string | null | undefined) {
+  const raw = text(value);
+  if (!raw) return false;
+  try {
+    const url = new URL(raw);
+    const loopback = ["127.0.0.1", "localhost", "[::1]"].includes(url.hostname.toLowerCase());
+    return !url.username && !url.password && !url.search && !url.hash &&
+      (url.protocol === "https:" || (url.protocol === "http:" && loopback));
+  } catch {
+    return false;
   }
 }
 
@@ -244,6 +268,9 @@ function publicKeyUrlFromEnv(env: Record<string, string | undefined>) {
 export function operatorAuthConfigFromEnv(env: Record<string, string | undefined> = process.env): StaffordOsOperatorAuthConfig {
   const issuerBaseUrl = text(env.STAFFORDOS_OPERATOR_ISSUER_BASE_URL);
   const frontendHandoffUrl = text(env.STAFFORDOS_OPERATOR_FRONTEND_HANDOFF_URL);
+  const handoffSharedSecret = typeof env.STAFFORDOS_OPERATOR_HANDOFF_SHARED_SECRET === "string"
+    ? env.STAFFORDOS_OPERATOR_HANDOFF_SHARED_SECRET
+    : "";
   const frontend = validateStaffordOsOperatorFrontendHandoffUrl(frontendHandoffUrl);
   return {
     issuer: text(env.STAFFORDOS_OPERATOR_JWT_ISSUER),
@@ -252,6 +279,7 @@ export function operatorAuthConfigFromEnv(env: Record<string, string | undefined
     issuerBaseUrl,
     frontendHandoffUrl,
     frontendOrigin: frontend?.origin || "",
+    handoffSharedSecret,
     publicKeyUrl: publicKeyUrlFromEnv(env),
     publicKeyPem: text(env.STAFFORDOS_OPERATOR_JWT_PUBLIC_KEY_PEM) || undefined,
     sessionSecret: text(env.STAFFORDOS_OPERATOR_FRONTEND_SESSION_SECRET),
@@ -263,8 +291,9 @@ export function operatorAuthConfigFromEnv(env: Record<string, string | undefined
 export function validateOperatorAuthConfig(config: StaffordOsOperatorAuthConfig) {
   validateOperatorSessionConfig(config);
   const missing = [
-    ["issuerBaseUrl", config.issuerBaseUrl],
+    ["issuerBaseUrl", validateStaffordOsOperatorIssuerBaseUrl(config.issuerBaseUrl) ? config.issuerBaseUrl : ""],
     ["frontendHandoffUrl", config.frontendHandoffUrl],
+    ["handoffSharedSecret", isCanonicalStaffordOsOperatorHandoffSecret(config.handoffSharedSecret) ? config.handoffSharedSecret : ""],
   ]
     .filter(([, value]) => !text(value))
     .map(([key]) => key);
@@ -451,8 +480,12 @@ export async function redeemStaffordOsIssuerHandoffCode(
   url.searchParams.set("code", code);
   const response = await fetchImpl(url.toString(), {
     method: "GET",
-    headers: { Accept: "application/json" },
+    headers: {
+      Accept: "application/json",
+      "X-StaffordOS-Handoff-Secret": config.handoffSharedSecret,
+    },
     cache: "no-store",
+    redirect: "error",
   });
   const body = await response.json().catch(() => ({}));
   const assertion = text((body as Record<string, unknown>).assertion);

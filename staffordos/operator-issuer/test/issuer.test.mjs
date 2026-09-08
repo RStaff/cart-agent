@@ -11,12 +11,15 @@ import {
   completeOAuthCallback,
   configFromEnv,
   createLoginResponse,
+  isCanonicalHandoffSharedSecret,
   sha256Hex,
   stableStringify,
   validateOperatorReturnPath,
   validateFrontendHandoffUrl,
   verifyStaffordosJwt,
 } from "../src/issuer.mjs";
+
+const testHandoffSecret = base64Url(crypto.randomBytes(32));
 
 class LocalEd25519Signer {
   constructor(keyPair = crypto.generateKeyPairSync("ed25519"), kid = "local-test-key:1") {
@@ -57,6 +60,7 @@ function testConfig(overrides = {}) {
     kmsKey: "test-fixture-kms-key",
     kmsKeyVersion: "1",
     frontendHandoffUrl: "http://127.0.0.1:3000/api/operator/auth/callback",
+    handoffSharedSecret: testHandoffSecret,
     nonInteractiveAssertionMode: false,
     ...overrides,
   };
@@ -93,13 +97,13 @@ function cookieValue(setCookie) {
   return String(setCookie).split(";")[0].split("=").slice(1).join("=");
 }
 
-function invokeServer(server, { method = "GET", path = "/", cookie = "", remoteAddress = "127.0.0.1" } = {}) {
+function invokeServer(server, { method = "GET", path = "/", cookie = "", remoteAddress = "127.0.0.1", headers = {} } = {}) {
   const listener = server.listeners("request")[0];
   return new Promise((resolve, reject) => {
     const req = {
       method,
       url: path,
-      headers: cookie ? { cookie } : {},
+      headers: { ...(cookie ? { cookie } : {}), ...headers },
       socket: { remoteAddress },
     };
     const chunks = [];
@@ -216,6 +220,26 @@ test("interactive issuer configuration fails closed without a handoff", () => {
     (error) => error instanceof IssuerError && error.code === "frontend_handoff_required",
   );
   assert.doesNotThrow(() => createLoginResponse(testConfig({ frontendHandoffUrl: "", nonInteractiveAssertionMode: true }), new Date("2026-07-30T00:00:00.000Z")));
+  assert.throws(
+    () => createIssuerServer({ config: testConfig({ handoffSharedSecret: "" }) }),
+    (error) => error instanceof IssuerError && error.code === "handoff_shared_secret_required",
+  );
+});
+
+test("handoff shared secrets require canonical 32-byte base64url", () => {
+  assert.equal(isCanonicalHandoffSharedSecret(testHandoffSecret), true);
+  for (const value of [
+    "",
+    " ",
+    "short",
+    `${testHandoffSecret}=`,
+    `${testHandoffSecret.slice(0, -1)}!`,
+    ` ${testHandoffSecret}`,
+    `${testHandoffSecret} `,
+    testHandoffSecret.slice(0, -1),
+  ]) {
+    assert.equal(isCanonicalHandoffSharedSecret(value), false);
+  }
 });
 
 test("callback validates Google identity and issues an EdDSA StaffordOS JWT", async () => {
@@ -295,6 +319,7 @@ test("local frontend handoff returns only an opaque code to the browser and rede
 
   const redeem = await invokeServer(server, {
     path: `/auth/staffordos/handoff?code=${location.searchParams.get("code")}`,
+    headers: { "x-staffordos-handoff-secret": config.handoffSharedSecret },
   });
   const body = JSON.parse(redeem.body);
   assert.equal(redeem.status, 200);
@@ -306,8 +331,88 @@ test("local frontend handoff returns only an opaque code to the browser and rede
 
   const secondRedeem = await invokeServer(server, {
     path: `/auth/staffordos/handoff?code=${location.searchParams.get("code")}`,
+    headers: { "x-staffordos-handoff-secret": config.handoffSharedSecret },
   });
   assert.equal(secondRedeem.status, 401);
+});
+
+test("configured HTTPS handoff accepts non-loopback callback traffic but requires service authentication for redemption", async () => {
+  const signer = new LocalEd25519Signer();
+  const google = createGoogleFixture();
+  let idToken = "";
+  const config = testConfig({ frontendHandoffUrl: "https://stafford.example/api/operator/auth/callback" });
+  const server = createIssuerServer({
+    config,
+    signer,
+    deps: { tokenExchanger: async () => ({ id_token: idToken }), googleJwks: google.jwks },
+  });
+
+  const login = await invokeServer(server, { path: "/login?returnTo=%2Foperator%2Fcareeros%2Fmissions%2Fexample" });
+  const loginLocation = new URL(login.headers.Location);
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  idToken = google.signGoogleIdToken({
+    nonce: loginLocation.searchParams.get("nonce"),
+    iat: nowSeconds,
+    exp: nowSeconds + 300,
+  });
+  const callback = await invokeServer(server, {
+    remoteAddress: "10.20.30.40",
+    path: `/auth/google/callback?code=google-code&state=${loginLocation.searchParams.get("state")}`,
+    cookie: `staffordos_oauth_state=${cookieValue(login.headers["Set-Cookie"])}`,
+    headers: {
+      host: "evil.example",
+      "x-forwarded-host": "evil.example",
+      forwarded: "host=evil.example",
+      "x-forwarded-proto": "http",
+    },
+  });
+  assert.equal(callback.status, 302);
+  const callbackLocation = new URL(callback.headers.Location);
+  assert.equal(callbackLocation.origin, "https://stafford.example");
+  assert.equal(callbackLocation.pathname, "/api/operator/auth/callback");
+  const handoffCode = callbackLocation.searchParams.get("code");
+  assert.ok(handoffCode);
+
+  const unauthorized = await invokeServer(server, {
+    remoteAddress: "10.20.30.41",
+    path: `/auth/staffordos/handoff?code=${handoffCode}`,
+  });
+  assert.equal(unauthorized.status, 401);
+
+  const redeemed = await invokeServer(server, {
+    remoteAddress: "10.20.30.41",
+    path: `/auth/staffordos/handoff?code=${handoffCode}`,
+    headers: { "x-staffordos-handoff-secret": config.handoffSharedSecret },
+  });
+  assert.equal(redeemed.status, 200);
+  assert.equal(JSON.parse(redeemed.body).return_to, "/operator/careeros/missions/example");
+});
+
+test("local HTTP handoff transport remains loopback-only", async () => {
+  const signer = new LocalEd25519Signer();
+  const google = createGoogleFixture();
+  let idToken = "";
+  const config = testConfig();
+  const server = createIssuerServer({
+    config,
+    signer,
+    deps: { tokenExchanger: async () => ({ id_token: idToken }), googleJwks: google.jwks },
+  });
+  const login = await invokeServer(server, { path: "/login" });
+  const loginLocation = new URL(login.headers.Location);
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  idToken = google.signGoogleIdToken({
+    nonce: loginLocation.searchParams.get("nonce"),
+    iat: nowSeconds,
+    exp: nowSeconds + 300,
+  });
+  const callback = await invokeServer(server, {
+    remoteAddress: "10.20.30.40",
+    path: `/auth/google/callback?code=google-code&state=${loginLocation.searchParams.get("state")}`,
+    cookie: `staffordos_oauth_state=${cookieValue(login.headers["Set-Cookie"])}`,
+  });
+  assert.equal(callback.status, 403);
+  assert.match(callback.body, /staffordos_handoff_not_local/);
 });
 
 test("expired opaque handoff is rejected by the production redemption path", async () => {
@@ -343,11 +448,17 @@ test("expired opaque handoff is rejected by the production redemption path", asy
     assert.ok(handoffCode);
 
     mock.timers.setTime(clockStart.getTime() + 62_000);
-    const expired = await invokeServer(server, { path: `/auth/staffordos/handoff?code=${handoffCode}` });
+    const expired = await invokeServer(server, {
+      path: `/auth/staffordos/handoff?code=${handoffCode}`,
+      headers: { "x-staffordos-handoff-secret": testConfig().handoffSharedSecret },
+    });
     assert.equal(expired.status, 401);
     assert.match(expired.body, /staffordos_handoff_code_expired/);
 
-    const replay = await invokeServer(server, { path: `/auth/staffordos/handoff?code=${handoffCode}` });
+    const replay = await invokeServer(server, {
+      path: `/auth/staffordos/handoff?code=${handoffCode}`,
+      headers: { "x-staffordos-handoff-secret": testConfig().handoffSharedSecret },
+    });
     assert.equal(replay.status, 401);
     assert.match(replay.body, /staffordos_handoff_code_invalid/);
   } finally {

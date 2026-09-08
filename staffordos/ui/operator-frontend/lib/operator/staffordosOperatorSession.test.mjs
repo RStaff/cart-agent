@@ -38,7 +38,9 @@ const {
   careerOsBetaOperationsProtectedProof,
   createStaffordOsOperatorSession,
   destroyStaffordOsOperatorSession,
+  isCanonicalStaffordOsOperatorHandoffSecret,
   operatorAuthorizationFailureBody,
+  redeemStaffordOsIssuerHandoffCode,
   resolveStaffordOsOperatorReturnPath,
   resolveStaffordOsOperatorSession,
   sessionCookieOptions,
@@ -50,6 +52,7 @@ const {
 const keyPair = crypto.generateKeyPairSync("ed25519");
 const publicKeyPem = keyPair.publicKey.export({ type: "spki", format: "pem" });
 const operatorSubject = "synthetic-operator-subject";
+const handoffSharedSecret = crypto.randomBytes(32).toString("base64url");
 const now = new Date("2026-08-29T12:00:00.000Z");
 const nowSeconds = Math.floor(now.getTime() / 1000);
 
@@ -76,6 +79,7 @@ function testConfig(overrides = {}) {
     issuerBaseUrl: "http://127.0.0.1:8787",
     frontendHandoffUrl: "http://127.0.0.1:3000/api/operator/auth/callback",
     frontendOrigin: "http://127.0.0.1:3000",
+    handoffSharedSecret,
     publicKeyUrl: "http://127.0.0.1:8787/public-key",
     publicKeyPem,
     sessionSecret: "synthetic-session-secret-with-enough-entropy",
@@ -102,6 +106,30 @@ function signAssertion(payloadOverrides = {}) {
   const signature = crypto.sign(null, Buffer.from(signingInput), keyPair.privateKey);
   return `${signingInput}.${base64Url(signature)}`;
 }
+
+test("frontend handoff secret validation accepts only canonical 32-byte base64url", () => {
+  assert.equal(isCanonicalStaffordOsOperatorHandoffSecret(handoffSharedSecret), true);
+  for (const value of ["", " ", "short", `${handoffSharedSecret}=`, `${handoffSharedSecret}!`, ` ${handoffSharedSecret}`, handoffSharedSecret.slice(0, -1)]) {
+    assert.equal(isCanonicalStaffordOsOperatorHandoffSecret(value), false);
+  }
+});
+
+test("handoff redemption rejects issuer redirects without forwarding the service credential", async () => {
+  const requests = [];
+  const config = testConfig();
+  await assert.rejects(
+    redeemStaffordOsIssuerHandoffCode("synthetic-code", config, async (url, options) => {
+      requests.push({ url, options });
+      if (options.redirect !== "error") requests.push({ url: "https://redirect-target.invalid", options });
+      return { ok: false, status: 302, json: async () => ({}) };
+    }),
+  );
+  assert.equal(requests.length, 1);
+  assert.equal(new URL(requests[0].url).pathname, "/auth/staffordos/handoff");
+  assert.equal(requests[0].options.redirect, "error");
+  assert.equal(typeof requests[0].options.headers["X-StaffordOS-Handoff-Secret"], "string");
+  assert.equal(requests[0].options.headers["X-StaffordOS-Handoff-Secret"].length, 43);
+});
 
 function verifiedSession(overrides = {}, configOverrides = {}) {
   const config = testConfig(configOverrides);

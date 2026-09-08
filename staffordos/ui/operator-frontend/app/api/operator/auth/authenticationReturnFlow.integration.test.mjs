@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import crypto from "node:crypto";
 import Module from "node:module";
 import path from "node:path";
 import { readFileSync } from "node:fs";
@@ -10,6 +11,7 @@ const frontendRoot = path.join(root, "staffordos/ui/operator-frontend");
 const routeRoot = path.join(frontendRoot, "app/api/operator/auth");
 const requireFromFrontend = createRequire(path.join(frontendRoot, "package.json"));
 const ts = requireFromFrontend("typescript");
+const handoffSharedSecret = crypto.randomBytes(32).toString("base64url");
 
 function compileModule(source, filename, replacements = {}) {
   const compiled = ts.transpileModule(source, {
@@ -98,6 +100,7 @@ const env = {
   STAFFORDOS_OPERATOR_FRONTEND_SESSION_SECRET: "route-test-session-secret",
   STAFFORDOS_OPERATOR_JWT_PUBLIC_KEY_URL: "http://127.0.0.1:8787/public-key",
   STAFFORDOS_OPERATOR_COOKIE_SECURE: "false",
+  STAFFORDOS_OPERATOR_HANDOFF_SHARED_SECRET: handoffSharedSecret,
 };
 
 function setTestEnv(overrides = {}) {
