@@ -5,6 +5,7 @@ import { createIssuerServer } from "../src/server.mjs";
 import { createInMemoryHandoffStore, createPostgresHandoffStore } from "../src/handoffStore.mjs";
 import {
   IssuerError,
+  STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS,
   STAFFORDOS_OPERATOR_PERMISSIONS,
   base64Url,
   base64UrlDecode,
@@ -17,6 +18,7 @@ import {
   isCanonicalHandoffSharedSecret,
   sha256Hex,
   stableStringify,
+  validateRuntimeConfig,
   validateOperatorReturnPath,
   validateFrontendHandoffUrl,
   verifyStaffordosJwt,
@@ -69,6 +71,16 @@ function testConfig(overrides = {}) {
     nonInteractiveAssertionMode: false,
     ...overrides,
   };
+}
+
+function nonInteractiveTestConfig(overrides = {}) {
+  const config = testConfig({
+    nonInteractiveAssertionMode: true,
+    ...overrides,
+  });
+  delete config.frontendHandoffUrl;
+  delete config.handoffSharedSecret;
+  return config;
 }
 
 function createGoogleFixture() {
@@ -245,18 +257,128 @@ test("frontend handoff URL accepts production HTTPS and rejects unsafe configura
       (error) => error instanceof IssuerError && error.code === "frontend_handoff_url_invalid",
     );
   }
+  for (const value of [null, "", " ", "\t", "\r\n", "\0", "\u00a0", {}, [], 0, false]) {
+    assert.throws(
+      () => validateFrontendHandoffUrl({ frontendHandoffUrl: value }),
+      (error) => error instanceof IssuerError && error.code === "frontend_handoff_url_invalid",
+    );
+  }
 });
 
 test("interactive issuer configuration fails closed without a handoff", () => {
   assert.throws(
     () => createLoginResponse(testConfig({ frontendHandoffUrl: "" }), new Date("2026-07-30T00:00:00.000Z")),
-    (error) => error instanceof IssuerError && error.code === "frontend_handoff_required",
+    (error) => error instanceof IssuerError && error.code === "frontend_handoff_url_invalid",
   );
-  assert.doesNotThrow(() => createLoginResponse(testConfig({ frontendHandoffUrl: "", nonInteractiveAssertionMode: true }), new Date("2026-07-30T00:00:00.000Z")));
+  assert.doesNotThrow(() => createLoginResponse(nonInteractiveTestConfig(), new Date("2026-07-30T00:00:00.000Z")));
+  assert.throws(
+    () => validateRuntimeConfig(testConfig({ nonInteractiveAssertionMode: true })),
+    (error) => error instanceof IssuerError && error.code === "authentication_modes_conflict",
+  );
+  assert.throws(
+    () => validateRuntimeConfig(testConfig({ frontendHandoffUrl: "", handoffSharedSecret: "", nonInteractiveAssertionMode: false })),
+    (error) => error instanceof IssuerError && error.code === "frontend_handoff_url_invalid",
+  );
+  assert.throws(
+    () => validateRuntimeConfig({ ...nonInteractiveTestConfig(), handoffSharedSecret: "" }),
+    (error) => error instanceof IssuerError && error.code === "handoff_secret_without_interactive_mode",
+  );
   assert.throws(
     () => createIssuerServer({ config: testConfig({ handoffSharedSecret: "" }) }),
     (error) => error instanceof IssuerError && error.code === "handoff_shared_secret_required",
   );
+});
+
+test("configuration derives raw handoff-secret presence and rejects supplied values in noninteractive mode", () => {
+  assert.equal(configFromEnv({}).handoffSharedSecret, undefined);
+  assert.equal(configFromEnv({ STAFFORDOS_OPERATOR_HANDOFF_SHARED_SECRET: "" }).handoffSharedSecret, "");
+  assert.equal(Object.prototype.hasOwnProperty.call(configFromEnv({}), "handoffSharedSecretConfigured"), false);
+  assert.doesNotThrow(() => validateRuntimeConfig(nonInteractiveTestConfig()));
+
+  const invalidSecrets = [
+    "",
+    " ",
+    "\t",
+    "\r\n",
+    "\0",
+    "\u0001",
+    "\u007f",
+    "\u00a0",
+    "\u2003",
+    "short",
+    `${testHandoffSecret}=`,
+    `${testHandoffSecret}!`,
+    `${testHandoffSecret} `,
+    `${testHandoffSecret}${testHandoffSecret}`,
+    testHandoffSecret.slice(0, -1),
+    testHandoffSecret,
+    null,
+    {},
+    [],
+    0,
+    false,
+  ];
+  for (const value of invalidSecrets) {
+    assert.throws(
+      () => validateRuntimeConfig({
+        ...nonInteractiveTestConfig(),
+        handoffSharedSecret: value,
+      }),
+      (error) => error instanceof IssuerError && error.code === "handoff_secret_without_interactive_mode"
+        && (typeof value !== "string" || !value || !error.message.includes(value)),
+    );
+  }
+
+  assert.doesNotThrow(() => validateRuntimeConfig(testConfig({ handoffSharedSecret: testHandoffSecret })));
+  for (const value of invalidSecrets.filter((value) => value !== testHandoffSecret)) {
+    assert.throws(
+      () => validateRuntimeConfig(testConfig({ handoffSharedSecret: value })),
+      (error) => error instanceof IssuerError && error.code === "handoff_shared_secret_required"
+        && (typeof value !== "string" || !value || !error.message.includes(value)),
+    );
+  }
+
+  assert.throws(
+    () => validateRuntimeConfig({ ...nonInteractiveTestConfig(), handoffSharedSecret: testHandoffSecret, handoffSharedSecretConfigured: false }),
+    (error) => error instanceof IssuerError && error.code === "handoff_secret_without_interactive_mode",
+  );
+  assert.throws(
+    () => validateRuntimeConfig({ ...nonInteractiveTestConfig(), handoffSharedSecret: testHandoffSecret, handoffSharedSecretConfigured: true }),
+    (error) => error instanceof IssuerError && error.code === "handoff_secret_without_interactive_mode",
+  );
+  assert.throws(
+    () => validateRuntimeConfig({ ...nonInteractiveTestConfig(), handoffSharedSecret: "short" }),
+    (error) => error instanceof IssuerError && error.code === "handoff_secret_without_interactive_mode",
+  );
+  assert.doesNotThrow(() => validateRuntimeConfig({ ...nonInteractiveTestConfig(), handoffSharedSecretConfigured: false }));
+  assert.doesNotThrow(() => validateRuntimeConfig({ ...nonInteractiveTestConfig(), handoffSharedSecretConfigured: true }));
+});
+
+test("configuration preserves supplied frontend handoff URL presence", () => {
+  assert.equal(configFromEnv({}).frontendHandoffUrl, undefined);
+  assert.equal(configFromEnv({ STAFFORDOS_OPERATOR_FRONTEND_HANDOFF_URL: "" }).frontendHandoffUrl, "");
+  assert.equal(configFromEnv({ STAFFORDOS_OPERATOR_FRONTEND_HANDOFF_URL: " " }).frontendHandoffUrl, " ");
+
+  for (const value of ["", " ", "\t", "\r\n", "\0", "\u00a0", "malformed"]) {
+    assert.throws(
+      () => validateRuntimeConfig({ ...nonInteractiveTestConfig(), frontendHandoffUrl: value }),
+      (error) => error instanceof IssuerError && error.code === "frontend_handoff_url_invalid",
+    );
+  }
+  assert.throws(
+    () => validateRuntimeConfig({ ...nonInteractiveTestConfig(), frontendHandoffUrl: "https://stafford.example/api/operator/auth/callback" }),
+    (error) => error instanceof IssuerError && error.code === "authentication_modes_conflict",
+  );
+  assert.throws(
+    () => validateRuntimeConfig({ ...nonInteractiveTestConfig(), frontendHandoffUrl: " ", handoffSharedSecret: undefined }),
+    (error) => error instanceof IssuerError && error.code === "frontend_handoff_url_invalid",
+  );
+});
+
+test("OAuth state ceiling is the authoritative interactive transaction lifetime", () => {
+  const config = configFromEnv({ OAUTH_STATE_TTL_SECONDS: "9999" });
+  assert.equal(config.stateTtlSeconds, STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS);
+  assert.equal(configFromEnv({ OAUTH_STATE_TTL_SECONDS: String(STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS) }).stateTtlSeconds, STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS);
 });
 
 test("handoff shared secrets require canonical 32-byte base64url", () => {

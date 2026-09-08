@@ -35,6 +35,7 @@ const {
   CAREEROS_BETA_OPERATIONS_READ_PERMISSION,
   STAFFORDOS_OPERATOR_SESSION_COOKIE,
   authorizeStaffordOsOperatorRead,
+  browserBindingCookieOptions,
   careerOsBetaOperationsProtectedProof,
   createStaffordOsOperatorSession,
   destroyStaffordOsOperatorSession,
@@ -53,6 +54,8 @@ const {
   verifyStaffordOsOperatorCanonicalEntryToken,
   STAFFORDOS_OPERATOR_CANONICAL_ENTRY_CLOCK_SKEW_SECONDS,
   STAFFORDOS_OPERATOR_CANONICAL_ENTRY_TTL_SECONDS,
+  STAFFORDOS_OPERATOR_BROWSER_BINDING_TTL_SECONDS,
+  STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS,
 } = auth;
 
 const keyPair = crypto.generateKeyPairSync("ed25519");
@@ -314,6 +317,15 @@ test("canonical login entry tokens preserve only validated return paths and expi
   assert.equal(verified.returnTo, "/operator/careeros/beta-users?search=AI%20automation");
   assert.equal(verifyStaffordOsOperatorCanonicalEntryToken(`${token}x`, handoffSharedSecret, issued), null);
   assert.equal(verifyStaffordOsOperatorCanonicalEntryToken(token, handoffSharedSecret, new Date(issued.getTime() + 91_000)), null);
+});
+
+test("browser binding lifetime covers the issuer OAuth state ceiling", () => {
+  const options = browserBindingCookieOptions(testConfig());
+  assert.equal(STAFFORDOS_OPERATOR_BROWSER_BINDING_TTL_SECONDS, STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS);
+  assert.equal(options.maxAge, STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS);
+  assert.equal(options.httpOnly, true);
+  assert.equal(options.sameSite, "lax");
+  assert.equal(options.path, "/");
 });
 
 test("canonical entry validation applies bounded clock skew without extending token lifetime", () => {

@@ -1,11 +1,12 @@
-import { configFromEnv } from "./issuer.mjs";
+import { configFromEnv, validateRuntimeConfig } from "./issuer.mjs";
 import { createIssuerServer } from "./server.mjs";
 import { runHandoffMigrations } from "./migrations.mjs";
 
 const config = configFromEnv();
-if (config.frontendHandoffUrl) await runHandoffMigrations(config);
-const server = createIssuerServer({ config });
+const validatedConfig = validateRuntimeConfig(config);
+if (validatedConfig.frontendHandoffUrl) await runHandoffMigrations(validatedConfig);
+const server = createIssuerServer({ config: validatedConfig });
 
-server.listen(config.port, () => {
-  process.stdout.write(`staffordos-operator-issuer listening on ${config.port}\n`);
+server.listen(validatedConfig.port, () => {
+  process.stdout.write(`staffordos-operator-issuer listening on ${validatedConfig.port}\n`);
 });

@@ -4,6 +4,10 @@ import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 
+// Keep this ceiling aligned with the frontend browser-binding lifetime contract.
+export const STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS = 900;
+export const STAFFORDOS_OPERATOR_OAUTH_STATE_CLOCK_SKEW_SECONDS = 0;
+
 export const STAFFORDOS_OPERATOR_PERMISSIONS = Object.freeze({
   AUDIT_READ: "shopifixer.audit.read",
   SCOPE_READ: "shopifixer.scope.read",
@@ -174,7 +178,7 @@ export function configFromEnv(env = process.env) {
     staffordosAudience: cleanString(env.STAFFORDOS_OPERATOR_JWT_AUDIENCE),
     sessionSecret: cleanString(env.ISSUER_SESSION_SECRET),
     assertionTtlSeconds: Math.max(60, Math.min(900, Number(env.STAFFORDOS_ASSERTION_TTL_SECONDS || 300))),
-    stateTtlSeconds: Math.max(60, Math.min(900, Number(env.OAUTH_STATE_TTL_SECONDS || 600))),
+    stateTtlSeconds: Math.max(60, Math.min(STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS, Number(env.OAUTH_STATE_TTL_SECONDS || 600))),
     allowedSubjects: csv(env.STAFFORDOS_OPERATOR_ALLOWED_SUBJECTS),
     allowedEmails: csv(env.STAFFORDOS_OPERATOR_ALLOWED_EMAILS).map(cleanLower),
     operatorRoles: roles.length ? roles : ["viewer"],
@@ -187,21 +191,22 @@ export function configFromEnv(env = process.env) {
     kmsAccessToken: cleanString(env.KMS_ACCESS_TOKEN),
     kmsImpersonateServiceAccount: cleanString(env.KMS_IMPERSONATE_SERVICE_ACCOUNT),
     kmsUseGcloudAuth: boolValue(env.KMS_USE_GCLOUD_AUTH),
-    frontendHandoffUrl: cleanString(env.STAFFORDOS_OPERATOR_FRONTEND_HANDOFF_URL),
+    frontendHandoffUrl: env.STAFFORDOS_OPERATOR_FRONTEND_HANDOFF_URL,
     handoffDatabaseUrl: cleanString(env.STAFFORDOS_OPERATOR_HANDOFF_DATABASE_URL),
     handoffEncryptionKey: typeof env.STAFFORDOS_OPERATOR_HANDOFF_ENCRYPTION_KEY === "string" ? env.STAFFORDOS_OPERATOR_HANDOFF_ENCRYPTION_KEY : "",
     handoffPreviousEncryptionKey: typeof env.STAFFORDOS_OPERATOR_HANDOFF_PREVIOUS_ENCRYPTION_KEY === "string" ? env.STAFFORDOS_OPERATOR_HANDOFF_PREVIOUS_ENCRYPTION_KEY : "",
-    handoffSharedSecret: typeof env.STAFFORDOS_OPERATOR_HANDOFF_SHARED_SECRET === "string"
-      ? env.STAFFORDOS_OPERATOR_HANDOFF_SHARED_SECRET
-      : "",
+    handoffSharedSecret: env.STAFFORDOS_OPERATOR_HANDOFF_SHARED_SECRET,
     nonInteractiveAssertionMode: boolValue(env.STAFFORDOS_OPERATOR_NONINTERACTIVE_ASSERTION_MODE),
     port: Number(env.PORT || 8787),
   };
 }
 
 export function validateFrontendHandoffUrl(config) {
-  const rawUrl = cleanString(config.frontendHandoffUrl);
-  if (!rawUrl) return "";
+  const rawUrl = config.frontendHandoffUrl;
+  if (rawUrl === undefined) return "";
+  if (typeof rawUrl !== "string" || !rawUrl || rawUrl !== rawUrl.trim() || /\s/.test(rawUrl) || /[\u0000-\u001f\u007f]/.test(rawUrl)) {
+    throw new IssuerError("frontend_handoff_url_invalid", 500);
+  }
 
   let url;
   try {
@@ -254,8 +259,15 @@ export function validateRuntimeConfig(config, { handoffStoreProvided = false } =
     throw new IssuerError("operator_subject_allowlist_missing", 500);
   }
   const handoffUrl = validateFrontendHandoffUrl(config);
+  const handoffSecretConfigured = config.handoffSharedSecret !== undefined;
+  if (handoffUrl && config.nonInteractiveAssertionMode) {
+    throw new IssuerError("authentication_modes_conflict", 500);
+  }
   if (!handoffUrl && !config.nonInteractiveAssertionMode) {
     throw new IssuerError("frontend_handoff_required", 500);
+  }
+  if (!handoffUrl && handoffSecretConfigured) {
+    throw new IssuerError("handoff_secret_without_interactive_mode", 500);
   }
   if (handoffUrl && !isCanonicalHandoffSharedSecret(config.handoffSharedSecret)) {
     throw new IssuerError("handoff_shared_secret_required", 500);
@@ -317,7 +329,7 @@ export function verifyStateCookie(cookieValue, secret, now = new Date()) {
 
 export function createLoginResponse(config, now = new Date(), returnTo = "", browserChallenge = config.browserChallenge || "") {
   validateRuntimeConfig(config);
-  if (config.frontendHandoffUrl && !config.nonInteractiveAssertionMode && !isCanonicalBrowserBindingValue(browserChallenge)) {
+  if (config.frontendHandoffUrl && !isCanonicalBrowserBindingValue(browserChallenge)) {
     throw new IssuerError("browser_binding_required", 500);
   }
   const state = base64Url(crypto.randomBytes(24));
