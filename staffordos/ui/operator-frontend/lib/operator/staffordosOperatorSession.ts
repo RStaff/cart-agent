@@ -5,6 +5,7 @@ export const STAFFORDOS_OPERATOR_BROWSER_BINDING_COOKIE = "staffordos_operator_b
 export const STAFFORDOS_OPERATOR_DEFAULT_RETURN_PATH = "/operator/cockpit";
 export const STAFFORDOS_OPERATOR_SESSION_TTL_SECONDS = 300;
 export const STAFFORDOS_OPERATOR_BROWSER_BINDING_TTL_SECONDS = 600;
+export const STAFFORDOS_OPERATOR_CANONICAL_ENTRY_TTL_SECONDS = 60;
 export const STAFFORDOS_OPERATOR_SESSION_MAX_TTL_SECONDS = 900;
 export const CAREEROS_BETA_OPERATIONS_READ_PERMISSION = "careeros.beta.operations.read";
 export const CAREEROS_BETA_OPERATIONS_ROLE = "careeros_beta_operations_viewer";
@@ -142,6 +143,40 @@ export function createStaffordOsOperatorBrowserBinding() {
   return { verifier, challenge };
 }
 
+function canonicalEntryKey(secret: string) {
+  return Buffer.from(crypto.hkdfSync("sha256", Buffer.from(secret, "ascii"), Buffer.alloc(0), Buffer.from("staffordos.operator.canonical-entry.v1", "ascii"), 32));
+}
+
+function canonicalEntryPayload(value: { returnTo: string; issuedAt: number; expiresAt: number; nonce: string }) {
+  return JSON.stringify({ v: 1, returnTo: value.returnTo, issuedAt: value.issuedAt, expiresAt: value.expiresAt, nonce: value.nonce });
+}
+
+export function createStaffordOsOperatorCanonicalEntryToken(returnTo: string | null, secret: string, now = new Date()) {
+  const validated = validateStaffordOsOperatorReturnPath(returnTo);
+  const issuedAt = Math.floor(now.getTime() / 1000);
+  const payload = canonicalEntryPayload({ returnTo: validated || "", issuedAt, expiresAt: issuedAt + STAFFORDOS_OPERATOR_CANONICAL_ENTRY_TTL_SECONDS, nonce: base64Url(crypto.randomBytes(16)) });
+  const encoded = base64Url(Buffer.from(payload, "utf8"));
+  const signature = base64Url(crypto.createHmac("sha256", canonicalEntryKey(secret)).update(encoded, "ascii").digest());
+  return `${encoded}.${signature}`;
+}
+
+export function verifyStaffordOsOperatorCanonicalEntryToken(token: string | null | undefined, secret: string, now = new Date()) {
+  if (typeof token !== "string") return null;
+  const [encoded, signature] = token.split(".");
+  if (!encoded || !signature || !/^[A-Za-z0-9_-]+$/.test(encoded) || !/^[A-Za-z0-9_-]+$/.test(signature)) return null;
+  const expected = base64Url(crypto.createHmac("sha256", canonicalEntryKey(secret)).update(encoded, "ascii").digest());
+  const actualBytes = Buffer.from(signature, "ascii");
+  const expectedBytes = Buffer.from(expected, "ascii");
+  if (actualBytes.length !== expectedBytes.length || !crypto.timingSafeEqual(actualBytes, expectedBytes)) return null;
+  try {
+    const payload = JSON.parse(base64UrlDecode(encoded).toString("utf8"));
+    const nowSeconds = Math.floor(now.getTime() / 1000);
+    if (payload.v !== 1 || !Number.isInteger(payload.issuedAt) || !Number.isInteger(payload.expiresAt) || payload.issuedAt > nowSeconds || payload.expiresAt <= nowSeconds || payload.expiresAt - payload.issuedAt > STAFFORDOS_OPERATOR_CANONICAL_ENTRY_TTL_SECONDS || typeof payload.nonce !== "string" || !/^[A-Za-z0-9_-]{22}$/.test(payload.nonce)) return null;
+    const returnTo = validateStaffordOsOperatorReturnPath(payload.returnTo);
+    return returnTo === null && payload.returnTo !== "" ? null : { returnTo, expiresAt: payload.expiresAt };
+  } catch { return null; }
+}
+
 export function browserBindingCookieOptions(config: StaffordOsOperatorAuthConfig, maxAge = STAFFORDOS_OPERATOR_BROWSER_BINDING_TTL_SECONDS) {
   return sessionCookieOptions(config, maxAge);
 }
@@ -190,7 +225,6 @@ export function resolveStaffordOsOperatorReturnPath(
 
   try {
     const refererUrl = new URL(rawReferer);
-    if (refererUrl.origin !== trustedOrigin) return null;
     return validateStaffordOsOperatorReturnPath(`${refererUrl.pathname}${refererUrl.search}`);
   } catch {
     return null;

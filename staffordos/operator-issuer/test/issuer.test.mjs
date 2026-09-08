@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import crypto from "node:crypto";
 import test, { mock } from "node:test";
 import { createIssuerServer } from "../src/server.mjs";
+import { createInMemoryHandoffStore, createPostgresHandoffStore } from "../src/handoffStore.mjs";
 import {
   IssuerError,
   STAFFORDOS_OPERATOR_PERMISSIONS,
@@ -307,6 +308,7 @@ test("callback validates Google identity and issues an EdDSA StaffordOS JWT", as
     signer,
     now,
     deps: {
+      handoffStore: createInMemoryHandoffStore(),
       tokenExchanger: async () => ({ id_token: idToken }),
       googleJwks: google.jwks,
     },
@@ -338,6 +340,7 @@ test("local frontend handoff returns only an opaque code to the browser and rede
     config,
     signer,
     deps: {
+      handoffStore: createInMemoryHandoffStore(),
       tokenExchanger: async () => ({ id_token: idToken }),
       googleJwks: google.jwks,
     },
@@ -396,7 +399,7 @@ test("configured HTTPS handoff accepts non-loopback callback traffic but require
   const server = createIssuerServer({
     config,
     signer,
-    deps: { tokenExchanger: async () => ({ id_token: idToken }), googleJwks: google.jwks },
+    deps: { handoffStore: createInMemoryHandoffStore(), tokenExchanger: async () => ({ id_token: idToken }), googleJwks: google.jwks },
   });
 
   const login = await invokeServer(server, { path: "/login?returnTo=%2Foperator%2Fcareeros%2Fmissions%2Fexample" });
@@ -461,7 +464,7 @@ test("local HTTP handoff transport remains loopback-only", async () => {
   const server = createIssuerServer({
     config,
     signer,
-    deps: { tokenExchanger: async () => ({ id_token: idToken }), googleJwks: google.jwks },
+    deps: { handoffStore: createInMemoryHandoffStore(), tokenExchanger: async () => ({ id_token: idToken }), googleJwks: google.jwks },
   });
   const login = await invokeServer(server, { path: "/login" });
   const loginLocation = new URL(login.headers.Location);
@@ -491,6 +494,7 @@ test("expired opaque handoff is rejected by the production redemption path", asy
       config: testConfig(),
       signer,
       deps: {
+        handoffStore: createInMemoryHandoffStore(),
         tokenExchanger: async () => ({ id_token: idToken }),
         googleJwks: google.jwks,
       },
@@ -535,6 +539,41 @@ test("expired opaque handoff is rejected by the production redemption path", asy
   } finally {
     mock.timers.reset();
   }
+});
+
+test("postgres handoff adapter encrypts records and consumes once across adapter instances", async () => {
+  const encryptionKey = base64Url(crypto.randomBytes(32));
+  const rows = new Map();
+  const fakePool = {
+    async query(query) {
+      const text = typeof query === "string" ? query : query.text;
+      if (text.startsWith("INSERT")) { rows.set(query.values[0].toString("hex"), Object.fromEntries([["code_hash", query.values[0]], ["ciphertext", query.values[1]], ["auth_tag", query.values[2]], ["nonce", query.values[3]], ["key_id", query.values[4]], ["browser_challenge", query.values[5]], ["return_to", query.values[6]], ["created_at", query.values[7]], ["expires_at", query.values[8]]])); return { rows: [], rowCount: 1 }; }
+      throw new Error(`unexpected_query_${text}`);
+    },
+    async connect() {
+      return {
+        async query(query) {
+          const text = typeof query === "string" ? query : query.text;
+          if (text === "BEGIN" || text === "COMMIT" || text === "ROLLBACK") return { rows: [] };
+          if (text.startsWith("SELECT")) return { rows: [...rows.values()] };
+          if (text.startsWith("DELETE")) { rows.delete(query.values[0].toString("hex")); return { rows: [], rowCount: 1 }; }
+          throw new Error(`unexpected_transaction_${text}`);
+        },
+        release() {},
+      };
+    },
+    async end() {},
+  };
+  const config = testConfig({ handoffDatabaseUrl: "postgres://test.invalid/db", handoffEncryptionKey: encryptionKey });
+  const storeA = createPostgresHandoffStore(config, { pool: fakePool });
+  const storeB = createPostgresHandoffStore(config, { pool: fakePool });
+  const grant = { code: "opaque-test-code", jwt: "synthetic-jwt", header: { kid: "k" }, payload: { exp: Math.floor(Date.now() / 1000) + 60 }, createdAt: new Date().toISOString(), expiresAt: new Date(Date.now() + 60_000).toISOString(), returnTo: "/operator/cockpit", browserChallenge: browserBindingChallenge(testBrowserVerifier) };
+  await storeA.create(grant);
+  const stored = [...rows.values()][0];
+  assert.equal(stored.ciphertext.includes(Buffer.from(grant.jwt)), false);
+  const redeemed = await storeB.consume(grant.code, testBrowserVerifier);
+  assert.equal(redeemed.jwt, grant.jwt);
+  await assert.rejects(storeA.consume(grant.code, testBrowserVerifier), /staffordos_handoff_code_invalid/);
 });
 
 test("issuer rejects invalid Google audience", async () => {

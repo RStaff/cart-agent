@@ -128,17 +128,25 @@ test("login route transports the mission path using configured origin policy", a
       referer: "http://127.0.0.1:3000/operator/careeros/missions/example",
     },
   }));
-  const location = new URL(response.headers.get("location"));
+  const canonical = new URL(response.headers.get("location"));
   assert.equal(response.status, 307);
+  assert.equal(canonical.origin, "http://127.0.0.1:3000");
+  assert.equal(canonical.pathname, "/api/operator/auth/login");
+  assert.equal(response.cookieSet, null);
+  const canonicalResponse = await loginRoute.GET(new Request(canonical.toString()));
+  const location = new URL(canonicalResponse.headers.get("location"));
   assert.equal(location.origin, "http://127.0.0.1:8787");
   assert.equal(location.pathname, "/login");
   assert.equal(location.searchParams.get("returnTo"), "/operator/careeros/missions/example");
+  assert.ok(canonicalResponse.cookieSet);
 });
 
 test("login route preserves validated encoded query data without changing its path", async () => {
   setTestEnv();
   const response = await loginRoute.GET(new Request("http://127.0.0.1:3000/api/operator/auth/login?returnTo=%2Foperator%2Fcareeros%2Fbeta-users%3Fsearch%3DAI%2520automation"));
-  const location = new URL(response.headers.get("location"));
+  const canonical = new URL(response.headers.get("location"));
+  const canonicalResponse = await loginRoute.GET(new Request(canonical.toString()));
+  const location = new URL(canonicalResponse.headers.get("location"));
   assert.equal(location.searchParams.get("returnTo"), "/operator/careeros/beta-users?search=AI%20automation");
 });
 

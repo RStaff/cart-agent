@@ -14,6 +14,7 @@ import {
   parseCookies,
   validateRuntimeConfig,
 } from "./issuer.mjs";
+import { HandoffStoreError, createPostgresHandoffStore } from "./handoffStore.mjs";
 
 const HANDOFF_GRANT_TTL_SECONDS = 60;
 
@@ -62,36 +63,21 @@ function assertHandoffTransport(req, config) {
   if (new URL(config.frontendHandoffUrl).protocol === "http:") assertLocalHandoffRequest(req);
 }
 
-function createHandoffGrant(handoffGrants, result, now = new Date()) {
+function createHandoffGrant(result, now = new Date()) {
   const code = crypto.randomBytes(24).toString("base64url");
   const assertionExpiresAt = Number(result.payload.exp || 0) * 1000;
   const ttlExpiresAt = now.getTime() + HANDOFF_GRANT_TTL_SECONDS * 1000;
   const expiresAt = Math.min(assertionExpiresAt, ttlExpiresAt);
-  handoffGrants.set(code, {
+  return {
+    code,
     jwt: result.jwt,
     header: result.header,
     payload: result.payload,
-    expiresAt,
+    createdAt: now.toISOString(),
+    expiresAt: new Date(expiresAt).toISOString(),
     returnTo: result.returnTo || "",
     browserChallenge: result.browserChallenge || "",
-  });
-  return { code, expiresAt, returnTo: result.returnTo || "" };
-}
-
-function consumeHandoffGrant(handoffGrants, code, browserVerifier, now = new Date()) {
-  const cleanCode = cleanString(code);
-  if (!cleanCode) throw new IssuerError("staffordos_handoff_code_missing", 400);
-  const grant = handoffGrants.get(cleanCode);
-  if (!grant) throw new IssuerError("staffordos_handoff_code_invalid", 401);
-  if (!Number.isFinite(grant.expiresAt) || grant.expiresAt <= now.getTime()) {
-    handoffGrants.delete(cleanCode);
-    throw new IssuerError("staffordos_handoff_code_expired", 401);
-  }
-  if (!browserBindingMatches(browserVerifier, grant.browserChallenge)) {
-    throw new IssuerError("staffordos_handoff_browser_binding_invalid", 401);
-  }
-  handoffGrants.delete(cleanCode);
-  return grant;
+  };
 }
 
 function redirectResponse(res, location, headers = {}) {
@@ -104,8 +90,8 @@ function redirectResponse(res, location, headers = {}) {
 }
 
 export function createIssuerServer({ config = configFromEnv(), signer = new CloudKmsJwtSigner(config), deps = {} } = {}) {
-  validateRuntimeConfig(config);
-  const handoffGrants = new Map();
+  validateRuntimeConfig(config, { handoffStoreProvided: Boolean(deps.handoffStore) });
+  const handoffStore = deps.handoffStore || (config.frontendHandoffUrl ? createPostgresHandoffStore(config) : null);
 
   return http.createServer(async (req, res) => {
     const url = new URL(req.url || "/", "http://127.0.0.1");
@@ -132,7 +118,7 @@ export function createIssuerServer({ config = configFromEnv(), signer = new Clou
         });
         if (config.frontendHandoffUrl) {
           assertHandoffTransport(req, config);
-          const handoff = createHandoffGrant(handoffGrants, result);
+          const handoff = await handoffStore.create(createHandoffGrant(result));
           const location = new URL(config.frontendHandoffUrl);
           location.searchParams.set("code", handoff.code);
           return redirectResponse(res, location.toString(), {
@@ -156,7 +142,9 @@ export function createIssuerServer({ config = configFromEnv(), signer = new Clou
       if (req.method === "GET" && url.pathname === "/auth/staffordos/handoff") {
         assertHandoffTransport(req, config);
         assertAuthenticatedHandoffRequest(req, config);
-        const grant = consumeHandoffGrant(handoffGrants, url.searchParams.get("code"), req.headers?.["x-staffordos-browser-verifier"]);
+        const code = cleanString(url.searchParams.get("code"));
+        if (!code) throw new IssuerError("staffordos_handoff_code_missing", 400);
+        const grant = await handoffStore.consume(code, req.headers?.["x-staffordos-browser-verifier"] || "");
         return jsonResponse(res, 200, {
           ok: true,
           token_type: "StaffordOS-Operator-Assertion",
@@ -180,6 +168,7 @@ export function createIssuerServer({ config = configFromEnv(), signer = new Clou
 
       return jsonResponse(res, 404, { ok: false, error: "not_found" });
     } catch (error) {
+      if (error instanceof HandoffStoreError) error = new IssuerError(error.code, error.status);
       const response = sanitizedError(error);
       return jsonResponse(res, response.status, response.body);
     }

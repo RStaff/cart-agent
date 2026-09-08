@@ -188,6 +188,9 @@ export function configFromEnv(env = process.env) {
     kmsImpersonateServiceAccount: cleanString(env.KMS_IMPERSONATE_SERVICE_ACCOUNT),
     kmsUseGcloudAuth: boolValue(env.KMS_USE_GCLOUD_AUTH),
     frontendHandoffUrl: cleanString(env.STAFFORDOS_OPERATOR_FRONTEND_HANDOFF_URL),
+    handoffDatabaseUrl: cleanString(env.STAFFORDOS_OPERATOR_HANDOFF_DATABASE_URL),
+    handoffEncryptionKey: typeof env.STAFFORDOS_OPERATOR_HANDOFF_ENCRYPTION_KEY === "string" ? env.STAFFORDOS_OPERATOR_HANDOFF_ENCRYPTION_KEY : "",
+    handoffPreviousEncryptionKey: typeof env.STAFFORDOS_OPERATOR_HANDOFF_PREVIOUS_ENCRYPTION_KEY === "string" ? env.STAFFORDOS_OPERATOR_HANDOFF_PREVIOUS_ENCRYPTION_KEY : "",
     handoffSharedSecret: typeof env.STAFFORDOS_OPERATOR_HANDOFF_SHARED_SECRET === "string"
       ? env.STAFFORDOS_OPERATOR_HANDOFF_SHARED_SECRET
       : "",
@@ -230,7 +233,7 @@ export function isCanonicalHandoffSharedSecret(value) {
   }
 }
 
-export function validateRuntimeConfig(config) {
+export function validateRuntimeConfig(config, { handoffStoreProvided = false } = {}) {
   for (const key of [
     "googleClientId",
     "googleClientSecret",

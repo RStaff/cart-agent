@@ -49,6 +49,8 @@ const {
   validateStaffordOsOperatorReturnPath,
   verifyStaffordOsOperatorAssertion,
   createStaffordOsOperatorBrowserBinding,
+  createStaffordOsOperatorCanonicalEntryToken,
+  verifyStaffordOsOperatorCanonicalEntryToken,
 } = auth;
 
 const keyPair = crypto.generateKeyPairSync("ed25519");
@@ -283,7 +285,7 @@ test("operator login resolves an absent return path from a same-origin referer",
       "http://localhost:3000/operator/cockpit",
       "http://127.0.0.1:3000",
     ),
-    null,
+    "/operator/cockpit",
   );
   assert.equal(
     resolveStaffordOsOperatorReturnPath(
@@ -301,6 +303,15 @@ test("operator login resolves an absent return path from a same-origin referer",
     ),
     null,
   );
+});
+
+test("canonical login entry tokens preserve only validated return paths and expire", () => {
+  const issued = new Date("2026-08-29T12:00:00.000Z");
+  const token = createStaffordOsOperatorCanonicalEntryToken("/operator/careeros/beta-users?search=AI%20automation", handoffSharedSecret, issued);
+  const verified = verifyStaffordOsOperatorCanonicalEntryToken(token, handoffSharedSecret, issued);
+  assert.equal(verified.returnTo, "/operator/careeros/beta-users?search=AI%20automation");
+  assert.equal(verifyStaffordOsOperatorCanonicalEntryToken(`${token}x`, handoffSharedSecret, issued), null);
+  assert.equal(verifyStaffordOsOperatorCanonicalEntryToken(token, handoffSharedSecret, new Date(issued.getTime() + 61_000)), null);
 });
 
 test("callback-created session validates through an independently loaded module", () => {
