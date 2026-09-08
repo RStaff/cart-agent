@@ -8,6 +8,8 @@ import {
   base64Url,
   base64UrlDecode,
   buildAndSignStaffordosJwt,
+  browserBindingChallenge,
+  browserBindingMatches,
   completeOAuthCallback,
   configFromEnv,
   createLoginResponse,
@@ -20,6 +22,7 @@ import {
 } from "../src/issuer.mjs";
 
 const testHandoffSecret = base64Url(crypto.randomBytes(32));
+const testBrowserVerifier = base64Url(crypto.randomBytes(32));
 
 class LocalEd25519Signer {
   constructor(keyPair = crypto.generateKeyPairSync("ed25519"), kid = "local-test-key:1") {
@@ -61,6 +64,7 @@ function testConfig(overrides = {}) {
     kmsKeyVersion: "1",
     frontendHandoffUrl: "http://127.0.0.1:3000/api/operator/auth/callback",
     handoffSharedSecret: testHandoffSecret,
+    browserChallenge: browserBindingChallenge(testBrowserVerifier),
     nonInteractiveAssertionMode: false,
     ...overrides,
   };
@@ -139,6 +143,7 @@ test("login endpoint contract produces Google OAuth redirect with state and nonc
   assert.equal(location.searchParams.get("scope"), "openid email profile");
   assert.ok(location.searchParams.get("state"));
   assert.ok(location.searchParams.get("nonce"));
+  assert.equal(location.searchParams.get("browserChallenge"), null);
   assert.match(login.headers["Set-Cookie"], /HttpOnly/);
 });
 
@@ -269,6 +274,20 @@ test("handoff shared secrets require canonical 32-byte base64url", () => {
   }
 });
 
+test("browser binding proofs require canonical verifiers and match in constant-time", () => {
+  assert.equal(browserBindingMatches(testBrowserVerifier, browserBindingChallenge(testBrowserVerifier)), true);
+  assert.equal(browserBindingMatches(testBrowserVerifier.slice(0, -1), browserBindingChallenge(testBrowserVerifier)), false);
+  assert.equal(browserBindingMatches(`${testBrowserVerifier}=`, browserBindingChallenge(testBrowserVerifier)), false);
+  assert.equal(browserBindingMatches(testBrowserVerifier, "malformed"), false);
+});
+
+test("interactive login requires a browser binding challenge", () => {
+  assert.throws(
+    () => createLoginResponse(testConfig({ browserChallenge: "" }), new Date("2026-07-30T00:00:00.000Z")),
+    (error) => error instanceof IssuerError && error.code === "browser_binding_required",
+  );
+});
+
 test("callback validates Google identity and issues an EdDSA StaffordOS JWT", async () => {
   const config = testConfig();
   const signer = new LocalEd25519Signer();
@@ -346,7 +365,10 @@ test("local frontend handoff returns only an opaque code to the browser and rede
 
   const redeem = await invokeServer(server, {
     path: `/auth/staffordos/handoff?code=${location.searchParams.get("code")}`,
-    headers: { "x-staffordos-handoff-secret": config.handoffSharedSecret },
+    headers: {
+      "x-staffordos-handoff-secret": config.handoffSharedSecret,
+      "x-staffordos-browser-verifier": testBrowserVerifier,
+    },
   });
   const body = JSON.parse(redeem.body);
   assert.equal(redeem.status, 200);
@@ -358,7 +380,10 @@ test("local frontend handoff returns only an opaque code to the browser and rede
 
   const secondRedeem = await invokeServer(server, {
     path: `/auth/staffordos/handoff?code=${location.searchParams.get("code")}`,
-    headers: { "x-staffordos-handoff-secret": config.handoffSharedSecret },
+    headers: {
+      "x-staffordos-handoff-secret": config.handoffSharedSecret,
+      "x-staffordos-browser-verifier": testBrowserVerifier,
+    },
   });
   assert.equal(secondRedeem.status, 401);
 });
@@ -406,10 +431,23 @@ test("configured HTTPS handoff accepts non-loopback callback traffic but require
   });
   assert.equal(unauthorized.status, 401);
 
+  const foreignBrowser = await invokeServer(server, {
+    remoteAddress: "10.20.30.41",
+    path: `/auth/staffordos/handoff?code=${handoffCode}`,
+    headers: {
+      "x-staffordos-handoff-secret": config.handoffSharedSecret,
+      "x-staffordos-browser-verifier": base64Url(crypto.randomBytes(32)),
+    },
+  });
+  assert.equal(foreignBrowser.status, 401);
+
   const redeemed = await invokeServer(server, {
     remoteAddress: "10.20.30.41",
     path: `/auth/staffordos/handoff?code=${handoffCode}`,
-    headers: { "x-staffordos-handoff-secret": config.handoffSharedSecret },
+    headers: {
+      "x-staffordos-handoff-secret": config.handoffSharedSecret,
+      "x-staffordos-browser-verifier": testBrowserVerifier,
+    },
   });
   assert.equal(redeemed.status, 200);
   assert.equal(JSON.parse(redeemed.body).return_to, "/operator/careeros/missions/example");
@@ -477,14 +515,20 @@ test("expired opaque handoff is rejected by the production redemption path", asy
     mock.timers.setTime(clockStart.getTime() + 62_000);
     const expired = await invokeServer(server, {
       path: `/auth/staffordos/handoff?code=${handoffCode}`,
-      headers: { "x-staffordos-handoff-secret": testConfig().handoffSharedSecret },
+      headers: {
+        "x-staffordos-handoff-secret": testConfig().handoffSharedSecret,
+        "x-staffordos-browser-verifier": testBrowserVerifier,
+      },
     });
     assert.equal(expired.status, 401);
     assert.match(expired.body, /staffordos_handoff_code_expired/);
 
     const replay = await invokeServer(server, {
       path: `/auth/staffordos/handoff?code=${handoffCode}`,
-      headers: { "x-staffordos-handoff-secret": testConfig().handoffSharedSecret },
+      headers: {
+        "x-staffordos-handoff-secret": testConfig().handoffSharedSecret,
+        "x-staffordos-browser-verifier": testBrowserVerifier,
+      },
     });
     assert.equal(replay.status, 401);
     assert.match(replay.body, /staffordos_handoff_code_invalid/);

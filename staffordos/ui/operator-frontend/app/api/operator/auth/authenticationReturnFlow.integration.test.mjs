@@ -46,9 +46,11 @@ class MockNextResponse {
     this.headers = new Headers(headers);
     this.body = body;
     this.cookieSet = null;
+    this.cookieSets = [];
     this.cookies = {
       set: (name, value, options) => {
-        this.cookieSet = { name, options };
+        this.cookieSet = { name, value, options };
+        this.cookieSets.push(this.cookieSet);
       },
     };
   }
@@ -74,9 +76,13 @@ const verified = {
   expiresAt: Math.floor(Date.now() / 1000) + 300,
 };
 let callbackReturnTo = "/operator/careeros/missions/example";
+const browserVerifier = crypto.randomBytes(32).toString("base64url");
 const routeAuth = {
   ...authModule,
-  redeemStaffordOsIssuerHandoffCode: async () => ({ assertion: "synthetic-assertion", returnTo: callbackReturnTo }),
+  redeemStaffordOsIssuerHandoffCode: async (_code, _config, verifier) => {
+    if (verifier !== browserVerifier) throw new Error("browser binding rejected");
+    return { assertion: "synthetic-assertion", returnTo: callbackReturnTo };
+  },
   fetchStaffordOsOperatorPublicKey: async () => "synthetic-public-key",
   verifyStaffordOsOperatorAssertion: () => verified,
 };
@@ -140,6 +146,7 @@ test("callback redirects to configured frontend origin and attaches the encrypte
   setTestEnv();
   const response = await callbackRoute.GET(new Request("http://localhost:3000/api/operator/auth/callback?code=opaque", {
     headers: {
+      cookie: `staffordos_operator_browser_binding=${browserVerifier}`,
       host: "evil.example",
       "x-forwarded-host": "evil.example",
       forwarded: "host=evil.example",
@@ -150,12 +157,14 @@ test("callback redirects to configured frontend origin and attaches the encrypte
   assert.equal(response.status, 307);
   assert.equal(location.origin, "http://127.0.0.1:3000");
   assert.equal(location.pathname, "/operator/careeros/missions/example");
-  assert.ok(response.cookieSet);
-  assert.equal(response.cookieSet.name, "staffordos_operator_session");
-  assert.equal(response.cookieSet.options.httpOnly, true);
-  assert.equal(response.cookieSet.options.sameSite, "lax");
-  assert.equal(response.cookieSet.options.path, "/");
-  assert.equal(response.cookieSet.options.secure, false);
+  const sessionCookie = response.cookieSets.find((cookie) => cookie.name === "staffordos_operator_session");
+  const bindingCookie = response.cookieSets.find((cookie) => cookie.name === "staffordos_operator_browser_binding");
+  assert.ok(sessionCookie);
+  assert.equal(sessionCookie.options.httpOnly, true);
+  assert.equal(sessionCookie.options.sameSite, "lax");
+  assert.equal(sessionCookie.options.path, "/");
+  assert.equal(sessionCookie.options.secure, false);
+  assert.equal(bindingCookie.value, "");
 });
 
 test("callback preserves the encoded query returned by the production handoff contract", async () => {
@@ -163,16 +172,39 @@ test("callback preserves the encoded query returned by the production handoff co
   callbackReturnTo = "/operator/careeros/beta-users?search=AI%20automation";
   try {
     const response = await callbackRoute.GET(new Request("http://127.0.0.1:3000/api/operator/auth/callback?code=opaque", {
-      headers: { host: "evil.example", "x-forwarded-host": "evil.example" },
+      headers: {
+        cookie: `staffordos_operator_browser_binding=${browserVerifier}`,
+        host: "evil.example",
+        "x-forwarded-host": "evil.example",
+      },
     }));
     const location = new URL(response.headers.get("location"));
     assert.equal(location.origin, "http://127.0.0.1:3000");
     assert.equal(location.pathname, "/operator/careeros/beta-users");
     assert.equal(location.search, "?search=AI%20automation");
-    assert.ok(response.cookieSet);
+    assert.ok(response.cookieSets.some((cookie) => cookie.name === "staffordos_operator_session"));
   } finally {
     callbackReturnTo = "/operator/careeros/missions/example";
   }
+});
+
+test("callback fails closed without the initiating browser binding", async () => {
+  setTestEnv();
+  const response = await callbackRoute.GET(new Request("http://127.0.0.1:3000/api/operator/auth/callback?code=opaque"));
+  assert.equal(response.status, 401);
+  assert.deepEqual(response.body, { ok: false, error: "OPERATOR_BROWSER_BINDING_MISSING" });
+  assert.equal(response.cookieSet, null);
+  assert.equal(response.headers.has("location"), false);
+});
+
+test("callback rejects a foreign browser binding without session or redirect", async () => {
+  setTestEnv();
+  const response = await callbackRoute.GET(new Request("http://127.0.0.1:3000/api/operator/auth/callback?code=opaque", {
+    headers: { cookie: `staffordos_operator_browser_binding=${crypto.randomBytes(32).toString("base64url")}` },
+  }));
+  assert.equal(response.status, 401);
+  assert.equal(response.cookieSet, null);
+  assert.equal(response.headers.has("location"), false);
 });
 
 test("missing handoff configuration fails closed instead of returning an interactive assertion", async () => {

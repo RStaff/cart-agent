@@ -80,6 +80,29 @@ export function validateOperatorReturnPath(value = "") {
   }
 }
 
+export function isCanonicalBrowserBindingValue(value) {
+  if (typeof value !== "string" || value.length !== 43 || value.trim() !== value || !/^[A-Za-z0-9_-]+$/.test(value)) return false;
+  try {
+    const decoded = base64UrlDecode(value);
+    return decoded.length === 32 && base64Url(decoded) === value;
+  } catch {
+    return false;
+  }
+}
+
+export function browserBindingChallenge(verifier) {
+  if (!isCanonicalBrowserBindingValue(verifier)) return "";
+  return base64Url(crypto.createHash("sha256").update(verifier, "ascii").digest());
+}
+
+export function browserBindingMatches(verifier, expectedChallenge) {
+  const actualChallenge = browserBindingChallenge(verifier);
+  if (!actualChallenge || !isCanonicalBrowserBindingValue(expectedChallenge)) return false;
+  const actual = Buffer.from(actualChallenge, "ascii");
+  const expected = Buffer.from(expectedChallenge, "ascii");
+  return actual.length === expected.length && crypto.timingSafeEqual(actual, expected);
+}
+
 export function csv(value = "") {
   return cleanString(value)
     .split(",")
@@ -289,12 +312,15 @@ export function verifyStateCookie(cookieValue, secret, now = new Date()) {
   return payload;
 }
 
-export function createLoginResponse(config, now = new Date(), returnTo = "") {
+export function createLoginResponse(config, now = new Date(), returnTo = "", browserChallenge = config.browserChallenge || "") {
   validateRuntimeConfig(config);
+  if (config.frontendHandoffUrl && !config.nonInteractiveAssertionMode && !isCanonicalBrowserBindingValue(browserChallenge)) {
+    throw new IssuerError("browser_binding_required", 500);
+  }
   const state = base64Url(crypto.randomBytes(24));
   const nonce = base64Url(crypto.randomBytes(24));
   const expiresAt = new Date(now.getTime() + config.stateTtlSeconds * 1000).toISOString();
-  const stateCookie = signStateCookie({ state, nonce, issuedAt: now.toISOString(), expiresAt, returnTo: validateOperatorReturnPath(returnTo) }, config.sessionSecret);
+  const stateCookie = signStateCookie({ state, nonce, issuedAt: now.toISOString(), expiresAt, returnTo: validateOperatorReturnPath(returnTo), browserChallenge }, config.sessionSecret);
   const url = new URL("https://accounts.google.com/o/oauth2/v2/auth");
   url.searchParams.set("client_id", config.googleClientId);
   url.searchParams.set("redirect_uri", config.googleRedirectUri);
@@ -469,7 +495,7 @@ export async function completeOAuthCallback({ code, state, stateCookie, config, 
     jwksProvider: deps.jwksProvider,
     fetchImpl: deps.fetchImpl,
   });
-  return { ...(await buildAndSignStaffordosJwt(googleClaims, config, signer, now)), returnTo: validateOperatorReturnPath(statePayload.returnTo) };
+  return { ...(await buildAndSignStaffordosJwt(googleClaims, config, signer, now)), returnTo: validateOperatorReturnPath(statePayload.returnTo), browserChallenge: statePayload.browserChallenge || "" };
 }
 
 async function gcloudAccessToken(config) {

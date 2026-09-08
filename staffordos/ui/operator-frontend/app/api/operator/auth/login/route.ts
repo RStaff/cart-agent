@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import {
+  browserBindingCookieOptions,
+  createStaffordOsOperatorBrowserBinding,
+  STAFFORDOS_OPERATOR_BROWSER_BINDING_COOKIE,
   operatorAuthConfigFromEnv,
   resolveStaffordOsOperatorReturnPath,
   validateOperatorAuthConfig,
@@ -17,7 +20,11 @@ export async function GET(request: Request) {
     );
     const issuerLogin = new URL("/login", config.issuerBaseUrl);
     if (returnTo) issuerLogin.searchParams.set("returnTo", returnTo);
-    return NextResponse.redirect(issuerLogin);
+    const browserBinding = createStaffordOsOperatorBrowserBinding();
+    issuerLogin.searchParams.set("browserChallenge", browserBinding.challenge);
+    const response = NextResponse.redirect(issuerLogin);
+    response.cookies.set(STAFFORDOS_OPERATOR_BROWSER_BINDING_COOKIE, browserBinding.verifier, browserBindingCookieOptions(config));
+    return response;
   } catch {
     return NextResponse.json({ ok: false, error: "OPERATOR_AUTH_CONFIG_UNAVAILABLE" }, { status: 500 });
   }

@@ -39,6 +39,7 @@ const {
   createStaffordOsOperatorSession,
   destroyStaffordOsOperatorSession,
   isCanonicalStaffordOsOperatorHandoffSecret,
+  isCanonicalStaffordOsOperatorBrowserBindingValue,
   operatorAuthorizationFailureBody,
   redeemStaffordOsIssuerHandoffCode,
   resolveStaffordOsOperatorReturnPath,
@@ -47,6 +48,7 @@ const {
   STAFFORDOS_OPERATOR_DEFAULT_RETURN_PATH,
   validateStaffordOsOperatorReturnPath,
   verifyStaffordOsOperatorAssertion,
+  createStaffordOsOperatorBrowserBinding,
 } = auth;
 
 const keyPair = crypto.generateKeyPairSync("ed25519");
@@ -114,11 +116,18 @@ test("frontend handoff secret validation accepts only canonical 32-byte base64ur
   }
 });
 
+test("frontend browser binding generates a canonical verifier and challenge", () => {
+  const binding = createStaffordOsOperatorBrowserBinding();
+  assert.equal(isCanonicalStaffordOsOperatorBrowserBindingValue(binding.verifier), true);
+  assert.equal(binding.challenge.length, 43);
+  assert.notEqual(binding.verifier, binding.challenge);
+});
+
 test("handoff redemption rejects issuer redirects without forwarding the service credential", async () => {
   const requests = [];
   const config = testConfig();
   await assert.rejects(
-    redeemStaffordOsIssuerHandoffCode("synthetic-code", config, async (url, options) => {
+    redeemStaffordOsIssuerHandoffCode("synthetic-code", config, "synthetic-browser-verifier", async (url, options) => {
       requests.push({ url, options });
       if (options.redirect !== "error") requests.push({ url: "https://redirect-target.invalid", options });
       return { ok: false, status: 302, json: async () => ({}) };

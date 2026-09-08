@@ -1,8 +1,10 @@
 import * as crypto from "node:crypto";
 
 export const STAFFORDOS_OPERATOR_SESSION_COOKIE = "staffordos_operator_session";
+export const STAFFORDOS_OPERATOR_BROWSER_BINDING_COOKIE = "staffordos_operator_browser_binding";
 export const STAFFORDOS_OPERATOR_DEFAULT_RETURN_PATH = "/operator/cockpit";
 export const STAFFORDOS_OPERATOR_SESSION_TTL_SECONDS = 300;
+export const STAFFORDOS_OPERATOR_BROWSER_BINDING_TTL_SECONDS = 600;
 export const STAFFORDOS_OPERATOR_SESSION_MAX_TTL_SECONDS = 900;
 export const CAREEROS_BETA_OPERATIONS_READ_PERMISSION = "careeros.beta.operations.read";
 export const CAREEROS_BETA_OPERATIONS_ROLE = "careeros_beta_operations_viewer";
@@ -122,6 +124,43 @@ export function isCanonicalStaffordOsOperatorHandoffSecret(value: unknown) {
   } catch {
     return false;
   }
+}
+
+export function isCanonicalStaffordOsOperatorBrowserBindingValue(value: unknown) {
+  if (typeof value !== "string" || value.length !== 43 || value.trim() !== value || !/^[A-Za-z0-9_-]+$/.test(value)) return false;
+  try {
+    const decoded = Buffer.from(value, "base64url");
+    return decoded.length === 32 && base64Url(decoded) === value;
+  } catch {
+    return false;
+  }
+}
+
+export function createStaffordOsOperatorBrowserBinding() {
+  const verifier = base64Url(crypto.randomBytes(32));
+  const challenge = base64Url(crypto.createHash("sha256").update(verifier, "ascii").digest());
+  return { verifier, challenge };
+}
+
+export function browserBindingCookieOptions(config: StaffordOsOperatorAuthConfig, maxAge = STAFFORDOS_OPERATOR_BROWSER_BINDING_TTL_SECONDS) {
+  return sessionCookieOptions(config, maxAge);
+}
+
+function readCookie(header: string | null | undefined, name: string) {
+  for (const part of String(header || "").split(";")) {
+    const [key, ...value] = part.trim().split("=");
+    if (key !== name) continue;
+    try {
+      return decodeURIComponent(value.join("="));
+    } catch {
+      return "";
+    }
+  }
+  return "";
+}
+
+export function readStaffordOsOperatorBrowserBindingCookie(header: string | null | undefined) {
+  return readCookie(header, STAFFORDOS_OPERATOR_BROWSER_BINDING_COOKIE);
 }
 
 function validateStaffordOsOperatorIssuerBaseUrl(value: string | null | undefined) {
@@ -480,6 +519,7 @@ export function operatorAuthorizationFailureBody(result: OperatorAuthorizationRe
 export async function redeemStaffordOsIssuerHandoffCode(
   code: string,
   config: StaffordOsOperatorAuthConfig,
+  browserVerifier: string,
   fetchImpl: typeof fetch = fetch,
 ) {
   validateOperatorAuthConfig(config);
@@ -490,6 +530,7 @@ export async function redeemStaffordOsIssuerHandoffCode(
     headers: {
       Accept: "application/json",
       "X-StaffordOS-Handoff-Secret": config.handoffSharedSecret,
+      "X-StaffordOS-Browser-Verifier": browserVerifier,
     },
     cache: "no-store",
     redirect: "error",

@@ -6,6 +6,8 @@ import {
   IssuerError,
   cleanString,
   completeOAuthCallback,
+  browserBindingChallenge,
+  browserBindingMatches,
   configFromEnv,
   createLoginResponse,
   isCanonicalHandoffSharedSecret,
@@ -71,19 +73,24 @@ function createHandoffGrant(handoffGrants, result, now = new Date()) {
     payload: result.payload,
     expiresAt,
     returnTo: result.returnTo || "",
+    browserChallenge: result.browserChallenge || "",
   });
   return { code, expiresAt, returnTo: result.returnTo || "" };
 }
 
-function consumeHandoffGrant(handoffGrants, code, now = new Date()) {
+function consumeHandoffGrant(handoffGrants, code, browserVerifier, now = new Date()) {
   const cleanCode = cleanString(code);
   if (!cleanCode) throw new IssuerError("staffordos_handoff_code_missing", 400);
   const grant = handoffGrants.get(cleanCode);
-  handoffGrants.delete(cleanCode);
   if (!grant) throw new IssuerError("staffordos_handoff_code_invalid", 401);
   if (!Number.isFinite(grant.expiresAt) || grant.expiresAt <= now.getTime()) {
+    handoffGrants.delete(cleanCode);
     throw new IssuerError("staffordos_handoff_code_expired", 401);
   }
+  if (!browserBindingMatches(browserVerifier, grant.browserChallenge)) {
+    throw new IssuerError("staffordos_handoff_browser_binding_invalid", 401);
+  }
+  handoffGrants.delete(cleanCode);
   return grant;
 }
 
@@ -108,7 +115,7 @@ export function createIssuerServer({ config = configFromEnv(), signer = new Clou
       }
 
       if (req.method === "GET" && url.pathname === "/login") {
-        const login = createLoginResponse(config, new Date(), url.searchParams.get("returnTo"));
+        const login = createLoginResponse(config, new Date(), url.searchParams.get("returnTo"), url.searchParams.get("browserChallenge") || config.browserChallenge || "");
         res.writeHead(login.status, login.headers);
         return res.end();
       }
@@ -149,7 +156,7 @@ export function createIssuerServer({ config = configFromEnv(), signer = new Clou
       if (req.method === "GET" && url.pathname === "/auth/staffordos/handoff") {
         assertHandoffTransport(req, config);
         assertAuthenticatedHandoffRequest(req, config);
-        const grant = consumeHandoffGrant(handoffGrants, url.searchParams.get("code"));
+        const grant = consumeHandoffGrant(handoffGrants, url.searchParams.get("code"), req.headers?.["x-staffordos-browser-verifier"]);
         return jsonResponse(res, 200, {
           ok: true,
           token_type: "StaffordOS-Operator-Assertion",
