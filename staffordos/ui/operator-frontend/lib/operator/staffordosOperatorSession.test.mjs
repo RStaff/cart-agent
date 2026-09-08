@@ -223,10 +223,37 @@ test("session cookie is HttpOnly, bounded, and never stores assertion material",
 test("operator return paths accept only internal StaffordOS destinations", () => {
   assert.equal(validateStaffordOsOperatorReturnPath("/operator/careeros/missions/example"), "/operator/careeros/missions/example");
   assert.equal(validateStaffordOsOperatorReturnPath("/operator/careeros/beta-users"), "/operator/careeros/beta-users");
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/careeros/beta-users?search=AI%20automation"), "/operator/careeros/beta-users?search=AI%20automation");
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/careeros/missions/example?tab=technical%20details"), "/operator/careeros/missions/example?tab=technical%20details");
+  assert.equal(validateStaffordOsOperatorReturnPath("/os/professional/jobs?filter=APPLY%5FNOW"), "/os/professional/jobs?filter=APPLY%5FNOW");
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/products?next=https%3A%2F%2Fevil.example%2F"), "/operator/products?next=https%3A%2F%2Fevil.example%2F");
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/products?a=1%2F2&b=3%3A4&c=5%3F6&d=7%26e%3D8&f=9%25"), "/operator/products?a=1%2F2&b=3%3A4&c=5%3F6&d=7%26e%3D8&f=9%25");
   assert.equal(validateStaffordOsOperatorReturnPath(""), null);
   assert.equal(validateStaffordOsOperatorReturnPath("https://evil.example/"), null);
   assert.equal(validateStaffordOsOperatorReturnPath("//evil.example/"), null);
   assert.equal(validateStaffordOsOperatorReturnPath("/operator/%2F%2Fevil"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/items%2Fexample"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/products?bad=%"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/products?bad=%2"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/products?bad=%GG"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/products?bad=%00"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/products?bad=%5C"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/../os"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/products#details"), null);
+  for (const invalid of [
+    " /operator/careeros/beta-users",
+    "/operator/careeros/beta-users ",
+    "\t/operator/careeros/beta-users\t",
+    "\r/operator/careeros/beta-users",
+    "/operator/careeros/beta-users\n",
+    "/operator/careeros/beta-users\r\n",
+    "/operator/careeros/beta-users\0",
+    "/operator/careeros/beta-users\x1b",
+    "/operator/careeros/beta-users\x7f",
+    "\u00a0/operator/careeros/beta-users",
+    "/operator/careeros/beta-users\u2003",
+    "/operator/careeros/beta-users?search=AI automation",
+  ]) assert.equal(validateStaffordOsOperatorReturnPath(invalid), null);
   assert.equal(validateStaffordOsOperatorReturnPath("/career/profile"), null);
   assert.equal(validateStaffordOsOperatorReturnPath("javascript:alert(1)"), null);
   assert.equal(STAFFORDOS_OPERATOR_DEFAULT_RETURN_PATH, "/operator/cockpit");

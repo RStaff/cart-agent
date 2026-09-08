@@ -78,13 +78,20 @@ function text(value: unknown) {
 }
 
 export function validateStaffordOsOperatorReturnPath(value: string | null | undefined) {
-  const raw = text(value);
-  if (!raw || raw.length > 2048 || raw.includes("%") || raw.includes("\\") || /[\u0000-\u001f\u007f]/.test(raw)) return null;
-  if (!raw.startsWith("/") || raw.startsWith("//")) return null;
+  if (typeof value !== "string") return null;
+  const raw = value;
+  if (!raw || raw.length > 2048 || raw !== raw.trim() || /\s/.test(raw) || raw.includes("#") || /[\u0000-\u001f\u007f]/.test(raw)) return null;
+  const queryIndex = raw.indexOf("?");
+  const pathname = queryIndex === -1 ? raw : raw.slice(0, queryIndex);
+  const query = queryIndex === -1 ? "" : raw.slice(queryIndex + 1);
+  if (!pathname.startsWith("/") || pathname.startsWith("//") || pathname.includes("\\") || pathname.includes("%")) return null;
+  if (query && (/%(?![0-9a-fA-F]{2})/.test(query) || /[\\\u0000-\u001f\u007f]/.test(query))) return null;
   try {
     const parsed = new URL(raw, "http://staffordos.local");
     if (parsed.origin !== "http://staffordos.local") return null;
     if (!(parsed.pathname === "/operator" || parsed.pathname.startsWith("/operator/") || parsed.pathname === "/os" || parsed.pathname.startsWith("/os/"))) return null;
+    if (parsed.pathname !== pathname || parsed.search.slice(1) !== query) return null;
+    if (query && /[\\\u0000-\u001f\u007f]/.test(decodeURIComponent(query))) return null;
     return raw;
   } catch {
     return null;

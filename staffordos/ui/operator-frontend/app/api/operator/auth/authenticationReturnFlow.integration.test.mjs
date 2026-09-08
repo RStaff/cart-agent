@@ -73,9 +73,10 @@ const verified = {
   jwtId: "route-test-jti",
   expiresAt: Math.floor(Date.now() / 1000) + 300,
 };
+let callbackReturnTo = "/operator/careeros/missions/example";
 const routeAuth = {
   ...authModule,
-  redeemStaffordOsIssuerHandoffCode: async () => ({ assertion: "synthetic-assertion", returnTo: "/operator/careeros/missions/example" }),
+  redeemStaffordOsIssuerHandoffCode: async () => ({ assertion: "synthetic-assertion", returnTo: callbackReturnTo }),
   fetchStaffordOsOperatorPublicKey: async () => "synthetic-public-key",
   verifyStaffordOsOperatorAssertion: () => verified,
 };
@@ -128,6 +129,13 @@ test("login route transports the mission path using configured origin policy", a
   assert.equal(location.searchParams.get("returnTo"), "/operator/careeros/missions/example");
 });
 
+test("login route preserves validated encoded query data without changing its path", async () => {
+  setTestEnv();
+  const response = await loginRoute.GET(new Request("http://127.0.0.1:3000/api/operator/auth/login?returnTo=%2Foperator%2Fcareeros%2Fbeta-users%3Fsearch%3DAI%2520automation"));
+  const location = new URL(response.headers.get("location"));
+  assert.equal(location.searchParams.get("returnTo"), "/operator/careeros/beta-users?search=AI%20automation");
+});
+
 test("callback redirects to configured frontend origin and attaches the encrypted session cookie", async () => {
   setTestEnv();
   const response = await callbackRoute.GET(new Request("http://localhost:3000/api/operator/auth/callback?code=opaque", {
@@ -148,6 +156,23 @@ test("callback redirects to configured frontend origin and attaches the encrypte
   assert.equal(response.cookieSet.options.sameSite, "lax");
   assert.equal(response.cookieSet.options.path, "/");
   assert.equal(response.cookieSet.options.secure, false);
+});
+
+test("callback preserves the encoded query returned by the production handoff contract", async () => {
+  setTestEnv();
+  callbackReturnTo = "/operator/careeros/beta-users?search=AI%20automation";
+  try {
+    const response = await callbackRoute.GET(new Request("http://127.0.0.1:3000/api/operator/auth/callback?code=opaque", {
+      headers: { host: "evil.example", "x-forwarded-host": "evil.example" },
+    }));
+    const location = new URL(response.headers.get("location"));
+    assert.equal(location.origin, "http://127.0.0.1:3000");
+    assert.equal(location.pathname, "/operator/careeros/beta-users");
+    assert.equal(location.search, "?search=AI%20automation");
+    assert.ok(response.cookieSet);
+  } finally {
+    callbackReturnTo = "/operator/careeros/missions/example";
+  }
 });
 
 test("missing handoff configuration fails closed instead of returning an interactive assertion", async () => {

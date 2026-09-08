@@ -145,10 +145,37 @@ test("login endpoint contract produces Google OAuth redirect with state and nonc
 test("return path is restricted to internal StaffordOS routes", () => {
   assert.equal(validateOperatorReturnPath("/operator/careeros/missions/example"), "/operator/careeros/missions/example");
   assert.equal(validateOperatorReturnPath("/operator/careeros/beta-users"), "/operator/careeros/beta-users");
+  assert.equal(validateOperatorReturnPath("/operator/careeros/beta-users?search=AI%20automation"), "/operator/careeros/beta-users?search=AI%20automation");
+  assert.equal(validateOperatorReturnPath("/operator/careeros/missions/example?tab=technical%20details"), "/operator/careeros/missions/example?tab=technical%20details");
+  assert.equal(validateOperatorReturnPath("/os/professional/jobs?filter=APPLY%5FNOW"), "/os/professional/jobs?filter=APPLY%5FNOW");
+  assert.equal(validateOperatorReturnPath("/operator/products?next=https%3A%2F%2Fevil.example%2F"), "/operator/products?next=https%3A%2F%2Fevil.example%2F");
+  assert.equal(validateOperatorReturnPath("/operator/products?a=1%2F2&b=3%3A4&c=5%3F6&d=7%26e%3D8&f=9%25"), "/operator/products?a=1%2F2&b=3%3A4&c=5%3F6&d=7%26e%3D8&f=9%25");
   assert.equal(validateOperatorReturnPath(""), "");
   assert.equal(validateOperatorReturnPath("https://evil.example/"), "");
   assert.equal(validateOperatorReturnPath("//evil.example/"), "");
   assert.equal(validateOperatorReturnPath("/operator/%2F%2Fevil"), "");
+  assert.equal(validateOperatorReturnPath("/operator/items%2Fexample"), "");
+  assert.equal(validateOperatorReturnPath("/operator/products?bad=%"), "");
+  assert.equal(validateOperatorReturnPath("/operator/products?bad=%2"), "");
+  assert.equal(validateOperatorReturnPath("/operator/products?bad=%GG"), "");
+  assert.equal(validateOperatorReturnPath("/operator/products?bad=%00"), "");
+  assert.equal(validateOperatorReturnPath("/operator/products?bad=%5C"), "");
+  assert.equal(validateOperatorReturnPath("/operator/../os"), "");
+  assert.equal(validateOperatorReturnPath("/operator/products#details"), "");
+  for (const invalid of [
+    " /operator/careeros/beta-users",
+    "/operator/careeros/beta-users ",
+    "\t/operator/careeros/beta-users\t",
+    "\r/operator/careeros/beta-users",
+    "/operator/careeros/beta-users\n",
+    "/operator/careeros/beta-users\r\n",
+    "/operator/careeros/beta-users\0",
+    "/operator/careeros/beta-users\x1b",
+    "/operator/careeros/beta-users\x7f",
+    "\u00a0/operator/careeros/beta-users",
+    "/operator/careeros/beta-users\u2003",
+    "/operator/careeros/beta-users?search=AI automation",
+  ]) assert.equal(validateOperatorReturnPath(invalid), "");
   assert.equal(validateOperatorReturnPath("/%2Foperator"), "");
   assert.equal(validateOperatorReturnPath("/career/profile"), "");
   assert.equal(validateOperatorReturnPath("javascript:alert(1)"), "");
@@ -157,9 +184,9 @@ test("return path is restricted to internal StaffordOS routes", () => {
 
 test("signed OAuth state preserves a validated return path and rejects invalid paths", () => {
   const config = testConfig();
-  const valid = createLoginResponse(config, new Date("2026-07-30T00:00:00.000Z"), "/operator/careeros/missions/example");
+  const valid = createLoginResponse(config, new Date("2026-07-30T00:00:00.000Z"), "/operator/careeros/missions/example?tab=technical%20details");
   const validState = new URL(valid.location).searchParams.get("state");
-  assert.equal(JSON.parse(base64UrlDecode(cookieValue(valid.headers["Set-Cookie"]).split(".")[0]).toString("utf8")).returnTo, "/operator/careeros/missions/example");
+  assert.equal(JSON.parse(base64UrlDecode(cookieValue(valid.headers["Set-Cookie"]).split(".")[0]).toString("utf8")).returnTo, "/operator/careeros/missions/example?tab=technical%20details");
   assert.ok(validState);
 
   const invalid = createLoginResponse(config, new Date("2026-07-30T00:00:00.000Z"), "https://evil.example/");
