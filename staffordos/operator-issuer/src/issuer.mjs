@@ -4,6 +4,10 @@ import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 
+// Keep this ceiling aligned with the frontend browser-binding lifetime contract.
+export const STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS = 900;
+export const STAFFORDOS_OPERATOR_OAUTH_STATE_CLOCK_SKEW_SECONDS = 0;
+
 export const STAFFORDOS_OPERATOR_PERMISSIONS = Object.freeze({
   AUDIT_READ: "shopifixer.audit.read",
   SCOPE_READ: "shopifixer.scope.read",
@@ -57,6 +61,50 @@ export function cleanString(value = "") {
 
 export function cleanLower(value = "") {
   return cleanString(value).toLowerCase();
+}
+
+export function validateOperatorReturnPath(value = "") {
+  if (typeof value !== "string") return "";
+  const raw = value;
+  if (!raw || raw.length > 2048 || raw !== raw.trim() || /\s/.test(raw) || raw.includes("#") || /[\u0000-\u001f\u007f]/.test(raw)) return "";
+  const queryIndex = raw.indexOf("?");
+  const pathname = queryIndex === -1 ? raw : raw.slice(0, queryIndex);
+  const query = queryIndex === -1 ? "" : raw.slice(queryIndex + 1);
+  if (!pathname.startsWith("/") || pathname.startsWith("//") || pathname.includes("\\") || pathname.includes("%")) return "";
+  if (query && (/%(?![0-9a-fA-F]{2})/.test(query) || /[\\\u0000-\u001f\u007f]/.test(query))) return "";
+  try {
+    const parsed = new URL(raw, "http://staffordos.local");
+    if (parsed.origin !== "http://staffordos.local") return "";
+    if (!(parsed.pathname === "/operator" || parsed.pathname.startsWith("/operator/") || parsed.pathname === "/os" || parsed.pathname.startsWith("/os/"))) return "";
+    if (parsed.pathname !== pathname || parsed.search.slice(1) !== query) return "";
+    if (query && /[\\\u0000-\u001f\u007f]/.test(decodeURIComponent(query))) return "";
+    return raw;
+  } catch {
+    return "";
+  }
+}
+
+export function isCanonicalBrowserBindingValue(value) {
+  if (typeof value !== "string" || value.length !== 43 || value.trim() !== value || !/^[A-Za-z0-9_-]+$/.test(value)) return false;
+  try {
+    const decoded = base64UrlDecode(value);
+    return decoded.length === 32 && base64Url(decoded) === value;
+  } catch {
+    return false;
+  }
+}
+
+export function browserBindingChallenge(verifier) {
+  if (!isCanonicalBrowserBindingValue(verifier)) return "";
+  return base64Url(crypto.createHash("sha256").update(verifier, "ascii").digest());
+}
+
+export function browserBindingMatches(verifier, expectedChallenge) {
+  const actualChallenge = browserBindingChallenge(verifier);
+  if (!actualChallenge || !isCanonicalBrowserBindingValue(expectedChallenge)) return false;
+  const actual = Buffer.from(actualChallenge, "ascii");
+  const expected = Buffer.from(expectedChallenge, "ascii");
+  return actual.length === expected.length && crypto.timingSafeEqual(actual, expected);
 }
 
 export function csv(value = "") {
@@ -130,7 +178,7 @@ export function configFromEnv(env = process.env) {
     staffordosAudience: cleanString(env.STAFFORDOS_OPERATOR_JWT_AUDIENCE),
     sessionSecret: cleanString(env.ISSUER_SESSION_SECRET),
     assertionTtlSeconds: Math.max(60, Math.min(900, Number(env.STAFFORDOS_ASSERTION_TTL_SECONDS || 300))),
-    stateTtlSeconds: Math.max(60, Math.min(900, Number(env.OAUTH_STATE_TTL_SECONDS || 600))),
+    stateTtlSeconds: Math.max(60, Math.min(STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS, Number(env.OAUTH_STATE_TTL_SECONDS || 600))),
     allowedSubjects: csv(env.STAFFORDOS_OPERATOR_ALLOWED_SUBJECTS),
     allowedEmails: csv(env.STAFFORDOS_OPERATOR_ALLOWED_EMAILS).map(cleanLower),
     operatorRoles: roles.length ? roles : ["viewer"],
@@ -143,14 +191,22 @@ export function configFromEnv(env = process.env) {
     kmsAccessToken: cleanString(env.KMS_ACCESS_TOKEN),
     kmsImpersonateServiceAccount: cleanString(env.KMS_IMPERSONATE_SERVICE_ACCOUNT),
     kmsUseGcloudAuth: boolValue(env.KMS_USE_GCLOUD_AUTH),
-    frontendHandoffUrl: cleanString(env.STAFFORDOS_OPERATOR_FRONTEND_HANDOFF_URL),
+    frontendHandoffUrl: env.STAFFORDOS_OPERATOR_FRONTEND_HANDOFF_URL,
+    handoffDatabaseUrl: cleanString(env.STAFFORDOS_OPERATOR_HANDOFF_DATABASE_URL),
+    handoffEncryptionKey: typeof env.STAFFORDOS_OPERATOR_HANDOFF_ENCRYPTION_KEY === "string" ? env.STAFFORDOS_OPERATOR_HANDOFF_ENCRYPTION_KEY : "",
+    handoffPreviousEncryptionKey: typeof env.STAFFORDOS_OPERATOR_HANDOFF_PREVIOUS_ENCRYPTION_KEY === "string" ? env.STAFFORDOS_OPERATOR_HANDOFF_PREVIOUS_ENCRYPTION_KEY : "",
+    handoffSharedSecret: env.STAFFORDOS_OPERATOR_HANDOFF_SHARED_SECRET,
+    nonInteractiveAssertionMode: boolValue(env.STAFFORDOS_OPERATOR_NONINTERACTIVE_ASSERTION_MODE),
     port: Number(env.PORT || 8787),
   };
 }
 
 export function validateFrontendHandoffUrl(config) {
-  const rawUrl = cleanString(config.frontendHandoffUrl);
-  if (!rawUrl) return "";
+  const rawUrl = config.frontendHandoffUrl;
+  if (rawUrl === undefined) return "";
+  if (typeof rawUrl !== "string" || !rawUrl || rawUrl !== rawUrl.trim() || /\s/.test(rawUrl) || /[\u0000-\u001f\u007f]/.test(rawUrl)) {
+    throw new IssuerError("frontend_handoff_url_invalid", 500);
+  }
 
   let url;
   try {
@@ -159,19 +215,30 @@ export function validateFrontendHandoffUrl(config) {
     throw new IssuerError("frontend_handoff_url_invalid", 500);
   }
 
-  if (url.protocol !== "http:") {
-    throw new IssuerError("frontend_handoff_url_not_local", 500);
+  if (url.username || url.password || url.search || url.hash || url.pathname !== "/api/operator/auth/callback") {
+    throw new IssuerError("frontend_handoff_url_invalid", 500);
   }
 
   const hostname = cleanLower(url.hostname);
-  if (hostname !== "127.0.0.1" && hostname !== "localhost" && hostname !== "::1") {
-    throw new IssuerError("frontend_handoff_url_not_local", 500);
+  const loopback = ["127.0.0.1", "localhost", "[::1]"].includes(hostname);
+  if (url.protocol !== "https:" && !(url.protocol === "http:" && loopback)) {
+    throw new IssuerError("frontend_handoff_url_not_trusted", 500);
   }
 
   return url.toString();
 }
 
-export function validateRuntimeConfig(config) {
+export function isCanonicalHandoffSharedSecret(value) {
+  if (typeof value !== "string" || value.length !== 43 || value.trim() !== value || !/^[A-Za-z0-9_-]+$/.test(value)) return false;
+  try {
+    const decoded = Buffer.from(value, "base64url");
+    return decoded.length === 32 && base64Url(decoded) === value;
+  } catch {
+    return false;
+  }
+}
+
+export function validateRuntimeConfig(config, { handoffStoreProvided = false } = {}) {
   for (const key of [
     "googleClientId",
     "googleClientSecret",
@@ -191,7 +258,20 @@ export function validateRuntimeConfig(config) {
   if (!config.allowedSubjects.length) {
     throw new IssuerError("operator_subject_allowlist_missing", 500);
   }
-  validateFrontendHandoffUrl(config);
+  const handoffUrl = validateFrontendHandoffUrl(config);
+  const handoffSecretConfigured = config.handoffSharedSecret !== undefined;
+  if (handoffUrl && config.nonInteractiveAssertionMode) {
+    throw new IssuerError("authentication_modes_conflict", 500);
+  }
+  if (!handoffUrl && !config.nonInteractiveAssertionMode) {
+    throw new IssuerError("frontend_handoff_required", 500);
+  }
+  if (!handoffUrl && handoffSecretConfigured) {
+    throw new IssuerError("handoff_secret_without_interactive_mode", 500);
+  }
+  if (handoffUrl && !isCanonicalHandoffSharedSecret(config.handoffSharedSecret)) {
+    throw new IssuerError("handoff_shared_secret_required", 500);
+  }
   return config;
 }
 
@@ -247,12 +327,15 @@ export function verifyStateCookie(cookieValue, secret, now = new Date()) {
   return payload;
 }
 
-export function createLoginResponse(config, now = new Date()) {
+export function createLoginResponse(config, now = new Date(), returnTo = "", browserChallenge = config.browserChallenge || "") {
   validateRuntimeConfig(config);
+  if (config.frontendHandoffUrl && !isCanonicalBrowserBindingValue(browserChallenge)) {
+    throw new IssuerError("browser_binding_required", 500);
+  }
   const state = base64Url(crypto.randomBytes(24));
   const nonce = base64Url(crypto.randomBytes(24));
   const expiresAt = new Date(now.getTime() + config.stateTtlSeconds * 1000).toISOString();
-  const stateCookie = signStateCookie({ state, nonce, issuedAt: now.toISOString(), expiresAt }, config.sessionSecret);
+  const stateCookie = signStateCookie({ state, nonce, issuedAt: now.toISOString(), expiresAt, returnTo: validateOperatorReturnPath(returnTo), browserChallenge }, config.sessionSecret);
   const url = new URL("https://accounts.google.com/o/oauth2/v2/auth");
   url.searchParams.set("client_id", config.googleClientId);
   url.searchParams.set("redirect_uri", config.googleRedirectUri);
@@ -427,7 +510,7 @@ export async function completeOAuthCallback({ code, state, stateCookie, config, 
     jwksProvider: deps.jwksProvider,
     fetchImpl: deps.fetchImpl,
   });
-  return buildAndSignStaffordosJwt(googleClaims, config, signer, now);
+  return { ...(await buildAndSignStaffordosJwt(googleClaims, config, signer, now)), returnTo: validateOperatorReturnPath(statePayload.returnTo), browserChallenge: statePayload.browserChallenge || "" };
 }
 
 async function gcloudAccessToken(config) {

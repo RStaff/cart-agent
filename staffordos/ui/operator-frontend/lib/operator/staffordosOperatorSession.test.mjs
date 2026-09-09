@@ -35,18 +35,35 @@ const {
   CAREEROS_BETA_OPERATIONS_READ_PERMISSION,
   STAFFORDOS_OPERATOR_SESSION_COOKIE,
   authorizeStaffordOsOperatorRead,
+  browserBindingCookieOptions,
   careerOsBetaOperationsProtectedProof,
   createStaffordOsOperatorSession,
   destroyStaffordOsOperatorSession,
+  isCanonicalStaffordOsOperatorHandoffSecret,
+  isCanonicalStaffordOsOperatorBrowserBindingValue,
   operatorAuthorizationFailureBody,
+  redeemStaffordOsIssuerHandoffCode,
+  resolveStaffordOsOperatorReturnPath,
   resolveStaffordOsOperatorSession,
   sessionCookieOptions,
+  STAFFORDOS_OPERATOR_DEFAULT_RETURN_PATH,
+  validateStaffordOsOperatorReturnPath,
   verifyStaffordOsOperatorAssertion,
+  createStaffordOsOperatorBrowserBinding,
+  createStaffordOsOperatorCanonicalEntryToken,
+  verifyStaffordOsOperatorCanonicalEntryToken,
+  STAFFORDOS_OPERATOR_CANONICAL_ENTRY_CLOCK_SKEW_SECONDS,
+  STAFFORDOS_OPERATOR_CANONICAL_ENTRY_TTL_SECONDS,
+  STAFFORDOS_OPERATOR_BROWSER_BINDING_TTL_SECONDS,
+  STAFFORDOS_OPERATOR_BROWSER_BINDING_REDIRECT_MARGIN_SECONDS,
+  STAFFORDOS_OPERATOR_OAUTH_STATE_CLOCK_SKEW_SECONDS,
+  STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS,
 } = auth;
 
 const keyPair = crypto.generateKeyPairSync("ed25519");
 const publicKeyPem = keyPair.publicKey.export({ type: "spki", format: "pem" });
 const operatorSubject = "synthetic-operator-subject";
+const handoffSharedSecret = crypto.randomBytes(32).toString("base64url");
 const now = new Date("2026-08-29T12:00:00.000Z");
 const nowSeconds = Math.floor(now.getTime() / 1000);
 
@@ -71,6 +88,9 @@ function testConfig(overrides = {}) {
     audience: "staffordos.operator.frontend.v1",
     allowedSubjects: [operatorSubject],
     issuerBaseUrl: "http://127.0.0.1:8787",
+    frontendHandoffUrl: "http://127.0.0.1:3000/api/operator/auth/callback",
+    frontendOrigin: "http://127.0.0.1:3000",
+    handoffSharedSecret,
     publicKeyUrl: "http://127.0.0.1:8787/public-key",
     publicKeyPem,
     sessionSecret: "synthetic-session-secret-with-enough-entropy",
@@ -97,6 +117,37 @@ function signAssertion(payloadOverrides = {}) {
   const signature = crypto.sign(null, Buffer.from(signingInput), keyPair.privateKey);
   return `${signingInput}.${base64Url(signature)}`;
 }
+
+test("frontend handoff secret validation accepts only canonical 32-byte base64url", () => {
+  assert.equal(isCanonicalStaffordOsOperatorHandoffSecret(handoffSharedSecret), true);
+  for (const value of ["", " ", "short", `${handoffSharedSecret}=`, `${handoffSharedSecret}!`, ` ${handoffSharedSecret}`, handoffSharedSecret.slice(0, -1)]) {
+    assert.equal(isCanonicalStaffordOsOperatorHandoffSecret(value), false);
+  }
+});
+
+test("frontend browser binding generates a canonical verifier and challenge", () => {
+  const binding = createStaffordOsOperatorBrowserBinding();
+  assert.equal(isCanonicalStaffordOsOperatorBrowserBindingValue(binding.verifier), true);
+  assert.equal(binding.challenge.length, 43);
+  assert.notEqual(binding.verifier, binding.challenge);
+});
+
+test("handoff redemption rejects issuer redirects without forwarding the service credential", async () => {
+  const requests = [];
+  const config = testConfig();
+  await assert.rejects(
+    redeemStaffordOsIssuerHandoffCode("synthetic-code", config, "synthetic-browser-verifier", async (url, options) => {
+      requests.push({ url, options });
+      if (options.redirect !== "error") requests.push({ url: "https://redirect-target.invalid", options });
+      return { ok: false, status: 302, json: async () => ({}) };
+    }),
+  );
+  assert.equal(requests.length, 1);
+  assert.equal(new URL(requests[0].url).pathname, "/auth/staffordos/handoff");
+  assert.equal(requests[0].options.redirect, "error");
+  assert.equal(typeof requests[0].options.headers["X-StaffordOS-Handoff-Secret"], "string");
+  assert.equal(requests[0].options.headers["X-StaffordOS-Handoff-Secret"].length, 43);
+});
 
 function verifiedSession(overrides = {}, configOverrides = {}) {
   const config = testConfig(configOverrides);
@@ -185,6 +236,136 @@ test("session cookie is HttpOnly, bounded, and never stores assertion material",
   assert.equal(cookieValue.includes("StaffordOS-Operator-Assertion"), false);
   assert.equal(cookieValue.includes("."), true);
   assert.equal(session.expiresAt, nowSeconds + 300);
+});
+
+test("operator return paths accept only internal StaffordOS destinations", () => {
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/careeros/missions/example"), "/operator/careeros/missions/example");
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/careeros/beta-users"), "/operator/careeros/beta-users");
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/careeros/beta-users?search=AI%20automation"), "/operator/careeros/beta-users?search=AI%20automation");
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/careeros/missions/example?tab=technical%20details"), "/operator/careeros/missions/example?tab=technical%20details");
+  assert.equal(validateStaffordOsOperatorReturnPath("/os/professional/jobs?filter=APPLY%5FNOW"), "/os/professional/jobs?filter=APPLY%5FNOW");
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/products?next=https%3A%2F%2Fevil.example%2F"), "/operator/products?next=https%3A%2F%2Fevil.example%2F");
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/products?a=1%2F2&b=3%3A4&c=5%3F6&d=7%26e%3D8&f=9%25"), "/operator/products?a=1%2F2&b=3%3A4&c=5%3F6&d=7%26e%3D8&f=9%25");
+  assert.equal(validateStaffordOsOperatorReturnPath(""), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("https://evil.example/"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("//evil.example/"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/%2F%2Fevil"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/items%2Fexample"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/products?bad=%"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/products?bad=%2"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/products?bad=%GG"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/products?bad=%00"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/products?bad=%5C"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/../os"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("/operator/products#details"), null);
+  for (const invalid of [
+    " /operator/careeros/beta-users",
+    "/operator/careeros/beta-users ",
+    "\t/operator/careeros/beta-users\t",
+    "\r/operator/careeros/beta-users",
+    "/operator/careeros/beta-users\n",
+    "/operator/careeros/beta-users\r\n",
+    "/operator/careeros/beta-users\0",
+    "/operator/careeros/beta-users\x1b",
+    "/operator/careeros/beta-users\x7f",
+    "\u00a0/operator/careeros/beta-users",
+    "/operator/careeros/beta-users\u2003",
+    "/operator/careeros/beta-users?search=AI automation",
+  ]) assert.equal(validateStaffordOsOperatorReturnPath(invalid), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("/career/profile"), null);
+  assert.equal(validateStaffordOsOperatorReturnPath("javascript:alert(1)"), null);
+  assert.equal(STAFFORDOS_OPERATOR_DEFAULT_RETURN_PATH, "/operator/cockpit");
+});
+
+test("operator login resolves an absent return path from a same-origin referer", () => {
+  assert.equal(
+    resolveStaffordOsOperatorReturnPath(
+      null,
+      "http://127.0.0.1:3000/operator/careeros/missions/example?view=summary#details",
+      "http://127.0.0.1:3000",
+    ),
+    "/operator/careeros/missions/example?view=summary",
+  );
+  assert.equal(
+    resolveStaffordOsOperatorReturnPath(
+      null,
+      "http://localhost:3000/operator/cockpit",
+      "http://127.0.0.1:3000",
+    ),
+    "/operator/cockpit",
+  );
+  assert.equal(
+    resolveStaffordOsOperatorReturnPath(
+      "/operator/cockpit",
+      "http://127.0.0.1:3000/operator/careeros/missions/example",
+      "http://127.0.0.1:3000",
+    ),
+    "/operator/cockpit",
+  );
+  assert.equal(
+    resolveStaffordOsOperatorReturnPath(
+      "/career/profile",
+      "http://127.0.0.1:3000/operator/careeros/missions/example",
+      "http://127.0.0.1:3000",
+    ),
+    null,
+  );
+});
+
+test("canonical login entry tokens preserve only validated return paths and expire", () => {
+  const issued = new Date("2026-08-29T12:00:00.000Z");
+  const token = createStaffordOsOperatorCanonicalEntryToken("/operator/careeros/beta-users?search=AI%20automation", handoffSharedSecret, issued);
+  const verified = verifyStaffordOsOperatorCanonicalEntryToken(token, handoffSharedSecret, issued);
+  assert.equal(verified.returnTo, "/operator/careeros/beta-users?search=AI%20automation");
+  assert.equal(verifyStaffordOsOperatorCanonicalEntryToken(`${token}x`, handoffSharedSecret, issued), null);
+  assert.equal(verifyStaffordOsOperatorCanonicalEntryToken(token, handoffSharedSecret, new Date(issued.getTime() + 91_000)), null);
+});
+
+test("browser binding lifetime covers the issuer OAuth state ceiling and bounded redirect margin", () => {
+  const options = browserBindingCookieOptions(testConfig());
+  assert.equal(STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS, 900);
+  assert.equal(STAFFORDOS_OPERATOR_BROWSER_BINDING_REDIRECT_MARGIN_SECONDS, 30);
+  assert.equal(
+    STAFFORDOS_OPERATOR_BROWSER_BINDING_TTL_SECONDS,
+    STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS +
+      STAFFORDOS_OPERATOR_OAUTH_STATE_CLOCK_SKEW_SECONDS +
+      STAFFORDOS_OPERATOR_BROWSER_BINDING_REDIRECT_MARGIN_SECONDS,
+  );
+  assert.equal(options.maxAge, 930);
+  assert.ok(options.maxAge > STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS);
+  assert.equal(Number.isFinite(options.maxAge), true);
+  assert.equal(options.httpOnly, true);
+  assert.equal(options.sameSite, "lax");
+  assert.equal(options.path, "/");
+});
+
+test("canonical entry validation applies bounded clock skew without extending token lifetime", () => {
+  const issued = new Date("2026-08-29T12:00:00.000Z");
+  const token = createStaffordOsOperatorCanonicalEntryToken("/operator/careeros/beta-users?search=AI%20automation", handoffSharedSecret, issued);
+  const skew = STAFFORDOS_OPERATOR_CANONICAL_ENTRY_CLOCK_SKEW_SECONDS;
+  assert.ok(verifyStaffordOsOperatorCanonicalEntryToken(token, handoffSharedSecret, new Date(issued.getTime() - (skew - 1) * 1000)));
+  assert.ok(verifyStaffordOsOperatorCanonicalEntryToken(token, handoffSharedSecret, new Date(issued.getTime() - skew * 1000)));
+  assert.equal(verifyStaffordOsOperatorCanonicalEntryToken(token, handoffSharedSecret, new Date(issued.getTime() - (skew + 1) * 1000)), null);
+  assert.ok(verifyStaffordOsOperatorCanonicalEntryToken(token, handoffSharedSecret, new Date(issued.getTime() + (60 + skew) * 1000)));
+  assert.equal(verifyStaffordOsOperatorCanonicalEntryToken(token, handoffSharedSecret, new Date(issued.getTime() + (60 + skew + 1) * 1000)), null);
+});
+
+test("canonical entry validation rejects unsafe timestamp claims", () => {
+  const issued = new Date("2026-08-29T12:00:00.000Z");
+  const token = createStaffordOsOperatorCanonicalEntryToken("/operator/cockpit", handoffSharedSecret, issued);
+  const [encoded, signature] = token.split(".");
+  const payload = JSON.parse(Buffer.from(encoded, "base64url").toString("utf8"));
+  for (const changes of [
+    { issuedAt: -1 },
+    { issuedAt: 1.5 },
+    { issuedAt: Number.MAX_SAFE_INTEGER + 1 },
+    { expiresAt: payload.issuedAt },
+    { expiresAt: payload.issuedAt + STAFFORDOS_OPERATOR_CANONICAL_ENTRY_TTL_SECONDS + 1 },
+  ]) {
+    const altered = { ...payload, ...changes };
+    const alteredEncoded = Buffer.from(JSON.stringify(altered), "utf8").toString("base64url");
+    assert.equal(verifyStaffordOsOperatorCanonicalEntryToken(`${alteredEncoded}.${signature}`, handoffSharedSecret, issued), null);
+  }
 });
 
 test("callback-created session validates through an independently loaded module", () => {

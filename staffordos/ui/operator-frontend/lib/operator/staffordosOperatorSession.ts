@@ -1,7 +1,20 @@
 import * as crypto from "node:crypto";
 
 export const STAFFORDOS_OPERATOR_SESSION_COOKIE = "staffordos_operator_session";
+export const STAFFORDOS_OPERATOR_BROWSER_BINDING_COOKIE = "staffordos_operator_browser_binding";
+export const STAFFORDOS_OPERATOR_DEFAULT_RETURN_PATH = "/operator/cockpit";
 export const STAFFORDOS_OPERATOR_SESSION_TTL_SECONDS = 300;
+// Must cover the issuer's maximum OAuth state lifetime plus its clock tolerance.
+export const STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS = 900;
+export const STAFFORDOS_OPERATOR_OAUTH_STATE_CLOCK_SKEW_SECONDS = 0;
+// Cover bounded issuance and redirect processing after the issuer creates state.
+export const STAFFORDOS_OPERATOR_BROWSER_BINDING_REDIRECT_MARGIN_SECONDS = 30;
+export const STAFFORDOS_OPERATOR_BROWSER_BINDING_TTL_SECONDS =
+  STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS +
+  STAFFORDOS_OPERATOR_OAUTH_STATE_CLOCK_SKEW_SECONDS +
+  STAFFORDOS_OPERATOR_BROWSER_BINDING_REDIRECT_MARGIN_SECONDS;
+export const STAFFORDOS_OPERATOR_CANONICAL_ENTRY_TTL_SECONDS = 60;
+export const STAFFORDOS_OPERATOR_CANONICAL_ENTRY_CLOCK_SKEW_SECONDS = 30;
 export const STAFFORDOS_OPERATOR_SESSION_MAX_TTL_SECONDS = 900;
 export const CAREEROS_BETA_OPERATIONS_READ_PERMISSION = "careeros.beta.operations.read";
 export const CAREEROS_BETA_OPERATIONS_ROLE = "careeros_beta_operations_viewer";
@@ -13,6 +26,9 @@ export type StaffordOsOperatorAuthConfig = {
   audience: string;
   allowedSubjects: string[];
   issuerBaseUrl: string;
+  frontendHandoffUrl: string;
+  frontendOrigin: string;
+  handoffSharedSecret: string;
   publicKeyUrl: string;
   publicKeyPem?: string;
   sessionSecret: string;
@@ -71,6 +87,157 @@ const SESSION_COOKIE_AAD = Buffer.from("staffordos_operator_session.v1", "utf8")
 
 function text(value: unknown) {
   return String(value ?? "").trim();
+}
+
+export function validateStaffordOsOperatorReturnPath(value: string | null | undefined) {
+  if (typeof value !== "string") return null;
+  const raw = value;
+  if (!raw || raw.length > 2048 || raw !== raw.trim() || /\s/.test(raw) || raw.includes("#") || /[\u0000-\u001f\u007f]/.test(raw)) return null;
+  const queryIndex = raw.indexOf("?");
+  const pathname = queryIndex === -1 ? raw : raw.slice(0, queryIndex);
+  const query = queryIndex === -1 ? "" : raw.slice(queryIndex + 1);
+  if (!pathname.startsWith("/") || pathname.startsWith("//") || pathname.includes("\\") || pathname.includes("%")) return null;
+  if (query && (/%(?![0-9a-fA-F]{2})/.test(query) || /[\\\u0000-\u001f\u007f]/.test(query))) return null;
+  try {
+    const parsed = new URL(raw, "http://staffordos.local");
+    if (parsed.origin !== "http://staffordos.local") return null;
+    if (!(parsed.pathname === "/operator" || parsed.pathname.startsWith("/operator/") || parsed.pathname === "/os" || parsed.pathname.startsWith("/os/"))) return null;
+    if (parsed.pathname !== pathname || parsed.search.slice(1) !== query) return null;
+    if (query && /[\\\u0000-\u001f\u007f]/.test(decodeURIComponent(query))) return null;
+    return raw;
+  } catch {
+    return null;
+  }
+}
+
+export function validateStaffordOsOperatorFrontendHandoffUrl(value: string | null | undefined) {
+  const raw = text(value);
+  if (!raw) return null;
+
+  try {
+    const url = new URL(raw);
+    const loopback = ["127.0.0.1", "localhost", "[::1]"].includes(url.hostname.toLowerCase());
+    if (url.username || url.password || url.search || url.hash || url.pathname !== "/api/operator/auth/callback") return null;
+    if (url.protocol === "https:") return { url: url.toString(), origin: url.origin };
+    if (url.protocol === "http:" && loopback) return { url: url.toString(), origin: url.origin };
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export function isCanonicalStaffordOsOperatorHandoffSecret(value: unknown) {
+  if (typeof value !== "string" || value.length !== 43 || value.trim() !== value || !/^[A-Za-z0-9_-]+$/.test(value)) return false;
+  try {
+    const decoded = Buffer.from(value, "base64url");
+    return decoded.length === 32 && base64Url(decoded) === value;
+  } catch {
+    return false;
+  }
+}
+
+export function isCanonicalStaffordOsOperatorBrowserBindingValue(value: unknown) {
+  if (typeof value !== "string" || value.length !== 43 || value.trim() !== value || !/^[A-Za-z0-9_-]+$/.test(value)) return false;
+  try {
+    const decoded = Buffer.from(value, "base64url");
+    return decoded.length === 32 && base64Url(decoded) === value;
+  } catch {
+    return false;
+  }
+}
+
+export function createStaffordOsOperatorBrowserBinding() {
+  const verifier = base64Url(crypto.randomBytes(32));
+  const challenge = base64Url(crypto.createHash("sha256").update(verifier, "ascii").digest());
+  return { verifier, challenge };
+}
+
+function canonicalEntryKey(secret: string) {
+  return Buffer.from(crypto.hkdfSync("sha256", Buffer.from(secret, "ascii"), Buffer.alloc(0), Buffer.from("staffordos.operator.canonical-entry.v1", "ascii"), 32));
+}
+
+function canonicalEntryPayload(value: { returnTo: string; issuedAt: number; expiresAt: number; nonce: string }) {
+  return JSON.stringify({ v: 1, returnTo: value.returnTo, issuedAt: value.issuedAt, expiresAt: value.expiresAt, nonce: value.nonce });
+}
+
+export function createStaffordOsOperatorCanonicalEntryToken(returnTo: string | null, secret: string, now = new Date()) {
+  const validated = validateStaffordOsOperatorReturnPath(returnTo);
+  const issuedAt = Math.floor(now.getTime() / 1000);
+  const payload = canonicalEntryPayload({ returnTo: validated || "", issuedAt, expiresAt: issuedAt + STAFFORDOS_OPERATOR_CANONICAL_ENTRY_TTL_SECONDS, nonce: base64Url(crypto.randomBytes(16)) });
+  const encoded = base64Url(Buffer.from(payload, "utf8"));
+  const signature = base64Url(crypto.createHmac("sha256", canonicalEntryKey(secret)).update(encoded, "ascii").digest());
+  return `${encoded}.${signature}`;
+}
+
+export function verifyStaffordOsOperatorCanonicalEntryToken(token: string | null | undefined, secret: string, now = new Date()) {
+  if (typeof token !== "string") return null;
+  const [encoded, signature] = token.split(".");
+  if (!encoded || !signature || !/^[A-Za-z0-9_-]+$/.test(encoded) || !/^[A-Za-z0-9_-]+$/.test(signature)) return null;
+  const expected = base64Url(crypto.createHmac("sha256", canonicalEntryKey(secret)).update(encoded, "ascii").digest());
+  const actualBytes = Buffer.from(signature, "ascii");
+  const expectedBytes = Buffer.from(expected, "ascii");
+  if (actualBytes.length !== expectedBytes.length || !crypto.timingSafeEqual(actualBytes, expectedBytes)) return null;
+  try {
+    const payload = JSON.parse(base64UrlDecode(encoded).toString("utf8"));
+    const nowSeconds = Math.floor(now.getTime() / 1000);
+    if (payload.v !== 1 || !Number.isSafeInteger(payload.issuedAt) || !Number.isSafeInteger(payload.expiresAt) || payload.issuedAt < 0 || payload.expiresAt < 0 || payload.issuedAt > nowSeconds + STAFFORDOS_OPERATOR_CANONICAL_ENTRY_CLOCK_SKEW_SECONDS || payload.expiresAt < nowSeconds - STAFFORDOS_OPERATOR_CANONICAL_ENTRY_CLOCK_SKEW_SECONDS || payload.expiresAt <= payload.issuedAt || payload.expiresAt - payload.issuedAt > STAFFORDOS_OPERATOR_CANONICAL_ENTRY_TTL_SECONDS || typeof payload.nonce !== "string" || !/^[A-Za-z0-9_-]{22}$/.test(payload.nonce)) return null;
+    const returnTo = validateStaffordOsOperatorReturnPath(payload.returnTo);
+    return returnTo === null && payload.returnTo !== "" ? null : { returnTo, expiresAt: payload.expiresAt };
+  } catch { return null; }
+}
+
+export function browserBindingCookieOptions(config: StaffordOsOperatorAuthConfig, maxAge = STAFFORDOS_OPERATOR_BROWSER_BINDING_TTL_SECONDS) {
+  return sessionCookieOptions(config, maxAge);
+}
+
+function readCookie(header: string | null | undefined, name: string) {
+  for (const part of String(header || "").split(";")) {
+    const [key, ...value] = part.trim().split("=");
+    if (key !== name) continue;
+    try {
+      return decodeURIComponent(value.join("="));
+    } catch {
+      return "";
+    }
+  }
+  return "";
+}
+
+export function readStaffordOsOperatorBrowserBindingCookie(header: string | null | undefined) {
+  return readCookie(header, STAFFORDOS_OPERATOR_BROWSER_BINDING_COOKIE);
+}
+
+function validateStaffordOsOperatorIssuerBaseUrl(value: string | null | undefined) {
+  const raw = text(value);
+  if (!raw) return false;
+  try {
+    const url = new URL(raw);
+    const loopback = ["127.0.0.1", "localhost", "[::1]"].includes(url.hostname.toLowerCase());
+    return !url.username && !url.password && !url.search && !url.hash &&
+      (url.protocol === "https:" || (url.protocol === "http:" && loopback));
+  } catch {
+    return false;
+  }
+}
+
+export function resolveStaffordOsOperatorReturnPath(
+  explicitReturnTo: string | null | undefined,
+  referer: string | null | undefined,
+  trustedOrigin: string,
+) {
+  if (explicitReturnTo !== null && explicitReturnTo !== undefined) {
+    return validateStaffordOsOperatorReturnPath(explicitReturnTo);
+  }
+
+  const rawReferer = text(referer);
+  if (!rawReferer) return null;
+
+  try {
+    const refererUrl = new URL(rawReferer);
+    return validateStaffordOsOperatorReturnPath(`${refererUrl.pathname}${refererUrl.search}`);
+  } catch {
+    return null;
+  }
 }
 
 function csv(value: unknown) {
@@ -189,11 +356,19 @@ function publicKeyUrlFromEnv(env: Record<string, string | undefined>) {
 
 export function operatorAuthConfigFromEnv(env: Record<string, string | undefined> = process.env): StaffordOsOperatorAuthConfig {
   const issuerBaseUrl = text(env.STAFFORDOS_OPERATOR_ISSUER_BASE_URL);
+  const frontendHandoffUrl = text(env.STAFFORDOS_OPERATOR_FRONTEND_HANDOFF_URL);
+  const handoffSharedSecret = typeof env.STAFFORDOS_OPERATOR_HANDOFF_SHARED_SECRET === "string"
+    ? env.STAFFORDOS_OPERATOR_HANDOFF_SHARED_SECRET
+    : "";
+  const frontend = validateStaffordOsOperatorFrontendHandoffUrl(frontendHandoffUrl);
   return {
     issuer: text(env.STAFFORDOS_OPERATOR_JWT_ISSUER),
     audience: text(env.STAFFORDOS_OPERATOR_JWT_AUDIENCE),
     allowedSubjects: csv(env.STAFFORDOS_OPERATOR_ALLOWED_SUBJECTS),
     issuerBaseUrl,
+    frontendHandoffUrl,
+    frontendOrigin: frontend?.origin || "",
+    handoffSharedSecret,
     publicKeyUrl: publicKeyUrlFromEnv(env),
     publicKeyPem: text(env.STAFFORDOS_OPERATOR_JWT_PUBLIC_KEY_PEM) || undefined,
     sessionSecret: text(env.STAFFORDOS_OPERATOR_FRONTEND_SESSION_SECRET),
@@ -205,12 +380,15 @@ export function operatorAuthConfigFromEnv(env: Record<string, string | undefined
 export function validateOperatorAuthConfig(config: StaffordOsOperatorAuthConfig) {
   validateOperatorSessionConfig(config);
   const missing = [
-    ["issuerBaseUrl", config.issuerBaseUrl],
+    ["issuerBaseUrl", validateStaffordOsOperatorIssuerBaseUrl(config.issuerBaseUrl) ? config.issuerBaseUrl : ""],
+    ["frontendHandoffUrl", config.frontendHandoffUrl],
+    ["handoffSharedSecret", isCanonicalStaffordOsOperatorHandoffSecret(config.handoffSharedSecret) ? config.handoffSharedSecret : ""],
   ]
     .filter(([, value]) => !text(value))
     .map(([key]) => key);
 
   if (!config.publicKeyPem && !config.publicKeyUrl) missing.push("publicKeyUrl");
+  if (!validateStaffordOsOperatorFrontendHandoffUrl(config.frontendHandoffUrl)) missing.push("frontendHandoffUrl");
   if (missing.length) throw new Error(`STAFFORDOS_OPERATOR_AUTH_CONFIG_MISSING:${missing.join(",")}`);
   return config;
 }
@@ -384,6 +562,7 @@ export function operatorAuthorizationFailureBody(result: OperatorAuthorizationRe
 export async function redeemStaffordOsIssuerHandoffCode(
   code: string,
   config: StaffordOsOperatorAuthConfig,
+  browserVerifier: string,
   fetchImpl: typeof fetch = fetch,
 ) {
   validateOperatorAuthConfig(config);
@@ -391,13 +570,21 @@ export async function redeemStaffordOsIssuerHandoffCode(
   url.searchParams.set("code", code);
   const response = await fetchImpl(url.toString(), {
     method: "GET",
-    headers: { Accept: "application/json" },
+    headers: {
+      Accept: "application/json",
+      "X-StaffordOS-Handoff-Secret": config.handoffSharedSecret,
+      "X-StaffordOS-Browser-Verifier": browserVerifier,
+    },
     cache: "no-store",
+    redirect: "error",
   });
   const body = await response.json().catch(() => ({}));
   const assertion = text((body as Record<string, unknown>).assertion);
   if (!response.ok || !assertion) throw new Error("STAFFORDOS_OPERATOR_HANDOFF_REDEEM_FAILED");
-  return assertion;
+  return {
+    assertion,
+    returnTo: text((body as Record<string, unknown>).return_to),
+  };
 }
 
 export function careerOsBetaOperationsProtectedProof(session: StaffordOsOperatorSession) {
