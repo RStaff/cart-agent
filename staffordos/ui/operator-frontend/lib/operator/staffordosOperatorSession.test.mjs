@@ -55,6 +55,8 @@ const {
   STAFFORDOS_OPERATOR_CANONICAL_ENTRY_CLOCK_SKEW_SECONDS,
   STAFFORDOS_OPERATOR_CANONICAL_ENTRY_TTL_SECONDS,
   STAFFORDOS_OPERATOR_BROWSER_BINDING_TTL_SECONDS,
+  STAFFORDOS_OPERATOR_BROWSER_BINDING_REDIRECT_MARGIN_SECONDS,
+  STAFFORDOS_OPERATOR_OAUTH_STATE_CLOCK_SKEW_SECONDS,
   STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS,
 } = auth;
 
@@ -319,10 +321,19 @@ test("canonical login entry tokens preserve only validated return paths and expi
   assert.equal(verifyStaffordOsOperatorCanonicalEntryToken(token, handoffSharedSecret, new Date(issued.getTime() + 91_000)), null);
 });
 
-test("browser binding lifetime covers the issuer OAuth state ceiling", () => {
+test("browser binding lifetime covers the issuer OAuth state ceiling and bounded redirect margin", () => {
   const options = browserBindingCookieOptions(testConfig());
-  assert.equal(STAFFORDOS_OPERATOR_BROWSER_BINDING_TTL_SECONDS, STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS);
-  assert.equal(options.maxAge, STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS);
+  assert.equal(STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS, 900);
+  assert.equal(STAFFORDOS_OPERATOR_BROWSER_BINDING_REDIRECT_MARGIN_SECONDS, 30);
+  assert.equal(
+    STAFFORDOS_OPERATOR_BROWSER_BINDING_TTL_SECONDS,
+    STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS +
+      STAFFORDOS_OPERATOR_OAUTH_STATE_CLOCK_SKEW_SECONDS +
+      STAFFORDOS_OPERATOR_BROWSER_BINDING_REDIRECT_MARGIN_SECONDS,
+  );
+  assert.equal(options.maxAge, 930);
+  assert.ok(options.maxAge > STAFFORDOS_OPERATOR_OAUTH_STATE_MAX_TTL_SECONDS);
+  assert.equal(Number.isFinite(options.maxAge), true);
   assert.equal(options.httpOnly, true);
   assert.equal(options.sameSite, "lax");
   assert.equal(options.path, "/");
