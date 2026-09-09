@@ -114,6 +114,31 @@ const attestFree = (overrides = {}) => attest({ text: createCandidateText(freeIn
 const shaped = (...fragments) => fragments.join("");
 const GH_PREFIX = shaped("gh", "p_");
 const GL_PREFIX = shaped("gl", "pat", "-");
+const SIGNATURE_VALUE_BYTES = 64;
+const SIGNATURE_VALUE_BASE64URL_LENGTH = 86;
+const CREDENTIAL_PREFIXES = Object.freeze([
+  GH_PREFIX,
+  shaped("github", "_pat", "_"),
+  GL_PREFIX,
+  shaped("xox", "b", "-"),
+  shaped("sk", "_live", "_"),
+  shaped("AKIA", "IOSFODNN7", "EXAMPLE"),
+  shaped("rnd", "_"),
+  shaped("AI", "za"),
+  shaped("ey", "J", "hbGciOiJIUzI1NiJ9"),
+]);
+
+function credentialShapedString(prefix) {
+  return shaped(prefix, "abcdefghijklmnopqrstuvwxyz", "0123456789");
+}
+
+function credentialShapedSignatureValue(prefix) {
+  const value = shaped(prefix, "A".repeat(SIGNATURE_VALUE_BASE64URL_LENGTH - prefix.length));
+  const bytes = Buffer.from(value, "base64url");
+  assert.equal(bytes.length, SIGNATURE_VALUE_BYTES);
+  assert.equal(bytes.toString("base64url"), value);
+  return value;
+}
 
 const rejects = (fn, code) => assert.rejects(fn, (error) => (error instanceof DeploymentAuthorityError && error.code === code) || assert.fail(`expected ${code}, got ${error.message}`));
 const throwsCode = (fn, code) => assert.throws(fn, (error) => (error instanceof DeploymentAuthorityError && error.code === code) || assert.fail(`expected ${code}, got ${error.message}`));
@@ -416,6 +441,49 @@ test("fabricated PASS certificate with recomputed digest but no trusted signatur
   throwsCode(() => assertPass(JSON.stringify({ ...fake, signature: { algorithm: "Ed25519", keyId: GATE_KEY_ID, value: "A".repeat(86) } }), policy()), "signature_invalid");
 });
 
+test("credential-shaped opaque signature values reach cryptographic verification", async () => {
+  const { certificateText } = await attest();
+  assert.equal(verifyCertificate(certificateText, policy()).status, STATUS.PASS);
+  for (const prefix of CREDENTIAL_PREFIXES) {
+    const value = credentialShapedSignatureValue(prefix);
+    const edited = JSON.parse(certificateText);
+    edited.signature.value = value;
+    let caught;
+    try {
+      verifyCertificate(JSON.stringify(edited), policy());
+    } catch (error) {
+      caught = error;
+    }
+    assert.ok(caught instanceof DeploymentAuthorityError);
+    assert.equal(caught.code, "signature_invalid");
+    assert.doesNotMatch(JSON.stringify({ message: caught.message, code: caught.code, path: caught.path, stack: caught.stack }), new RegExp(value));
+  }
+});
+
+test("credential-shaped signature exemption is not available to human-controlled fields", async () => {
+  const credentialShaped = CREDENTIAL_PREFIXES.map(credentialShapedString);
+  assert.ok(credentialShaped[0].startsWith(GH_PREFIX) && credentialShaped[2].startsWith(GL_PREFIX), "assembled fixtures must reproduce the blocked prefixes at runtime");
+  const { certificateText } = await attest();
+  for (const value of credentialShaped) {
+    throwsCode(() => createCandidateText({ ...input, audience: value }), "credential_shaped_value");
+    throwsCode(() => createEd25519Signer({ privateKey: gateKeys.privateKey, keyId: value }), "credential_shaped_value");
+    throwsCode(() => createTrustedKeys({ [value]: gateKeys.publicKey }), "credential_shaped_value");
+    throwsCode(() => createCandidateText({ ...input, repository: { ...input.repository, owner: value } }), "credential_shaped_value");
+    throwsCode(() => createCandidateText({ ...input, provider: { ...input.provider, accountId: value } }), "credential_shaped_value");
+    await rejects(() => attest({ git: gitEvidence({ remoteName: value }) }), "credential_shaped_value");
+    await rejects(() => attest({ git: { ...gitEvidence(), [value]: "x" } }), "schema_additional_property");
+    await rejects(() => attest({ provider: providerEvidence({ accountId: value }) }), "credential_shaped_value");
+    const edited = JSON.parse(certificateText);
+    edited.signature.keyId = value;
+    throwsCode(() => verifyCertificate(JSON.stringify(edited), policy()), "credential_shaped_value");
+  }
+  const signatureValue = credentialShapedSignatureValue(GH_PREFIX);
+  const nestedSignature = JSON.parse(certificateText);
+  nestedSignature.candidate.signature = { value: signatureValue };
+  throwsCode(() => verifyCertificate(JSON.stringify(nestedSignature), policy()), "schema_additional_property");
+  await rejects(() => attest({ provider: { ...providerEvidence(), signature: { value: signatureValue } } }), "schema_additional_property");
+});
+
 test("fabricated certificate signed by an attacker-controlled key fails, even with the trusted key id or an embedded key", async () => {
   const { certificateText } = await attest();
   const legit = JSON.parse(certificateText);
@@ -617,17 +685,8 @@ test("evidence shapes are allowlisted: raw output, headers, env, tokens, bodies 
   await rejects(() => attest({ git: gitEvidence({ remoteName: "origin\nauthorization: Bearer x" }) }), "schema_pattern_mismatch");
   await rejects(() => attest({ git: gitEvidence({ remoteName: `https://user:${GH_PREFIX}secret@host/x` }) }), "schema_pattern_mismatch");
   await rejects(() => attest({ git: gitEvidence({ remoteName: "user:pass@host" }) }), "schema_pattern_mismatch");
-  const credentialShaped = [
-    shaped(GH_PREFIX, "abcdefghijklmnopqrstuvwxyz", "0123456789"),
-    shaped("github_", "pat_", "11AAAA"),
-    shaped(GL_PREFIX, "abcdefghij", "klmnopqrst"),
-    shaped("xox", "b-", "1234-5678"),
-    shaped("sk_", "live_", "abcdef"),
-    shaped("AKIA", "IOSFODNN7", "EXAMPLE"),
-    shaped("rnd", "_", "abcdefghijklmnopqrstuvwxyz"),
-    shaped("eyJ", "hbGciOiJIUzI1NiJ9", ".", "eyJzdWIiOiIxIn0"),
-  ];
-  assert.ok(credentialShaped[0].startsWith("ghp_") && credentialShaped[2].startsWith("glpat-"), "assembled fixtures must reproduce the real prefixes at runtime");
+  const credentialShaped = CREDENTIAL_PREFIXES.map(credentialShapedString);
+  assert.ok(credentialShaped[0].startsWith(GH_PREFIX) && credentialShaped[2].startsWith(GL_PREFIX), "assembled fixtures must reproduce the real prefixes at runtime");
   for (const value of credentialShaped) {
     await rejects(() => attest({ provider: providerEvidence({ accountId: value }) }), "credential_shaped_value");
   }
@@ -918,7 +977,7 @@ test("createTrustedKeys accepts only public Ed25519 material and never derives a
   rejectsKey(gateKeys.privateKey, "trusted_key_private_rejected");
   rejectsKey(privatePem, "trusted_key_private_rejected");
   rejectsKey(privatePem.replace("PRIVATE KEY", "ENCRYPTED PRIVATE KEY"), "trusted_key_private_rejected");
-  rejectsKey("-----BEGIN OPENSSH PRIVATE KEY-----\nAAAA\n-----END OPENSSH PRIVATE KEY-----\n", "trusted_key_private_rejected");
+  rejectsKey(shaped("-----", "BEGIN OPENSSH PRIVATE KEY-----\nAAAA\n-----END OPENSSH PRIVATE KEY-----\n"), "trusted_key_private_rejected");
   rejectsKey(privatePem.replace(/PRIVATE KEY/g, "PUBLIC KEY"), "trusted_key_invalid");
   rejectsKey(crypto.generateKeyPairSync("rsa", { modulusLength: 2048 }).publicKey, "trusted_key_invalid");
   rejectsKey(crypto.generateKeyPairSync("rsa", { modulusLength: 2048 }).publicKey.export({ type: "spki", format: "pem" }), "trusted_key_invalid");

@@ -412,6 +412,10 @@ function assertSchemaWellFormed(root) {
   for (const name of Object.keys(root.$defs)) assertSubschemaWellFormed(root.$defs[name], root, joinPath("/$defs", name));
 }
 
+function isAuthenticatedSignatureValue(schema, root, path) {
+  return root === CERTIFICATE_SCHEMA && path === "/signature/value" && schema === CERTIFICATE_SCHEMA.$defs.signatureValue;
+}
+
 function validateNode(value, schema, root, path) {
   if (Object.hasOwn(schema, "$ref")) schema = resolveRef(root, schema.$ref, path);
   const type = schema.type;
@@ -422,7 +426,7 @@ function validateNode(value, schema, root, path) {
     if (Object.hasOwn(schema, "minLength")) assert(value.length >= schema.minLength, "schema_min_length", path);
     if (Object.hasOwn(schema, "maxLength")) assert(value.length <= schema.maxLength, "schema_max_length", path);
     if (Object.hasOwn(schema, "pattern")) assert(new RegExp(schema.pattern, "u").test(value), "schema_pattern_mismatch", path);
-    assert(!CREDENTIAL_SHAPED_RE.test(value), "credential_shaped_value", path);
+    if (!isAuthenticatedSignatureValue(schema, root, path)) assert(!CREDENTIAL_SHAPED_RE.test(value), "credential_shaped_value", path);
     return;
   }
   if (type === "integer") {
