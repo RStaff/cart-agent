@@ -853,14 +853,13 @@ export function createCandidateText(input) {
 // Collector failures never carry the underlying error: stdout, stderr, response bodies and
 // credentials must not be able to reach logs through this module.
 async function collectEvidence(collector, request, definitionName, code) {
-  let result;
   try {
-    result = await collector(request);
+    const result = await collector(request);
+    assert(result !== undefined && result !== null, `${code}_collection_failed`);
+    return validateAgainstSchema(result, definitionName);
   } catch {
     return fail(`${code}_collection_failed`);
   }
-  assert(result !== undefined && result !== null, `${code}_unavailable`);
-  return validateAgainstSchema(result, definitionName);
 }
 
 // Attests a candidate with fresh evidence and signs the result. Collectors are called with a
@@ -895,8 +894,8 @@ export async function attestCertificate({ candidateText, collectGitEvidence, col
     databaseIds: candidate.provider.databases.map((database) => database.id),
   });
 
-  const gitEvidence = await collectEvidence(collectGitEvidence, gitRequest, "gitEvidence", "git_evidence");
-  const providerEvidence = await collectEvidence(collectProviderEvidence, providerRequest, "providerEvidence", "provider_evidence");
+  const gitEvidence = await collectEvidence(collectGitEvidence, gitRequest, "gitEvidence", "git");
+  const providerEvidence = await collectEvidence(collectProviderEvidence, providerRequest, "providerEvidence", "provider");
   const generatedAtUtc = new Date(readClock(policy.clock)).toISOString();
 
   assertEvidenceCoverage(candidate, gitEvidence, providerEvidence);

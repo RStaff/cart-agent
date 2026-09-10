@@ -142,6 +142,51 @@ function credentialShapedSignatureValue(prefix) {
 
 const rejects = (fn, code) => assert.rejects(fn, (error) => (error instanceof DeploymentAuthorityError && error.code === code) || assert.fail(`expected ${code}, got ${error.message}`));
 const throwsCode = (fn, code) => assert.throws(fn, (error) => (error instanceof DeploymentAuthorityError && error.code === code) || assert.fail(`expected ${code}, got ${error.message}`));
+async function captureRejected(fn, code) {
+  let caught;
+  try {
+    await fn();
+  } catch (error) {
+    caught = error;
+  }
+  assert.ok(caught instanceof DeploymentAuthorityError, `expected ${code}, got ${caught?.message ?? "no error"}`);
+  assert.equal(caught.code, code);
+  return caught;
+}
+
+function inspectedErrorText(error, certificateText = "", reportText = "") {
+  const ownProperties = Object.getOwnPropertyNames(error).map((name) => [name, typeof error[name] === "string" ? error[name] : typeof error[name]]);
+  return JSON.stringify({
+    name: error.name,
+    message: error.message,
+    code: error.code,
+    path: error.path,
+    cause: error.cause,
+    ownProperties,
+    stack: error.stack,
+    serialized: JSON.stringify(error),
+    certificateText,
+    reportText,
+  });
+}
+
+function assertSecretNotDisclosed(error, secret, certificateText = "", reportText = "") {
+  assert.equal(Object.hasOwn(error, "cause"), false);
+  assert.equal(error.cause, undefined);
+  assert.equal(inspectedErrorText(error, certificateText, reportText).includes(secret), false);
+}
+
+function countingSigner(counter) {
+  return {
+    algorithm: "Ed25519",
+    keyId: GATE_KEY_ID,
+    sign: (messageBytes) => {
+      counter.calls += 1;
+      return signer.sign(messageBytes);
+    },
+  };
+}
+
 // Re-sign a tampered certificate with an arbitrary in-memory signer (models attacker capabilities).
 // The test signers are synchronous, so this helper is synchronous as well.
 function resign(certificateObject, withSigner) {
@@ -470,9 +515,15 @@ test("credential-shaped signature exemption is not available to human-controlled
     throwsCode(() => createTrustedKeys({ [value]: gateKeys.publicKey }), "credential_shaped_value");
     throwsCode(() => createCandidateText({ ...input, repository: { ...input.repository, owner: value } }), "credential_shaped_value");
     throwsCode(() => createCandidateText({ ...input, provider: { ...input.provider, accountId: value } }), "credential_shaped_value");
-    await rejects(() => attest({ git: gitEvidence({ remoteName: value }) }), "credential_shaped_value");
-    await rejects(() => attest({ git: { ...gitEvidence(), [value]: "x" } }), "schema_additional_property");
-    await rejects(() => attest({ provider: providerEvidence({ accountId: value }) }), "credential_shaped_value");
+    await rejects(() => attest({ git: gitEvidence({ remoteName: value }) }), "git_collection_failed");
+    await rejects(() => attest({ git: { ...gitEvidence(), [value]: "x" } }), "git_collection_failed");
+    await rejects(() => attest({ provider: providerEvidence({ accountId: value }) }), "provider_collection_failed");
+    const evidenceEdited = JSON.parse(certificateText);
+    evidenceEdited.gitEvidence.remoteName = value;
+    throwsCode(() => verifyCertificate(JSON.stringify(evidenceEdited), policy()), "credential_shaped_value");
+    const providerEdited = JSON.parse(certificateText);
+    providerEdited.providerEvidence.accountId = value;
+    throwsCode(() => verifyCertificate(JSON.stringify(providerEdited), policy()), "credential_shaped_value");
     const edited = JSON.parse(certificateText);
     edited.signature.keyId = value;
     throwsCode(() => verifyCertificate(JSON.stringify(edited), policy()), "credential_shaped_value");
@@ -481,7 +532,7 @@ test("credential-shaped signature exemption is not available to human-controlled
   const nestedSignature = JSON.parse(certificateText);
   nestedSignature.candidate.signature = { value: signatureValue };
   throwsCode(() => verifyCertificate(JSON.stringify(nestedSignature), policy()), "schema_additional_property");
-  await rejects(() => attest({ provider: { ...providerEvidence(), signature: { value: signatureValue } } }), "schema_additional_property");
+  await rejects(() => attest({ provider: { ...providerEvidence(), signature: { value: signatureValue } } }), "provider_collection_failed");
 });
 
 test("fabricated certificate signed by an attacker-controlled key fails, even with the trusted key id or an embedded key", async () => {
@@ -590,7 +641,7 @@ test("evidence freshness at generation is enforced independently of consumption 
   await rejects(() => attest({ git: gitEvidence({ observedAtUtc: tooOld }) }), "evidence_not_fresh");
   await rejects(() => attest({ provider: providerEvidence({ observedAtUtc: new Date(NOW_MS + 61_000).toISOString() }) }), "evidence_observed_in_future");
   await rejects(() => attest({ git: gitEvidence({ observedAtUtc: "2026-02-30T00:00:00.000Z" }) }), "timestamp_invalid");
-  await rejects(() => attest({ git: gitEvidence({ observedAtUtc: "2026-09-08T11:59:30Z" }) }), "schema_pattern_mismatch");
+  await rejects(() => attest({ git: gitEvidence({ observedAtUtc: "2026-09-08T11:59:30Z" }) }), "git_collection_failed");
   await rejects(() => attest({ now: () => Number.NaN }), "clock_invalid");
   const ok = await attest({ git: gitEvidence({ observedAtUtc: new Date(NOW_MS - EVIDENCE_MAX_AGE_MS).toISOString() }) });
   assert.equal(ok.certificate.status, STATUS.PASS);
@@ -647,22 +698,22 @@ test("provider evidence mismatches fail closed without normalization", async () 
 test("incomplete, partial, unavailable, or unshaped evidence throws instead of issuing a certificate", async () => {
   await rejects(() => attestCertificate({ candidateText: candidateText(), signer, trustedKeys, expectedAudience: AUDIENCE, clock, collectProviderEvidence: async () => providerEvidence() }), "git_evidence_collector_missing");
   await rejects(() => attestCertificate({ candidateText: candidateText(), signer, trustedKeys, expectedAudience: AUDIENCE, clock, collectGitEvidence: async () => gitEvidence() }), "provider_evidence_collector_missing");
-  await rejects(() => attest({ git: null }), "git_evidence_unavailable");
-  await rejects(() => attestCertificate({ candidateText: candidateText(), signer, trustedKeys, expectedAudience: AUDIENCE, clock, collectGitEvidence: async () => gitEvidence(), collectProviderEvidence: async () => undefined }), "provider_evidence_unavailable");
-  await rejects(() => attest({ provider: "ok" }), "schema_type_mismatch");
+  await rejects(() => attest({ git: null }), "git_collection_failed");
+  await rejects(() => attestCertificate({ candidateText: candidateText(), signer, trustedKeys, expectedAudience: AUDIENCE, clock, collectGitEvidence: async () => gitEvidence(), collectProviderEvidence: async () => undefined }), "provider_collection_failed");
+  await rejects(() => attest({ provider: "ok" }), "provider_collection_failed");
   await rejects(() => attest({ git: gitEvidence({ roots: gitEvidence().roots.slice(0, 2) }) }), "git_evidence_roots_incomplete");
   await rejects(() => attest({ git: gitEvidence({ roots: gitEvidence().roots.map((r, i) => (i === 1 ? { ...r, path: "staffordos/ui/other" } : r)) }) }), "git_evidence_root_not_requested");
   await rejects(() => attest({ git: gitEvidence({ ref: { fullRef: "refs/heads/main", sha: COMMIT } }) }), "git_evidence_ref_not_requested");
   await rejects(() => attest({ git: gitEvidence({ commit: { sha: OTHER_SHA, treeSha: TREE } }) }), "git_evidence_commit_not_requested");
-  await rejects(() => attest({ git: { ...gitEvidence(), commit: { sha: COMMIT } } }), "schema_required_missing");
-  await rejects(() => attest({ git: { ...gitEvidence(), roots: [] } }), "schema_min_items");
-  await rejects(() => attest({ git: gitEvidence({ repository: { owner: "RStaff", name: "cart-agent" } }) }), "schema_required_missing");
-  await rejects(() => attest({ provider: providerEvidence({ services: [] }) }), "schema_min_items");
+  await rejects(() => attest({ git: { ...gitEvidence(), commit: { sha: COMMIT } } }), "git_collection_failed");
+  await rejects(() => attest({ git: { ...gitEvidence(), roots: [] } }), "git_collection_failed");
+  await rejects(() => attest({ git: gitEvidence({ repository: { owner: "RStaff", name: "cart-agent" } }) }), "git_collection_failed");
+  await rejects(() => attest({ provider: providerEvidence({ services: [] }) }), "provider_collection_failed");
   await rejects(() => attest({ provider: providerEvidence({ services: [{ requestedId: "srv-other", ...service }] }) }), "provider_evidence_service_not_requested");
   await rejects(() => attest({ provider: providerEvidence({ services: [{ requestedId: service.id, ...service }, { requestedId: "srv-2", ...service, id: "srv-2" }] }) }), "provider_evidence_services_incomplete");
   const partialService = { requestedId: service.id, ...service }; delete partialService.region;
-  await rejects(() => attest({ provider: providerEvidence({ services: [partialService] }) }), "schema_required_missing");
-  await rejects(() => attest({ provider: providerEvidence({ accountId: "" }) }), "schema_pattern_mismatch");
+  await rejects(() => attest({ provider: providerEvidence({ services: [partialService] }) }), "provider_collection_failed");
+  await rejects(() => attest({ provider: providerEvidence({ accountId: "" }) }), "provider_collection_failed");
 });
 
 // ---------------------------------------------------------------------------
@@ -675,20 +726,20 @@ test("evidence shapes are allowlisted: raw output, headers, env, tokens, bodies 
     assertion: "x", password: "x", privateKey: "x", responseBody: "{}", metadata: { anything: true }, command: "git ls-remote", note: "harmless", publicKey: "x",
   };
   for (const [key, value] of Object.entries(extras)) {
-    await rejects(() => attest({ git: { ...gitEvidence(), [key]: value } }), "schema_additional_property");
-    await rejects(() => attest({ git: gitEvidence({ repository: { ...repoIdentity, [key]: value } }) }), "schema_additional_property");
-    await rejects(() => attest({ git: gitEvidence({ roots: [{ ...gitEvidence().roots[0], [key]: value }, ...gitEvidence().roots.slice(1)] }) }), "schema_additional_property");
-    await rejects(() => attest({ provider: { ...providerEvidence(), [key]: value } }), "schema_additional_property");
-    await rejects(() => attest({ provider: providerEvidence({ services: [{ requestedId: service.id, ...service, [key]: value }] }) }), "schema_additional_property");
-    await rejects(() => attest({ provider: providerEvidence({ databases: [{ requestedId: database.id, ...database, [key]: value }] }) }), "schema_additional_property");
+    await rejects(() => attest({ git: { ...gitEvidence(), [key]: value } }), "git_collection_failed");
+    await rejects(() => attest({ git: gitEvidence({ repository: { ...repoIdentity, [key]: value } }) }), "git_collection_failed");
+    await rejects(() => attest({ git: gitEvidence({ roots: [{ ...gitEvidence().roots[0], [key]: value }, ...gitEvidence().roots.slice(1)] }) }), "git_collection_failed");
+    await rejects(() => attest({ provider: { ...providerEvidence(), [key]: value } }), "provider_collection_failed");
+    await rejects(() => attest({ provider: providerEvidence({ services: [{ requestedId: service.id, ...service, [key]: value }] }) }), "provider_collection_failed");
+    await rejects(() => attest({ provider: providerEvidence({ databases: [{ requestedId: database.id, ...database, [key]: value }] }) }), "provider_collection_failed");
   }
-  await rejects(() => attest({ git: gitEvidence({ remoteName: "origin\nauthorization: Bearer x" }) }), "schema_pattern_mismatch");
-  await rejects(() => attest({ git: gitEvidence({ remoteName: `https://user:${GH_PREFIX}secret@host/x` }) }), "schema_pattern_mismatch");
-  await rejects(() => attest({ git: gitEvidence({ remoteName: "user:pass@host" }) }), "schema_pattern_mismatch");
+  await rejects(() => attest({ git: gitEvidence({ remoteName: "origin\nauthorization: Bearer x" }) }), "git_collection_failed");
+  await rejects(() => attest({ git: gitEvidence({ remoteName: `https://user:${GH_PREFIX}secret@host/x` }) }), "git_collection_failed");
+  await rejects(() => attest({ git: gitEvidence({ remoteName: "user:pass@host" }) }), "git_collection_failed");
   const credentialShaped = CREDENTIAL_PREFIXES.map(credentialShapedString);
   assert.ok(credentialShaped[0].startsWith(GH_PREFIX) && credentialShaped[2].startsWith(GL_PREFIX), "assembled fixtures must reproduce the real prefixes at runtime");
   for (const value of credentialShaped) {
-    await rejects(() => attest({ provider: providerEvidence({ accountId: value }) }), "credential_shaped_value");
+    await rejects(() => attest({ provider: providerEvidence({ accountId: value }) }), "provider_collection_failed");
   }
   const { certificateText } = await attest();
   for (const literal of ["stdout", "stderr", "header", "authorization", "token", "cookie", "password", "privateKey", "metadata", "Bearer", "BEGIN"]) assert.doesNotMatch(certificateText, new RegExp(literal, "i"));
@@ -700,20 +751,20 @@ test("collector failures and rejected values never reach errors, reports, or ser
   const inspect = (error) => JSON.stringify({ message: error.message, code: error.code, path: error.path, cause: error.cause, keys: Object.getOwnPropertyNames(error), stack: error.stack });
   let caught;
   try { await attestCertificate({ candidateText: candidateText(), signer, trustedKeys, expectedAudience: AUDIENCE, clock, collectGitEvidence: failing, collectProviderEvidence: async () => providerEvidence() }); } catch (error) { caught = error; }
-  assert.equal(caught.code, "git_evidence_collection_failed");
+  assert.equal(caught.code, "git_collection_failed");
   assert.equal(caught.cause, undefined);
   assert.doesNotMatch(inspect(caught), new RegExp(PLANTED));
   assert.doesNotMatch(inspect(caught), /Authentication|stderr|Bearer/);
   try { await attestCertificate({ candidateText: candidateText(), signer, trustedKeys, expectedAudience: AUDIENCE, clock, collectGitEvidence: async () => gitEvidence(), collectProviderEvidence: failing }); } catch (error) { caught = error; }
-  assert.equal(caught.code, "provider_evidence_collection_failed");
+  assert.equal(caught.code, "provider_collection_failed");
   assert.doesNotMatch(inspect(caught), new RegExp(PLANTED));
   // Rejected values and rejected property names are not echoed.
   try { await attest({ git: gitEvidence({ remoteName: `origin ${PLANTED}` }) }); } catch (error) { caught = error; }
-  assert.equal(caught.code, "schema_pattern_mismatch");
+  assert.equal(caught.code, "git_collection_failed");
   assert.doesNotMatch(inspect(caught), new RegExp(PLANTED));
   try { await attest({ git: { ...gitEvidence(), [PLANTED]: "x" } }); } catch (error) { caught = error; }
-  assert.equal(caught.code, "schema_additional_property");
-  assert.equal(caught.path, "");
+  assert.equal(caught.code, "git_collection_failed");
+  assert.equal(caught.path, null);
   assert.doesNotMatch(inspect(caught), new RegExp(PLANTED));
   try { toPlainData({ a: { [PLANTED]: () => 1 } }); } catch (error) { caught = error; }
   assert.doesNotMatch(inspect(caught), new RegExp(PLANTED));
@@ -727,6 +778,160 @@ test("collector failures and rejected values never reach errors, reports, or ser
   assert.doesNotMatch(inspect(caught), new RegExp(PLANTED));
   assert.doesNotMatch(certificateText, new RegExp(PLANTED));
   assert.doesNotMatch(renderReport(certificateText, policy()), new RegExp(PLANTED));
+});
+
+test("collector normalization failures are sanitized without re-inspecting hostile values", async () => {
+  const topLevelField = (side) => (side === "git" ? "remoteName" : "accountId");
+  const arrayField = (side) => (side === "git" ? "roots" : "services");
+  const baseEvidence = (side) => (side === "git" ? gitEvidence() : providerEvidence());
+  const installNestedRepository = (side, value, repository) => {
+    if (side === "git") {
+      value.repository = repository;
+    } else {
+      value.services = [{ ...value.services[0], repository }, ...value.services.slice(1)];
+    }
+  };
+  const cases = [
+    {
+      name: "throwing getter",
+      make: (side, state, secret) => {
+        const value = baseEvidence(side);
+        Object.defineProperty(value, topLevelField(side), { enumerable: true, get() { state.calls += 1; throw new Error(`getter leaked ${secret}`); } });
+        return value;
+      },
+    },
+    {
+      name: "throwing nested getter",
+      make: (side, state, secret) => {
+        const value = baseEvidence(side);
+        const repository = { ...repoIdentity };
+        Object.defineProperty(repository, "owner", { enumerable: true, get() { state.calls += 1; throw new Error(`nested getter leaked ${secret}`); } });
+        installNestedRepository(side, value, repository);
+        return value;
+      },
+    },
+    {
+      name: "proxy ownKeys",
+      make: (side, state, secret) => new Proxy(baseEvidence(side), {
+        ownKeys() { state.calls += 1; throw new Error(`ownKeys leaked ${secret}`); },
+      }),
+    },
+    {
+      name: "proxy getOwnPropertyDescriptor",
+      make: (side, state, secret) => new Proxy(baseEvidence(side), {
+        ownKeys: (target) => Reflect.ownKeys(target),
+        getOwnPropertyDescriptor() { state.calls += 1; throw new Error(`descriptor leaked ${secret}`); },
+      }),
+    },
+    {
+      name: "proxy getPrototypeOf",
+      make: (side, state, secret) => new Proxy(baseEvidence(side), {
+        getPrototypeOf() { state.calls += 1; throw new Error(`prototype leaked ${secret}`); },
+      }),
+    },
+    {
+      name: "proxy property access",
+      make: (_side, state, secret) => new Proxy([], {
+        get(target, key, receiver) {
+          if (key === "length") {
+            state.calls += 1;
+            throw new Error(`property access leaked ${secret}`);
+          }
+          return Reflect.get(target, key, receiver);
+        },
+      }),
+    },
+    {
+      name: "revoked proxy",
+      make: (side) => {
+        const { proxy, revoke } = Proxy.revocable(baseEvidence(side), {});
+        revoke();
+        return proxy;
+      },
+    },
+    {
+      name: "accessor descriptor",
+      make: (side, state) => {
+        const value = baseEvidence(side);
+        Object.defineProperty(value, topLevelField(side), { enumerable: true, get() { state.calls += 1; return "never-read"; } });
+        return value;
+      },
+    },
+    {
+      name: "hostile array reflection",
+      make: (side, state, secret) => {
+        const value = baseEvidence(side);
+        value[arrayField(side)] = new Proxy([...value[arrayField(side)]], {
+          ownKeys() { state.calls += 1; throw new Error(`array ownKeys leaked ${secret}`); },
+        });
+        return value;
+      },
+    },
+    {
+      name: "malformed inspectable value",
+      make: (side, state, secret) => {
+        const value = baseEvidence(side);
+        value.observedAtUtc = {
+          toJSON() { state.calls += 1; throw new Error(`toJSON leaked ${secret}`); },
+          toString() { state.calls += 1; throw new Error(`toString leaked ${secret}`); },
+          valueOf() { state.calls += 1; throw new Error(`valueOf leaked ${secret}`); },
+        };
+        return value;
+      },
+    },
+    {
+      name: "direct secret-bearing throw",
+      makeCollector: (_side, state, secret) => async () => {
+        state.calls += 1;
+        const error = new Error(`collector leaked ${secret}`);
+        error.stdout = secret;
+        error.stderr = secret;
+        error.response = { body: secret, headers: { authorization: `Bearer ${secret}` } };
+        error.metadata = { secret };
+        throw error;
+      },
+    },
+  ];
+
+  async function expectSanitized(side, entry) {
+    const caseLabel = entry.name.replace(/[^A-Za-z0-9]/g, "_").toUpperCase();
+    const secret = shaped(GH_PREFIX, "SYNTHETIC_", side.toUpperCase(), "_", caseLabel, "_0123456789abcdef");
+    const state = { calls: 0 };
+    const signCounter = { calls: 0 };
+    const collector = entry.makeCollector ? entry.makeCollector(side, state, secret) : async () => entry.make(side, state, secret);
+    let result;
+    const caught = await captureRejected(async () => {
+      result = await attestCertificate({
+        candidateText: candidateText(),
+        signer: countingSigner(signCounter),
+        trustedKeys,
+        expectedAudience: AUDIENCE,
+        clock,
+        collectGitEvidence: side === "git" ? collector : async () => gitEvidence(),
+        collectProviderEvidence: side === "provider" ? collector : async () => providerEvidence(),
+      });
+    }, `${side}_collection_failed`);
+    const callsAfterFailure = state.calls;
+    assert.equal(result, undefined, `${side} ${entry.name} must not issue a certificate`);
+    assertSecretNotDisclosed(caught, secret);
+    assert.equal(state.calls, callsAfterFailure, `${side} ${entry.name} was touched while sanitizing`);
+    assert.equal(signCounter.calls, 0, `${side} ${entry.name} must not call signer`);
+  }
+
+  for (const side of ["git", "provider"]) {
+    for (const entry of cases) await expectSanitized(side, entry);
+  }
+});
+
+test("sanitized collector boundary preserves valid, stale, and mismatch evidence derivation", async () => {
+  const pass = await attest();
+  assert.equal(verifyCertificate(pass.certificateText, policy()).status, STATUS.PASS);
+  const mismatch = await attest({ provider: providerEvidence({ services: [{ requestedId: service.id, ...service, branch: "careos/private-beta" }] }) });
+  assert.equal(mismatch.certificate.status, STATUS.MISMATCH);
+  assert.deepEqual(mismatch.certificate.mismatches.map((m) => m.field), ["providerEvidence.services[0].branch"]);
+  const stale = await attest({ git: gitEvidence({ ref: { fullRef: "refs/heads/careeros/private-beta", sha: OTHER_SHA } }) });
+  assert.equal(stale.certificate.status, STATUS.STALE);
+  assert.deepEqual(stale.certificate.mismatches, [{ field: "gitEvidence.ref.sha", expected: COMMIT, observed: OTHER_SHA }]);
 });
 
 // ---------------------------------------------------------------------------
