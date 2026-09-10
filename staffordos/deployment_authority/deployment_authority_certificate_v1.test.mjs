@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import crypto from "node:crypto";
+import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import { test } from "node:test";
 import {
@@ -329,10 +330,27 @@ test("candidate text is parsed strictly and rejects caller-supplied status, dige
   const badBranches = [
     ["careeros/private-beta ", "schema_pattern_mismatch"], ["careeros/private-beta​", "schema_pattern_mismatch"], ["careeros//private-beta", "schema_pattern_mismatch"],
     ["/careeros/private-beta", "schema_pattern_mismatch"], ["careeros/private-beta/", "schema_pattern_mismatch"], ["careeros/.private-beta", "schema_pattern_mismatch"],
-    ["careeros/private-beta.lock", "path_segment_invalid"], ["careeros/private..beta", "path_segment_invalid"],
+    ["careeros/private-beta.lock", "path_segment_invalid"], ["careeros/private..beta", "path_segment_invalid"], ["careeros/private-beta.", "branch_name_invalid"],
+    ["-private-beta", "schema_pattern_mismatch"], ["careeros/@{private-beta", "schema_pattern_mismatch"], ["refs/heads/private-beta", "branch_name_invalid"], ["@", "schema_pattern_mismatch"],
   ];
   for (const [shortName, code] of badBranches) {
     throwsCode(() => createCandidateText({ ...input, branch: { shortName }, provider: { ...input.provider, services: [{ ...service, branch: shortName }] } }), code);
+  }
+});
+
+test("branch validation rejects Git-invalid shorthand without normalization", () => {
+  const cases = [
+    ["careeros/private-beta", true, true], ["staffordos/deployment-authority-certificate-v1", true, true], ["foo/-bar", true, false],
+    ["foo.", false, false], ["foo/.bar", false, false], ["foo/bar.lock", false, false], ["foo..bar", false, false], ["foo@{bar", false, false], ["@", true, false],
+    ["-foo", false], ["foo bar", false], ["foo~bar", false], ["foo^bar", false], ["foo:bar", false], ["foo?bar", false],
+    ["foo*bar", false], ["foo[bar", false], ["foo\\bar", false], ["refs/heads/foo", true, false], ["refs/heads/refs/heads/foo", true, false],
+  ];
+  for (const [shortName, expectedGit, expectedRuntime = false] of cases) {
+    const oracle = spawnSync("git", ["check-ref-format", "--branch", shortName], { encoding: "utf8" });
+    assert.equal(oracle.status === 0, expectedGit, `Git oracle mismatch for ${shortName}`);
+    const candidateInput = { ...input, branch: { shortName }, provider: { ...input.provider, services: [{ ...service, branch: shortName }] } };
+    const accepted = (() => { try { createCandidateText(candidateInput); return true; } catch { return false; } })();
+    assert.equal(accepted, expectedRuntime, `runtime branch decision mismatch for ${shortName}`);
   }
 });
 
@@ -1092,6 +1110,21 @@ test("downstream proposals must be complete exact restatements; every node is co
   assert.ok(descriptorReads > 0);
   const lying = new Proxy(full(), { getOwnPropertyDescriptor(target, key) { const d = Reflect.getOwnPropertyDescriptor(target, key); if (key === "audience" && d) d.value = "other-gate"; return d; } });
   throwsCode(() => assertNoDownstreamOverrides(certificateText, lying, policy()), "override_rejected");
+});
+
+test("downstream override authorization requires independently derived PASS before proposal inspection", async () => {
+  const stale = await attest({ git: gitEvidence({ ref: { fullRef: "refs/heads/careeros/private-beta", sha: OTHER_SHA } }) });
+  const mismatch = await attest({ provider: providerEvidence({ accountId: "tea-other" }) });
+  for (const result of [stale, mismatch]) {
+    throwsCode(() => assertNoDownstreamOverrides(result.certificateText, JSON.parse(result.certificateText).candidate, policy()), "not_pass");
+    throwsCode(() => assertNoDownstreamOverrides(result.certificateText, {}, policy()), "not_pass");
+    let inspected = 0;
+    const hostile = new Proxy({}, { ownKeys() { inspected += 1; throw new Error("proposal inspected"); } });
+    throwsCode(() => assertNoDownstreamOverrides(result.certificateText, hostile, policy()), "not_pass");
+    assert.equal(inspected, 0);
+  }
+  const pass = await attest();
+  assert.deepEqual(assertNoDownstreamOverrides(pass.certificateText, JSON.parse(pass.certificateText).candidate, policy()), pass.certificate);
 });
 
 // ---------------------------------------------------------------------------

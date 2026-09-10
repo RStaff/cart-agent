@@ -552,6 +552,28 @@ function assertPathSegments(value, path) {
   assert(!value.includes(".."), "path_segment_invalid", path);
 }
 
+// Git branch shorthand is stricter than the schema's bounded character grammar.
+// Keep this deterministic and local so validation never depends on shelling out to Git.
+function assertGitBranchName(value, path) {
+  assert(typeof value === "string" && value.length > 0 && value.length <= 255, "branch_name_invalid", path);
+  assert(value !== "@", "branch_name_invalid", path);
+  assert(!value.startsWith("/") && !value.endsWith("/") && !value.includes("//"), "branch_name_invalid", path);
+  assert(!value.startsWith("refs/heads/"), "branch_name_invalid", path);
+  assert(!value.startsWith("-"), "branch_name_invalid", path);
+  assert(!value.includes("@{") && !/[\x00-\x20\x7f~^:?*\x5b\x5d\x5c]/u.test(value), "branch_name_invalid", path);
+  assert(!value.includes(".."), "path_segment_invalid", path);
+  for (const segment of value.split("/")) {
+    assert(segment !== "." && segment !== "..", "path_segment_invalid", path);
+    assert(!segment.endsWith(".lock"), "path_segment_invalid", path);
+    assert(!segment.startsWith(".") && !segment.endsWith("."), "branch_name_invalid", path);
+  }
+}
+
+function assertGitBranchRef(value, path) {
+  assert(typeof value === "string" && value.startsWith("refs/heads/"), "branch_ref_invalid", path);
+  assertGitBranchName(value.slice("refs/heads/".length), path);
+}
+
 function assertUnique(values, code, path) {
   assert(new Set(values).size === values.length, code, path);
 }
@@ -572,7 +594,7 @@ function assertCandidateSemantics(candidate) {
   const { repository, branch, commit, roots, provider } = candidate;
   assert(normalizeForgeHost(repository.forgeHost) === repository.forgeHost, "forge_host_not_canonical", "/repository/forgeHost");
   assert(branch.fullRef === `refs/heads/${branch.shortName}`, "branch_ref_inconsistent", "/branch/fullRef");
-  assertPathSegments(branch.shortName, "/branch/shortName");
+  assertGitBranchName(branch.shortName, "/branch/shortName");
   assertUtf8Metadata(branch.shortName, branch.nameUtf8Hex, branch.nameByteLength, "/branch");
   assert(commit.sha !== commit.treeSha, "commit_tree_identical", "/commit");
   roots.forEach((root, i) => {
@@ -600,6 +622,8 @@ function assertCandidateSemantics(candidate) {
 // Evidence must cover exactly what the candidate asked to be observed. Anything else is not
 // evidence about this candidate and is rejected outright rather than reported as a mismatch.
 function assertEvidenceCoverage(candidate, gitEvidence, providerEvidence) {
+  assertGitBranchRef(gitEvidence.ref.fullRef, "/gitEvidence/ref/fullRef");
+  providerEvidence.services.forEach((service, i) => assertGitBranchName(service.branch, `/providerEvidence/services/${i}/branch`));
   assert(gitEvidence.ref.fullRef === candidate.branch.fullRef, "git_evidence_ref_not_requested", "/gitEvidence/ref/fullRef");
   assert(gitEvidence.commit.sha === candidate.commit.sha, "git_evidence_commit_not_requested", "/gitEvidence/commit/sha");
   assert(gitEvidence.roots.length === candidate.roots.length, "git_evidence_roots_incomplete", "/gitEvidence/roots");
@@ -950,6 +974,7 @@ function assertProposalEqualsAuthority(authority, proposal, path) {
 // candidate: any unknown, missing, differing, retyped, truncated, expanded or emptied node rejects.
 export function assertNoDownstreamOverrides(certificateText, proposed, verificationPolicy) {
   const certificate = verifyCertificate(certificateText, verificationPolicy);
+  assert(certificate.status === STATUS.PASS && certificate.mismatches.length === 0, "not_pass", "/status");
   const proposal = toPlainData(proposed);
   assert(isPlainObject(proposal), "override_proposal_invalid");
   assertProposalEqualsAuthority(certificate.candidate, proposal, "");
