@@ -177,6 +177,18 @@ function assertSecretNotDisclosed(error, secret, certificateText = "", reportTex
   assert.equal(inspectedErrorText(error, certificateText, reportText).includes(secret), false);
 }
 
+function assertRemoteRejectedWithoutDisclosure(remoteUrl, code = "remote_url_path_invalid") {
+  let caught;
+  try {
+    repositoryIdentityFromRemoteUrl(remoteUrl);
+  } catch (error) {
+    caught = error;
+  }
+  assert.ok(caught instanceof DeploymentAuthorityError, `expected ${code}, got ${caught?.message ?? "no error"}`);
+  assert.equal(caught.code, code);
+  assertSecretNotDisclosed(caught, remoteUrl);
+}
+
 function countingSigner(counter) {
   return {
     algorithm: "Ed25519",
@@ -420,14 +432,69 @@ test("forge identity normalization follows one deterministic rule and rejects un
     ["https://xn--gthub-9za.com/RStaff/cart-agent", "forge_host_punycode_rejected"], ["https://gíthub.com/RStaff/cart-agent", "remote_url_non_ascii"],
     ["https://github/RStaff/cart-agent", "forge_host_invalid"], ["https://github.com./RStaff/cart-agent", "forge_host_invalid"], ["https://-github.com/RStaff/cart-agent", "forge_host_invalid"],
     ["https://github.com/RStaff", "remote_url_path_invalid"], ["https://github.com/RStaff/cart-agent/extra", "remote_url_path_invalid"], ["https://github.com/../cart-agent", "remote_url_path_invalid"],
+    ["git@github.com:/RStaff/cart-agent.git", "remote_url_path_invalid"], ["git@github.com:RStaff/cart-agent.git/", "remote_url_path_invalid"],
+    ["git@github.com:RStaff//cart-agent.git", "remote_url_path_invalid"], ["git@github.com://RStaff/cart-agent.git", "remote_url_path_invalid"],
+    ["git@github.com:/cart-agent.git", "remote_url_path_invalid"], ["git@github.com:RStaff/", "remote_url_path_invalid"],
+    ["git@github.com:RStaff/cart-agent/extra", "remote_url_path_invalid"], ["git@github.com:.git/cart-agent", "remote_url_path_invalid"], ["git@github.com:RStaff/.git", "remote_url_path_invalid"],
     [`https://github.com/RStaff/${GH_PREFIX}abcdefghijklmnop`, "credential_shaped_value"], ["", "remote_url_invalid"], [42, "remote_url_invalid"],
   ];
   for (const [url, code] of cases) throwsCode(() => repositoryIdentityFromRemoteUrl(url), code, url);
+  for (const [url, code] of cases.filter(([url]) => typeof url === "string" && url.startsWith("git@"))) assertRemoteRejectedWithoutDisclosure(url, code);
   assert.equal(normalizeForgeHost("GitLab.Example.ORG"), "gitlab.example.org");
   for (const [host, code] of [["github.com:443", "forge_host_invalid"], ["github", "forge_host_invalid"], ["gіthub.com", "forge_host_non_ascii"], ["xn--80ak6aa92e.com", "forge_host_punycode_rejected"], ["192.168.0.1", "forge_host_ip_literal"], ["", "forge_host_invalid"]]) {
     throwsCode(() => normalizeForgeHost(host), code, host);
   }
   throwsCode(() => createCandidateText({ ...input, repository: { ...input.repository, forgeHost: "GitHub.com" } }), "schema_pattern_mismatch");
+});
+
+test("SCP-style remote paths cannot bypass candidate, evidence, certificate, or downstream authority", async () => {
+  const expected = { forgeHost: "github.com", owner: "RStaff", name: "cart-agent" };
+  const validScpIdentity = repositoryIdentityFromRemoteUrl("git@github.com:RStaff/cart-agent.git");
+  assert.deepEqual(validScpIdentity, expected);
+  assert.deepEqual(repositoryIdentityFromRemoteUrl("https://github.com/RStaff/cart-agent"), expected);
+  assert.deepEqual(repositoryIdentityFromRemoteUrl("ssh://git@github.com/RStaff/cart-agent.git"), expected);
+  assert.notDeepEqual(repositoryIdentityFromRemoteUrl("git@github.com:rstaff/cart-agent.git"), expected);
+
+  for (const remoteUrl of [
+    "git@github.com:/RStaff/cart-agent.git",
+    "git@github.com:RStaff/cart-agent.git/",
+    "git@github.com:RStaff//cart-agent.git",
+    "git@github.com:/cart-agent.git",
+    "git@github.com:RStaff/",
+    "git@github.com:RStaff/cart-agent/extra",
+  ]) {
+    assertRemoteRejectedWithoutDisclosure(remoteUrl);
+  }
+
+  const validScpInput = {
+    ...input,
+    repository: { ...validScpIdentity, remoteName: "origin" },
+    provider: { ...input.provider, services: [{ ...service, repository: validScpIdentity }] },
+  };
+  const validScpText = createCandidateText(validScpInput);
+  const pass = await attest({
+    text: validScpText,
+    git: gitEvidence({ repository: validScpIdentity }),
+    provider: providerEvidence({ services: [{ requestedId: service.id, ...service, repository: validScpIdentity }] }),
+  });
+  assert.equal(pass.certificate.status, STATUS.PASS);
+
+  const absoluteOwner = { forgeHost: "github.com", owner: "/RStaff", name: "cart-agent" };
+  throwsCode(() => createCandidateText({
+    ...input,
+    repository: { ...absoluteOwner, remoteName: "origin" },
+    provider: { ...input.provider, services: [{ ...service, repository: absoluteOwner }] },
+  }), "schema_pattern_mismatch");
+  await rejects(() => attest({ text: validScpText, git: gitEvidence({ repository: absoluteOwner }) }), "git_collection_failed");
+  await rejects(() => attest({
+    text: validScpText,
+    provider: providerEvidence({ services: [{ requestedId: service.id, ...service, repository: absoluteOwner }] }),
+  }), "provider_collection_failed");
+
+  const forged = JSON.parse(pass.certificateText);
+  forged.candidate.repository.owner = absoluteOwner.owner;
+  throwsCode(() => verifyCertificate(JSON.stringify(forged), policy()), "schema_pattern_mismatch");
+  throwsCode(() => assertNoDownstreamOverrides(pass.certificateText, { ...pass.certificate.candidate, repository: { ...pass.certificate.candidate.repository, owner: absoluteOwner.owner } }, policy()), "override_rejected");
 });
 
 test("same owner and repository on a different forge host is a mismatch, not an equivalent", async () => {

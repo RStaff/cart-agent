@@ -495,8 +495,8 @@ export function normalizeForgeHost(host) {
   return lower;
 }
 
-function repositorySegments(pathText) {
-  const trimmed = pathText.replace(/^\/+/, "").replace(/\/+$/, "");
+function repositorySegments(pathText, { trimBoundarySlashes = true } = {}) {
+  const trimmed = trimBoundarySlashes ? pathText.replace(/^\/+/, "").replace(/\/+$/, "") : pathText;
   const segments = trimmed.split("/");
   assert(segments.length === 2, "remote_url_path_invalid");
   const [owner, rawName] = segments;
@@ -512,7 +512,7 @@ export function repositoryIdentityFromRemoteUrl(remoteUrl) {
   const scp = SCP_REMOTE_RE.exec(remoteUrl);
   if (scp) {
     const forgeHost = normalizeForgeHost(scp[1]);
-    return deepFreeze({ forgeHost, ...repositorySegments(scp[2]) });
+    return deepFreeze({ forgeHost, ...repositorySegments(scp[2], { trimBoundarySlashes: false }) });
   }
   const url = URL_REMOTE_RE.exec(remoteUrl);
   assert(url !== null, "remote_url_scheme_unsupported");
