@@ -495,9 +495,22 @@ export function normalizeForgeHost(host) {
   return lower;
 }
 
-function repositorySegments(pathText, { trimBoundarySlashes = true } = {}) {
-  const trimmed = trimBoundarySlashes ? pathText.replace(/^\/+/, "").replace(/\/+$/, "") : pathText;
-  const segments = trimmed.split("/");
+function repositorySegments(pathText, { requireSingleLeadingSlash = false } = {}) {
+  let normalized = pathText;
+  if (requireSingleLeadingSlash) {
+    assert(pathText.startsWith("/") && !pathText.startsWith("//"), "remote_url_path_invalid");
+    normalized = pathText.slice(1);
+  } else {
+    assert(!pathText.startsWith("/"), "remote_url_path_invalid");
+  }
+  assert(
+    normalized.length > 0 &&
+      !normalized.startsWith("/") &&
+      !normalized.endsWith("/") &&
+      !normalized.includes("//"),
+    "remote_url_path_invalid",
+  );
+  const segments = normalized.split("/");
   assert(segments.length === 2, "remote_url_path_invalid");
   const [owner, rawName] = segments;
   const name = rawName.endsWith(".git") ? rawName.slice(0, -4) : rawName;
@@ -512,7 +525,7 @@ export function repositoryIdentityFromRemoteUrl(remoteUrl) {
   const scp = SCP_REMOTE_RE.exec(remoteUrl);
   if (scp) {
     const forgeHost = normalizeForgeHost(scp[1]);
-    return deepFreeze({ forgeHost, ...repositorySegments(scp[2], { trimBoundarySlashes: false }) });
+    return deepFreeze({ forgeHost, ...repositorySegments(scp[2]) });
   }
   const url = URL_REMOTE_RE.exec(remoteUrl);
   assert(url !== null, "remote_url_scheme_unsupported");
@@ -527,7 +540,7 @@ export function repositoryIdentityFromRemoteUrl(remoteUrl) {
   }
   assert(!host.includes(":"), "remote_url_port_rejected");
   const forgeHost = normalizeForgeHost(host);
-  return deepFreeze({ forgeHost, ...repositorySegments(pathText) });
+  return deepFreeze({ forgeHost, ...repositorySegments(pathText, { requireSingleLeadingSlash: true }) });
 }
 
 // ---------------------------------------------------------------------------

@@ -417,7 +417,14 @@ test("database policy: missing, unknown, or contradictory values are rejected", 
 
 test("forge identity normalization follows one deterministic rule and rejects unsafe remotes", () => {
   const expected = { forgeHost: "github.com", owner: "RStaff", name: "cart-agent" };
-  for (const url of ["https://github.com/RStaff/cart-agent", "https://GitHub.COM/RStaff/cart-agent.git", "https://github.com/RStaff/cart-agent/", "ssh://git@github.com/RStaff/cart-agent.git", "ssh://github.com/RStaff/cart-agent", "git@github.com:RStaff/cart-agent.git", "git@GITHUB.com:RStaff/cart-agent"]) {
+  for (const url of [
+    "https://github.com/RStaff/cart-agent",
+    "https://GitHub.COM/RStaff/cart-agent.git",
+    "ssh://git@github.com/RStaff/cart-agent.git",
+    "ssh://github.com/RStaff/cart-agent",
+    "git@github.com:RStaff/cart-agent.git",
+    "git@GITHUB.com:RStaff/cart-agent",
+  ]) {
     assert.deepEqual(repositoryIdentityFromRemoteUrl(url), expected, url);
     assert.ok(Object.isFrozen(repositoryIdentityFromRemoteUrl(url)));
   }
@@ -431,7 +438,12 @@ test("forge identity normalization follows one deterministic rule and rejects un
     ["https://[::1]/RStaff/cart-agent", "remote_url_ip_literal"], ["https://10.0.0.1/RStaff/cart-agent", "forge_host_ip_literal"],
     ["https://xn--gthub-9za.com/RStaff/cart-agent", "forge_host_punycode_rejected"], ["https://gíthub.com/RStaff/cart-agent", "remote_url_non_ascii"],
     ["https://github/RStaff/cart-agent", "forge_host_invalid"], ["https://github.com./RStaff/cart-agent", "forge_host_invalid"], ["https://-github.com/RStaff/cart-agent", "forge_host_invalid"],
-    ["https://github.com/RStaff", "remote_url_path_invalid"], ["https://github.com/RStaff/cart-agent/extra", "remote_url_path_invalid"], ["https://github.com/../cart-agent", "remote_url_path_invalid"],
+    ["https://github.com/RStaff", "remote_url_path_invalid"], ["https://github.com/RStaff/cart-agent/", "remote_url_path_invalid"],
+    ["https://github.com//RStaff/cart-agent", "remote_url_path_invalid"], ["https://github.com///RStaff/cart-agent", "remote_url_path_invalid"],
+    ["https://github.com/RStaff//cart-agent", "remote_url_path_invalid"], ["https://github.com//cart-agent", "remote_url_path_invalid"],
+    ["https://github.com/RStaff/cart-agent/extra", "remote_url_path_invalid"], ["https://github.com/RStaff/cart-agent//extra", "remote_url_path_invalid"],
+    ["ssh://git@github.com//RStaff/cart-agent.git", "remote_url_path_invalid"], ["ssh://git@github.com/RStaff/cart-agent.git/", "remote_url_path_invalid"],
+    ["ssh://git@github.com/RStaff//cart-agent.git", "remote_url_path_invalid"], ["https://github.com/../cart-agent", "remote_url_path_invalid"],
     ["git@github.com:/RStaff/cart-agent.git", "remote_url_path_invalid"], ["git@github.com:RStaff/cart-agent.git/", "remote_url_path_invalid"],
     ["git@github.com:RStaff//cart-agent.git", "remote_url_path_invalid"], ["git@github.com://RStaff/cart-agent.git", "remote_url_path_invalid"],
     ["git@github.com:/cart-agent.git", "remote_url_path_invalid"], ["git@github.com:RStaff/", "remote_url_path_invalid"],
@@ -439,7 +451,9 @@ test("forge identity normalization follows one deterministic rule and rejects un
     [`https://github.com/RStaff/${GH_PREFIX}abcdefghijklmnop`, "credential_shaped_value"], ["", "remote_url_invalid"], [42, "remote_url_invalid"],
   ];
   for (const [url, code] of cases) throwsCode(() => repositoryIdentityFromRemoteUrl(url), code, url);
-  for (const [url, code] of cases.filter(([url]) => typeof url === "string" && url.startsWith("git@"))) assertRemoteRejectedWithoutDisclosure(url, code);
+  for (const [url, code] of cases.filter(([url, code]) => typeof url === "string" && code === "remote_url_path_invalid" && /^(git@|https:\/\/|ssh:\/\/)/.test(url))) {
+    assertRemoteRejectedWithoutDisclosure(url, code);
+  }
   assert.equal(normalizeForgeHost("GitLab.Example.ORG"), "gitlab.example.org");
   for (const [host, code] of [["github.com:443", "forge_host_invalid"], ["github", "forge_host_invalid"], ["gіthub.com", "forge_host_non_ascii"], ["xn--80ak6aa92e.com", "forge_host_punycode_rejected"], ["192.168.0.1", "forge_host_ip_literal"], ["", "forge_host_invalid"]]) {
     throwsCode(() => normalizeForgeHost(host), code, host);
@@ -495,6 +509,61 @@ test("SCP-style remote paths cannot bypass candidate, evidence, certificate, or 
   forged.candidate.repository.owner = absoluteOwner.owner;
   throwsCode(() => verifyCertificate(JSON.stringify(forged), policy()), "schema_pattern_mismatch");
   throwsCode(() => assertNoDownstreamOverrides(pass.certificateText, { ...pass.certificate.candidate, repository: { ...pass.certificate.candidate.repository, owner: absoluteOwner.owner } }, policy()), "override_rejected");
+});
+
+test("URL-form remote paths cannot bypass candidate, evidence, certificate, or downstream authority", async () => {
+  const expected = { forgeHost: "github.com", owner: "RStaff", name: "cart-agent" };
+  assert.deepEqual(repositoryIdentityFromRemoteUrl("https://github.com/RStaff/cart-agent"), expected);
+  assert.deepEqual(repositoryIdentityFromRemoteUrl("https://github.com/RStaff/cart-agent.git"), expected);
+  assert.deepEqual(repositoryIdentityFromRemoteUrl("ssh://git@github.com/RStaff/cart-agent.git"), expected);
+  assert.deepEqual(repositoryIdentityFromRemoteUrl("git@github.com:RStaff/cart-agent.git"), expected);
+
+  const invalidUrlRemotes = [
+    "https://github.com//RStaff/cart-agent.git",
+    "https://github.com///RStaff/cart-agent.git",
+    "https://github.com/RStaff/cart-agent.git/",
+    "https://github.com/RStaff//cart-agent.git",
+    "https://github.com//cart-agent.git",
+    "https://github.com/RStaff/",
+    "https://github.com/RStaff/cart-agent.git/extra",
+    "https://github.com/RStaff/cart-agent.git//extra",
+    "ssh://git@github.com//RStaff/cart-agent.git",
+    "ssh://git@github.com/RStaff/cart-agent.git/",
+    "ssh://git@github.com/RStaff//cart-agent.git",
+    "ssh://git@github.com/RStaff/cart-agent.git/extra",
+  ];
+  for (const remoteUrl of invalidUrlRemotes) {
+    assertRemoteRejectedWithoutDisclosure(remoteUrl);
+  }
+
+  const invalidRepository = { forgeHost: "github.com", owner: "RStaff", name: "cart-agent/extra" };
+  throwsCode(() => createCandidateText({
+    ...input,
+    repository: { ...invalidRepository, remoteName: "origin" },
+    provider: { ...input.provider, services: [{ ...service, repository: invalidRepository }] },
+  }), "schema_pattern_mismatch");
+
+  const validUrlText = createCandidateText({
+    ...input,
+    repository: { ...expected, remoteName: "origin" },
+    provider: { ...input.provider, services: [{ ...service, repository: expected }] },
+  });
+  const pass = await attest({
+    text: validUrlText,
+    git: gitEvidence({ repository: expected }),
+    provider: providerEvidence({ services: [{ requestedId: service.id, ...service, repository: expected }] }),
+  });
+  assert.equal(pass.certificate.status, STATUS.PASS);
+  await rejects(() => attest({ text: validUrlText, git: gitEvidence({ repository: invalidRepository }) }), "git_collection_failed");
+  await rejects(() => attest({
+    text: validUrlText,
+    provider: providerEvidence({ services: [{ requestedId: service.id, ...service, repository: invalidRepository }] }),
+  }), "provider_collection_failed");
+
+  const forged = JSON.parse(pass.certificateText);
+  forged.candidate.repository.name = invalidRepository.name;
+  throwsCode(() => verifyCertificate(JSON.stringify(forged), policy()), "schema_pattern_mismatch");
+  throwsCode(() => assertNoDownstreamOverrides(pass.certificateText, { ...pass.certificate.candidate, repository: { ...pass.certificate.candidate.repository, name: invalidRepository.name } }, policy()), "override_rejected");
 });
 
 test("same owner and repository on a different forge host is a mismatch, not an equivalent", async () => {
