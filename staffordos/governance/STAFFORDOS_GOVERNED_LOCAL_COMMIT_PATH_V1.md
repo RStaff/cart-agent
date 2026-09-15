@@ -11,7 +11,7 @@ StaffordOS needs a governed way to create a local commit without pushing. The ex
 The runner:
 
 - requires task, expected artifact, and commit message arguments;
-- normalizes inputs through the character integrity guard;
+- normalizes inputs through the stateless character integrity guard, which emits only to stdout and never writes repository output;
 - checks the validator map and resolver syntax;
 - verifies the expected artifact exists and parses JSON artifacts;
 - requires an empty staging area before it starts;
@@ -30,6 +30,12 @@ The local-only runner contains no `git push`, deploy, publish, or remote mutatio
 ## Existing Runner
 
 `staffordos/operator_daemon/run_task_with_commit_gate_v1.sh` remains unchanged and still performs the existing commit-then-push behavior for missions that authorize push.
+
+## Character-Integrity Output Boundary
+
+`staffordos/guards/character_integrity_guard_v1.mjs` is a stateless validator. Its normal operation emits the normalized value or deterministic structured result on stdout, rejects unknown modes and oversized input, and does not create or modify `staffordos/operator_daemon/output/character_integrity_guard_v1.json`. That tracked JSON is historical fixture data only; it is not current authority or runtime state. The guard accepts no output-path argument and no environment-controlled destination.
+
+The guard's output is an integrity decision, not owner authentication. Its callers remain responsible for the existing commit and push gates. The push-capable runner retains its broader runtime behavior and must be separately authorized for any remote mutation.
 
 ## Commit Containment
 

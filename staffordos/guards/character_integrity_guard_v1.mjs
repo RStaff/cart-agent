@@ -1,10 +1,17 @@
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs";
-
-const outDir = "staffordos/operator_daemon/output";
-mkdirSync(outDir, { recursive: true });
-
 const mode = process.argv[2] || "check";
 const taskRaw = process.argv[3] || "";
+
+const MAX_INPUT_LENGTH = 4096;
+
+if (mode !== "check" && mode !== "normalize-task") {
+  console.error("character integrity guard rejected input");
+  process.exit(2);
+}
+
+if (taskRaw.length > MAX_INPUT_LENGTH || /\u0000/.test(taskRaw)) {
+  console.error("character integrity guard rejected input");
+  process.exit(2);
+}
 
 function normalizeText(value) {
   return String(value || "")
@@ -21,7 +28,6 @@ const taskNormalized = normalizeText(taskRaw);
 
 const result = {
   schema: "staffordos.character_integrity_guard.v1",
-  generated_at: new Date().toISOString(),
   mode,
   status: hasHiddenChars(taskRaw) ? "normalized_hidden_characters" : "passed",
   input: {
@@ -36,8 +42,6 @@ const result = {
     revenue_action: false
   }
 };
-
-writeFileSync(`${outDir}/character_integrity_guard_v1.json`, JSON.stringify(result, null, 2));
 
 if (mode === "normalize-task") {
   console.log(taskNormalized);
