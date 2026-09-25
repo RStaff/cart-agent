@@ -11,6 +11,10 @@ type CampaignAttributionReport = {
   attributed_leads?: number;
 };
 
+type StaffordMediaOfferRegistry = {
+  offers?: Array<{ offerId?: string; businessUnit?: string; price?: { currency?: string; amount?: number } }>;
+};
+
 const VALIDATION_PATHS = {
   preflight: "preflight/output/preflight_report_v1.json",
   qa: "qa/output/command_center_primary_action_qa_v1.json",
@@ -55,6 +59,14 @@ export default function OperatorLayout({ children }: { children: ReactNode }) {
     path.join(repoRoot, "staffordos/qa/output/campaign_attribution_report_v1.json"),
     {}
   );
+  const staffordMediaOffers = readJson<StaffordMediaOfferRegistry>(
+    path.join(repoRoot, "staffordos/leads/staffordmedia_offer_registry_v1.json"),
+    {}
+  );
+  const staffordMediaTransactions = readJson<{ schema?: string; transactions?: unknown[] }>(
+    path.join(repoRoot, "staffordos/leads/staffordmedia_revenue_transactions_v1.json"),
+    {}
+  );
 
   const campaignRegistryCount = Array.isArray(campaignRegistry.items) ? campaignRegistry.items.length : 0;
   const totalLeads = Number(campaignAttributionReport.total_leads ?? 0);
@@ -65,6 +77,17 @@ export default function OperatorLayout({ children }: { children: ReactNode }) {
   const campaignAttributionStatus = totalLeads > 0
     ? `Implemented · ${attributedLeads}/${totalLeads} attributed`
     : "Not Yet Implemented";
+  const staffordMediaOfferRegistered = (staffordMediaOffers.offers || []).some((offer) =>
+    offer.offerId === "STAFFORDMEDIA_AUTOMATION_OPPORTUNITY_ASSESSMENT_V1"
+    && offer.businessUnit === "STAFFORDMEDIA"
+    && offer.price?.currency === "USD"
+    && offer.price?.amount === 750
+  );
+  const revenueOfferStatus = staffordMediaOfferRegistered ? "Registered · $750 assessment" : "Not registered";
+  const governedTransactionStatus = staffordMediaTransactions.schema === "staffordos.staffordmedia_revenue_transactions.v1"
+    && Array.isArray(staffordMediaTransactions.transactions)
+    ? `Ready · ${staffordMediaTransactions.transactions.length} transaction records`
+    : "Unavailable";
   const preflightPath = path.join(repoRoot, VALIDATION_PATHS.preflight);
   const qaPath = path.join(repoRoot, VALIDATION_PATHS.qa);
   const validationStatusParts = [
@@ -87,6 +110,8 @@ export default function OperatorLayout({ children }: { children: ReactNode }) {
         validationStatus,
         campaignRegistryStatus,
         campaignAttributionStatus,
+        revenueOfferStatus,
+        governedTransactionStatus,
         systemHealthStatus,
       }}
     >

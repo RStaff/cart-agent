@@ -1,4 +1,5 @@
 import LeadActions from "./LeadActions";
+import GovernedProspectTransaction from "./GovernedProspectTransaction";
 import { loadOperatorLeads } from "../../../lib/leads/loadOperatorLeads";
 
 type Lead = {
@@ -17,29 +18,27 @@ type Lead = {
   sent: boolean;
   replied: boolean;
   last_event_at: string | null;
+  product_scope: string;
+  staffordmedia_eligible: boolean;
+  governed_transaction: any;
 };
 
 export default async function OperatorLeadsPage() {
   const data = await loadOperatorLeads();
   const summary = data.summary || {};
   const leads: Lead[] = Array.isArray(data.leads) ? data.leads : [];
+  const staffordMediaLeads = leads.filter((lead) => lead.staffordmedia_eligible);
+  const revenueOperations = data.staffordmedia_revenue_operations;
 
   return (
-    <main style={{ padding: "32px", fontFamily: "system-ui, sans-serif" }}>
-      <p style={{ color: "#666", marginBottom: 8 }}>StaffordOS / Operator Leads</p>
-      <h1 style={{ fontSize: 32, marginBottom: 8 }}>Lead Command</h1>
-      <p style={{ color: "#555", marginBottom: 24 }}>
+    <main className="leadCommand">
+      <p className="leadCommandEyebrow">StaffordOS / Operator Leads</p>
+      <h1>Lead Command</h1>
+      <p className="leadCommandIntro">
         Real lead registry, queue, readiness, send ledger, and event counts. No placeholder lead data.
       </p>
 
-      <section
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-          gap: 12,
-          marginBottom: 28
-        }}
-      >
+      <section className="leadSummary" aria-label="Lead summary">
         {[
           ["Total Leads", summary.total_leads],
           ["Contact Ready", summary.contact_ready],
@@ -50,74 +49,97 @@ export default async function OperatorLeadsPage() {
           ["Blocked", summary.blocked],
           ["Events", summary.event_count]
         ].map(([label, value]) => (
-          <div
-            key={String(label)}
-            style={{
-              border: "1px solid #ddd",
-              borderRadius: 12,
-              padding: 16,
-              background: "#fff"
-            }}
-          >
-            <div style={{ color: "#666", fontSize: 13 }}>{label}</div>
-            <div style={{ fontSize: 28, fontWeight: 700 }}>{String(value ?? 0)}</div>
+          <div key={String(label)} className="leadSummaryItem">
+            <span>{label}</span>
+            <strong>{String(value ?? 0)}</strong>
           </div>
         ))}
       </section>
 
-      <section style={{ border: "1px solid #ddd", borderRadius: 12, overflow: "hidden" }}>
-        <div style={{ padding: 16, borderBottom: "1px solid #ddd", background: "#fafafa" }}>
-          <strong>Real Lead Pipeline</strong>
-          <div style={{ color: "#666", fontSize: 13 }}>
+      <section className="staffordMediaOutreach" aria-labelledby="staffordmedia-outreach-heading">
+        <div>
+          <p className="leadCommandEyebrow">StaffordMedia revenue operations</p>
+          <h2 id="staffordmedia-outreach-heading">Governed prospect transaction</h2>
+          <p>
+            The Automation Opportunity Assessment is {revenueOperations.offer_registered ? "registered at $750" : "not registered"}. Only leads explicitly bound to StaffordMedia, this offer, its campaign, and the Stafford Media tenant can appear here.
+          </p>
+        </div>
+        <span className={`statusPill ${revenueOperations.real_send_enabled ? "statusPillPartial" : "statusPillReady"}`}>
+          {revenueOperations.real_send_enabled ? "Real send enabled" : "Real send disabled"}
+        </span>
+        {staffordMediaLeads.length === 0 ? (
+          <div className="staffordMediaEmpty">
+            No validated StaffordMedia prospects are registered. Existing Shopify and unscoped lead records remain separate below.
+          </div>
+        ) : (
+          <div className="staffordMediaProspectGrid">
+            {staffordMediaLeads.map((lead) => (
+              <article key={lead.id} className="staffordMediaProspect">
+                <strong>{lead.name}</strong>
+                <span>{lead.email}</span>
+                <GovernedProspectTransaction leadId={lead.id} email={lead.email} transaction={lead.governed_transaction} />
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="leadInventory">
+        <div className="leadInventoryHeader">
+          <strong>Canonical lead inventory</strong>
+          <div>
             Source policy: {data.source_policy} · Registry + send queue + send ready + send console.
           </div>
         </div>
 
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+        <div className="leadInventoryTableWrap">
+          <table className="leadInventoryTable">
           <thead>
-            <tr style={{ background: "#f5f5f5", textAlign: "left" }}>
-              {["Lead", "Domain", "Email", "Stage", "Next Action", "Score", "Temp", "Status", "Actions"].map((h) => (
-                <th key={h} style={{ padding: 12, borderBottom: "1px solid #ddd" }}>{h}</th>
+            <tr>
+              {["Lead", "Product Scope", "Domain", "Email", "Stage", "Next Action", "Score", "Temp", "Status", "Actions"].map((h) => (
+                <th key={h}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {leads.map((lead) => (
               <tr key={lead.id}>
-                <td style={{ padding: 12, borderBottom: "1px solid #eee", fontWeight: 600 }}>
+                <td className="leadName">
                   {lead.name}
                 </td>
-                <td style={{ padding: 12, borderBottom: "1px solid #eee" }}>
+                <td><span className="leadScopeBadge">{lead.product_scope}</span></td>
+                <td>
                   {lead.domain || "—"}
                 </td>
-                <td style={{ padding: 12, borderBottom: "1px solid #eee" }}>
+                <td>
                   {lead.email || "Needs contact"}
                 </td>
-                <td style={{ padding: 12, borderBottom: "1px solid #eee" }}>
+                <td>
                   {lead.lifecycle_stage}
                 </td>
-                <td style={{ padding: 12, borderBottom: "1px solid #eee", maxWidth: 280 }}>
+                <td className="leadNextAction">
                   {lead.next_action}
                 </td>
-                <td style={{ padding: 12, borderBottom: "1px solid #eee" }}>
+                <td>
                   {lead.conversion_score ?? lead.score ?? "—"}
                 </td>
-                <td style={{ padding: 12, borderBottom: "1px solid #eee", fontWeight: 700 }}>
+                <td className="leadTemperature">
                   {(lead.temperature || "cold").toUpperCase()}
                 </td>
-                <td style={{ padding: 12, borderBottom: "1px solid #eee" }}>
+                <td>
                   {lead.sent ? "Sent" : lead.queued ? "Queued" : lead.outreach_ready ? "Ready" : "Blocked"}
                 </td>
-                <td style={{ padding: 12, borderBottom: "1px solid #eee" }}>
+                <td>
                   <LeadActions leadId={lead.id} />
                 </td>
               </tr>
             ))}
           </tbody>
-        </table>
+          </table>
+        </div>
 
         {leads.length === 0 && (
-          <div style={{ padding: 24, color: "#666" }}>
+          <div className="leadInventoryEmpty">
             No real leads found in the current registry or queue files.
           </div>
         )}
