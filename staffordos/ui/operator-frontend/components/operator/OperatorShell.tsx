@@ -15,6 +15,8 @@ type ShellStatus = {
   validationStatus: string;
   campaignRegistryStatus: string;
   campaignAttributionStatus: string;
+  revenueOfferStatus: string;
+  governedTransactionStatus: string;
   systemHealthStatus: string;
 };
 
@@ -95,6 +97,7 @@ export function OperatorShell({ children, status }: OperatorShellProps) {
   const pathname = usePathname();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const breadcrumbs = breadcrumbFromPath(pathname);
+  const isLeadWorkspace = pathname === "/operator/leads";
 
   return (
     <div className="operatorShell">
@@ -219,12 +222,12 @@ export function OperatorShell({ children, status }: OperatorShellProps) {
                 <strong>{validationSummary(status.validationStatus)}</strong>
               </div>
           <div className="operatorShellStatusItem">
-            <span className="operatorShellStatusLabel">Campaign Registry</span>
-            <strong>{status.campaignRegistryStatus}</strong>
+            <span className="operatorShellStatusLabel">{isLeadWorkspace ? "StaffordMedia Offer" : "Campaign Registry"}</span>
+            <strong>{isLeadWorkspace ? status.revenueOfferStatus : status.campaignRegistryStatus}</strong>
           </div>
           <div className="operatorShellStatusItem">
-            <span className="operatorShellStatusLabel">Campaign Attribution</span>
-            <strong>{status.campaignAttributionStatus}</strong>
+            <span className="operatorShellStatusLabel">{isLeadWorkspace ? "Governed Transaction" : "Campaign Attribution"}</span>
+            <strong>{isLeadWorkspace ? status.governedTransactionStatus : status.campaignAttributionStatus}</strong>
           </div>
           <div className="operatorShellStatusItem">
             <span className="operatorShellStatusLabel">System Health</span>

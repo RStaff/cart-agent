@@ -214,7 +214,7 @@ test("gate performs no mutation and denied assertion fails predictably", () => {
   assert.equal(assertOperatorWriteAllowed({ headers: headers({ host: "localhost:3000" }), env: localEnv() }).allowed, true);
 });
 
-test("all five POST route handlers call the canonical gate before mutation work", () => {
+test("all five registered POST route handlers call the canonical gate before mutation work", () => {
   assert.equal(postRouteFiles.length, 5);
 
   for (const routeFile of postRouteFiles) {
@@ -230,6 +230,20 @@ test("all five POST route handlers call the canonical gate before mutation work"
     assert.ok(markerIndex >= 0, `${routeFile} must contain expected mutation marker ${marker}`);
     assert.ok(gateIndex < markerIndex, `${routeFile} must gate before mutation marker`);
   }
+});
+
+test("StaffordMedia revenue operations route gates before authentication or body parsing", () => {
+  const routeFile = path.join(frontendRoot, "app/api/operator/revenue-operations/action/route.ts");
+  const source = readFileSync(routeFile, "utf8");
+  const gateIndex = source.indexOf("evaluateOperatorWriteIsolation");
+  const cookieIndex = source.indexOf("const config = operatorAuthConfigFromEnv");
+  const bodyIndex = source.indexOf("const body = await req.json();");
+
+  assert.ok(gateIndex >= 0);
+  assert.ok(cookieIndex > gateIndex);
+  assert.ok(bodyIndex > cookieIndex);
+  assert.match(source, /STAFFORDOS_REAL_PROSPECT_SEND_ENABLED !== "1"/);
+  assert.match(source, /STAFFORDOS_REVENUE_OPERATIONS_APPROVER_SUBJECT/);
 });
 
 test("server-action directives are guarded before form data and write helpers", () => {

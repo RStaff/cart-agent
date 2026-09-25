@@ -1,0 +1,31 @@
+{
+  "schema": "staffordos.staffordmedia_offer_registry.v1",
+  "offers": [
+    {
+      "offerId": "STAFFORDMEDIA_AUTOMATION_OPPORTUNITY_ASSESSMENT_V1",
+      "businessUnit": "STAFFORDMEDIA",
+      "audience": "home and field-service businesses",
+      "price": {
+        "currency": "USD",
+        "amount": 750
+      },
+      "deliveryTargetBusinessDays": 5,
+      "scope": [
+        "one current-state workflow map",
+        "three ranked automation opportunities",
+        "one bounded first-automation specification",
+        "human-review requirements",
+        "system/data dependencies",
+        "exclusions and separately priced implementation options"
+      ],
+      "exclusions": [
+        "implementation",
+        "software fees",
+        "migration",
+        "compliance certification",
+        "guaranteed savings"
+      ],
+      "creditPolicy": "$750 may be credited toward a separately approved implementation sprint"
+    }
+  ]
+}

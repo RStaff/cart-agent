@@ -195,6 +195,9 @@ textarea {
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .statusPillReady {
@@ -485,6 +488,11 @@ textarea {
   align-items: end;
 }
 
+.operatorShellHeaderPrimary > *,
+.operatorShellStatusItem {
+  min-width: 0;
+}
+
 .operatorShellHeaderPrimary strong,
 .operatorShellStatusItem strong {
   display: block;
@@ -544,6 +552,193 @@ textarea {
 
 .operatorShellStatusItem strong {
   font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.leadCommand {
+  padding: 32px;
+}
+
+.leadCommand h1,
+.leadCommand h2,
+.leadCommand p {
+  margin-top: 0;
+}
+
+.leadCommand h1 {
+  margin-bottom: 8px;
+  font-size: 32px;
+  color: #f8fafc;
+}
+
+.leadCommandEyebrow {
+  margin-bottom: 8px;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.leadCommandIntro {
+  margin-bottom: 24px;
+  color: #cbd5e1;
+}
+
+.leadSummary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.leadSummaryItem {
+  padding: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.82);
+}
+
+.leadSummaryItem span {
+  display: block;
+  color: #cbd5e1;
+  font-size: 13px;
+}
+
+.leadSummaryItem strong {
+  display: block;
+  margin-top: 4px;
+  color: #f8fafc;
+  font-size: 28px;
+}
+
+.staffordMediaOutreach {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px 20px;
+  margin-bottom: 24px;
+  padding: 20px;
+  border-block: 1px solid rgba(34, 211, 238, 0.35);
+  background: rgba(8, 47, 73, 0.24);
+}
+
+.staffordMediaOutreach > .statusPill {
+  align-self: start;
+}
+
+.staffordMediaOutreach h2 {
+  margin-bottom: 8px;
+  color: #f8fafc;
+  font-size: 20px;
+}
+
+.staffordMediaOutreach p:not(.leadCommandEyebrow),
+.staffordMediaEmpty {
+  margin-bottom: 0;
+  color: #cbd5e1;
+  line-height: 1.5;
+}
+
+.staffordMediaEmpty,
+.staffordMediaProspectGrid {
+  grid-column: 1 / -1;
+}
+
+.staffordMediaProspectGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.staffordMediaProspect {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.6);
+}
+
+.leadInventory {
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.52);
+}
+
+.leadInventoryHeader {
+  padding: 16px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(15, 23, 42, 0.88);
+  color: #f8fafc;
+}
+
+.leadInventoryHeader div {
+  margin-top: 4px;
+  color: #cbd5e1;
+  font-size: 13px;
+}
+
+.leadInventoryTableWrap {
+  overflow-x: auto;
+}
+
+.leadInventoryTable {
+  width: 100%;
+  min-width: 1120px;
+  border-collapse: collapse;
+  color: #e2e8f0;
+  font-size: 14px;
+}
+
+.leadInventoryTable th,
+.leadInventoryTable td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+  text-align: left;
+  vertical-align: top;
+}
+
+.leadInventoryTable th {
+  background: rgba(15, 23, 42, 0.68);
+  color: #cbd5e1;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.leadName,
+.leadTemperature {
+  color: #f8fafc;
+  font-weight: 700;
+}
+
+.leadNextAction {
+  max-width: 280px;
+}
+
+.leadScopeBadge {
+  display: inline-flex;
+  padding: 4px 7px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 4px;
+  color: #bae6fd;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.leadInventoryEmpty {
+  padding: 24px;
+  color: #cbd5e1;
+}
+
+@media (max-width: 900px) {
+  .leadSummary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .staffordMediaOutreach {
+    grid-template-columns: 1fr;
+  }
 }
 
 .operatorShellContent {
