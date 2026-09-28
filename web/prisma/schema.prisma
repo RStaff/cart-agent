@@ -530,3 +530,41 @@ model DailyAggregate {
   @@unique([storeId, date])
   @@index([storeId, date])
 }
+
+model StaffordosInboundAutomationInquiry {
+  id                     String   @id @default(cuid())
+  submissionId           String   @unique
+  payloadHash            String
+  briefHash              String
+  source                 String   @default("staffordmedia_automate")
+  status                 String   @default("NEEDS_REVIEW")
+  name                   String?
+  email                  String
+  phone                  String?
+  companyName            String?
+  businessType           String?
+  improvements           Json
+  systems                Json
+  currentWorkflow        String?
+  desiredWorkflow        String?
+  contactAcknowledgement Boolean  @default(false)
+  possibleDuplicateOfId  String?
+  reviewedAt             DateTime?
+  reviewedBy             String?
+  nextAction             String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@index([email, createdAt])
+  @@index([status, createdAt])
+}
+
+model StaffordosInboundAutomationRateLimit {
+  scopeHash   String
+  windowStart DateTime
+  count       Int      @default(0)
+  updatedAt   DateTime @updatedAt
+
+  @@id([scopeHash, windowStart])
+  @@index([windowStart])
+}

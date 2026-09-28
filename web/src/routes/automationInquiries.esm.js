@@ -1,0 +1,44 @@
+import { internalOnly } from "../middleware/internalOnly.js";
+import { AUTOMATION_INQUIRY_MAX_BODY_BYTES, normalizeAutomationInquiry } from "../lib/automationInquiry.js";
+import { createAutomationInquiryRepository } from "../lib/automationInquiryRepository.js";
+import { createAutomationInquiryRateLimiter } from "../lib/automationInquiryRateLimiter.js";
+
+export function buildAutomationInquiryHandlers({ repository, rateLimiter }) {
+  return {
+    async post(req, res) {
+      try {
+        const normalized = normalizeAutomationInquiry(req.body);
+        const limit = await rateLimiter.consume(req.get("x-stafford-visitor-token"), normalized.email);
+        if (!limit.allowed) return res.set("Retry-After", String(limit.retryAfterSeconds)).status(429).json({ ok: false, error: "INQUIRY_RATE_LIMITED" });
+        const result = await repository.accept(normalized);
+        return res.status(result.created ? 201 : 200).json({ ok: true, inquiryId: result.inquiry.id, status: result.inquiry.status, created: result.created });
+      } catch (error) {
+        const code = String(error?.code || error?.message || "INQUIRY_REJECTED");
+        const status = code === "IDEMPOTENCY_KEY_REUSE" ? 409 : (code === "INQUIRY_VISITOR_TOKEN_INVALID" ? 401 : (code.startsWith("INQUIRY_") ? 400 : 503));
+        return res.status(status).json({ ok: false, error: status === 503 ? "INQUIRY_STORAGE_UNAVAILABLE" : code });
+      }
+    },
+    async list(req, res) {
+      try {
+        return res.status(200).json({ ok: true, inquiries: await repository.list({ limit: req.query?.limit }) });
+      } catch {
+        return res.status(503).json({ ok: false, error: "INQUIRY_STORAGE_UNAVAILABLE" });
+      }
+    },
+  };
+}
+
+export function installAutomationInquiryRoute(app, { prisma }) {
+  const repository = createAutomationInquiryRepository({ prisma });
+  const rateLimiter = createAutomationInquiryRateLimiter({ prisma, secret: process.env.INTERNAL_API_KEY, emailHashSecret: process.env.STAFFORDOS_INTAKE_EMAIL_HMAC_KEY });
+  const handlers = buildAutomationInquiryHandlers({ repository, rateLimiter });
+  const boundedBody = (req, res, next) => {
+    const declared = Number(req.get("content-length") || 0);
+    if (declared > AUTOMATION_INQUIRY_MAX_BODY_BYTES) return res.status(413).json({ ok: false, error: "INQUIRY_PAYLOAD_TOO_LARGE" });
+    if (Buffer.byteLength(JSON.stringify(req.body || {}), "utf8") > AUTOMATION_INQUIRY_MAX_BODY_BYTES) return res.status(413).json({ ok: false, error: "INQUIRY_PAYLOAD_TOO_LARGE" });
+    return next();
+  };
+  app.post("/api/staffordos/automation-inquiries", internalOnly, boundedBody, handlers.post);
+  app.get("/api/staffordos/automation-inquiries", internalOnly, handlers.list);
+  return { bodyLimit: AUTOMATION_INQUIRY_MAX_BODY_BYTES };
+}
