@@ -28,7 +28,17 @@ function text(value, max, code, optional = false) {
 function optionalText(value, max, code) { return text(value, max, code, true) || null; }
 function email(value) {
   const result = text(value, 254, "INQUIRY_EMAIL_INVALID").toLowerCase();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(result) || /[\r\n,;]/.test(result)) fail("INQUIRY_EMAIL_INVALID");
+  const at = result.indexOf("@");
+  const domain = at >= 0 ? result.slice(at + 1) : "";
+  const local = at > 0 ? result.slice(0, at) : "";
+  if (
+    at !== result.lastIndexOf("@") ||
+    !local ||
+    !domain ||
+    domain.indexOf(".") <= 0 ||
+    domain.endsWith(".") ||
+    /[\s\r\n,;]/.test(result)
+  ) fail("INQUIRY_EMAIL_INVALID");
   return result;
 }
 function boundedList(value, allowed, code) {
