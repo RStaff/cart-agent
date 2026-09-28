@@ -38,6 +38,8 @@ import { installRecoveryExecution } from "./routes/recoveryExecution.esm.js";
 import { installSendOffer } from "./routes/sendOffer.esm.js";
 import { installShopifixerAuditRetrieval } from "./routes/shopifixerAuditRetrieval.esm.js";
 import { installShopifixerScopeAuthority } from "./routes/shopifixerScopeAuthority.esm.js";
+import { installAutomationInquiryRoute } from "./routes/automationInquiries.esm.js";
+import { prisma } from "./db.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, "..", "..");
@@ -283,6 +285,9 @@ app.post("/api/shopify/webhooks/orders-paid", express.raw({ type: "application/j
 installStripeWebhook(app); // uses express.raw({ type: "application/json" })
 
 app.use(express.json({ limit: "1mb" }));
+
+// Stafford Media inbound automation inquiry; service-authenticated and intentionally separate from outbound leads.
+installAutomationInquiryRoute(app, { prisma });
 
 // Execute public checkout installer (source-of-truth)
 checkoutPublic(app);

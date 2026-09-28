@@ -1,4 +1,5 @@
 import LeadActions from "./LeadActions";
+import InboundAutomationReview from "./InboundAutomationReview";
 import { loadOperatorLeads } from "../../../lib/leads/loadOperatorLeads";
 
 type Lead = {
@@ -122,6 +123,8 @@ export default async function OperatorLeadsPage() {
           </div>
         )}
       </section>
+
+      <InboundAutomationReview />
     </main>
   );
 }
