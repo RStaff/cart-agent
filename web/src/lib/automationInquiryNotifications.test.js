@@ -89,6 +89,29 @@ test("provider failure is durable and retry is controlled", async () => {
   const retry = await processInboundInquiryEmails({ prisma: fakePrisma(retryState), inquiry: inquiry(), env: { STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", STAFFORDOS_INBOUND_EMAIL_ACTIVATED_AT: "1970-01-01T00:00:00Z", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "ross@example.test" }, sendEmail: async () => ({ id: "provider_retry" }), now: new Date(1) });
   assert.equal(retry.attempted, 2);
   assert.equal(failures, 2);
+  assert.ok(state[0].firstAttemptAt);
+  assert.equal(state[0].firstAttemptAt, retryState[0].firstAttemptAt);
+});
+
+test("a delivery keeps its first provider-attempt timestamp across retries", async () => {
+  const state = rows();
+  const firstAttempt = new Date("2026-09-30T00:00:00.000Z");
+  await processInboundInquiryEmails({
+    prisma: fakePrisma(state),
+    inquiry: inquiry(),
+    env: { STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", STAFFORDOS_INBOUND_EMAIL_ACTIVATED_AT: "1970-01-01T00:00:00Z", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "ross@example.test" },
+    sendEmail: async () => { throw new Error("provider unavailable"); },
+    now: firstAttempt,
+  });
+  const recorded = state[0].firstAttemptAt;
+  await processInboundInquiryEmails({
+    prisma: fakePrisma(state.map((row) => ({ ...row, claimed: false, nextAttemptAt: new Date(firstAttempt.getTime() + 1) }))),
+    inquiry: inquiry(),
+    env: { STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", STAFFORDOS_INBOUND_EMAIL_ACTIVATED_AT: "1970-01-01T00:00:00Z", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "ross@example.test" },
+    sendEmail: async () => ({ id: "provider_retry" }),
+    now: new Date(firstAttempt.getTime() + 6 * 60 * 1000),
+  });
+  assert.equal(recorded, firstAttempt);
 });
 
 test("disabled gate records failure without calling provider", async () => {

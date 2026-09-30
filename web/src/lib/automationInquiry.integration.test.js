@@ -113,7 +113,7 @@ test("concurrent processors claim each message once and provider failure is retr
     const ambiguous = await repository.accept(input({ submissionId: ambiguousSubmission, email: "processor-ambiguous@example.com" }));
     const oldTime = new Date(Date.now() - 25 * 60 * 60 * 1000);
     const ambiguousRow = await prisma.staffordosInboundAutomationEmail.findFirst({ where: { inquiryId: ambiguous.inquiry.id }, orderBy: { createdAt: "asc" } });
-    await prisma.staffordosInboundAutomationEmail.update({ where: { id: ambiguousRow.id }, data: { status: "SENDING", claimToken: "expired-worker", claimStartedAt: oldTime, claimExpiresAt: oldTime, createdAt: oldTime, attemptCount: 1 } });
+    await prisma.staffordosInboundAutomationEmail.update({ where: { id: ambiguousRow.id }, data: { status: "SENDING", claimToken: "expired-worker", claimStartedAt: new Date(), claimExpiresAt: oldTime, firstAttemptAt: oldTime, attemptCount: 1 } });
     let ambiguousSend = false;
     await processInboundInquiryEmails({ prisma, inquiry: ambiguous.notificationInquiry, env: config, sendEmail: async () => { ambiguousSend = true; return { id: "must-not-send" }; }, now: new Date() });
     // The other message is still independently deliverable; the expired
@@ -124,6 +124,27 @@ test("concurrent processors claim each message once and provider failure is retr
     await prisma.staffordosInboundAutomationInquiry.deleteMany({ where: { id: ambiguous.inquiry.id } });
   } finally {
     await prisma.staffordosInboundAutomationInquiry.deleteMany({ where: { submissionId } });
+  }
+});
+
+test("scheduled due batches skip exhausted rows before pending work", async (t) => {
+  if (!process.env.DATABASE_URL) { t.skip("DATABASE_URL not provided"); return; }
+  const repository = createAutomationInquiryRepository({ prisma });
+  const prefix = `starvation_${Date.now()}`;
+  const config = { STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", STAFFORDOS_INBOUND_EMAIL_ACTIVATED_AT: "1970-01-01T00:00:00Z", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "operator@example.test" };
+  try {
+    for (let index = 0; index < 105; index += 1) {
+      const exhausted = await repository.accept(input({ submissionId: `${prefix}_exhausted_${index}`, email: `exhausted-${index}@example.com` }));
+      await prisma.staffordosInboundAutomationEmail.updateMany({ where: { inquiryId: exhausted.inquiry.id }, data: { status: "FAILED", attemptCount: 3, nextAttemptAt: new Date(0) } });
+    }
+    const pending = await repository.accept(input({ submissionId: `${prefix}_pending`, email: "pending@example.com" }));
+    let calls = 0;
+    const result = await processDueInboundInquiryEmails({ prisma, env: config, limit: 1, sendEmail: async () => { calls += 1; return { id: `pending_${calls}` }; } });
+    assert.equal(result.inquiries, 1);
+    assert.equal(calls, 2);
+    assert.equal(await prisma.staffordosInboundAutomationEmail.count({ where: { inquiryId: pending.inquiry.id, status: "PROVIDER_ACCEPTED" } }), 2);
+  } finally {
+    await prisma.staffordosInboundAutomationInquiry.deleteMany({ where: { submissionId: { startsWith: prefix } } });
   }
 });
 

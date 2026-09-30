@@ -574,6 +574,7 @@ model StaffordosInboundAutomationEmail {
   claimToken     String?
   claimStartedAt DateTime?
   claimExpiresAt DateTime?
+  firstAttemptAt DateTime?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   inquiry        StaffordosInboundAutomationInquiry @relation(fields: [inquiryId], references: [id], onDelete: Cascade)

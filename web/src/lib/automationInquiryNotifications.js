@@ -96,7 +96,8 @@ export async function processInboundInquiryEmails({ prisma, inquiry, env = proce
     const row = await prisma.staffordosInboundAutomationEmail.findUnique({ where: { idempotencyKey: message.idempotencyKey } });
     if (!row || row.status === EMAIL_SENT) continue;
     if (row.status === "SENDING" && row.claimExpiresAt && row.claimExpiresAt <= now) {
-      if (row.createdAt && now.getTime() - new Date(row.createdAt).getTime() >= RESEND_IDEMPOTENCY_RETENTION_MS) {
+      const firstAttemptAt = row.firstAttemptAt || row.claimStartedAt;
+      if (firstAttemptAt && now.getTime() - new Date(firstAttemptAt).getTime() >= RESEND_IDEMPOTENCY_RETENTION_MS) {
         await prisma.staffordosInboundAutomationEmail.updateMany({
           where: { id: row.id, status: "SENDING", claimExpiresAt: { lte: now } },
           data: { status: "AMBIGUOUS", lastError: "idempotency_window_expired", nextAttemptAt: null, claimToken: null, claimStartedAt: null, claimExpiresAt: null, updatedAt: now },
@@ -116,7 +117,7 @@ export async function processInboundInquiryEmails({ prisma, inquiry, env = proce
         attemptCount: { lt: 3 },
         OR: [{ nextAttemptAt: null }, { nextAttemptAt: { lte: now } }],
       },
-      data: { status: "SENDING", attemptCount: { increment: 1 }, claimToken, claimStartedAt: now, claimExpiresAt: new Date(now.getTime() + EMAIL_CLAIM_LEASE_MS), updatedAt: now },
+      data: { status: "SENDING", attemptCount: { increment: 1 }, claimToken, claimStartedAt: now, claimExpiresAt: new Date(now.getTime() + EMAIL_CLAIM_LEASE_MS), firstAttemptAt: row.firstAttemptAt || now, updatedAt: now },
     });
     if (claimed.count !== 1) continue;
     attempted += 1;
@@ -148,9 +149,9 @@ export async function processDueInboundInquiryEmails({ prisma, env = process.env
   const due = await prisma.staffordosInboundAutomationEmail.findMany({
     where: {
       OR: [
-        { status: EMAIL_PENDING },
-        { status: EMAIL_FAILED, nextAttemptAt: { lte: now } },
-        { status: "SENDING", claimExpiresAt: { lte: now } },
+        { status: EMAIL_PENDING, attemptCount: { lt: 3 } },
+        { status: EMAIL_FAILED, attemptCount: { lt: 3 }, nextAttemptAt: { lte: now } },
+        { status: "SENDING", attemptCount: { lt: 3 }, claimExpiresAt: { lte: now } },
       ],
     },
     select: { inquiryId: true },
