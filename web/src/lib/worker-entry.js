@@ -3,3 +3,5 @@ if (process.env.DISABLE_WORKER === '1') {
   process.exit(0);
 }
 await import('./send-worker-loop.js');
+const { startInboundEmailRetryWorker } = await import('./automationInquiryRetryWorker.js');
+startInboundEmailRetryWorker();

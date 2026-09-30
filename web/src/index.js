@@ -39,6 +39,7 @@ import { installSendOffer } from "./routes/sendOffer.esm.js";
 import { installShopifixerAuditRetrieval } from "./routes/shopifixerAuditRetrieval.esm.js";
 import { installShopifixerScopeAuthority } from "./routes/shopifixerScopeAuthority.esm.js";
 import { installAutomationInquiryRoute } from "./routes/automationInquiries.esm.js";
+import { startInboundEmailRetryWorker } from "./lib/automationInquiryRetryWorker.js";
 import { prisma } from "./db.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -55,6 +56,10 @@ for (const envPath of [
     dotenv.config({ path: envPath, override: false });
   }
 }
+
+// Render's existing API process is always on; when explicitly enabled, use it
+// as the durable retry scheduler so retries do not depend on another request.
+startInboundEmailRetryWorker();
 
 function normalizeStoreInput(value = "") {
   const raw = String(value || "").trim();

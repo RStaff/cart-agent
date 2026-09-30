@@ -45,6 +45,23 @@ test("same submission retry is idempotent and changed reuse is rejected", async 
   assert.equal(first.statusCode, 201); assert.equal(retry.statusCode, 200); assert.equal(changed.statusCode, 409);
 });
 
+test("notification processing runs only after durable creation and never on an idempotent retry", async () => {
+  let created = false;
+  let notifications = 0;
+  const repository = {
+    async accept(input) {
+      if (created) return { created: false, inquiry: { id: "inq_1", status: "NEEDS_REVIEW" } };
+      created = true;
+      return { created: true, inquiry: { id: "inq_1", status: "NEEDS_REVIEW" }, notificationInquiry: { id: "inq_1", submissionId: input.submissionId, email: input.email, source: "staffordmedia_automate" } };
+    },
+  };
+  const handlers = buildAutomationInquiryHandlers({ repository, rateLimiter: { consume: async () => ({ allowed: true }) }, notificationProcessor: async () => { notifications += 1; } });
+  const response = () => ({ statusCode: 0, body: null, status(code) { this.statusCode = code; return this; }, json(body) { this.body = body; return this; } });
+  await handlers.post({ body: base(), get: () => "signed-token" }, response());
+  await handlers.post({ body: base(), get: () => "signed-token" }, response());
+  assert.equal(notifications, 1);
+});
+
 test("storage failure is honest and does not expose payload", async () => {
   const handlers = buildAutomationInquiryHandlers({ repository: { accept: async () => { throw new Error("database down"); } }, rateLimiter: { consume: async () => ({ allowed: true }) } });
   const response = { statusCode: 0, body: null, status(code) { this.statusCode = code; return this; }, json(body) { this.body = body; return this; } };
