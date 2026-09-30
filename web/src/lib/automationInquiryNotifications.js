@@ -18,7 +18,9 @@ export function inboundEmailConfig(env = process.env) {
   const parsedActivation = activationRaw ? new Date(activationRaw) : null;
   return {
     enabled: clean(env.STAFFORDOS_INBOUND_EMAIL_ENABLED).toLowerCase() === "true",
-    from: clean(env.FROM_EMAIL),
+    // Keep inbound transactional mail isolated from the shared FROM_EMAIL
+    // used by legacy offers, recovery, and other product mailers.
+    from: clean(env.STAFFORDOS_INBOUND_EMAIL_FROM || env.FROM_EMAIL),
     operatorEmail: clean(env.STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL),
     replyTo: clean(env.STAFFORDOS_INQUIRY_REPLY_TO_EMAIL),
     activationAt: parsedActivation && !Number.isNaN(parsedActivation.getTime()) ? parsedActivation : null,
