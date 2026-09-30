@@ -78,7 +78,7 @@ test("concurrent processors claim each message once and provider failure is retr
   const repository = createAutomationInquiryRepository({ prisma });
   const submissionId = `email_process_${Date.now()}`;
   const payload = input({ submissionId, email: "processor@example.com" });
-  const config = { STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "operator@example.test", STAFFORDOS_INQUIRY_REPLY_TO_EMAIL: "support@staffordmedia.ai" };
+  const config = { STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", STAFFORDOS_INBOUND_EMAIL_ACTIVATED_AT: "1970-01-01T00:00:00Z", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "operator@example.test", STAFFORDOS_INQUIRY_REPLY_TO_EMAIL: "support@staffordmedia.ai" };
   try {
     const accepted = await repository.accept(payload);
     let sends = 0;
@@ -131,7 +131,7 @@ test("scheduled due processor is safe across concurrent worker ticks", async (t)
   if (!process.env.DATABASE_URL) { t.skip("DATABASE_URL not provided"); return; }
   const repository = createAutomationInquiryRepository({ prisma });
   const submissionId = `scheduled_${Date.now()}`;
-  const config = { STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "operator@example.test" };
+  const config = { STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", STAFFORDOS_INBOUND_EMAIL_ACTIVATED_AT: "1970-01-01T00:00:00Z", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "operator@example.test" };
   try {
     const accepted = await repository.accept(input({ submissionId, email: "scheduled@example.com" }));
     let calls = 0;
@@ -153,7 +153,7 @@ test("scheduled retries stop after the bounded attempt count", async (t) => {
   if (!process.env.DATABASE_URL) { t.skip("DATABASE_URL not provided"); return; }
   const repository = createAutomationInquiryRepository({ prisma });
   const submissionId = `bounded_${Date.now()}`;
-  const config = { STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "operator@example.test" };
+  const config = { STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", STAFFORDOS_INBOUND_EMAIL_ACTIVATED_AT: "1970-01-01T00:00:00Z", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "operator@example.test" };
   try {
     const accepted = await repository.accept(input({ submissionId, email: "bounded@example.com" }));
     let calls = 0;
@@ -166,6 +166,24 @@ test("scheduled retries stop after the bounded attempt count", async (t) => {
     assert.equal(rows.every((row) => row.attemptCount === 3 && row.status === "FAILED"), true);
     await processDueInboundInquiryEmails({ prisma, env: config, sendEmail: async () => { throw new Error("must-not-send"); }, now: new Date(Date.now() + 60 * 60 * 1000) });
     assert.equal(await prisma.staffordosInboundAutomationEmail.count({ where: { inquiryId: accepted.inquiry.id, attemptCount: { gt: 3 } } }), 0);
+  } finally {
+    await prisma.staffordosInboundAutomationInquiry.deleteMany({ where: { submissionId } });
+  }
+});
+
+test("activation policy suppresses pre-activation ledger rows", async (t) => {
+  if (!process.env.DATABASE_URL) { t.skip("DATABASE_URL not provided"); return; }
+  const repository = createAutomationInquiryRepository({ prisma });
+  const submissionId = `activation_${Date.now()}`;
+  const activationAt = new Date(Date.now() + 60 * 60 * 1000);
+  const config = { STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", STAFFORDOS_INBOUND_EMAIL_ACTIVATED_AT: activationAt.toISOString(), FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "operator@example.test" };
+  try {
+    const accepted = await repository.accept(input({ submissionId, email: "pre-activation@example.com" }));
+    let calls = 0;
+    const result = await processDueInboundInquiryEmails({ prisma, env: config, sendEmail: async () => { calls += 1; return { id: "must-not-send" }; }, now: new Date() });
+    assert.equal(result.attempted, 0);
+    assert.equal(calls, 0);
+    assert.equal(await prisma.staffordosInboundAutomationEmail.count({ where: { inquiryId: accepted.inquiry.id, status: "SUPPRESSED" } }), 2);
   } finally {
     await prisma.staffordosInboundAutomationInquiry.deleteMany({ where: { submissionId } });
   }

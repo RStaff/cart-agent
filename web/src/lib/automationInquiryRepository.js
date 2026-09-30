@@ -51,6 +51,7 @@ export function createAutomationInquiryRepository({ prisma }) {
           name: created.name,
           email: created.email,
           companyName: created.companyName,
+          createdAt: created.createdAt,
         },
       };
     },

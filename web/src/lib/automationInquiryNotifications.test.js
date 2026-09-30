@@ -55,8 +55,8 @@ function rows() {
 
 test("config requires an explicit inbound transactional-email gate and recipients", () => {
   assert.equal(inboundEmailConfig({ STAFFORDOS_INBOUND_EMAIL_ENABLED: "false" }).enabled, false);
-  assert.equal(inboundEmailConfig({ STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "ross@example.test" }).replyTo, "");
-  assert.deepEqual(inboundEmailConfig({ STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "ross@example.test" }), { enabled: true, from: "support@staffordmedia.ai", operatorEmail: "ross@example.test", replyTo: "" });
+  assert.equal(inboundEmailConfig({ STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", STAFFORDOS_INBOUND_EMAIL_ACTIVATED_AT: "2026-09-30T00:00:00Z", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "ross@example.test" }).replyTo, "");
+  assert.deepEqual(inboundEmailConfig({ STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "ross@example.test" }), { enabled: true, from: "support@staffordmedia.ai", operatorEmail: "ross@example.test", replyTo: "", activationAt: null });
 });
 
 test("visitor acknowledgement and Ross notification are minimal and text-safe", () => {
@@ -71,7 +71,7 @@ test("visitor acknowledgement and Ross notification are minimal and text-safe", 
 test("valid acceptance sends each ledger row once, with provider idempotency keys", async () => {
   const state = rows();
   const calls = [];
-  const result = await processInboundInquiryEmails({ prisma: fakePrisma(state), inquiry: inquiry(), env: { STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "ross@example.test" }, sendEmail: async (message) => { calls.push(message); return { id: `provider_${calls.length}` }; } });
+  const result = await processInboundInquiryEmails({ prisma: fakePrisma(state), inquiry: inquiry(), env: { STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", STAFFORDOS_INBOUND_EMAIL_ACTIVATED_AT: "1970-01-01T00:00:00Z", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "ross@example.test" }, sendEmail: async (message) => { calls.push(message); return { id: `provider_${calls.length}` }; } });
   assert.equal(result.attempted, 2);
   assert.equal(calls.length, 2);
   assert.equal(calls[0].idempotencyKey, "inquiry:web_submission_1:visitor-ack");
@@ -81,12 +81,12 @@ test("valid acceptance sends each ledger row once, with provider idempotency key
 test("provider failure is durable and retry is controlled", async () => {
   const state = rows();
   let failures = 0;
-  const first = await processInboundInquiryEmails({ prisma: fakePrisma(state), inquiry: inquiry(), env: { STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "ross@example.test" }, sendEmail: async () => { failures += 1; throw new Error("provider unavailable"); } });
+  const first = await processInboundInquiryEmails({ prisma: fakePrisma(state), inquiry: inquiry(), env: { STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", STAFFORDOS_INBOUND_EMAIL_ACTIVATED_AT: "1970-01-01T00:00:00Z", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "ross@example.test" }, sendEmail: async () => { failures += 1; throw new Error("provider unavailable"); } });
   assert.equal(first.attempted, 2);
   assert.deepEqual(state.map((row) => row.status), [EMAIL_FAILED, EMAIL_FAILED]);
   assert.equal(state[0].lastError, "provider unavailable");
   const retryState = state.map((row) => ({ ...row, claimed: false, nextAttemptAt: new Date(0) }));
-  const retry = await processInboundInquiryEmails({ prisma: fakePrisma(retryState), inquiry: inquiry(), env: { STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "ross@example.test" }, sendEmail: async () => ({ id: "provider_retry" }), now: new Date(1) });
+  const retry = await processInboundInquiryEmails({ prisma: fakePrisma(retryState), inquiry: inquiry(), env: { STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", STAFFORDOS_INBOUND_EMAIL_ACTIVATED_AT: "1970-01-01T00:00:00Z", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "ross@example.test" }, sendEmail: async () => ({ id: "provider_retry" }), now: new Date(1) });
   assert.equal(retry.attempted, 2);
   assert.equal(failures, 2);
 });
@@ -112,8 +112,8 @@ test("concurrent processors claim each delivery once", async () => {
   let calls = 0;
   const provider = async () => { calls += 1; await new Promise((resolve) => setTimeout(resolve, 5)); return { id: `provider_${calls}` }; };
   await Promise.all([
-    processInboundInquiryEmails({ prisma: fakePrisma(state), inquiry: inquiry(), env: { STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "ross@example.test" }, sendEmail: provider }),
-    processInboundInquiryEmails({ prisma: fakePrisma(state), inquiry: inquiry(), env: { STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "ross@example.test" }, sendEmail: provider }),
+    processInboundInquiryEmails({ prisma: fakePrisma(state), inquiry: inquiry(), env: { STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", STAFFORDOS_INBOUND_EMAIL_ACTIVATED_AT: "1970-01-01T00:00:00Z", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "ross@example.test" }, sendEmail: provider }),
+    processInboundInquiryEmails({ prisma: fakePrisma(state), inquiry: inquiry(), env: { STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", STAFFORDOS_INBOUND_EMAIL_ACTIVATED_AT: "1970-01-01T00:00:00Z", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "ross@example.test" }, sendEmail: provider }),
   ]);
   assert.equal(calls, 2);
 });

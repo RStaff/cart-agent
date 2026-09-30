@@ -6,6 +6,7 @@ export const ROSS_NOTIFICATION = "ROSS_NOTIFICATION";
 export const EMAIL_PENDING = "PENDING";
 export const EMAIL_SENT = "PROVIDER_ACCEPTED";
 export const EMAIL_FAILED = "FAILED";
+export const EMAIL_SUPPRESSED = "SUPPRESSED";
 export const EMAIL_CLAIM_LEASE_MS = 5 * 60 * 1000;
 export const RESEND_IDEMPOTENCY_RETENTION_MS = 24 * 60 * 60 * 1000;
 
@@ -13,11 +14,14 @@ function clean(value) { return String(value ?? "").trim(); }
 function safePlainText(value) { return clean(value).replace(/[<>]/g, "").replace(/[\u0000-\u001f\u007f]/g, ""); }
 
 export function inboundEmailConfig(env = process.env) {
+  const activationRaw = clean(env.STAFFORDOS_INBOUND_EMAIL_ACTIVATED_AT);
+  const parsedActivation = activationRaw ? new Date(activationRaw) : null;
   return {
     enabled: clean(env.STAFFORDOS_INBOUND_EMAIL_ENABLED).toLowerCase() === "true",
     from: clean(env.FROM_EMAIL),
     operatorEmail: clean(env.STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL),
     replyTo: clean(env.STAFFORDOS_INQUIRY_REPLY_TO_EMAIL),
+    activationAt: parsedActivation && !Number.isNaN(parsedActivation.getTime()) ? parsedActivation : null,
   };
 }
 
@@ -58,10 +62,17 @@ function safeError(error) {
   return code.replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g, "[email]");
 }
 
-async function markBlocked(prisma, inquiryId, now) {
+async function markBlocked(prisma, inquiryId, now, lastError = "inbound_email_not_enabled") {
   await prisma.staffordosInboundAutomationEmail.updateMany({
     where: { inquiryId, status: EMAIL_PENDING },
-    data: { status: EMAIL_FAILED, lastError: "inbound_email_not_enabled", nextAttemptAt: now, updatedAt: now },
+    data: { status: EMAIL_FAILED, lastError, nextAttemptAt: now, updatedAt: now },
+  });
+}
+
+async function suppressBeforeActivation(prisma, activationAt, now) {
+  await prisma.staffordosInboundAutomationEmail.updateMany({
+    where: { createdAt: { lt: activationAt }, status: { in: [EMAIL_PENDING, EMAIL_FAILED, "SENDING"] } },
+    data: { status: EMAIL_SUPPRESSED, lastError: "activation_policy_excluded", nextAttemptAt: null, claimToken: null, claimStartedAt: null, claimExpiresAt: null, updatedAt: now },
   });
 }
 
@@ -69,6 +80,14 @@ export async function processInboundInquiryEmails({ prisma, inquiry, env = proce
   const config = inboundEmailConfig(env);
   if (!config.enabled) {
     await markBlocked(prisma, inquiry.id, now);
+    return { attempted: 0, blocked: true };
+  }
+  if (!config.activationAt) {
+    await markBlocked(prisma, inquiry.id, now, "inbound_email_activation_missing");
+    return { attempted: 0, blocked: true };
+  }
+  if (inquiry.createdAt && new Date(inquiry.createdAt) < config.activationAt) {
+    await suppressBeforeActivation(prisma, config.activationAt, now);
     return { attempted: 0, blocked: true };
   }
   const messages = buildInquiryMessages(inquiry, config);
@@ -123,7 +142,9 @@ export async function processInboundInquiryEmails({ prisma, inquiry, env = proce
  * safely call this function at the same time.
  */
 export async function processDueInboundInquiryEmails({ prisma, env = process.env, sendEmail = defaultSendEmail, now = new Date(), limit = 100 }) {
-  if (!inboundEmailConfig(env).enabled) return { inquiries: 0, attempted: 0, disabled: true };
+  const config = inboundEmailConfig(env);
+  if (!config.enabled || !config.activationAt) return { inquiries: 0, attempted: 0, disabled: true };
+  await suppressBeforeActivation(prisma, config.activationAt, now);
   const due = await prisma.staffordosInboundAutomationEmail.findMany({
     where: {
       OR: [
