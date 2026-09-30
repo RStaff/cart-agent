@@ -64,7 +64,7 @@ test("visitor acknowledgement and Ross notification are minimal and text-safe", 
   assert.equal(messages.length, 2);
   assert.equal(messages[0].subject, "We received your Stafford Media inquiry");
   assert.match(messages[0].text, /You can reply to this email/);
-  assert.doesNotMatch(messages[1].text, /<script>/);
+  assert.equal(messages[1].text.toLowerCase().includes("<script"), false);
   assert.match(messages[1].text, /cm_inquiry_1/);
 });
 
