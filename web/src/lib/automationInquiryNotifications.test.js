@@ -59,6 +59,15 @@ test("config requires an explicit inbound transactional-email gate and recipient
   assert.deepEqual(inboundEmailConfig({ STAFFORDOS_INBOUND_EMAIL_ENABLED: "true", FROM_EMAIL: "support@staffordmedia.ai", STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "ross@example.test" }), { enabled: true, from: "support@staffordmedia.ai", operatorEmail: "ross@example.test", replyTo: "", activationAt: null });
 });
 
+test("inbound mail prefers its scoped sender over shared mail settings", () => {
+  const config = inboundEmailConfig({
+    STAFFORDOS_INBOUND_EMAIL_FROM: "support@staffordmedia.ai",
+    FROM_EMAIL: "rossstafford1@gmail.com",
+    STAFFORDOS_INQUIRY_NOTIFICATION_EMAIL: "rossstafford1@gmail.com",
+  });
+  assert.equal(config.from, "support@staffordmedia.ai");
+});
+
 test("visitor acknowledgement and Ross notification are minimal and text-safe", () => {
   const messages = buildInquiryMessages(inquiry(), { from: "support@staffordmedia.ai", operatorEmail: "ross@example.test", replyTo: "support@staffordmedia.ai" });
   assert.equal(messages.length, 2);
