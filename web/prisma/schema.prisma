@@ -554,9 +554,33 @@ model StaffordosInboundAutomationInquiry {
   nextAction             String?
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
+  emailDeliveries        StaffordosInboundAutomationEmail[]
 
   @@index([email, createdAt])
   @@index([status, createdAt])
+}
+
+model StaffordosInboundAutomationEmail {
+  id             String   @id @default(cuid())
+  inquiryId      String
+  messageType    String
+  status         String   @default("PENDING")
+  attemptCount   Int      @default(0)
+  providerId     String?
+  lastError      String?
+  idempotencyKey String   @unique
+  sentAt         DateTime?
+  nextAttemptAt  DateTime?
+  claimToken     String?
+  claimStartedAt DateTime?
+  claimExpiresAt DateTime?
+  firstAttemptAt DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  inquiry        StaffordosInboundAutomationInquiry @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+
+  @@unique([inquiryId, messageType])
+  @@index([status, nextAttemptAt])
 }
 
 model StaffordosInboundAutomationRateLimit {

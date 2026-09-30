@@ -34,8 +34,26 @@ export function createAutomationInquiryRepository({ prisma }) {
         nextAction: "Ross reviews this inbound inquiry",
         createdAt: now,
         updatedAt: now,
+        emailDeliveries: {
+          create: [
+            { messageType: "VISITOR_ACKNOWLEDGEMENT", idempotencyKey: `inquiry:${normalized.submissionId}:visitor-ack` },
+            { messageType: "ROSS_NOTIFICATION", idempotencyKey: `inquiry:${normalized.submissionId}:ross-notification` },
+          ],
+        },
       } });
-      return { created: true, inquiry: inquiryPublicRecord(created) };
+      return {
+        created: true,
+        inquiry: inquiryPublicRecord(created),
+        notificationInquiry: {
+          id: created.id,
+          submissionId: created.submissionId,
+          source: created.source,
+          name: created.name,
+          email: created.email,
+          companyName: created.companyName,
+          createdAt: created.createdAt,
+        },
+      };
     },
     async list({ limit = 50 } = {}) {
       const rows = await model().findMany({ orderBy: { createdAt: "desc" }, take: Math.min(Math.max(Number(limit) || 50, 1), 100) });

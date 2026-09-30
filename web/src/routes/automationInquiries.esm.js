@@ -2,8 +2,9 @@ import { internalOnly } from "../middleware/internalOnly.js";
 import { AUTOMATION_INQUIRY_MAX_BODY_BYTES, normalizeAutomationInquiry } from "../lib/automationInquiry.js";
 import { createAutomationInquiryRepository } from "../lib/automationInquiryRepository.js";
 import { createAutomationInquiryRateLimiter } from "../lib/automationInquiryRateLimiter.js";
+import { processInboundInquiryEmails } from "../lib/automationInquiryNotifications.js";
 
-export function buildAutomationInquiryHandlers({ repository, rateLimiter }) {
+export function buildAutomationInquiryHandlers({ repository, rateLimiter, notificationProcessor = processInboundInquiryEmails }) {
   return {
     async post(req, res) {
       try {
@@ -11,6 +12,14 @@ export function buildAutomationInquiryHandlers({ repository, rateLimiter }) {
         const limit = await rateLimiter.consume(req.get("x-stafford-visitor-token"), normalized.email);
         if (!limit.allowed) return res.set("Retry-After", String(limit.retryAfterSeconds)).status(429).json({ ok: false, error: "INQUIRY_RATE_LIMITED" });
         const result = await repository.accept(normalized);
+        if (result.created && result.notificationInquiry) {
+          try {
+            await notificationProcessor({ prisma: repository.prisma, inquiry: result.notificationInquiry });
+          } catch (error) {
+            // Acceptance is durable; email status is tracked separately and never turns this into a retry prompt.
+            console.error("[staffordos-inquiry-email] processing failed", "provider_error");
+          }
+        }
         return res.status(result.created ? 201 : 200).json({ ok: true, inquiryId: result.inquiry.id, status: result.inquiry.status, created: result.created });
       } catch (error) {
         const code = String(error?.code || error?.message || "INQUIRY_REJECTED");
@@ -30,6 +39,7 @@ export function buildAutomationInquiryHandlers({ repository, rateLimiter }) {
 
 export function installAutomationInquiryRoute(app, { prisma }) {
   const repository = createAutomationInquiryRepository({ prisma });
+  repository.prisma = prisma;
   const rateLimiter = createAutomationInquiryRateLimiter({ prisma, secret: process.env.INTERNAL_API_KEY, emailHashSecret: process.env.STAFFORDOS_INTAKE_EMAIL_HMAC_KEY });
   const handlers = buildAutomationInquiryHandlers({ repository, rateLimiter });
   const boundedBody = (req, res, next) => {
