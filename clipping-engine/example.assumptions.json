@@ -1,0 +1,18 @@
+{
+  "mode": "assumptions_only",
+  "earningWindowDays": 7,
+  "subscriptionUsd": 29,
+  "campaign": {
+    "id": "hypothetical_campaign",
+    "rateUsdPerThousand": 1,
+    "feeFraction": 0.1,
+    "minimumGrossUsd": 1,
+    "maximumGrossUsd": 100,
+    "remainingGrossBudgetUsd": 1000
+  },
+  "clips": [
+    {"id":"hook_a","eligibility":"eligible","directCostUsd":0,"workMinutes":20,"payableViews":{"low":500,"base":5000,"high":20000}},
+    {"id":"hook_b","eligibility":"eligible","directCostUsd":0,"workMinutes":10,"payableViews":{"low":1000,"base":8000,"high":50000}},
+    {"id":"needs_review","eligibility":"unknown","directCostUsd":0,"workMinutes":20,"payableViews":{"low":1000,"base":20000,"high":100000}}
+  ]
+}
