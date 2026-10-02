@@ -44,3 +44,17 @@ test("review persists actor and next action without inventing a status", async (
   assert.equal(otherRow.nextAction, "Ross reviews this inbound inquiry");
   await assert.rejects(() => repository.review({ inquiryId: accepted.inquiry.id, nextAction: "\u0000bad", reviewedBy: "ross-subject" }), /INQUIRY_REVIEW_INPUT_INVALID/);
 });
+
+test("review rejects non-string, blank, oversized, and control-character next actions", async () => {
+  const { prisma } = fakePrisma();
+  const repository = createAutomationInquiryRepository({ prisma });
+  const accepted = await repository.accept(input());
+  for (const nextAction of [null, 42, true, {}, [], "", "   ", "x".repeat(501), "before\u007fafter"]) {
+    await assert.rejects(
+      () => repository.review({ inquiryId: accepted.inquiry.id, nextAction, reviewedBy: "ross-subject" }),
+      /INQUIRY_REVIEW_INPUT_INVALID/,
+    );
+  }
+  const reviewed = await repository.review({ inquiryId: accepted.inquiry.id, nextAction: "  Keep the human review  ", reviewedBy: "ross-subject" });
+  assert.equal(reviewed.nextAction, "Keep the human review");
+});

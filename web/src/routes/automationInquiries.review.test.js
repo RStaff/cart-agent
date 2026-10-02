@@ -44,3 +44,11 @@ test("invalid input and missing inquiry are rejected", async () => {
   assert.equal((await review({ inquiryId: "inq_one", nextAction: "\u0000bad", reviewed: true }, auth)).status, 400);
   assert.equal((await review({ inquiryId: "missing", nextAction: "updated", reviewed: true }, auth)).status, 404);
 });
+
+test("non-string next actions are rejected without changing the record", async () => {
+  for (const nextAction of [null, 42, true, {}, [], "", "   ", "x".repeat(501), "bad\u0000text"]) {
+    assert.equal((await review({ inquiryId: "inq_two", nextAction, reviewed: true }, auth)).status, 400);
+  }
+  assert.equal(rows[1].nextAction, "second");
+  assert.equal(rows[1].reviewedAt, null);
+});

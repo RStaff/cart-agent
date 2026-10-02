@@ -61,7 +61,8 @@ export function createAutomationInquiryRepository({ prisma }) {
     },
     async review({ inquiryId, nextAction, reviewedBy }, now = new Date()) {
       const id = String(inquiryId || "").trim();
-      const action = String(nextAction || "").trim();
+      if (typeof nextAction !== "string") throw Object.assign(new Error("INQUIRY_REVIEW_INPUT_INVALID"), { code: "INQUIRY_REVIEW_INPUT_INVALID" });
+      const action = nextAction.trim();
       const actor = String(reviewedBy || "").trim();
       if (!id || id.length > 120 || !action || action.length > 500 || /[\u0000-\u001f\u007f]/.test(action)) throw Object.assign(new Error("INQUIRY_REVIEW_INPUT_INVALID"), { code: "INQUIRY_REVIEW_INPUT_INVALID" });
       if (!actor || actor.length > 300 || /[\u0000-\u001f\u007f]/.test(actor)) throw Object.assign(new Error("INQUIRY_REVIEW_ACTOR_INVALID"), { code: "INQUIRY_REVIEW_ACTOR_INVALID" });
