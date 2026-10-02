@@ -104,6 +104,8 @@ export function inquiryPublicRecord(record) {
     currentWorkflow: record.currentWorkflow,
     desiredWorkflow: record.desiredWorkflow,
     possibleDuplicateOfId: record.possibleDuplicateOfId || null,
+    reviewedAt: record.reviewedAt || null,
+    reviewedBy: record.reviewedBy || null,
     nextAction: record.nextAction || "Ross reviews this inbound inquiry",
   };
 }

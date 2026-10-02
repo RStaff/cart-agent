@@ -59,5 +59,16 @@ export function createAutomationInquiryRepository({ prisma }) {
       const rows = await model().findMany({ orderBy: { createdAt: "desc" }, take: Math.min(Math.max(Number(limit) || 50, 1), 100) });
       return rows.map(inquiryPublicRecord);
     },
+    async review({ inquiryId, nextAction, reviewedBy }, now = new Date()) {
+      const id = String(inquiryId || "").trim();
+      const action = String(nextAction || "").trim();
+      const actor = String(reviewedBy || "").trim();
+      if (!id || id.length > 120 || !action || action.length > 500 || /[\u0000-\u001f\u007f]/.test(action)) throw Object.assign(new Error("INQUIRY_REVIEW_INPUT_INVALID"), { code: "INQUIRY_REVIEW_INPUT_INVALID" });
+      if (!actor || actor.length > 300 || /[\u0000-\u001f\u007f]/.test(actor)) throw Object.assign(new Error("INQUIRY_REVIEW_ACTOR_INVALID"), { code: "INQUIRY_REVIEW_ACTOR_INVALID" });
+      const existing = await model().findUnique({ where: { id } });
+      if (!existing) throw Object.assign(new Error("INQUIRY_NOT_FOUND"), { code: "INQUIRY_NOT_FOUND" });
+      const updated = await model().update({ where: { id }, data: { reviewedAt: now, reviewedBy: actor, nextAction: action } });
+      return inquiryPublicRecord(updated);
+    },
   };
 }
