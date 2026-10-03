@@ -3,6 +3,7 @@ import { AUTOMATION_INQUIRY_MAX_BODY_BYTES, normalizeAutomationInquiry } from ".
 import { createAutomationInquiryRepository } from "../lib/automationInquiryRepository.js";
 import { createAutomationInquiryRateLimiter } from "../lib/automationInquiryRateLimiter.js";
 import { processInboundInquiryEmails } from "../lib/automationInquiryNotifications.js";
+import { requireOperatorReviewContext } from "../lib/automationInquiryReview.js";
 
 export function buildAutomationInquiryHandlers({ repository, rateLimiter, notificationProcessor = processInboundInquiryEmails }) {
   return {
@@ -34,6 +35,16 @@ export function buildAutomationInquiryHandlers({ repository, rateLimiter, notifi
         return res.status(503).json({ ok: false, error: "INQUIRY_STORAGE_UNAVAILABLE" });
       }
     },
+    async review(req, res) {
+      try {
+        const { subject } = requireOperatorReviewContext(req);
+        const inquiry = await repository.review({ inquiryId: req.body?.inquiryId, nextAction: req.body?.nextAction, reviewedBy: subject });
+        return res.status(200).json({ ok: true, inquiry });
+      } catch (error) {
+        const code = String(error?.code || "INQUIRY_REVIEW_FAILED");
+        return res.status(code === "INQUIRY_NOT_FOUND" ? 404 : code === "INQUIRY_REVIEW_INPUT_INVALID" || code === "INQUIRY_REVIEW_ACTOR_INVALID" ? 400 : code === "OPERATOR_IDENTITY_MISSING" || code === "OPERATOR_PERMISSION_MISSING" ? 403 : 503).json({ ok: false, error: code });
+      }
+    },
   };
 }
 
@@ -50,5 +61,6 @@ export function installAutomationInquiryRoute(app, { prisma }) {
   };
   app.post("/api/staffordos/automation-inquiries", internalOnly, boundedBody, handlers.post);
   app.get("/api/staffordos/automation-inquiries", internalOnly, handlers.list);
+  app.patch("/api/staffordos/automation-inquiries/review", internalOnly, boundedBody, handlers.review);
   return { bodyLimit: AUTOMATION_INQUIRY_MAX_BODY_BYTES };
 }

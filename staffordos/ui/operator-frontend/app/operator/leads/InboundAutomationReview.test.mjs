@@ -11,4 +11,12 @@ test("inbound review uses the authenticated read route and text-safe rendering",
   assert.match(view, /Status:/);
   assert.match(view, /submittedAt/);
   assert.doesNotMatch(view, /dangerouslySetInnerHTML/);
+  assert.match(view, /<section className="outreachRegister"/);
+  assert.match(view, /state\.loading \? <p>Loading inbound inquiries…<\/p>/);
+  assert.match(view, /Awaiting review/);
+  assert.match(view, /Reviewed/);
+  assert.match(view, /Mark reviewed and save/);
+  assert.match(view, /\/api\/operator\/inbound-automation\/review/);
+  assert.match(view, /nextAction/);
+  assert.match(view, /reviewedAt/);
 });
