@@ -287,7 +287,7 @@ app.post("/api/shopify/webhooks/orders-paid", express.raw({ type: "application/j
 
 // Canonical Stripe webhook must be mounted before global JSON parsing
 // because Stripe signature verification requires the raw request body.
-installStripeWebhook(app); // uses express.raw({ type: "application/json" })
+installStripeWebhook(app, { prismaClient: prisma }); // uses express.raw({ type: "application/json" })
 
 app.use(express.json({ limit: "1mb" }));
 

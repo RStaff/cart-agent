@@ -1,4 +1,5 @@
 import express from "express";
+import rateLimit from "express-rate-limit";
 import Stripe from "stripe";
 import {
   bindPacketPayment,
@@ -9,6 +10,10 @@ import {
 import { recordStripePaymentPropagation } from "../../../staffordos/revenue/revenue_agent_v1.mjs";
 import { rebuildShopifixerFulfillmentTruth } from "../../../staffordos/fulfillment/build_shopifixer_fulfillment_truth_v1.mjs";
 import { appendProofEvent } from "../../../staffordos/execution/proof_authority_v1.mjs";
+import {
+  BlueprintPaymentRejection,
+  createBlueprintPaymentAuthority,
+} from "../lib/blueprintPaymentAuthority.js";
 
 function getStripeClient() {
   const key = process.env.STRIPE_LIVE_SECRET_KEY || process.env.STRIPE_SECRET_KEY || "";
@@ -24,8 +29,33 @@ function getStripeClient() {
  * - STRIPE_WEBHOOK_SECRET
  * - pre-existing canonical packet
  */
-export function installStripeWebhook(app) {
-  app.post("/stripe/webhook", express.raw({ type: "application/json" }), async (req, res) => {
+export function installStripeWebhook(app, { stripeClient = null, prismaClient = null } = {}) {
+  const invalidSignatureLimiter = rateLimit({
+    windowMs: 60_000,
+    limit: 120,
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: () => "invalid-stripe-signature",
+    skip: async (req) => {
+      const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
+      if (!webhookSecret) return false;
+      try {
+        const stripe = stripeClient || getStripeClient();
+        req.stripeVerifiedEvent = stripe.webhooks.constructEvent(
+          req.body,
+          req.headers["stripe-signature"] || "",
+          webhookSecret,
+        );
+        req.stripeVerifiedClient = stripe;
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    handler: (_req, res) => res.status(429).json({ ok: false, error: "stripe_webhook_rate_limited" }),
+  });
+
+  app.post("/stripe/webhook", express.raw({ type: "application/json" }), invalidSignatureLimiter, async (req, res) => {
     const sig = req.headers["stripe-signature"] || "";
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
 
@@ -35,9 +65,10 @@ export function installStripeWebhook(app) {
     }
 
     let event;
+    let stripe;
     try {
-      const stripe = getStripeClient();
-      event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+      stripe = req.stripeVerifiedClient || stripeClient || getStripeClient();
+      event = req.stripeVerifiedEvent || stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
     } catch (error) {
       console.error("[stripe:webhook] signature verification failed", error?.message || error);
       return res.status(400).send(`Webhook Error: ${error?.message || String(error)}`);
@@ -48,6 +79,39 @@ export function installStripeWebhook(app) {
       const evtId = event?.id || "unknown";
 
       console.log("[stripe:webhook] verified event", { id: evtId, type: evtType });
+
+      if (prismaClient) {
+        try {
+          const blueprint = await createBlueprintPaymentAuthority({
+            prisma: prismaClient,
+            stripeClient: stripe,
+          }).accept(event);
+          if (blueprint.handled) {
+            return res.status(200).json({
+              ok: true,
+              received: true,
+              blueprintAccepted: true,
+              duplicate: blueprint.duplicate,
+              engagementId: blueprint.engagementId,
+            });
+          }
+        } catch (error) {
+          if (error instanceof BlueprintPaymentRejection) {
+            console.warn("[stripe:webhook] Blueprint payment rejected", {
+              eventId: evtId,
+              eventType: evtType,
+              code: error.code,
+            });
+            return res.status(400).json({ ok: false, error: error.code });
+          }
+          console.error("[stripe:webhook] Blueprint payment persistence failed", {
+            eventId: evtId,
+            eventType: evtType,
+            error: error?.message || String(error),
+          });
+          return res.status(500).json({ ok: false, error: "blueprint_payment_persistence_failed" });
+        }
+      }
 
       if (evtType === "checkout.session.completed") {
         const session = event.data?.object || {};
