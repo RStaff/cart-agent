@@ -592,3 +592,44 @@ model StaffordosInboundAutomationRateLimit {
   @@id([scopeHash, windowStart])
   @@index([windowStart])
 }
+
+model StaffordosBlueprintEngagement {
+  id                      String                           @id @default(cuid())
+  offerId                 String
+  state                   String                           @default("PAID_IDENTITY_REVIEW")
+  associationStatus       String                           @default("PENDING_REVIEW")
+  stripeSessionId         String                           @unique
+  stripePaymentLinkId     String
+  stripeProductId         String
+  stripePriceId           String
+  stripeCustomerId        String?
+  stripePaymentIntentId   String?
+  amountTotal             Int
+  currency                String
+  quantity                Int
+  buyerEmail              String?
+  buyerName               String?
+  buyerPhone              String?
+  claimedInquiryReference String?
+  clientId                String?
+  inquiryId               String?
+  paidAt                  DateTime
+  createdAt               DateTime                         @default(now())
+  updatedAt               DateTime                         @updatedAt
+  paymentEvent            StaffordosBlueprintPaymentEvent?
+
+  @@index([state, createdAt])
+  @@index([associationStatus, createdAt])
+}
+
+model StaffordosBlueprintPaymentEvent {
+  id              String                        @id @default(cuid())
+  stripeEventId   String                        @unique
+  stripeSessionId String                        @unique
+  stripeEventType String
+  livemode        Boolean
+  engagementId    String                        @unique
+  receivedAt      DateTime
+  createdAt       DateTime                      @default(now())
+  engagement      StaffordosBlueprintEngagement @relation(fields: [engagementId], references: [id], onDelete: Restrict)
+}
