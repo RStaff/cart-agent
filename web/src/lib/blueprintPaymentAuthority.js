@@ -70,6 +70,9 @@ function verifiedEvidence(event, session) {
 
   const item = lineItems[0];
   const price = item?.price;
+  const paymentIntent = session?.payment_intent;
+  const charge = paymentIntent?.latest_charge;
+  const balanceTransaction = charge?.balance_transaction;
   if (item?.quantity !== BLUEPRINT_OFFER.quantity) throw new BlueprintPaymentRejection("BLUEPRINT_QUANTITY_MISMATCH");
   if (item?.amount_total !== BLUEPRINT_OFFER.amountTotal) throw new BlueprintPaymentRejection("BLUEPRINT_LINE_ITEM_AMOUNT_MISMATCH");
   if (price?.id !== BLUEPRINT_OFFER.priceId) throw new BlueprintPaymentRejection("BLUEPRINT_PRICE_MISMATCH");
@@ -77,13 +80,23 @@ function verifiedEvidence(event, session) {
   if (price?.unit_amount !== BLUEPRINT_OFFER.amountTotal) throw new BlueprintPaymentRejection("BLUEPRINT_UNIT_AMOUNT_MISMATCH");
   if (String(price?.currency || "").toLowerCase() !== BLUEPRINT_OFFER.currency) throw new BlueprintPaymentRejection("BLUEPRINT_PRICE_CURRENCY_MISMATCH");
   if (idOf(price?.product) !== BLUEPRINT_OFFER.productId) throw new BlueprintPaymentRejection("BLUEPRINT_PRODUCT_MISMATCH");
+  if (!paymentIntent || paymentIntent.object !== "payment_intent") throw new BlueprintPaymentRejection("BLUEPRINT_PAYMENT_INTENT_REQUIRED");
+  if (paymentIntent.livemode !== true || paymentIntent.status !== "succeeded") throw new BlueprintPaymentRejection("BLUEPRINT_PAYMENT_INTENT_NOT_SUCCEEDED");
+  if (paymentIntent.amount_received !== BLUEPRINT_OFFER.amountTotal) throw new BlueprintPaymentRejection("BLUEPRINT_PAYMENT_INTENT_AMOUNT_MISMATCH");
+  if (String(paymentIntent.currency || "").toLowerCase() !== BLUEPRINT_OFFER.currency) throw new BlueprintPaymentRejection("BLUEPRINT_PAYMENT_INTENT_CURRENCY_MISMATCH");
+  if (!charge || charge.object !== "charge" || charge.paid !== true || charge.status !== "succeeded") throw new BlueprintPaymentRejection("BLUEPRINT_CHARGE_NOT_SUCCEEDED");
+  if (charge.amount !== BLUEPRINT_OFFER.amountTotal) throw new BlueprintPaymentRejection("BLUEPRINT_CHARGE_AMOUNT_MISMATCH");
+  if (String(charge.currency || "").toLowerCase() !== BLUEPRINT_OFFER.currency) throw new BlueprintPaymentRejection("BLUEPRINT_CHARGE_CURRENCY_MISMATCH");
+  if (!balanceTransaction || balanceTransaction.object !== "balance_transaction" || !Number.isSafeInteger(balanceTransaction.created) || balanceTransaction.created <= 0) {
+    throw new BlueprintPaymentRejection("BLUEPRINT_SETTLEMENT_EVIDENCE_REQUIRED");
+  }
 
   return {
     stripeEventId: event.id,
     stripeEventType: event.type,
     stripeSessionId: session.id,
     stripeCustomerId: optionalText(idOf(session.customer)),
-    stripePaymentIntentId: optionalText(idOf(session.payment_intent)),
+    stripePaymentIntentId: optionalText(idOf(paymentIntent)),
     buyerEmail: optionalText(session.customer_details?.email, 254),
     buyerName: optionalText(session.customer_details?.name),
     buyerPhone: optionalText(session.customer_details?.phone, 80),
@@ -91,7 +104,8 @@ function verifiedEvidence(event, session) {
       session.metadata?.inquiry_id || session.metadata?.inquiryId || session.client_reference_id,
       191,
     ),
-    paidAt: new Date(event.created * 1000),
+    paidAt: new Date(balanceTransaction.created * 1000),
+    providerCreatedAt: new Date(event.created * 1000),
   };
 }
 
@@ -122,7 +136,7 @@ function resultFrom(receipt, duplicate) {
   };
 }
 
-export function createBlueprintPaymentAuthority({ prisma, stripeClient }) {
+export function createBlueprintPaymentAuthority({ prisma, stripeClient, now = () => new Date() }) {
   if (!prisma || !stripeClient?.checkout?.sessions?.retrieve) {
     throw new Error("blueprint_payment_authority_dependencies_required");
   }
@@ -140,7 +154,7 @@ export function createBlueprintPaymentAuthority({ prisma, stripeClient }) {
 
       validateEvent(event);
       const session = await stripeClient.checkout.sessions.retrieve(sessionId, {
-        expand: ["line_items.data.price.product"],
+        expand: ["line_items.data.price.product", "payment_intent.latest_charge.balance_transaction"],
       });
       if (session.id !== sessionId) throw new BlueprintPaymentRejection("BLUEPRINT_SESSION_ID_MISMATCH");
       const evidence = verifiedEvidence(event, session);
@@ -173,7 +187,8 @@ export function createBlueprintPaymentAuthority({ prisma, stripeClient }) {
                 stripeSessionId: evidence.stripeSessionId,
                 stripeEventType: evidence.stripeEventType,
                 livemode: true,
-                receivedAt: evidence.paidAt,
+                providerCreatedAt: evidence.providerCreatedAt,
+                receivedAt: now(),
               },
             },
           },

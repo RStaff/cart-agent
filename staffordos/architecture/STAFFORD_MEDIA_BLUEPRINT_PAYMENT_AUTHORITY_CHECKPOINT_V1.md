@@ -18,9 +18,11 @@ Status: local Step 3 implementation patch; not promoted or deployed.
 
 The patch adds durable PostgreSQL engagement and payment-event records, exact server-side offer verification, replay protection, and an isolated Blueprint branch in the existing signed raw-body webhook. Buyer evidence is retained, while client and inquiry association remain pending Ross review. It does not perform onboarding, email, delivery, client merging, portal work, implementation-credit application, or implementation execution.
 
+Review hardening additionally requires expanded PaymentIntent, Charge, and balance-transaction evidence. The durable engagement records the balance-transaction timestamp as `paidAt`; the payment receipt separately records Stripe's event timestamp and the server receipt timestamp. Invalid-signature traffic is rate-limited, while successfully signed Stripe deliveries bypass that quota and continue through the existing handler.
+
 ## Unresolved promotion blockers
 
-1. Review and merge the local patch through the normal GitHub path.
+1. Resolve or disposition the PR checks and merge through the normal GitHub path. The alignment validator currently also matches `web/src/routes/automationInquiries.review.test.js`, which is present unchanged on the base revision; that workflow defect is outside this Step 3 patch.
 2. Apply the additive migration before routing Blueprint events to the new code.
 3. Deploy and verify the API revision and signed-event behavior.
 4. Only after the API deploy, add `checkout.session.async_payment_succeeded` to the existing Stripe destination without removing any existing subscription.
@@ -32,6 +34,7 @@ Steps 4–6 must extend the same durable engagement authority with appropriately
 
 - Prisma 6.16 schema validation and client generation passed.
 - All 30 migrations, including the additive Blueprint migration, applied successfully to a disposable PostgreSQL database.
-- Targeted authority, webhook, and PostgreSQL tests passed: 11 of 11; the changed webhook failure-path tests then passed 2 of 2.
+- After review hardening, Prisma 6.16 schema validation and generation passed; all 30 migrations applied to a fresh disposable PostgreSQL database; targeted authority, webhook, and PostgreSQL tests passed 14 of 14.
+- Tests cover server-verified settlement evidence and distinct provider/receipt timestamps, asynchronous success, no-inquiry purchase, sequential and concurrent replay, retryable provider/database failures, invalid signatures before processing, exact offer rejection, and ShopiFixer bypass.
 - No live payment, customer record, email, onboarding, delivery, or Stripe configuration was used or changed.
 - Local dependency installation reported pre-existing audit findings; this patch changes no dependency manifest or lockfile.

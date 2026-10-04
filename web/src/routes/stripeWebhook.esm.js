@@ -1,4 +1,5 @@
 import express from "express";
+import rateLimit from "express-rate-limit";
 import Stripe from "stripe";
 import {
   bindPacketPayment,
@@ -29,7 +30,32 @@ function getStripeClient() {
  * - pre-existing canonical packet
  */
 export function installStripeWebhook(app, { stripeClient = null, prismaClient = null } = {}) {
-  app.post("/stripe/webhook", express.raw({ type: "application/json" }), async (req, res) => {
+  const invalidSignatureLimiter = rateLimit({
+    windowMs: 60_000,
+    limit: 120,
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: () => "invalid-stripe-signature",
+    skip: async (req) => {
+      const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
+      if (!webhookSecret) return false;
+      try {
+        const stripe = stripeClient || getStripeClient();
+        req.stripeVerifiedEvent = stripe.webhooks.constructEvent(
+          req.body,
+          req.headers["stripe-signature"] || "",
+          webhookSecret,
+        );
+        req.stripeVerifiedClient = stripe;
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    handler: (_req, res) => res.status(429).json({ ok: false, error: "stripe_webhook_rate_limited" }),
+  });
+
+  app.post("/stripe/webhook", express.raw({ type: "application/json" }), invalidSignatureLimiter, async (req, res) => {
     const sig = req.headers["stripe-signature"] || "";
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
 
@@ -41,8 +67,8 @@ export function installStripeWebhook(app, { stripeClient = null, prismaClient = 
     let event;
     let stripe;
     try {
-      stripe = stripeClient || getStripeClient();
-      event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+      stripe = req.stripeVerifiedClient || stripeClient || getStripeClient();
+      event = req.stripeVerifiedEvent || stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
     } catch (error) {
       console.error("[stripe:webhook] signature verification failed", error?.message || error);
       return res.status(400).send(`Webhook Error: ${error?.message || String(error)}`);

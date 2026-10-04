@@ -17,7 +17,27 @@ function session(overrides = {}) {
     amount_total: 75000,
     currency: "usd",
     customer: "cus_buyer_evidence",
-    payment_intent: "pi_payment_evidence",
+    payment_intent: {
+      id: "pi_payment_evidence",
+      object: "payment_intent",
+      livemode: true,
+      status: "succeeded",
+      amount_received: 75000,
+      currency: "usd",
+      latest_charge: {
+        id: "ch_payment_evidence",
+        object: "charge",
+        paid: true,
+        status: "succeeded",
+        amount: 75000,
+        currency: "usd",
+        balance_transaction: {
+          id: "txn_payment_evidence",
+          object: "balance_transaction",
+          created: 1791154800,
+        },
+      },
+    },
     customer_details: { email: "buyer@example.test", name: "Blueprint Buyer", phone: null },
     client_reference_id: null,
     metadata: {},
@@ -93,12 +113,22 @@ function authority({ retrieved = session(), prisma = memoryPrisma(), retrieveErr
   const stripeClient = {
     checkout: { sessions: { retrieve: async (_id, options) => {
       calls += 1;
-      assert.deepEqual(options, { expand: ["line_items.data.price.product"] });
+      assert.deepEqual(options, {
+        expand: ["line_items.data.price.product", "payment_intent.latest_charge.balance_transaction"],
+      });
       if (retrieveError) throw retrieveError;
       return retrieved;
     } } },
   };
-  return { service: createBlueprintPaymentAuthority({ prisma, stripeClient }), prisma, calls: () => calls };
+  return {
+    service: createBlueprintPaymentAuthority({
+      prisma,
+      stripeClient,
+      now: () => new Date("2026-10-05T00:00:00.000Z"),
+    }),
+    prisma,
+    calls: () => calls,
+  };
 }
 
 test("accepts verified asynchronous success without an inquiry and persists buyer evidence", async () => {
@@ -114,6 +144,9 @@ test("accepts verified asynchronous success without an inquiry and persists buye
   assert.equal(fixture.prisma.engagements[0].clientId, null);
   assert.equal(fixture.prisma.engagements[0].buyerEmail, "buyer@example.test");
   assert.equal(fixture.prisma.engagements[0].claimedInquiryReference, null);
+  assert.equal(fixture.prisma.engagements[0].paidAt.toISOString(), "2026-10-04T23:00:00.000Z");
+  assert.equal(fixture.prisma.receipts[0].providerCreatedAt.toISOString(), "2026-10-04T22:00:00.000Z");
+  assert.equal(fixture.prisma.receipts[0].receivedAt.toISOString(), "2026-10-05T00:00:00.000Z");
 });
 
 test("rejects unpaid and wrong-offer sessions", async (t) => {
@@ -122,6 +155,8 @@ test("rejects unpaid and wrong-offer sessions", async (t) => {
     ["wrong link", session({ payment_link: "plink_other" }), "BLUEPRINT_PAYMENT_LINK_MISMATCH"],
     ["wrong product", session({ line_items: { has_more: false, data: [{ quantity: 1, amount_total: 75000, price: { id: BLUEPRINT_OFFER.priceId, type: "one_time", unit_amount: 75000, currency: "usd", product: "prod_other" } }] } }), "BLUEPRINT_PRODUCT_MISMATCH"],
     ["adjusted quantity", session({ line_items: { has_more: false, data: [{ quantity: 2, amount_total: 75000, price: { id: BLUEPRINT_OFFER.priceId, type: "one_time", unit_amount: 75000, currency: "usd", product: BLUEPRINT_OFFER.productId } }] } }), "BLUEPRINT_QUANTITY_MISMATCH"],
+    ["unsucceeded payment intent", session({ payment_intent: { ...session().payment_intent, status: "processing" } }), "BLUEPRINT_PAYMENT_INTENT_NOT_SUCCEEDED"],
+    ["missing settlement evidence", session({ payment_intent: { ...session().payment_intent, latest_charge: { ...session().payment_intent.latest_charge, balance_transaction: null } } }), "BLUEPRINT_SETTLEMENT_EVIDENCE_REQUIRED"],
   ]) {
     await t.test(name, async () => {
       const fixture = authority({ retrieved });

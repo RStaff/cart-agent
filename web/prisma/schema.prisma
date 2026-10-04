@@ -623,13 +623,14 @@ model StaffordosBlueprintEngagement {
 }
 
 model StaffordosBlueprintPaymentEvent {
-  id              String                        @id @default(cuid())
-  stripeEventId   String                        @unique
-  stripeSessionId String                        @unique
-  stripeEventType String
-  livemode        Boolean
-  engagementId    String                        @unique
-  receivedAt      DateTime
-  createdAt       DateTime                      @default(now())
-  engagement      StaffordosBlueprintEngagement @relation(fields: [engagementId], references: [id], onDelete: Restrict)
+  id                String                        @id @default(cuid())
+  stripeEventId     String                        @unique
+  stripeSessionId   String                        @unique
+  stripeEventType   String
+  livemode          Boolean
+  engagementId      String                        @unique
+  providerCreatedAt DateTime
+  receivedAt        DateTime
+  createdAt         DateTime                      @default(now())
+  engagement        StaffordosBlueprintEngagement @relation(fields: [engagementId], references: [id], onDelete: Restrict)
 }

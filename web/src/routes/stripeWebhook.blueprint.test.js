@@ -26,10 +26,10 @@ test("webhook rejects invalid signatures before provider retrieval or persistenc
     checkout: { sessions: { retrieve: async () => { retrieved = true; } } },
   };
   const prismaClient = { $transaction: async () => { persisted = true; } };
-  const app = express();
-  installStripeWebhook(app, { stripeClient, prismaClient });
+  const application = express();
+  installStripeWebhook(application, { stripeClient, prismaClient });
   try {
-    await withServer(app, async (baseUrl) => {
+    await withServer(application, async (baseUrl) => {
       const response = await fetch(`${baseUrl}/stripe/webhook`, {
         method: "POST",
         headers: { "content-type": "application/json", "stripe-signature": "bad" },
@@ -57,6 +57,27 @@ test("webhook returns retryable failure and never acceptance when durable storag
     payment_link: BLUEPRINT_OFFER.paymentLinkId,
     amount_total: 75000,
     currency: "usd",
+    payment_intent: {
+      id: "pi_storage_failure",
+      object: "payment_intent",
+      livemode: true,
+      status: "succeeded",
+      amount_received: 75000,
+      currency: "usd",
+      latest_charge: {
+        id: "ch_storage_failure",
+        object: "charge",
+        paid: true,
+        status: "succeeded",
+        amount: 75000,
+        currency: "usd",
+        balance_transaction: {
+          id: "txn_storage_failure",
+          object: "balance_transaction",
+          created: 1791154800,
+        },
+      },
+    },
     customer_details: { email: "storage-failure@example.test" },
     metadata: {},
     line_items: { has_more: false, data: [{
@@ -85,10 +106,10 @@ test("webhook returns retryable failure and never acceptance when durable storag
     staffordosBlueprintPaymentEvent: { findFirst: async () => null },
     $transaction: async () => { throw new Error("database unavailable"); },
   };
-  const app = express();
-  installStripeWebhook(app, { stripeClient, prismaClient });
+  const application = express();
+  installStripeWebhook(application, { stripeClient, prismaClient });
   try {
-    await withServer(app, async (baseUrl) => {
+    await withServer(application, async (baseUrl) => {
       const response = await fetch(`${baseUrl}/stripe/webhook`, {
         method: "POST",
         headers: { "content-type": "application/json", "stripe-signature": "valid" },

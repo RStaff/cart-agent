@@ -32,6 +32,7 @@ CREATE TABLE "StaffordosBlueprintPaymentEvent" (
     "stripeEventType" TEXT NOT NULL,
     "livemode" BOOLEAN NOT NULL,
     "engagementId" TEXT NOT NULL,
+    "providerCreatedAt" TIMESTAMP(3) NOT NULL,
     "receivedAt" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
