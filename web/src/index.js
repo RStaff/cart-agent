@@ -39,6 +39,7 @@ import { installSendOffer } from "./routes/sendOffer.esm.js";
 import { installShopifixerAuditRetrieval } from "./routes/shopifixerAuditRetrieval.esm.js";
 import { installShopifixerScopeAuthority } from "./routes/shopifixerScopeAuthority.esm.js";
 import { installAutomationInquiryRoute } from "./routes/automationInquiries.esm.js";
+import { installBlueprintOnboardingRoutes } from "./routes/blueprintOnboarding.esm.js";
 import { startInboundEmailRetryWorker } from "./lib/automationInquiryRetryWorker.js";
 import { prisma } from "./db.js";
 
@@ -293,6 +294,7 @@ app.use(express.json({ limit: "1mb" }));
 
 // Stafford Media inbound automation inquiry; service-authenticated and intentionally separate from outbound leads.
 installAutomationInquiryRoute(app, { prisma });
+installBlueprintOnboardingRoutes(app, { prisma });
 
 // Execute public checkout installer (source-of-truth)
 checkoutPublic(app);
