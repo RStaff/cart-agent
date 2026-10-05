@@ -64,6 +64,7 @@ function optionalText(value, code, max = 500) {
 }
 
 function requiredDate(value, code, now, { futureAllowed = false } = {}) {
+  if (!(value instanceof Date) && (typeof value !== "string" || !value.trim())) fail(code);
   const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) fail(code);
   if (!futureAllowed && date.getTime() > now.getTime() + 300_000) fail(code);
@@ -295,6 +296,7 @@ export function createBlueprintOnboardingAuthority({
           } else if (clientId) {
             fail("BLUEPRINT_CLIENT_ID_NOT_VERIFIED");
           }
+          if (decision === "ESTABLISH_NEW_CLIENT") fail("BLUEPRINT_CLIENT_AUTHORITY_UNAVAILABLE", 503);
           if ((decision === "LEAVE_UNASSOCIATED_PENDING" || decision === "REJECT_CLAIMED_ASSOCIATION") && (clientId || inquiryId)) {
             fail("BLUEPRINT_IDENTITY_ASSOCIATION_CONFLICT");
           }
@@ -316,6 +318,7 @@ export function createBlueprintOnboardingAuthority({
           payload = { decision, candidates, clientId, inquiryId, safeOperatingContactConfirmed: true };
         } else if (commandName === "DEFINE_WORKFLOW") {
           if (!WORKFLOW_DEFINITION_STATES.has(engagement.state)) fail("BLUEPRINT_WORKFLOW_STATE_INVALID");
+          if (current?.currentInterviewCompletedAt) fail("BLUEPRINT_WORKFLOW_CHANGE_REQUIRES_MATERIAL_AGREEMENT");
           const boundary = normalizeBoundary(data?.boundary);
           const clientConfirmedAt = requiredDate(data?.clientConfirmedAt, "BLUEPRINT_WORKFLOW_CLIENT_CONFIRMATION_REQUIRED", occurredAt);
           const clientConfirmedBy = requiredText(data?.clientConfirmedBy, "BLUEPRINT_WORKFLOW_CLIENT_CONFIRMATION_REQUIRED", 200);

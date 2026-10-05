@@ -164,6 +164,13 @@ test("governed HTTP onboarding is durable, atomic, isolated, and preserves payme
       assert.equal(await prisma.staffordosBlueprintOnboarding.count({ where: { engagementId: engagement.id } }), 0);
 
       response = await command(0, "DECIDE_IDENTITY", common({
+        decision: "ESTABLISH_NEW_CLIENT", safeOperatingContactConfirmed: true,
+      }));
+      assert.equal(response.status, 503);
+      assert.equal((await response.json()).error, "BLUEPRINT_CLIENT_AUTHORITY_UNAVAILABLE");
+      assert.equal(await prisma.staffordosBlueprintOnboarding.count({ where: { engagementId: engagement.id } }), 0);
+
+      response = await command(0, "DECIDE_IDENTITY", common({
         decision: "LEAVE_UNASSOCIATED_PENDING",
         candidates: ["Provider-observed buyer evidence; not auto-associated"],
         safeOperatingContactConfirmed: true,
@@ -177,6 +184,10 @@ test("governed HTTP onboarding is durable, atomic, isolated, and preserves payme
       response = await command(1, "TRANSITION", common({ nextState: "ONBOARDING" }));
       assert.equal(response.status, 200);
       assert.equal((await command(2, "TRANSITION", common({ nextState: "DELIVERY_READY" }))).status, 400);
+      assert.equal((await command(2, "DEFINE_WORKFLOW", common({
+        boundary: workflow, clientConfirmedAt: null,
+        clientConfirmedBy: "Synthetic client owner", clientConfirmationEvidenceRef: "evidence://step4a/null-date",
+      }))).status, 400);
 
       const concurrent = await Promise.all([
         command(2, "DEFINE_WORKFLOW", common({
@@ -205,6 +216,11 @@ test("governed HTTP onboarding is durable, atomic, isolated, and preserves payme
         clientConfirmationEvidenceRef: "evidence://step4a/late-workflow",
       }))).status, 400);
       assert.equal((await command(5, "RECORD_INTERVIEW", common({
+        completedAt: null,
+        participants: [{ name: "Ross Stafford", role: "Facilitator" }],
+        interviewEvidenceRef: "evidence://step4a/null-interview-date",
+      }))).status, 400);
+      assert.equal((await command(5, "RECORD_INTERVIEW", common({
         completedAt: "2026-10-01T15:45:00.000Z",
         participants: [{ name: "Ross Stafford", role: "Facilitator" }, { name: "Synthetic client owner", role: "Workflow owner" }],
         interviewEvidenceRef: "evidence://step4a/interview",
@@ -214,20 +230,40 @@ test("governed HTTP onboarding is durable, atomic, isolated, and preserves payme
         participants: [{ name: "Ross Stafford", role: "Facilitator" }],
         interviewEvidenceRef: "evidence://step4a/interview-overwrite",
       }))).status, 400);
-      assert.equal((await command(6, "TRANSITION", common({ nextState: "INTERVIEW_COMPLETE" }))).status, 200);
-      assert.equal((await command(7, "TRANSITION", common({ nextState: "DELIVERY_READY" }))).status, 400);
+      assert.equal((await command(6, "TRANSITION", common({ nextState: "WAITING_FOR_CLIENT_INPUT" }))).status, 200);
+      assert.equal((await command(7, "DEFINE_WORKFLOW", common({
+        boundary: { ...workflow, name: "Interview-bypassing replacement" },
+        clientConfirmedAt: "2026-10-01T15:55:00.000Z",
+        clientConfirmedBy: "Synthetic client owner",
+        clientConfirmationEvidenceRef: "evidence://step4a/interview-bypass",
+      }))).status, 400);
+      assert.equal((await command(7, "TRANSITION", common({ nextState: "READY_FOR_INTERVIEW" }))).status, 200);
+      assert.equal((await command(8, "TRANSITION", common({ nextState: "INTERVIEW_COMPLETE" }))).status, 200);
+      assert.equal((await command(9, "TRANSITION", common({ nextState: "DELIVERY_READY" }))).status, 400);
 
-      response = await command(7, "SET_REQUIRED_INPUTS", common({
+      response = await command(9, "SET_REQUIRED_INPUTS", common({
+        checklist: {
+          items: [{
+            key: "baseline", label: "Baseline", owner: "Client", rationale: "Required",
+            status: "RECEIVED", evidenceRef: "evidence://step4a/baseline", receivedAt: null,
+          }],
+          allSixDeliverablesAchievable: true,
+        },
+        readinessEvidenceRef: "evidence://step4a/null-received-date",
+      }));
+      assert.equal(response.status, 400);
+
+      response = await command(9, "SET_REQUIRED_INPUTS", common({
         checklist: completeChecklist({ unavailable: true }), readinessEvidenceRef: "evidence://step4a/readiness",
       }));
       assert.equal(response.status, 400);
-      assert.equal((await prisma.staffordosBlueprintOnboarding.findUnique({ where: { engagementId: engagement.id } })).version, 7);
+      assert.equal((await prisma.staffordosBlueprintOnboarding.findUnique({ where: { engagementId: engagement.id } })).version, 9);
 
-      assert.equal((await command(7, "SET_REQUIRED_INPUTS", common({
+      assert.equal((await command(9, "SET_REQUIRED_INPUTS", common({
         checklist: completeChecklist({ unavailable: true, agreed: true }), readinessEvidenceRef: "evidence://step4a/readiness",
       }))).status, 200);
       const readyAt = (await prisma.staffordosBlueprintOnboarding.findUnique({ where: { engagementId: engagement.id } })).currentRequiredInformationReadyAt;
-      assert.equal((await command(8, "SET_REQUIRED_INPUTS", common({
+      assert.equal((await command(10, "SET_REQUIRED_INPUTS", common({
         checklist: completeChecklist({ unavailable: true, agreed: true }), readinessEvidenceRef: "evidence://step4a/readiness-reconfirmed",
       }))).status, 200);
       assert.equal(
@@ -238,7 +274,7 @@ test("governed HTTP onboarding is durable, atomic, isolated, and preserves payme
         (await prisma.staffordosBlueprintOnboarding.findUnique({ where: { engagementId: engagement.id } })).originalRequiredInformationReadyAt.toISOString(),
         readyAt.toISOString(),
       );
-      response = await command(9, "TRANSITION", common({ nextState: "DELIVERY_READY" }));
+      response = await command(11, "TRANSITION", common({ nextState: "DELIVERY_READY" }));
       assert.equal(response.status, 200);
       body = await response.json();
       assert.equal(body.onboarding.originalDeliveryClockStartedAt, "2026-10-01T16:11:00.000Z");
@@ -250,10 +286,10 @@ test("governed HTTP onboarding is durable, atomic, isolated, and preserves payme
         due: body.onboarding.originalDeliveryDueAt,
       };
 
-      assert.equal((await command(10, "APPROVE_MATERIAL_WORKFLOW_CHANGE", common({
+      assert.equal((await command(12, "APPROVE_MATERIAL_WORKFLOW_CHANGE", common({
         boundary: { ...workflow, name: "Revised workflow" }, deadlineEffect: "UNCHANGED",
       }))).status, 400);
-      response = await command(10, "APPROVE_MATERIAL_WORKFLOW_CHANGE", common({
+      response = await command(12, "APPROVE_MATERIAL_WORKFLOW_CHANGE", common({
         boundary: { ...workflow, name: "Revised workflow" },
         clientAgreedBy: "Synthetic client owner", clientAgreedAt: "2026-10-01T16:00:00.000Z",
         clientAgreementEvidenceRef: "evidence://step4a/material-change", deadlineEffect: "UNCHANGED",
@@ -271,8 +307,8 @@ test("governed HTTP onboarding is durable, atomic, isolated, and preserves payme
       response = await fetch(endpoint, { headers: AUTH });
       assert.equal(response.status, 200);
       body = await response.json();
-      assert.equal(body.onboarding.version, 11);
-      assert.equal(body.auditEvents.length, 11);
+      assert.equal(body.onboarding.version, 13);
+      assert.equal(body.auditEvents.length, 13);
       assert.equal(body.auditEvents.every((event) => event.actorSubject === ACTOR), true);
       assert.equal(body.auditEvents[0].payload.actorSubject, undefined);
       assert.equal(body.auditEvents.at(-1).payload.previousDates.dueAt, originalDates.due);
@@ -306,7 +342,7 @@ test("governed HTTP onboarding is durable, atomic, isolated, and preserves payme
       prisma.staffordosBlueprintOnboardingAuditEvent.update({ where: { id: audit.id }, data: { reason: "mutation forbidden" } }),
       /append-only/i,
     );
-    assert.equal(await prisma.staffordosBlueprintOnboardingAuditEvent.count({ where: { engagementId: engagement.id } }), 11);
+    assert.equal(await prisma.staffordosBlueprintOnboardingAuditEvent.count({ where: { engagementId: engagement.id } }), 13);
   } finally {
     await prisma.$disconnect();
     if (priorKey === undefined) delete process.env.INTERNAL_API_KEY;
