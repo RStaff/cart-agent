@@ -129,12 +129,12 @@ test("governed HTTP onboarding is durable, atomic, isolated, and preserves payme
     "2026-10-01T16:06:00.000Z", "2026-10-01T16:07:00.000Z", "2026-10-01T16:08:00.000Z",
     "2026-10-01T16:09:00.000Z", "2026-10-01T16:10:00.000Z", "2026-10-01T16:11:00.000Z",
   ];
-  const app = express();
-  app.use(express.json());
-  installBlueprintOnboardingRoutes(app, { prisma, now: () => new Date(instants[Math.min(tick++, instants.length - 1)]) });
+  const application = express();
+  application.use(express.json());
+  installBlueprintOnboardingRoutes(application, { prisma, now: () => new Date(instants[Math.min(tick++, instants.length - 1)]) });
 
   try {
-    await withServer(app, async (baseUrl) => {
+    await withServer(application, async (baseUrl) => {
       const endpoint = `${baseUrl}/api/staffordos/blueprint-engagements/${engagement.id}/onboarding`;
       const post = (body, headers = AUTH) => fetch(`${endpoint}/commands`, {
         method: "POST", headers, body: JSON.stringify(body),
