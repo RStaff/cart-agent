@@ -594,11 +594,11 @@ model StaffordosInboundAutomationRateLimit {
 }
 
 model StaffordosBlueprintEngagement {
-  id                      String                           @id @default(cuid())
+  id                      String                                    @id @default(cuid())
   offerId                 String
-  state                   String                           @default("PAID_IDENTITY_REVIEW")
-  associationStatus       String                           @default("PENDING_REVIEW")
-  stripeSessionId         String                           @unique
+  state                   String                                    @default("PAID_IDENTITY_REVIEW")
+  associationStatus       String                                    @default("PENDING_REVIEW")
+  stripeSessionId         String                                    @unique
   stripePaymentLinkId     String
   stripeProductId         String
   stripePriceId           String
@@ -614,9 +614,11 @@ model StaffordosBlueprintEngagement {
   clientId                String?
   inquiryId               String?
   paidAt                  DateTime
-  createdAt               DateTime                         @default(now())
-  updatedAt               DateTime                         @updatedAt
+  createdAt               DateTime                                  @default(now())
+  updatedAt               DateTime                                  @updatedAt
   paymentEvent            StaffordosBlueprintPaymentEvent?
+  onboarding              StaffordosBlueprintOnboarding?
+  onboardingAuditEvents   StaffordosBlueprintOnboardingAuditEvent[]
 
   @@index([state, createdAt])
   @@index([associationStatus, createdAt])
@@ -633,4 +635,62 @@ model StaffordosBlueprintPaymentEvent {
   receivedAt        DateTime
   createdAt         DateTime                      @default(now())
   engagement        StaffordosBlueprintEngagement @relation(fields: [engagementId], references: [id], onDelete: Restrict)
+}
+
+model StaffordosBlueprintOnboarding {
+  id                                      String                                    @id @default(cuid())
+  engagementId                            String                                    @unique
+  version                                 Int                                       @default(0)
+  identityDecision                        String?
+  identityCandidates                      Json?
+  identityEvidenceRef                     String?
+  identityReviewedAt                      DateTime?
+  identityReviewedBy                      String?
+  safeOperatingContactConfirmed           Boolean                                   @default(false)
+  workflowVersion                         Int                                       @default(0)
+  workflowBoundary                        Json?
+  workflowClientConfirmedAt               DateTime?
+  workflowClientConfirmedBy               String?
+  workflowClientConfirmationEvidenceRef   String?
+  checklistVersion                        Int                                       @default(0)
+  requiredInputChecklist                  Json?
+  currentRequiredInformationReadyAt       DateTime?
+  requiredInformationReadinessEvidenceRef String?
+  currentInterviewCompletedAt             DateTime?
+  currentInterviewParticipants            Json?
+  currentInterviewEvidenceRef             String?
+  interviewRecordedBy                     String?
+  originalInterviewCompletedAt            DateTime?
+  originalRequiredInformationReadyAt      DateTime?
+  originalDeliveryClockStartedAt          DateTime?
+  originalDeliveryDueAt                   DateTime?
+  currentDeliveryClockStartedAt           DateTime?
+  currentDeliveryDueAt                    DateTime?
+  approvedRevisedDueAt                    DateTime?
+  approvedRevisionEvidenceRef             String?
+  calendarVersion                         String?
+  createdAt                               DateTime                                  @default(now())
+  updatedAt                               DateTime                                  @updatedAt
+  engagement                              StaffordosBlueprintEngagement             @relation(fields: [engagementId], references: [id], onDelete: Restrict)
+  auditEvents                             StaffordosBlueprintOnboardingAuditEvent[]
+}
+
+model StaffordosBlueprintOnboardingAuditEvent {
+  id            String                        @id @default(cuid())
+  onboardingId  String
+  engagementId  String
+  version       Int
+  action        String
+  previousState String
+  nextState     String
+  actorSubject  String
+  reason        String
+  evidenceRef   String
+  payload       Json
+  createdAt     DateTime                      @default(now())
+  onboarding    StaffordosBlueprintOnboarding @relation(fields: [onboardingId], references: [id], onDelete: Restrict)
+  engagement    StaffordosBlueprintEngagement @relation(fields: [engagementId], references: [id], onDelete: Restrict)
+
+  @@unique([onboardingId, version])
+  @@index([engagementId, createdAt])
 }
