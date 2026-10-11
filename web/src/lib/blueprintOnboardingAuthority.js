@@ -213,10 +213,46 @@ function resultShape(engagement, onboarding, auditEvents = []) {
       associationStatus: engagement.associationStatus,
       clientId: engagement.clientId,
       inquiryId: engagement.inquiryId,
+      paymentStatus: "VERIFIED_PAID",
+      amountTotal: engagement.amountTotal,
+      currency: engagement.currency,
+      quantity: engagement.quantity,
+      stripeSessionId: engagement.stripeSessionId,
+      stripePaymentLinkId: engagement.stripePaymentLinkId,
+      stripeProductId: engagement.stripeProductId,
+      stripePriceId: engagement.stripePriceId,
+      buyerEvidence: {
+        email: engagement.buyerEmail,
+        name: engagement.buyerName,
+        phone: engagement.buyerPhone,
+        claimedInquiryReference: engagement.claimedInquiryReference,
+        authority: "PAYMENT_PROVIDER_EVIDENCE_NOT_CONFIRMED_IDENTITY",
+      },
       paidAt: engagement.paidAt,
+      createdAt: engagement.createdAt,
     },
     onboarding,
     auditEvents,
+  };
+}
+
+function listShape(engagement) {
+  return {
+    ...resultShape(engagement, engagement.onboarding).engagement,
+    onboarding: engagement.onboarding ? {
+      version: engagement.onboarding.version,
+      identityDecision: engagement.onboarding.identityDecision,
+      identityReviewedAt: engagement.onboarding.identityReviewedAt,
+      safeOperatingContactConfirmed: engagement.onboarding.safeOperatingContactConfirmed,
+      workflowVersion: engagement.onboarding.workflowVersion,
+      workflowName: engagement.onboarding.workflowBoundary?.name || null,
+      checklistVersion: engagement.onboarding.checklistVersion,
+      requiredInformationReadyAt: engagement.onboarding.currentRequiredInformationReadyAt,
+      interviewCompletedAt: engagement.onboarding.currentInterviewCompletedAt,
+      deliveryClockStartedAt: engagement.onboarding.currentDeliveryClockStartedAt,
+      deliveryDueAt: engagement.onboarding.currentDeliveryDueAt,
+      calendarVersion: engagement.onboarding.calendarVersion,
+    } : null,
   };
 }
 
@@ -249,6 +285,15 @@ export function createBlueprintOnboardingAuthority({
     });
     if (!engagement) fail("BLUEPRINT_ENGAGEMENT_NOT_FOUND", 404);
     return resultShape(engagement, engagement.onboarding, engagement.onboardingAuditEvents);
+  }
+
+  async function list() {
+    const engagements = await prisma.staffordosBlueprintEngagement.findMany({
+      orderBy: [{ paidAt: "desc" }, { createdAt: "desc" }],
+      take: 100,
+      include: { onboarding: true },
+    });
+    return { engagements: engagements.map(listShape) };
   }
 
   async function execute({ engagementId, expectedVersion, command, data, actor }) {
@@ -509,5 +554,5 @@ export function createBlueprintOnboardingAuthority({
     }
   }
 
-  return { read, execute };
+  return { list, read, execute };
 }

@@ -135,6 +135,7 @@ test("governed HTTP onboarding is durable, atomic, isolated, and preserves payme
 
   try {
     await withServer(application, async (baseUrl) => {
+      const collectionEndpoint = `${baseUrl}/api/staffordos/blueprint-engagements`;
       const endpoint = `${baseUrl}/api/staffordos/blueprint-engagements/${engagement.id}/onboarding`;
       const post = (body, headers = AUTH) => fetch(`${endpoint}/commands`, {
         method: "POST", headers, body: JSON.stringify(body),
@@ -143,6 +144,18 @@ test("governed HTTP onboarding is durable, atomic, isolated, and preserves payme
         expectedVersion, command: name, data: { ...data, actorSubject: "browser-spoof-must-be-ignored" },
       }, headers);
       let response;
+
+      assert.equal((await fetch(collectionEndpoint)).status, 401);
+      assert.equal((await fetch(collectionEndpoint, { headers: { ...AUTH, "x-staffordos-operator-subject": "" } })).status, 403);
+      response = await fetch(collectionEndpoint, { headers: AUTH });
+      assert.equal(response.status, 200);
+      const listed = (await response.json()).engagements.find((item) => item.id === engagement.id);
+      assert.equal(listed.paymentStatus, "VERIFIED_PAID");
+      assert.equal(listed.amountTotal, 75000);
+      assert.equal(listed.buyerEvidence.email, "synthetic-step4a@example.test");
+      assert.equal(listed.buyerEvidence.authority, "PAYMENT_PROVIDER_EVIDENCE_NOT_CONFIRMED_IDENTITY");
+      assert.equal(listed.clientId, null);
+      assert.equal(listed.inquiryId, null);
 
       assert.equal((await command(0, "DECIDE_IDENTITY", common({
         decision: "LEAVE_UNASSOCIATED_PENDING", safeOperatingContactConfirmed: true,
