@@ -33,6 +33,7 @@ const SIDEBAR_ITEMS: NavItem[] = [
   { href: "/operator/leads", label: "Sales", note: "Lead command center", subtle: true },
   { href: "/operator/leads", label: "Leads", note: "Lead queue and readiness" },
   { label: "Relationships", note: "Planned — Coming Soon", planned: true },
+  { href: "/operator/blueprints", label: "Blueprints", note: "Paid onboarding engagements" },
   { label: "Delivery", note: "Planned — Coming Soon", planned: true },
   { label: "Customer Success", note: "Planned — Coming Soon", planned: true },
   { href: "/operator/revenue-command", label: "Finance", note: "Revenue command center" },
@@ -47,6 +48,7 @@ const QUICK_ACTIONS = [
   { href: "/operator/command-center", label: "Executive" },
   { href: "/operator/campaigns", label: "Campaigns" },
   { href: "/operator/leads", label: "Leads" },
+  { href: "/operator/blueprints", label: "Blueprints" },
   { href: "/operator/revenue-command", label: "Revenue" },
   { href: "/operator/execution-log", label: "Execution Log" },
   { href: "/operator/system-map", label: "System Map" },
@@ -54,7 +56,7 @@ const QUICK_ACTIONS = [
 
 function isActive(pathname: string, href?: string) {
   if (!href) return false;
-  return pathname === href;
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 function breadcrumbFromPath(pathname: string) {
@@ -68,6 +70,7 @@ function breadcrumbFromPath(pathname: string) {
     if (part === "command-center") segments.push("Executive");
     else if (part === "campaigns") segments.push("Campaigns");
     else if (part === "leads") segments.push("Leads");
+    else if (part === "blueprints") segments.push("Blueprints");
     else if (part === "revenue-command") segments.push("Finance");
     else if (part === "execution-log") segments.push("Execution Log");
     else if (part === "system-map") segments.push("System Map");

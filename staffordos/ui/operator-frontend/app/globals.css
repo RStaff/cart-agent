@@ -225,6 +225,298 @@ textarea {
   background: #020617;
 }
 
+.blueprintWorkspacePage {
+  padding: 28px;
+  color: #e2e8f0;
+}
+
+.blueprintWorkspaceHeading {
+  max-width: 860px;
+  margin-bottom: 24px;
+}
+
+.blueprintWorkspaceHeading h1,
+.blueprintWorkspaceHeading p {
+  margin: 0 0 8px;
+}
+
+.blueprintWorkspace {
+  display: grid;
+  grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.blueprintEngagementList,
+.blueprintEngagementDetail,
+.blueprintSummaryGrid article,
+.blueprintActionStack > details,
+.blueprintAudit {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.74);
+}
+
+.blueprintEngagementList {
+  position: sticky;
+  top: 18px;
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
+
+.blueprintListHeader,
+.blueprintDetailHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.blueprintListHeader h2,
+.blueprintDetailHeader h2,
+.blueprintSummaryGrid h3,
+.blueprintAudit h3 {
+  margin: 0;
+}
+
+.blueprintEngagementChoice {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 12px;
+  background: rgba(2, 6, 23, 0.6);
+  color: #cbd5e1;
+  text-align: left;
+  cursor: pointer;
+}
+
+.blueprintEngagementChoice:hover,
+.blueprintEngagementChoice:focus-visible,
+.blueprintEngagementChoiceActive {
+  border-color: #2dd4bf;
+  outline: none;
+}
+
+.blueprintEngagementChoice span,
+.blueprintEngagementChoice small,
+.blueprintSummaryGrid small,
+.blueprintField small {
+  color: #94a3b8;
+}
+
+.blueprintEngagementDetail {
+  min-width: 0;
+  padding: 20px;
+}
+
+.blueprintSummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.blueprintSummaryGrid article {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+}
+
+.blueprintSummaryGrid p,
+.blueprintSummaryGrid small {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.blueprintProgress {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.blueprintProgress span {
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: rgba(30, 41, 59, 0.9);
+  color: #cbd5e1;
+  font-size: 12px;
+}
+
+.blueprintActionStack {
+  display: grid;
+  gap: 12px;
+}
+
+.blueprintActionStack > details > summary {
+  padding: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.blueprintActionStack > details > summary:focus-visible {
+  outline: 2px solid #2dd4bf;
+  outline-offset: -3px;
+}
+
+.blueprintActionBody {
+  padding: 0 16px 18px;
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.blueprintFormGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 14px 0;
+}
+
+.blueprintField {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.blueprintField span,
+.blueprintCheckbox,
+.blueprintInputList legend {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.blueprintField input,
+.blueprintField select,
+.blueprintField textarea,
+.blueprintDisabledAuthority input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 8px;
+  background: #020617;
+  color: #f8fafc;
+  font: inherit;
+}
+
+.blueprintField input:focus-visible,
+.blueprintField select:focus-visible,
+.blueprintField textarea:focus-visible,
+.blueprintActionBody button:focus-visible {
+  outline: 2px solid #2dd4bf;
+  outline-offset: 2px;
+}
+
+.blueprintActionBody button,
+.blueprintListHeader button,
+.blueprintAlert button,
+.blueprintAlert a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 9px 14px;
+  border: 1px solid #2dd4bf;
+  border-radius: 9px;
+  background: #0f766e;
+  color: #f0fdfa;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.blueprintActionBody button:disabled,
+.blueprintDisabledAuthority {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.blueprintSecondaryButton {
+  border-color: rgba(148, 163, 184, 0.45) !important;
+  background: transparent !important;
+}
+
+.blueprintCheckbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.blueprintCheckbox input {
+  width: 18px;
+  height: 18px;
+}
+
+.blueprintDisabledAuthority,
+.blueprintInputList fieldset,
+.blueprintTransitionGrid form {
+  margin: 14px 0;
+  padding: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 12px;
+}
+
+.blueprintAlert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 14px 0;
+  padding: 12px;
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  border-radius: 10px;
+  background: rgba(14, 116, 144, 0.18);
+}
+
+.blueprintAlertError { border-color: rgba(248, 113, 113, 0.55); background: rgba(127, 29, 29, 0.24); }
+.blueprintAlertSuccess { border-color: rgba(45, 212, 191, 0.55); background: rgba(17, 94, 89, 0.24); }
+
+.blueprintAudit {
+  margin-top: 18px;
+  padding: 16px;
+}
+
+.blueprintAudit ol {
+  display: grid;
+  gap: 10px;
+  padding-left: 24px;
+}
+
+.blueprintAudit li {
+  padding: 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.blueprintAudit li > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.blueprintAudit pre {
+  max-width: 100%;
+  overflow: auto;
+  padding: 12px;
+  background: #020617;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px) {
+  .blueprintWorkspace { grid-template-columns: 1fr; }
+  .blueprintEngagementList { position: static; }
+  .blueprintSummaryGrid, .blueprintFormGrid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .blueprintWorkspacePage { padding: 16px; }
+  .blueprintEngagementDetail { padding: 14px; }
+  .blueprintDetailHeader, .blueprintAlert, .blueprintAudit li > div { align-items: flex-start; flex-direction: column; }
+}
+
 .operatorShellSidebar {
   position: sticky;
   top: 0;

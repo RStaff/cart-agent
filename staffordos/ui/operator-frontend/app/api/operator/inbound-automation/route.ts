@@ -2,13 +2,13 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import {
   REVENUE_OPERATIONS_PERMISSION,
-} from "../../../../../../../leads/staffordmedia_revenue_transaction_v1.mjs";
+} from "../../../../../../leads/staffordmedia_revenue_transaction_v1.mjs";
 import {
   STAFFORDOS_OPERATOR_SESSION_COOKIE,
   authorizeStaffordOsOperatorRead,
   operatorAuthConfigFromEnv,
   operatorAuthorizationFailureBody,
-} from "../../../../../lib/operator/staffordosOperatorSession";
+} from "../../../../lib/operator/staffordosOperatorSession";
 
 export const runtime = "nodejs";
 

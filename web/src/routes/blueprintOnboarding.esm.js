@@ -40,7 +40,16 @@ export function installBlueprintOnboardingRoutes(app, {
   verifyClientAssociation,
 } = {}) {
   const authority = createBlueprintOnboardingAuthority({ prisma, now, approvedClosures, verifyClientAssociation });
+  const collectionPath = "/api/staffordos/blueprint-engagements";
   const path = "/api/staffordos/blueprint-engagements/:engagementId/onboarding";
+
+  app.get(collectionPath, internalOnly, governedOperator, async (_req, res) => {
+    try {
+      return res.status(200).json({ ok: true, ...(await authority.list()) });
+    } catch (error) {
+      return failure(res, error);
+    }
+  });
 
   app.get(path, internalOnly, governedOperator, async (req, res) => {
     try {
@@ -65,5 +74,5 @@ export function installBlueprintOnboardingRoutes(app, {
     }
   });
 
-  return { path, maxCommandBytes: MAX_COMMAND_BYTES };
+  return { collectionPath, path, maxCommandBytes: MAX_COMMAND_BYTES };
 }
