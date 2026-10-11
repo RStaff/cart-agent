@@ -9,6 +9,16 @@ import {
 export const runtime = "nodejs";
 
 export async function POST() {
+  const clearCookie = (response: NextResponse) => {
+    response.cookies.set(STAFFORDOS_OPERATOR_SESSION_COOKIE, "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 0,
+    });
+    return response;
+  };
   try {
     const config = operatorAuthConfigFromEnv(process.env);
     const jar = await cookies();
@@ -18,6 +28,6 @@ export async function POST() {
     response.cookies.set(STAFFORDOS_OPERATOR_SESSION_COOKIE, "", result.cookieOptions);
     return response;
   } catch {
-    return NextResponse.json({ ok: true });
+    return clearCookie(NextResponse.json({ ok: true }));
   }
 }

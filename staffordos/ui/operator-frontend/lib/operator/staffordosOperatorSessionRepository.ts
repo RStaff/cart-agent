@@ -88,6 +88,15 @@ function permissionsForRoles(roles: string[]) {
   return Array.from(new Set(roles.flatMap((role) => ROLE_PERMISSIONS[role] || []))).sort();
 }
 
+function isRenderDatabaseUrl(value: string) {
+  try {
+    const hostname = new URL(value).hostname.toLowerCase();
+    return hostname === "render.com" || hostname.endsWith(".render.com");
+  } catch {
+    return false;
+  }
+}
+
 function getPool(): SqlPool {
   if (globalState[poolKey]) return globalState[poolKey];
   const connectionString = clean(process.env.DATABASE_URL);
@@ -96,7 +105,7 @@ function getPool(): SqlPool {
     connectionString,
     max: 5,
     idleTimeoutMillis: 30_000,
-    ssl: connectionString.includes("render.com") ? { rejectUnauthorized: false } : undefined,
+    ssl: isRenderDatabaseUrl(connectionString) ? { rejectUnauthorized: false } : undefined,
   }) as SqlPool;
   globalState[poolKey] = pool;
   return pool;
@@ -155,6 +164,10 @@ export const postgresStaffordOsOperatorSessionRepository: StaffordOsOperatorSess
         ...verified.roles.filter((role) => ROLE_PERMISSIONS[role]),
         ...(verified.permissions.includes("careeros.beta.operations.read") ? ["careeros_beta_operations_viewer"] : []),
       ]));
+      await client.query(
+        'UPDATE "public"."StaffordosOperatorRole" SET "revokedAt" = $2, "revokedByOperatorId" = $3, "revocationReason" = \'issuer_assertion_role_removed\', "updatedAt" = $2 WHERE "operatorId" = $3 AND "grantSource" = \'staffordos_operator_issuer\' AND "revokedAt" IS NULL AND NOT ("role" = ANY($1::text[]))',
+        [trustedRoles, now, operatorRow.id],
+      );
       for (const role of trustedRoles) {
         await client.query(
           'INSERT INTO "public"."StaffordosOperatorRole" ("id", "operatorId", "role", "scope", "activeKey", "grantSource", "createdAt", "updatedAt") VALUES ($1, $2, $3, \'shopifixer\', $4, \'staffordos_operator_issuer\', $5, $5) ON CONFLICT ("activeKey") DO UPDATE SET "revokedAt" = NULL, "revocationReason" = NULL, "updatedAt" = EXCLUDED."updatedAt"',

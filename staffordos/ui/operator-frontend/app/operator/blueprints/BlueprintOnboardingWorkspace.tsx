@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { blueprintSaveMessage, blueprintWorkspaceActions } from "../../../lib/operator/blueprintOnboardingViewModel.mjs";
 
@@ -42,6 +42,14 @@ function formatDate(value: unknown) {
   if (!value) return "Not recorded";
   const date = new Date(String(value));
   return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+}
+
+function localDateTimeValue(value: unknown) {
+  if (!value) return "";
+  const date = new Date(String(value));
+  if (Number.isNaN(date.getTime())) return "";
+  const pad = (part: number) => String(part).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
 function money(amount: number, currency: string) {
@@ -124,16 +132,18 @@ export default function BlueprintOnboardingWorkspace() {
   const [listError, setListError] = useState("");
   const [feedback, setFeedback] = useState<Feedback>({ state: "idle", message: "" });
   const [inputs, setInputs] = useState<InputDraft[]>([{ ...EMPTY_INPUT }]);
+  const selectionRequest = useRef(0);
 
-  async function loadDetail(id: string) {
+  async function loadDetail(id: string, requestId = selectionRequest.current) {
     const response = await fetch(`/api/operator/blueprints/${encodeURIComponent(id)}`, { cache: "no-store" });
     const body = await response.json().catch(() => ({}));
     if (!response.ok) throw Object.assign(new Error(body.error || "BLUEPRINT_ONBOARDING_SOURCE_UNAVAILABLE"), { status: response.status, code: body.error });
+    if (requestId !== selectionRequest.current) return;
     setDetail(body);
     const items = body.onboarding?.requiredInputChecklist?.items;
     setInputs(Array.isArray(items) && items.length ? items.map((item: any) => ({
       key: item.key || "", label: item.label || "", owner: item.owner || "", rationale: item.rationale || "", status: item.status || "PENDING",
-      evidenceRef: item.evidenceRef || "", receivedAt: item.receivedAt ? String(item.receivedAt).slice(0, 16) : "", limitation: item.limitation || "",
+      evidenceRef: item.evidenceRef || "", receivedAt: localDateTimeValue(item.receivedAt), limitation: item.limitation || "",
     })) : [{ ...EMPTY_INPUT }]);
   }
 
@@ -159,22 +169,30 @@ export default function BlueprintOnboardingWorkspace() {
   useEffect(() => { void loadList(); }, []);
 
   async function select(id: string) {
+    const requestId = selectionRequest.current + 1;
+    selectionRequest.current = requestId;
     setSelectedId(id);
+    setDetail(null);
     setFeedback({ state: "idle", message: "" });
-    try { await loadDetail(id); } catch (error: any) { setFeedback({ state: "error", message: blueprintSaveMessage(error?.status || 503, error?.code) }); }
+    try { await loadDetail(id, requestId); } catch (error: any) {
+      if (requestId === selectionRequest.current) setFeedback({ state: "error", message: blueprintSaveMessage(error?.status || 503, error?.code) });
+    }
   }
 
   async function save(command: string, data: any) {
     if (!detail) return;
     setFeedback({ state: "saving", message: "Saving governed change…" });
+    const engagementId = detail.engagement.id;
+    const requestId = selectionRequest.current;
     try {
-      const response = await fetch(`/api/operator/blueprints/${encodeURIComponent(detail.engagement.id)}/commands`, {
+      const response = await fetch(`/api/operator/blueprints/${encodeURIComponent(engagementId)}/commands`, {
         method: "POST", headers: { "content-type": "application/json" },
         body: JSON.stringify({ expectedVersion: detail.onboarding?.version || 0, command, data }),
       });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw Object.assign(new Error(body.error || "BLUEPRINT_ONBOARDING_SAVE_FAILED"), { status: response.status, code: body.error });
-      await loadDetail(detail.engagement.id);
+      await loadDetail(engagementId, requestId);
+      if (requestId !== selectionRequest.current) return;
       const listResponse = await fetch("/api/operator/blueprints", { cache: "no-store" });
       const listBody = await listResponse.json().catch(() => ({}));
       if (listResponse.ok && Array.isArray(listBody.engagements)) setEngagements(listBody.engagements);

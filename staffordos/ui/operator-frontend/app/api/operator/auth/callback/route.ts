@@ -28,6 +28,15 @@ export async function GET(request: Request) {
       expiresAt: session.expiresAt,
     });
     response.cookies.set(STAFFORDOS_OPERATOR_SESSION_COOKIE, cookieValue, cookieOptions);
+    const returnTo = url.searchParams.get("returnTo");
+    if (returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//")) {
+      const target = new URL(returnTo, url.origin);
+      if (target.origin === url.origin) {
+        const redirect = NextResponse.redirect(target);
+        redirect.cookies.set(STAFFORDOS_OPERATOR_SESSION_COOKIE, cookieValue, cookieOptions);
+        return redirect;
+      }
+    }
     return response;
   } catch {
     return NextResponse.json({ ok: false, error: "OPERATOR_ASSERTION_UNTRUSTED" }, { status: 401 });
