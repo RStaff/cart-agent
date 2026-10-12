@@ -189,6 +189,7 @@
     "bindHost": "127.0.0.1",
     "requiresLoopbackSocketPeer": true,
     "rejectsIncomingForwardingHeaders": true,
+    "requiresCanonicalSameOriginForUnsafeMethods": true,
     "frameworkForwardingAllowedOnlyWith": "private request-scoped one-use AsyncLocalStorage proof",
     "proofBrowserForgeable": false,
     "proofReusable": false,

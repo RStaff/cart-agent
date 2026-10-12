@@ -83,7 +83,7 @@ The implementation denies production-mode processes even on loopback. That is a 
 
 For local development only, framework-generated forwarding metadata may coexist with the gate when a custom Next server has already proven the original transport boundary. The server binds exclusively to `127.0.0.1`, verifies a loopback socket peer, rejects incoming `Forwarded`, `X-Forwarded-*`, `X-Real-IP`, `True-Client-IP`, and `CF-Connecting-IP` headers before Next handling, and creates a private request-scoped proof. The proof is carried through private `AsyncLocalStorage`, consumed once by the canonical gate, and cannot be supplied by a browser, copied into a header, or reused on another request.
 
-Missing, mismatched, or reused proof remains fail-closed. Authentication, exact permission, origin, explicit enablement, development mode, cloud/preview denial, and all other gate rules remain required. This amendment affects only the guarded local write surfaces and does not enable production or read-only routes.
+Missing, mismatched, or reused proof remains fail-closed. The wrapper also requires the canonical `127.0.0.1` host and same-origin `Origin` on unsafe methods before Next handling. Authentication, exact permission, origin, explicit enablement, development mode, cloud/preview denial, and all other gate rules remain required. This amendment affects only the guarded local write surfaces and does not enable production or read-only routes.
 
 ## Denial Behavior
 
