@@ -1,6 +1,11 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import { NextResponse } from "next/server";
+import {
+  OPERATOR_WRITE_DENIED_STATUS,
+  evaluateOperatorWriteIsolation,
+  operatorWriteDeniedResponseBody,
+} from "../../../../../lib/operator/operatorWriteIsolation";
 
 const ROOT = path.resolve(process.cwd(), "../../..");
 const LEADS_DIR = path.join(ROOT, "staffordos/leads");
@@ -128,6 +133,11 @@ function recordDryRunSendProof(lead: any, now: string) {
 }
 
 export async function POST(req: Request) {
+  const writeGate = evaluateOperatorWriteIsolation({ request: req, env: process.env });
+  if (!writeGate.allowed) {
+    return NextResponse.json(operatorWriteDeniedResponseBody(writeGate), { status: OPERATOR_WRITE_DENIED_STATUS });
+  }
+
   const body = await req.json();
   const leadId = String(body?.leadId || "");
   const action = String(body?.action || "");

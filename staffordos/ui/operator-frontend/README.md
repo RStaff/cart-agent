@@ -33,6 +33,14 @@ Local run:
 npm run dev
 ```
 
+For the approved local operator-write fixture, `npm run dev` invokes `server.mjs`,
+which binds only to `127.0.0.1` and supplies private one-use transport proof to
+the G004 gate. Set `STAFFORDOS_LOCAL_OPERATOR_WRITES_ENABLED=true` and
+`STAFFORDOS_LOCAL_OPERATOR_BIND_HOST=127.0.0.1` only in a development fixture;
+the server fails closed otherwise. Keep `INTERNAL_API_KEY` and database/session
+values in the established local secret store, never in source or browser code.
+Production and preview deployments do not receive this write authority.
+
 ## Packet Authority
 
 The operator home hydrates the paid packet from the packet authority API.

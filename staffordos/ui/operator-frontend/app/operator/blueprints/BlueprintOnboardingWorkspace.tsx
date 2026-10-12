@@ -204,11 +204,12 @@ export default function BlueprintOnboardingWorkspace() {
 
   const actions = useMemo(() => blueprintWorkspaceActions(detail), [detail]);
   const versionKey = detail ? `${detail.engagement.id}:${detail.onboarding?.version || 0}` : "empty";
+  const canSignIn = /OPERATOR_SESSION_(MISSING|EXPIRED)|OPERATOR_ASSERTION_UNTRUSTED/.test(listError);
 
   return <div className="blueprintWorkspace">
     <aside className="blueprintEngagementList" aria-label="Blueprint engagements">
       <div className="blueprintListHeader"><h2>Paid engagements</h2><button type="button" onClick={() => void loadList(selectedId)}>Refresh</button></div>
-      {loading ? <p>Loading verified purchases…</p> : listError ? <div role="alert" className="blueprintAlert blueprintAlertError"><p>{listError}</p><a href="/api/operator/auth/login?returnTo=%2Foperator%2Fblueprints">Sign in</a></div> : engagements.length === 0 ? <p>No verified Blueprint purchases are available.</p> : engagements.map((item) => <button type="button" key={item.id} className={`blueprintEngagementChoice${selectedId === item.id ? " blueprintEngagementChoiceActive" : ""}`} onClick={() => void select(item.id)} aria-pressed={selectedId === item.id}>
+      {loading ? <p>Loading verified purchases…</p> : listError ? <div role="alert" className="blueprintAlert blueprintAlertError"><p>{listError}</p>{canSignIn ? <a href="/api/operator/auth/login?returnTo=%2Foperator%2Fblueprints">Sign in</a> : null}</div> : engagements.length === 0 ? <p>No verified Blueprint purchases are available.</p> : engagements.map((item) => <button type="button" key={item.id} className={`blueprintEngagementChoice${selectedId === item.id ? " blueprintEngagementChoiceActive" : ""}`} onClick={() => void select(item.id)} aria-pressed={selectedId === item.id}>
         <strong>{item.buyerEvidence?.name || item.buyerEvidence?.email || "Buyer evidence unavailable"}</strong>
         <span>{STATE_LABELS[item.state] || item.state}</span>
         <small>{formatDate(item.paidAt)} · {money(item.amountTotal, item.currency)}</small>

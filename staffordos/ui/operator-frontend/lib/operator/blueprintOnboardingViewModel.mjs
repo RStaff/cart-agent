@@ -44,6 +44,8 @@ export function blueprintSaveMessage(status, code) {
     OPERATOR_SESSION_EXPIRED: "Your operator session expired. Sign in again; your current form entries remain on this page.",
     OPERATOR_PERMISSION_MISSING: "This operator session does not have revenue-operations write permission.",
     OPERATOR_WRITE_DISABLED: "Changes are disabled in this runtime. Use the approved local operator launcher.",
+    unauthorized_internal_route: "The Blueprint service could not authenticate this request. Verify the approved server-only service configuration; operator sign-in will not fix this.",
+    UNAUTHORIZED_INTERNAL_ROUTE: "The Blueprint service could not authenticate this request. Verify the approved server-only service configuration; operator sign-in will not fix this.",
     BLUEPRINT_CLIENT_AUTHORITY_UNAVAILABLE: "Client association is unavailable until the durable client authority is compatible. Leave the buyer unassociated for Ross review.",
   };
   return messages[code] || `The change was not saved${code ? ` (${code})` : ""}. Review the highlighted section and try again.`;
