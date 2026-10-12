@@ -304,9 +304,7 @@ export function parseCookies(header = "") {
 }
 
 function hmacSha256(value, secret) {
-  // codeql[js/insufficient-password-hash]: this is a keyed MAC for signed
-  // OAuth state, not password hashing; HMAC-SHA256 is the required verifier.
-  return crypto.createHmac("sha256", secret).update(value).digest();
+  return crypto.createHmac("sha256", secret).update(value).digest(); // codeql[js/insufficient-password-hash]: keyed MAC for signed OAuth state, not password hashing.
 }
 
 export function signStateCookie(payload, secret) {
