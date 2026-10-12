@@ -156,7 +156,7 @@
     "request and audit context"
   ],
   "staticCoverageScan": {
-    "postRoutesGuarded": 5,
+    "postRoutesGuarded": 6,
     "serverActionDirectivesGuarded": 10,
     "duplicateIsolationUtilities": 0,
     "hardcodedBypassFound": false,
