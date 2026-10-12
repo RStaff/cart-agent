@@ -1,0 +1,22 @@
+{
+  "schema": "staffordos.application_patch_commit_intent.v1",
+  "repository": "RStaff/cart-agent",
+  "branch": "codex/step4b-followup-pr-v2",
+  "base_head": "0bafcc075a36fd0d5049d5388d533f5e24915500",
+  "paths": [
+    "staffordos/ui/operator-frontend/app/operator/blueprints/BlueprintOnboardingWorkspace.test.mjs",
+    "staffordos/ui/operator-frontend/app/operator/blueprints/BlueprintOnboardingWorkspace.tsx",
+    "staffordos/ui/operator-frontend/lib/operator/localTransportProof.mjs",
+    "staffordos/ui/operator-frontend/lib/operator/localTransportProof.test.mjs",
+    "staffordos/ui/operator-frontend/test/transport-command-route.integration.test.mjs"
+  ],
+  "staged_blobs": {
+    "staffordos/ui/operator-frontend/app/operator/blueprints/BlueprintOnboardingWorkspace.test.mjs": "824c6282c3c783ba458de7bc4197bfca357731b9",
+    "staffordos/ui/operator-frontend/app/operator/blueprints/BlueprintOnboardingWorkspace.tsx": "f25152436323df7f9316a912c4201dcc90e303af",
+    "staffordos/ui/operator-frontend/lib/operator/localTransportProof.mjs": "25a0df084a0f99325db77f0f1727c02a89b16d7a",
+    "staffordos/ui/operator-frontend/lib/operator/localTransportProof.test.mjs": "a22acd15029900d5abb5dc094582bc48eb148e06",
+    "staffordos/ui/operator-frontend/test/transport-command-route.integration.test.mjs": "b0d08e5c2e1c58ad0a2616835deab08f25357860"
+  },
+  "staged_binary_diff_sha256": "e09b83f4526602c8b026960a29044ef8321a85fc5d26fc0a5dc05d86943ec241",
+  "commit_message": "fix(staffordos): repair PR124 local QA blockers"
+}
