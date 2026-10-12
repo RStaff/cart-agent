@@ -17,8 +17,23 @@ The hook receives a private, one-use authorization file created by the
 adapter. Missing, malformed, expired, mismatched, or reused authorization
 fails closed. Callers do not set gate authorization.
 
+Bootstrap resolves the effective hook location with `git rev-parse --git-path
+hooks`; it does not assume `.git` is a directory and therefore works from a
+linked worktree. The installer reports whether a linked worktree will alter a
+shared hook and fails closed unless `STAFFORDOS_ALLOW_SHARED_HOOK_INSTALL=true`
+is explicitly supplied after reviewing that impact. An existing hook is
+copied beside itself before replacement and the installer prints the exact
+rollback command. The installed hook stores an absolute path and SHA-256 for
+the reviewed validator, so a target worktree need not contain governance
+source files and a later silent validator replacement is rejected.
+
 Bootstrap requires installing the revised hook with:
 
 ```sh
 bash staffordos/operator_daemon/install_gated_commit_hook_v1.sh
 ```
+
+When using the adapter against a target worktree, invoke the adapter by its
+absolute path from the governance checkout while the target is its working
+directory. The adapter resolves its authorization store through
+`git rev-parse --git-dir`, preserving worktree-local one-use state.

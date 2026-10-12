@@ -1,37 +1,61 @@
 #!/bin/bash
 set -euo pipefail
 
-mkdir -p .git/hooks
-
-cat > .git/hooks/pre-commit <<'HOOK'
-#!/bin/bash
-set -euo pipefail
-echo "===== PRE-COMMIT GATE ====="
-if [ -n "${STAFFORDOS_PATCH_AUTH_FILE:-}" ] && [ -f "${STAFFORDOS_PATCH_AUTH_FILE}" ]; then
-node - <<'NODE'
-const fs = require('fs');
-const crypto = require('crypto');
-const {execFileSync} = require('child_process');
-const p = process.env.STAFFORDOS_PATCH_AUTH_FILE;
-const j = JSON.parse(fs.readFileSync(p, 'utf8'));
-const run = a => execFileSync('git', a, {encoding:'utf8'}).trim();
-if (j.schema !== 'staffordos.application_patch_authorization.v1' || j.nonce !== process.env.STAFFORDOS_PATCH_AUTH_NONCE) process.exit(1);
-if (Date.now() > j.expires_at || j.root !== run(['rev-parse','--show-toplevel']) || j.repository !== run(['config','--get','remote.origin.url']).replace(/\.git$/,'').replace('https://github.com/','') || j.branch !== run(['symbolic-ref','--short','HEAD']) || j.head !== run(['rev-parse','HEAD'])) process.exit(1);
-const paths = run(['diff','--cached','--name-only']).split('\n').filter(Boolean).sort();
-if (JSON.stringify(paths) !== JSON.stringify([...j.paths].sort())) process.exit(1);
-for (const path of paths) if (j.staged_blobs?.[path] !== run(['rev-parse', `:${path}`])) process.exit(1);
-const d = crypto.createHash('sha256').update(execFileSync('git',['-c','color.ui=false','diff','--cached','--binary','--full-index','--no-ext-diff','--no-textconv'])).digest('hex');
-if (j.digest !== d) process.exit(1);
-fs.unlinkSync(p);
-NODE
-  echo "validated application-patch authorization consumed"
-elif [ "${STAFFORDOS_GATED:-}" = "true" ]; then
-  echo "legacy governed operational gate"
-else
-  echo "BLOCKED: no governed authorization"
+ROOT="$(git rev-parse --show-toplevel)"
+GIT_DIR="$(git rev-parse --git-dir)"
+COMMON_DIR="$(git rev-parse --git-common-dir)"
+HOOKS_DIR="$(git rev-parse --git-path hooks)"
+case "$HOOKS_DIR" in
+  /*) ;;
+  *) HOOKS_DIR="$ROOT/$HOOKS_DIR" ;;
+esac
+case "$GIT_DIR" in
+  /*) ;;
+  *) GIT_DIR="$ROOT/$GIT_DIR" ;;
+esac
+case "$COMMON_DIR" in
+  /*) ;;
+  *) COMMON_DIR="$ROOT/$COMMON_DIR" ;;
+esac
+HOOKS_DIR="$(cd "$HOOKS_DIR" 2>/dev/null && pwd || { mkdir -p "$HOOKS_DIR"; cd "$HOOKS_DIR"; pwd; })"
+HOOK="$HOOKS_DIR/pre-commit"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+VALIDATOR_PATH="$SCRIPT_DIR/application_patch_hook_validator_v1.mjs"
+if [ ! -r "$VALIDATOR_PATH" ]; then
+  echo "BLOCKED: reviewed hook validator is unavailable: $VALIDATOR_PATH" >&2
   exit 1
 fi
-HOOK
+VALIDATOR_DIGEST="$(shasum -a 256 "$VALIDATOR_PATH" | awk '{print $1}')"
 
-chmod +x .git/hooks/pre-commit
+SHARED=false
+if [ "$GIT_DIR" != "$COMMON_DIR" ] && [[ "$HOOKS_DIR/" == "$COMMON_DIR/"* ]]; then
+  SHARED=true
+fi
+echo "effective_hook=$HOOK"
+echo "shared_hook=$SHARED"
+if [ "$SHARED" = true ] && [ "${STAFFORDOS_ALLOW_SHARED_HOOK_INSTALL:-}" != true ]; then
+  echo "BLOCKED: this linked worktree resolves to a shared hook; review impact and rerun with STAFFORDOS_ALLOW_SHARED_HOOK_INSTALL=true" >&2
+  exit 1
+fi
+
+mkdir -p "$HOOKS_DIR"
+BACKUP=""
+if [ -e "$HOOK" ]; then
+  BACKUP="$HOOK.staffordos-backup.$(date +%Y%m%d%H%M%S).$$"
+  cp -p "$HOOK" "$BACKUP"
+fi
+TMP="$(mktemp "$HOOKS_DIR/.pre-commit.staffordos.XXXXXX")"
+VALIDATOR_Q="$(printf '%q' "$VALIDATOR_PATH")"
+{
+  printf '%s\n' '#!/bin/bash' 'set -euo pipefail' 'echo "===== PRE-COMMIT GATE ====="'
+  printf 'if [ -n "${STAFFORDOS_PATCH_AUTH_FILE:-}" ] && [ -f "${STAFFORDOS_PATCH_AUTH_FILE}" ]; then\n  [ "$(shasum -a 256 %s | awk '\''{print $1}'\'')" = %s ] || { echo "BLOCKED: reviewed hook validator changed" >&2; exit 1; }\n  node %s\n' "$VALIDATOR_Q" "$VALIDATOR_DIGEST" "$VALIDATOR_Q"
+  printf '%s\n' '  echo "validated application-patch authorization consumed"' 'elif [ "${STAFFORDOS_GATED:-}" = "true" ]; then' '  echo "legacy governed operational gate"' 'else' '  echo "BLOCKED: no governed authorization"' '  exit 1' 'fi'
+} > "$TMP"
+chmod 755 "$TMP"
+mv -f "$TMP" "$HOOK"
 echo "gated hook installed"
+if [ -n "$BACKUP" ]; then
+  echo "rollback: mv -- $(printf '%q' "$BACKUP") $(printf '%q' "$HOOK")"
+else
+  echo "rollback: rm -- $(printf '%q' "$HOOK")"
+fi
