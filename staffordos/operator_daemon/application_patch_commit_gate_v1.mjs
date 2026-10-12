@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { createHash, randomBytes } from "node:crypto";
-import { chmodSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { execFileSync, spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 
@@ -30,14 +30,15 @@ if (validateOnly) { console.log(JSON.stringify({ ok: true, root, ...initial }));
 
 const final = validate();
 
-const authDir = resolve(root, ".git", "application-patch-auth");
+const gitDir = run(["rev-parse", "--git-dir"]);
+const authDir = resolve(gitDir, "application-patch-auth");
 const nonce = randomBytes(32).toString("hex");
 const authPath = resolve(authDir, `${nonce}.json`);
 const repository = intent.repository;
 const branch = intent.branch;
 const staged_blobs = Object.fromEntries(final.paths.map((path) => [path, run(["rev-parse", `:${path}`])]));
 const auth = { schema: "staffordos.application_patch_authorization.v1", nonce, repository, branch, root, head: intent.base_head, paths: final.paths, staged_blobs, digest: final.digest, expires_at: Date.now() + 60000 };
-execFileSync("mkdir", ["-p", authDir]);
+mkdirSync(authDir, { recursive: true });
 writeFileSync(authPath, JSON.stringify(auth)); chmodSync(authPath, 0o600);
 const result = spawnSync("git", ["commit", "-m", intent.commit_message], { cwd: root, stdio: "inherit", env: { ...process.env, STAFFORDOS_PATCH_AUTH_FILE: authPath, STAFFORDOS_PATCH_AUTH_NONCE: nonce } });
 try { unlinkSync(authPath); } catch {}
