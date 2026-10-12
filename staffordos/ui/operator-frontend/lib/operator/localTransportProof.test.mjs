@@ -18,3 +18,10 @@ test("concurrent request contexts cannot consume one another's proof", async () 
   })));
   assert.deepEqual(results, [[true, false], [true, false]]);
 });
+
+test("server and separately bundled route modules share only the active request proof", async () => {
+  const serverModule = await import("./localTransportProof.mjs?server-bundle");
+  const routeModule = await import("./localTransportProof.mjs?route-bundle");
+  assert.equal(await serverModule.runWithLocalTransportProof(async () => routeModule.consumeLocalTransportProof()), true);
+  assert.equal(routeModule.consumeLocalTransportProof(), false);
+});

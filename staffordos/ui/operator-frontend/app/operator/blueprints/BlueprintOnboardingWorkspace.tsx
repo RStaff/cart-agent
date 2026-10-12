@@ -202,6 +202,12 @@ export default function BlueprintOnboardingWorkspace() {
     }
   }
 
+  function refreshDetail(id: string) {
+    void loadDetail(id).catch((error: any) => {
+      setFeedback({ state: "error", message: blueprintSaveMessage(error?.status || 503, error?.code || error?.message) });
+    });
+  }
+
   const actions = useMemo(() => blueprintWorkspaceActions(detail), [detail]);
   const versionKey = detail ? `${detail.engagement.id}:${detail.onboarding?.version || 0}` : "empty";
   const canSignIn = /OPERATOR_SESSION_(MISSING|EXPIRED)|OPERATOR_ASSERTION_UNTRUSTED/.test(listError);
@@ -219,7 +225,7 @@ export default function BlueprintOnboardingWorkspace() {
     <section className="blueprintEngagementDetail" aria-live="polite">
       {!detail ? <p>Select an engagement to review onboarding.</p> : <div key={versionKey}>
         <div className="blueprintDetailHeader"><div><p className="operatorShellHeaderLabel">Engagement</p><h2>{detail.engagement.id}</h2></div><span className="statusPill statusPillReady">{STATE_LABELS[detail.engagement.state] || detail.engagement.state}</span></div>
-        {feedback.message ? <div className={`blueprintAlert ${feedback.state === "error" ? "blueprintAlertError" : feedback.state === "success" ? "blueprintAlertSuccess" : ""}`} role={feedback.state === "error" ? "alert" : "status"}>{feedback.message}{feedback.state === "error" ? <button type="button" onClick={() => void loadDetail(detail.engagement.id)}>Refresh engagement</button> : null}</div> : null}
+        {feedback.message ? <div className={`blueprintAlert ${feedback.state === "error" ? "blueprintAlertError" : feedback.state === "success" ? "blueprintAlertSuccess" : ""}`} role={feedback.state === "error" ? "alert" : "status"}>{feedback.message}{feedback.state === "error" ? <button type="button" onClick={() => refreshDetail(detail.engagement.id)}>Refresh engagement</button> : null}</div> : null}
 
         <div className="blueprintSummaryGrid">
           <article><h3>Verified payment</h3><strong>{detail.engagement.paymentStatus} · {money(detail.engagement.amountTotal, detail.engagement.currency)}</strong><p>{detail.engagement.quantity} Blueprint · paid {formatDate(detail.engagement.paidAt)}</p><small>Offer: {detail.engagement.offerId} · Provider session: {detail.engagement.stripeSessionId}</small></article>
