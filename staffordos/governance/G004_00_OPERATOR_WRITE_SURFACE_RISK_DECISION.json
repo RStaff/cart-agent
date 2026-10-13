@@ -1,0 +1,117 @@
+{
+  "mission": "G004_00_OPERATOR_WRITE_SURFACE_RISK_DECISION",
+  "date": "2026-08-03",
+  "finalClassification": "OPERATOR_WRITE_RISK_CLASSIFIED",
+  "checkpointAuthority": {
+    "startingHead": "64ac3b4b891cf44c97df19d0a87527efb6237b1b",
+    "requiredCommitsPresent": [
+      "625b9150",
+      "eae4f9dd",
+      "d6a09095",
+      "f5728284",
+      "64ac3b4b"
+    ],
+    "operatorRuntimeAuthority": "/operator",
+    "parentWorkspaceShell": "/os",
+    "privateJobOpportunityConnection": "blocked on server authorization",
+    "s007Readiness": "VERIFIER_NOT_CONNECTED"
+  },
+  "worktreeExclusions": [
+    "pre-existing runtime JSON artifacts",
+    "pre-existing web runtime changes",
+    "pre-existing S007 local identity and issuer artifacts",
+    "pre-existing production and architecture artifacts"
+  ],
+  "verifiedCounts": {
+    "operatorFrontendPostWriteOrExecutionRoutes": 5,
+    "operatorFrontendServerActionDirectives": 10,
+    "readOnlyGetRoutesExcluded": true,
+    "s007InternalRoutesCountedAsCurrentOperatorUiProtection": false
+  },
+  "authorizationInventory": {
+    "serverSideHumanAuthenticationPresent": false,
+    "roleAuthorizationPresent": false,
+    "actionSpecificApprovalPresent": false,
+    "s007SessionEnforcedByOperatorFrontend": false,
+    "uiVisibilityOnlyObserved": true,
+    "clientConfirmationObserved": true,
+    "validationObserved": true,
+    "auditArtifactsObserved": true
+  },
+  "reachabilityDecision": {
+    "repositoryProvenPublicExposure": false,
+    "operatorFrontendDeploymentProven": false,
+    "classification": "SOURCE_ONLY",
+    "limitation": "If the operator frontend is started, proxied, tunneled, or deployed outside observed repository configuration, write routes become reachable server endpoints."
+  },
+  "overallRiskDecision": "PARTIAL_ACCEPTANCE_WITH_IMMEDIATE_ISOLATION",
+  "acceptedRiskActivated": false,
+  "acceptedRiskProposalCreated": false,
+  "s007Compatibility": {
+    "classification": "VERIFIER_NOT_CONNECTED",
+    "issuerLocal": true,
+    "issuerDeployed": false,
+    "operatorFrontendVerifierConnected": false,
+    "oauthSecretRotationStillRequired": true,
+    "browserOAuthProofStillRequired": true,
+    "permissionModelGap": "Current S007 permissions are mainly ShopiFixer-specific and need workspace/capability-scoped expansion before multi-workspace writes."
+  },
+  "jobSearchImpact": {
+    "permittedSlices": [
+      "private opportunity storage outside Git",
+      "read-only architecture",
+      "static requirement extraction contracts",
+      "synthetic evidence mapping",
+      "private career review outside UI"
+    ],
+    "blockedSlices": [
+      "private opportunity display in a deployed UI",
+      "application creation",
+      "resume mutation",
+      "application approval",
+      "application submission",
+      "recruiter messaging",
+      "external job-source fetching when identity or privacy is required"
+    ]
+  },
+  "correctionSequencing": [
+    {
+      "order": 1,
+      "mission": "G004_01_MINIMAL_OPERATOR_WRITE_SURFACE_ISOLATION",
+      "reason": "highest risk-reduction-to-change ratio"
+    },
+    {
+      "order": 2,
+      "mission": "S007_01I_OAUTH_SECRET_ROTATION_AND_BROWSER_PROOF_PLAN",
+      "reason": "required before issuer deployment"
+    },
+    {
+      "order": 3,
+      "mission": "S007_02_OPERATOR_VERIFIER_AND_SESSION_INTEGRATION_ARCHITECTURE",
+      "reason": "connect identity to server sessions"
+    },
+    {
+      "order": 4,
+      "mission": "CAPABILITY_PERMISSION_AND_ACTION_APPROVAL_MAPPING",
+      "reason": "separate authentication, authorization, approval, and audit"
+    },
+    {
+      "order": 5,
+      "mission": "PRIVATE_JOB_QUEUE_SERVER_ADAPTER_AFTER_AUTHORIZATION",
+      "reason": "private UI display remains blocked until server authorization exists"
+    }
+  ],
+  "validation": {
+    "sourceInventoryStaticOnly": true,
+    "writeRoutesInvoked": false,
+    "serverActionsInvoked": false,
+    "privateDataRead": false,
+    "secretValuesRead": false,
+    "sourceCodeChanged": false,
+    "routesDisabled": false,
+    "identityCodeChanged": false,
+    "deploymentOrPushOccurred": false
+  },
+  "selectedNextMission": "G004_01_MINIMAL_OPERATOR_WRITE_SURFACE_ISOLATION",
+  "rollback": "git revert <G004 commit SHA>"
+}

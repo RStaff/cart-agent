@@ -2,12 +2,14 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { ShopifixerPilotWorkspace } from "../../../components/operator/ShopifixerPilotWorkspace";
 import { loadShopifixerCommandCenter } from "../../../lib/operator/loadShopifixerCommandCenter";
 import { loadOperatorLeads } from "../../../lib/leads/loadOperatorLeads";
 import { getCampaignResolverReport } from "../../../lib/operator/campaignResolver";
 import { loadPreflightReport } from "../../../lib/operator/loadPreflightReport";
 import { loadCommandCenterQaReport } from "../../../lib/operator/loadCommandCenterQaReport";
+import { assertOperatorWriteAllowed } from "../../../lib/operator/operatorWriteIsolation";
 import { writeShopifixerBeforeEvidence } from "../../../lib/operator/writeShopifixerBeforeEvidence";
 import { writeShopifixerAfterEvidence } from "../../../lib/operator/writeShopifixerAfterEvidence";
 import { writeShopifixerProofPackage } from "../../../lib/operator/writeShopifixerProofPackage";
@@ -909,6 +911,128 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
   const recommendedPhase = selectedPhaseTruthComplete
     ? phaseItems.find((phase, index) => index > selectedPhaseIndex && phase.state !== "complete") || activePhase
     : phaseItems.find((phase) => phase.state !== "complete") || activePhase;
+
+  async function captureBeforeEvidence(formData: FormData) {
+    "use server";
+    assertOperatorWriteAllowed({ headers: await headers(), env: process.env });
+
+    const store = String(formData.get("store") || commandCenterMerchant.store || shopifixer.merchant?.store || "unavailable");
+    const date = String(formData.get("date") || beforeEvidenceWorkbenchDate);
+    const affected_page_or_artifact = String(formData.get("affected_page_or_artifact") || "");
+    const issue = String(formData.get("issue") || "");
+    const why_it_matters = String(formData.get("why_it_matters") || "");
+    const screenshot = String(formData.get("screenshot") || "");
+    const notes = String(formData.get("notes") || "");
+
+    writeShopifixerBeforeEvidence({
+      store,
+      date,
+      affected_page_or_artifact,
+      issue,
+      why_it_matters,
+      screenshot,
+      notes
+    }, {
+      outputPath: proofRunContext.beforePath
+    });
+
+    redirect(`${missionPhaseHref("before_evidence")}&shopifixer_before_saved=1`);
+  }
+
+  async function captureAfterEvidence(formData: FormData) {
+    "use server";
+    assertOperatorWriteAllowed({ headers: await headers(), env: process.env });
+
+    const store = String(formData.get("store") || commandCenterMerchant.store || shopifixer.merchant?.store || "unavailable");
+    const date = String(formData.get("date") || afterEvidenceWorkbenchDate);
+    const affected_page_or_artifact = String(formData.get("affected_page_or_artifact") || "");
+    const after_screenshot = String(formData.get("after_screenshot") || "");
+    const after_notes = String(formData.get("after_notes") || "");
+    const remaining_limitations = String(formData.get("remaining_limitations") || "");
+    const observed_improvement = String(formData.get("observed_improvement") || "");
+    const merchant_facing_summary = String(formData.get("merchant_facing_summary") || "");
+
+    writeShopifixerAfterEvidence({
+      store,
+      date,
+      affected_page_or_artifact,
+      after_screenshot,
+      after_notes,
+      remaining_limitations,
+      observed_improvement,
+      merchant_facing_summary
+    }, {
+      outputPath: proofRunContext.afterPath
+    });
+
+    redirect(`${missionPhaseHref("after_evidence")}&shopifixer_after_saved=1`);
+  }
+
+  async function captureProofPackage(formData: FormData) {
+    "use server";
+    assertOperatorWriteAllowed({ headers: await headers(), env: process.env });
+
+    const _store = String(formData.get("store") || commandCenterMerchant.store || shopifixer.merchant?.store || "unavailable");
+    const _date = String(formData.get("date") || proofPackageWorkbenchDate);
+
+    writeShopifixerProofPackage({
+      proofRunDir: proofRunContext.artifactRoot,
+      scopePath: proofRunContext.scopePath,
+      beforePath: proofRunContext.beforePath,
+      afterPath: proofRunContext.afterPath,
+      outputPath: proofRunContext.proofPackagePath,
+      sealPath: proofRunContext.sealPath
+    });
+
+    redirect(`${missionPhaseHref("proof_seal")}&shopifixer_proof_package_saved=1`);
+  }
+
+  async function captureCompletion(formData: FormData) {
+    "use server";
+    assertOperatorWriteAllowed({ headers: await headers(), env: process.env });
+
+    const store = String(formData.get("store") || commandCenterMerchant.store || shopifixer.merchant?.store || "unavailable");
+    const date = String(formData.get("date") || completionWorkbenchDate);
+
+    writeShopifixerCompletion({
+      store,
+      date
+    });
+
+    redirect(`${missionPhaseHref("delivery_payment")}&shopifixer_completion_saved=1`);
+  }
+
+  async function captureScopeWorkbench(formData: FormData) {
+    "use server";
+    assertOperatorWriteAllowed({ headers: await headers(), env: process.env });
+
+    const store = String(formData.get("store") || commandCenterMerchant.store || shopifixer.merchant?.store || "unavailable");
+    const scoped_fix = String(formData.get("scoped_fix") || "");
+    const in_scope = String(formData.get("in_scope") || "");
+    const out_of_scope = String(formData.get("out_of_scope") || "");
+    const merchant_approval_needed = String(formData.get("merchant_approval_needed") || "no");
+    const change_made = String(formData.get("change_made") || "");
+    const location_changed = String(formData.get("location_changed") || "");
+    const implementation_notes = String(formData.get("implementation_notes") || "");
+    const success_criteria = String(formData.get("success_criteria") || "");
+
+    writeShopifixerScopedFix({
+      store,
+      scoped_fix,
+      in_scope,
+      out_of_scope,
+      merchant_approval_needed,
+      change_made,
+      location_changed,
+      implementation_notes,
+      success_criteria
+    }, {
+      outputPath: proofRunContext.scopePath
+    });
+
+    redirect(`${missionPhaseHref("scope")}&shopifixer_scoped_fix_saved=1`);
+  }
+
   return (
     <ShopifixerPilotWorkspace
       merchant={{
@@ -1042,125 +1166,19 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
         missingFields: scopeMissingFields,
         sourceState: scopeSummary.sourceState
       }}
-      beforeEvidenceAction={async (formData: FormData) => {
-        "use server";
-
-        const store = String(formData.get("store") || commandCenterMerchant.store || shopifixer.merchant?.store || "unavailable");
-        const date = String(formData.get("date") || beforeEvidenceWorkbenchDate);
-        const affected_page_or_artifact = String(formData.get("affected_page_or_artifact") || "");
-        const issue = String(formData.get("issue") || "");
-        const why_it_matters = String(formData.get("why_it_matters") || "");
-        const screenshot = String(formData.get("screenshot") || "");
-        const notes = String(formData.get("notes") || "");
-
-        writeShopifixerBeforeEvidence({
-          store,
-          date,
-          affected_page_or_artifact,
-          issue,
-          why_it_matters,
-          screenshot,
-          notes
-        }, {
-          outputPath: proofRunContext.beforePath
-        });
-
-        redirect(`${missionPhaseHref("before_evidence")}&shopifixer_before_saved=1`);
-      }}
+      beforeEvidenceAction={captureBeforeEvidence}
       beforeEvidenceSaved={beforeEvidenceWorkbenchSaved}
       beforeEvidenceDate={beforeEvidenceWorkbenchDate}
-      afterEvidenceAction={async (formData: FormData) => {
-        "use server";
-
-        const store = String(formData.get("store") || commandCenterMerchant.store || shopifixer.merchant?.store || "unavailable");
-        const date = String(formData.get("date") || afterEvidenceWorkbenchDate);
-        const affected_page_or_artifact = String(formData.get("affected_page_or_artifact") || "");
-        const after_screenshot = String(formData.get("after_screenshot") || "");
-        const after_notes = String(formData.get("after_notes") || "");
-        const remaining_limitations = String(formData.get("remaining_limitations") || "");
-        const observed_improvement = String(formData.get("observed_improvement") || "");
-        const merchant_facing_summary = String(formData.get("merchant_facing_summary") || "");
-
-        writeShopifixerAfterEvidence({
-          store,
-          date,
-          affected_page_or_artifact,
-          after_screenshot,
-          after_notes,
-          remaining_limitations,
-          observed_improvement,
-          merchant_facing_summary
-        }, {
-          outputPath: proofRunContext.afterPath
-        });
-
-        redirect(`${missionPhaseHref("after_evidence")}&shopifixer_after_saved=1`);
-      }}
+      afterEvidenceAction={captureAfterEvidence}
       afterEvidenceSaved={afterEvidenceWorkbenchSaved}
       afterEvidenceDate={afterEvidenceWorkbenchDate}
-      proofPackageAction={async (formData: FormData) => {
-        "use server";
-
-        const _store = String(formData.get("store") || commandCenterMerchant.store || shopifixer.merchant?.store || "unavailable");
-        const _date = String(formData.get("date") || proofPackageWorkbenchDate);
-
-        writeShopifixerProofPackage({
-          proofRunDir: proofRunContext.artifactRoot,
-          scopePath: proofRunContext.scopePath,
-          beforePath: proofRunContext.beforePath,
-          afterPath: proofRunContext.afterPath,
-          outputPath: proofRunContext.proofPackagePath,
-          sealPath: proofRunContext.sealPath
-        });
-
-        redirect(`${missionPhaseHref("proof_seal")}&shopifixer_proof_package_saved=1`);
-      }}
+      proofPackageAction={captureProofPackage}
       proofPackageSaved={proofPackageWorkbenchSaved}
       proofPackageDate={proofPackageWorkbenchDate}
-      completionAction={async (formData: FormData) => {
-        "use server";
-
-        const store = String(formData.get("store") || commandCenterMerchant.store || shopifixer.merchant?.store || "unavailable");
-        const date = String(formData.get("date") || completionWorkbenchDate);
-
-        writeShopifixerCompletion({
-          store,
-          date
-        });
-
-        redirect(`${missionPhaseHref("delivery_payment")}&shopifixer_completion_saved=1`);
-      }}
+      completionAction={captureCompletion}
       completionSaved={completionWorkbenchSaved}
       completionDate={completionWorkbenchDate}
-      scopeWorkbenchAction={async (formData: FormData) => {
-        "use server";
-
-        const store = String(formData.get("store") || commandCenterMerchant.store || shopifixer.merchant?.store || "unavailable");
-        const scoped_fix = String(formData.get("scoped_fix") || "");
-        const in_scope = String(formData.get("in_scope") || "");
-        const out_of_scope = String(formData.get("out_of_scope") || "");
-        const merchant_approval_needed = String(formData.get("merchant_approval_needed") || "no");
-        const change_made = String(formData.get("change_made") || "");
-        const location_changed = String(formData.get("location_changed") || "");
-        const implementation_notes = String(formData.get("implementation_notes") || "");
-        const success_criteria = String(formData.get("success_criteria") || "");
-
-        writeShopifixerScopedFix({
-          store,
-          scoped_fix,
-          in_scope,
-          out_of_scope,
-          merchant_approval_needed,
-          change_made,
-          location_changed,
-          implementation_notes,
-          success_criteria
-        }, {
-          outputPath: proofRunContext.scopePath
-        });
-
-        redirect(`${missionPhaseHref("scope")}&shopifixer_scoped_fix_saved=1`);
-      }}
+      scopeWorkbenchAction={captureScopeWorkbench}
       scopeWorkbenchSaved={scopeWorkbenchSaved}
       scopeWorkbenchDate={scopeWorkbenchDate}
       beforeEvidenceSummary={{

@@ -1,6 +1,7 @@
 export const OPERATOR_WRITE_ENABLE_ENV = "STAFFORDOS_LOCAL_OPERATOR_WRITES_ENABLED";
 export const OPERATOR_WRITE_DENIED_STATUS = 403;
 export const OPERATOR_WRITE_DISABLED_ERROR = "OPERATOR_WRITE_DISABLED";
+import { consumeLocalTransportProof } from "./localTransportProof.mjs";
 
 export type OperatorWriteIsolationCode =
   | "ALLOWED_LOCAL_EXPLICIT"
@@ -164,7 +165,9 @@ export function evaluateOperatorWriteIsolation(input: OperatorWriteIsolationInpu
 
   const headers = input.headers || input.request?.headers || null;
   if (forwardedBoundaryDetected(headers)) {
-    return result(false, "DENIED_FORWARDED_REQUEST", "FORWARDED", "Forwarded request boundary is not governed.");
+    if (!consumeLocalTransportProof()) {
+      return result(false, "DENIED_FORWARDED_REQUEST", "FORWARDED", "Forwarded request boundary is not governed.");
+    }
   }
 
   const host = normalizeHost(getHeader(headers, "host") || requestHost(input.request));

@@ -29,6 +29,8 @@ test("workspace separates evidence, provides progressive controls, and preserves
   assert.match(workspace, /fieldset disabled/);
   assert.doesNotMatch(workspace, /reset\(|\.reset\(/);
   assert.match(workspace, /Refresh engagement/);
+  assert.match(workspace, /refreshDetail\(detail\.engagement\.id\)/);
+  assert.match(workspace, /void loadDetail\(id\)\.catch/);
   assert.match(workspace, /aria-live="polite"/);
 });
 
