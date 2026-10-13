@@ -619,6 +619,8 @@ model StaffordosBlueprintEngagement {
   paymentEvent            StaffordosBlueprintPaymentEvent?
   onboarding              StaffordosBlueprintOnboarding?
   onboardingAuditEvents   StaffordosBlueprintOnboardingAuditEvent[]
+  deliverables            StaffordosBlueprintDeliverable[]
+  deliverableAuditEvents  StaffordosBlueprintDeliverableAuditEvent[]
 
   @@index([state, createdAt])
   @@index([associationStatus, createdAt])
@@ -692,5 +694,50 @@ model StaffordosBlueprintOnboardingAuditEvent {
   engagement    StaffordosBlueprintEngagement @relation(fields: [engagementId], references: [id], onDelete: Restrict)
 
   @@unique([onboardingId, version])
+  @@index([engagementId, createdAt])
+}
+
+model StaffordosBlueprintDeliverable {
+  id                       String                                     @id @default(cuid())
+  engagementId             String
+  identifier               String
+  version                  Int                                        @default(1)
+  recordVersion            Int                                        @default(0)
+  status                   String                                     @default("recorded")
+  owner                    String
+  prerequisiteRefs         Json                                       @default("[]")
+  contents                 Json
+  evidenceRefs             Json                                       @default("[]")
+  claimClassifications     Json                                       @default("[]")
+  limitations              Json                                       @default("[]")
+  qualityReviewEvidenceRef String?
+  supersedesId             String?
+  createdAt                DateTime                                   @default(now())
+  updatedAt                DateTime                                   @updatedAt
+  engagement               StaffordosBlueprintEngagement              @relation(fields: [engagementId], references: [id], onDelete: Restrict)
+  auditEvents              StaffordosBlueprintDeliverableAuditEvent[]
+
+  @@unique([engagementId, identifier, version])
+  @@index([engagementId, identifier, status])
+}
+
+model StaffordosBlueprintDeliverableAuditEvent {
+  id             String                         @id @default(cuid())
+  deliverableId  String
+  engagementId   String
+  sequence       Int
+  version        Int
+  action         String
+  previousStatus String
+  nextStatus     String
+  actorSubject   String
+  reason         String
+  evidenceRef    String
+  payload        Json
+  createdAt      DateTime                       @default(now())
+  deliverable    StaffordosBlueprintDeliverable @relation(fields: [deliverableId], references: [id], onDelete: Restrict)
+  engagement     StaffordosBlueprintEngagement  @relation(fields: [engagementId], references: [id], onDelete: Restrict)
+
+  @@unique([deliverableId, sequence])
   @@index([engagementId, createdAt])
 }
