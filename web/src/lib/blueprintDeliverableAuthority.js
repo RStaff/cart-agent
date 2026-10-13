@@ -105,6 +105,11 @@ function expectedVersion(value) {
   return value;
 }
 
+function expectedDraftVersion(value) {
+  if (!Number.isInteger(value) || value < 1) throw new BlueprintDeliverableError("BLUEPRINT_DELIVERABLE_DRAFT_VERSION_REQUIRED");
+  return value;
+}
+
 function auditData({ deliverableId, engagementId, sequence, version, action, previousStatus, nextStatus, actorSubject, reasonText, evidenceRef, payload }) {
   return {
     deliverableId,
@@ -151,13 +156,15 @@ export function createBlueprintDeliverableAuthority({ prisma, now = () => new Da
       const evidenceRef = clean(data?.evidenceRef, 1000);
       if (!evidenceRef) throw new BlueprintDeliverableError("BLUEPRINT_DELIVERABLE_EVIDENCE_REQUIRED");
 
-      const result = await prisma.$transaction(async (tx) => {
+      try {
+        const result = await prisma.$transaction(async (tx) => {
         const engagement = await tx.staffordosBlueprintEngagement.findUnique({ where: { id }, select: { id: true } });
         if (!engagement) throw new BlueprintDeliverableError("BLUEPRINT_ENGAGEMENT_NOT_FOUND", 404);
         const key = identifier(data?.identifier);
         const current = await tx.staffordosBlueprintDeliverable.findFirst({ where: { engagementId: id, identifier: key }, orderBy: { version: "desc" } });
 
         if (commandName === "REGISTER_DRAFT") {
+          if (expected !== 0) throw new BlueprintDeliverableError("BLUEPRINT_DELIVERABLE_INITIAL_VERSION_INVALID", 409);
           if (current) throw new BlueprintDeliverableError("BLUEPRINT_DELIVERABLE_ALREADY_EXISTS", 409);
           const draft = normalizedDraft(data);
           const created = await tx.staffordosBlueprintDeliverable.create({ data: { engagementId: id, identifier: key, version: 1, recordVersion: 1, status: "recorded", ...draft } });
@@ -165,7 +172,8 @@ export function createBlueprintDeliverableAuthority({ prisma, now = () => new Da
           return created;
         }
 
-        if (!current || current.recordVersion !== expected) throw new BlueprintDeliverableError("BLUEPRINT_DELIVERABLE_STALE", 409);
+        const expectedDraft = expectedDraftVersion(data?.expectedDraftVersion);
+        if (!current || current.version !== expectedDraft || current.recordVersion !== expected) throw new BlueprintDeliverableError("BLUEPRINT_DELIVERABLE_STALE", 409);
         if (commandName === "REVISE_DRAFT") {
           const draft = normalizedDraft(data);
           const created = await tx.staffordosBlueprintDeliverable.create({ data: { engagementId: id, identifier: key, version: current.version + 1, recordVersion: 1, status: "recorded", ...draft, supersedesId: current.id } });
@@ -179,8 +187,12 @@ export function createBlueprintDeliverableAuthority({ prisma, now = () => new Da
         const reviewed = await tx.staffordosBlueprintDeliverable.findUnique({ where: { id: current.id } });
         await tx.staffordosBlueprintDeliverableAuditEvent.create({ data: auditData({ deliverableId: current.id, engagementId: id, sequence: reviewed.recordVersion, version: current.version, action: commandName, previousStatus: "recorded", nextStatus: "reviewed", actorSubject: operator.subject, reasonText, evidenceRef, payload: {} }) });
         return reviewed;
-      });
-      return { deliverable: result, deliverables: await list(id) };
+        });
+        return { deliverable: result, deliverables: await list(id) };
+      } catch (error) {
+        if (error?.code === "P2002") throw new BlueprintDeliverableError("BLUEPRINT_DELIVERABLE_STALE", 409);
+        throw error;
+      }
     },
   };
 }

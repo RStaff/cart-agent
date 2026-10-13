@@ -89,6 +89,8 @@ test("deliverable drafting/review is durable, governed, versioned, isolated, and
         const response = await post({ expectedVersion: 0, command: "REGISTER_DRAFT", data: { identifier: id, ...draft() } });
         assert.equal(response.status, 200);
       }
+      const invalidInitial = await post({ expectedVersion: 1, command: "REGISTER_DRAFT", data: { identifier: "workflow_interview_current_state_map", ...draft() } });
+      assert.equal(invalidInitial.status, 409);
       const collection = await fetch(endpoint, { headers: AUTH });
       assert.equal(collection.status, 200);
       const listed = await collection.json();
@@ -96,7 +98,7 @@ test("deliverable drafting/review is durable, governed, versioned, isolated, and
       assert.equal(listed.deliverables.every((item) => item.status === "recorded"), true);
 
       const detail = listed.deliverables[0];
-      const reviewed = await post({ expectedVersion: detail.recordVersion, command: "RECORD_QUALITY_REVIEW", data: { identifier: detail.identifier, ...draft() } });
+      const reviewed = await post({ expectedVersion: detail.recordVersion, command: "RECORD_QUALITY_REVIEW", data: { identifier: detail.identifier, expectedDraftVersion: detail.version, ...draft() } });
       assert.equal(reviewed.status, 200);
       const reviewedBody = await reviewed.json();
       assert.equal(reviewedBody.deliverable.status, "reviewed");
@@ -108,13 +110,20 @@ test("deliverable drafting/review is durable, governed, versioned, isolated, and
       assert.equal(reviewedBody.deliverables.find((item) => item.id === reviewedBody.deliverable.id).auditEvents.at(-1).actorSubject, ACTOR);
       assert.equal(reviewedBody.deliverables.find((item) => item.id === reviewedBody.deliverable.id).auditEvents.at(-1).evidenceRef, "evidence://step5a/review");
 
-      const revised = await post({ expectedVersion: reviewedBody.deliverable.recordVersion, command: "REVISE_DRAFT", data: { identifier: detail.identifier, ...draft({ contents: { answer: "Revised draft" } }) } });
+      const revised = await post({ expectedVersion: reviewedBody.deliverable.recordVersion, command: "REVISE_DRAFT", data: { identifier: detail.identifier, expectedDraftVersion: reviewedBody.deliverable.version, ...draft({ contents: { answer: "Revised draft" } }) } });
       assert.equal(revised.status, 200);
       const revisedBody = await revised.json();
       const versions = revisedBody.deliverables.filter((item) => item.identifier === detail.identifier).sort((a, b) => b.version - a.version);
       assert.deepEqual(versions.map((item) => [item.version, item.status]), [[2, "recorded"], [1, "reviewed"]]);
 
-      const stale = await post({ expectedVersion: 0, command: "RECORD_QUALITY_REVIEW", data: { identifier: detail.identifier, ...draft() } });
+      const concurrentRevisionTarget = listed.deliverables[1];
+      const revisionResults = await Promise.all([
+        post({ expectedVersion: concurrentRevisionTarget.recordVersion, command: "REVISE_DRAFT", data: { identifier: concurrentRevisionTarget.identifier, expectedDraftVersion: concurrentRevisionTarget.version, ...draft({ contents: { answer: "Concurrent revision A" } }) } }),
+        post({ expectedVersion: concurrentRevisionTarget.recordVersion, command: "REVISE_DRAFT", data: { identifier: concurrentRevisionTarget.identifier, expectedDraftVersion: concurrentRevisionTarget.version, ...draft({ contents: { answer: "Concurrent revision B" } }) } }),
+      ]);
+      assert.deepEqual(revisionResults.map((response) => response.status).sort(), [200, 409]);
+
+      const stale = await post({ expectedVersion: 0, command: "RECORD_QUALITY_REVIEW", data: { identifier: detail.identifier, expectedDraftVersion: detail.version, ...draft() } });
       assert.equal(stale.status, 409);
       const unauthorized = await post({ expectedVersion: 0, command: "REGISTER_DRAFT", data: { identifier: "workflow_interview_current_state_map", ...draft() } }, { ...AUTH, "x-staffordos-operator-permission": "staffordos.revenue_operations.read" });
       assert.equal(unauthorized.status, 403);
@@ -125,8 +134,8 @@ test("deliverable drafting/review is durable, governed, versioned, isolated, and
 
       const concurrentTarget = versions[0];
       const results = await Promise.all([
-        post({ expectedVersion: concurrentTarget.recordVersion, command: "RECORD_QUALITY_REVIEW", data: { identifier: concurrentTarget.identifier, ...draft() } }),
-        post({ expectedVersion: concurrentTarget.recordVersion, command: "RECORD_QUALITY_REVIEW", data: { identifier: concurrentTarget.identifier, ...draft() } }),
+        post({ expectedVersion: concurrentTarget.recordVersion, command: "RECORD_QUALITY_REVIEW", data: { identifier: concurrentTarget.identifier, expectedDraftVersion: concurrentTarget.version, ...draft() } }),
+        post({ expectedVersion: concurrentTarget.recordVersion, command: "RECORD_QUALITY_REVIEW", data: { identifier: concurrentTarget.identifier, expectedDraftVersion: concurrentTarget.version, ...draft() } }),
       ]);
       assert.deepEqual(results.map((response) => response.status).sort(), [200, 409]);
     });
