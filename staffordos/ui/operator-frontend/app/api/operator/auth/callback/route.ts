@@ -7,12 +7,14 @@ import {
   redeemStaffordOsIssuerHandoffCode,
   verifyStaffordOsOperatorAssertion,
 } from "../../../../../lib/operator/staffordosOperatorSession";
+import { canonicalOperatorFrontendOrigin, canonicalOperatorReturnLocation } from "../../../../../lib/operator/operatorFrontendOrigin.mjs";
 
 export const runtime = "nodejs";
 
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
+    const canonicalOrigin = canonicalOperatorFrontendOrigin(process.env);
     const code = url.searchParams.get("code") || "";
     if (!code) return NextResponse.json({ ok: false, error: "OPERATOR_HANDOFF_CODE_MISSING" }, { status: 400 });
 
@@ -29,13 +31,11 @@ export async function GET(request: Request) {
     });
     response.cookies.set(STAFFORDOS_OPERATOR_SESSION_COOKIE, cookieValue, cookieOptions);
     const returnTo = url.searchParams.get("returnTo");
-    if (returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//")) {
-      const target = new URL(returnTo, url.origin);
-      if (target.origin === url.origin) {
-        const redirect = NextResponse.redirect(target);
-        redirect.cookies.set(STAFFORDOS_OPERATOR_SESSION_COOKIE, cookieValue, cookieOptions);
-        return redirect;
-      }
+    const target = canonicalOperatorReturnLocation(returnTo, canonicalOrigin);
+    if (target) {
+      const redirect = NextResponse.redirect(target);
+      redirect.cookies.set(STAFFORDOS_OPERATOR_SESSION_COOKIE, cookieValue, cookieOptions);
+      return redirect;
     }
     return response;
   } catch {

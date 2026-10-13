@@ -18,6 +18,7 @@ function startServer() {
       STAFFORDOS_OPERATOR_JWT_AUDIENCE: "audience.test",
       STAFFORDOS_OPERATOR_ALLOWED_SUBJECTS: "subject.test",
       STAFFORDOS_OPERATOR_FRONTEND_SESSION_SECRET: "local-integration-session-secret",
+      STAFFORDOS_OPERATOR_FRONTEND_ORIGIN: base,
     },
     stdio: ["ignore", "pipe", "pipe"],
   });
