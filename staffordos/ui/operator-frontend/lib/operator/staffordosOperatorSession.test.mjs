@@ -50,6 +50,7 @@ const {
   createStaffordOsOperatorSession,
   destroyStaffordOsOperatorSession,
   operatorAuthorizationFailureBody,
+  operatorAuthConfigFromEnv,
   resolveStaffordOsOperatorSession,
   sessionCookieOptions,
   verifyStaffordOsOperatorAssertion,
@@ -218,6 +219,75 @@ test("session cookie is HttpOnly, bounded, and never stores assertion material",
   assert.equal(cookieValue.includes("StaffordOS-Operator-Assertion"), false);
   assert.equal(cookieValue.includes("."), true);
   assert.equal(session.expiresAt, nowSeconds + 300);
+});
+
+test("session TTL configuration fails safe and never exceeds eight hours", () => {
+  const base = {
+    STAFFORDOS_OPERATOR_JWT_ISSUER: "https://staffordos-operator.staffordmedia.ai",
+    STAFFORDOS_OPERATOR_JWT_AUDIENCE: "staffordos.operator.frontend.v1",
+    STAFFORDOS_OPERATOR_ALLOWED_SUBJECTS: operatorSubject,
+    STAFFORDOS_OPERATOR_FRONTEND_SESSION_SECRET: "synthetic-session-secret-with-enough-entropy",
+  };
+  assert.equal(operatorAuthConfigFromEnv(base).sessionTtlSeconds, 300);
+  assert.equal(operatorAuthConfigFromEnv({ ...base, STAFFORDOS_OPERATOR_FRONTEND_SESSION_TTL_SECONDS: "not-a-number" }).sessionTtlSeconds, 300);
+  assert.equal(operatorAuthConfigFromEnv({ ...base, STAFFORDOS_OPERATOR_FRONTEND_SESSION_TTL_SECONDS: "-10" }).sessionTtlSeconds, 60);
+  assert.equal(operatorAuthConfigFromEnv({ ...base, STAFFORDOS_OPERATOR_FRONTEND_SESSION_TTL_SECONDS: "999999" }).sessionTtlSeconds, 28800);
+});
+
+test("durable session uses the bounded eight-hour TTL after a short assertion", async () => {
+  const config = testConfig({ sessionTtlSeconds: 8 * 60 * 60 });
+  const assertion = signAssertion({ exp: nowSeconds + 300 });
+  const verified = verifyStaffordOsOperatorAssertion(assertion, publicKeyPem, config, now);
+  const created = await createStaffordOsOperatorSession(verified, config, now);
+  assert.equal(created.session.expiresAt, nowSeconds + 8 * 60 * 60);
+  assert.equal(created.cookieOptions.maxAge, 8 * 60 * 60);
+  const afterAssertionExpiry = await authorizeStaffordOsOperatorRead(
+    created.cookieValue,
+    CAREEROS_BETA_OPERATIONS_READ_PERMISSION,
+    config,
+    new Date(now.getTime() + 301 * 1000),
+  );
+  assert.equal(afterAssertionExpiry.ok, true);
+  const afterSessionExpiry = await authorizeStaffordOsOperatorRead(
+    created.cookieValue,
+    CAREEROS_BETA_OPERATIONS_READ_PERMISSION,
+    config,
+    new Date(now.getTime() + (8 * 60 * 60 + 1) * 1000),
+  );
+  assert.equal(afterSessionExpiry.status, 401);
+});
+
+test("same durable session survives a frontend restart with unchanged secret and repository", async () => {
+  const repository = fakeSessionRepository();
+  const firstConfig = testConfig({ sessionTtlSeconds: 8 * 60 * 60, sessionRepository: repository });
+  const assertion = signAssertion({ exp: nowSeconds + 300 });
+  const verified = verifyStaffordOsOperatorAssertion(assertion, publicKeyPem, firstConfig, now);
+  const created = await createStaffordOsOperatorSession(verified, firstConfig, now);
+  const restartedConfig = testConfig({ sessionTtlSeconds: 8 * 60 * 60, sessionRepository: repository });
+  const restored = await authorizeStaffordOsOperatorRead(created.cookieValue, CAREEROS_BETA_OPERATIONS_READ_PERMISSION, restartedConfig, new Date(now.getTime() + 301 * 1000));
+  assert.equal(restored.ok, true);
+});
+
+test("durable permission removal and operator disablement deny an existing session", async () => {
+  const repository = fakeSessionRepository();
+  let permissionActive = true;
+  let operatorActive = true;
+  const resolvingRepository = {
+    ...repository,
+    async resolveSession(args) {
+      const session = await repository.resolveSession(args);
+      if (!session || !operatorActive) return null;
+      return permissionActive ? session : { ...session, permissions: [] };
+    },
+  };
+  const config = testConfig({ sessionTtlSeconds: 8 * 60 * 60, sessionRepository: resolvingRepository });
+  const verified = verifyStaffordOsOperatorAssertion(signAssertion({ exp: nowSeconds + 300 }), publicKeyPem, config, now);
+  const created = await createStaffordOsOperatorSession(verified, config, now);
+  permissionActive = false;
+  assert.equal((await authorizeStaffordOsOperatorRead(created.cookieValue, CAREEROS_BETA_OPERATIONS_READ_PERMISSION, config, now)).status, 403);
+  permissionActive = true;
+  operatorActive = false;
+  assert.equal((await authorizeStaffordOsOperatorRead(created.cookieValue, CAREEROS_BETA_OPERATIONS_READ_PERMISSION, config, now)).status, 401);
 });
 
 test("guard distinguishes missing, invalid, missing permission, and authorized sessions", async () => {
