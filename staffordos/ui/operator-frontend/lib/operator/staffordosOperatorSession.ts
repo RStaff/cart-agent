@@ -6,7 +6,7 @@ import {
 
 export const STAFFORDOS_OPERATOR_SESSION_COOKIE = "staffordos_operator_session";
 export const STAFFORDOS_OPERATOR_SESSION_TTL_SECONDS = 300;
-export const STAFFORDOS_OPERATOR_SESSION_MAX_TTL_SECONDS = 900;
+export const STAFFORDOS_OPERATOR_SESSION_MAX_TTL_SECONDS = 8 * 60 * 60;
 export const CAREEROS_BETA_OPERATIONS_READ_PERMISSION = "careeros.beta.operations.read";
 export const CAREEROS_BETA_OPERATIONS_ROLE = "careeros_beta_operations_viewer";
 
@@ -274,7 +274,11 @@ export async function createStaffordOsOperatorSession(
 ) {
   validateOperatorSessionConfig(config);
   const nowSeconds = Math.floor(now.getTime() / 1000);
-  const expiresAt = Math.min(verified.expiresAt, nowSeconds + config.sessionTtlSeconds);
+  // The assertion is short-lived login proof. It has already passed signature,
+  // issuer, audience, time, and one-time handoff checks before this point. The
+  // durable session has its own bounded expiry and is revalidated on every
+  // request against durable operator status, roles, permissions, and revocation.
+  const expiresAt = nowSeconds + config.sessionTtlSeconds;
   const id = `staffordos_operator_session_${base64Url(crypto.randomBytes(18))}`;
   const session: StaffordOsOperatorSession = {
     id,
