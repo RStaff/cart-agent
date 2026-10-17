@@ -89,6 +89,10 @@ test("deliverable selection and refresh are request-bound and review evidence is
   assert.match(deliverablesWorkspace, /setItems\(\[\]\); setDrafts\(\{\}\); setReviewInputs\(\{\}\)/);
   assert.match(deliverablesWorkspace, /Review reason is required before recording quality review/);
   assert.match(deliverablesWorkspace, /Review evidence reference is required before recording quality review/);
-  assert.match(deliverablesWorkspace, /loadDeliverables\(selectedId, \{ rethrow: true \}\)/);
+  assert.match(deliverablesWorkspace, /loadDeliverables\(selectedId, \{ rethrow: true, preserveDrafts:/);
   assert.match(deliverablesWorkspace, /The engagement changed while saving/);
+  assert.match(deliverablesWorkspace, /preserveDrafts/);
+  assert.match(deliverablesWorkspace, /setDrafts\(\(current\) => options\.preserveDrafts/);
+  assert.match(deliverablesWorkspace, /if \(saving\) return/);
+  assert.match(deliverablesWorkspace, /disabled=\{Boolean\(saving\)\}/);
 });

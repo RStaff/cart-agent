@@ -152,7 +152,7 @@ export default function BlueprintDeliverablesWorkspace() {
     finally { setLoading(false); }
   }
 
-  async function loadDeliverables(id: string, options: { rethrow?: boolean } = {}) {
+  async function loadDeliverables(id: string, options: { rethrow?: boolean; preserveDrafts?: string; preserveReviews?: boolean } = {}) {
     const sequence = ++deliverableLoadSequence.current;
     setError("");
     try {
@@ -162,8 +162,9 @@ export default function BlueprintDeliverablesWorkspace() {
       if (sequence !== deliverableLoadSequence.current) return false;
       const next = Array.isArray(body.deliverables) ? body.deliverables : [];
       setItems(next);
-      setDrafts(Object.fromEntries(PUBLIC_DELIVERABLES.map((descriptor) => [descriptor.id, draftFrom(activeVersion(next, descriptor.id))])));
-      setReviewInputs({});
+      const refreshedDrafts = Object.fromEntries(PUBLIC_DELIVERABLES.map((descriptor) => [descriptor.id, draftFrom(activeVersion(next, descriptor.id))]));
+      setDrafts((current) => options.preserveDrafts ? { ...current, [options.preserveDrafts]: refreshedDrafts[options.preserveDrafts] } : refreshedDrafts);
+      if (!options.preserveReviews) setReviewInputs({});
       return true;
     } catch (cause: any) {
       if (sequence === deliverableLoadSequence.current) setError(operatorLoadError(cause));
@@ -194,6 +195,7 @@ export default function BlueprintDeliverablesWorkspace() {
       ? (!review.reason.trim() ? "Review reason is required before recording quality review." : !review.evidenceRef.trim() ? "Review evidence reference is required before recording quality review." : "")
       : draftValidation(draft);
     if (validation) { setFeedback({ state: "error", message: validation }); return; }
+    if (saving) return;
     setSaving(descriptor.id); setFeedback({ state: "idle", message: "" });
     const data = action === "RECORD_QUALITY_REVIEW" ? { identifier: descriptor.id, expectedDraftVersion: item?.version, reason: review.reason, evidenceRef: review.evidenceRef } : {
       identifier: descriptor.id,
@@ -211,7 +213,7 @@ export default function BlueprintDeliverablesWorkspace() {
       const response = await fetch(`/api/operator/blueprints/${encodeURIComponent(selectedId)}/deliverables/commands`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ expectedVersion: item?.recordVersion ?? 0, command: action, data }) });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.error || "Deliverable save failed");
-      const refreshed = await loadDeliverables(selectedId, { rethrow: true });
+      const refreshed = await loadDeliverables(selectedId, { rethrow: true, preserveDrafts: descriptor.id, preserveReviews: true });
       if (!refreshed) throw new Error("The engagement changed while saving; select it again before retrying.");
       setFeedback({ state: "success", message: `${descriptor.label} saved and refreshed from durable authority.` });
     } catch (cause: any) {
@@ -240,9 +242,9 @@ export default function BlueprintDeliverablesWorkspace() {
               <div className="blueprintDeliverableMeta"><span>Owner: {item?.owner || "Not recorded"}</span><span>Active version: {item ? `v${item.version}` : "None"}</span><span>Quality review: {item?.qualityReviewEvidenceRef || "Not reviewed"}</span></div>
               <fieldset><legend>{item ? `Draft v${item.version} · ${item.status}` : "Register draft v1"}</legend><div className="blueprintFormGrid"><label className="blueprintField"><span>Owner</span><input value={draft.owner} onChange={(event) => changeDraft(descriptor.id, "owner", event.target.value)} /></label><label className="blueprintField"><span>Primary response</span><textarea rows={4} value={draft.primary} onChange={(event) => changeDraft(descriptor.id, "primary", event.target.value)} /></label><label className="blueprintField"><span>Supporting findings / design notes</span><textarea rows={4} value={draft.supporting} onChange={(event) => changeDraft(descriptor.id, "supporting", event.target.value)} /></label><label className="blueprintField"><span>Open decisions, unknowns, or assumptions</span><textarea rows={3} value={draft.openDecisions} onChange={(event) => changeDraft(descriptor.id, "openDecisions", event.target.value)} /></label><label className="blueprintField"><span>Prerequisite references (one per line)</span><textarea rows={2} value={draft.prerequisites} onChange={(event) => changeDraft(descriptor.id, "prerequisites", event.target.value)} /></label><label className="blueprintField"><span>Evidence references (one per line)</span><textarea rows={3} value={draft.evidence} onChange={(event) => changeDraft(descriptor.id, "evidence", event.target.value)} /></label><label className="blueprintField"><span>Claim classifications (CLIENT_STATED | claim; OBSERVED | claim; ESTIMATE | claim; or ASSUMPTION | claim)</span><textarea rows={3} value={draft.classifications} onChange={(event) => changeDraft(descriptor.id, "classifications", event.target.value)} aria-describedby={`classification-help-${descriptor.id}`} /></label><label className="blueprintField"><span>Limitations (one per line)</span><textarea rows={3} value={draft.limitations} onChange={(event) => changeDraft(descriptor.id, "limitations", event.target.value)} /></label></div>
                 <p id={`classification-help-${descriptor.id}`} className="blueprintFieldHint">Use exactly one allowed classification before the separator. OBSERVED is for dated evidence-backed observations; CLIENT_STATED, ESTIMATE, and ASSUMPTION remain distinct. A file reference or digest alone does not prove storage, release, delivery, or acceptance.</p>
-                <div className="blueprintCommandRow">{!item ? <button type="button" disabled={saving === descriptor.id} onClick={() => void command(descriptor, "REGISTER_DRAFT")}>Register draft</button> : <button type="button" disabled={saving === descriptor.id} onClick={() => void command(descriptor, "REVISE_DRAFT")}>Save revision</button>}</div>
+                <div className="blueprintCommandRow">{!item ? <button type="button" disabled={Boolean(saving)} onClick={() => void command(descriptor, "REGISTER_DRAFT")}>Register draft</button> : <button type="button" disabled={Boolean(saving)} onClick={() => void command(descriptor, "REVISE_DRAFT")}>Save revision</button>}</div>
               </fieldset>
-              {item?.status === "recorded" ? <fieldset><legend>Ross quality review for exact v{item.version}</legend><div className="blueprintFormGrid"><label className="blueprintField"><span>Review reason</span><input value={review.reason} onChange={(event) => setReviewInputs((current) => ({ ...current, [descriptor.id]: { ...review, reason: event.target.value } }))} /></label><label className="blueprintField"><span>Review evidence reference</span><input value={review.evidenceRef} onChange={(event) => setReviewInputs((current) => ({ ...current, [descriptor.id]: { ...review, evidenceRef: event.target.value } }))} /></label></div><button type="button" disabled={saving === descriptor.id} onClick={() => void command(descriptor, "RECORD_QUALITY_REVIEW")}>Record quality review</button></fieldset> : null}
+              {item?.status === "recorded" ? <fieldset><legend>Ross quality review for exact v{item.version}</legend><div className="blueprintFormGrid"><label className="blueprintField"><span>Review reason</span><input value={review.reason} onChange={(event) => setReviewInputs((current) => ({ ...current, [descriptor.id]: { ...review, reason: event.target.value } }))} /></label><label className="blueprintField"><span>Review evidence reference</span><input value={review.evidenceRef} onChange={(event) => setReviewInputs((current) => ({ ...current, [descriptor.id]: { ...review, evidenceRef: event.target.value } }))} /></label></div><button type="button" disabled={Boolean(saving)} onClick={() => void command(descriptor, "RECORD_QUALITY_REVIEW")}>Record quality review</button></fieldset> : null}
               <div className="blueprintDeliverableHistory"><h4>Prior-version history and quality evidence</h4>{versions.length ? <ol>{versions.map((version) => <li key={version.id}><strong>v{version.version} · {version.status}</strong> · updated {formatDate(version.updatedAt)} · {version.qualityReviewEvidenceRef ? `quality evidence: ${version.qualityReviewEvidenceRef}` : "not reviewed"}{version.auditEvents?.length ? <ul>{version.auditEvents.map((event) => <li key={event.id}>{event.action} by {event.actorSubject} · {event.reason} · evidence: {event.evidenceRef}</li>)}</ul> : null}</li>)}</ol> : <p>No draft version recorded.</p>}</div>
               <p className="blueprintDeliverableUnavailable">Release and delivery are unavailable in Step 5A. No external artifact storage, client access, messaging, or retention policy is added here.</p>
             </div>
