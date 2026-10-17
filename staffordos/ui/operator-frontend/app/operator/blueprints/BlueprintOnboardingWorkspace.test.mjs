@@ -81,3 +81,14 @@ test("Step 5B deliverables use the exact authority and only approved commands", 
   assert.match(deliverablesWorkspace, /Your operator session is missing or expired/);
   assert.match(deliverablesWorkspace, /api\/operator\/auth\/login\?returnTo=%2Foperator%2Fblueprints/);
 });
+
+test("deliverable selection and refresh are request-bound and review evidence is validated", () => {
+  assert.match(deliverablesWorkspace, /useRef/);
+  assert.match(deliverablesWorkspace, /deliverableLoadSequence/);
+  assert.match(deliverablesWorkspace, /sequence !== deliverableLoadSequence\.current/);
+  assert.match(deliverablesWorkspace, /setItems\(\[\]\); setDrafts\(\{\}\); setReviewInputs\(\{\}\)/);
+  assert.match(deliverablesWorkspace, /Review reason is required before recording quality review/);
+  assert.match(deliverablesWorkspace, /Review evidence reference is required before recording quality review/);
+  assert.match(deliverablesWorkspace, /loadDeliverables\(selectedId, \{ rethrow: true \}\)/);
+  assert.match(deliverablesWorkspace, /The engagement changed while saving/);
+});

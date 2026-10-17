@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type Engagement = { id: string; buyerEvidence?: { email?: string | null; name?: string | null }; state?: string; paidAt?: string };
 type Deliverable = {
@@ -134,6 +134,7 @@ export default function BlueprintDeliverablesWorkspace() {
   const [error, setError] = useState("");
   const [feedback, setFeedback] = useState({ state: "idle" as "idle" | "success" | "error", message: "" });
   const [saving, setSaving] = useState("");
+  const deliverableLoadSequence = useRef(0);
 
   async function loadEngagements(preferred = "") {
     setLoading(true); setError("");
@@ -151,17 +152,24 @@ export default function BlueprintDeliverablesWorkspace() {
     finally { setLoading(false); }
   }
 
-  async function loadDeliverables(id: string) {
+  async function loadDeliverables(id: string, options: { rethrow?: boolean } = {}) {
+    const sequence = ++deliverableLoadSequence.current;
     setError("");
     try {
       const response = await fetch(`/api/operator/blueprints/${encodeURIComponent(id)}/deliverables`, { cache: "no-store" });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.error || "Deliverable authority unavailable");
+      if (sequence !== deliverableLoadSequence.current) return false;
       const next = Array.isArray(body.deliverables) ? body.deliverables : [];
       setItems(next);
       setDrafts(Object.fromEntries(PUBLIC_DELIVERABLES.map((descriptor) => [descriptor.id, draftFrom(activeVersion(next, descriptor.id))])));
       setReviewInputs({});
-    } catch (cause: any) { setError(operatorLoadError(cause)); }
+      return true;
+    } catch (cause: any) {
+      if (sequence === deliverableLoadSequence.current) setError(operatorLoadError(cause));
+      if (options.rethrow && sequence === deliverableLoadSequence.current) throw cause;
+      return false;
+    }
   }
 
   useEffect(() => { void loadEngagements(); }, []);
@@ -182,7 +190,9 @@ export default function BlueprintDeliverablesWorkspace() {
     const item = activeVersion(items, descriptor.id);
     const draft = drafts[descriptor.id] || emptyDraft;
     const review = reviewInputs[descriptor.id] || { reason: "", evidenceRef: "" };
-    const validation = action === "RECORD_QUALITY_REVIEW" ? "" : draftValidation(draft);
+    const validation = action === "RECORD_QUALITY_REVIEW"
+      ? (!review.reason.trim() ? "Review reason is required before recording quality review." : !review.evidenceRef.trim() ? "Review evidence reference is required before recording quality review." : "")
+      : draftValidation(draft);
     if (validation) { setFeedback({ state: "error", message: validation }); return; }
     setSaving(descriptor.id); setFeedback({ state: "idle", message: "" });
     const data = action === "RECORD_QUALITY_REVIEW" ? { identifier: descriptor.id, expectedDraftVersion: item?.version, reason: review.reason, evidenceRef: review.evidenceRef } : {
@@ -201,7 +211,8 @@ export default function BlueprintDeliverablesWorkspace() {
       const response = await fetch(`/api/operator/blueprints/${encodeURIComponent(selectedId)}/deliverables/commands`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ expectedVersion: item?.recordVersion ?? 0, command: action, data }) });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.error || "Deliverable save failed");
-      await loadDeliverables(selectedId);
+      const refreshed = await loadDeliverables(selectedId, { rethrow: true });
+      if (!refreshed) throw new Error("The engagement changed while saving; select it again before retrying.");
       setFeedback({ state: "success", message: `${descriptor.label} saved and refreshed from durable authority.` });
     } catch (cause: any) {
       setFeedback({ state: "error", message: `${String(cause?.message || "Deliverable save failed")}. Your entered values remain in this form; refresh only when you are ready to discard them.` });
@@ -214,7 +225,7 @@ export default function BlueprintDeliverablesWorkspace() {
     {!loading && error && /session|sign in/i.test(error) ? <a href="/api/operator/auth/login?returnTo=%2Foperator%2Fblueprints">Sign in again</a> : null}
     {!loading && !error && !selected ? <p>No verified Blueprint engagement is available.</p> : null}
     {selected ? <>
-      <div className="blueprintDeliverableContext"><label>Engagement<select value={selectedId} onChange={(event) => { setSelectedId(event.target.value); void loadDeliverables(event.target.value); }}>{engagements.map((entry) => <option key={entry.id} value={entry.id}>{entry.buyerEvidence?.name || entry.buyerEvidence?.email || entry.id} · {entry.id}</option>)}</select></label><span>Preparation reviewed: {reviewedCount}/6 ({Math.round((reviewedCount / 6) * 100)}%)</span><span>Next action: {nextAction}</span></div>
+      <div className="blueprintDeliverableContext"><label>Engagement<select value={selectedId} onChange={(event) => { setSelectedId(event.target.value); setItems([]); setDrafts({}); setReviewInputs({}); setError(""); void loadDeliverables(event.target.value); }}>{engagements.map((entry) => <option key={entry.id} value={entry.id}>{entry.buyerEvidence?.name || entry.buyerEvidence?.email || entry.id} · {entry.id}</option>)}</select></label><span>Preparation reviewed: {reviewedCount}/6 ({Math.round((reviewedCount / 6) * 100)}%)</span><span>Next action: {nextAction}</span></div>
       {feedback.message ? <div className={`blueprintAlert ${feedback.state === "error" ? "blueprintAlertError" : "blueprintAlertSuccess"}`} role={feedback.state === "error" ? "alert" : "status"}>{feedback.message}</div> : null}
       <div className="blueprintDeliverableList">
         {PUBLIC_DELIVERABLES.map((descriptor) => {
