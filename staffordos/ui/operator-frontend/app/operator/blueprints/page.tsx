@@ -1,4 +1,5 @@
 import BlueprintOnboardingWorkspace from "./BlueprintOnboardingWorkspace";
+import BlueprintDeliverablesWorkspace from "./BlueprintDeliverablesWorkspace";
 
 export default function BlueprintOnboardingPage() {
   return (
@@ -9,6 +10,7 @@ export default function BlueprintOnboardingPage() {
         <p>Review verified purchases and move one engagement through the approved onboarding gates. Website inquiries and outbound prospects remain separate.</p>
       </div>
       <BlueprintOnboardingWorkspace />
+      <BlueprintDeliverablesWorkspace />
     </main>
   );
 }

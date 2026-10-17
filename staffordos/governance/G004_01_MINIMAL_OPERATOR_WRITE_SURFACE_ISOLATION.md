@@ -35,6 +35,7 @@ No write route was invoked. No server action was invoked. No private Career or J
 | `G004-API-004` | `app/api/operator/lead-registry/action/route.ts` | Guarded before request-body parsing |
 | `G004-API-005` | `app/api/proof/abando-recovery/run/route.ts` | Guarded before environment-file reads, worker execution, and proof writes |
 | `G004-API-006` | `app/api/operator/blueprints/[engagementId]/commands/route.ts` | Guarded before onboarding command forwarding |
+| `G004-API-007` | `app/api/operator/blueprints/[engagementId]/deliverables/commands/route.ts` | Guarded before deliverable command parsing/forwarding; only Step 5A drafting and quality-review commands |
 
 ### Server Actions
 

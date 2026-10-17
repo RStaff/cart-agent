@@ -104,6 +104,11 @@
       "surfaceId": "G004-API-005",
       "file": "staffordos/ui/operator-frontend/app/api/proof/abando-recovery/run/route.ts",
       "guardedBefore": "environment-file reads, worker execution, and proof writes"
+    },
+    {
+      "surfaceId": "G004-API-007",
+      "file": "staffordos/ui/operator-frontend/app/api/operator/blueprints/[engagementId]/deliverables/commands/route.ts",
+      "guardedBefore": "deliverable command parsing and forwarding; only REGISTER_DRAFT, REVISE_DRAFT, and RECORD_QUALITY_REVIEW"
     }
   ],
   "serverActionCoverage": [
