@@ -95,4 +95,6 @@ test("deliverable selection and refresh are request-bound and review evidence is
   assert.match(deliverablesWorkspace, /setDrafts\(\(current\) => options\.preserveDrafts/);
   assert.match(deliverablesWorkspace, /if \(saving\) return/);
   assert.match(deliverablesWorkspace, /disabled=\{Boolean\(saving\)\}/);
+  assert.match(deliverablesWorkspace, /setReviewInputs\(\(current\) => \(\{ \.\.\.current, \[descriptor\.id\]: \{ reason: "", evidenceRef: "" \} \}\)\)/);
+  assert.match(deliverablesWorkspace, /<fieldset disabled=\{Boolean\(saving\)\}>/);
 });
