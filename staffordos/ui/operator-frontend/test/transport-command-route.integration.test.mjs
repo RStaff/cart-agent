@@ -53,6 +53,15 @@ test("actual Next command route accepts governed transport before session author
     assert.equal(response.status, 401);
     assert.equal(body.error, "OPERATOR_SESSION_MISSING");
 
+    const deliverableResponse = await fetch(`${base}/api/operator/blueprints/synthetic/deliverables/commands`, {
+      method: "POST",
+      headers: { Host: `127.0.0.1:${port}`, Origin: base, "content-type": "application/json" },
+      body: JSON.stringify({ expectedVersion: 0, command: "REGISTER_DRAFT", data: { identifier: "workflow_interview_current_state_map" } }),
+    });
+    const deliverableBody = await deliverableResponse.json();
+    assert.equal(deliverableResponse.status, 401);
+    assert.equal(deliverableBody.error, "OPERATOR_SESSION_MISSING");
+
     const spoofed = await fetch(`${base}/api/operator/blueprints/synthetic/commands`, {
       method: "POST",
       headers: { Host: `127.0.0.1:${port}`, Origin: base, "x-forwarded-for": "127.0.0.1", "content-type": "application/json" },
@@ -61,6 +70,15 @@ test("actual Next command route accepts governed transport before session author
     const spoofedBody = await spoofed.json();
     assert.equal(spoofed.status, 400);
     assert.equal(spoofedBody.error, "INCOMING_FORWARDING_HEADERS_REJECTED");
+
+    const spoofedDeliverable = await fetch(`${base}/api/operator/blueprints/synthetic/deliverables/commands`, {
+      method: "POST",
+      headers: { Host: `127.0.0.1:${port}`, Origin: base, "x-forwarded-for": "127.0.0.1", "content-type": "application/json" },
+      body: JSON.stringify({ expectedVersion: 0, command: "REGISTER_DRAFT", data: { identifier: "workflow_interview_current_state_map" } }),
+    });
+    const spoofedDeliverableBody = await spoofedDeliverable.json();
+    assert.equal(spoofedDeliverable.status, 400);
+    assert.equal(spoofedDeliverableBody.error, "INCOMING_FORWARDING_HEADERS_REJECTED");
   } finally {
     child.kill("SIGTERM");
   }
