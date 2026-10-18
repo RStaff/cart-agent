@@ -30,7 +30,7 @@ test("package route requires disposable database and covers snapshot/release/del
   const isolated = await prisma.staffordosBlueprintEngagement.create({ data: { offerId: "stafford_media_automation_opportunity_blueprint_v1", stripeSessionId: `cs_step5c_isolated_${suffix}`, stripePaymentLinkId: "plink_1UJacwJyylmUTExqQDaNV1dB", stripeProductId: "prod_VKF6B7HLG2L0tQ", stripePriceId: "price_1UJacYJyylmUTExqBGErXBxb", amountTotal: 75000, currency: "usd", quantity: 1, buyerEmail: "synthetic-step5c-isolated@example.test", paidAt: new Date(), onboarding: { create: {} }, paymentEvent: { create: { stripeEventId: `evt_step5c_isolated_${suffix}`, stripeSessionId: `cs_step5c_isolated_${suffix}`, stripeEventType: "checkout.session.completed", livemode: true, providerCreatedAt: new Date(), receivedAt: new Date() } } } });
   const baseline = await prisma.staffordosBlueprintEngagement.findUnique({ where: { id: engagement.id }, include: { paymentEvent: true, onboarding: true } });
   await prisma.staffordosBlueprintDeliverable.createMany({ data: IDS.map((identifier, index) => ({ engagementId: engagement.id, identifier, version: 1, recordVersion: 2, status: "reviewed", owner: "Synthetic owner", contents: { finding: `Synthetic finding ${index}` }, evidenceRefs: [{ ref: `evidence://step5c/${identifier}` }], claimClassifications: [{ classification: "OBSERVED", claim: "Synthetic fixture" }], limitations: [], qualityReviewEvidenceRef: `review://step5c/${identifier}` })) });
-  const app = express(); app.use(express.json()); installBlueprintPackageRoutes(app, { prisma });
+  const app = express(); app.use(express.json()); const fixedNow = new Date("2026-10-18T16:00:00.000Z"); installBlueprintPackageRoutes(app, { prisma, now: () => fixedNow });
   const server = await new Promise((resolve) => { const value = app.listen(0, "127.0.0.1", () => resolve(value)); });
   try {
     const base = `http://127.0.0.1:${server.address().port}`;
@@ -39,6 +39,13 @@ test("package route requires disposable database and covers snapshot/release/del
     const previewBody = await response.json();
     assert.equal(previewBody.package.sourceVersions.length, 6);
     assert.doesNotMatch(previewBody.package.renderedHtml, new RegExp(engagement.id));
+    const latestRead = await fetch(`${base}/api/staffordos/blueprint-engagements/${engagement.id}/package`, { headers: AUTH });
+    const latestBody = await latestRead.json();
+    assert.equal(latestRead.status, 200);
+    assert.equal(latestBody.package.id, previewBody.package.id);
+    assert.equal(Object.hasOwn(latestBody.package, "releasedBy"), false);
+    assert.equal(Object.hasOwn(latestBody.package.auditEvents[0], "actorSubject"), false);
+    assert.equal(Object.hasOwn(latestBody.package.auditEvents[0], "payload"), false);
     const crossRead = await fetch(`${base}/api/staffordos/blueprint-engagements/${isolated.id}/package/${previewBody.package.id}`, { headers: AUTH });
     assert.equal(crossRead.status, 404);
     const replay = await fetch(`${base}/api/staffordos/blueprint-engagements/${engagement.id}/package/commands`, { method: "POST", headers: AUTH, body: JSON.stringify({ command: "CREATE_PREVIEW_SNAPSHOT", data: { idempotencyKey: "preview", reason: "synthetic", evidenceRef: "evidence://synthetic" } }) });
@@ -47,9 +54,11 @@ test("package route requires disposable database and covers snapshot/release/del
     assert.equal(missingInspection.status, 409);
     const release = await fetch(`${base}/api/staffordos/blueprint-engagements/${engagement.id}/package/commands`, { method: "POST", headers: AUTH, body: JSON.stringify({ command: "RELEASE_PACKAGE", data: { snapshotId: previewBody.package.id, contentDigest: previewBody.package.contentDigest, inspectionSnapshotId: previewBody.package.id, inspectionDigest: previewBody.package.contentDigest, inspectionConfirmed: true, idempotencyKey: "release", reason: "synthetic", evidenceRef: "evidence://release" } }) });
     assert.equal(release.status, 200);
-    const delivery = await fetch(`${base}/api/staffordos/blueprint-engagements/${engagement.id}/package/commands`, { method: "POST", headers: AUTH, body: JSON.stringify({ command: "RECORD_DELIVERY", data: { snapshotId: previewBody.package.id, idempotencyKey: "delivery", reason: "synthetic", evidenceRef: "handoff://synthetic", recipient: "synthetic-recipient@example.test", channel: "MANUAL_EMAIL", recipientVerified: true, handoffAt: "2026-10-18T15:00:00.000Z" } }) });
+    const invalidDelivery = await fetch(`${base}/api/staffordos/blueprint-engagements/${engagement.id}/package/commands`, { method: "POST", headers: AUTH, body: JSON.stringify({ command: "RECORD_DELIVERY", data: { snapshotId: previewBody.package.id, idempotencyKey: "delivery-invalid", reason: "synthetic", evidenceRef: "handoff://invalid", recipient: "synthetic-recipient@example.test", channel: "MANUAL_EMAIL", recipientVerified: true, handoffAt: "2026-10-18T00:00:00.000Z" } }) });
+    assert.equal(invalidDelivery.status, 400);
+    const delivery = await fetch(`${base}/api/staffordos/blueprint-engagements/${engagement.id}/package/commands`, { method: "POST", headers: AUTH, body: JSON.stringify({ command: "RECORD_DELIVERY", data: { snapshotId: previewBody.package.id, idempotencyKey: "delivery", reason: "synthetic", evidenceRef: "handoff://synthetic", recipient: "synthetic-recipient@example.test", channel: "MANUAL_EMAIL", recipientVerified: true, handoffAt: "2026-10-18T16:00:00.000Z" } }) });
     assert.equal(delivery.status, 200);
-    const deliveryReplay = await fetch(`${base}/api/staffordos/blueprint-engagements/${engagement.id}/package/commands`, { method: "POST", headers: AUTH, body: JSON.stringify({ command: "RECORD_DELIVERY", data: { snapshotId: previewBody.package.id, idempotencyKey: "delivery", reason: "synthetic", evidenceRef: "handoff://synthetic", recipient: "synthetic-recipient@example.test", channel: "MANUAL_EMAIL", recipientVerified: true, handoffAt: "2026-10-18T15:00:00.000Z" } }) });
+    const deliveryReplay = await fetch(`${base}/api/staffordos/blueprint-engagements/${engagement.id}/package/commands`, { method: "POST", headers: AUTH, body: JSON.stringify({ command: "RECORD_DELIVERY", data: { snapshotId: previewBody.package.id, idempotencyKey: "delivery", reason: "synthetic", evidenceRef: "handoff://synthetic", recipient: "synthetic-recipient@example.test", channel: "MANUAL_EMAIL", recipientVerified: true, handoffAt: "2026-10-18T16:00:00.000Z" } }) });
     assert.equal(deliveryReplay.status, 200);
     const secondPreview = await fetch(`${base}/api/staffordos/blueprint-engagements/${engagement.id}/package/commands`, { method: "POST", headers: AUTH, body: JSON.stringify({ command: "CREATE_PREVIEW_SNAPSHOT", data: { idempotencyKey: "preview-second", reason: "synthetic", evidenceRef: "evidence://synthetic" } }) });
     assert.equal(secondPreview.status, 200);

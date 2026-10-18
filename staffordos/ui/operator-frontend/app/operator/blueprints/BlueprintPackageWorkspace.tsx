@@ -32,6 +32,7 @@ export default function BlueprintPackageWorkspace() {
     if (!engagementId && next[0]?.id) setEngagementId(next[0].id);
   }
   useEffect(() => { void loadEngagements().catch((error) => setMessage(error.message)); }, []);
+  useEffect(() => { if (engagementId) void inspect("").catch((error) => setMessage(error.message)); }, [engagementId]);
 
   async function command(action: string, data: Record<string, unknown> = {}) {
     if (!engagementId) return;
@@ -45,7 +46,7 @@ export default function BlueprintPackageWorkspace() {
     finally { setBusy(""); }
   }
   async function inspect(id: string) {
-    if (!engagementId || !id) return;
+    if (!engagementId) return;
     const response = await fetch(`/api/operator/blueprints/${encodeURIComponent(engagementId)}/package/${encodeURIComponent(id)}`, { cache: "no-store" });
     const body = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(body.error || "Package unavailable");
@@ -60,7 +61,7 @@ export default function BlueprintPackageWorkspace() {
     {message ? <div role="status" className="blueprintAlert">{message}</div> : null}
     {snapshot ? <div className="blueprintPackageInspection"><h3>Snapshot inspection</h3><p>Snapshot {snapshot.id} · {snapshot.status} · digest {snapshot.contentDigest}</p><iframe title="Sanitized Blueprint package preview" sandbox="" srcDoc={snapshot.renderedHtml} className="blueprintPackagePreview" />
       {snapshot.status === "preview" ? <button type="button" disabled={Boolean(busy)} onClick={() => void command("RELEASE_PACKAGE", { snapshotId: snapshot.id, contentDigest: snapshot.contentDigest, inspectionSnapshotId: snapshot.id, inspectionDigest: snapshot.contentDigest, inspectionConfirmed: true, idempotencyKey: `release-${snapshot.id}` })}>Release inspected snapshot</button> : null}
-      {snapshot.status === "released" ? <fieldset><legend>Record manual delivery</legend><label>Verified recipient<input value={recipient} onChange={(event) => setRecipient(event.target.value)} /></label><label>Channel<select value={channel} onChange={(event) => setChannel(event.target.value)}><option value="MANUAL_EMAIL">Manual email</option><option value="MANUAL_SHARED_LINK">Manual shared link</option><option value="MANUAL_IN_PERSON">Manual in-person handoff</option></select></label><label><input type="checkbox" checked={recipientVerified} onChange={(event) => setRecipientVerified(event.target.checked)} /> I verified this recipient through the approved operating process</label><label>Handoff time<input type="datetime-local" value={handoffAt} onChange={(event) => setHandoffAt(event.target.value)} /></label><label>Handoff evidence reference<input value={evidenceRef} onChange={(event) => setEvidenceRef(event.target.value)} /></label><button type="button" disabled={Boolean(busy)} onClick={() => { if (!recipient.trim() || !recipientVerified || !handoffAt || !evidenceRef.trim()) { setMessage("Recipient, verification, handoff time, and evidence are required. No delivery was recorded."); return; } void command("RECORD_DELIVERY", { snapshotId: snapshot.id, recipient, channel, recipientVerified, handoffAt, evidenceRef, idempotencyKey: `delivery-${snapshot.id}-${recipient}` }); }}>Record actual handoff</button></fieldset> : null}
+      {snapshot.status === "released" ? <fieldset><legend>Record manual delivery</legend><label>Verified recipient<input value={recipient} onChange={(event) => setRecipient(event.target.value)} /></label><label>Channel<select value={channel} onChange={(event) => setChannel(event.target.value)}><option value="MANUAL_EMAIL">Manual email</option><option value="MANUAL_SHARED_LINK">Manual shared link</option><option value="MANUAL_IN_PERSON">Manual in-person handoff</option></select></label><label><input type="checkbox" checked={recipientVerified} onChange={(event) => setRecipientVerified(event.target.checked)} /> I verified this recipient through the approved operating process</label><label>Handoff time<input type="datetime-local" value={handoffAt} onChange={(event) => setHandoffAt(event.target.value)} /></label><label>Handoff evidence reference<input value={evidenceRef} onChange={(event) => setEvidenceRef(event.target.value)} /></label><button type="button" disabled={Boolean(busy)} onClick={() => { if (!recipient.trim() || !recipientVerified || !handoffAt || !evidenceRef.trim()) { setMessage("Recipient, verification, handoff time, and evidence are required. No delivery was recorded."); return; } const absoluteHandoffAt = new Date(handoffAt).toISOString(); void command("RECORD_DELIVERY", { snapshotId: snapshot.id, recipient, channel, recipientVerified, handoffAt: absoluteHandoffAt, evidenceRef, idempotencyKey: `delivery-${snapshot.id}-${Date.now()}` }); }}>Record actual handoff</button></fieldset> : null}
     </div> : null}
   </section>;
 }

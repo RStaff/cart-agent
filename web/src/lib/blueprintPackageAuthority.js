@@ -83,7 +83,7 @@ export function createBlueprintPackageAuthority({ prisma, now = () => new Date()
   const sourceTuple = (rows) => rows.map((item) => ({ id: item.id, identifier: item.identifier, version: item.version, recordVersion: item.recordVersion, contentDigest: digest(stable({ owner: item.owner, contents: item.contents, evidenceRefs: item.evidenceRefs, claimClassifications: item.claimClassifications, limitations: item.limitations })) }));
   const audit = ({ packageId, engagementId, sequence, action, previousStatus, nextStatus, actorSubject, reasonText, evidenceRef, payload }) => ({ packageId, engagementId, sequence, action, previousStatus, nextStatus, actorSubject, reason: reasonText, evidenceRef, payload });
   async function readSnapshot({ engagementId, snapshotId }) {
-    const packageRow = await prisma.staffordosBlueprintPackage.findFirst({ where: { id: snapshotId, engagementId }, include: { auditEvents: { orderBy: { sequence: "asc" } }, deliveries: { orderBy: { createdAt: "asc" } } } });
+    const packageRow = await prisma.staffordosBlueprintPackage.findFirst({ where: { ...(snapshotId ? { id: snapshotId } : {}), engagementId }, orderBy: { packageVersion: "desc" }, select: { id: true, engagementId: true, packageVersion: true, status: true, sourceVersions: true, rendererVersion: true, templateDigest: true, assetDigest: true, renderedHtml: true, contentDigest: true, recordVersion: true, releasedAt: true, createdAt: true, updatedAt: true, auditEvents: { orderBy: { sequence: "asc" }, select: { id: true, sequence: true, action: true, previousStatus: true, nextStatus: true, reason: true, evidenceRef: true, createdAt: true } }, deliveries: { orderBy: { createdAt: "asc" }, select: { id: true, recipient: true, channel: true, handoffAt: true, evidenceRef: true, verified: true, createdAt: true } } } });
     if (!packageRow) throw new BlueprintPackageError("BLUEPRINT_PACKAGE_NOT_FOUND", 404);
     return { package: packageRow };
   }
@@ -103,7 +103,7 @@ export function createBlueprintPackageAuthority({ prisma, now = () => new Date()
         const created = await tx.staffordosBlueprintPackage.create({ data: { engagementId: id, packageVersion, sourceVersions, rendererVersion: BLUEPRINT_PACKAGE_RENDERER_VERSION, templateDigest: digest("stafford-media-blueprint-template-v1"), assetDigest: digest(""), renderedHtml, contentDigest, creationIdempotencyKey: idem } });
         await tx.staffordosBlueprintPackageAuditEvent.create({ data: audit({ packageId: created.id, engagementId: id, sequence: 1, action: "CREATE_PREVIEW_SNAPSHOT", previousStatus: "NONE", nextStatus: "preview", actorSubject: operator.subject, reasonText, evidenceRef, payload: { sourceVersions } }) });
         return { package: created };
-      });
+      }, { isolationLevel: "Serializable" });
     },
     async read({ engagementId, snapshotId }) { return readSnapshot({ engagementId: clean(engagementId, 100), snapshotId: clean(snapshotId, 100) }); },
     async execute({ engagementId, actor: rawActor, command, data }) {
@@ -119,12 +119,12 @@ export function createBlueprintPackageAuthority({ prisma, now = () => new Date()
           const updated = await tx.staffordosBlueprintPackage.updateMany({ where: { id: snapshotId, engagementId: id, status: "preview", recordVersion: packageRow.recordVersion }, data: { status: "released", releasedAt: now(), releasedBy: operator.subject, releaseIdempotencyKey: idem, recordVersion: { increment: 1 } } }); if (updated.count !== 1) throw new BlueprintPackageError("BLUEPRINT_PACKAGE_STALE", 409);
           const released = await tx.staffordosBlueprintPackage.findUnique({ where: { id: snapshotId } }); await tx.staffordosBlueprintPackageAuditEvent.create({ data: audit({ packageId: snapshotId, engagementId: id, sequence: released.recordVersion, action: commandName, previousStatus: "preview", nextStatus: "released", actorSubject: operator.subject, reasonText, evidenceRef, payload: { contentDigest: released.contentDigest, inspectedSnapshotId: inspectedId, inspectedDigest } }) }); return { package: released };
         }
-        const idem = idempotency(data?.idempotencyKey); const recipient = clean(data?.recipient, 320); const channel = clean(data?.channel, 100); const handoffAt = new Date(data?.handoffAt || ""); if (!recipient || !MANUAL_CHANNELS.has(channel) || !data?.recipientVerified || !evidenceRef || Number.isNaN(handoffAt.getTime())) throw new BlueprintPackageError("BLUEPRINT_DELIVERY_HANDOFF_INVALID");
+        const idem = idempotency(data?.idempotencyKey); const recipient = clean(data?.recipient, 320); const channel = clean(data?.channel, 100); const handoffAt = new Date(data?.handoffAt || ""); const currentTime = now(); if (!recipient || !MANUAL_CHANNELS.has(channel) || !data?.recipientVerified || !evidenceRef || Number.isNaN(handoffAt.getTime()) || !packageRow.releasedAt || handoffAt < packageRow.releasedAt || handoffAt > currentTime) throw new BlueprintPackageError("BLUEPRINT_DELIVERY_HANDOFF_INVALID");
         const existing = await tx.staffordosBlueprintDelivery.findUnique({ where: { idempotencyKey: idem } }); if (existing) { if (existing.engagementId !== id || existing.packageId !== snapshotId) throw new BlueprintPackageError("BLUEPRINT_DELIVERY_IDEMPOTENCY_CONFLICT", 409); return { delivery: existing, package: packageRow }; } if (packageRow.status !== "released") throw new BlueprintPackageError("BLUEPRINT_DELIVERY_RELEASE_REQUIRED", 409);
         const advanced = await tx.staffordosBlueprintPackage.updateMany({ where: { id: snapshotId, engagementId: id, status: "released", recordVersion: packageRow.recordVersion }, data: { recordVersion: { increment: 1 } } }); if (advanced.count !== 1) throw new BlueprintPackageError("BLUEPRINT_PACKAGE_STALE", 409);
         const delivery = await tx.staffordosBlueprintDelivery.create({ data: { packageId: snapshotId, engagementId: id, recipient, channel, handoffAt, evidenceRef, verified: true, actorSubject: operator.subject, idempotencyKey: idem } });
         await tx.staffordosBlueprintPackageAuditEvent.create({ data: audit({ packageId: snapshotId, engagementId: id, sequence: packageRow.recordVersion + 1, action: commandName, previousStatus: "released", nextStatus: "released", actorSubject: operator.subject, reasonText, evidenceRef, payload: { deliveryId: delivery.id, recipient, channel, handoffAt: handoffAt.toISOString() } }) }); return { delivery, package: { ...packageRow, recordVersion: packageRow.recordVersion + 1 } };
-      });
+      }, { isolationLevel: "Serializable" });
     },
   };
 }

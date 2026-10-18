@@ -13,13 +13,16 @@ function bounded(req, res, next) {
 }
 function failure(res, error) {
   if (error instanceof BlueprintPackageError) return res.status(error.status).json({ ok: false, error: error.code });
+  if (error?.code === "P2034") return res.status(409).json({ ok: false, error: "BLUEPRINT_PACKAGE_STALE" });
   console.error("[staffordos:blueprint-package] operation failed", error?.message || String(error));
   return res.status(503).json({ ok: false, error: "BLUEPRINT_PACKAGE_STORAGE_UNAVAILABLE" });
 }
 export function installBlueprintPackageRoutes(app, { prisma, now } = {}) {
   const authority = createBlueprintPackageAuthority({ prisma, now });
   const base = "/api/staffordos/blueprint-engagements/:engagementId/package";
-  app.get(`${base}/:snapshotId`, internalOnly, governedOperator, async (req, res) => { try { return res.status(200).json({ ok: true, ...(await authority.read({ engagementId: req.params.engagementId, snapshotId: req.params.snapshotId })) }); } catch (error) { return failure(res, error); } });
+  const read = async (req, res) => { try { return res.status(200).json({ ok: true, ...(await authority.read({ engagementId: req.params.engagementId, snapshotId: req.params.snapshotId })) }); } catch (error) { return failure(res, error); } };
+  app.get(base, internalOnly, governedOperator, read);
+  app.get(`${base}/:snapshotId`, internalOnly, governedOperator, read);
   app.post(`${base}/commands`, internalOnly, governedOperator, bounded, async (req, res) => { try { return res.status(200).json({ ok: true, ...(await authority.execute({ engagementId: req.params.engagementId, command: req.body?.command, data: req.body?.data, actor: req.blueprintPackageActor })) }); } catch (error) { return failure(res, error); } });
   return { base, permission: BLUEPRINT_PACKAGE_PERMISSION, maxCommandBytes: MAX_COMMAND_BYTES };
 }
