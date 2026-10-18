@@ -80,6 +80,9 @@ export function createBlueprintPackageAuthority({ prisma, now = () => new Date()
     }
     return rows;
   };
+  const lockDeliverables = async (tx, engagementId) => {
+    await tx.$queryRaw`SELECT "id" FROM "StaffordosBlueprintDeliverable" WHERE "engagementId" = ${engagementId} FOR SHARE`;
+  };
   const sourceTuple = (rows) => rows.map((item) => ({ id: item.id, identifier: item.identifier, version: item.version, recordVersion: item.recordVersion, contentDigest: digest(stable({ owner: item.owner, contents: item.contents, evidenceRefs: item.evidenceRefs, claimClassifications: item.claimClassifications, limitations: item.limitations })) }));
   const audit = ({ packageId, engagementId, sequence, action, previousStatus, nextStatus, actorSubject, reasonText, evidenceRef, payload }) => ({ packageId, engagementId, sequence, action, previousStatus, nextStatus, actorSubject, reason: reasonText, evidenceRef, payload });
   async function readSnapshot({ engagementId, snapshotId }) {
@@ -98,7 +101,7 @@ export function createBlueprintPackageAuthority({ prisma, now = () => new Date()
           return { package: existing };
         }
         if (!await tx.staffordosBlueprintEngagement.findUnique({ where: { id }, select: { id: true } })) throw new BlueprintPackageError("BLUEPRINT_ENGAGEMENT_NOT_FOUND", 404);
-        const rows = await latestReviewed(tx, id); const sourceVersions = sourceTuple(rows); const last = await tx.staffordosBlueprintPackage.findFirst({ where: { engagementId: id }, orderBy: { packageVersion: "desc" }, select: { packageVersion: true } }); const packageVersion = (last?.packageVersion || 0) + 1; const renderedHtml = renderBlueprintPackageHtml({ packageVersion, deliverables: rows });
+        await lockDeliverables(tx, id); const rows = await latestReviewed(tx, id); const sourceVersions = sourceTuple(rows); const last = await tx.staffordosBlueprintPackage.findFirst({ where: { engagementId: id }, orderBy: { packageVersion: "desc" }, select: { packageVersion: true } }); const packageVersion = (last?.packageVersion || 0) + 1; const renderedHtml = renderBlueprintPackageHtml({ packageVersion, deliverables: rows });
         const contentDigest = digest(renderedHtml);
         const created = await tx.staffordosBlueprintPackage.create({ data: { engagementId: id, packageVersion, sourceVersions, rendererVersion: BLUEPRINT_PACKAGE_RENDERER_VERSION, templateDigest: digest("stafford-media-blueprint-template-v1"), assetDigest: digest(""), renderedHtml, contentDigest, creationIdempotencyKey: idem } });
         await tx.staffordosBlueprintPackageAuditEvent.create({ data: audit({ packageId: created.id, engagementId: id, sequence: 1, action: "CREATE_PREVIEW_SNAPSHOT", previousStatus: "NONE", nextStatus: "preview", actorSubject: operator.subject, reasonText, evidenceRef, payload: { sourceVersions } }) });
@@ -115,7 +118,7 @@ export function createBlueprintPackageAuthority({ prisma, now = () => new Date()
         if (commandName === "RELEASE_PACKAGE") {
           const idem = idempotency(data?.idempotencyKey); const suppliedDigest = clean(data?.contentDigest, 128); const inspectedId = clean(data?.inspectionSnapshotId, 100); const inspectedDigest = clean(data?.inspectionDigest, 128); if (data?.inspectionConfirmed !== true || inspectedId !== snapshotId || !suppliedDigest || suppliedDigest !== packageRow.contentDigest || inspectedDigest !== packageRow.contentDigest) throw new BlueprintPackageError("BLUEPRINT_PACKAGE_INSPECTION_REQUIRED", 409); if (packageRow.status === "released" && packageRow.releaseIdempotencyKey === idem) return { package: packageRow };
           if (packageRow.status !== "preview") throw new BlueprintPackageError("BLUEPRINT_PACKAGE_ALREADY_RELEASED", 409);
-          const rows = await latestReviewed(tx, id); const current = sourceTuple(rows); if (stable(current) !== stable(packageRow.sourceVersions)) throw new BlueprintPackageError("BLUEPRINT_PACKAGE_STALE", 409);
+          await lockDeliverables(tx, id); const rows = await latestReviewed(tx, id); const current = sourceTuple(rows); if (stable(current) !== stable(packageRow.sourceVersions)) throw new BlueprintPackageError("BLUEPRINT_PACKAGE_STALE", 409);
           const updated = await tx.staffordosBlueprintPackage.updateMany({ where: { id: snapshotId, engagementId: id, status: "preview", recordVersion: packageRow.recordVersion }, data: { status: "released", releasedAt: now(), releasedBy: operator.subject, releaseIdempotencyKey: idem, recordVersion: { increment: 1 } } }); if (updated.count !== 1) throw new BlueprintPackageError("BLUEPRINT_PACKAGE_STALE", 409);
           const released = await tx.staffordosBlueprintPackage.findUnique({ where: { id: snapshotId } }); await tx.staffordosBlueprintPackageAuditEvent.create({ data: audit({ packageId: snapshotId, engagementId: id, sequence: released.recordVersion, action: commandName, previousStatus: "preview", nextStatus: "released", actorSubject: operator.subject, reasonText, evidenceRef, payload: { contentDigest: released.contentDigest, inspectedSnapshotId: inspectedId, inspectedDigest } }) }); return { package: released };
         }

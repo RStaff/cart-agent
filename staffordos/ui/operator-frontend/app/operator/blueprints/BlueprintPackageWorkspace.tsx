@@ -22,6 +22,8 @@ export default function BlueprintPackageWorkspace() {
   const [recipientVerified, setRecipientVerified] = useState(false);
   const [handoffAt, setHandoffAt] = useState("");
   const [evidenceRef, setEvidenceRef] = useState("");
+  const [deliveryIdempotencyKey, setDeliveryIdempotencyKey] = useState("");
+  const clearDelivery = () => { setRecipient(""); setChannel("MANUAL_EMAIL"); setRecipientVerified(false); setHandoffAt(""); setEvidenceRef(""); setDeliveryIdempotencyKey(""); };
 
   async function loadEngagements() {
     const response = await fetch("/api/operator/blueprints", { cache: "no-store" });
@@ -35,19 +37,19 @@ export default function BlueprintPackageWorkspace() {
   useEffect(() => { if (engagementId) void inspect("").catch((error) => setMessage(error.message)); }, [engagementId]);
 
   async function command(action: string, data: Record<string, unknown> = {}) {
-    if (!engagementId) return;
+    if (!engagementId) return false;
     setBusy(action); setMessage("");
     try {
       const response = await fetch(`/api/operator/blueprints/${encodeURIComponent(engagementId)}/package/commands`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ command: action, data: { idempotencyKey: `${action}-${engagementId}-${Date.now()}`, reason: `Step 5 package ${action}`, evidenceRef: evidenceRef || "operator://package-review", ...data } }) });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.error || "Package command failed");
-      setSnapshot(body.package || snapshot); setMessage(action === "CREATE_PREVIEW_SNAPSHOT" ? "Immutable preview created. Inspect it before release." : `${action} recorded.`);
-    } catch (error: any) { setMessage(`${error.message}. No delivery was sent.`); }
+      setSnapshot(body.package || snapshot); setMessage(action === "CREATE_PREVIEW_SNAPSHOT" ? "Immutable preview created. Inspect it before release." : `${action} recorded.`); return true;
+    } catch (error: any) { setMessage(`${error.message}. No delivery was sent.`); return false; }
     finally { setBusy(""); }
   }
   async function inspect(id: string) {
     if (!engagementId) return;
-    const response = await fetch(`/api/operator/blueprints/${encodeURIComponent(engagementId)}/package/${encodeURIComponent(id)}`, { cache: "no-store" });
+    const response = await fetch(`/api/operator/blueprints/${encodeURIComponent(engagementId)}/package${id ? `?snapshotId=${encodeURIComponent(id)}` : ""}`, { cache: "no-store" });
     const body = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(body.error || "Package unavailable");
     setSnapshot(body.package);
@@ -55,13 +57,13 @@ export default function BlueprintPackageWorkspace() {
 
   return <section className="blueprintPackageWorkspace" aria-labelledby="package-heading">
     <div className="blueprintDeliverablesHeading"><div><p className="operatorShellHeaderLabel">Step 5 package delivery</p><h2 id="package-heading">Inspect and release Blueprint package</h2><p>Release is separate from delivery. No message or client receipt is created here.</p></div></div>
-    <label>Engagement<select value={engagementId} onChange={(event) => { setEngagementId(event.target.value); setSnapshot(null); }}><option value="">Select engagement</option>{engagements.map((entry) => <option key={entry.id} value={entry.id}>{entry.id}</option>)}</select></label>
+    <label>Engagement<select value={engagementId} onChange={(event) => { clearDelivery(); setEngagementId(event.target.value); setSnapshot(null); }}><option value="">Select engagement</option>{engagements.map((entry) => <option key={entry.id} value={entry.id}>{entry.id}</option>)}</select></label>
     <p className="blueprintFieldHint">A preview requires all six exact deliverables to be currently reviewed: {IDS.join(", ")}.</p>
     <button type="button" disabled={!engagementId || Boolean(busy)} onClick={() => void command("CREATE_PREVIEW_SNAPSHOT")}>Create immutable preview</button>
     {message ? <div role="status" className="blueprintAlert">{message}</div> : null}
     {snapshot ? <div className="blueprintPackageInspection"><h3>Snapshot inspection</h3><p>Snapshot {snapshot.id} · {snapshot.status} · digest {snapshot.contentDigest}</p><iframe title="Sanitized Blueprint package preview" sandbox="" srcDoc={snapshot.renderedHtml} className="blueprintPackagePreview" />
       {snapshot.status === "preview" ? <button type="button" disabled={Boolean(busy)} onClick={() => void command("RELEASE_PACKAGE", { snapshotId: snapshot.id, contentDigest: snapshot.contentDigest, inspectionSnapshotId: snapshot.id, inspectionDigest: snapshot.contentDigest, inspectionConfirmed: true, idempotencyKey: `release-${snapshot.id}` })}>Release inspected snapshot</button> : null}
-      {snapshot.status === "released" ? <fieldset><legend>Record manual delivery</legend><label>Verified recipient<input value={recipient} onChange={(event) => setRecipient(event.target.value)} /></label><label>Channel<select value={channel} onChange={(event) => setChannel(event.target.value)}><option value="MANUAL_EMAIL">Manual email</option><option value="MANUAL_SHARED_LINK">Manual shared link</option><option value="MANUAL_IN_PERSON">Manual in-person handoff</option></select></label><label><input type="checkbox" checked={recipientVerified} onChange={(event) => setRecipientVerified(event.target.checked)} /> I verified this recipient through the approved operating process</label><label>Handoff time<input type="datetime-local" value={handoffAt} onChange={(event) => setHandoffAt(event.target.value)} /></label><label>Handoff evidence reference<input value={evidenceRef} onChange={(event) => setEvidenceRef(event.target.value)} /></label><button type="button" disabled={Boolean(busy)} onClick={() => { if (!recipient.trim() || !recipientVerified || !handoffAt || !evidenceRef.trim()) { setMessage("Recipient, verification, handoff time, and evidence are required. No delivery was recorded."); return; } const absoluteHandoffAt = new Date(handoffAt).toISOString(); void command("RECORD_DELIVERY", { snapshotId: snapshot.id, recipient, channel, recipientVerified, handoffAt: absoluteHandoffAt, evidenceRef, idempotencyKey: `delivery-${snapshot.id}-${Date.now()}` }); }}>Record actual handoff</button></fieldset> : null}
+      {snapshot.status === "released" ? <fieldset><legend>Record manual delivery</legend><label>Verified recipient<input value={recipient} onChange={(event) => { setRecipient(event.target.value); setDeliveryIdempotencyKey(""); }} /></label><label>Channel<select value={channel} onChange={(event) => { setChannel(event.target.value); setDeliveryIdempotencyKey(""); }}><option value="MANUAL_EMAIL">Manual email</option><option value="MANUAL_SHARED_LINK">Manual shared link</option><option value="MANUAL_IN_PERSON">Manual in-person handoff</option></select></label><label><input type="checkbox" checked={recipientVerified} onChange={(event) => { setRecipientVerified(event.target.checked); setDeliveryIdempotencyKey(""); }} /> I verified this recipient through the approved operating process</label><label>Handoff time<input type="datetime-local" value={handoffAt} onChange={(event) => { setHandoffAt(event.target.value); setDeliveryIdempotencyKey(""); }} /></label><label>Handoff evidence reference<input value={evidenceRef} onChange={(event) => { setEvidenceRef(event.target.value); setDeliveryIdempotencyKey(""); }} /></label><button type="button" disabled={Boolean(busy)} onClick={async () => { if (!recipient.trim() || !recipientVerified || !handoffAt || !evidenceRef.trim()) { setMessage("Recipient, verification, handoff time, and evidence are required. No delivery was recorded."); return; } const absoluteHandoffAt = new Date(handoffAt).toISOString(); const key = deliveryIdempotencyKey || `delivery-${snapshot.id}-${Date.now()}`; setDeliveryIdempotencyKey(key); if (await command("RECORD_DELIVERY", { snapshotId: snapshot.id, recipient, channel, recipientVerified, handoffAt: absoluteHandoffAt, evidenceRef, idempotencyKey: key })) setDeliveryIdempotencyKey(""); }}>Record actual handoff</button></fieldset> : null}
     </div> : null}
   </section>;
 }
