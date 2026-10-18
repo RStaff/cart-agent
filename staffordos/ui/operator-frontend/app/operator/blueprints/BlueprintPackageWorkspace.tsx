@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPackageResponseGuard } from "../../../lib/packageResponseGuard.mjs";
+import { createPackageWorkspaceController } from "../../../lib/packageWorkspaceController.mjs";
 
 const IDS = [
   "workflow_interview_current_state_map",
@@ -25,6 +27,8 @@ export default function BlueprintPackageWorkspace() {
   const [evidenceRef, setEvidenceRef] = useState("");
   const [deliveryIdempotencyKey, setDeliveryIdempotencyKey] = useState("");
   const [operationIdempotencyKeys, setOperationIdempotencyKeys] = useState<Record<string, string>>({});
+  const responseGuard = useRef(createPackageResponseGuard()).current;
+  const workspaceController = useRef(createPackageWorkspaceController()).current;
   const clearDelivery = () => { setRecipient(""); setChannel("MANUAL_EMAIL"); setRecipientVerified(false); setHandoffAt(""); setEvidenceRef(""); setDeliveryIdempotencyKey(""); };
 
   async function loadEngagements() {
@@ -41,7 +45,8 @@ export default function BlueprintPackageWorkspace() {
   async function command(action: string, data: Record<string, unknown> = {}) {
     if (!engagementId) return false;
     const providedKey = typeof data.idempotencyKey === "string" ? data.idempotencyKey : "";
-    const idempotencyKey = providedKey || operationIdempotencyKeys[action] || `${action}-${engagementId}-${Date.now()}`;
+    const operation = workspaceController.operation(action, engagementId, data);
+    const idempotencyKey = providedKey || operationIdempotencyKeys[action] || operation.idempotencyKey || `${action}-${engagementId}-${Date.now()}`;
     if (!providedKey && !operationIdempotencyKeys[action]) setOperationIdempotencyKeys((current) => ({ ...current, [action]: idempotencyKey }));
     setBusy(action); setMessage("");
     try {
@@ -49,6 +54,7 @@ export default function BlueprintPackageWorkspace() {
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.error || "Package command failed");
       if (body.package?.id || snapshot?.id) await inspect(body.package?.id || snapshot.id);
+      workspaceController.complete(action);
       setOperationIdempotencyKeys((current) => { const next = { ...current }; delete next[action]; return next; });
       setMessage(action === "CREATE_PREVIEW_SNAPSHOT" ? "Immutable preview created. Inspect it before release." : `${action} recorded.`); return true;
     } catch (error: any) { setMessage(`${error.message}. No delivery was sent.`); return false; }
@@ -56,9 +62,13 @@ export default function BlueprintPackageWorkspace() {
   }
   async function inspect(id: string) {
     if (!engagementId) return;
+    workspaceController.select(engagementId);
+    const selection = id ? `${engagementId}:${id}` : engagementId;
+    const request = responseGuard.begin(selection);
     const response = await fetch(`/api/operator/blueprints/${encodeURIComponent(engagementId)}/package${id ? `?snapshotId=${encodeURIComponent(id)}` : ""}`, { cache: "no-store" });
     const body = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(body.error || "Package unavailable");
+    if (!responseGuard.accepts(request, selection)) return;
     setSnapshot(body.package);
     setPackages(Array.isArray(body.packages) ? body.packages : []);
   }

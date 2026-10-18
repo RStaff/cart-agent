@@ -62,6 +62,14 @@ test("package route requires disposable database and covers snapshot/release/del
     assert.equal(delivery.status, 200);
     const deliveryReplay = await fetch(`${base}/api/staffordos/blueprint-engagements/${engagement.id}/package/commands`, { method: "POST", headers: AUTH, body: JSON.stringify({ command: "RECORD_DELIVERY", data: { snapshotId: previewBody.package.id, idempotencyKey: "delivery", reason: "synthetic", evidenceRef: "handoff://synthetic", recipient: "synthetic-recipient@example.test", channel: "MANUAL_EMAIL", recipientVerified: true, handoffAt: "2026-10-18T16:00:00.000Z" } }) });
     assert.equal(deliveryReplay.status, 200);
+    const deliveryCount = await prisma.staffordosBlueprintDelivery.count({ where: { packageId: previewBody.package.id } });
+    const deliveryAuditCount = await prisma.staffordosBlueprintPackageAuditEvent.count({ where: { packageId: previewBody.package.id, action: "RECORD_DELIVERY" } });
+    assert.equal(deliveryCount, 1);
+    assert.equal(deliveryAuditCount, 1);
+    const deliveredRead = await fetch(`${base}/api/staffordos/blueprint-engagements/${engagement.id}/package/${previewBody.package.id}`, { headers: AUTH });
+    const deliveredBody = await deliveredRead.json();
+    assert.equal(deliveredBody.package.status, "released");
+    assert.equal(deliveredBody.package.deliveries.length, 1);
     const secondPreview = await fetch(`${base}/api/staffordos/blueprint-engagements/${engagement.id}/package/commands`, { method: "POST", headers: AUTH, body: JSON.stringify({ command: "CREATE_PREVIEW_SNAPSHOT", data: { idempotencyKey: "preview-second", reason: "synthetic", evidenceRef: "evidence://synthetic" } }) });
     assert.equal(secondPreview.status, 200);
     const secondPreviewBody = await secondPreview.json();
