@@ -532,12 +532,12 @@ model DailyAggregate {
 }
 
 model StaffordosInboundAutomationInquiry {
-  id                     String   @id @default(cuid())
-  submissionId           String   @unique
+  id                     String                             @id @default(cuid())
+  submissionId           String                             @unique
   payloadHash            String
   briefHash              String
-  source                 String   @default("staffordmedia_automate")
-  status                 String   @default("NEEDS_REVIEW")
+  source                 String                             @default("staffordmedia_automate")
+  status                 String                             @default("NEEDS_REVIEW")
   name                   String?
   email                  String
   phone                  String?
@@ -547,13 +547,13 @@ model StaffordosInboundAutomationInquiry {
   systems                Json
   currentWorkflow        String?
   desiredWorkflow        String?
-  contactAcknowledgement Boolean  @default(false)
+  contactAcknowledgement Boolean                            @default(false)
   possibleDuplicateOfId  String?
   reviewedAt             DateTime?
   reviewedBy             String?
   nextAction             String?
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
+  createdAt              DateTime                           @default(now())
+  updatedAt              DateTime                           @updatedAt
   emailDeliveries        StaffordosInboundAutomationEmail[]
 
   @@index([email, createdAt])
@@ -561,22 +561,22 @@ model StaffordosInboundAutomationInquiry {
 }
 
 model StaffordosInboundAutomationEmail {
-  id             String   @id @default(cuid())
+  id             String                             @id @default(cuid())
   inquiryId      String
   messageType    String
-  status         String   @default("PENDING")
-  attemptCount   Int      @default(0)
+  status         String                             @default("PENDING")
+  attemptCount   Int                                @default(0)
   providerId     String?
   lastError      String?
-  idempotencyKey String   @unique
+  idempotencyKey String                             @unique
   sentAt         DateTime?
   nextAttemptAt  DateTime?
   claimToken     String?
   claimStartedAt DateTime?
   claimExpiresAt DateTime?
   firstAttemptAt DateTime?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime                           @default(now())
+  updatedAt      DateTime                           @updatedAt
   inquiry        StaffordosInboundAutomationInquiry @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
 
   @@unique([inquiryId, messageType])
@@ -594,11 +594,11 @@ model StaffordosInboundAutomationRateLimit {
 }
 
 model StaffordosBlueprintEngagement {
-  id                      String                                    @id @default(cuid())
+  id                      String                                     @id @default(cuid())
   offerId                 String
-  state                   String                                    @default("PAID_IDENTITY_REVIEW")
-  associationStatus       String                                    @default("PENDING_REVIEW")
-  stripeSessionId         String                                    @unique
+  state                   String                                     @default("PAID_IDENTITY_REVIEW")
+  associationStatus       String                                     @default("PENDING_REVIEW")
+  stripeSessionId         String                                     @unique
   stripePaymentLinkId     String
   stripeProductId         String
   stripePriceId           String
@@ -614,13 +614,16 @@ model StaffordosBlueprintEngagement {
   clientId                String?
   inquiryId               String?
   paidAt                  DateTime
-  createdAt               DateTime                                  @default(now())
-  updatedAt               DateTime                                  @updatedAt
+  createdAt               DateTime                                   @default(now())
+  updatedAt               DateTime                                   @updatedAt
   paymentEvent            StaffordosBlueprintPaymentEvent?
   onboarding              StaffordosBlueprintOnboarding?
   onboardingAuditEvents   StaffordosBlueprintOnboardingAuditEvent[]
   deliverables            StaffordosBlueprintDeliverable[]
   deliverableAuditEvents  StaffordosBlueprintDeliverableAuditEvent[]
+  packages                StaffordosBlueprintPackage[]
+  packageAuditEvents      StaffordosBlueprintPackageAuditEvent[]
+  deliveries              StaffordosBlueprintDelivery[]
 
   @@index([state, createdAt])
   @@index([associationStatus, createdAt])
@@ -739,5 +742,69 @@ model StaffordosBlueprintDeliverableAuditEvent {
   engagement     StaffordosBlueprintEngagement  @relation(fields: [engagementId], references: [id], onDelete: Restrict)
 
   @@unique([deliverableId, sequence])
+  @@index([engagementId, createdAt])
+}
+
+model StaffordosBlueprintPackage {
+  id                     String                                 @id @default(cuid())
+  engagementId           String
+  packageVersion         Int                                    @default(1)
+  status                 String                                 @default("preview")
+  sourceVersions         Json
+  rendererVersion        String
+  templateDigest         String
+  assetDigest            String
+  renderedHtml           String                                 @db.Text
+  contentDigest          String
+  recordVersion          Int                                    @default(1)
+  creationIdempotencyKey String?                                @unique
+  releaseIdempotencyKey  String?                                @unique
+  releasedAt             DateTime?
+  releasedBy             String?
+  createdAt              DateTime                               @default(now())
+  updatedAt              DateTime                               @updatedAt
+  engagement             StaffordosBlueprintEngagement          @relation(fields: [engagementId], references: [id], onDelete: Restrict)
+  auditEvents            StaffordosBlueprintPackageAuditEvent[]
+  deliveries             StaffordosBlueprintDelivery[]
+
+  @@unique([engagementId, packageVersion])
+  @@index([engagementId, status, createdAt])
+}
+
+model StaffordosBlueprintPackageAuditEvent {
+  id             String                        @id @default(cuid())
+  packageId      String
+  engagementId   String
+  sequence       Int
+  action         String
+  previousStatus String
+  nextStatus     String
+  actorSubject   String
+  reason         String
+  evidenceRef    String
+  payload        Json
+  createdAt      DateTime                      @default(now())
+  package        StaffordosBlueprintPackage    @relation(fields: [packageId], references: [id], onDelete: Restrict)
+  engagement     StaffordosBlueprintEngagement @relation(fields: [engagementId], references: [id], onDelete: Restrict)
+
+  @@unique([packageId, sequence])
+  @@index([engagementId, createdAt])
+}
+
+model StaffordosBlueprintDelivery {
+  id             String                        @id @default(cuid())
+  packageId      String
+  engagementId   String
+  recipient      String
+  channel        String
+  handoffAt      DateTime
+  evidenceRef    String
+  verified       Boolean                       @default(false)
+  actorSubject   String
+  idempotencyKey String                        @unique
+  createdAt      DateTime                      @default(now())
+  package        StaffordosBlueprintPackage    @relation(fields: [packageId], references: [id], onDelete: Restrict)
+  engagement     StaffordosBlueprintEngagement @relation(fields: [engagementId], references: [id], onDelete: Restrict)
+
   @@index([engagementId, createdAt])
 }

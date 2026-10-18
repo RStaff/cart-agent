@@ -1,0 +1,85 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import express from "express";
+import pkg from "@prisma/client";
+import { installBlueprintPackageRoutes } from "./blueprintPackage.esm.js";
+import { renderBlueprintPackageHtml } from "../lib/blueprintPackageAuthority.js";
+
+const { PrismaClient } = pkg;
+const IDS = ["workflow_interview_current_state_map", "primary_automation_diagnosis", "recommended_system_design", "prioritized_opportunities", "implementation_roadmap", "written_blueprint_review"];
+const AUTH = { "content-type": "application/json", "x-internal-api-key": "step5c-disposable-key", "x-staffordos-operator-subject": "ross-step5c-test-subject", "x-staffordos-operator-permission": "staffordos.revenue_operations.write" };
+
+test("package renderer escapes untrusted content and emits self-contained print HTML", () => {
+  const html = renderBlueprintPackageHtml({ engagementId: "synthetic", packageVersion: 1, deliverables: IDS.map((identifier) => ({ identifier, version: 1, status: "reviewed", owner: "<owner>", contents: { finding: "<script>alert(1)</script>" }, evidenceRefs: [{ ref: "evidence://synthetic" }], claimClassifications: [{ classification: "OBSERVED", claim: "synthetic" }], limitations: [] })) });
+  assert.match(html, /&lt;script&gt;alert/);
+  assert.doesNotMatch(html, /<script/i);
+  assert.doesNotMatch(html, /https?:\/\//);
+  assert.match(html, /@media print/);
+  assert.match(html, /Measurement status/);
+  assert.match(html, /<dt>finding<\/dt>/);
+  assert.equal((html.match(/<section class="deliverable">/g) || []).length, 6);
+  for (const title of ["Workflow interview and current-state map", "Primary automation diagnosis", "Recommended system design", "Prioritized opportunities", "Implementation roadmap", "Written Blueprint and review"]) assert.match(html, new RegExp(title));
+});
+
+test("package route requires disposable database and covers snapshot/release/delivery lifecycle", async (t) => {
+  if (!process.env.DATABASE_URL) { t.skip("DATABASE_URL not provided"); return; }
+  const prior = process.env.INTERNAL_API_KEY; process.env.INTERNAL_API_KEY = "step5c-disposable-key";
+  const prisma = new PrismaClient();
+  const suffix = `${Date.now()}_${Math.random().toString(16).slice(2)}`;
+  const engagement = await prisma.staffordosBlueprintEngagement.create({ data: { offerId: "stafford_media_automation_opportunity_blueprint_v1", stripeSessionId: `cs_step5c_${suffix}`, stripePaymentLinkId: "plink_1UJacwJyylmUTExqQDaNV1dB", stripeProductId: "prod_VKF6B7HLG2L0tQ", stripePriceId: "price_1UJacYJyylmUTExqBGErXBxb", amountTotal: 75000, currency: "usd", quantity: 1, buyerEmail: "synthetic-step5c@example.test", paidAt: new Date(), onboarding: { create: {} }, paymentEvent: { create: { stripeEventId: `evt_step5c_${suffix}`, stripeSessionId: `cs_step5c_${suffix}`, stripeEventType: "checkout.session.completed", livemode: true, providerCreatedAt: new Date(), receivedAt: new Date() } } } });
+  const isolated = await prisma.staffordosBlueprintEngagement.create({ data: { offerId: "stafford_media_automation_opportunity_blueprint_v1", stripeSessionId: `cs_step5c_isolated_${suffix}`, stripePaymentLinkId: "plink_1UJacwJyylmUTExqQDaNV1dB", stripeProductId: "prod_VKF6B7HLG2L0tQ", stripePriceId: "price_1UJacYJyylmUTExqBGErXBxb", amountTotal: 75000, currency: "usd", quantity: 1, buyerEmail: "synthetic-step5c-isolated@example.test", paidAt: new Date(), onboarding: { create: {} }, paymentEvent: { create: { stripeEventId: `evt_step5c_isolated_${suffix}`, stripeSessionId: `cs_step5c_isolated_${suffix}`, stripeEventType: "checkout.session.completed", livemode: true, providerCreatedAt: new Date(), receivedAt: new Date() } } } });
+  const baseline = await prisma.staffordosBlueprintEngagement.findUnique({ where: { id: engagement.id }, include: { paymentEvent: true, onboarding: true } });
+  await prisma.staffordosBlueprintDeliverable.createMany({ data: IDS.map((identifier, index) => ({ engagementId: engagement.id, identifier, version: 1, recordVersion: 2, status: "reviewed", owner: "Synthetic owner", contents: { finding: `Synthetic finding ${index}` }, evidenceRefs: [{ ref: `evidence://step5c/${identifier}` }], claimClassifications: [{ classification: "OBSERVED", claim: "Synthetic fixture" }], limitations: [], qualityReviewEvidenceRef: `review://step5c/${identifier}` })) });
+  const app = express(); app.use(express.json()); installBlueprintPackageRoutes(app, { prisma });
+  const server = await new Promise((resolve) => { const value = app.listen(0, "127.0.0.1", () => resolve(value)); });
+  try {
+    const base = `http://127.0.0.1:${server.address().port}`;
+    const response = await fetch(`${base}/api/staffordos/blueprint-engagements/${engagement.id}/package/commands`, { method: "POST", headers: AUTH, body: JSON.stringify({ command: "CREATE_PREVIEW_SNAPSHOT", data: { idempotencyKey: "preview", reason: "synthetic", evidenceRef: "evidence://synthetic" } }) });
+    assert.equal(response.status, 200);
+    const previewBody = await response.json();
+    assert.equal(previewBody.package.sourceVersions.length, 6);
+    assert.doesNotMatch(previewBody.package.renderedHtml, new RegExp(engagement.id));
+    const crossRead = await fetch(`${base}/api/staffordos/blueprint-engagements/${isolated.id}/package/${previewBody.package.id}`, { headers: AUTH });
+    assert.equal(crossRead.status, 404);
+    const replay = await fetch(`${base}/api/staffordos/blueprint-engagements/${engagement.id}/package/commands`, { method: "POST", headers: AUTH, body: JSON.stringify({ command: "CREATE_PREVIEW_SNAPSHOT", data: { idempotencyKey: "preview", reason: "synthetic", evidenceRef: "evidence://synthetic" } }) });
+    assert.equal((await replay.json()).package.id, previewBody.package.id);
+    const release = await fetch(`${base}/api/staffordos/blueprint-engagements/${engagement.id}/package/commands`, { method: "POST", headers: AUTH, body: JSON.stringify({ command: "RELEASE_PACKAGE", data: { snapshotId: previewBody.package.id, contentDigest: previewBody.package.contentDigest, idempotencyKey: "release", reason: "synthetic", evidenceRef: "evidence://release" } }) });
+    assert.equal(release.status, 200);
+    const delivery = await fetch(`${base}/api/staffordos/blueprint-engagements/${engagement.id}/package/commands`, { method: "POST", headers: AUTH, body: JSON.stringify({ command: "RECORD_DELIVERY", data: { snapshotId: previewBody.package.id, idempotencyKey: "delivery", reason: "synthetic", evidenceRef: "handoff://synthetic", recipient: "synthetic-recipient@example.test", channel: "MANUAL_EMAIL", recipientVerified: true, handoffAt: "2026-10-18T15:00:00.000Z" } }) });
+    assert.equal(delivery.status, 200);
+    const deliveryReplay = await fetch(`${base}/api/staffordos/blueprint-engagements/${engagement.id}/package/commands`, { method: "POST", headers: AUTH, body: JSON.stringify({ command: "RECORD_DELIVERY", data: { snapshotId: previewBody.package.id, idempotencyKey: "delivery", reason: "synthetic", evidenceRef: "handoff://synthetic", recipient: "synthetic-recipient@example.test", channel: "MANUAL_EMAIL", recipientVerified: true, handoffAt: "2026-10-18T15:00:00.000Z" } }) });
+    assert.equal(deliveryReplay.status, 200);
+    const secondPreview = await fetch(`${base}/api/staffordos/blueprint-engagements/${engagement.id}/package/commands`, { method: "POST", headers: AUTH, body: JSON.stringify({ command: "CREATE_PREVIEW_SNAPSHOT", data: { idempotencyKey: "preview-second", reason: "synthetic", evidenceRef: "evidence://synthetic" } }) });
+    assert.equal(secondPreview.status, 200);
+    const secondPreviewBody = await secondPreview.json();
+    const stale = await prisma.staffordosBlueprintDeliverable.update({ where: { id: (await prisma.staffordosBlueprintDeliverable.findFirst({ where: { engagementId: engagement.id, identifier: IDS[0] } })).id }, data: { recordVersion: 3, contents: { finding: "Changed after preview" } } });
+    assert.equal(stale.recordVersion, 3);
+    const staleRelease = await fetch(`${base}/api/staffordos/blueprint-engagements/${engagement.id}/package/commands`, { method: "POST", headers: AUTH, body: JSON.stringify({ command: "RELEASE_PACKAGE", data: { snapshotId: secondPreviewBody.package.id, contentDigest: secondPreviewBody.package.contentDigest, idempotencyKey: "release-stale", reason: "synthetic", evidenceRef: "evidence://stale" } }) });
+    assert.equal(staleRelease.status, 409);
+    const thirdPreview = await fetch(`${base}/api/staffordos/blueprint-engagements/${engagement.id}/package/commands`, { method: "POST", headers: AUTH, body: JSON.stringify({ command: "CREATE_PREVIEW_SNAPSHOT", data: { idempotencyKey: "preview-third", reason: "synthetic", evidenceRef: "evidence://synthetic" } }) });
+    const thirdPreviewBody = await thirdPreview.json();
+    const concurrentRelease = await Promise.all(["release-concurrent-a", "release-concurrent-b"].map((idempotencyKey) => fetch(`${base}/api/staffordos/blueprint-engagements/${engagement.id}/package/commands`, { method: "POST", headers: AUTH, body: JSON.stringify({ command: "RELEASE_PACKAGE", data: { snapshotId: thirdPreviewBody.package.id, contentDigest: thirdPreviewBody.package.contentDigest, idempotencyKey, reason: "synthetic", evidenceRef: "evidence://concurrent" } }) })));
+    assert.deepEqual(concurrentRelease.map((item) => item.status).sort(), [200, 409]);
+    const unauthenticated = await fetch(`${base}/api/staffordos/blueprint-engagements/${engagement.id}/package/commands`, { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
+    assert.equal(unauthenticated.status, 401);
+    const after = await prisma.staffordosBlueprintEngagement.findUnique({ where: { id: engagement.id }, include: { paymentEvent: true, onboarding: true } });
+    assert.equal(after.amountTotal, baseline.amountTotal);
+    assert.equal(after.stripeSessionId, baseline.stripeSessionId);
+    assert.equal(after.paymentEvent.stripeEventId, baseline.paymentEvent.stripeEventId);
+    assert.deepEqual(after.onboarding, baseline.onboarding);
+  } finally {
+    await new Promise((resolve) => server.close(resolve));
+    await prisma.staffordosBlueprintPackageAuditEvent.deleteMany({ where: { engagementId: engagement.id } });
+    await prisma.staffordosBlueprintDelivery.deleteMany({ where: { engagementId: engagement.id } });
+    await prisma.staffordosBlueprintPackage.deleteMany({ where: { engagementId: engagement.id } });
+    await prisma.staffordosBlueprintDeliverableAuditEvent.deleteMany({ where: { engagementId: engagement.id } });
+    await prisma.staffordosBlueprintDeliverable.deleteMany({ where: { engagementId: engagement.id } });
+    await prisma.staffordosBlueprintOnboarding.deleteMany({ where: { engagementId: engagement.id } });
+    await prisma.staffordosBlueprintPaymentEvent.deleteMany({ where: { engagementId: engagement.id } });
+    await prisma.staffordosBlueprintEngagement.delete({ where: { id: engagement.id } });
+    await prisma.staffordosBlueprintOnboarding.deleteMany({ where: { engagementId: isolated.id } });
+    await prisma.staffordosBlueprintPaymentEvent.deleteMany({ where: { engagementId: isolated.id } });
+    await prisma.staffordosBlueprintEngagement.delete({ where: { id: isolated.id } });
+    await prisma.$disconnect(); if (prior === undefined) delete process.env.INTERNAL_API_KEY; else process.env.INTERNAL_API_KEY = prior;
+  }
+});
