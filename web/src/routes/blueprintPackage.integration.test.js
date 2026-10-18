@@ -43,6 +43,8 @@ test("package route requires disposable database and covers snapshot/release/del
     const latestBody = await latestRead.json();
     assert.equal(latestRead.status, 200);
     assert.equal(latestBody.package.id, previewBody.package.id);
+    assert.equal(latestBody.packages[0].id, previewBody.package.id);
+    assert.equal(Object.hasOwn(latestBody.packages[0], "renderedHtml"), false);
     assert.equal(Object.hasOwn(latestBody.package, "releasedBy"), false);
     assert.equal(Object.hasOwn(latestBody.package.auditEvents[0], "actorSubject"), false);
     assert.equal(Object.hasOwn(latestBody.package.auditEvents[0], "payload"), false);
