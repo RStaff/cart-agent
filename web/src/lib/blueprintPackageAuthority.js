@@ -25,6 +25,16 @@ const stable = (value) => {
   return JSON.stringify(value);
 };
 const MANUAL_CHANNELS = new Set(["MANUAL_EMAIL", "MANUAL_SHARED_LINK", "MANUAL_IN_PERSON"]);
+// Only source/evidence references explicitly approved for the client projection
+// are rendered. Prerequisite refs and quality-review evidence remain operator-only.
+const CLIENT_VISIBLE_REFERENCE_FIELDS = Object.freeze(["ref", "observedAt"]);
+function clientReference(value) {
+  const ref = typeof value === "string" ? value : value?.ref;
+  if (typeof ref !== "string" || !ref.trim()) return null;
+  const result = { ref: ref.trim() };
+  if (CLIENT_VISIBLE_REFERENCE_FIELDS.includes("observedAt") && value && typeof value === "object" && typeof value.observedAt === "string" && value.observedAt.trim()) result.observedAt = value.observedAt.trim();
+  return result;
+}
 
 function actor(value) {
   if (!value?.subject || value.permission !== BLUEPRINT_PACKAGE_PERMISSION) throw new BlueprintPackageError("OPERATOR_PERMISSION_MISSING", 403);
@@ -61,7 +71,7 @@ function labeled(value) {
 export function renderBlueprintPackageHtml({ packageVersion, deliverables }) {
   const sections = deliverables.map((item) => {
     const title = CLIENT_TITLES[item.identifier] || item.identifier;
-    const evidenceRefs = Array.isArray(item.evidenceRefs) ? item.evidenceRefs : [];
+    const evidenceRefs = (Array.isArray(item.evidenceRefs) ? item.evidenceRefs : []).map(clientReference).filter(Boolean);
     const claims = Array.isArray(item.claimClassifications) ? item.claimClassifications : [];
     const limitations = Array.isArray(item.limitations) ? item.limitations : [];
     return `<section class="deliverable"><h2>${esc(title)}</h2><p class="version">Version ${esc(item.version)} · reviewed</p><h3>Owner</h3><p>${esc(item.owner)}</p><h3>Contents</h3><div class="contents">${labeled(item.contents)}</div><h3>Evidence references</h3><ul>${evidenceRefs.map((entry) => `<li>${clientJson(typeof entry === "string" ? entry : entry?.ref)}${entry?.observedAt ? ` <span>(${esc(entry.observedAt)})</span>` : ""}</li>`).join("")}</ul><h3>Claim classifications</h3><ul>${claims.map((entry) => `<li>${esc(entry?.classification)}: ${clientJson(entry?.claim)}</li>`).join("")}</ul><h3>Limitations</h3>${limitations.length ? `<ul>${limitations.map((entry) => `<li>${clientJson(typeof entry === "string" ? entry : entry?.text)}</li>`).join("")}</ul>` : "<p>None recorded.</p>"}</section>`;

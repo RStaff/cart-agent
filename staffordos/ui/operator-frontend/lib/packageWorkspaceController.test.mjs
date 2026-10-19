@@ -25,6 +25,7 @@ test("lost command response retries the same operation key and payload", async (
   const calls = [];
   let readback = 0;
   const workspace = createPackageWorkspaceController({
+    createOperationKey: () => "injected-test-key",
     loadPackage: async () => ({ snapshot: { id: "package-a", readback: ++readback }, history: [] }),
     submitCommand: async (operation) => {
       calls.push(operation);
@@ -43,6 +44,40 @@ test("lost command response retries the same operation key and payload", async (
   assert.deepEqual(calls[0].payload, calls[1].payload);
   assert.equal(workspace.getState().snapshot.id, "package-a");
   assert.equal(workspace.getState().snapshot.readback, 1);
+});
+
+test("new preview operations get distinct keys after success and remount", async () => {
+  let nextKey = 0;
+  const keys = [];
+  const make = () => createPackageWorkspaceController({
+    createOperationKey: () => `preview-key-${++nextKey}`,
+    loadPackage: async () => ({ snapshot: { id: "package-a" }, history: [] }),
+    submitCommand: async (operation) => { keys.push(operation.idempotencyKey); return { ok: true }; },
+  });
+  const first = make(); first.select("engagement-a"); await first.command("CREATE_PREVIEW_SNAPSHOT", "engagement-a", {});
+  const second = make(); second.select("engagement-a"); await second.command("CREATE_PREVIEW_SNAPSHOT", "engagement-a", {});
+  assert.deepEqual(keys, ["preview-key-1", "preview-key-2"]);
+});
+
+test("old command completion cannot read back after A to B to A selection changes", async () => {
+  let resolveCommand;
+  let loadCount = 0;
+  const workspace = createPackageWorkspaceController({
+    createOperationKey: () => "command-key",
+    loadPackage: async () => ({ snapshot: { id: `package-${++loadCount}` }, history: [] }),
+    submitCommand: () => new Promise((resolve) => { resolveCommand = resolve; }),
+  });
+  workspace.select("engagement-a");
+  const command = workspace.command("RELEASE_PACKAGE", "engagement-a", { snapshotId: "package-a" });
+  workspace.select("engagement-b");
+  workspace.select("engagement-a");
+  resolveCommand({ ok: true });
+  const result = await command;
+  assert.equal(result.readback.applied, false);
+  assert.equal(result.readback.skipped, "selection-changed");
+  assert.equal(loadCount, 0);
+  assert.equal(workspace.getState().selection, "engagement-a");
+  assert.equal(workspace.getState().snapshot, null);
 });
 
 test("successful mutation/readback keeps snapshot, history, and selection consistent", async () => {

@@ -10,13 +10,15 @@ const IDS = ["workflow_interview_current_state_map", "primary_automation_diagnos
 const AUTH = { "content-type": "application/json", "x-internal-api-key": "step5c-disposable-key", "x-staffordos-operator-subject": "ross-step5c-test-subject", "x-staffordos-operator-permission": "staffordos.revenue_operations.write" };
 
 test("package renderer escapes untrusted content and emits self-contained print HTML", () => {
-  const html = renderBlueprintPackageHtml({ engagementId: "synthetic", packageVersion: 1, deliverables: IDS.map((identifier) => ({ identifier, version: 1, status: "reviewed", owner: "<owner>", contents: { finding: "<script>alert(1)</script>" }, evidenceRefs: [{ ref: "evidence://synthetic" }], claimClassifications: [{ classification: "OBSERVED", claim: "synthetic" }], limitations: [] })) });
+  const html = renderBlueprintPackageHtml({ engagementId: "synthetic", packageVersion: 1, deliverables: IDS.map((identifier) => ({ identifier, version: 1, status: "reviewed", owner: "<owner>", contents: { finding: "<script>alert(1)</script>" }, prerequisiteRefs: [{ ref: "internal://prerequisite" }], evidenceRefs: [{ ref: "evidence://synthetic" }], qualityReviewEvidenceRef: "internal://quality-review", claimClassifications: [{ classification: "OBSERVED", claim: "synthetic" }], limitations: [] })) });
   assert.match(html, /&lt;script&gt;alert/);
   assert.doesNotMatch(html, /<script/i);
   assert.doesNotMatch(html, /https?:\/\//);
   assert.match(html, /@media print/);
   assert.match(html, /Measurement status/);
   assert.match(html, /<dt>finding<\/dt>/);
+  assert.match(html, /evidence:\/\/synthetic/);
+  assert.doesNotMatch(html, /internal:\/\/(?:prerequisite|quality-review)/);
   assert.equal((html.match(/<section class="deliverable">/g) || []).length, 6);
   for (const title of ["Workflow interview and current-state map", "Primary automation diagnosis", "Recommended system design", "Prioritized opportunities", "Implementation roadmap", "Written Blueprint and review"]) assert.match(html, new RegExp(title));
 });
