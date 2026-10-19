@@ -255,9 +255,12 @@ and implementation approval remain separate future records.
 #### Client-visible allowlist
 
 Expose only the six public titles and rendered substantive contents,
-source/evidence references explicitly labelled as references, claim
+evidence references explicitly labelled as references: each allowlisted
+`evidenceRefs[].ref` and its optional `observedAt` date. `prerequisiteRefs`
+and `qualityReviewEvidenceRef` remain operator-only because they describe
+internal workflow/review authority rather than client evidence. Claim
 classifications, recorded limitations, package version/digest, release date,
-and delivery date/channel label. Do not expose payment/provider identifiers,
+and delivery date/channel label remain client-safe. Do not expose payment/provider identifiers,
 buyer or identity evidence, inquiry/client associations, operator subjects,
 permission/security details, raw audit payloads, or internal database IDs.
 Client access is an approved handoff, not an implemented portal.
