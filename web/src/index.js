@@ -41,6 +41,7 @@ import { installShopifixerScopeAuthority } from "./routes/shopifixerScopeAuthori
 import { installAutomationInquiryRoute } from "./routes/automationInquiries.esm.js";
 import { installBlueprintOnboardingRoutes } from "./routes/blueprintOnboarding.esm.js";
 import { installBlueprintDeliverableRoutes } from "./routes/blueprintDeliverables.esm.js";
+import { installBlueprintPackageRoutes } from "./routes/blueprintPackage.esm.js";
 import { startInboundEmailRetryWorker } from "./lib/automationInquiryRetryWorker.js";
 import { prisma } from "./db.js";
 
@@ -297,6 +298,7 @@ app.use(express.json({ limit: "1mb" }));
 installAutomationInquiryRoute(app, { prisma });
 installBlueprintOnboardingRoutes(app, { prisma });
 installBlueprintDeliverableRoutes(app, { prisma });
+installBlueprintPackageRoutes(app, { prisma });
 
 // Execute public checkout installer (source-of-truth)
 checkoutPublic(app);

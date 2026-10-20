@@ -47,6 +47,7 @@ const postRouteFiles = [
   "app/api/proof/abando-recovery/run/route.ts",
   "app/api/operator/blueprints/[engagementId]/commands/route.ts",
   "app/api/operator/blueprints/[engagementId]/deliverables/commands/route.ts",
+  "app/api/operator/blueprints/[engagementId]/package/commands/route.ts",
 ].map((relativePath) => path.join(frontendRoot, relativePath));
 
 const postRouteMutationMarkers = new Map([
@@ -57,6 +58,7 @@ const postRouteMutationMarkers = new Map([
   [postRouteFiles[4], "const repoRoot = repoRootFromCwd();"],
   [postRouteFiles[5], "const writeGate = evaluateOperatorWriteIsolation"],
   [postRouteFiles[6], "const writeGate = evaluateOperatorWriteIsolation"],
+  [postRouteFiles[7], "const writeGate = evaluateOperatorWriteIsolation"],
 ]);
 
 const serverActionFiles = [
@@ -218,8 +220,8 @@ test("gate performs no mutation and denied assertion fails predictably", () => {
   assert.equal(assertOperatorWriteAllowed({ headers: headers({ host: "localhost:3000" }), env: localEnv() }).allowed, true);
 });
 
-test("all seven inventoried POST route handlers call the canonical gate before mutation work", () => {
-  assert.equal(postRouteFiles.length, 7);
+test("all eight inventoried POST route handlers call the canonical gate before mutation work", () => {
+  assert.equal(postRouteFiles.length, 8);
 
   for (const routeFile of postRouteFiles) {
     const source = readFileSync(routeFile, "utf8");
@@ -311,9 +313,9 @@ test("G004 documentation count remains consistent with current source", () => {
     .match(/"use server";/g)?.length || 0;
   const routeCount = postRouteFiles.filter((file) => existsSync(file) && /export async function POST/.test(readFileSync(file, "utf8"))).length;
 
-  assert.equal(decision.verifiedCounts.operatorFrontendPostWriteOrExecutionRoutes, 7);
+  assert.equal(decision.verifiedCounts.operatorFrontendPostWriteOrExecutionRoutes, 8);
   assert.equal(decision.verifiedCounts.operatorFrontendServerActionDirectives, 10);
-  assert.equal(routeCount, 7);
+  assert.equal(routeCount, 8);
   assert.equal(sourceServerActionCount, 10);
 });
 

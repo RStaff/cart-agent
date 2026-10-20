@@ -23,7 +23,7 @@
     "pre-existing production and architecture artifacts"
   ],
   "verifiedCounts": {
-    "operatorFrontendPostWriteOrExecutionRoutes": 7,
+    "operatorFrontendPostWriteOrExecutionRoutes": 8,
     "operatorFrontendServerActionDirectives": 10,
     "readOnlyGetRoutesExcluded": true,
     "s007InternalRoutesCountedAsCurrentOperatorUiProtection": false

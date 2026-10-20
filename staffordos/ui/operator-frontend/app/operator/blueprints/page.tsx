@@ -1,5 +1,6 @@
 import BlueprintOnboardingWorkspace from "./BlueprintOnboardingWorkspace";
 import BlueprintDeliverablesWorkspace from "./BlueprintDeliverablesWorkspace";
+import BlueprintPackageWorkspace from "./BlueprintPackageWorkspace";
 
 export default function BlueprintOnboardingPage() {
   return (
@@ -11,6 +12,7 @@ export default function BlueprintOnboardingPage() {
       </div>
       <BlueprintOnboardingWorkspace />
       <BlueprintDeliverablesWorkspace />
+      <BlueprintPackageWorkspace />
     </main>
   );
 }

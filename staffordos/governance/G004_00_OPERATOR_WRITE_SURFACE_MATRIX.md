@@ -8,7 +8,7 @@ Scope: active `staffordos/ui/operator-frontend` `/operator` write and execution 
 
 | Count | Result | Source basis |
 | --- | ---: | --- |
-| POST write or execution API routes | 7 | `app/api` route handlers exporting `POST` |
+| POST write or execution API routes | 8 | `app/api` route handlers exporting `POST` |
 | Server-action directives | 10 | `"use server"` directives in two `/operator` pages |
 | PUT/PATCH/DELETE route handlers | 0 | No active operator-frontend matches found |
 
@@ -23,6 +23,7 @@ Scope: active `staffordos/ui/operator-frontend` `/operator` write and execution 
 | G004-API-005 | `POST /api/proof/abando-recovery/run` | `app/api/proof/abando-recovery/run/route.ts` | Abando Proof | `DATABASE`, `MESSAGE_OR_COMMUNICATION`, `EXECUTION_OR_CODE_CHANGE`, `FILESYSTEM` | `CRITICAL` | UI button and worker test-mode flag; no human auth | `DIRECT_REQUEST_POSSIBLE` | `SOURCE_ONLY` | Generated proof JSON can be reverted; database/email side effects may not be fully reversible | Medium proof artifact, uncertain provider audit | S007 operator session and action-specific execution grant | Explicit proof-run approval | Disable outside governed local proof | Yes | Yes | No |
 | G004-API-006 | `POST /api/operator/blueprints/:engagementId/commands` | `app/api/operator/blueprints/[engagementId]/commands/route.ts` | Blueprint Onboarding | `DATABASE`, `AUDIT` | `MODERATE` | Existing operator session, `staffordos.revenue_operations.write`, and canonical local write gate; onboarding allowlist only | `DIRECT_REQUEST_POSSIBLE` | `SOURCE_ONLY` | Preserve onboarding history and append-only audits | Atomic onboarding/audit record | Existing governed operator session and permission | Step 4A command policy | Local-only guarded onboarding | Yes | Yes | Conditional local QA only |
 | G004-API-007 | `POST /api/operator/blueprints/:engagementId/deliverables/commands` | `app/api/operator/blueprints/[engagementId]/deliverables/commands/route.ts` | Blueprint Deliverable Drafting | `DATABASE`, `AUDIT` | `MODERATE` | Existing operator session, `staffordos.revenue_operations.write`, and canonical local write gate; only `REGISTER_DRAFT`, `REVISE_DRAFT`, `RECORD_QUALITY_REVIEW` | `DIRECT_REQUEST_POSSIBLE` | `SOURCE_ONLY` | Preserve prior versions and append-only audits; no release/delivery action exists | Atomic version/audit record | Existing governed operator session and permission | Step 5A command policy | Local-only guarded drafting | Yes | Yes | Conditional local QA only |
+| G004-API-008 | `POST /api/operator/blueprints/:engagementId/package/commands` | `app/api/operator/blueprints/[engagementId]/package/commands/route.ts` | Blueprint Package Release/Delivery | `DATABASE`, `AUDIT` | `MODERATE` | Existing operator session, `staffordos.revenue_operations.write`, canonical local write gate; only `CREATE_PREVIEW_SNAPSHOT`, `RELEASE_PACKAGE`, `RECORD_DELIVERY` | `DIRECT_REQUEST_POSSIBLE` | `SOURCE_ONLY` | Preserve immutable package and append-only audits; no automatic handoff | Atomic package/release/delivery records | Existing governed operator session and permission | Step 5 package policy | Local-only guarded package operations | Yes | Yes | Conditional local QA only |
 
 ## Server Actions
 
