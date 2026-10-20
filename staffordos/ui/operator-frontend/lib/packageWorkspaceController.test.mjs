@@ -80,6 +80,33 @@ test("old command completion cannot read back after A to B to A selection change
   assert.equal(workspace.getState().snapshot, null);
 });
 
+test("old command completion cannot read back after package selection changes", async () => {
+  let resolveCommand;
+  let loadCount = 0;
+  const workspace = createPackageWorkspaceController({
+    createOperationKey: () => "package-command-key",
+    loadPackage: async () => ({ snapshot: { id: `package-${++loadCount}` }, history: [] }),
+    submitCommand: () => new Promise((resolve) => { resolveCommand = resolve; }),
+  });
+  workspace.select("engagement-a:package-a");
+  const command = workspace.command("RELEASE_PACKAGE", "engagement-a", { snapshotId: "package-a" });
+  workspace.select("engagement-a:package-b");
+  resolveCommand({ ok: true });
+  const result = await command;
+  assert.equal(result.readback.applied, false);
+  assert.equal(result.readback.skipped, "selection-changed");
+  assert.equal(loadCount, 0);
+  assert.equal(workspace.getState().selection, "engagement-a:package-b");
+  assert.equal(workspace.getState().snapshot, null);
+});
+
+test("selection wiring clears busy state when invalidating a command", async () => {
+  const source = await import("node:fs/promises").then((fs) => fs.readFile(new URL("../app/operator/blueprints/BlueprintPackageWorkspace.tsx", import.meta.url), "utf8"));
+  assert.match(source, /const resetSelectionState = \(\) => \{ clearDelivery\(\); setBusy\(""\);/);
+  assert.match(source, /resetSelectionState\(\); workspaceController\.select\(event\.target\.value\)/);
+  assert.match(source, /resetSelectionState\(\); workspaceController\.select\(`\$\{engagementId\}:\$\{nextPackageId\}`\)/);
+});
+
 test("successful mutation/readback keeps snapshot, history, and selection consistent", async () => {
   const workspace = createPackageWorkspaceController({
     loadPackage: async (engagementId) => ({
