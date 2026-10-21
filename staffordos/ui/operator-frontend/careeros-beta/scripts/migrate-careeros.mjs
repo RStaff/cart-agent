@@ -6,11 +6,11 @@ const ROOT = new URL("../", import.meta.url);
 const MIGRATIONS = [
   {
     id: "20260816000000_careeros_p0_foundation",
-    objects: [{ kind: "table", name: "CareerUser" }],
+    objects: ["CareerUser", "CareerTenant", "CareerTenantMembership", "CareerProfile", "CareerSource", "CareerFactCandidate", "CareerFactReviewDecision", "CareerFact", "CareerSession", "CareerOnboardingState", "CareerAuditEvent", "CareerInvite", "CareerRateLimitBucket"].map((name) => ({ kind: "table", name })),
   },
   {
     id: "20260817000000_careeros_capability_match_product",
-    objects: [{ kind: "table", name: "CareerCapabilityAuthority" }],
+    objects: ["CareerCapabilityAuthority", "CareerCapabilityDecision", "CareerOpportunity", "CareerOpportunityRequirement", "CareerMatchEvaluation"].map((name) => ({ kind: "table", name })),
   },
   {
     id: "20260817010000_add_career_story_status",
@@ -22,7 +22,17 @@ const MIGRATIONS = [
   },
   {
     id: "20260818030000_add_resume_drafts",
-    objects: [{ kind: "table", name: "CareerResumeDraft" }],
+    objects: [
+      { kind: "table", name: "CareerResumeDraft" },
+      { kind: "column", table: "CareerOpportunity", name: "lifecycleState" },
+      { kind: "table", name: "CareerOpportunityEvent" },
+      { kind: "table", name: "CareerOpportunityNote" },
+      { kind: "column", table: "CareerResumeDraft", name: "materialType" },
+      { kind: "column", table: "CareerResumeDraft", name: "generationMethod" },
+      { kind: "column", table: "CareerResumeDraft", name: "provider" },
+      { kind: "column", table: "CareerResumeDraft", name: "model" },
+      { kind: "table", name: "CareerOpportunityInboxItem" },
+    ],
   },
   {
     id: "20260820050000_add_career_search_preferences",
