@@ -516,7 +516,7 @@ textarea {
   align-items: flex-start;
 }
 
-.blueprintPackageInspection fieldset input,
+.blueprintPackageInspection fieldset input:not([type="checkbox"]),
 .blueprintPackageInspection fieldset select {
   width: 100%;
   min-height: 40px;
@@ -527,6 +527,16 @@ textarea {
   background: #020617;
   color: #f8fafc;
   font: inherit;
+}
+
+.blueprintPackageInspection fieldset input[type="checkbox"] {
+  width: 18px;
+  min-width: 18px;
+  height: 18px;
+  min-height: 18px;
+  margin: 2px 0 0;
+  accent-color: #2dd4bf;
+  flex: 0 0 auto;
 }
 
 @media (max-width: 640px) {
