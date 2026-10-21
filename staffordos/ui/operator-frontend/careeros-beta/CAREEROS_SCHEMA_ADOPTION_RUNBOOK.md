@@ -1,0 +1,88 @@
+# CareerOS schema reconciliation and reviewed adoption
+
+This is an operator-reviewed, one-shot procedure for the existing
+`careos-private-beta` database. It is not part of normal startup and must not
+be run against production without explicit approval.
+
+The Render service uses the literal repository root
+`staffordos/ui/operator-frontend/careeros-beta`; `careos-beta` is not a
+repository or Render path. The service branch remains `careeros/private-beta`.
+
+## Preconditions
+
+1. Verify a provider backup and a successful restore to a separate database.
+2. Restore to a separate database and run
+   `prepare-careeros-adoption-evidence.mjs` after reconciliation. It derives
+   the source revision, full catalog fingerprint, and all eight SQL checksums
+   from this checkout; no values are manually assembled.
+3. Run `reconcile-careeros-story-status.mjs` with
+   `CAREEROS_LEGACY_SCHEMA_FINGERPRINT`. This adds only the exact missing
+   column from migration `20260817010000_add_career_story_status`.
+4. Recompute the full post-reconciliation fingerprint. Do not continue if
+   any catalog difference remains.
+5. Keep the service stopped or read-only while the adoption transaction runs;
+   both utilities take the `careeros-migration-v1` transaction advisory lock
+   and re-read the fingerprint while holding it.
+
+## Adoption
+
+Run `adopt-careeros-schema.mjs` with the generated evidence manifest. It
+atomically creates the normal ledger and
+`CareerOSMigrationAdoption`, inserts all eight checksums, and records
+`REVIEWED_SCHEMA_ADOPTION`. It rejects an existing ledger, adoption record,
+unexpected tables, fingerprint mismatch or checksum mismatch.
+
+The existing startup runner remains unchanged and will subsequently no-op
+against the adopted ledger. It never performs automatic adoption.
+
+The adoption transaction creates both ledger tables, inserts all eight
+checksums, and inserts the durable `REVIEWED_SCHEMA_ADOPTION` record. Any
+failure rolls back all of those writes together.
+
+## Live-database preparation gate (required before merge)
+
+This is a separate owner-approved step between successful restore rehearsal
+and merging the migration-runner PR (#133). It is not performed by CI or
+normal startup.
+
+1. **Schema revalidation.** Freeze or coordinate every CareerOS writer,
+   record the live database identifier and UTC time, and rerun the catalog
+   fingerprint against the live database without selecting application rows.
+   The fingerprint must match the restored rehearsal result. If it differs,
+   stop and reconcile the difference separately.
+2. **Backup freshness.** Confirm a new provider backup/export completed after
+   the final schema revalidation and record its provider ID, UTC timestamp,
+   restore point and retention window. Do not use an older rehearsal backup
+   as the live recovery guarantee.
+3. **Maintenance/write coordination.** Place the CareerOS service in its
+   documented maintenance/read-only state, or stop all writers, and verify no
+   migration/startup process is running. Keep the maintenance window open
+   through correction, adoption, post-adoption runner verification and the
+   first health probe.
+4. **Recovery procedure.** If any check fails, stop the operation and restore
+   the fresh backup to a separate recovery database. Validate its catalog
+   fingerprint there, then obtain a new owner decision before any service
+   connection change. Never delete ledger rows or restore in place as an
+   unreviewed rollback.
+5. **Approval record.** Ross records the live fingerprint, backup/export ID,
+   maintenance window, source revision, generated eight-checksum manifest,
+   reviewer identity and recovery target before authorizing the one-shot
+   reconciliation/adoption commands.
+
+Merge remains blocked until this gate is complete. #133 supplies the normal
+   runner; this package supplies the explicit reviewed correction/adoption
+   procedure and must not be treated as an automatic dependency of startup.
+
+The provider recovery mechanism is Render Postgres Recovery/PITR and logical
+exports. Recovery creates a new database instance; it does not overwrite the
+source. A logical export can be downloaded from the database Recovery page
+and restored only into an empty target with the matching PostgreSQL client
+tools. Confirm workspace access, recovery-window availability and any new
+database cost before starting either operation.
+
+## Recovery
+
+Keep the original database unchanged until the restored copy and adoption
+verification succeed. On failure, discard the separate target and restore
+the verified backup to a separately approved target; do not delete ledger
+rows or perform an in-place rollback.
