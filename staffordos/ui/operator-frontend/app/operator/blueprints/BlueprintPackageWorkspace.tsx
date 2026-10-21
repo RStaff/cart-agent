@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPackageResponseGuard } from "../../../lib/packageResponseGuard.mjs";
 import { createPackageWorkspaceController } from "../../../lib/packageWorkspaceController.mjs";
+import { snapshotDownloadFilename, verifySnapshotDownload } from "../../../lib/snapshotDownload.mjs";
 
 const IDS = [
   "workflow_interview_current_state_map",
@@ -31,6 +32,13 @@ export default function BlueprintPackageWorkspace() {
   const workspaceController = useRef(createPackageWorkspaceController()).current;
   const clearDelivery = () => { setRecipient(""); setChannel("MANUAL_EMAIL"); setRecipientVerified(false); setHandoffAt(""); setEvidenceRef(""); setDeliveryIdempotencyKey(""); };
   const resetSelectionState = () => { clearDelivery(); setBusy(""); setMessage(""); setSnapshot(null); setPackages([]); };
+  async function downloadSnapshotHtml() {
+    const verified = await verifySnapshotDownload(snapshot);
+    if (!verified.ok) { setMessage("Snapshot digest verification failed. Nothing was downloaded."); return; }
+    const url = URL.createObjectURL(new Blob([verified.html], { type: "text/html;charset=utf-8" }));
+    const link = document.createElement("a"); link.href = url; link.download = verified.filename || snapshotDownloadFilename(snapshot.id); link.click();
+    URL.revokeObjectURL(url); setMessage("Verified snapshot HTML downloaded. No release or delivery was recorded.");
+  }
 
   async function loadEngagements() {
     const response = await fetch("/api/operator/blueprints", { cache: "no-store" });
@@ -80,7 +88,7 @@ export default function BlueprintPackageWorkspace() {
     <p className="blueprintFieldHint">A preview requires all six exact deliverables to be currently reviewed: {IDS.join(", ")}.</p>
     <button type="button" disabled={!engagementId || Boolean(busy)} onClick={() => void command("CREATE_PREVIEW_SNAPSHOT")}>Create immutable preview</button>
     {message ? <div role="status" className="blueprintAlert">{message}</div> : null}
-    {snapshot ? <div className="blueprintPackageInspection"><h3>Snapshot inspection</h3><p>Snapshot {snapshot.id} · {snapshot.status} · digest {snapshot.contentDigest}</p><iframe title="Sanitized Blueprint package preview" sandbox="" srcDoc={snapshot.renderedHtml} className="blueprintPackagePreview" />
+    {snapshot ? <div className="blueprintPackageInspection"><h3>Snapshot inspection</h3><p>Snapshot {snapshot.id} · {snapshot.status} · digest {snapshot.contentDigest}</p><button type="button" className="blueprintSecondaryButton" onClick={() => void downloadSnapshotHtml()}>Download HTML</button><iframe title="Sanitized Blueprint package preview" sandbox="" srcDoc={snapshot.renderedHtml} className="blueprintPackagePreview" />
       {packages.length > 1 ? <label>Package version<select value={snapshot.id} onChange={(event) => { const nextPackageId = event.target.value; resetSelectionState(); workspaceController.select(`${engagementId}:${nextPackageId}`); void inspect(nextPackageId); }}>{packages.map((entry) => <option key={entry.id} value={entry.id}>v{entry.packageVersion} · {entry.status} · {entry.id}</option>)}</select></label> : null}
       {snapshot.status === "preview" ? <button type="button" disabled={Boolean(busy)} onClick={() => void command("RELEASE_PACKAGE", { snapshotId: snapshot.id, contentDigest: snapshot.contentDigest, inspectionSnapshotId: snapshot.id, inspectionDigest: snapshot.contentDigest, inspectionConfirmed: true, idempotencyKey: `release-${snapshot.id}` })}>Release inspected snapshot</button> : null}
       {snapshot.status === "released" ? <fieldset><legend>Record manual delivery</legend><label>Verified recipient<input value={recipient} onChange={(event) => { setRecipient(event.target.value); setDeliveryIdempotencyKey(""); }} /></label><label>Channel<select value={channel} onChange={(event) => { setChannel(event.target.value); setDeliveryIdempotencyKey(""); }}><option value="MANUAL_EMAIL">Manual email</option><option value="MANUAL_SHARED_LINK">Manual shared link</option><option value="MANUAL_IN_PERSON">Manual in-person handoff</option></select></label><label><input type="checkbox" checked={recipientVerified} onChange={(event) => { setRecipientVerified(event.target.checked); setDeliveryIdempotencyKey(""); }} /> I verified this recipient through the approved operating process</label><label>Handoff time<input type="datetime-local" step="1" value={handoffAt} onChange={(event) => { setHandoffAt(event.target.value); setDeliveryIdempotencyKey(""); }} /></label><label>Handoff evidence reference<input value={evidenceRef} onChange={(event) => { setEvidenceRef(event.target.value); setDeliveryIdempotencyKey(""); }} /></label><button type="button" disabled={Boolean(busy)} onClick={async () => { if (!recipient.trim() || !recipientVerified || !handoffAt || !evidenceRef.trim()) { setMessage("Recipient, verification, handoff time, and evidence are required. No delivery was recorded."); return; } const absoluteHandoffAt = new Date(handoffAt).toISOString(); const key = deliveryIdempotencyKey || `delivery-${snapshot.id}-${Date.now()}`; setDeliveryIdempotencyKey(key); if (await command("RECORD_DELIVERY", { snapshotId: snapshot.id, recipient, channel, recipientVerified, handoffAt: absoluteHandoffAt, evidenceRef, idempotencyKey: key })) setDeliveryIdempotencyKey(""); }}>Record actual handoff</button></fieldset> : null}

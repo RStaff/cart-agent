@@ -3,7 +3,7 @@ import { BLUEPRINT_DELIVERABLE_IDENTIFIERS } from "./blueprintDeliverableAuthori
 
 export const BLUEPRINT_PACKAGE_PERMISSION = "staffordos.revenue_operations.write";
 export const BLUEPRINT_PACKAGE_COMMANDS = Object.freeze(["CREATE_PREVIEW_SNAPSHOT", "RELEASE_PACKAGE", "RECORD_DELIVERY"]);
-export const BLUEPRINT_PACKAGE_RENDERER_VERSION = "stafford-media-blueprint-html-v1";
+export const BLUEPRINT_PACKAGE_RENDERER_VERSION = "stafford-media-blueprint-html-v2";
 const CLIENT_TITLES = Object.freeze({
   workflow_interview_current_state_map: "Workflow interview and current-state map",
   primary_automation_diagnosis: "Primary automation diagnosis",
@@ -61,10 +61,18 @@ function clientJson(value) {
   if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return esc(value);
   return esc(JSON.stringify(value, null, 2));
 }
+function humanLabel(value) {
+  return String(value ?? "")
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (character) => character.toUpperCase());
+}
 function labeled(value) {
   if (value === null || value === undefined) return "<span>Not recorded</span>";
   if (Array.isArray(value)) return `<ul>${value.map((entry) => `<li>${labeled(entry)}</li>`).join("")}</ul>`;
-  if (typeof value === "object") return `<dl>${Object.entries(value).map(([key, entry]) => `<div><dt>${esc(key)}</dt><dd>${labeled(entry)}</dd></div>`).join("")}</dl>`;
+  if (typeof value === "object") return `<dl>${Object.entries(value).map(([key, entry]) => `<div><dt>${esc(humanLabel(key))}</dt><dd>${labeled(entry)}</dd></div>`).join("")}</dl>`;
   return `<span>${esc(value)}</span>`;
 }
 
@@ -76,7 +84,7 @@ export function renderBlueprintPackageHtml({ packageVersion, deliverables }) {
     const limitations = Array.isArray(item.limitations) ? item.limitations : [];
     return `<section class="deliverable"><h2>${esc(title)}</h2><p class="version">Version ${esc(item.version)} · reviewed</p><h3>Owner</h3><p>${esc(item.owner)}</p><h3>Contents</h3><div class="contents">${labeled(item.contents)}</div><h3>Evidence references</h3><ul>${evidenceRefs.map((entry) => `<li>${clientJson(typeof entry === "string" ? entry : entry?.ref)}${entry?.observedAt ? ` <span>(${esc(entry.observedAt)})</span>` : ""}</li>`).join("")}</ul><h3>Claim classifications</h3><ul>${claims.map((entry) => `<li>${esc(entry?.classification)}: ${clientJson(entry?.claim)}</li>`).join("")}</ul><h3>Limitations</h3>${limitations.length ? `<ul>${limitations.map((entry) => `<li>${clientJson(typeof entry === "string" ? entry : entry?.text)}</li>`).join("")}</ul>` : "<p>None recorded.</p>"}</section>`;
   }).join("");
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Stafford Media Automation Opportunity Blueprint</title><style>body{font-family:system-ui,sans-serif;max-width:860px;margin:2rem auto;padding:0 1rem;color:#17202a;line-height:1.45}h1{font-size:2rem}h2{border-top:1px solid #ccd;padding-top:1.5rem;break-after:avoid}.version{color:#52606d}.contents{background:#f5f7f9;padding:1rem;border-radius:.35rem;overflow-wrap:anywhere}.contents dl{margin:0}.contents dt{font-weight:700;margin-top:.6rem}.contents dd{margin:.15rem 0 0 1rem}.contents ul{margin:.2rem 0}.contents li{overflow-wrap:anywhere}li{overflow-wrap:anywhere}@media print{body{margin:0}.deliverable{break-inside:auto}h2{break-after:avoid}}</style></head><body><header><h1>Stafford Media Automation Opportunity Blueprint</h1><p>Package version ${esc(packageVersion)}</p><p>Preparation evidence only: implementation, client acceptance, and business outcomes are separate.</p></header>${sections}<section class="measurement-status"><h2>Measurement status</h2><p>Baseline: Not measured yet.</p><p>Agreed target: Not measured yet.</p><p>Observed result: Not measured yet.</p><p>Business outcomes and ROI: Not measured yet.</p></section></body></html>`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Stafford Media Automation Opportunity Blueprint</title><style>body{font-family:system-ui,sans-serif;max-width:860px;margin:2rem auto;padding:0 1rem;color:#17202a;line-height:1.45}h1{font-size:2rem}h2{border-top:1px solid #ccd;padding-top:1.5rem;break-after:avoid}.version{color:#52606d}.contents{background:#f5f7f9;padding:1rem;border-radius:.35rem;overflow-wrap:anywhere}.contents dl{margin:0}.contents dl>div{margin:.75rem 0;break-inside:avoid}.contents dt{font-weight:700;line-height:1.25}.contents dd{margin:.25rem 0 0 1rem;overflow-wrap:anywhere}.contents ul{margin:.2rem 0}.contents li{overflow-wrap:anywhere}li{overflow-wrap:anywhere}@page{margin:18mm 16mm 20mm;@bottom-center{content:"Page " counter(page) " of " counter(pages);font-size:9pt;color:#52606d}}@media print{body{margin:0}.deliverable{break-inside:auto}h2{break-after:avoid}}</style></head><body><header><h1>Stafford Media Automation Opportunity Blueprint</h1><p>Package version ${esc(packageVersion)}</p><p>Preparation evidence only: implementation, client acceptance, and business outcomes are separate.</p></header>${sections}<section class="measurement-status"><h2>Measurement status</h2><p>Baseline: Not measured yet.</p><p>Agreed target: Not measured yet.</p><p>Observed result: Not measured yet.</p><p>Business outcomes and ROI: Not measured yet.</p></section></body></html>`;
 }
 
 export function createBlueprintPackageAuthority({ prisma, now = () => new Date() } = {}) {
@@ -116,7 +124,7 @@ export function createBlueprintPackageAuthority({ prisma, now = () => new Date()
         if (!await tx.staffordosBlueprintEngagement.findUnique({ where: { id }, select: { id: true } })) throw new BlueprintPackageError("BLUEPRINT_ENGAGEMENT_NOT_FOUND", 404);
         await lockDeliverables(tx, id); const rows = await latestReviewed(tx, id); const sourceVersions = sourceTuple(rows); const last = await tx.staffordosBlueprintPackage.findFirst({ where: { engagementId: id }, orderBy: { packageVersion: "desc" }, select: { packageVersion: true } }); const packageVersion = (last?.packageVersion || 0) + 1; const renderedHtml = renderBlueprintPackageHtml({ packageVersion, deliverables: rows });
         const contentDigest = digest(renderedHtml);
-        const created = await tx.staffordosBlueprintPackage.create({ data: { engagementId: id, packageVersion, sourceVersions, rendererVersion: BLUEPRINT_PACKAGE_RENDERER_VERSION, templateDigest: digest("stafford-media-blueprint-template-v1"), assetDigest: digest(""), renderedHtml, contentDigest, creationIdempotencyKey: idem } });
+        const created = await tx.staffordosBlueprintPackage.create({ data: { engagementId: id, packageVersion, sourceVersions, rendererVersion: BLUEPRINT_PACKAGE_RENDERER_VERSION, templateDigest: digest("stafford-media-blueprint-template-v2"), assetDigest: digest(""), renderedHtml, contentDigest, creationIdempotencyKey: idem } });
         await tx.staffordosBlueprintPackageAuditEvent.create({ data: audit({ packageId: created.id, engagementId: id, sequence: 1, action: "CREATE_PREVIEW_SNAPSHOT", previousStatus: "NONE", nextStatus: "preview", actorSubject: operator.subject, reasonText, evidenceRef, payload: { sourceVersions } }) });
         return { package: created };
       }, { isolationLevel: "Serializable" });
