@@ -19,7 +19,8 @@ function connectionFor(database) {
 }
 
 async function withClient(url, fn) {
-  const client = new Client({ connectionString: url, ssl: { rejectUnauthorized: false } });
+  const hostname = new URL(url).hostname;
+  const client = new Client({ connectionString: url, ssl: ["127.0.0.1", "localhost", "::1"].includes(hostname) ? false : { rejectUnauthorized: false } });
   await client.connect();
   try { return await fn(client); } finally { await client.end(); }
 }

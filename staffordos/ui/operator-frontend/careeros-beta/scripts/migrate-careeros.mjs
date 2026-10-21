@@ -130,7 +130,9 @@ async function applyMigration(client, migration, migrationsRoot) {
 
 export async function runCareerosMigrations({ connectionString = process.env.DATABASE_URL, migrationsRoot = ROOT } = {}) {
   if (!connectionString) throw new Error("DATABASE_URL_REQUIRED");
-  const client = new Client({ connectionString, ssl: { rejectUnauthorized: false } });
+  let loopback = false;
+  try { loopback = ["127.0.0.1", "localhost", "::1"].includes(new URL(connectionString).hostname); } catch {}
+  const client = new Client({ connectionString, ssl: loopback ? false : { rejectUnauthorized: false } });
   await client.connect();
   try {
     for (const migration of MIGRATIONS) await applyMigration(client, migration, migrationsRoot);
