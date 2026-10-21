@@ -1,0 +1,14 @@
+{
+  "artifact": "CAREEROS_HUMAN_PROFILE_ACCEPTANCE",
+  "presentation_only": true,
+  "primary_source": "CUSTOMER_CONFIRMED_SOURCE_BACKED_CAREER_FACT",
+  "review_queue": "PROPOSED_OR_NEEDS_REVIEW_ONLY",
+  "provenance": "SECONDARY_DISCLOSURE_PRESERVED",
+  "structural_or_machine_like_records": "EVIDENCE_ONLY_WITHOUT_MUTATION",
+  "schema_changed": false,
+  "authority_changed": false,
+  "matching_changed": false,
+  "tenant_scoping": "existing_store_and_postgres_context_filters",
+  "synthetic_fixtures_only": true,
+  "manual_ross_acceptance_required": true
+}

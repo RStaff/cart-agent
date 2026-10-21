@@ -12,6 +12,8 @@ invite-only text beta.
 - Runtime: Next.js Node runtime
 - Customer routes: `/career/*` and `/api/career/*`
 - Database migration source: `prisma/careeros.prisma` and `prisma/migrations/`
+- Promoted source SHA: `e9fdcd390281f0022a8f42ae68f9326133180a6b`
+- Remote beta branch: `careeros/private-beta`
 
 The root intentionally excludes `/os/*`, `/operator/*`, operator components, and
 StaffordOS private loaders. It is not a replacement for the StaffordOS operator

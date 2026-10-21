@@ -1,0 +1,19 @@
+{
+  "schema": "careeros.v1.evidence_backed_capability_review.v1",
+  "status": "validated",
+  "scope": "confirmed CareerFact to customer-reviewed capability propositions",
+  "invariants": [
+    "derived capability propositions use confirmed source-backed CareerFacts only",
+    "supporting evidence and available provenance remain visible without internal identifiers",
+    "explicit customer decisions remain separate from derived propositions",
+    "NOT_SUPPORTED and KEEP_UNRESOLVED remain non-authorizing states",
+    "interviewer and helper text cannot derive capability propositions"
+  ],
+  "validation": {
+    "focused_tests": "PASS",
+    "full_career_suite": "PASS",
+    "typescript_build": "PASS",
+    "semantic_validator": "PASS",
+    "preflight": "PASS"
+  }
+}

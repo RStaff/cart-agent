@@ -1,0 +1,21 @@
+{
+  "schema": "careeros.v1.confirmed_evidence_capability_refresh_repair.v1",
+  "status": "validated",
+  "scope": "reopen capability review when new confirmed evidence strengthens an existing capability proposition",
+  "invariants": [
+    "only CUSTOMER_CONFIRMED_SOURCE_BACKED CareerFacts derive capability authority",
+    "new fact provenance sets NEEDS_MORE_EVIDENCE without deleting prior decisions",
+    "unconfirmed, rejected, and deferred candidates remain non-authoritative",
+    "capability completion requires no unresolved evidence-backed proposition"
+  ],
+  "validation": {
+    "focused_tests": "PASS",
+    "full_career_suite": "PASS",
+    "typescript_build": "PASS",
+    "git_diff_check": "PASS",
+    "semantic_validator": "PASS",
+    "required_agents": "GO",
+    "validator_map": "PASS",
+    "preflight": "GO"
+  }
+}

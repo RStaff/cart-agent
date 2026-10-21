@@ -1,0 +1,11 @@
+{
+  "artifact": "CAREEROS_V1_P1_APPLICATION_MATERIALS_ACCEPTANCE",
+  "material_store": "CareerResumeDraft with materialType RESUME/COVER_LETTER/APPLICATION_ANSWER",
+  "generation": "deterministic_server_side",
+  "provider": null,
+  "authority_chain": "CareerFact -> capability authority -> Application Evidence Packet -> application material draft",
+  "motivation_policy": "requires temporary user intent and never creates CareerFact",
+  "stale_policy": "current evaluation required; explicit re-analysis before refresh",
+  "raw_customer_data": false,
+  "final_submission": false
+}

@@ -1,0 +1,5 @@
+{
+  "internal": ["CareerFact", "capability authority", "scope/directness", "requirement concept", "projection", "specialist firewall"],
+  "customer": ["experience", "career story", "strengths", "what you demonstrated", "what CareerOS understands", "what needs clarification", "not established yet"],
+  "rule": "Internal ontology may support advanced explanations but does not lead normal customer onboarding copy."
+}

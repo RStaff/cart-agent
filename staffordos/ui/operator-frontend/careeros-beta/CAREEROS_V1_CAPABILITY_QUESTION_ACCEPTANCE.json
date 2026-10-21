@@ -1,0 +1,5 @@
+{
+  "questionProperties": ["plain language", "capability specific", "uncertainty identified", "bounded choices", "distinct question key"],
+  "syntheticTarget": "<=15 questions",
+  "internalIdentifiersShown": false
+}

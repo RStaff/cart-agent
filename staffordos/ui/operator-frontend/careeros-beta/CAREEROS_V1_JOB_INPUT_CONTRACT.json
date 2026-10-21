@@ -1,0 +1,7 @@
+{
+  "sourceType": "USER_SUPPLIED_SOURCE",
+  "input": "pasted plaintext job description",
+  "maxCharacters": 50000,
+  "url": "optional metadata only; no provider retrieval",
+  "provenance": "plaintext supplied by customer; no synthetic sections"
+}

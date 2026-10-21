@@ -313,11 +313,12 @@ type ShopifixerPilotSearchParams = {
   shopifixer_completion_saved?: string;
 };
 
-export default async function ShopifixerPilotPage({ searchParams }: { searchParams?: ShopifixerPilotSearchParams }) {
+export default async function ShopifixerPilotPage({ searchParams }: { searchParams?: Promise<ShopifixerPilotSearchParams> }) {
   const repoRoot = resolveRepoRoot();
   const shopifixer = await loadShopifixerCommandCenter();
   const shopifixerRecord = shopifixer as any;
-  const proofRunContext = resolveProofRunContext(repoRoot, searchParams);
+  const resolvedSearchParams = await searchParams;
+  const proofRunContext = resolveProofRunContext(repoRoot, resolvedSearchParams);
   const missionKey = proofRunContext.missionKey || undefined;
   const missionPhaseHref = (key: string) => phaseHref(key, missionKey);
   const leadData = await loadOperatorLeads();
@@ -367,23 +368,23 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
   const scopeFilePath = proofRunContext.scopePath;
   const scopeFileContent = readText(scopeFilePath);
   const scopeSummary = parseScopeSummary(scopeFileContent);
-  const scopeWorkbenchSaved = (searchParams as { shopifixer_scoped_fix_saved?: string } | undefined)?.shopifixer_scoped_fix_saved === "1";
+  const scopeWorkbenchSaved = resolvedSearchParams?.shopifixer_scoped_fix_saved === "1";
   const scopeWorkbenchDate = new Date().toISOString().slice(0, 10);
   const beforeEvidencePath = proofRunContext.beforePath;
   const beforeEvidenceContent = readText(beforeEvidencePath);
   const beforeEvidenceFields = parseEvidenceFields(beforeEvidenceContent);
-  const beforeEvidenceWorkbenchSaved = (searchParams as { shopifixer_before_saved?: string } | undefined)?.shopifixer_before_saved === "1";
+  const beforeEvidenceWorkbenchSaved = resolvedSearchParams?.shopifixer_before_saved === "1";
   const beforeEvidenceWorkbenchDate = new Date().toISOString().slice(0, 10);
   const afterEvidencePath = proofRunContext.afterPath;
   const afterEvidenceContent = readText(afterEvidencePath);
   const afterEvidenceFields = parseEvidenceFields(afterEvidenceContent);
-  const afterEvidenceWorkbenchSaved = (searchParams as { shopifixer_after_saved?: string } | undefined)?.shopifixer_after_saved === "1";
+  const afterEvidenceWorkbenchSaved = resolvedSearchParams?.shopifixer_after_saved === "1";
   const afterEvidenceWorkbenchDate = new Date().toISOString().slice(0, 10);
   const proofPackagePath = proofRunContext.proofPackagePath;
   const proofPackageContent = readText(proofPackagePath);
-  const proofPackageWorkbenchSaved = (searchParams as { shopifixer_proof_package_saved?: string } | undefined)?.shopifixer_proof_package_saved === "1";
+  const proofPackageWorkbenchSaved = resolvedSearchParams?.shopifixer_proof_package_saved === "1";
   const proofPackageWorkbenchDate = new Date().toISOString().slice(0, 10);
-  const completionWorkbenchSaved = (searchParams as { shopifixer_completion_saved?: string } | undefined)?.shopifixer_completion_saved === "1";
+  const completionWorkbenchSaved = resolvedSearchParams?.shopifixer_completion_saved === "1";
   const completionWorkbenchDate = new Date().toISOString().slice(0, 10);
   const evidenceManifest = readJson<Record<string, any>>(
     path.join(repoRoot, "staffordos/proof_runs/output/evidence_manifest_v1.json"),
@@ -644,7 +645,7 @@ export default async function ShopifixerPilotPage({ searchParams }: { searchPara
 
   const evidenceManifestPath = path.join(repoRoot, "staffordos/proof_runs/output/evidence_manifest_v1.json");
   const sealPath = proofRunContext.sealPath;
-  const selectedPhaseKey = resolvePhaseKey(Array.isArray(searchParams?.phase) ? searchParams?.phase[0] : searchParams?.phase);
+  const selectedPhaseKey = resolvePhaseKey(Array.isArray(resolvedSearchParams?.phase) ? resolvedSearchParams?.phase[0] : resolvedSearchParams?.phase);
   const proofPrerequisitesComplete = scopeComplete && beforeEvidenceCaptured && executionComplete && afterEvidenceCaptured;
   const phaseTruth = {
     merchant_context: Boolean(commandCenterMerchant.store || commandCenterMerchant.client_id),

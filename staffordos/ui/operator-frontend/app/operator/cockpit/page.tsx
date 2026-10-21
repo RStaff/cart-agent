@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ExecutePrimaryActionButton } from "../../../components/operator/ExecutePrimaryActionButton";
 
 type CeoTruthSnapshot = {
   metadata?: {
@@ -184,14 +183,6 @@ export default function OperatorCockpitPage() {
   const systemBlockers = displayList(snapshot?.system_health?.blockers);
   const systemWarnings = displayList(snapshot?.system_health?.warnings);
   const missingSources = displayList(snapshot?.system_health?.missing_sources);
-  const primaryActionExecutable = Boolean(
-    primaryAction?.action_label &&
-      primaryAction?.action_type &&
-      primaryAction?.domain_id &&
-      primaryAction?.owner &&
-      primaryAction?.next_step
-  );
-
   const revenue = useMemo(
     () => snapshot?.revenue || {},
     [snapshot]
@@ -214,14 +205,14 @@ export default function OperatorCockpitPage() {
       <div className="container">
         <section className="panel">
           <div className="panelInner">
-            <p className="eyebrow">StaffordOS CEO Truth Snapshot</p>
-            <h1 className="title">Business truth at a glance</h1>
+            <p className="eyebrow">Today</p>
+            <h1 className="title">StaffordOS Cockpit</h1>
             <p className="subtitle">
-              Read-only cockpit driven directly from <code>staffordos/cockpit/ceo_truth_snapshot_v1.json</code>.
+              Your daily co-operator. Review what matters now, what is running, what is blocked, and what was completed.
             </p>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 16 }}>
               <Link className="button buttonPrimary" href="/operator/command-center">
-                Command Center
+                ShopiFixer Command Center
               </Link>
               <Link className="button" href="/operator">
                 Operator Console
@@ -302,7 +293,7 @@ export default function OperatorCockpitPage() {
 
               <article className="panel">
                 <div className="panelInner">
-                  <h2 className="sectionTitle">Primary Action</h2>
+                  <h2 className="sectionTitle">What needs your decision</h2>
                   <p className="subtitle" style={{ marginTop: 0 }}>
                     {displayText(primaryAction?.action_label)}
                   </p>
@@ -315,25 +306,16 @@ export default function OperatorCockpitPage() {
                     <span className="badge success">Source: {displayText(snapshot.operator_actions?.action_source?.primary)}</span>
                     <span className="badge success">Top-5: {displayText(snapshot.operator_actions?.confidence?.top_5_actions)}</span>
                   </div>
-                  <div style={{ marginTop: 16 }}>
-                    {primaryActionExecutable ? (
-                      <ExecutePrimaryActionButton />
-                    ) : (
-                      <button className="button buttonPrimary" type="button" disabled>
-                        Execution unavailable
-                      </button>
-                    )}
-                    <p className="hint" style={{ marginTop: 12 }}>
-                      Launch path: /api/operator/execute-primary-action
-                    </p>
-                  </div>
+                  <p className="hint" style={{ marginTop: 16 }}>
+                    Execution controls remain available only from their explicitly named product workflow.
+                  </p>
                 </div>
               </article>
             </section>
 
             <section className="panel">
               <div className="panelInner">
-                <h2 className="sectionTitle">Top 5 Actions</h2>
+                <h2 className="sectionTitle">What matters now</h2>
                 <p className="subtitle" style={{ marginTop: 0 }}>
                   {displayText(snapshot.operator_actions?.top_5_actions?.status)} · {displayText(snapshot.operator_actions?.top_5_actions?.note)}
                 </p>

@@ -1,0 +1,7 @@
+{
+  "mission": "CAREEROS_V1_P1_OUTCOME_TRACKING_AND_DAILY_TRIAGE",
+  "status": "IMPLEMENTED_PENDING_GOVERNED_DEPLOYMENT",
+  "authority": "CareerOpportunity lifecycle and activity are tenant/user scoped; matching and career authority are unchanged",
+  "manual_acceptance_required": true,
+  "real_customer_data": false
+}

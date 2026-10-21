@@ -1,0 +1,24 @@
+{
+  "schema": "careeros.v1.p0.voice_capture_implementation.v1",
+  "sourceBoundary": "careeros/private-beta",
+  "audioRetention": "NONE_IN_CAREEROS",
+  "maxRecordingDurationSeconds": 300,
+  "maxAudioBytes": 8388608,
+  "mimeStrategy": ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"],
+  "provider": "openai",
+  "model": "gpt-4o-transcribe",
+  "providerCredential": "SERVER_ONLY_FAIL_CLOSED",
+  "transcriptionPersistence": "NONE_BEFORE_USER_SUBMISSION",
+  "authorityPath": "VOICE_TRANSCRIPT -> existing text intake -> CareerFactCandidate -> customer review -> CareerFact",
+  "rawAudioPersistence": false,
+  "matchingChanged": false,
+  "binaryUploadEnabled": false,
+  "permissionsPolicy": "microphone=(self)",
+  "manualBrowserAcceptanceRequired": true,
+  "prismaSchemaChanged": false,
+  "knownLimitations": [
+    "Provider-side retention is governed by provider/account authority and is not claimed here.",
+    "Prisma CLI was unavailable locally; no schema changes were made.",
+    "Render deployment requires the governed remote promotion path and provider connectivity."
+  ]
+}

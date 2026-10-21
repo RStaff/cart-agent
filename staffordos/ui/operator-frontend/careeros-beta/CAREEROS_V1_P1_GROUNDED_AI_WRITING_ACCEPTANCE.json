@@ -1,0 +1,38 @@
+{
+  "mission": "CAREEROS_V1_P1_GROUNDED_LLM_APPLICATION_WRITING",
+  "classification": "CAREEROS_V1_P1_GROUNDED_AI_WRITING_READY_FOR_ROSS",
+  "source_authority": "91f55c774022eeff76a31a68085cd46441d92fff",
+  "provider": "OpenAI server-side API",
+  "model": "gpt-4o-mini",
+  "provider_boundary": "/v1/chat/completions",
+  "credential_source": "OPENAI_API_KEY server runtime only",
+  "deterministic_material_preserved": true,
+  "generation_methods": ["DETERMINISTIC", "AI_ASSISTED"],
+  "claim_validation": {
+    "structured_claims_required": true,
+    "support_references_validated": true,
+    "unsupported_claims_rejected": true,
+    "needs_review_visible": true
+  },
+  "authority_unchanged": {
+    "career_facts": true,
+    "capabilities": true,
+    "matching": true,
+    "scope": true,
+    "specialist": true,
+    "tenant_isolation": true
+  },
+  "privacy": {
+    "optional": true,
+    "provider_inputs_minimized": true,
+    "secrets_client_side": false,
+    "private_prompts_logged": false,
+    "disclosure_updated": true
+  },
+  "automated_acceptance": {
+    "focused_tests": "PASS",
+    "production_build": "PASS",
+    "prisma_cli": "UNAVAILABLE_NO_LOCAL_PRISMA_BINARY",
+    "live_browser_ai_test": "MANUAL_REQUIRED"
+  }
+}

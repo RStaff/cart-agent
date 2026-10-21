@@ -1,0 +1,30 @@
+{
+  "artifact": "CAREEROS_V1_P0_UX_HARDENING_ACCEPTANCE",
+  "profile": {
+    "routine_surface": "compact_privacy_affordance",
+    "full_notice_route": "/career/privacy"
+  },
+  "capability_review": {
+    "acknowledgement": "question_scoped_transient",
+    "selection_persistence": "retained"
+  },
+  "voice_input": {
+    "speech_presence_guard": "browser_rms_energy",
+    "rms_threshold": 0.02,
+    "minimum_speech_active_ms": 300,
+    "maximum_recording_seconds": 300,
+    "empty_or_unusable_transcript": "rejected_before_story_submission",
+    "text_fallback": "available"
+  },
+  "authority": {
+    "no_speech_mutates_career_authority": false,
+    "transcription_failure_mutates_career_authority": false,
+    "existing_story_intake_path_preserved": true,
+    "matching_changed": false
+  },
+  "manual_acceptance_required": true,
+  "known_limitations": [
+    "Server-side audio speech detection is not added; the bounded browser energy guard is the primary silence gate.",
+    "Prisma validation is not applicable because no schema changed."
+  ]
+}

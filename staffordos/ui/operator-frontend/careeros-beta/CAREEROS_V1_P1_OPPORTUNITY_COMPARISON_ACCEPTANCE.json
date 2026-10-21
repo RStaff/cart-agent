@@ -1,0 +1,35 @@
+{
+  "mission": "CAREEROS_V1_P1_OPPORTUNITY_COMPARISON_AND_PRIORITIZATION",
+  "scope": "Read-side comparison and qualitative prioritization over existing saved opportunity evaluations",
+  "comparison": {
+    "minimum_opportunities": 2,
+    "maximum_opportunities": 4,
+    "reanalysis_on_selection": false,
+    "tenant_scoped_lookup": true,
+    "stale_evaluations_identified": true
+  },
+  "priority_rule": {
+    "numeric_score": false,
+    "source": "existing CareerMatchEvaluation relationship states",
+    "labels": [
+      "Strong evidence alignment",
+      "Promising, with transferable experience",
+      "Worth reviewing - some evidence gaps",
+      "More information needed",
+      "Needs updated analysis"
+    ]
+  },
+  "authority": {
+    "matching_changed": false,
+    "capability_changed": false,
+    "career_fact_changed": false,
+    "decision_state_remains_separate": true,
+    "source_url_remains_metadata_only": true,
+    "origin_main_mutated": false
+  },
+  "validation": {
+    "synthetic_fixtures_only": true,
+    "real_customer_data_accessed": false,
+    "external_job_provider_used": false
+  }
+}

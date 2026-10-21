@@ -17,7 +17,11 @@ model CareerUser {
   memberships  CareerTenantMembership[]
   sessions     CareerSession[]
   profiles     CareerProfile[]
+  contextClaims CareerFactContextClaim[]
   auditEvents  CareerAuditEvent[]
+  opportunityEvents CareerOpportunityEvent[]
+  opportunityNotes CareerOpportunityNote[]
+  relevanceFeedback CareerRelevanceFeedback[]
 }
 
 model CareerTenant {
@@ -31,9 +35,21 @@ model CareerTenant {
   candidates  CareerFactCandidate[]
   reviews     CareerFactReviewDecision[]
   facts       CareerFact[]
+  contextClaims CareerFactContextClaim[]
   onboarding  CareerOnboardingState[]
   auditEvents CareerAuditEvent[]
+  opportunityEvents CareerOpportunityEvent[]
+  opportunityNotes CareerOpportunityNote[]
   sessions    CareerSession[]
+  capabilities CareerCapabilityAuthority[]
+  capabilityDecisions CareerCapabilityDecision[]
+  opportunities CareerOpportunity[]
+  requirements CareerOpportunityRequirement[]
+  matchEvaluations CareerMatchEvaluation[]
+  resumeDrafts CareerResumeDraft[]
+  inboxItems CareerOpportunityInboxItem[]
+  searchPreferences CareerSearchPreference[]
+  relevanceFeedback CareerRelevanceFeedback[]
 }
 
 model CareerTenantMembership {
@@ -66,7 +82,14 @@ model CareerProfile {
   sources     CareerSource[]
   candidates  CareerFactCandidate[]
   facts       CareerFact[]
+  contextClaims CareerFactContextClaim[]
   onboarding  CareerOnboardingState?
+  capabilities CareerCapabilityAuthority[]
+  opportunities CareerOpportunity[]
+  matchEvaluations CareerMatchEvaluation[]
+  resumeDrafts CareerResumeDraft[]
+  inboxItems CareerOpportunityInboxItem[]
+  searchPreferences CareerSearchPreference[]
 
   @@unique([tenantId, userId])
   @@index([userId, updatedAt])
@@ -158,9 +181,37 @@ model CareerFact {
   tenant          CareerTenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   profile         CareerProfile       @relation(fields: [profileId], references: [id], onDelete: Cascade)
   candidate       CareerFactCandidate @relation(fields: [candidateFactId], references: [candidateFactId], onDelete: Cascade)
+  contextClaims   CareerFactContextClaim[]
 
   @@index([tenantId, userId, updatedAt])
   @@index([profileId, createdAt])
+}
+
+model CareerFactContextClaim {
+  id                String   @id @default(cuid())
+  tenantId          String
+  userId            String
+  profileId         String
+  careerFactId      String
+  sourceId          String
+  dimension         String
+  displayValue      String
+  normalizedValue   String
+  authorityState    String
+  status            String   @default("ACTIVE")
+  extractionVersion String
+  sourceAnchor      Json
+  supersedesClaimId String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  tenant            CareerTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user              CareerUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile           CareerProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  careerFact        CareerFact @relation(fields: [careerFactId], references: [id], onDelete: Cascade)
+
+  @@unique([careerFactId, dimension, normalizedValue, extractionVersion])
+  @@index([tenantId, userId, profileId, status])
+  @@index([careerFactId, status])
 }
 
 model CareerSession {
@@ -226,4 +277,245 @@ model CareerRateLimitBucket {
   updatedAt       DateTime @updatedAt
 
   @@index([updatedAt])
+}
+
+model CareerCapabilityAuthority {
+  id              String   @id @default(cuid())
+  tenantId        String
+  userId          String
+  profileId       String
+  capabilityKey   String
+  label           String
+  domain          String
+  scope           String
+  authorityState  String
+  provenance      Json
+  taxonomyVersion String
+  version         Int      @default(1)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  tenant          CareerTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  profile         CareerProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  decisions       CareerCapabilityDecision[]
+
+  @@unique([tenantId, profileId, capabilityKey])
+  @@index([tenantId, userId, authorityState])
+}
+
+model CareerCapabilityDecision {
+  id            String   @id @default(cuid())
+  tenantId      String
+  userId        String
+  capabilityId  String
+  questionKey   String
+  answer        String
+  decisionState String
+  rationale     String?
+  taxonomyVersion String
+  createdAt     DateTime @default(now())
+  supersededAt  DateTime?
+  tenant        CareerTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  capability   CareerCapabilityAuthority @relation(fields: [capabilityId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, capabilityId, createdAt])
+  @@index([tenantId, questionKey, supersededAt])
+}
+
+model CareerOpportunity {
+  id              String   @id @default(cuid())
+  tenantId        String
+  userId          String
+  profileId       String
+  sourceType      String
+  title           String
+  company         String?
+  location        String?
+  description     String
+  sourceUrl       String?
+  decisionState   String   @default("CONSIDERING")
+  lifecycleState  String   @default("NEW")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  tenant          CareerTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  profile         CareerProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  requirements    CareerOpportunityRequirement[]
+  evaluations     CareerMatchEvaluation[]
+  resumeDrafts    CareerResumeDraft[]
+  inboxItems      CareerOpportunityInboxItem[]
+  events          CareerOpportunityEvent[]
+  notes           CareerOpportunityNote[]
+
+  @@index([tenantId, userId, updatedAt])
+}
+
+model CareerOpportunityEvent {
+  id            String   @id @default(cuid())
+  tenantId      String
+  userId        String
+  opportunityId String
+  eventType     String
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  tenant        CareerTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user          CareerUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opportunity   CareerOpportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, opportunityId, createdAt])
+  @@index([tenantId, userId, createdAt])
+}
+
+model CareerOpportunityNote {
+  id            String   @id @default(cuid())
+  tenantId      String
+  userId        String
+  opportunityId String
+  content       String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  tenant        CareerTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user          CareerUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opportunity   CareerOpportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, opportunityId, createdAt])
+}
+
+model CareerOpportunityInboxItem {
+  id                    String   @id @default(cuid())
+  tenantId              String
+  userId                String
+  profileId             String
+  sourceType            String
+  sourceName            String?
+  sourceUrl             String?
+  externalOpportunityId String?
+  discoveredAt          DateTime?
+  importedAt            DateTime @default(now())
+  title                 String
+  company               String?
+  location              String?
+  description           String?
+  provenance            Json?
+  normalizedDigest      String?
+  normalizedUrl         String?
+  normalizationStatus   String   @default("NORMALIZED")
+  duplicateStatus       String   @default("NEW")
+  status                String   @default("READY_TO_ANALYZE")
+  duplicateOfInboxItemId String?
+  opportunityId         String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  tenant                CareerTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  profile               CareerProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  opportunity           CareerOpportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, userId, status, updatedAt])
+  @@index([tenantId, normalizedDigest])
+  @@index([tenantId, normalizedUrl])
+}
+
+model CareerSearchPreference {
+  id               String   @id @default(cuid())
+  tenantId         String
+  userId           String
+  keywords         String   @default("")
+  requestedTitle   String   @default("")
+  normalizedTitle  String   @default("")
+  roleFamily       String   @default("")
+  specialization   Json
+  seniority        String   @default("UNSPECIFIED")
+  excludedTitles   Json
+  location         String   @default("")
+  remotePreference String   @default("any")
+  postedWithinDays Int?
+  salaryMin        Int?
+  resultLimit      Int      @default(10)
+  active           Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  tenant           CareerTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user             CareerUser   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId])
+  @@index([tenantId, userId, active])
+}
+
+model CareerRelevanceFeedback {
+  id                      String   @id @default(cuid())
+  tenantId                String
+  userId                  String
+  targetRoleNormalized    String
+  requestedTitle          String
+  observedTitle           String
+  observedTitleNormalized String
+  reason                  String
+  provider                String?
+  externalOpportunityId   String?
+  createdAt               DateTime @default(now())
+  tenant                  CareerTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user                    CareerUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, userId, targetRoleNormalized])
+  @@index([tenantId, userId, observedTitleNormalized])
+}
+
+model CareerOpportunityRequirement {
+  id            String   @id @default(cuid())
+  tenantId      String
+  opportunityId String
+  sourceOrder   Int
+  text          String
+  conceptKey    String
+  importance    String
+  scope         String
+  specialist    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  tenant        CareerTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  opportunity   CareerOpportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+
+  @@unique([opportunityId, sourceOrder])
+  @@index([tenantId, opportunityId])
+}
+
+model CareerMatchEvaluation {
+  id               String   @id @default(cuid())
+  tenantId         String
+  userId           String
+  profileId        String
+  opportunityId    String
+  taxonomyVersion  String
+  evaluationVersion String
+  summary          Json
+  relationships    Json
+  stale            Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  tenant           CareerTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  profile          CareerProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  opportunity      CareerOpportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, opportunityId, createdAt])
+  @@index([tenantId, profileId, stale])
+}
+
+model CareerResumeDraft {
+  id                String   @id @default(cuid())
+  tenantId          String
+  userId            String
+  profileId         String
+  opportunityId     String
+  materialType      String   @default("RESUME")
+  generationMethod  String   @default("DETERMINISTIC")
+  provider          String?
+  model             String?
+  evaluationVersion String
+  authorityVersion  Int      @default(1)
+  draftVersion      Int      @default(1)
+  content           Json
+  stale             Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  tenant            CareerTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  profile           CareerProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  opportunity       CareerOpportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, userId, opportunityId, createdAt])
 }

@@ -1,0 +1,223 @@
+{
+  "MATCH_SCORE": {
+    "semanticKey": "MATCH_SCORE",
+    "status": "NOT_READY",
+    "customerFacingAllowed": false,
+    "authoritativeSource": "governed_product_policy",
+    "allowedLabels": [],
+    "calculationAuthority": null,
+    "staleBehavior": "NEVER_RENDER_AS_CURRENT"
+  },
+  "EVIDENCE_COVERAGE_PERCENTAGE": {
+    "semanticKey": "EVIDENCE_COVERAGE_PERCENTAGE",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "buildEvidenceFit",
+    "allowedLabels": ["Evidence fit"],
+    "calculationAuthority": "floor((DIRECT + TRANSFERABLE) / canonical parsed relationships * 100)",
+    "staleBehavior": "RENDER_NO_VALUE"
+  },
+  "QUALITATIVE_ASSESSMENT": {
+    "semanticKey": "QUALITATIVE_ASSESSMENT",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "buildDecisionFirstMatchSummary",
+    "allowedLabels": ["Strong evidence alignment", "Promising alignment", "Mixed evidence", "Limited confirmed evidence", "More analysis needed", "Analysis needs to be refreshed"],
+    "calculationAuthority": "existing relationship states and coverage guard",
+    "staleBehavior": "RENDER_STALE_WARNING"
+  },
+  "PROFILE_IDENTITY": {
+    "semanticKey": "PROFILE_IDENTITY",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerProfile",
+    "allowedSurface": "/career/profile",
+    "notes": "Profile identity and positioning only; confirmed career evidence is reviewed through Career Story and Evidence surfaces."
+  },
+  "CAREER_STORY": {
+    "semanticKey": "CAREER_STORY",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerSource -> CareerFactCandidate -> customer review -> CareerFact",
+    "allowedSurface": "/career/onboarding",
+    "notes": "Story intake may propose facts but may not silently confirm them."
+  },
+  "CAREER_EVIDENCE": {
+    "semanticKey": "CAREER_EVIDENCE",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerFact and source provenance",
+    "notes": "Confirmed facts and provenance remain inspectable without creating a second evidence store."
+  },
+  "CONTEXT_CLAIM_AUTHORITY": {
+    "semanticKey": "CONTEXT_CLAIM_AUTHORITY",
+    "status": "RESTRICTED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerFactContextClaim linked to CUSTOMER_CONFIRMED_SOURCE_BACKED CareerFact",
+    "notes": "Context claims are separately reviewable and cannot authorize capabilities, matching, recommendations, resumes, or applications.",
+    "invariants": [
+      "ONLY_CONFIRMED_CAREER_FACTS_CREATE_CONTEXT_PROPOSALS",
+      "SYSTEM_PROPOSED_CONTEXT_IS_NOT_CUSTOMER_AUTHORITY",
+      "CONTEXT_CORRECTION_SUPERSEDES_WITHOUT_REWRITING_CAREER_FACT",
+      "CONTEXT_CLAIMS_DO_NOT_AFFECT_CAPABILITY_AUTHORITY",
+      "CONTEXT_CLAIMS_DO_NOT_AFFECT_MATCHING"
+    ]
+  },
+  "CAPABILITY_AUTHORITY": {
+    "semanticKey": "CAPABILITY_AUTHORITY",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerCapabilityAuthority and CareerCapabilityDecision",
+    "allowedSurface": "/career/capabilities",
+    "notes": "Capability review remains separate from profile identity and raw story intake.",
+    "invariants": [
+      "NEW_CONFIRMED_FACT_PROVENANCE_REOPENS_CAPABILITY_REVIEW",
+      "PRIOR_CAPABILITY_DECISIONS_REMAIN_PERSISTED"
+    ]
+  },
+  "DERIVED_CAPABILITY_PROPOSITION": {
+    "semanticKey": "DERIVED_CAPABILITY_PROPOSITION",
+    "status": "RESTRICTED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerCapabilityAuthority provenance from confirmed CareerFacts",
+    "notes": "A derived proposition is not customer-authorized until an explicit CareerCapabilityDecision exists."
+  },
+  "CUSTOMER_AUTHORIZED_CAPABILITY": {
+    "semanticKey": "CUSTOMER_AUTHORIZED_CAPABILITY",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerCapabilityDecision and CareerCapabilityAuthority.authorityState",
+    "notes": "Only an explicit customer decision authorizes a capability; NOT_SUPPORTED and KEEP_UNRESOLVED remain unresolved for matching."
+  },
+  "APPLICATION_ARTIFACTS": {
+    "semanticKey": "APPLICATION_ARTIFACTS",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerResumeDraft and application evidence packet",
+    "notes": "Job-specific drafts are presentation artifacts and cannot become CareerFact or Profile authority."
+  },
+  "UNCONFIRMED_DATA": {
+    "semanticKey": "UNCONFIRMED_DATA",
+    "status": "RESTRICTED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerFactCandidate status",
+    "notes": "Candidate facts must be visibly proposed and reviewed before appearing as confirmed profile truth."
+  },
+  "TESTIMONY_REVIEW_CONTINUITY": {
+    "semanticKey": "TESTIMONY_REVIEW_CONTINUITY",
+    "status": "REQUIRED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerStoryBuilder -> CareerSource -> CareerFactCandidate -> customer review",
+    "allowedLabels": ["Here’s what CareerOS understood", "Review proposed experience", "Review strengths"],
+    "invariants": [
+      "SUBMITTED_TESTIMONY_EXPOSES_CANDIDATE_REVIEW",
+      "CANDIDATES_REMAIN_UNCONFIRMED_UNTIL_CUSTOMER_REVIEW",
+      "ACTIVE_INTERVIEW_DOES_NOT_EXPOSE_CAPABILITY_REVIEW",
+      "REVIEW_STRENGTHS_DOES_NOT_BYPASS_PENDING_CANDIDATE_REVIEW",
+      "CAPABILITIES_USE_CONFIRMED_CAREER_FACTS_ONLY"
+    ]
+  },
+  "SURFACE_SEPARATION": {
+    "semanticKey": "SURFACE_SEPARATION",
+    "status": "REQUIRED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerOS information architecture contract",
+    "invariants": [
+      "PROFILE_DOES_NOT_RENDER_FULL_CAREER_STORY_BUILDER",
+      "CAREER_STORY_SURFACE_RETAINS_EXISTING_REVIEW_FLOW",
+      "APPLICATION_ARTIFACTS_REMAIN_OPPORTUNITY_SPECIFIC"
+    ]
+  },
+  "SEARCH_PREFERENCE": {
+    "semanticKey": "SEARCH_PREFERENCE",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerSearchPreference",
+    "notes": "Customer-entered discovery criteria remain authoritative. Bounded generic search themes may be derived from confirmed CareerFacts, reviewed capability authority, and reviewed context claims, but private evidence text, testimony, resumes, application history, and notes must not be sent to providers."
+  },
+  "SEARCH_INTENT": {
+    "semanticKey": "SEARCH_INTENT",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "Confirmed CareerFacts, reviewed capability authority, reviewed context claims, and CareerSearchPreference",
+    "notes": "Derived search intent may produce only generic role-family terms for provider queries. It must preserve explicit customer targets and must not convert tools or stakeholders into unsupported job titles."
+  },
+  "SEARCH_PRESET": {
+    "semanticKey": "SEARCH_PRESET",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "Discover UI preset criteria",
+    "notes": "Convenience criteria only; presets do not authorize capability or qualification claims."
+  },
+  "PROVIDER_RESULT": {
+    "semanticKey": "PROVIDER_RESULT",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "Authorized provider adapter response",
+    "notes": "Transient provider data may be normalized, filtered, ranked, and displayed with attribution. It is not persisted as a CareerOpportunity and is not a full CareerOS match assessment until explicitly imported and analyzed."
+  },
+  "TRIAGE_STATUS": {
+    "semanticKey": "TRIAGE_STATUS",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerOpportunity decision/lifecycle and provider closing date",
+    "notes": "Triage labels must derive from existing persisted states or actual provider dates."
+  },
+  "AUTO_IMPORT": {
+    "semanticKey": "AUTO_IMPORT",
+    "status": "PROHIBITED",
+    "customerFacingAllowed": false,
+    "authoritativeSource": "governed_product_policy"
+  },
+  "BACKGROUND_SEARCH": {
+    "semanticKey": "BACKGROUND_SEARCH",
+    "status": "NOT_AUTHORIZED",
+    "customerFacingAllowed": false,
+    "authoritativeSource": "governed_product_policy"
+  },
+  "FUTURE_CONTEXTUAL_QUESTIONING": {
+    "semanticKey": "FUTURE_CONTEXTUAL_QUESTIONING",
+    "status": "FUTURE_NOT_IMPLEMENTED",
+    "customerFacingAllowed": false,
+    "authoritativeSource": "Slice 3 implementation plan",
+    "invariants": [
+      "QUESTIONS_MUST_USE_CONFIRMED_SOURCE_BACKED_EVIDENCE",
+      "QUESTIONS_MUST_NOT_INVENT_FACTS",
+      "QUESTIONS_MUST_RETAIN_UNKNOWN_AND_UNCONFIRMED_STATES"
+    ]
+  },
+  "SLICE_2_TIMELINE_PRESERVATION": {
+    "semanticKey": "SLICE_2_TIMELINE_PRESERVATION",
+    "status": "FUTURE_NOT_IMPLEMENTED",
+    "customerFacingAllowed": false,
+    "authoritativeSource": "Slice 2 implementation plan",
+    "invariants": [
+      "EXPLICIT_DATE_WORDING_REMAINS_SOURCE_BACKED",
+      "APPROXIMATE_DATES_ARE_NOT_RESOLVED",
+      "RELATIVE_SEQUENCE_IS_NOT_INFERRED"
+    ]
+  },
+  "NAVIGATION_DESTINATION": {
+    "semanticKey": "NAVIGATION_DESTINATION",
+    "status": "AUTHORIZED",
+    "customerFacingAllowed": true,
+    "authoritativeSource": "CareerOS customer route inventory",
+    "destinations": {
+      "CAREEROS_HOME": "/career",
+      "JOB_SEARCH_WORKSPACE": "/career/jobs",
+      "OPPORTUNITY_DETAIL": "/career/jobs/[opportunityId]",
+      "DISCOVER_OPPORTUNITIES": "/career/discover",
+      "OPPORTUNITY_INBOX": "/career/inbox",
+      "PROFILE": "/career/profile",
+      "CAPABILITIES": "/career/capabilities",
+      "COMPARISON": "/career/jobs/compare",
+      "APPLICATION_EVIDENCE": "/career/jobs/[opportunityId]/application-evidence"
+    },
+    "invariants": [
+      "OPPORTUNITY_DETAIL_REACHES_HOME_AND_WORKSPACE",
+      "JOB_SEARCH_WORKSPACE_REACHES_HOME",
+      "DISTINCT_LABELS_DO_NOT_ALIAS_UNAUTHORIZED_DESTINATIONS",
+      "SOURCE_LINK_REMAINS_EXTERNAL_PROVENANCE"
+    ]
+  }
+}

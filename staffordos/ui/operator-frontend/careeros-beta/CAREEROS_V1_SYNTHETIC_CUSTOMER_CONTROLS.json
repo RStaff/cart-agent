@@ -1,0 +1,6 @@
+{
+  "dataClass": "synthetic_only",
+  "profiles": ["general_program_delivery", "adjacent_transferable", "generalist_without_specialist_authority"],
+  "realInvitations": false,
+  "rossPrivateData": false
+}

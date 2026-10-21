@@ -1,0 +1,6 @@
+{
+  "status": "DISABLED",
+  "binaryFilesAccepted": false,
+  "reason": "Secure binary storage and its inspection, access, retention, deletion, backup, and restore controls are not yet authorized.",
+  "uxBoundary": "Add document is visible as unavailable and directs the customer to paste or type instead."
+}
