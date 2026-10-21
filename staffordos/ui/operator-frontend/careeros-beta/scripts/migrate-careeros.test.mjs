@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { Client } from "pg";
@@ -65,7 +66,7 @@ try {
   assert.equal(await count(freshUrl, "CareerOSMigration"), 8, "fresh and repeat runs ledger eight migrations");
 
   const changedRootPath = await mkdtemp(join(tmpdir(), "careeros-changed-"));
-  const changedRoot = new URL(`${changedRootPath}/`);
+  const changedRoot = pathToFileURL(`${changedRootPath}/`);
   await cp(new URL("../", import.meta.url), changedRootPath, { recursive: true });
   const changedMigration = join(changedRootPath, "prisma/migrations/20260816000000_careeros_p0_foundation/migration.sql");
   await writeFile(changedMigration, `${await readFile(changedMigration, "utf8")}\n-- changed for checksum test\n`);
@@ -75,7 +76,7 @@ try {
   const failed = await createDatabase("resume"); databases.push(failed);
   const failedUrl = connectionFor(failed);
   const brokenRootPath = await mkdtemp(join(tmpdir(), "careeros-broken-"));
-  const brokenRoot = new URL(`${brokenRootPath}/`);
+  const brokenRoot = pathToFileURL(`${brokenRootPath}/`);
   await cp(new URL("../", import.meta.url), brokenRootPath, { recursive: true });
   const brokenMigration = join(brokenRootPath, "prisma/migrations/20260817000000_careeros_capability_match_product/migration.sql");
   await writeFile(brokenMigration, `${await readFile(brokenMigration, "utf8")}\nTHIS IS INVALID SQL;\n`);
