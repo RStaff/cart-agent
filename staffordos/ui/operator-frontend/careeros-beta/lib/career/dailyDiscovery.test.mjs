@@ -81,13 +81,13 @@ test("Career Home keeps the core journey descriptions concise", () => {
 });
 
 test("saved preference schema is applied by the existing CareerOS startup path", () => {
-  const startup = read("scripts/start-careeros.mjs");
-  assert.match(startup, /20260820050000_add_career_search_preferences\/migration\.sql/);
+  const runner = read("scripts/migrate-careeros.mjs");
+  assert.match(runner, /20260820050000_add_career_search_preferences/);
 });
 
 test("context claim schema is applied by the existing CareerOS startup path", () => {
-  const startup = read("scripts/start-careeros.mjs");
-  assert.match(startup, /20260822010000_add_career_fact_context_claims\/migration\.sql/);
+  const runner = read("scripts/migrate-careeros.mjs");
+  assert.match(runner, /20260822010000_add_career_fact_context_claims/);
 });
 
 test("context claim migration is additive and idempotent", () => {

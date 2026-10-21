@@ -47,6 +47,11 @@ const MIGRATIONS = [
     objects: [
       { kind: "table", name: "CareerRelevanceFeedback" },
       { kind: "column", table: "CareerSearchPreference", name: "requestedTitle" },
+      { kind: "column", table: "CareerSearchPreference", name: "normalizedTitle" },
+      { kind: "column", table: "CareerSearchPreference", name: "roleFamily" },
+      { kind: "column", table: "CareerSearchPreference", name: "specialization" },
+      { kind: "column", table: "CareerSearchPreference", name: "seniority" },
+      { kind: "column", table: "CareerSearchPreference", name: "excludedTitles" },
     ],
   },
 ];
