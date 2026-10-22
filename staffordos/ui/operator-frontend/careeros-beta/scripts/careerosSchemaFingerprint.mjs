@@ -41,7 +41,7 @@ export async function readCareerOSSchema(client) {
       JOIN pg_attribute a ON a.attrelid=pc.oid AND a.attname=c.column_name
       LEFT JOIN pg_collation coll ON coll.oid=a.attcollation
       WHERE c.table_schema=current_schema() AND c.table_name IN (${tableList})
-      ORDER BY c.table_name,c.ordinal_position`),
+      ORDER BY c.table_name,c.column_name`),
     client.query(`SELECT tc.table_name,tc.constraint_name,tc.constraint_type,pc.condeferrable,pc.condeferred,
       pc.convalidated,pg_get_constraintdef(pc.oid) AS definition
       FROM information_schema.table_constraints tc
@@ -56,14 +56,15 @@ export async function readCareerOSSchema(client) {
     client.query(CATALOG_SQL),
   ]);
   const catalogObjects = objects.rows;
+  const canonicalSort = (rows) => [...rows].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
   const value = {
-    tables: tables.rows.map((row) => row.tablename),
-    columns: columns.rows,
-    constraints: constraints.rows,
-    indexes: indexes.rows,
+    tables: tables.rows.map((row) => row.tablename).sort(),
+    columns: canonicalSort(columns.rows),
+    constraints: canonicalSort(constraints.rows),
+    indexes: canonicalSort(indexes.rows),
     // Operational ledgers are intentionally excluded from the application
     // fingerprint; catalogObjects remains available for unexpected-object checks.
-    objects: objects.rows.filter((row) => CAREEROS_TABLES.includes(row.object_name) || HISTORICAL_SCHEMA_OBJECTS.includes(row.object_name)),
+    objects: canonicalSort(objects.rows.filter((row) => CAREEROS_TABLES.includes(row.object_name) || HISTORICAL_SCHEMA_OBJECTS.includes(row.object_name))),
   };
   const canonical = JSON.stringify(value);
   return { ...value, catalogObjects, canonical, fingerprint: createHash("sha256").update(canonical, "utf8").digest("hex") };
