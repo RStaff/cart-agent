@@ -1,5 +1,7 @@
 import { createHash } from "node:crypto";
 
+export const CAREEROS_SCHEMA_FINGERPRINT_VERSION = "careeros-schema-fingerprint-v2";
+
 export const CAREEROS_TABLES = [
   "CareerUser", "CareerTenant", "CareerTenantMembership", "CareerProfile", "CareerSource",
   "CareerFactCandidate", "CareerFactReviewDecision", "CareerFact", "CareerSession",
@@ -58,6 +60,7 @@ export async function readCareerOSSchema(client) {
   const catalogObjects = objects.rows;
   const canonicalSort = (rows) => [...rows].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
   const value = {
+    fingerprintVersion: CAREEROS_SCHEMA_FINGERPRINT_VERSION,
     tables: tables.rows.map((row) => row.tablename).sort(),
     columns: canonicalSort(columns.rows),
     constraints: canonicalSort(constraints.rows),
