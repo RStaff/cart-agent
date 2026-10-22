@@ -69,9 +69,24 @@ normal startup.
    reviewer identity and recovery target before authorizing the one-shot
    reconciliation/adoption commands.
 
-Merge remains blocked until this gate is complete. #133 supplies the normal
-   runner; this package supplies the explicit reviewed correction/adoption
-   procedure and must not be treated as an automatic dependency of startup.
+## Required release sequence
+
+The only approved order is:
+
+1. Complete the separate restore rehearsal and validate its catalog,
+   backup/export evidence, correction, adoption, and normal-runner repeat.
+2. Obtain approval for the live-database preparation gate, then perform the
+   live schema revalidation, fresh-backup confirmation, maintenance/write
+   coordination, correction and reviewed adoption.
+3. Merge PR #133 into `careeros/private-beta`; do not merge this package or
+   #133 before the live gate is approved.
+4. Verify Render's automatic deployment: exact merge revision, startup
+   migration result/no-op ledger validation, service health, and protected
+   route behavior.
+
+Merge remains blocked until steps 1 and 2 are complete. #133 supplies the
+normal runner; this package supplies the explicit reviewed correction/adoption
+procedure and must not be treated as an automatic dependency of startup.
 
 The provider recovery mechanism is Render Postgres Recovery/PITR and logical
 exports. Recovery creates a new database instance; it does not overwrite the
