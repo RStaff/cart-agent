@@ -3,7 +3,7 @@ import { execFile } from "node:child_process";
 import { readFile, writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
 import { Client } from "pg";
-import { assertExactCareerOSSchema, readCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
+import { assertExactCareerOSSchema, assertNoUnexpectedApplicationObjects, readCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
 
 const exec = promisify(execFile);
 const connectionString = process.env.DATABASE_URL;
@@ -29,7 +29,7 @@ try {
   const ledger = await client.query(`SELECT to_regclass('"CareerOSMigration"') AS name`);
   const adoption = await client.query(`SELECT to_regclass('"CareerOSMigrationAdoption"') AS name`);
   if (ledger.rows[0].name || adoption.rows[0].name) throw new Error("CAREEROS_SCHEMA_ALREADY_ADOPTED");
-  const schema = await readCareerOSSchema(client); assertExactCareerOSSchema(schema);
+  const schema = await readCareerOSSchema(client); assertExactCareerOSSchema(schema); assertNoUnexpectedApplicationObjects(schema);
   await writeFile(outputPath, `${JSON.stringify({ kind: "REVIEWED_SCHEMA_ADOPTION_EVIDENCE", sourceRevision, reviewedBy, schemaFingerprint: schema.fingerprint, migrationChecksums }, null, 2)}\n`, { flag: "wx" });
   console.log(`CareerOS adoption evidence written: ${outputPath}`);
 } finally { await client.end(); }

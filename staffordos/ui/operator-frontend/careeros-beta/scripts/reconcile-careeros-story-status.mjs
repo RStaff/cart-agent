@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { Client } from "pg";
-import { readCareerOSSchema, assertExactCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
+import { readCareerOSSchema, assertExactCareerOSSchema, assertNoUnexpectedApplicationObjects } from "./careerosSchemaFingerprint.mjs";
 
 const connectionString = process.env.DATABASE_URL;
 const expectedLegacyFingerprint = process.env.CAREEROS_LEGACY_SCHEMA_FINGERPRINT;
@@ -18,6 +18,7 @@ try {
   if (ledger.rows[0].table_name) throw new Error("CAREEROS_RECONCILIATION_REQUIRES_UNLEDGERED_SCHEMA");
   const schema = await readCareerOSSchema(client);
   assertExactCareerOSSchema({ ...schema, tables: schema.tables.filter((name) => name !== "CareerOSMigration") });
+  assertNoUnexpectedApplicationObjects(schema);
   if (schema.fingerprint !== expectedLegacyFingerprint) throw new Error(`CAREEROS_LEGACY_SCHEMA_FINGERPRINT_MISMATCH:${schema.fingerprint}`);
   const existing = await client.query(`SELECT data_type,udt_name,is_nullable,COALESCE(column_default,'') AS column_default
     FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='CareerOnboardingState' AND column_name='storyStatus'`);

@@ -1,7 +1,8 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { Client } from "pg";
-import { assertExactCareerOSSchema, readCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
+import { assertExactCareerOSSchema, assertNoUnexpectedApplicationObjects, readCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
+import { verifyAdoptionApproval } from "./careerosAdoptionApproval.mjs";
 
 const connectionString = process.env.DATABASE_URL;
 const evidencePath = process.env.CAREEROS_ADOPTION_MANIFEST_PATH;
@@ -37,7 +38,10 @@ try {
   await client.query("SELECT pg_advisory_xact_lock(hashtext($1))", ["careeros-migration-v1"]);
   const schema = await readCareerOSSchema(client);
   assertExactCareerOSSchema(schema);
+  assertNoUnexpectedApplicationObjects(schema);
   if (schema.fingerprint !== reviewedFingerprint) throw new Error(`CAREEROS_REVIEWED_SCHEMA_FINGERPRINT_MISMATCH:${schema.fingerprint}`);
+  const identity = (await client.query(`SELECT current_database() AS database_name,current_user AS database_user,current_schema() AS schema_name,COALESCE(inet_server_addr()::text,'') AS server_address,inet_server_port() AS server_port`)).rows[0];
+  const approval = await verifyAdoptionApproval({ approvalPath: process.env.CAREEROS_ADOPTION_APPROVAL_PATH, trustedKeysJson: process.env.CAREEROS_ADOPTION_TRUSTED_KEYS_JSON, target: identity, sourceRevision, schemaFingerprint: reviewedFingerprint, migrationChecksums: checksums });
   const existingLedger = await client.query(`SELECT to_regclass('"CareerOSMigration"') AS table_name`);
   const existingAdoption = await client.query(`SELECT to_regclass('"CareerOSMigrationAdoption"') AS table_name`);
   if (existingLedger.rows[0].table_name || existingAdoption.rows[0].table_name) throw new Error("CAREEROS_SCHEMA_ALREADY_ADOPTED");
@@ -55,7 +59,7 @@ try {
   }
   for (const id of migrationIds) await client.query(`INSERT INTO "CareerOSMigration" ("id","checksum") VALUES ($1,$2)`, [id, checksums[id]]);
   const adoptionId = `schema-adoption-${createHash("sha256").update(`${sourceRevision}:${reviewedFingerprint}`).digest("hex").slice(0, 24)}`;
-  await client.query(`INSERT INTO "CareerOSMigrationAdoption" ("id","kind","sourceRevision","schemaFingerprint","migrationChecksums","reviewedBy") VALUES ($1,$2,$3,$4,$5::jsonb,$6)`, [adoptionId, "REVIEWED_SCHEMA_ADOPTION", sourceRevision, reviewedFingerprint, JSON.stringify(checksums), reviewedBy]);
+  await client.query(`INSERT INTO "CareerOSMigrationAdoption" ("id","kind","sourceRevision","schemaFingerprint","migrationChecksums","reviewedBy") VALUES ($1,$2,$3,$4,$5::jsonb,$6)`, [adoptionId, "REVIEWED_SCHEMA_ADOPTION", sourceRevision, reviewedFingerprint, JSON.stringify(checksums), approval.reviewedBy]);
   await client.query("COMMIT");
   console.log(`CareerOS reviewed schema adoption recorded: ${adoptionId}`);
 } catch (error) {

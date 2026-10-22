@@ -6,7 +6,9 @@ be run against production without explicit approval.
 
 The Render service uses the literal repository root
 `staffordos/ui/operator-frontend/careeros-beta`; `careos-beta` is not a
-repository or Render path. The service branch remains `careeros/private-beta`.
+repository or Render path. The service branch remains exactly
+`careeros/private-beta`. This runbook supersedes any earlier stacked-PR or
+`#134` merge instruction; no separate package merge is required.
 
 ## Preconditions
 
@@ -26,7 +28,11 @@ repository or Render path. The service branch remains `careeros/private-beta`.
 
 ## Adoption
 
-Run `adopt-careeros-schema.mjs` with the generated evidence manifest. It
+Run `adopt-careeros-schema.mjs` with the generated evidence manifest and a
+separately authenticated Ed25519 approval artifact. The approval must bind
+the target database identity, source revision, post-correction fingerprint,
+and all eight migration checksums; editable manifest fields alone are never
+authority. It
 atomically creates the normal ledger and
 `CareerOSMigrationAdoption`, inserts all eight checksums, and records
 `REVIEWED_SCHEMA_ADOPTION`. It rejects an existing ledger, adoption record,
@@ -38,6 +44,14 @@ against the adopted ledger. It never performs automatic adoption.
 The adoption transaction creates both ledger tables, inserts all eight
 checksums, and inserts the durable `REVIEWED_SCHEMA_ADOPTION` record. Any
 failure rolls back all of those writes together.
+
+The generated manifest is not an approval. Supply the approval artifact via
+`CAREEROS_ADOPTION_APPROVAL_PATH`; trusted Ed25519 public keys come from the
+secure runtime source `CAREEROS_ADOPTION_TRUSTED_KEYS_JSON`. This is a
+key-id-to-base64-SPKI map and must never be committed or logged. The verifier
+compares live `current_database`, database user, schema, server address/port,
+source revision, post-correction fingerprint and every checksum before
+verifying the signature. Edited or replayed artifacts fail closed.
 
 ## Live-database preparation gate (required before merge)
 
