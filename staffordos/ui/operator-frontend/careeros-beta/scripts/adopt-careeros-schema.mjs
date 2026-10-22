@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { Client } from "pg";
-import { assertExactCareerOSSchema, assertNoUnexpectedApplicationObjects, readCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
+import { assertExactCareerOSSchema, assertNoUnexpectedApplicationObjects, CAREEROS_SCHEMA_FINGERPRINT_VERSION, readCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
 import { verifyAdoptionApproval } from "./careerosAdoptionApproval.mjs";
 
 const connectionString = process.env.DATABASE_URL;
@@ -10,7 +10,7 @@ if (!connectionString) throw new Error("DATABASE_URL_REQUIRED");
 if (!evidencePath) throw new Error("CAREEROS_ADOPTION_MANIFEST_PATH_REQUIRED");
 const evidence = JSON.parse(await readFile(evidencePath, "utf8"));
 const { schemaFingerprint: reviewedFingerprint, sourceRevision, reviewedBy, migrationChecksums: supplied } = evidence;
-if (evidence.kind !== "REVIEWED_SCHEMA_ADOPTION_EVIDENCE" || !reviewedFingerprint || !sourceRevision || !reviewedBy || !supplied) throw new Error("CAREEROS_ADOPTION_EVIDENCE_INVALID");
+if (evidence.kind !== "REVIEWED_SCHEMA_ADOPTION_EVIDENCE" || evidence.fingerprintVersion !== CAREEROS_SCHEMA_FINGERPRINT_VERSION || !reviewedFingerprint || !sourceRevision || !reviewedBy || !supplied) throw new Error("CAREEROS_ADOPTION_EVIDENCE_INVALID");
 
 const migrationsRoot = new URL("../", import.meta.url);
 const migrationIds = [
@@ -41,7 +41,7 @@ try {
   assertNoUnexpectedApplicationObjects(schema);
   if (schema.fingerprint !== reviewedFingerprint) throw new Error(`CAREEROS_REVIEWED_SCHEMA_FINGERPRINT_MISMATCH:${schema.fingerprint}`);
   const identity = (await client.query(`SELECT current_database() AS database_name,current_user AS database_user,current_schema() AS schema_name,COALESCE(inet_server_addr()::text,'') AS server_address,inet_server_port() AS server_port`)).rows[0];
-  const approval = await verifyAdoptionApproval({ approvalPath: process.env.CAREEROS_ADOPTION_APPROVAL_PATH, trustedKeysJson: process.env.CAREEROS_ADOPTION_TRUSTED_KEYS_JSON, target: identity, sourceRevision, schemaFingerprint: reviewedFingerprint, migrationChecksums: checksums });
+  const approval = await verifyAdoptionApproval({ approvalPath: process.env.CAREEROS_ADOPTION_APPROVAL_PATH, trustedKeysJson: process.env.CAREEROS_ADOPTION_TRUSTED_KEYS_JSON, target: identity, fingerprintVersion: evidence.fingerprintVersion, sourceRevision, schemaFingerprint: reviewedFingerprint, migrationChecksums: checksums });
   const existingLedger = await client.query(`SELECT to_regclass('"CareerOSMigration"') AS table_name`);
   const existingAdoption = await client.query(`SELECT to_regclass('"CareerOSMigrationAdoption"') AS table_name`);
   if (existingLedger.rows[0].table_name || existingAdoption.rows[0].table_name) throw new Error("CAREEROS_SCHEMA_ALREADY_ADOPTED");

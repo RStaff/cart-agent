@@ -4,7 +4,7 @@ import { promisify } from "node:util";
 import { readFile, writeFile } from "node:fs/promises";
 import { Client } from "pg";
 import { generateKeyPairSync, sign } from "node:crypto";
-import { assertNoUnexpectedApplicationObjects, readCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
+import { assertNoUnexpectedApplicationObjects, CAREEROS_SCHEMA_FINGERPRINT_VERSION, readCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
 import { approvalPayload } from "./careerosAdoptionApproval.mjs";
 
 const exec = promisify(execFile);
@@ -37,8 +37,8 @@ async function approvalFor(url, manifest, path) {
   const identity = await withClient(url, async (c) => (await c.query(`SELECT current_database() AS database_name,current_user AS database_user,current_schema() AS schema_name,COALESCE(inet_server_addr()::text,'') AS server_address,inet_server_port() AS server_port`)).rows[0]);
   const { publicKey, privateKey } = generateKeyPairSync("ed25519");
   const keyId = "synthetic-review-key";
-  const payload = approvalPayload({ target: identity, sourceRevision: manifest.sourceRevision, schemaFingerprint: manifest.schemaFingerprint, migrationChecksums: manifest.migrationChecksums, reviewedBy: manifest.reviewedBy });
-  const approval = { kind: "CAREEROS_SCHEMA_ADOPTION_APPROVAL_V1", target: { databaseIdentity: identity, sourceRevision: manifest.sourceRevision, schemaFingerprint: manifest.schemaFingerprint, migrationChecksums: manifest.migrationChecksums }, reviewedBy: manifest.reviewedBy, signature: { algorithm: "Ed25519", keyId, value: sign(null, Buffer.from(payload), privateKey).toString("base64url") } };
+  const payload = approvalPayload({ target: identity, fingerprintVersion: CAREEROS_SCHEMA_FINGERPRINT_VERSION, sourceRevision: manifest.sourceRevision, schemaFingerprint: manifest.schemaFingerprint, migrationChecksums: manifest.migrationChecksums, reviewedBy: manifest.reviewedBy });
+  const approval = { kind: "CAREEROS_SCHEMA_ADOPTION_APPROVAL_V1", target: { databaseIdentity: identity, fingerprintVersion: CAREEROS_SCHEMA_FINGERPRINT_VERSION, sourceRevision: manifest.sourceRevision, schemaFingerprint: manifest.schemaFingerprint, migrationChecksums: manifest.migrationChecksums }, reviewedBy: manifest.reviewedBy, signature: { algorithm: "Ed25519", keyId, value: sign(null, Buffer.from(payload), privateKey).toString("base64url") } };
   await writeFile(path, JSON.stringify(approval));
   return { CAREEROS_ADOPTION_APPROVAL_PATH: path, CAREEROS_ADOPTION_TRUSTED_KEYS_JSON: JSON.stringify({ [keyId]: publicKey.export({ format: "der", type: "spki" }).toString("base64") }) };
 }
