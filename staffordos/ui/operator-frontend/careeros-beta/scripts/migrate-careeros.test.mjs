@@ -109,10 +109,16 @@ try {
   await writeFile(indexBrokenMigration, `${await readFile(indexBrokenMigration, "utf8")}\nTHIS IS INVALID SQL;\n`);
   await expectFailure(indexConflictUrl, indexBrokenRoot, /syntax error|42601|CAREEROS/);
   await withClient(indexConflictUrl, async (client) => {
-    await client.query(`CREATE INDEX "CareerRelevanceFeedback_tenantId_userId_targetRoleNormalized_idx" ON "CareerUser" ("id")`);
+    await client.query(`CREATE TABLE "IndexNameHost" ("id" INTEGER NOT NULL) PARTITION BY RANGE ("id")`);
+    await client.query(`CREATE TABLE "IndexNameHostPart" PARTITION OF "IndexNameHost" FOR VALUES FROM (0) TO (100)`);
+    await client.query(`CREATE INDEX "CareerRelevanceFeedback_tenantId_userId_targetRoleNormalized_idx" ON ONLY "IndexNameHost" ("id")`);
   });
   await expectFailure(indexConflictUrl, root, /CAREEROS_MIGRATION_STATE_UNVERIFIED/);
-  await withClient(indexConflictUrl, (client) => client.query(`DROP INDEX "CareerRelevanceFeedback_tenantId_userId_targetRoleNormalized_idx"`));
+  await withClient(indexConflictUrl, async (client) => {
+    assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM "CareerOSMigration"`)).rows[0].count, 1, "partitioned-index conflict creates no further ledger row");
+    assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM "IndexNameHostPart"`)).rows[0].count, 0, "partitioned-index conflict preserves data");
+    await client.query(`DROP TABLE "IndexNameHost" CASCADE`);
+  });
   await run(indexConflictUrl);
   await withClient(indexConflictUrl, async (client) => {
     assert.equal((await client.query(`SELECT EXISTS (SELECT 1 FROM pg_class WHERE relkind='i' AND relname LIKE 'CareerRelevanceFeedback_tenantId_userId_targetRoleNormalized%') AS exists`)).rows[0].exists, true, "required index is created after conflict is removed");
@@ -128,12 +134,13 @@ try {
   await writeFile(constraintBrokenMigration, `${await readFile(constraintBrokenMigration, "utf8")}\nTHIS IS INVALID SQL;\n`);
   await expectFailure(constraintConflictUrl, constraintBrokenRoot, /syntax error|42601|CAREEROS/);
   await withClient(constraintConflictUrl, async (client) => {
-    await client.query(`CREATE SCHEMA "shadow_schema"`);
-    await client.query(`CREATE TABLE "shadow_schema"."Shadow" ("id" TEXT NOT NULL, CONSTRAINT "CareerFactContextClaim_tenantId_fkey" UNIQUE ("id"))`);
+    await client.query(`CREATE DOMAIN "ShadowDomain" AS TEXT CONSTRAINT "CareerFactContextClaim_tenantId_fkey" CHECK (VALUE <> '')`);
   });
   await expectFailure(constraintConflictUrl, root, /CAREEROS_MIGRATION_STATE_UNVERIFIED/);
   await withClient(constraintConflictUrl, async (client) => {
-    await client.query(`DROP SCHEMA "shadow_schema" CASCADE`);
+    assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM "CareerOSMigration"`)).rows[0].count, 1, "domain-constraint conflict creates no further ledger row");
+    assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM pg_constraint WHERE conname='CareerFactContextClaim_tenantId_fkey'`)).rows[0].count, 1, "domain constraint remains unchanged");
+    await client.query(`DROP DOMAIN "ShadowDomain"`);
   });
   await run(constraintConflictUrl);
   await withClient(constraintConflictUrl, async (client) => {

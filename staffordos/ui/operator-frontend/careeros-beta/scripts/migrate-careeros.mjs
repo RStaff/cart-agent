@@ -75,7 +75,7 @@ async function tableExists(client, table) {
   const result = await client.query(
     `SELECT EXISTS (
        SELECT 1 FROM pg_class
-       WHERE relnamespace = current_schema()::regnamespace AND relkind = 'r' AND relname = $1
+       WHERE relnamespace = current_schema()::regnamespace AND relname = $1
      ) AS exists`,
     [table],
   );
@@ -103,8 +103,8 @@ async function assertUnledgeredSchemaAbsent(client, migrations, migrationsRoot) 
       : object.kind === "column"
         ? await columnExists(client, object.table, object.name)
         : object.kind === "index"
-          ? (await client.query(`SELECT EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname=current_schema() AND c.relkind='i' AND c.relname=$1) AS exists`, [postgresIdentifier(object.name)])).rows[0].exists
-          : (await client.query(`SELECT EXISTS (SELECT 1 FROM pg_constraint pc JOIN pg_class c ON c.oid=pc.conrelid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE pc.conname=$1) AS exists`, [postgresIdentifier(object.name)])).rows[0].exists;
+          ? (await client.query(`SELECT EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname=current_schema() AND c.relname=$1) AS exists`, [postgresIdentifier(object.name)])).rows[0].exists
+          : (await client.query(`SELECT EXISTS (SELECT 1 FROM pg_constraint WHERE conname=$1) AS exists`, [postgresIdentifier(object.name)])).rows[0].exists;
     if (exists) {
       throw new Error(`CAREEROS_MIGRATION_STATE_UNVERIFIED:${migration.id}:${object.kind}:${object.name}`);
     }
