@@ -86,9 +86,60 @@ try {
     const result = await client.query(`SELECT to_regclass('"CareerCapabilityAuthority"') AS table_name`);
     assert.equal(result.rows[0].table_name, null, "failed migration rolls back its SQL");
   });
+  await withClient(failedUrl, async (client) => {
+    await client.query(`CREATE TABLE "CareerRelevanceFeedback" ("id" TEXT PRIMARY KEY)`);
+    await client.query(`INSERT INTO "CareerRelevanceFeedback" ("id") VALUES ('partial-ledger-row')`);
+  });
+  await expectFailure(failedUrl, root, /CAREEROS_MIGRATION_STATE_UNVERIFIED/);
+  await withClient(failedUrl, async (client) => {
+    assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM "CareerOSMigration"`)).rows[0].count, 1, "partial-ledger conflict creates no further ledger row");
+    assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM "CareerRelevanceFeedback"`)).rows[0].count, 1, "partial-ledger conflict preserves data");
+    await client.query(`DROP TABLE "CareerRelevanceFeedback"`);
+  });
   await run(failedUrl);
   assert.equal(await count(failedUrl, "CareerOSMigration"), 8, "correct runner resumes after failure");
   await rm(brokenRootPath, { recursive: true, force: true });
+
+  const indexConflict = await createDatabase("index-conflict"); databases.push(indexConflict);
+  const indexConflictUrl = connectionFor(indexConflict);
+  const indexBrokenRootPath = await mkdtemp(join(tmpdir(), "careeros-index-broken-"));
+  const indexBrokenRoot = pathToFileURL(`${indexBrokenRootPath}/`);
+  await cp(new URL("../", import.meta.url), indexBrokenRootPath, { recursive: true });
+  const indexBrokenMigration = join(indexBrokenRootPath, "prisma/migrations/20260817000000_careeros_capability_match_product/migration.sql");
+  await writeFile(indexBrokenMigration, `${await readFile(indexBrokenMigration, "utf8")}\nTHIS IS INVALID SQL;\n`);
+  await expectFailure(indexConflictUrl, indexBrokenRoot, /syntax error|42601|CAREEROS/);
+  await withClient(indexConflictUrl, async (client) => {
+    await client.query(`CREATE INDEX "CareerRelevanceFeedback_tenantId_userId_targetRoleNormalized_idx" ON "CareerUser" ("id")`);
+  });
+  await expectFailure(indexConflictUrl, root, /CAREEROS_MIGRATION_STATE_UNVERIFIED/);
+  await withClient(indexConflictUrl, (client) => client.query(`DROP INDEX "CareerRelevanceFeedback_tenantId_userId_targetRoleNormalized_idx"`));
+  await run(indexConflictUrl);
+  await withClient(indexConflictUrl, async (client) => {
+    assert.equal((await client.query(`SELECT EXISTS (SELECT 1 FROM pg_class WHERE relkind='i' AND relname LIKE 'CareerRelevanceFeedback_tenantId_userId_targetRoleNormalized%') AS exists`)).rows[0].exists, true, "required index is created after conflict is removed");
+  });
+  await rm(indexBrokenRootPath, { recursive: true, force: true });
+
+  const constraintConflict = await createDatabase("constraint-conflict"); databases.push(constraintConflict);
+  const constraintConflictUrl = connectionFor(constraintConflict);
+  const constraintBrokenRootPath = await mkdtemp(join(tmpdir(), "careeros-constraint-broken-"));
+  const constraintBrokenRoot = pathToFileURL(`${constraintBrokenRootPath}/`);
+  await cp(new URL("../", import.meta.url), constraintBrokenRootPath, { recursive: true });
+  const constraintBrokenMigration = join(constraintBrokenRootPath, "prisma/migrations/20260817000000_careeros_capability_match_product/migration.sql");
+  await writeFile(constraintBrokenMigration, `${await readFile(constraintBrokenMigration, "utf8")}\nTHIS IS INVALID SQL;\n`);
+  await expectFailure(constraintConflictUrl, constraintBrokenRoot, /syntax error|42601|CAREEROS/);
+  await withClient(constraintConflictUrl, async (client) => {
+    await client.query(`CREATE SCHEMA "shadow_schema"`);
+    await client.query(`CREATE TABLE "shadow_schema"."Shadow" ("id" TEXT NOT NULL, CONSTRAINT "CareerFactContextClaim_tenantId_fkey" UNIQUE ("id"))`);
+  });
+  await expectFailure(constraintConflictUrl, root, /CAREEROS_MIGRATION_STATE_UNVERIFIED/);
+  await withClient(constraintConflictUrl, async (client) => {
+    await client.query(`DROP SCHEMA "shadow_schema" CASCADE`);
+  });
+  await run(constraintConflictUrl);
+  await withClient(constraintConflictUrl, async (client) => {
+    assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM pg_constraint WHERE conname='CareerFactContextClaim_tenantId_fkey'`)).rows[0].count, 1, "required constraint is created after cross-schema conflict is removed");
+  });
+  await rm(constraintBrokenRootPath, { recursive: true, force: true });
 
   const concurrent = await createDatabase("concurrent"); databases.push(concurrent);
   const concurrentUrl = connectionFor(concurrent);

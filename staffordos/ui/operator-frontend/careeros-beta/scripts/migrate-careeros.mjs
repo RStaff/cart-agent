@@ -58,6 +58,7 @@ const MIGRATIONS = [
 
 const migrationPath = (root, id) => new URL(`prisma/migrations/${id}/migration.sql`, root);
 const checksum = (sql) => createHash("sha256").update(sql, "utf8").digest("hex");
+const postgresIdentifier = (name) => Buffer.from(name, "utf8").subarray(0, 63).toString("utf8");
 
 async function columnExists(client, table, column) {
   const result = await client.query(
@@ -85,21 +86,29 @@ async function ledgerColumnExists(client, column) {
   return columnExists(client, "CareerOSMigration", column);
 }
 
-async function assertUnledgeredSchemaAbsent(client, migrations = MIGRATIONS) {
-  for (const migration of migrations) for (const object of migration.objects) {
+async function migrationGuardedObjects(migration, migrationsRoot) {
+  const sql = await readFile(migrationPath(migrationsRoot, migration.id), "utf8");
+  const objects = [...migration.objects];
+  for (const match of sql.matchAll(/CREATE\s+TABLE(?:\s+IF\s+NOT\s+EXISTS)?\s+"([^"]+)"/gi)) objects.push({ kind: "table", name: match[1] });
+  for (const match of sql.matchAll(/ALTER\s+TABLE\s+"([^"]+)"\s+ADD\s+COLUMN(?:\s+IF\s+NOT\s+EXISTS)?\s+"([^"]+)"/gi)) objects.push({ kind: "column", table: match[1], name: match[2] });
+  for (const match of sql.matchAll(/CREATE\s+(?:UNIQUE\s+)?INDEX(?:\s+IF\s+NOT\s+EXISTS)?\s+"([^"]+)"\s+ON\s+"([^"]+)"/gi)) objects.push({ kind: "index", table: match[2], name: match[1] });
+  for (const match of sql.matchAll(/IF\s+NOT\s+EXISTS\s*\(\s*SELECT\s+1\s+FROM\s+pg_constraint\s+WHERE\s+conname\s*=\s*'([^']+)'/gi)) objects.push({ kind: "constraint", name: match[1] });
+  return objects;
+}
+
+async function assertUnledgeredSchemaAbsent(client, migrations, migrationsRoot) {
+  for (const migration of migrations) for (const object of await migrationGuardedObjects(migration, migrationsRoot)) {
     const exists = object.kind === "table"
       ? await tableExists(client, object.name)
-      : await columnExists(client, object.table, object.name);
+      : object.kind === "column"
+        ? await columnExists(client, object.table, object.name)
+        : object.kind === "index"
+          ? (await client.query(`SELECT EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname=current_schema() AND c.relkind='i' AND c.relname=$1) AS exists`, [postgresIdentifier(object.name)])).rows[0].exists
+          : (await client.query(`SELECT EXISTS (SELECT 1 FROM pg_constraint pc JOIN pg_class c ON c.oid=pc.conrelid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE pc.conname=$1) AS exists`, [postgresIdentifier(object.name)])).rows[0].exists;
     if (exists) {
       throw new Error(`CAREEROS_MIGRATION_STATE_UNVERIFIED:${migration.id}:${object.kind}:${object.name}`);
     }
   }
-}
-
-async function ledgerHasRows(client) {
-  if (!(await tableExists(client, "CareerOSMigration"))) return false;
-  const result = await client.query('SELECT EXISTS (SELECT 1 FROM "CareerOSMigration") AS exists');
-  return result.rows[0].exists;
 }
 
 async function applyMigration(client, migration, migrationsRoot) {
@@ -108,10 +117,6 @@ async function applyMigration(client, migration, migrationsRoot) {
   await client.query("BEGIN");
   try {
     await client.query("SELECT pg_advisory_xact_lock(hashtext($1))", ["careeros-migration-v1"]);
-    // Before the first ledger write, inspect the complete migration object
-    // inventory while holding the transaction lock. A later migration's
-    // object on an unledgered database is not safe to adopt implicitly.
-    if (!(await ledgerHasRows(client))) await assertUnledgeredSchemaAbsent(client);
     await client.query(`CREATE TABLE IF NOT EXISTS "CareerOSMigration" (
       "id" TEXT PRIMARY KEY,
       "checksum" TEXT NOT NULL,
@@ -148,9 +153,17 @@ export async function runCareerosMigrations({ connectionString = process.env.DAT
   try { loopback = ["127.0.0.1", "localhost", "::1"].includes(new URL(connectionString).hostname); } catch {}
   const client = new Client({ connectionString, ssl: loopback ? false : { rejectUnauthorized: false } });
   await client.connect();
+  await client.query("SELECT pg_advisory_lock(hashtext($1))", ["careeros-migration-v1"]);
   try {
+    const ledgerExists = await tableExists(client, "CareerOSMigration");
+    const applied = ledgerExists
+      ? (await client.query('SELECT "id" FROM "CareerOSMigration"')).rows.map((row) => row.id)
+      : [];
+    const missing = MIGRATIONS.filter((migration) => !applied.includes(migration.id));
+    await assertUnledgeredSchemaAbsent(client, missing, migrationsRoot);
     for (const migration of MIGRATIONS) await applyMigration(client, migration, migrationsRoot);
   } finally {
+    await client.query("SELECT pg_advisory_unlock(hashtext($1))", ["careeros-migration-v1"]).catch(() => {});
     await client.end();
   }
 }
