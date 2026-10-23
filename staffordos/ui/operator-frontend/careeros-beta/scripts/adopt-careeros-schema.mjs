@@ -2,15 +2,23 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { Client } from "pg";
 import { assertExactCareerOSSchema, assertNoUnexpectedApplicationObjects, CAREEROS_SCHEMA_FINGERPRINT_VERSION, readCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
+import { compareReferenceFields } from "./careerosSchemaReference.mjs";
+import { executingSourceRevision, sourceFileDigests } from "./careerosAdoptionSource.mjs";
 import { verifyAdoptionApproval } from "./careerosAdoptionApproval.mjs";
 
 const connectionString = process.env.DATABASE_URL;
 const evidencePath = process.env.CAREEROS_ADOPTION_MANIFEST_PATH;
+const referencePath = process.env.CAREEROS_SCHEMA_REFERENCE_PATH;
 if (!connectionString) throw new Error("DATABASE_URL_REQUIRED");
 if (!evidencePath) throw new Error("CAREEROS_ADOPTION_MANIFEST_PATH_REQUIRED");
+if (!referencePath) throw new Error("CAREEROS_SCHEMA_REFERENCE_PATH_REQUIRED");
 const evidence = JSON.parse(await readFile(evidencePath, "utf8"));
-const { schemaFingerprint: reviewedFingerprint, sourceRevision, reviewedBy, migrationChecksums: supplied } = evidence;
-if (evidence.kind !== "REVIEWED_SCHEMA_ADOPTION_EVIDENCE" || evidence.fingerprintVersion !== CAREEROS_SCHEMA_FINGERPRINT_VERSION || !reviewedFingerprint || !sourceRevision || !reviewedBy || !supplied) throw new Error("CAREEROS_ADOPTION_EVIDENCE_INVALID");
+const { schemaFingerprint: reviewedFingerprint, sourceRevision, sourceFiles: reviewedSourceFiles, referenceFingerprint, reviewedBy, migrationChecksums: supplied } = evidence;
+if (evidence.kind !== "REVIEWED_SCHEMA_ADOPTION_EVIDENCE" || evidence.fingerprintVersion !== CAREEROS_SCHEMA_FINGERPRINT_VERSION || !reviewedFingerprint || !sourceRevision || !reviewedSourceFiles || !referenceFingerprint || !reviewedBy || !supplied) throw new Error("CAREEROS_ADOPTION_EVIDENCE_INVALID");
+const executingRevision = await executingSourceRevision(new URL("../", import.meta.url).pathname);
+if (sourceRevision !== executingRevision) throw new Error("CAREEROS_EXECUTING_SOURCE_REVISION_MISMATCH");
+const executingSourceFiles = await sourceFileDigests(new URL("../", import.meta.url).pathname);
+if (JSON.stringify(executingSourceFiles) !== JSON.stringify(reviewedSourceFiles)) throw new Error("CAREEROS_ADOPTION_SOURCE_FILES_MISMATCH");
 
 const migrationsRoot = new URL("../", import.meta.url);
 const migrationIds = [
@@ -39,9 +47,12 @@ try {
   const schema = await readCareerOSSchema(client);
   assertExactCareerOSSchema(schema);
   assertNoUnexpectedApplicationObjects(schema);
+  const expectedReference = JSON.parse(await readFile(referencePath, "utf8"));
+  const referenceDifferences = compareReferenceFields(schema, expectedReference);
+  if (referenceDifferences.length || expectedReference.fingerprint !== referenceFingerprint) throw new Error(`CAREEROS_REFERENCE_MISMATCH:${referenceDifferences.join(",")}`);
   if (schema.fingerprint !== reviewedFingerprint) throw new Error(`CAREEROS_REVIEWED_SCHEMA_FINGERPRINT_MISMATCH:${schema.fingerprint}`);
   const identity = (await client.query(`SELECT current_database() AS database_name,current_user AS database_user,current_schema() AS schema_name,COALESCE(inet_server_addr()::text,'') AS server_address,inet_server_port() AS server_port`)).rows[0];
-  const approval = await verifyAdoptionApproval({ approvalPath: process.env.CAREEROS_ADOPTION_APPROVAL_PATH, trustedKeysJson: process.env.CAREEROS_ADOPTION_TRUSTED_KEYS_JSON, target: identity, fingerprintVersion: evidence.fingerprintVersion, sourceRevision, schemaFingerprint: reviewedFingerprint, migrationChecksums: checksums });
+  const approval = await verifyAdoptionApproval({ approvalPath: process.env.CAREEROS_ADOPTION_APPROVAL_PATH, trustedKeysJson: process.env.CAREEROS_ADOPTION_TRUSTED_KEYS_JSON, target: identity, fingerprintVersion: evidence.fingerprintVersion, sourceRevision, sourceFiles: executingSourceFiles, referenceFingerprint, schemaFingerprint: reviewedFingerprint, migrationChecksums: checksums });
   const existingLedger = await client.query(`SELECT to_regclass('"CareerOSMigration"') AS table_name`);
   const existingAdoption = await client.query(`SELECT to_regclass('"CareerOSMigrationAdoption"') AS table_name`);
   if (existingLedger.rows[0].table_name || existingAdoption.rows[0].table_name) throw new Error("CAREEROS_SCHEMA_ALREADY_ADOPTED");

@@ -14,9 +14,15 @@ repository or Render path. The service branch remains exactly
 
 1. Verify a provider backup and a successful restore to a separate database.
 2. Restore to a separate database and run
-   `prepare-careeros-adoption-evidence.mjs` after reconciliation. It derives
-   the source revision, full catalog fingerprint, and all eight SQL checksums
-   from this checkout; no values are manually assembled.
+   `prepare-careeros-adoption-evidence.mjs` after reconciliation, supplying
+   an independently generated clean-reference JSON via
+   `CAREEROS_SCHEMA_REFERENCE_PATH`. It derives the executing source revision,
+   adoption-critical source-file digests, full catalog fingerprint, and all
+   eight SQL checksums from this checkout; no values are manually assembled.
+   Generate that JSON by applying all eight reviewed migrations to a clean
+   disposable database and serializing `readCareerOSSchema` through
+   `referenceFingerprint`; the older v2 hashes that omitted
+   `triggers`, `routines`, and `policies` are superseded and must not be reused.
 3. Run `reconcile-careeros-story-status.mjs` with
    `CAREEROS_LEGACY_SCHEMA_FINGERPRINT`. This adds only the exact missing
    column from migration `20260817010000_add_career_story_status`.
@@ -47,12 +53,15 @@ The adoption transaction creates both ledger tables, inserts all eight
 checksums, and inserts the durable `REVIEWED_SCHEMA_ADOPTION` record. Any
 failure rolls back all of those writes together.
 
-The generated manifest is not an approval. Supply the approval artifact via
+The generated manifest is not an approval. It must match the independent
+reference across tables, columns, constraints, indexes, relations,
+triggers, routines and policies. Supply the approval artifact via
 `CAREEROS_ADOPTION_APPROVAL_PATH`; trusted Ed25519 public keys come from the
 secure runtime source `CAREEROS_ADOPTION_TRUSTED_KEYS_JSON`. This is a
 key-id-to-base64-SPKI map and must never be committed or logged. The verifier
 compares live `current_database`, database user, schema, server address/port,
-source revision, post-correction fingerprint and every checksum before
+executing source revision, every adoption-critical source-file digest, clean
+reference fingerprint, post-correction fingerprint and every checksum before
 verifying the signature. Edited or replayed artifacts fail closed.
 
 ## Live-database preparation gate (required before merge)
@@ -75,6 +84,14 @@ normal startup.
    migration/startup process is running. Keep the maintenance window open
    through correction, adoption, post-adoption runner verification and the
    first health probe.
+   For the Render private-beta service (`srv-da16c39t0dsc73b434ig`), the
+   concrete entry action is the service dashboard's **Suspend service** (or
+   the owner-approved maintenance control); confirm public `/career/login`
+   returns `503`. Suspend every other identified CareerOS writer/worker too:
+   maintenance mode alone does not stop background writers. From a
+   privileged metadata-only database connection, verify `pg_stat_activity`
+   has no non-idle application writers and the active-job count is zero.
+   Keep the window open and do not describe suspended routes as reachable.
 4. **Recovery procedure.** If any check fails, stop the operation and restore
    the fresh backup to a separate recovery database. Validate its catalog
    fingerprint there, then obtain a new owner decision before any service
@@ -84,6 +101,14 @@ normal startup.
    maintenance window, source revision, generated eight-checksum manifest,
    reviewer identity and recovery target before authorizing the one-shot
    reconciliation/adoption commands.
+6. **Deployment verification and exit.** After the approved merge, confirm
+   Render reports this service at the exact merge SHA, predeploy/startup
+   migration completed (the adopted ledger is a no-op), and `/health` is
+   healthy. Probe only unauthenticated protected-route rejection until
+   these checks pass. Resume the service from the dashboard only afterward,
+   then verify `/career/login` and repeat the metadata-only writer/job checks.
+   If deployment or health fails, leave traffic paused and restore the fresh
+   recovery point to a separate target for diagnosis.
 
 ## Required release sequence
 

@@ -11,6 +11,9 @@ export function referenceFields(schema) {
     constraints: schema.constraints,
     indexes: schema.indexes,
     objects: schema.objects,
+    triggers: schema.triggers,
+    routines: schema.routines,
+    policies: schema.policies,
   };
 }
 
@@ -20,6 +23,6 @@ export function referenceFingerprint(schema) {
 }
 
 export function compareReferenceFields(actual, expected) {
-  const fields = ["fingerprintVersion", "tables", "columns", "constraints", "indexes", "objects"];
+  const fields = ["fingerprintVersion", "tables", "columns", "constraints", "indexes", "objects", "triggers", "routines", "policies"];
   return fields.filter((field) => JSON.stringify(actual[field]) !== JSON.stringify(expected[field]));
 }

@@ -1,16 +1,17 @@
 import { createHash } from "node:crypto";
-import { execFile } from "node:child_process";
 import { readFile, writeFile } from "node:fs/promises";
-import { promisify } from "node:util";
 import { Client } from "pg";
 import { assertExactCareerOSSchema, assertNoUnexpectedApplicationObjects, CAREEROS_SCHEMA_FINGERPRINT_VERSION, readCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
+import { compareReferenceFields } from "./careerosSchemaReference.mjs";
+import { executingSourceRevision, sourceFileDigests } from "./careerosAdoptionSource.mjs";
 
-const exec = promisify(execFile);
 const connectionString = process.env.DATABASE_URL;
 const outputPath = process.env.CAREEROS_ADOPTION_MANIFEST_PATH;
+const referencePath = process.env.CAREEROS_SCHEMA_REFERENCE_PATH;
 const reviewedBy = process.env.CAREEROS_REVIEWED_BY;
 if (!connectionString) throw new Error("DATABASE_URL_REQUIRED");
 if (!outputPath) throw new Error("CAREEROS_ADOPTION_MANIFEST_PATH_REQUIRED");
+if (!referencePath) throw new Error("CAREEROS_SCHEMA_REFERENCE_PATH_REQUIRED");
 if (!reviewedBy) throw new Error("CAREEROS_REVIEWED_BY_REQUIRED");
 const migrationIds = [
   "20260816000000_careeros_p0_foundation", "20260817000000_careeros_capability_match_product",
@@ -21,7 +22,10 @@ const migrationIds = [
 const migrationsRoot = new URL("../", import.meta.url);
 const migrationChecksums = {};
 for (const id of migrationIds) migrationChecksums[id] = createHash("sha256").update(await readFile(new URL(`prisma/migrations/${id}/migration.sql`, migrationsRoot), "utf8"), "utf8").digest("hex");
-const sourceRevision = process.env.CAREEROS_REVIEWED_SOURCE_REVISION || (await exec("git", ["rev-parse", "HEAD"], { cwd: new URL("../", import.meta.url).pathname })).stdout.trim();
+const executingRevision = await executingSourceRevision(new URL("../", import.meta.url).pathname);
+const sourceRevision = process.env.CAREEROS_REVIEWED_SOURCE_REVISION || executingRevision;
+if (sourceRevision !== executingRevision) throw new Error("CAREEROS_EXECUTING_SOURCE_REVISION_MISMATCH");
+const sourceFiles = await sourceFileDigests(new URL("../", import.meta.url).pathname);
 const hostname = (() => { try { return new URL(connectionString).hostname; } catch { return ""; } })();
 const client = new Client({ connectionString, ssl: ["127.0.0.1", "localhost", "::1"].includes(hostname) ? false : { rejectUnauthorized: false } });
 await client.connect();
@@ -29,7 +33,10 @@ try {
   const ledger = await client.query(`SELECT to_regclass('"CareerOSMigration"') AS name`);
   const adoption = await client.query(`SELECT to_regclass('"CareerOSMigrationAdoption"') AS name`);
   if (ledger.rows[0].name || adoption.rows[0].name) throw new Error("CAREEROS_SCHEMA_ALREADY_ADOPTED");
+  const expected = JSON.parse(await readFile(referencePath, "utf8"));
   const schema = await readCareerOSSchema(client); assertExactCareerOSSchema(schema); assertNoUnexpectedApplicationObjects(schema);
-  await writeFile(outputPath, `${JSON.stringify({ kind: "REVIEWED_SCHEMA_ADOPTION_EVIDENCE", fingerprintVersion: CAREEROS_SCHEMA_FINGERPRINT_VERSION, sourceRevision, reviewedBy, schemaFingerprint: schema.fingerprint, migrationChecksums }, null, 2)}\n`, { flag: "wx" });
+  const referenceDifferences = compareReferenceFields(schema, expected);
+  if (referenceDifferences.length) throw new Error(`CAREEROS_REFERENCE_MISMATCH:${referenceDifferences.join(",")}`);
+  await writeFile(outputPath, `${JSON.stringify({ kind: "REVIEWED_SCHEMA_ADOPTION_EVIDENCE", fingerprintVersion: CAREEROS_SCHEMA_FINGERPRINT_VERSION, sourceRevision, sourceFiles, referenceFingerprint: expected.fingerprint, reviewedBy, schemaFingerprint: schema.fingerprint, migrationChecksums }, null, 2)}\n`, { flag: "wx" });
   console.log(`CareerOS adoption evidence written: ${outputPath}`);
 } finally { await client.end(); }

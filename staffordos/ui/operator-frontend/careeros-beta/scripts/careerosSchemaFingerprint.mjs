@@ -31,7 +31,7 @@ const CATALOG_SQL = `
   ORDER BY c.relname,c.relkind`;
 
 export async function readCareerOSSchema(client) {
-  const [columns, constraints, indexes, tables, objects] = await Promise.all([
+  const [columns, constraints, indexes, tables, objects, triggers, routines, policies] = await Promise.all([
     client.query(`SELECT c.table_name,c.column_name,c.data_type,c.udt_schema,c.udt_name,c.is_nullable,
       COALESCE(c.column_default,'') AS column_default,c.character_maximum_length,c.numeric_precision,
       c.numeric_scale,c.datetime_precision,COALESCE(a.attidentity,'') AS identity_kind,
@@ -57,6 +57,29 @@ export async function readCareerOSSchema(client) {
       ORDER BY tablename,indexname`),
     client.query(`SELECT tablename FROM pg_tables WHERE schemaname=current_schema() AND tablename IN (${tableList}) ORDER BY tablename`),
     client.query(CATALOG_SQL),
+    client.query(`SELECT c.relname AS table_name,t.tgname AS trigger_name,t.tgenabled,
+      pg_get_triggerdef(t.oid) AS definition
+      FROM pg_trigger t
+      JOIN pg_class c ON c.oid=t.tgrelid
+      JOIN pg_namespace n ON n.oid=c.relnamespace
+      WHERE n.nspname=current_schema() AND NOT t.tgisinternal
+      ORDER BY c.relname,t.tgname`),
+    client.query(`SELECT p.proname AS routine_name,p.prokind,p.provolatile,p.prosecdef,
+      pg_get_function_identity_arguments(p.oid) AS identity_arguments,
+      pg_get_functiondef(p.oid) AS definition
+      FROM pg_proc p
+      JOIN pg_namespace n ON n.oid=p.pronamespace
+      WHERE n.nspname=current_schema()
+      ORDER BY p.proname,p.prokind,identity_arguments`),
+    client.query(`SELECT c.relname AS table_name,pol.polname AS policy_name,
+      pol.polpermissive,pol.polcmd,pol.polroles::text AS roles,
+      COALESCE(pg_get_expr(pol.polqual,pol.polrelid),'') AS using_expression,
+      COALESCE(pg_get_expr(pol.polwithcheck,pol.polrelid),'') AS check_expression
+      FROM pg_policy pol
+      JOIN pg_class c ON c.oid=pol.polrelid
+      JOIN pg_namespace n ON n.oid=c.relnamespace
+      WHERE n.nspname=current_schema()
+      ORDER BY c.relname,pol.polname`),
   ]);
   const catalogObjects = objects.rows;
   const canonicalSort = (rows) => [...rows].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
@@ -66,6 +89,9 @@ export async function readCareerOSSchema(client) {
     columns: canonicalSort(columns.rows),
     constraints: canonicalSort(constraints.rows),
     indexes: canonicalSort(indexes.rows),
+    triggers: canonicalSort(triggers.rows),
+    routines: canonicalSort(routines.rows),
+    policies: canonicalSort(policies.rows),
     // Operational ledgers are intentionally excluded from the application
     // fingerprint; catalogObjects remains available for unexpected-object checks.
     objects: canonicalSort(objects.rows.filter((row) => CAREEROS_TABLES.includes(row.object_name) || HISTORICAL_SCHEMA_OBJECTS.includes(row.object_name))),

@@ -5,7 +5,8 @@ import { readFile, writeFile } from "node:fs/promises";
 import { Client } from "pg";
 import { generateKeyPairSync, sign } from "node:crypto";
 import { assertNoUnexpectedApplicationObjects, CAREEROS_SCHEMA_FINGERPRINT_VERSION, readCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
-import { approvalPayload } from "./careerosAdoptionApproval.mjs";
+import { approvalPayload, verifyAdoptionApproval } from "./careerosAdoptionApproval.mjs";
+import { referenceFingerprint } from "./careerosSchemaReference.mjs";
 
 const exec = promisify(execFile);
 const root = new URL("../", import.meta.url);
@@ -37,8 +38,9 @@ async function approvalFor(url, manifest, path) {
   const identity = await withClient(url, async (c) => (await c.query(`SELECT current_database() AS database_name,current_user AS database_user,current_schema() AS schema_name,COALESCE(inet_server_addr()::text,'') AS server_address,inet_server_port() AS server_port`)).rows[0]);
   const { publicKey, privateKey } = generateKeyPairSync("ed25519");
   const keyId = "synthetic-review-key";
-  const payload = approvalPayload({ target: identity, fingerprintVersion: CAREEROS_SCHEMA_FINGERPRINT_VERSION, sourceRevision: manifest.sourceRevision, schemaFingerprint: manifest.schemaFingerprint, migrationChecksums: manifest.migrationChecksums, reviewedBy: manifest.reviewedBy });
-  const approval = { kind: "CAREEROS_SCHEMA_ADOPTION_APPROVAL_V1", target: { databaseIdentity: identity, fingerprintVersion: CAREEROS_SCHEMA_FINGERPRINT_VERSION, sourceRevision: manifest.sourceRevision, schemaFingerprint: manifest.schemaFingerprint, migrationChecksums: manifest.migrationChecksums }, reviewedBy: manifest.reviewedBy, signature: { algorithm: "Ed25519", keyId, value: sign(null, Buffer.from(payload), privateKey).toString("base64url") } };
+  const target = { databaseIdentity: identity, fingerprintVersion: CAREEROS_SCHEMA_FINGERPRINT_VERSION, sourceRevision: manifest.sourceRevision, sourceFiles: manifest.sourceFiles, referenceFingerprint: manifest.referenceFingerprint, schemaFingerprint: manifest.schemaFingerprint, migrationChecksums: manifest.migrationChecksums };
+  const payload = approvalPayload({ target: identity, fingerprintVersion: CAREEROS_SCHEMA_FINGERPRINT_VERSION, sourceRevision: manifest.sourceRevision, sourceFiles: manifest.sourceFiles, referenceFingerprint: manifest.referenceFingerprint, schemaFingerprint: manifest.schemaFingerprint, migrationChecksums: manifest.migrationChecksums, reviewedBy: manifest.reviewedBy });
+  const approval = { kind: "CAREEROS_SCHEMA_ADOPTION_APPROVAL_V1", target, reviewedBy: manifest.reviewedBy, signature: { algorithm: "Ed25519", keyId, value: sign(null, Buffer.from(payload), privateKey).toString("base64url") } };
   await writeFile(path, JSON.stringify(approval));
   return { CAREEROS_ADOPTION_APPROVAL_PATH: path, CAREEROS_ADOPTION_TRUSTED_KEYS_JSON: JSON.stringify({ [keyId]: publicKey.export({ format: "der", type: "spki" }).toString("base64") }) };
 }
@@ -61,6 +63,10 @@ try {
   });
   const expected = await withClient(url, (c) => readCareerOSSchema(c));
   assert.ok(expected.objects.some((object) => object.object_name === "_prisma_migrations"), "historical Prisma table participates in the v2 fingerprint");
+  const referencePath = `${process.env.TMPDIR || "/tmp"}/careeros-reference-${Date.now()}.json`;
+  const manifestPath = `${process.env.TMPDIR || "/tmp"}/careeros-adoption-${Date.now()}.json`;
+  await writeFile(referencePath, JSON.stringify(referenceFingerprint(expected)));
+  await assert.rejects(runScript(prepare, url, { CAREEROS_ADOPTION_MANIFEST_PATH: `${manifestPath}.wrong-source`, CAREEROS_SCHEMA_REFERENCE_PATH: referencePath, CAREEROS_REVIEWED_SOURCE_REVISION: "0000000000000000000000000000000000000000", CAREEROS_REVIEWED_BY: "synthetic-review" }), /CAREEROS_EXECUTING_SOURCE_REVISION_MISMATCH/);
   await withClient(url, async (c) => {
     const constraint = (await c.query(`SELECT constraint_name FROM information_schema.table_constraints WHERE table_schema=current_schema() AND table_name='CareerUser' ORDER BY constraint_name LIMIT 1`)).rows[0].constraint_name;
     const quoted = constraint.replaceAll('"', '""');
@@ -93,11 +99,24 @@ try {
   }
   assert.equal(corrected.fingerprint, expected.fingerprint, "correction reproduces reviewed schema");
   const migrationChecksums = await checksums();
-  const manifestPath = `${process.env.TMPDIR || "/tmp"}/careeros-adoption-${Date.now()}.json`;
-  await runScript(prepare, url, { CAREEROS_ADOPTION_MANIFEST_PATH: manifestPath, CAREEROS_REVIEWED_SOURCE_REVISION: "ef79782778773ff4e7e82c65a493f7cd36850d33", CAREEROS_REVIEWED_BY: "synthetic-review" });
+  const reviewedSourceRevision = (await exec("git", ["rev-parse", "HEAD"], { cwd: new URL("../", import.meta.url).pathname })).stdout.trim();
+  await runScript(prepare, url, { CAREEROS_ADOPTION_MANIFEST_PATH: manifestPath, CAREEROS_SCHEMA_REFERENCE_PATH: referencePath, CAREEROS_REVIEWED_SOURCE_REVISION: reviewedSourceRevision, CAREEROS_REVIEWED_BY: "synthetic-review" });
   const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+  await withClient(url, async (c) => {
+    await c.query(`CREATE FUNCTION "unexpected_adoption_function"() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NEW; END $$`);
+    await c.query(`CREATE TRIGGER "unexpected_adoption_trigger" BEFORE INSERT ON "CareerUser" FOR EACH ROW EXECUTE FUNCTION "unexpected_adoption_function"()`);
+    await c.query(`ALTER TABLE "CareerUser" ENABLE ROW LEVEL SECURITY`);
+    await c.query(`CREATE POLICY "unexpected_adoption_policy" ON "CareerUser" USING (true)`);
+  });
+  await assert.rejects(runScript(prepare, url, { CAREEROS_ADOPTION_MANIFEST_PATH: `${manifestPath}.catalog`, CAREEROS_SCHEMA_REFERENCE_PATH: referencePath, CAREEROS_REVIEWED_SOURCE_REVISION: manifest.sourceRevision, CAREEROS_REVIEWED_BY: manifest.reviewedBy }), /CAREEROS_REFERENCE_MISMATCH/);
+  await withClient(url, async (c) => {
+    await c.query(`DROP POLICY "unexpected_adoption_policy" ON "CareerUser"`);
+    await c.query(`ALTER TABLE "CareerUser" DISABLE ROW LEVEL SECURITY`);
+    await c.query(`DROP TRIGGER "unexpected_adoption_trigger" ON "CareerUser"`);
+    await c.query(`DROP FUNCTION "unexpected_adoption_function"()`);
+  });
   await withClient(url, async (c) => { await c.query(`CREATE TABLE "UnexpectedApplicationTable" ("id" TEXT PRIMARY KEY)`); });
-  await assert.rejects(runScript(prepare, url, { CAREEROS_ADOPTION_MANIFEST_PATH: `${manifestPath}.unexpected`, CAREEROS_REVIEWED_SOURCE_REVISION: manifest.sourceRevision, CAREEROS_REVIEWED_BY: manifest.reviewedBy }), /CAREEROS_UNEXPECTED_SCHEMA_OBJECTS/);
+  await assert.rejects(runScript(prepare, url, { CAREEROS_ADOPTION_MANIFEST_PATH: `${manifestPath}.unexpected`, CAREEROS_SCHEMA_REFERENCE_PATH: referencePath, CAREEROS_REVIEWED_SOURCE_REVISION: manifest.sourceRevision, CAREEROS_REVIEWED_BY: manifest.reviewedBy }), /CAREEROS_UNEXPECTED_SCHEMA_OBJECTS/);
   await withClient(url, (c) => c.query(`DROP TABLE "UnexpectedApplicationTable"`));
   const approvalPath = `${process.env.TMPDIR || "/tmp"}/careeros-approval-${Date.now()}.json`;
   const approvalEnv = await approvalFor(url, manifest, approvalPath);
@@ -124,20 +143,37 @@ try {
   await writeFile(rollbackManifestPath, JSON.stringify({ ...manifest, schemaFingerprint: rollbackCorrected.fingerprint }));
   const rollbackApprovalPath = `${process.env.TMPDIR || "/tmp"}/careeros-approval-rollback-${Date.now()}.json`;
   const rollbackApprovalEnv = await approvalFor(rollbackUrl, { ...manifest, schemaFingerprint: rollbackCorrected.fingerprint }, rollbackApprovalPath);
-  await assert.rejects(runScript(adopt, rollbackUrl, { NODE_ENV: "test", CAREEROS_ADOPTION_TEST_FAIL_AFTER_LEDGER: "1", CAREEROS_ADOPTION_MANIFEST_PATH: rollbackManifestPath, ...rollbackApprovalEnv }), /CAREEROS_TEST_FAILURE_AFTER_LEDGER/);
+  await assert.rejects(runScript(adopt, rollbackUrl, { NODE_ENV: "test", CAREEROS_ADOPTION_TEST_FAIL_AFTER_LEDGER: "1", CAREEROS_ADOPTION_MANIFEST_PATH: rollbackManifestPath, CAREEROS_SCHEMA_REFERENCE_PATH: referencePath, ...rollbackApprovalEnv }), /CAREEROS_TEST_FAILURE_AFTER_LEDGER/);
   const forgedApprovalPath = `${process.env.TMPDIR || "/tmp"}/careeros-approval-forged-${Date.now()}.json`;
   const forgedApproval = JSON.parse(await readFile(rollbackApprovalPath, "utf8"));
   forgedApproval.target.sourceRevision = "edited-source";
   await writeFile(forgedApprovalPath, JSON.stringify(forgedApproval));
-  await assert.rejects(runScript(adopt, rollbackUrl, { CAREEROS_ADOPTION_MANIFEST_PATH: rollbackManifestPath, CAREEROS_ADOPTION_APPROVAL_PATH: forgedApprovalPath, CAREEROS_ADOPTION_TRUSTED_KEYS_JSON: rollbackApprovalEnv.CAREEROS_ADOPTION_TRUSTED_KEYS_JSON }), /CAREEROS_ADOPTION_APPROVAL_TARGET_MISMATCH/);
+  await assert.rejects(runScript(adopt, rollbackUrl, { CAREEROS_ADOPTION_MANIFEST_PATH: rollbackManifestPath, CAREEROS_SCHEMA_REFERENCE_PATH: referencePath, CAREEROS_ADOPTION_APPROVAL_PATH: forgedApprovalPath, CAREEROS_ADOPTION_TRUSTED_KEYS_JSON: rollbackApprovalEnv.CAREEROS_ADOPTION_TRUSTED_KEYS_JSON }), /CAREEROS_ADOPTION_APPROVAL_TARGET_MISMATCH/);
+  const reorderedApprovalPath = `${process.env.TMPDIR || "/tmp"}/careeros-approval-reordered-${Date.now()}.json`;
+  const reorderedApproval = JSON.parse(await readFile(rollbackApprovalPath, "utf8"));
+  const originalTarget = reorderedApproval.target;
+  reorderedApproval.target = {
+    migrationChecksums: originalTarget.migrationChecksums,
+    schemaFingerprint: originalTarget.schemaFingerprint,
+    referenceFingerprint: originalTarget.referenceFingerprint,
+    sourceFiles: originalTarget.sourceFiles,
+    sourceRevision: originalTarget.sourceRevision,
+    fingerprintVersion: originalTarget.fingerprintVersion,
+    databaseIdentity: originalTarget.databaseIdentity,
+  };
+  await writeFile(reorderedApprovalPath, JSON.stringify(reorderedApproval));
+  await verifyAdoptionApproval({ approvalPath: reorderedApprovalPath, trustedKeysJson: rollbackApprovalEnv.CAREEROS_ADOPTION_TRUSTED_KEYS_JSON, target: originalTarget.databaseIdentity, fingerprintVersion: originalTarget.fingerprintVersion, sourceRevision: originalTarget.sourceRevision, sourceFiles: originalTarget.sourceFiles, referenceFingerprint: originalTarget.referenceFingerprint, schemaFingerprint: originalTarget.schemaFingerprint, migrationChecksums: originalTarget.migrationChecksums });
+  const modifiedSourceManifestPath = `${process.env.TMPDIR || "/tmp"}/careeros-adoption-modified-source-${Date.now()}.json`;
+  await writeFile(modifiedSourceManifestPath, JSON.stringify({ ...JSON.parse(await readFile(rollbackManifestPath, "utf8")), sourceFiles: { ...manifest.sourceFiles, "scripts/adopt-careeros-schema.mjs": "0" } }));
+  await assert.rejects(runScript(adopt, rollbackUrl, { CAREEROS_ADOPTION_MANIFEST_PATH: modifiedSourceManifestPath, CAREEROS_SCHEMA_REFERENCE_PATH: referencePath, ...rollbackApprovalEnv }), /CAREEROS_ADOPTION_SOURCE_FILES_MISMATCH/);
   await withClient(rollbackUrl, async (c) => { assert.equal((await c.query(`SELECT to_regclass('"CareerOSMigration"') AS name`)).rows[0].name, null); assert.equal((await c.query(`SELECT to_regclass('"CareerOSMigrationAdoption"') AS name`)).rows[0].name, null); });
   assert.equal(rollbackExpected.fingerprint, expected.fingerprint);
-  await runScript(adopt, url, { CAREEROS_ADOPTION_MANIFEST_PATH: manifestPath, ...approvalEnv });
+  await runScript(adopt, url, { CAREEROS_ADOPTION_MANIFEST_PATH: manifestPath, CAREEROS_SCHEMA_REFERENCE_PATH: referencePath, ...approvalEnv });
   await runMigrations(url); await runMigrations(url);
   const badManifestPath = `${process.env.TMPDIR || "/tmp"}/careeros-adoption-bad-${Date.now()}.json`;
   await writeFile(badManifestPath, JSON.stringify({ ...manifest, migrationChecksums: { ...migrationChecksums, [migrationIds[0]]: "bad" } }));
-  await assert.rejects(runScript(adopt, url, { CAREEROS_ADOPTION_MANIFEST_PATH: badManifestPath }), /CAREEROS_MIGRATION_CHECKSUM_REVIEW_MISMATCH/);
-  await assert.rejects(runScript(adopt, url, { CAREEROS_ADOPTION_MANIFEST_PATH: manifestPath }), /CAREEROS_ADOPTION_APPROVAL_REQUIRED/);
+  await assert.rejects(runScript(adopt, url, { CAREEROS_ADOPTION_MANIFEST_PATH: badManifestPath, CAREEROS_SCHEMA_REFERENCE_PATH: referencePath }), /CAREEROS_MIGRATION_CHECKSUM_REVIEW_MISMATCH/);
+  await assert.rejects(runScript(adopt, url, { CAREEROS_ADOPTION_MANIFEST_PATH: manifestPath, CAREEROS_SCHEMA_REFERENCE_PATH: referencePath }), /CAREEROS_ADOPTION_APPROVAL_REQUIRED/);
   await withClient(url, async (c) => { assert.equal((await c.query(`SELECT COUNT(*)::int AS n FROM "CareerOSMigration"`)).rows[0].n, 8); assert.equal((await c.query(`SELECT COUNT(*)::int AS n FROM "CareerOSMigrationAdoption"`)).rows[0].n, 1); });
   console.log("CareerOS adoption tests passed: observed-schema correction, fingerprint rejection, atomic adoption, checksum rejection, normal-runner repeat.");
 } finally { for (const db of databases) await dropDatabase(db); }
