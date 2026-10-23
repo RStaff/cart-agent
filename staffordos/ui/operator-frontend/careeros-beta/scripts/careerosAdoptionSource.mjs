@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
 import { readFile } from "node:fs/promises";
+import { join, relative } from "node:path";
 import { promisify } from "node:util";
 
 const exec = promisify(execFile);
@@ -42,8 +43,11 @@ export async function sourceFileDigests(root) {
 
 export async function sourceFileDigestsAtRevision(root, revision) {
   const result = {};
+  const { stdout: repoRootOutput } = await exec("git", ["rev-parse", "--show-toplevel"], { cwd: root });
+  const repoRoot = repoRootOutput.trim();
   for (const relativePath of ADOPTION_CRITICAL_FILES) {
-    const { stdout } = await exec("git", ["show", `${revision}:${relativePath}`], { cwd: root, encoding: "buffer", maxBuffer: 8 * 1024 * 1024 });
+    const gitPath = relative(repoRoot, join(root, relativePath));
+    const { stdout } = await exec("git", ["show", `${revision}:${gitPath}`], { cwd: root, encoding: "buffer", maxBuffer: 8 * 1024 * 1024 });
     result[relativePath] = createHash("sha256").update(stdout).digest("hex");
   }
   return result;
