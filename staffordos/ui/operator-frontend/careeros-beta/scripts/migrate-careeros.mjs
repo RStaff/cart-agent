@@ -86,6 +86,14 @@ async function ledgerColumnExists(client, column) {
   return columnExists(client, "CareerOSMigration", column);
 }
 
+async function ledgerRelationKind(client) {
+  const result = await client.query(`SELECT c.relkind
+    FROM pg_class c
+    JOIN pg_namespace n ON n.oid=c.relnamespace
+    WHERE n.nspname=current_schema() AND c.relname='CareerOSMigration'`);
+  return result.rows[0]?.relkind || null;
+}
+
 async function migrationGuardedObjects(migration, migrationsRoot) {
   const sql = await readFile(migrationPath(migrationsRoot, migration.id), "utf8");
   const objects = [...migration.objects];
@@ -155,7 +163,9 @@ export async function runCareerosMigrations({ connectionString = process.env.DAT
   await client.connect();
   await client.query("SELECT pg_advisory_lock(hashtext($1))", ["careeros-migration-v1"]);
   try {
-    const ledgerExists = await tableExists(client, "CareerOSMigration");
+    const ledgerKind = await ledgerRelationKind(client);
+    if (ledgerKind && ledgerKind !== "r") throw new Error("CAREEROS_MIGRATION_LEDGER_UNVERIFIED");
+    const ledgerExists = ledgerKind === "r";
     const applied = ledgerExists
       ? (await client.query('SELECT "id" FROM "CareerOSMigration"')).rows.map((row) => row.id)
       : [];

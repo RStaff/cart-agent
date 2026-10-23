@@ -148,6 +148,22 @@ try {
   });
   await rm(constraintBrokenRootPath, { recursive: true, force: true });
 
+  const ledgerView = await createDatabase("ledger-view"); databases.push(ledgerView);
+  const ledgerViewUrl = connectionFor(ledgerView);
+  await run(ledgerViewUrl);
+  await withClient(ledgerViewUrl, async (client) => {
+    const row = (await client.query(`SELECT "id", "checksum" FROM "CareerOSMigration" ORDER BY "id" LIMIT 1`)).rows[0];
+    await client.query(`DROP TABLE "CareerOSMigration"`);
+    await client.query(`CREATE TABLE "CareerOSMigrationBacking" ("id" TEXT PRIMARY KEY, "checksum" TEXT NOT NULL, "appliedAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP)`);
+    await client.query(`INSERT INTO "CareerOSMigrationBacking" ("id", "checksum") VALUES ($1, $2)`, [row.id, row.checksum]);
+    await client.query(`CREATE VIEW "CareerOSMigration" AS SELECT "id", "checksum", "appliedAt" FROM "CareerOSMigrationBacking"`);
+  });
+  await expectFailure(ledgerViewUrl, root, /CAREEROS_MIGRATION_LEDGER_UNVERIFIED/);
+  await withClient(ledgerViewUrl, async (client) => {
+    assert.equal((await client.query(`SELECT c.relkind FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname=current_schema() AND c.relname='CareerOSMigration'`)).rows[0].relkind, "v", "unsupported ledger relation remains a view");
+    assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM "CareerOSMigrationBacking"`)).rows[0].count, 1, "view-backed ledger data remains unchanged");
+  });
+
   const concurrent = await createDatabase("concurrent"); databases.push(concurrent);
   const concurrentUrl = connectionFor(concurrent);
   const results = await Promise.allSettled([run(concurrentUrl), run(concurrentUrl)]);
