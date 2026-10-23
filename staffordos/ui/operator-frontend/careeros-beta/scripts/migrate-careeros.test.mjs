@@ -104,6 +104,20 @@ try {
     const result = await client.query(`SELECT to_regclass('"CareerOSMigration"') AS table_name`);
     assert.equal(result.rows[0].table_name, null, "unledgered schema is not adopted");
   });
+
+  const laterObject = await createDatabase("later-object"); databases.push(laterObject);
+  const laterObjectUrl = connectionFor(laterObject);
+  await withClient(laterObjectUrl, async (client) => {
+    await client.query(`CREATE TABLE "CareerRelevanceFeedback" ("id" TEXT PRIMARY KEY)`);
+    await client.query(`INSERT INTO "CareerRelevanceFeedback" ("id") VALUES ('fixture-row')`);
+  });
+  await expectFailure(laterObjectUrl, root, /CAREEROS_MIGRATION_STATE_UNVERIFIED/);
+  await withClient(laterObjectUrl, async (client) => {
+    const result = await client.query(`SELECT to_regclass('"CareerRelevanceFeedback"') AS table_name, to_regclass('"CareerOSMigration"') AS ledger_name`);
+    assert.equal(result.rows[0].table_name, '"CareerRelevanceFeedback"', "later-migration object remains unchanged");
+    assert.equal(result.rows[0].ledger_name, null, "later-migration rejection creates no ledger");
+    assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM "CareerRelevanceFeedback"`)).rows[0].count, 1, "later-migration data remains unchanged");
+  });
 } finally {
   for (const database of databases) await dropDatabase(database);
 }

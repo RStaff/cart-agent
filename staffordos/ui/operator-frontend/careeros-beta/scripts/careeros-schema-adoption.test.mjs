@@ -62,6 +62,15 @@ try {
   const expected = await withClient(url, (c) => readCareerOSSchema(c));
   assert.ok(expected.objects.some((object) => object.object_name === "_prisma_migrations"), "historical Prisma table participates in the v2 fingerprint");
   await withClient(url, async (c) => {
+    const constraint = (await c.query(`SELECT constraint_name FROM information_schema.table_constraints WHERE table_schema=current_schema() AND table_name='CareerUser' ORDER BY constraint_name LIMIT 1`)).rows[0].constraint_name;
+    const quoted = constraint.replaceAll('"', '""');
+    await c.query(`CREATE SCHEMA "shadow_schema"`);
+    await c.query(`CREATE TABLE "shadow_schema"."CareerUser" ("id" TEXT NOT NULL, CONSTRAINT "${quoted}" UNIQUE ("id"))`);
+    const shadowed = await readCareerOSSchema(c);
+    assert.equal(shadowed.fingerprint, expected.fingerprint, "same-named objects in another schema do not affect the intended fingerprint");
+    await c.query(`DROP SCHEMA "shadow_schema" CASCADE`);
+  });
+  await withClient(url, async (c) => {
     await c.query(`ALTER TABLE "CareerSearchPreference" ALTER COLUMN "roleFamily" SET DEFAULT 'CHANGED_FOR_TEST'`);
     const changed = await readCareerOSSchema(c);
     assert.notEqual(changed.fingerprint, expected.fingerprint, "definition-bearing default changes fingerprint");

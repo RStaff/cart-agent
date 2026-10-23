@@ -85,8 +85,8 @@ async function ledgerColumnExists(client, column) {
   return columnExists(client, "CareerOSMigration", column);
 }
 
-async function assertUnledgeredSchemaAbsent(client, migration) {
-  for (const object of migration.objects) {
+async function assertUnledgeredSchemaAbsent(client, migrations = MIGRATIONS) {
+  for (const migration of migrations) for (const object of migration.objects) {
     const exists = object.kind === "table"
       ? await tableExists(client, object.name)
       : await columnExists(client, object.table, object.name);
@@ -96,12 +96,22 @@ async function assertUnledgeredSchemaAbsent(client, migration) {
   }
 }
 
+async function ledgerHasRows(client) {
+  if (!(await tableExists(client, "CareerOSMigration"))) return false;
+  const result = await client.query('SELECT EXISTS (SELECT 1 FROM "CareerOSMigration") AS exists');
+  return result.rows[0].exists;
+}
+
 async function applyMigration(client, migration, migrationsRoot) {
   const sql = await readFile(migrationPath(migrationsRoot, migration.id), "utf8");
   const digest = checksum(sql);
   await client.query("BEGIN");
   try {
     await client.query("SELECT pg_advisory_xact_lock(hashtext($1))", ["careeros-migration-v1"]);
+    // Before the first ledger write, inspect the complete migration object
+    // inventory while holding the transaction lock. A later migration's
+    // object on an unledgered database is not safe to adopt implicitly.
+    if (!(await ledgerHasRows(client))) await assertUnledgeredSchemaAbsent(client);
     await client.query(`CREATE TABLE IF NOT EXISTS "CareerOSMigration" (
       "id" TEXT PRIMARY KEY,
       "checksum" TEXT NOT NULL,
@@ -119,7 +129,6 @@ async function applyMigration(client, migration, migrationsRoot) {
         throw new Error(`CAREEROS_MIGRATION_CHECKSUM_MISMATCH:${migration.id}`);
       }
     } else {
-      await assertUnledgeredSchemaAbsent(client, migration);
       await client.query(sql);
       await client.query(
         `INSERT INTO "CareerOSMigration" ("id", "checksum") VALUES ($1, $2)`,

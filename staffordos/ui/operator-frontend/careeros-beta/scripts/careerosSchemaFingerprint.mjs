@@ -49,6 +49,7 @@ export async function readCareerOSSchema(client) {
       FROM information_schema.table_constraints tc
       JOIN pg_constraint pc ON pc.conname=tc.constraint_name
       JOIN pg_class c ON c.oid=pc.conrelid AND c.relname=tc.table_name
+      JOIN pg_namespace cn ON cn.oid=c.relnamespace AND cn.nspname=tc.table_schema
       WHERE tc.table_schema=current_schema() AND tc.table_name IN (${tableList})
       ORDER BY tc.table_name,tc.constraint_type,definition`),
     client.query(`SELECT schemaname,tablename,indexname,indexdef FROM pg_indexes
