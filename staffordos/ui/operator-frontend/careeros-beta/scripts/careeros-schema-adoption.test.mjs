@@ -47,7 +47,20 @@ const databases = [];
 try {
   const db = await createDatabase("observed"); databases.push(db); const url = urlFor(db);
   await runMigrations(url);
+  await withClient(url, async (c) => {
+    await c.query(`CREATE TABLE "_prisma_migrations" (
+      id VARCHAR(36) PRIMARY KEY,
+      checksum VARCHAR(64) NOT NULL,
+      finished_at TIMESTAMPTZ,
+      migration_name VARCHAR(255) NOT NULL,
+      logs TEXT,
+      rolled_back_at TIMESTAMPTZ,
+      started_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      applied_steps_count INTEGER NOT NULL DEFAULT 0
+    )`);
+  });
   const expected = await withClient(url, (c) => readCareerOSSchema(c));
+  assert.ok(expected.objects.some((object) => object.object_name === "_prisma_migrations"), "historical Prisma table participates in the v2 fingerprint");
   await withClient(url, async (c) => {
     await c.query(`ALTER TABLE "CareerSearchPreference" ALTER COLUMN "roleFamily" SET DEFAULT 'CHANGED_FOR_TEST'`);
     const changed = await readCareerOSSchema(c);
@@ -81,6 +94,18 @@ try {
   const approvalEnv = await approvalFor(url, manifest, approvalPath);
   const rollbackDb = await createDatabase("rollback"); databases.push(rollbackDb); const rollbackUrl = urlFor(rollbackDb);
   await runMigrations(rollbackUrl);
+  await withClient(rollbackUrl, async (c) => {
+    await c.query(`CREATE TABLE "_prisma_migrations" (
+      id VARCHAR(36) PRIMARY KEY,
+      checksum VARCHAR(64) NOT NULL,
+      finished_at TIMESTAMPTZ,
+      migration_name VARCHAR(255) NOT NULL,
+      logs TEXT,
+      rolled_back_at TIMESTAMPTZ,
+      started_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      applied_steps_count INTEGER NOT NULL DEFAULT 0
+    )`);
+  });
   const rollbackExpected = await withClient(rollbackUrl, (c) => readCareerOSSchema(c));
   await withClient(rollbackUrl, async (c) => { await c.query(`DROP TABLE "CareerOSMigration"`); await c.query(`ALTER TABLE "CareerOnboardingState" DROP COLUMN "storyStatus"`); });
   const rollbackLegacy = await withClient(rollbackUrl, (c) => readCareerOSSchema(c));
