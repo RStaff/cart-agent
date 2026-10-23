@@ -39,3 +39,12 @@ export async function sourceFileDigests(root) {
   }
   return result;
 }
+
+export async function sourceFileDigestsAtRevision(root, revision) {
+  const result = {};
+  for (const relativePath of ADOPTION_CRITICAL_FILES) {
+    const { stdout } = await exec("git", ["show", `${revision}:${relativePath}`], { cwd: root, encoding: "buffer", maxBuffer: 8 * 1024 * 1024 });
+    result[relativePath] = createHash("sha256").update(stdout).digest("hex");
+  }
+  return result;
+}

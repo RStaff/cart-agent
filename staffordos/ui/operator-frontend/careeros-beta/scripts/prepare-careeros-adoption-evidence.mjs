@@ -3,7 +3,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { Client } from "pg";
 import { assertExactCareerOSSchema, assertNoUnexpectedApplicationObjects, CAREEROS_SCHEMA_FINGERPRINT_VERSION, readCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
 import { compareReferenceFields } from "./careerosSchemaReference.mjs";
-import { executingSourceRevision, sourceFileDigests } from "./careerosAdoptionSource.mjs";
+import { executingSourceRevision, sourceFileDigests, sourceFileDigestsAtRevision } from "./careerosAdoptionSource.mjs";
 
 const connectionString = process.env.DATABASE_URL;
 const outputPath = process.env.CAREEROS_ADOPTION_MANIFEST_PATH;
@@ -26,6 +26,8 @@ const executingRevision = await executingSourceRevision(new URL("../", import.me
 const sourceRevision = process.env.CAREEROS_REVIEWED_SOURCE_REVISION || executingRevision;
 if (sourceRevision !== executingRevision) throw new Error("CAREEROS_EXECUTING_SOURCE_REVISION_MISMATCH");
 const sourceFiles = await sourceFileDigests(new URL("../", import.meta.url).pathname);
+const reviewedSourceFiles = await sourceFileDigestsAtRevision(new URL("../", import.meta.url).pathname, sourceRevision);
+if (JSON.stringify(sourceFiles) !== JSON.stringify(reviewedSourceFiles)) throw new Error("CAREEROS_ADOPTION_SOURCE_FILES_MODIFIED");
 const hostname = (() => { try { return new URL(connectionString).hostname; } catch { return ""; } })();
 const client = new Client({ connectionString, ssl: ["127.0.0.1", "localhost", "::1"].includes(hostname) ? false : { rejectUnauthorized: false } });
 await client.connect();

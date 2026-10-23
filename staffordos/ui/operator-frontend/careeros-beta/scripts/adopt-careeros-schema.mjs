@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { Client } from "pg";
 import { assertExactCareerOSSchema, assertNoUnexpectedApplicationObjects, CAREEROS_SCHEMA_FINGERPRINT_VERSION, readCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
 import { compareReferenceFields } from "./careerosSchemaReference.mjs";
-import { executingSourceRevision, sourceFileDigests } from "./careerosAdoptionSource.mjs";
+import { executingSourceRevision, sourceFileDigests, sourceFileDigestsAtRevision } from "./careerosAdoptionSource.mjs";
 import { verifyAdoptionApproval } from "./careerosAdoptionApproval.mjs";
 
 const connectionString = process.env.DATABASE_URL;
@@ -18,6 +18,8 @@ if (evidence.kind !== "REVIEWED_SCHEMA_ADOPTION_EVIDENCE" || evidence.fingerprin
 const executingRevision = await executingSourceRevision(new URL("../", import.meta.url).pathname);
 if (sourceRevision !== executingRevision) throw new Error("CAREEROS_EXECUTING_SOURCE_REVISION_MISMATCH");
 const executingSourceFiles = await sourceFileDigests(new URL("../", import.meta.url).pathname);
+const reviewedRevisionFiles = await sourceFileDigestsAtRevision(new URL("../", import.meta.url).pathname, sourceRevision);
+if (JSON.stringify(executingSourceFiles) !== JSON.stringify(reviewedRevisionFiles)) throw new Error("CAREEROS_ADOPTION_SOURCE_FILES_MODIFIED");
 if (JSON.stringify(executingSourceFiles) !== JSON.stringify(reviewedSourceFiles)) throw new Error("CAREEROS_ADOPTION_SOURCE_FILES_MISMATCH");
 
 const migrationsRoot = new URL("../", import.meta.url);
