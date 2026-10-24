@@ -99,7 +99,7 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
       pg_get_userbyid(c.relowner) AS owner_role,COALESCE(c.relacl::text,'') AS acl
       FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
       WHERE n.nspname=current_schema()
-        AND (c.relname IN (${tableList},'_prisma_migrations','CareerOSMigration','CareerOSMigrationAdoption') OR c.relkind='S')
+        AND (c.relname IN (${tableList},'_prisma_migrations') OR c.relkind='S')
       ORDER BY c.relname,c.relkind`),
     client.query(`SELECT table_name,column_name,grantee,grantor,privilege_type,is_grantable
       FROM information_schema.column_privileges
