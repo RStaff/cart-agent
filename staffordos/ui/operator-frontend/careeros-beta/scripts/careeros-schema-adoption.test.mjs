@@ -214,8 +214,8 @@ try {
     await c.query(`GRANT SELECT ON TABLE "CareerUser" TO ${quoteIdentifier(adminRole)}`);
     await c.query(`GRANT INSERT ON TABLE "CareerUser" TO ${quoteIdentifier(specialRole)}`);
     await c.query(`GRANT UPDATE ON TABLE "CareerUser" TO PUBLIC`);
-    assert.ok(compareReferenceFields(referenceFingerprint(mapped), referenceFingerprint(expected)).includes("relationPrivileges"), "PUBLIC grant drift is reference-visible");
     const mapped = await readCareerOSSchema(c, { roleMapping: { postgres: "reviewed-app", [specialRole]: "reviewed-special" } });
+    assert.ok(compareReferenceFields(referenceFingerprint(mapped), referenceFingerprint(expected)).includes("relationPrivileges"), "PUBLIC grant drift is reference-visible");
     const relation = mapped.relationPrivileges.find((row) => row.object_name === "CareerUser");
     const grantees = relation.privileges.map((privilege) => privilege.grantee);
     assert.ok(grantees.some((p) => p.kind === "role" && p.name === adminRole), "mapping postgres does not alter postgres_admin");
