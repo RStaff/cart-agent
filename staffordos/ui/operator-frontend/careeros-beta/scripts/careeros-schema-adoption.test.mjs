@@ -57,6 +57,7 @@ async function approvalFor(url, manifest, path) {
 
 const databases = [];
 const unexpectedRole = `careeros_unexpected_role_${Date.now()}`;
+const quoteIdentifier = (value) => `"${value.replaceAll('"', '""')}"`;
 try {
   const db = await createDatabase("observed"); databases.push(db); const url = urlFor(db);
   await runMigrations(url);
@@ -204,6 +205,23 @@ try {
     assert.deepEqual(referenceFingerprint(mappedObserved), referenceFingerprint(mappedReference), "explicit reviewed role mapping accepts disposable and Render role names");
     await c.query(`ALTER TABLE "CareerUser" OWNER TO postgres`);
     await c.query(`DROP ROLE "${renderRole}"`);
+  });
+  await withClient(url, async (c) => {
+    const adminRole = `postgres_admin_${Date.now()}`;
+    const specialRole = `role-quoted-"${Date.now()}`;
+    await c.query(`CREATE ROLE ${quoteIdentifier(adminRole)} NOLOGIN`);
+    await c.query(`CREATE ROLE ${quoteIdentifier(specialRole)} NOLOGIN`);
+    await c.query(`GRANT SELECT ON TABLE "CareerUser" TO ${quoteIdentifier(adminRole)}`);
+    await c.query(`GRANT INSERT ON TABLE "CareerUser" TO ${quoteIdentifier(specialRole)}`);
+    const mapped = await readCareerOSSchema(c, { roleMapping: { postgres: "reviewed-app", [specialRole]: "reviewed-special" } });
+    const relation = mapped.relationPrivileges.find((row) => row.object_name === "CareerUser");
+    const grantees = relation.privileges.map((privilege) => privilege.grantee);
+    assert.ok(grantees.includes(adminRole), "mapping postgres does not alter postgres_admin");
+    assert.ok(grantees.includes("reviewed-special"), "quoted role mapping is exact and structured");
+    assert.notEqual(grantees.indexOf(adminRole), grantees.indexOf("reviewed-special"), "different principals remain distinct");
+    await c.query(`REVOKE ALL PRIVILEGES ON TABLE "CareerUser" FROM ${quoteIdentifier(adminRole)},${quoteIdentifier(specialRole)}`);
+    await c.query(`DROP ROLE ${quoteIdentifier(adminRole)}`);
+    await c.query(`DROP ROLE ${quoteIdentifier(specialRole)}`);
   });
   console.log("CareerOS adoption tests passed: observed-schema correction, fingerprint rejection, atomic adoption, checksum rejection, normal-runner repeat.");
 } finally { for (const db of databases) await dropDatabase(db); }

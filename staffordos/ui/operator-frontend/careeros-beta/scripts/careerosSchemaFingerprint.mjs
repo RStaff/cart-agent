@@ -34,12 +34,13 @@ function mapRoleName(value, roleMapping) {
   return roleMapping[value] || value;
 }
 
-function mapRoleText(value, roleMapping) {
-  let result = value || "";
-  for (const [from, to] of Object.entries(roleMapping)) {
-    result = result.replaceAll(`"${from}"`, `"${to}"`).replaceAll(from, to);
-  }
-  return result;
+function mapPrivilegeJson(value, roleMapping) {
+  const privileges = typeof value === "string" ? JSON.parse(value || "[]") : (value || []);
+  return privileges.map((privilege) => ({
+    ...privilege,
+    grantee: mapRoleName(privilege.grantee, roleMapping),
+    grantor: mapRoleName(privilege.grantor, roleMapping),
+  })).sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
 }
 
 export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
@@ -77,7 +78,11 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
       WHERE n.nspname=current_schema() AND NOT t.tgisinternal
       ORDER BY c.relname,t.tgname`),
     client.query(`SELECT p.proname AS routine_name,p.prokind,p.provolatile,p.prosecdef,
-      pg_get_userbyid(p.proowner) AS owner_role,COALESCE(p.proacl::text,'') AS acl,
+      pg_get_userbyid(p.proowner) AS owner_role,
+      COALESCE((SELECT jsonb_agg(jsonb_build_object(
+        'grantee',CASE WHEN e.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(e.grantee) END,
+        'grantor',pg_get_userbyid(e.grantor),'privilege',e.privilege_type,'grantable',e.is_grantable)
+        ORDER BY e.grantee,e.privilege_type)::text FROM aclexplode(COALESCE(p.proacl,acldefault('f',p.proowner))) e),'[]') AS privileges,
       pg_get_function_identity_arguments(p.oid) AS identity_arguments,
       pg_get_functiondef(p.oid) AS definition
       FROM pg_proc p
@@ -86,8 +91,8 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
       ORDER BY p.proname,p.prokind,identity_arguments`),
     client.query(`SELECT c.relname AS table_name,pol.polname AS policy_name,
       pol.polpermissive,pol.polcmd,
-      COALESCE((SELECT string_agg(r.rolname, ',' ORDER BY r.rolname)
-        FROM unnest(pol.polroles) role_oid JOIN pg_roles r ON r.oid=role_oid),'') AS roles,
+      COALESCE((SELECT jsonb_agg(CASE WHEN role_oid=0 THEN 'PUBLIC' ELSE r.rolname END ORDER BY role_oid)
+        FROM unnest(pol.polroles) role_oid LEFT JOIN pg_roles r ON r.oid=role_oid),'[]')::text AS roles,
       COALESCE(pg_get_expr(pol.polqual,pol.polrelid),'') AS using_expression,
       COALESCE(pg_get_expr(pol.polwithcheck,pol.polrelid),'') AS check_expression
       FROM pg_policy pol
@@ -96,10 +101,17 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
       WHERE n.nspname=current_schema()
       ORDER BY c.relname,pol.polname`),
     client.query(`SELECT n.nspname AS schema_name, pg_get_userbyid(n.nspowner) AS owner_role,
-      COALESCE(n.nspacl::text,'') AS acl
+      COALESCE((SELECT jsonb_agg(jsonb_build_object(
+        'grantee',CASE WHEN e.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(e.grantee) END,
+        'grantor',pg_get_userbyid(e.grantor),'privilege',e.privilege_type,'grantable',e.is_grantable)
+        ORDER BY e.grantee,e.privilege_type)::text FROM aclexplode(COALESCE(n.nspacl,acldefault('n',n.nspowner))) e),'[]') AS privileges
       FROM pg_namespace n WHERE n.nspname=current_schema()`),
     client.query(`SELECT c.relname AS object_name,c.relkind AS object_kind,
-      pg_get_userbyid(c.relowner) AS owner_role,COALESCE(c.relacl::text,'') AS acl
+      pg_get_userbyid(c.relowner) AS owner_role,
+      COALESCE((SELECT jsonb_agg(jsonb_build_object(
+        'grantee',CASE WHEN e.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(e.grantee) END,
+        'grantor',pg_get_userbyid(e.grantor),'privilege',e.privilege_type,'grantable',e.is_grantable)
+        ORDER BY e.grantee,e.privilege_type)::text FROM aclexplode(COALESCE(c.relacl,acldefault(CASE WHEN c.relkind='S' THEN 'S'::"char" ELSE 'r'::"char" END,c.relowner))) e),'[]') AS privileges
       FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
       WHERE n.nspname=current_schema()
         AND (c.relname IN (${tableList},'_prisma_migrations') OR c.relkind='S')
@@ -109,7 +121,10 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
       WHERE table_schema=current_schema() AND table_name IN (${tableList})
       ORDER BY table_name,column_name,grantee,privilege_type`),
     client.query(`SELECT c.relname AS sequence_name,pg_get_userbyid(c.relowner) AS owner_role,
-      COALESCE(c.relacl::text,'') AS acl
+      COALESCE((SELECT jsonb_agg(jsonb_build_object(
+        'grantee',CASE WHEN e.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(e.grantee) END,
+        'grantor',pg_get_userbyid(e.grantor),'privilege',e.privilege_type,'grantable',e.is_grantable)
+        ORDER BY e.grantee,e.privilege_type)::text FROM aclexplode(COALESCE(c.relacl,acldefault('S',c.relowner))) e),'[]') AS privileges
       FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
       WHERE n.nspname=current_schema() AND c.relkind='S'
       ORDER BY c.relname`),
@@ -119,7 +134,7 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
   const normalizeRoles = (rows, fields) => rows.map((row) => {
     const copy = { ...row };
     for (const field of fields) if (copy[field] != null) copy[field] = mapRoleName(copy[field], roleMapping);
-    if (copy.acl != null) copy.acl = mapRoleText(copy.acl, roleMapping);
+    if (copy.privileges != null) copy.privileges = mapPrivilegeJson(copy.privileges, roleMapping);
     return copy;
   });
   const value = {
@@ -130,7 +145,7 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
     indexes: canonicalSort(indexes.rows),
     triggers: canonicalSort(triggers.rows),
     routines: canonicalSort(normalizeRoles(routines.rows, ["owner_role"])),
-    policies: canonicalSort(policies.rows.map((row) => ({ ...row, roles: mapRoleText(row.roles, roleMapping) }))),
+    policies: canonicalSort(policies.rows.map((row) => ({ ...row, roles: JSON.parse(row.roles || "[]").map((role) => mapRoleName(role, roleMapping)).sort() }))),
     roleMapping: Object.fromEntries(Object.entries(roleMapping).sort(([a], [b]) => a.localeCompare(b))),
     schemaPrivileges: canonicalSort(normalizeRoles(schemaPrivileges.rows, ["owner_role"])),
     relationPrivileges: canonicalSort(normalizeRoles(relationPrivileges.rows, ["owner_role"])),
