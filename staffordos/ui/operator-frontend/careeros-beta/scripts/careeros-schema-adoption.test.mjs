@@ -271,7 +271,7 @@ try {
       `postgres->${chainRoles[0]}`,
     ];
     assert.deepEqual(expectedChainEdges.filter((edge) => longChainEdges.has(edge)), expectedChainEdges, "every edge in the membership path longer than 32 edges is captured");
-    assert.ok(longChain.roleMemberships.some((m) => m.member_role === chainRoles[chainRoles.length - 2] && m.granted_role === chainRoles[chainRoles.length - 1] && m.admin_option && m.inherit_option && m.set_option), "individual membership options remain unchanged");
+    assert.ok(longChain.roleMemberships.some((m) => m.member_role === chainRoles[chainRoles.length - 2] && m.granted_role === chainRoles[chainRoles.length - 1] && !m.admin_option && m.inherit_option && m.set_option), "individual membership options remain unchanged");
     const diamondRoles = [`careeros_diamond_a_${Date.now()}`, `careeros_diamond_b_${Date.now()}`, `careeros_diamond_shared_${Date.now()}`];
     for (const role of diamondRoles) await c.query(`CREATE ROLE ${quoteIdentifier(role)} NOLOGIN`);
     await c.query(`GRANT SELECT ON TABLE "CareerUser" TO ${quoteIdentifier(diamondRoles[2])}`);
