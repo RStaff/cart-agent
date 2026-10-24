@@ -16,6 +16,15 @@ export const HISTORICAL_SCHEMA_OBJECTS = Object.freeze(["_prisma_migrations"]);
 export const OPERATIONAL_SCHEMA_OBJECTS = Object.freeze(["CareerOSMigration", "CareerOSMigrationAdoption"]);
 const tableList = CAREEROS_TABLES.map((table) => `'${table.replaceAll("'", "''")}'`).join(",");
 
+// These owner seeds are intentionally shared by default-ACL and role-attribute
+// capture. Principal seeds may additionally include ACL/policy participants;
+// those are authorization principals, not default-ACL owners.
+const RELEVANT_OWNER_SQL = `
+        SELECT n.nspowner AS oid FROM pg_namespace n WHERE n.nspname=current_schema()
+        UNION SELECT c.relowner FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+          WHERE n.nspname=current_schema() AND (c.relname IN (${tableList},'_prisma_migrations') OR c.relkind='S')
+        UNION SELECT p.proowner FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname=current_schema()`;
+
 const CATALOG_SQL = `
   SELECT
     c.relname AS object_name,
@@ -153,11 +162,7 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
       FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
       WHERE n.nspname=current_schema() AND c.relkind='S'
       ORDER BY c.relname`),
-    client.query(`WITH RECURSIVE relevant_owners AS (
-        SELECT n.nspowner AS oid FROM pg_namespace n WHERE n.nspname=current_schema()
-        UNION SELECT c.relowner FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
-          WHERE n.nspname=current_schema() AND (c.relname IN (${tableList},'_prisma_migrations') OR c.relkind='S')
-        UNION SELECT p.proowner FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname=current_schema()
+    client.query(`WITH RECURSIVE relevant_owners AS (${RELEVANT_OWNER_SQL}
       ), relevant AS (
         SELECT oid FROM relevant_owners
         UNION SELECT e.grantee FROM pg_namespace n CROSS JOIN LATERAL aclexplode(COALESCE(n.nspacl,acldefault('n',n.nspowner))) e WHERE n.nspname=current_schema()
@@ -206,9 +211,7 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
         ORDER BY e.grantee,e.privilege_type)::text FROM aclexplode(d.defaclacl) e),'[]') AS privileges
       FROM pg_default_acl d LEFT JOIN pg_namespace n ON n.oid=d.defaclnamespace
       WHERE (d.defaclnamespace=0 OR d.defaclnamespace=(SELECT oid FROM pg_namespace WHERE nspname=current_schema()))
-        AND d.defaclrole IN (SELECT nspowner FROM pg_namespace WHERE nspname=current_schema()
-          UNION SELECT c.relowner FROM pg_class c JOIN pg_namespace ns ON ns.oid=c.relnamespace WHERE ns.nspname=current_schema()
-          UNION SELECT p.proowner FROM pg_proc p JOIN pg_namespace ns ON ns.oid=p.pronamespace WHERE ns.nspname=current_schema())
+        AND d.defaclrole IN (${RELEVANT_OWNER_SQL})
       ORDER BY d.defaclrole,d.defaclnamespace,d.defaclobjtype`),
     client.query(`WITH RECURSIVE relevant AS (
         SELECT n.nspowner AS oid FROM pg_namespace n WHERE n.nspname=current_schema()

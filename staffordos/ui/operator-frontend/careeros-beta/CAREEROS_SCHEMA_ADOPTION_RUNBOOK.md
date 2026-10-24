@@ -28,8 +28,8 @@ repository or Render path. The service branch remains exactly
    column from migration `20260817010000_add_career_story_status`.
 4. Recompute the full post-reconciliation fingerprint. Do not continue if
    any catalog difference remains.
-   Record the `careeros-schema-fingerprint-v2` format alongside the digest;
-   the prior fingerprint format is historical evidence only.
+   Record the `careeros-schema-fingerprint-v3` format alongside the digest;
+   v2 hashes are historical evidence only and are not valid adoption inputs.
 5. Keep the service stopped or read-only while the adoption transaction runs;
    both utilities take the `careeros-migration-v1` transaction advisory lock
    and re-read the fingerprint while holding it.

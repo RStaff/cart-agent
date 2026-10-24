@@ -88,6 +88,19 @@ try {
     await c.query(`REVOKE SELECT ON TABLE "CareerUser" FROM ${quoteIdentifier(role)}`);
     await c.query(`DROP ROLE ${quoteIdentifier(role)}`);
   });
+  await withClient(url, async (c) => {
+    const columnRole = `careeros_column_attribute_probe_${Date.now()}`;
+    await c.query(`CREATE ROLE ${quoteIdentifier(columnRole)} NOLOGIN`);
+    await c.query(`GRANT SELECT ("id") ON TABLE "CareerUser" TO ${quoteIdentifier(columnRole)}`);
+    const baseline = await readCareerOSSchema(c);
+    await c.query(`ALTER ROLE ${quoteIdentifier(columnRole)} SUPERUSER BYPASSRLS`);
+    const changed = await readCareerOSSchema(c);
+    assert.notDeepEqual(changed.roleAttributes, baseline.roleAttributes, "column-only ACL principals seed role-attribute capture");
+    assert.ok(changed.roleAttributes.some((entry) => entry.rolname === columnRole && entry.rolsuper && entry.rolbypassrls), "column-only principal attributes are captured");
+    await c.query(`ALTER ROLE ${quoteIdentifier(columnRole)} NOSUPERUSER NOBYPASSRLS`);
+    await c.query(`REVOKE SELECT ("id") ON TABLE "CareerUser" FROM ${quoteIdentifier(columnRole)}`);
+    await c.query(`DROP ROLE ${quoteIdentifier(columnRole)}`);
+  });
   const referencePath = `${process.env.TMPDIR || "/tmp"}/careeros-reference-${Date.now()}.json`;
   const manifestPath = `${process.env.TMPDIR || "/tmp"}/careeros-adoption-${Date.now()}.json`;
   await writeFile(referencePath, JSON.stringify(referenceFingerprint(expected)));
@@ -333,6 +346,7 @@ try {
     const unrelatedDefaultAndMembership = await readCareerOSSchema(c);
     assert.deepEqual(unrelatedDefaultAndMembership.roleMemberships, membershipBaseline.roleMemberships, "unrelated default-ACL role membership is excluded");
     assert.deepEqual(unrelatedDefaultAndMembership.defaultPrivileges, membershipBaseline.defaultPrivileges, "unrelated global default ACL is excluded");
+    assert.deepEqual(unrelatedDefaultAndMembership.roleAttributes, membershipBaseline.roleAttributes, "unrelated default-ACL owners do not seed role attributes");
     await c.query(`ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT SELECT ON TABLES TO PUBLIC`);
     const defaults = await readCareerOSSchema(c);
     assert.notDeepEqual(defaults.defaultPrivileges, expected.defaultPrivileges, "schema-scoped default privileges are fingerprinted");
