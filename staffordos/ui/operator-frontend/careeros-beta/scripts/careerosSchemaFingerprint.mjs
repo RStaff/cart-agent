@@ -99,7 +99,7 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
       ORDER BY c.relname,t.tgname`),
     client.query(`SELECT p.proname AS routine_name,p.prokind,p.provolatile,p.prosecdef,
       pg_get_userbyid(p.proowner) AS owner_role,
-      CASE WHEN a.attacl IS NULL THEN '[]' ELSE COALESCE((SELECT jsonb_agg(jsonb_build_object(
+      COALESCE((SELECT jsonb_agg(jsonb_build_object(
         'grantee',CASE WHEN e.grantee=0 THEN jsonb_build_object('kind','public') ELSE jsonb_build_object('kind','role','name',pg_get_userbyid(e.grantee)) END,
         'grantor',CASE WHEN e.grantor=0 THEN jsonb_build_object('kind','public') ELSE jsonb_build_object('kind','role','name',pg_get_userbyid(e.grantor)) END,'privilege',e.privilege_type,'grantable',e.is_grantable)
         ORDER BY e.grantee,e.privilege_type)::text FROM aclexplode(COALESCE(p.proacl,acldefault('f',p.proowner))) e),'[]') AS privileges,
@@ -137,7 +137,7 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
         AND (c.relname IN (${tableList},'_prisma_migrations') OR c.relkind='S')
       ORDER BY c.relname,c.relkind`),
     client.query(`SELECT c.relname AS table_name,a.attname AS column_name,
-      COALESCE((SELECT jsonb_agg(jsonb_build_object(
+      CASE WHEN a.attacl IS NULL THEN '[]' ELSE COALESCE((SELECT jsonb_agg(jsonb_build_object(
         'grantee',CASE WHEN e.grantee=0 THEN jsonb_build_object('kind','public') ELSE jsonb_build_object('kind','role','name',pg_get_userbyid(e.grantee)) END,
         'grantor',CASE WHEN e.grantor=0 THEN jsonb_build_object('kind','public') ELSE jsonb_build_object('kind','role','name',pg_get_userbyid(e.grantor)) END,
         'privilege',e.privilege_type,'grantable',e.is_grantable)
