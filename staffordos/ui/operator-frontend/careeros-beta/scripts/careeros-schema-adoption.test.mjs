@@ -56,6 +56,7 @@ async function approvalFor(url, manifest, path) {
 }
 
 const databases = [];
+const unexpectedRole = `careeros_unexpected_role_${Date.now()}`;
 try {
   const db = await createDatabase("observed"); databases.push(db); const url = urlFor(db);
   await runMigrations(url);
@@ -186,12 +187,12 @@ try {
   await assert.rejects(runScript(adopt, url, { CAREEROS_ADOPTION_MANIFEST_PATH: manifestPath, CAREEROS_SCHEMA_REFERENCE_PATH: referencePath }), /CAREEROS_ADOPTION_APPROVAL_REQUIRED/);
   await withClient(url, async (c) => { assert.equal((await c.query(`SELECT COUNT(*)::int AS n FROM "CareerOSMigration"`)).rows[0].n, 8); assert.equal((await c.query(`SELECT COUNT(*)::int AS n FROM "CareerOSMigrationAdoption"`)).rows[0].n, 1); });
   await withClient(url, async (c) => {
-    await c.query(`CREATE ROLE "careeros_unexpected_role" NOLOGIN`);
-    await c.query(`GRANT SELECT ON TABLE "CareerUser" TO "careeros_unexpected_role"`);
+    await c.query(`CREATE ROLE "${unexpectedRole}" NOLOGIN`);
+    await c.query(`GRANT SELECT ON TABLE "CareerUser" TO "${unexpectedRole}"`);
     const privileged = await readCareerOSSchema(c);
     assert.notDeepEqual(referenceFingerprint(privileged).relationPrivileges, referenceFingerprint(expected).relationPrivileges, "unexpected relation ownership/grants reject against independent reference");
-    await c.query(`REVOKE SELECT ON TABLE "CareerUser" FROM "careeros_unexpected_role"`);
-    await c.query(`DROP ROLE "careeros_unexpected_role"`);
+    await c.query(`REVOKE SELECT ON TABLE "CareerUser" FROM "${unexpectedRole}"`);
+    await c.query(`DROP ROLE "${unexpectedRole}"`);
   });
   console.log("CareerOS adoption tests passed: observed-schema correction, fingerprint rejection, atomic adoption, checksum rejection, normal-runner repeat.");
 } finally { for (const db of databases) await dropDatabase(db); }
