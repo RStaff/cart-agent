@@ -30,21 +30,41 @@ const CATALOG_SQL = `
     AND c.relkind IN ('r','p','v','m','S','f')
   ORDER BY c.relname,c.relkind`;
 
+function validateRoleMapping(roleMapping) {
+  for (const [from, to] of Object.entries(roleMapping)) {
+    if (from === "PUBLIC" || to === "PUBLIC") {
+      throw new Error("CAREEROS_PUBLIC_ROLE_MAPPING_FORBIDDEN");
+    }
+  }
+}
+
 function mapRoleName(value, roleMapping) {
   return roleMapping[value] || value;
+}
+
+function mapPrincipal(value, roleMapping) {
+  if (value && typeof value === "object") {
+    if (value.kind === "public") return { kind: "public" };
+    if (value.kind === "role") return { kind: "role", name: mapRoleName(value.name, roleMapping) };
+  }
+  // Keep compatibility with older captured references while never treating
+  // the PUBLIC pseudo-principal as a private role.
+  if (value === "PUBLIC") return { kind: "public" };
+  return { kind: "role", name: mapRoleName(value, roleMapping) };
 }
 
 function mapPrivilegeJson(value, roleMapping) {
   const privileges = typeof value === "string" ? JSON.parse(value || "[]") : (value || []);
   return privileges.map((privilege) => ({
     ...privilege,
-    grantee: mapRoleName(privilege.grantee, roleMapping),
-    grantor: mapRoleName(privilege.grantor, roleMapping),
+    grantee: mapPrincipal(privilege.grantee, roleMapping),
+    grantor: mapPrincipal(privilege.grantor, roleMapping),
   })).sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
 }
 
 export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
-  const [columns, constraints, indexes, tables, objects, triggers, routines, policies, schemaPrivileges, relationPrivileges, columnPrivileges, sequences] = await Promise.all([
+  validateRoleMapping(roleMapping);
+  const [columns, constraints, indexes, tables, objects, triggers, routines, policies, schemaPrivileges, relationPrivileges, columnPrivileges, sequences, roleMemberships, defaultPrivileges] = await Promise.all([
     client.query(`SELECT c.table_name,c.column_name,c.data_type,c.udt_schema,c.udt_name,c.is_nullable,
       COALESCE(c.column_default,'') AS column_default,c.character_maximum_length,c.numeric_precision,
       c.numeric_scale,c.datetime_precision,COALESCE(a.attidentity,'') AS identity_kind,
@@ -80,8 +100,8 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
     client.query(`SELECT p.proname AS routine_name,p.prokind,p.provolatile,p.prosecdef,
       pg_get_userbyid(p.proowner) AS owner_role,
       COALESCE((SELECT jsonb_agg(jsonb_build_object(
-        'grantee',CASE WHEN e.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(e.grantee) END,
-        'grantor',pg_get_userbyid(e.grantor),'privilege',e.privilege_type,'grantable',e.is_grantable)
+        'grantee',CASE WHEN e.grantee=0 THEN jsonb_build_object('kind','public') ELSE jsonb_build_object('kind','role','name',pg_get_userbyid(e.grantee)) END,
+        'grantor',CASE WHEN e.grantor=0 THEN jsonb_build_object('kind','public') ELSE jsonb_build_object('kind','role','name',pg_get_userbyid(e.grantor)) END,'privilege',e.privilege_type,'grantable',e.is_grantable)
         ORDER BY e.grantee,e.privilege_type)::text FROM aclexplode(COALESCE(p.proacl,acldefault('f',p.proowner))) e),'[]') AS privileges,
       pg_get_function_identity_arguments(p.oid) AS identity_arguments,
       pg_get_functiondef(p.oid) AS definition
@@ -91,7 +111,7 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
       ORDER BY p.proname,p.prokind,identity_arguments`),
     client.query(`SELECT c.relname AS table_name,pol.polname AS policy_name,
       pol.polpermissive,pol.polcmd,
-      COALESCE((SELECT jsonb_agg(CASE WHEN role_oid=0 THEN 'PUBLIC' ELSE r.rolname END ORDER BY role_oid)
+        COALESCE((SELECT jsonb_agg(CASE WHEN role_oid=0 THEN jsonb_build_object('kind','public') ELSE jsonb_build_object('kind','role','name',r.rolname) END ORDER BY role_oid)
         FROM unnest(pol.polroles) role_oid LEFT JOIN pg_roles r ON r.oid=role_oid),'[]')::text AS roles,
       COALESCE(pg_get_expr(pol.polqual,pol.polrelid),'') AS using_expression,
       COALESCE(pg_get_expr(pol.polwithcheck,pol.polrelid),'') AS check_expression
@@ -102,15 +122,15 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
       ORDER BY c.relname,pol.polname`),
     client.query(`SELECT n.nspname AS schema_name, pg_get_userbyid(n.nspowner) AS owner_role,
       COALESCE((SELECT jsonb_agg(jsonb_build_object(
-        'grantee',CASE WHEN e.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(e.grantee) END,
-        'grantor',pg_get_userbyid(e.grantor),'privilege',e.privilege_type,'grantable',e.is_grantable)
+        'grantee',CASE WHEN e.grantee=0 THEN jsonb_build_object('kind','public') ELSE jsonb_build_object('kind','role','name',pg_get_userbyid(e.grantee)) END,
+        'grantor',CASE WHEN e.grantor=0 THEN jsonb_build_object('kind','public') ELSE jsonb_build_object('kind','role','name',pg_get_userbyid(e.grantor)) END,'privilege',e.privilege_type,'grantable',e.is_grantable)
         ORDER BY e.grantee,e.privilege_type)::text FROM aclexplode(COALESCE(n.nspacl,acldefault('n',n.nspowner))) e),'[]') AS privileges
       FROM pg_namespace n WHERE n.nspname=current_schema()`),
     client.query(`SELECT c.relname AS object_name,c.relkind AS object_kind,
       pg_get_userbyid(c.relowner) AS owner_role,
       COALESCE((SELECT jsonb_agg(jsonb_build_object(
-        'grantee',CASE WHEN e.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(e.grantee) END,
-        'grantor',pg_get_userbyid(e.grantor),'privilege',e.privilege_type,'grantable',e.is_grantable)
+        'grantee',CASE WHEN e.grantee=0 THEN jsonb_build_object('kind','public') ELSE jsonb_build_object('kind','role','name',pg_get_userbyid(e.grantee)) END,
+        'grantor',CASE WHEN e.grantor=0 THEN jsonb_build_object('kind','public') ELSE jsonb_build_object('kind','role','name',pg_get_userbyid(e.grantor)) END,'privilege',e.privilege_type,'grantable',e.is_grantable)
         ORDER BY e.grantee,e.privilege_type)::text FROM aclexplode(COALESCE(c.relacl,acldefault(CASE WHEN c.relkind='S' THEN 'S'::"char" ELSE 'r'::"char" END,c.relowner))) e),'[]') AS privileges
       FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
       WHERE n.nspname=current_schema()
@@ -122,12 +142,33 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
       ORDER BY table_name,column_name,grantee,privilege_type`),
     client.query(`SELECT c.relname AS sequence_name,pg_get_userbyid(c.relowner) AS owner_role,
       COALESCE((SELECT jsonb_agg(jsonb_build_object(
-        'grantee',CASE WHEN e.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(e.grantee) END,
-        'grantor',pg_get_userbyid(e.grantor),'privilege',e.privilege_type,'grantable',e.is_grantable)
+        'grantee',CASE WHEN e.grantee=0 THEN jsonb_build_object('kind','public') ELSE jsonb_build_object('kind','role','name',pg_get_userbyid(e.grantee)) END,
+        'grantor',CASE WHEN e.grantor=0 THEN jsonb_build_object('kind','public') ELSE jsonb_build_object('kind','role','name',pg_get_userbyid(e.grantor)) END,'privilege',e.privilege_type,'grantable',e.is_grantable)
         ORDER BY e.grantee,e.privilege_type)::text FROM aclexplode(COALESCE(c.relacl,acldefault('S',c.relowner))) e),'[]') AS privileges
       FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
       WHERE n.nspname=current_schema() AND c.relkind='S'
       ORDER BY c.relname`),
+    client.query(`WITH RECURSIVE memberships AS (
+        SELECT am.member,am.roleid,am.admin_option,am.inherit_option,am.set_option,1 AS depth
+        FROM pg_auth_members am
+        UNION ALL
+        SELECT m.member,am.roleid,(m.admin_option AND am.admin_option),(m.inherit_option AND am.inherit_option),
+          (m.set_option AND am.set_option),m.depth + 1
+        FROM memberships m JOIN pg_auth_members am ON am.member=m.roleid
+        WHERE m.depth < 32
+      )
+      SELECT DISTINCT pg_get_userbyid(member) AS member_role, pg_get_userbyid(roleid) AS granted_role,
+        admin_option,inherit_option,set_option,depth
+      FROM memberships ORDER BY member,roleid,depth`),
+    client.query(`SELECT COALESCE(n.nspname,'') AS schema_name, pg_get_userbyid(d.defaclrole) AS owner_role,
+      d.defaclobjtype,
+      COALESCE((SELECT jsonb_agg(jsonb_build_object(
+        'grantee',CASE WHEN e.grantee=0 THEN jsonb_build_object('kind','public') ELSE jsonb_build_object('kind','role','name',pg_get_userbyid(e.grantee)) END,
+        'grantor',CASE WHEN e.grantor=0 THEN jsonb_build_object('kind','public') ELSE jsonb_build_object('kind','role','name',pg_get_userbyid(e.grantor)) END,
+        'privilege',e.privilege_type,'grantable',e.is_grantable)
+        ORDER BY e.grantee,e.privilege_type)::text FROM aclexplode(d.defaclacl) e),'[]') AS privileges
+      FROM pg_default_acl d LEFT JOIN pg_namespace n ON n.oid=d.defaclnamespace
+      ORDER BY d.defaclrole,d.defaclnamespace,d.defaclobjtype`),
   ]);
   const catalogObjects = objects.rows;
   const canonicalSort = (rows) => [...rows].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
@@ -137,6 +178,11 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
     if (copy.privileges != null) copy.privileges = mapPrivilegeJson(copy.privileges, roleMapping);
     return copy;
   });
+  const normalizePrivilegeRows = (rows) => rows.map((row) => ({
+    ...row,
+    grantee: mapPrincipal(row.grantee, roleMapping),
+    grantor: mapPrincipal(row.grantor, roleMapping),
+  }));
   const value = {
     fingerprintVersion: CAREEROS_SCHEMA_FINGERPRINT_VERSION,
     tables: tables.rows.map((row) => row.tablename).sort(),
@@ -145,12 +191,14 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
     indexes: canonicalSort(indexes.rows),
     triggers: canonicalSort(triggers.rows),
     routines: canonicalSort(normalizeRoles(routines.rows, ["owner_role"])),
-    policies: canonicalSort(policies.rows.map((row) => ({ ...row, roles: JSON.parse(row.roles || "[]").map((role) => mapRoleName(role, roleMapping)).sort() }))),
+    policies: canonicalSort(policies.rows.map((row) => ({ ...row, roles: JSON.parse(row.roles || "[]").map((role) => mapPrincipal(role, roleMapping)).sort((a,b) => JSON.stringify(a).localeCompare(JSON.stringify(b))) }))),
     roleMapping: Object.fromEntries(Object.entries(roleMapping).sort(([a], [b]) => a.localeCompare(b))),
     schemaPrivileges: canonicalSort(normalizeRoles(schemaPrivileges.rows, ["owner_role"])),
     relationPrivileges: canonicalSort(normalizeRoles(relationPrivileges.rows, ["owner_role"])),
-    columnPrivileges: canonicalSort(normalizeRoles(columnPrivileges.rows, ["grantee", "grantor"])),
+    columnPrivileges: canonicalSort(normalizePrivilegeRows(columnPrivileges.rows)),
     sequences: canonicalSort(normalizeRoles(sequences.rows, ["owner_role"])),
+    roleMemberships: canonicalSort(normalizeRoles(roleMemberships.rows, ["member_role", "granted_role"])),
+    defaultPrivileges: canonicalSort(normalizeRoles(defaultPrivileges.rows, ["owner_role"])),
     // Operational ledgers are intentionally excluded from the application
     // fingerprint; catalogObjects remains available for unexpected-object checks.
     objects: canonicalSort(objects.rows.filter((row) => CAREEROS_TABLES.includes(row.object_name) || HISTORICAL_SCHEMA_OBJECTS.includes(row.object_name))),
