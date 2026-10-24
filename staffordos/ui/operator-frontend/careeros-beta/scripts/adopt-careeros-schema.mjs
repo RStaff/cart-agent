@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { Client } from "pg";
 import { postgresSslForConnection } from "./careerosConnection.mjs";
 import { assertExactCareerOSSchema, assertNoUnexpectedApplicationObjects, CAREEROS_SCHEMA_FINGERPRINT_VERSION, readCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
-import { compareReferenceFields } from "./careerosSchemaReference.mjs";
+import { compareReferenceFields, referenceFingerprint as recomputeReferenceFingerprint } from "./careerosSchemaReference.mjs";
 import { executingSourceRevision, sourceFileDigests, sourceFileDigestsAtRevision } from "./careerosAdoptionSource.mjs";
 import { verifyAdoptionApproval } from "./careerosAdoptionApproval.mjs";
 
@@ -51,6 +51,8 @@ try {
   assertExactCareerOSSchema(schema);
   assertNoUnexpectedApplicationObjects(schema);
   const expectedReference = JSON.parse(await readFile(referencePath, "utf8"));
+  const recomputedReference = recomputeReferenceFingerprint(expectedReference);
+  if (expectedReference.fingerprint !== recomputedReference.fingerprint) throw new Error("CAREEROS_REFERENCE_DIGEST_MISMATCH");
   const referenceDifferences = compareReferenceFields(schema, expectedReference);
   if (referenceDifferences.length || expectedReference.fingerprint !== referenceFingerprint) throw new Error(`CAREEROS_REFERENCE_MISMATCH:${referenceDifferences.join(",")}`);
   if (schema.fingerprint !== reviewedFingerprint) throw new Error(`CAREEROS_REVIEWED_SCHEMA_FINGERPRINT_MISMATCH:${schema.fingerprint}`);

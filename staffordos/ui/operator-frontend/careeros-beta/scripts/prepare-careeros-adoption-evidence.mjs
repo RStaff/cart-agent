@@ -3,7 +3,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { Client } from "pg";
 import { postgresSslForConnection } from "./careerosConnection.mjs";
 import { assertExactCareerOSSchema, assertNoUnexpectedApplicationObjects, CAREEROS_SCHEMA_FINGERPRINT_VERSION, readCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
-import { compareReferenceFields } from "./careerosSchemaReference.mjs";
+import { compareReferenceFields, referenceFingerprint } from "./careerosSchemaReference.mjs";
 import { executingSourceRevision, sourceFileDigests, sourceFileDigestsAtRevision } from "./careerosAdoptionSource.mjs";
 
 const connectionString = process.env.DATABASE_URL;
@@ -37,6 +37,8 @@ try {
   const adoption = await client.query(`SELECT to_regclass('"CareerOSMigrationAdoption"') AS name`);
   if (ledger.rows[0].name || adoption.rows[0].name) throw new Error("CAREEROS_SCHEMA_ALREADY_ADOPTED");
   const expected = JSON.parse(await readFile(referencePath, "utf8"));
+  const recomputedReference = referenceFingerprint(expected);
+  if (expected.fingerprint !== recomputedReference.fingerprint) throw new Error("CAREEROS_REFERENCE_DIGEST_MISMATCH");
   const schema = await readCareerOSSchema(client, { roleMapping }); assertExactCareerOSSchema(schema); assertNoUnexpectedApplicationObjects(schema);
   const referenceDifferences = compareReferenceFields(schema, expected);
   if (referenceDifferences.length) throw new Error(`CAREEROS_REFERENCE_MISMATCH:${referenceDifferences.join(",")}`);

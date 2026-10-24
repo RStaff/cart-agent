@@ -78,6 +78,10 @@ try {
   const referencePath = `${process.env.TMPDIR || "/tmp"}/careeros-reference-${Date.now()}.json`;
   const manifestPath = `${process.env.TMPDIR || "/tmp"}/careeros-adoption-${Date.now()}.json`;
   await writeFile(referencePath, JSON.stringify(referenceFingerprint(expected)));
+  const staleReferenceDigestPath = `${referencePath}.stale-digest`;
+  const referenceArtifact = JSON.parse(await readFile(referencePath, "utf8"));
+  await writeFile(staleReferenceDigestPath, JSON.stringify({ ...referenceArtifact, roleMemberships: [...referenceArtifact.roleMemberships, { member_role: "tampered", granted_role: "tampered", admin_option: false, inherit_option: true, set_option: true, depth: 1 }] }));
+  await assert.rejects(runScript(prepare, url, { CAREEROS_ADOPTION_MANIFEST_PATH: `${manifestPath}.stale-digest`, CAREEROS_SCHEMA_REFERENCE_PATH: staleReferenceDigestPath, CAREEROS_REVIEWED_SOURCE_REVISION: sourceRevision, CAREEROS_REVIEWED_BY: "synthetic-review" }), /CAREEROS_REFERENCE_DIGEST_MISMATCH/);
   await assert.rejects(runScript(prepare, url, { CAREEROS_ADOPTION_MANIFEST_PATH: `${manifestPath}.wrong-source`, CAREEROS_SCHEMA_REFERENCE_PATH: referencePath, CAREEROS_REVIEWED_SOURCE_REVISION: "0000000000000000000000000000000000000000", CAREEROS_REVIEWED_BY: "synthetic-review" }), /CAREEROS_EXECUTING_SOURCE_REVISION_MISMATCH/);
   await withClient(url, async (c) => {
     const constraint = (await c.query(`SELECT constraint_name FROM information_schema.table_constraints WHERE table_schema=current_schema() AND table_name='CareerUser' ORDER BY constraint_name LIMIT 1`)).rows[0].constraint_name;
