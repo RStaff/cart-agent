@@ -226,7 +226,7 @@ try {
     const memberRole = (await c.query(`SELECT rolname FROM pg_roles WHERE rolname LIKE 'careeros_membership_%' ORDER BY rolname DESC LIMIT 1`)).rows[0].rolname;
     await c.query(`GRANT ${quoteIdentifier(memberRole)} TO postgres WITH INHERIT TRUE, SET TRUE`);
     const memberships = await readCareerOSSchema(c);
-    assert.ok(memberships.roleMemberships.some((m) => m.member_role === memberRole && m.granted_role === "postgres" && m.inherit_option && m.set_option), "role membership options are captured");
+    assert.ok(memberships.roleMemberships.some((m) => m.member_role === "postgres" && m.granted_role === memberRole && m.inherit_option && m.set_option), "role membership options are captured");
     await c.query(`ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT SELECT ON TABLES TO PUBLIC`);
     const defaults = await readCareerOSSchema(c);
     assert.notDeepEqual(defaults.defaultPrivileges, expected.defaultPrivileges, "schema-scoped default privileges are fingerprinted");
