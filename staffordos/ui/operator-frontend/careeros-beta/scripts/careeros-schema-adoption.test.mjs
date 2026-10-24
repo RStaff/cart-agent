@@ -216,6 +216,7 @@ try {
     await c.query(`GRANT UPDATE ON TABLE "CareerUser" TO PUBLIC`);
     await c.query(`CREATE ROLE "PUBLIC" NOLOGIN`);
     await c.query(`GRANT SELECT ("id") ON TABLE "CareerUser" TO "PUBLIC"`);
+    await c.query(`GRANT UPDATE ("id") ON TABLE "CareerUser" TO PUBLIC`);
     const mapped = await readCareerOSSchema(c, { roleMapping: { postgres: "reviewed-app", [specialRole]: "reviewed-special" } });
     assert.ok(compareReferenceFields(referenceFingerprint(mapped), referenceFingerprint(expected)).includes("relationPrivileges"), "PUBLIC grant drift is reference-visible");
     const relation = mapped.relationPrivileges.find((row) => row.object_name === "CareerUser");
