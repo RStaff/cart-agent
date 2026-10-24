@@ -178,13 +178,13 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
             AND (d.defaclnamespace=0 OR d.defaclnamespace=(SELECT oid FROM pg_namespace WHERE nspname=current_schema()))
       ), memberships AS (
         SELECT am.member,am.roleid,am.admin_option,am.inherit_option,am.set_option,1 AS depth,
-          ARRAY[am.member,am.roleid]::oid[] AS path
-        FROM pg_auth_members am WHERE am.member IN (SELECT oid FROM relevant)
+          ARRAY[am.roleid,am.member]::oid[] AS path
+        FROM pg_auth_members am WHERE am.roleid IN (SELECT oid FROM relevant)
         UNION ALL
         SELECT am.member,am.roleid,(m.admin_option AND am.admin_option),(m.inherit_option AND am.inherit_option),
-          (m.set_option AND am.set_option),m.depth + 1,m.path || am.roleid
-        FROM memberships m JOIN pg_auth_members am ON am.member=m.roleid
-        WHERE NOT (am.roleid = ANY(m.path))
+          (m.set_option AND am.set_option),m.depth + 1,ARRAY[am.roleid]::oid[] || m.path
+        FROM memberships m JOIN pg_auth_members am ON am.roleid=m.member
+        WHERE NOT (am.member = ANY(m.path))
       )
       SELECT DISTINCT ON (member,roleid,admin_option,inherit_option,set_option)
         pg_get_userbyid(member) AS member_role, pg_get_userbyid(roleid) AS granted_role,
