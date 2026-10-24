@@ -257,6 +257,16 @@ try {
     assert.ok(memberships.roleMemberships.some((m) => m.member_role === memberRole && m.granted_role === parentRole), "indirect role membership edge is captured");
     assert.ok(memberships.roleMemberships.some((m) => m.member_role === unauthorizedLogin && m.granted_role === memberRole), "direct unauthorized login membership is captured");
     assert.ok(memberships.roleMemberships.some((m) => m.member_role === routineLogin && m.granted_role === routineRole), "routine ACL principals seed relevant membership checks");
+    const optionRoot = `careeros_option_root_${Date.now()}`;
+    const optionMember = `careeros_option_member_${Date.now()}`;
+    const optionLogin = `careeros_option_login_${Date.now()}`;
+    for (const role of [optionRoot, optionMember, optionLogin]) await c.query(`CREATE ROLE ${quoteIdentifier(role)} NOLOGIN`);
+    await c.query(`GRANT SELECT ON TABLE "CareerUser" TO ${quoteIdentifier(optionRoot)}`);
+    await c.query(`GRANT ${quoteIdentifier(optionRoot)} TO ${quoteIdentifier(optionMember)} WITH INHERIT FALSE, SET FALSE`);
+    await c.query(`GRANT ${quoteIdentifier(optionMember)} TO ${quoteIdentifier(optionLogin)} WITH INHERIT TRUE, SET TRUE`);
+    const optionEvidence = await readCareerOSSchema(c);
+    assert.ok(optionEvidence.roleMemberships.some((m) => m.member_role === optionMember && m.granted_role === optionRoot && !m.inherit_option && !m.set_option), "root membership options are preserved per edge");
+    assert.ok(optionEvidence.roleMemberships.some((m) => m.member_role === optionLogin && m.granted_role === optionMember && m.inherit_option && m.set_option), "downstream membership options are not cumulatively ANDed");
     const chainRoles = Array.from({ length: 34 }, (_, i) => `careeros_chain_${Date.now()}_${i}`);
     for (const role of chainRoles) await c.query(`CREATE ROLE ${quoteIdentifier(role)} NOLOGIN`);
     await c.query(`GRANT SELECT ON TABLE "CareerUser" TO ${quoteIdentifier(chainRoles[chainRoles.length - 1])}`);
@@ -313,6 +323,10 @@ try {
     await c.query(`DROP ROLE ${quoteIdentifier(unauthorizedLogin)}`);
     await c.query(`DROP ROLE ${quoteIdentifier(routineLogin)}`);
     await c.query(`DROP ROLE ${quoteIdentifier(routineRole)}`);
+    await c.query(`REVOKE ${quoteIdentifier(optionMember)} FROM ${quoteIdentifier(optionLogin)}`);
+    await c.query(`REVOKE ${quoteIdentifier(optionRoot)} FROM ${quoteIdentifier(optionMember)}`);
+    await c.query(`REVOKE SELECT ON TABLE "CareerUser" FROM ${quoteIdentifier(optionRoot)}`);
+    for (const role of [optionLogin, optionMember, optionRoot]) await c.query(`DROP ROLE ${quoteIdentifier(role)}`);
     for (let i = chainRoles.length - 1; i >= 1; i -= 1) await c.query(`REVOKE ${quoteIdentifier(chainRoles[i])} FROM ${quoteIdentifier(chainRoles[i - 1])}`);
     await c.query(`REVOKE ${quoteIdentifier(chainRoles[0])} FROM postgres`);
     await c.query(`REVOKE SELECT ON TABLE "CareerUser" FROM ${quoteIdentifier(chainRoles[chainRoles.length - 1])}`);
