@@ -194,5 +194,16 @@ try {
     await c.query(`REVOKE SELECT ON TABLE "CareerUser" FROM "${unexpectedRole}"`);
     await c.query(`DROP ROLE "${unexpectedRole}"`);
   });
+  await withClient(url, async (c) => {
+    const renderRole = `careeros_render_role_${Date.now()}`;
+    await c.query(`CREATE ROLE "${renderRole}" NOLOGIN`);
+    const roleMapping = { postgres: "reviewed-app", [renderRole]: "reviewed-app" };
+    const mappedReference = await readCareerOSSchema(c, { roleMapping });
+    await c.query(`ALTER TABLE "CareerUser" OWNER TO "${renderRole}"`);
+    const mappedObserved = await readCareerOSSchema(c, { roleMapping });
+    assert.deepEqual(referenceFingerprint(mappedObserved), referenceFingerprint(mappedReference), "explicit reviewed role mapping accepts disposable and Render role names");
+    await c.query(`ALTER TABLE "CareerUser" OWNER TO postgres`);
+    await c.query(`DROP ROLE "${renderRole}"`);
+  });
   console.log("CareerOS adoption tests passed: observed-schema correction, fingerprint rejection, atomic adoption, checksum rejection, normal-runner repeat.");
 } finally { for (const db of databases) await dropDatabase(db); }
