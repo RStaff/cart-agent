@@ -8,6 +8,6 @@ assert.match(source, /await\s+runCareerosMigrations\(\)/);
 assert.match(source, /spawn\(process\.execPath,\s*\["node_modules\/next\/dist\/bin\/next",\s*"start"\]/);
 assert.doesNotMatch(source, /prisma\s+migrate\s+deploy/);
 const runbook = await readFile(new URL("../CAREEROS_SCHEMA_ADOPTION_RUNBOOK.md", import.meta.url), "utf8");
-assert.match(runbook, new RegExp(`Record the \\`${CAREEROS_SCHEMA_FINGERPRINT_VERSION}\\` format`));
+assert.ok(runbook.includes("Record the `" + CAREEROS_SCHEMA_FINGERPRINT_VERSION + "` format"));
 assert.doesNotMatch(runbook, /Record the `careeros-schema-fingerprint-v2` format alongside the digest/);
 console.log("CareerOS startup authority test passed: CareerOSMigration runner gates Next startup; no competing Prisma command.");
