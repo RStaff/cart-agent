@@ -76,14 +76,6 @@ try {
   const referencePath = `${process.env.TMPDIR || "/tmp"}/careeros-reference-${Date.now()}.json`;
   const manifestPath = `${process.env.TMPDIR || "/tmp"}/careeros-adoption-${Date.now()}.json`;
   await writeFile(referencePath, JSON.stringify(referenceFingerprint(expected)));
-  await withClient(url, async (c) => {
-    await c.query(`CREATE ROLE "careeros_unexpected_role" NOLOGIN`);
-    await c.query(`GRANT SELECT ON TABLE "CareerUser" TO "careeros_unexpected_role"`);
-    const privileged = await readCareerOSSchema(c);
-    assert.notDeepEqual(referenceFingerprint(privileged).relationPrivileges, referenceFingerprint(expected).relationPrivileges, "unexpected relation ownership/grants reject against independent reference");
-    await c.query(`REVOKE SELECT ON TABLE "CareerUser" FROM "careeros_unexpected_role"`);
-    await c.query(`DROP ROLE "careeros_unexpected_role"`);
-  });
   await assert.rejects(runScript(prepare, url, { CAREEROS_ADOPTION_MANIFEST_PATH: `${manifestPath}.wrong-source`, CAREEROS_SCHEMA_REFERENCE_PATH: referencePath, CAREEROS_REVIEWED_SOURCE_REVISION: "0000000000000000000000000000000000000000", CAREEROS_REVIEWED_BY: "synthetic-review" }), /CAREEROS_EXECUTING_SOURCE_REVISION_MISMATCH/);
   await withClient(url, async (c) => {
     const constraint = (await c.query(`SELECT constraint_name FROM information_schema.table_constraints WHERE table_schema=current_schema() AND table_name='CareerUser' ORDER BY constraint_name LIMIT 1`)).rows[0].constraint_name;
@@ -193,5 +185,12 @@ try {
   await assert.rejects(runScript(adopt, url, { CAREEROS_ADOPTION_MANIFEST_PATH: badManifestPath, CAREEROS_SCHEMA_REFERENCE_PATH: referencePath }), /CAREEROS_MIGRATION_CHECKSUM_REVIEW_MISMATCH/);
   await assert.rejects(runScript(adopt, url, { CAREEROS_ADOPTION_MANIFEST_PATH: manifestPath, CAREEROS_SCHEMA_REFERENCE_PATH: referencePath }), /CAREEROS_ADOPTION_APPROVAL_REQUIRED/);
   await withClient(url, async (c) => { assert.equal((await c.query(`SELECT COUNT(*)::int AS n FROM "CareerOSMigration"`)).rows[0].n, 8); assert.equal((await c.query(`SELECT COUNT(*)::int AS n FROM "CareerOSMigrationAdoption"`)).rows[0].n, 1); });
+  await withClient(url, async (c) => {
+    await c.query(`CREATE ROLE "careeros_unexpected_role" NOLOGIN`);
+    await c.query(`GRANT SELECT ON TABLE "CareerUser" TO "careeros_unexpected_role"`);
+    const privileged = await readCareerOSSchema(c);
+    assert.notDeepEqual(referenceFingerprint(privileged).relationPrivileges, referenceFingerprint(expected).relationPrivileges, "unexpected relation ownership/grants reject against independent reference");
+    await c.query(`DROP ROLE "careeros_unexpected_role"`);
+  });
   console.log("CareerOS adoption tests passed: observed-schema correction, fingerprint rejection, atomic adoption, checksum rejection, normal-runner repeat.");
 } finally { for (const db of databases) await dropDatabase(db); }
