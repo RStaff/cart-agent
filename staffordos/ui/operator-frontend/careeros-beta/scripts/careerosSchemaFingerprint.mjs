@@ -159,7 +159,7 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
       )
       SELECT DISTINCT pg_get_userbyid(member) AS member_role, pg_get_userbyid(roleid) AS granted_role,
         admin_option,inherit_option,set_option,depth
-      FROM memberships ORDER BY member,roleid,depth`),
+      FROM memberships ORDER BY member_role,granted_role,depth`),
     client.query(`SELECT COALESCE(n.nspname,'') AS schema_name, pg_get_userbyid(d.defaclrole) AS owner_role,
       d.defaclobjtype,
       COALESCE((SELECT jsonb_agg(jsonb_build_object(
