@@ -257,11 +257,12 @@ try {
     const diamond = await readCareerOSSchema(c);
     const diamondEdges = diamond.roleMemberships.filter((m) => m.granted_role === diamondRoles[2]);
     assert.equal(new Set(diamondEdges.map((m) => `${m.member_role}:${m.granted_role}:${m.depth}`)).size, diamondEdges.length, "branching membership paths have no duplicate evidence");
+    const membershipBaseline = await readCareerOSSchema(c);
     assert.ok(compareReferenceFields(referenceFingerprint(memberships), referenceFingerprint(expected)).includes("roleMemberships"), "membership drift is reference-visible");
     await c.query(`ALTER DEFAULT PRIVILEGES FOR ROLE ${quoteIdentifier(unrelatedRole)} GRANT SELECT ON TABLES TO ${quoteIdentifier(unrelatedGrantedRole)}`);
     const unrelatedDefaultAndMembership = await readCareerOSSchema(c);
-    assert.deepEqual(unrelatedDefaultAndMembership.roleMemberships, memberships.roleMemberships, "unrelated default-ACL role membership is excluded");
-    assert.deepEqual(unrelatedDefaultAndMembership.defaultPrivileges, memberships.defaultPrivileges, "unrelated global default ACL is excluded");
+    assert.deepEqual(unrelatedDefaultAndMembership.roleMemberships, membershipBaseline.roleMemberships, "unrelated default-ACL role membership is excluded");
+    assert.deepEqual(unrelatedDefaultAndMembership.defaultPrivileges, membershipBaseline.defaultPrivileges, "unrelated global default ACL is excluded");
     await c.query(`ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT SELECT ON TABLES TO PUBLIC`);
     const defaults = await readCareerOSSchema(c);
     assert.notDeepEqual(defaults.defaultPrivileges, expected.defaultPrivileges, "schema-scoped default privileges are fingerprinted");
