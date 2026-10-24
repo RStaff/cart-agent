@@ -273,7 +273,7 @@ try {
     await c.query(`GRANT ${quoteIdentifier(unrelatedGrantedRole)} TO ${quoteIdentifier(unrelatedRole)} WITH INHERIT TRUE, SET TRUE`);
     const memberships = await readCareerOSSchema(c);
     assert.ok(!memberships.roleMemberships.some((m) => m.member_role === unrelatedRole || m.granted_role === unrelatedGrantedRole), "unrelated cluster membership is excluded");
-    assert.ok(memberships.roleMemberships.some((m) => m.member_role === "postgres" && m.granted_role === memberRole && m.inherit_option && m.set_option), "role membership options are captured");
+    assert.ok(memberships.roleMemberships.some((m) => m.member_role === "postgres" && m.granted_role === memberRole && m.grantor_role === "postgres" && m.inherit_option && m.set_option), "role membership options and grantor are captured");
     assert.ok(memberships.roleMemberships.some((m) => m.member_role === memberRole && m.granted_role === parentRole), "indirect role membership edge is captured");
     assert.ok(memberships.roleMemberships.some((m) => m.member_role === unauthorizedLogin && m.granted_role === memberRole), "direct unauthorized login membership is captured");
     assert.ok(memberships.roleMemberships.some((m) => m.member_role === routineLogin && m.granted_role === routineRole), "routine ACL principals seed relevant membership checks");

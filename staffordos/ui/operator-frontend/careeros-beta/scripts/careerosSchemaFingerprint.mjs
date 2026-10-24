@@ -184,19 +184,19 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
           WHERE d.defaclrole IN (SELECT oid FROM relevant_owners)
             AND (d.defaclnamespace=0 OR d.defaclnamespace=(SELECT oid FROM pg_namespace WHERE nspname=current_schema()))
       ), memberships AS (
-        SELECT am.member,am.roleid,am.admin_option,am.inherit_option,am.set_option,1 AS depth,
+        SELECT am.member,am.roleid,am.grantor,am.admin_option,am.inherit_option,am.set_option,1 AS depth,
           ARRAY[am.roleid,am.member]::oid[] AS path
         FROM pg_auth_members am WHERE am.roleid IN (SELECT oid FROM relevant)
         UNION ALL
-        SELECT am.member,am.roleid,am.admin_option,am.inherit_option,
+        SELECT am.member,am.roleid,am.grantor,am.admin_option,am.inherit_option,
           am.set_option,m.depth + 1,ARRAY[am.roleid]::oid[] || m.path
         FROM memberships m JOIN pg_auth_members am ON am.roleid=m.member
         WHERE NOT (am.member = ANY(m.path))
       )
-      SELECT DISTINCT ON (member,roleid,admin_option,inherit_option,set_option)
-        pg_get_userbyid(member) AS member_role, pg_get_userbyid(roleid) AS granted_role,
+      SELECT DISTINCT ON (member,roleid,grantor,admin_option,inherit_option,set_option)
+        pg_get_userbyid(member) AS member_role, pg_get_userbyid(roleid) AS granted_role, pg_get_userbyid(grantor) AS grantor_role,
         admin_option,inherit_option,set_option,depth
-      FROM memberships ORDER BY member,roleid,admin_option,inherit_option,set_option,depth`),
+      FROM memberships ORDER BY member,roleid,grantor,admin_option,inherit_option,set_option,depth`),
     client.query(`SELECT COALESCE(n.nspname,'') AS schema_name, pg_get_userbyid(d.defaclrole) AS owner_role,
       d.defaclobjtype,
       COALESCE((SELECT jsonb_agg(jsonb_build_object(
