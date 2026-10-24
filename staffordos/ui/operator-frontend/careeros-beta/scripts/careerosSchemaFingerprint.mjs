@@ -136,10 +136,15 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
       WHERE n.nspname=current_schema()
         AND (c.relname IN (${tableList},'_prisma_migrations') OR c.relkind='S')
       ORDER BY c.relname,c.relkind`),
-    client.query(`SELECT table_name,column_name,grantee,grantor,privilege_type,is_grantable
-      FROM information_schema.column_privileges
-      WHERE table_schema=current_schema() AND table_name IN (${tableList})
-      ORDER BY table_name,column_name,grantee,privilege_type`),
+    client.query(`SELECT c.relname AS table_name,a.attname AS column_name,
+      COALESCE((SELECT jsonb_agg(jsonb_build_object(
+        'grantee',CASE WHEN e.grantee=0 THEN jsonb_build_object('kind','public') ELSE jsonb_build_object('kind','role','name',pg_get_userbyid(e.grantee)) END,
+        'grantor',CASE WHEN e.grantor=0 THEN jsonb_build_object('kind','public') ELSE jsonb_build_object('kind','role','name',pg_get_userbyid(e.grantor)) END,
+        'privilege',e.privilege_type,'grantable',e.is_grantable)
+        ORDER BY e.grantee,e.privilege_type)::text FROM aclexplode(COALESCE(a.attacl,ARRAY[]::aclitem[])) e),'[]') AS privileges
+      FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid JOIN pg_namespace n ON n.oid=c.relnamespace
+      WHERE n.nspname=current_schema() AND c.relname IN (${tableList}) AND a.attnum>0 AND NOT a.attisdropped
+      ORDER BY c.relname,a.attnum`),
     client.query(`SELECT c.relname AS sequence_name,pg_get_userbyid(c.relowner) AS owner_role,
       COALESCE((SELECT jsonb_agg(jsonb_build_object(
         'grantee',CASE WHEN e.grantee=0 THEN jsonb_build_object('kind','public') ELSE jsonb_build_object('kind','role','name',pg_get_userbyid(e.grantee)) END,
@@ -148,13 +153,19 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
       FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
       WHERE n.nspname=current_schema() AND c.relkind='S'
       ORDER BY c.relname`),
-    client.query(`WITH RECURSIVE memberships AS (
+    client.query(`WITH RECURSIVE relevant AS (
+        SELECT n.nspowner AS oid FROM pg_namespace n WHERE n.nspname=current_schema()
+        UNION SELECT c.relowner FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+          WHERE n.nspname=current_schema() AND (c.relname IN (${tableList},'_prisma_migrations') OR c.relkind='S')
+        UNION SELECT p.proowner FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname=current_schema()
+        UNION SELECT d.defaclrole FROM pg_default_acl d WHERE d.defaclnamespace=0 OR d.defaclnamespace=(SELECT oid FROM pg_namespace WHERE nspname=current_schema())
+      ), memberships AS (
         SELECT am.member,am.roleid,am.admin_option,am.inherit_option,am.set_option,1 AS depth
-        FROM pg_auth_members am
+        FROM pg_auth_members am WHERE am.member IN (SELECT oid FROM relevant) OR am.roleid IN (SELECT oid FROM relevant)
         UNION ALL
-        SELECT m.member,am.roleid,(m.admin_option AND am.admin_option),(m.inherit_option AND am.inherit_option),
+        SELECT am.member,am.roleid,(m.admin_option AND am.admin_option),(m.inherit_option AND am.inherit_option),
           (m.set_option AND am.set_option),m.depth + 1
-        FROM memberships m JOIN pg_auth_members am ON am.member=m.roleid
+        FROM memberships m JOIN pg_auth_members am ON am.member=m.roleid OR am.roleid=m.member
         WHERE m.depth < 32
       )
       SELECT DISTINCT pg_get_userbyid(member) AS member_role, pg_get_userbyid(roleid) AS granted_role,
@@ -168,6 +179,9 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
         'privilege',e.privilege_type,'grantable',e.is_grantable)
         ORDER BY e.grantee,e.privilege_type)::text FROM aclexplode(d.defaclacl) e),'[]') AS privileges
       FROM pg_default_acl d LEFT JOIN pg_namespace n ON n.oid=d.defaclnamespace
+      WHERE (d.defaclnamespace=0 OR d.defaclnamespace=(SELECT oid FROM pg_namespace WHERE nspname=current_schema()))
+        AND d.defaclrole IN (SELECT nspowner FROM pg_namespace WHERE nspname=current_schema()
+          UNION SELECT c.relowner FROM pg_class c JOIN pg_namespace ns ON ns.oid=c.relnamespace WHERE ns.nspname=current_schema())
       ORDER BY d.defaclrole,d.defaclnamespace,d.defaclobjtype`),
   ]);
   const catalogObjects = objects.rows;
@@ -178,11 +192,6 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
     if (copy.privileges != null) copy.privileges = mapPrivilegeJson(copy.privileges, roleMapping);
     return copy;
   });
-  const normalizePrivilegeRows = (rows) => rows.map((row) => ({
-    ...row,
-    grantee: mapPrincipal(row.grantee, roleMapping),
-    grantor: mapPrincipal(row.grantor, roleMapping),
-  }));
   const value = {
     fingerprintVersion: CAREEROS_SCHEMA_FINGERPRINT_VERSION,
     tables: tables.rows.map((row) => row.tablename).sort(),
@@ -195,7 +204,7 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
     roleMapping: Object.fromEntries(Object.entries(roleMapping).sort(([a], [b]) => a.localeCompare(b))),
     schemaPrivileges: canonicalSort(normalizeRoles(schemaPrivileges.rows, ["owner_role"])),
     relationPrivileges: canonicalSort(normalizeRoles(relationPrivileges.rows, ["owner_role"])),
-    columnPrivileges: canonicalSort(normalizePrivilegeRows(columnPrivileges.rows)),
+    columnPrivileges: canonicalSort(normalizeRoles(columnPrivileges.rows, [])),
     sequences: canonicalSort(normalizeRoles(sequences.rows, ["owner_role"])),
     roleMemberships: canonicalSort(normalizeRoles(roleMemberships.rows, ["member_role", "granted_role"])),
     defaultPrivileges: canonicalSort(normalizeRoles(defaultPrivileges.rows, ["owner_role"])),
