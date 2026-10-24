@@ -190,6 +190,7 @@ try {
     await c.query(`GRANT SELECT ON TABLE "CareerUser" TO "careeros_unexpected_role"`);
     const privileged = await readCareerOSSchema(c);
     assert.notDeepEqual(referenceFingerprint(privileged).relationPrivileges, referenceFingerprint(expected).relationPrivileges, "unexpected relation ownership/grants reject against independent reference");
+    await c.query(`REVOKE SELECT ON TABLE "CareerUser" FROM "careeros_unexpected_role"`);
     await c.query(`DROP ROLE "careeros_unexpected_role"`);
   });
   console.log("CareerOS adoption tests passed: observed-schema correction, fingerprint rejection, atomic adoption, checksum rejection, normal-runner repeat.");
