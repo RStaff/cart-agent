@@ -213,6 +213,7 @@ try {
     await c.query(`CREATE ROLE ${quoteIdentifier(specialRole)} NOLOGIN`);
     await c.query(`GRANT SELECT ON TABLE "CareerUser" TO ${quoteIdentifier(adminRole)}`);
     await c.query(`GRANT INSERT ON TABLE "CareerUser" TO ${quoteIdentifier(specialRole)}`);
+    await c.query(`GRANT UPDATE ON TABLE "CareerUser" TO PUBLIC`);
     const mapped = await readCareerOSSchema(c, { roleMapping: { postgres: "reviewed-app", [specialRole]: "reviewed-special" } });
     const relation = mapped.relationPrivileges.find((row) => row.object_name === "CareerUser");
     const grantees = relation.privileges.map((privilege) => privilege.grantee);
@@ -233,6 +234,7 @@ try {
     await c.query(`REVOKE ${quoteIdentifier(memberRole)} FROM postgres`);
     await c.query(`DROP ROLE ${quoteIdentifier(memberRole)}`);
     await c.query(`REVOKE ALL PRIVILEGES ON TABLE "CareerUser" FROM ${quoteIdentifier(adminRole)},${quoteIdentifier(specialRole)}`);
+    await c.query(`REVOKE UPDATE ON TABLE "CareerUser" FROM PUBLIC`);
     await c.query(`DROP ROLE ${quoteIdentifier(adminRole)}`);
     await c.query(`DROP ROLE ${quoteIdentifier(specialRole)}`);
   });
