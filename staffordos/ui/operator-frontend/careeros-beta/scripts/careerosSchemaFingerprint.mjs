@@ -269,7 +269,7 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
     sequences: canonicalSort(normalizeRoles(sequences.rows, ["owner_role"])),
     roleMemberships: canonicalSort(normalizeRoles(roleMemberships.rows, ["member_role", "granted_role"])),
     defaultPrivileges: canonicalSort(normalizeRoles(defaultPrivileges.rows, ["owner_role"])),
-    roleAttributes: canonicalSort(roleAttributes.rows),
+    roleAttributes: canonicalSort(normalizeRoles(roleAttributes.rows, ["rolname"])),
     // Operational ledgers are intentionally excluded from the application
     // fingerprint; catalogObjects remains available for unexpected-object checks.
     objects: canonicalSort(objects.rows.filter((row) => CAREEROS_TABLES.includes(row.object_name) || HISTORICAL_SCHEMA_OBJECTS.includes(row.object_name))),
