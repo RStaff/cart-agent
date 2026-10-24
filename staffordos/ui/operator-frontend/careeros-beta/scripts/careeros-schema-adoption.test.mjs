@@ -243,6 +243,10 @@ try {
     assert.ok(memberships.roleMemberships.some((m) => m.member_role === "postgres" && m.granted_role === memberRole && m.inherit_option && m.set_option), "role membership options are captured");
     assert.ok(memberships.roleMemberships.some((m) => m.member_role === memberRole && m.granted_role === parentRole), "indirect role membership edge is captured");
     assert.ok(compareReferenceFields(referenceFingerprint(memberships), referenceFingerprint(expected)).includes("roleMemberships"), "membership drift is reference-visible");
+    await c.query(`ALTER DEFAULT PRIVILEGES FOR ROLE ${quoteIdentifier(unrelatedRole)} GRANT SELECT ON TABLES TO ${quoteIdentifier(unrelatedGrantedRole)}`);
+    const unrelatedDefaultAndMembership = await readCareerOSSchema(c);
+    assert.deepEqual(unrelatedDefaultAndMembership.roleMemberships, memberships.roleMemberships, "unrelated default-ACL role membership is excluded");
+    assert.deepEqual(unrelatedDefaultAndMembership.defaultPrivileges, memberships.defaultPrivileges, "unrelated global default ACL is excluded");
     await c.query(`ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT SELECT ON TABLES TO PUBLIC`);
     const defaults = await readCareerOSSchema(c);
     assert.notDeepEqual(defaults.defaultPrivileges, expected.defaultPrivileges, "schema-scoped default privileges are fingerprinted");
@@ -253,6 +257,7 @@ try {
     assert.deepEqual(otherSchemaDefaults.defaultPrivileges, defaults.defaultPrivileges, "other-schema default ACLs are excluded");
     await c.query(`DROP SCHEMA "other_acl" CASCADE`);
     await c.query(`ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public REVOKE SELECT ON TABLES FROM PUBLIC`);
+    await c.query(`ALTER DEFAULT PRIVILEGES FOR ROLE ${quoteIdentifier(unrelatedRole)} REVOKE SELECT ON TABLES FROM ${quoteIdentifier(unrelatedGrantedRole)}`);
     await c.query(`REVOKE ${quoteIdentifier(memberRole)} FROM postgres`);
     await c.query(`REVOKE ${quoteIdentifier(parentRole)} FROM ${quoteIdentifier(memberRole)}`);
     await c.query(`DROP ROLE ${quoteIdentifier(parentRole)}`);

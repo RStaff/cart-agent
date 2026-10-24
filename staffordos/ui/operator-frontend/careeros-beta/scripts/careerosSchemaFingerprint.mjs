@@ -153,12 +153,27 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
       FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
       WHERE n.nspname=current_schema() AND c.relkind='S'
       ORDER BY c.relname`),
-    client.query(`WITH RECURSIVE relevant AS (
+    client.query(`WITH RECURSIVE relevant_owners AS (
         SELECT n.nspowner AS oid FROM pg_namespace n WHERE n.nspname=current_schema()
         UNION SELECT c.relowner FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
           WHERE n.nspname=current_schema() AND (c.relname IN (${tableList},'_prisma_migrations') OR c.relkind='S')
         UNION SELECT p.proowner FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname=current_schema()
-        UNION SELECT d.defaclrole FROM pg_default_acl d WHERE d.defaclnamespace=0 OR d.defaclnamespace=(SELECT oid FROM pg_namespace WHERE nspname=current_schema())
+      ), relevant AS (
+        SELECT oid FROM relevant_owners
+        UNION SELECT e.grantee FROM pg_namespace n CROSS JOIN LATERAL aclexplode(COALESCE(n.nspacl,acldefault('n',n.nspowner))) e WHERE n.nspname=current_schema()
+        UNION SELECT e.grantor FROM pg_namespace n CROSS JOIN LATERAL aclexplode(COALESCE(n.nspacl,acldefault('n',n.nspowner))) e WHERE n.nspname=current_schema()
+        UNION SELECT e.grantee FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace CROSS JOIN LATERAL aclexplode(COALESCE(c.relacl,acldefault(CASE WHEN c.relkind='S' THEN 'S'::"char" ELSE 'r'::"char" END,c.relowner))) e
+          WHERE n.nspname=current_schema() AND (c.relname IN (${tableList},'_prisma_migrations') OR c.relkind='S')
+        UNION SELECT e.grantor FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace CROSS JOIN LATERAL aclexplode(COALESCE(c.relacl,acldefault(CASE WHEN c.relkind='S' THEN 'S'::"char" ELSE 'r'::"char" END,c.relowner))) e
+          WHERE n.nspname=current_schema() AND (c.relname IN (${tableList},'_prisma_migrations') OR c.relkind='S')
+        UNION SELECT e.grantee FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid JOIN pg_namespace n ON n.oid=c.relnamespace CROSS JOIN LATERAL aclexplode(a.attacl) e
+          WHERE a.attacl IS NOT NULL AND n.nspname=current_schema() AND c.relname IN (${tableList}) AND a.attnum>0 AND NOT a.attisdropped
+        UNION SELECT e.grantor FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid JOIN pg_namespace n ON n.oid=c.relnamespace CROSS JOIN LATERAL aclexplode(a.attacl) e
+          WHERE a.attacl IS NOT NULL AND n.nspname=current_schema() AND c.relname IN (${tableList}) AND a.attnum>0 AND NOT a.attisdropped
+        UNION SELECT e.grantee FROM pg_default_acl d CROSS JOIN LATERAL aclexplode(d.defaclacl) e
+          WHERE d.defaclnamespace=0 OR d.defaclnamespace=(SELECT oid FROM pg_namespace WHERE nspname=current_schema())
+        UNION SELECT e.grantor FROM pg_default_acl d CROSS JOIN LATERAL aclexplode(d.defaclacl) e
+          WHERE d.defaclnamespace=0 OR d.defaclnamespace=(SELECT oid FROM pg_namespace WHERE nspname=current_schema())
       ), memberships AS (
         SELECT am.member,am.roleid,am.admin_option,am.inherit_option,am.set_option,1 AS depth
         FROM pg_auth_members am WHERE am.member IN (SELECT oid FROM relevant) OR am.roleid IN (SELECT oid FROM relevant)
