@@ -6,6 +6,7 @@ import { pathToFileURL } from "node:url";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { Client } from "pg";
+import { postgresSslForConnection } from "./careerosConnection.mjs";
 
 const exec = promisify(execFile);
 const root = new URL("../", import.meta.url);
@@ -20,8 +21,7 @@ function connectionFor(database) {
 }
 
 async function withClient(url, fn) {
-  const hostname = new URL(url).hostname;
-  const client = new Client({ connectionString: url, ssl: ["127.0.0.1", "localhost", "::1"].includes(hostname) ? false : { rejectUnauthorized: false } });
+  const client = new Client({ connectionString: url, ssl: postgresSslForConnection(url) });
   await client.connect();
   try { return await fn(client); } finally { await client.end(); }
 }

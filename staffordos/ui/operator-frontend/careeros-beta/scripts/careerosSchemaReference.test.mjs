@@ -11,11 +11,16 @@ const fixture = {
   triggers: [],
   routines: [],
   policies: [],
+  roleMapping: { postgres: "reviewed-app" },
+  schemaPrivileges: [],
+  relationPrivileges: [],
+  columnPrivileges: [],
+  sequences: [],
 };
 const generated = referenceFingerprint(fixture);
 assert.equal(generated.fingerprintVersion, CAREEROS_SCHEMA_FINGERPRINT_VERSION);
 assert.ok(generated.objects.some((object) => object.object_name === "_prisma_migrations"));
-assert.deepEqual(Object.keys(referenceFields(fixture)).sort(), ["columns", "constraints", "fingerprintVersion", "indexes", "objects", "policies", "routines", "tables", "triggers"]);
+assert.deepEqual(Object.keys(referenceFields(fixture)).sort(), ["columnPrivileges", "columns", "constraints", "fingerprintVersion", "indexes", "objects", "policies", "relationPrivileges", "roleMapping", "routines", "schemaPrivileges", "sequences", "tables", "triggers"]);
 assert.deepEqual(compareReferenceFields({ ...generated, canonical: "derived", fingerprint: "derived" }, { ...generated, canonical: "different", fingerprint: "different" }), []);
 const changed = { ...generated, fingerprintVersion: "careos-schema-fingerprint-v2" };
 assert.deepEqual(compareReferenceFields(changed, generated), ["fingerprintVersion"]);

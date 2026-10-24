@@ -1,14 +1,20 @@
 import { readFile } from "node:fs/promises";
 import { Client } from "pg";
 import { readCareerOSSchema, assertExactCareerOSSchema, assertNoUnexpectedApplicationObjects } from "./careerosSchemaFingerprint.mjs";
+import { postgresSslForConnection } from "./careerosConnection.mjs";
+import { executingSourceRevision, sourceFileDigests, sourceFileDigestsAtRevision, assertReviewedSourceDigests } from "./careerosAdoptionSource.mjs";
 
 const connectionString = process.env.DATABASE_URL;
 const expectedLegacyFingerprint = process.env.CAREEROS_LEGACY_SCHEMA_FINGERPRINT;
 if (!connectionString) throw new Error("DATABASE_URL_REQUIRED");
 if (!expectedLegacyFingerprint) throw new Error("CAREEROS_LEGACY_SCHEMA_FINGERPRINT_REQUIRED");
 
-const hostname = (() => { try { return new URL(connectionString).hostname; } catch { return ""; } })();
-const client = new Client({ connectionString, ssl: ["127.0.0.1", "localhost", "::1"].includes(hostname) ? false : { rejectUnauthorized: false } });
+const client = new Client({ connectionString, ssl: postgresSslForConnection(connectionString) });
+const root = new URL("../", import.meta.url);
+const reviewedRevision = process.env.CAREEROS_REVIEWED_SOURCE_REVISION || await executingSourceRevision(root.pathname);
+const currentSourceFiles = await sourceFileDigests(root.pathname);
+const reviewedSourceFiles = await sourceFileDigestsAtRevision(root.pathname, reviewedRevision);
+assertReviewedSourceDigests(currentSourceFiles, reviewedSourceFiles, "CAREEROS_RECONCILIATION_SOURCE_FILES_MODIFIED");
 const correctionSql = await readFile(new URL("../prisma/migrations/20261021000000_reconcile_existing_story_status/migration.sql", import.meta.url), "utf8");
 await client.connect();
 try {

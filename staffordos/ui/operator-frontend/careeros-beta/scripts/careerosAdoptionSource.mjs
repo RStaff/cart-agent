@@ -15,6 +15,7 @@ export const ADOPTION_CRITICAL_FILES = Object.freeze([
   "scripts/migrate-careeros.mjs",
   "scripts/prepare-careeros-adoption-evidence.mjs",
   "scripts/reconcile-careeros-story-status.mjs",
+  "scripts/careerosConnection.mjs",
   "prisma/migrations/20260816000000_careeros_p0_foundation/migration.sql",
   "prisma/migrations/20260817000000_careeros_capability_match_product/migration.sql",
   "prisma/migrations/20260817010000_add_career_story_status/migration.sql",
@@ -23,6 +24,7 @@ export const ADOPTION_CRITICAL_FILES = Object.freeze([
   "prisma/migrations/20260820050000_add_career_search_preferences/migration.sql",
   "prisma/migrations/20260822010000_add_career_fact_context_claims/migration.sql",
   "prisma/migrations/20260830100000_add_role_intent_and_relevance_feedback/migration.sql",
+  "prisma/migrations/20261021000000_reconcile_existing_story_status/migration.sql",
 ]);
 
 export async function executingSourceRevision(root) {
@@ -35,7 +37,7 @@ export async function executingSourceRevision(root) {
 export async function sourceFileDigests(root) {
   const result = {};
   for (const relativePath of ADOPTION_CRITICAL_FILES) {
-    const bytes = await readFile(new URL(`../${relativePath}`, import.meta.url));
+    const bytes = await readFile(join(root, relativePath));
     result[relativePath] = createHash("sha256").update(bytes).digest("hex");
   }
   return result;
@@ -51,4 +53,11 @@ export async function sourceFileDigestsAtRevision(root, revision) {
     result[relativePath] = createHash("sha256").update(stdout).digest("hex");
   }
   return result;
+}
+
+export function assertReviewedSourceDigests(current, reviewed, errorCode = "CAREEROS_SOURCE_FILES_MODIFIED") {
+  for (const [path, digest] of Object.entries(reviewed)) {
+    if (current[path] !== digest) throw new Error(`${errorCode}:${path}`);
+  }
+  return true;
 }

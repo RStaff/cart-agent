@@ -30,8 +30,20 @@ const CATALOG_SQL = `
     AND c.relkind IN ('r','p','v','m','S','f')
   ORDER BY c.relname,c.relkind`;
 
-export async function readCareerOSSchema(client) {
-  const [columns, constraints, indexes, tables, objects, triggers, routines, policies] = await Promise.all([
+function mapRoleName(value, roleMapping) {
+  return roleMapping[value] || value;
+}
+
+function mapRoleText(value, roleMapping) {
+  let result = value || "";
+  for (const [from, to] of Object.entries(roleMapping)) {
+    result = result.replaceAll(`"${from}"`, `"${to}"`).replaceAll(from, to);
+  }
+  return result;
+}
+
+export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
+  const [columns, constraints, indexes, tables, objects, triggers, routines, policies, schemaPrivileges, relationPrivileges, columnPrivileges, sequences] = await Promise.all([
     client.query(`SELECT c.table_name,c.column_name,c.data_type,c.udt_schema,c.udt_name,c.is_nullable,
       COALESCE(c.column_default,'') AS column_default,c.character_maximum_length,c.numeric_precision,
       c.numeric_scale,c.datetime_precision,COALESCE(a.attidentity,'') AS identity_kind,
@@ -80,9 +92,33 @@ export async function readCareerOSSchema(client) {
       JOIN pg_namespace n ON n.oid=c.relnamespace
       WHERE n.nspname=current_schema()
       ORDER BY c.relname,pol.polname`),
+    client.query(`SELECT n.nspname AS schema_name, pg_get_userbyid(n.nspowner) AS owner_role,
+      COALESCE(n.nspacl::text,'') AS acl
+      FROM pg_namespace n WHERE n.nspname=current_schema()`),
+    client.query(`SELECT c.relname AS object_name,c.relkind AS object_kind,
+      pg_get_userbyid(c.relowner) AS owner_role,COALESCE(c.relacl::text,'') AS acl
+      FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+      WHERE n.nspname=current_schema()
+        AND (c.relname IN (${tableList},'_prisma_migrations','CareerOSMigration','CareerOSMigrationAdoption') OR c.relkind='S')
+      ORDER BY c.relname,c.relkind`),
+    client.query(`SELECT table_name,column_name,grantee,grantor,privilege_type,is_grantable
+      FROM information_schema.column_privileges
+      WHERE table_schema=current_schema() AND table_name IN (${tableList})
+      ORDER BY table_name,column_name,grantee,privilege_type`),
+    client.query(`SELECT c.relname AS sequence_name,pg_get_userbyid(c.relowner) AS owner_role,
+      COALESCE(c.relacl::text,'') AS acl
+      FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+      WHERE n.nspname=current_schema() AND c.relkind='S'
+      ORDER BY c.relname`),
   ]);
   const catalogObjects = objects.rows;
   const canonicalSort = (rows) => [...rows].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
+  const normalizeRoles = (rows, fields) => rows.map((row) => {
+    const copy = { ...row };
+    for (const field of fields) if (copy[field] != null) copy[field] = mapRoleName(copy[field], roleMapping);
+    if (copy.acl != null) copy.acl = mapRoleText(copy.acl, roleMapping);
+    return copy;
+  });
   const value = {
     fingerprintVersion: CAREEROS_SCHEMA_FINGERPRINT_VERSION,
     tables: tables.rows.map((row) => row.tablename).sort(),
@@ -92,6 +128,11 @@ export async function readCareerOSSchema(client) {
     triggers: canonicalSort(triggers.rows),
     routines: canonicalSort(routines.rows),
     policies: canonicalSort(policies.rows),
+    roleMapping: Object.fromEntries(Object.entries(roleMapping).sort(([a], [b]) => a.localeCompare(b))),
+    schemaPrivileges: canonicalSort(normalizeRoles(schemaPrivileges.rows, ["owner_role"])),
+    relationPrivileges: canonicalSort(normalizeRoles(relationPrivileges.rows, ["owner_role"])),
+    columnPrivileges: canonicalSort(normalizeRoles(columnPrivileges.rows, ["grantee", "grantor"])),
+    sequences: canonicalSort(normalizeRoles(sequences.rows, ["owner_role"])),
     // Operational ledgers are intentionally excluded from the application
     // fingerprint; catalogObjects remains available for unexpected-object checks.
     objects: canonicalSort(objects.rows.filter((row) => CAREEROS_TABLES.includes(row.object_name) || HISTORICAL_SCHEMA_OBJECTS.includes(row.object_name))),

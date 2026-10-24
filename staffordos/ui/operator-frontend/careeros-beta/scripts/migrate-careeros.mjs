@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { Client } from "pg";
+import { postgresSslForConnection } from "./careerosConnection.mjs";
 
 const ROOT = new URL("../", import.meta.url);
 const MIGRATIONS = [
@@ -157,9 +158,7 @@ async function applyMigration(client, migration, migrationsRoot) {
 
 export async function runCareerosMigrations({ connectionString = process.env.DATABASE_URL, migrationsRoot = ROOT } = {}) {
   if (!connectionString) throw new Error("DATABASE_URL_REQUIRED");
-  let loopback = false;
-  try { loopback = ["127.0.0.1", "localhost", "::1"].includes(new URL(connectionString).hostname); } catch {}
-  const client = new Client({ connectionString, ssl: loopback ? false : { rejectUnauthorized: false } });
+  const client = new Client({ connectionString, ssl: postgresSslForConnection(connectionString) });
   await client.connect();
   await client.query("SELECT pg_advisory_lock(hashtext($1))", ["careeros-migration-v1"]);
   try {

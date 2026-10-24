@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { Client } from "pg";
+import { postgresSslForConnection } from "./careerosConnection.mjs";
 import { assertExactCareerOSSchema, assertNoUnexpectedApplicationObjects, CAREEROS_SCHEMA_FINGERPRINT_VERSION, readCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
 import { compareReferenceFields } from "./careerosSchemaReference.mjs";
 import { executingSourceRevision, sourceFileDigests, sourceFileDigestsAtRevision } from "./careerosAdoptionSource.mjs";
@@ -9,6 +10,7 @@ import { verifyAdoptionApproval } from "./careerosAdoptionApproval.mjs";
 const connectionString = process.env.DATABASE_URL;
 const evidencePath = process.env.CAREEROS_ADOPTION_MANIFEST_PATH;
 const referencePath = process.env.CAREEROS_SCHEMA_REFERENCE_PATH;
+const roleMapping = process.env.CAREEROS_SCHEMA_ROLE_MAPPING_JSON ? JSON.parse(process.env.CAREEROS_SCHEMA_ROLE_MAPPING_JSON) : {};
 if (!connectionString) throw new Error("DATABASE_URL_REQUIRED");
 if (!evidencePath) throw new Error("CAREEROS_ADOPTION_MANIFEST_PATH_REQUIRED");
 if (!referencePath) throw new Error("CAREEROS_SCHEMA_REFERENCE_PATH_REQUIRED");
@@ -40,13 +42,12 @@ for (const id of migrationIds) {
   if (supplied[id] !== checksums[id]) throw new Error(`CAREEROS_MIGRATION_CHECKSUM_REVIEW_MISMATCH:${id}`);
 }
 
-const hostname = (() => { try { return new URL(connectionString).hostname; } catch { return ""; } })();
-const client = new Client({ connectionString, ssl: ["127.0.0.1", "localhost", "::1"].includes(hostname) ? false : { rejectUnauthorized: false } });
+const client = new Client({ connectionString, ssl: postgresSslForConnection(connectionString) });
 await client.connect();
 try {
   await client.query("BEGIN");
   await client.query("SELECT pg_advisory_xact_lock(hashtext($1))", ["careeros-migration-v1"]);
-  const schema = await readCareerOSSchema(client);
+  const schema = await readCareerOSSchema(client, { roleMapping });
   assertExactCareerOSSchema(schema);
   assertNoUnexpectedApplicationObjects(schema);
   const expectedReference = JSON.parse(await readFile(referencePath, "utf8"));

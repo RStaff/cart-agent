@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { Client } from "pg";
+import { postgresSslForConnection } from "./careerosConnection.mjs";
 import { assertExactCareerOSSchema, assertNoUnexpectedApplicationObjects, CAREEROS_SCHEMA_FINGERPRINT_VERSION, readCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
 import { compareReferenceFields } from "./careerosSchemaReference.mjs";
 import { executingSourceRevision, sourceFileDigests, sourceFileDigestsAtRevision } from "./careerosAdoptionSource.mjs";
@@ -8,6 +9,7 @@ import { executingSourceRevision, sourceFileDigests, sourceFileDigestsAtRevision
 const connectionString = process.env.DATABASE_URL;
 const outputPath = process.env.CAREEROS_ADOPTION_MANIFEST_PATH;
 const referencePath = process.env.CAREEROS_SCHEMA_REFERENCE_PATH;
+const roleMapping = process.env.CAREEROS_SCHEMA_ROLE_MAPPING_JSON ? JSON.parse(process.env.CAREEROS_SCHEMA_ROLE_MAPPING_JSON) : {};
 const reviewedBy = process.env.CAREEROS_REVIEWED_BY;
 if (!connectionString) throw new Error("DATABASE_URL_REQUIRED");
 if (!outputPath) throw new Error("CAREEROS_ADOPTION_MANIFEST_PATH_REQUIRED");
@@ -28,15 +30,14 @@ if (sourceRevision !== executingRevision) throw new Error("CAREEROS_EXECUTING_SO
 const sourceFiles = await sourceFileDigests(new URL("../", import.meta.url).pathname);
 const reviewedSourceFiles = await sourceFileDigestsAtRevision(new URL("../", import.meta.url).pathname, sourceRevision);
 if (JSON.stringify(sourceFiles) !== JSON.stringify(reviewedSourceFiles)) throw new Error("CAREEROS_ADOPTION_SOURCE_FILES_MODIFIED");
-const hostname = (() => { try { return new URL(connectionString).hostname; } catch { return ""; } })();
-const client = new Client({ connectionString, ssl: ["127.0.0.1", "localhost", "::1"].includes(hostname) ? false : { rejectUnauthorized: false } });
+const client = new Client({ connectionString, ssl: postgresSslForConnection(connectionString) });
 await client.connect();
 try {
   const ledger = await client.query(`SELECT to_regclass('"CareerOSMigration"') AS name`);
   const adoption = await client.query(`SELECT to_regclass('"CareerOSMigrationAdoption"') AS name`);
   if (ledger.rows[0].name || adoption.rows[0].name) throw new Error("CAREEROS_SCHEMA_ALREADY_ADOPTED");
   const expected = JSON.parse(await readFile(referencePath, "utf8"));
-  const schema = await readCareerOSSchema(client); assertExactCareerOSSchema(schema); assertNoUnexpectedApplicationObjects(schema);
+  const schema = await readCareerOSSchema(client, { roleMapping }); assertExactCareerOSSchema(schema); assertNoUnexpectedApplicationObjects(schema);
   const referenceDifferences = compareReferenceFields(schema, expected);
   if (referenceDifferences.length) throw new Error(`CAREEROS_REFERENCE_MISMATCH:${referenceDifferences.join(",")}`);
   await writeFile(outputPath, `${JSON.stringify({ kind: "REVIEWED_SCHEMA_ADOPTION_EVIDENCE", fingerprintVersion: CAREEROS_SCHEMA_FINGERPRINT_VERSION, sourceRevision, sourceFiles, referenceFingerprint: expected.fingerprint, reviewedBy, schemaFingerprint: schema.fingerprint, migrationChecksums }, null, 2)}\n`, { flag: "wx" });

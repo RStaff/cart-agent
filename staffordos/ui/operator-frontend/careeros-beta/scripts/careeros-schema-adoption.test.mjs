@@ -7,6 +7,8 @@ import { generateKeyPairSync, sign } from "node:crypto";
 import { assertNoUnexpectedApplicationObjects, CAREEROS_SCHEMA_FINGERPRINT_VERSION, readCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
 import { approvalPayload, verifyAdoptionApproval } from "./careerosAdoptionApproval.mjs";
 import { referenceFingerprint } from "./careerosSchemaReference.mjs";
+import { postgresSslForConnection } from "./careerosConnection.mjs";
+import { ADOPTION_CRITICAL_FILES, sourceFileDigests, sourceFileDigestsAtRevision, assertReviewedSourceDigests } from "./careerosAdoptionSource.mjs";
 
 const exec = promisify(execFile);
 const root = new URL("../", import.meta.url);
@@ -23,10 +25,18 @@ const migrationIds = [
   "20260822010000_add_career_fact_context_claims", "20260830100000_add_role_intent_and_relevance_feedback",
 ];
 
+const sourceRevision = (await exec(process.execPath, ["-e", "process.stdout.write(require('child_process').execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim())"], { cwd: new URL("../", import.meta.url).pathname })).stdout.trim();
+const sourceDigests = await sourceFileDigests(new URL("../", import.meta.url).pathname);
+const reviewedDigests = await sourceFileDigestsAtRevision(new URL("../", import.meta.url).pathname, sourceRevision);
+assert.ok(ADOPTION_CRITICAL_FILES.includes("prisma/migrations/20261021000000_reconcile_existing_story_status/migration.sql"), "reconciliation SQL is source-bound");
+assert.deepEqual(sourceDigests, reviewedDigests, "executing and reviewed source digests agree");
+const modifiedReconciliation = { ...sourceDigests, "prisma/migrations/20261021000000_reconcile_existing_story_status/migration.sql": "0".repeat(64) };
+assert.notDeepEqual(modifiedReconciliation, reviewedDigests, "modified reconciliation SQL cannot satisfy source binding");
+assert.throws(() => assertReviewedSourceDigests(modifiedReconciliation, reviewedDigests, "CAREEROS_RECONCILIATION_SOURCE_FILES_MODIFIED"), /CAREEROS_RECONCILIATION_SOURCE_FILES_MODIFIED:prisma\/migrations\/20261021000000_reconcile_existing_story_status\/migration\.sql/);
+
 function urlFor(database) { const url = new URL(baseUrl); url.pathname = `/${database}`; return url.toString(); }
 async function withClient(url, fn) {
-  const host = new URL(url).hostname;
-  const client = new Client({ connectionString: url, ssl: ["127.0.0.1", "localhost", "::1"].includes(host) ? false : { rejectUnauthorized: false } });
+  const client = new Client({ connectionString: url, ssl: postgresSslForConnection(url) });
   await client.connect(); try { return await fn(client); } finally { await client.end(); }
 }
 async function createDatabase(label) { const name = `careeros_adopt_${label}_${Date.now()}`; await withClient(urlFor("postgres"), (c) => c.query(`CREATE DATABASE "${name}"`)); return name; }
@@ -66,6 +76,14 @@ try {
   const referencePath = `${process.env.TMPDIR || "/tmp"}/careeros-reference-${Date.now()}.json`;
   const manifestPath = `${process.env.TMPDIR || "/tmp"}/careeros-adoption-${Date.now()}.json`;
   await writeFile(referencePath, JSON.stringify(referenceFingerprint(expected)));
+  await withClient(url, async (c) => {
+    await c.query(`CREATE ROLE "careeros_unexpected_role" NOLOGIN`);
+    await c.query(`GRANT SELECT ON TABLE "CareerUser" TO "careeros_unexpected_role"`);
+    const privileged = await readCareerOSSchema(c);
+    assert.notDeepEqual(referenceFingerprint(privileged).relationPrivileges, referenceFingerprint(expected).relationPrivileges, "unexpected relation ownership/grants reject against independent reference");
+    await c.query(`REVOKE SELECT ON TABLE "CareerUser" FROM "careeros_unexpected_role"`);
+    await c.query(`DROP ROLE "careeros_unexpected_role"`);
+  });
   await assert.rejects(runScript(prepare, url, { CAREEROS_ADOPTION_MANIFEST_PATH: `${manifestPath}.wrong-source`, CAREEROS_SCHEMA_REFERENCE_PATH: referencePath, CAREEROS_REVIEWED_SOURCE_REVISION: "0000000000000000000000000000000000000000", CAREEROS_REVIEWED_BY: "synthetic-review" }), /CAREEROS_EXECUTING_SOURCE_REVISION_MISMATCH/);
   await withClient(url, async (c) => {
     const constraint = (await c.query(`SELECT constraint_name FROM information_schema.table_constraints WHERE table_schema=current_schema() AND table_name='CareerUser' ORDER BY constraint_name LIMIT 1`)).rows[0].constraint_name;
