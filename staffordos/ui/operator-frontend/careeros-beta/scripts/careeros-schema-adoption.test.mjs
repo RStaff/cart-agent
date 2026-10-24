@@ -214,8 +214,7 @@ try {
     await c.query(`GRANT SELECT ON TABLE "CareerUser" TO ${quoteIdentifier(adminRole)}`);
     await c.query(`GRANT INSERT ON TABLE "CareerUser" TO ${quoteIdentifier(specialRole)}`);
     await c.query(`GRANT UPDATE ON TABLE "CareerUser" TO PUBLIC`);
-    await c.query(`CREATE ROLE "PUBLIC" NOLOGIN`);
-    await c.query(`GRANT SELECT ("id") ON TABLE "CareerUser" TO "PUBLIC"`);
+    await assert.rejects(c.query(`CREATE ROLE "PUBLIC" NOLOGIN`), /already exists|reserved/i, "PostgreSQL reserves PUBLIC as a pseudo-principal");
     await c.query(`GRANT UPDATE ("id") ON TABLE "CareerUser" TO PUBLIC`);
     const mapped = await readCareerOSSchema(c, { roleMapping: { postgres: "reviewed-app", [specialRole]: "reviewed-special" } });
     assert.ok(compareReferenceFields(referenceFingerprint(mapped), referenceFingerprint(expected)).includes("relationPrivileges"), "PUBLIC grant drift is reference-visible");
@@ -227,7 +226,6 @@ try {
     assert.ok(grantees.some((p) => p.kind === "public"), "PUBLIC remains a distinct pseudo-principal");
     const column = mapped.columnPrivileges.find((row) => row.table_name === "CareerUser" && row.column_name === "id");
     assert.ok(column.privileges.some((p) => p.grantee.kind === "public"), "column PUBLIC grant is preserved as pseudo-principal");
-    assert.ok(column.privileges.some((p) => p.grantee.kind === "role" && p.grantee.name === "PUBLIC"), "quoted PUBLIC role remains a private principal");
     await assert.rejects(readCareerOSSchema(c, { roleMapping: { PUBLIC: "reviewed-app" } }), /CAREEROS_PUBLIC_ROLE_MAPPING_FORBIDDEN/);
     await c.query(`CREATE ROLE "careeros_membership_${Date.now()}"`);
     const memberRole = (await c.query(`SELECT rolname FROM pg_roles WHERE rolname LIKE 'careeros_membership_%' ORDER BY rolname DESC LIMIT 1`)).rows[0].rolname;
@@ -260,7 +258,6 @@ try {
     await c.query(`DROP ROLE ${quoteIdentifier(parentRole)}`);
     await c.query(`DROP ROLE ${quoteIdentifier(unrelatedRole)}`);
     await c.query(`DROP ROLE ${quoteIdentifier(unrelatedGrantedRole)}`);
-    await c.query(`DROP ROLE "PUBLIC"`);
     await c.query(`DROP ROLE ${quoteIdentifier(memberRole)}`);
     await c.query(`REVOKE ALL PRIVILEGES ON TABLE "CareerUser" FROM ${quoteIdentifier(adminRole)},${quoteIdentifier(specialRole)}`);
     await c.query(`REVOKE UPDATE ON TABLE "CareerUser" FROM PUBLIC`);
