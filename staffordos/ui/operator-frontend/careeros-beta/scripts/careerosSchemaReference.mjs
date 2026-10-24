@@ -21,6 +21,7 @@ export function referenceFields(schema) {
     sequences: schema.sequences || [],
     roleMemberships: schema.roleMemberships || [],
     defaultPrivileges: schema.defaultPrivileges || [],
+    roleAttributes: schema.roleAttributes || [],
   };
 }
 
@@ -30,6 +31,6 @@ export function referenceFingerprint(schema) {
 }
 
 export function compareReferenceFields(actual, expected) {
-  const fields = ["fingerprintVersion", "tables", "columns", "constraints", "indexes", "objects", "triggers", "routines", "policies", "roleMapping", "schemaPrivileges", "relationPrivileges", "columnPrivileges", "sequences", "roleMemberships", "defaultPrivileges"];
+  const fields = ["fingerprintVersion", "tables", "columns", "constraints", "indexes", "objects", "triggers", "routines", "policies", "roleMapping", "schemaPrivileges", "relationPrivileges", "columnPrivileges", "sequences", "roleMemberships", "defaultPrivileges", "roleAttributes"];
   return fields.filter((field) => JSON.stringify(actual[field]) !== JSON.stringify(expected[field]));
 }

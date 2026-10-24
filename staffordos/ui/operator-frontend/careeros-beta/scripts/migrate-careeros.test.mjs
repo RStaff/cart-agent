@@ -73,6 +73,21 @@ try {
   await expectFailure(freshUrl, changedRoot, /CAREEROS_MIGRATION_CHECKSUM_MISMATCH/);
   await rm(changedRootPath, { recursive: true, force: true });
 
+  const combinedState = await createDatabase("combined-state"); databases.push(combinedState);
+  const combinedStateUrl = connectionFor(combinedState);
+  await withClient(combinedStateUrl, async (client) => {
+    await client.query(`CREATE TABLE "CareerOSMigration" ("id" TEXT PRIMARY KEY, "checksum" TEXT NOT NULL, "appliedAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP)`);
+    await client.query(`CREATE TABLE "MigrationSentinel" ("id" TEXT PRIMARY KEY)`);
+    await client.query(`INSERT INTO "MigrationSentinel" ("id") VALUES ('untouched')`);
+    await client.query(`INSERT INTO "CareerOSMigration" ("id", "checksum") VALUES ($1, $2)`, ["20260830100000_add_role_intent_and_relevance_feedback", "incorrect-later-checksum"]);
+  });
+  await expectFailure(combinedStateUrl, root, /CAREEROS_MIGRATION_CHECKSUM_MISMATCH:20260830100000_add_role_intent_and_relevance_feedback/);
+  await withClient(combinedStateUrl, async (client) => {
+    assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM "CareerOSMigration"`)).rows[0].count, 1, "combined missing-earlier/incorrect-later state creates no ledger rows");
+    assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM "MigrationSentinel" WHERE "id"='untouched'`)).rows[0].count, 1, "combined invalid state preserves application data");
+    assert.equal((await client.query(`SELECT to_regclass('"CareerUser"') AS table_name`)).rows[0].table_name, null, "combined invalid state applies no missing earlier schema");
+  });
+
   const failed = await createDatabase("resume"); databases.push(failed);
   const failedUrl = connectionFor(failed);
   const brokenRootPath = await mkdtemp(join(tmpdir(), "careeros-broken-"));

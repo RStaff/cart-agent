@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const CAREEROS_SCHEMA_FINGERPRINT_VERSION = "careeros-schema-fingerprint-v2";
+export const CAREEROS_SCHEMA_FINGERPRINT_VERSION = "careeros-schema-fingerprint-v3";
 
 export const CAREEROS_TABLES = [
   "CareerUser", "CareerTenant", "CareerTenantMembership", "CareerProfile", "CareerSource",
@@ -64,7 +64,7 @@ function mapPrivilegeJson(value, roleMapping) {
 
 export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
   validateRoleMapping(roleMapping);
-  const [columns, constraints, indexes, tables, objects, triggers, routines, policies, schemaPrivileges, relationPrivileges, columnPrivileges, sequences, roleMemberships, defaultPrivileges] = await Promise.all([
+  const [columns, constraints, indexes, tables, objects, triggers, routines, policies, schemaPrivileges, relationPrivileges, columnPrivileges, sequences, roleMemberships, defaultPrivileges, roleAttributes] = await Promise.all([
     client.query(`SELECT c.table_name,c.column_name,c.data_type,c.udt_schema,c.udt_name,c.is_nullable,
       COALESCE(c.column_default,'') AS column_default,c.character_maximum_length,c.numeric_precision,
       c.numeric_scale,c.datetime_precision,COALESCE(a.attidentity,'') AS identity_kind,
@@ -210,6 +210,40 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
           UNION SELECT c.relowner FROM pg_class c JOIN pg_namespace ns ON ns.oid=c.relnamespace WHERE ns.nspname=current_schema()
           UNION SELECT p.proowner FROM pg_proc p JOIN pg_namespace ns ON ns.oid=p.pronamespace WHERE ns.nspname=current_schema())
       ORDER BY d.defaclrole,d.defaclnamespace,d.defaclobjtype`),
+    client.query(`WITH RECURSIVE relevant AS (
+        SELECT n.nspowner AS oid FROM pg_namespace n WHERE n.nspname=current_schema()
+        UNION SELECT c.relowner FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+          WHERE n.nspname=current_schema() AND (c.relname IN (${tableList},'_prisma_migrations') OR c.relkind='S')
+        UNION SELECT p.proowner FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname=current_schema()
+        UNION SELECT e.grantee FROM pg_namespace n CROSS JOIN LATERAL aclexplode(COALESCE(n.nspacl,acldefault('n',n.nspowner))) e WHERE n.nspname=current_schema()
+        UNION SELECT e.grantor FROM pg_namespace n CROSS JOIN LATERAL aclexplode(COALESCE(n.nspacl,acldefault('n',n.nspowner))) e WHERE n.nspname=current_schema()
+        UNION SELECT e.grantee FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace CROSS JOIN LATERAL aclexplode(COALESCE(c.relacl,acldefault(CASE WHEN c.relkind='S' THEN 'S'::"char" ELSE 'r'::"char" END,c.relowner))) e
+          WHERE n.nspname=current_schema() AND (c.relname IN (${tableList},'_prisma_migrations') OR c.relkind='S')
+        UNION SELECT e.grantor FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace CROSS JOIN LATERAL aclexplode(COALESCE(c.relacl,acldefault(CASE WHEN c.relkind='S' THEN 'S'::"char" ELSE 'r'::"char" END,c.relowner))) e
+          WHERE n.nspname=current_schema() AND (c.relname IN (${tableList},'_prisma_migrations') OR c.relkind='S')
+        UNION SELECT e.grantee FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace CROSS JOIN LATERAL aclexplode(COALESCE(p.proacl,acldefault('f',p.proowner))) e WHERE n.nspname=current_schema()
+        UNION SELECT e.grantor FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace CROSS JOIN LATERAL aclexplode(COALESCE(p.proacl,acldefault('f',p.proowner))) e WHERE n.nspname=current_schema()
+        UNION SELECT role_oid FROM pg_policy pol JOIN pg_class c ON c.oid=pol.polrelid JOIN pg_namespace n ON n.oid=c.relnamespace CROSS JOIN LATERAL unnest(pol.polroles) role_oid WHERE n.nspname=current_schema()
+        UNION SELECT d.defaclrole FROM pg_default_acl d LEFT JOIN pg_namespace n ON n.oid=d.defaclnamespace
+          WHERE d.defaclnamespace=0 OR d.defaclnamespace=(SELECT oid FROM pg_namespace WHERE nspname=current_schema())
+      ), memberships AS (
+        SELECT am.member,am.roleid,am.grantor,ARRAY[am.roleid,am.member]::oid[] AS path
+        FROM pg_auth_members am WHERE am.roleid IN (SELECT oid FROM relevant)
+        UNION ALL
+        SELECT am.member,am.roleid,am.grantor,ARRAY[am.roleid]::oid[] || m.path
+        FROM memberships m JOIN pg_auth_members am ON am.roleid=m.member
+        WHERE NOT (am.member=ANY(m.path))
+      ), role_ids AS (
+        SELECT oid FROM relevant
+        UNION SELECT member FROM memberships
+        UNION SELECT roleid FROM memberships
+        UNION SELECT grantor FROM memberships
+      )
+      SELECT r.rolname, r.rolsuper, r.rolinherit, r.rolcreaterole, r.rolcreatedb,
+        r.rolcanlogin, r.rolreplication, r.rolbypassrls, r.rolconnlimit,
+        COALESCE(r.rolvaliduntil::text,'') AS rolvaliduntil
+      FROM pg_roles r WHERE r.oid IN (SELECT oid FROM role_ids)
+      ORDER BY r.rolname`),
   ]);
   const catalogObjects = objects.rows;
   const canonicalSort = (rows) => [...rows].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
@@ -235,6 +269,7 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
     sequences: canonicalSort(normalizeRoles(sequences.rows, ["owner_role"])),
     roleMemberships: canonicalSort(normalizeRoles(roleMemberships.rows, ["member_role", "granted_role"])),
     defaultPrivileges: canonicalSort(normalizeRoles(defaultPrivileges.rows, ["owner_role"])),
+    roleAttributes: canonicalSort(roleAttributes.rows),
     // Operational ledgers are intentionally excluded from the application
     // fingerprint; catalogObjects remains available for unexpected-object checks.
     objects: canonicalSort(objects.rows.filter((row) => CAREEROS_TABLES.includes(row.object_name) || HISTORICAL_SCHEMA_OBJECTS.includes(row.object_name))),

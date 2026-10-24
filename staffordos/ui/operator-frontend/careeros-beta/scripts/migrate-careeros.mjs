@@ -120,6 +120,16 @@ async function assertUnledgeredSchemaAbsent(client, migrations, migrationsRoot) 
   }
 }
 
+async function assertAppliedMigrationChecksums(client, applied, migrations, migrationsRoot) {
+  const known = new Map(migrations.map((migration) => [migration.id, migration]));
+  for (const row of applied) {
+    const migration = known.get(row.id);
+    if (!migration) throw new Error(`CAREEROS_MIGRATION_UNKNOWN_LEDGER:${row.id}`);
+    const digest = checksum(await readFile(migrationPath(migrationsRoot, migration.id), "utf8"));
+    if (row.checksum !== digest) throw new Error(`CAREEROS_MIGRATION_CHECKSUM_MISMATCH:${migration.id}`);
+  }
+}
+
 async function applyMigration(client, migration, migrationsRoot) {
   const sql = await readFile(migrationPath(migrationsRoot, migration.id), "utf8");
   const digest = checksum(sql);
@@ -165,9 +175,11 @@ export async function runCareerosMigrations({ connectionString = process.env.DAT
     const ledgerKind = await ledgerRelationKind(client);
     if (ledgerKind && ledgerKind !== "r") throw new Error("CAREEROS_MIGRATION_LEDGER_UNVERIFIED");
     const ledgerExists = ledgerKind === "r";
-    const applied = ledgerExists
-      ? (await client.query('SELECT "id" FROM "CareerOSMigration"')).rows.map((row) => row.id)
+    const appliedRows = ledgerExists
+      ? (await client.query('SELECT "id", "checksum" FROM "CareerOSMigration"')).rows
       : [];
+    await assertAppliedMigrationChecksums(client, appliedRows, MIGRATIONS, migrationsRoot);
+    const applied = appliedRows.map((row) => row.id);
     const missing = MIGRATIONS.filter((migration) => !applied.includes(migration.id));
     await assertUnledgeredSchemaAbsent(client, missing, migrationsRoot);
     for (const migration of MIGRATIONS) await applyMigration(client, migration, migrationsRoot);

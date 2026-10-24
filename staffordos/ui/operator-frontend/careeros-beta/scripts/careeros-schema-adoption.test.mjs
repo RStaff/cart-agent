@@ -75,6 +75,19 @@ try {
   });
   const expected = await withClient(url, (c) => readCareerOSSchema(c));
   assert.ok(expected.objects.some((object) => object.object_name === "_prisma_migrations"), "historical Prisma table participates in the v2 fingerprint");
+  await withClient(url, async (c) => {
+    const role = `careeros_attribute_probe_${Date.now()}`;
+    await c.query(`CREATE ROLE ${quoteIdentifier(role)} NOLOGIN`);
+    await c.query(`GRANT SELECT ON TABLE "CareerUser" TO ${quoteIdentifier(role)}`);
+    const baseline = await readCareerOSSchema(c);
+    await c.query(`ALTER ROLE ${quoteIdentifier(role)} SUPERUSER BYPASSRLS`);
+    const changed = await readCareerOSSchema(c);
+    assert.notDeepEqual(changed.roleAttributes, baseline.roleAttributes, "authorization-relevant role attributes change the fingerprint");
+    assert.ok(changed.roleAttributes.some((entry) => entry.rolname === role && entry.rolsuper && entry.rolbypassrls), "rolsuper and rolbypassrls are captured");
+    await c.query(`ALTER ROLE ${quoteIdentifier(role)} NOSUPERUSER NOBYPASSRLS`);
+    await c.query(`REVOKE SELECT ON TABLE "CareerUser" FROM ${quoteIdentifier(role)}`);
+    await c.query(`DROP ROLE ${quoteIdentifier(role)}`);
+  });
   const referencePath = `${process.env.TMPDIR || "/tmp"}/careeros-reference-${Date.now()}.json`;
   const manifestPath = `${process.env.TMPDIR || "/tmp"}/careeros-adoption-${Date.now()}.json`;
   await writeFile(referencePath, JSON.stringify(referenceFingerprint(expected)));
