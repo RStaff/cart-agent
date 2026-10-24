@@ -213,22 +213,24 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
       WHERE (d.defaclnamespace=0 OR d.defaclnamespace=(SELECT oid FROM pg_namespace WHERE nspname=current_schema()))
         AND d.defaclrole IN (${RELEVANT_OWNER_SQL})
       ORDER BY d.defaclrole,d.defaclnamespace,d.defaclobjtype`),
-    client.query(`WITH RECURSIVE relevant AS (
-        SELECT n.nspowner AS oid FROM pg_namespace n WHERE n.nspname=current_schema()
-        UNION SELECT c.relowner FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
-          WHERE n.nspname=current_schema() AND (c.relname IN (${tableList},'_prisma_migrations') OR c.relkind='S')
-        UNION SELECT p.proowner FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname=current_schema()
+    client.query(`WITH RECURSIVE relevant_owners AS (${RELEVANT_OWNER_SQL}), relevant AS (
+        SELECT oid FROM relevant_owners
         UNION SELECT e.grantee FROM pg_namespace n CROSS JOIN LATERAL aclexplode(COALESCE(n.nspacl,acldefault('n',n.nspowner))) e WHERE n.nspname=current_schema()
         UNION SELECT e.grantor FROM pg_namespace n CROSS JOIN LATERAL aclexplode(COALESCE(n.nspacl,acldefault('n',n.nspowner))) e WHERE n.nspname=current_schema()
         UNION SELECT e.grantee FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace CROSS JOIN LATERAL aclexplode(COALESCE(c.relacl,acldefault(CASE WHEN c.relkind='S' THEN 'S'::"char" ELSE 'r'::"char" END,c.relowner))) e
           WHERE n.nspname=current_schema() AND (c.relname IN (${tableList},'_prisma_migrations') OR c.relkind='S')
         UNION SELECT e.grantor FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace CROSS JOIN LATERAL aclexplode(COALESCE(c.relacl,acldefault(CASE WHEN c.relkind='S' THEN 'S'::"char" ELSE 'r'::"char" END,c.relowner))) e
           WHERE n.nspname=current_schema() AND (c.relname IN (${tableList},'_prisma_migrations') OR c.relkind='S')
+        UNION SELECT e.grantee FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid JOIN pg_namespace n ON n.oid=c.relnamespace CROSS JOIN LATERAL aclexplode(a.attacl) e
+          WHERE a.attacl IS NOT NULL AND n.nspname=current_schema() AND c.relname IN (${tableList}) AND a.attnum>0 AND NOT a.attisdropped
+        UNION SELECT e.grantor FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid JOIN pg_namespace n ON n.oid=c.relnamespace CROSS JOIN LATERAL aclexplode(a.attacl) e
+          WHERE a.attacl IS NOT NULL AND n.nspname=current_schema() AND c.relname IN (${tableList}) AND a.attnum>0 AND NOT a.attisdropped
         UNION SELECT e.grantee FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace CROSS JOIN LATERAL aclexplode(COALESCE(p.proacl,acldefault('f',p.proowner))) e WHERE n.nspname=current_schema()
         UNION SELECT e.grantor FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace CROSS JOIN LATERAL aclexplode(COALESCE(p.proacl,acldefault('f',p.proowner))) e WHERE n.nspname=current_schema()
         UNION SELECT role_oid FROM pg_policy pol JOIN pg_class c ON c.oid=pol.polrelid JOIN pg_namespace n ON n.oid=c.relnamespace CROSS JOIN LATERAL unnest(pol.polroles) role_oid WHERE n.nspname=current_schema()
         UNION SELECT d.defaclrole FROM pg_default_acl d LEFT JOIN pg_namespace n ON n.oid=d.defaclnamespace
-          WHERE d.defaclnamespace=0 OR d.defaclnamespace=(SELECT oid FROM pg_namespace WHERE nspname=current_schema())
+          WHERE (d.defaclnamespace=0 OR d.defaclnamespace=(SELECT oid FROM pg_namespace WHERE nspname=current_schema()))
+            AND d.defaclrole IN (SELECT oid FROM relevant_owners)
       ), memberships AS (
         SELECT am.member,am.roleid,am.grantor,ARRAY[am.roleid,am.member]::oid[] AS path
         FROM pg_auth_members am WHERE am.roleid IN (SELECT oid FROM relevant)
