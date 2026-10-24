@@ -77,6 +77,7 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
       WHERE n.nspname=current_schema() AND NOT t.tgisinternal
       ORDER BY c.relname,t.tgname`),
     client.query(`SELECT p.proname AS routine_name,p.prokind,p.provolatile,p.prosecdef,
+      pg_get_userbyid(p.proowner) AS owner_role,COALESCE(p.proacl::text,'') AS acl,
       pg_get_function_identity_arguments(p.oid) AS identity_arguments,
       pg_get_functiondef(p.oid) AS definition
       FROM pg_proc p
@@ -84,7 +85,9 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
       WHERE n.nspname=current_schema()
       ORDER BY p.proname,p.prokind,identity_arguments`),
     client.query(`SELECT c.relname AS table_name,pol.polname AS policy_name,
-      pol.polpermissive,pol.polcmd,pol.polroles::text AS roles,
+      pol.polpermissive,pol.polcmd,
+      COALESCE((SELECT string_agg(r.rolname, ',' ORDER BY r.rolname)
+        FROM unnest(pol.polroles) role_oid JOIN pg_roles r ON r.oid=role_oid),'') AS roles,
       COALESCE(pg_get_expr(pol.polqual,pol.polrelid),'') AS using_expression,
       COALESCE(pg_get_expr(pol.polwithcheck,pol.polrelid),'') AS check_expression
       FROM pg_policy pol
@@ -126,8 +129,8 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
     constraints: canonicalSort(constraints.rows),
     indexes: canonicalSort(indexes.rows),
     triggers: canonicalSort(triggers.rows),
-    routines: canonicalSort(routines.rows),
-    policies: canonicalSort(policies.rows),
+    routines: canonicalSort(normalizeRoles(routines.rows, ["owner_role"])),
+    policies: canonicalSort(policies.rows.map((row) => ({ ...row, roles: mapRoleText(row.roles, roleMapping) }))),
     roleMapping: Object.fromEntries(Object.entries(roleMapping).sort(([a], [b]) => a.localeCompare(b))),
     schemaPrivileges: canonicalSort(normalizeRoles(schemaPrivileges.rows, ["owner_role"])),
     relationPrivileges: canonicalSort(normalizeRoles(relationPrivileges.rows, ["owner_role"])),
