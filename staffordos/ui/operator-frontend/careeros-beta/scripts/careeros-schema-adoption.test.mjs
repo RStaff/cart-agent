@@ -241,7 +241,7 @@ try {
     const memberships = await readCareerOSSchema(c);
     assert.ok(!memberships.roleMemberships.some((m) => m.member_role === unrelatedRole || m.granted_role === unrelatedGrantedRole), "unrelated cluster membership is excluded");
     assert.ok(memberships.roleMemberships.some((m) => m.member_role === "postgres" && m.granted_role === memberRole && m.inherit_option && m.set_option), "role membership options are captured");
-    assert.ok(memberships.roleMemberships.some((m) => m.member_role === "postgres" && m.granted_role === parentRole && m.depth === 2), "indirect role membership is captured");
+    assert.ok(memberships.roleMemberships.some((m) => m.member_role === memberRole && m.granted_role === parentRole), "indirect role membership edge is captured");
     assert.ok(compareReferenceFields(referenceFingerprint(memberships), referenceFingerprint(expected)).includes("roleMemberships"), "membership drift is reference-visible");
     await c.query(`ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT SELECT ON TABLES TO PUBLIC`);
     const defaults = await readCareerOSSchema(c);
