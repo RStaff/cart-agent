@@ -233,6 +233,14 @@ try {
     await c.query(`CREATE ROLE ${quoteIdentifier(parentRole)} NOLOGIN`);
     const unauthorizedLogin = `careeros_unexpected_login_${Date.now()}`;
     await c.query(`CREATE ROLE ${quoteIdentifier(unauthorizedLogin)} NOLOGIN`);
+    const routineRole = `careeros_routine_role_${Date.now()}`;
+    const routineLogin = `careeros_routine_login_${Date.now()}`;
+    const routineName = `careeros_membership_probe_${Date.now()}`;
+    await c.query(`CREATE ROLE ${quoteIdentifier(routineRole)} NOLOGIN`);
+    await c.query(`CREATE ROLE ${quoteIdentifier(routineLogin)} NOLOGIN`);
+    await c.query(`CREATE FUNCTION ${quoteIdentifier(routineName)}() RETURNS integer LANGUAGE SQL AS 'SELECT 1'`);
+    await c.query(`GRANT EXECUTE ON FUNCTION ${quoteIdentifier(routineName)}() TO ${quoteIdentifier(routineRole)}`);
+    await c.query(`GRANT ${quoteIdentifier(routineRole)} TO ${quoteIdentifier(routineLogin)} WITH INHERIT TRUE, SET TRUE`);
     const unrelatedRole = `careeros_unrelated_${Date.now()}`;
     await c.query(`CREATE ROLE ${quoteIdentifier(unrelatedRole)} NOLOGIN`);
     const unrelatedGrantedRole = `careeros_unrelated_granted_${Date.now()}`;
@@ -248,13 +256,22 @@ try {
     assert.ok(memberships.roleMemberships.some((m) => m.member_role === "postgres" && m.granted_role === memberRole && m.inherit_option && m.set_option), "role membership options are captured");
     assert.ok(memberships.roleMemberships.some((m) => m.member_role === memberRole && m.granted_role === parentRole), "indirect role membership edge is captured");
     assert.ok(memberships.roleMemberships.some((m) => m.member_role === unauthorizedLogin && m.granted_role === memberRole), "direct unauthorized login membership is captured");
+    assert.ok(memberships.roleMemberships.some((m) => m.member_role === routineLogin && m.granted_role === routineRole), "routine ACL principals seed relevant membership checks");
     const chainRoles = Array.from({ length: 34 }, (_, i) => `careeros_chain_${Date.now()}_${i}`);
     for (const role of chainRoles) await c.query(`CREATE ROLE ${quoteIdentifier(role)} NOLOGIN`);
     await c.query(`GRANT SELECT ON TABLE "CareerUser" TO ${quoteIdentifier(chainRoles[chainRoles.length - 1])}`);
     await c.query(`GRANT ${quoteIdentifier(chainRoles[0])} TO postgres WITH INHERIT TRUE, SET TRUE`);
     for (let i = 1; i < chainRoles.length; i += 1) await c.query(`GRANT ${quoteIdentifier(chainRoles[i])} TO ${quoteIdentifier(chainRoles[i - 1])} WITH INHERIT TRUE, SET TRUE`);
     const longChain = await readCareerOSSchema(c);
-    assert.ok(longChain.roleMemberships.some((m) => m.member_role === chainRoles[chainRoles.length - 2] && m.granted_role === chainRoles[chainRoles.length - 1]), "membership paths longer than 32 edges are captured");
+    const longChainEdges = new Set(longChain.roleMemberships
+      .filter((m) => m.granted_role === chainRoles[chainRoles.length - 1] || chainRoles.includes(m.granted_role))
+      .map((m) => `${m.member_role}->${m.granted_role}`));
+    const expectedChainEdges = [
+      ...chainRoles.slice(1).map((role, index) => `${chainRoles[index]}->${role}`),
+      `postgres->${chainRoles[0]}`,
+    ];
+    assert.deepEqual(expectedChainEdges.filter((edge) => longChainEdges.has(edge)), expectedChainEdges, "every edge in the membership path longer than 32 edges is captured");
+    assert.ok(longChain.roleMemberships.some((m) => m.member_role === chainRoles[chainRoles.length - 2] && m.granted_role === chainRoles[chainRoles.length - 1] && m.admin_option && m.inherit_option && m.set_option), "individual membership options remain unchanged");
     const diamondRoles = [`careeros_diamond_a_${Date.now()}`, `careeros_diamond_b_${Date.now()}`, `careeros_diamond_shared_${Date.now()}`];
     for (const role of diamondRoles) await c.query(`CREATE ROLE ${quoteIdentifier(role)} NOLOGIN`);
     await c.query(`GRANT SELECT ON TABLE "CareerUser" TO ${quoteIdentifier(diamondRoles[2])}`);
@@ -286,11 +303,16 @@ try {
     await c.query(`REVOKE ${quoteIdentifier(parentRole)} FROM ${quoteIdentifier(memberRole)}`);
     await c.query(`REVOKE ${quoteIdentifier(memberRole)} FROM ${quoteIdentifier(unauthorizedLogin)}`);
     await c.query(`REVOKE SELECT ON TABLE "CareerUser" FROM ${quoteIdentifier(memberRole)},${quoteIdentifier(parentRole)}`);
+    await c.query(`REVOKE ${quoteIdentifier(routineRole)} FROM ${quoteIdentifier(routineLogin)}`);
+    await c.query(`REVOKE EXECUTE ON FUNCTION ${quoteIdentifier(routineName)}() FROM ${quoteIdentifier(routineRole)}`);
+    await c.query(`DROP FUNCTION ${quoteIdentifier(routineName)}()`);
     await c.query(`DROP ROLE ${quoteIdentifier(parentRole)}`);
     await c.query(`DROP ROLE ${quoteIdentifier(unrelatedRole)}`);
     await c.query(`DROP ROLE ${quoteIdentifier(unrelatedGrantedRole)}`);
     await c.query(`DROP ROLE ${quoteIdentifier(memberRole)}`);
     await c.query(`DROP ROLE ${quoteIdentifier(unauthorizedLogin)}`);
+    await c.query(`DROP ROLE ${quoteIdentifier(routineLogin)}`);
+    await c.query(`DROP ROLE ${quoteIdentifier(routineRole)}`);
     for (let i = chainRoles.length - 1; i >= 1; i -= 1) await c.query(`REVOKE ${quoteIdentifier(chainRoles[i])} FROM ${quoteIdentifier(chainRoles[i - 1])}`);
     await c.query(`REVOKE ${quoteIdentifier(chainRoles[0])} FROM postgres`);
     await c.query(`REVOKE SELECT ON TABLE "CareerUser" FROM ${quoteIdentifier(chainRoles[chainRoles.length - 1])}`);

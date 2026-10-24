@@ -170,6 +170,10 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
           WHERE a.attacl IS NOT NULL AND n.nspname=current_schema() AND c.relname IN (${tableList}) AND a.attnum>0 AND NOT a.attisdropped
         UNION SELECT e.grantor FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid JOIN pg_namespace n ON n.oid=c.relnamespace CROSS JOIN LATERAL aclexplode(a.attacl) e
           WHERE a.attacl IS NOT NULL AND n.nspname=current_schema() AND c.relname IN (${tableList}) AND a.attnum>0 AND NOT a.attisdropped
+        UNION SELECT e.grantee FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace CROSS JOIN LATERAL aclexplode(COALESCE(p.proacl,acldefault('f',p.proowner))) e
+          WHERE n.nspname=current_schema()
+        UNION SELECT e.grantor FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace CROSS JOIN LATERAL aclexplode(COALESCE(p.proacl,acldefault('f',p.proowner))) e
+          WHERE n.nspname=current_schema()
         UNION SELECT e.grantee FROM pg_default_acl d CROSS JOIN LATERAL aclexplode(d.defaclacl) e
           WHERE d.defaclrole IN (SELECT oid FROM relevant_owners)
             AND (d.defaclnamespace=0 OR d.defaclnamespace=(SELECT oid FROM pg_namespace WHERE nspname=current_schema()))
@@ -181,8 +185,8 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
           ARRAY[am.roleid,am.member]::oid[] AS path
         FROM pg_auth_members am WHERE am.roleid IN (SELECT oid FROM relevant)
         UNION ALL
-        SELECT am.member,am.roleid,(m.admin_option AND am.admin_option),(m.inherit_option AND am.inherit_option),
-          (m.set_option AND am.set_option),m.depth + 1,ARRAY[am.roleid]::oid[] || m.path
+        SELECT am.member,am.roleid,am.admin_option,am.inherit_option,
+          am.set_option,m.depth + 1,ARRAY[am.roleid]::oid[] || m.path
         FROM memberships m JOIN pg_auth_members am ON am.roleid=m.member
         WHERE NOT (am.member = ANY(m.path))
       )
