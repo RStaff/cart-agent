@@ -174,6 +174,9 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
           WHERE n.nspname=current_schema()
         UNION SELECT e.grantor FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace CROSS JOIN LATERAL aclexplode(COALESCE(p.proacl,acldefault('f',p.proowner))) e
           WHERE n.nspname=current_schema()
+        UNION SELECT role_oid FROM pg_policy pol JOIN pg_class c ON c.oid=pol.polrelid JOIN pg_namespace n ON n.oid=c.relnamespace
+          CROSS JOIN LATERAL unnest(pol.polroles) role_oid
+          WHERE n.nspname=current_schema()
         UNION SELECT e.grantee FROM pg_default_acl d CROSS JOIN LATERAL aclexplode(d.defaclacl) e
           WHERE d.defaclrole IN (SELECT oid FROM relevant_owners)
             AND (d.defaclnamespace=0 OR d.defaclnamespace=(SELECT oid FROM pg_namespace WHERE nspname=current_schema()))
@@ -204,7 +207,8 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
       FROM pg_default_acl d LEFT JOIN pg_namespace n ON n.oid=d.defaclnamespace
       WHERE (d.defaclnamespace=0 OR d.defaclnamespace=(SELECT oid FROM pg_namespace WHERE nspname=current_schema()))
         AND d.defaclrole IN (SELECT nspowner FROM pg_namespace WHERE nspname=current_schema()
-          UNION SELECT c.relowner FROM pg_class c JOIN pg_namespace ns ON ns.oid=c.relnamespace WHERE ns.nspname=current_schema())
+          UNION SELECT c.relowner FROM pg_class c JOIN pg_namespace ns ON ns.oid=c.relnamespace WHERE ns.nspname=current_schema()
+          UNION SELECT p.proowner FROM pg_proc p JOIN pg_namespace ns ON ns.oid=p.pronamespace WHERE ns.nspname=current_schema())
       ORDER BY d.defaclrole,d.defaclnamespace,d.defaclobjtype`),
   ]);
   const catalogObjects = objects.rows;
