@@ -197,8 +197,8 @@ export async function runCareerosMigrations({ connectionString = process.env.DAT
       ? (await client.query('SELECT "id", "checksum" FROM "CareerOSMigration"')).rows
       : [];
     await assertAppliedMigrationChecksums(client, appliedRows, MIGRATIONS, migrationsRoot);
-    await assertAppliedMigrationObjectsPresent(client, MIGRATIONS.filter((migration) => applied.includes(migration.id)), migrationsRoot);
     const applied = appliedRows.map((row) => row.id);
+    await assertAppliedMigrationObjectsPresent(client, MIGRATIONS.filter((migration) => applied.includes(migration.id)), migrationsRoot);
     const missing = MIGRATIONS.filter((migration) => !applied.includes(migration.id));
     await assertUnledgeredSchemaAbsent(client, missing, migrationsRoot);
     for (const migration of MIGRATIONS) await applyMigration(client, migration, migrationsRoot);
