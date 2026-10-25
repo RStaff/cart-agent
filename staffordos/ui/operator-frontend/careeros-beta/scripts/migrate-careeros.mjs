@@ -131,7 +131,11 @@ async function assertAppliedMigrationObjectsPresent(client, migrations, migratio
 
 async function assertUnledgeredSchemaAbsent(client, migrations, migrationsRoot) {
   for (const migration of migrations) for (const object of await migrationGuardedObjects(migration, migrationsRoot)) {
-    const exists = await migrationObjectExists(client, object);
+    const exists = object.kind === "index"
+      ? (await client.query(`SELECT EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname=current_schema() AND c.relname=$1) AS exists`, [postgresIdentifier(object.name)])).rows[0].exists
+      : object.kind === "constraint"
+        ? (await client.query(`SELECT EXISTS (SELECT 1 FROM pg_constraint WHERE conname=$1) AS exists`, [postgresIdentifier(object.name)])).rows[0].exists
+        : await migrationObjectExists(client, object);
     if (exists) {
       throw new Error(`CAREEROS_MIGRATION_STATE_UNVERIFIED:${migration.id}:${object.kind}:${object.name}`);
     }
