@@ -136,6 +136,29 @@ try {
     assert.equal((await client.query(`SELECT to_regclass('"CareerUser"') AS table_name`)).rows[0].table_name, null, "combined invalid state applies no missing earlier schema");
   });
 
+  for (const [label, setup] of [
+    ["malformed-empty-ledger", async (client) => {
+      await client.query(`CREATE TABLE "CareerOSMigration" ("id" TEXT, "checksum" TEXT NOT NULL, "appliedAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP)`);
+    }],
+    ["suppressed-ledger-insert", async (client) => {
+      await client.query(`CREATE TABLE "CareerOSMigration" ("id" TEXT PRIMARY KEY, "checksum" TEXT NOT NULL, "appliedAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP)`);
+      await client.query(`CREATE FUNCTION suppress_careeros_ledger_insert() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NULL; END $$`);
+      await client.query(`CREATE TRIGGER suppress_careeros_ledger_insert BEFORE INSERT ON "CareerOSMigration" FOR EACH ROW EXECUTE FUNCTION suppress_careeros_ledger_insert()`);
+    }],
+  ]) {
+    const database = await createDatabase(label); databases.push(database); const databaseUrl = connectionFor(database);
+    await withClient(databaseUrl, async (client) => {
+      await client.query(`CREATE TABLE "MigrationSentinel" ("id" TEXT PRIMARY KEY)`);
+      await client.query(`INSERT INTO "MigrationSentinel" ("id") VALUES ('untouched')`);
+      await setup(client);
+    });
+    await expectFailure(databaseUrl, root, /CAREEROS_MIGRATION_LEDGER_UNVERIFIED/);
+    await withClient(databaseUrl, async (client) => {
+      assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM "MigrationSentinel" WHERE "id"='untouched'`)).rows[0].count, 1, `${label} preserves application data`);
+      assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname LIKE 'CareerUser'`)).rows[0].count, 0, `${label} applies no schema`);
+    });
+  }
+
   const failed = await createDatabase("resume"); databases.push(failed);
   const failedUrl = connectionFor(failed);
   const brokenRootPath = await mkdtemp(join(tmpdir(), "careeros-broken-"));
