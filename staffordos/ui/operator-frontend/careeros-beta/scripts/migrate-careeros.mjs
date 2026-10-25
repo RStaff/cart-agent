@@ -101,19 +101,37 @@ async function migrationGuardedObjects(migration, migrationsRoot) {
   for (const match of sql.matchAll(/CREATE\s+TABLE(?:\s+IF\s+NOT\s+EXISTS)?\s+"([^"]+)"/gi)) objects.push({ kind: "table", name: match[1] });
   for (const match of sql.matchAll(/ALTER\s+TABLE\s+"([^"]+)"\s+ADD\s+COLUMN(?:\s+IF\s+NOT\s+EXISTS)?\s+"([^"]+)"/gi)) objects.push({ kind: "column", table: match[1], name: match[2] });
   for (const match of sql.matchAll(/CREATE\s+(?:UNIQUE\s+)?INDEX(?:\s+IF\s+NOT\s+EXISTS)?\s+"([^"]+)"\s+ON\s+"([^"]+)"/gi)) objects.push({ kind: "index", table: match[2], name: match[1] });
-  for (const match of sql.matchAll(/IF\s+NOT\s+EXISTS\s*\(\s*SELECT\s+1\s+FROM\s+pg_constraint\s+WHERE\s+conname\s*=\s*'([^']+)'/gi)) objects.push({ kind: "constraint", name: match[1] });
-  return objects;
+  for (const match of sql.matchAll(/ALTER\s+TABLE\s+"([^"]+)"[\s\S]*?IF\s+NOT\s+EXISTS\s*\(\s*SELECT\s+1\s+FROM\s+pg_constraint\s+WHERE\s+conname\s*=\s*'([^']+)'/gi)) objects.push({ kind: "constraint", table: match[1], name: match[2] });
+  return [...new Map(objects.map((object) => [`${object.kind}:${object.table || ""}:${object.name}`, object])).values()];
+}
+
+async function migrationObjectExists(client, object) {
+  if (object.kind === "table") return tableExists(client, object.name);
+  if (object.kind === "column") return columnExists(client, object.table, object.name);
+  if (object.kind === "index") return (await client.query(`SELECT EXISTS (
+    SELECT 1 FROM pg_class i JOIN pg_namespace n ON n.oid=i.relnamespace
+    WHERE n.nspname=current_schema() AND i.relname=$1 AND i.relkind IN ('i','I')
+      AND EXISTS (SELECT 1 FROM pg_index x JOIN pg_class base ON base.oid=x.indrelid
+        WHERE x.indexrelid=i.oid AND base.relname=$2 AND base.relnamespace=n.oid)
+  ) AS exists`, [postgresIdentifier(object.name), postgresIdentifier(object.table)])).rows[0].exists;
+  return (await client.query(`SELECT EXISTS (
+    SELECT 1 FROM pg_constraint k JOIN pg_class t ON t.oid=k.conrelid
+    JOIN pg_namespace n ON n.oid=t.relnamespace
+    WHERE n.nspname=current_schema() AND k.conname=$1 AND t.relname=$2
+  ) AS exists`, [postgresIdentifier(object.name), postgresIdentifier(object.table)])).rows[0].exists;
+}
+
+async function assertAppliedMigrationObjectsPresent(client, migrations, migrationsRoot) {
+  for (const migration of migrations) for (const object of await migrationGuardedObjects(migration, migrationsRoot)) {
+    if (!(await migrationObjectExists(client, object))) {
+      throw new Error(`CAREEROS_MIGRATION_APPLIED_OBJECT_MISSING:${migration.id}:${object.kind}:${object.table ? `${object.table}.` : ""}${object.name}`);
+    }
+  }
 }
 
 async function assertUnledgeredSchemaAbsent(client, migrations, migrationsRoot) {
   for (const migration of migrations) for (const object of await migrationGuardedObjects(migration, migrationsRoot)) {
-    const exists = object.kind === "table"
-      ? await tableExists(client, object.name)
-      : object.kind === "column"
-        ? await columnExists(client, object.table, object.name)
-        : object.kind === "index"
-          ? (await client.query(`SELECT EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname=current_schema() AND c.relname=$1) AS exists`, [postgresIdentifier(object.name)])).rows[0].exists
-          : (await client.query(`SELECT EXISTS (SELECT 1 FROM pg_constraint WHERE conname=$1) AS exists`, [postgresIdentifier(object.name)])).rows[0].exists;
+    const exists = await migrationObjectExists(client, object);
     if (exists) {
       throw new Error(`CAREEROS_MIGRATION_STATE_UNVERIFIED:${migration.id}:${object.kind}:${object.name}`);
     }
@@ -179,6 +197,7 @@ export async function runCareerosMigrations({ connectionString = process.env.DAT
       ? (await client.query('SELECT "id", "checksum" FROM "CareerOSMigration"')).rows
       : [];
     await assertAppliedMigrationChecksums(client, appliedRows, MIGRATIONS, migrationsRoot);
+    await assertAppliedMigrationObjectsPresent(client, MIGRATIONS.filter((migration) => applied.includes(migration.id)), migrationsRoot);
     const applied = appliedRows.map((row) => row.id);
     const missing = MIGRATIONS.filter((migration) => !applied.includes(migration.id));
     await assertUnledgeredSchemaAbsent(client, missing, migrationsRoot);

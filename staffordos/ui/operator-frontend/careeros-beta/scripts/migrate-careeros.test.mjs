@@ -65,6 +65,21 @@ try {
   await run(freshUrl);
   assert.equal(await count(freshUrl, "CareerOSMigration"), 8, "fresh and repeat runs ledger eight migrations");
 
+  for (const [label, mutate, expected] of [
+    ["missing-applied-table", async (client) => client.query(`DROP TABLE "CareerSearchPreference" CASCADE`), "table:CareerSearchPreference"],
+    ["missing-applied-column", async (client) => client.query(`ALTER TABLE "CareerOnboardingState" DROP COLUMN "storyStatus"`), "column:CareerOnboardingState.storyStatus"],
+    ["missing-applied-index", async (client) => { const row = (await client.query(`SELECT indexname, tablename FROM pg_indexes WHERE schemaname=current_schema() AND tablename='CareerSearchPreference' LIMIT 1`)).rows[0]; await client.query(`DROP INDEX "${row.indexname.replaceAll('"', '""')}"`); }, "index:"],
+    ["missing-applied-constraint", async (client) => { const row = (await client.query(`SELECT constraint_name, table_name FROM information_schema.table_constraints WHERE table_schema=current_schema() AND table_name='CareerSearchPreference' LIMIT 1`)).rows[0]; await client.query(`ALTER TABLE "${row.table_name}" DROP CONSTRAINT "${row.constraint_name.replaceAll('"', '""')}"`); }, "constraint:"],
+  ]) {
+    const database = await createDatabase(label); databases.push(database); const databaseUrl = connectionFor(database);
+    await run(databaseUrl);
+    await withClient(databaseUrl, mutate);
+    await expectFailure(databaseUrl, root, new RegExp(`CAREEROS_MIGRATION_APPLIED_OBJECT_MISSING:[^:]+:${expected}`));
+    await withClient(databaseUrl, async (client) => {
+      assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM "CareerOSMigration"`)).rows[0].count, 8, `${label} preserves ledger`);
+    });
+  }
+
   const changedRootPath = await mkdtemp(join(tmpdir(), "careeros-changed-"));
   const changedRoot = pathToFileURL(`${changedRootPath}/`);
   await cp(new URL("../", import.meta.url), changedRootPath, { recursive: true });

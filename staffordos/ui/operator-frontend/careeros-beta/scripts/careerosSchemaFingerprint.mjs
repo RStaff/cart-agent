@@ -20,6 +20,8 @@ const tableList = CAREEROS_TABLES.map((table) => `'${table.replaceAll("'", "''")
 // capture. Principal seeds may additionally include ACL/policy participants;
 // those are authorization principals, not default-ACL owners.
 const RELEVANT_OWNER_SQL = `
+        SELECT oid FROM pg_roles WHERE rolname=current_user
+        UNION
         SELECT n.nspowner AS oid FROM pg_namespace n WHERE n.nspname=current_schema()
         UNION SELECT c.relowner FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
           WHERE n.nspname=current_schema() AND (c.relname IN (${tableList},'_prisma_migrations') OR c.relkind='S')
