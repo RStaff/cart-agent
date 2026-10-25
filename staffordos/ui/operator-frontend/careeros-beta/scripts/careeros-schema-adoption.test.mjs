@@ -337,8 +337,10 @@ try {
     await c.query(`GRANT ${quoteIdentifier(memberRole)} TO ${quoteIdentifier(unauthorizedLogin)} WITH INHERIT TRUE, SET TRUE`);
     await c.query(`GRANT ${quoteIdentifier(unrelatedGrantedRole)} TO ${quoteIdentifier(unrelatedRole)} WITH INHERIT TRUE, SET TRUE`);
     const memberships = await readCareerOSSchema(c);
+    const expectedGrant = (await c.query(`SELECT pg_get_userbyid(member) AS member_role, pg_get_userbyid(roleid) AS granted_role, pg_get_userbyid(grantor) AS grantor_role, admin_option, inherit_option, set_option FROM pg_auth_members WHERE member = 'postgres'::regrole AND roleid = $1::regrole`, [memberRole])).rows[0];
+    assert.ok(expectedGrant, "the GRANT statement created a membership row");
     assert.ok(!memberships.roleMemberships.some((m) => m.member_role === unrelatedRole || m.granted_role === unrelatedGrantedRole), "unrelated cluster membership is excluded");
-    assert.ok(memberships.roleMemberships.some((m) => m.member_role === "postgres" && m.granted_role === memberRole && m.grantor_role === "postgres" && m.inherit_option && m.set_option), "role membership options and grantor are captured");
+    assert.ok(memberships.roleMemberships.some((m) => m.member_role === expectedGrant.member_role && m.granted_role === expectedGrant.granted_role && m.grantor_role === expectedGrant.grantor_role && m.admin_option === expectedGrant.admin_option && m.inherit_option === expectedGrant.inherit_option && m.set_option === expectedGrant.set_option), "role membership options and grantor are captured exactly as PostgreSQL recorded them");
     assert.ok(memberships.roleMemberships.some((m) => m.member_role === memberRole && m.granted_role === parentRole), "indirect role membership edge is captured");
     assert.ok(memberships.roleMemberships.some((m) => m.member_role === unauthorizedLogin && m.granted_role === memberRole), "direct unauthorized login membership is captured");
     assert.ok(memberships.roleMemberships.some((m) => m.member_role === routineLogin && m.granted_role === routineRole), "routine ACL principals seed relevant membership checks");
