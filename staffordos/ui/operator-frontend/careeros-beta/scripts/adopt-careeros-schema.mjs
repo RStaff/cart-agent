@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { Client } from "pg";
-import { postgresSslForConnection } from "./careerosConnection.mjs";
+import { assertPublicSchema, postgresSslForConnection } from "./careerosConnection.mjs";
 import { assertExactCareerOSSchema, assertNoUnexpectedApplicationObjects, CAREEROS_SCHEMA_FINGERPRINT_VERSION, readCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
 import { compareReferenceFields, referenceFingerprint as recomputeReferenceFingerprint } from "./careerosSchemaReference.mjs";
 import { executingSourceRevision, sourceFileDigests, sourceFileDigestsAtRevision } from "./careerosAdoptionSource.mjs";
@@ -45,6 +45,7 @@ for (const id of migrationIds) {
 const client = new Client({ connectionString, ssl: postgresSslForConnection(connectionString) });
 await client.connect();
 try {
+  await assertPublicSchema(client);
   await client.query("BEGIN");
   await client.query("SELECT pg_advisory_xact_lock(hashtext($1))", ["careeros-migration-v1"]);
   const schema = await readCareerOSSchema(client, { roleMapping });

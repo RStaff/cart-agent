@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { Client } from "pg";
 import { readCareerOSSchema, assertExactCareerOSSchema, assertNoUnexpectedApplicationObjects } from "./careerosSchemaFingerprint.mjs";
-import { postgresSslForConnection } from "./careerosConnection.mjs";
+import { assertPublicSchema, postgresSslForConnection } from "./careerosConnection.mjs";
 import { executingSourceRevision, sourceFileDigests, sourceFileDigestsAtRevision, assertReviewedSourceDigests } from "./careerosAdoptionSource.mjs";
 
 const connectionString = process.env.DATABASE_URL;
@@ -18,6 +18,7 @@ assertReviewedSourceDigests(currentSourceFiles, reviewedSourceFiles, "CAREEROS_R
 const correctionSql = await readFile(new URL("../prisma/migrations/20261021000000_reconcile_existing_story_status/migration.sql", import.meta.url), "utf8");
 await client.connect();
 try {
+  await assertPublicSchema(client);
   await client.query("BEGIN");
   await client.query("SELECT pg_advisory_xact_lock(hashtext($1))", ["careeros-migration-v1"]);
   const ledger = await client.query(`SELECT to_regclass('"CareerOSMigration"') AS table_name`);

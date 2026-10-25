@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { Client } from "pg";
-import { postgresSslForConnection } from "./careerosConnection.mjs";
+import { assertPublicSchema, postgresSslForConnection } from "./careerosConnection.mjs";
 import { assertAppliedSchemaContract } from "./careerosMigrationSchemaContract.mjs";
 
 const ROOT = new URL("../", import.meta.url);
@@ -193,6 +193,7 @@ export async function runCareerosMigrations({ connectionString = process.env.DAT
   if (!connectionString) throw new Error("DATABASE_URL_REQUIRED");
   const client = new Client({ connectionString, ssl: postgresSslForConnection(connectionString) });
   await client.connect();
+  await assertPublicSchema(client);
   await client.query("SELECT pg_advisory_lock(hashtext($1))", ["careeros-migration-v1"]);
   try {
     const ledgerKind = await ledgerRelationKind(client);

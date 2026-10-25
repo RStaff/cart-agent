@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { Client } from "pg";
-import { postgresSslForConnection } from "./careerosConnection.mjs";
+import { assertPublicSchema, postgresSslForConnection } from "./careerosConnection.mjs";
 import { assertExactCareerOSSchema, assertNoUnexpectedApplicationObjects, CAREEROS_SCHEMA_FINGERPRINT_VERSION, readCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
 import { compareReferenceFields, referenceFingerprint } from "./careerosSchemaReference.mjs";
 import { executingSourceRevision, sourceFileDigests, sourceFileDigestsAtRevision } from "./careerosAdoptionSource.mjs";
@@ -33,6 +33,7 @@ if (JSON.stringify(sourceFiles) !== JSON.stringify(reviewedSourceFiles)) throw n
 const client = new Client({ connectionString, ssl: postgresSslForConnection(connectionString) });
 await client.connect();
 try {
+  await assertPublicSchema(client);
   const ledger = await client.query(`SELECT to_regclass('"CareerOSMigration"') AS name`);
   const adoption = await client.query(`SELECT to_regclass('"CareerOSMigrationAdoption"') AS name`);
   if (ledger.rows[0].name || adoption.rows[0].name) throw new Error("CAREEROS_SCHEMA_ALREADY_ADOPTED");

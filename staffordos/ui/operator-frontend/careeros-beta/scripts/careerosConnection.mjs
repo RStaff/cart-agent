@@ -12,3 +12,10 @@ export function postgresSslForConnection(connectionString) {
   try { hostname = new URL(connectionString).hostname; } catch {}
   return isLoopbackPostgresHostname(hostname) ? false : { rejectUnauthorized: false };
 }
+
+export async function assertPublicSchema(client) {
+  const result = await client.query("SELECT current_schema() AS schema_name, current_setting('search_path') AS search_path");
+  const { schema_name: schemaName } = result.rows[0];
+  if (schemaName !== "public") throw new Error(`CAREEROS_PUBLIC_SCHEMA_REQUIRED:${schemaName || "none"}`);
+  return true;
+}

@@ -36,18 +36,18 @@ async function dropDatabase(name) {
   await withClient(connectionFor("postgres"), (client) => client.query(`DROP DATABASE IF EXISTS "${name}"`));
 }
 
-async function run(url, migrationsRoot = root) {
+async function run(url, migrationsRoot = root, extraEnv = {}) {
   const wrapper = await mkdtemp(join(tmpdir(), "careeros-runner-wrapper-"));
   const modulePath = join(wrapper, "run.mjs");
   const rootPath = new URL(migrationsRoot).href;
   await writeFile(modulePath, `import { runCareerosMigrations } from ${JSON.stringify(new URL("scripts/migrate-careeros.mjs", root).href)}; await runCareerosMigrations({ connectionString: process.env.DATABASE_URL, migrationsRoot: new URL(${JSON.stringify(rootPath)}) });`);
   try {
-    return await exec(process.execPath, [modulePath], { env: { ...process.env, DATABASE_URL: url } });
+    return await exec(process.execPath, [modulePath], { env: { ...process.env, DATABASE_URL: url, ...extraEnv } });
   } finally { await rm(wrapper, { recursive: true, force: true }); }
 }
 
-async function expectFailure(url, migrationsRoot = root, pattern) {
-  await assert.rejects(run(url, migrationsRoot), pattern);
+async function expectFailure(url, migrationsRoot = root, pattern, extraEnv = {}) {
+  await assert.rejects(run(url, migrationsRoot, extraEnv), pattern);
 }
 
 async function count(url, table) {
@@ -61,6 +61,14 @@ const databases = [];
 try {
   const fresh = await createDatabase("fresh"); databases.push(fresh);
   const freshUrl = connectionFor(fresh);
+  const nonPublic = await createDatabase("non-public-schema"); databases.push(nonPublic);
+  const nonPublicUrl = connectionFor(nonPublic);
+  await withClient(nonPublicUrl, async (client) => { await client.query(`CREATE SCHEMA "shadow_schema"`); });
+  await assert.rejects(run(nonPublicUrl, root, { PGOPTIONS: "-c search_path=shadow_schema,public" }), /CAREEROS_PUBLIC_SCHEMA_REQUIRED:shadow_schema/);
+  await withClient(nonPublicUrl, async (client) => {
+    assert.equal((await client.query(`SELECT to_regclass('shadow_schema."CareerOSMigration"') AS name`)).rows[0].name, null, "non-public schema rejection leaves shadow schema unchanged");
+    assert.equal((await client.query(`SELECT to_regclass('public."CareerOSMigration"') AS name`)).rows[0].name, null, "non-public schema rejection leaves public schema unchanged");
+  });
   await run(freshUrl);
   await run(freshUrl);
   assert.equal(await count(freshUrl, "CareerOSMigration"), 8, "fresh and repeat runs ledger eight migrations");

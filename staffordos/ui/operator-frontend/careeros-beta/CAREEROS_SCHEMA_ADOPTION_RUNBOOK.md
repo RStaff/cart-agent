@@ -13,7 +13,14 @@ repository or Render path. The service branch remains exactly
 ## Preconditions
 
 1. Verify a provider backup and a successful restore to a separate database.
-2. Restore to a separate database and run
+2. **Public-schema prerequisite.** This release supports only the effective
+   PostgreSQL `public` schema. Before any runner, reconciliation, evidence,
+   adoption, or ledger operation, verify `current_schema()` is exactly
+   `public` and that the effective `search_path` does not select another
+   schema first. The utilities fail closed with
+   `CAREEROS_PUBLIC_SCHEMA_REQUIRED`; multi-schema deployment is out of
+   scope.
+3. Restore to a separate database and run
    `prepare-careeros-adoption-evidence.mjs` after reconciliation, supplying
    an independently generated clean-reference JSON via
    `CAREEROS_SCHEMA_REFERENCE_PATH`. It derives the executing source revision,
@@ -23,14 +30,14 @@ repository or Render path. The service branch remains exactly
    disposable database and serializing `readCareerOSSchema` through
    `referenceFingerprint`; the older v2 hashes that omitted
    `triggers`, `routines`, and `policies` are superseded and must not be reused.
-3. Run `reconcile-careeros-story-status.mjs` with
+4. Run `reconcile-careeros-story-status.mjs` with
    `CAREEROS_LEGACY_SCHEMA_FINGERPRINT`. This adds only the exact missing
    column from migration `20260817010000_add_career_story_status`.
-4. Recompute the full post-reconciliation fingerprint. Do not continue if
+5. Recompute the full post-reconciliation fingerprint. Do not continue if
    any catalog difference remains.
    Record the `careeros-schema-fingerprint-v3` format alongside the digest;
    v2 hashes are historical evidence only and are not valid adoption inputs.
-5. Keep the service stopped or read-only while the adoption transaction runs;
+6. Keep the service stopped or read-only while the adoption transaction runs;
    both utilities take the `careeros-migration-v1` transaction advisory lock
    and re-read the fingerprint while holding it.
 
