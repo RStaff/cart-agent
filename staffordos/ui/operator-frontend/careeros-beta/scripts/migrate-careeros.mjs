@@ -101,7 +101,7 @@ async function migrationGuardedObjects(migration, migrationsRoot) {
   for (const match of sql.matchAll(/CREATE\s+TABLE(?:\s+IF\s+NOT\s+EXISTS)?\s+"([^"]+)"/gi)) objects.push({ kind: "table", name: match[1] });
   for (const match of sql.matchAll(/ALTER\s+TABLE\s+"([^"]+)"\s+ADD\s+COLUMN(?:\s+IF\s+NOT\s+EXISTS)?\s+"([^"]+)"/gi)) objects.push({ kind: "column", table: match[1], name: match[2] });
   for (const match of sql.matchAll(/CREATE\s+(?:UNIQUE\s+)?INDEX(?:\s+IF\s+NOT\s+EXISTS)?\s+"([^"]+)"\s+ON\s+"([^"]+)"/gi)) objects.push({ kind: "index", table: match[2], name: match[1] });
-  for (const match of sql.matchAll(/ALTER\s+TABLE\s+"([^"]+)"[\s\S]*?IF\s+NOT\s+EXISTS\s*\(\s*SELECT\s+1\s+FROM\s+pg_constraint\s+WHERE\s+conname\s*=\s*'([^']+)'/gi)) objects.push({ kind: "constraint", table: match[1], name: match[2] });
+  for (const match of sql.matchAll(/IF\s+NOT\s+EXISTS\s*\(\s*SELECT\s+1\s+FROM\s+pg_constraint\s+WHERE\s+conname\s*=\s*'([^']+)'[\s\S]*?THEN\s+ALTER\s+TABLE\s+"([^"]+)"\s+ADD\s+CONSTRAINT/gi)) objects.push({ kind: "constraint", table: match[2], name: match[1] });
   return [...new Map(objects.map((object) => [`${object.kind}:${object.table || ""}:${object.name}`, object])).values()];
 }
 
