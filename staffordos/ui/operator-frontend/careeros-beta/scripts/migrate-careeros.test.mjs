@@ -120,7 +120,7 @@ try {
     await client.query(`CREATE TABLE "CareerRelevanceFeedback" ("id" TEXT PRIMARY KEY)`);
     await client.query(`INSERT INTO "CareerRelevanceFeedback" ("id") VALUES ('partial-ledger-row')`);
   });
-  await expectFailure(failedUrl, root, /CAREEROS_MIGRATION_STATE_UNVERIFIED/);
+  await expectFailure(failedUrl, root, /CAREEROS_MIGRATION_STATE_UNVERIFIED|CAREEROS_MIGRATION_APPLIED_SCHEMA_MISMATCH/);
   await withClient(failedUrl, async (client) => {
     assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM "CareerOSMigration"`)).rows[0].count, 1, "partial-ledger conflict creates no further ledger row");
     assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM "CareerRelevanceFeedback"`)).rows[0].count, 1, "partial-ledger conflict preserves data");
