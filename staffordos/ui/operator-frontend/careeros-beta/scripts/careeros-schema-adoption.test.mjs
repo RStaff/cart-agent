@@ -101,6 +101,19 @@ try {
     await c.query(`REVOKE SELECT ("id") ON TABLE "CareerUser" FROM ${quoteIdentifier(columnRole)}`);
     await c.query(`DROP ROLE ${quoteIdentifier(columnRole)}`);
   });
+  await withClient(url, async (c) => {
+    const defaultRole = `careeros_default_attribute_probe_${Date.now()}`;
+    await c.query(`CREATE ROLE ${quoteIdentifier(defaultRole)} NOLOGIN`);
+    await c.query(`ALTER DEFAULT PRIVILEGES FOR ROLE postgres GRANT SELECT ON TABLES TO ${quoteIdentifier(defaultRole)}`);
+    const baseline = await readCareerOSSchema(c);
+    await c.query(`ALTER ROLE ${quoteIdentifier(defaultRole)} SUPERUSER BYPASSRLS`);
+    const changed = await readCareerOSSchema(c);
+    assert.notDeepEqual(changed.roleAttributes, baseline.roleAttributes, "relevant default-ACL principals seed role attributes");
+    assert.ok(changed.roleAttributes.some((entry) => entry.rolname === defaultRole && entry.rolsuper && entry.rolbypassrls), "default-ACL principal attributes are captured");
+    await c.query(`ALTER ROLE ${quoteIdentifier(defaultRole)} NOSUPERUSER NOBYPASSRLS`);
+    await c.query(`ALTER DEFAULT PRIVILEGES FOR ROLE postgres REVOKE SELECT ON TABLES FROM ${quoteIdentifier(defaultRole)}`);
+    await c.query(`DROP ROLE ${quoteIdentifier(defaultRole)}`);
+  });
   const referencePath = `${process.env.TMPDIR || "/tmp"}/careeros-reference-${Date.now()}.json`;
   const manifestPath = `${process.env.TMPDIR || "/tmp"}/careeros-adoption-${Date.now()}.json`;
   await writeFile(referencePath, JSON.stringify(referenceFingerprint(expected)));
@@ -119,6 +132,21 @@ try {
     const changed = await readCareerOSSchema(c);
     assert.notEqual(changed.fingerprint, expected.fingerprint, "definition-bearing default changes fingerprint");
     await c.query(`ALTER TABLE "CareerSearchPreference" ALTER COLUMN "roleFamily" SET DEFAULT ''`);
+  });
+  await withClient(url, async (c) => {
+    await c.query(`CREATE RULE "careeros_rule_probe" AS ON INSERT TO "CareerUser" DO INSTEAD NOTHING`);
+    const created = await readCareerOSSchema(c);
+    assert.equal(created.rewriteRules.length, 1, "user-defined table rewrite rules are captured");
+    assert.match(created.rewriteRules[0].definition, /DO INSTEAD NOTHING/);
+    const clean = await readCareerOSSchema(c);
+    await c.query(`DROP RULE "careeros_rule_probe" ON "CareerUser"`);
+    await c.query(`CREATE RULE "careeros_rule_probe" AS ON INSERT TO "CareerUser" DO INSTEAD SELECT 1`);
+    const changedDefinition = await readCareerOSSchema(c);
+    assert.notDeepEqual(changedDefinition.rewriteRules, clean.rewriteRules, "changed rewrite definitions are reference-visible");
+    await c.query(`ALTER TABLE "CareerUser" DISABLE RULE "careeros_rule_probe"`);
+    const changedState = await readCareerOSSchema(c);
+    assert.notDeepEqual(changedState.rewriteRules, changedDefinition.rewriteRules, "rewrite enabled state is reference-visible");
+    await c.query(`DROP RULE "careeros_rule_probe" ON "CareerUser"`);
   });
   await withClient(url, async (c) => { await c.query(`DROP TABLE "CareerOSMigration"`); await c.query(`ALTER TABLE "CareerOnboardingState" DROP COLUMN "storyStatus"`); });
   const legacy = await withClient(url, (c) => readCareerOSSchema(c));

@@ -12,6 +12,7 @@ export function referenceFields(schema) {
     indexes: schema.indexes,
     objects: schema.objects,
     triggers: schema.triggers,
+    rewriteRules: schema.rewriteRules || [],
     routines: schema.routines,
     policies: schema.policies,
     roleMapping: schema.roleMapping || {},
@@ -31,6 +32,6 @@ export function referenceFingerprint(schema) {
 }
 
 export function compareReferenceFields(actual, expected) {
-  const fields = ["fingerprintVersion", "tables", "columns", "constraints", "indexes", "objects", "triggers", "routines", "policies", "roleMapping", "schemaPrivileges", "relationPrivileges", "columnPrivileges", "sequences", "roleMemberships", "defaultPrivileges", "roleAttributes"];
+  const fields = ["fingerprintVersion", "tables", "columns", "constraints", "indexes", "objects", "triggers", "rewriteRules", "routines", "policies", "roleMapping", "schemaPrivileges", "relationPrivileges", "columnPrivileges", "sequences", "roleMemberships", "defaultPrivileges", "roleAttributes"];
   return fields.filter((field) => JSON.stringify(actual[field]) !== JSON.stringify(expected[field]));
 }

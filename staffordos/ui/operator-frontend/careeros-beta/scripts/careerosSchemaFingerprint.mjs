@@ -73,7 +73,7 @@ function mapPrivilegeJson(value, roleMapping) {
 
 export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
   validateRoleMapping(roleMapping);
-  const [columns, constraints, indexes, tables, objects, triggers, routines, policies, schemaPrivileges, relationPrivileges, columnPrivileges, sequences, roleMemberships, defaultPrivileges, roleAttributes] = await Promise.all([
+  const [columns, constraints, indexes, tables, objects, triggers, rewriteRules, routines, policies, schemaPrivileges, relationPrivileges, columnPrivileges, sequences, roleMemberships, defaultPrivileges, roleAttributes] = await Promise.all([
     client.query(`SELECT c.table_name,c.column_name,c.data_type,c.udt_schema,c.udt_name,c.is_nullable,
       COALESCE(c.column_default,'') AS column_default,c.character_maximum_length,c.numeric_precision,
       c.numeric_scale,c.datetime_precision,COALESCE(a.attidentity,'') AS identity_kind,
@@ -106,6 +106,13 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
       JOIN pg_namespace n ON n.oid=c.relnamespace
       WHERE n.nspname=current_schema() AND NOT t.tgisinternal
       ORDER BY c.relname,t.tgname`),
+    client.query(`SELECT c.relname AS table_name,r.rulename AS rule_name,r.ev_enabled,
+      pg_get_ruledef(r.oid, true) AS definition
+      FROM pg_rewrite r
+      JOIN pg_class c ON c.oid=r.ev_class
+      JOIN pg_namespace n ON n.oid=c.relnamespace
+      WHERE n.nspname=current_schema() AND c.relname IN (${tableList}) AND r.rulename <> '_RETURN'
+      ORDER BY c.relname,r.rulename`),
     client.query(`SELECT p.proname AS routine_name,p.prokind,p.provolatile,p.prosecdef,
       pg_get_userbyid(p.proowner) AS owner_role,
       COALESCE((SELECT jsonb_agg(jsonb_build_object(
@@ -265,6 +272,7 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
     constraints: canonicalSort(constraints.rows),
     indexes: canonicalSort(indexes.rows),
     triggers: canonicalSort(triggers.rows),
+    rewriteRules: canonicalSort(rewriteRules.rows),
     routines: canonicalSort(normalizeRoles(routines.rows, ["owner_role"])),
     policies: canonicalSort(policies.rows.map((row) => ({ ...row, roles: JSON.parse(row.roles || "[]").map((role) => mapPrincipal(role, roleMapping)).sort((a,b) => JSON.stringify(a).localeCompare(JSON.stringify(b))) }))),
     roleMapping: Object.fromEntries(Object.entries(roleMapping).sort(([a], [b]) => a.localeCompare(b))),
