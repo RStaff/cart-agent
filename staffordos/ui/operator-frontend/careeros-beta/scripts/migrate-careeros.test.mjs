@@ -68,7 +68,7 @@ try {
   for (const [label, mutate, expected] of [
     ["missing-applied-table", async (client) => client.query(`DROP TABLE "CareerSearchPreference" CASCADE`), "table:CareerSearchPreference"],
     ["missing-applied-column", async (client) => client.query(`ALTER TABLE "CareerOnboardingState" DROP COLUMN "storyStatus"`), "column:CareerOnboardingState.storyStatus"],
-    ["missing-applied-index", async (client) => { const row = (await client.query(`SELECT indexname, tablename FROM pg_indexes WHERE schemaname=current_schema() AND tablename='CareerSearchPreference' LIMIT 1`)).rows[0]; await client.query(`DROP INDEX "${row.indexname.replaceAll('"', '""')}"`); }, "index:"],
+    ["missing-applied-index", async (client) => { const row = (await client.query(`SELECT i.indexrelid::regclass::text AS indexname, c.relname AS tablename FROM pg_index i JOIN pg_class c ON c.oid=i.indrelid JOIN pg_class ix ON ix.oid=i.indexrelid JOIN pg_namespace n ON n.oid=ix.relnamespace WHERE n.nspname=current_schema() AND c.relname='CareerSearchPreference' AND NOT EXISTS (SELECT 1 FROM pg_constraint k WHERE k.conindid=i.indexrelid) LIMIT 1`)).rows[0]; await client.query(`DROP INDEX "${row.indexname.replaceAll('"', '""')}"`); }, "index:"],
     ["missing-applied-constraint", async (client) => { const row = (await client.query(`SELECT constraint_name, table_name FROM information_schema.table_constraints WHERE table_schema=current_schema() AND table_name='CareerSearchPreference' LIMIT 1`)).rows[0]; await client.query(`ALTER TABLE "${row.table_name}" DROP CONSTRAINT "${row.constraint_name.replaceAll('"', '""')}"`); }, "constraint:"],
   ]) {
     const database = await createDatabase(label); databases.push(database); const databaseUrl = connectionFor(database);
