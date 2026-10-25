@@ -272,7 +272,18 @@ try {
     await c.query(`GRANT SELECT ON TABLE "CareerUser" TO ${quoteIdentifier(adminRole)}`);
     await c.query(`GRANT INSERT ON TABLE "CareerUser" TO ${quoteIdentifier(specialRole)}`);
     await c.query(`GRANT UPDATE ON TABLE "CareerUser" TO PUBLIC`);
-    await assert.rejects(c.query(`CREATE ROLE "PUBLIC" NOLOGIN`), /already exists|reserved/i, "PostgreSQL reserves PUBLIC as a pseudo-principal");
+    let quotedPublicCreated = false;
+    try {
+      await c.query(`CREATE ROLE "PUBLIC" NOLOGIN`);
+      quotedPublicCreated = true;
+    } catch (error) {
+      assert.match(error.message, /already exists|reserved/i, "only PostgreSQL versions that reserve PUBLIC may reject the quoted role");
+    }
+    if (quotedPublicCreated) {
+      const identity = (await c.query(`SELECT oid FROM pg_roles WHERE rolname='PUBLIC'`)).rows[0];
+      assert.ok(identity, "quoted PUBLIC role has a catalog identity");
+      assert.notEqual(Number(identity.oid), 0, "quoted PUBLIC role is distinct from PUBLIC pseudo-principal OID zero");
+    }
     await c.query(`GRANT UPDATE ("id") ON TABLE "CareerUser" TO PUBLIC`);
     const mapped = await readCareerOSSchema(c, { roleMapping: { postgres: "reviewed-app", [specialRole]: "reviewed-special" } });
     assert.ok(compareReferenceFields(referenceFingerprint(mapped), referenceFingerprint(expected)).includes("relationPrivileges"), "PUBLIC grant drift is reference-visible");

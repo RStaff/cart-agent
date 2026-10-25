@@ -70,13 +70,23 @@ try {
     ["missing-applied-column", async (client) => client.query(`ALTER TABLE "CareerOnboardingState" DROP COLUMN "storyStatus"`), "CAREEROS_MIGRATION_APPLIED_SCHEMA_MISMATCH:columns"],
     ["missing-applied-index", async (client) => { const row = (await client.query(`SELECT ix.relname AS indexname, c.relname AS tablename FROM pg_index i JOIN pg_class c ON c.oid=i.indrelid JOIN pg_class ix ON ix.oid=i.indexrelid JOIN pg_namespace n ON n.oid=ix.relnamespace WHERE n.nspname=current_schema() AND c.relname='CareerSearchPreference' AND NOT EXISTS (SELECT 1 FROM pg_constraint k WHERE k.conindid=i.indexrelid) LIMIT 1`)).rows[0]; await client.query(`DROP INDEX "${row.indexname.replaceAll('"', '""')}"`); }, "CAREEROS_MIGRATION_APPLIED_SCHEMA_MISMATCH:indexes"],
     ["missing-applied-constraint", async (client) => { const row = (await client.query(`SELECT constraint_name, table_name FROM information_schema.table_constraints WHERE table_schema=current_schema() AND table_name='CareerResumeDraft' AND constraint_name='CareerResumeDraft_tenantId_fkey'`)).rows[0]; await client.query(`ALTER TABLE "${row.table_name}" DROP CONSTRAINT "${row.constraint_name.replaceAll('"', '""')}"`); }, "CAREEROS_MIGRATION_APPLIED_SCHEMA_MISMATCH:constraints"],
+    ["changed-column-type", async (client) => client.query(`ALTER TABLE "CareerUser" ALTER COLUMN "email" TYPE VARCHAR(500)`), "CAREEROS_MIGRATION_APPLIED_SCHEMA_MISMATCH:columns"],
+    ["changed-column-nullability", async (client) => client.query(`ALTER TABLE "CareerSearchPreference" ALTER COLUMN "keywords" DROP NOT NULL`), "CAREEROS_MIGRATION_APPLIED_SCHEMA_MISMATCH:columns"],
+    ["changed-column-default", async (client) => client.query(`ALTER TABLE "CareerSearchPreference" ALTER COLUMN "active" SET DEFAULT false`), "CAREEROS_MIGRATION_APPLIED_SCHEMA_MISMATCH:columns"],
+    ["changed-index-definition", async (client) => { await client.query(`DROP INDEX "CareerSearchPreference_tenantId_userId_active_idx"`); await client.query(`CREATE INDEX "CareerSearchPreference_tenantId_userId_active_idx" ON "CareerSearchPreference"("active")`); }, "CAREEROS_MIGRATION_APPLIED_SCHEMA_MISMATCH:indexes"],
+    ["changed-constraint-definition", async (client) => { await client.query(`ALTER TABLE "CareerSearchPreference" DROP CONSTRAINT "CareerSearchPreference_tenantId_fkey"`); await client.query(`ALTER TABLE "CareerSearchPreference" ADD CONSTRAINT "CareerSearchPreference_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "CareerTenant"("id") ON DELETE RESTRICT ON UPDATE CASCADE`); }, "CAREEROS_MIGRATION_APPLIED_SCHEMA_MISMATCH:constraints"],
   ]) {
     const database = await createDatabase(label); databases.push(database); const databaseUrl = connectionFor(database);
     await run(databaseUrl);
-    await withClient(databaseUrl, mutate);
+    await withClient(databaseUrl, async (client) => {
+      await client.query(`CREATE TABLE "MigrationSentinel" ("id" TEXT PRIMARY KEY)`);
+      await client.query(`INSERT INTO "MigrationSentinel" ("id") VALUES ('untouched')`);
+      await mutate(client);
+    });
     await expectFailure(databaseUrl, root, new RegExp(expected));
     await withClient(databaseUrl, async (client) => {
       assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM "CareerOSMigration"`)).rows[0].count, 8, `${label} preserves ledger`);
+      assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM "MigrationSentinel" WHERE "id"='untouched'`)).rows[0].count, 1, `${label} preserves application data`);
     });
   }
 
