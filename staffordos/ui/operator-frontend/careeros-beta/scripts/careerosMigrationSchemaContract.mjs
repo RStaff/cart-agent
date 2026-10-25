@@ -1,13 +1,14 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
+import { gunzipSync } from "node:zlib";
 import { readCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
 
-const CONTRACT_URL = new URL("./careerosMigrationSchemaContract.v1.json", import.meta.url);
+const CONTRACT_URL = new URL("./careerosMigrationSchemaContract.v1.json.gz", import.meta.url);
 const structuralFields = ["tables", "columns", "constraints", "indexes", "rewriteRules", "triggers"];
 
 export async function assertAppliedSchemaContract(client, appliedRows, migrationsRoot) {
   if (!appliedRows.length) return;
-  const contract = JSON.parse(await readFile(CONTRACT_URL, "utf8"));
+  const contract = JSON.parse(gunzipSync(await readFile(CONTRACT_URL)).toString("utf8"));
   const migrationChecksums = {};
   for (const row of appliedRows) {
     const sql = await readFile(new URL(`prisma/migrations/${row.id}/migration.sql`, migrationsRoot), "utf8");

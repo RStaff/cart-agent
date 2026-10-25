@@ -13,7 +13,7 @@ export const ADOPTION_CRITICAL_FILES = Object.freeze([
   "scripts/careerosSchemaFingerprint.mjs",
   "scripts/careerosSchemaReference.mjs",
   "scripts/careerosMigrationSchemaContract.mjs",
-  "scripts/careerosMigrationSchemaContract.v1.json",
+  "scripts/careerosMigrationSchemaContract.v1.json.gz",
   "scripts/migrate-careeros.mjs",
   "scripts/prepare-careeros-adoption-evidence.mjs",
   "scripts/reconcile-careeros-story-status.mjs",

@@ -58,6 +58,7 @@ async function approvalFor(url, manifest, path) {
 const databases = [];
 const unexpectedRole = `careeros_unexpected_role_${Date.now()}`;
 const quoteIdentifier = (value) => `"${value.replaceAll('"', '""')}"`;
+let quotedPublicCreated = false;
 try {
   const db = await createDatabase("observed"); databases.push(db); const url = urlFor(db);
   await runMigrations(url);
@@ -272,7 +273,6 @@ try {
     await c.query(`GRANT SELECT ON TABLE "CareerUser" TO ${quoteIdentifier(adminRole)}`);
     await c.query(`GRANT INSERT ON TABLE "CareerUser" TO ${quoteIdentifier(specialRole)}`);
     await c.query(`GRANT UPDATE ON TABLE "CareerUser" TO PUBLIC`);
-    let quotedPublicCreated = false;
     try {
       await c.query(`CREATE ROLE "PUBLIC" NOLOGIN`);
       quotedPublicCreated = true;
@@ -439,4 +439,11 @@ try {
     await c.query(`DROP ROLE ${quoteIdentifier(specialRole)}`);
   });
   console.log("CareerOS adoption tests passed: observed-schema correction, fingerprint rejection, atomic adoption, checksum rejection, normal-runner repeat.");
-} finally { for (const db of databases) await dropDatabase(db); }
+} finally {
+  if (quotedPublicCreated) {
+    await withClient(urlFor("postgres"), async (c) => {
+      await c.query(`DROP ROLE IF EXISTS "PUBLIC"`);
+    });
+  }
+  for (const db of databases) await dropDatabase(db);
+}

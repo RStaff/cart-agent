@@ -96,9 +96,13 @@ export async function readCareerOSSchema(client, { roleMapping = {} } = {}) {
       JOIN pg_namespace cn ON cn.oid=c.relnamespace AND cn.nspname=tc.table_schema
       WHERE tc.table_schema=current_schema() AND tc.table_name IN (${tableList})
       ORDER BY tc.table_name,tc.constraint_type,definition`),
-    client.query(`SELECT schemaname,tablename,indexname,indexdef FROM pg_indexes
-      WHERE schemaname=current_schema() AND tablename IN (${tableList})
-      ORDER BY tablename,indexname`),
+    client.query(`SELECT p.schemaname,p.tablename,p.indexname,p.indexdef,i.indisvalid,i.indisready
+      FROM pg_indexes p
+      JOIN pg_class ix ON ix.relname=p.indexname
+      JOIN pg_namespace ixn ON ixn.oid=ix.relnamespace AND ixn.nspname=p.schemaname
+      JOIN pg_index i ON i.indexrelid=ix.oid
+      WHERE p.schemaname=current_schema() AND p.tablename IN (${tableList})
+      ORDER BY p.tablename,p.indexname`),
     client.query(`SELECT tablename FROM pg_tables WHERE schemaname=current_schema() AND tablename IN (${tableList}) ORDER BY tablename`),
     client.query(CATALOG_SQL),
     client.query(`SELECT c.relname AS table_name,t.tgname AS trigger_name,t.tgenabled,

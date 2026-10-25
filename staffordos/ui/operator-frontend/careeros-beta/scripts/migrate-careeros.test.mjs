@@ -74,6 +74,14 @@ try {
     ["changed-column-nullability", async (client) => client.query(`ALTER TABLE "CareerSearchPreference" ALTER COLUMN "keywords" DROP NOT NULL`), "CAREEROS_MIGRATION_APPLIED_SCHEMA_MISMATCH:columns"],
     ["changed-column-default", async (client) => client.query(`ALTER TABLE "CareerSearchPreference" ALTER COLUMN "active" SET DEFAULT false`), "CAREEROS_MIGRATION_APPLIED_SCHEMA_MISMATCH:columns"],
     ["changed-index-definition", async (client) => { await client.query(`DROP INDEX "CareerSearchPreference_tenantId_userId_active_idx"`); await client.query(`CREATE INDEX "CareerSearchPreference_tenantId_userId_active_idx" ON "CareerSearchPreference"("active")`); }, "CAREEROS_MIGRATION_APPLIED_SCHEMA_MISMATCH:indexes"],
+    ["invalid-required-index", async (client) => {
+      await client.query(`DROP INDEX "CareerSearchPreference_tenantId_userId_active_idx"`);
+      await client.query(`INSERT INTO "CareerTenant" ("id", "name", "updatedAt") VALUES ('tenant-invalid-index', 'Invalid index', CURRENT_TIMESTAMP)`);
+      await client.query(`INSERT INTO "CareerUser" ("id", "email", "passwordHash", "passwordSalt", "updatedAt") VALUES ('user-invalid-index', 'invalid-index@example.test', 'hash', 'salt', CURRENT_TIMESTAMP)`);
+      await client.query(`INSERT INTO "CareerUser" ("id", "email", "passwordHash", "passwordSalt", "updatedAt") VALUES ('user-invalid-index-b', 'invalid-index-b@example.test', 'hash', 'salt', CURRENT_TIMESTAMP)`);
+      await client.query(`INSERT INTO "CareerSearchPreference" ("id", "tenantId", "userId", "active") VALUES ('pref-invalid-index-a', 'tenant-invalid-index', 'user-invalid-index', true), ('pref-invalid-index-b', 'tenant-invalid-index', 'user-invalid-index-b', true)`);
+      await assert.rejects(client.query(`CREATE UNIQUE INDEX CONCURRENTLY "CareerSearchPreference_tenantId_userId_active_idx" ON "CareerSearchPreference"("active")`), /duplicate key|already exists|could not create unique index/i);
+    }, "CAREEROS_MIGRATION_APPLIED_SCHEMA_MISMATCH:indexes"],
     ["changed-constraint-definition", async (client) => { await client.query(`ALTER TABLE "CareerSearchPreference" DROP CONSTRAINT "CareerSearchPreference_tenantId_fkey"`); await client.query(`ALTER TABLE "CareerSearchPreference" ADD CONSTRAINT "CareerSearchPreference_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "CareerTenant"("id") ON DELETE RESTRICT ON UPDATE CASCADE`); }, "CAREEROS_MIGRATION_APPLIED_SCHEMA_MISMATCH:constraints"],
   ]) {
     const database = await createDatabase(label); databases.push(database); const databaseUrl = connectionFor(database);
