@@ -64,7 +64,14 @@ try {
   const nonPublic = await createDatabase("non-public-schema"); databases.push(nonPublic);
   const nonPublicUrl = connectionFor(nonPublic);
   await withClient(nonPublicUrl, async (client) => { await client.query(`CREATE SCHEMA "shadow_schema"`); });
-  await assert.rejects(run(nonPublicUrl, root, { PGOPTIONS: "-c search_path=shadow_schema,public" }), /CAREEROS_PUBLIC_SCHEMA_REQUIRED:shadow_schema/);
+  const guardUrl = new URL(nonPublicUrl);
+  guardUrl.searchParams.set("application_name", "careeros-schema-guard-test");
+  await assert.rejects(run(guardUrl.toString(), root, { PGOPTIONS: "-c search_path=shadow_schema,public" }), /CAREEROS_PUBLIC_SCHEMA_REQUIRED:shadow_schema/);
+  await assert.rejects(run(guardUrl.toString(), root, { PGOPTIONS: "-c search_path=public,shadow_schema" }), /CAREEROS_PUBLIC_SCHEMA_REQUIRED:public/);
+  await withClient(connectionFor("postgres"), async (client) => {
+    const active = await client.query(`SELECT COUNT(*)::int AS count FROM pg_stat_activity WHERE application_name='careeros-schema-guard-test'`);
+    assert.equal(active.rows[0].count, 0, "schema rejection closes the migration client");
+  });
   await withClient(nonPublicUrl, async (client) => {
     assert.equal((await client.query(`SELECT to_regclass('shadow_schema."CareerOSMigration"') AS name`)).rows[0].name, null, "non-public schema rejection leaves shadow schema unchanged");
     assert.equal((await client.query(`SELECT to_regclass('public."CareerOSMigration"') AS name`)).rows[0].name, null, "non-public schema rejection leaves public schema unchanged");

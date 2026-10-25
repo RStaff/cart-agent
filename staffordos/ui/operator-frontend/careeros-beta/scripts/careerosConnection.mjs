@@ -14,8 +14,12 @@ export function postgresSslForConnection(connectionString) {
 }
 
 export async function assertPublicSchema(client) {
-  const result = await client.query("SELECT current_schema() AS schema_name, current_setting('search_path') AS search_path");
-  const { schema_name: schemaName } = result.rows[0];
-  if (schemaName !== "public") throw new Error(`CAREEROS_PUBLIC_SCHEMA_REQUIRED:${schemaName || "none"}`);
+  const result = await client.query("SELECT current_schema() AS schema_name, current_setting('search_path') AS search_path, unnest(current_schemas(true)) AS effective_schema");
+  const schemaName = result.rows[0]?.schema_name;
+  const effectiveSchemas = result.rows.map(({ effective_schema: name }) => name);
+  const allowed = (name) => name === "public" || name === "pg_catalog" || name === "pg_toast" || /^pg_temp_\d+$/.test(name) || /^pg_toast_temp_\d+$/.test(name);
+  if (schemaName !== "public" || effectiveSchemas.some((name) => !allowed(name))) {
+    throw new Error(`CAREEROS_PUBLIC_SCHEMA_REQUIRED:${schemaName || "none"}:${effectiveSchemas.join(",")}`);
+  }
   return true;
 }
