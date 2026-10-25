@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { Client } from "pg";
 import { postgresSslForConnection } from "./careerosConnection.mjs";
+import { assertAppliedSchemaContract } from "./careerosMigrationSchemaContract.mjs";
 
 const ROOT = new URL("../", import.meta.url);
 const MIGRATIONS = [
@@ -202,7 +203,7 @@ export async function runCareerosMigrations({ connectionString = process.env.DAT
       : [];
     await assertAppliedMigrationChecksums(client, appliedRows, MIGRATIONS, migrationsRoot);
     const applied = appliedRows.map((row) => row.id);
-    await assertAppliedMigrationObjectsPresent(client, MIGRATIONS.filter((migration) => applied.includes(migration.id)), migrationsRoot);
+    await assertAppliedSchemaContract(client, appliedRows, migrationsRoot);
     const missing = MIGRATIONS.filter((migration) => !applied.includes(migration.id));
     await assertUnledgeredSchemaAbsent(client, missing, migrationsRoot);
     for (const migration of MIGRATIONS) await applyMigration(client, migration, migrationsRoot);
