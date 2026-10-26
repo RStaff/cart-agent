@@ -57,6 +57,12 @@ async function count(url, table) {
   });
 }
 
+async function relationState(client) {
+  return (await client.query(`SELECT c.relname, c.relkind, c.relpersistence
+    FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+    WHERE n.nspname=current_schema() ORDER BY c.relname, c.relkind`)).rows;
+}
+
 const databases = [];
 try {
   const fresh = await createDatabase("fresh"); databases.push(fresh);
@@ -140,6 +146,14 @@ try {
     ["malformed-empty-ledger", async (client) => {
       await client.query(`CREATE TABLE "CareerOSMigration" ("id" TEXT, "checksum" TEXT NOT NULL, "appliedAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP)`);
     }],
+    ["unlogged-empty-ledger", async (client) => {
+      await client.query(`CREATE UNLOGGED TABLE "CareerOSMigration" ("id" TEXT PRIMARY KEY, "checksum" TEXT NOT NULL, "appliedAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP)`);
+    }],
+    ["return-rule-empty-ledger", async (client) => {
+      await client.query(`CREATE TABLE "CareerOSMigration" ("id" TEXT PRIMARY KEY, "checksum" TEXT NOT NULL, "appliedAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP)`);
+      await client.query(`CREATE RULE suppress_careeros_ledger_insert AS ON INSERT TO "CareerOSMigration" DO INSTEAD NOTHING`);
+      await client.query(`ALTER RULE suppress_careeros_ledger_insert ON "CareerOSMigration" RENAME TO "_RETURN"`);
+    }],
     ["suppressed-ledger-insert", async (client) => {
       await client.query(`CREATE TABLE "CareerOSMigration" ("id" TEXT PRIMARY KEY, "checksum" TEXT NOT NULL, "appliedAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP)`);
       await client.query(`CREATE FUNCTION suppress_careeros_ledger_insert() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NULL; END $$`);
@@ -147,17 +161,38 @@ try {
     }],
   ]) {
     const database = await createDatabase(label); databases.push(database); const databaseUrl = connectionFor(database);
+    let expectedRelations;
     await withClient(databaseUrl, async (client) => {
       await client.query(`CREATE TABLE "MigrationSentinel" ("id" TEXT PRIMARY KEY)`);
       await client.query(`INSERT INTO "MigrationSentinel" ("id") VALUES ('untouched')`);
       await setup(client);
+      expectedRelations = await relationState(client);
     });
     await expectFailure(databaseUrl, root, /CAREEROS_MIGRATION_LEDGER_UNVERIFIED/);
     await withClient(databaseUrl, async (client) => {
       assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM "MigrationSentinel" WHERE "id"='untouched'`)).rows[0].count, 1, `${label} preserves application data`);
-      assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname LIKE 'CareerUser'`)).rows[0].count, 0, `${label} applies no schema`);
+      assert.deepEqual(await relationState(client), expectedRelations, `${label} preserves schema`);
+      assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM "CareerOSMigration"`)).rows[0].count, 0, `${label} preserves ledger`);
     });
   }
+
+  const appliedReturnRule = await createDatabase("return-rule-applied-ledger"); databases.push(appliedReturnRule);
+  const appliedReturnRuleUrl = connectionFor(appliedReturnRule);
+  await run(appliedReturnRuleUrl);
+  let expectedAppliedRelations;
+  await withClient(appliedReturnRuleUrl, async (client) => {
+    await client.query(`INSERT INTO "CareerTenant" ("id", "name", "updatedAt") VALUES ('tenant-return-rule', 'Rule sentinel', CURRENT_TIMESTAMP)`);
+    await client.query(`CREATE RULE suppress_careeros_ledger_insert AS ON INSERT TO "CareerOSMigration" DO INSTEAD NOTHING`);
+    await client.query(`ALTER RULE suppress_careeros_ledger_insert ON "CareerOSMigration" RENAME TO "_RETURN"`);
+    expectedAppliedRelations = await relationState(client);
+  });
+  await expectFailure(appliedReturnRuleUrl, root, /CAREEROS_MIGRATION_LEDGER_UNVERIFIED/);
+  await withClient(appliedReturnRuleUrl, async (client) => {
+    assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM "CareerOSMigration"`)).rows[0].count, 8, "startup rejection preserves the fully applied ledger");
+    assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM "CareerTenant" WHERE "id"='tenant-return-rule'`)).rows[0].count, 1, "startup rejection preserves application data");
+    assert.deepEqual(await relationState(client), expectedAppliedRelations, "startup rejection preserves the application schema");
+    assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM pg_rewrite r JOIN pg_class c ON c.oid=r.ev_class WHERE c.relname='CareerOSMigration' AND r.rulename='_RETURN'`)).rows[0].count, 1, "startup rejection leaves the ledger rule unchanged");
+  });
 
   const failed = await createDatabase("resume"); databases.push(failed);
   const failedUrl = connectionFor(failed);

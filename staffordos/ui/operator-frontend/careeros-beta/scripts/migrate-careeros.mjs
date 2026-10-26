@@ -97,11 +97,11 @@ async function ledgerRelationKind(client) {
 }
 
 async function assertMigrationLedgerDefinition(client) {
-  const relation = await client.query(`SELECT c.oid, c.relkind
+  const relation = await client.query(`SELECT c.oid, c.relkind, c.relpersistence
     FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
     WHERE n.nspname=current_schema() AND c.relname='CareerOSMigration'`);
   if (!relation.rowCount) return false;
-  if (relation.rows[0].relkind !== "r") throw new Error("CAREEROS_MIGRATION_LEDGER_UNVERIFIED");
+  if (relation.rows[0].relkind !== "r" || relation.rows[0].relpersistence !== "p") throw new Error("CAREEROS_MIGRATION_LEDGER_UNVERIFIED");
   const oid = relation.rows[0].oid;
   const columns = (await client.query(`SELECT a.attname, format_type(a.atttypid,a.atttypmod) AS type_name,
       a.attnotnull, COALESCE(pg_get_expr(d.adbin,d.adrelid),'') AS column_default
@@ -121,7 +121,7 @@ async function assertMigrationLedgerDefinition(client) {
   if (primaryKeys.length !== 1 || constraints.length !== 1) throw new Error("CAREEROS_MIGRATION_LEDGER_UNVERIFIED");
   const triggers = await client.query(`SELECT 1 FROM pg_trigger WHERE tgrelid=$1 AND NOT tgisinternal LIMIT 1`, [oid]);
   if (triggers.rowCount) throw new Error("CAREEROS_MIGRATION_LEDGER_UNVERIFIED");
-  const rules = await client.query(`SELECT 1 FROM pg_rewrite WHERE ev_class=$1 AND rulename <> '_RETURN' LIMIT 1`, [oid]);
+  const rules = await client.query(`SELECT 1 FROM pg_rewrite WHERE ev_class=$1 LIMIT 1`, [oid]);
   if (rules.rowCount) throw new Error("CAREEROS_MIGRATION_LEDGER_UNVERIFIED");
   return true;
 }
