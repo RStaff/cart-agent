@@ -63,6 +63,12 @@ async function relationState(client) {
     WHERE n.nspname=current_schema() ORDER BY c.relname, c.relkind`)).rows;
 }
 
+async function ledgerRewriteState(client) {
+  return (await client.query(`SELECT r.rulename, r.ev_type, r.ev_enabled, r.is_instead, pg_get_ruledef(r.oid) AS definition
+    FROM pg_rewrite r JOIN pg_class c ON c.oid=r.ev_class JOIN pg_namespace n ON n.oid=c.relnamespace
+    WHERE n.nspname=current_schema() AND c.relname='CareerOSMigration' ORDER BY r.rulename`)).rows;
+}
+
 const databases = [];
 try {
   const fresh = await createDatabase("fresh"); databases.push(fresh);
@@ -162,17 +168,20 @@ try {
   ]) {
     const database = await createDatabase(label); databases.push(database); const databaseUrl = connectionFor(database);
     let expectedRelations;
+    let expectedLedgerRewrite;
     await withClient(databaseUrl, async (client) => {
       await client.query(`CREATE TABLE "MigrationSentinel" ("id" TEXT PRIMARY KEY)`);
       await client.query(`INSERT INTO "MigrationSentinel" ("id") VALUES ('untouched')`);
       await setup(client);
       expectedRelations = await relationState(client);
+      if (label === "return-rule-empty-ledger") expectedLedgerRewrite = await ledgerRewriteState(client);
     });
     await expectFailure(databaseUrl, root, /CAREEROS_MIGRATION_LEDGER_UNVERIFIED/);
     await withClient(databaseUrl, async (client) => {
       assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM "MigrationSentinel" WHERE "id"='untouched'`)).rows[0].count, 1, `${label} preserves application data`);
       assert.deepEqual(await relationState(client), expectedRelations, `${label} preserves schema`);
       assert.equal((await client.query(`SELECT COUNT(*)::int AS count FROM "CareerOSMigration"`)).rows[0].count, 0, `${label} preserves ledger`);
+      if (label === "return-rule-empty-ledger") assert.deepEqual(await ledgerRewriteState(client), expectedLedgerRewrite, `${label} preserves the ledger rewrite rule`);
     });
   }
 
