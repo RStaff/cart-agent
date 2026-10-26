@@ -1,0 +1,48 @@
+import { createHash } from "node:crypto";
+import { readFile, writeFile } from "node:fs/promises";
+import { Client } from "pg";
+import { assertPublicSchema, postgresSslForConnection } from "./careerosConnection.mjs";
+import { assertExactCareerOSSchema, assertNoUnexpectedApplicationObjects, CAREEROS_SCHEMA_FINGERPRINT_VERSION, readCareerOSSchema } from "./careerosSchemaFingerprint.mjs";
+import { compareReferenceFields, referenceFingerprint } from "./careerosSchemaReference.mjs";
+import { executingSourceRevision, sourceFileDigests, sourceFileDigestsAtRevision } from "./careerosAdoptionSource.mjs";
+
+const connectionString = process.env.DATABASE_URL;
+const outputPath = process.env.CAREEROS_ADOPTION_MANIFEST_PATH;
+const referencePath = process.env.CAREEROS_SCHEMA_REFERENCE_PATH;
+const roleMapping = process.env.CAREEROS_SCHEMA_ROLE_MAPPING_JSON ? JSON.parse(process.env.CAREEROS_SCHEMA_ROLE_MAPPING_JSON) : {};
+const reviewedBy = process.env.CAREEROS_REVIEWED_BY;
+if (!connectionString) throw new Error("DATABASE_URL_REQUIRED");
+if (!outputPath) throw new Error("CAREEROS_ADOPTION_MANIFEST_PATH_REQUIRED");
+if (!referencePath) throw new Error("CAREEROS_SCHEMA_REFERENCE_PATH_REQUIRED");
+if (!reviewedBy) throw new Error("CAREEROS_REVIEWED_BY_REQUIRED");
+const migrationIds = [
+  "20260816000000_careeros_p0_foundation", "20260817000000_careeros_capability_match_product",
+  "20260817010000_add_career_story_status", "20260817020000_add_opportunity_decision_state",
+  "20260818030000_add_resume_drafts", "20260820050000_add_career_search_preferences",
+  "20260822010000_add_career_fact_context_claims", "20260830100000_add_role_intent_and_relevance_feedback",
+];
+const migrationsRoot = new URL("../", import.meta.url);
+const migrationChecksums = {};
+for (const id of migrationIds) migrationChecksums[id] = createHash("sha256").update(await readFile(new URL(`prisma/migrations/${id}/migration.sql`, migrationsRoot), "utf8"), "utf8").digest("hex");
+const executingRevision = await executingSourceRevision(new URL("../", import.meta.url).pathname);
+const sourceRevision = process.env.CAREEROS_REVIEWED_SOURCE_REVISION || executingRevision;
+if (sourceRevision !== executingRevision) throw new Error("CAREEROS_EXECUTING_SOURCE_REVISION_MISMATCH");
+const sourceFiles = await sourceFileDigests(new URL("../", import.meta.url).pathname);
+const reviewedSourceFiles = await sourceFileDigestsAtRevision(new URL("../", import.meta.url).pathname, sourceRevision);
+if (JSON.stringify(sourceFiles) !== JSON.stringify(reviewedSourceFiles)) throw new Error("CAREEROS_ADOPTION_SOURCE_FILES_MODIFIED");
+const client = new Client({ connectionString, ssl: postgresSslForConnection(connectionString) });
+await client.connect();
+try {
+  await assertPublicSchema(client);
+  const ledger = await client.query(`SELECT to_regclass('"CareerOSMigration"') AS name`);
+  const adoption = await client.query(`SELECT to_regclass('"CareerOSMigrationAdoption"') AS name`);
+  if (ledger.rows[0].name || adoption.rows[0].name) throw new Error("CAREEROS_SCHEMA_ALREADY_ADOPTED");
+  const expected = JSON.parse(await readFile(referencePath, "utf8"));
+  const recomputedReference = referenceFingerprint(expected);
+  if (expected.fingerprint !== recomputedReference.fingerprint) throw new Error("CAREEROS_REFERENCE_DIGEST_MISMATCH");
+  const schema = await readCareerOSSchema(client, { roleMapping }); assertExactCareerOSSchema(schema); assertNoUnexpectedApplicationObjects(schema);
+  const referenceDifferences = compareReferenceFields(schema, expected);
+  if (referenceDifferences.length) throw new Error(`CAREEROS_REFERENCE_MISMATCH:${referenceDifferences.join(",")}`);
+  await writeFile(outputPath, `${JSON.stringify({ kind: "REVIEWED_SCHEMA_ADOPTION_EVIDENCE", fingerprintVersion: CAREEROS_SCHEMA_FINGERPRINT_VERSION, sourceRevision, sourceFiles, referenceFingerprint: expected.fingerprint, reviewedBy, schemaFingerprint: schema.fingerprint, migrationChecksums }, null, 2)}\n`, { flag: "wx" });
+  console.log(`CareerOS adoption evidence written: ${outputPath}`);
+} finally { await client.end(); }
