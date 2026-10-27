@@ -132,7 +132,7 @@ if pr133_legacy_destination:
         "c902c6abadb5200b4892a6dd10420b5ab1b1e04e",
     ): reject("PUSH_BLOCKED_AUTHORIZATION")
 if scanner_repair_destination:
-    authorized = {
+    initial = {
         "remoteName": "origin",
         "sourceCommitSha": "a0548f316630f99c5b69c80fd8861559743cad8d",
         "sourceTreeSha": "d77993c72def9d590c1e5f3a0ae439c6f488f1a8",
@@ -147,7 +147,22 @@ if scanner_repair_destination:
             {"path":"scripts/ci/verify-secret-scan-history.sh","mode":"100644","sha256":"2b6449cae7ac9a2fb83be23864f5b736702e593430ea856692bda2b9873cb7c7"},
         ],
     }
-    if any(value[key] != expected for key, expected in authorized.items()): reject("PUSH_BLOCKED_AUTHORIZATION")
+    review_followup = {
+        "remoteName": "origin",
+        "sourceCommitSha": "7476d832041a3ef86cfcfea9fc38e83940e3b8cf",
+        "sourceTreeSha": "0f439cae226cb6bdacfa8e32eb88bd236d3c8bf1",
+        "expectedParentSha": "a0548f316630f99c5b69c80fd8861559743cad8d",
+        "destinationPrecondition": "EXACT_SHA",
+        "expectedDestinationSha": "a0548f316630f99c5b69c80fd8861559743cad8d",
+        "authorizationRef": "scanner-repair.review-followup-publication.2026-10-27",
+        "approvedFiles": [
+            {"path":".github/workflows/security-ci.yml","mode":"100644","sha256":"abc8aaba500355c5fe2e65e8ecd9fbf2be5aec0ba6a99147a606919ad411f0df"},
+            {"path":"scripts/ci/run-secret-scan.sh","mode":"100644","sha256":"8d502f6cf33c07ce806fcd7125c231f2edcd28d5dc828fa1261c63069d1edaf5"},
+            {"path":"scripts/ci/test-secret-scan-control.sh","mode":"100644","sha256":"3fd93a4ec54dc55f2f75c34c871c2041325eb20b749261670aca6db2d1aaccd4"},
+        ],
+    }
+    if not any(all(value[key] == expected for key, expected in authorized.items()) for authorized in (initial, review_followup)):
+        reject("PUSH_BLOCKED_AUTHORIZATION")
 Path(sys.argv[2]).write_text(json.dumps(value, ensure_ascii=True, separators=(",", ":")), encoding="ascii")
 PY
 then
@@ -466,6 +481,8 @@ BEFORE="$RUNNER_TMP/before"; AFTER="$RUNNER_TMP/after"; if ! snapshot "$BEFORE";
 BASE_BEFORE="$(remote_ref "$BASE_REF")"
 if [ "$PR133_LEGACY_DESTINATION" = 1 ]; then
   [ -n "$BASE_BEFORE" ] || { printf '%s\n' PUSH_BLOCKED_BASE; exit 1; }
+elif [ "$SCANNER_REPAIR_DESTINATION" = 1 ] && [ "$STATE" = "EXACT_SHA" ]; then
+  [ "$BASE_BEFORE" = "17b07030ce0dc8289b6efbd92ef60de8151e2976" ] || { printf '%s\n' PUSH_BLOCKED_BASE; exit 1; }
 else
   [ "$BASE_BEFORE" = "$PARENT" ] || { printf '%s\n' PUSH_BLOCKED_BASE; exit 1; }
 fi
