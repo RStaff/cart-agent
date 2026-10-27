@@ -107,6 +107,20 @@ const staffordNextSecurityReleaseAuthorization = () => ({
     { path: "staffordos/ui/operator-frontend/careeros-beta/package.json", mode: "100644", sha256: "121550bab16186a82cc0e7d04f0c8cd5331784d48ea8065138610ef1cfcc2556" },
   ],
 });
+const staffordNextSecurityReleaseMergeBindingAuthorization = () => ({
+  canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git",
+  sourceCommitSha: "c485ec013041df8bd9aed5432b22f47c302db6d9",
+  sourceTreeSha: "2ce9bb631fdec1e3b1ad9c22e69bd6842849a77d",
+  expectedParentSha: "d9a071f40c4b79d246dd03e894b88f001fb31416",
+  destinationRef: "refs/heads/careos/staffordnext-security-release-20261027",
+  destinationPrecondition: "EXACT_SHA",
+  expectedDestinationSha: "2c00db0535ce47272b6ebff63921aefea61407d4",
+  authorizationRef: "staffordnext-security-release.owner-authorized-merge-binding.2026-10-27",
+  approvedFiles: [
+    { path: "staffordos/ui/operator-frontend/careeros-beta/package-lock.json", mode: "100644", sha256: "6c3d2a44fb7f0097a2bf347c5d20dec4187ee9181c3f531c62553e696edde323" },
+    { path: "staffordos/ui/operator-frontend/careeros-beta/package.json", mode: "100644", sha256: "121550bab16186a82cc0e7d04f0c8cd5331784d48ea8065138610ef1cfcc2556" },
+  ],
+});
 
 function fixture({ mixed = false } = {}) {
   const root = mkdtempSync(join(tmpdir(), "staffordos-exact-ref-test-"));
@@ -480,6 +494,14 @@ test("exact-ref runner permits only the two owner-authorized destinations for RS
     assert.notEqual(result.status, 0);
     assert.doesNotMatch(`${result.stdout}${result.stderr}`, /PUSH_BLOCKED_(?:AUTHORIZATION|DESTINATION_REF)/);
   } finally { rmSync(securityRelease.root, { recursive: true, force: true }); }
+
+  const securityReleaseMergeBinding = fixture();
+  try {
+    securityReleaseMergeBinding.makeManifest(staffordNextSecurityReleaseMergeBindingAuthorization());
+    const result = invoke(securityReleaseMergeBinding);
+    assert.notEqual(result.status, 0);
+    assert.doesNotMatch(`${result.stdout}${result.stderr}`, /PUSH_BLOCKED_(?:AUTHORIZATION|DESTINATION_REF)/);
+  } finally { rmSync(securityReleaseMergeBinding.root, { recursive: true, force: true }); }
 
   for (const [name, overrides] of [
     ["other careos ref", { destinationRef: "refs/heads/careos/another-branch", canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],

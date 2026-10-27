@@ -192,7 +192,7 @@ if scanner_repair_destination:
     if not any(all(value[key] == expected for key, expected in authorized.items()) for authorized in (initial, review_followup, second_review_followup, third_review_followup)):
         reject("PUSH_BLOCKED_AUTHORIZATION")
 if security_release_destination:
-    authorized = {
+    initial = {
         "remoteName": "origin",
         "sourceCommitSha": "2c00db0535ce47272b6ebff63921aefea61407d4",
         "sourceTreeSha": "2ce9bb631fdec1e3b1ad9c22e69bd6842849a77d",
@@ -205,7 +205,21 @@ if security_release_destination:
             {"path":"staffordos/ui/operator-frontend/careeros-beta/package.json","mode":"100644","sha256":"121550bab16186a82cc0e7d04f0c8cd5331784d48ea8065138610ef1cfcc2556"},
         ],
     }
-    if any(value[key] != expected for key, expected in authorized.items()): reject("PUSH_BLOCKED_AUTHORIZATION")
+    merge_binding = {
+        "remoteName": "origin",
+        "sourceCommitSha": "c485ec013041df8bd9aed5432b22f47c302db6d9",
+        "sourceTreeSha": "2ce9bb631fdec1e3b1ad9c22e69bd6842849a77d",
+        "expectedParentSha": "d9a071f40c4b79d246dd03e894b88f001fb31416",
+        "destinationPrecondition": "EXACT_SHA",
+        "expectedDestinationSha": "2c00db0535ce47272b6ebff63921aefea61407d4",
+        "authorizationRef": "staffordnext-security-release.owner-authorized-merge-binding.2026-10-27",
+        "approvedFiles": [
+            {"path":"staffordos/ui/operator-frontend/careeros-beta/package-lock.json","mode":"100644","sha256":"6c3d2a44fb7f0097a2bf347c5d20dec4187ee9181c3f531c62553e696edde323"},
+            {"path":"staffordos/ui/operator-frontend/careeros-beta/package.json","mode":"100644","sha256":"121550bab16186a82cc0e7d04f0c8cd5331784d48ea8065138610ef1cfcc2556"},
+        ],
+    }
+    if not any(all(value[key] == expected for key, expected in authorized.items()) for authorized in (initial, merge_binding)):
+        reject("PUSH_BLOCKED_AUTHORIZATION")
 Path(sys.argv[2]).write_text(json.dumps(value, ensure_ascii=True, separators=(",", ":")), encoding="ascii")
 PY
 then
