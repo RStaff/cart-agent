@@ -544,6 +544,8 @@ if [ "$PR133_LEGACY_DESTINATION" = 1 ]; then
   [ -n "$BASE_BEFORE" ] || { printf '%s\n' PUSH_BLOCKED_BASE; exit 1; }
 elif [ "$SCANNER_REPAIR_DESTINATION" = 1 ] && [ "$STATE" = "EXACT_SHA" ]; then
   [ "$BASE_BEFORE" = "17b07030ce0dc8289b6efbd92ef60de8151e2976" ] || { printf '%s\n' PUSH_BLOCKED_BASE; exit 1; }
+elif [ "$SECURITY_RELEASE_DESTINATION" = 1 ] && [ "$STATE" = "EXACT_SHA" ]; then
+  [ "$BASE_BEFORE" = "$SOURCE" ] || { printf '%s\n' PUSH_BLOCKED_BASE; exit 1; }
 else
   [ "$BASE_BEFORE" = "$PARENT" ] || { printf '%s\n' PUSH_BLOCKED_BASE; exit 1; }
 fi
