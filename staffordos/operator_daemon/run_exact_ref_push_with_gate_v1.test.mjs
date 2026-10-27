@@ -57,6 +57,20 @@ const scannerRepairFollowupAuthorization = () => ({
     { path: "scripts/ci/test-secret-scan-control.sh", mode: "100644", sha256: "3fd93a4ec54dc55f2f75c34c871c2041325eb20b749261670aca6db2d1aaccd4" },
   ],
 });
+const scannerRepairSecondFollowupAuthorization = () => ({
+  canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git",
+  sourceCommitSha: "549164f5bfd346244c6e704709390d7c8b2bacf4",
+  sourceTreeSha: "7ea5ed6549305ab51b3236d7014a49d24e984ff7",
+  expectedParentSha: "7476d832041a3ef86cfcfea9fc38e83940e3b8cf",
+  destinationRef: "refs/heads/careos/secret-scan-scope-20261027",
+  destinationPrecondition: "EXACT_SHA",
+  expectedDestinationSha: "7476d832041a3ef86cfcfea9fc38e83940e3b8cf",
+  authorizationRef: "scanner-repair.second-review-followup-publication.2026-10-27",
+  approvedFiles: [
+    { path: "scripts/ci/run-secret-scan.sh", mode: "100644", sha256: "0a76efd67aec803c73fb7eeccfd916acde55132e0b80b4408f7a435edeac630e" },
+    { path: "scripts/ci/test-secret-scan-control.sh", mode: "100644", sha256: "7440b3d6efc058fe8e7ae9ab97a62dfd3543be2f27e71abfc66066d69e337ad7" },
+  ],
+});
 
 function fixture({ mixed = false } = {}) {
   const root = mkdtempSync(join(tmpdir(), "staffordos-exact-ref-test-"));
@@ -406,6 +420,14 @@ test("exact-ref runner permits only the two owner-authorized destinations for RS
     assert.notEqual(result.status, 0);
     assert.doesNotMatch(`${result.stdout}${result.stderr}`, /PUSH_BLOCKED_(?:AUTHORIZATION|DESTINATION_REF)/);
   } finally { rmSync(scannerFollowup.root, { recursive: true, force: true }); }
+
+  const scannerSecondFollowup = fixture();
+  try {
+    scannerSecondFollowup.makeManifest(scannerRepairSecondFollowupAuthorization());
+    const result = invoke(scannerSecondFollowup);
+    assert.notEqual(result.status, 0);
+    assert.doesNotMatch(`${result.stdout}${result.stderr}`, /PUSH_BLOCKED_(?:AUTHORIZATION|DESTINATION_REF)/);
+  } finally { rmSync(scannerSecondFollowup.root, { recursive: true, force: true }); }
 
   for (const [name, overrides] of [
     ["other careos ref", { destinationRef: "refs/heads/careos/another-branch", canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],
