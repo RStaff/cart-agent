@@ -1,0 +1,5 @@
+# Synthetic operator-issuer KMS identifier fixtures introduced by 3f6c1172.
+# These entries suppress only the exact historical generic-api-key findings;
+# other rules, files, lines, commits, and future changes remain scanned.
+3f6c11721b42111db6b66609e2101f1d05737789:staffordos/operator-issuer/test/issuer.test.mjs:generic-api-key:56
+3f6c11721b42111db6b66609e2101f1d05737789:staffordos/operator-issuer/test/issuer.test.mjs:generic-api-key:151
