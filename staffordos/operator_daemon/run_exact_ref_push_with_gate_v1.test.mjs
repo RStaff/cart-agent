@@ -71,6 +71,21 @@ const scannerRepairSecondFollowupAuthorization = () => ({
     { path: "scripts/ci/test-secret-scan-control.sh", mode: "100644", sha256: "7440b3d6efc058fe8e7ae9ab97a62dfd3543be2f27e71abfc66066d69e337ad7" },
   ],
 });
+const scannerRepairThirdFollowupAuthorization = () => ({
+  canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git",
+  sourceCommitSha: "7615ebbcc1e2b9a88865b561aae390987ce53ae5",
+  sourceTreeSha: "d7051136d0bbf2e2cf50142e282e5360392bc70d",
+  expectedParentSha: "549164f5bfd346244c6e704709390d7c8b2bacf4",
+  destinationRef: "refs/heads/careos/secret-scan-scope-20261027",
+  destinationPrecondition: "EXACT_SHA",
+  expectedDestinationSha: "549164f5bfd346244c6e704709390d7c8b2bacf4",
+  authorizationRef: "scanner-repair.third-review-followup-publication.2026-10-27",
+  approvedFiles: [
+    { path: ".github/workflows/security-ci.yml", mode: "100644", sha256: "b350e3bc0e87295e27ff2a5029bb5c949e76780fced5d6735011d4bebfef4e9c" },
+    { path: "scripts/ci/run-secret-scan.sh", mode: "100644", sha256: "ce9326ac72742cd4322dda959c34785c0667a933848c12a40abb551901f83215" },
+    { path: "scripts/ci/test-secret-scan-control.sh", mode: "100644", sha256: "19d9cde193d846da6f2ccf335a1ebfcaf11126bb4fd02e8b1713a5fbddbe5d16" },
+  ],
+});
 
 function fixture({ mixed = false } = {}) {
   const root = mkdtempSync(join(tmpdir(), "staffordos-exact-ref-test-"));
@@ -428,6 +443,14 @@ test("exact-ref runner permits only the two owner-authorized destinations for RS
     assert.notEqual(result.status, 0);
     assert.doesNotMatch(`${result.stdout}${result.stderr}`, /PUSH_BLOCKED_(?:AUTHORIZATION|DESTINATION_REF)/);
   } finally { rmSync(scannerSecondFollowup.root, { recursive: true, force: true }); }
+
+  const scannerThirdFollowup = fixture();
+  try {
+    scannerThirdFollowup.makeManifest(scannerRepairThirdFollowupAuthorization());
+    const result = invoke(scannerThirdFollowup);
+    assert.notEqual(result.status, 0);
+    assert.doesNotMatch(`${result.stdout}${result.stderr}`, /PUSH_BLOCKED_(?:AUTHORIZATION|DESTINATION_REF)/);
+  } finally { rmSync(scannerThirdFollowup.root, { recursive: true, force: true }); }
 
   for (const [name, overrides] of [
     ["other careos ref", { destinationRef: "refs/heads/careos/another-branch", canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],

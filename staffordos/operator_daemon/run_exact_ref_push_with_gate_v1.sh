@@ -174,7 +174,21 @@ if scanner_repair_destination:
             {"path":"scripts/ci/test-secret-scan-control.sh","mode":"100644","sha256":"7440b3d6efc058fe8e7ae9ab97a62dfd3543be2f27e71abfc66066d69e337ad7"},
         ],
     }
-    if not any(all(value[key] == expected for key, expected in authorized.items()) for authorized in (initial, review_followup, second_review_followup)):
+    third_review_followup = {
+        "remoteName": "origin",
+        "sourceCommitSha": "7615ebbcc1e2b9a88865b561aae390987ce53ae5",
+        "sourceTreeSha": "d7051136d0bbf2e2cf50142e282e5360392bc70d",
+        "expectedParentSha": "549164f5bfd346244c6e704709390d7c8b2bacf4",
+        "destinationPrecondition": "EXACT_SHA",
+        "expectedDestinationSha": "549164f5bfd346244c6e704709390d7c8b2bacf4",
+        "authorizationRef": "scanner-repair.third-review-followup-publication.2026-10-27",
+        "approvedFiles": [
+            {"path":".github/workflows/security-ci.yml","mode":"100644","sha256":"b350e3bc0e87295e27ff2a5029bb5c949e76780fced5d6735011d4bebfef4e9c"},
+            {"path":"scripts/ci/run-secret-scan.sh","mode":"100644","sha256":"ce9326ac72742cd4322dda959c34785c0667a933848c12a40abb551901f83215"},
+            {"path":"scripts/ci/test-secret-scan-control.sh","mode":"100644","sha256":"19d9cde193d846da6f2ccf335a1ebfcaf11126bb4fd02e8b1713a5fbddbe5d16"},
+        ],
+    }
+    if not any(all(value[key] == expected for key, expected in authorized.items()) for authorized in (initial, review_followup, second_review_followup, third_review_followup)):
         reject("PUSH_BLOCKED_AUTHORIZATION")
 Path(sys.argv[2]).write_text(json.dumps(value, ensure_ascii=True, separators=(",", ":")), encoding="ascii")
 PY
