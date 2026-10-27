@@ -550,7 +550,16 @@ else
   [ "$BASE_BEFORE" = "$PARENT" ] || { printf '%s\n' PUSH_BLOCKED_BASE; exit 1; }
 fi
 DEST_BEFORE="$(remote_ref "$DEST")"
-if [ "$STATE" = ABSENT ]; then [ -z "$DEST_BEFORE" ] || { printf '%s\n' PUSH_BLOCKED_DESTINATION; exit 1; }; else [ "$DEST_BEFORE" = "$EXPECTED_DEST" ] || { printf '%s\n' PUSH_BLOCKED_DESTINATION; exit 1; }; "$GIT_BIN" -C "$NETWORK_REPO" merge-base --is-ancestor "$EXPECTED_DEST" "$SOURCE" || { printf '%s\n' PUSH_BLOCKED_FAST_FORWARD; exit 1; }; fi
+if [ "$STATE" = ABSENT ]; then
+  [ -z "$DEST_BEFORE" ] || { printf '%s\n' PUSH_BLOCKED_DESTINATION; exit 1; }
+else
+  [ "$DEST_BEFORE" = "$EXPECTED_DEST" ] || { printf '%s\n' PUSH_BLOCKED_DESTINATION; exit 1; }
+  if [ "$SECURITY_RELEASE_DESTINATION" = 1 ]; then
+    [ "$($GIT_BIN -C "$NETWORK_REPO" show -s --format=%T "$EXPECTED_DEST" 2>/dev/null)" = "$TREE" ] || { printf '%s\n' PUSH_BLOCKED_TREE_EQUIVALENCE; exit 1; }
+  else
+    "$GIT_BIN" -C "$NETWORK_REPO" merge-base --is-ancestor "$EXPECTED_DEST" "$SOURCE" || { printf '%s\n' PUSH_BLOCKED_FAST_FORWARD; exit 1; }
+  fi
+fi
 DEST_RECHECK="$(remote_ref "$DEST")"; [ "$DEST_RECHECK" = "$DEST_BEFORE" ] || { printf '%s\n' PUSH_BLOCKED_DESTINATION_RACE; exit 1; }
 test_gate before-push
 

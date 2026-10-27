@@ -18,6 +18,8 @@ test("security release uses the exact recovery branch as its freshness base", ()
   assert.match(runnerSource, /\|\| \[ "\$SECURITY_RELEASE_DESTINATION" = 1 \]/);
   assert.match(runnerSource, /BASE_REF="refs\/heads\/careeros\/recovery-17b07030-20261026"/);
   assert.match(runnerSource, /\[ "\$BASE_BEFORE" = "\$SOURCE" \]/);
+  assert.match(runnerSource, /PUSH_BLOCKED_TREE_EQUIVALENCE/);
+  assert.match(runnerSource, /show -s --format=%T "\$EXPECTED_DEST"/);
 });
 const pr133Authorization = () => ({
   canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git",
