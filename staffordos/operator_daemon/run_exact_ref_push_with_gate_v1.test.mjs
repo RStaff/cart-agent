@@ -86,6 +86,20 @@ const scannerRepairThirdFollowupAuthorization = () => ({
     { path: "scripts/ci/test-secret-scan-control.sh", mode: "100644", sha256: "19d9cde193d846da6f2ccf335a1ebfcaf11126bb4fd02e8b1713a5fbddbe5d16" },
   ],
 });
+const staffordNextSecurityReleaseAuthorization = () => ({
+  canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git",
+  sourceCommitSha: "2c00db0535ce47272b6ebff63921aefea61407d4",
+  sourceTreeSha: "2ce9bb631fdec1e3b1ad9c22e69bd6842849a77d",
+  expectedParentSha: "d9a071f40c4b79d246dd03e894b88f001fb31416",
+  destinationRef: "refs/heads/careos/staffordnext-security-release-20261027",
+  destinationPrecondition: "ABSENT",
+  expectedDestinationSha: null,
+  authorizationRef: "staffordnext-security-release.owner-authorized-integration.2026-10-27",
+  approvedFiles: [
+    { path: "staffordos/ui/operator-frontend/careeros-beta/package-lock.json", mode: "100644", sha256: "6c3d2a44fb7f0097a2bf347c5d20dec4187ee9181c3f531c62553e696edde323" },
+    { path: "staffordos/ui/operator-frontend/careeros-beta/package.json", mode: "100644", sha256: "121550bab16186a82cc0e7d04f0c8cd5331784d48ea8065138610ef1cfcc2556" },
+  ],
+});
 
 function fixture({ mixed = false } = {}) {
   const root = mkdtempSync(join(tmpdir(), "staffordos-exact-ref-test-"));
@@ -452,11 +466,20 @@ test("exact-ref runner permits only the two owner-authorized destinations for RS
     assert.doesNotMatch(`${result.stdout}${result.stderr}`, /PUSH_BLOCKED_(?:AUTHORIZATION|DESTINATION_REF)/);
   } finally { rmSync(scannerThirdFollowup.root, { recursive: true, force: true }); }
 
+  const securityRelease = fixture();
+  try {
+    securityRelease.makeManifest(staffordNextSecurityReleaseAuthorization());
+    const result = invoke(securityRelease);
+    assert.notEqual(result.status, 0);
+    assert.doesNotMatch(`${result.stdout}${result.stderr}`, /PUSH_BLOCKED_(?:AUTHORIZATION|DESTINATION_REF)/);
+  } finally { rmSync(securityRelease.root, { recursive: true, force: true }); }
+
   for (const [name, overrides] of [
     ["other careos ref", { destinationRef: "refs/heads/careos/another-branch", canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],
     ["same ref in another repository", { destinationRef: "refs/heads/careos/migration-runner-v1", canonicalRemoteIdentity: "https://github.com/RStaff/another-repository.git" }],
     ["scanner ref in another repository", { destinationRef: "refs/heads/careos/secret-scan-scope-20261027", canonicalRemoteIdentity: "https://github.com/RStaff/another-repository.git" }],
     ["neighbor scanner ref", { destinationRef: "refs/heads/careos/secret-scan-scope-20261027-other", canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],
+    ["neighbor security release ref", { destinationRef: "refs/heads/careos/staffordnext-security-release-20261027-other", canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],
     ["existing governed namespace on official repository", { destinationRef: "refs/heads/staffordos/another-branch", canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],
   ]) {
     const rejected = fixture();
