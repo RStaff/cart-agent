@@ -230,6 +230,10 @@ SCANNER_REPAIR_DESTINATION=0
 if [ "$DEST" = "refs/heads/careos/secret-scan-scope-20261027" ] && [ "$REMOTE_ID" = "https://github.com/RStaff/cart-agent.git" ]; then
   SCANNER_REPAIR_DESTINATION=1
 fi
+SECURITY_RELEASE_DESTINATION=0
+if [ "$DEST" = "refs/heads/careos/staffordnext-security-release-20261027" ] && [ "$REMOTE_ID" = "https://github.com/RStaff/cart-agent.git" ]; then
+  SECURITY_RELEASE_DESTINATION=1
+fi
 
 TEST_LOCAL_FAILURE=0
 if [ "$TEST_MODE" = 1 ]; then
@@ -519,7 +523,7 @@ validate_commit_contents "$NETWORK_REPO"
 snapshot() { "$GIT_BIN" -C "$NETWORK_REPO" ls-remote --heads --tags "$REMOTE_ID" 2>/dev/null | LC_ALL=C sort > "$1"; }
 remote_ref() { "$GIT_BIN" -C "$NETWORK_REPO" ls-remote --refs "$REMOTE_ID" "$1" 2>/dev/null | awk 'NF {print $1; exit}' || true; }
 BASE_REF="refs/heads/careeros/private-beta"
-if [ "$SCANNER_REPAIR_DESTINATION" = 1 ]; then BASE_REF="refs/heads/careeros/recovery-17b07030-20261026"; fi
+if [ "$SCANNER_REPAIR_DESTINATION" = 1 ] || [ "$SECURITY_RELEASE_DESTINATION" = 1 ]; then BASE_REF="refs/heads/careeros/recovery-17b07030-20261026"; fi
 BEFORE="$RUNNER_TMP/before"; AFTER="$RUNNER_TMP/after"; if ! snapshot "$BEFORE"; then printf '%s\n' PUSH_BLOCKED_REMOTE_STATE; exit 1; fi
 BASE_BEFORE="$(remote_ref "$BASE_REF")"
 if [ "$PR133_LEGACY_DESTINATION" = 1 ]; then

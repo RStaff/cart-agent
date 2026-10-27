@@ -7,10 +7,17 @@ import { join, resolve } from "node:path";
 import test from "node:test";
 
 const runner = resolve(new URL("./run_exact_ref_push_with_gate_v1.sh", import.meta.url).pathname);
+const runnerSource = readFileSync(runner, "utf8");
 const git = (cwd, args) => execFileSync("git", ["-C", cwd, ...args], { encoding: "utf8" }).trim();
 const gitMaybe = (cwd, args) => { try { return git(cwd, args); } catch { return ""; } };
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+test("security release uses the exact recovery branch as its freshness base", () => {
+  assert.match(runnerSource, /SECURITY_RELEASE_DESTINATION=0/);
+  assert.match(runnerSource, /\|\| \[ "\$SECURITY_RELEASE_DESTINATION" = 1 \]/);
+  assert.match(runnerSource, /BASE_REF="refs\/heads\/careeros\/recovery-17b07030-20261026"/);
+});
 const pr133Authorization = () => ({
   canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git",
   sourceCommitSha: "c902c6abadb5200b4892a6dd10420b5ab1b1e04e",
