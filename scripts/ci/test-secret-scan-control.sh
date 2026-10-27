@@ -99,6 +99,52 @@ if (
   exit 1
 fi
 
+git init -q "$tmp_root/merge-resolution"
+git -C "$tmp_root/merge-resolution" config user.name "Secret Scan Regression"
+git -C "$tmp_root/merge-resolution" config user.email "secret-scan-regression@example.invalid"
+printf '%s\n' "baseline" > "$tmp_root/merge-resolution/probe.txt"
+git -C "$tmp_root/merge-resolution" add probe.txt
+git -C "$tmp_root/merge-resolution" commit -qm "baseline"
+resolution_base="$(git -C "$tmp_root/merge-resolution" rev-parse HEAD)"
+resolution_main_branch="$(git -C "$tmp_root/merge-resolution" symbolic-ref --short HEAD)"
+git -C "$tmp_root/merge-resolution" switch -qc resolution-side
+printf '%s\n' "side" > "$tmp_root/merge-resolution/probe.txt"
+git -C "$tmp_root/merge-resolution" commit -qam "side change"
+git -C "$tmp_root/merge-resolution" switch -q "$resolution_main_branch"
+printf '%s\n' "main" > "$tmp_root/merge-resolution/probe.txt"
+git -C "$tmp_root/merge-resolution" commit -qam "main change"
+if git -C "$tmp_root/merge-resolution" merge -q --no-ff resolution-side -m "conflicting merge" >/dev/null 2>&1; then
+  echo "merge-resolution regression did not create the expected conflict" >&2
+  exit 1
+fi
+printf 'api_key = "%s%s"\n' 'q5W8eR2tY9uI3oP7' 'aS4dF6gH1jK0lZ2x' > "$tmp_root/merge-resolution/probe.txt"
+git -C "$tmp_root/merge-resolution" add probe.txt
+git -C "$tmp_root/merge-resolution" commit -qm "synthetic secret in merge resolution"
+resolution_head="$(git -C "$tmp_root/merge-resolution" rev-parse HEAD)"
+if (
+  cd "$tmp_root/merge-resolution"
+  SECRET_SCAN_EVENT_NAME=pull_request \
+  SECRET_SCAN_BASE_SHA="$resolution_base" \
+  SECRET_SCAN_HEAD_SHA="$resolution_head" \
+    bash "$scanner" >/dev/null 2>&1
+); then
+  echo "secret introduced only by merge resolution was not detected" >&2
+  exit 1
+fi
+
+empty_branch="$(git -C "$tmp_root/source" symbolic-ref --short HEAD)"
+if ! (
+  cd "$tmp_root/source"
+  SECRET_SCAN_EVENT_NAME=push \
+  SECRET_SCAN_BASE_SHA=0000000000000000000000000000000000000000 \
+  SECRET_SCAN_HEAD_SHA="$head_sha" \
+  SECRET_SCAN_DEFAULT_BRANCH_REF="$empty_branch" \
+    bash "$scanner" >/dev/null 2>&1
+); then
+  echo "unchanged new branch was not accepted as an empty scan" >&2
+  exit 1
+fi
+
 git clone -q --depth 1 "file://$tmp_root/source" "$tmp_root/shallow"
 if (
   cd "$tmp_root/shallow"

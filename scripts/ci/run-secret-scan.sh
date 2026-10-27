@@ -22,7 +22,9 @@ case "$event_name" in
   push)
     if [[ -n "$base_sha" && "$base_sha" != "$zero_sha" ]]; then
       range_base="$base_sha"
+      new_branch=0
     else
+      new_branch=1
       default_ref="${SECRET_SCAN_DEFAULT_BRANCH_REF:?SECRET_SCAN_DEFAULT_BRANCH_REF is required for a new branch}"
       git rev-parse --verify "${default_ref}^{commit}" >/dev/null 2>&1 || {
         echo "secret scan failed: default branch history is unavailable" >&2
@@ -39,10 +41,14 @@ esac
 
 range="${range_base}..${head_sha}"
 commit_count="$(git rev-list --count "$range")"
+if [[ "$commit_count" -eq 0 && "${new_branch:-0}" -eq 1 ]]; then
+  echo "secret scan range verified: no new commits on new branch"
+  exit 0
+fi
 [[ "$commit_count" -gt 0 ]] || {
   echo "secret scan failed: verified range contains no commits" >&2
   exit 1
 }
 
 echo "secret scan range verified: ${commit_count} commit(s)"
-gitleaks git --redact --log-opts="$range" .
+gitleaks git --redact --log-opts="--diff-merges=first-parent $range" .
