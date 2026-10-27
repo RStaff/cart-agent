@@ -26,11 +26,17 @@ case "$event_name" in
     else
       new_branch=1
       default_ref="${SECRET_SCAN_DEFAULT_BRANCH_REF:?SECRET_SCAN_DEFAULT_BRANCH_REF is required for a new branch}"
+      default_branch="${SECRET_SCAN_DEFAULT_BRANCH_NAME:?SECRET_SCAN_DEFAULT_BRANCH_NAME is required for a new branch}"
+      ref_name="${SECRET_SCAN_REF_NAME:?SECRET_SCAN_REF_NAME is required for a new branch}"
       git rev-parse --verify "${default_ref}^{commit}" >/dev/null 2>&1 || {
         echo "secret scan failed: default branch history is unavailable" >&2
         exit 1
       }
-      range_base="$(git merge-base "$default_ref" "$head_sha")"
+      if [[ "$ref_name" == "$default_branch" ]]; then
+        scan_log_opts="$head_sha"
+      else
+        range_base="$(git merge-base "$default_ref" "$head_sha")"
+      fi
     fi
     ;;
   *)
@@ -39,9 +45,13 @@ case "$event_name" in
     ;;
 esac
 
-range="${range_base}..${head_sha}"
-commit_count="$(git rev-list --count "$range")"
-if [[ "$commit_count" -eq 0 && "${new_branch:-0}" -eq 1 ]]; then
+if [[ -n "${scan_log_opts:-}" ]]; then
+  commit_count="$(git rev-list --count "$scan_log_opts")"
+else
+  scan_log_opts="${range_base}..${head_sha}"
+  commit_count="$(git rev-list --count "$scan_log_opts")"
+fi
+if [[ "$commit_count" -eq 0 && "${new_branch:-0}" -eq 1 && "$ref_name" != "$default_branch" ]]; then
   echo "secret scan range verified: no new commits on new branch"
   exit 0
 fi
@@ -51,4 +61,4 @@ fi
 }
 
 echo "secret scan range verified: ${commit_count} commit(s)"
-gitleaks git --redact --log-opts="--diff-merges=first-parent $range" .
+gitleaks git --redact --log-opts="--diff-merges=first-parent $scan_log_opts" .

@@ -139,9 +139,25 @@ if ! (
   SECRET_SCAN_BASE_SHA=0000000000000000000000000000000000000000 \
   SECRET_SCAN_HEAD_SHA="$head_sha" \
   SECRET_SCAN_DEFAULT_BRANCH_REF="$empty_branch" \
+  SECRET_SCAN_DEFAULT_BRANCH_NAME="$empty_branch" \
+  SECRET_SCAN_REF_NAME=empty-feature \
     bash "$scanner" >/dev/null 2>&1
 ); then
   echo "unchanged new branch was not accepted as an empty scan" >&2
+  exit 1
+fi
+
+if (
+  cd "$tmp_root/source"
+  SECRET_SCAN_EVENT_NAME=push \
+  SECRET_SCAN_BASE_SHA=0000000000000000000000000000000000000000 \
+  SECRET_SCAN_HEAD_SHA="$head_sha" \
+  SECRET_SCAN_DEFAULT_BRANCH_REF="$empty_branch" \
+  SECRET_SCAN_DEFAULT_BRANCH_NAME="$empty_branch" \
+  SECRET_SCAN_REF_NAME="$empty_branch" \
+    bash "$scanner" >/dev/null 2>&1
+); then
+  echo "synthetic secret on an initial default-branch push was not detected" >&2
   exit 1
 fi
 
