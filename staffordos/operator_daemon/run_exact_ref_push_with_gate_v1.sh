@@ -84,8 +84,9 @@ destination = value["destinationRef"]
 test_mode = sys.argv[3] == "1"
 official_remote = value["canonicalRemoteIdentity"] == "https://github.com/RStaff/cart-agent.git"
 pr133_legacy_destination = destination == "refs/heads/careos/migration-runner-v1" and official_remote
+scanner_repair_destination = destination == "refs/heads/careos/secret-scan-scope-20261027" and official_remote
 if official_remote:
-    if not pr133_legacy_destination: reject("PUSH_BLOCKED_DESTINATION_REF")
+    if not (pr133_legacy_destination or scanner_repair_destination): reject("PUSH_BLOCKED_DESTINATION_REF")
 elif not test_mode:
     reject("PUSH_BLOCKED_DESTINATION_REF")
 elif "://" in value["canonicalRemoteIdentity"] or value["canonicalRemoteIdentity"].startswith("git@"):
@@ -130,6 +131,23 @@ if pr133_legacy_destination:
         "8998391cde4772f99eb11aa0e9c3845c0df301a9",
         "c902c6abadb5200b4892a6dd10420b5ab1b1e04e",
     ): reject("PUSH_BLOCKED_AUTHORIZATION")
+if scanner_repair_destination:
+    authorized = {
+        "remoteName": "origin",
+        "sourceCommitSha": "a0548f316630f99c5b69c80fd8861559743cad8d",
+        "sourceTreeSha": "d77993c72def9d590c1e5f3a0ae439c6f488f1a8",
+        "expectedParentSha": "17b07030ce0dc8289b6efbd92ef60de8151e2976",
+        "destinationPrecondition": "ABSENT",
+        "expectedDestinationSha": None,
+        "authorizationRef": "scanner-repair.owner-authorized-publication.2026-10-27",
+        "approvedFiles": [
+            {"path":".github/workflows/security-ci.yml","mode":"100644","sha256":"8315dcc5d636d641cd3a09ad3d33b5e7664fca91d82543315e5c4b7f2699aaec"},
+            {"path":".gitleaksignore","mode":"100644","sha256":"999a1bbf7116925245e2c0d9a0ef5251c821665f379110af6ed221e85e364547"},
+            {"path":"scripts/ci/test-secret-scan-control.sh","mode":"100644","sha256":"462265464b38fd8383f951e7b6477aff72630d30a29f9f297136505191b3e9ac"},
+            {"path":"scripts/ci/verify-secret-scan-history.sh","mode":"100644","sha256":"2b6449cae7ac9a2fb83be23864f5b736702e593430ea856692bda2b9873cb7c7"},
+        ],
+    }
+    if any(value[key] != expected for key, expected in authorized.items()): reject("PUSH_BLOCKED_AUTHORIZATION")
 Path(sys.argv[2]).write_text(json.dumps(value, ensure_ascii=True, separators=(",", ":")), encoding="ascii")
 PY
 then
@@ -149,6 +167,10 @@ EXPECTED_DEST="$("$PYTHON_BIN" -I -c 'import json,sys; print(json.load(open(sys.
 PR133_LEGACY_DESTINATION=0
 if [ "$DEST" = "refs/heads/careos/migration-runner-v1" ] && [ "$REMOTE_ID" = "https://github.com/RStaff/cart-agent.git" ]; then
   PR133_LEGACY_DESTINATION=1
+fi
+SCANNER_REPAIR_DESTINATION=0
+if [ "$DEST" = "refs/heads/careos/secret-scan-scope-20261027" ] && [ "$REMOTE_ID" = "https://github.com/RStaff/cart-agent.git" ]; then
+  SCANNER_REPAIR_DESTINATION=1
 fi
 
 TEST_LOCAL_FAILURE=0
@@ -438,7 +460,9 @@ chmod 400 "$NETWORK_REPO/config"
 validate_commit_contents "$NETWORK_REPO"
 snapshot() { "$GIT_BIN" -C "$NETWORK_REPO" ls-remote --heads --tags "$REMOTE_ID" 2>/dev/null | LC_ALL=C sort > "$1"; }
 remote_ref() { "$GIT_BIN" -C "$NETWORK_REPO" ls-remote --refs "$REMOTE_ID" "$1" 2>/dev/null | awk 'NF {print $1; exit}' || true; }
-BASE_REF="refs/heads/careeros/private-beta"; BEFORE="$RUNNER_TMP/before"; AFTER="$RUNNER_TMP/after"; if ! snapshot "$BEFORE"; then printf '%s\n' PUSH_BLOCKED_REMOTE_STATE; exit 1; fi
+BASE_REF="refs/heads/careeros/private-beta"
+if [ "$SCANNER_REPAIR_DESTINATION" = 1 ]; then BASE_REF="refs/heads/careeros/recovery-17b07030-20261026"; fi
+BEFORE="$RUNNER_TMP/before"; AFTER="$RUNNER_TMP/after"; if ! snapshot "$BEFORE"; then printf '%s\n' PUSH_BLOCKED_REMOTE_STATE; exit 1; fi
 BASE_BEFORE="$(remote_ref "$BASE_REF")"
 if [ "$PR133_LEGACY_DESTINATION" = 1 ]; then
   [ -n "$BASE_BEFORE" ] || { printf '%s\n' PUSH_BLOCKED_BASE; exit 1; }

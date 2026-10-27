@@ -26,6 +26,22 @@ const pr133Authorization = () => ({
     { path: "staffordos/ui/operator-frontend/careeros-beta/scripts/reconcile-careeros-story-status.pg17.test.mjs", mode: "100644", sha256: "b7073a0f95054ac63d34d0646d4892937cc0ec3e8950c11259e426c029f01083" },
   ],
 });
+const scannerRepairAuthorization = () => ({
+  canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git",
+  sourceCommitSha: "a0548f316630f99c5b69c80fd8861559743cad8d",
+  sourceTreeSha: "d77993c72def9d590c1e5f3a0ae439c6f488f1a8",
+  expectedParentSha: "17b07030ce0dc8289b6efbd92ef60de8151e2976",
+  destinationRef: "refs/heads/careos/secret-scan-scope-20261027",
+  destinationPrecondition: "ABSENT",
+  expectedDestinationSha: null,
+  authorizationRef: "scanner-repair.owner-authorized-publication.2026-10-27",
+  approvedFiles: [
+    { path: ".github/workflows/security-ci.yml", mode: "100644", sha256: "8315dcc5d636d641cd3a09ad3d33b5e7664fca91d82543315e5c4b7f2699aaec" },
+    { path: ".gitleaksignore", mode: "100644", sha256: "999a1bbf7116925245e2c0d9a0ef5251c821665f379110af6ed221e85e364547" },
+    { path: "scripts/ci/test-secret-scan-control.sh", mode: "100644", sha256: "462265464b38fd8383f951e7b6477aff72630d30a29f9f297136505191b3e9ac" },
+    { path: "scripts/ci/verify-secret-scan-history.sh", mode: "100644", sha256: "2b6449cae7ac9a2fb83be23864f5b736702e593430ea856692bda2b9873cb7c7" },
+  ],
+});
 
 function fixture({ mixed = false } = {}) {
   const root = mkdtempSync(join(tmpdir(), "staffordos-exact-ref-test-"));
@@ -334,7 +350,7 @@ test("exact-ref runner rejects local URL rewrites and malformed Git refs", () =>
   } finally { rmSync(fx.root, { recursive: true, force: true }); }
 });
 
-test("exact-ref runner permits only PR 133's exact legacy destination for RStaff/cart-agent", () => {
+test("exact-ref runner permits only the two owner-authorized destinations for RStaff/cart-agent", () => {
   const authorized = fixture();
   try {
     authorized.makeManifest(pr133Authorization());
@@ -360,9 +376,19 @@ test("exact-ref runner permits only PR 133's exact legacy destination for RStaff
     assert.match(`${result.stdout}${result.stderr}`, /PUSH_BLOCKED_AUTHORIZATION/);
   } finally { rmSync(exact.root, { recursive: true, force: true }); }
 
+  const scanner = fixture();
+  try {
+    scanner.makeManifest(scannerRepairAuthorization());
+    const result = invoke(scanner);
+    assert.notEqual(result.status, 0);
+    assert.doesNotMatch(`${result.stdout}${result.stderr}`, /PUSH_BLOCKED_(?:AUTHORIZATION|DESTINATION_REF)/);
+  } finally { rmSync(scanner.root, { recursive: true, force: true }); }
+
   for (const [name, overrides] of [
     ["other careos ref", { destinationRef: "refs/heads/careos/another-branch", canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],
     ["same ref in another repository", { destinationRef: "refs/heads/careos/migration-runner-v1", canonicalRemoteIdentity: "https://github.com/RStaff/another-repository.git" }],
+    ["scanner ref in another repository", { destinationRef: "refs/heads/careos/secret-scan-scope-20261027", canonicalRemoteIdentity: "https://github.com/RStaff/another-repository.git" }],
+    ["neighbor scanner ref", { destinationRef: "refs/heads/careos/secret-scan-scope-20261027-other", canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],
     ["existing governed namespace on official repository", { destinationRef: "refs/heads/staffordos/another-branch", canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],
   ]) {
     const rejected = fixture();
