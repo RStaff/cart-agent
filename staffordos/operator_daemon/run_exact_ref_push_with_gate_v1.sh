@@ -268,7 +268,7 @@ if staffordnext_node24_destination:
     if not any(all(value[key] == expected for key, expected in authorized.items()) for authorized in (initial, review_followup)):
         reject("PUSH_BLOCKED_AUTHORIZATION")
 if db_cart_destination:
-    authorized = {
+    initial = {
         "remoteName": "origin",
         "sourceCommitSha": "e4b34c38b2db7f3346950e2e8a2ac08cc7a6ef92",
         "sourceTreeSha": "e0ecd9ebcaf5f5fda47e825d5227ac871ae3c896",
@@ -285,9 +285,23 @@ if db_cart_destination:
             {"path":"web/src/routes/recoveryTrigger.esm.js","mode":"100644","sha256":"0dba64365ec56eb66431bf6b6fdc041ff4671c08446e2b6224eb08efa40bae5e"},
         ],
     }
-    if any(value[key] != expected for key, expected in authorized.items()): reject("PUSH_BLOCKED_AUTHORIZATION")
+    review_followup = {
+        "remoteName": "origin",
+        "sourceCommitSha": "4bda3c7530f9bffb3a7dba92dcf4243c578078b7",
+        "sourceTreeSha": "63f50bba956cb12220a554f18b8650445d7d3b47",
+        "expectedParentSha": "e4b34c38b2db7f3346950e2e8a2ac08cc7a6ef92",
+        "destinationPrecondition": "EXACT_SHA",
+        "expectedDestinationSha": "e4b34c38b2db7f3346950e2e8a2ac08cc7a6ef92",
+        "authorizationRef": "db-security-cart-agent.review-followup-publication.2026-10-28",
+        "approvedFiles": [
+            {"path":"web/src/lib/postgresConnection.js","mode":"100644","sha256":"24c9f007b99547030584718366328df2dc19011455036a6e0364659a896e7643"},
+            {"path":"web/src/lib/postgresConnection.test.js","mode":"100644","sha256":"490e0c64965d0ae27fcb67f0d9522dbfe31c5327e1e9d203becbc107d3a902d6"},
+        ],
+    }
+    if not any(all(value[key] == expected for key, expected in authorized.items()) for authorized in (initial, review_followup)):
+        reject("PUSH_BLOCKED_AUTHORIZATION")
 if db_staffordnext_destination:
-    authorized = {
+    initial = {
         "remoteName": "origin",
         "sourceCommitSha": "b93f1465b8c603bd8fc347d5360b3b645b853d5e",
         "sourceTreeSha": "474f21527883bcdf6279c8a0ebbf55e6f74ee53e",
@@ -302,9 +316,23 @@ if db_staffordnext_destination:
             {"path":"staffordos/ui/operator-frontend/careeros-beta/scripts/start-careeros.mjs","mode":"100644","sha256":"c89dbdd031bd90cdbe82317dc8e58340256c777fa8edbcb94c7ea2d8c527bac0"},
         ],
     }
-    if any(value[key] != expected for key, expected in authorized.items()): reject("PUSH_BLOCKED_AUTHORIZATION")
+    review_followup = {
+        "remoteName": "origin",
+        "sourceCommitSha": "7e74f6c8ec15b8976910e81bdc48458ab27980b0",
+        "sourceTreeSha": "2bab8e5b0fb576cc6364c7919661522ba55930f9",
+        "expectedParentSha": "b93f1465b8c603bd8fc347d5360b3b645b853d5e",
+        "destinationPrecondition": "EXACT_SHA",
+        "expectedDestinationSha": "b93f1465b8c603bd8fc347d5360b3b645b853d5e",
+        "authorizationRef": "db-security-staffordnext.review-followup-publication.2026-10-28",
+        "approvedFiles": [
+            {"path":"staffordos/ui/operator-frontend/careeros-beta/lib/career/postgresConnection.mjs","mode":"100644","sha256":"7e09a6a24587d0a2ff985141a81857fb2e1d5911fd4b4ecaff4f308217f1f749"},
+            {"path":"staffordos/ui/operator-frontend/careeros-beta/lib/career/postgresConnection.test.mjs","mode":"100644","sha256":"698ea8334847a8cc3e0de413122a9f0397956b9c60d77c947264c50b731b908a"},
+        ],
+    }
+    if not any(all(value[key] == expected for key, expected in authorized.items()) for authorized in (initial, review_followup)):
+        reject("PUSH_BLOCKED_AUTHORIZATION")
 if db_staffordos_core_destination:
-    authorized = {
+    initial = {
         "remoteName": "origin",
         "sourceCommitSha": "c534f903627a8c98920db34d4800af60b9211823",
         "sourceTreeSha": "66aa7b6e656a94e9231354e94df4518d3ae7dc76",
@@ -319,7 +347,22 @@ if db_staffordos_core_destination:
             {"path":"src/server.ts","mode":"100644","sha256":"54342820f98b34f20660508303ea91f3ed7b0ce01ec2d94683fed63b6b6211d9"},
         ],
     }
-    if any(value[key] != expected for key, expected in authorized.items()): reject("PUSH_BLOCKED_AUTHORIZATION")
+    review_followup = {
+        "remoteName": "origin",
+        "sourceCommitSha": "8b3790e1dd23147e0e1a8a3d611dcc075f0dd6a9",
+        "sourceTreeSha": "972fbfa70a58d664cf3027add1ba2c7ce76a6fc0",
+        "expectedParentSha": "c534f903627a8c98920db34d4800af60b9211823",
+        "destinationPrecondition": "EXACT_SHA",
+        "expectedDestinationSha": "c534f903627a8c98920db34d4800af60b9211823",
+        "authorizationRef": "db-security-staffordos-core.review-followup-publication.2026-10-28",
+        "approvedFiles": [
+            {"path":".github/workflows/database-tls.yml","mode":"100644","sha256":"caf71082cd098cad0c1736f1414ff24b96a1c9300085d14135707348debb009d"},
+            {"path":"src/postgresConnection.test.ts","mode":"100644","sha256":"a8f7c6fe3b55dfe8b63aedae7ad155f1dd55dca750a353b3aadb2d978ee7244a"},
+            {"path":"src/postgresConnection.ts","mode":"100644","sha256":"d6756ff1e00e2786b0685466f85e382ef1677b55ebeeea162df9c25aa8f287cf"},
+        ],
+    }
+    if not any(all(value[key] == expected for key, expected in authorized.items()) for authorized in (initial, review_followup)):
+        reject("PUSH_BLOCKED_AUTHORIZATION")
 Path(sys.argv[2]).write_text(json.dumps(value, ensure_ascii=True, separators=(",", ":")), encoding="ascii")
 PY
 then

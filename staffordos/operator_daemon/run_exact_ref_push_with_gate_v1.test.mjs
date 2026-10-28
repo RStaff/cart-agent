@@ -218,6 +218,46 @@ const dbStaffordosCoreAuthorization = () => ({
     { path: "src/server.ts", mode: "100644", sha256: "54342820f98b34f20660508303ea91f3ed7b0ce01ec2d94683fed63b6b6211d9" },
   ],
 });
+const dbCartFollowupAuthorization = () => ({
+  ...dbCartAuthorization(),
+  sourceCommitSha: "4bda3c7530f9bffb3a7dba92dcf4243c578078b7",
+  sourceTreeSha: "63f50bba956cb12220a554f18b8650445d7d3b47",
+  expectedParentSha: "e4b34c38b2db7f3346950e2e8a2ac08cc7a6ef92",
+  destinationPrecondition: "EXACT_SHA",
+  expectedDestinationSha: "e4b34c38b2db7f3346950e2e8a2ac08cc7a6ef92",
+  authorizationRef: "db-security-cart-agent.review-followup-publication.2026-10-28",
+  approvedFiles: [
+    { path: "web/src/lib/postgresConnection.js", mode: "100644", sha256: "24c9f007b99547030584718366328df2dc19011455036a6e0364659a896e7643" },
+    { path: "web/src/lib/postgresConnection.test.js", mode: "100644", sha256: "490e0c64965d0ae27fcb67f0d9522dbfe31c5327e1e9d203becbc107d3a902d6" },
+  ],
+});
+const dbStaffordNextFollowupAuthorization = () => ({
+  ...dbStaffordNextAuthorization(),
+  sourceCommitSha: "7e74f6c8ec15b8976910e81bdc48458ab27980b0",
+  sourceTreeSha: "2bab8e5b0fb576cc6364c7919661522ba55930f9",
+  expectedParentSha: "b93f1465b8c603bd8fc347d5360b3b645b853d5e",
+  destinationPrecondition: "EXACT_SHA",
+  expectedDestinationSha: "b93f1465b8c603bd8fc347d5360b3b645b853d5e",
+  authorizationRef: "db-security-staffordnext.review-followup-publication.2026-10-28",
+  approvedFiles: [
+    { path: "staffordos/ui/operator-frontend/careeros-beta/lib/career/postgresConnection.mjs", mode: "100644", sha256: "7e09a6a24587d0a2ff985141a81857fb2e1d5911fd4b4ecaff4f308217f1f749" },
+    { path: "staffordos/ui/operator-frontend/careeros-beta/lib/career/postgresConnection.test.mjs", mode: "100644", sha256: "698ea8334847a8cc3e0de413122a9f0397956b9c60d77c947264c50b731b908a" },
+  ],
+});
+const dbStaffordosCoreFollowupAuthorization = () => ({
+  ...dbStaffordosCoreAuthorization(),
+  sourceCommitSha: "8b3790e1dd23147e0e1a8a3d611dcc075f0dd6a9",
+  sourceTreeSha: "972fbfa70a58d664cf3027add1ba2c7ce76a6fc0",
+  expectedParentSha: "c534f903627a8c98920db34d4800af60b9211823",
+  destinationPrecondition: "EXACT_SHA",
+  expectedDestinationSha: "c534f903627a8c98920db34d4800af60b9211823",
+  authorizationRef: "db-security-staffordos-core.review-followup-publication.2026-10-28",
+  approvedFiles: [
+    { path: ".github/workflows/database-tls.yml", mode: "100644", sha256: "caf71082cd098cad0c1736f1414ff24b96a1c9300085d14135707348debb009d" },
+    { path: "src/postgresConnection.test.ts", mode: "100644", sha256: "a8f7c6fe3b55dfe8b63aedae7ad155f1dd55dca750a353b3aadb2d978ee7244a" },
+    { path: "src/postgresConnection.ts", mode: "100644", sha256: "d6756ff1e00e2786b0685466f85e382ef1677b55ebeeea162df9c25aa8f287cf" },
+  ],
+});
 
 function fixture({ mixed = false } = {}) {
   const root = mkdtempSync(join(tmpdir(), "staffordos-exact-ref-test-"));
@@ -683,6 +723,9 @@ test("exact-ref runner permits only owner-authorized repository/ref pairs", () =
     ["cart-agent database TLS", dbCartAuthorization()],
     ["StaffordNext database TLS", dbStaffordNextAuthorization()],
     ["staffordos-core database TLS", dbStaffordosCoreAuthorization()],
+    ["cart-agent database TLS follow-up", dbCartFollowupAuthorization()],
+    ["StaffordNext database TLS follow-up", dbStaffordNextFollowupAuthorization()],
+    ["staffordos-core database TLS follow-up", dbStaffordosCoreFollowupAuthorization()],
   ]) {
     const accepted = fixture();
     try {
@@ -729,6 +772,25 @@ test("normal invocation rejects non-official remotes even in governed namespaces
     assert.match(`${result.stdout}${result.stderr}`, /PUSH_BLOCKED_DESTINATION_REF/);
     assert.equal(gitMaybe(fx.remote, ["show-ref", "refs/heads/careeros/synthetic-exact"]), "");
   } finally { rmSync(fx.root, { recursive: true, force: true }); }
+});
+
+test("database TLS follow-up authorizations reject altered exact content bindings", () => {
+  for (const [name, manifest] of [
+    ["cart tree", { ...dbCartFollowupAuthorization(), sourceTreeSha: "0000000000000000000000000000000000000000" }],
+    ["StaffordNext source", { ...dbStaffordNextFollowupAuthorization(), sourceCommitSha: "0000000000000000000000000000000000000000" }],
+    ["staffordos-core authorization reuse", { ...dbStaffordosCoreFollowupAuthorization(), authorizationRef: "db-security-staffordos-core.owner-authorized-publication.2026-10-28" }],
+  ]) {
+    const fx = fixture();
+    try {
+      fx.makeManifest(manifest);
+      const result = invoke(fx);
+      assert.notEqual(result.status, 0, name);
+      assert.match(`${result.stdout}${result.stderr}`, /PUSH_BLOCKED_AUTHORIZATION/, name);
+      assert.equal(gitMaybe(fx.remote, ["show-ref", manifest.destinationRef]), "", name);
+    } finally {
+      rmSync(fx.root, { recursive: true, force: true });
+    }
+  }
 });
 
 test("synthetic mode rejects traversal and symlink remote identities", () => {
