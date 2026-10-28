@@ -584,6 +584,8 @@ elif [ "$SCANNER_REPAIR_DESTINATION" = 1 ] && [ "$STATE" = "EXACT_SHA" ]; then
   [ "$BASE_BEFORE" = "17b07030ce0dc8289b6efbd92ef60de8151e2976" ] || { printf '%s\n' PUSH_BLOCKED_BASE; exit 1; }
 elif [ "$SECURITY_RELEASE_DESTINATION" = 1 ] && [ "$STATE" = "EXACT_SHA" ]; then
   [ "$BASE_BEFORE" = "$SOURCE" ] || { printf '%s\n' PUSH_BLOCKED_BASE; exit 1; }
+elif [ "$STAFFORDNEXT_NODE24_DESTINATION" = 1 ]; then
+  [ "$BASE_BEFORE" = "c485ec013041df8bd9aed5432b22f47c302db6d9" ] || { printf '%s\n' PUSH_BLOCKED_BASE; exit 1; }
 else
   [ "$BASE_BEFORE" = "$PARENT" ] || { printf '%s\n' PUSH_BLOCKED_BASE; exit 1; }
 fi

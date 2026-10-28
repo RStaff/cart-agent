@@ -21,6 +21,11 @@ test("security release uses the exact recovery branch as its freshness base", ()
   assert.match(runnerSource, /PUSH_BLOCKED_TREE_EQUIVALENCE/);
   assert.match(runnerSource, /show -s --format=%T "\$EXPECTED_DEST"/);
 });
+test("StaffordNext Node 24 publication pins the deployed release as its freshness base", () => {
+  assert.match(runnerSource, /STAFFORDNEXT_NODE24_DESTINATION=0/);
+  assert.match(runnerSource, /BASE_REF="refs\/heads\/careos\/staffordnext-security-release-20261027"/);
+  assert.match(runnerSource, /BASE_BEFORE" = "c485ec013041df8bd9aed5432b22f47c302db6d9"/);
+});
 const pr133Authorization = () => ({
   canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git",
   sourceCommitSha: "c902c6abadb5200b4892a6dd10420b5ab1b1e04e",
