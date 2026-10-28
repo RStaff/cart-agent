@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import pg from "pg";
+import { postgresConnectionOptions } from "./postgresConnection.js";
 
 const { Pool } = pg;
 
@@ -7,12 +8,7 @@ let pool;
 
 function getPool() {
   if (!pool) {
-    pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
-      ssl: process.env.DATABASE_URL?.includes("render.com")
-        ? { rejectUnauthorized: false }
-        : undefined,
-    });
+    pool = new Pool(postgresConnectionOptions());
   }
 
   return pool;
