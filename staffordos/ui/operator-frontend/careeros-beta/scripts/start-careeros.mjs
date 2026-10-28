@@ -1,13 +1,14 @@
 import { readFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { Client } from "pg";
+import { postgresConnectionOptions } from "../lib/career/postgresConnection.mjs";
 
 async function ensureCareerSchema() {
   if (!process.env.DATABASE_URL) {
     if (process.env.NODE_ENV === "production") throw new Error("DATABASE_URL_REQUIRED");
     return;
   }
-  const client = new Client({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+  const client = new Client(postgresConnectionOptions());
   await client.connect();
   try {
     for (const migration of [
