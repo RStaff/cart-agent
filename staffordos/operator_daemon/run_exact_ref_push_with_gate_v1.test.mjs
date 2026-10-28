@@ -141,6 +141,20 @@ const staffordNextNode24Authorization = () => ({
     { path: "staffordos/ui/operator-frontend/careeros-beta/scripts/assert-node-version.mjs", mode: "100644", sha256: "c3275520fed23b0d792df2c5c3c0e462f76b9b9b25d75671828b5cccbeebedb8" },
   ],
 });
+const staffordNextNode24FollowupAuthorization = () => ({
+  canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git",
+  sourceCommitSha: "db177287456f42d3706f39da5d24d629fd916989",
+  sourceTreeSha: "5068283d545217ec7311f0b31a2258a92683d608",
+  expectedParentSha: "0908c5d98614f1542e41e10124c924051c768069",
+  destinationRef: "refs/heads/careos/staffordnext-node24-20261027",
+  destinationPrecondition: "EXACT_SHA",
+  expectedDestinationSha: "0908c5d98614f1542e41e10124c924051c768069",
+  authorizationRef: "staffordnext-node24.review-followup-publication.2026-10-27",
+  approvedFiles: [
+    { path: "staffordos/ui/operator-frontend/careeros-beta/scripts/promote_remote_beta_branch_v1.sh", mode: "100755", sha256: "00d546612f313919dd5d63aea81bb796a5b4b0ec505ccb6044846e030251215e" },
+    { path: "staffordos/ui/operator-frontend/careeros-beta/scripts/promote_remote_beta_branch_v1.test.mjs", mode: "100644", sha256: "ed055c4ce15d25bffebc59b9c7563f87e4ae6f6de209678478c611d6731142f0" },
+  ],
+});
 
 function fixture({ mixed = false } = {}) {
   const root = mkdtempSync(join(tmpdir(), "staffordos-exact-ref-test-"));
@@ -530,6 +544,14 @@ test("exact-ref runner permits only the owner-authorized destinations for RStaff
     assert.notEqual(result.status, 0);
     assert.doesNotMatch(`${result.stdout}${result.stderr}`, /PUSH_BLOCKED_(?:AUTHORIZATION|DESTINATION_REF)/);
   } finally { rmSync(staffordNextNode24.root, { recursive: true, force: true }); }
+
+  const staffordNextNode24Followup = fixture();
+  try {
+    staffordNextNode24Followup.makeManifest(staffordNextNode24FollowupAuthorization());
+    const result = invoke(staffordNextNode24Followup);
+    assert.notEqual(result.status, 0);
+    assert.doesNotMatch(`${result.stdout}${result.stderr}`, /PUSH_BLOCKED_(?:AUTHORIZATION|DESTINATION_REF)/);
+  } finally { rmSync(staffordNextNode24Followup.root, { recursive: true, force: true }); }
 
   for (const [name, overrides] of [
     ["other careos ref", { destinationRef: "refs/heads/careos/another-branch", canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],

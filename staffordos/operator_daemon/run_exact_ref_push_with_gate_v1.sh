@@ -222,7 +222,7 @@ if security_release_destination:
     if not any(all(value[key] == expected for key, expected in authorized.items()) for authorized in (initial, merge_binding)):
         reject("PUSH_BLOCKED_AUTHORIZATION")
 if staffordnext_node24_destination:
-    authorized = {
+    initial = {
         "remoteName": "origin",
         "sourceCommitSha": "0908c5d98614f1542e41e10124c924051c768069",
         "sourceTreeSha": "1e1b360633146eb0e7308379c44996c82d5d4c86",
@@ -238,7 +238,21 @@ if staffordnext_node24_destination:
             {"path":"staffordos/ui/operator-frontend/careeros-beta/scripts/assert-node-version.mjs","mode":"100644","sha256":"c3275520fed23b0d792df2c5c3c0e462f76b9b9b25d75671828b5cccbeebedb8"},
         ],
     }
-    if any(value[key] != expected for key, expected in authorized.items()): reject("PUSH_BLOCKED_AUTHORIZATION")
+    review_followup = {
+        "remoteName": "origin",
+        "sourceCommitSha": "db177287456f42d3706f39da5d24d629fd916989",
+        "sourceTreeSha": "5068283d545217ec7311f0b31a2258a92683d608",
+        "expectedParentSha": "0908c5d98614f1542e41e10124c924051c768069",
+        "destinationPrecondition": "EXACT_SHA",
+        "expectedDestinationSha": "0908c5d98614f1542e41e10124c924051c768069",
+        "authorizationRef": "staffordnext-node24.review-followup-publication.2026-10-27",
+        "approvedFiles": [
+            {"path":"staffordos/ui/operator-frontend/careeros-beta/scripts/promote_remote_beta_branch_v1.sh","mode":"100755","sha256":"00d546612f313919dd5d63aea81bb796a5b4b0ec505ccb6044846e030251215e"},
+            {"path":"staffordos/ui/operator-frontend/careeros-beta/scripts/promote_remote_beta_branch_v1.test.mjs","mode":"100644","sha256":"ed055c4ce15d25bffebc59b9c7563f87e4ae6f6de209678478c611d6731142f0"},
+        ],
+    }
+    if not any(all(value[key] == expected for key, expected in authorized.items()) for authorized in (initial, review_followup)):
+        reject("PUSH_BLOCKED_AUTHORIZATION")
 Path(sys.argv[2]).write_text(json.dumps(value, ensure_ascii=True, separators=(",", ":")), encoding="ascii")
 PY
 then
