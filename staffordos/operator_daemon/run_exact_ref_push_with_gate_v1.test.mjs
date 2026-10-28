@@ -124,6 +124,23 @@ const staffordNextSecurityReleaseMergeBindingAuthorization = () => ({
     { path: "staffordos/ui/operator-frontend/careeros-beta/package.json", mode: "100644", sha256: "121550bab16186a82cc0e7d04f0c8cd5331784d48ea8065138610ef1cfcc2556" },
   ],
 });
+const staffordNextNode24Authorization = () => ({
+  canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git",
+  sourceCommitSha: "0908c5d98614f1542e41e10124c924051c768069",
+  sourceTreeSha: "1e1b360633146eb0e7308379c44996c82d5d4c86",
+  expectedParentSha: "c485ec013041df8bd9aed5432b22f47c302db6d9",
+  destinationRef: "refs/heads/careos/staffordnext-node24-20261027",
+  destinationPrecondition: "ABSENT",
+  expectedDestinationSha: null,
+  authorizationRef: "staffordnext-node24.owner-authorized-publication.2026-10-27",
+  approvedFiles: [
+    { path: ".github/workflows/staffordnext-node-runtime.yml", mode: "100644", sha256: "e963ab832dd20db5e4bd1f1f9b7100cade29a53b78f5c6ce3bc74bbbc13becb6" },
+    { path: "staffordos/ui/operator-frontend/careeros-beta/.node-version", mode: "100644", sha256: "d9f318747a126ce2247661af67852b185def7789492eabfad7bba322be087c33" },
+    { path: "staffordos/ui/operator-frontend/careeros-beta/package-lock.json", mode: "100644", sha256: "ee92fa5925c8b15a76420831d3be29516c530bdda2ab09460c225643910e7c91" },
+    { path: "staffordos/ui/operator-frontend/careeros-beta/package.json", mode: "100644", sha256: "264eb5ffafbd12bdb3d534ad399040e5521fa187079bbeeecbfcab3a957823ad" },
+    { path: "staffordos/ui/operator-frontend/careeros-beta/scripts/assert-node-version.mjs", mode: "100644", sha256: "c3275520fed23b0d792df2c5c3c0e462f76b9b9b25d75671828b5cccbeebedb8" },
+  ],
+});
 
 function fixture({ mixed = false } = {}) {
   const root = mkdtempSync(join(tmpdir(), "staffordos-exact-ref-test-"));
@@ -432,7 +449,7 @@ test("exact-ref runner rejects local URL rewrites and malformed Git refs", () =>
   } finally { rmSync(fx.root, { recursive: true, force: true }); }
 });
 
-test("exact-ref runner permits only the two owner-authorized destinations for RStaff/cart-agent", () => {
+test("exact-ref runner permits only the owner-authorized destinations for RStaff/cart-agent", () => {
   const authorized = fixture();
   try {
     authorized.makeManifest(pr133Authorization());
@@ -506,12 +523,22 @@ test("exact-ref runner permits only the two owner-authorized destinations for RS
     assert.doesNotMatch(`${result.stdout}${result.stderr}`, /PUSH_BLOCKED_(?:AUTHORIZATION|DESTINATION_REF)/);
   } finally { rmSync(securityReleaseMergeBinding.root, { recursive: true, force: true }); }
 
+  const staffordNextNode24 = fixture();
+  try {
+    staffordNextNode24.makeManifest(staffordNextNode24Authorization());
+    const result = invoke(staffordNextNode24);
+    assert.notEqual(result.status, 0);
+    assert.doesNotMatch(`${result.stdout}${result.stderr}`, /PUSH_BLOCKED_(?:AUTHORIZATION|DESTINATION_REF)/);
+  } finally { rmSync(staffordNextNode24.root, { recursive: true, force: true }); }
+
   for (const [name, overrides] of [
     ["other careos ref", { destinationRef: "refs/heads/careos/another-branch", canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],
     ["same ref in another repository", { destinationRef: "refs/heads/careos/migration-runner-v1", canonicalRemoteIdentity: "https://github.com/RStaff/another-repository.git" }],
     ["scanner ref in another repository", { destinationRef: "refs/heads/careos/secret-scan-scope-20261027", canonicalRemoteIdentity: "https://github.com/RStaff/another-repository.git" }],
     ["neighbor scanner ref", { destinationRef: "refs/heads/careos/secret-scan-scope-20261027-other", canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],
     ["neighbor security release ref", { destinationRef: "refs/heads/careos/staffordnext-security-release-20261027-other", canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],
+    ["Node 24 ref in another repository", { destinationRef: "refs/heads/careos/staffordnext-node24-20261027", canonicalRemoteIdentity: "https://github.com/RStaff/another-repository.git" }],
+    ["neighbor Node 24 ref", { destinationRef: "refs/heads/careos/staffordnext-node24-20261027-other", canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],
     ["existing governed namespace on official repository", { destinationRef: "refs/heads/staffordos/another-branch", canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],
   ]) {
     const rejected = fixture();

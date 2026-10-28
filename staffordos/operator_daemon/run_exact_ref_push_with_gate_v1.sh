@@ -86,8 +86,9 @@ official_remote = value["canonicalRemoteIdentity"] == "https://github.com/RStaff
 pr133_legacy_destination = destination == "refs/heads/careos/migration-runner-v1" and official_remote
 scanner_repair_destination = destination == "refs/heads/careos/secret-scan-scope-20261027" and official_remote
 security_release_destination = destination == "refs/heads/careos/staffordnext-security-release-20261027" and official_remote
+staffordnext_node24_destination = destination == "refs/heads/careos/staffordnext-node24-20261027" and official_remote
 if official_remote:
-    if not (pr133_legacy_destination or scanner_repair_destination or security_release_destination): reject("PUSH_BLOCKED_DESTINATION_REF")
+    if not (pr133_legacy_destination or scanner_repair_destination or security_release_destination or staffordnext_node24_destination): reject("PUSH_BLOCKED_DESTINATION_REF")
 elif not test_mode:
     reject("PUSH_BLOCKED_DESTINATION_REF")
 elif "://" in value["canonicalRemoteIdentity"] or value["canonicalRemoteIdentity"].startswith("git@"):
@@ -220,6 +221,24 @@ if security_release_destination:
     }
     if not any(all(value[key] == expected for key, expected in authorized.items()) for authorized in (initial, merge_binding)):
         reject("PUSH_BLOCKED_AUTHORIZATION")
+if staffordnext_node24_destination:
+    authorized = {
+        "remoteName": "origin",
+        "sourceCommitSha": "0908c5d98614f1542e41e10124c924051c768069",
+        "sourceTreeSha": "1e1b360633146eb0e7308379c44996c82d5d4c86",
+        "expectedParentSha": "c485ec013041df8bd9aed5432b22f47c302db6d9",
+        "destinationPrecondition": "ABSENT",
+        "expectedDestinationSha": None,
+        "authorizationRef": "staffordnext-node24.owner-authorized-publication.2026-10-27",
+        "approvedFiles": [
+            {"path":".github/workflows/staffordnext-node-runtime.yml","mode":"100644","sha256":"e963ab832dd20db5e4bd1f1f9b7100cade29a53b78f5c6ce3bc74bbbc13becb6"},
+            {"path":"staffordos/ui/operator-frontend/careeros-beta/.node-version","mode":"100644","sha256":"d9f318747a126ce2247661af67852b185def7789492eabfad7bba322be087c33"},
+            {"path":"staffordos/ui/operator-frontend/careeros-beta/package-lock.json","mode":"100644","sha256":"ee92fa5925c8b15a76420831d3be29516c530bdda2ab09460c225643910e7c91"},
+            {"path":"staffordos/ui/operator-frontend/careeros-beta/package.json","mode":"100644","sha256":"264eb5ffafbd12bdb3d534ad399040e5521fa187079bbeeecbfcab3a957823ad"},
+            {"path":"staffordos/ui/operator-frontend/careeros-beta/scripts/assert-node-version.mjs","mode":"100644","sha256":"c3275520fed23b0d792df2c5c3c0e462f76b9b9b25d75671828b5cccbeebedb8"},
+        ],
+    }
+    if any(value[key] != expected for key, expected in authorized.items()): reject("PUSH_BLOCKED_AUTHORIZATION")
 Path(sys.argv[2]).write_text(json.dumps(value, ensure_ascii=True, separators=(",", ":")), encoding="ascii")
 PY
 then
@@ -247,6 +266,10 @@ fi
 SECURITY_RELEASE_DESTINATION=0
 if [ "$DEST" = "refs/heads/careos/staffordnext-security-release-20261027" ] && [ "$REMOTE_ID" = "https://github.com/RStaff/cart-agent.git" ]; then
   SECURITY_RELEASE_DESTINATION=1
+fi
+STAFFORDNEXT_NODE24_DESTINATION=0
+if [ "$DEST" = "refs/heads/careos/staffordnext-node24-20261027" ] && [ "$REMOTE_ID" = "https://github.com/RStaff/cart-agent.git" ]; then
+  STAFFORDNEXT_NODE24_DESTINATION=1
 fi
 
 TEST_LOCAL_FAILURE=0
@@ -538,6 +561,7 @@ snapshot() { "$GIT_BIN" -C "$NETWORK_REPO" ls-remote --heads --tags "$REMOTE_ID"
 remote_ref() { "$GIT_BIN" -C "$NETWORK_REPO" ls-remote --refs "$REMOTE_ID" "$1" 2>/dev/null | awk 'NF {print $1; exit}' || true; }
 BASE_REF="refs/heads/careeros/private-beta"
 if [ "$SCANNER_REPAIR_DESTINATION" = 1 ] || [ "$SECURITY_RELEASE_DESTINATION" = 1 ]; then BASE_REF="refs/heads/careeros/recovery-17b07030-20261026"; fi
+if [ "$STAFFORDNEXT_NODE24_DESTINATION" = 1 ]; then BASE_REF="refs/heads/careos/staffordnext-security-release-20261027"; fi
 BEFORE="$RUNNER_TMP/before"; AFTER="$RUNNER_TMP/after"; if ! snapshot "$BEFORE"; then printf '%s\n' PUSH_BLOCKED_REMOTE_STATE; exit 1; fi
 BASE_BEFORE="$(remote_ref "$BASE_REF")"
 if [ "$PR133_LEGACY_DESTINATION" = 1 ]; then
