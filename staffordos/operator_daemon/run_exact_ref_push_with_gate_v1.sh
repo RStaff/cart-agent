@@ -48,7 +48,7 @@ mkdir -m 700 "$RUNNER_TMP/hooks"
 "$GIT_BIN" -c core.hooksPath="$RUNNER_TMP/hooks" -C "$(pwd)" rev-parse --show-toplevel >/dev/null
 
 if ! "$PYTHON_BIN" -I - "$MANIFEST" "$RUNNER_TMP/validated.json" "$TEST_MODE" 2>"$RUNNER_TMP/manifest.err" <<'PY'
-import json, re, sys
+import json, os, re, stat, sys
 from pathlib import Path
 
 class Reject(Exception): pass
@@ -64,7 +64,17 @@ def text(value, code, limit=512):
 def sha40(value, code):
     text(value, code, 40)
     if not re.fullmatch(r"[a-f0-9]{40}", value): reject(code)
-raw = Path(sys.argv[1]).read_bytes()
+manifest_fd = -1
+try:
+    manifest_fd = os.open(sys.argv[1], os.O_RDONLY | os.O_NONBLOCK | getattr(os, "O_CLOEXEC", 0))
+    if not stat.S_ISREG(os.fstat(manifest_fd).st_mode): reject("PUSH_BLOCKED_MANIFEST_TYPE")
+    raw = os.read(manifest_fd, 128 * 1024 + 1)
+except Reject:
+    raise
+except OSError:
+    reject("PUSH_BLOCKED_MANIFEST_FILE")
+finally:
+    if manifest_fd >= 0: os.close(manifest_fd)
 if len(raw) > 128 * 1024: reject("PUSH_BLOCKED_MANIFEST_SIZE")
 try: source = raw.decode("ascii")
 except UnicodeDecodeError: reject("PUSH_BLOCKED_MANIFEST_ENCODING")

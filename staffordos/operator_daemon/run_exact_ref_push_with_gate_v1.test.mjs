@@ -281,6 +281,22 @@ function invoke(fx, env = {}, synthetic = true) {
   });
 }
 
+function invokeManifest(fx, manifestPath, timeout = 2_000) {
+  const started = Date.now();
+  const result = spawnSync(runner, [manifestPath, "--synthetic-test-mode"], {
+    cwd: fx.repo,
+    encoding: "utf8",
+    env: process.env,
+    timeout,
+  });
+  return { ...result, elapsedMs: Date.now() - started };
+}
+
+function assertNoPublicationOrAuthorizationSideEffects(fx) {
+  assert.equal(gitMaybe(fx.remote, ["show-ref", "refs/heads/careeros/synthetic-exact"]), "");
+  assert.equal(existsSync(join(fx.repo, ".staffordos-exact-ref-test-gh-marker")), false);
+}
+
 function enableSyntheticControl(fx, lines) {
   writeFileSync(join(fx.repo, ".staffordos-exact-ref-test-control"), `${lines.join("\n")}\n`);
     writeFileSync(join(fx.repo, ".git", "info", "exclude"), ".staffordos-exact-ref-test-control*\n.staffordos-exact-ref-test-gh*\n.staffordos-exact-ref-test-cellar*\n", { flag: "a" });
@@ -355,6 +371,53 @@ exit 1
   enableSyntheticControl(fx, ["credential-helper=synthetic"]);
   return marker;
 }
+
+test("manifest input is bounded, regular, descriptor-stable, and side-effect free on rejection", () => {
+  const valid = fixture();
+  try {
+    valid.makeManifest();
+    const result = invoke(valid);
+    assert.equal(result.status, 0);
+    assert.equal(git(valid.remote, ["show-ref", "--hash", "refs/heads/careeros/synthetic-exact"]), valid.source);
+  } finally { rmSync(valid.root, { recursive: true, force: true }); }
+
+  const cases = [
+    {
+      name: "oversized regular file",
+      prepare(fx) { writeFileSync(fx.manifestPath, "x".repeat(128 * 1024 + 1)); return fx.manifestPath; },
+      expected: "PUSH_BLOCKED_MANIFEST_SIZE",
+    },
+    {
+      name: "FIFO",
+      prepare(fx) { const fifo = join(fx.root, "authorization.fifo"); execFileSync("mkfifo", [fifo]); return fifo; },
+      expected: "PUSH_BLOCKED_MANIFEST_TYPE",
+    },
+    {
+      name: "/dev/zero",
+      prepare() { return "/dev/zero"; },
+      expected: "PUSH_BLOCKED_MANIFEST_TYPE",
+    },
+    {
+      name: "malformed JSON",
+      prepare(fx) { writeFileSync(fx.manifestPath, "{not-json"); return fx.manifestPath; },
+      expected: "PUSH_BLOCKED_MANIFEST_JSON",
+    },
+  ];
+
+  for (const { name, prepare, expected } of cases) {
+    const fx = fixture();
+    try {
+      fx.makeManifest();
+      const manifestPath = prepare(fx);
+      const result = invokeManifest(fx, manifestPath);
+      assert.equal(result.error, undefined, `${name} exceeded the bounded timeout`);
+      assert.notEqual(result.status, 0, name);
+      assert.ok(result.elapsedMs < 2_000, `${name} took ${result.elapsedMs}ms`);
+      assert.match(`${result.stdout}${result.stderr}`, new RegExp(expected), name);
+      assertNoPublicationOrAuthorizationSideEffects(fx);
+    } finally { rmSync(fx.root, { recursive: true, force: true }); }
+  }
+});
 
 test("actual runner handles deterministic interruption boundaries", async () => {
   for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"]) {
