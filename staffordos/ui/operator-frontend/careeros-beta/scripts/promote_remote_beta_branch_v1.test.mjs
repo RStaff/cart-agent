@@ -125,6 +125,15 @@ test("accepts a tip containing the governed script and focused test", async () =
   assertSuccess(result);
 });
 
+test("accepts only the StaffordNext Node runtime workflow with CareerOS source", async () => {
+  const fixture = await linearFixture([
+    "staffordos/ui/operator-frontend/careeros-beta/index.txt",
+    ".github/workflows/staffordnext-node-runtime.yml",
+  ]);
+  const result = await invoke(fixture.root, fixture.source, fixture.base);
+  assertSuccess(result);
+});
+
 test("accepts the exact release differential baseline authority artifact", async () => {
   const fixture = await linearFixture([
     "staffordos/ui/operator-frontend/careeros-beta/index.txt",
@@ -161,6 +170,8 @@ const rejectedPaths = [
   ["Abando path", "abando/source.js"],
   ["arbitrary governance path", "staffordos/governance/unrelated-review.json"],
   ["unversioned baseline exception", "staffordos/governance/STAFFORDOS_CAREEROS_BASELINE_EXCEPTION.json"],
+  ["other GitHub workflow", ".github/workflows/other.yml"],
+  ["neighbor Node runtime workflow", ".github/workflows/staffordnext-node-runtime-other.yml"],
 ];
 
 for (const [name, file] of rejectedPaths) {
