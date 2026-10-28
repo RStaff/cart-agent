@@ -26,6 +26,14 @@ test("StaffordNext Node 24 publication pins the deployed release as its freshnes
   assert.match(runnerSource, /BASE_REF="refs\/heads\/careos\/staffordnext-security-release-20261027"/);
   assert.match(runnerSource, /BASE_BEFORE" = "c485ec013041df8bd9aed5432b22f47c302db6d9"/);
 });
+test("database TLS destinations pin their exact repository and current production base", () => {
+  assert.match(runnerSource, /refs\/heads\/careos\/db-security-cart-agent-20261028/);
+  assert.match(runnerSource, /refs\/heads\/careos\/db-security-staffordnext-20261028/);
+  assert.match(runnerSource, /refs\/heads\/security\/db-tls-staffordos-core-20261028/);
+  assert.match(runnerSource, /https:\/\/github\.com\/RStaff\/staffordos-core\.git/);
+  assert.match(runnerSource, /DB_CART_DESTINATION.*DB_STAFFORDOS_CORE_DESTINATION.*BASE_REF="refs\/heads\/main"/s);
+  assert.match(runnerSource, /DB_STAFFORDNEXT_DESTINATION.*BASE_REF="refs\/heads\/careos\/staffordnext-security-release-20261027"/s);
+});
 const pr133Authorization = () => ({
   canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git",
   sourceCommitSha: "c902c6abadb5200b4892a6dd10420b5ab1b1e04e",
@@ -158,6 +166,56 @@ const staffordNextNode24FollowupAuthorization = () => ({
   approvedFiles: [
     { path: "staffordos/ui/operator-frontend/careeros-beta/scripts/promote_remote_beta_branch_v1.sh", mode: "100755", sha256: "00d546612f313919dd5d63aea81bb796a5b4b0ec505ccb6044846e030251215e" },
     { path: "staffordos/ui/operator-frontend/careeros-beta/scripts/promote_remote_beta_branch_v1.test.mjs", mode: "100644", sha256: "ed055c4ce15d25bffebc59b9c7563f87e4ae6f6de209678478c611d6731142f0" },
+  ],
+});
+const dbCartAuthorization = () => ({
+  canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git",
+  sourceCommitSha: "e4b34c38b2db7f3346950e2e8a2ac08cc7a6ef92",
+  sourceTreeSha: "e0ecd9ebcaf5f5fda47e825d5227ac871ae3c896",
+  expectedParentSha: "3fe5438b8eb43d2b8ebd19ab0e4725927b49737d",
+  destinationRef: "refs/heads/careos/db-security-cart-agent-20261028",
+  destinationPrecondition: "ABSENT",
+  expectedDestinationSha: null,
+  authorizationRef: "db-security-cart-agent.owner-authorized-publication.2026-10-28",
+  approvedFiles: [
+    { path: "web/src/lib/packetRepository.js", mode: "100644", sha256: "1366b6247eac50bce3a1e03a08ae9ed5745557bc67eb2c61db08e54a5e461216" },
+    { path: "web/src/lib/postgresConnection.js", mode: "100644", sha256: "944e49f62f98f2edf97f17bc1686e042d2a7b3a57900de82f4148c9d6aa5ec63" },
+    { path: "web/src/lib/postgresConnection.test.js", mode: "100644", sha256: "82498387c0aaa648b693337fbdfe87263bbfdfa81f6fbb3fb94e291a2afba47f" },
+    { path: "web/src/routes/checkoutEventProof.esm.js", mode: "100644", sha256: "42ff4ec412a536a0d8e5d83766ad938a92a9bd006d71ccb795fd7b570cf687a2" },
+    { path: "web/src/routes/merchantSummary.esm.js", mode: "100644", sha256: "b127c931cf61e37f136ba3ffb6169c666a391322ede02e13c5c58281e6c603b8" },
+    { path: "web/src/routes/recoveryTrigger.esm.js", mode: "100644", sha256: "0dba64365ec56eb66431bf6b6fdc041ff4671c08446e2b6224eb08efa40bae5e" },
+  ],
+});
+const dbStaffordNextAuthorization = () => ({
+  canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git",
+  sourceCommitSha: "b93f1465b8c603bd8fc347d5360b3b645b853d5e",
+  sourceTreeSha: "474f21527883bcdf6279c8a0ebbf55e6f74ee53e",
+  expectedParentSha: "6e7323f3f19dcd0788f320c9d53def50c6dfef9d",
+  destinationRef: "refs/heads/careos/db-security-staffordnext-20261028",
+  destinationPrecondition: "ABSENT",
+  expectedDestinationSha: null,
+  authorizationRef: "db-security-staffordnext.owner-authorized-publication.2026-10-28",
+  approvedFiles: [
+    { path: "staffordos/ui/operator-frontend/careeros-beta/lib/career/careerP0Postgres.mjs", mode: "100644", sha256: "ba002076e1e62c75758de105ec7c32748fd70dcfad1bb388667fbe8354078049" },
+    { path: "staffordos/ui/operator-frontend/careeros-beta/lib/career/postgresConnection.mjs", mode: "100644", sha256: "d9363a312df53d5f7461b94832f4c7b9432682f44743abab8ce3620c60faca41" },
+    { path: "staffordos/ui/operator-frontend/careeros-beta/lib/career/postgresConnection.test.mjs", mode: "100644", sha256: "9cacccddbdccb67860034278ee859ab80a0ac66c9302298277b00c66ab740f2a" },
+    { path: "staffordos/ui/operator-frontend/careeros-beta/scripts/start-careeros.mjs", mode: "100644", sha256: "c89dbdd031bd90cdbe82317dc8e58340256c777fa8edbcb94c7ea2d8c527bac0" },
+  ],
+});
+const dbStaffordosCoreAuthorization = () => ({
+  canonicalRemoteIdentity: "https://github.com/RStaff/staffordos-core.git",
+  sourceCommitSha: "c534f903627a8c98920db34d4800af60b9211823",
+  sourceTreeSha: "66aa7b6e656a94e9231354e94df4518d3ae7dc76",
+  expectedParentSha: "b21c91bf0214d02d4b6c257560c5d1e3b2fd19bc",
+  destinationRef: "refs/heads/security/db-tls-staffordos-core-20261028",
+  destinationPrecondition: "ABSENT",
+  expectedDestinationSha: null,
+  authorizationRef: "db-security-staffordos-core.owner-authorized-publication.2026-10-28",
+  approvedFiles: [
+    { path: "package.json", mode: "100644", sha256: "d33ed5e9563088e93b78621042284d5e94881f6aae000893d6174483411bd173" },
+    { path: "src/postgresConnection.test.ts", mode: "100644", sha256: "3a097b9a1189c9dab21641524193e0ed6a766e59cd9e1d20f1e67cccbc486bb5" },
+    { path: "src/postgresConnection.ts", mode: "100644", sha256: "4bcdd0f2cd675fb53acd868d0aef4ab397f69b4c15419e0217a54ed174b11a9e" },
+    { path: "src/server.ts", mode: "100644", sha256: "54342820f98b34f20660508303ea91f3ed7b0ce01ec2d94683fed63b6b6211d9" },
   ],
 });
 
@@ -468,7 +526,7 @@ test("exact-ref runner rejects local URL rewrites and malformed Git refs", () =>
   } finally { rmSync(fx.root, { recursive: true, force: true }); }
 });
 
-test("exact-ref runner permits only the owner-authorized destinations for RStaff/cart-agent", () => {
+test("exact-ref runner permits only owner-authorized repository/ref pairs", () => {
   const authorized = fixture();
   try {
     authorized.makeManifest(pr133Authorization());
@@ -558,6 +616,20 @@ test("exact-ref runner permits only the owner-authorized destinations for RStaff
     assert.doesNotMatch(`${result.stdout}${result.stderr}`, /PUSH_BLOCKED_(?:AUTHORIZATION|DESTINATION_REF)/);
   } finally { rmSync(staffordNextNode24Followup.root, { recursive: true, force: true }); }
 
+  for (const [name, authorization] of [
+    ["cart-agent database TLS", dbCartAuthorization()],
+    ["StaffordNext database TLS", dbStaffordNextAuthorization()],
+    ["staffordos-core database TLS", dbStaffordosCoreAuthorization()],
+  ]) {
+    const accepted = fixture();
+    try {
+      accepted.makeManifest(authorization);
+      const result = invoke(accepted);
+      assert.notEqual(result.status, 0, name);
+      assert.doesNotMatch(`${result.stdout}${result.stderr}`, /PUSH_BLOCKED_(?:AUTHORIZATION|DESTINATION_REF)/, name);
+    } finally { rmSync(accepted.root, { recursive: true, force: true }); }
+  }
+
   for (const [name, overrides] of [
     ["other careos ref", { destinationRef: "refs/heads/careos/another-branch", canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],
     ["same ref in another repository", { destinationRef: "refs/heads/careos/migration-runner-v1", canonicalRemoteIdentity: "https://github.com/RStaff/another-repository.git" }],
@@ -566,6 +638,13 @@ test("exact-ref runner permits only the owner-authorized destinations for RStaff
     ["neighbor security release ref", { destinationRef: "refs/heads/careos/staffordnext-security-release-20261027-other", canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],
     ["Node 24 ref in another repository", { destinationRef: "refs/heads/careos/staffordnext-node24-20261027", canonicalRemoteIdentity: "https://github.com/RStaff/another-repository.git" }],
     ["neighbor Node 24 ref", { destinationRef: "refs/heads/careos/staffordnext-node24-20261027-other", canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],
+    ["neighbor cart database TLS ref", { ...dbCartAuthorization(), destinationRef: "refs/heads/careos/db-security-cart-agent-20261028-other" }],
+    ["cart database TLS ref in another repository", { ...dbCartAuthorization(), canonicalRemoteIdentity: "https://github.com/RStaff/another-repository.git" }],
+    ["neighbor StaffordNext database TLS ref", { ...dbStaffordNextAuthorization(), destinationRef: "refs/heads/careos/db-security-staffordnext-20261028-other" }],
+    ["StaffordNext database TLS ref in another repository", { ...dbStaffordNextAuthorization(), canonicalRemoteIdentity: "https://github.com/RStaff/another-repository.git" }],
+    ["neighbor staffordos-core database TLS ref", { ...dbStaffordosCoreAuthorization(), destinationRef: "refs/heads/security/db-tls-staffordos-core-20261028-other" }],
+    ["staffordos-core database TLS ref in cart-agent", { ...dbStaffordosCoreAuthorization(), canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],
+    ["cart database TLS ref in staffordos-core", { ...dbCartAuthorization(), canonicalRemoteIdentity: "https://github.com/RStaff/staffordos-core.git" }],
     ["existing governed namespace on official repository", { destinationRef: "refs/heads/staffordos/another-branch", canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],
   ]) {
     const rejected = fixture();

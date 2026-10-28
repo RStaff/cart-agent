@@ -82,13 +82,17 @@ for field, code in [("sourceCommitSha","PUSH_BLOCKED_SOURCE_SHA"),("sourceTreeSh
 if value["noForce"] is not True: reject("PUSH_BLOCKED_FORCE_POLICY")
 destination = value["destinationRef"]
 test_mode = sys.argv[3] == "1"
-official_remote = value["canonicalRemoteIdentity"] == "https://github.com/RStaff/cart-agent.git"
-pr133_legacy_destination = destination == "refs/heads/careos/migration-runner-v1" and official_remote
-scanner_repair_destination = destination == "refs/heads/careos/secret-scan-scope-20261027" and official_remote
-security_release_destination = destination == "refs/heads/careos/staffordnext-security-release-20261027" and official_remote
-staffordnext_node24_destination = destination == "refs/heads/careos/staffordnext-node24-20261027" and official_remote
-if official_remote:
-    if not (pr133_legacy_destination or scanner_repair_destination or security_release_destination or staffordnext_node24_destination): reject("PUSH_BLOCKED_DESTINATION_REF")
+cart_agent_remote = value["canonicalRemoteIdentity"] == "https://github.com/RStaff/cart-agent.git"
+staffordos_core_remote = value["canonicalRemoteIdentity"] == "https://github.com/RStaff/staffordos-core.git"
+pr133_legacy_destination = destination == "refs/heads/careos/migration-runner-v1" and cart_agent_remote
+scanner_repair_destination = destination == "refs/heads/careos/secret-scan-scope-20261027" and cart_agent_remote
+security_release_destination = destination == "refs/heads/careos/staffordnext-security-release-20261027" and cart_agent_remote
+staffordnext_node24_destination = destination == "refs/heads/careos/staffordnext-node24-20261027" and cart_agent_remote
+db_cart_destination = destination == "refs/heads/careos/db-security-cart-agent-20261028" and cart_agent_remote
+db_staffordnext_destination = destination == "refs/heads/careos/db-security-staffordnext-20261028" and cart_agent_remote
+db_staffordos_core_destination = destination == "refs/heads/security/db-tls-staffordos-core-20261028" and staffordos_core_remote
+if cart_agent_remote or staffordos_core_remote:
+    if not (pr133_legacy_destination or scanner_repair_destination or security_release_destination or staffordnext_node24_destination or db_cart_destination or db_staffordnext_destination or db_staffordos_core_destination): reject("PUSH_BLOCKED_DESTINATION_REF")
 elif not test_mode:
     reject("PUSH_BLOCKED_DESTINATION_REF")
 elif "://" in value["canonicalRemoteIdentity"] or value["canonicalRemoteIdentity"].startswith("git@"):
@@ -253,6 +257,59 @@ if staffordnext_node24_destination:
     }
     if not any(all(value[key] == expected for key, expected in authorized.items()) for authorized in (initial, review_followup)):
         reject("PUSH_BLOCKED_AUTHORIZATION")
+if db_cart_destination:
+    authorized = {
+        "remoteName": "origin",
+        "sourceCommitSha": "e4b34c38b2db7f3346950e2e8a2ac08cc7a6ef92",
+        "sourceTreeSha": "e0ecd9ebcaf5f5fda47e825d5227ac871ae3c896",
+        "expectedParentSha": "3fe5438b8eb43d2b8ebd19ab0e4725927b49737d",
+        "destinationPrecondition": "ABSENT",
+        "expectedDestinationSha": None,
+        "authorizationRef": "db-security-cart-agent.owner-authorized-publication.2026-10-28",
+        "approvedFiles": [
+            {"path":"web/src/lib/packetRepository.js","mode":"100644","sha256":"1366b6247eac50bce3a1e03a08ae9ed5745557bc67eb2c61db08e54a5e461216"},
+            {"path":"web/src/lib/postgresConnection.js","mode":"100644","sha256":"944e49f62f98f2edf97f17bc1686e042d2a7b3a57900de82f4148c9d6aa5ec63"},
+            {"path":"web/src/lib/postgresConnection.test.js","mode":"100644","sha256":"82498387c0aaa648b693337fbdfe87263bbfdfa81f6fbb3fb94e291a2afba47f"},
+            {"path":"web/src/routes/checkoutEventProof.esm.js","mode":"100644","sha256":"42ff4ec412a536a0d8e5d83766ad938a92a9bd006d71ccb795fd7b570cf687a2"},
+            {"path":"web/src/routes/merchantSummary.esm.js","mode":"100644","sha256":"b127c931cf61e37f136ba3ffb6169c666a391322ede02e13c5c58281e6c603b8"},
+            {"path":"web/src/routes/recoveryTrigger.esm.js","mode":"100644","sha256":"0dba64365ec56eb66431bf6b6fdc041ff4671c08446e2b6224eb08efa40bae5e"},
+        ],
+    }
+    if any(value[key] != expected for key, expected in authorized.items()): reject("PUSH_BLOCKED_AUTHORIZATION")
+if db_staffordnext_destination:
+    authorized = {
+        "remoteName": "origin",
+        "sourceCommitSha": "b93f1465b8c603bd8fc347d5360b3b645b853d5e",
+        "sourceTreeSha": "474f21527883bcdf6279c8a0ebbf55e6f74ee53e",
+        "expectedParentSha": "6e7323f3f19dcd0788f320c9d53def50c6dfef9d",
+        "destinationPrecondition": "ABSENT",
+        "expectedDestinationSha": None,
+        "authorizationRef": "db-security-staffordnext.owner-authorized-publication.2026-10-28",
+        "approvedFiles": [
+            {"path":"staffordos/ui/operator-frontend/careeros-beta/lib/career/careerP0Postgres.mjs","mode":"100644","sha256":"ba002076e1e62c75758de105ec7c32748fd70dcfad1bb388667fbe8354078049"},
+            {"path":"staffordos/ui/operator-frontend/careeros-beta/lib/career/postgresConnection.mjs","mode":"100644","sha256":"d9363a312df53d5f7461b94832f4c7b9432682f44743abab8ce3620c60faca41"},
+            {"path":"staffordos/ui/operator-frontend/careeros-beta/lib/career/postgresConnection.test.mjs","mode":"100644","sha256":"9cacccddbdccb67860034278ee859ab80a0ac66c9302298277b00c66ab740f2a"},
+            {"path":"staffordos/ui/operator-frontend/careeros-beta/scripts/start-careeros.mjs","mode":"100644","sha256":"c89dbdd031bd90cdbe82317dc8e58340256c777fa8edbcb94c7ea2d8c527bac0"},
+        ],
+    }
+    if any(value[key] != expected for key, expected in authorized.items()): reject("PUSH_BLOCKED_AUTHORIZATION")
+if db_staffordos_core_destination:
+    authorized = {
+        "remoteName": "origin",
+        "sourceCommitSha": "c534f903627a8c98920db34d4800af60b9211823",
+        "sourceTreeSha": "66aa7b6e656a94e9231354e94df4518d3ae7dc76",
+        "expectedParentSha": "b21c91bf0214d02d4b6c257560c5d1e3b2fd19bc",
+        "destinationPrecondition": "ABSENT",
+        "expectedDestinationSha": None,
+        "authorizationRef": "db-security-staffordos-core.owner-authorized-publication.2026-10-28",
+        "approvedFiles": [
+            {"path":"package.json","mode":"100644","sha256":"d33ed5e9563088e93b78621042284d5e94881f6aae000893d6174483411bd173"},
+            {"path":"src/postgresConnection.test.ts","mode":"100644","sha256":"3a097b9a1189c9dab21641524193e0ed6a766e59cd9e1d20f1e67cccbc486bb5"},
+            {"path":"src/postgresConnection.ts","mode":"100644","sha256":"4bcdd0f2cd675fb53acd868d0aef4ab397f69b4c15419e0217a54ed174b11a9e"},
+            {"path":"src/server.ts","mode":"100644","sha256":"54342820f98b34f20660508303ea91f3ed7b0ce01ec2d94683fed63b6b6211d9"},
+        ],
+    }
+    if any(value[key] != expected for key, expected in authorized.items()): reject("PUSH_BLOCKED_AUTHORIZATION")
 Path(sys.argv[2]).write_text(json.dumps(value, ensure_ascii=True, separators=(",", ":")), encoding="ascii")
 PY
 then
@@ -284,6 +341,18 @@ fi
 STAFFORDNEXT_NODE24_DESTINATION=0
 if [ "$DEST" = "refs/heads/careos/staffordnext-node24-20261027" ] && [ "$REMOTE_ID" = "https://github.com/RStaff/cart-agent.git" ]; then
   STAFFORDNEXT_NODE24_DESTINATION=1
+fi
+DB_CART_DESTINATION=0
+if [ "$DEST" = "refs/heads/careos/db-security-cart-agent-20261028" ] && [ "$REMOTE_ID" = "https://github.com/RStaff/cart-agent.git" ]; then
+  DB_CART_DESTINATION=1
+fi
+DB_STAFFORDNEXT_DESTINATION=0
+if [ "$DEST" = "refs/heads/careos/db-security-staffordnext-20261028" ] && [ "$REMOTE_ID" = "https://github.com/RStaff/cart-agent.git" ]; then
+  DB_STAFFORDNEXT_DESTINATION=1
+fi
+DB_STAFFORDOS_CORE_DESTINATION=0
+if [ "$DEST" = "refs/heads/security/db-tls-staffordos-core-20261028" ] && [ "$REMOTE_ID" = "https://github.com/RStaff/staffordos-core.git" ]; then
+  DB_STAFFORDOS_CORE_DESTINATION=1
 fi
 
 TEST_LOCAL_FAILURE=0
@@ -576,6 +645,8 @@ remote_ref() { "$GIT_BIN" -C "$NETWORK_REPO" ls-remote --refs "$REMOTE_ID" "$1" 
 BASE_REF="refs/heads/careeros/private-beta"
 if [ "$SCANNER_REPAIR_DESTINATION" = 1 ] || [ "$SECURITY_RELEASE_DESTINATION" = 1 ]; then BASE_REF="refs/heads/careeros/recovery-17b07030-20261026"; fi
 if [ "$STAFFORDNEXT_NODE24_DESTINATION" = 1 ]; then BASE_REF="refs/heads/careos/staffordnext-security-release-20261027"; fi
+if [ "$DB_CART_DESTINATION" = 1 ] || [ "$DB_STAFFORDOS_CORE_DESTINATION" = 1 ]; then BASE_REF="refs/heads/main"; fi
+if [ "$DB_STAFFORDNEXT_DESTINATION" = 1 ]; then BASE_REF="refs/heads/careos/staffordnext-security-release-20261027"; fi
 BEFORE="$RUNNER_TMP/before"; AFTER="$RUNNER_TMP/after"; if ! snapshot "$BEFORE"; then printf '%s\n' PUSH_BLOCKED_REMOTE_STATE; exit 1; fi
 BASE_BEFORE="$(remote_ref "$BASE_REF")"
 if [ "$PR133_LEGACY_DESTINATION" = 1 ]; then
