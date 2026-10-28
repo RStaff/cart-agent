@@ -51,12 +51,14 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 validate_path() {
   local path="$1"
   case "$path" in
+    .github/workflows/staffordnext-node-runtime.yml)
+      ;;
     *.prisma|*/prisma/migrations/*|*/migrations/*|*.sql|*.env|*.env.*|*.pem|*.key|*.crt|*.cer|*.p12|*.pfx|*.dump|*.tar|*.log|.next/*|*/.next/*|node_modules/*|*/node_modules/*|staffordos/execution/output/*|staffordos/operator_daemon/output/*|staffordos/shopifixer/*|staffordos/abando/*|web/*|.github/*)
       fail "forbidden path in promotion scope"
       ;;
   esac
   case "$path" in
-    staffordos/ui/operator-frontend/careeros-beta/*|staffordos/ui/operator-frontend/app/api/operator/*|staffordos/ui/operator-frontend/app/operator/*|staffordos/ui/operator-frontend/app/os/*|staffordos/ui/operator-frontend/lib/operator/*|staffordos/ui/operator-frontend/components/operator/*|staffordos/ui/operator-frontend/app/globals.css|staffordos/operator-issuer/*|staffordos/reconciliation/*|staffordos/architecture/S008_01_EXISTING_OPERATOR_UI_AND_NEW_OS_SHELL_RECONCILIATION.md|staffordos/governance/STAFFORDOS_CANONICAL_UI_AUTHORITY_CONTRACT_V1.md|staffordos/governance/STAFFORDOS_CANONICAL_UI_CAPABILITY_MAP_V1.md|staffordos/governance/STAFFORDOS_V1_CAREEROS_PROMOTION_DIFFERENTIAL_BASELINE_AUTHORITY_V1.json|staffordos/ui/operator-frontend/CAREEROS_V1_PRIVATE_BETA_DEFINITION_OF_DONE.md)
+    .github/workflows/staffordnext-node-runtime.yml|staffordos/ui/operator-frontend/careeros-beta/*|staffordos/ui/operator-frontend/app/api/operator/*|staffordos/ui/operator-frontend/app/operator/*|staffordos/ui/operator-frontend/app/os/*|staffordos/ui/operator-frontend/lib/operator/*|staffordos/ui/operator-frontend/components/operator/*|staffordos/ui/operator-frontend/app/globals.css|staffordos/operator-issuer/*|staffordos/reconciliation/*|staffordos/architecture/S008_01_EXISTING_OPERATOR_UI_AND_NEW_OS_SHELL_RECONCILIATION.md|staffordos/governance/STAFFORDOS_CANONICAL_UI_AUTHORITY_CONTRACT_V1.md|staffordos/governance/STAFFORDOS_CANONICAL_UI_CAPABILITY_MAP_V1.md|staffordos/governance/STAFFORDOS_V1_CAREEROS_PROMOTION_DIFFERENTIAL_BASELINE_AUTHORITY_V1.json|staffordos/ui/operator-frontend/CAREEROS_V1_PRIVATE_BETA_DEFINITION_OF_DONE.md)
       ;;
     *)
       fail "unexpected path in promotion scope"
