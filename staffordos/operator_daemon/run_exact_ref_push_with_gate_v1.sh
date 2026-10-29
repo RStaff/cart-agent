@@ -101,13 +101,18 @@ staffordnext_node24_destination = destination == "refs/heads/careos/staffordnext
 db_cart_destination = destination == "refs/heads/careos/db-security-cart-agent-20261028" and cart_agent_remote
 db_staffordnext_destination = destination == "refs/heads/careos/db-security-staffordnext-20261028" and cart_agent_remote
 db_staffordos_core_destination = destination == "refs/heads/security/db-tls-staffordos-core-20261028" and staffordos_core_remote
+synthetic_db_tls_destination = test_mode and destination in (
+    "refs/heads/careos/db-security-cart-agent-20261028",
+    "refs/heads/careos/db-security-staffordnext-20261028",
+    "refs/heads/security/db-tls-staffordos-core-20261028",
+)
 if cart_agent_remote or staffordos_core_remote:
     if not (pr133_legacy_destination or scanner_repair_destination or security_release_destination or staffordnext_node24_destination or db_cart_destination or db_staffordnext_destination or db_staffordos_core_destination): reject("PUSH_BLOCKED_DESTINATION_REF")
 elif not test_mode:
     reject("PUSH_BLOCKED_DESTINATION_REF")
 elif "://" in value["canonicalRemoteIdentity"] or value["canonicalRemoteIdentity"].startswith("git@"):
     reject("PUSH_BLOCKED_DESTINATION_REF")
-elif not re.fullmatch(r"refs/heads/(?:careeros|staffordos)/.+", destination):
+elif not synthetic_db_tls_destination and not re.fullmatch(r"refs/heads/(?:careeros|staffordos)/.+", destination):
     reject("PUSH_BLOCKED_DESTINATION_REF")
 segments = destination.split("/")
 if len(segments) < 4 or any(not re.fullmatch(r"[A-Za-z0-9_][A-Za-z0-9._-]*", segment) or segment.endswith(".") or segment.endswith(".lock") or segment in (".", "..") for segment in segments[2:]): reject("PUSH_BLOCKED_DESTINATION_REF")
@@ -407,6 +412,7 @@ DB_STAFFORDOS_CORE_DESTINATION=0
 if [ "$DEST" = "refs/heads/security/db-tls-staffordos-core-20261028" ] && [ "$REMOTE_ID" = "https://github.com/RStaff/staffordos-core.git" ]; then
   DB_STAFFORDOS_CORE_DESTINATION=1
 fi
+DB_TLS_TEST_PRODUCTION_BASE=""
 
 TEST_LOCAL_FAILURE=0
 if [ "$TEST_MODE" = 1 ]; then
@@ -443,6 +449,19 @@ PY
   REMOTE_ID="$(printf '%s\n' "$SYNTHETIC_PATHS" | sed -n '2p')"
   TEST_CONTROL="$REPO_ROOT/.staffordos-exact-ref-test-control"
   [ -f "$TEST_CONTROL" ] && [ ! -L "$TEST_CONTROL" ] || { printf '%s\n' PUSH_BLOCKED_SYNTHETIC_BOUNDARY; exit 1; }
+  DB_TLS_TEST_PROFILE="$(sed -n 's/^db-tls-profile=//p' "$TEST_CONTROL")"
+  DB_TLS_TEST_PRODUCTION_BASE="$(sed -n 's/^db-tls-production-base=//p' "$TEST_CONTROL")"
+  if [ -n "$DB_TLS_TEST_PROFILE" ] || [ -n "$DB_TLS_TEST_PRODUCTION_BASE" ]; then
+    [ "$(grep -c '^db-tls-profile=' "$TEST_CONTROL")" = 1 ] &&
+      [ "$(grep -c '^db-tls-production-base=' "$TEST_CONTROL")" = 1 ] &&
+      printf '%s' "$DB_TLS_TEST_PRODUCTION_BASE" | grep -Eq '^[a-f0-9]{40}$' || { printf '%s\n' PUSH_BLOCKED_SYNTHETIC_BOUNDARY; exit 1; }
+    case "$DB_TLS_TEST_PROFILE:$DEST" in
+      cart:refs/heads/careos/db-security-cart-agent-20261028) DB_CART_DESTINATION=1 ;;
+      staffordnext:refs/heads/careos/db-security-staffordnext-20261028) DB_STAFFORDNEXT_DESTINATION=1 ;;
+      staffordos-core:refs/heads/security/db-tls-staffordos-core-20261028) DB_STAFFORDOS_CORE_DESTINATION=1 ;;
+      *) printf '%s\n' PUSH_BLOCKED_SYNTHETIC_BOUNDARY; exit 1 ;;
+    esac
+  fi
   printf '%s\n' "$RUNNER_TMP" > "$TEST_CONTROL.tmp-path"
   TRACE_FILE="$RUNNER_TMP/trace2.json"
   (set -C; : > "$TRACE_FILE") 2>/dev/null || { printf '%s\n' PUSH_BLOCKED_SYNTHETIC_BOUNDARY; exit 1; }
@@ -696,14 +715,19 @@ validate_commit_contents "$NETWORK_REPO"
 snapshot() { "$GIT_BIN" -C "$NETWORK_REPO" ls-remote --heads --tags "$REMOTE_ID" 2>/dev/null | LC_ALL=C sort > "$1"; }
 remote_ref() { "$GIT_BIN" -C "$NETWORK_REPO" ls-remote --refs "$REMOTE_ID" "$1" 2>/dev/null | awk 'NF {print $1; exit}' || true; }
 BASE_REF="refs/heads/careeros/private-beta"
+EXPECTED_BASE_SHA=""
 if [ "$SCANNER_REPAIR_DESTINATION" = 1 ] || [ "$SECURITY_RELEASE_DESTINATION" = 1 ]; then BASE_REF="refs/heads/careeros/recovery-17b07030-20261026"; fi
 if [ "$STAFFORDNEXT_NODE24_DESTINATION" = 1 ]; then BASE_REF="refs/heads/careos/staffordnext-security-release-20261027"; fi
-if [ "$DB_CART_DESTINATION" = 1 ] || [ "$DB_STAFFORDOS_CORE_DESTINATION" = 1 ]; then BASE_REF="refs/heads/main"; fi
-if [ "$DB_STAFFORDNEXT_DESTINATION" = 1 ]; then BASE_REF="refs/heads/careos/staffordnext-security-release-20261027"; fi
+if [ "$DB_CART_DESTINATION" = 1 ]; then BASE_REF="refs/heads/main"; EXPECTED_BASE_SHA="3fe5438b8eb43d2b8ebd19ab0e4725927b49737d"; fi
+if [ "$DB_STAFFORDNEXT_DESTINATION" = 1 ]; then BASE_REF="refs/heads/careos/staffordnext-security-release-20261027"; EXPECTED_BASE_SHA="6e7323f3f19dcd0788f320c9d53def50c6dfef9d"; fi
+if [ "$DB_STAFFORDOS_CORE_DESTINATION" = 1 ]; then BASE_REF="refs/heads/main"; EXPECTED_BASE_SHA="b21c91bf0214d02d4b6c257560c5d1e3b2fd19bc"; fi
+if [ -n "$DB_TLS_TEST_PRODUCTION_BASE" ]; then EXPECTED_BASE_SHA="$DB_TLS_TEST_PRODUCTION_BASE"; fi
 BEFORE="$RUNNER_TMP/before"; AFTER="$RUNNER_TMP/after"; if ! snapshot "$BEFORE"; then printf '%s\n' PUSH_BLOCKED_REMOTE_STATE; exit 1; fi
 BASE_BEFORE="$(remote_ref "$BASE_REF")"
 if [ "$PR133_LEGACY_DESTINATION" = 1 ]; then
   [ -n "$BASE_BEFORE" ] || { printf '%s\n' PUSH_BLOCKED_BASE; exit 1; }
+elif [ -n "$EXPECTED_BASE_SHA" ]; then
+  [ "$BASE_BEFORE" = "$EXPECTED_BASE_SHA" ] || { printf '%s\n' PUSH_BLOCKED_BASE; exit 1; }
 elif [ "$SCANNER_REPAIR_DESTINATION" = 1 ] && [ "$STATE" = "EXACT_SHA" ]; then
   [ "$BASE_BEFORE" = "17b07030ce0dc8289b6efbd92ef60de8151e2976" ] || { printf '%s\n' PUSH_BLOCKED_BASE; exit 1; }
 elif [ "$SECURITY_RELEASE_DESTINATION" = 1 ] && [ "$STATE" = "EXACT_SHA" ]; then

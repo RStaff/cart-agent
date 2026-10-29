@@ -31,8 +31,10 @@ test("database TLS destinations pin their exact repository and current productio
   assert.match(runnerSource, /refs\/heads\/careos\/db-security-staffordnext-20261028/);
   assert.match(runnerSource, /refs\/heads\/security\/db-tls-staffordos-core-20261028/);
   assert.match(runnerSource, /https:\/\/github\.com\/RStaff\/staffordos-core\.git/);
-  assert.match(runnerSource, /DB_CART_DESTINATION.*DB_STAFFORDOS_CORE_DESTINATION.*BASE_REF="refs\/heads\/main"/s);
-  assert.match(runnerSource, /DB_STAFFORDNEXT_DESTINATION.*BASE_REF="refs\/heads\/careos\/staffordnext-security-release-20261027"/s);
+  assert.match(runnerSource, /DB_CART_DESTINATION" = 1.*BASE_REF="refs\/heads\/main"; EXPECTED_BASE_SHA="3fe5438b8eb43d2b8ebd19ab0e4725927b49737d"/s);
+  assert.match(runnerSource, /DB_STAFFORDNEXT_DESTINATION" = 1.*BASE_REF="refs\/heads\/careos\/staffordnext-security-release-20261027"; EXPECTED_BASE_SHA="6e7323f3f19dcd0788f320c9d53def50c6dfef9d"/s);
+  assert.match(runnerSource, /DB_STAFFORDOS_CORE_DESTINATION" = 1.*BASE_REF="refs\/heads\/main"; EXPECTED_BASE_SHA="b21c91bf0214d02d4b6c257560c5d1e3b2fd19bc"/s);
+  assert.match(runnerSource, /\[ -n "\$EXPECTED_BASE_SHA" \].*\[ "\$BASE_BEFORE" = "\$EXPECTED_BASE_SHA" \]/s);
 });
 const pr133Authorization = () => ({
   canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git",
@@ -340,6 +342,42 @@ function assertNoPublicationOrAuthorizationSideEffects(fx) {
 function enableSyntheticControl(fx, lines) {
   writeFileSync(join(fx.repo, ".staffordos-exact-ref-test-control"), `${lines.join("\n")}\n`);
     writeFileSync(join(fx.repo, ".git", "info", "exclude"), ".staffordos-exact-ref-test-control*\n.staffordos-exact-ref-test-gh*\n.staffordos-exact-ref-test-cellar*\n", { flag: "a" });
+}
+
+function tlsFollowupPolicyFixture(profile) {
+  const policy = {
+    cart: {
+      destinationRef: "refs/heads/careos/db-security-cart-agent-20261028",
+      baseRef: "refs/heads/main",
+    },
+    staffordnext: {
+      destinationRef: "refs/heads/careos/db-security-staffordnext-20261028",
+      baseRef: "refs/heads/careos/staffordnext-security-release-20261027",
+    },
+    "staffordos-core": {
+      destinationRef: "refs/heads/security/db-tls-staffordos-core-20261028",
+      baseRef: "refs/heads/main",
+    },
+  }[profile];
+  const fx = fixture();
+  const predecessor = fx.source;
+  git(fx.repo, ["push", "origin", `${predecessor}:${policy.destinationRef}`]);
+  git(fx.remote, ["update-ref", policy.baseRef, fx.parent]);
+  writeFileSync(join(fx.repo, "approved.txt"), `synthetic ${profile} follow-up\n`);
+  git(fx.repo, ["add", "approved.txt"]);
+  git(fx.repo, ["commit", "-m", `synthetic ${profile} follow-up`]);
+  const source = git(fx.repo, ["rev-parse", "HEAD"]);
+  const tree = git(fx.repo, ["rev-parse", "HEAD^{tree}"]);
+  fx.makeManifest({
+    sourceCommitSha: source,
+    sourceTreeSha: tree,
+    expectedParentSha: predecessor,
+    destinationRef: policy.destinationRef,
+    destinationPrecondition: "EXACT_SHA",
+    expectedDestinationSha: predecessor,
+  });
+  enableSyntheticControl(fx, [`db-tls-profile=${profile}`, `db-tls-production-base=${fx.parent}`]);
+  return { ...fx, ...policy, predecessor, source, tree };
 }
 
 async function waitFor(path) {
@@ -790,6 +828,64 @@ test("database TLS follow-up authorizations reject altered exact content binding
     } finally {
       rmSync(fx.root, { recursive: true, force: true });
     }
+  }
+});
+
+test("database TLS follow-ups keep production bases separate from destination predecessors", () => {
+  for (const profile of ["cart", "staffordnext", "staffordos-core"]) {
+    const accepted = tlsFollowupPolicyFixture(profile);
+    try {
+      const result = invoke(accepted);
+      assert.equal(result.status, 0, `${profile}: ${result.stdout}${result.stderr}`);
+      assert.equal(result.stdout.trim(), "PUSH_CONFIRMED", profile);
+      assert.equal(git(accepted.remote, ["show-ref", "--hash", accepted.destinationRef]), accepted.source, profile);
+      assert.equal(git(accepted.remote, ["show-ref", "--hash", accepted.baseRef]), accepted.parent, profile);
+    } finally { rmSync(accepted.root, { recursive: true, force: true }); }
+
+    const wrongBase = tlsFollowupPolicyFixture(profile);
+    try {
+      git(wrongBase.remote, ["update-ref", wrongBase.baseRef, wrongBase.predecessor]);
+      const result = invoke(wrongBase);
+      assert.notEqual(result.status, 0, profile);
+      assert.match(`${result.stdout}${result.stderr}`, /PUSH_BLOCKED_BASE/, profile);
+      assert.equal(git(wrongBase.remote, ["show-ref", "--hash", wrongBase.destinationRef]), wrongBase.predecessor, profile);
+    } finally { rmSync(wrongBase.root, { recursive: true, force: true }); }
+
+    const wrongPredecessor = tlsFollowupPolicyFixture(profile);
+    try {
+      wrongPredecessor.makeManifest({
+        sourceCommitSha: wrongPredecessor.source,
+        sourceTreeSha: wrongPredecessor.tree,
+        expectedParentSha: wrongPredecessor.predecessor,
+        destinationRef: wrongPredecessor.destinationRef,
+        destinationPrecondition: "EXACT_SHA",
+        expectedDestinationSha: wrongPredecessor.parent,
+      });
+      const result = invoke(wrongPredecessor);
+      assert.notEqual(result.status, 0, profile);
+      assert.match(`${result.stdout}${result.stderr}`, /PUSH_BLOCKED_DESTINATION/, profile);
+      assert.equal(git(wrongPredecessor.remote, ["show-ref", "--hash", wrongPredecessor.destinationRef]), wrongPredecessor.predecessor, profile);
+    } finally { rmSync(wrongPredecessor.root, { recursive: true, force: true }); }
+  }
+});
+
+test("database TLS follow-ups reject neighboring refs and swapped repositories", () => {
+  for (const [name, manifest] of [
+    ["cart neighboring ref", { ...dbCartFollowupAuthorization(), destinationRef: "refs/heads/careos/db-security-cart-agent-20261028-neighbor" }],
+    ["StaffordNext neighboring ref", { ...dbStaffordNextFollowupAuthorization(), destinationRef: "refs/heads/careos/db-security-staffordnext-20261028-neighbor" }],
+    ["staffordos-core neighboring ref", { ...dbStaffordosCoreFollowupAuthorization(), destinationRef: "refs/heads/security/db-tls-staffordos-core-20261028-neighbor" }],
+    ["cart repository swap", { ...dbCartFollowupAuthorization(), canonicalRemoteIdentity: "https://github.com/RStaff/staffordos-core.git" }],
+    ["StaffordNext repository swap", { ...dbStaffordNextFollowupAuthorization(), canonicalRemoteIdentity: "https://github.com/RStaff/staffordos-core.git" }],
+    ["staffordos-core repository swap", { ...dbStaffordosCoreFollowupAuthorization(), canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],
+  ]) {
+    const fx = fixture();
+    try {
+      fx.makeManifest(manifest);
+      const result = invoke(fx);
+      assert.notEqual(result.status, 0, name);
+      assert.match(`${result.stdout}${result.stderr}`, /PUSH_BLOCKED_DESTINATION_REF/, name);
+      assert.equal(gitMaybe(fx.remote, ["show-ref", manifest.destinationRef]), "", name);
+    } finally { rmSync(fx.root, { recursive: true, force: true }); }
   }
 });
 
