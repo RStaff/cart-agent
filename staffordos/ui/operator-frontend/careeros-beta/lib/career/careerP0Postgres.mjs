@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import pg from "pg";
 import { contextSummary, extractContextClaims, normalizeContextCorrection } from "./contextClaims.mjs";
+import { postgresConnectionOptions } from "./postgresConnection.mjs";
 
 const { Pool } = pg;
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 30;
@@ -27,7 +28,7 @@ function candidate(row) { return row ? { candidateFactId: row["candidateFactId"]
 
 export function createCareerP0PostgresStore({ connectionString = process.env.DATABASE_URL, pool: providedPool = null } = {}) {
   if (!connectionString) throw new Error("CAREEROS_DATABASE_URL_REQUIRED");
-  const pool = providedPool || new Pool({ connectionString, max: Number(process.env.CAREEROS_DB_POOL_MAX || 10), connectionTimeoutMillis: 5000, idleTimeoutMillis: 30000 });
+  const pool = providedPool || new Pool({ ...postgresConnectionOptions(connectionString), max: Number(process.env.CAREEROS_DB_POOL_MAX || 10), connectionTimeoutMillis: 5000, idleTimeoutMillis: 30000 });
 
   async function transaction(work) { const client = await pool.connect(); try { await client.query("BEGIN"); const result = await work(client); await client.query("COMMIT"); return result; } catch (error) { await client.query("ROLLBACK"); throw error; } finally { client.release(); } }
   async function context(sessionId, client = pool) {
