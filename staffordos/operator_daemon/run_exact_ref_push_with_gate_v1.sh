@@ -303,7 +303,20 @@ if db_cart_destination:
             {"path":"web/src/lib/postgresConnection.test.js","mode":"100644","sha256":"490e0c64965d0ae27fcb67f0d9522dbfe31c5327e1e9d203becbc107d3a902d6"},
         ],
     }
-    if not any(all(value[key] == expected for key, expected in authorized.items()) for authorized in (initial, review_followup)):
+    loopback_followup = {
+        "remoteName": "origin",
+        "sourceCommitSha": "c86582f774be8fbe551ebc2c5028e72f93a0ba81",
+        "sourceTreeSha": "0545f66373f68d08618be9efd5d8961d01a6d563",
+        "expectedParentSha": "4bda3c7530f9bffb3a7dba92dcf4243c578078b7",
+        "destinationPrecondition": "EXACT_SHA",
+        "expectedDestinationSha": "4bda3c7530f9bffb3a7dba92dcf4243c578078b7",
+        "authorizationRef": "db-security-cart-agent.loopback-followup-publication.2026-10-29",
+        "approvedFiles": [
+            {"path":"web/src/lib/postgresConnection.js","mode":"100644","sha256":"c2dd2cb3b9b163858fdf48b828a8b237fcac7a4d59ed76e20094be43692e8d80"},
+            {"path":"web/src/lib/postgresConnection.test.js","mode":"100644","sha256":"ca5cbb525037f73c5298b7fa0facd228df0e43c6f9adefc840748a62b02aabdc"},
+        ],
+    }
+    if not any(all(value[key] == expected for key, expected in authorized.items()) for authorized in (initial, review_followup, loopback_followup)):
         reject("PUSH_BLOCKED_AUTHORIZATION")
 if db_staffordnext_destination:
     initial = {
@@ -334,7 +347,20 @@ if db_staffordnext_destination:
             {"path":"staffordos/ui/operator-frontend/careeros-beta/lib/career/postgresConnection.test.mjs","mode":"100644","sha256":"698ea8334847a8cc3e0de413122a9f0397956b9c60d77c947264c50b731b908a"},
         ],
     }
-    if not any(all(value[key] == expected for key, expected in authorized.items()) for authorized in (initial, review_followup)):
+    loopback_followup = {
+        "remoteName": "origin",
+        "sourceCommitSha": "3f659a8ef8064608c5c3d0f6cd19da7527016332",
+        "sourceTreeSha": "03dd5afc7c8da7bccede6c9dd9857b7d4d2f1927",
+        "expectedParentSha": "7e74f6c8ec15b8976910e81bdc48458ab27980b0",
+        "destinationPrecondition": "EXACT_SHA",
+        "expectedDestinationSha": "7e74f6c8ec15b8976910e81bdc48458ab27980b0",
+        "authorizationRef": "db-security-staffordnext.loopback-followup-publication.2026-10-29",
+        "approvedFiles": [
+            {"path":"staffordos/ui/operator-frontend/careeros-beta/lib/career/postgresConnection.mjs","mode":"100644","sha256":"cb75920530d734cc79144f1d3091a8c51136be8c48ae5281895efa62842b52af"},
+            {"path":"staffordos/ui/operator-frontend/careeros-beta/lib/career/postgresConnection.test.mjs","mode":"100644","sha256":"28bae8393ba6526c1dd5479c47e6d0d7bf2cc55fe14f09bf4123d184acb8690b"},
+        ],
+    }
+    if not any(all(value[key] == expected for key, expected in authorized.items()) for authorized in (initial, review_followup, loopback_followup)):
         reject("PUSH_BLOCKED_AUTHORIZATION")
 if db_staffordos_core_destination:
     initial = {
@@ -366,7 +392,20 @@ if db_staffordos_core_destination:
             {"path":"src/postgresConnection.ts","mode":"100644","sha256":"d6756ff1e00e2786b0685466f85e382ef1677b55ebeeea162df9c25aa8f287cf"},
         ],
     }
-    if not any(all(value[key] == expected for key, expected in authorized.items()) for authorized in (initial, review_followup)):
+    loopback_followup = {
+        "remoteName": "origin",
+        "sourceCommitSha": "e64e440d429c4b6003f83ca8bf5e05ef1288f578",
+        "sourceTreeSha": "0c9f0b2aa32617b5e00d04514e5b2732b46b3dfb",
+        "expectedParentSha": "8b3790e1dd23147e0e1a8a3d611dcc075f0dd6a9",
+        "destinationPrecondition": "EXACT_SHA",
+        "expectedDestinationSha": "8b3790e1dd23147e0e1a8a3d611dcc075f0dd6a9",
+        "authorizationRef": "db-security-staffordos-core.loopback-followup-publication.2026-10-29",
+        "approvedFiles": [
+            {"path":"src/postgresConnection.test.ts","mode":"100644","sha256":"fe167ae4e4a2e2be7e1d32c03d4c68441a4fffe879f3ba5873bfb440ec5bb475"},
+            {"path":"src/postgresConnection.ts","mode":"100644","sha256":"ab00048c2aa45be571490b2fdf6078757b50d306b28293d5c8e019151395500e"},
+        ],
+    }
+    if not any(all(value[key] == expected for key, expected in authorized.items()) for authorized in (initial, review_followup, loopback_followup)):
         reject("PUSH_BLOCKED_AUTHORIZATION")
 Path(sys.argv[2]).write_text(json.dumps(value, ensure_ascii=True, separators=(",", ":")), encoding="ascii")
 PY

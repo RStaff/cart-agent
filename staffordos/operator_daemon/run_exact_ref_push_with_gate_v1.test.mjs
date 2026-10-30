@@ -260,6 +260,45 @@ const dbStaffordosCoreFollowupAuthorization = () => ({
     { path: "src/postgresConnection.ts", mode: "100644", sha256: "d6756ff1e00e2786b0685466f85e382ef1677b55ebeeea162df9c25aa8f287cf" },
   ],
 });
+const dbCartLoopbackFollowupAuthorization = () => ({
+  ...dbCartAuthorization(),
+  sourceCommitSha: "c86582f774be8fbe551ebc2c5028e72f93a0ba81",
+  sourceTreeSha: "0545f66373f68d08618be9efd5d8961d01a6d563",
+  expectedParentSha: "4bda3c7530f9bffb3a7dba92dcf4243c578078b7",
+  destinationPrecondition: "EXACT_SHA",
+  expectedDestinationSha: "4bda3c7530f9bffb3a7dba92dcf4243c578078b7",
+  authorizationRef: "db-security-cart-agent.loopback-followup-publication.2026-10-29",
+  approvedFiles: [
+    { path: "web/src/lib/postgresConnection.js", mode: "100644", sha256: "c2dd2cb3b9b163858fdf48b828a8b237fcac7a4d59ed76e20094be43692e8d80" },
+    { path: "web/src/lib/postgresConnection.test.js", mode: "100644", sha256: "ca5cbb525037f73c5298b7fa0facd228df0e43c6f9adefc840748a62b02aabdc" },
+  ],
+});
+const dbStaffordNextLoopbackFollowupAuthorization = () => ({
+  ...dbStaffordNextAuthorization(),
+  sourceCommitSha: "3f659a8ef8064608c5c3d0f6cd19da7527016332",
+  sourceTreeSha: "03dd5afc7c8da7bccede6c9dd9857b7d4d2f1927",
+  expectedParentSha: "7e74f6c8ec15b8976910e81bdc48458ab27980b0",
+  destinationPrecondition: "EXACT_SHA",
+  expectedDestinationSha: "7e74f6c8ec15b8976910e81bdc48458ab27980b0",
+  authorizationRef: "db-security-staffordnext.loopback-followup-publication.2026-10-29",
+  approvedFiles: [
+    { path: "staffordos/ui/operator-frontend/careeros-beta/lib/career/postgresConnection.mjs", mode: "100644", sha256: "cb75920530d734cc79144f1d3091a8c51136be8c48ae5281895efa62842b52af" },
+    { path: "staffordos/ui/operator-frontend/careeros-beta/lib/career/postgresConnection.test.mjs", mode: "100644", sha256: "28bae8393ba6526c1dd5479c47e6d0d7bf2cc55fe14f09bf4123d184acb8690b" },
+  ],
+});
+const dbStaffordosCoreLoopbackFollowupAuthorization = () => ({
+  ...dbStaffordosCoreAuthorization(),
+  sourceCommitSha: "e64e440d429c4b6003f83ca8bf5e05ef1288f578",
+  sourceTreeSha: "0c9f0b2aa32617b5e00d04514e5b2732b46b3dfb",
+  expectedParentSha: "8b3790e1dd23147e0e1a8a3d611dcc075f0dd6a9",
+  destinationPrecondition: "EXACT_SHA",
+  expectedDestinationSha: "8b3790e1dd23147e0e1a8a3d611dcc075f0dd6a9",
+  authorizationRef: "db-security-staffordos-core.loopback-followup-publication.2026-10-29",
+  approvedFiles: [
+    { path: "src/postgresConnection.test.ts", mode: "100644", sha256: "fe167ae4e4a2e2be7e1d32c03d4c68441a4fffe879f3ba5873bfb440ec5bb475" },
+    { path: "src/postgresConnection.ts", mode: "100644", sha256: "ab00048c2aa45be571490b2fdf6078757b50d306b28293d5c8e019151395500e" },
+  ],
+});
 
 function fixture({ mixed = false } = {}) {
   const root = mkdtempSync(join(tmpdir(), "staffordos-exact-ref-test-"));
@@ -764,6 +803,9 @@ test("exact-ref runner permits only owner-authorized repository/ref pairs", () =
     ["cart-agent database TLS follow-up", dbCartFollowupAuthorization()],
     ["StaffordNext database TLS follow-up", dbStaffordNextFollowupAuthorization()],
     ["staffordos-core database TLS follow-up", dbStaffordosCoreFollowupAuthorization()],
+    ["cart-agent database TLS loopback follow-up", dbCartLoopbackFollowupAuthorization()],
+    ["StaffordNext database TLS loopback follow-up", dbStaffordNextLoopbackFollowupAuthorization()],
+    ["staffordos-core database TLS loopback follow-up", dbStaffordosCoreLoopbackFollowupAuthorization()],
   ]) {
     const accepted = fixture();
     try {
@@ -831,6 +873,23 @@ test("database TLS follow-up authorizations reject altered exact content binding
   }
 });
 
+test("database TLS loopback follow-ups reject incorrect predecessor leases", () => {
+  for (const [name, manifest] of [
+    ["cart predecessor", { ...dbCartLoopbackFollowupAuthorization(), expectedParentSha: "e4b34c38b2db7f3346950e2e8a2ac08cc7a6ef92" }],
+    ["StaffordNext predecessor", { ...dbStaffordNextLoopbackFollowupAuthorization(), expectedDestinationSha: "b93f1465b8c603bd8fc347d5360b3b645b853d5e" }],
+    ["staffordos-core predecessor", { ...dbStaffordosCoreLoopbackFollowupAuthorization(), expectedParentSha: "c534f903627a8c98920db34d4800af60b9211823" }],
+  ]) {
+    const fx = fixture();
+    try {
+      fx.makeManifest(manifest);
+      const result = invoke(fx);
+      assert.notEqual(result.status, 0, name);
+      assert.match(`${result.stdout}${result.stderr}`, /PUSH_BLOCKED_AUTHORIZATION/, name);
+      assert.equal(gitMaybe(fx.remote, ["show-ref", manifest.destinationRef]), "", name);
+    } finally { rmSync(fx.root, { recursive: true, force: true }); }
+  }
+});
+
 test("database TLS follow-ups keep production bases separate from destination predecessors", () => {
   for (const profile of ["cart", "staffordnext", "staffordos-core"]) {
     const accepted = tlsFollowupPolicyFixture(profile);
@@ -877,6 +936,9 @@ test("database TLS follow-ups reject neighboring refs and swapped repositories",
     ["cart repository swap", { ...dbCartFollowupAuthorization(), canonicalRemoteIdentity: "https://github.com/RStaff/staffordos-core.git" }],
     ["StaffordNext repository swap", { ...dbStaffordNextFollowupAuthorization(), canonicalRemoteIdentity: "https://github.com/RStaff/staffordos-core.git" }],
     ["staffordos-core repository swap", { ...dbStaffordosCoreFollowupAuthorization(), canonicalRemoteIdentity: "https://github.com/RStaff/cart-agent.git" }],
+    ["cart loopback neighboring ref", { ...dbCartLoopbackFollowupAuthorization(), destinationRef: "refs/heads/careos/db-security-cart-agent-20261028-loopback" }],
+    ["StaffordNext loopback neighboring ref", { ...dbStaffordNextLoopbackFollowupAuthorization(), destinationRef: "refs/heads/careos/db-security-staffordnext-20261028-loopback" }],
+    ["staffordos-core loopback neighboring ref", { ...dbStaffordosCoreLoopbackFollowupAuthorization(), destinationRef: "refs/heads/security/db-tls-staffordos-core-20261028-loopback" }],
   ]) {
     const fx = fixture();
     try {
